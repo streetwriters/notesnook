@@ -68,11 +68,12 @@
         <activity android:exported="false" android:name="com.facebook.react.devsupport.DevSettingsActivity" />
         <activity
             android:name=".ShareActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:label="@string/title_activity_share"
             android:noHistory="true"
             android:screenOrientation="unspecified"
             android:exported="true"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppThemeB">
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND" />

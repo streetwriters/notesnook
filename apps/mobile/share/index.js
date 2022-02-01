@@ -1,22 +1,25 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import { getLinkPreview } from 'link-preview-js';
 import { HTMLRootElement } from 'node-html-parser/dist/nodes/html';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
+  NativeModules,
   Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
+  UIManager,
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, { acc, Easing, timing, useValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
@@ -213,6 +216,7 @@ const NotesnookShare = ({ quicknote = false }) => {
   const insets = Platform.OS === 'android' ? { top: StatusBar.currentHeight } : useSafeAreaInsets();
   const prevAnimation = useRef(null);
   const [showSearch, setShowSearch] = useState(false);
+  const [kh, setKh] = useState(0);
 
   const animate = (opacityV, translateV) => {
     prevAnimation.current = translateV;
@@ -232,10 +236,14 @@ const NotesnookShare = ({ quicknote = false }) => {
   const onKeyboardDidShow = event => {
     let kHeight = event.endCoordinates.height;
     keyboardHeight.current = kHeight;
+    setKh(kHeight);
+    console.log('keyboard show/hide');
   };
 
   const onKeyboardDidHide = () => {
     keyboardHeight.current = 0;
+    setKh(0);
+    console.log('keyboard hide');
   };
 
   useEffect(() => {
@@ -466,33 +474,89 @@ const NotesnookShare = ({ quicknote = false }) => {
     }
   };
 
+  const Outer = Platform.OS === 'android' ? Modal : Fragment;
+
+  const outerProps =
+    Platform.OS === 'android'
+      ? {
+          animationType: 'fade',
+          transparent: true,
+          visible: true
+        }
+      : {};
+
   return (
-    <AnimatedSAV
-      style={{
-        width: width > 500 ? 500 : width,
-        height: height,
-        opacity: Platform.OS !== 'ios' ? opacity : 1,
-        alignSelf: 'center'
-      }}
-    >
-      {quicknote && !showSearch ? (
-        <View
-          style={{
-            width: '100%',
-            backgroundColor: colors.bg,
-            height: 50 + insets.top,
-            paddingTop: insets.top,
-            ...getElevation(1),
-            marginTop: -insets.top,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
-          <Button
-            type="action"
-            icon="close"
-            iconColor={colors.pri}
+    <Outer {...outerProps}>
+      <AnimatedSAV
+        style={{
+          width: width > 500 ? 500 : width,
+          height: height - kh,
+          opacity: Platform.OS !== 'ios' ? opacity : 1,
+          alignSelf: 'center',
+          justifyContent: 'flex-end'
+        }}
+      >
+        {quicknote && !showSearch ? (
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: colors.bg,
+              height: 50 + insets.top,
+              paddingTop: insets.top,
+              ...getElevation(1),
+              marginTop: -insets.top,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <Button
+              type="action"
+              icon="close"
+              iconColor={colors.pri}
+              onPress={() => {
+                if (showSearch) {
+                  console.log('hide search');
+                  setShowSearch(false);
+                  animate(1, 0);
+                } else {
+                  close();
+                }
+              }}
+              style={{
+                width: 50,
+                height: 50,
+                marginBottom: 0
+              }}
+              iconSize={25}
+            />
+
+            <Text
+              style={{
+                color: colors.pri,
+                fontSize: 17,
+                fontFamily: 'OpenSans-Regular'
+              }}
+            >
+              Quick note
+            </Text>
+
+            <Button
+              type="action"
+              icon="check"
+              iconColor={accent.color}
+              onPress={onPress}
+              style={{
+                width: 50,
+                height: 50,
+                marginBottom: 0
+              }}
+              iconSize={25}
+            />
+          </View>
+        ) : (
+          <TouchableOpacity
+            activeOpacity={1}
             onPress={() => {
               if (showSearch) {
                 console.log('hide search');
@@ -503,300 +567,257 @@ const NotesnookShare = ({ quicknote = false }) => {
               }
             }}
             style={{
-              width: 50,
-              height: 50,
-              marginBottom: 0
-            }}
-            iconSize={25}
-          />
-
-          <Text
-            style={{
-              color: colors.pri,
-              fontSize: 17,
-              fontFamily: 'OpenSans-Regular'
-            }}
-          >
-            Quick note
-          </Text>
-
-          <Button
-            type="action"
-            icon="check"
-            iconColor={accent.color}
-            onPress={onPress}
-            style={{
-              width: 50,
-              height: 50,
-              marginBottom: 0
-            }}
-            iconSize={25}
-          />
-        </View>
-      ) : (
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => {
-            if (showSearch) {
-              console.log('hide search');
-              setShowSearch(false);
-              animate(1, 0);
-            } else {
-              close();
-            }
-          }}
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute'
-          }}
-        >
-          <View
-            style={{
               width: '100%',
               height: '100%',
-              backgroundColor: 'white',
-              opacity: 0.01
+              position: 'absolute'
+            }}
+          >
+            <View
+              style={{
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'white',
+                opacity: 0.01
+              }}
+            />
+            <View />
+          </TouchableOpacity>
+        )}
+
+        {showSearch ? (
+          <Search
+            quicknote={quicknote}
+            getKeyboardHeight={() => keyboardHeight.current}
+            close={() => {
+              setShowSearch(false);
+              animate(1, 0);
             }}
           />
-          <View />
-        </TouchableOpacity>
-      )}
+        ) : null}
 
-      {showSearch ? (
-        <Search
-          quicknote={quicknote}
-          getKeyboardHeight={() => keyboardHeight.current}
-          close={() => {
-            setShowSearch(false);
-            animate(1, 0);
-          }}
-        />
-      ) : null}
-
-      <AnimatedKAV
-        enabled={!floating}
-        onLayout={event => {
-          if (prevAnimation.current === 0) return;
-          translate.setValue(event.nativeEvent.layout.height + 30);
-        }}
-        style={{
-          paddingVertical: 25,
-          backgroundColor: 'transparent',
-          marginBottom: insets.top,
-          display: showSearch ? 'none' : 'flex'
-        }}
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
-      >
         <View
           style={{
-            maxHeight: '100%',
-            paddingHorizontal: 12
+            paddingVertical: 25,
+            backgroundColor: 'transparent',
+            marginBottom: insets.top,
+            display: showSearch ? 'none' : 'flex'
           }}
         >
-          <ScrollView
-            horizontal
-            contentContainerStyle={{
-              alignItems: 'center',
-              height: 45
-            }}
-            style={{
-              width: '100%',
-              height: 35,
-              borderRadius: 10,
-              flexDirection: 'row'
-            }}
-          >
-            <Button
-              color={appendNote ? colors.nav : accent.color}
-              onPress={() => {
-                useShareStore.getState().setAppendNote(null);
-              }}
-              icon="plus"
-              iconSize={18}
-              iconColor={!appendNote ? colors.light : colors.icon}
-              title="Create new note"
-              textColor={!appendNote ? colors.light : colors.icon}
-              type="rounded"
-              textStyle={{
-                fontSize: 13
-              }}
-              style={{
-                paddingHorizontal: 12,
-                ...getElevation(1),
-                height: 35
-              }}
-            />
-
-            <Button
-              color={!appendNote ? colors.nav : accent.color}
-              onPress={() => {
-                setShowSearch(true);
-                animate(1, 1000);
-              }}
-              icon="text-short"
-              iconSize={18}
-              iconColor={appendNote ? colors.light : colors.icon}
-              title={`${appendNote ? appendNote.title.slice(0, 25) : 'Append to note'}`}
-              textColor={appendNote ? colors.light : colors.icon}
-              type="rounded"
-              textStyle={{
-                fontSize: 13
-              }}
-              style={{
-                paddingHorizontal: 12,
-                ...getElevation(1),
-                height: 35
-              }}
-            />
-          </ScrollView>
-
           <View
             style={{
-              width: '100%'
+              maxHeight: '100%',
+              paddingHorizontal: 12
             }}
           >
-            {!quicknote ? (
+            <ScrollView
+              horizontal
+              contentContainerStyle={{
+                alignItems: 'center',
+                height: 50
+              }}
+              style={{
+                width: '100%',
+                height: 50,
+                borderRadius: 10,
+                flexDirection: 'row',
+                bottom: -10
+              }}
+            >
               <Button
-                color={accent.color}
-                onPress={onPress}
-                loading={loading || loadingIntent}
-                icon="check"
-                iconSize={22}
-                iconColor={colors.light}
+                color={colors.nav}
+                onPress={() => {
+                  useShareStore.getState().setAppendNote(null);
+                }}
+                icon="plus"
+                iconSize={18}
+                iconColor={!appendNote ? accent.color : colors.icon}
+                title="New note"
+                textColor={!appendNote ? accent.color : colors.icon}
+                type="rounded"
+                textStyle={{
+                  fontSize: 13
+                }}
                 style={{
-                  position: 'absolute',
-                  zIndex: 999,
-                  ...getElevation(10),
-                  right: 24,
-                  bottom: -25,
-                  paddingHorizontal: 24,
-                  height: 35,
-                  borderRadius: 100
+                  paddingHorizontal: 12,
+                  ...getElevation(1),
+                  height: 35
                 }}
               />
-            ) : null}
+
+              <Button
+                color={colors.nav}
+                onPress={() => {
+                  setShowSearch(true);
+                  animate(1, 1000);
+                }}
+                icon="text-short"
+                iconSize={18}
+                iconColor={appendNote ? accent.color : colors.icon}
+                title={`${appendNote ? appendNote.title.slice(0, 25) : 'Append to note'}`}
+                textColor={appendNote ? accent.color : colors.icon}
+                type="rounded"
+                textStyle={{
+                  fontSize: 13
+                }}
+                style={{
+                  paddingHorizontal: 12,
+                  ...getElevation(1),
+                  height: 35
+                }}
+              />
+            </ScrollView>
 
             <View
               style={{
-                marginTop: 10,
-                minHeight: 100,
-                borderRadius: 10,
-                ...getElevation(quicknote ? 1 : 5),
-                backgroundColor: colors.bg,
-                overflow: 'hidden'
+                width: '100%'
               }}
             >
               <View
                 style={{
-                  width: '100%',
-                  height: height * 0.25,
-                  paddingBottom: 15,
-                  borderRadius: 10
+                  marginTop: 10,
+                  minHeight: 100,
+                  borderRadius: 10,
+                  ...getElevation(quicknote ? 1 : 5),
+                  backgroundColor: colors.bg,
+                  overflow: 'hidden'
                 }}
               >
-                <WebView
-                  onLoad={onLoad}
-                  ref={webviewRef}
+                <View
                   style={{
                     width: '100%',
-                    height: '100%',
-                    borderRadius: 10,
-                    backgroundColor: 'transparent'
-                  }}
-                  cacheMode="LOAD_DEFAULT"
-                  domStorageEnabled={true}
-                  scrollEnabled={true}
-                  bounces={false}
-                  allowFileAccess={true}
-                  scalesPageToFit={true}
-                  allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
-                  onMessage={onMessage}
-                  onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-                  allowFileAccessFromFileURLs={true}
-                  allowUniversalAccessFromFileURLs={true}
-                  originWhitelist={['*']}
-                  javaScriptEnabled={true}
-                  cacheEnabled={true}
-                  source={
-                    Platform.OS === 'ios'
-                      ? { uri: sourceUri }
-                      : {
-                          uri: 'file:///android_asset/plaineditor.html',
-                          baseUrl: 'file:///android_asset/'
-                        }
-                  }
-                />
-              </View>
-
-              {appendNote ? (
-                <Text
-                  style={{
-                    fontSize: 11,
-                    color: colors.gray,
-                    fontFamily: 'OpenSans-Regular',
-                    paddingHorizontal: 12,
-                    marginBottom: 10,
-                    flexWrap: 'wrap'
+                    height: height * 0.3,
+                    paddingBottom: 15,
+                    borderRadius: 10
                   }}
                 >
-                  This shared note will be appended to{' '}
+                  <WebView
+                    onLoad={onLoad}
+                    ref={webviewRef}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: 10,
+                      backgroundColor: 'transparent'
+                    }}
+                    cacheMode="LOAD_DEFAULT"
+                    domStorageEnabled={true}
+                    scrollEnabled={true}
+                    bounces={false}
+                    allowFileAccess={true}
+                    scalesPageToFit={true}
+                    allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
+                    onMessage={onMessage}
+                    onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+                    allowFileAccessFromFileURLs={true}
+                    allowUniversalAccessFromFileURLs={true}
+                    originWhitelist={['*']}
+                    javaScriptEnabled={true}
+                    cacheEnabled={true}
+                    source={
+                      Platform.OS === 'ios'
+                        ? { uri: sourceUri }
+                        : {
+                            uri: 'file:///android_asset/plaineditor.html',
+                            baseUrl: 'file:///android_asset/'
+                          }
+                    }
+                  />
+                </View>
+
+                {appendNote ? (
                   <Text
                     style={{
-                      color: accent.color,
-                      fontFamily: 'OpenSans-SemiBold'
+                      fontSize: 12,
+                      color: colors.icon,
+                      fontFamily: 'OpenSans-Regular',
+                      paddingHorizontal: 12,
+                      marginBottom: 10,
+                      flexWrap: 'wrap'
                     }}
                   >
-                    "{appendNote.title}"
-                  </Text>{' '}
-                  . Click on "Create new note" to add to a new note instead.
-                </Text>
-              ) : null}
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  paddingHorizontal: 12,
-                  paddingRight: 80,
-                  alignItems: 'center'
-                }}
-              >
-                {rawData.value && isURL(rawData.value) ? (
-                  <Button
-                    color={mode == 2 ? colors.shade : colors.nav}
-                    icon={modes[2].icon}
-                    onPress={() => changeMode(2)}
-                    title={modes[2].title}
-                    iconSize={18}
-                    iconColor={mode == 2 ? accent.color : colors.icon}
-                    textColor={mode == 2 ? accent.color : colors.icon}
-                    type="rounded"
-                    style={{ paddingHorizontal: 12 }}
-                  />
+                    Above content will append to{' '}
+                    <Text
+                      style={{
+                        color: accent.color,
+                        fontFamily: 'OpenSans-SemiBold'
+                      }}
+                    >
+                      "{appendNote.title}"
+                    </Text>{' '}
+                    . Click on "New note" to create a new note.
+                  </Text>
                 ) : null}
-                <Button
-                  color={mode == 1 ? colors.shade : colors.nav}
-                  icon={modes[1].icon}
-                  onPress={() => changeMode(1)}
-                  title={modes[1].title}
-                  iconSize={18}
-                  iconColor={mode == 1 ? accent.color : colors.icon}
-                  textColor={mode == 1 ? accent.color : colors.icon}
-                  type="rounded"
-                  style={{ paddingHorizontal: 12 }}
-                />
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    paddingHorizontal: 12,
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
+                    width: '100%'
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row'
+                    }}
+                  >
+                    {rawData.value && isURL(rawData.value) ? (
+                      <Button
+                        color={mode == 2 ? colors.shade : colors.nav}
+                        icon={modes[2].icon}
+                        onPress={() => changeMode(2)}
+                        title={modes[2].title}
+                        iconSize={18}
+                        iconColor={mode == 2 ? accent.color : colors.icon}
+                        textColor={mode == 2 ? accent.color : colors.icon}
+                        type="rounded"
+                        style={{ paddingHorizontal: 12 }}
+                      />
+                    ) : null}
+                    <Button
+                      color={mode == 1 ? colors.shade : colors.nav}
+                      icon={modes[1].icon}
+                      onPress={() => changeMode(1)}
+                      title={modes[1].title}
+                      iconSize={18}
+                      iconColor={mode == 1 ? accent.color : colors.icon}
+                      textColor={mode == 1 ? accent.color : colors.icon}
+                      type="rounded"
+                      style={{ paddingHorizontal: 12 }}
+                    />
+                  </View>
+
+                  {!quicknote ? (
+                    <Button
+                      color={accent.color}
+                      onPress={onPress}
+                      loading={loading || loadingIntent}
+                      icon="check"
+                      iconSize={20}
+                      iconColor={colors.light}
+                      style={{
+                        paddingHorizontal: 0,
+                        height: 40,
+                        width: 40,
+                        borderRadius: 100,
+                        minWidth: 0
+                      }}
+                    />
+                  ) : null}
+                </View>
               </View>
             </View>
-          </View>
 
-          <View
-            style={{
-              height: Platform.isPad ? 150 : Platform.OS === 'ios' ? 110 : 40
-            }}
-          />
+            <View
+              style={{
+                height: Platform.isPad ? 150 : Platform.OS === 'ios' ? 110 : 0
+              }}
+            />
+          </View>
         </View>
-      </AnimatedKAV>
-    </AnimatedSAV>
+      </AnimatedSAV>
+    </Outer>
   );
 };
 

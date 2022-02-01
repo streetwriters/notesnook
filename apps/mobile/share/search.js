@@ -118,7 +118,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote }) => {
         backgroundColor: colors.bg,
         borderRadius: quicknote ? 0 : 10,
         width: quicknote ? '100%' : '95%',
-        minHeight: 50,
+        minHeight: 250,
         alignSelf: 'center',
         overflow: 'hidden',
         zIndex: 999,
@@ -183,7 +183,9 @@ export const Search = ({ close, getKeyboardHeight, quicknote }) => {
                 color: colors.icon
               }}
             >
-              Search for a note to append to it.
+              {searchKeyword.current
+                ? `No results found for "${searchKeyword.current}"`
+                : `Search for a note to append to it.`}
             </Text>
           </View>
         }
