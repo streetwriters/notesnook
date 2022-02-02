@@ -9,6 +9,7 @@
   "dependencies": {
     "@mdi/js": "^6.5.95",
     "@mdi/react": "^1.4.0",
+    "@notesnook/crypto": "^1.0.0",
     "@notesnook/desktop": "file:desktop",
     "@rebass/forms": "^4.0.6",
     "@streetwriters/tinymce-plugins": "^1.5.9",
@@ -33,7 +34,6 @@
     "just-debounce-it": "^3.0.1",
     "localforage": "^1.10.0",
     "localforage-getitems": "https://github.com/thecodrr/localForage-getItems.git",
-    "nncrypto": "file:packages/nncrypto",
     "nncryptoworker": "file:packages/nncryptoworker",
     "notes-core": "npm:@streetwriters/notesnook-core@latest",
     "platform": "^1.3.6",

@@ -9,7 +9,7 @@ async function loadNNCrypto() {
     const { NNCryptoWorker } = await import("nncryptoworker");
     return NNCryptoWorker;
   } else {
-    const { NNCrypto } = await import("nncrypto");
+    const { NNCrypto } = await import("@notesnook/crypto");
     return NNCrypto;
   }
 }
