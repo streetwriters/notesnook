@@ -8,7 +8,7 @@ const colorSchemes = {
 
 class ColorSchemeFactory {
   static construct<TTheme extends keyof typeof colorSchemes>(theme: TTheme) {
-    return colorSchemes[theme].construct("#008837");
+    return colorSchemes[theme].construct(theme === "light" ? "#000" : "#fff");
   }
 }
 export default ColorSchemeFactory;

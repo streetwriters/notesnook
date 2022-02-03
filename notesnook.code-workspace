@@ -1,26 +1,30 @@
 {
   "folders": [
-	{
-		"name": "✨ notesnook",
-		"path": "."
-	},
-	{
-		"name": "🚀 @notesnook/importer-web",
-		"path": "apps/importer"
-	},
-	{
-		"name": "📦 @notesnook/enex",
-		"path": "packages/enex"
-	},
-	{
-		"name": "📦 @notesnook/importer",
-		"path": "packages/importer"
-	},
-	{
-		"name": "📦 @streetwritersco/tinymce-plugins",
-		"path": "packages/tinymce-plugins"
-	}
-],
+    {
+      "name": "✨ notesnook",
+      "path": "."
+    },
+    {
+      "name": "🚀 @notesnook/importer-web",
+      "path": "apps/importer"
+    },
+    {
+      "name": "🚀 @notesnook/vericrypt",
+      "path": "apps/vericrypt"
+    },
+    {
+      "name": "📦 @notesnook/enex",
+      "path": "packages/enex"
+    },
+    {
+      "name": "📦 @notesnook/importer",
+      "path": "packages/importer"
+    },
+    {
+      "name": "📦 @streetwriters/tinymce-plugins",
+      "path": "packages/tinymce-plugins"
+    }
+  ],
   "settings": {
     "git.ignoreLimitWarning": true
   }

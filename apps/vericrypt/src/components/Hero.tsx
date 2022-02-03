@@ -1,4 +1,4 @@
-import { Flex, Link, Text } from "@theme-ui/components";
+import { Flex, Box, Link, Text } from "@theme-ui/components";
 import { appVersion } from "../utils/version";
 import {
   MdOutlineShield,
@@ -6,6 +6,7 @@ import {
   MdOutlineStorage,
   MdOutlineEnhancedEncryption,
 } from "react-icons/md";
+import { getAppUrl } from "../utils/links";
 
 const Algorithms = [
   {
@@ -60,53 +61,49 @@ export function Hero() {
           v{appVersion}
         </Text>
         <Link
-          href="https://github.com/streetwriters/notesnook"
+          href={getAppUrl("vericrypt")}
           variant="text.body"
           sx={{ px: 1, borderLeft: "1px solid var(--theme-ui-colors-border)" }}
         >
           See source code
         </Link>
       </Flex>
-      <Flex
+      <Box
         sx={{
-          mt: 4,
-          flexDirection: "column",
+          mt: 100,
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          rowGap: 2,
         }}
       >
-        <Text
-          variant="subheading"
-          sx={{
-            textAlign: "center",
-          }}
-        >
-          Encryption algorithms
-        </Text>
-        <Flex sx={{ justifyContent: "space-between", mt: 2 }}>
-          {Algorithms.map((alg) => (
-            <Flex
+        {Algorithms.map((alg) => (
+          <Flex
+            sx={{
+              flexDirection: "column",
+              mr: 4,
+              p: 2,
+              borderRadius: "default",
+              bg: "black",
+              width: 250,
+            }}
+            key={alg.key}
+          >
+            <alg.icon color={"var(--theme-ui-colors-fontSecondary)"} />
+            <Text variant="subtitle" sx={{ color: "fontSecondary" }}>
+              {alg.title}
+            </Text>
+            <Text
+              variant="body"
               sx={{
-                flexDirection: "column",
-                mr: 4,
-                p: 2,
-                borderRadius: "default",
-                border: "1px solid var(--theme-ui-colors-border)",
+                fontSize: "subtitle",
+                color: "fontSecondary",
               }}
-              key={alg.key}
             >
-              <alg.icon color={"var(--theme-ui-colors-icon)"} />
-              <Text variant="subtitle">{alg.title}</Text>
-              <Text
-                variant="body"
-                sx={{
-                  fontSize: "subtitle",
-                }}
-              >
-                {alg.name}
-              </Text>
-            </Flex>
-          ))}
-        </Flex>
-      </Flex>
+              {alg.name}
+            </Text>
+          </Flex>
+        ))}
+      </Box>
     </Flex>
   );
 }

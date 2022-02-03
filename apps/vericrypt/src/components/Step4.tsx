@@ -1,8 +1,7 @@
-import { Flex, Text, Image, Input, Textarea } from "@theme-ui/components";
+import { Flex, Text, Image, Textarea } from "@theme-ui/components";
 import { StepContainer } from "./StepContainer";
 import DevtoolsRequestsFilter from "../assets/screenshots/devtools_requests_filter.png";
 import DevtoolsRequestsCopy from "../assets/screenshots/devtools_requests_copy.png";
-import DevtoolsSalt from "../assets/screenshots/devtools_salt.png";
 import { Accordion } from "./Accordion";
 import { getCombo } from "../utils/keycombos";
 import Platform from "platform";
@@ -11,6 +10,11 @@ import { Code } from "./Code";
 import { CURLParser } from "parse-curl-js-fixed";
 import { useState } from "react";
 import { ErrorsList } from "./ErrorsList";
+import { getSourceUrl } from "../utils/links";
+
+type PasteEncryptedDataProps = {
+  onEncryptedDataPasted: (data: SyncRequestBody) => void;
+};
 
 type EncryptedSyncItem = {
   alg: string;
@@ -22,14 +26,14 @@ type EncryptedSyncItem = {
   salt: string;
   v: number;
 };
-type SyncRequestBody = {
+export type SyncRequestBody = {
   notes: EncryptedSyncItem[];
   content: EncryptedSyncItem[];
   notebooks: EncryptedSyncItem[];
   attachments: EncryptedSyncItem[];
 };
 
-const SAMPLE_CURL = `Paste your cURL request here as it is. 
+const SAMPLE_CURL = `Paste your cURL request here. 
 For example:
 curl 'https://api.notesnook.com/sync'
 -H 'authority: api.notesnook.com'
@@ -81,16 +85,23 @@ const steps = {
 };
 
 const isChromium = Platform.name === "Chrome";
-export function PasteEncryptedData() {
+const instructions = isChromium ? steps.chromium : null;
+
+export function PasteEncryptedData(props: PasteEncryptedDataProps) {
   const [error, setError] = useState<string | undefined>();
   const [encryptedData, setEncryptedData] = useState<
     SyncRequestBody | undefined
   >();
-  const instructions = isChromium ? steps.chromium : null;
 
   return (
     <StepContainer as="form" sx={{ flexDirection: "column" }}>
-      <Text variant="title">Step 4: Paste raw encrypted data</Text>
+      <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+        <Text variant="title">Paste raw encrypted data</Text>
+        <Code
+          text="src/components/Step4.tsx"
+          href={getSourceUrl("src/components/Step4.tsx")}
+        />
+      </Flex>
       <Accordion
         title="How to get raw encrypted data?"
         sx={{
@@ -143,6 +154,7 @@ export function PasteEncryptedData() {
             }
             setEncryptedData(syncData);
             e.target.value = JSON.stringify(syncData, undefined, "  ");
+            props.onEncryptedDataPasted(syncData);
           } catch (e) {
             const error = e as Error;
             setError(error.message);

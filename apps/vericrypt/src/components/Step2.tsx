@@ -8,6 +8,12 @@ import { getCombo } from "../utils/keycombos";
 import Platform from "platform";
 import { KeyCombo } from "./KeyCombo";
 import { Code } from "./Code";
+import { useState } from "react";
+import { getSourceUrl } from "../utils/links";
+
+type GetAccountSaltProps = {
+  onSaltSubmitted: (salt: string) => void;
+};
 
 const steps = {
   chromium: [
@@ -49,11 +55,20 @@ const steps = {
 };
 
 const isChromium = Platform.name === "Chrome";
-export function GetAccountSalt() {
-  const instructions = isChromium ? steps.chromium : null;
+const instructions = isChromium ? steps.chromium : null;
+
+export function GetAccountSalt(props: GetAccountSaltProps) {
+  const [isSaltValid, setIsSaltValid] = useState<boolean>();
+
   return (
     <StepContainer as="form" sx={{ flexDirection: "column" }}>
-      <Text variant="title">Step 2: Enter your account salt</Text>
+      <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+        <Text variant="title">Account salt</Text>
+        <Code
+          text="src/components/Step2.tsx"
+          href={getSourceUrl("src/components/Step2.tsx")}
+        />
+      </Flex>
       <Accordion
         title="How to get your account salt?"
         sx={{
@@ -80,30 +95,35 @@ export function GetAccountSalt() {
         id="salt"
         name="salt"
         type="text"
-        placeholder="xxxxxxxxxxxxxxxx"
+        placeholder="Enter your account salt"
         sx={{
           mt: 2,
           fontSize: "subheading",
           fontFamily: "monospace",
           textAlign: "center",
+          color:
+            isSaltValid === true
+              ? "primary"
+              : isSaltValid === false
+              ? "error"
+              : "text",
+        }}
+        spellCheck={false}
+        onChange={(e) => {
+          setIsSaltValid(undefined);
+          try {
+            const value = e.target.value;
+            const isValid = Buffer.from(value, "base64").length === 16;
+            if (!isValid) setIsSaltValid(false);
+            else {
+              setIsSaltValid(true);
+              props.onSaltSubmitted(value);
+            }
+          } catch (e) {
+            setIsSaltValid(false);
+          }
         }}
       />
-      <Flex
-        sx={{
-          bg: "bgSecondary",
-          mt: 2,
-          p: 2,
-          borderRadius: "default",
-          flexDirection: "column",
-        }}
-      >
-        <Text variant="subtitle">Did you know?</Text>
-        <Text as="p" variant="body">
-          Your salt is randomly generated on our servers when you sign up for a
-          new account. Every single account has a secure, unique & random salt
-          which is then used to encrypt their data.
-        </Text>
-      </Flex>
     </StepContainer>
   );
 }

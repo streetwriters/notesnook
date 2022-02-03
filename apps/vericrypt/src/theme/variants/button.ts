@@ -19,8 +19,8 @@ class Default {
       fontSize: "body",
       borderRadius: "5px",
       cursor: "pointer",
-      p: 1,
-      px: 2,
+      p: 2,
+      px: 4,
       transition: "filter 200ms ease-in, box-shadow 200ms ease-out",
       ":hover:not(:disabled)": {
         filter: "brightness(90%)",

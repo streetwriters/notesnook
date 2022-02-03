@@ -10,7 +10,7 @@ export function Accordion({
   title,
   children,
   sx,
-  color,
+  color = "icon",
   ...restProps
 }: PropsWithChildren<AccordionProps>) {
   const [isContentHidden, setIsContentHidden] = useState<boolean>(true);
@@ -22,6 +22,7 @@ export function Accordion({
           alignItems: "center",
           p: 2,
           cursor: "pointer",
+          color: color,
         }}
         onClick={() => {
           setIsContentHidden((state) => !state);

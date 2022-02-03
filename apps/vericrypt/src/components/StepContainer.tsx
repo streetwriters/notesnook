@@ -12,6 +12,7 @@ export function StepContainer({
         boxShadow: "0px 0px 20px 0px #00000011",
         p: 4,
         borderRadius: "default",
+        bg: "background",
         ...sx,
       }}
       {...restProps}

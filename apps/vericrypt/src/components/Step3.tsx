@@ -1,25 +1,22 @@
-import { Flex, Button, Text, Input, Label } from "@theme-ui/components";
-import { ProviderFactory } from "@notesnook/importer";
-import { Providers } from "@notesnook/importer/dist/src/providers/providerfactory";
+import { Flex, Text, Input } from "@theme-ui/components";
+import { getSourceUrl } from "../utils/links";
+import { Code } from "./Code";
 import { StepContainer } from "./StepContainer";
 
-export function EnterAccountPassword() {
+type EnterAccountPasswordProps = {
+  onPasswordSubmitted: (password: string) => void;
+};
+
+export function EnterAccountPassword(props: EnterAccountPasswordProps) {
   return (
     <StepContainer as="form" sx={{ flexDirection: "column" }}>
-      <Text variant="title">Step 3: Enter your account password</Text>
-      <Input
-        variant="forms.clean"
-        id="password"
-        name="password"
-        type="password"
-        placeholder="Your account password"
-        sx={{
-          mt: 2,
-          fontSize: "subheading",
-          fontFamily: "monospace",
-          textAlign: "center",
-        }}
-      />
+      <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
+        <Text variant="title">Account password</Text>
+        <Code
+          text="src/components/Step3.tsx"
+          href={getSourceUrl("src/components/Step3.tsx")}
+        />
+      </Flex>
       <Flex
         sx={{
           bg: "bgSecondary",
@@ -39,6 +36,22 @@ export function EnterAccountPassword() {
           encryption.
         </Text>
       </Flex>
+      <Input
+        variant="forms.clean"
+        id="password"
+        name="password"
+        type="password"
+        placeholder="Enter your account password"
+        sx={{
+          mt: 2,
+          fontSize: "subheading",
+          fontFamily: "monospace",
+          textAlign: "center",
+        }}
+        onChange={(e) => {
+          props.onPasswordSubmitted(e.target.value);
+        }}
+      />
     </StepContainer>
   );
 }
