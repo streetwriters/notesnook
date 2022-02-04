@@ -46,28 +46,32 @@ export function useMenu() {
  * @returns
  */
 export function getPosition(element, relativeTo = "mouse", location) {
-  const { x, y, width, height } =
+  const { x, y, width, height, actualX, actualY } =
     relativeTo === "mouse" ? mousePosition : getElementPosition(relativeTo);
 
   const elementWidth = element.offsetWidth;
   const elementHeight = element.offsetHeight;
 
-  const windowWidth = window.document.body.offsetWidth;
-  const windowHeight = window.document.body.offsetHeight;
+  const windowWidth = window.innerHeight;
+  const windowHeight = window.innerHeight - 50;
 
   let position = { top: undefined, left: undefined };
 
-  if (windowWidth - x < elementWidth) {
+  if (windowWidth - actualX < elementWidth) {
+    const xDiff = actualX - x;
     position.left = windowWidth - elementWidth;
+    position.left -= xDiff;
   } else {
     position.left = x;
 
-    if (location === "right") position.top += width;
-    else if (location === "left") position.top -= width;
+    if (location === "right") position.left += width;
+    else if (location === "left") position.left -= width;
   }
 
-  if (windowHeight - y < elementHeight) {
+  if (windowHeight - actualY < elementHeight) {
+    const yDiff = actualY - y;
     position.top = windowHeight - elementHeight;
+    position.top -= yDiff;
   } else {
     position.top = y;
     if (location === "below") position.top += height;
@@ -98,6 +102,8 @@ function getMousePosition(e) {
   return {
     x: posx,
     y: posy,
+    actualY: posy,
+    actualX: posx,
   };
 }
 
@@ -106,11 +112,14 @@ function getMousePosition(e) {
  * @param {HTMLElement} element
  */
 function getElementPosition(element) {
+  const rect = element.getBoundingClientRect();
   return {
     x: element.offsetLeft,
     y: element.offsetTop,
     width: element.offsetWidth,
     height: element.offsetHeight,
+    actualY: rect.y,
+    actualX: rect.x,
   };
 }
 
@@ -167,7 +176,7 @@ function mapMenuItems(items, data) {
       color,
       iconColor,
 
-      items,
+      items: hasSubmenu ? mapMenuItems(items, data) : [],
     };
 
     prev.push(menuItem);

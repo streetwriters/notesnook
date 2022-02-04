@@ -10,6 +10,7 @@ import React, {
 import { Flex, Box, Text, Button } from "rebass";
 import useMobile from "../../utils/use-mobile";
 import { AnimatedFlex } from "../animated";
+import { getPosition } from "../../hooks/use-menu";
 
 function useMenuFocus(items) {
   const [focusIndex, setFocusIndex] = useState(-1);
@@ -121,8 +122,7 @@ function MenuContainer({ title, children }) {
         borderRadius: "default",
         boxShadow: "0px 0px 10px 0px #00000022",
         border: "1px solid var(--border)",
-        minWidth: 200,
-        maxWidth: 500,
+        width: 220,
       }}
     >
       {title && (
@@ -217,16 +217,35 @@ function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
     isPremium,
   } = item;
   const itemRef = useRef();
+  const subMenuRef = useRef();
 
   useEffect(() => {
     if (isFocused) itemRef.current?.focus();
   }, [isFocused]);
 
+  useEffect(() => {
+    if (!subMenuRef.current) return;
+    if (!isSubmenuOpen) {
+      subMenuRef.current.style.visibility = "hidden";
+      return;
+    }
+
+    const { top, left } = getPosition(
+      subMenuRef.current,
+      itemRef.current,
+      "right"
+    );
+
+    subMenuRef.current.style.visibility = "visible";
+    subMenuRef.current.style.top = `${top}px`;
+    subMenuRef.current.style.left = `${left}px`;
+  }, [isSubmenuOpen]);
+
   const onAction = useCallback(
     (e) => {
       e.stopPropagation();
       if (onClose) onClose();
-      onClick(data, item);
+      if (onClick) onClick(data, item);
     },
     [onClick, onClose, item, data]
   );
@@ -249,7 +268,7 @@ function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
       as="li"
       flexDirection={"column"}
       flex={1}
-      sx={{ position: "relative" }}
+      // sx={{ position: "relative" }}
       onMouseOver={onHover}
     >
       <Button
@@ -290,12 +309,14 @@ function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
           {hasSubmenu && <ChevronRight size={14} />}
         </Flex>
       </Button>
-      {hasSubmenu && isSubmenuOpen && (
+      {hasSubmenu && (
         <Flex
+          ref={subMenuRef}
+          style={{ visibility: "hidden" }}
           sx={{
             position: "absolute",
-            top: 0,
-            left: itemRef.current?.offsetWidth,
+            // top: 0,
+            // left: itemRef.current?.offsetWidth,
           }}
         >
           <Menu
