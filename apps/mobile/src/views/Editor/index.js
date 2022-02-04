@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
@@ -21,6 +21,7 @@ import {
 } from './Functions';
 import tiny from './tiny/tiny';
 import EditorToolbar from './tiny/toolbar';
+import { useEditor } from './use-editor';
 
 const source = { uri: sourceUri + 'index.html' };
 
@@ -37,6 +38,9 @@ const Editor = React.memo(
     const premiumUser = useUserStore(state => state.premium);
     const sessionId = useEditorStore(state => state.sessionId);
     const [resetting, setResetting] = useState(false);
+    const editorRef = useRef();
+    const editor = useEditor(editorRef);
+
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
@@ -96,22 +100,7 @@ const Editor = React.memo(
             onError={() => {
               onResetRequested();
             }}
-            injectedJavaScript={`
-            sessionId="${sessionId}";
-            console.log(sessionId);
-            (function() {
-              const func = function() {
-                setTimeout(function() {
-                  if (globalThis.tinymce) {
-                    init_tiny("calc(100vh - 55px)");
-                  } else {
-                    console.log('tinymce is not ready');
-                    func();
-                  }
-                },5);
-              }
-              func();
-            })();`}
+            injectedJavaScript={`globalThis.sessionId="${sessionId}";`}
             javaScriptEnabled={true}
             focusable={true}
             keyboardDisplayRequiresUserAction={false}
@@ -129,10 +118,12 @@ const Editor = React.memo(
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
-            source={source}
+            source={{
+              uri: 'http://192.168.10.3:3000'
+            }}
             style={style}
             autoManageStatusBarEnabled={false}
-            onMessage={_onMessage}
+            onMessage={editor.onMessage}
           />
         </View>
         <EditorToolbar />

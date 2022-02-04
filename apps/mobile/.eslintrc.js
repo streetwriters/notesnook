@@ -28,6 +28,7 @@ module.exports = {
       }
     ],
     'no-empty': 'off',
+    'react/no-unescaped-entities': 'off',
     'react/prop-types': 0,
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     'prettier/prettier': [
