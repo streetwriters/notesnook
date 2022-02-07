@@ -100,7 +100,7 @@ const AppLoader = ({ onLoad }) => {
       (async () => {
         await sleep(500);
         if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
-          eSendEvent(eOpenLoginDialog, 4);
+          eSendEvent('session_expired');
           return;
         }
 

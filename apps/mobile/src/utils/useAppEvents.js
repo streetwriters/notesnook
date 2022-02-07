@@ -132,7 +132,7 @@ export const useAppEvents = () => {
 
   const onSessionExpired = async () => {
     await Storage.write('loginSessionHasExpired', 'expired');
-    eSendEvent(eOpenLoginDialog, 4);
+    eSendEvent('session_expired');
   };
 
   // const onNoteRemoved = async id => {

@@ -6,7 +6,8 @@ import {
   Platform,
   SafeAreaView,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { useSettingStore } from '../../provider/stores';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
@@ -26,7 +27,8 @@ const BaseDialog = ({
   background = null,
   animated = true,
   bounce = true,
-  closeOnTouch = true
+  closeOnTouch = true,
+  useSafeArea = true
 }) => {
   const floating = useIsFloatingKeyboard();
 
@@ -35,6 +37,8 @@ const BaseDialog = ({
       useSettingStore.getState().setSheetKeyboardHandler(true);
     };
   }, []);
+
+  const Wrapper = useSafeArea ? SafeAreaView : View;
 
   return (
     <Modal
@@ -62,7 +66,7 @@ const BaseDialog = ({
         onRequestClose && onRequestClose();
       }}
     >
-      <SafeAreaView
+      <Wrapper
         style={{
           backgroundColor: background ? background : transparent ? 'transparent' : 'rgba(0,0,0,0.3)'
         }}
@@ -87,7 +91,7 @@ const BaseDialog = ({
             {children}
           </BouncingView>
         </KeyboardAvoidingView>
-      </SafeAreaView>
+      </Wrapper>
     </Modal>
   );
 };

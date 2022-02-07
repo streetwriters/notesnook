@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { StatusBar } from 'react-native-bars';
+import { ChangePassword } from '../../components/LoginDialog/change-password';
 import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import { Header } from '../../components/Header/index';
@@ -80,6 +81,8 @@ export const Home = ({ navigation }) => {
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
+    eSendEvent('session_expired');
+    return;
     if (!DDS.isTab) {
       if (getNote()) {
         eSendEvent(eOnLoadNote, { type: 'new' });

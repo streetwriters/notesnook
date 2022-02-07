@@ -17,7 +17,9 @@ const SheetWrapper = ({
   onOpen,
   closeOnTouchBackdrop = true,
   onHasReachedTop,
-  keyboardMode
+  keyboardMode,
+  overlay,
+  overlayOpacity = 0.3
 }) => {
   const [state] = useTracked();
   const { colors } = state;
@@ -74,10 +76,12 @@ const SheetWrapper = ({
       indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
+      defaultOverlayOpacity={overlayOpacity}
       overlayColor={pitchBlack ? '#585858' : '#000000'}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>
+          {overlay}
           <Toast context="local" />
           <PremiumToast context="sheet" close={() => fwdRef?.current?.hide()} offset={50} />
         </>

@@ -12,6 +12,7 @@ import ExportDialog from '../ExportDialog';
 import GeneralSheet from '../GeneralSheet';
 import ImagePreview from '../ImagePreview';
 import LoginDialog from '../LoginDialog';
+import { SessionExpired } from '../LoginDialog/session-expired';
 import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
 import PremiumDialog from '../Premium';
@@ -75,6 +76,7 @@ export class DialogManager extends Component {
         <AttachmentDialog />
         <Expiring />
         <AnnouncementDialog />
+        <SessionExpired />
       </>
     );
   }
