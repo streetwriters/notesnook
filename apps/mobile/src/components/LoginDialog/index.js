@@ -47,11 +47,13 @@ const LoginDialog = () => {
     <BaseDialog
       overlayOpacity={0}
       statusBarTranslucent={false}
-      onRequestClose={MODES.sessionExpired !== mode && close}
+      onRequestClose={mode !== MODES.welcomeSignup && close}
       visible={true}
       onClose={close}
+      useSafeArea={false}
+      bounce={false}
       background={colors.bg}
-      transparent={true}
+      transparent={false}
     >
       <Toast context="local" />
 

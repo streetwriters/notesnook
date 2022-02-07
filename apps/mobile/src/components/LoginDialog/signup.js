@@ -128,7 +128,7 @@ export const Signup = ({ changeMode, welcome }) => {
             size={30}
             color={colors.heading}
           >
-            Create an account
+            Create your account
           </Heading>
           <Paragraph
             style={{
@@ -207,7 +207,6 @@ export const Signup = ({ changeMode, welcome }) => {
 
           <View
             style={{
-              // position: 'absolute',
               marginTop: 50,
               alignSelf: 'center'
             }}
@@ -230,6 +229,9 @@ export const Signup = ({ changeMode, welcome }) => {
                   marginTop: 10,
                   width: 250,
                   borderRadius: 100
+                }}
+                onPress={() => {
+                  eSendEvent(eCloseLoginDialog);
                 }}
                 type="grayBg"
                 title="Skip for now"

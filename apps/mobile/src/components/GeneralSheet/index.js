@@ -82,8 +82,8 @@ const GeneralSheet = ({ context = 'global' }) => {
   return !visible || !dialogData ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
-      gestureEnabled={!dialogData?.progress}
-      closeOnTouchBackdrop={!dialogData?.progress}
+      gestureEnabled={!dialogData?.progress && !dialogData.disableClosing}
+      closeOnTouchBackdrop={!dialogData?.progress && !dialogData.disableClosing}
       onClose={() => {
         dialogData.onClose && dialogData.onClose();
         setVisible(false);

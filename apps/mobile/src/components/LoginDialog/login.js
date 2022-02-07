@@ -242,7 +242,7 @@ export const Login = ({ changeMode }) => {
               onPress={login}
               //  width="100%"
               type="accent"
-              title={loading ? null : 'Log in to your account'}
+              title={loading ? null : 'Login to your account'}
             />
           </View>
         </View>
