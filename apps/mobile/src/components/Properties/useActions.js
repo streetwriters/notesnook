@@ -40,6 +40,7 @@ import { deleteItems } from '../../utils/functions';
 import { MMKV } from '../../utils/mmkv';
 import { sleep } from '../../utils/TimeUtils';
 import { presentDialog } from '../Dialog/functions';
+import { MoveNotes } from '../MoveNoteDialog/movenote';
 import NoteHistory from '../NoteHistory';
 
 export const useActions = ({ close = () => {}, item }) => {
@@ -487,6 +488,17 @@ export const useActions = ({ close = () => {}, item }) => {
       icon: 'book-outline',
       func: addTo
     },
+    {
+      name: 'Move notes',
+      title: 'Add notes',
+      icon: 'plus',
+      func: async () => {
+        close();
+        await sleep(300);
+        MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
+      }
+    },
+
     {
       name: 'Pin',
       title: item.pinned ? 'Unpin' : 'Pin to top',

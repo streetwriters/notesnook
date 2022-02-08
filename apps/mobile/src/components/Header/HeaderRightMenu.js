@@ -77,21 +77,20 @@ export const HeaderRightMenu = ({ currentScreen, action, rightButtons }) => {
           }
         >
           {rightButtons.map((item, index) => (
-            <MenuItem
+            <Button
+              style={{
+                width: 150,
+                justifyContent: 'flex-start',
+                borderRadius: 0
+              }}
+              type="gray"
+              buttonType={{
+                text: colors.pri
+              }}
               key={item.title}
-              onPress={async () => {
-                menuRef.current?.hide();
-                await sleep(300);
-                item.func();
-              }}
-              textStyle={{
-                fontSize: SIZE.md,
-                color: colors.pri
-              }}
-            >
-              <Icon name={item.icon} size={SIZE.md} />
-              {'  ' + item.title}
-            </MenuItem>
+              title={item.title}
+              onPress={item.func}
+            />
           ))}
         </Menu>
       ) : null}

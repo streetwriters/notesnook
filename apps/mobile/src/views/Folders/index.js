@@ -3,8 +3,10 @@ import { ContainerBottomButton } from '../../components/Container/ContainerBotto
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import { AddNotebookEvent } from '../../components/DialogManager/recievers';
 import { Header } from '../../components/Header';
+import { MoveNotes } from '../../components/MoveNoteDialog/movenote';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
+import { Walkthrough } from '../../components/Walkthrough';
 import { useNotebookStore } from '../../provider/stores';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
@@ -44,6 +46,7 @@ export const Folders = ({ navigation }) => {
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
+    Walkthrough.present('notebooks');
     return () => {
       ranAfterInteractions = false;
       navigation.removeListener('focus', onFocus);
@@ -65,7 +68,9 @@ export const Folders = ({ navigation }) => {
     });
   }, []);
 
-  const _onPressBottomButton = () => AddNotebookEvent();
+  const _onPressBottomButton = () => {
+    AddNotebookEvent();
+  };
 
   return (
     <>
@@ -81,7 +86,7 @@ export const Folders = ({ navigation }) => {
         placeholderData={{
           heading: 'Your notebooks',
           paragraph: 'You have not added any notebooks yet.',
-          button: 'Add a notebook',
+          button: 'Add your first notebook',
           action: _onPressBottomButton,
           loading: 'Loading your notebooks'
         }}

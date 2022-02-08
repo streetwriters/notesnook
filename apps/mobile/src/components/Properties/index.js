@@ -150,7 +150,7 @@ Properties.present = (item, buttons = []) => {
       props.push(['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete']);
       break;
     case 'topic':
-      props.push(['Edit Topic', 'Add Shortcut', 'Delete']);
+      props.push(['Move notes', 'Edit Topic', 'Add Shortcut', 'Delete']);
       break;
     case 'tag':
       props.push(['Add Shortcut', 'Delete', 'Rename Tag']);
