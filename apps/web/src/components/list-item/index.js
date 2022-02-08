@@ -146,7 +146,7 @@ function ListItem(props) {
 
   return (
     <Flex
-      bg={isSelected || isContextMenuOpen ? "bgSecondary" : background}
+      bg={isSelected ? "bgSecondary" : background}
       onContextMenu={(e) => {
         e.preventDefault();
         openMenu(menuItems, {
@@ -156,7 +156,7 @@ function ListItem(props) {
       }}
       p={2}
       py={isCompact ? 1 : 2}
-      tabIndex={0}
+      tabIndex={-1}
       sx={{
         height: "inherit",
         cursor: "pointer",
@@ -168,12 +168,10 @@ function ListItem(props) {
         ":hover": {
           backgroundColor: "hover",
         },
-        ":focus": {
+        ":focus,:focus-visible": {
           outline: "none",
-        },
-        ":focus-visible": {
-          border: "1px solid",
-          borderColor: primary,
+          borderTop: `1px solid var(--${primary})`,
+          borderBottom: `1px solid var(--${primary})`,
         },
         overflow: "hidden",
         maxWidth: "100%",

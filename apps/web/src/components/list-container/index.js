@@ -18,6 +18,8 @@ function ListContainer(props) {
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
   const listRef = useRef();
+  const focusedItemIndex = useRef(-1);
+  const listContainerRef = useRef();
 
   useEffect(() => {
     if (shouldSelectAll && window.currentViewKey === type)
@@ -35,13 +37,55 @@ function ListContainer(props) {
         </>
       ) : (
         <>
-          <Flex variant="columnFill" data-test-id="note-list">
+          <Flex
+            ref={listContainerRef}
+            variant="columnFill"
+            data-test-id="note-list"
+            onFocus={(e) => {
+              if (e.target.parentElement.dataset.index) {
+                focusedItemIndex.current = parseInt(
+                  e.target.parentElement.dataset.index
+                );
+              }
+            }}
+          >
             <Virtuoso
               ref={listRef}
               data={items}
               computeItemKey={(index) => items[index].id || items[index].title}
               defaultItemHeight={profile.estimatedItemHeight}
               totalCount={items.length}
+              onKeyDown={(e) => {
+                const isUp = e.code === "ArrowUp";
+                const isDown = e.code === "ArrowDown";
+                const isHeader = (i) => items && items[i]?.type === "header";
+                const moveDown = (i) => (i < items.length - 1 ? ++i : 0);
+                const moveUp = (i) => (i > 0 ? --i : items.length - 1);
+
+                let i = focusedItemIndex.current;
+                let nextIndex = i;
+
+                if (nextIndex <= -1 && (isUp || isDown)) {
+                  nextIndex = 0;
+                }
+
+                if (isUp) {
+                  nextIndex = moveUp(i);
+                  if (isHeader(nextIndex)) nextIndex = moveUp(nextIndex);
+                } else if (isDown) {
+                  nextIndex = moveDown(i);
+                  if (isHeader(nextIndex)) nextIndex = moveDown(nextIndex);
+                }
+
+                if (isUp || isDown) {
+                  listRef.current.scrollToIndex(nextIndex);
+                  const listItem = listContainerRef.current.querySelector(
+                    `[data-item-index="${nextIndex}"]`
+                  );
+                  if (!listItem) return;
+                  listItem.firstElementChild.focus();
+                }
+              }}
               // overscan={10}
               components={{
                 Scroller: CustomScrollbarsVirtualList,
