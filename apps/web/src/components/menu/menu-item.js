@@ -119,6 +119,16 @@ function MenuItem({
         <Flex>
           {isChecked && <Check size={14} />}
           {hasSubmenu && <ChevronRight size={14} />}
+          {modifier && (
+            <Text
+              as="span"
+              fontFamily="body"
+              fontSize="menu"
+              color="fontTertiary"
+            >
+              {modifier}
+            </Text>
+          )}
         </Flex>
       </Button>
       {hasSubmenu && (
