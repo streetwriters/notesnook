@@ -2,11 +2,13 @@ import create from "zustand";
 import shallow from "zustand/shallow";
 import { isUserPremium } from "./use-is-user-premium";
 
-const mousePosition = {};
+const mousePosition = { x: 0, y: 0, actualX: 0, actualY: 0 };
 window.addEventListener("mousemove", (e) => {
-  const { x, y } = getMousePosition(e);
+  const { x, y, actualX, actualY } = getMousePosition(e);
   mousePosition.x = x;
   mousePosition.y = y;
+  mousePosition.actualX = actualX;
+  mousePosition.actualY = actualY;
 });
 
 const useMenuStore = create((set) => ({
@@ -52,8 +54,8 @@ export function getPosition(element, relativeTo = "mouse", location) {
   const elementWidth = element.offsetWidth;
   const elementHeight = element.offsetHeight;
 
-  const windowWidth = window.innerHeight;
-  const windowHeight = window.innerHeight - 50;
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight - 20;
 
   let position = { top: undefined, left: undefined };
 
@@ -138,6 +140,7 @@ function mapMenuItems(items, data) {
       isNew,
       type,
       iconColor,
+      modifier,
     } = item;
 
     const isHidden = hidden && hidden(data, item);
@@ -177,6 +180,8 @@ function mapMenuItems(items, data) {
       iconColor,
 
       items: hasSubmenu ? mapMenuItems(items, data) : [],
+
+      modifier: modifier?.join("+"),
     };
 
     prev.push(menuItem);
