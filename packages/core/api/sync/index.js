@@ -31,6 +31,7 @@ import {
   EV,
   EVENTS,
   sendAttachmentsProgressEvent,
+  sendSyncProgressEvent,
 } from "../../common";
 import Constants from "../../utils/constants";
 import http from "../../utils/http";
@@ -60,10 +61,11 @@ export default class Sync {
         accessTokenFactory: () => this._db.user.tokenManager.getAccessToken(),
       })
       .build();
-    this._connection.on("SyncItem", async (type, item) => {
+    this._connection.on("SyncItem", async (type, item, current, total) => {
       this.stopAutoSync();
       await this._realtimeMerger.mergeItem(type, JSON.parse(item));
       EV.publish(EVENTS.appRefreshRequested);
+      sendSyncProgressEvent("download", total, current);
       await this.startAutoSync();
     });
 
@@ -221,7 +223,9 @@ export default class Sync {
       await this._connection.send("FetchItems", lastSynced);
       // TODO progress
       var serverResponse = await new Promise((resolve) => {
-        this._connection.on("SyncCompleted", (result) => resolve(result));
+        this._connection.on("SyncCompleted", (synced, lastSynced) =>
+          resolve({ synced, lastSynced })
+        );
       });
 
       await this._db.conflicts.check();
@@ -330,6 +334,7 @@ export default class Sync {
   }
 
   async sendItemsToServer(type, array, dateSynced) {
+    let index = 0;
     for (const item of array) {
       if (!item) return;
       const result = await this._connection.invoke(
@@ -339,6 +344,7 @@ export default class Sync {
         dateSynced
       );
       if (result !== 1) throw new Error(`Failed to sync item: ${item.id}.`);
+      sendSyncProgressEvent("upload", array.length, ++index);
     }
   }
 }

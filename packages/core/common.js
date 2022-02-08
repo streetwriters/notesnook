@@ -19,6 +19,14 @@ export function sendAttachmentsProgressEvent(type, groupId, total, current) {
   });
 }
 
+export function sendSyncProgressEvent(type, total, current) {
+  EV.publish(EVENTS.syncProgress, {
+    type,
+    total,
+    current: current === undefined ? total : current,
+  });
+}
+
 export const CLIENT_ID = "notesnook";
 
 export const CHECK_IDS = {
@@ -41,6 +49,7 @@ export const EVENTS = {
   userSignedUp: "user:signedUp",
   userSessionExpired: "user:sessionExpired",
   databaseSyncRequested: "db:syncRequested",
+  syncProgress: "sync:progress",
   databaseMigrated: "db:migrated",
   databaseUpdated: "db:updated",
   databaseCollectionInitiated: "db:collectionInitiated",
