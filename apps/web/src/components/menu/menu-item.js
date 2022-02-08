@@ -4,7 +4,14 @@ import { Flex, Box, Text, Button } from "rebass";
 import { getPosition } from "../../hooks/use-menu";
 import Menu from "./index";
 
-function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
+function MenuItem({
+  item,
+  data,
+  isFocused,
+  isSubmenuOpen,
+  closeMenu,
+  onHover,
+}) {
   const {
     title,
     key,
@@ -19,6 +26,7 @@ function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
     isChecked,
     hasSubmenu,
     isPremium,
+    modifier,
   } = item;
   const itemRef = useRef();
   const subMenuRef = useRef();
@@ -48,10 +56,10 @@ function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
   const onAction = useCallback(
     (e) => {
       e.stopPropagation();
-      if (onClose) onClose();
+      if (closeMenu) closeMenu();
       if (onClick) onClick(data, item);
     },
-    [onClick, onClose, item, data]
+    [onClick, closeMenu, item, data]
   );
 
   if (type === "seperator")
@@ -125,7 +133,7 @@ function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
         >
           <Menu
             items={items}
-            onClose={onClose}
+            closeMenu={closeMenu}
             data={{ ...data, parent: item, title: undefined }}
           />
         </Flex>

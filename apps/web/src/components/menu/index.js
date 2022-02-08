@@ -74,7 +74,7 @@ function Menu({ items, data, closeMenu }) {
           index={index}
           item={item}
           data={data}
-          onClose={closeMenu}
+          closeMenu={closeMenu}
           isFocused={focusIndex === index}
           isSubmenuOpen={focusIndex === index && isSubmenuOpen}
           onHover={() => {

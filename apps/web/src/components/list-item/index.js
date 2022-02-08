@@ -102,7 +102,7 @@ function ListItem(props) {
   const isSelected =
     selectedItems.findIndex((item) => props.item.id === item.id) > -1;
   const selectItem = useSelectionStore((store) => store.selectItem);
-  const { isOpen: isContextMenuOpen, openMenu } = useMenuTrigger();
+  const { openMenu } = useMenuTrigger();
 
   const toggleSelection = useCallback(
     function toggleSelection() {
