@@ -193,6 +193,34 @@ const pin = (note) => {
     .catch((error) => showToast("error", error.message));
 };
 
+const formats = [
+  {
+    type: "pdf",
+    title: "PDF",
+    icon: Icon.PDF,
+    subtitle:
+      "Can be opened in any PDF reader like Adobe Acrobat or Foxit Reader.",
+  },
+  {
+    type: "md",
+    title: "Markdown",
+    icon: Icon.Markdown,
+    subtitle: "Can be opened in any plain-text or markdown editor.",
+  },
+  {
+    type: "html",
+    title: "HTML",
+    icon: Icon.HTML,
+    subtitle: "Can be opened in any web browser like Google Chrome.",
+  },
+  {
+    type: "txt",
+    title: "Text",
+    icon: Icon.Text,
+    subtitle: "Can be opened in any plain-text editor.",
+  },
+];
+
 const menuItems = [
   {
     key: "pin",
@@ -201,12 +229,14 @@ const menuItems = [
     onClick: async ({ note }) => {
       await pin(note);
     },
+    modifier: ["Alt", "P"],
   },
   {
     key: "favorite",
     title: ({ note }) => (note.favorite ? "Unfavorite" : "Favorite"),
     icon: Icon.StarOutline,
     onClick: ({ note }) => store.favorite(note),
+    modifier: ["Alt", "F"],
   },
   {
     key: "addtonotebook",
@@ -248,16 +278,19 @@ const menuItems = [
   },
   {
     key: "export",
-    title: "Export",
+    title: "Export as",
     icon: Icon.Export,
-    onClick: async ({ note }) => {
-      if (note.locked) {
-        alert("Locked notes cannot be exported currently.");
-        return;
-      }
-      if (await showExportDialog([note.id]))
-        showToast("success", `Note exported successfully!`);
-    },
+    disabled: ({ note }) => note.locked,
+    disableReason: "Locked notes cannot be exported currently.",
+    items: formats.map((format) => ({
+      key: format.type,
+      title: format.title,
+      tooltip: `Export as ${format.title} - ${format.subtitle}`,
+      icon: format.icon,
+      onClick: ({ note }) => {
+        alert("TBI");
+      },
+    })),
     isPro: true,
   },
   {
@@ -275,6 +308,7 @@ const menuItems = [
       }
     },
     isPro: true,
+    modifier: ["Alt", "L"],
   },
 
   {
@@ -291,6 +325,7 @@ const menuItems = [
       }
       await store.delete(note.id).then(() => showItemDeletedToast(note));
     },
+    modifier: ["Delete"],
   },
 ];
 
