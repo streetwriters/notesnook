@@ -2,28 +2,32 @@ import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import sort from "fast-sort";
 import { getNNCrypto } from "./nncrypto.stub";
+import { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
+
+type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
 
 extendPrototype(localforage);
+const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 
 localforage.config({
   name: "Notesnook",
   driver: [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE],
 });
 
-function read(key) {
+function read<T>(key: string): Promise<T | null> {
   return localforage.getItem(key);
 }
 
-function readMulti(keys) {
+function readMulti(keys: string[]) {
   if (keys.length <= 0) return [];
   return localforage.getItems(sort(keys).asc());
 }
 
-function write(key, data) {
+function write<T>(key: string, data: T) {
   return localforage.setItem(key, data);
 }
 
-function remove(key) {
+function remove(key: string) {
   return localforage.removeItem(key);
 }
 
@@ -35,8 +39,8 @@ function getAllKeys() {
   return localforage.keys();
 }
 
-async function deriveCryptoKey(name, data) {
-  const { password, salt } = data;
+async function deriveCryptoKey(name: string, credentials: SerializedKey) {
+  const { password, salt } = credentials;
   if (!password) throw new Error("Invalid data provided to deriveCryptoKey.");
 
   const crypto = await getNNCrypto();
@@ -45,17 +49,17 @@ async function deriveCryptoKey(name, data) {
   if (isIndexedDBSupported() && window?.crypto?.subtle) {
     const pbkdfKey = await derivePBKDF2Key(password);
     await write(name, pbkdfKey);
-    const cipheredKey = await aesEncrypt(pbkdfKey, keyData.key);
+    const cipheredKey = await aesEncrypt(pbkdfKey, keyData.key!);
     await write(`${name}@_k`, cipheredKey);
   } else {
     await write(`${name}@_k`, keyData.key);
   }
 }
 
-async function getCryptoKey(name) {
+async function getCryptoKey(name: string) {
   if (isIndexedDBSupported() && window?.crypto?.subtle) {
-    const pbkdfKey = await read(name);
-    const cipheredKey = await read(`${name}@_k`);
+    const pbkdfKey = await read<CryptoKey>(name);
+    const cipheredKey = await read<EncryptedKey>(`${name}@_k`);
     if (typeof cipheredKey === "string") return cipheredKey;
     if (!pbkdfKey || !cipheredKey) return;
     return await aesDecrypt(pbkdfKey, cipheredKey);
@@ -64,17 +68,43 @@ async function getCryptoKey(name) {
   }
 }
 
-function isIndexedDBSupported() {
+function isIndexedDBSupported(): boolean {
   return localforage.driver() === "asyncStorage";
 }
 
-async function generateCryptoKey(password, salt = false) {
+async function generateCryptoKey(
+  password: string,
+  salt?: string
+): Promise<SerializedKey> {
   if (!password) throw new Error("Invalid data provided to generateCryptoKey.");
   const crypto = await getNNCrypto();
   return await crypto.exportKey(password, salt);
 }
 
-const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
+async function hash(password: string, email: string): Promise<string> {
+  const crypto = await getNNCrypto();
+  return await crypto.hash(password, `${APP_SALT}${email}`);
+}
+
+async function encrypt(key: SerializedKey, plainText: string): Promise<Cipher> {
+  const crypto = await getNNCrypto();
+  return await crypto.encrypt(
+    key,
+    { format: "text", data: plainText },
+    "base64"
+  );
+}
+
+async function decrypt(
+  key: SerializedKey,
+  cipherData: Cipher
+): Promise<string | undefined> {
+  const crypto = await getNNCrypto();
+  cipherData.format = "base64";
+  const result = await crypto.decrypt(key, cipherData);
+  if (typeof result.data === "string") return result.data;
+}
+
 const Storage = {
   read,
   readMulti,
@@ -85,31 +115,16 @@ const Storage = {
   generateCryptoKey,
   deriveCryptoKey,
   getCryptoKey,
-  hash: async function (password, email) {
-    const crypto = await getNNCrypto();
-    return await crypto.hash(password, `${APP_SALT}${email}`);
-  },
-  encrypt: async function (key, plainText) {
-    const crypto = await getNNCrypto();
-    return await crypto.encrypt(
-      key,
-      { format: "text", data: plainText },
-      "base64"
-    );
-  },
-  decrypt: async function (key, cipherData) {
-    const crypto = await getNNCrypto();
-    cipherData.format = "base64";
-    const result = await crypto.decrypt(key, cipherData);
-    return result.data;
-  },
+  hash,
+  encrypt,
+  decrypt,
 };
 export default Storage;
 
 let enc = new TextEncoder();
 let dec = new TextDecoder();
 
-async function derivePBKDF2Key(password) {
+async function derivePBKDF2Key(password: string): Promise<CryptoKey> {
   const key = await window.crypto.subtle.importKey(
     "raw",
     enc.encode(password),
@@ -133,7 +148,10 @@ async function derivePBKDF2Key(password) {
   );
 }
 
-async function aesEncrypt(cryptoKey, data) {
+async function aesEncrypt(
+  cryptoKey: CryptoKey,
+  data: string
+): Promise<EncryptedKey> {
   let iv = window.crypto.getRandomValues(new Uint8Array(12));
 
   const cipher = await window.crypto.subtle.encrypt(
@@ -151,7 +169,10 @@ async function aesEncrypt(cryptoKey, data) {
   };
 }
 
-async function aesDecrypt(cryptoKey, data) {
+async function aesDecrypt(
+  cryptoKey: CryptoKey,
+  data: EncryptedKey
+): Promise<string> {
   const { iv, cipher } = data;
 
   const plainText = await window.crypto.subtle.decrypt(
