@@ -1,16 +1,6 @@
-import { useAnimation } from "framer-motion";
-import { Check, ChevronRight, Pro } from "../icons";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Flex, Box, Text, Button } from "rebass";
-import useMobile from "../../utils/use-mobile";
-import { AnimatedFlex } from "../animated";
-import { getPosition } from "../../hooks/use-menu";
+import React, { useCallback, useEffect, useState } from "react";
+import { Flex, Text } from "rebass";
+import MenuItem from "./menu-item";
 
 function useMenuFocus(items) {
   const [focusIndex, setFocusIndex] = useState(-1);
@@ -73,17 +63,11 @@ function useMenuFocus(items) {
 }
 
 function Menu({ items, data, closeMenu }) {
-  const isMobile = useMobile();
   const [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen] =
     useMenuFocus(items);
 
-  const Container = useMemo(
-    () => (isMobile ? MobileMenuContainer : MenuContainer),
-    [isMobile]
-  );
-
   return (
-    <Container title={data?.title}>
+    <MenuContainer title={data?.title}>
       {items.map((item, index) => (
         <MenuItem
           key={item.key}
@@ -101,7 +85,7 @@ function Menu({ items, data, closeMenu }) {
           }}
         />
       ))}
-    </Container>
+    </MenuContainer>
   );
 }
 export default React.memo(Menu);
@@ -138,194 +122,6 @@ function MenuContainer({ title, children }) {
         </Text>
       )}
       {children}
-    </Flex>
-  );
-}
-
-function MobileMenuContainer({ style, id, state, title, children }) {
-  const animation = useAnimation();
-
-  useEffect(() => {
-    if (state === "open") {
-      animation.start({ y: 0 });
-      const menu = document.getElementById(id);
-      menu.style.top = 0;
-      menu.style.left = 0;
-    } else {
-      animation.start({ y: 500 });
-    }
-  }, [state, animation, id]);
-
-  return (
-    <Flex
-      flexDirection="column"
-      id={id}
-      style={style}
-      width="100%"
-      height="100%"
-      bg="overlay"
-      overflow="hidden"
-      sx={{ position: "relative" }}
-    >
-      <AnimatedFlex
-        width="100%"
-        bg="background"
-        sx={{
-          position: "absolute",
-          bottom: 0,
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
-          overflow: "hidden",
-        }}
-        initial={{ y: 500 }}
-        animate={animation}
-        flexDirection="column"
-        p={2}
-      >
-        <Box
-          width={50}
-          height={7}
-          bg="shade"
-          alignSelf="center"
-          sx={{ borderRadius: "default" }}
-        />
-        <Flex flex="1" flexDirection="column" overflowY="scroll">
-          <Text variant="title" mt={2} alignSelf="center">
-            {title || "Properties"}
-          </Text>
-          {children}
-        </Flex>
-      </AnimatedFlex>
-    </Flex>
-  );
-}
-
-function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
-  const {
-    title,
-    key,
-    onClick,
-    color,
-    items,
-    icon: Icon,
-    iconColor,
-    type,
-    tooltip,
-    isDisabled,
-    isChecked,
-    hasSubmenu,
-    isPremium,
-  } = item;
-  const itemRef = useRef();
-  const subMenuRef = useRef();
-
-  useEffect(() => {
-    if (isFocused) itemRef.current?.focus();
-  }, [isFocused]);
-
-  useEffect(() => {
-    if (!subMenuRef.current) return;
-    if (!isSubmenuOpen) {
-      subMenuRef.current.style.visibility = "hidden";
-      return;
-    }
-
-    const { top, left } = getPosition(
-      subMenuRef.current,
-      itemRef.current,
-      "right"
-    );
-
-    subMenuRef.current.style.visibility = "visible";
-    subMenuRef.current.style.top = `${top}px`;
-    subMenuRef.current.style.left = `${left}px`;
-  }, [isSubmenuOpen]);
-
-  const onAction = useCallback(
-    (e) => {
-      e.stopPropagation();
-      if (onClose) onClose();
-      if (onClick) onClick(data, item);
-    },
-    [onClick, onClose, item, data]
-  );
-
-  if (type === "seperator")
-    return (
-      <Box
-        as="li"
-        key={key}
-        width="95%"
-        height="0.5px"
-        bg="border"
-        my={2}
-        alignSelf="center"
-      />
-    );
-
-  return (
-    <Flex
-      as="li"
-      flexDirection={"column"}
-      flex={1}
-      // sx={{ position: "relative" }}
-      onMouseOver={onHover}
-    >
-      <Button
-        data-test-id={`menuitem-${title.split(" ").join("").toLowerCase()}`}
-        key={key}
-        ref={itemRef}
-        tabIndex={-1}
-        variant="menuitem"
-        display="flex"
-        alignItems={"center"}
-        justifyContent={"space-between"}
-        title={tooltip}
-        disabled={isDisabled}
-        onClick={onAction}
-        onKeyUp={(e) => {
-          if (e.key === "Enter") onAction(e);
-        }}
-        sx={{
-          bg: isFocused ? "hover" : "transparent",
-        }}
-      >
-        <Flex>
-          {Icon && (
-            <Icon color={iconColor || "text"} size={15} sx={{ mr: 2 }} />
-          )}
-          <Text
-            as="span"
-            fontFamily="body"
-            fontSize="menu"
-            color={color || "text"}
-          >
-            {title}
-          </Text>
-          {isPremium && <Pro size={14} color="primary" sx={{ ml: 1 }} />}
-        </Flex>
-        <Flex>
-          {isChecked && <Check size={14} />}
-          {hasSubmenu && <ChevronRight size={14} />}
-        </Flex>
-      </Button>
-      {hasSubmenu && (
-        <Flex
-          ref={subMenuRef}
-          style={{ visibility: "hidden" }}
-          sx={{
-            position: "absolute",
-            // top: 0,
-            // left: itemRef.current?.offsetWidth,
-          }}
-        >
-          <Menu
-            items={items}
-            onClose={onClose}
-            data={{ ...data, parent: item, title: undefined }}
-          />
-        </Flex>
-      )}
     </Flex>
   );
 }
