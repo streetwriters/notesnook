@@ -16,10 +16,10 @@ class Collector {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.getEncryptionKey();
     return {
-      notes: await this._encrypt(this._collect(this._db.notes.raw)),
-      notebooks: await this._encrypt(this._collect(this._db.notebooks.raw)),
-      content: await this._encrypt(this._collect(await this._db.content.all())),
-      attachments: await this._encrypt(this._collect(this._db.attachments.all)),
+      notes: this._collect(await this._db.notes.encrypted()),
+      notebooks: this._collect(await this._db.notebooks.encrypted()),
+      content: this._collect(await this._db.content.encrypted()),
+      attachments: this._collect(await this._db.attachments.encrypted()),
       settings: await this._encrypt(this._collect([this._db.settings.raw])),
       vaultKey: await this._serialize(await this._db.vault._getKey()),
     };
@@ -45,21 +45,19 @@ class Collector {
     return array.reduce((prev, item) => {
       if (!item || item.localOnly) return prev;
       if (item.dateModified > this._lastSyncedTimestamp || item.migrated)
-        prev.push(item);
+        prev.push(this._map(item));
       return prev;
     }, []);
   }
 
-  async _map(item) {
-    // in case of resolved content
-    delete item.resolved;
-    // turn the migrated flag off so we don't keep syncing this item repeated
-    delete item.migrated;
-
+  _map(item) {
     return {
       id: item.id,
       v: CURRENT_DATABASE_VERSION,
-      ...(await this._serialize(item)),
+      iv: item.iv,
+      cipher: item.cipher,
+      length: item.length,
+      alg: item.alg,
     };
   }
 }

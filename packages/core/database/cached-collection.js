@@ -3,16 +3,30 @@ import IndexedCollection from "./indexed-collection";
 import MapStub from "../utils/map";
 
 export default class CachedCollection extends IndexedCollection {
-  constructor(context, type) {
-    super(context, type);
+  constructor(context, type, encryptionKeyFactory) {
+    super(context, type, encryptionKeyFactory);
     this.type = type;
     this.map = new Map();
+    this.encryptionKeyFactory = encryptionKeyFactory;
   }
 
   async init() {
     await super.init();
-    const data = await this.indexer.readMulti(this.indexer.indices);
+    let data = await this.indexer.readMulti(this.indexer.indices);
     if (this.map && this.map.dispose) this.map.dispose();
+
+    const encryptionKey =
+      this.encryptionKeyFactory && (await this.encryptionKeyFactory());
+    if (encryptionKey) {
+      for (let item of data) {
+        const [_key, value] = item;
+        const decryptedValue = JSON.parse(
+          await this.indexer.decrypt(encryptionKey, value)
+        );
+        item[1] = decryptedValue;
+      }
+    }
+
     this.map = new MapStub.Map(data, this.type);
   }
 

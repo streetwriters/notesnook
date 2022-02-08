@@ -101,21 +101,27 @@ class Database {
     this.offers = new Offers();
     this.debug = new Debug();
 
+    const factory = () => this.user.getEncryptionKey();
     // collections
     /** @type {Notes} */
-    this.notes = await Notes.new(this, "notes", true, true);
+    this.notes = await Notes.new(this, "notes", factory, true, true);
     /** @type {Notebooks} */
-    this.notebooks = await Notebooks.new(this, "notebooks");
+    this.notebooks = await Notebooks.new(this, "notebooks", factory);
     /** @type {Tags} */
-    this.tags = await Tags.new(this, "tags");
+    this.tags = await Tags.new(this, "tags", factory);
     /** @type {Tags} */
-    this.colors = await Tags.new(this, "colors");
+    this.colors = await Tags.new(this, "colors", factory);
     /** @type {Content} */
-    this.content = await Content.new(this, "content", false);
+    this.content = await Content.new(this, "content", factory, false);
     /** @type {Attachments} */
-    this.attachments = await Attachments.new(this, "attachments");
+    this.attachments = await Attachments.new(this, "attachments", factory);
     /**@type {NoteHistory} */
-    this.noteHistory = await NoteHistory.new(this, "notehistory", false);
+    this.noteHistory = await NoteHistory.new(
+      this,
+      "notehistory",
+      factory,
+      false
+    );
 
     this.trash = new Trash(this);
 
@@ -213,11 +219,11 @@ class Database {
             await this.user.fetchUser(true);
             EV.publish(EVENTS.userEmailConfirmed);
             break;
-          case "sync":
-            if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) break;
+          // case "sync":
+          //   if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) break;
 
-            await this.syncer.remoteSync(data);
-            break;
+          //   await this.syncer.remoteSync(data);
+          //   break;
         }
       };
     });

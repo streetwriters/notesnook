@@ -24,6 +24,7 @@
     "test": "jest --forceExit"
   },
   "dependencies": {
+    "@microsoft/signalr": "^6.0.1",
     "@stablelib/blake2s": "^1.0.1",
     "async-mutex": "^0.3.2",
     "base64-arraybuffer": "^1.0.1",

@@ -18,13 +18,9 @@ import SessionContent from "./session-content";
  */
 
 export default class NoteHistory extends Collection {
-  constructor(db, name, cached) {
-    super(db, name, cached);
-    this.versionsLimit = 100;
-  }
-
   async init() {
     await super.init();
+    this.versionsLimit = 100;
 
     /**
      * @type {SessionContent}
@@ -32,6 +28,7 @@ export default class NoteHistory extends Collection {
     this.sessionContent = await SessionContent.new(
       this._db,
       "sessioncontent",
+      this._collection.encryptionKeyFactory,
       false
     );
   }

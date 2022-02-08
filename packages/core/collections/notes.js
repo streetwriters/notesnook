@@ -109,7 +109,8 @@ export default class Notes extends Collection {
   }
 
   get all() {
-    return this._collection.getItems();
+    const items = this._collection.getItems();
+    return items;
   }
 
   get pinned() {

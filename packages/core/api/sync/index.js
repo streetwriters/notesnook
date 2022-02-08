@@ -39,6 +39,8 @@ import Collector from "./collector";
 import Merger from "./merger";
 import { areAllEmpty } from "./utils";
 import { Mutex, withTimeout } from "async-mutex";
+import * as signalr from "@microsoft/signalr";
+import RealtimeMerger from "./realtimeMerger";
 
 export default class Sync {
   /**
@@ -49,9 +51,21 @@ export default class Sync {
     this._db = db;
     this._collector = new Collector(this._db);
     this._merger = new Merger(this._db);
+    this._realtimeMerger = new RealtimeMerger(this._db);
     this._tokenManager = new TokenManager(this._db.storage);
     this._autoSyncTimeout = 0;
     this._autoSyncInterval = 5000;
+    this._connection = new signalr.HubConnectionBuilder()
+      .withUrl(`${Constants.API_HOST}/hubs/sync`, {
+        accessTokenFactory: () => this._db.user.tokenManager.getAccessToken(),
+      })
+      .build();
+    this._connection.on("SyncItem", async (type, item) => {
+      this.stopAutoSync();
+      await this._realtimeMerger.mergeItem(type, JSON.parse(item));
+      EV.publish(EVENTS.appRefreshRequested);
+      await this.startAutoSync();
+    });
 
     this.syncMutex = withTimeout(
       new Mutex(),
@@ -66,25 +80,25 @@ export default class Sync {
     return this.syncMutex
       .runExclusive(() => {
         this.stopAutoSync();
-        return this._sync(full, force);
+        return this._realTimeSync(full, force);
       })
       .finally(() => this._afterSync());
   }
 
-  async remoteSync() {
-    if (this.syncMutex.isLocked()) {
-      this.hasNewChanges = true;
-      return;
-    }
-    await this.syncMutex
-      .runExclusive(async () => {
-        this.stopAutoSync();
-        this.hasNewChanges = false;
-        if (await this._sync(true, false))
-          EV.publish(EVENTS.appRefreshRequested);
-      })
-      .finally(() => this._afterSync());
-  }
+  // async remoteSync() {
+  //   if (this.syncMutex.isLocked()) {
+  //     this.hasNewChanges = true;
+  //     return;
+  //   }
+  //   await this.syncMutex
+  //     .runExclusive(async () => {
+  //       this.stopAutoSync();
+  //       this.hasNewChanges = false;
+  //       if (await this._realTimeSync(true, false))
+  //         EV.publish(EVENTS.appRefreshRequested);
+  //     })
+  //     .finally(() => this._afterSync());
+  // }
 
   async startAutoSync() {
     if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) return;
@@ -147,6 +161,90 @@ export default class Sync {
 
     if (!areAllEmpty(data)) {
       lastSynced = await this._send(data);
+    } else if (serverResponse) lastSynced = serverResponse.lastSynced;
+
+    await this._db.storage.write("lastSynced", lastSynced);
+    return true;
+  }
+
+  _mapToIds(data) {
+    const ids = [];
+    for (let arrayKey in data) {
+      const array = data[arrayKey];
+      if (Array.isArray(array)) {
+        for (let item of array) {
+          ids.push(item.id);
+        }
+      }
+    }
+    return ids;
+  }
+
+  async _realTimeSync(full, force) {
+    if (this._connection.state !== signalr.HubConnectionState.Connected)
+      await this._connection.start();
+
+    let { lastSynced } = await this._performChecks();
+    if (force) lastSynced = 0;
+
+    // Real time sync is different from on-demand sync in a couple of ways:
+    // 1. Since everything is being done in real time, we have to send
+    // local changes before fetching remote changes.
+    // 2. All data is sent in a specific sequence:
+    //    1. Content
+    //    2. Attachments
+    //    3. Notes
+    //    4. Notebooks
+    //    5. Settings
+    // This reduces a lot of complexity in cases where only data has been synced
+    // partially.
+    // 3. Only one sync can run at a time for a single device. This allows for
+    // easy resumability.
+    // 4. Progress events are sent regularly
+
+    // We collect, encrypt, and ready local changes before asking
+    // the server for remote changes. This is done to ensure we
+    // don't accidentally send the remote changes back to the server.
+    const data = await this._collector.collect(lastSynced);
+    // save all the item ids before running the sync. this will ensure
+    // resumability.
+    // TODO: const itemIds = mapToIds(data);
+    // const syncData = { itemIds, lastSynced };
+    // await this._db.storage.write("running_sync", syncData);
+
+    // We update the local last synced time before fetching data
+    // from the server. This is necessary to ensure that if the user
+    // makes any local changes, it is not ignored in the next sync.
+    // This is also the last synced time that is set for later sync cycles.
+    const newLastSynced = Date.now();
+    if (full) {
+      await this._connection.send("FetchItems", lastSynced);
+      // TODO progress
+      var serverResponse = await new Promise((resolve) => {
+        this._connection.on("SyncCompleted", (result) => resolve(result));
+      });
+
+      await this._db.conflicts.check();
+    }
+
+    // All pending attachments are uploaded before anything else.
+    // This is done to ensure that when any note arrives on user's
+    // device, its attachments can be downloaded.
+    await this._uploadAttachments();
+
+    if (!areAllEmpty(data)) {
+      await this.sendItemsToServer(
+        "attachment",
+        data.attachments,
+        newLastSynced
+      );
+      await this.sendItemsToServer("content", data.content, newLastSynced);
+      await this.sendItemsToServer("note", data.notes, newLastSynced);
+      await this.sendItemsToServer("notebook", data.notebooks, newLastSynced);
+      await this.sendItemsToServer("settings", data.settings, newLastSynced);
+      await this.sendItemsToServer("vaultKey", [data.vaultKey], newLastSynced);
+      if (await this._connection.invoke("SyncCompleted", newLastSynced))
+        lastSynced = newLastSynced;
     } else if (serverResponse) lastSynced = serverResponse.lastSynced;
 
     await this._db.storage.write("lastSynced", lastSynced);
@@ -229,5 +327,18 @@ export default class Sync {
       `${Constants.API_HOST}/sync/attachments?lst=${lastSynced}`,
       token
     );
+  }
+
+  async sendItemsToServer(type, array, dateSynced) {
+    for (const item of array) {
+      if (!item) return;
+      const result = await this._connection.invoke(
+        "SyncItem",
+        type,
+        JSON.stringify(item),
+        dateSynced
+      );
+      if (result !== 1) throw new Error(`Failed to sync item: ${item.id}.`);
+    }
   }
 }
