@@ -9,6 +9,7 @@ import { DDS } from './src/services/DeviceDetection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from './src/services/EventManager';
 import Notifications from './src/services/Notifications';
 import SettingsService from './src/services/SettingsService';
+import { TipManager } from './src/services/tip-manager';
 import { Tracker } from './src/utils';
 import { db } from './src/utils/database';
 import { eDispatchAction } from './src/utils/Events';
@@ -74,6 +75,7 @@ const App = () => {
         if (SettingsService.get().appLockMode && SettingsService.get().appLockMode !== 'none') {
           setVerifyUser(true);
         }
+        await TipManager.init();
         await loadDatabase();
         useUserStore.getState().setUser(await db.user.getUser());
         if (SettingsService.get().telemetry) {

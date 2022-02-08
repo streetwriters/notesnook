@@ -11,6 +11,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
+import { TipManager } from '../../services/tip-manager';
 import { editing } from '../../utils';
 import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
 import { hexToRGBA } from '../../utils/ColorUtils';
@@ -63,6 +64,7 @@ let waitForContent = false;
 let prevNoteContent = null;
 let sessionId = null;
 let historySessionId = null;
+let placeholderTip = TipManager.placeholderTip();
 
 export function startClosingSession() {
   closingSession = true;
@@ -688,6 +690,8 @@ export async function clearEditor() {
     tiny.call(EditorWebView, tiny.reset());
     //EditorWebView.current?.reload();
     await waitForEvent('resetcomplete');
+    placeholderTip = TipManager.placeholderTip();
+    tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
     editing.focusType = null;
     eSendEvent('historyEvent', {
       undo: 0,
@@ -911,6 +915,7 @@ export async function onWebViewLoad(premium, colors) {
   }, 300);
   eSendEvent('updateTags');
   setColors(colors);
+  tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
 }
 
 async function restoreEditorState() {

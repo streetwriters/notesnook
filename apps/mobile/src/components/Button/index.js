@@ -3,7 +3,7 @@ import { ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
 import { BUTTON_TYPES, showTooltip } from '../../utils';
-import { ph, SIZE } from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/SizeUtils';
 import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';

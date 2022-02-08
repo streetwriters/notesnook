@@ -259,6 +259,7 @@ export default class CustomTabs extends Component {
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}
           disableIntervalMomentum={true}
+          disableVirtualization={true}
           decelerationRate="fast"
           snapToAlignment="start"
           snapToOffsets={[this.props.offsets.a, this.props.offsets.b, this.props.offsets.c]}

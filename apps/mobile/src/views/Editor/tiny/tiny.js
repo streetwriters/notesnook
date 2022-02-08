@@ -2,6 +2,8 @@ import { Platform } from 'react-native';
 import { editing } from '../../../utils';
 import { EditorWebView, getWebviewInit, post, textInput } from '../Functions';
 
+const placeholders = ['hello world', 'this \n that'];
+
 const reset = id => `
 sessionId = null;
 document.getElementById("titleInput").value = '';
@@ -23,6 +25,11 @@ document.activeElement.blur();
 window.blur();
 toggleNode(".tag-bar-parent","hide"); 
 clearNode(".tag-bar");
+`;
+
+const setPlaceholder = placeholder => `
+editor.dom.setAttrib(editor.dom.doc.body, 'data-mce-placeholder', '${placeholder}');
+editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', '${placeholder}');
 `;
 
 const removeMarkdown = `
@@ -245,5 +252,6 @@ export default {
   onKeyboardShow,
   pre,
   setMarkdown,
-  removeMarkdown
+  removeMarkdown,
+  setPlaceholder
 };

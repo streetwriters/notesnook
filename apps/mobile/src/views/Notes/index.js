@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import { Header } from '../../components/Header';
+import { MoveNotes } from '../../components/MoveNoteDialog/movenote';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import { useTracked } from '../../provider';
@@ -194,18 +195,19 @@ export const Notes = ({ route, navigation }) => {
       params.current?.get === 'monographs'
         ? 'You have not published any notes as monographs yet.'
         : 'You have not added any notes yet.',
-    button: params.current?.get === 'monographs' ? 'Learn about monographs' : 'Add your first Note',
+    button:
+      params.current?.get === 'monographs' ? 'Learn more about monographs' : 'Add your first Note',
     action: _onPressBottomButton,
     buttonIcon: params.current?.get === 'monographs' ? 'information-outline' : null,
     loading:
-      params.current?.get === 'monographs' ? 'Loading published notes' : 'Loading your notes.'
+      params.current?.get === 'monographs' ? 'Loading published notes' : 'Loading your notes.',
+    type: params.current?.get === 'monographs' ? 'monographs' : null
   };
 
   const isFocused = () => navigation.isFocused();
 
   const headerRightButtons = [
     {
-      icon: 'pencil',
       title: 'Edit topic',
       func: () => {
         if (params.current?.type !== 'topic') return;
@@ -213,6 +215,13 @@ export const Notes = ({ route, navigation }) => {
           notebookId: params.current?.notebookId,
           toEdit: params.current
         });
+      }
+    },
+    {
+      title: 'Move notes',
+      func: () => {
+        if (params.current?.type !== 'topic') return;
+        MoveNotes.present(db.notebooks.notebook(params.current?.notebookId).data, params.current);
       }
     }
   ];

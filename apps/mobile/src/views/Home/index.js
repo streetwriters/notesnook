@@ -16,6 +16,8 @@ import { db } from '../../utils/database';
 import { eOnLoadNote } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
 import { getNote } from '../Editor/Functions';
+import { Tip } from '../../components/Tip';
+import { TipManager } from '../../services/tip-manager';
 
 export const Home = ({ navigation }) => {
   const notes = useNoteStore(state => state.notes);
@@ -81,8 +83,6 @@ export const Home = ({ navigation }) => {
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
-    eSendEvent('session_expired');
-    return;
     if (!DDS.isTab) {
       if (getNote()) {
         eSendEvent(eOnLoadNote, { type: 'new' });

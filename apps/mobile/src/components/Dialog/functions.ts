@@ -25,7 +25,7 @@ type DialogInfo = {
   context: 'global' | 'local';
 };
 
-export function presentDialog(data: DialogInfo): void {
+export function presentDialog(data: Partial<DialogInfo>): void {
   eSendEvent(eOpenSimpleDialog, data);
 }
 
