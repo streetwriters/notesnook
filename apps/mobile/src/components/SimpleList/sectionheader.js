@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Popable, usePopable } from 'react-native-popable';
 import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
 import {
@@ -9,11 +10,14 @@ import {
   presentSheet
 } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
+import { TipManager } from '../../services/tip-manager';
 import { GROUP } from '../../utils';
 import { COLORS_NOTE } from '../../utils/Colors';
 import { db } from '../../utils/database';
 import { eOpenJumpToDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import useTooltip, { useTooltipHandler } from '../../utils/use-tooltip';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 import Sort from '../Sort';
@@ -25,6 +29,26 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
   const { fontScale } = useWindowDimensions();
   const [groupOptions, setGroupOptions] = useState(db.settings?.getGroupOptions(type));
   let groupBy = Object.keys(GROUP).find(key => GROUP[key] === groupOptions.groupBy);
+  const tooltip = useTooltip();
+  const jumpToRef = useRef();
+  const sortRef = useRef();
+  const compactModeRef = useRef();
+
+  useTooltipHandler('sectionheader', () => {
+    let popup =
+      TipManager.popup('sortmenu') || TipManager.popup('jumpto') || TipManager.popup('compactmode');
+    switch (popup.id) {
+      case 'sortmenu':
+        tooltip.show(sortRef, popup.text, 'top');
+        break;
+      case 'jumpto':
+        tooltip.show(jumpToRef, popup.text, 'top');
+        break;
+      case 'compactmode':
+        tooltip.show(compactModeRef, popup.text, 'top');
+        break;
+    }
+  });
 
   const settings = useSettingStore(state => state.settings);
   const listMode = type === 'notebooks' ? settings.notebooksListMode : settings.notesListMode;
@@ -46,6 +70,7 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
 
   return (
     <View
+      ref={tooltip.parent}
       style={{
         flexDirection: 'row',
         alignItems: 'center',
@@ -63,6 +88,7 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
         onPress={() => {
           eSendEvent(eOpenJumpToDialog, type);
         }}
+        ref={jumpToRef}
         activeOpacity={0.9}
         hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
         style={{
@@ -97,6 +123,7 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
                   component: <Sort screen={screen} type={type} />
                 });
               }}
+              fwdRef={sortRef}
               title={groupBy}
               icon={groupOptions.sortDirection === 'asc' ? 'sort-ascending' : 'sort-descending'}
               height={25}
@@ -109,12 +136,14 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
               type="gray"
               iconPosition="right"
             />
+
             {type === 'notes' || type === 'notebooks' || type === 'home' ? (
               <ActionIcon
                 customStyle={{
                   width: 25,
                   height: 25
                 }}
+                fwdRef={compactModeRef}
                 color={colors.icon}
                 name={listMode == 'compact' ? 'view-list' : 'view-list-outline'}
                 onPress={() => {

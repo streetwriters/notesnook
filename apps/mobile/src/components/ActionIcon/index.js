@@ -21,7 +21,8 @@ export const ActionIcon = ({
   disabled,
   onLongPress,
   tooltipText,
-  type = 'gray'
+  type = 'gray',
+  fwdRef
 }) => {
   const [state, dispatch] = useTracked();
   const { colors } = state;
@@ -29,6 +30,7 @@ export const ActionIcon = ({
   return (
     <PressableButton
       testID={testID}
+      fwdRef={fwdRef}
       onPress={onPress}
       hitSlop={{ top: top, left: left, right: right, bottom: bottom }}
       onLongPress={event => {

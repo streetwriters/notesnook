@@ -29,7 +29,8 @@ export const PressableButton = ({
   customColor,
   customSelectedColor,
   customAlpha,
-  customOpacity
+  customOpacity,
+  fwdRef
 }) => {
   const [state] = useTracked();
   const { colors } = state;
@@ -76,6 +77,7 @@ export const PressableButton = ({
   return (
     <Pressable
       testID={testID}
+      ref={fwdRef}
       disabled={disabled}
       hitSlop={hitSlop}
       onPress={onPress}

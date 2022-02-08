@@ -33,7 +33,8 @@ export const Button = ({
   hitSlop,
   buttonType = {},
   bold,
-  iconColor
+  iconColor,
+  fwdRef
 }) => {
   const [state] = useTracked();
   const { colors } = state;
@@ -49,6 +50,7 @@ export const Button = ({
 
   return (
     <PressableButton
+      fwdRef={fwdRef}
       hitSlop={hitSlop}
       onPress={onPress}
       onLongPress={event => {

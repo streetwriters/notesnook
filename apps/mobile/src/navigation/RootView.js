@@ -27,6 +27,8 @@ import { EditorWrapper } from '../views/Editor/EditorWrapper';
 import { checkStatus, EditorWebView, getNote } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
 import { NavigatorStack } from './NavigatorStack';
+import useTooltip, { hideAllTooltips } from '../utils/use-tooltip';
+
 let layoutTimer = null;
 
 const onChangeTab = async obj => {
@@ -58,6 +60,9 @@ const onChangeTab = async obj => {
       if (getNote()?.locked) {
         eSendEvent(eClearEditor);
       }
+      setTimeout(() => {
+        useTooltip.present('sectionheader');
+      }, 1000);
       eSendEvent('showTooltip');
       editing.movedAway = true;
       if (editing.currentlyEditing) {
@@ -220,6 +225,7 @@ const NativeStack = React.memo(
     }
 
     const onScroll = scrollOffset => {
+      hideAllTooltips();
       if (scrollOffset > offsets[deviceMode].a - 10) {
         animatedOpacity.setValue(0);
         toggleView(false);

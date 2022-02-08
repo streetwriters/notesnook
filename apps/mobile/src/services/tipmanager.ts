@@ -64,7 +64,15 @@ type Popup = {
 const popups: Popup[] = [
   {
     id: 'sortmenu',
-    text: 'Click here to sort your notes'
+    text: 'Tap here to change sorting'
+  },
+  {
+    id: 'jumpto',
+    text: 'Tap here to jump to a section'
+  },
+  {
+    id: 'compactmode',
+    text: 'Try compact mode to fit more items on screen'
   }
 ];
 const destructiveContexts = ['first-note'];
