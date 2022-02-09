@@ -1,8 +1,10 @@
 import React from 'react';
 import { Image, TextStyle, View, ViewStyle } from 'react-native';
 import { useTracked } from '../../provider';
-import { presentSheet } from '../../services/EventManager';
+import { eSendEvent, presentSheet } from '../../services/EventManager';
 import { TTip } from '../../services/tip-manager';
+import { eCloseProgressDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
 import { SIZE } from '../../utils/SizeUtils';
 import { Button } from '../Button';
 import Seperator from '../Seperator';
@@ -49,11 +51,9 @@ export const Tip = ({
         <Button
           //@ts-ignore
           title="TIP"
-          type="grayAccent"
           icon="information"
           fontSize={SIZE.xs}
           iconSize={SIZE.xs}
-          accentText={color}
           style={{
             width: null,
             height: 22,
@@ -74,6 +74,10 @@ export const Tip = ({
             icon="close"
             fontSize={SIZE.xs}
             iconSize={SIZE.xs}
+            onPress={() => {
+              MMKV.setItem('neverShowSheetTips', 'true');
+              eSendEvent(eCloseProgressDialog);
+            }}
             style={{
               width: null,
               height: 25,
@@ -92,16 +96,22 @@ export const Tip = ({
         {tip.text}
       </Paragraph>
       {tip.image && !noImage && (
-        <Image
-          source={{ uri: tip.image }}
+        <View
           style={{
-            width: '100%',
-            height: 200,
-            marginTop: 10,
             borderRadius: 10,
-            alignSelf: 'center'
+            overflow: 'hidden',
+            marginTop: 10
           }}
-        />
+        >
+          <Image
+            source={{ uri: tip.image }}
+            style={{
+              width: '100%',
+              height: 230,
+              alignSelf: 'center'
+            }}
+          />
+        </View>
       )}
 
       {tip.button && (
@@ -127,9 +137,10 @@ export const Tip = ({
   ) : null;
 };
 
-Tip.present = (tip: TTip) => {
+Tip.present = async (tip: TTip) => {
   if (!tip) return;
-  console.log(tip);
+  let dontShow = await MMKV.getItem('neverShowSheetTips');
+  if (dontShow) return;
   presentSheet({
     component: (
       <Tip

@@ -29,29 +29,25 @@ type Context =
 export type TTip = {
   text: string;
   contexts: Context[];
-  image: string;
+  image?: string;
   button?: TipButton;
 };
 
 const tips: TTip[] = [
   {
     text: 'You can swipe left anywhere in the app to start a new note',
-    image: 'https://picsum.photos/400/500',
     contexts: ['notes', 'first-note']
   },
   {
     text: 'Long press on any item in list to open quick actions menu.',
-    image: 'https://picsum.photos/400/500',
     contexts: ['notes', 'notebook', 'notebook', 'tags']
   },
   {
     text: 'Monographs enable you to share your notes in a secure and private way',
-    image: 'https://picsum.photos/400/500',
     contexts: ['monographs']
   },
   {
     text: 'Monographs can be encrypted with a secret key and shared with anyone',
-    image: 'https://picsum.photos/400/500',
     contexts: ['monographs']
   }
 ];

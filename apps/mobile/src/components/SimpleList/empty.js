@@ -1,20 +1,16 @@
 import React from 'react';
-import { ActivityIndicator, Image, useWindowDimensions, View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
+import * as Progress from 'react-native-progress';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
-import { TipManager, useTip } from '../../services/tip-manager';
-import { getElevation } from '../../utils';
+import { useTip } from '../../services/tip-manager';
 import { COLORS_NOTE } from '../../utils/Colors';
-import { normalize, SIZE } from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/SizeUtils';
 import { Button } from '../Button';
-import { Placeholder } from '../ListPlaceholders';
-import Seperator from '../Seperator';
 import { Tip } from '../Tip';
-import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Empty = ({ loading = true, placeholderData, absolute, headerProps, type, screen }) => {
+export const Empty = ({ loading = true, placeholderData, headerProps, type, screen }) => {
   const [state] = useTracked();
   const { colors } = state;
   const insets = useSafeAreaInsets();
@@ -23,47 +19,79 @@ export const Empty = ({ loading = true, placeholderData, absolute, headerProps, 
     screen === 'Notes' ? 'first-note' : placeholderData.type || type,
     screen === 'Notes' ? 'notes' : null
   );
+  const color =
+    colors[COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'];
 
   return (
     <View
       style={[
         {
-          position: absolute ? 'absolute' : 'relative',
-          zIndex: absolute ? 10 : null,
-          height: height - 140 - insets.top,
+          height: height - (140 + insets.top),
           width: '80%',
           justifyContent: 'center',
           alignSelf: 'center'
         }
       ]}
     >
-      <Tip
-        color={COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'}
-        tip={tip}
-      />
       {!loading ? (
-        <Button
-          type="accent"
-          title={placeholderData.button}
-          iconPosition="right"
-          icon="arrow-right"
-          onPress={placeholderData.action}
-          accentColor={COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'}
-          accentText="light"
-          style={{
-            marginTop: 10,
-            alignSelf: 'flex-start',
-            borderRadius: 100,
-            height: 40
-          }}
-        />
+        <>
+          <Tip
+            color={COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'}
+            tip={tip}
+            style={{
+              backgroundColor: 'transparent',
+              paddingHorizontal: 0
+            }}
+          />
+          {placeholderData.button && (
+            <Button
+              type="grayAccent"
+              title={placeholderData.button}
+              iconPosition="right"
+              icon="arrow-right"
+              onPress={placeholderData.action}
+              accentColor={
+                COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'
+              }
+              accentText="light"
+              style={{
+                alignSelf: 'flex-start',
+                borderRadius: 5,
+                height: 40
+              }}
+            />
+          )}
+        </>
       ) : (
-        <ActivityIndicator
-          style={{
-            height: 35
-          }}
-          color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
-        />
+        <>
+          <View
+            style={{
+              alignSelf: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <Progress.Bar
+              unfilledColor={colors.nav}
+              borderWidth={0}
+              indeterminate
+              width={70}
+              color={color}
+              indeterminateAnimationDuration={2000}
+              borderRadius={100}
+            />
+            <Paragraph
+              style={{
+                textAlign: 'center',
+                marginTop: 5
+              }}
+              size={SIZE.md}
+              textBreakStrategy="balanced"
+              color={colors.icon}
+            >
+              {loading ? placeholderData.loading : placeholderData.paragraph}
+            </Paragraph>
+          </View>
+        </>
       )}
     </View>
   );

@@ -37,6 +37,7 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
   useTooltipHandler('sectionheader', () => {
     let popup =
       TipManager.popup('sortmenu') || TipManager.popup('jumpto') || TipManager.popup('compactmode');
+    if (!popup) return;
     switch (popup.id) {
       case 'sortmenu':
         tooltip.show(sortRef, popup.text, 'top');

@@ -117,11 +117,11 @@ export const Home = ({ navigation }) => {
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
         placeholderData={{
-          heading: 'Your notes',
+          heading: 'Notes',
           paragraph: 'You have not added any notes yet.',
           button: 'Add your first note',
           action: _onPressBottomButton,
-          loading: 'Loading your notes.'
+          loading: 'Loading your notes'
         }}
       />
 

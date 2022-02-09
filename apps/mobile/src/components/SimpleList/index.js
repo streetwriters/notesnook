@@ -118,7 +118,6 @@ const SimpleList = ({
   );
 
   let styles = {
-    height: '100%',
     width: '100%',
     minHeight: 1,
     minWidth: 1,

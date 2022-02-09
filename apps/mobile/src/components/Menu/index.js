@@ -1,6 +1,5 @@
 import React from 'react';
 import { FlatList, View } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
@@ -8,7 +7,6 @@ import { Actions } from '../../provider/Actions';
 import { useSettingStore, useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
-import { DrawerScale } from '../../utils/Animations';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -79,19 +77,13 @@ export const Menu = React.memo(
           backgroundColor: colors.nav
         }}
       >
-        <Animated.View
+        <View
           style={{
             height: '100%',
             width: '100%',
             backgroundColor: deviceMode !== 'mobile' ? colors.nav : colors.bg,
-
             paddingTop: insets.top,
-            borderRadius: 10,
-            transform: [
-              {
-                scale: deviceMode !== 'mobile' ? 1 : DrawerScale
-              }
-            ]
+            borderRadius: 10
           }}
         >
           <FlatList
@@ -150,7 +142,7 @@ export const Menu = React.memo(
           >
             <UserSection noTextMode={noTextMode} />
           </View>
-        </Animated.View>
+        </View>
       </View>
     );
   },

@@ -16,6 +16,7 @@ import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import { Properties } from '../Properties';
+import { Notice } from '../Notice';
 
 export const TagsSection = () => {
   const menuPins = useMenuStore(state => state.menuPins);
@@ -78,6 +79,13 @@ export const TagsSection = () => {
         style={{
           flexGrow: 1
         }}
+        ListEmptyComponent={
+          <Notice
+            size="small"
+            type="information"
+            text="Add shortcuts for notebooks, topics and tags here."
+          />
+        }
         contentContainerStyle={{
           flexGrow: 1
         }}
