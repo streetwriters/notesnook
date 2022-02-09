@@ -14,11 +14,13 @@ import { loadTrackerScript } from "./utils/analytics";
 import useAnnouncements from "./utils/use-announcements";
 import {
   showAnnouncementDialog,
+  showBuyDialog,
   showInvalidSystemTimeDialog,
 } from "./common/dialog-controller";
 import useSystemTheme from "./utils/use-system-theme";
 import { isTesting } from "./utils/platform";
 import { updateStatus, removeStatus } from "./hooks/use-status";
+import { showToast } from "./utils/toast";
 
 if (process.env.NODE_ENV === "production") {
   loadTrackerScript();
@@ -48,8 +50,10 @@ export default function AppEffects({ setShow }) {
             return { type, result: true };
           } else {
             if (type !== CHECK_IDS.databaseSync)
-              await import("./common/dialogcontroller").then((dialogs) =>
-                dialogs.showBuyDialog()
+              showToast(
+                "error",
+                "Please upgrade your account to Pro to use this feature.",
+                [{ text: "Upgrade now", onClick: () => showBuyDialog() }]
               );
             return { type, result: false };
           }
