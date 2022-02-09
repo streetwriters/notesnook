@@ -1,17 +1,33 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Box } from "rebass";
 import { Scrollbars } from "rc-scrollbars";
 import "./style.css";
 
 const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
+  const ref = useRef();
   return (
     <Scrollbars
       {...props}
       autoHide
-      ref={(sRef) => forwardedRef && sRef && forwardedRef(sRef.view)}
+      ref={(sRef) => {
+        forwardedRef && sRef && forwardedRef(sRef.view);
+        ref.current = sRef;
+      }}
       style={{ ...style, overflowY: "hidden" }}
       renderView={({ style, ...props }) => (
-        <Box {...props} style={{ ...style, inset: "-1px" }} />
+        <Box
+          {...props}
+          style={{ ...style, inset: "-1px" }}
+          onMouseEnter={() => {
+            const height = ref.current.getThumbVerticalHeight();
+            const width = ref.current.getThumbHorizontalWidth();
+            if (height !== ref.current.thumbVertical.style.height)
+              ref.current.thumbVertical.style.height = `${height}px`;
+            else if (ref.current.thumbHorizontal.style.width !== width) {
+              ref.current.thumbHorizontal.style.width = `${width}px`;
+            }
+          }}
+        />
       )}
       renderThumbVertical={({ style, ...props }) => (
         <Box
