@@ -4,9 +4,12 @@ import { Button } from '../../../../components/Button';
 import Input from '../../../../components/Input';
 import { useTracked } from '../../../../provider';
 import { useEditorStore, useSettingStore } from '../../../../provider/stores';
+import { TipManager } from '../../../../services/tip-manager';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
 import layoutmanager from '../../../../utils/layout-manager';
 import { SIZE } from '../../../../utils/SizeUtils';
+import { useKeyboard } from '../../../../utils/use-keyboard';
+import useTooltip, { hideAllTooltips, useTooltipHandler } from '../../../../utils/use-tooltip';
 import { EditorWebView } from '../../Functions';
 import tiny from '../tiny';
 import { endSearch } from './commands';
@@ -29,6 +32,16 @@ const SearcReplace = () => {
     find: null,
     replace: null
   });
+  const switchModeRef = useRef();
+  const tooltip = useTooltip();
+
+  useTooltipHandler('searchreplace', () => {
+    let popup = TipManager.popup('searchreplace');
+    console.log('showing:', popup);
+    if (popup) {
+      tooltip.show(switchModeRef, popup.text, 'top');
+    }
+  });
 
   async function searchWithSelection() {
     values.current.find = searchSelection;
@@ -45,6 +58,7 @@ const SearcReplace = () => {
   useEffect(() => {
     setTimeout(() => {
       findRef.current?.focus();
+      setTimeout(() => useTooltip.present('searchreplace'), 1000);
     }, 300);
   }, []);
 
@@ -176,6 +190,7 @@ const SearcReplace = () => {
 
   return (
     <View
+      ref={tooltip.parent}
       style={{
         width: '100%',
         backgroundColor: colors.bg,
@@ -192,11 +207,12 @@ const SearcReplace = () => {
       <Button
         height="93%"
         iconSize={SIZE.md + 4}
-        icon={enableReplace ? 'chevron-down' : 'chevron-right'}
+        icon={enableReplace ? 'chevron-down' : 'find-replace'}
         style={{
           paddingHorizontal: 3,
           marginBottom: 10
         }}
+        fwdRef={switchModeRef}
         iconColor={enableReplace ? colors.accent : colors.icon}
         onPress={() => {
           layoutmanager.withSpringAnimation(500);

@@ -69,6 +69,10 @@ const popups: Popup[] = [
   {
     id: 'compactmode',
     text: 'Try compact mode to fit more items on screen'
+  },
+  {
+    id: 'searchreplace',
+    text: 'Switch to search/replace mode'
   }
 ];
 const destructiveContexts = ['first-note'];

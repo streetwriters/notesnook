@@ -3,6 +3,7 @@ import { RefObject, useEffect, useRef } from 'react';
 import RNTooltips from 'react-native-tooltips';
 import { useTracked } from '../provider';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
+import { useKeyboard } from './use-keyboard';
 
 let currentTargets: number[] = [];
 
@@ -21,6 +22,11 @@ const useTooltip = () => {
   const [state, dispatch] = useTracked();
   const { colors } = state;
   const parent = useRef();
+  let keyboard = useKeyboard();
+
+  useEffect(() => {
+    hideAllTooltips();
+  }, [keyboard.keyboardShown]);
 
   const positions = {
     left: 1,
@@ -53,7 +59,7 @@ const useTooltip = () => {
   return { parent, show };
 };
 
-type TTooltipIdentifiers = 'sectionheader';
+type TTooltipIdentifiers = 'sectionheader' | 'searchreplace';
 
 export const useTooltipHandler = (id: TTooltipIdentifiers, callback: () => void) => {
   useEffect(() => {
