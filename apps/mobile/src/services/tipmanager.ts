@@ -33,57 +33,15 @@ export type TTip = {
   button?: TipButton;
 };
 
-const tips: TTip[] = [
-  {
-    text: 'You can swipe left anywhere in the app to start a new note',
-    contexts: ['notes', 'first-note']
-  },
-  {
-    text: 'Long press on any item in list to open quick actions menu.',
-    contexts: ['notes', 'notebook', 'notebook', 'tags']
-  },
-  {
-    text: 'Monographs enable you to share your notes in a secure and private way',
-    contexts: ['monographs']
-  },
-  {
-    text: 'Monographs can be encrypted with a secret key and shared with anyone',
-    contexts: ['monographs']
-  }
-];
-
 type Popup = {
   id: string;
   text: string;
 };
 
-const popups: Popup[] = [
-  {
-    id: 'sortmenu',
-    text: 'Tap here to change sorting'
-  },
-  {
-    id: 'jumpto',
-    text: 'Tap here to jump to a section'
-  },
-  {
-    id: 'compactmode',
-    text: 'Try compact mode to fit more items on screen'
-  },
-  {
-    id: 'searchreplace',
-    text: 'Switch to search/replace mode'
-  }
-];
 const destructiveContexts = ['first-note'];
 
 let tipState = {};
 let popState = {};
-
-const placeholderTips = [
-  `Privacy is really important and a must have. Many people take this lightly but remember. Privacy is everything.`,
-  `Notes can be pinned in notifications from Properties.`
-];
 
 export class TipManager {
   static async init() {
@@ -164,12 +122,45 @@ export const useTip = (
   return tip;
 };
 
-export const usePopup = (id: Context) => {
-  const [popup, setPopup] = useState(TipManager.popup(id));
+const tips: TTip[] = [
+  {
+    text: 'You can swipe left anywhere in the app to start a new note',
+    contexts: ['notes', 'first-note']
+  },
+  {
+    text: 'Long press on any item in list to open quick actions menu.',
+    contexts: ['notes', 'notebook', 'notebook', 'tags']
+  },
+  {
+    text: 'Monographs enable you to share your notes in a secure and private way',
+    contexts: ['monographs']
+  },
+  {
+    text: 'Monographs can be encrypted with a secret key and shared with anyone',
+    contexts: ['monographs']
+  }
+];
 
-  useEffect(() => {
-    setPopup(TipManager.popup(id));
-  }, [id]);
+const popups: Popup[] = [
+  {
+    id: 'sortmenu',
+    text: 'Tap here to change sorting'
+  },
+  {
+    id: 'jumpto',
+    text: 'Tap here to jump to a section'
+  },
+  {
+    id: 'compactmode',
+    text: 'Try compact mode to fit more items on screen'
+  },
+  {
+    id: 'searchreplace',
+    text: 'Switch to search/replace mode'
+  }
+];
 
-  return popup;
-};
+const placeholderTips = [
+  `Privacy is really important and a must have. Many people take this lightly but remember. Privacy is everything.`,
+  `Notes can be pinned in notifications from Properties.`
+];

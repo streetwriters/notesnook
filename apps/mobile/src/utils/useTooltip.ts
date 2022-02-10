@@ -19,7 +19,7 @@ export const hideAllTooltips = async () => {
 };
 
 const useTooltip = () => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const { colors } = state;
   const parent = useRef();
   let keyboard = useKeyboard();
