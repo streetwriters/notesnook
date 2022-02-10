@@ -58,7 +58,18 @@ class Collector {
       cipher: item.cipher,
       length: item.length,
       alg: item.alg,
+      dateModified: item.dateModified,
     };
+  }
+
+  filter(data, predicate) {
+    const arrays = ["notes", "notebooks", "content", "attachments", "settings"];
+    const newData = {};
+    for (let array of arrays) {
+      if (!data[array]) continue;
+      newData[array] = data[array].filter(predicate);
+    }
+    return newData;
   }
 }
 export default Collector;

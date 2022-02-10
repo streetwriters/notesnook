@@ -42,6 +42,15 @@ import { areAllEmpty } from "./utils";
 import { Mutex, withTimeout } from "async-mutex";
 import * as signalr from "@microsoft/signalr";
 import RealtimeMerger from "./realtimeMerger";
+import set from "../../utils/set";
+
+const ITEM_TYPE_MAP = {
+  attachments: "attachment",
+  content: "content",
+  notes: "note",
+  notebooks: "notebooks",
+  settings: "settings",
+};
 
 export default class Sync {
   /**
@@ -53,14 +62,17 @@ export default class Sync {
     this._collector = new Collector(this._db);
     this._merger = new Merger(this._db);
     this._realtimeMerger = new RealtimeMerger(this._db);
+    this.syncMutex = new Mutex();
     this._tokenManager = new TokenManager(this._db.storage);
     this._autoSyncTimeout = 0;
-    this._autoSyncInterval = 5000;
+    this._autoSyncInterval = 100;
+    this._queue = new SyncQueue(this._db.storage);
     this._connection = new signalr.HubConnectionBuilder()
       .withUrl(`${Constants.API_HOST}/hubs/sync`, {
         accessTokenFactory: () => this._db.user.tokenManager.getAccessToken(),
       })
       .build();
+
     this._connection.on("SyncItem", async (type, item, current, total) => {
       this.stopAutoSync();
       await this._realtimeMerger.mergeItem(type, JSON.parse(item));
@@ -68,12 +80,6 @@ export default class Sync {
       sendSyncProgressEvent("download", total, current);
       await this.startAutoSync();
     });
-
-    this.syncMutex = withTimeout(
-      new Mutex(),
-      20 * 1000,
-      new Error("Sync timed out.")
-    );
   }
 
   async start(full, force) {
@@ -121,107 +127,18 @@ export default class Sync {
     await this.startAutoSync();
   }
 
-  async _sync(full, force) {
-    let { lastSynced } = await this._performChecks();
-    if (force) lastSynced = 0;
-
-    if (full) {
-      // We request and merge remote attachments beforehand to handle
-      // all possible conflicts that will occur if a user attaches
-      // the same file/image on both his devices. Since both files
-      // will have the same hash but different encryption key, it
-      // will cause problems on the local device.
-      await this._mergeAttachments(lastSynced);
-
-      // All pending attachments are uploaded before anything else.
-      // This is done to ensure that when any note arrives on user's
-      // device, its attachments can be downloaded.
-      await this._uploadAttachments();
-    }
-
-    // We collect, encrypt, and ready local changes before asking
-    // the server for remote changes. This is done to ensure we
-    // don't accidentally send the remote changes back to the server.
-    const data = await this._collector.collect(lastSynced);
-
-    // We update the local last synced time before fetching data
-    // from the server. This is necessary to ensure that if the user
-    // makes any local changes, it is not ignored in the next sync.
-    // This is also the last synced time that is set for later sync cycles.
-    data.lastSynced = Date.now();
-    if (full) {
-      // We request remote changes and merge them. If any new changes
-      // come before or during this step (e.g. SSE), it can be safely
-      // ignored because the `lastSynced` time can never be newer
-      // than the change time.
-      var serverResponse = await this._fetch(lastSynced);
-      await this._merger.merge(serverResponse, lastSynced);
-      await this._db.conflicts.check();
-      // ignore the changes that have arrived uptil this point.
-      // this.hasNewChanges = false;
-    }
-
-    if (!areAllEmpty(data)) {
-      lastSynced = await this._send(data);
-    } else if (serverResponse) lastSynced = serverResponse.lastSynced;
-
-    await this._db.storage.write("lastSynced", lastSynced);
-    return true;
-  }
-
-  _mapToIds(data) {
-    const ids = [];
-    for (let arrayKey in data) {
-      const array = data[arrayKey];
-      if (Array.isArray(array)) {
-        for (let item of array) {
-          ids.push(item.id);
-        }
-      }
-    }
-    return ids;
-  }
-
   async _realTimeSync(full, force) {
     if (this._connection.state !== signalr.HubConnectionState.Connected)
       await this._connection.start();
 
     let { lastSynced } = await this._performChecks();
+    const oldLastSynced = lastSynced;
     if (force) lastSynced = 0;
 
-    // Real time sync is different from on-demand sync in a couple of ways:
-    // 1. Since everything is being done in real time, we have to send
-    // local changes before fetching remote changes.
-    // 2. All data is sent in a specific sequence:
-    //    1. Content
-    //    2. Attachments
-    //    3. Notes
-    //    4. Notebooks
-    //    5. Settings
-    // This reduces a lot of complexity in cases where only data has been synced
-    // partially.
-    // 3. Only one sync can run at a time for a single device. This allows for
-    // easy resumability.
-    // 4. Progress events are sent regularly
+    let { syncedAt } = await this._queue.get();
 
-    // We collect, encrypt, and ready local changes before asking
-    // the server for remote changes. This is done to ensure we
-    // don't accidentally send the remote changes back to the server.
-    const data = await this._collector.collect(lastSynced);
-    // save all the item ids before running the sync. this will ensure
-    // resumability.
-    // TODO: const itemIds = mapToIds(data);
-    // const syncData = { itemIds, lastSynced };
-    // await this._db.storage.write("running_sync", syncData);
-
-    // We update the local last synced time before fetching data
-    // from the server. This is necessary to ensure that if the user
-    // makes any local changes, it is not ignored in the next sync.
-    // This is also the last synced time that is set for later sync cycles.
-    const newLastSynced = Date.now();
-    if (full) {
+    if (full && !syncedAt) {
       await this._connection.send("FetchItems", lastSynced);
-      // TODO progress
       var serverResponse = await new Promise((resolve) => {
         this._connection.on("SyncCompleted", (synced, lastSynced) =>
           resolve({ synced, lastSynced })
@@ -231,25 +148,48 @@ export default class Sync {
       await this._db.conflicts.check();
     }
 
-    // All pending attachments are uploaded before anything else.
-    // This is done to ensure that when any note arrives on user's
-    // device, its attachments can be downloaded.
     await this._uploadAttachments();
 
-    if (!areAllEmpty(data)) {
-      await this.sendItemsToServer(
-        "attachment",
-        data.attachments,
-        newLastSynced
+    const data = await this._collector.collect(lastSynced);
+    console.log(data, syncedAt, lastSynced);
+    if (syncedAt) {
+      const newData = this._collector.filter(
+        data,
+        (item) => item.dateModified > syncedAt
       );
-      await this.sendItemsToServer("content", data.content, newLastSynced);
-      await this.sendItemsToServer("note", data.notes, newLastSynced);
-      await this.sendItemsToServer("notebook", data.notebooks, newLastSynced);
-      await this.sendItemsToServer("settings", data.settings, newLastSynced);
-      await this.sendItemsToServer("vaultKey", [data.vaultKey], newLastSynced);
-      if (await this._connection.invoke("SyncCompleted", newLastSynced))
-        lastSynced = newLastSynced;
+      lastSynced = Date.now();
+      await this._queue.merge(newData, lastSynced);
+    } else {
+      lastSynced = Date.now();
+      await this._queue.new(data, lastSynced);
+    }
+
+    if (!areAllEmpty(data)) {
+      const { itemIds } = await this._queue.get();
+      const total = itemIds.length;
+      for (let i = 0; i < total; ++i) {
+        const id = itemIds[i];
+        const [arrayKey, itemId] = id.split(":");
+
+        const array = data[arrayKey] || [];
+        const item = array.find((item) => item.id === itemId);
+        const type = ITEM_TYPE_MAP[arrayKey];
+        if (!item) {
+          continue;
+        }
+
+        if (await this.sendItemToServer(type, item, lastSynced)) {
+          await this._queue.dequeue(id);
+          sendSyncProgressEvent("upload", total, i + 1);
+        }
+      }
+      if (data.vaultKey)
+        await this.sendItemToServer("vaultKey", data.vaultKey, lastSynced);
+
+      if (!(await this._connection.invoke("SyncCompleted", lastSynced)))
+        lastSynced = oldLastSynced;
     } else if (serverResponse) lastSynced = serverResponse.lastSynced;
+    else lastSynced = oldLastSynced;
 
     await this._db.storage.write("lastSynced", lastSynced);
     return true;
@@ -333,18 +273,79 @@ export default class Sync {
     );
   }
 
-  async sendItemsToServer(type, array, dateSynced) {
-    let index = 0;
-    for (const item of array) {
-      if (!item) return;
-      const result = await this._connection.invoke(
-        "SyncItem",
-        type,
-        JSON.stringify(item),
-        dateSynced
-      );
-      if (result !== 1) throw new Error(`Failed to sync item: ${item.id}.`);
-      sendSyncProgressEvent("upload", array.length, ++index);
+  async sendItemToServer(type, item, dateSynced) {
+    if (!item) return;
+    const result = await this._connection.invoke(
+      "SyncItem",
+      type,
+      JSON.stringify(item),
+      dateSynced
+    );
+    return result === 1;
+  }
+}
+
+function mapToIds(data) {
+  const ids = [];
+  const keys = ["attachments", "content", "notes", "notebooks", "settings"];
+  for (let key of keys) {
+    const array = data[key];
+    if (!array || !Array.isArray(array)) continue;
+
+    for (let item of array) {
+      ids.push(`${key}:${item.id}`);
     }
+  }
+  return ids;
+}
+
+class SyncQueue {
+  /**
+   *
+   * @param {import("../../database/storage").default} storage
+   */
+  constructor(storage) {
+    this.storage = storage;
+  }
+
+  async new(data, syncedAt) {
+    const itemIds = mapToIds(data);
+    const syncData = { itemIds, syncedAt };
+    await this.save(syncData);
+    return syncData;
+  }
+
+  async merge(data, syncedAt) {
+    const syncQueue = await this.get();
+    if (!syncQueue.itemIds) return;
+
+    const itemIds = set.union(syncQueue.itemIds, mapToIds(data));
+    const syncData = { itemIds, syncedAt };
+    await this.save(syncData);
+    return syncData;
+  }
+
+  async dequeue(id) {
+    const syncQueue = await this.get();
+    if (!syncQueue || !syncQueue.itemIds) return;
+    const { itemIds } = syncQueue;
+    const index = itemIds.findIndex((i) => i === id);
+    if (index <= -1) return;
+    syncQueue.itemIds.splice(index, 1);
+    await this.save(syncQueue);
+  }
+
+  /**
+   *
+   * @returns {Promise<{ itemIds: string[]; syncedAt: number; }>}
+   */
+  async get() {
+    const syncQueue = await this.storage.read("syncQueue");
+    if (!syncQueue || syncQueue.itemIds.length <= 0) return {};
+    return syncQueue;
+  }
+
+  async save(syncQueue) {
+    await this.storage.write("syncQueue", syncQueue);
   }
 }
