@@ -26,7 +26,6 @@ const markdownPatterns = [
   { start: '*', end: '*', format: 'italic' },
   { start: '**', end: '**', format: 'bold' },
   { start: '`', end: '`', format: 'code' },
-  { start: '#', format: 'h1' },
   { start: '##', format: 'h2' },
   { start: '###', format: 'h3' },
   { start: '####', format: 'h4' },
