@@ -907,7 +907,7 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
 export async function onWebViewLoad(premium, colors) {
   eSendEvent('resetcomplete');
   setTimeout(() => {
-    if (premium) {
+    if (PremiumService.get()) {
       tiny.call(EditorWebView, tiny.setMarkdown, true);
     } else {
       tiny.call(EditorWebView, tiny.removeMarkdown, true);

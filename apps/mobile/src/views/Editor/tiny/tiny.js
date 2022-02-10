@@ -34,11 +34,12 @@ editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', '${placeholder}');
 
 const removeMarkdown = `
 if (globalThis.tinymce && tinymce.activeEditor) {
+  
   tinymce.activeEditor.plugins.textpattern.setPatterns("")
 }`;
 
 const setMarkdown = `
-if (globalThis.tinymce &&  tinymce.activeEditor) {
+if (globalThis.tinymce && tinymce.activeEditor) {
   tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns);
 }`;
 
