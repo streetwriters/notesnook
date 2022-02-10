@@ -4,11 +4,9 @@ import { Button } from '../../../../components/Button';
 import Input from '../../../../components/Input';
 import { useTracked } from '../../../../provider';
 import { useEditorStore, useSettingStore } from '../../../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
 import layoutmanager from '../../../../utils/layout-manager';
 import { SIZE } from '../../../../utils/SizeUtils';
-import { sleep } from '../../../../utils/TimeUtils';
 import { EditorWebView } from '../../Functions';
 import tiny from '../tiny';
 import { endSearch } from './commands';
@@ -70,6 +68,10 @@ const SearcReplace = () => {
         tinymce.activeEditor.plugins.searchreplace.replace("${values.current?.replace}",true${
         all ? ',true' : ''
       });
+      setTimeout(function() {
+        tinymce.activeEditor.fire("input");
+      },100)
+
       });
       `
     );

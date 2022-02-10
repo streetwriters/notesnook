@@ -296,7 +296,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     let func = (value: string) => {
       eUnSubscribeEvent('selectionvalue', func);
       console.log('setSearchReplace:', value, value.length);
-      if ((!value || value.trim() === '') && get().searchReplace) {
+      if (!value && get().searchReplace) {
         endSearch();
         return;
       }

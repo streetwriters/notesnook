@@ -202,19 +202,11 @@ export function safeKeyboardDismiss() {
 }
 
 const undo = `
-	
 tinymce.activeEditor.undoManager.undo();
-
 `;
-const redo = `
-	
-tinymce.activeEditor.undoManager.redo();
+const redo = `tinymce.activeEditor.undoManager.redo();`;
 
-`;
-
-const clearHistory = `
-tinymce.activeEditor.undoManager.clear();
-`;
+const clearHistory = `tinymce.activeEditor.undoManager.clear();`;
 
 const onKeyboardShow = () => {
   if (!editing.movedAway) {
