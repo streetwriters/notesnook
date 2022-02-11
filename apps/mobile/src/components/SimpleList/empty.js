@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
 import * as Progress from 'react-native-progress';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
@@ -7,7 +7,9 @@ import { useTip } from '../../services/tip-manager';
 import { COLORS_NOTE } from '../../utils/Colors';
 import { SIZE } from '../../utils/SizeUtils';
 import { Button } from '../Button';
+import Seperator from '../Seperator';
 import { Tip } from '../Tip';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const Empty = ({ loading = true, placeholderData, headerProps, type, screen }) => {
@@ -67,29 +69,19 @@ export const Empty = ({ loading = true, placeholderData, headerProps, type, scre
           <View
             style={{
               alignSelf: 'center',
-              alignItems: 'center'
+              alignItems: 'flex-start',
+              width: '100%'
             }}
           >
-            <Progress.Bar
-              unfilledColor={colors.nav}
-              borderWidth={0}
-              indeterminate
-              width={70}
-              color={color}
-              indeterminateAnimationDuration={2000}
-              borderRadius={100}
-            />
-            <Paragraph
-              style={{
-                textAlign: 'center',
-                marginTop: 5
-              }}
-              size={SIZE.md}
-              textBreakStrategy="balanced"
-              color={colors.icon}
-            >
-              {loading ? placeholderData.loading : placeholderData.paragraph}
+            <Heading>{placeholderData.heading}</Heading>
+            <Paragraph size={SIZE.sm} textBreakStrategy="balanced">
+              {placeholderData.loading}
             </Paragraph>
+            <Seperator />
+            <ActivityIndicator
+              size={SIZE.lg}
+              color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
+            />
           </View>
         </>
       )}
