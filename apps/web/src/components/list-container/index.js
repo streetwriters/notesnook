@@ -78,7 +78,11 @@ function ListContainer(props) {
                 }
 
                 if (isUp || isDown) {
-                  listRef.current.scrollToIndex(nextIndex);
+                  listRef.current.scrollIntoView({
+                    index: nextIndex,
+                    behavior: "auto",
+                  });
+                  e.preventDefault();
                   const listItem = listContainerRef.current.querySelector(
                     `[data-item-index="${nextIndex}"]`
                   );
