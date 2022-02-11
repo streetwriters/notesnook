@@ -38,19 +38,17 @@ function attachTitleInputListeners() {
     }
   };
 
-  document
-    .getElementById('titleInput')
-    .addEventListener('focus', function (evt) {
-      if (window.ReactNativeWebView) {
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            type: 'focus',
-            value: 'title',
-            sessionId: sessionId
-          })
-        );
-      }
-    });
+  document.getElementById('titleInput').addEventListener('focus', function (evt) {
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          type: 'focus',
+          value: 'title',
+          sessionId: sessionId
+        })
+      );
+    }
+  });
   document.getElementById('titleInput').onpaste = function (evt) {
     onTitleChange();
   };
@@ -76,8 +74,7 @@ function onTitleChange() {
 
     info = document.querySelector(infoBar);
     if (tinymce.activeEditor) {
-      info.querySelector('#infowords').innerText =
-        editor.countWords() + ' words';
+      info.querySelector('#infowords').innerText = editor.countWords() + ' words';
       updateInfoBar();
     }
 
@@ -156,12 +153,13 @@ function attachMessageListener() {
         isLoading = true;
         globalThis.isClearingNoteData = false;
         tinymce.activeEditor.mode.set('readonly');
-        if (!isInvalidValue(value)) {
-          tinymce.activeEditor.setHTML(value);
+        let html = value.data;
+        if (!isInvalidValue(html)) {
+          tinymce.activeEditor.setHTML(html);
           let timeout = 0;
           if (value.length > 400000) {
             timeout = 900;
-          }else if (value.length > 300000) {
+          } else if (value.length > 300000) {
             timeout = 600;
           } else if (value.length > 200000) {
             timeout = 450;
@@ -181,17 +179,16 @@ function attachMessageListener() {
           globalThis.isClearingNoteData = false;
           reactNativeEventHandler('noteLoaded', true);
         }
-        tinymce.activeEditor.mode.set('design');
+        if (!value.readOnly) {
+          tinymce.activeEditor.mode.set('design');
+        }
         info = document.querySelector(infoBar);
-        info.querySelector('#infowords').innerText =
-          editor.countWords() + ' words';
+        info.querySelector('#infowords').innerText = editor.countWords() + ' words';
         updateInfoBar();
         break;
       case 'htmldiff':
         document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;
-        document
-          .querySelector('.htmldiff_div')
-          .setAttribute('contenteditable', 'false');
+        document.querySelector('.htmldiff_div').setAttribute('contenteditable', 'false');
         break;
       case 'theme':
         pageTheme.colors = JSON.parse(value);

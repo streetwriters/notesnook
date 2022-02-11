@@ -2,7 +2,12 @@ import { Platform } from 'react-native';
 import { editing } from '../../../utils';
 import { EditorWebView, getWebviewInit, post, textInput } from '../Functions';
 
-const placeholders = ['hello world', 'this \n that'];
+/**
+ *
+ * @param {"design" | "readonly"} mode
+ * @returns
+ */
+const toogleReadMode = mode => `tinymce.activeEditor.mode.set('${mode}')`;
 
 const reset = id => `
 sessionId = null;
@@ -246,5 +251,6 @@ export default {
   pre,
   setMarkdown,
   removeMarkdown,
-  setPlaceholder
+  setPlaceholder,
+  toogleReadMode
 };

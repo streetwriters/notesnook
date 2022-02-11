@@ -470,6 +470,8 @@ export const useActions = ({ close = () => {}, item }) => {
     eSendEvent(eOpenExportDialog, [item]);
   }
 
+  const toggleReadyOnlyMode = async () => {};
+
   const actions = [
     {
       name: 'Dark Mode',
@@ -636,6 +638,13 @@ export const useActions = ({ close = () => {}, item }) => {
       title: 'Delete ' + item.itemType,
       icon: 'delete',
       func: deleteTrashItem
+    },
+    {
+      name: 'ReadOnly',
+      title: 'Read only',
+      icon: 'pencil-lock',
+      func: toggleReadyOnlyMode,
+      on: item.readonly
     },
     {
       name: 'History',

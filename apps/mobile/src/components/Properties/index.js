@@ -142,6 +142,7 @@ Properties.present = (item, buttons = []) => {
         'Delete',
         'RemoveTopic',
         'History',
+        'ReadOnly',
         ...android,
         ...buttons
       ]);

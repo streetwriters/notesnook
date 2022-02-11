@@ -985,7 +985,10 @@ const loadNoteInEditor = async (keepHistory = true) => {
         );
       } else {
         console.log('posting html');
-        post('html', content.data);
+        post('html', {
+          data: content.data,
+          readOnly: note.readonly
+        });
       }
       if (id) {
         db.attachments.downloadImages(id);

@@ -10,7 +10,7 @@ import layoutmanager from '../../../../utils/layout-manager';
 import { SIZE } from '../../../../utils/SizeUtils';
 import { useKeyboard } from '../../../../utils/use-keyboard';
 import useTooltip, { hideAllTooltips, useTooltipHandler } from '../../../../utils/use-tooltip';
-import { EditorWebView } from '../../Functions';
+import { EditorWebView, getNote } from '../../Functions';
 import tiny from '../tiny';
 import { endSearch } from './commands';
 import { properties } from './constants';
@@ -215,6 +215,7 @@ const SearcReplace = () => {
         fwdRef={switchModeRef}
         iconColor={enableReplace ? colors.accent : colors.icon}
         onPress={() => {
+          if (getNote()?.readonly) return;
           layoutmanager.withSpringAnimation(500);
           if (enableReplace) {
             if (focusType === 2) {
