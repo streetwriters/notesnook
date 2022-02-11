@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Appearance, NativeModules, Platform, SafeAreaView } from 'react-native';
+import { Appearance, NativeModules, Platform, SafeAreaView, View } from 'react-native';
 import { NavigationBar } from 'react-native-bars';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
@@ -24,8 +24,10 @@ import {
 } from '../../services/EventManager';
 import { setRateAppMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
+import SettingsService from '../../services/SettingsService';
 import { editing } from '../../utils';
 import { COLOR_SCHEME_DARK } from '../../utils/Colors';
+import { getColorScheme } from '../../utils/ColorUtils';
 import { db } from '../../utils/database';
 import { eOpenAnnouncementDialog, eOpenLoginDialog } from '../../utils/Events';
 import { MMKV } from '../../utils/mmkv';
@@ -33,8 +35,11 @@ import { tabBarRef } from '../../utils/Refs';
 import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
 import SettingsBackupAndRestore from '../../views/Settings/backup-restore';
+import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 import Input from '../Input';
+import { SvgToPngView } from '../ListPlaceholders';
+import { SVG } from '../LoginDialog/background';
 import Seperator from '../Seperator';
 import SplashScreen from '../SplashScreen';
 import Heading from '../Typography/Heading';
@@ -231,56 +236,78 @@ const AppLoader = ({ onLoad }) => {
       }
     } catch (e) {}
   };
-
   return verifyUser ? (
-    <Animated.View
+    <View
       style={{
-        backgroundColor: Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK.bg : colors.bg,
+        backgroundColor: colors.bg,
         width: '100%',
         height: '100%',
         position: 'absolute',
-        zIndex: 999,
-        borderRadius: 10
+        zIndex: 999
       }}
     >
-      <Animated.View
+      <View
         style={{
-          backgroundColor:
-            Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK.bg : colors.bg,
-          width: '100%',
-          height: '100%',
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderRadius: 10
+          height: 250,
+          overflow: 'hidden'
         }}
       >
-        <SafeAreaView
+        <SvgToPngView src={SVG(colors.night ? 'white' : 'black')} height={700} />
+      </View>
+
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          width: deviceMode !== 'mobile' ? '50%' : Platform.OS == 'ios' ? '95%' : '100%',
+          paddingHorizontal: 12,
+          marginBottom: 30,
+          marginTop: 15
+        }}
+      >
+        <ActionIcon
+          name="fingerprint"
+          size={100}
+          customStyle={{
+            width: 100,
+            height: 100,
+            marginBottom: 20,
+            marginTop: user ? 0 : 50
+          }}
+          onPress={onUnlockBiometrics}
+          color={colors.border}
+        />
+        <Heading
+          color={colors.heading}
           style={{
-            flex: 1,
-            justifyContent: 'center',
-            width: deviceMode !== 'mobile' ? '50%' : Platform.OS == 'ios' ? '95%' : '100%',
-            paddingHorizontal: 12
+            alignSelf: 'center',
+            textAlign: 'center'
           }}
         >
-          <Heading
-            style={{
-              alignSelf: 'center'
-            }}
-          >
-            Verify your identity
-          </Heading>
+          Unlock to access your notes
+        </Heading>
 
+        <Paragraph
+          style={{
+            alignSelf: 'center',
+            textAlign: 'center',
+            fontSize: SIZE.md,
+            maxWidth: '90%'
+          }}
+        >
+          Please verify it's you
+        </Paragraph>
+        <Seperator />
+        <View
+          style={{
+            width: '100%',
+            padding: 12,
+            backgroundColor: colors.bg,
+            flexGrow: 1
+          }}
+        >
           {user ? (
             <>
-              <Paragraph
-                style={{
-                  alignSelf: 'center'
-                }}
-              >
-                To keep your notes secure, please enter password of the account you are logged in
-                to.
-              </Paragraph>
-              <Seperator />
               <Input
                 fwdRef={pwdInput}
                 secureTextEntry
@@ -288,42 +315,47 @@ const AppLoader = ({ onLoad }) => {
                 onChangeText={v => (passwordValue = v)}
                 onSubmit={onSubmit}
               />
-              <Seperator half />
-              <Button
-                title="Unlock"
-                type="accent"
-                onPress={onSubmit}
-                width="100%"
-                height={50}
-                fontSize={SIZE.md}
-              />
-              <Seperator />
             </>
-          ) : (
-            <>
-              <Paragraph
-                style={{
-                  alignSelf: 'center'
-                }}
-              >
-                To keep your notes secure, please unlock app the with biometrics.
-              </Paragraph>
-              <Seperator />
-            </>
-          )}
+          ) : null}
 
-          <Button
-            title="Unlock with Biometrics"
-            width="100%"
-            height={50}
-            onPress={onUnlockBiometrics}
-            icon={'fingerprint'}
-            type={!user ? 'accent' : 'transparent'}
-            fontSize={SIZE.md}
-          />
-        </SafeAreaView>
-      </Animated.View>
-    </Animated.View>
+          <View
+            style={{
+              marginTop: user ? 50 : 25
+            }}
+          >
+            {user ? (
+              <>
+                <Button
+                  title="Continue"
+                  type="accent"
+                  onPress={onSubmit}
+                  width={250}
+                  height={45}
+                  style={{
+                    borderRadius: 150,
+                    marginBottom: 10
+                  }}
+                  fontSize={SIZE.md}
+                />
+              </>
+            ) : null}
+
+            <Button
+              title="Unlock with Biometrics"
+              width={250}
+              height={45}
+              style={{
+                borderRadius: 100
+              }}
+              onPress={onUnlockBiometrics}
+              icon={'fingerprint'}
+              type={user ? 'grayAccent' : 'accent'}
+              fontSize={SIZE.md}
+            />
+          </View>
+        </View>
+      </View>
+    </View>
   ) : requireIntro.value && !_loading ? (
     <SplashScreen />
   ) : null;

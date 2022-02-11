@@ -44,7 +44,9 @@ const Input = ({
   buttons,
   marginRight,
   autoCorrect = true,
-  buttonLeft
+  buttonLeft,
+  inputStyle = {},
+  containerStyle = {}
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -138,7 +140,8 @@ const Input = ({
     flexGrow: 1,
     height: height || 50,
     paddingHorizontal: 12,
-    paddingRight: buttons || button || secureTextEntry || error ? 6 : 12
+    paddingRight: buttons || button || secureTextEntry || error ? 6 : 12,
+    ...containerStyle
   };
 
   const textStyle = {
@@ -149,7 +152,8 @@ const Input = ({
     paddingBottom: 2.5,
     flexGrow: 1,
     height: height || 50,
-    fontFamily: 'OpenSans-Regular'
+    fontFamily: 'OpenSans-Regular',
+    ...inputStyle
   };
 
   return (

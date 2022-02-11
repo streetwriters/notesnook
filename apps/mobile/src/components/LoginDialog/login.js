@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { eCloseLoginDialog } from '../../utils/Events';
+import { SheetManager } from 'react-native-actions-sheet';
 import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
@@ -8,6 +8,7 @@ import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManage
 import { clearMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
 import { db } from '../../utils/database';
+import { eCloseLoginDialog } from '../../utils/Events';
 import { MMKV } from '../../utils/mmkv';
 import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
@@ -20,7 +21,6 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import { SVG } from './background';
 import { ForgotPassword } from './forgot-password';
-import { SheetManager } from 'react-native-actions-sheet';
 
 export const Login = ({ changeMode }) => {
   const [state] = useTracked();
