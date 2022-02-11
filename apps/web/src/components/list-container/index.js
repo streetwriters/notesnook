@@ -1,9 +1,12 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
 import * as Icon from "../icons";
 import { Virtuoso } from "react-virtuoso";
-import { useStore as useSelectionStore } from "../../stores/selection-store";
+import {
+  useStore as useSelectionStore,
+  store as selectionStore,
+} from "../../stores/selection-store";
 import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
 import { CustomScrollbarsVirtualList } from "../scroll-container";
@@ -15,16 +18,10 @@ function ListContainer(props) {
   const { type, groupType, items, context, refresh, header } = props;
   const [announcements, removeAnnouncement] = useAnnouncements();
   const profile = useMemo(() => ListProfiles[type], [type]);
-  const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
   const listRef = useRef();
   const focusedItemIndex = useRef(-1);
   const listContainerRef = useRef();
-
-  useEffect(() => {
-    if (shouldSelectAll && window.currentViewKey === type)
-      setSelectedItems(items.filter((item) => item.type !== "header"));
-  }, [shouldSelectAll, type, setSelectedItems, items]);
 
   return (
     <Flex variant="columnFill">
@@ -55,7 +52,21 @@ function ListContainer(props) {
               computeItemKey={(index) => items[index].id || items[index].title}
               defaultItemHeight={profile.estimatedItemHeight}
               totalCount={items.length}
+              onKeyUp={(e) => {
+                if (e.code === "Escape") {
+                  selectionStore.toggleSelectionMode(false);
+                }
+              }}
               onKeyDown={(e) => {
+                if (e.code === "KeyA" && e.ctrlKey) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSelectedItems(
+                    items.filter((item) => item.type !== "header")
+                  );
+                  return;
+                }
+
                 const isUp = e.code === "ArrowUp";
                 const isDown = e.code === "ArrowDown";
                 const isHeader = (i) => items && items[i]?.type === "header";
