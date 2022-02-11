@@ -128,12 +128,16 @@ function GroupHeader(props) {
       onClick={(e) => {
         if (groups.length <= 0) return;
         e.stopPropagation();
-        const items = groups.map((group) => ({
-          key: group.title,
-          title: () => group.title,
-          onClick: () => onJump(group.title),
-          checked: group.title === title,
-        }));
+        const items = groups.map((group) => {
+          const groupTitle = group.title.toString();
+          return {
+            key: groupTitle,
+            title: () => groupTitle,
+            onClick: () => onJump(groupTitle),
+            checked: group.title === title,
+          };
+        });
+
         openContextMenu(e, items, {
           title: "Jump to group",
         });
