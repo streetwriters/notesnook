@@ -337,11 +337,11 @@ export const loadNote = async item => {
 
       return;
     }
-    tiny.call(
-      EditorWebView,
-      `toggleNode(".tag-bar-parent","show"); 
-    clearNode(".tag-bar")`
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `toggleNode(".tag-bar-parent","show");
+    // clearNode(".tag-bar")`
+    // );
     makeSessionId(item);
     useEditorStore.getState().setSessionId(sessionId);
     webviewInit = true;
@@ -913,7 +913,6 @@ export async function onWebViewLoad(premium, colors) {
       tiny.call(EditorWebView, tiny.removeMarkdown, true);
     }
   }, 300);
-  eSendEvent('updateTags');
   setColors(colors);
   tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
 }
