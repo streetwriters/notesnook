@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { RefObject, useState } from 'react';
 import { View } from 'react-native';
+import ActionSheet from 'react-native-actions-sheet';
 import { FlatList } from 'react-native-gesture-handler';
 import { useTracked } from '../../provider';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
@@ -17,7 +18,15 @@ import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const MoveNotes = ({ notebook, selectedTopic }: { notebook: any; selectedTopic?: any }) => {
+export const MoveNotes = ({
+  notebook,
+  selectedTopic,
+  fwdRef
+}: {
+  notebook: any;
+  selectedTopic?: any;
+  fwdRef: RefObject<ActionSheet>;
+}) => {
   const [state] = useTracked();
   const colors = state.colors;
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
@@ -93,7 +102,7 @@ export const MoveNotes = ({ notebook, selectedTopic }: { notebook: any; selected
             select(item.id);
           }
         }}
-        type={'grayAccent'}
+        type={'transparent'}
         customStyle={{
           paddingVertical: 12,
           justifyContent: 'space-between',
@@ -189,7 +198,7 @@ export const MoveNotes = ({ notebook, selectedTopic }: { notebook: any; selected
               marginTop: 5
             }}
           >
-            <Paragraph color={colors.accent}>{topic.title}</Paragraph>
+            <Paragraph color={colors.accent}>in {topic.title}</Paragraph>
 
             <Paragraph
               style={{
@@ -215,6 +224,10 @@ export const MoveNotes = ({ notebook, selectedTopic }: { notebook: any; selected
       )}
 
       <FlatList
+        nestedScrollEnabled
+        onMomentumScrollEnd={() => {
+          fwdRef.current?.handleChildScrollEnd();
+        }}
         ListEmptyComponent={
           <View
             style={{
@@ -236,7 +249,7 @@ export const MoveNotes = ({ notebook, selectedTopic }: { notebook: any; selected
                 onPress={() => {
                   openAddTopicDialog();
                 }}
-                title="Add a topic"
+                title="Add first topic"
                 type="grayAccent"
               />
             )}
@@ -276,6 +289,6 @@ export const MoveNotes = ({ notebook, selectedTopic }: { notebook: any; selected
 
 MoveNotes.present = (notebook: any, topic: any) => {
   presentSheet({
-    component: <MoveNotes notebook={notebook} selectedTopic={topic} />
+    component: ref => <MoveNotes fwdRef={ref} notebook={notebook} selectedTopic={topic} />
   });
 };

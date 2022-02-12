@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Appearance, NativeModules, Platform, SafeAreaView, View } from 'react-native';
-import { NavigationBar } from 'react-native-bars';
+import { NativeModules, Platform, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
-import Animated from 'react-native-reanimated';
 import { useTracked } from '../../provider';
 import {
   useFavoriteStore,
@@ -12,7 +10,6 @@ import {
   useSettingStore,
   useUserStore
 } from '../../provider/stores';
-import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
 import { DDS } from '../../services/DeviceDetection';
 import {
@@ -24,12 +21,9 @@ import {
 } from '../../services/EventManager';
 import { setRateAppMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
-import SettingsService from '../../services/SettingsService';
 import { editing } from '../../utils';
-import { COLOR_SCHEME_DARK } from '../../utils/Colors';
-import { getColorScheme } from '../../utils/ColorUtils';
 import { db } from '../../utils/database';
-import { eOpenAnnouncementDialog, eOpenLoginDialog } from '../../utils/Events';
+import { eOpenAnnouncementDialog } from '../../utils/Events';
 import { MMKV } from '../../utils/mmkv';
 import { tabBarRef } from '../../utils/Refs';
 import { SIZE } from '../../utils/SizeUtils';

@@ -5,7 +5,6 @@ import { Actions } from '../provider/Actions';
 import { useSettingStore } from '../provider/stores';
 import { AndroidModule } from '../utils';
 import { getColorScheme } from '../utils/ColorUtils';
-import layoutmanager from '../utils/layout-manager';
 import { MMKV } from '../utils/mmkv';
 import { scale, updateSize } from '../utils/SizeUtils';
 import Notifications from './Notifications';
@@ -97,7 +96,7 @@ async function init() {
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
-    updateEvent({ type: Actions.THEME, colors: newColors });
+    updateEvent({ type: Actions.THEME, colors: { ...newColors } });
   }
 };
 

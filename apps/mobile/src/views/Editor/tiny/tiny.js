@@ -33,8 +33,8 @@ clearNode(".tag-bar");
 `;
 
 const setPlaceholder = placeholder => `
-editor.dom.setAttrib(editor.dom.doc.body, 'data-mce-placeholder', '${placeholder}');
-editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', '${placeholder}');
+editor.dom.setAttrib(editor.dom.doc.body, 'data-mce-placeholder', "${placeholder}");
+editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', "${placeholder}");
 `;
 
 const removeMarkdown = `

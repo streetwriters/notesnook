@@ -33,15 +33,15 @@ export type TTip = {
   button?: TipButton;
 };
 
-type Popup = {
+export type Popup = {
   id: string;
   text: string;
 };
 
 const destructiveContexts = ['first-note'];
 
-let tipState = {};
-let popState = {};
+let tipState: { [name: string]: boolean } = {};
+let popState: { [name: string]: boolean } = {};
 
 export class TipManager {
   static async init() {
@@ -82,10 +82,14 @@ export class TipManager {
     let pop = popups.find(p => p.id === id);
     //@ts-ignore
     if (popState[id]) return null;
+
+    return pop;
+  }
+
+  static markPopupUsed(id: string) {
     //@ts-ignore
     popState[id] = true;
     MMKV.setItem('popupState', JSON.stringify(popState));
-    return pop;
   }
 
   static placeholderTip() {
@@ -161,6 +165,8 @@ const popups: Popup[] = [
 ];
 
 const placeholderTips = [
-  `Privacy is really important and a must have. Many people take this lightly but remember. Privacy is everything.`,
-  `Notes can be pinned in notifications from Properties.`
+  `Want to remember something? Pin an\nimportant in notifications.`,
+  `Privacy is power. What people don't know they cant ruin`,
+  `If you read someone else's diary, you get what you deserve. - David Sedaris`,
+  'Take quick notes from notifications. Just enable the option in Settings.'
 ];

@@ -8,15 +8,14 @@ import Navigation from '../../services/Navigation';
 import { db } from '../../utils/database';
 import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
 import { normalize, SIZE } from '../../utils/SizeUtils';
-import SheetWrapper from '../Sheet';
 import { Button } from '../Button';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import { Notice } from '../Notice';
 import { PressableButton } from '../PressableButton';
+import { Properties } from '../Properties';
 import Seperator from '../Seperator';
+import SheetWrapper from '../Sheet';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { Properties } from '../Properties';
-import { Notice } from '../Notice';
 
 export const TagsSection = () => {
   const menuPins = useMenuStore(state => state.menuPins);
@@ -96,7 +95,7 @@ export const TagsSection = () => {
   );
 };
 
-const PinItem = ({ item, index, onPress }) => {
+export const PinItem = ({ item, index, onPress, placeholder }) => {
   const [state, dispatch] = useTracked();
   const { colors } = state;
   const setMenuPins = useMenuStore(state => state.setMenuPins);
@@ -115,6 +114,7 @@ const PinItem = ({ item, index, onPress }) => {
   };
 
   useEffect(() => {
+    if (placeholder) return;
     eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
     return () => {
       eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
@@ -159,6 +159,7 @@ const PinItem = ({ item, index, onPress }) => {
       <PressableButton
         type={headerTextState?.id === item.id ? 'grayBg' : 'gray'}
         onLongPress={() => {
+          if (placeholder) return;
           Properties.present(item);
         }}
         onPress={() => onPress(item)}

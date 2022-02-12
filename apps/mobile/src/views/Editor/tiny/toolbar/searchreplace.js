@@ -37,9 +37,8 @@ const SearcReplace = () => {
 
   useTooltipHandler('searchreplace', () => {
     let popup = TipManager.popup('searchreplace');
-    console.log('showing:', popup);
     if (popup) {
-      tooltip.show(switchModeRef, popup.text, 'top');
+      tooltip.show(switchModeRef, popup, 'top');
     }
   });
 
@@ -216,6 +215,7 @@ const SearcReplace = () => {
         iconColor={enableReplace ? colors.accent : colors.icon}
         onPress={() => {
           if (getNote()?.readonly) return;
+          hideAllTooltips();
           layoutmanager.withSpringAnimation(500);
           if (enableReplace) {
             if (focusType === 2) {

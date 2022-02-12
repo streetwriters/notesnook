@@ -3,7 +3,7 @@ import { createContainer } from 'react-tracked';
 import { defaultState } from './DefaultState';
 import { reducer } from './Reducer';
 
-type TrackedState = typeof defaultState;
+export type TrackedState = typeof defaultState;
 
 const useValue: () => [TrackedState, React.DispatchWithoutAction] = () =>
   useReducer(reducer, defaultState);

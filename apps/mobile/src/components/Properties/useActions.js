@@ -641,7 +641,7 @@ export const useActions = ({ close = () => {}, item }) => {
     },
     {
       name: 'ReadOnly',
-      title: 'Read only',
+      title: 'Lock editing',
       icon: 'pencil-lock',
       func: toggleReadyOnlyMode,
       on: item.readonly

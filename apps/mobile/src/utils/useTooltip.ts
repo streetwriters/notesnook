@@ -3,11 +3,14 @@ import { RefObject, useEffect, useRef } from 'react';
 import RNTooltips from 'react-native-tooltips';
 import { useTracked } from '../provider';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
+import { Popup, TipManager } from '../services/tip-manager';
 import { useKeyboard } from './use-keyboard';
 
 let currentTargets: number[] = [];
+let timers: NodeJS.Timeout[] = [];
 
 export const hideAllTooltips = async () => {
+  timers.forEach(t => t && clearTimeout(t));
   for (let target of currentTargets) {
     if (target) {
       console.log('dimissing targets', target);
@@ -37,23 +40,26 @@ const useTooltip = () => {
 
   function show(
     target: RefObject<any>,
-    text: string,
+    popup: Popup,
     position: keyof typeof positions,
     duration: number
   ) {
     if (!target?.current || !parent?.current) return;
     target.current && RNTooltips.Dismiss(target.current);
     currentTargets.push(target.current._nativeTag);
-    RNTooltips.Show(target.current, parent.current, {
-      text: text,
-      tintColor: colors.night ? colors.nav : '#404040',
-      corner: 80,
-      textSize: 15,
-      position: positions[position],
-      duration: duration || 10000,
-      clickToHide: true,
-      shadow: true
-    });
+    timers[timers.length] = setTimeout(() => {
+      TipManager.markPopupUsed(popup.id);
+      RNTooltips.Show(target.current, parent.current, {
+        text: popup.text,
+        tintColor: colors.night ? colors.nav : '#404040',
+        corner: 80,
+        textSize: 15,
+        position: positions[position],
+        duration: duration || 10000,
+        clickToHide: true,
+        shadow: true
+      });
+    }, 1000);
   }
 
   return { parent, show };

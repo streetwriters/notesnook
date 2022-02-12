@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { Popable, usePopable } from 'react-native-popable';
 import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
 import {
@@ -16,7 +15,6 @@ import { COLORS_NOTE } from '../../utils/Colors';
 import { db } from '../../utils/database';
 import { eOpenJumpToDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
 import useTooltip, { useTooltipHandler } from '../../utils/use-tooltip';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
@@ -40,13 +38,13 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
     if (!popup) return;
     switch (popup.id) {
       case 'sortmenu':
-        tooltip.show(sortRef, popup.text, 'top');
+        tooltip.show(sortRef, popup, 'top');
         break;
       case 'jumpto':
-        tooltip.show(jumpToRef, popup.text, 'top');
+        tooltip.show(jumpToRef, popup, 'top');
         break;
       case 'compactmode':
-        tooltip.show(compactModeRef, popup.text, 'top');
+        tooltip.show(compactModeRef, popup, 'top');
         break;
     }
   });

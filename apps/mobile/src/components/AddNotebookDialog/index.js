@@ -14,6 +14,7 @@ import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
+import { MoveNotes } from '../MoveNoteDialog/movenote';
 import Seperator from '../Seperator';
 import SheetWrapper from '../Sheet';
 import { Toast } from '../Toast';
@@ -162,7 +163,7 @@ export class AddNotebookDialog extends React.Component {
         this.currentInputValue = null;
       }
     }
-
+    let newNotebookId = null;
     if (notebook) {
       if (this.topicsToDelete?.length > 0) {
         await db.notebooks.notebook(toEdit.id).topics.delete(...this.topicsToDelete);
@@ -189,7 +190,7 @@ export class AddNotebookDialog extends React.Component {
 
       await db.notebooks.notebook(toEdit.id).topics.add(...nextTopics);
     } else {
-      await db.notebooks.add({
+      newNotebookId = await db.notebooks.add({
         title: this.title,
         description: this.description,
         topics: prevTopics,
@@ -206,6 +207,10 @@ export class AddNotebookDialog extends React.Component {
       loading: false
     });
     this.close();
+    await sleep(300);
+    if (!notebook) {
+      MoveNotes.present(db.notebooks.notebook(newNotebookId).data);
+    }
   };
 
   onSubmit = (forward = true) => {

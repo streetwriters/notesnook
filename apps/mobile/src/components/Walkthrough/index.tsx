@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Image, LayoutAnimation, View } from 'react-native';
+import { LayoutAnimation, View } from 'react-native';
+import { useTracked } from '../../provider';
 import { eSendEvent, presentSheet } from '../../services/EventManager';
 import { eCloseProgressDialog } from '../../utils/Events';
 import { MMKV } from '../../utils/mmkv';
@@ -11,6 +12,8 @@ import Paragraph from '../Typography/Paragraph';
 import walkthroughs, { TStep } from './walkthroughs';
 
 export const Walkthrough = ({ steps }: { steps: TStep[] }) => {
+  const [state] = useTracked();
+  const colors = state.colors;
   const [step, setStep] = useState<TStep>(steps && steps[0]);
 
   const next = () => {
@@ -28,16 +31,8 @@ export const Walkthrough = ({ steps }: { steps: TStep[] }) => {
         paddingBottom: 0
       }}
     >
-      <Image
-        source={{ uri: step.image }}
-        style={{
-          width: '100%',
-          height: 200,
-          borderRadius: 10,
-          alignSelf: 'center',
-          marginBottom: 10
-        }}
-      />
+      {step.walkthroughItem(colors)}
+
       <Heading>{step.title}</Heading>
       <Paragraph
         style={{
@@ -55,7 +50,7 @@ export const Walkthrough = ({ steps }: { steps: TStep[] }) => {
         style={{
           borderRadius: 100,
           height: 40,
-          marginTop: 10
+          marginTop: 20
         }}
         onPress={async () => {
           switch (step.button?.type) {
@@ -77,16 +72,17 @@ export const Walkthrough = ({ steps }: { steps: TStep[] }) => {
       <Button
         //@ts-ignore
         style={{
-          borderRadius: 100,
-          height: 40,
+          height: 30,
           marginTop: 10
+        }}
+        textStyle={{
+          textDecorationLine: 'underline'
         }}
         onPress={async () => {
           eSendEvent(eCloseProgressDialog);
         }}
-        width={250}
-        title="Skip"
-        type="grayBg"
+        type="gray"
+        title="Skip introduction"
       />
     </View>
   );
