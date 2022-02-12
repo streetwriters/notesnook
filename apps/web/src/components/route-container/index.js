@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore } from "../../stores/app-store";
-import { useStore as useSelectionStore } from "../../stores/selection-store";
-import { CREATE_BUTTON_MAP, SELECTION_OPTIONS_MAP } from "../../common";
+import { CREATE_BUTTON_MAP } from "../../common";
 import useMobile from "../../utils/use-mobile";
 import { navigate } from "../../navigation";
 import { Input } from "@rebass/forms";
@@ -41,12 +40,6 @@ function Header(props) {
   const createButtonData = CREATE_BUTTON_MAP[type];
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
-  const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
-  const selectAll = useSelectionStore((store) => store.selectAll);
-  const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
-  const toggleSelectionMode = useSelectionStore(
-    (store) => store.toggleSelectionMode
-  );
 
   // if (!subtitle) return null;
   return (
@@ -84,74 +77,33 @@ function Header(props) {
             />
           )}
         </Flex>
-        <SelectionOptions options={SELECTION_OPTIONS_MAP[type]} />
-        {!isSelectionMode && (
-          <Flex flexShrink={0}>
-            {buttons?.search && (
-              <Icon.Search
-                size={24}
-                title={buttons.search.title}
-                onClick={() => navigate(`/search/${type}`)}
-              />
-            )}
+        <Flex flexShrink={0}>
+          {buttons?.search && (
+            <Icon.Search
+              size={24}
+              title={buttons.search.title}
+              onClick={() => navigate(`/search/${type}`)}
+            />
+          )}
 
-            {!isMobile && createButtonData && (
-              <Icon.Plus
-                data-test-id={`${type}-action-button`}
-                color="static"
-                size={18}
-                sx={{
-                  bg: "primary",
-                  ml: 2,
-                  borderRadius: 100,
-                  size: 28,
-                  ":hover": { boxShadow: "0px 0px 5px 0px var(--dimPrimary)" },
-                }}
-                title={createButtonData.title}
-                onClick={createButtonData.onClick}
-              />
-            )}
-          </Flex>
-        )}
-      </Flex>
-      {isSelectionMode && (
-        <Flex
-          mb={2}
-          notebook
-          alignItems="center"
-          sx={{ cursor: "pointer" }}
-          onClick={() => {
-            if (shouldSelectAll) toggleSelectionMode(false);
-            else selectAll();
-          }}
-        >
-          <Icon.Select size={16} sx={{ mr: 1 }} />
-          <Text variant="body">
-            {shouldSelectAll ? "Unselect all" : "Select all"}
-          </Text>
+          {!isMobile && createButtonData && (
+            <Icon.Plus
+              data-test-id={`${type}-action-button`}
+              color="static"
+              size={18}
+              sx={{
+                bg: "primary",
+                ml: 2,
+                borderRadius: 100,
+                size: 28,
+                ":hover": { boxShadow: "0px 0px 5px 0px var(--dimPrimary)" },
+              }}
+              title={createButtonData.title}
+              onClick={createButtonData.onClick}
+            />
+          )}
         </Flex>
-      )}
-    </Flex>
-  );
-}
-
-function SelectionOptions(props) {
-  const { options } = props;
-
-  const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
-
-  if (!isSelectionMode || !options) return null;
-  return (
-    <Flex flexShrink={0}>
-      {options.map((option) => (
-        <option.icon
-          title={option.title}
-          size={20}
-          key={option.key}
-          onClick={option.onClick}
-          sx={{ cursor: "pointer", mx: 2 }}
-        />
-      ))}
+      </Flex>
     </Flex>
   );
 }
