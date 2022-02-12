@@ -45,9 +45,14 @@ function ListItem(props) {
     isCompact,
   } = props;
 
-  const selectedItems = useSelectionStore((store) => store.selectedItems);
-  const isSelected =
-    selectedItems.findIndex((item) => props.item.id === item.id) > -1;
+  const isSelected = useSelectionStore((store) => {
+    const inInSelection =
+      store.selectedItems.findIndex((item) => props.item.id === item.id) > -1;
+    return isFocused
+      ? store.selectedItems.length > 1 && inInSelection
+      : inInSelection;
+  });
+
   const selectItem = useSelectionStore((store) => store.selectItem);
   const { openMenu } = useMenuTrigger();
 
@@ -55,7 +60,7 @@ function ListItem(props) {
     let items = props.menu?.items;
     if (!items) return [];
 
-    if (selectedItems.length > 0) {
+    if (isSelected) {
       const options = SELECTION_OPTIONS_MAP[window.currentViewType];
       items = options.map((option) => {
         return {
@@ -70,7 +75,7 @@ function ListItem(props) {
     if (Config.get("debugMode", false))
       items = [...items, ...debugMenuItems(props.item.type)];
     return items;
-  }, [props.menu?.items, props.item.type, selectedItems.length]);
+  }, [props.menu?.items, props.item.type, isSelected]);
 
   return (
     <Flex
@@ -111,11 +116,11 @@ function ListItem(props) {
       justifyContent={isCompact ? "space-between" : "center"}
       alignItems={isCompact ? "center" : undefined}
       onClick={(e) => {
-        //e.stopPropagation();
         if (e.ctrlKey) {
           selectItem(props.item);
         } else {
           selectionStore.toggleSelectionMode(false);
+          selectItem(props.item);
           props.onClick();
         }
       }}
