@@ -37,6 +37,13 @@ function GlobalMenuWrapper() {
       contentElement={(props, children) => (
         <Box
           {...props}
+          onKeyDown={(e) => {
+            if (props.onKeyDown) props.onKeyDown(e);
+            if (e.key === "Escape") {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+          }}
           style={{}}
           sx={{
             top: 0,

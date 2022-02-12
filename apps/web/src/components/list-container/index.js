@@ -56,12 +56,11 @@ function ListContainer(props) {
               computeItemKey={(index) => items[index].id || items[index].title}
               defaultItemHeight={profile.estimatedItemHeight}
               totalCount={items.length}
-              onKeyUp={(e) => {
+              onKeyDown={(e) => {
                 if (e.code === "Escape") {
                   selectionStore.toggleSelectionMode(false);
+                  return;
                 }
-              }}
-              onKeyDown={(e) => {
                 if (e.code === "KeyA" && e.ctrlKey) {
                   e.preventDefault();
                   e.stopPropagation();
