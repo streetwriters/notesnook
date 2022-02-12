@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { getHomeRoute, NavigationEvents } from "../../navigation";
+import { store as selectionStore } from "../../stores/selection-store";
 import useRoutes from "../../utils/use-routes";
 import RouteContainer from "../route-container";
 import ThemeProvider from "../theme-provider";
@@ -10,7 +11,11 @@ var cache = {};
 function CachedRouter() {
   const [RouteResult, location] = useRoutes(routes, {
     fallbackRoute: getHomeRoute(),
+    hooks: {
+      beforeNavigate: () => selectionStore.toggleSelectionMode(false),
+    },
   });
+
   useEffect(() => {
     if (!RouteResult) return;
     NavigationEvents.publish("onNavigate", RouteResult, location);
