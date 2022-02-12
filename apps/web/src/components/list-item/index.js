@@ -112,7 +112,9 @@ function ListItem(props) {
       justifyContent={isCompact ? "space-between" : "center"}
       alignItems={isCompact ? "center" : undefined}
       onClick={(e) => {
-        if (e.ctrlKey) {
+        if (e.shiftKey) {
+          //ignore (handled by listcontainer)
+        } else if (e.ctrlKey) {
           selectItem(props.item);
         } else {
           selectionStore.toggleSelectionMode(false);

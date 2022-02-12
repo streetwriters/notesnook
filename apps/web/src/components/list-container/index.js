@@ -21,6 +21,7 @@ function ListContainer(props) {
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
   const listRef = useRef();
   const focusedItemIndex = useRef(-1);
+  const anchorIndex = useRef();
   const listContainerRef = useRef();
   const groups = useMemo(
     () => props.items.filter((v) => v.type === "header"),
@@ -47,6 +48,9 @@ function ListContainer(props) {
                 focusedItemIndex.current = parseInt(
                   e.target.parentElement.dataset.index
                 );
+
+                if (selectionStore.get().selectedItems < 2)
+                  anchorIndex.current = focusedItemIndex.current;
               }
             }}
           >
@@ -56,6 +60,15 @@ function ListContainer(props) {
               computeItemKey={(index) => items[index].id || items[index].title}
               defaultItemHeight={profile.estimatedItemHeight}
               totalCount={items.length}
+              onMouseDown={(e) => {
+                const listItem = e.target.closest(`[data-item-index]`);
+                if (e.shiftKey && listItem) {
+                  e.preventDefault();
+                  const endIndex = parseInt(listItem.dataset.index);
+                  if (isNaN(endIndex)) return;
+                  setSelectedItems(items.slice(anchorIndex, endIndex + 1));
+                }
+              }}
               onKeyDown={(e) => {
                 if (e.code === "Escape") {
                   selectionStore.toggleSelectionMode(false);
@@ -70,11 +83,13 @@ function ListContainer(props) {
                   return;
                 }
 
+                const isShiftKey = e.shiftKey;
                 const isUp = e.code === "ArrowUp";
                 const isDown = e.code === "ArrowDown";
                 const isHeader = (i) => items && items[i]?.type === "header";
-                const moveDown = (i) => (i < items.length - 1 ? ++i : 0);
-                const moveUp = (i) => (i > 0 ? --i : items.length - 1);
+                const moveDown = (i) =>
+                  i < items.length - 1 ? ++i : items.length - 1;
+                const moveUp = (i) => (i > 0 ? --i : 0);
 
                 let i = focusedItemIndex.current;
                 let nextIndex = i;
@@ -92,16 +107,41 @@ function ListContainer(props) {
                 }
 
                 if (isUp || isDown) {
+                  e.preventDefault();
+
                   listRef.current.scrollIntoView({
                     index: nextIndex,
                     behavior: "auto",
+                    done: () => {
+                      const query = `[data-item-index="${nextIndex}"]`;
+                      const listItem = document.querySelector(query);
+                      if (!listItem) return;
+                      listItem.firstElementChild.focus();
+                    },
                   });
-                  e.preventDefault();
-                  const listItem = listContainerRef.current.querySelector(
-                    `[data-item-index="${nextIndex}"]`
-                  );
-                  if (!listItem) return;
-                  listItem.firstElementChild.focus();
+
+                  if (isShiftKey) {
+                    const isUp = nextIndex < i; // ? "up" : "down";
+                    const isBefore = nextIndex < anchorIndex.current; // ? "before" : "after";
+                    let isSelect = isBefore ? isUp : !isUp;
+                    const selectedItems = selectionStore
+                      .get()
+                      .selectedItems.slice();
+
+                    if (isSelect && nextIndex === anchorIndex.current) {
+                      isSelect = false;
+                    }
+
+                    if (isSelect) selectedItems.push(items[nextIndex]);
+                    else {
+                      const indexOfItem = selectedItems.indexOf(items[i]);
+                      if (indexOfItem <= -1) return;
+                      selectedItems.splice(indexOfItem, 1);
+                    }
+                    setSelectedItems(selectedItems);
+                  } else {
+                    selectionStore.toggleSelectionMode(false);
+                  }
                 }
               }}
               // overscan={10}
