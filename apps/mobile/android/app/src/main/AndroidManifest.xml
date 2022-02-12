@@ -22,7 +22,7 @@
         android:theme="@style/BootTheme"
         android:largeHeap="true"
         android:usesCleartextTraffic="true">
-        <receiver android:exported="true" android:name=".NoteWidget">
+        <receiver android:exported="false" android:name=".NoteWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -73,6 +73,8 @@
             android:noHistory="true"
             android:screenOrientation="unspecified"
             android:exported="true"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppThemeB">
             <intent-filter android:label="Make Note">
@@ -84,9 +86,7 @@
             </intent-filter>
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
