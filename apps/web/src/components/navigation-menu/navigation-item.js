@@ -17,14 +17,15 @@ function NavigationItem(props) {
       data-test-id={`navitem-${title.toLowerCase()}`}
       variant="icon"
       bg={props.selected ? "border" : "transparent"}
-      p={2}
-      mx={2}
-      mt={[1, 2, 1]}
+      px={2}
+      py={"9px"}
+      mx={1}
+      mt={[1, 2, "3px"]}
       sx={{
         borderRadius: "default",
         position: "relative",
-        ":first-of-type": { mt: 2 },
-        ":last-of-type": { mb: 2 },
+        ":first-of-type": { mt: 1 },
+        ":last-of-type": { mb: 1 },
       }}
       label={title}
       title={title}
