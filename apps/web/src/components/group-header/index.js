@@ -129,7 +129,7 @@ function map(items) {
 }
 
 function GroupHeader(props) {
-  const { title, groups, onJump, index, type, refresh } = props;
+  const { title, groups, onJump, index, type, refresh, onSelectGroup } = props;
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(type)
   );
@@ -160,6 +160,10 @@ function GroupHeader(props) {
     <AnimatedFlex
       transition={{ duration: 0.3, repeatType: "reverse", repeat: 3 }}
       onClick={(e) => {
+        if (e.ctrlKey) {
+          onSelectGroup();
+          return;
+        }
         if (groups.length <= 0) return;
         e.stopPropagation();
         const items = groups.map((group) => ({

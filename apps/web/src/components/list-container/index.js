@@ -22,6 +22,10 @@ function ListContainer(props) {
   const listRef = useRef();
   const focusedItemIndex = useRef(-1);
   const listContainerRef = useRef();
+  const groups = useMemo(
+    () => props.items.filter((v) => v.type === "header"),
+    [props.items]
+  );
 
   return (
     <Flex variant="columnFill">
@@ -127,7 +131,23 @@ function ListContainer(props) {
                         refresh={refresh}
                         title={item.title}
                         index={index}
-                        groups={props.items.filter((v) => v.type === "header")}
+                        onSelectGroup={() => {
+                          let endIndex;
+                          for (let i = index + 1; i < props.items.length; ++i) {
+                            if (props.items[i].type === "header") {
+                              endIndex = i;
+                              break;
+                            }
+                          }
+                          setSelectedItems([
+                            ...selectionStore.get().selectedItems,
+                            ...props.items.slice(
+                              index,
+                              endIndex || props.items.length
+                            ),
+                          ]);
+                        }}
+                        groups={groups}
                         onJump={(title) => {
                           const index = props.items.findIndex(
                             (v) => v.title === title
