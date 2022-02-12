@@ -5,7 +5,9 @@ import { Box } from "rebass";
 
 function GlobalMenuWrapper() {
   const { isOpen, closeMenu } = useMenuTrigger();
-  const { items, data } = useMenu();
+  const { items, data = {} } = useMenu();
+  const { positionOptions, type } = data;
+  const isAutocomplete = type === "autocomplete";
 
   return (
     <Modal
@@ -14,25 +16,33 @@ function GlobalMenuWrapper() {
       shouldCloseOnEsc
       shouldReturnFocusAfterClose
       shouldCloseOnOverlayClick
-      shouldFocusAfterRender
+      shouldFocusAfterRender={!isAutocomplete}
+      ariaHideApp={!isAutocomplete}
+      preventScroll={!isAutocomplete}
       onRequestClose={closeMenu}
       id={"globalContextMenu"}
-      overlayElement={(props, contentEl) => (
-        <Box
-          {...props}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            closeMenu();
-          }}
-        >
-          {contentEl}
-        </Box>
-      )}
+      overlayElement={(props, contentEl) => {
+        return (
+          <Box
+            {...props}
+            style={{
+              ...props.style,
+              backgroundColor: isAutocomplete ? "transparent" : "unset",
+            }}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              closeMenu();
+            }}
+          >
+            {contentEl}
+          </Box>
+        );
+      }}
       onAfterOpen={({ contentEl: menu }) => {
         if (!menu) return;
-        const position = getPosition(menu);
-        menu.style.top = position.top + "px";
-        menu.style.left = position.left + "px";
+        const menuPosition = getPosition(menu, positionOptions);
+        menu.style.top = menuPosition.top + "px";
+        menu.style.left = menuPosition.left + "px";
       }}
       contentElement={(props, children) => (
         <Box
@@ -74,7 +84,7 @@ function GlobalMenuWrapper() {
       <Menu
         items={items}
         data={data}
-        title={data.title}
+        title={data?.title}
         closeMenu={closeMenu}
       />
     </Modal>

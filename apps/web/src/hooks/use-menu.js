@@ -47,9 +47,17 @@ export function useMenu() {
  * @param {"right"|"below"|"left"|"top"} location
  * @returns
  */
-export function getPosition(element, relativeTo = "mouse", location) {
+export function getPosition(element, positionOptions) {
+  const {
+    relativeTo = "mouse",
+    absolute = false,
+    location = undefined,
+  } = positionOptions || {};
+
   const { x, y, width, height, actualX, actualY } =
-    relativeTo === "mouse" ? mousePosition : getElementPosition(relativeTo);
+    relativeTo === "mouse"
+      ? mousePosition
+      : getElementPosition(relativeTo, absolute);
 
   const elementWidth = element.offsetWidth;
   const elementHeight = element.offsetHeight;
@@ -65,7 +73,6 @@ export function getPosition(element, relativeTo = "mouse", location) {
     position.left -= xDiff;
   } else {
     position.left = x;
-
     if (location === "right") position.left += width;
     else if (location === "left") position.left -= width;
   }
@@ -79,7 +86,6 @@ export function getPosition(element, relativeTo = "mouse", location) {
     if (location === "below") position.top += height;
     else if (location === "top") position.top -= height;
   }
-
   return position;
 }
 
@@ -113,16 +119,21 @@ function getMousePosition(e) {
  *
  * @param {HTMLElement} element
  */
-function getElementPosition(element) {
+function getElementPosition(element, absolute) {
   const rect = element.getBoundingClientRect();
-  return {
+  const position = {
     x: element.offsetLeft,
     y: element.offsetTop,
-    width: element.offsetWidth,
-    height: element.offsetHeight,
+    width: rect.width,
+    height: rect.height,
     actualY: rect.y,
     actualX: rect.x,
   };
+  if (absolute) {
+    position.x = position.actualX;
+    position.y = position.actualY;
+  }
+  return position;
 }
 
 function mapMenuItems(items, data) {

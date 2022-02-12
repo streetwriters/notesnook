@@ -1,5 +1,5 @@
 import { Check, ChevronRight, Pro } from "../icons";
-import React, { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Flex, Box, Text, Button } from "rebass";
 import { getPosition } from "../../hooks/use-menu";
 import Menu from "./index";
@@ -11,11 +11,11 @@ function MenuItem({
   isSubmenuOpen,
   closeMenu,
   onHover,
+  onClick,
 }) {
   const {
     title,
     key,
-    onClick,
     color,
     items,
     icon: Icon,
@@ -32,35 +32,21 @@ function MenuItem({
   const subMenuRef = useRef();
 
   useEffect(() => {
-    if (isFocused) itemRef.current?.focus();
-  }, [isFocused]);
-
-  useEffect(() => {
     if (!subMenuRef.current) return;
     if (!isSubmenuOpen) {
       subMenuRef.current.style.visibility = "hidden";
       return;
     }
 
-    const { top, left } = getPosition(
-      subMenuRef.current,
-      itemRef.current,
-      "right"
-    );
+    const { top, left } = getPosition(subMenuRef.current, {
+      relativeTo: itemRef.current,
+      location: "right",
+    });
 
     subMenuRef.current.style.visibility = "visible";
     subMenuRef.current.style.top = `${top}px`;
     subMenuRef.current.style.left = `${left}px`;
   }, [isSubmenuOpen]);
-
-  const onAction = useCallback(
-    (e) => {
-      e.stopPropagation();
-      if (closeMenu) closeMenu();
-      if (onClick) onClick(data, item);
-    },
-    [onClick, closeMenu, item, data]
-  );
 
   if (type === "seperator")
     return (
@@ -94,10 +80,7 @@ function MenuItem({
         justifyContent={"space-between"}
         title={tooltip}
         disabled={isDisabled}
-        onClick={onAction}
-        onKeyUp={(e) => {
-          if (e.key === "Enter") onAction(e);
-        }}
+        onClick={onClick}
         sx={{
           bg: isFocused ? "hover" : "transparent",
         }}

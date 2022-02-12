@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Flex, Text } from "rebass";
 import MenuItem from "./menu-item";
 
-function useMenuFocus(items) {
+function useMenuFocus(items, onAction) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
 
@@ -42,6 +42,9 @@ function useMenuFocus(items) {
           case "ArrowLeft":
             closeSubmenu(i);
             break;
+          case "Enter":
+            onAction && onAction(e);
+            break;
           default:
             break;
         }
@@ -49,7 +52,7 @@ function useMenuFocus(items) {
         return nextIndex;
       });
     },
-    [items, isSubmenuOpen]
+    [items, isSubmenuOpen, onAction]
   );
 
   useEffect(() => {
@@ -63,8 +66,20 @@ function useMenuFocus(items) {
 }
 
 function Menu({ items, data, title, closeMenu }) {
+  const onAction = useCallback(
+    (e, item) => {
+      e.stopPropagation();
+      if (closeMenu) closeMenu();
+      if (item.onClick) item.onClick(data, item);
+    },
+    [closeMenu, data]
+  );
+
   const [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen] =
-    useMenuFocus(items);
+    useMenuFocus(items, (e) => {
+      const item = items[focusIndex];
+      if (item) onAction(e, item);
+    });
 
   return (
     <MenuContainer title={title}>
@@ -75,6 +90,7 @@ function Menu({ items, data, title, closeMenu }) {
           item={item}
           data={data}
           closeMenu={closeMenu}
+          onClick={(e) => onAction(e, item)}
           isFocused={focusIndex === index}
           isSubmenuOpen={focusIndex === index && isSubmenuOpen}
           onHover={() => {
@@ -107,6 +123,9 @@ function MenuContainer({ title, children }) {
         boxShadow: "0px 0px 10px 0px #00000022",
         border: "1px solid var(--border)",
         width: 220,
+      }}
+      onKeyDown={(e) => {
+        console.log("KEY!", e);
       }}
     >
       {title && (
