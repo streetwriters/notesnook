@@ -346,6 +346,7 @@ function TinyMCE(props) {
         }
       }}
       onKeyDown={(e) => {
+        e.stopPropagation();
         if (e.ctrlKey && e.key === "s") {
           e.preventDefault();
           onSave();
