@@ -141,11 +141,7 @@ function MenuItem({
             // left: itemRef.current?.offsetWidth,
           }}
         >
-          <Menu
-            items={items}
-            closeMenu={closeMenu}
-            data={{ ...data, parent: item, title: undefined }}
-          />
+          <Menu items={items} closeMenu={closeMenu} data={data} />
         </Flex>
       )}
     </Flex>

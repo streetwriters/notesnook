@@ -71,7 +71,12 @@ function GlobalMenuWrapper() {
         },
       }}
     >
-      <Menu items={items} data={data} closeMenu={closeMenu} />
+      <Menu
+        items={items}
+        data={data}
+        title={data.title}
+        closeMenu={closeMenu}
+      />
     </Modal>
   );
 }

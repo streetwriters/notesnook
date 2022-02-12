@@ -62,12 +62,12 @@ function useMenuFocus(items) {
   return [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen];
 }
 
-function Menu({ items, data, closeMenu }) {
+function Menu({ items, data, title, closeMenu }) {
   const [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen] =
     useMenuFocus(items);
 
   return (
-    <MenuContainer title={data?.title}>
+    <MenuContainer title={title}>
       {items.map((item, index) => (
         <MenuItem
           key={item.key}

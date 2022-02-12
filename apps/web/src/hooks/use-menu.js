@@ -179,10 +179,14 @@ function mapMenuItems(items, data) {
       color,
       iconColor,
 
-      items: hasSubmenu ? mapMenuItems(items, data) : [],
-
       modifier: modifier?.join("+"),
     };
+
+    if (hasSubmenu)
+      menuItem.items = mapMenuItems(items, {
+        ...data,
+        parent: menuItem,
+      });
 
     prev.push(menuItem);
 
