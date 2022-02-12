@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Flex, Text } from "rebass";
+import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";
 
 function useMenuFocus(items, onAction) {
@@ -124,9 +125,6 @@ function MenuContainer({ title, children }) {
         border: "1px solid var(--border)",
         width: 220,
       }}
-      onKeyDown={(e) => {
-        console.log("KEY!", e);
-      }}
     >
       {title && (
         <Text
@@ -140,7 +138,7 @@ function MenuContainer({ title, children }) {
           {title}
         </Text>
       )}
-      {children}
+      <FlexScrollContainer>{children}</FlexScrollContainer>
     </Flex>
   );
 }

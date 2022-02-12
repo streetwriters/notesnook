@@ -86,6 +86,16 @@ export function getPosition(element, positionOptions) {
     if (location === "below") position.top += height;
     else if (location === "top") position.top -= height;
   }
+
+  position.top = position.top < 0 ? 0 : position.top;
+  position.left = position.left < 0 ? 0 : position.left;
+
+  // Adjust menu height
+  if (elementHeight > windowHeight - position.top) {
+    element.style.maxHeight = `${windowHeight - 100}px`;
+    return getPosition(element, positionOptions);
+  }
+
   return position;
 }
 
