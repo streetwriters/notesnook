@@ -52,6 +52,7 @@ export function getPosition(element, positionOptions) {
     relativeTo = "mouse",
     absolute = false,
     location = undefined,
+    yOffset = 0,
   } = positionOptions || {};
 
   const { x, y, width, height, actualX, actualY } =
@@ -89,11 +90,11 @@ export function getPosition(element, positionOptions) {
 
   position.top = position.top < 0 ? 0 : position.top;
   position.left = position.left < 0 ? 0 : position.left;
+  position.top += yOffset;
 
   // Adjust menu height
   if (elementHeight > windowHeight - position.top) {
-    element.style.maxHeight = `${windowHeight - 100}px`;
-    return getPosition(element, positionOptions);
+    element.style.maxHeight = `${windowHeight - 20}px`;
   }
 
   return position;

@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useRef, useEffect, useState } from "react";
 import { Flex, Text } from "rebass";
+import { getPosition } from "../../hooks/use-menu";
 import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";
 
@@ -82,27 +83,70 @@ function Menu({ items, data, title, closeMenu }) {
       if (item) onAction(e, item);
     });
 
+  useEffect(() => {
+    const item = items[focusIndex];
+    if (!item) return;
+    const element = document.getElementById(item.key);
+
+    element.scrollIntoView({ behavior: "auto" });
+  }, [focusIndex, items]);
+
+  const subMenuRef = useRef();
+  useEffect(() => {
+    const item = items[focusIndex];
+    if (!item || !subMenuRef.current) return;
+
+    if (!isSubmenuOpen) {
+      subMenuRef.current.style.visibility = "hidden";
+      return;
+    }
+
+    const { top, left } = getPosition(subMenuRef.current, {
+      yOffset: document.getElementById(item.key).offsetHeight,
+      relativeTo: document.getElementById(item.key),
+      location: "right",
+    });
+
+    subMenuRef.current.style.visibility = "visible";
+    subMenuRef.current.style.top = `${top}px`;
+    subMenuRef.current.style.left = `${left}px`;
+  }, [isSubmenuOpen, focusIndex, items]);
+
   return (
-    <MenuContainer title={title}>
-      {items.map((item, index) => (
-        <MenuItem
-          key={item.key}
-          index={index}
-          item={item}
-          data={data}
-          closeMenu={closeMenu}
-          onClick={(e) => onAction(e, item)}
-          isFocused={focusIndex === index}
-          isSubmenuOpen={focusIndex === index && isSubmenuOpen}
-          onHover={() => {
-            setFocusIndex(index);
-            setIsSubmenuOpen((state) => {
-              return item.items?.length ? true : state ? false : state;
-            });
+    <>
+      <MenuContainer title={title}>
+        {items.map((item, index) => (
+          <MenuItem
+            key={item.key}
+            index={index}
+            item={item}
+            onClick={(e) => onAction(e, item)}
+            isFocused={focusIndex === index}
+            onHover={() => {
+              setFocusIndex(index);
+              setIsSubmenuOpen((state) => {
+                return item.items?.length ? true : state ? false : state;
+              });
+            }}
+          />
+        ))}
+      </MenuContainer>
+      {isSubmenuOpen && (
+        <Flex
+          ref={subMenuRef}
+          style={{ visibility: "hidden" }}
+          sx={{
+            position: "absolute",
           }}
-        />
-      ))}
-    </MenuContainer>
+        >
+          <Menu
+            items={items[focusIndex]?.items || []}
+            closeMenu={closeMenu}
+            data={data}
+          />
+        </Flex>
+      )}
+    </>
   );
 }
 export default React.memo(Menu);
