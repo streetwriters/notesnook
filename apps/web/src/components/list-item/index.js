@@ -126,7 +126,7 @@ function ListItem(props) {
 
       <Text
         data-test-id={`${props.item.type}-${props.index}-title`}
-        variant={isCompact ? "subtitle" : "title"}
+        variant={"subtitle"}
         fontWeight={isCompact ? "body" : "bold"}
         color={text}
         display={"block"}
