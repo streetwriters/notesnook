@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Box, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import {
@@ -56,34 +55,31 @@ function ListItem(props) {
   const selectItem = useSelectionStore((store) => store.selectItem);
   const { openMenu } = useMenuTrigger();
 
-  const menuItems = useMemo(() => {
-    let items = props.menu?.items;
-    if (!items) return [];
-
-    if (isSelected) {
-      const options = SELECTION_OPTIONS_MAP[window.currentViewType];
-      items = options.map((option) => {
-        return {
-          key: option.key,
-          title: () => option.title,
-          icon: option.icon,
-          onClick: option.onClick,
-        };
-      });
-    }
-
-    if (Config.get("debugMode", false))
-      items = [...items, ...debugMenuItems(props.item.type)];
-    return items;
-  }, [props.menu?.items, props.item.type, isSelected]);
-
   return (
     <Flex
       bg={isSelected ? "shade" : background}
       onContextMenu={(e) => {
         e.preventDefault();
-        openMenu(menuItems, {
-          title: props.item.title,
+        let items = props.menu?.items || [];
+        let title = props.item.title;
+
+        if (isSelected) {
+          const options = SELECTION_OPTIONS_MAP[window.currentViewType];
+          items = options.map((option) => {
+            return {
+              key: option.key,
+              title: () => option.title,
+              icon: option.icon,
+              onClick: option.onClick,
+            };
+          });
+          title = `${selectionStore.get().selectedItems.length} selected`;
+        } else if (Config.get("debugMode", false)) {
+          items.push(...debugMenuItems(props.item.type));
+        }
+
+        openMenu(items, {
+          title,
           ...props.menu?.extraData,
         });
       }}
