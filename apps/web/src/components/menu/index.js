@@ -9,6 +9,19 @@ function useMenuFocus(items, onAction) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
 
+  const moveItemIntoView = useCallback(
+    (index) => {
+      const item = items[index];
+      if (!item) return;
+      const element = document.getElementById(item.key);
+      if (!element) return;
+      element.scrollIntoView({
+        behavior: "auto",
+      });
+    },
+    [items]
+  );
+
   const onKeyDown = useCallback(
     (e) => {
       const isSeperator = (i) => items && items[i]?.type === "seperator";
@@ -51,11 +64,12 @@ function useMenuFocus(items, onAction) {
           default:
             break;
         }
+        if (nextIndex !== i) moveItemIntoView(nextIndex);
 
         return nextIndex;
       });
     },
-    [items, isSubmenuOpen, onAction]
+    [items, isSubmenuOpen, moveItemIntoView, onAction]
   );
 
   useEffect(() => {
@@ -87,14 +101,6 @@ function Menu({ items, data, title, closeMenu }) {
       const item = items[focusIndex];
       if (item) onAction(e, item);
     });
-
-  useEffect(() => {
-    const item = items[focusIndex];
-    if (!item) return;
-    const element = document.getElementById(item.key);
-    if (!element) return;
-    element.scrollIntoView({ behavior: "auto" });
-  }, [focusIndex, items]);
 
   const subMenuRef = useRef();
   useEffect(() => {
