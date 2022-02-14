@@ -1,10 +1,8 @@
 import Compressor from "compressorjs";
 import { AppEventManager, AppEvents } from "../../../common/app-events";
 import { db } from "../../../common/db";
-import {
-  showBuyDialog,
-  showProgressDialog,
-} from "../../../common/dialog-controller";
+import { showBuyDialog } from "../../../common/dialog-controller";
+import { TaskManager } from "../../../common/task-manager";
 import { isUserPremium } from "../../../hooks/use-is-user-premium";
 import fs from "../../../interfaces/fs";
 import { formatBytes } from "../../../utils/filename";
@@ -158,26 +156,23 @@ function compressImage(file) {
  * @returns
  */
 async function addAttachment(file, dataurl) {
-  const result = await showProgressDialog({
-    title: `Encrypting attachment`,
+  const result = await TaskManager.startTask({
+    type: "modal",
+    title: "Encrypting attachment",
     subtitle: "Please wait while we encrypt this attachment for upload.",
-    message: file.name,
-    total: formatBytes(file.size, 0),
-    setProgress: (set) => {
+    action: async (report) => {
       const event = AppEventManager.subscribe(
         AppEvents.UPDATE_ATTACHMENT_PROGRESS,
         ({ type, total, loaded }) => {
           if (type !== "encrypt") return;
-
-          const percent = Math.round((loaded / total) * 100);
-          set({ loaded: formatBytes(loaded, 0), progress: percent });
+          report({
+            current: formatBytes(loaded, 0),
+            total: total,
+            text: file.name,
+          });
         }
       );
-      return () => {
-        event.unsubscribe();
-      };
-    },
-    action: async () => {
+
       const key = await getEncryptionKey();
 
       const reader = file.stream().getReader();
@@ -198,6 +193,7 @@ async function addAttachment(file, dataurl) {
         });
       }
 
+      event.unsubscribe();
       return {
         hash: hash,
         filename: file.name,
@@ -207,7 +203,5 @@ async function addAttachment(file, dataurl) {
       };
     },
   });
-  console.log(file, dataurl, result);
-  if (result instanceof Error) throw result;
   return result;
 }
