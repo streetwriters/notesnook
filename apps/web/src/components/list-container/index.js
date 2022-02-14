@@ -21,7 +21,6 @@ function ListContainer(props) {
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
   const listRef = useRef();
   const focusedItemIndex = useRef(-1);
-  const anchorIndex = useRef();
   const listContainerRef = useRef();
   const groups = useMemo(
     () => props.items.filter((v) => v.type === "header"),
@@ -48,9 +47,6 @@ function ListContainer(props) {
                 focusedItemIndex.current = parseInt(
                   e.target.parentElement.dataset.index
                 );
-
-                if (selectionStore.get().selectedItems < 2)
-                  anchorIndex.current = focusedItemIndex.current;
               }
             }}
           >
@@ -66,7 +62,11 @@ function ListContainer(props) {
                   e.preventDefault();
                   const endIndex = parseInt(listItem.dataset.index);
                   if (isNaN(endIndex)) return;
-                  setSelectedItems(items.slice(anchorIndex, endIndex + 1));
+                  setSelectedItems([
+                    ...selectionStore.get().selectedItems,
+                    ...items.slice(focusedItemIndex.current, endIndex + 1),
+                  ]);
+                  listItem.firstElementChild.focus();
                 }
               }}
               onKeyDown={(e) => {
