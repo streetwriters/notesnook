@@ -1,7 +1,6 @@
 import * as Icon from "../icons";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "rebass";
-import { AnimatedFlex } from "../animated";
 import { db } from "../../common/db";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import { useStore as useNoteStore } from "../../stores/note-store";
@@ -129,15 +128,30 @@ function map(items) {
 }
 
 function GroupHeader(props) {
-  const { title, groups, onJump, index, type, refresh, onSelectGroup } = props;
+  const {
+    title,
+    groups,
+    onJump,
+    index,
+    type,
+    refresh,
+    onSelectGroup,
+    isFocused,
+  } = props;
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(type)
   );
-  const { openMenu } = useMenuTrigger();
+  const groupHeaderRef = useRef();
+  const { openMenu, target } = useMenuTrigger();
   const notesViewMode = useNoteStore((store) => store.viewMode);
   const setNotesViewMode = useNoteStore((store) => store.setViewMode);
   const notebooksViewMode = useNotebookStore((store) => store.viewMode);
   const setNotebooksViewMode = useNotebookStore((store) => store.setViewMode);
+
+  useEffect(() => {
+    if (isFocused) groupHeaderRef.current.focus();
+  }, [isFocused]);
+  const isMenuTarget = target && target === groupHeaderRef.current;
 
   const [viewMode, setViewMode] = useMemo(() => {
     if (type === "home" || type === "notes" || type === "favorites") {
@@ -157,8 +171,8 @@ function GroupHeader(props) {
   if (!title) return null;
 
   return (
-    <AnimatedFlex
-      transition={{ duration: 0.3, repeatType: "reverse", repeat: 3 }}
+    <Flex
+      ref={groupHeaderRef}
       onClick={(e) => {
         if (e.ctrlKey) {
           onSelectGroup();
@@ -177,9 +191,9 @@ function GroupHeader(props) {
         });
         openMenu(items, {
           title: "Jump to group",
+          target: groupHeaderRef.current,
         });
       }}
-      p={1}
       mx={1}
       my={1}
       py={1}
@@ -190,7 +204,14 @@ function GroupHeader(props) {
       bg="bgSecondary"
       sx={{
         borderRadius: "default",
+        cursor: "pointer",
+        border: isMenuTarget ? "1px solid var(--primary)" : "none",
+        ":focus": {
+          border: "1px solid var(--primary)",
+          outline: "none",
+        },
       }}
+      tabIndex={0}
     >
       <Text
         variant="subtitle"
@@ -238,7 +259,7 @@ function GroupHeader(props) {
           )}
         </Flex>
       )}
-    </AnimatedFlex>
+    </Flex>
   );
 }
 export default GroupHeader;

@@ -18,7 +18,6 @@ function MenuItem({ item, isFocused, onHover, onClick }) {
     modifier,
   } = item;
   const itemRef = useRef();
-  console.log(key, isDisabled);
   if (type === "seperator")
     return (
       <Box

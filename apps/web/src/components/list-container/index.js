@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Flex, Button } from "rebass";
 import * as Icon from "../icons";
 import { Virtuoso } from "react-virtuoso";
@@ -15,6 +15,9 @@ import useAnnouncements from "../../utils/use-announcements";
 
 function ListContainer(props) {
   const { type, groupType, items, context, refresh, header } = props;
+
+  const [focusedGroupIndex, setFocusedGroupIndex] = useState(-1);
+
   const [announcements, removeAnnouncement] = useAnnouncements();
   const profile = useMemo(() => ListProfiles[type], [type]);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
@@ -68,6 +71,7 @@ function ListContainer(props) {
                   listItem.firstElementChild.focus();
                 }
               }}
+              onBlur={() => setFocusedGroupIndex(-1)}
               onKeyDown={(e) => {
                 if (e.code === "Escape") {
                   selectionStore.toggleSelectionMode(false);
@@ -170,6 +174,7 @@ function ListContainer(props) {
                         type={groupType}
                         refresh={refresh}
                         title={item.title}
+                        isFocused={index === focusedGroupIndex}
                         index={index}
                         onSelectGroup={() => {
                           let endIndex;
@@ -196,8 +201,9 @@ function ListContainer(props) {
                           listRef.current.scrollToIndex({
                             index,
                             align: "center",
-                            behavior: "smooth",
+                            behavior: "auto",
                           });
+                          setFocusedGroupIndex(index);
                         }}
                       />
                     );
