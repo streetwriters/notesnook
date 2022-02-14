@@ -74,6 +74,7 @@ function ListContainer(props) {
                   selectionStore.toggleSelectionMode(false);
                   return;
                 }
+
                 if (e.code === "KeyA" && e.ctrlKey) {
                   e.preventDefault();
                   e.stopPropagation();
@@ -83,7 +84,7 @@ function ListContainer(props) {
                   return;
                 }
 
-                const isShiftKey = e.shiftKey;
+                // const isShiftKey = e.shiftKey;
                 const isUp = e.code === "ArrowUp";
                 const isDown = e.code === "ArrowDown";
                 const isHeader = (i) => items && items[i]?.type === "header";
@@ -119,29 +120,30 @@ function ListContainer(props) {
                       listItem.firstElementChild.focus();
                     },
                   });
+                  selectionStore.toggleSelectionMode(false);
+                  // if (isShiftKey) {
+                  //   const isUp = nextIndex < i; // ? "up" : "down";
+                  //   const isBefore = nextIndex < anchorIndex.current; // ? "before" : "after";
+                  //   let isSelect = isBefore ? isUp : !isUp;
+                  //   const selectedItems = selectionStore
+                  //     .get()
+                  //     .selectedItems.slice();
 
-                  if (isShiftKey) {
-                    const isUp = nextIndex < i; // ? "up" : "down";
-                    const isBefore = nextIndex < anchorIndex.current; // ? "before" : "after";
-                    let isSelect = isBefore ? isUp : !isUp;
-                    const selectedItems = selectionStore
-                      .get()
-                      .selectedItems.slice();
+                  //   if (isSelect && nextIndex === anchorIndex.current) {
+                  //     isSelect = false;
+                  //   }
 
-                    if (isSelect && nextIndex === anchorIndex.current) {
-                      isSelect = false;
-                    }
-
-                    if (isSelect) selectedItems.push(items[nextIndex]);
-                    else {
-                      const indexOfItem = selectedItems.indexOf(items[i]);
-                      if (indexOfItem <= -1) return;
-                      selectedItems.splice(indexOfItem, 1);
-                    }
-                    setSelectedItems(selectedItems);
-                  } else {
-                    selectionStore.toggleSelectionMode(false);
-                  }
+                  //   if (isSelect) selectedItems.push(items[nextIndex]);
+                  //   else {
+                  //     const indexOfItem = selectedItems.indexOf(items[i]);
+                  //     if (indexOfItem <= -1) return;
+                  //     selectedItems.splice(indexOfItem, 1);
+                  //   }
+                  //   setSelectedItems(selectedItems);
+                  // } else {
+                  //   setSelectedItems([items[nextIndex]]);
+                  //   // selectionStore.toggleSelectionMode(false);
+                  // }
                 }
               }}
               // overscan={10}
