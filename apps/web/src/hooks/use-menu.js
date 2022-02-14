@@ -18,11 +18,18 @@ const useMenuStore = create((set) => ({
   data: undefined,
   open: (items, data) =>
     set(() => ({ isOpen: true, items: mapMenuItems(items, data), data })),
-  close: () => set(() => ({ isOpen: false, items: [] })),
+  close: () =>
+    set(() => ({
+      isOpen: false,
+      items: [],
+      data: undefined,
+      title: undefined,
+    })),
 }));
 
 export function useMenuTrigger() {
   const isOpen = useMenuStore((store) => store.isOpen);
+  const target = useMenuStore((store) => store.data?.target);
   const [open, close] = useMenuStore(
     (store) => [store.open, store.close],
     shallow
@@ -32,6 +39,7 @@ export function useMenuTrigger() {
     openMenu: open,
     closeMenu: close,
     isOpen,
+    target,
   };
 }
 

@@ -8,6 +8,7 @@ import { useMenuTrigger } from "../../hooks/use-menu";
 import Config from "../../utils/config";
 import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
+import { useRef } from "react";
 
 function debugMenuItems(type) {
   if (!type) return [];
@@ -43,6 +44,10 @@ function ListItem(props) {
     isCompact,
   } = props;
 
+  const listItemRef = useRef();
+  const { openMenu, target } = useMenuTrigger();
+  const isMenuTarget = target && target === listItemRef.current;
+
   const isSelected = useSelectionStore((store) => {
     const inInSelection =
       store.selectedItems.findIndex((item) => props.item.id === item.id) > -1;
@@ -52,10 +57,10 @@ function ListItem(props) {
   });
 
   const selectItem = useSelectionStore((store) => store.selectItem);
-  const { openMenu } = useMenuTrigger();
 
   return (
     <Flex
+      ref={listItemRef}
       bg={isSelected ? "shade" : background}
       onContextMenu={(e) => {
         e.preventDefault();
@@ -75,6 +80,7 @@ function ListItem(props) {
         openMenu(items, {
           title,
           items: selectedItems,
+          target: listItemRef.current,
           ...props.menu?.extraData,
         });
       }}
@@ -89,6 +95,9 @@ function ListItem(props) {
           ? `5px 2px 0px -2px var(--${primary}) inset`
           : "none",
         transition: "box-shadow 200ms ease-in",
+        // isMenuTarget
+        borderTop: isMenuTarget ? `1px solid var(--${primary})` : "none",
+        borderBottom: isMenuTarget ? `1px solid var(--${primary})` : "none",
         ":hover": {
           backgroundColor: isSelected ? "shade" : "hover",
         },

@@ -68,6 +68,7 @@ function GlobalMenuWrapper() {
             padding: 0,
             zIndex: 0,
             outline: 0,
+            isolation: "isolate",
           }}
         >
           {children}
