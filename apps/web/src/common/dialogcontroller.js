@@ -280,15 +280,17 @@ export function showLoadingDialog(dialogData) {
   ));
 }
 
+/**
+ *
+ * @param {{title: string, subtitle?: string, action: Function}} dialogData
+ * @returns
+ */
 export function showProgressDialog(dialogData) {
-  const { title, message, subtitle, total, setProgress, action } = dialogData;
+  const { title, subtitle, action } = dialogData;
   return showDialog((Dialogs, perform) => (
     <Dialogs.ProgressDialog
       title={title}
       subtitle={subtitle}
-      message={message}
-      total={total}
-      setProgress={setProgress}
       action={action}
       onDone={(e) => perform(e)}
     />

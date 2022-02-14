@@ -1,147 +1,181 @@
-import { useAnimation } from "framer-motion";
-import { Check } from "../icons";
-import React, { useEffect, useMemo } from "react";
-import { Flex, Box, Text, Button } from "rebass";
-import { useIsUserPremium } from "../../hooks/use-is-user-premium";
-import useMobile from "../../utils/use-mobile";
-import { AnimatedFlex } from "../animated";
+import React, { useCallback, useRef, useEffect, useState } from "react";
+import { Flex, Text } from "rebass";
+import { getPosition } from "../../hooks/use-menu";
+import { FlexScrollContainer } from "../scroll-container";
+import MenuItem from "./menu-item";
+import { store as selectionStore } from "../../stores/selection-store";
 
-function Menu(props) {
-  const { menuItems, data, closeMenu, id, style, sx, state } = props;
-  const isUserPremium = useIsUserPremium();
-  const isMobile = useMobile();
-  const Container = useMemo(
-    () => (isMobile ? MobileMenuContainer : MenuContainer),
-    [isMobile]
+function useMenuFocus(items, onAction) {
+  const [focusIndex, setFocusIndex] = useState(-1);
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+
+  const onKeyDown = useCallback(
+    (e) => {
+      const isSeperator = (i) => items && items[i]?.type === "seperator";
+      const moveDown = (i) => (i < items.length - 1 ? ++i : 0);
+      const moveUp = (i) => (i > 0 ? --i : items.length - 1);
+      const hasSubmenu = (i) => items && items[i]?.hasSubmenu;
+      const openSubmenu = (index) => {
+        if (!hasSubmenu(index)) return;
+        setIsSubmenuOpen(true);
+      };
+
+      const closeSubmenu = (index) => {
+        if (!hasSubmenu(index)) return;
+        setIsSubmenuOpen(false);
+      };
+
+      setFocusIndex((i) => {
+        let nextIndex = i;
+
+        switch (e.key) {
+          case "ArrowUp":
+            if (isSubmenuOpen) break;
+            nextIndex = moveUp(i);
+            if (isSeperator(nextIndex)) nextIndex = moveUp(nextIndex);
+            break;
+          case "ArrowDown":
+            if (isSubmenuOpen) break;
+            nextIndex = moveDown(i);
+            if (isSeperator(nextIndex)) nextIndex = moveDown(nextIndex);
+            break;
+          case "ArrowRight":
+            openSubmenu(i);
+            break;
+          case "ArrowLeft":
+            closeSubmenu(i);
+            break;
+          case "Enter":
+            onAction && onAction(e);
+            break;
+          default:
+            break;
+        }
+
+        return nextIndex;
+      });
+    },
+    [items, isSubmenuOpen, onAction]
   );
 
-  return (
-    <Container id={id} title={data?.title} style={style} sx={sx} state={state}>
-      {menuItems.map(
-        (
-          {
-            title,
-            key,
-            onClick,
-            component: Component,
-            color,
-            isPro,
-            isNew,
-            disabled,
-            disableReason,
-            checked,
-            icon: Icon,
-            type,
-          },
-          index
-        ) =>
-          type === "seperator" ? (
-            <Box
-              key={key}
-              width="95%"
-              height="0.5px"
-              bg="border"
-              my={2}
-              alignSelf="center"
-            />
-          ) : (
-            <Button
-              variant="menuitem"
-              color={color || "text"}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              title={
-                (disabled && disabled(data) && disableReason) || title(data)
-              }
-              disabled={disabled && disabled(data)}
-              data-test-id={`menuitem-${title(data)
-                .split(" ")
-                .join("")
-                .toLowerCase()}`}
-              key={key}
-              onClick={async (e) => {
-                e.stopPropagation();
-                if (closeMenu) {
-                  closeMenu();
-                }
+  useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onKeyDown]);
 
-                if (!Component) {
-                  onClick(data, menuItems[index]);
-                }
-              }}
-            >
-              {Icon && (
-                <Icon
-                  color={color || "text"}
-                  size={15}
-                  sx={{ mr: 2, ml: -1 }}
-                />
-              )}
-              {Component ? (
-                <Component data={data} />
-              ) : (
-                <Text
-                  as="span"
-                  textAlign="left"
-                  fontFamily="body"
-                  fontSize="menu"
-                  flex={1}
-                >
-                  {title(data)}
-                </Text>
-              )}
-              {isPro && !isUserPremium && (
-                <Text
-                  fontSize="subBody"
-                  bg="primary"
-                  color="static"
-                  px={1}
-                  sx={{ borderRadius: "default" }}
-                >
-                  Pro
-                </Text>
-              )}
-              {isNew && (
-                <Text
-                  fontSize="subBody"
-                  bg="primary"
-                  color="static"
-                  px={1}
-                  sx={{ borderRadius: "default" }}
-                >
-                  NEW
-                </Text>
-              )}
-              {checked && <Check size={14} />}
-            </Button>
-          )
+  return [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen];
+}
+
+function Menu({ items, data, title, closeMenu }) {
+  const onAction = useCallback(
+    (e, item) => {
+      e.stopPropagation();
+      if (closeMenu) closeMenu();
+      if (item.onClick) {
+        item.onClick(data, item);
+        // TODO: this probably shouldn't be here.
+        selectionStore.toggleSelectionMode(false);
+      }
+    },
+    [closeMenu, data]
+  );
+
+  const [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen] =
+    useMenuFocus(items, (e) => {
+      const item = items[focusIndex];
+      if (item) onAction(e, item);
+    });
+
+  useEffect(() => {
+    const item = items[focusIndex];
+    if (!item) return;
+    const element = document.getElementById(item.key);
+    if (!element) return;
+    element.scrollIntoView({ behavior: "auto" });
+  }, [focusIndex, items]);
+
+  const subMenuRef = useRef();
+  useEffect(() => {
+    const item = items[focusIndex];
+    if (!item || !subMenuRef.current) return;
+
+    if (!isSubmenuOpen) {
+      subMenuRef.current.style.visibility = "hidden";
+      return;
+    }
+
+    const { top, left } = getPosition(subMenuRef.current, {
+      yOffset: document.getElementById(item.key).offsetHeight,
+      relativeTo: document.getElementById(item.key),
+      location: "right",
+    });
+
+    subMenuRef.current.style.visibility = "visible";
+    subMenuRef.current.style.top = `${top}px`;
+    subMenuRef.current.style.left = `${left}px`;
+  }, [isSubmenuOpen, focusIndex, items]);
+
+  return (
+    <>
+      <MenuContainer title={title}>
+        {items.map((item, index) => (
+          <MenuItem
+            key={item.key}
+            index={index}
+            item={item}
+            onClick={(e) => onAction(e, item)}
+            isFocused={focusIndex === index}
+            onHover={() => {
+              setFocusIndex(index);
+              setIsSubmenuOpen((state) => {
+                return item.items?.length ? true : state ? false : state;
+              });
+            }}
+          />
+        ))}
+      </MenuContainer>
+      {isSubmenuOpen && (
+        <Flex
+          ref={subMenuRef}
+          style={{ visibility: "hidden" }}
+          sx={{
+            position: "absolute",
+          }}
+        >
+          <Menu
+            items={items[focusIndex]?.items || []}
+            closeMenu={closeMenu}
+            data={data}
+          />
+        </Flex>
       )}
-    </Container>
+    </>
   );
 }
-export default React.memo(Menu, (prev, next) => {
-  return prev.state === next.state;
-});
+export default React.memo(Menu);
 
-function MenuContainer({ id, style, sx, title, children }) {
+function MenuContainer({ title, children }) {
   return (
     <Flex
-      id={id}
+      as="ul"
+      tabIndex={-1}
       bg="background"
       py={1}
-      style={style}
+      flexDirection={"column"}
       sx={{
         position: "relative",
-        width: "11em",
+        listStyle: "none",
+        padding: 0,
+        margin: 0,
         borderRadius: "default",
-        boxShadow: "0px 10px 10px 0px #00000022",
-        border: "1px solid",
-        borderColor: "border",
-        ...sx,
+        boxShadow: "0px 0px 10px 0px #00000022",
+        border: "1px solid var(--border)",
+        width: 220,
       }}
     >
-      <Flex flexDirection="column" width="100%">
+      {title && (
         <Text
           fontFamily="body"
           fontSize="subtitle"
@@ -150,68 +184,10 @@ function MenuContainer({ id, style, sx, title, children }) {
           px={3}
           sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
         >
-          {title || "Properties"}
+          {title}
         </Text>
-        {children}
-      </Flex>
-    </Flex>
-  );
-}
-
-function MobileMenuContainer({ style, id, state, title, children }) {
-  const animation = useAnimation();
-
-  useEffect(() => {
-    if (state === "open") {
-      animation.start({ y: 0 });
-      const menu = document.getElementById(id);
-      menu.style.top = 0;
-      menu.style.left = 0;
-    } else {
-      animation.start({ y: 500 });
-    }
-  }, [state, animation, id]);
-
-  return (
-    <Flex
-      flexDirection="column"
-      id={id}
-      style={style}
-      width="100%"
-      height="100%"
-      bg="overlay"
-      overflow="hidden"
-      sx={{ position: "relative" }}
-    >
-      <AnimatedFlex
-        width="100%"
-        bg="background"
-        sx={{
-          position: "absolute",
-          bottom: 0,
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
-          overflow: "hidden",
-        }}
-        initial={{ y: 500 }}
-        animate={animation}
-        flexDirection="column"
-        p={2}
-      >
-        <Box
-          width={50}
-          height={7}
-          bg="shade"
-          alignSelf="center"
-          sx={{ borderRadius: "default" }}
-        />
-        <Flex flex="1" flexDirection="column" overflowY="scroll">
-          <Text variant="title" mt={2} alignSelf="center">
-            {title || "Properties"}
-          </Text>
-          {children}
-        </Flex>
-      </AnimatedFlex>
+      )}
+      <FlexScrollContainer>{children}</FlexScrollContainer>
     </Flex>
   );
 }

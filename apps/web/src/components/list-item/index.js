@@ -1,32 +1,13 @@
-import React, { useEffect, useCallback, useMemo } from "react";
 import { Box, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import {
   store as selectionStore,
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
-import { useOpenContextMenu } from "../../utils/useContextMenu";
-import { SELECTION_OPTIONS_MAP } from "../../common";
+import { useMenuTrigger } from "../../hooks/use-menu";
 import Config from "../../utils/config";
 import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
-
-function selectMenuItem(isSelected, toggleSelection) {
-  return {
-    key: "select",
-    title: () => (isSelected ? "Unselect" : "Select"),
-    icon: Icon.Select,
-    onClick: () => {
-      const selectionState = selectionStore.get();
-      if (!selectionState.isSelectionMode) {
-        selectionState.toggleSelectionMode();
-        toggleSelection();
-      } else {
-        toggleSelection();
-      }
-    },
-  };
-}
 
 function debugMenuItems(type) {
   if (!type) return [];
@@ -51,41 +32,6 @@ function debugMenuItems(type) {
   ];
 }
 
-const ItemSelector = ({ isSelected, toggleSelection }) => {
-  return isSelected ? (
-    <Icon.CheckCircle
-      color="primary"
-      size={16}
-      sx={{
-        flexShrink: 0,
-        marginLeft: 0,
-        marginRight: 1,
-        color: "primary",
-        cursor: "pointer",
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        toggleSelection();
-      }}
-    />
-  ) : (
-    <Icon.CircleEmpty
-      size={16}
-      sx={{
-        flexShrink: 0,
-        marginLeft: 0,
-        marginRight: 1,
-        bg: "transparent",
-        cursor: "pointer",
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        toggleSelection();
-      }}
-    />
-  );
-};
-
 function ListItem(props) {
   const {
     colors: { text, background, primary } = {
@@ -97,63 +43,44 @@ function ListItem(props) {
     isCompact,
   } = props;
 
-  const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
-  const selectedItems = useSelectionStore((store) => store.selectedItems);
-  const isSelected =
-    selectedItems.findIndex((item) => props.item.id === item.id) > -1;
+  const isSelected = useSelectionStore((store) => {
+    const inInSelection =
+      store.selectedItems.findIndex((item) => props.item.id === item.id) > -1;
+    return isFocused
+      ? store.selectedItems.length > 1 && inInSelection
+      : inInSelection;
+  });
+
   const selectItem = useSelectionStore((store) => store.selectItem);
-
-  const openContextMenu = useOpenContextMenu();
-
-  const toggleSelection = useCallback(
-    function toggleSelection() {
-      selectItem(props.item);
-    },
-    [selectItem, props.item]
-  );
-
-  const menuItems = useMemo(() => {
-    let items = props.menu?.items;
-    if (!items) return [];
-
-    if (isSelectionMode) {
-      const options = SELECTION_OPTIONS_MAP[window.currentViewType];
-      items = options.map((option) => {
-        return {
-          key: option.key,
-          title: () => option.title,
-          icon: option.icon,
-          onClick: option.onClick,
-        };
-      });
-    }
-    if (props.selectable)
-      items = [selectMenuItem(isSelected, toggleSelection), ...items];
-    if (Config.get("debugMode", false))
-      items = [...items, ...debugMenuItems(props.item.type)];
-    return items;
-  }, [
-    props.menu?.items,
-    props.item.type,
-    isSelected,
-    isSelectionMode,
-    toggleSelection,
-    props.selectable,
-  ]);
-
-  useEffect(() => {
-    if (!isSelectionMode && isSelected) toggleSelection();
-  }, [isSelectionMode, toggleSelection, isSelected]);
+  const { openMenu } = useMenuTrigger();
 
   return (
     <Flex
-      bg={isSelected ? "bgSecondary" : background}
-      onContextMenu={(e) =>
-        openContextMenu(e, menuItems, props.menu?.extraData, false)
-      }
+      bg={isSelected ? "shade" : background}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        let items = props.menu?.items || [];
+        let title = props.item.title;
+        let selectedItems = selectionStore.get().selectedItems.slice();
+
+        if (isSelected) {
+          title = `${selectedItems.length} items selected`;
+          items = items.filter((item) => item.multiSelect);
+        } else if (Config.get("debugMode", false)) {
+          items.push(...debugMenuItems(props.item.type));
+        } else {
+          selectedItems.push(props.item);
+        }
+
+        openMenu(items, {
+          title,
+          items: selectedItems,
+          ...props.menu?.extraData,
+        });
+      }}
       p={2}
       py={isCompact ? 1 : 2}
-      tabIndex={0}
+      tabIndex={-1}
       sx={{
         height: "inherit",
         cursor: "pointer",
@@ -163,14 +90,12 @@ function ListItem(props) {
           : "none",
         transition: "box-shadow 200ms ease-in",
         ":hover": {
-          backgroundColor: "hover",
+          backgroundColor: isSelected ? "shade" : "hover",
         },
-        ":focus": {
+        ":focus,:focus-visible": {
           outline: "none",
-        },
-        ":focus-visible": {
-          border: "1px solid",
-          borderColor: primary,
+          borderTop: `1px solid var(--${primary})`,
+          borderBottom: `1px solid var(--${primary})`,
         },
         overflow: "hidden",
         maxWidth: "100%",
@@ -181,12 +106,15 @@ function ListItem(props) {
       flexDirection={isCompact ? "row" : "column"}
       justifyContent={isCompact ? "space-between" : "center"}
       alignItems={isCompact ? "center" : undefined}
-      onClick={() => {
-        //e.stopPropagation();
-        if (isSelectionMode) {
-          toggleSelection();
-        } else if (props.onClick) {
-          props.onClick();
+      onClick={(e) => {
+        if (e.shiftKey) {
+          //ignore (handled by listcontainer)
+        } else if (e.ctrlKey) {
+          selectItem(props.item);
+        } else {
+          selectionStore.toggleSelectionMode(false);
+          selectItem(props.item);
+          props.onClick && props.onClick();
         }
       }}
       data-test-id={`${props.item.type}-${props.index}`}
@@ -195,22 +123,16 @@ function ListItem(props) {
 
       <Text
         data-test-id={`${props.item.type}-${props.index}-title`}
-        variant={isCompact ? "subtitle" : "title"}
+        variant={"subtitle"}
         fontWeight={isCompact ? "body" : "bold"}
         color={text}
-        display={isSelectionMode ? "flex" : "block"}
+        display={"block"}
         sx={{
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
         }}
       >
-        {isSelectionMode && (
-          <ItemSelector
-            isSelected={isSelected}
-            toggleSelection={toggleSelection}
-          />
-        )}
         {props.title}
       </Text>
 

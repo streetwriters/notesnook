@@ -273,6 +273,13 @@ function RecoveryOptionsStep({ onFinished }) {
 }
 
 function RecoveryKeyStep({ performAction, onFinished }) {
+  const isSessionExpired = useIsSessionExpired();
+
+  if (isSessionExpired) {
+    onFinished();
+    return null;
+  }
+
   return (
     <Step
       heading="Recover your account"

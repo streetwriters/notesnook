@@ -68,13 +68,15 @@ class NoteStore extends BaseStore {
     });
   };
 
-  delete = async (id) => {
+  delete = async (...ids) => {
     const { session, clearSession } = editorStore.get();
-    if (session && session.id === id) {
-      await clearSession();
+    for (let id of ids) {
+      if (session && session.id === id) {
+        await clearSession();
+      }
     }
 
-    await db.notes.delete(id);
+    await db.notes.delete(ids);
 
     this.refresh();
     appStore.refreshNavItems();

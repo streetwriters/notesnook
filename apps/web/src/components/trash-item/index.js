@@ -1,13 +1,16 @@
 import React from "react";
 import ListItem from "../list-item";
-import { confirm } from "../../common/dialog-controller";
+import {
+  confirm,
+  showMultiPermanentDeleteConfirmation,
+} from "../../common/dialog-controller";
 import * as Icon from "../icons";
 import { store } from "../../stores/trash-store";
 import { Flex, Text } from "rebass";
 import TimeAgo from "../time-ago";
 import { toTitleCase } from "../../utils/string";
+import { showUndoableToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
-import { showPermanentDeleteToast } from "../../common/toasts";
 
 function TrashItem({ item, index, date }) {
   return (
@@ -34,46 +37,27 @@ export default TrashItem;
 
 const menuItems = [
   {
-    title: () => "Restore",
+    title: "Restore",
     icon: Icon.Restore,
-    onClick: ({ item }) => {
-      store.restore(item.id);
-      showToast(
-        "success",
-        `${
-          item.itemType === "note" ? "Note" : "Notebook"
-        } restored successfully!`
-      );
+    onClick: ({ items }) => {
+      store.restore(items.map((i) => i.id));
+      showToast("success", `${items.length} items restored`);
     },
+    multiSelect: true,
   },
   {
-    title: () => "Delete",
+    title: "Delete",
     icon: Icon.DeleteForver,
     color: "red",
-    onClick: ({ item }) => {
-      confirm({
-        title: `Permanently delete ${item.itemType}`,
-        subtitle: `Are you sure you want to permanently delete this ${item.itemType}?`,
-        yesText: `Delete`,
-        noText: "Cancel",
-        message: (
-          <>
-            This action is{" "}
-            <Text as="span" color="error">
-              IRREVERSIBLE
-            </Text>
-            . You will{" "}
-            <Text as="span" color="error">
-              not be able to recover this {item.itemType}.
-            </Text>
-          </>
-        ),
-      }).then(async (res) => {
-        if (res) {
-          await store.delete(item.id);
-          showPermanentDeleteToast(item);
-        }
-      });
+    onClick: async ({ items }) => {
+      if (!(await showMultiPermanentDeleteConfirmation(items.length))) return;
+      const ids = items.map((i) => i.id);
+      showUndoableToast(
+        `${items.length} items permanently deleted`,
+        () => store.delete(ids),
+        () => store.delete(ids, true)
+      );
     },
+    multiSelect: true,
   },
 ];

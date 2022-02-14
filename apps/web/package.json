@@ -51,7 +51,7 @@
     "react-scrollbars-custom": "^4.0.25",
     "react-toggle": "^4.1.2",
     "react-virtualized-auto-sizer": "^1.0.4",
-    "react-virtuoso": "^1.9.3",
+    "react-virtuoso": "^2.4.0",
     "rebass": "^4.0.7",
     "showdown": "github:thecodrr/showdown",
     "streamablefs": "file:packages/streamablefs",

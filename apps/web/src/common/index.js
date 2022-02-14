@@ -33,14 +33,6 @@ export const SUBSCRIPTION_STATUS = {
   PREMIUM_CANCELED: 7,
 };
 
-export const SELECTION_OPTIONS_MAP = {
-  notes: SelectionOptions.NotesOptions,
-  notebooks: SelectionOptions.NotebooksOptions,
-  favorites: SelectionOptions.FavoritesOptions,
-  trash: SelectionOptions.TrashOptions,
-  topics: SelectionOptions.TopicOptions,
-};
-
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: "Make a note",
