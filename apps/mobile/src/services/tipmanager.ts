@@ -24,7 +24,8 @@ type Context =
   | 'properties'
   | 'first-note'
   | 'first-editor-launch'
-  | 'monographs';
+  | 'monographs'
+  | 'trash';
 
 export type TTip = {
   text: string;
@@ -142,6 +143,30 @@ const tips: TTip[] = [
   {
     text: 'Monographs can be encrypted with a secret key and shared with anyone',
     contexts: ['monographs']
+  },
+  {
+    text: 'Frequently accessed notebooks can be pinned to Side Menu so that they are easily accessible',
+    contexts: ['notebook', 'notebooks']
+  },
+  {
+    text: 'A notebook can have unlimited topics with unlimited notes.',
+    contexts: ['notebook']
+  },
+  {
+    text: 'You can multi-select notes and move them to a notebook at once',
+    contexts: ['notebook']
+  },
+  {
+    text: 'Items in trash are kept for 7 days after which they are permanently deleted.',
+    contexts: ['trash']
+  },
+  {
+    text: 'Mark important notes by adding them to favorites',
+    contexts: ['notes']
+  },
+  {
+    text: 'Have to scroll down a lot to open a note you are working on? Pin it to top from properties.',
+    contexts: ['notes']
   }
 ];
 
@@ -165,8 +190,14 @@ const popups: Popup[] = [
 ];
 
 const placeholderTips = [
-  `Want to remember something? Pin an\nimportant in notifications.`,
-  `Privacy is power. What people don't know they cant ruin`,
-  `If you read someone else's diary, you get what you deserve. - David Sedaris`,
-  'Take quick notes from notifications. Just enable the option in Settings.'
+  `Want to remember something\? Pin an important note in notifications.`,
+  `Privacy is power. What people don\'t know they cant ruin`,
+  `If you read someone else\'s diary, you get what you deserve. - David Sedaris`,
+  'Take quick notes from notifications. Enable the option in Settings to try',
+  'Get Notesnook on all your devices. Or even open it in browser by going to https://app.notesnook.com to access all your notes',
+  `With note history, you can restore back to an older version of the note if you accidently deleted something.`,
+  `When your heart speaks\, take good notes. - Judith Campbell`,
+  `If other\'s can read your notes\, they are not your notes anymore.`,
+  "You can publish a note and share it with anyone. Even if they don't use Notesnook!",
+  'Published notes can be encrypted. Which means only you and the person you share the password with can read them.'
 ];

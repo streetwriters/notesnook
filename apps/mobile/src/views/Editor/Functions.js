@@ -781,6 +781,7 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
     let locked = false;
     if (_id) {
       let _note = db.notes.note(_id).data;
+      if (_note.readonly) return;
       if (_note.conflicted) {
         presentResolveConflictDialog(_note);
         return;
