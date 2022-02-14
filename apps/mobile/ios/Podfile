@@ -4,7 +4,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 platform :ios, '11.0'
 
 pod 'Base64'
-pod 'SexyTooltip',:git => 'https://github.com/prscX/SexyTooltip.git'
+pod 'SexyTooltip',:git => 'https://github.com/ammarahm-ed/SexyTooltip.git'
 pod 'MMKV'
 
 target 'Notesnook' do

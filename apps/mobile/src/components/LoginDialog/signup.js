@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Dimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
@@ -30,6 +31,8 @@ export const Signup = ({ changeMode, welcome }) => {
   const confirmPassword = useRef();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const insets = useSafeAreaInsets();
 
   const setUser = useUserStore(state => state.setUser);
   const setLastSynced = useUserStore(state => state.setLastSynced);
@@ -87,7 +90,7 @@ export const Signup = ({ changeMode, welcome }) => {
             position: 'absolute',
             zIndex: 999,
             left: 12,
-            top: 12
+            top: 12 + insets.top
           }}
         />
       )}
@@ -118,7 +121,7 @@ export const Signup = ({ changeMode, welcome }) => {
             alignSelf: 'center',
             paddingHorizontal: 12,
             marginBottom: 30,
-            marginTop: 15
+            marginTop: Dimensions.get('window').height < 700 ? -75 : 15
           }}
         >
           <Heading

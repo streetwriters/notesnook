@@ -355,18 +355,20 @@ export const TOOLTIP_POSITIONS = {
   BOTTOM: 4
 };
 let prevTarget = null;
-export function showTooltip(event, text, position) {
+export function showTooltip(event, text, position = 2) {
   if (!event._targetInst?.ref?.current) return;
   prevTarget && RNTooltips.Dismiss(prevTarget);
   prevTarget = null;
   prevTarget = event._targetInst.ref.current;
-  RNTooltips.Show(event._targetInst.ref.current, tabBarRef.current, {
+  RNTooltips.Show(prevTarget, tabBarRef.current, {
     text: text,
-    tintColor: 'black',
-    corner: 40,
+    tintColor: '#000000',
+    corner: Platform.OS === 'ios' ? 5 : 40,
     textSize: 14,
     position: position,
-    duration: 1000
+    duration: 1000,
+    autoHide: true,
+    clickToHide: true
   });
 }
 

@@ -1,4 +1,5 @@
 import { RefObject, useEffect, useRef } from 'react';
+import { Platform } from 'react-native';
 //@ts-ignore
 import RNTooltips from 'react-native-tooltips';
 import { useTracked } from '../provider';
@@ -52,12 +53,13 @@ const useTooltip = () => {
       RNTooltips.Show(target.current, parent.current, {
         text: popup.text,
         tintColor: colors.night ? colors.nav : '#404040',
-        corner: 80,
+        corner: Platform.OS === 'ios' ? 5 : 80,
         textSize: 15,
         position: positions[position],
         duration: duration || 10000,
         clickToHide: true,
-        shadow: true
+        shadow: true,
+        autoHide: true
       });
     }, 1000);
   }

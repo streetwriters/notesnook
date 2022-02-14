@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { NativeModules, Platform, View } from 'react-native';
+import { NativeModules, Platform, StatusBar, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
 import { useTracked } from '../../provider';
@@ -75,9 +75,13 @@ const AppLoader = ({ onLoad }) => {
     await sleep(requireIntro.value ? 500 : 0);
     await RNBootSplash.hide({ fade: true });
     setTimeout(async () => {
-      NativeModules.RNBars.setStatusBarStyle(!colors.night ? 'light-content' : 'dark-content');
-      await sleep(5);
-      NativeModules.RNBars.setStatusBarStyle(colors.night ? 'light-content' : 'dark-content');
+      if (Platform.OS === 'android') {
+        NativeModules.RNBars.setStatusBarStyle(!colors.night ? 'light-content' : 'dark-content');
+        await sleep(5);
+        NativeModules.RNBars.setStatusBarStyle(colors.night ? 'light-content' : 'dark-content');
+      } else {
+        StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
+      }
     }, 500);
   };
 

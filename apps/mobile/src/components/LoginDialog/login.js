@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
@@ -34,6 +35,7 @@ export const Login = ({ changeMode }) => {
 
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const setUser = useUserStore(state => state.setUser);
 
@@ -109,7 +111,7 @@ export const Login = ({ changeMode }) => {
           position: 'absolute',
           zIndex: 999,
           left: 12,
-          top: 12
+          top: 12 + insets.top
         }}
       />
 
