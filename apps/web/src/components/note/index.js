@@ -290,6 +290,8 @@ const menuItems = [
       title: format.title,
       tooltip: `Export as ${format.title} - ${format.subtitle}`,
       icon: format.icon,
+      disabled: ({ items }) => format.type === "pdf" && items.length > 1,
+      disableReason: "Multiple notes cannot be exported as PDF.",
       onClick: async ({ items }) => {
         await exportNotes(
           format.type,

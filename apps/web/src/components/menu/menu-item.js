@@ -18,7 +18,7 @@ function MenuItem({ item, isFocused, onHover, onClick }) {
     modifier,
   } = item;
   const itemRef = useRef();
-
+  console.log(key, isDisabled);
   if (type === "seperator")
     return (
       <Box
@@ -33,52 +33,54 @@ function MenuItem({ item, isFocused, onHover, onClick }) {
     );
 
   return (
-    <Button
-      id={key}
-      as="li"
-      data-test-id={`menuitem-${title.split(" ").join("").toLowerCase()}`}
-      key={key}
-      ref={itemRef}
-      tabIndex={-1}
-      variant="menuitem"
-      display="flex"
-      alignItems={"center"}
-      justifyContent={"space-between"}
-      title={tooltip}
-      disabled={isDisabled}
-      onClick={onClick}
-      onMouseOver={onHover}
-      sx={{
-        bg: isFocused ? "hover" : "transparent",
-      }}
-    >
-      <Flex>
-        {Icon && <Icon color={iconColor || "text"} size={15} sx={{ mr: 2 }} />}
-        <Text
-          as="span"
-          fontFamily="body"
-          fontSize="menu"
-          color={color || "text"}
-        >
-          {title}
-        </Text>
-        {isPremium && <Pro size={14} color="primary" sx={{ ml: 1 }} />}
-      </Flex>
-      <Flex>
-        {isChecked && <Check size={14} />}
-        {hasSubmenu && <ChevronRight size={14} />}
-        {modifier && (
+    <Flex as="li" flexDirection={"column"} flex={1} onMouseOver={onHover}>
+      <Button
+        id={key}
+        data-test-id={`menuitem-${title.split(" ").join("").toLowerCase()}`}
+        key={key}
+        ref={itemRef}
+        tabIndex={-1}
+        variant="menuitem"
+        display="flex"
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        title={tooltip}
+        disabled={isDisabled}
+        onClick={onClick}
+        sx={{
+          bg: isFocused ? "hover" : "transparent",
+        }}
+      >
+        <Flex>
+          {Icon && (
+            <Icon color={iconColor || "text"} size={15} sx={{ mr: 2 }} />
+          )}
           <Text
             as="span"
             fontFamily="body"
             fontSize="menu"
-            color="fontTertiary"
+            color={color || "text"}
           >
-            {modifier}
+            {title}
           </Text>
-        )}
-      </Flex>
-    </Button>
+          {isPremium && <Pro size={14} color="primary" sx={{ ml: 1 }} />}
+        </Flex>
+        <Flex>
+          {isChecked && <Check size={14} />}
+          {hasSubmenu && <ChevronRight size={14} />}
+          {modifier && (
+            <Text
+              as="span"
+              fontFamily="body"
+              fontSize="menu"
+              color="fontTertiary"
+            >
+              {modifier}
+            </Text>
+          )}
+        </Flex>
+      </Button>
+    </Flex>
   );
 }
 export default MenuItem;
