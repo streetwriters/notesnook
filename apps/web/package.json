@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.16.0",
+    "@types/file-saver": "^2.0.5",
     "@types/hookrouter": "^2.2.5",
     "@types/node-fetch": "^2.5.10",
     "@types/quill": "^2.0.5",

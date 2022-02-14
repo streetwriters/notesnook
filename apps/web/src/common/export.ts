@@ -1,7 +1,7 @@
-import download from "../utils/download";
 import { db } from "./db";
 import { TaskManager } from "./task-manager";
 import { zip } from "../utils/zip";
+import { saveAs } from "file-saver";
 
 async function exportToPDF(content: string): Promise<boolean> {
   if (!content) return false;
@@ -43,17 +43,20 @@ export async function exportNotes(
           text: `Exporting "${note.title}"...`,
         });
         console.log("Exporting", note.title);
-        const content = await note.export(format).catch(() => {});
+        const content: string = await note.export(format).catch(() => {});
         if (!content) continue;
         files.push({ filename: note.title, content });
       }
 
       if (!files.length) return false;
       if (files.length === 1) {
-        download(files[0].filename, files[0].content, format);
+        saveAs(
+          new Blob([Buffer.from(files[0].content, "utf-8")]),
+          `${files[0].filename}.${format}`
+        );
       } else {
-        const zipped = zip(files, format);
-        download("notes", zipped, "zip");
+        const zipped = await zip(files, format);
+        saveAs(new Blob([zipped.buffer]), "notes.zip");
       }
       return true;
     },

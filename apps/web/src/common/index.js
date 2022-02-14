@@ -1,4 +1,3 @@
-import SelectionOptions from "./selectionoptions";
 import {
   showFeatureDialog,
   showLoadingDialog,
