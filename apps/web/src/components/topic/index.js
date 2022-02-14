@@ -6,6 +6,7 @@ import { store as appStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
+import { Multiselect } from "../../common/multi-select";
 
 function Topic({ item, index, onClick }) {
   const topic = item;
@@ -32,7 +33,7 @@ function Topic({ item, index, onClick }) {
       index={index}
       menu={{
         items: menuItems,
-        extraData: { topic },
+        extraData: { topic, notebookId: topic.notebookId },
       }}
     />
   );
@@ -45,16 +46,6 @@ export default React.memo(Topic, (prev, next) => {
   );
 });
 
-const generalTopicMenuItems = [
-  {
-    key: "shortcut",
-    title: ({ topic }) =>
-      db.settings.isPinned(topic.id) ? "Remove shortcut" : "Create shortcut",
-    icon: Icon.Shortcut,
-    onClick: ({ topic }) => appStore.pinItemToMenu(topic),
-  },
-];
-
 const menuItems = [
   {
     key: "edit",
@@ -63,15 +54,22 @@ const menuItems = [
     onClick: ({ topic }) =>
       hashNavigate(`/notebooks/${topic.notebookId}/topics/${topic.id}/edit`),
   },
-  ...generalTopicMenuItems,
+  {
+    key: "shortcut",
+    title: ({ topic }) =>
+      db.settings.isPinned(topic.id) ? "Remove shortcut" : "Create shortcut",
+    icon: Icon.Shortcut,
+    onClick: ({ topic }) => appStore.pinItemToMenu(topic),
+  },
   {
     key: "delete",
     title: "Delete",
     icon: Icon.Trash,
-    color: "red",
-    onClick: async ({ topic }) => {
-      await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);
-      store.setSelectedNotebook(topic.notebookId);
+    color: "error",
+    iconColor: "error",
+    onClick: async ({ items, notebookId }) => {
+      await Multiselect.deleteTopics(notebookId, items);
     },
+    multiSelect: true,
   },
 ];

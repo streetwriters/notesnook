@@ -5,7 +5,6 @@ import {
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
 import { useMenuTrigger } from "../../hooks/use-menu";
-import { SELECTION_OPTIONS_MAP } from "../../common";
 import Config from "../../utils/config";
 import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
@@ -62,24 +61,20 @@ function ListItem(props) {
         e.preventDefault();
         let items = props.menu?.items || [];
         let title = props.item.title;
+        let selectedItems = selectionStore.get().selectedItems.slice();
 
         if (isSelected) {
-          const options = SELECTION_OPTIONS_MAP[window.currentViewType];
-          items = options.map((option) => {
-            return {
-              key: option.key,
-              title: () => option.title,
-              icon: option.icon,
-              onClick: option.onClick,
-            };
-          });
-          title = `${selectionStore.get().selectedItems.length} selected`;
+          title = `${selectedItems.length} items selected`;
+          items = items.filter((item) => item.multiSelect);
         } else if (Config.get("debugMode", false)) {
           items.push(...debugMenuItems(props.item.type));
+        } else {
+          selectedItems.push(props.item);
         }
 
         openMenu(items, {
           title,
+          items: selectedItems,
           ...props.menu?.extraData,
         });
       }}
@@ -119,7 +114,7 @@ function ListItem(props) {
         } else {
           selectionStore.toggleSelectionMode(false);
           selectItem(props.item);
-          props.onClick();
+          props.onClick && props.onClick();
         }
       }}
       data-test-id={`${props.item.type}-${props.index}`}

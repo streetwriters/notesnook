@@ -9,6 +9,7 @@ import * as Icon from "../icons";
 import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import { showToast } from "../../utils/toast";
+import { Multiselect } from "../../common/multi-select";
 
 function Notebook(props) {
   const { item, index, totalNotes, date } = props;
@@ -124,11 +125,11 @@ const menuItems = [
   {
     title: "Move to trash",
     color: "red",
+    iconColor: "red",
     icon: Icon.Trash,
-    onClick: async ({ notebook }) => {
-      await store
-        .delete(notebook.id)
-        .then(() => showItemDeletedToast(notebook));
+    onClick: async ({ items }) => {
+      await Multiselect.moveNotebooksToTrash(items);
     },
+    multiSelect: true,
   },
 ];

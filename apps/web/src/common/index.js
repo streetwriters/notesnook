@@ -1,4 +1,3 @@
-import SelectionOptions from "./selectionoptions";
 import download from "../utils/download";
 import {
   showFeatureDialog,
@@ -30,14 +29,6 @@ export const SUBSCRIPTION_STATUS = {
   PREMIUM: 5,
   PREMIUM_EXPIRED: 6,
   PREMIUM_CANCELED: 7,
-};
-
-export const SELECTION_OPTIONS_MAP = {
-  notes: SelectionOptions.NotesOptions,
-  notebooks: SelectionOptions.NotebooksOptions,
-  favorites: SelectionOptions.FavoritesOptions,
-  trash: SelectionOptions.TrashOptions,
-  topics: SelectionOptions.TopicOptions,
 };
 
 export const CREATE_BUTTON_MAP = {

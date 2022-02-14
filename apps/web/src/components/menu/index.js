@@ -3,6 +3,7 @@ import { Flex, Text } from "rebass";
 import { getPosition } from "../../hooks/use-menu";
 import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";
+import { store as selectionStore } from "../../stores/selection-store";
 
 function useMenuFocus(items, onAction) {
   const [focusIndex, setFocusIndex] = useState(-1);
@@ -72,7 +73,11 @@ function Menu({ items, data, title, closeMenu }) {
     (e, item) => {
       e.stopPropagation();
       if (closeMenu) closeMenu();
-      if (item.onClick) item.onClick(data, item);
+      if (item.onClick) {
+        item.onClick(data, item);
+        // TODO: this probably shouldn't be here.
+        selectionStore.toggleSelectionMode(false);
+      }
     },
     [closeMenu, data]
   );
@@ -87,7 +92,7 @@ function Menu({ items, data, title, closeMenu }) {
     const item = items[focusIndex];
     if (!item) return;
     const element = document.getElementById(item.key);
-
+    if (!element) return;
     element.scrollIntoView({ behavior: "auto" });
   }, [focusIndex, items]);
 

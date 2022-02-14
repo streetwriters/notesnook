@@ -2,7 +2,6 @@ import AddNotebookDialog from "./addnotebookdialog";
 import BuyDialog from "./buy-dialog";
 import Confirm from "./confirm";
 import EmailVerificationDialog from "./emailverificationdialog";
-import ExportDialog from "./exportdialog";
 import ImportDialog from "./importdialog";
 import LoadingDialog from "./loadingdialog";
 import ProgressDialog from "./progressdialog";
@@ -22,7 +21,6 @@ const Dialogs = {
   BuyDialog,
   Confirm,
   EmailVerificationDialog,
-  ExportDialog,
   LoadingDialog,
   MoveDialog,
   PasswordDialog,
