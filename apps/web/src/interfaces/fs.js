@@ -177,84 +177,98 @@ async function uploadFile(filename, requestOptions) {
 
   if (uploaded) return true;
 
-  const { headers, cancellationToken } = requestOptions;
+  try {
+    const { headers, cancellationToken } = requestOptions;
 
-  const initiateMultiPartUpload = await axios.get(
-    `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${TOTAL_PARTS}&uploadId=${uploadId}`,
-    {
-      headers,
-      cancelToken: cancellationToken,
+    const initiateMultiPartUpload = await axios
+      .get(
+        `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${TOTAL_PARTS}&uploadId=${uploadId}`,
+        {
+          headers,
+          cancelToken: cancellationToken,
+        }
+      )
+      .catch((e) => {
+        throw new S3Error("Could not initiate multi-part upload.", e);
+      });
+
+    uploadId = initiateMultiPartUpload.data.uploadId;
+    const { parts } = initiateMultiPartUpload.data;
+
+    await fileHandle.addAdditionalData("uploadId", uploadId);
+
+    function onUploadProgress(ev) {
+      reportProgress(
+        {
+          total: fileHandle.file.size + ABYTES,
+          loaded: uploadedBytes + ev.loaded,
+        },
+        {
+          type: "upload",
+          hash: filename,
+        }
+      );
     }
-  );
-  if (!isSuccessStatusCode(initiateMultiPartUpload.status))
-    throw new Error("Could not initiate multi-part upload.");
 
-  uploadId = initiateMultiPartUpload.data.uploadId;
-  const { parts } = initiateMultiPartUpload.data;
+    for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
+      const blob = await fileHandle.readChunks(
+        i * UPLOAD_PART_REQUIRED_CHUNKS,
+        UPLOAD_PART_REQUIRED_CHUNKS
+      );
+      const url = parts[i];
+      const data = await blob.arrayBuffer();
+      const response = await axios
+        .request({
+          url,
+          method: "PUT",
+          headers: { "Content-Type": "" },
+          cancelToken: cancellationToken,
+          data,
+          onUploadProgress,
+        })
+        .catch((e) => {
+          throw new S3Error(`Failed to upload part at offset ${i}`, e);
+        });
 
-  await fileHandle.addAdditionalData("uploadId", uploadId);
+      if (!response.headers.etag)
+        throw new Error(`Failed to upload part at offset ${i}: no etag found.`);
 
-  function onUploadProgress(ev) {
-    reportProgress(
-      {
-        total: fileHandle.file.size + ABYTES,
-        loaded: uploadedBytes + ev.loaded,
-      },
-      {
-        type: "upload",
-        hash: filename,
-      }
-    );
-  }
-
-  for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
-    const blob = await fileHandle.readChunks(
-      i * UPLOAD_PART_REQUIRED_CHUNKS,
-      UPLOAD_PART_REQUIRED_CHUNKS
-    );
-    const url = parts[i];
-    const data = await blob.arrayBuffer();
-    const response = await axios.request({
-      url,
-      method: "PUT",
-      headers: { "Content-Type": "" },
-      cancelToken: cancellationToken,
-      data,
-      onUploadProgress,
-    });
-    if (!isSuccessStatusCode(response.status) || !response.headers.etag)
-      throw new Error(`Failed to upload part at offset ${i}.`);
-
-    uploadedBytes += blob.size;
-    uploadedChunks.push({
-      PartNumber: i + 1,
-      ETag: JSON.parse(response.headers.etag),
-    });
-    await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
-    await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
-  }
-
-  const completeMultiPartUpload = await axios.post(
-    `${hosts.API_HOST}/s3/multipart`,
-    {
-      Key: filename,
-      UploadId: uploadId,
-      PartETags: uploadedChunks,
-    },
-    {
-      headers,
-      cancelToken: cancellationToken,
+      uploadedBytes += blob.size;
+      uploadedChunks.push({
+        PartNumber: i + 1,
+        ETag: JSON.parse(response.headers.etag),
+      });
+      await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
+      await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
     }
-  );
-  if (!isSuccessStatusCode(completeMultiPartUpload.status))
-    throw new Error("Could not complete multi-part upload.");
 
-  await fileHandle.addAdditionalData("uploaded", true);
-  // Keep the images cached; delete everything else.
-  if (!fileHandle.file.type?.startsWith("image/")) {
-    await streamablefs.deleteFile(filename);
+    await axios
+      .post(
+        `${hosts.API_HOST}/s3/multipart`,
+        {
+          Key: filename,
+          UploadId: uploadId,
+          PartETags: uploadedChunks,
+        },
+        {
+          headers,
+          cancelToken: cancellationToken,
+        }
+      )
+      .catch((e) => {
+        throw new Error("Could not complete multi-part upload.", e);
+      });
+
+    await fileHandle.addAdditionalData("uploaded", true);
+    // Keep the images cached; delete everything else.
+    if (!fileHandle.file.type?.startsWith("image/")) {
+      await streamablefs.deleteFile(filename);
+    }
+    return true;
+  } catch (e) {
+    if (e.handle) e.handle();
+    else handleS3Error(e);
   }
-  return true;
 }
 
 function reportProgress(ev, { type, hash }) {
@@ -280,7 +294,6 @@ async function downloadFile(filename, requestOptions) {
       headers,
       responseType: "text",
     });
-    if (!isSuccessStatusCode(signedUrlResponse.status)) return false;
 
     const signedUrl = signedUrlResponse.data;
     const response = await axios.get(signedUrl, {
@@ -290,9 +303,16 @@ async function downloadFile(filename, requestOptions) {
         reportProgress(ev, { type: "download", hash: filename }),
     });
 
-    const contentLength =
-      response.headers["content-length"] || response.headers["Content-Length"];
-    if (!isSuccessStatusCode(response.status) || contentLength === "0") {
+    const contentType = response.headers["content-type"];
+    if (contentType === "application/xml") {
+      const error = parseS3Error(response.data);
+      if (error.Code !== "Unknown") {
+        throw new Error(`[${error.Code}] ${error.Message}`);
+      }
+    }
+
+    const contentLength = response.headers["content-length"];
+    if (contentLength === "0") {
       console.error("Abort: file length is 0.", filename);
       return false;
     }
@@ -313,8 +333,7 @@ async function downloadFile(filename, requestOptions) {
 
     return true;
   } catch (e) {
-    showToast("error", `Could not download file: ${e.message}`);
-    console.error(e);
+    handleS3Error(e, "Could not download file");
     reportProgress(undefined, { type: "download", hash: filename });
     return false;
   }
@@ -324,9 +343,13 @@ function exists(filename) {
   return streamablefs.exists(filename);
 }
 
-async function saveFile(filename, { key, iv, name, type }) {
+async function saveFile(filename, fileMetadata) {
+  if (!fileMetadata) return false;
+
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle) return false;
+
+  const { key, iv, name, type, isUploaded } = fileMetadata;
 
   const blobParts = [];
   const reader = fileHandle.getReader();
@@ -347,7 +370,8 @@ async function saveFile(filename, { key, iv, name, type }) {
     filename
   );
   saveAs(new Blob(blobParts, { type }), name);
-  await streamablefs.deleteFile(filename);
+
+  if (isUploaded) await streamablefs.deleteFile(filename);
 }
 
 async function deleteFile(filename, requestOptions) {
@@ -480,5 +504,40 @@ class ChunkDistributor {
         if (chunk.length === this.chunkSize) this.filledCount++;
       }
     }
+  }
+}
+
+function parseS3Error(data) {
+  const xml = new TextDecoder().decode(data);
+  const doc = new DOMParser().parseFromString(xml, "text/xml");
+
+  const ErrorElement = doc.getElementsByTagName("Error")[0];
+  if (!ErrorElement)
+    return { Code: "Unknown", Message: "An unknown error occured." };
+
+  const error = {};
+  for (const child of ErrorElement.children) {
+    error[child.tagName] = child.textContent;
+  }
+  return error;
+}
+
+function handleS3Error(e, message) {
+  if (axios.isAxiosError(e)) {
+    const error = parseS3Error(e.response.data);
+    showToast("error", `${message}: [${error.Code}] ${error.Message}`);
+  } else {
+    showToast("error", `${message}: ${e.message}`);
+  }
+}
+
+class S3Error extends Error {
+  constructor(message, error) {
+    super(message);
+    this.error = error;
+  }
+
+  handle() {
+    handleS3Error(this.error, this.message);
   }
 }

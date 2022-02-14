@@ -1,4 +1,5 @@
-import { Chunk, File } from "./types";
+import { File } from "./types";
+import { Chunk } from "@notesnook/crypto/dist/src/types";
 
 export default class FileStreamSource implements UnderlyingSource<Chunk> {
   private storage: LocalForage;

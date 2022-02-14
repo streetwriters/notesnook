@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { hashNavigate } from "../navigation";
+import { hardNavigate, hashNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import { qclone } from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
@@ -183,6 +183,16 @@ export function showLogoutConfirmation() {
   });
 }
 
+export function showClearSessionsConfirmation() {
+  return confirm({
+    title: `Logout from other devices?`,
+    message:
+      "All other logged-in devices will be forced to logout stopping sync. Use with care lest you lose important notes.",
+    yesText: `Yes`,
+    noText: "No",
+  });
+}
+
 // export function showAccountDeletedNotice() {
 //   return confirm(Icon.Logout, {
 //     title: `Account deleted`,
@@ -203,9 +213,11 @@ export function showLogoutConfirmation() {
 
 export function showAccountLoggedOutNotice(reason) {
   return confirm({
-    title: reason,
-    message: `You were logged out`,
-    yesText: `Okay`,
+    title: "You were logged out",
+    message: reason,
+    noText: "Okay",
+    yesText: `Relogin`,
+    yesAction: () => hardNavigate("/login"),
   });
 }
 
@@ -343,6 +355,13 @@ function getDialogData(type) {
         title: "Unlock vault",
         subtitle: "Please enter your vault password to continue.",
         positiveButtonText: "Unlock",
+      };
+    case "ask_backup_password":
+      return {
+        title: "Encrypted backup",
+        subtitle:
+          "Please enter the password to decrypt and restore this backup.",
+        positiveButtonText: "Restore",
       };
     case "change_account_password":
       return {

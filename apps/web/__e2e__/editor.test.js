@@ -132,7 +132,7 @@ test("format changes should get saved", async () => {
 
   await page.waitForSelector(".mce-content-body");
 
-  await page.keyboard.press("Control+a");
+  await page.keyboard.press("Shift+End");
 
   await page.click(`#editorToolbar button[title="Bold"]`);
 
@@ -205,4 +205,26 @@ test("select all & backspace should clear all content in editor", async () => {
   await page.waitForSelector(".mce-content-body");
 
   await expect(getEditorContent()).resolves.toBe("");
+});
+
+test.only("last line doesn't get saved if it's font is different", async () => {
+  const selector = await createNoteAndCheckPresence();
+
+  await page.keyboard.press("Enter");
+
+  await page.click(`#editorToolbar button[title="Fonts"]`);
+
+  await page.click(`div[title="Serif"]`);
+
+  await page.type(".mce-content-body", "I am another line in Serif font.");
+
+  await page.waitForTimeout(200);
+
+  await page.click(getTestId("notes-action-button"));
+
+  await page.click(selector);
+
+  const content = await getEditorContentAsHTML();
+
+  expect(content).toMatchSnapshot(`last-line-with-different-font.txt`);
 });

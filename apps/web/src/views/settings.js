@@ -13,18 +13,19 @@ import {
   showImportDialog,
   showIssueDialog,
   showTrackingDetailsDialog,
+  showClearSessionsConfirmation,
+  showLogoutConfirmation,
+  showRecoveryKeyDialog,
+  showLoadingDialog,
+  showBuyDialog,
+  showPasswordDialog,
 } from "../common/dialog-controller";
-import { showLogoutConfirmation } from "../common/dialog-controller";
 import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
-import { showRecoveryKeyDialog } from "../common/dialog-controller";
-import { showBuyDialog } from "../common/dialog-controller";
 import ScrollContainer from "../components/scroll-container";
-import { showLoadingDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
-import { showPasswordDialog } from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "notes-core/common";
@@ -268,28 +269,6 @@ function Settings(props) {
                 tip="Log out of your account and clear all data."
               />
             </Button>
-            <Button
-              variant="list"
-              onClick={async () => {
-                return showPasswordDialog(
-                  "delete_account",
-                  async ({ password }) => {
-                    await db.user.deleteUser(password);
-                    return true;
-                  }
-                );
-              }}
-              sx={{ ":hover": { borderColor: "error" } }}
-              bg="errorBg"
-              mx={-2}
-              px={2}
-            >
-              <Tip
-                color="error"
-                text="Delete account"
-                tip="Permanently delete account and logout from all devices."
-              />
-            </Button>
           </>
         )}
         <Header
@@ -390,7 +369,7 @@ function Settings(props) {
               type="file"
               id="restore-backup"
               hidden
-              accept=".nnbackup,text/plain,application/json"
+              accept=".nnbackup,application/json"
             />
             <Button
               variant="list"
@@ -401,18 +380,29 @@ function Settings(props) {
                       "You must be logged in to restore backups."
                     );
 
-                  const backupData = JSON.stringify(await importBackup());
-                  const error = await showLoadingDialog({
-                    title: "Restoring backup",
-                    subtitle:
-                      "Please do NOT close your browser or shut down your PC.",
-                    action: () => db.backup.import(backupData),
-                  });
-                  if (!error) {
-                    await showToast("success", "Backup restored!");
+                  const backup = await importBackup();
+
+                  async function restore(password) {
+                    await db.backup.import(backup, password);
                     await refreshApp();
+                    showToast("success", "Backup restored!");
+                  }
+
+                  if (backup.data.iv && backup.data.salt) {
+                    await showPasswordDialog(
+                      "ask_backup_password",
+                      async ({ password }) => {
+                        const error = await restore(password);
+                        return !error;
+                      }
+                    );
                   } else {
-                    throw new Error(error);
+                    await showLoadingDialog({
+                      title: "Restoring backup",
+                      subtitle:
+                        "Please do NOT close your browser or shut down your PC until the process completes.",
+                      action: restore,
+                    });
                   }
                 } catch (e) {
                   console.error(e);
@@ -650,6 +640,52 @@ function Settings(props) {
             />
           </>
         )}
+        {isLoggedIn && (
+          <Flex
+            flexDirection={"column"}
+            sx={{ border: "2px solid var(--error)", borderRadius: "default" }}
+            p={1}
+            my={2}
+          >
+            <Text variant={"body"} fontWeight={"bold"} color="error">
+              DANGER ZONE
+            </Text>
+            <Button
+              variant="list"
+              onClick={async () => {
+                if (!(await showClearSessionsConfirmation())) return;
+
+                await db.user.clearSessions();
+                await showToast(
+                  "success",
+                  "You have been logged out from all other devices."
+                );
+              }}
+            >
+              <Tip
+                text="Logout from all other devices"
+                tip="Force logout from all other logged in devices."
+              />
+            </Button>
+            <Button
+              variant="list"
+              onClick={async () => {
+                return showPasswordDialog(
+                  "delete_account",
+                  async ({ password }) => {
+                    await db.user.deleteUser(password);
+                    return true;
+                  }
+                );
+              }}
+            >
+              <Tip
+                text="Delete account"
+                tip="Permanently delete account and logout from all devices."
+              />
+            </Button>
+          </Flex>
+        )}
       </Flex>
     </ScrollContainer>
   );
@@ -884,6 +920,7 @@ function AccountStatusContainer(props) {
       bg={bg}
       flexDirection="column"
       p={2}
+      mt={1}
       sx={{ borderRadius: "default", border: "1px solid var(--border)" }}
     >
       <Flex flex="1" justifyContent="space-between">

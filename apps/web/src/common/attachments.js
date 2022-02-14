@@ -20,5 +20,6 @@ export async function downloadAttachment(hash) {
     iv: attachment.iv,
     name: attachment.metadata.filename,
     type: attachment.metadata.type,
+    isUploaded: !!attachment.dateUploaded,
   });
 }

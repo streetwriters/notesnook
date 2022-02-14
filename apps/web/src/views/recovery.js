@@ -14,6 +14,7 @@ import { useStore as useThemeStore } from "../stores/theme-store";
 import useDatabase from "../hooks/use-database";
 import Loader from "../components/loader";
 import Config from "../utils/config";
+import TextWithTip from "../components/tip";
 
 function useRecovery() {
   const [{ code, userId }] = useQueryParams();
@@ -76,11 +77,18 @@ function useAuthenticateUser({ code, userId, performAction }) {
   }, [code, userId, performAction, isAppLoaded]);
 }
 
-const steps = [RecoveryKeyStep, BackupDataStep, NewPasswordStep, FinalStep];
+const steps = {
+  recoveryOptions: RecoveryOptionsStep,
+  recoveryKey: RecoveryKeyStep,
+  oldPassword: OldPasswordStep,
+  backupData: BackupDataStep,
+  newPassword: NewPasswordStep,
+  final: FinalStep,
+};
 
 function AccountRecovery() {
   const { code, userId, loading, performAction } = useRecovery();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState("recoveryOptions");
   const Step = useMemo(() => steps[step], [step]);
   useAuthenticateUser({ code, userId, performAction });
   useEffect(() => {
@@ -158,8 +166,8 @@ function AccountRecovery() {
             <>
               <Step
                 performAction={performAction}
-                onFinished={() => {
-                  setStep((s) => ++s);
+                onFinished={(next) => {
+                  setStep(next);
                 }}
                 onRestart={() => {
                   setStep(0);
@@ -213,6 +221,57 @@ function Step({ testId, heading, children, subtitle }) {
   );
 }
 
+function RecoveryOptionsStep({ onFinished }) {
+  const isSessionExpired = useIsSessionExpired();
+
+  if (isSessionExpired) {
+    onFinished("newPassword");
+    return null;
+  }
+
+  return (
+    <Step
+      heading="Choose a recovery option"
+      testId={"step-recovery-options"}
+      subtitle={"How do you want to recover your account?"}
+    >
+      <Flex flexDirection="column" width="100%">
+        <Button
+          data-test-id="step-recovery-key"
+          variant={"list"}
+          mt={1}
+          onClick={() => onFinished("recoveryKey")}
+        >
+          <TextWithTip
+            text={"Use data recovery key"}
+            tip={
+              "Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption."
+            }
+          />
+        </Button>
+        <Button
+          data-test-id="step-old-password"
+          variant={"list"}
+          onClick={() => onFinished("oldPassword")}
+        >
+          <TextWithTip
+            text={"Use your old account password"}
+            tip={
+              "In some cases, you cannot login due to case sensitivity issues in your email address. This option can be used to recover your account. (This is very similar to changing your account password but without logging in)."
+            }
+          />
+        </Button>
+        {/* <Button disabled variant={"list"}>
+          <TextWithTip
+            text={"Delete all data & reset account"}
+            tip={"USE WITH CARE!"}
+          />
+        </Button> */}
+      </Flex>
+    </Step>
+  );
+}
+
 function RecoveryKeyStep({ performAction, onFinished }) {
   const isSessionExpired = useIsSessionExpired();
 
@@ -254,7 +313,7 @@ function RecoveryKeyStep({ performAction, onFinished }) {
                 const user = await db.user.getUser();
                 await db.storage.write(`_uk_@${user.email}@_k`, recoveryKey);
                 await db.sync(true);
-                onFinished();
+                onFinished("backupData");
               },
             });
           }
@@ -267,20 +326,95 @@ function RecoveryKeyStep({ performAction, onFinished }) {
           label="Enter your recovery key"
           autoFocus
           required
-          helpText="We'll use the recovery key to download & decrypt your data"
+          helpText="Your data recovery key will be used to decrypt your data"
+          type="password"
         />
 
-        <Button
-          data-test-id="step-next"
-          display="flex"
-          sx={{ justifyContent: "center", alignItems: "center" }}
-          alignSelf="flex-end"
-          px={20}
-          mt={2}
-          type={"submit"}
-        >
-          Next
-        </Button>
+        <Flex justifyContent={"space-between"} mt={2}>
+          <Button
+            data-test-id="step-prev"
+            variant={"anchor"}
+            type={"button"}
+            onClick={() => onFinished("recoveryOptions")}
+          >
+            Don't have a recovery key?
+          </Button>
+          <Button data-test-id="step-next" px={20} type={"submit"}>
+            Next
+          </Button>
+        </Flex>
+      </Flex>
+    </Step>
+  );
+}
+
+function OldPasswordStep({ performAction, onFinished }) {
+  return (
+    <Step
+      heading="Recover your account"
+      testId={"step-old-password"}
+      subtitle={
+        <Text variant={"error"} color="warn" bg="warnBg" p={1}>
+          <b>WARNING!</b>
+          <br />
+          You'll be logged out from all your devices.{" "}
+          <b>
+            If you have any unsynced data on any device, make sure to sync
+            before continuing.
+          </b>
+        </Text>
+      }
+    >
+      <Flex
+        flexDirection="column"
+        as="form"
+        width="100%"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          var formData = new FormData(e.target);
+
+          var oldPassword = formData.get("old_password");
+          if (oldPassword) {
+            await performAction({
+              message: "Downloading your data. This might take a bit.",
+              error: "Incorrect old password.",
+              action: async function recoverData() {
+                const { email, salt } = await db.user.getUser();
+                await db.storage.deriveCryptoKey(`_uk_@${email}`, {
+                  password: oldPassword,
+                  salt,
+                });
+                await db.sync(true);
+                onFinished("backupData");
+              },
+            });
+          }
+        }}
+      >
+        <Field
+          data-test-id="old_password"
+          id="old_password"
+          name="old_password"
+          label="Enter your old password"
+          type="password"
+          autoFocus
+          required
+          helpText="Your old account password will be used to decrypt your data."
+        />
+
+        <Flex justifyContent={"space-between"} mt={2}>
+          <Button
+            data-test-id="step-prev"
+            variant={"anchor"}
+            type={"button"}
+            onClick={() => onFinished("recoveryOptions")}
+          >
+            Don't remember old password?
+          </Button>
+          <Button data-test-id="step-next" px={20} type={"submit"}>
+            Next
+          </Button>
+        </Flex>
       </Flex>
     </Step>
   );
@@ -306,7 +440,7 @@ function BackupDataStep({ performAction, onFinished }) {
             onError: onFinished,
             action: async function downloadBackup() {
               await createBackup();
-              onFinished();
+              onFinished("newPassword");
             },
           });
         }}
@@ -349,7 +483,7 @@ function NewPasswordStep({ performAction, onFinished, onRestart }) {
             onError: () => {},
             action: async function setNewPassword() {
               if (await db.user.resetPassword(newPassword)) {
-                onFinished();
+                onFinished("final");
               }
             },
           });
@@ -360,13 +494,13 @@ function NewPasswordStep({ performAction, onFinished, onRestart }) {
           id="new_password"
           name="new_password"
           type="password"
-          label="New Password"
+          label="Enter new password"
           autoComplete="new-password"
           validatePassword
           onError={setError}
           autoFocus
           required
-          helpText="Enter new account password"
+          helpText="This will be your new account password — a strong memorable password is recommended."
         />
         <Button
           data-test-id="step-next"

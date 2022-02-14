@@ -36,7 +36,7 @@ const metadataItems = [
   {
     key: "dateEdited",
     label: "Last edited at",
-    value: (date) => (date ? formatDate(date) : "-"),
+    value: (date) => (date ? formatDate(date) : "never"),
   },
 ];
 

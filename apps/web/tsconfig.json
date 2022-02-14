@@ -6,8 +6,6 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
-    "maxNodeModuleJsDepth": 1,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,

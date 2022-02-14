@@ -79,6 +79,8 @@ function IssueDialog(props) {
               body: requestData.body,
               userId: userstore.get().user?.id,
             });
+
+            props.onClose();
             await showIssueReportedDialog({ url });
           } catch (e) {
             setError(e.message);

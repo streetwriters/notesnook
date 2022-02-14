@@ -1,9 +1,0 @@
-[
-  {
-    "title": "Welcome to Notesnook!",
-    "headline": "Thank you for checking out Notesnook. We are so glad to have you on board!",
-    "webContent": "/notes/welcome-web",
-    "mobileContent": "https://app.notesnook.com/notes/welcome-mobile",
-    "autoOpen": true
-  }
-]

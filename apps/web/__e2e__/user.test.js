@@ -50,11 +50,11 @@ test("login user and change password repeatedly", async ({
   page,
   browserName,
 }) => {
-  test.setTimeout(0);
+  test.setTimeout(6 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");
 
-  let currentPassword = "";
-  let newPassword = USER.password;
+  let currentPassword = USER.password;
+  let newPassword = "";
   let email = USER.email;
 
   for (let i = 0; i < 10; i++) {
@@ -92,10 +92,98 @@ test("login user and change password repeatedly", async ({
   }
 });
 
-test("reset user password", async ({ page, browserName }) => {
+test("reset user password using recovery key", async ({
+  page,
+  browserName,
+}) => {
   test.setTimeout(2 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");
 
+  await recoverAccount(async ({ currentKey }) => {
+    await page.click(getTestId("step-recovery-key"));
+
+    await page.waitForSelector(getTestId("step-recovery-key"));
+
+    await page.fill(getTestId("recovery_key"), currentKey);
+
+    await page.click(getTestId("step-next"));
+  });
+});
+
+test("reset user password after session expiry", async ({
+  page,
+  browserName,
+}) => {
+  test.setTimeout(2 * 60 * 1000);
+  test.skip(browserName !== "chromium", "Cannot run in parallel.");
+
+  let newPassword = "";
+  let newKey = "";
+
+  let currentPassword = USER.password;
+  let currentKey = "";
+
+  let email = USER.email;
+
+  for (let i = 0; i <= 1; ++i) {
+    await loginUser({ email, password: currentPassword });
+
+    await forceExpireSession();
+
+    await page.click(getTestId("auth-forgot-password"));
+
+    await page.click(getTestId("submitButton"));
+
+    await page.waitForSelector(getTestId("step-new-password"));
+
+    await page.fill(getTestId("new_password"), newPassword);
+
+    await page.click(getTestId("step-next"));
+
+    await page.waitForSelector(getTestId("step-finished"));
+
+    const actualRecoveryKey = await page.innerText(
+      getTestId("new-recovery-key")
+    );
+    expect(actualRecoveryKey).toBe(newKey);
+
+    await page.click(getTestId("step-finish"));
+
+    await loginUser({ password: newPassword }, false);
+
+    await page.waitForSelector(getTestId("sync-status-success"));
+
+    await logoutUser();
+
+    const cPassword = currentPassword;
+    currentPassword = newPassword;
+    newPassword = cPassword;
+
+    const cKey = currentKey;
+    currentKey = newKey;
+    newKey = cKey;
+  }
+});
+
+test("reset user password using old password", async ({
+  page,
+  browserName,
+}) => {
+  test.setTimeout(2 * 60 * 1000);
+  test.skip(browserName !== "chromium", "Cannot run in parallel.");
+
+  await recoverAccount(async ({ currentPassword }) => {
+    await page.click(getTestId("step-old-password"));
+
+    await page.waitForSelector(getTestId("step-old-password"));
+
+    await page.fill(getTestId("old_password"), currentPassword);
+
+    await page.click(getTestId("step-next"));
+  });
+});
+
+async function recoverAccount(submitRecoveryData) {
   let newPassword = "";
   let newKey = "";
 
@@ -113,11 +201,9 @@ test("reset user password", async ({ page, browserName }) => {
 
     await page.click(getTestId("submitButton"));
 
-    await page.waitForSelector(getTestId("step-recovery-key"));
+    await page.waitForSelector(getTestId("step-recovery-options"));
 
-    await page.fill(getTestId("recovery_key"), currentKey);
-
-    await page.click(getTestId("step-next"));
+    await submitRecoveryData({ currentPassword, currentKey });
 
     await page.waitForSelector(getTestId("step-backup-data"));
 
@@ -152,63 +238,4 @@ test("reset user password", async ({ page, browserName }) => {
     currentKey = newKey;
     newKey = cKey;
   }
-});
-
-test("reset user password after session expiry", async ({
-  page,
-  browserName,
-}) => {
-  test.setTimeout(2 * 60 * 1000);
-  test.skip(browserName !== "chromium", "Cannot run in parallel.");
-
-  let currentPassword = "";
-  let currentKey = "";
-
-  let newPassword = USER.password;
-  let newKey = "";
-
-  let email = USER.email;
-
-  for (let i = 0; i <= 1; ++i) {
-    await loginUser({ email, password: currentPassword });
-
-    await forceExpireSession();
-
-    await page.click(getTestId("auth-forgot-password"));
-
-    await page.click(getTestId("submitButton"));
-
-    await page.waitForSelector(getTestId("step-backup-data"));
-
-    await page.click(getTestId("step-next"));
-
-    await page.waitForSelector(getTestId("step-new-password"));
-
-    await page.fill(getTestId("new_password"), newPassword);
-
-    await page.click(getTestId("step-next"));
-
-    await page.waitForSelector(getTestId("step-finished"));
-
-    const actualRecoveryKey = await page.innerText(
-      getTestId("new-recovery-key")
-    );
-    expect(actualRecoveryKey).toBe(newKey);
-
-    await page.click(getTestId("step-finish"));
-
-    await loginUser({ password: newPassword }, false);
-
-    await page.waitForSelector(getTestId("sync-status-success"));
-
-    await logoutUser();
-
-    const cPassword = currentPassword;
-    currentPassword = newPassword;
-    newPassword = cPassword;
-
-    const cKey = currentKey;
-    currentKey = newKey;
-    newKey = cKey;
-  }
-});
+}
