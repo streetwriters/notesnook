@@ -1,7 +1,6 @@
 import { db } from "./db";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
-import { store as trashstore } from "../stores/trash-store";
 import { showToast } from "../utils/toast";
 
 function showNotesMovedToast(note, noteIds, notebook) {
@@ -57,12 +56,13 @@ function showItemDeletedToast(item) {
   var toast = showToast("success", messageText, actions);
 }
 
-async function showUndoableToast(message, onAction, onUndo) {
-  const timeoutId = setTimeout(onAction, 5000);
+async function showUndoableToast(message, onAction, onPermanentAction, onUndo) {
+  await onAction();
+  const timeoutId = setTimeout(onPermanentAction, 5000);
   const undoAction = async () => {
+    clearTimeout(timeoutId);
     toast.hide();
     onUndo();
-    clearTimeout(timeoutId);
   };
   let actions = [{ text: "Undo", onClick: undoAction }];
   var toast = showToast("success", message, actions);

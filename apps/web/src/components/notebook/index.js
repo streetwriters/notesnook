@@ -124,8 +124,8 @@ const menuItems = [
   },
   {
     title: "Move to trash",
-    color: "red",
-    iconColor: "red",
+    color: "error",
+    iconColor: "error",
     icon: Icon.Trash,
     onClick: async ({ items }) => {
       await Multiselect.moveNotebooksToTrash(items);

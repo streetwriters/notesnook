@@ -1,9 +1,6 @@
 import React from "react";
 import ListItem from "../list-item";
-import {
-  confirm,
-  showMultiPermanentDeleteConfirmation,
-} from "../../common/dialog-controller";
+import { showMultiPermanentDeleteConfirmation } from "../../common/dialog-controller";
 import * as Icon from "../icons";
 import { store } from "../../stores/trash-store";
 import { Flex, Text } from "rebass";
@@ -48,14 +45,16 @@ const menuItems = [
   {
     title: "Delete",
     icon: Icon.DeleteForver,
-    color: "red",
+    color: "error",
+    iconColor: "error",
     onClick: async ({ items }) => {
       if (!(await showMultiPermanentDeleteConfirmation(items.length))) return;
       const ids = items.map((i) => i.id);
       showUndoableToast(
         `${items.length} items permanently deleted`,
         () => store.delete(ids),
-        () => store.delete(ids, true)
+        () => store.delete(ids, true),
+        () => store.refresh()
       );
     },
     multiSelect: true,

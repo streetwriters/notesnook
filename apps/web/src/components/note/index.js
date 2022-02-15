@@ -318,8 +318,8 @@ const menuItems = [
   {
     key: "movetotrash",
     title: "Move to trash",
-    color: "red",
-    iconColor: "red",
+    color: "error",
+    iconColor: "error",
     icon: Icon.Trash,
     disabled: ({ items }) =>
       items.length === 1 && db.monographs.isPublished(items[0].id),
@@ -337,8 +337,8 @@ const topicNoteMenuItems = [
     key: "removefromtopic",
     title: "Remove from topic",
     icon: Icon.TopicRemove,
-    color: "red",
-    iconColor: "red",
+    color: "error",
+    iconColor: "error",
     onClick: async ({ items, context }) => {
       await db.notebooks
         .notebook(context.value.id)
