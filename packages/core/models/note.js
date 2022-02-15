@@ -150,4 +150,8 @@ export default class Note {
   pin() {
     return this._toggle("pinned");
   }
+
+  readonly() {
+    return this._toggle("readonly")
+  }
 }

@@ -82,6 +82,7 @@ export default class Notes extends Collection {
       favorite: !!note.favorite,
       localOnly: !!note.localOnly,
       conflicted: !!note.conflicted,
+      readonly: !!note.readonly,
 
       dateCreated: note.dateCreated,
       dateEdited: note.dateEdited || note.dateCreated || Date.now(),
