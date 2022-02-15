@@ -67,7 +67,7 @@ async function createTagAndCheckPresence(title) {
 
 async function renameTag(tagSelector, newTitle, expected) {
   await useContextMenu(tagSelector.build(), async () => {
-    await clickMenuItem("renametag");
+    await clickMenuItem("rename");
   });
 
   await page.fill(getTestId("item-dialog-title"), newTitle);
@@ -167,7 +167,7 @@ test("create a shortcut of a tag", async ({ page }) => {
   const tagSelector = await createTagAndCheckPresence("helloworld");
 
   await useContextMenu(tagSelector.build(), async () => {
-    await clickMenuItem("createshortcut");
+    await clickMenuItem("shortcut");
   });
 
   expect(
@@ -183,7 +183,7 @@ test("delete a shortcut of a tag", async ({ page }) => {
   const tagSelector = await createTagAndCheckPresence("helloworld");
 
   await useContextMenu(tagSelector.build(), async () => {
-    await clickMenuItem("createshortcut");
+    await clickMenuItem("shortcut");
   });
 
   expect(
@@ -208,7 +208,7 @@ test("delete the last note of a tag that is also a shortcut", async ({
   const tagSelector = await createTagAndCheckPresence("helloworld");
 
   await useContextMenu(tagSelector.build(), async () => {
-    await clickMenuItem("createshortcut");
+    await clickMenuItem("shortcut");
   });
 
   await page.click(tagSelector.build());

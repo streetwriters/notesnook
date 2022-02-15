@@ -10,7 +10,11 @@ const {
 } = require("./utils/actions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
-const { checkNotePresence, isPresent } = require("./utils/conditions");
+const {
+  checkNotePresence,
+  isPresent,
+  checkMenuItemText,
+} = require("./utils/conditions");
 
 /**
  * @type {Page}
@@ -203,7 +207,7 @@ test("permanently delete a notebook", async () => {
   ).resolves.toBeFalsy();
 });
 
-test("pin a notebook", async () => {
+test("pin a notebook", async ({ page }) => {
   const notebookSelector = await createNotebookAndCheckPresence();
 
   await useContextMenu(notebookSelector, () => clickMenuItem("pin"));
@@ -211,10 +215,9 @@ test("pin a notebook", async () => {
   // wait for the menu to properly close
   await page.waitForTimeout(500);
 
-  await useContextMenu(notebookSelector, () =>
-    expect(
-      isPresent(Menu.new("menuitem").item("unpin").build())
-    ).resolves.toBeTruthy()
+  await useContextMenu(
+    notebookSelector,
+    async () => await checkMenuItemText("pin", "Unpin")
   );
 
   // wait for the menu to properly close

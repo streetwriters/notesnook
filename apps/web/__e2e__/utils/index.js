@@ -71,7 +71,7 @@ async function downloadFile(downloadActionSelector, encoding) {
   return new Promise(async (resolve) => {
     page.on("download", async (download) => {
       const path = await download.path();
-      resolve(fs.readFileSync(path, { encoding }).toString());
+      resolve(fs.readFileSync(path, { encoding }));
     });
     await page.waitForSelector(downloadActionSelector);
 

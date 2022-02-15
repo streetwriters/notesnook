@@ -251,19 +251,7 @@ const menuItems = [
     key: "colors",
     title: "Assign color",
     icon: Icon.Colors,
-    items: COLORS.map((label) => ({
-      key: label,
-      title: db.colors.alias(label.toLowerCase()) || label.toLowerCase(),
-      icon: Icon.Circle,
-      iconColor: label.toLowerCase(),
-      checked: ({ note }) => {
-        return note.color === label.toLowerCase();
-      },
-      onClick: ({ note }) => {
-        const { id } = note;
-        store.setColor(id, label.toLowerCase());
-      },
-    })),
+    items: colorsToMenuItems(),
   },
   {
     key: "publish",
@@ -300,7 +288,7 @@ const menuItems = [
     isPro: true,
   },
   {
-    key: "unlocknote",
+    key: "lock",
     title: ({ note }) => (note.locked ? "Unlock" : "Lock"),
     icon: Icon.Lock,
     onClick: async ({ note }) => {
@@ -349,3 +337,22 @@ const topicNoteMenuItems = [
     multiSelect: true,
   },
 ];
+
+function colorsToMenuItems() {
+  return COLORS.map((label) => {
+    label = label.toLowerCase();
+    return {
+      key: label,
+      title: db.colors.alias(label) || label,
+      icon: Icon.Circle,
+      iconColor: label,
+      checked: ({ note }) => {
+        return note.color === label;
+      },
+      onClick: ({ note }) => {
+        const { id } = note;
+        store.setColor(id, label);
+      },
+    };
+  });
+}

@@ -6,6 +6,7 @@ class MenuItemIDBuilder {
   }
   constructor(type) {
     this.type = type;
+    this.suffix = "";
   }
 
   item(itemId) {
@@ -13,18 +14,15 @@ class MenuItemIDBuilder {
     return this;
   }
 
-  colorCheck(color) {
-    this.itemId = "colors-" + color + "-check";
-    return this;
-  }
-
-  color(color) {
-    this.itemId = "colors-" + color;
+  checked() {
+    this.suffix = "checked";
     return this;
   }
 
   build() {
-    return getTestId(`${this.type}-${this.itemId}`);
+    return getTestId(
+      `${this.type}-${this.itemId}${this.suffix ? `-${this.suffix}` : ""}`
+    );
   }
 }
 module.exports = MenuItemIDBuilder;

@@ -18,15 +18,15 @@ async function openContextMenu(selector) {
 }
 
 async function closeContextMenu() {
-  await page.click("body", { button: "left" });
+  await page.keyboard.press("Escape");
 }
 
-async function useContextMenu(selector, action) {
+async function useContextMenu(selector, action, close = false) {
   await openContextMenu(selector);
 
   await action();
 
-  await closeContextMenu();
+  if (close) await closeContextMenu();
 }
 
 async function confirmDialog() {

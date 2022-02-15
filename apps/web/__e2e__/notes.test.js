@@ -30,6 +30,7 @@ const {
   isAbsent,
   checkNotePresence,
   createNoteAndCheckPresence,
+  checkMenuItemText,
 } = require("./utils/conditions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
@@ -66,10 +67,10 @@ async function deleteNoteAndCheckAbsence(viewId = "home") {
   return trashItemSelector;
 }
 
-async function lockUnlockNote(noteSelector, type) {
+async function lockUnlockNote(noteSelector) {
   await openContextMenu(noteSelector);
 
-  await clickMenuItem(type);
+  await clickMenuItem("lock");
 
   await page.fill(getTestId("dialog-password"), PASSWORD);
 
@@ -93,9 +94,7 @@ async function openLockedNote(noteSelector) {
 async function checkNotePinned(noteSelector, pause) {
   await openContextMenu(noteSelector);
 
-  const unpinSelector = Menu.new("menuitem").item("unpin").build();
-
-  await expect(isPresent(unpinSelector)).resolves.toBeTruthy();
+  await checkMenuItemText("pin", "Unpin");
 
   await closeContextMenu(noteSelector);
 
@@ -114,11 +113,11 @@ async function checkNoteLocked(noteSelector) {
     isAbsent(List.new("note").grouped().atIndex(0).body().build())
   ).resolves.toBeTruthy();
 
-  await useContextMenu(noteSelector, () =>
-    expect(
-      isPresent(Menu.new("menuitem").item("unlock").build())
-    ).resolves.toBeTruthy()
-  );
+  await openContextMenu(noteSelector);
+
+  await checkMenuItemText("lock", "Unlock");
+
+  await closeContextMenu(noteSelector);
 }
 
 async function checkNoteColored(noteSelector) {
@@ -126,8 +125,10 @@ async function checkNoteColored(noteSelector) {
 
   await openContextMenu(noteSelector);
 
+  await page.click(Menu.new("menuitem").item("colors").build());
+
   await expect(
-    isPresent(Menu.new("menuitem").colorCheck("Red").build())
+    isPresent(Menu.new("menuitem").item("red").checked().build())
   ).resolves.toBeTruthy();
 
   await closeContextMenu(noteSelector);
@@ -188,10 +189,7 @@ async function exportNote(format) {
     Date.prototype.toLocaleString = () => "xxx";
   });
 
-  const output = await downloadFile(
-    getTestId(`export-dialog-${format}`),
-    "utf-8"
-  );
+  const output = await downloadFile(getTestId(`menuitem-${format}`), "utf-8");
   expect(output).toMatchSnapshot(`export-${format}.txt`);
 }
 
@@ -230,7 +228,7 @@ test.describe("run tests independently", () => {
 
     await openContextMenu(noteSelector);
 
-    await clickMenuItem("addtonotebook(s)");
+    await clickMenuItem("addtonotebook");
 
     await addNoteToNotebook();
   });
@@ -242,11 +240,13 @@ test.describe("run tests independently", () => {
       await clickMenuItem("favorite");
     });
 
-    await useContextMenu(noteSelector, async () => {
-      await expect(
-        isPresent(Menu.new("menuitem").item("unfavorite").build())
-      ).resolves.toBeTruthy();
-    });
+    await useContextMenu(
+      noteSelector,
+      async () => {
+        await checkMenuItemText("favorite", "Unfavorite");
+      },
+      true
+    );
 
     await navigateTo("favorites");
 
@@ -265,14 +265,16 @@ test.describe("run tests independently", () => {
     await page.waitForTimeout(500);
 
     await useContextMenu(noteSelector, async () => {
-      await clickMenuItem("unfavorite");
+      await clickMenuItem("favorite");
     });
 
-    await useContextMenu(noteSelector, async () => {
-      await expect(
-        isPresent(Menu.new("menuitem").item("favorite").build())
-      ).resolves.toBeTruthy();
-    });
+    await useContextMenu(
+      noteSelector,
+      async () => {
+        await checkMenuItemText("favorite", "Favorite");
+      },
+      true
+    );
   });
 
   test("favorite a note from properties", async () => {
@@ -288,11 +290,13 @@ test.describe("run tests independently", () => {
 
     noteSelector = await checkNotePresence("notes");
 
-    await useContextMenu(noteSelector, async () => {
-      await expect(
-        isPresent(Menu.new("menuitem").item("unfavorite").build())
-      ).resolves.toBeTruthy();
-    });
+    await useContextMenu(
+      noteSelector,
+      async () => {
+        await checkMenuItemText("favorite", "Unfavorite");
+      },
+      true
+    );
 
     await navigateTo("notes");
   });
@@ -302,7 +306,8 @@ test.describe("run tests independently", () => {
 
     await openContextMenu(noteSelector);
 
-    await page.click(Menu.new("menuitem").color("Red").build());
+    await page.click(Menu.new("menuitem").item("colors").build());
+    await page.click(Menu.new("menuitem").item("red").build());
 
     await page.click(getTestId("properties"));
 
@@ -330,12 +335,12 @@ test.describe("run tests independently", () => {
 
     await page.waitForTimeout(500);
 
-    await useContextMenu(noteSelector, () => clickMenuItem("unpin"));
+    await useContextMenu(noteSelector, () => clickMenuItem("pin"));
 
-    await useContextMenu(noteSelector, () =>
-      expect(
-        isPresent(Menu.new("menuitem").item("pin").build())
-      ).resolves.toBeTruthy()
+    await useContextMenu(
+      noteSelector,
+      async () => await checkMenuItemText("pin", "Pin"),
+      true
     );
   });
 
@@ -369,7 +374,7 @@ test.describe("run tests independently", () => {
   test("lock a note", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 
-    await lockUnlockNote(noteSelector, "lock");
+    await lockUnlockNote(noteSelector);
 
     await checkNoteLocked(noteSelector);
   });
@@ -393,9 +398,7 @@ test.describe("run tests independently", () => {
 
     await openContextMenu(noteSelector);
 
-    await expect(
-      isPresent(Menu.new("menuitem").item("lock").build())
-    ).resolves.toBeTruthy();
+    await checkMenuItemText("lock", "Lock");
 
     await closeContextMenu(noteSelector);
   });

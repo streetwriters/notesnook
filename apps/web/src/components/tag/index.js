@@ -11,6 +11,7 @@ import { showToast } from "../../utils/toast";
 
 const menuItems = [
   {
+    key: "rename",
     title: "Rename tag",
     icon: Icon.Edit,
     onClick: ({ tag }) => {
@@ -18,12 +19,14 @@ const menuItems = [
     },
   },
   {
+    key: "shortcut",
     title: ({ tag }) =>
       db.settings.isPinned(tag.id) ? "Remove shortcut" : "Create shortcut",
     icon: Icon.Shortcut,
     onClick: ({ tag }) => appStore.pinItemToMenu(tag),
   },
   {
+    key: "delete",
     color: "error",
     iconColor: "error",
     title: "Delete",

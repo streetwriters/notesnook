@@ -35,7 +35,7 @@ function MenuItem({ item, isFocused, onHover, onClick }) {
     <Flex as="li" flexDirection={"column"} flex={1} onMouseOver={onHover}>
       <Button
         id={key}
-        data-test-id={`menuitem-${title.split(" ").join("").toLowerCase()}`}
+        data-test-id={`menuitem-${key}`}
         key={key}
         ref={itemRef}
         tabIndex={-1}
@@ -65,7 +65,9 @@ function MenuItem({ item, isFocused, onHover, onClick }) {
           {isPremium && <Pro size={14} color="primary" sx={{ ml: 1 }} />}
         </Flex>
         <Flex>
-          {isChecked && <Check size={14} />}
+          {isChecked && (
+            <Check size={14} data-test-id={`menuitem-${key}-checked`} />
+          )}
           {hasSubmenu && <ChevronRight size={14} />}
           {modifier && (
             <Text

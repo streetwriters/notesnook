@@ -68,12 +68,12 @@ function ListItem(props) {
         let title = props.item.title;
         let selectedItems = selectionStore.get().selectedItems.slice();
 
-        if (isSelected || isFocused) {
+        if (isSelected) {
           title = `${selectedItems.length} items selected`;
           items = items.filter((item) => item.multiSelect);
         } else if (Config.get("debugMode", false)) {
           items.push(...debugMenuItems(props.item.type));
-        } else {
+        } else if (selectedItems.indexOf(props.item) === -1) {
           selectedItems.push(props.item);
         }
 

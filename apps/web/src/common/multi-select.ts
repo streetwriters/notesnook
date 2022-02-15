@@ -1,20 +1,15 @@
-import { removeStatus, updateStatus } from "../hooks/use-status";
-import {
-  showMultiDeleteConfirmation,
-  showMultiPermanentDeleteConfirmation,
-} from "./dialog-controller";
-import { store as editorStore } from "../stores/editor-store";
-import { store as appStore } from "../stores/app-store";
+import { showMultiDeleteConfirmation } from "./dialog-controller";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
 import { db } from "./db";
-import { hashNavigate } from "../navigation";
 import { showToast } from "../utils/toast";
 import Vault from "./vault";
 import { showItemDeletedToast } from "./toasts";
 import { TaskManager } from "./task-manager";
 
 async function moveNotesToTrash(notes: any[]) {
+  console.log(notes);
+
   const item = notes[0];
   const isMultiselect = notes.length > 1;
   if (isMultiselect) {

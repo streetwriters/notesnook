@@ -131,7 +131,10 @@ function Menu({ items, data, title, closeMenu }) {
             key={item.key}
             index={index}
             item={item}
-            onClick={(e) => onAction(e, item)}
+            onClick={(e) => {
+              if (item.items?.length) setIsSubmenuOpen(true);
+              else onAction(e, item);
+            }}
             isFocused={focusIndex === index}
             onHover={() => {
               setFocusIndex(index);

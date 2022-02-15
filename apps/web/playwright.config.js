@@ -42,9 +42,9 @@ module.exports = {
   timeout: 30000,
   workers: IS_CI ? 3 : 4,
   reporter: "list",
-  retries: IS_CI ? 3 : 1,
+  retries: IS_CI ? 3 : 0,
   use: {
-    headless: false,
+    headless: true,
     acceptDownloads: true,
 
     // Artifacts

@@ -207,7 +207,7 @@ test("select all & backspace should clear all content in editor", async () => {
   await expect(getEditorContent()).resolves.toBe("");
 });
 
-test.only("last line doesn't get saved if it's font is different", async () => {
+test("last line doesn't get saved if it's font is different", async () => {
   const selector = await createNoteAndCheckPresence();
 
   await page.keyboard.press("Enter");

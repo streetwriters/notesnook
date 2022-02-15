@@ -34,6 +34,7 @@ export default TrashItem;
 
 const menuItems = [
   {
+    key: "restore",
     title: "Restore",
     icon: Icon.Restore,
     onClick: ({ items }) => {
@@ -43,6 +44,7 @@ const menuItems = [
     multiSelect: true,
   },
   {
+    key: "delete",
     title: "Delete",
     icon: Icon.DeleteForver,
     color: "error",
