@@ -45,6 +45,7 @@ function Editor({ noteId, nonce }) {
   const [isEditorLoading, setIsEditorLoading] = useState(true);
   const sessionId = useStore((store) => store.session.id);
   const sessionState = useStore((store) => store.session.state);
+  const isPreviewMode = useStore((store) => store.session.previewMode);
   const isReadonly = useStore((store) => store.session.readonly);
   const contentId = useStore((store) => store.session.contentId);
   const contentType = useStore((store) => store.session.content?.type);
@@ -149,13 +150,23 @@ function Editor({ noteId, nonce }) {
 
   useEffect(
     function openPreviewSession() {
-      if (!isReadonly || sessionState !== SESSION_STATES.new) return;
+      if (!isPreviewMode || sessionState !== SESSION_STATES.new) return;
 
       setContent();
       enabledPreviewMode();
     },
-    [isReadonly, sessionState, setContent, enabledPreviewMode]
+    [isPreviewMode, sessionState, setContent, enabledPreviewMode]
   );
+
+  useEffect(() => {
+    const editor = editorRef.current?.editor;
+    if (editor)
+      if (isReadonly) {
+        editor.mode.set("readonly");
+      } else {
+        editor.mode.set("design");
+      }
+  }, [isReadonly]);
 
   useEffect(
     function newSession() {
@@ -215,7 +226,7 @@ function Editor({ noteId, nonce }) {
             py: 1,
           }}
         />
-        {isReadonly && (
+        {isPreviewMode && (
           <Notice
             title={"Readonly mode"}
             subtitle={`You are previewing note version edited from ${formatDate(
@@ -246,7 +257,7 @@ function Editor({ noteId, nonce }) {
           px={[2, 2, 35]}
           mt={[2, 2, 25]}
         >
-          <Header readonly={isReadonly} />
+          <Header readonly={isPreviewMode || isReadonly} />
 
           {isSessionReady && (
             <Suspense fallback={<div />}>

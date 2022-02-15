@@ -126,6 +126,7 @@ import {
   mdiLinkVariantOff,
   mdiNetworkOffOutline,
   mdiCheckNetworkOutline,
+  mdiPencilLockOutline,
   mdiSort,
   mdiOrderAlphabeticalAscending,
   mdiOrderAlphabeticalDescending,
@@ -330,6 +331,7 @@ export const ShortcutLink = createIcon(mdiLinkVariant);
 export const RemoveShortcutLink = createIcon(mdiLinkVariantOff);
 export const Offline = createIcon(mdiNetworkOffOutline);
 export const Online = createIcon(mdiCheckNetworkOutline);
+export const Readonly = createIcon(mdiPencilLockOutline);
 
 export const SortBy = createIcon(mdiSort);
 export const GroupBy = createIcon(mdiSelectGroup);

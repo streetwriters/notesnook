@@ -115,6 +115,12 @@ class NoteStore extends BaseStore {
       await editorStore.openSession(id, true);
   };
 
+  readonly = async (id) => {
+    const note = db.notes.note(id)
+    await note.readonly();
+    this.refresh();
+  }
+
   setColor = async (id, color) => {
     try {
       let note = db.notes.note(id);

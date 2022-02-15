@@ -19,6 +19,7 @@ const SESSION_STATES = {
 
 const getDefaultSession = (sessionId = Date.now()) => {
   return {
+    previewMode: false,
     readonly: false,
     state: undefined,
     saveState: 1, // -1 = not saved, 0 = saving, 1 = saved
@@ -94,7 +95,7 @@ class EditorStore extends BaseStore {
       state.session.sessionId = undefined;
       state.session.dateCreated = dateCreated;
       state.session.dateEdited = dateEdited;
-      state.session.readonly = true;
+      state.session.previewMode = true;
       state.session.state = SESSION_STATES.new;
     });
   };
@@ -105,7 +106,7 @@ class EditorStore extends BaseStore {
       state.session.sessionId = newSession.sessionId;
       state.session.dateCreated = newSession.dateCreated;
       state.session.dateEdited = newSession.dateEdited;
-      state.session.readonly = false;
+      state.session.previewMode = false;
       state.session.state = SESSION_STATES.stale;
 
       delete state.session.oldContent;
@@ -272,6 +273,10 @@ class EditorStore extends BaseStore {
   toggleLocked = () => {
     if (this.get().session.locked) noteStore.unlock(this.get().session.id);
     else noteStore.lock(this.get().session.id);
+  };
+
+  toggleReadonly = () => {
+    noteStore.readonly(this.get().session.id);
   };
 
   setColor = (color) => {

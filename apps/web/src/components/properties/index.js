@@ -25,6 +25,7 @@ const tools = [
     label: "Favorite",
   },
   { key: "locked", icon: Icon.Unlock, label: "Lock" },
+  { key: "readonly", icon: Icon.Readonly, label: "Readonly" },
 ];
 
 const metadataItems = [
@@ -45,6 +46,7 @@ function Properties() {
   const [versionHistory, setVersionHistory] = useState([]);
 
   const toggleLocked = useStore((store) => store.toggleLocked);
+  const toggleReadonly = useStore((store) => store.toggleReadonly);
   const setSession = useStore((store) => store.setSession);
   const openPreviewSession = useStore((store) => store.openPreviewSession);
   const setColor = useStore((store) => store.setColor);
@@ -57,7 +59,7 @@ function Properties() {
     color,
     notebooks,
     attachments,
-    readonly: isReadonly,
+    previewMode: isPreviewMode,
   } = session;
 
   const changeState = useCallback(
@@ -66,9 +68,14 @@ function Properties() {
         toggleLocked();
         return;
       }
+
       setSession((state) => {
         state.session[prop] = value;
       });
+
+      if (prop === "readonly") {
+        toggleReadonly();
+      }
     },
     [setSession, toggleLocked]
   );
@@ -149,7 +156,7 @@ function Properties() {
               />
             }
           >
-            {!isReadonly && (
+            {!isPreviewMode && (
               <>
                 {tools.map((tool, _) => (
                   <Toggle
@@ -181,7 +188,7 @@ function Properties() {
                 </Text>
               </Flex>
             ))}
-            {!isReadonly && (
+            {!isPreviewMode && (
               <>
                 <Flex
                   py={2}
