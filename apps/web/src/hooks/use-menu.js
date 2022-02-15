@@ -159,7 +159,7 @@ function mapMenuItems(items, data) {
   return items.reduce((prev, item) => {
     const {
       key,
-      onClick,
+      onClick: _onClick,
       color,
       disableReason,
       disabled,
@@ -186,6 +186,8 @@ function mapMenuItems(items, data) {
     const icon = resolveProp(item.icon, data, item);
     const isChecked = resolveProp(checked, data, item);
     const isDisabled = resolveProp(disabled, data, item);
+    const onClick =
+      typeof _onClick === "function" && _onClick.bind(this, data, item);
 
     const tooltip = (isDisabled && disableReason) || item.tooltip || title;
     const isPremium = isPro && !isUserPremium();
@@ -213,10 +215,7 @@ function mapMenuItems(items, data) {
     };
 
     if (hasSubmenu)
-      menuItem.items = mapMenuItems(items, {
-        ...data,
-        parent: menuItem,
-      });
+      menuItem.items = mapMenuItems(items, { ...data, parent: menuItem });
 
     prev.push(menuItem);
 

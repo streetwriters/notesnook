@@ -88,12 +88,12 @@ function Menu({ items, data, title, closeMenu }) {
       e.stopPropagation();
       if (closeMenu) closeMenu();
       if (item.onClick) {
-        item.onClick(data, item);
+        item.onClick();
         // TODO: this probably shouldn't be here.
         selectionStore.toggleSelectionMode(false);
       }
     },
-    [closeMenu, data]
+    [closeMenu]
   );
 
   const [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen] =
