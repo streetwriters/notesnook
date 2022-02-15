@@ -23,16 +23,10 @@ async function moveNotesToTrash(notes: any[]) {
     if (item.locked && !(await Vault.unlockNote(item.id))) return;
   }
 
-  var isAnyNoteOpened = false;
   const items = notes.map((item) => {
-    if (item.id === editorStore.get().session.id) isAnyNoteOpened = true;
     if (item.locked || db.monographs.isPublished(item.id)) return 0;
     return item.id;
   });
-
-  if (isAnyNoteOpened) {
-    hashNavigate("/notes/create", { addNonce: true });
-  }
 
   await TaskManager.startTask({
     type: "status",

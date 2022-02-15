@@ -68,7 +68,7 @@ function ListItem(props) {
         let title = props.item.title;
         let selectedItems = selectionStore.get().selectedItems.slice();
 
-        if (isSelected) {
+        if (isSelected || isFocused) {
           title = `${selectedItems.length} items selected`;
           items = items.filter((item) => item.multiSelect);
         } else if (Config.get("debugMode", false)) {

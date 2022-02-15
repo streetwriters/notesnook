@@ -76,7 +76,7 @@ class NoteStore extends BaseStore {
       }
     }
 
-    await db.notes.delete(ids);
+    await db.notes.delete(...ids);
 
     this.refresh();
     appStore.refreshNavItems();
