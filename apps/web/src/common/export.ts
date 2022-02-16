@@ -29,21 +29,21 @@ export async function exportNotes(
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
       if (format === "pdf") {
-        const note = db.notes.note(noteIds[0]);
-        return await exportToPDF(await note.export("html"));
+        const note = db.notes!.note(noteIds[0]);
+        return await exportToPDF(await note.export("html", null));
       }
 
       var files = [];
       let index = 0;
       for (var noteId of noteIds) {
-        const note = db.notes.note(noteId);
+        const note = db.notes!.note(noteId);
         report({
           current: ++index,
           total: noteIds.length,
           text: `Exporting "${note.title}"...`,
         });
         console.log("Exporting", note.title);
-        const content: string = await note.export(format).catch(() => {});
+        const content: string = await note.export(format, null).catch(() => {});
         if (!content) continue;
         files.push({ filename: note.title, content });
       }

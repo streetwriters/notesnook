@@ -19,7 +19,7 @@ async function moveNotesToTrash(notes: any[]) {
   }
 
   const items = notes.map((item) => {
-    if (item.locked || db.monographs.isPublished(item.id)) return 0;
+    if (item.locked || db.monographs!.isPublished(item.id)) return 0;
     return item.id;
   });
 
@@ -76,8 +76,8 @@ async function deleteTopics(notebookId: string, topics: any[]) {
       report({
         text: `Deleting ${topics.length} topics...`,
       });
-      await db.notebooks
-        .notebook(notebookId)
+      await db
+        .notebooks!.notebook(notebookId)
         .topics.delete(...topics.map((t) => t.id));
       notebookStore.setSelectedNotebook(notebookId);
     },
