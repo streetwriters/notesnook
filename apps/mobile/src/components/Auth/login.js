@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { LayoutAnimation, Platform, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
@@ -18,6 +18,7 @@ import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import Input from '../Input';
 import { SvgToPngView } from '../ListPlaceholders';
+import { BouncingView } from '../Transitions/bouncing-view';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import { SVG } from './background';
@@ -67,7 +68,7 @@ export const Login = ({ changeMode }) => {
     setLoading(true);
     let user;
     try {
-      await db.user.login(email.toLowerCase(), password);
+      await db.user.login(email.current.toLowerCase(), password.current);
       user = await db.user.getUser();
       if (!user) throw new Error('Email or password incorrect!');
       PremiumService.setPremiumStatus();
@@ -89,6 +90,7 @@ export const Login = ({ changeMode }) => {
         progress: true
       });
     } catch (e) {
+      console.log(e.stack);
       setLoading(false);
       ToastEvent.show({
         heading: user ? 'Failed to sync' : 'Login failed',
@@ -111,7 +113,7 @@ export const Login = ({ changeMode }) => {
           position: 'absolute',
           zIndex: 999,
           left: 12,
-          top: 12 + insets.top
+          top: Platform.OS === 'ios' ? 12 + insets.top : 12
         }}
       />
 
@@ -133,121 +135,124 @@ export const Login = ({ changeMode }) => {
             overflow: 'hidden'
           }}
         >
-          <SvgToPngView src={SVG(colors.night ? 'white' : 'black')} height={700} />
+          <BouncingView initialScale={1.2} duration={5000}>
+            <SvgToPngView src={SVG(colors.night ? 'white' : 'black')} height={700} />
+          </BouncingView>
         </View>
-
-        <View
-          style={{
-            width: '100%',
-            justifyContent: 'center',
-            alignSelf: 'center',
-            paddingHorizontal: 12,
-            marginBottom: 30,
-            marginTop: 15
-          }}
-        >
-          <Heading
-            style={{
-              textAlign: 'center'
-            }}
-            size={30}
-            color={colors.heading}
-          >
-            Welcome back!
-          </Heading>
-          <Paragraph
-            style={{
-              textDecorationLine: 'underline',
-              textAlign: 'center',
-              marginTop: 5
-            }}
-            onPress={() => {
-              changeMode(1);
-            }}
-            size={SIZE.md}
-          >
-            Don't have an account? Sign up
-          </Paragraph>
-        </View>
-        <View
-          style={{
-            width: focused ? '100%' : '99.9%',
-            padding: 12,
-            backgroundColor: colors.bg,
-            flexGrow: 1
-          }}
-        >
-          <Input
-            fwdRef={emailInputRef}
-            onChangeText={value => {
-              email.current = value;
-            }}
-            onErrorCheck={e => setError(e)}
-            returnKeyLabel="Next"
-            returnKeyType="next"
-            autoCompleteType="email"
-            validationType="email"
-            autoCorrect={false}
-            autoCapitalize="none"
-            errorMessage="Email is invalid"
-            placeholder="Email"
-            onSubmit={() => {}}
-          />
-
-          <Input
-            fwdRef={passwordInputRef}
-            onChangeText={value => {
-              password.current = value;
-            }}
-            onErrorCheck={e => setError(e)}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            secureTextEntry
-            autoCompleteType="password"
-            autoCapitalize="none"
-            validationType="password"
-            autoCorrect={false}
-            placeholder="Password"
-            marginBottom={0}
-          />
-          <Button
-            title="Forgot your password?"
-            style={{
-              alignSelf: 'flex-end',
-              height: 30,
-              paddingHorizontal: 0
-            }}
-            onPress={() => {
-              SheetManager.show('forgotpassword_sheet', email.current);
-            }}
-            textStyle={{
-              textDecorationLine: 'underline'
-            }}
-            fontSize={SIZE.xs}
-            type="gray"
-          />
-
+        <BouncingView initialScale={0.95} duration={3000}>
           <View
             style={{
-              // position: 'absolute',
-              marginTop: 50,
-              alignSelf: 'center'
+              width: '100%',
+              justifyContent: 'center',
+              alignSelf: 'center',
+              paddingHorizontal: 12,
+              marginBottom: 30,
+              marginTop: 15
             }}
           >
-            <Button
+            <Heading
               style={{
-                marginTop: 10,
-                width: 250,
-                borderRadius: 100
+                textAlign: 'center'
               }}
-              loading={loading}
-              onPress={login}
-              //  width="100%"
-              type="accent"
-              title={loading ? null : 'Login to your account'}
-            />
+              size={30}
+              color={colors.heading}
+            >
+              Welcome back!
+            </Heading>
+            <Paragraph
+              style={{
+                textDecorationLine: 'underline',
+                textAlign: 'center',
+                marginTop: 5
+              }}
+              onPress={() => {
+                changeMode(1);
+              }}
+              size={SIZE.md}
+            >
+              Don't have an account? Sign up
+            </Paragraph>
           </View>
-        </View>
+          <View
+            style={{
+              width: focused ? '100%' : '99.9%',
+              padding: 12,
+              backgroundColor: colors.bg,
+              flexGrow: 1
+            }}
+          >
+            <Input
+              fwdRef={emailInputRef}
+              onChangeText={value => {
+                email.current = value;
+              }}
+              onErrorCheck={e => setError(e)}
+              returnKeyLabel="Next"
+              returnKeyType="next"
+              autoCompleteType="email"
+              validationType="email"
+              autoCorrect={false}
+              autoCapitalize="none"
+              errorMessage="Email is invalid"
+              placeholder="Email"
+              onSubmit={() => {}}
+            />
+
+            <Input
+              fwdRef={passwordInputRef}
+              onChangeText={value => {
+                password.current = value;
+              }}
+              onErrorCheck={e => setError(e)}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+              secureTextEntry
+              autoCompleteType="password"
+              autoCapitalize="none"
+              validationType="password"
+              autoCorrect={false}
+              placeholder="Password"
+              marginBottom={0}
+            />
+            <Button
+              title="Forgot your password?"
+              style={{
+                alignSelf: 'flex-end',
+                height: 30,
+                paddingHorizontal: 0
+              }}
+              onPress={() => {
+                SheetManager.show('forgotpassword_sheet', email.current);
+              }}
+              textStyle={{
+                textDecorationLine: 'underline'
+              }}
+              fontSize={SIZE.xs}
+              type="gray"
+            />
+
+            <View
+              style={{
+                // position: 'absolute',
+                marginTop: 50,
+                alignSelf: 'center'
+              }}
+            >
+              <Button
+                style={{
+                  marginTop: 10,
+                  width: 250,
+                  borderRadius: 100
+                }}
+                loading={loading}
+                onPress={login}
+                //  width="100%"
+                type="accent"
+                title={loading ? null : 'Login to your account'}
+              />
+            </View>
+          </View>
+        </BouncingView>
       </View>
     </>
   );

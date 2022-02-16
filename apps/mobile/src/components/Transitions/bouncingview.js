@@ -18,6 +18,7 @@ export const BouncingView = ({
       duration: duration,
       easing: Easing.elastic(1)
     }).start();
+
     return () => {
       if (!animated) return;
       scale.setValue(initialScale);

@@ -317,7 +317,7 @@ const features_list = [
   }
 ];
 
-const sheet = (context, promo) => {
+const sheet = (context, promo, trial) => {
   presentSheet({
     context: context,
     component: ref => (
@@ -332,7 +332,7 @@ const sheet = (context, promo) => {
         <Seperator />
         <CompactFeatures scrollRef={ref} maxHeight={300} features={features_list} vertical />
         <Seperator half />
-        <PricingPlans compact heading={false} promo={promo} />
+        <PricingPlans trial={trial} compact heading={false} promo={promo} />
       </>
     )
   });

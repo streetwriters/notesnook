@@ -62,7 +62,7 @@ function loadFontSize() {
 let changeTimer = null;
 const COLLAPSED_KEY = 'c';
 const HIDDEN_KEY = 'h';
-const collapsibleTags = {HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6};
+const collapsibleTags = { HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6 };
 let styleElement;
 
 function addStyle() {
@@ -142,12 +142,12 @@ function init_callback(_editor) {
   editor.on('BeforeAddUndo', onUndoChange);
   editor.on('AddUndo', onUndoChange);
   editor.on('cut', function () {
-    onChange({type: 'cut'});
+    onChange({ type: 'cut' });
     onUndoChange();
   });
   editor.on('copy', onUndoChange);
   editor.on('paste', function () {
-    onChange({type: 'paste'});
+    onChange({ type: 'paste' });
   });
 
   editor.on('focus', function () {
@@ -169,7 +169,7 @@ function init_callback(_editor) {
 
   editor.on('NewBlock', function (e) {
     console.log('New Block', e);
-    const {newBlock} = e;
+    const { newBlock } = e;
     let target;
     if (newBlock) {
       target = newBlock.previousElementSibling;
@@ -182,7 +182,7 @@ function init_callback(_editor) {
   });
 
   editor.on('touchstart mousedown', function (e) {
-    const {target} = e;
+    const { target } = e;
     if (
       e.offsetX < 6 &&
       collapsibleTags[target.tagName] &&
@@ -212,10 +212,7 @@ function init_callback(_editor) {
   });
 
   editor.on('tap', function (e) {
-    if (
-      e.target.classList.contains('mce-content-body') &&
-      !e.target.innerText.length > 0
-    ) {
+    if (e.target.classList.contains('mce-content-body') && !e.target.innerText.length > 0) {
       e.preventDefault();
     }
   });
@@ -409,8 +406,7 @@ function init_tiny(size) {
     autoresize_bottom_margin: 120,
     table_toolbar:
       'tcellprops trowprops | tableinsertrowafter tableinsertcolafter tabledeleterow tabledeletecol | tableconfig',
-    imagetools_toolbar:
-      'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
+    imagetools_toolbar: 'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     table_responsive_width: false,
@@ -558,10 +554,7 @@ function setup_tiny(_editor) {
           };
           reader.readAsDataURL(recoveredBlob);
         };
-        xhr.open(
-          'GET',
-          tinymce.activeEditor.selection.getNode().getAttribute('src')
-        );
+        xhr.open('GET', tinymce.activeEditor.selection.getNode().getAttribute('src'));
         xhr.send();
       }
     }
@@ -592,7 +585,7 @@ function scrollSelectionIntoView(event) {
       let node = editor.selection.getNode();
       if (node) {
         console.log(node, 'scrolling into view');
-        node.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, 1);
   }

@@ -1,8 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
-import * as Progress from 'react-native-progress';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import { useTip } from '../../services/tip-manager';
 import { COLORS_NOTE } from '../../utils/Colors';
 import { SIZE } from '../../utils/SizeUtils';
@@ -12,82 +12,89 @@ import { Tip } from '../Tip';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Empty = ({ loading = true, placeholderData, headerProps, type, screen }) => {
-  const [state] = useTracked();
-  const { colors } = state;
-  const insets = useSafeAreaInsets();
-  const { height } = useWindowDimensions();
-  const tip = useTip(
-    screen === 'Notes' ? 'first-note' : placeholderData.type || type,
-    screen === 'Notes' ? 'notes' : null
-  );
-  const color =
-    colors[COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'];
+export const Empty = React.memo(
+  ({ loading = true, placeholderData, headerProps, type, screen }) => {
+    const [state] = useTracked();
+    const { colors } = state;
+    const insets = useSafeAreaInsets();
+    const { height } = useWindowDimensions();
+    const introCompleted = useSettingStore(state => state.isIntroCompleted);
+    const tip = useTip(
+      screen === 'Notes' && introCompleted ? 'first-note' : placeholderData.type || type,
+      screen === 'Notes' ? 'notes' : null
+    );
 
-  return (
-    <View
-      style={[
-        {
-          height: height - (140 + insets.top),
-          width: '80%',
-          justifyContent: 'center',
-          alignSelf: 'center'
-        }
-      ]}
-    >
-      {!loading ? (
-        <>
-          <Tip
-            color={COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'}
-            tip={tip}
-            style={{
-              backgroundColor: 'transparent',
-              paddingHorizontal: 0
-            }}
-          />
-          {placeholderData.button && (
-            <Button
-              type="grayAccent"
-              title={placeholderData.button}
-              iconPosition="right"
-              icon="arrow-right"
-              onPress={placeholderData.action}
-              accentColor={
-                COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'
-              }
-              accentText="light"
+    const color =
+      colors[COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'];
+    return (
+      <View
+        style={[
+          {
+            height: height - (140 + insets.top),
+            width: '80%',
+            justifyContent: 'center',
+            alignSelf: 'center'
+          }
+        ]}
+      >
+        {!loading ? (
+          <>
+            <Tip
+              color={COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'}
+              tip={tip}
               style={{
-                alignSelf: 'flex-start',
-                borderRadius: 5,
-                height: 40
+                backgroundColor: 'transparent',
+                paddingHorizontal: 0
               }}
             />
-          )}
-        </>
-      ) : (
-        <>
-          <View
-            style={{
-              alignSelf: 'center',
-              alignItems: 'flex-start',
-              width: '100%'
-            }}
-          >
-            <Heading>{placeholderData.heading}</Heading>
-            <Paragraph size={SIZE.sm} textBreakStrategy="balanced">
-              {placeholderData.loading}
-            </Paragraph>
-            <Seperator />
-            <ActivityIndicator
-              size={SIZE.lg}
-              color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
-            />
-          </View>
-        </>
-      )}
-    </View>
-  );
-};
+            {placeholderData.button && (
+              <Button
+                type="grayAccent"
+                title={placeholderData.button}
+                iconPosition="right"
+                icon="arrow-right"
+                onPress={placeholderData.action}
+                accentColor={
+                  COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'
+                }
+                accentText="light"
+                style={{
+                  alignSelf: 'flex-start',
+                  borderRadius: 5,
+                  height: 40
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <View
+              style={{
+                alignSelf: 'center',
+                alignItems: 'flex-start',
+                width: '100%'
+              }}
+            >
+              <Heading>{placeholderData.heading}</Heading>
+              <Paragraph size={SIZE.sm} textBreakStrategy="balanced">
+                {placeholderData.loading}
+              </Paragraph>
+              <Seperator />
+              <ActivityIndicator
+                size={SIZE.lg}
+                color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
+              />
+            </View>
+          </>
+        )}
+      </View>
+    );
+  },
+  (prev, next) => {
+    if (prev.loading === next.loading) return true;
+    return false;
+  }
+);
 
 /**
  * Make a tips manager.

@@ -46,7 +46,12 @@ class PremiumDialog extends React.Component {
 
   render() {
     return !this.state.visible ? null : (
-      <BaseDialog bounce background={this.props.colors.bg} onRequestClose={this.onClose}>
+      <BaseDialog
+        animation="slide"
+        bounce={false}
+        background={this.props.colors.bg}
+        onRequestClose={this.onClose}
+      >
         <Component getRef={() => this.actionSheetRef} promo={this.state.promo} close={this.close} />
       </BaseDialog>
     );

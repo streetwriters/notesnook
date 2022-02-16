@@ -11,8 +11,8 @@ import { Dialog } from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import GeneralSheet from '../GeneralSheet';
 import ImagePreview from '../ImagePreview';
-import LoginDialog from '../LoginDialog';
-import { SessionExpired } from '../LoginDialog/session-expired';
+import Auth from '../Auth';
+import { SessionExpired } from '../Auth/session-expired';
 import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
 import PremiumDialog from '../Premium';
@@ -59,7 +59,7 @@ export class DialogManager extends Component {
         <AddTopicDialog colors={colors} />
         <AddNotebookDialog colors={colors} />
         <PremiumDialog colors={colors} />
-        <LoginDialog colors={colors} />
+        <Auth colors={colors} />
         <MergeEditor />
         <ExportDialog />
         <RecoveryKeyDialog colors={colors} />

@@ -33,7 +33,7 @@ import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 import Input from '../Input';
 import { SvgToPngView } from '../ListPlaceholders';
-import { SVG } from '../LoginDialog/background';
+import { SVG } from '../Auth/background';
 import Seperator from '../Seperator';
 import SplashScreen from '../SplashScreen';
 import Heading from '../Typography/Heading';

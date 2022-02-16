@@ -8,17 +8,18 @@ import { Toast } from '../Toast';
 import { Login } from './login';
 import { Signup } from './signup';
 
-const MODES = {
+export const AuthMode = {
   login: 0,
   signup: 1,
-  welcomeSignup: 2
+  welcomeSignup: 2,
+  trialSignup: 3
 };
 
-const LoginDialog = () => {
+const Auth = () => {
   const [state] = useTracked();
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
-  const [mode, setMode] = useState(MODES.login);
+  const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();
 
   useEffect(() => {
@@ -31,7 +32,7 @@ const LoginDialog = () => {
   }, []);
 
   async function open(mode) {
-    setMode(mode ? mode : MODES.login);
+    setCurrentAuthMode(mode ? mode : AuthMode.login);
     setVisible(true);
     await sleep(10);
     actionSheetRef.current?.show();
@@ -39,7 +40,7 @@ const LoginDialog = () => {
 
   const close = () => {
     actionSheetRef.current?.hide();
-    setMode(MODES.login);
+    setCurrentAuthMode(AuthMode.login);
     setVisible(false);
   };
 
@@ -47,7 +48,7 @@ const LoginDialog = () => {
     <BaseDialog
       overlayOpacity={0}
       statusBarTranslucent={false}
-      onRequestClose={mode !== MODES.welcomeSignup && close}
+      onRequestClose={currentAuthMode !== AuthMode.welcomeSignup && close}
       visible={true}
       onClose={close}
       useSafeArea={false}
@@ -57,13 +58,17 @@ const LoginDialog = () => {
     >
       <Toast context="local" />
 
-      {mode === MODES.signup || mode === MODES.welcomeSignup ? (
-        <Signup changeMode={mode => setMode(mode)} welcome={mode === MODES.welcomeSignup} />
+      {currentAuthMode !== AuthMode.login ? (
+        <Signup
+          changeMode={mode => setCurrentAuthMode(mode)}
+          trial={AuthMode.trialSignup === currentAuthMode}
+          welcome={currentAuthMode === AuthMode.welcomeSignup}
+        />
       ) : (
-        <Login changeMode={mode => setMode(mode)} />
+        <Login changeMode={mode => setCurrentAuthMode(mode)} />
       )}
     </BaseDialog>
   );
 };
 
-export default LoginDialog;
+export default Auth;

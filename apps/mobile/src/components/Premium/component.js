@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import PremiumService from '../../services/PremiumService';
 import { LAUNCH_ROCKET } from '../../assets/images/assets';
 import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, presentSheet } from '../../services/EventManager';
+import PremiumService from '../../services/PremiumService';
 import { getElevation } from '../../utils';
-import { eOpenLoginDialog } from '../../utils/Events';
+import { eOpenLoginDialog, eOpenResultDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
 import umami from '../../utils/umami';
 import { ActionIcon } from '../ActionIcon';
+import { AuthMode } from '../Auth';
 import { Button } from '../Button';
 import GeneralSheet from '../GeneralSheet';
 import { SvgToPngView } from '../ListPlaceholders';
@@ -26,6 +27,8 @@ export const Component = ({ close, promo, getRef }) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const user = useUserStore(state => state.user);
+  const userCanRequestTrial =
+    user && (!user.subscription || !user.subscription.expiry) ? true : false;
   const [floatingButton, setFloatingButton] = useState(false);
 
   const onPress = async () => {
@@ -33,13 +36,13 @@ export const Component = ({ close, promo, getRef }) => {
       umami.pageView('/pro-plans', `/pro-screen`);
       presentSheet({
         context: 'pricing_plans',
-        component: <PricingPlans marginTop={1} promo={promo} />
+        component: <PricingPlans showTrialOption={false} marginTop={1} promo={promo} />
       });
     } else {
       close();
       umami.pageView('/signup', `/pro-screen`);
       setTimeout(() => {
-        eSendEvent(eOpenLoginDialog, 1);
+        eSendEvent(eOpenLoginDialog, AuthMode.trialSignup);
       }, 400);
     }
   };
@@ -140,18 +143,37 @@ export const Component = ({ close, promo, getRef }) => {
           Ready to take the next step on your private note taking journey?
         </Paragraph>
 
+        {userCanRequestTrial ? (
+          <Button
+            key="calltoaction"
+            onPress={() => {
+              eSendEvent(eOpenResultDialog);
+            }}
+            title="Try free for 14 days"
+            type="accent"
+            width={250}
+            style={{
+              paddingHorizontal: 12,
+              marginBottom: 15,
+              borderRadius: 100
+            }}
+          />
+        ) : null}
+
         <Button
           key="calltoaction"
           onPress={onPress}
           title={promo ? promo.text : user ? `See all plans` : `Sign up for free`}
-          type="accent"
+          type={userCanRequestTrial ? 'grayAccent' : 'accent'}
+          width={250}
           style={{
-            paddingHorizontal: 24,
-            marginBottom: 10
+            paddingHorizontal: 12,
+            marginBottom: 15,
+            borderRadius: 100
           }}
         />
 
-        {!user ? (
+        {!user || userCanRequestTrial ? (
           <Paragraph
             color={colors.icon}
             size={SIZE.xs}
@@ -162,7 +184,9 @@ export const Component = ({ close, promo, getRef }) => {
               maxWidth: '80%'
             }}
           >
-            Your 14 day free trial will activate when you sign up.{' '}
+            {user
+              ? `On clicking "Try free for 14 days", your free trial will be activated.`
+              : `After sign up you will be asked to activate your free trial.`}{' '}
             <Paragraph size={SIZE.xs} style={{ fontWeight: 'bold' }}>
               No credit card is required.
             </Paragraph>
@@ -181,7 +205,7 @@ export const Component = ({ close, promo, getRef }) => {
             paddingHorizontal: 12
           }}
         >
-          <PricingPlans promo={promo} />
+          <PricingPlans showTrialOption={false} promo={promo} />
         </View>
       </ScrollView>
 
@@ -193,6 +217,7 @@ export const Component = ({ close, promo, getRef }) => {
           style={{
             paddingHorizontal: 24,
             position: 'absolute',
+            borderRadius: 100,
             bottom: 30,
             ...getElevation(10)
           }}
