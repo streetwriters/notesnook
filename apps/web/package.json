@@ -68,6 +68,7 @@
     "@types/node-fetch": "^2.5.10",
     "@types/quill": "^2.0.5",
     "@types/rebass": "^4.0.10",
+    "@types/rebass__forms": "^4.0.6",
     "babel-eslint": "^10.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "chalk": "^4.1.0",

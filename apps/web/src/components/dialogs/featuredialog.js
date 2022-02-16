@@ -41,8 +41,7 @@ const features = {
   },
   welcome: {
     title: "Thank you for signing up!",
-    subtitle:
-      "You can use all features of Notesnook for 7 days. No limitations. No commitments.",
+    subtitle: "Please confirm your email",
 
     subFeatures: [
       {
@@ -70,7 +69,7 @@ const features = {
   },
   confirmed: {
     title: "Email confirmed!",
-    subtitle: "Your have been rewarded 7 more days of free trial. Enjoy!",
+    subtitle: "",
     subFeatures: [
       {
         title: "Unlimited notes & notebooks",

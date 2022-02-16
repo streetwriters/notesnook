@@ -251,7 +251,7 @@ function CalltoAction({ action, index }) {
   );
 }
 
-function Features({ item }) {
+export function Features({ item }) {
   const { style } = item;
   return (
     <Box
