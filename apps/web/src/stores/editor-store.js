@@ -143,7 +143,10 @@ class EditorStore extends BaseStore {
     if (note.conflicted)
       return hashNavigate(`/notes/${noteId}/conflict`, { replace: true });
 
-    let content = await db.content.raw(note.contentId, false);
+    let content = await db.content.insertPlaceholders(
+      await db.content.raw(note.contentId),
+      "/placeholder.svg"
+    );
 
     this.set((state) => {
       const defaultSession = getDefaultSession(note.dateEdited);
