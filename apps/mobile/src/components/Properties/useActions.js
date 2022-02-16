@@ -5,7 +5,13 @@ import Share from 'react-native-share';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
 import { Actions } from '../../provider/Actions';
-import { useMenuStore, useSelectionStore, useTagStore, useUserStore } from '../../provider/stores';
+import {
+  useEditorStore,
+  useMenuStore,
+  useSelectionStore,
+  useTagStore,
+  useUserStore
+} from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -59,7 +65,7 @@ export const useActions = ({ close = () => {}, item }) => {
       : item.type === 'color'
       ? db.colors.alias(item.id)
       : item.title;
-
+  console.log(item);
   const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
   const noteInTopic =
     item.type === 'note' &&
@@ -470,7 +476,16 @@ export const useActions = ({ close = () => {}, item }) => {
     eSendEvent(eOpenExportDialog, [item]);
   }
 
-  const toggleReadyOnlyMode = async () => {};
+  const toggleReadyOnlyMode = async () => {
+    await db.notes.note(item.id).readonly();
+    useEditorStore.getState().setReadonly(db.notes.note(item.id).data.readonly);
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes
+    ]);
+    close();
+  };
 
   const actions = [
     {

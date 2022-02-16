@@ -288,6 +288,10 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   },
   searchReplace: false,
   searchSelection: null,
+  readonly: false,
+  setReadonly: readonly => {
+    set({ readonly: readonly });
+  },
   setSearchReplace: searchReplace => {
     if (!searchReplace) {
       set({ searchSelection: null, searchReplace: false });

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { StatusBar } from 'react-native-bars';
-import { ChangePassword } from '../../components/LoginDialog/change-password';
+import { ChangePassword } from '../../components/Auth/change-password';
 import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import { Header } from '../../components/Header/index';

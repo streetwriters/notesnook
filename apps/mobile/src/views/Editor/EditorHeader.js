@@ -57,6 +57,7 @@ const EditorHeader = () => {
   const closing = useRef(false);
   const editorTags = useEditorTags();
   const searchReplace = useEditorStore(state => state.searchReplace);
+  const readonly = useEditorStore(state => state.readonly);
 
   useEffect(() => {
     setColors(colors);
@@ -341,7 +342,7 @@ const EditorHeader = () => {
               }}
             />
 
-            {currentlyEditingNote && (
+            {currentlyEditingNote && !readonly && (
               <ActionIcon
                 name="cloud-upload-outline"
                 color={colors.pri}
@@ -353,15 +354,17 @@ const EditorHeader = () => {
               />
             )}
 
-            <ActionIcon
-              name="attachment"
-              color={colors.pri}
-              customStyle={{
-                marginLeft: 5
-              }}
-              top={50}
-              onPress={picker.pick}
-            />
+            {!readonly && (
+              <ActionIcon
+                name="attachment"
+                color={colors.pri}
+                customStyle={{
+                  marginLeft: 5
+                }}
+                top={50}
+                onPress={picker.pick}
+              />
+            )}
 
             {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon

@@ -110,6 +110,8 @@ export interface EditorStore extends State {
   searchReplace: boolean;
   setSearchReplace: (searchReplace: boolean) => void;
   searchSelection: string | null;
+  readonly: boolean;
+  setReadonly: (readonly: boolean) => void;
 }
 
 export interface SearchStore extends State {

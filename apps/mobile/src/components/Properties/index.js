@@ -129,6 +129,7 @@ Properties.present = (item, buttons = []) => {
       break;
     case 'note':
       android = Platform.OS === 'android' ? ['PinToNotif'] : [];
+      item = db.notes.note(item.id).data;
       props.push([
         'Add to notebook',
         'Share',
@@ -148,12 +149,15 @@ Properties.present = (item, buttons = []) => {
       ]);
       break;
     case 'notebook':
+      item = db.notebooks.notebook(item.id).data;
       props.push(['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete']);
       break;
     case 'topic':
+      item = db.notebooks.notebook(item.notebookId).topics.topic(item.id)._topic;
       props.push(['Move notes', 'Edit Topic', 'Add Shortcut', 'Delete']);
       break;
     case 'tag':
+      item = db.tags.tag(item.id);
       props.push(['Add Shortcut', 'Delete', 'Rename Tag']);
       break;
   }

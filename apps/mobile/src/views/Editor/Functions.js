@@ -152,6 +152,10 @@ export function getNote() {
   return note;
 }
 
+export function setReadOnly(readonly) {
+  note.readonly = readonly;
+}
+
 export function setNoteOnly(n) {
   note = n;
 }
@@ -270,6 +274,7 @@ export const loadNote = async item => {
     clearNote();
     eSendEvent('loadingNote');
     eSendEvent('updateTags');
+    useEditorStore.getState().setReadonly(false);
     closingSession = false;
     disableSaving = false;
     lastEditTime = 0;
@@ -328,7 +333,7 @@ export const loadNote = async item => {
     noteEdited = false;
     webviewInit = false;
     editing.isFocused = false;
-
+    useEditorStore.getState().setReadonly(item.readonly);
     await setNote(item);
     if (loading_queue && (loading_queue?.id !== item?.id || loading_queue?.type === 'new')) {
       clearNote();

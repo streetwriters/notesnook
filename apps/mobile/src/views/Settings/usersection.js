@@ -3,7 +3,7 @@ import React from 'react';
 import { Linking, Platform, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ChangePassword } from '../../components/LoginDialog/change-password';
+import { ChangePassword } from '../../components/Auth/change-password';
 import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
 import Heading from '../../components/Typography/Heading';
