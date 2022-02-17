@@ -50,10 +50,11 @@ const useTooltip = () => {
     currentTargets.push(target.current._nativeTag);
     timers[timers.length] = setTimeout(() => {
       TipManager.markPopupUsed(popup.id);
+      console.log('tooltip showing', popup.text);
       RNTooltips.Show(target.current, parent.current, {
         text: popup.text,
         tintColor: colors.night ? colors.nav : '#404040',
-        corner: Platform.OS === 'ios' ? 5 : 80,
+        corner: Platform.OS === 'ios' ? 5 : 50,
         textSize: 15,
         position: positions[position],
         duration: duration || 10000,

@@ -60,7 +60,9 @@ const onChangeTab = async obj => {
       if (getNote()?.locked) {
         eSendEvent(eClearEditor);
       }
-      useTooltip.present('sectionheader');
+      setTimeout(() => {
+        useTooltip.present('sectionheader');
+      }, 300);
       eSendEvent('showTooltip');
       editing.movedAway = true;
       if (editing.currentlyEditing) {
