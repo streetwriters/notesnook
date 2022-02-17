@@ -56,15 +56,17 @@ async function deriveCryptoKey(name: string, credentials: SerializedKey) {
   }
 }
 
-async function getCryptoKey(name: string) {
+async function getCryptoKey(name: string): Promise<string | undefined> {
   if (isIndexedDBSupported() && window?.crypto?.subtle) {
     const pbkdfKey = await read<CryptoKey>(name);
-    const cipheredKey = await read<EncryptedKey>(`${name}@_k`);
+    const cipheredKey = await read<EncryptedKey | string>(`${name}@_k`);
     if (typeof cipheredKey === "string") return cipheredKey;
     if (!pbkdfKey || !cipheredKey) return;
     return await aesDecrypt(pbkdfKey, cipheredKey);
   } else {
-    return await read(`${name}@_k`);
+    const key = await read<string>(`${name}@_k`);
+    if (!key) return;
+    return key;
   }
 }
 
