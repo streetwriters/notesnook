@@ -89,7 +89,6 @@ import {
   mdiNoteOutline,
   mdiSyncAlert,
   mdiAlertOutline,
-  mdiAlertOctagramOutline,
   mdiEyeOutline,
   mdiEyeOffOutline,
   mdiAttachment,
@@ -136,6 +135,8 @@ import {
   mdiContentSaveCheckOutline,
   mdiContentSaveAlertOutline,
   mdiCurrencyUsd,
+  mdiAlertOctagonOutline,
+  mdiGithub,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -201,7 +202,7 @@ export const ArrowRight = createIcon(mdiArrowRight);
 export const ArrowDown = createIcon(mdiArrowDown);
 export const Move = createIcon(mdiBookPlusMultipleOutline);
 export const Topic = createIcon(mdiBookmarkOutline);
-export const Alert = createIcon(mdiAlertOctagramOutline);
+export const Alert = createIcon(mdiAlertOctagonOutline);
 export const Vault = createIcon(mdiShieldOutline);
 export const Unlock = createIcon(mdiLockOpenOutline);
 export const Lock = createIcon(mdiLockOutline);
@@ -292,6 +293,7 @@ export const DetailedView = createIcon(mdiViewSequentialOutline);
 export const MailCheck = createIcon(mdiEmailCheckOutline);
 export const Discord = createIcon(mdiDiscord);
 export const Twitter = createIcon(mdiTwitter);
+export const Github = createIcon(mdiGithub);
 export const Reddit = createIcon(mdiReddit);
 export const Dismiss = createIcon(mdiClose);
 export const File = createIcon(mdiFileOutline);

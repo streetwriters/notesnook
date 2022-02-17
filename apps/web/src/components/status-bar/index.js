@@ -26,7 +26,6 @@ import { getIconFromAlias } from "../icons/resolver";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
-  const sync = useAppStore((state) => state.sync);
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const statuses = useStatus();
   const updateStatus = useAutoUpdater();
@@ -62,14 +61,7 @@ function StatusBar() {
               </Text>
             </Button>
 
-            <Button
-              variant="statusitem"
-              display="flex"
-              onClick={sync}
-              sx={{ alignItems: "center", justifyContent: "center" }}
-            >
-              <SyncStatus />
-            </Button>
+            <SyncStatus />
           </>
         ) : (
           <Button
@@ -167,56 +159,90 @@ function statusToInfoText(status) {
 function SyncStatus() {
   const syncStatus = useAppStore((state) => state.syncStatus);
   const lastSynced = useAppStore((state) => state.lastSynced);
+  const sync = useAppStore((state) => state.sync);
+  const user = useUserStore((state) => state.user);
 
-  if (!lastSynced && syncStatus === "synced") return null;
-  switch (syncStatus) {
-    case "synced":
-      return (
-        <>
-          <Sync size={12} />
-          <Text variant="subBody" ml={1}>
-            {"Synced "}
-            <TimeAgo live={true} datetime={lastSynced} />
-          </Text>
-        </>
-      );
-    case "syncing":
-      return (
-        <>
-          <Sync size={12} rotate={syncStatus === "syncing"} />
-          <Text variant="subBody" ml={1}>
-            Syncing
-          </Text>
-        </>
-      );
-    case "failed":
-      return (
-        <>
-          <SyncError size={12} />
-          <Text variant="subBody" ml={1}>
-            Sync failed
-          </Text>
-        </>
-      );
-    case "completed":
-      return (
-        <>
-          <Checkmark size={12} color="success" />
-          <Text data-test-id="sync-status-success" variant="subBody" ml={1}>
-            Sync completed
-          </Text>
-        </>
-      );
-    case "conflicts":
-      return (
-        <>
-          <Alert size={12} color="error" />
-          <Text variant="subBody" ml={1}>
-            Merge conflicts
-          </Text>
-        </>
-      );
-    default:
-      return null;
-  }
+  const status = syncStatusFilters.find((f) =>
+    f.check(syncStatus, user, lastSynced)
+  );
+
+  return (
+    <Button
+      variant="statusitem"
+      display="flex"
+      onClick={sync}
+      sx={{ alignItems: "center", justifyContent: "center" }}
+      title={status.tooltip}
+    >
+      <status.icon size={12} color={status.iconColor} rotate={status.loading} />
+      <Text variant="subBody" ml={1}>
+        {typeof status.text === "string" ? (
+          status.text
+        ) : (
+          <status.text lastSynced={lastSynced} />
+        )}
+      </Text>
+    </Button>
+  );
 }
+
+const syncStatusFilters = [
+  {
+    key: "emailNotConfirmed",
+    check: (_syncStatus, user) => !user.isEmailConfirmed,
+    icon: Alert,
+    iconColor: "warn",
+    text: "Sync disabled",
+    tooltip: "Please confirm your email to start syncing.",
+  },
+  {
+    key: "neverSynced",
+    check: (_syncStatus, _user, lastSynced) => !lastSynced,
+    icon: Sync,
+    text: "Synced never",
+    tooltip: "Click to sync your notes.",
+  },
+  {
+    key: "failed",
+    check: (syncStatus) => syncStatus === "failed",
+    icon: SyncError,
+    color: "error",
+    text: "Sync failed",
+    tooltip: "Sync failed to completed. Please try again.",
+  },
+  {
+    key: "synced",
+    check: (syncStatus) => syncStatus === "synced",
+    icon: Sync,
+    text: ({ lastSynced }) => (
+      <>
+        {"Synced "}
+        <TimeAgo live={true} datetime={lastSynced} />
+      </>
+    ),
+    tooltip: "All changes are synced.",
+  },
+  {
+    key: "syncing",
+    check: (syncStatus) => syncStatus === "syncing",
+    icon: Sync,
+    loading: true,
+    text: "Syncing",
+    tooltip: "Syncing your notes...",
+  },
+  {
+    key: "completed",
+    check: (syncStatus) => syncStatus === "completed",
+    icon: Checkmark,
+    iconColor: "success",
+    text: "Sync completed",
+  },
+  {
+    key: "conflicts",
+    check: (syncStatus) => syncStatus === "conflicts",
+    icon: Alert,
+    iconColor: "error",
+    text: "Merge conflicts",
+    tooltip: "Please resolve all merge conflicts and run the sync again.",
+  },
+];
