@@ -598,9 +598,9 @@ export function showImportDialog() {
   ));
 }
 
-export function showOnboardingDialog() {
+export function showOnboardingDialog(type) {
   return showDialog((Dialogs, perform) => (
-    <Dialogs.OnboardingDialog onClose={(res) => perform(res)} />
+    <Dialogs.OnboardingDialog type={type} onClose={(res) => perform(res)} />
   ));
 }
 

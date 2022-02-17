@@ -4,10 +4,14 @@ import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
 import { EV, EVENTS } from "notes-core/common";
-import { showAccountLoggedOutNotice } from "../common/dialog-controller";
+import {
+  showAccountLoggedOutNotice,
+  showOnboardingDialog,
+} from "../common/dialog-controller";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { hashNavigate } from "../navigation";
+import { isUserPremium } from "../hooks/use-is-user-premium";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -49,7 +53,9 @@ class UserStore extends BaseStore {
       });
 
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
+        const wasUserPremium = isUserPremium();
         this.set((state) => (state.user.subscription = subscription));
+        if (!wasUserPremium && isUserPremium()) showOnboardingDialog("pro");
       });
 
       EV.subscribe(EVENTS.userEmailConfirmed, () => {

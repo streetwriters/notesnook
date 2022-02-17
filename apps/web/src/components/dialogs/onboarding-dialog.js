@@ -1,10 +1,9 @@
-import React, { useState } from "react";
 import { Text, Flex, Button, Image, Box } from "rebass";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
-import { getHomeRoute, hardNavigate } from "../../navigation";
 import { ReactComponent as E2E } from "../../assets/e2e.svg";
 import { ReactComponent as Note } from "../../assets/note2.svg";
+import { ReactComponent as Nomad } from "../../assets/nomad.svg";
 import LightUI from "../../assets/light1.png";
 import DarkUI from "../../assets/dark1.png";
 import GooglePlay from "../../assets/play.png";
@@ -13,8 +12,13 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { Checkbox, Label } from "@rebass/forms";
 import { Features } from "../announcements/body";
 import { showBuyDialog } from "../../common/dialog-controller";
+import { TaskManager } from "../../common/task-manager";
+import { db } from "../../common/db";
+import { usePersistentState } from "../../utils/hooks";
+import accents from "../../theme/accents";
+import AccentItem from "../accent-item";
 
-const steps = [
+const newUserSteps = [
   {
     title: "Safe & encrypted notes",
     subtitle: "Write with freedom. Never compromise on privacy again.",
@@ -45,15 +49,42 @@ const steps = [
   },
 ];
 
-function OnboardingDialog(props) {
-  const [step, setStep] = useState(0);
+const proUserSteps = [
+  {
+    title: "Welcome to Notesnook Pro",
+    subtitle: "Let's make Notesnook your new private note taking home",
+    buttonText: "Next",
+    image: <Nomad width={120} />,
+    component: AccentSelector,
+  },
+  {
+    title: "High priority support",
+    subtitle: "If you face any issue, you can reach out to us anytime.",
+    buttonText: "Next",
+    component: Support,
+  },
+  {
+    title: "Import your notes",
+    subtitle: "You can import your notes from most other note taking apps.",
+    component: Importer,
+  },
+];
+
+const onboarding = {
+  new: newUserSteps,
+  pro: proUserSteps,
+};
+
+function OnboardingDialog({ onClose, type }) {
+  const [step, setStep] = usePersistentState(type, 0);
   const {
     title,
     subtitle,
     image,
     component: Component,
     buttonText,
-  } = steps[step];
+  } = onboarding[type][step];
+
   return (
     <Dialog isOpen={true} width={500}>
       <Flex flexDirection="column" overflowY="auto" alignItems={"center"}>
@@ -64,7 +95,7 @@ function OnboardingDialog(props) {
         <Text variant={"body"} color="fontTertiary" textAlign={"center"}>
           {subtitle}
         </Text>
-        {Component && <Component onClose={props.onClose} />}
+        {Component && <Component onClose={onClose} />}
         {buttonText && (
           <Button
             sx={{ borderRadius: 50, px: 30, mb: 4 }}
@@ -78,6 +109,129 @@ function OnboardingDialog(props) {
   );
 }
 export default OnboardingDialog;
+
+const importers = [
+  { title: "Evernote" },
+  { title: "Simplenote" },
+  { title: "HTML" },
+  { title: "Markdown" },
+  { title: "Text" },
+  { title: "Google Keep" },
+  { title: "Standard Notes" },
+];
+function Importer({ onClose }) {
+  return (
+    <Flex my={4} flexDirection={"column"}>
+      <Box
+        sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 1 }}
+      >
+        {importers.map((importer) => (
+          <Flex
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              borderRadius: "default",
+              border: "1px solid var(--border)",
+              alignItems: "center",
+              p: 1,
+            }}
+          >
+            <Text variant={"body"} ml={1}>
+              {importer.title}
+            </Text>
+          </Flex>
+        ))}
+      </Box>
+      <Button
+        as="a"
+        href="https://importer.notesnook.com/"
+        target="_blank"
+        mt={4}
+        variant={"primary"}
+        sx={{ borderRadius: 50, alignSelf: "center", width: "40%" }}
+      >
+        Start importing now
+      </Button>
+      <Button
+        variant={"anchor"}
+        color="fontTertiary"
+        mt={2}
+        onClick={() => onClose()}
+      >
+        Skip for now
+      </Button>
+    </Flex>
+  );
+}
+
+function AccentSelector() {
+  return (
+    <Flex my={4}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr",
+        }}
+      >
+        {accents.map((color) => (
+          <AccentItem key={color.code} code={color.code} label={color.label} />
+        ))}
+      </Box>
+    </Flex>
+  );
+}
+
+const supportChannels = [
+  {
+    key: "email",
+    url: "mailto:support@streetwriters.co",
+    title: "Email us",
+    icon: Icon.Email,
+  },
+  {
+    key: "discord",
+    url: "https://discord.com/invite/zQBK97EE22",
+    title: "Join the community",
+    icon: Icon.Discord,
+  },
+  {
+    key: "twitter",
+    url: "https://twitter.com/notesnook",
+    title: "Follow us @notesnook",
+    icon: Icon.Twitter,
+  },
+  {
+    key: "github",
+    url: "https://github.com/streetwriters/notesnook",
+    title: "Create an issue",
+    icon: Icon.Github,
+  },
+];
+
+function Support() {
+  return (
+    <Box my={4} sx={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+      {supportChannels.map((channel) => (
+        <Button
+          as="a"
+          href={channel.url}
+          variant={"icon"}
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            borderRadius: "default",
+            alignItems: "center",
+          }}
+        >
+          <channel.icon size={16} />
+          <Text variant={"body"} ml={1}>
+            {channel.title}
+          </Text>
+        </Button>
+      ))}
+    </Box>
+  );
+}
 
 const themes = [
   { key: "light", name: "Light", image: LightUI },
@@ -135,9 +289,19 @@ function ThemeSelector() {
 }
 
 function TrackingConsent() {
+  const [enableTelemetry, setEnableTelemetry] = usePersistentState(
+    "telemetry",
+    true
+  );
   return (
     <Label variant="text.subBody" my={4} width="80%">
-      <Checkbox width={14} checked />
+      <Checkbox
+        width={14}
+        checked={enableTelemetry}
+        onChange={(e) => {
+          setEnableTelemetry(e.target.checked);
+        }}
+      />
       <Text>
         Help improve Notesnook by sending completely anonymized product
         analytics.
@@ -172,7 +336,7 @@ function TrialOffer({ onClose }) {
         p={1}
         sx={{ borderRadius: "default" }}
       >
-        <b>Note:</b> Upgrade now and get a flat 50% discount on all plans.
+        <b>Note:</b> Upgrade now and get 50% discount on all plans.
       </Text>
       <Flex mt={2} width="100%" justifyContent={"center"}>
         <Button
@@ -187,14 +351,30 @@ function TrialOffer({ onClose }) {
         <Button
           variant={"secondary"}
           sx={{ borderRadius: 50, alignSelf: "center", width: "40%" }}
-          onClick={() => {
+          onClick={async () => {
             onClose();
+            await TaskManager.startTask({
+              type: "modal",
+              title: "Activating your trial",
+              subtitle: "Please wait while we activate your 14 day trial.",
+              action: (report) => {
+                report({
+                  text: "This trial is completely free of charge. No credit card or other information is required on your part.",
+                });
+                return db.user.activateTrial();
+              },
+            });
           }}
         >
           Try free for 14 days
         </Button>
       </Flex>
-      <Button variant={"anchor"} color="fontTertiary" mt={2} onClick={onClose}>
+      <Button
+        variant={"anchor"}
+        color="fontTertiary"
+        mt={2}
+        onClick={() => onClose()}
+      >
         Skip for now
       </Button>
     </Flex>

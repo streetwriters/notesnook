@@ -28,7 +28,7 @@ function ProgressDialog(props) {
     >
       <Flex flexDirection="column">
         <Text variant="body">{text}</Text>
-        {current > 0 && (
+        {current > 0 ? (
           <>
             <Text variant="subBody">
               {current} of {total}
@@ -43,6 +43,8 @@ function ProgressDialog(props) {
               }}
             />
           </>
+        ) : (
+          <Flex my={1} />
         )}
       </Flex>
     </Dialog>
