@@ -11,7 +11,6 @@ import { refreshNotesPage } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
-import { ActionSheetEvent } from '../DialogManager/recievers';
 import { Properties } from '../Properties';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';

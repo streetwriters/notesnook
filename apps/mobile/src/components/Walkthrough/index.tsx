@@ -100,7 +100,7 @@ Walkthrough.present = async (id: 'notebooks') => {
   if (walkthroughState[id]) return;
   //@ts-ignore
   walkthroughState[id] = true;
-  //MMKV.setItem('walkthroughState', JSON.stringify(walkthroughState));
+  MMKV.setItem('walkthroughState', JSON.stringify(walkthroughState));
   //@ts-ignore
   let walkthrough = walkthroughs[id];
   if (!walkthrough) return;

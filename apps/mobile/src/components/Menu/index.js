@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
@@ -31,6 +31,7 @@ export const Menu = React.memo(
     const insets = useSafeAreaInsets();
     const user = useUserStore(state => state.user);
     const noTextMode = false;
+
     function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
       let newColors = setColorScheme(colors, accent);
       dispatch({ type: Actions.THEME, colors: newColors });
@@ -69,6 +70,19 @@ export const Menu = React.memo(
       }
     };
 
+    const renderItem = useCallback(
+      () => (
+        <>
+          {MenuItemsList.map((item, index) => (
+            <MenuListItem key={item.name} item={item} testID={item.name} index={index} />
+          ))}
+          <ColorSection noTextMode={noTextMode} />
+          <TagsSection />
+        </>
+      ),
+      []
+    );
+
     return (
       <View
         style={{
@@ -99,15 +113,7 @@ export const Menu = React.memo(
             showsVerticalScrollIndicator={false}
             data={[0]}
             keyExtractor={() => 'mainMenuView'}
-            renderItem={() => (
-              <>
-                {MenuItemsList.map((item, index) => (
-                  <MenuListItem key={item.name} item={item} testID={item.name} index={index} />
-                ))}
-                <ColorSection noTextMode={noTextMode} />
-                <TagsSection />
-              </>
-            )}
+            renderItem={renderItem}
           />
           <View
             style={{

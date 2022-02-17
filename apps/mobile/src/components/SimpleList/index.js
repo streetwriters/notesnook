@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl, RefreshControlComponent, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
@@ -7,7 +7,6 @@ import { eSendEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/Events';
-import { sleep } from '../../utils/TimeUtils';
 import JumpToDialog from '../JumpToDialog';
 import { NotebookWrapper } from '../NotebookItem/wrapper';
 import { NoteWrapper } from '../NoteItem/wrapper';
