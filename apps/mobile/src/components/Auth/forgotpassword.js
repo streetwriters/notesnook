@@ -42,13 +42,15 @@ export const ForgotPassword = () => {
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
       ToastEvent.show({
         heading: `Check your email to reset password`,
-        message: `Recovery email has been sent to ${email.toLowerCase()}`,
+        message: `Recovery email has been sent to ${email.current.toLowerCase()}`,
         type: 'success',
         context: 'local',
         duration: 7000
       });
       setLoading(false);
+      setSent(true);
     } catch (e) {
+      setLoading(false);
       ToastEvent.show({
         heading: 'Recovery email not sent',
         message: e.message,
@@ -64,7 +66,9 @@ export const ForgotPassword = () => {
         onBeforeShow={data => (email.current = data)}
         onClose={() => {
           setSent(false);
+          setLoading(false);
         }}
+        keyboardShouldPersistTaps="always"
         onOpen={() => {
           emailInputRef.current?.setNativeProps({
             text: email.current

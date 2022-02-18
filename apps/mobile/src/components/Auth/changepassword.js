@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
 import { db } from '../../utils/database';
 import { eCloseProgressDialog } from '../../utils/Events';
@@ -20,8 +21,18 @@ export const ChangePassword = () => {
 
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const user = useUserStore(state => state.user);
 
   const changePassword = async () => {
+    if (!user.isEmailConfirmed) {
+      ToastEvent.show({
+        heading: 'Email not confirmed',
+        message: 'Please confirm your email to change account password',
+        type: 'error',
+        context: 'local'
+      });
+      return;
+    }
     if (error || !oldPassword.current || !password.current) {
       ToastEvent.show({
         heading: 'All fields required',
@@ -31,16 +42,19 @@ export const ChangePassword = () => {
       });
       return;
     }
-    eSendEvent(eCloseProgressDialog);
     setLoading(true);
     try {
+      await db.user.clearSessions();
       await db.user.changePassword(oldPassword.current, password.current);
       ToastEvent.show({
         heading: `Account password updated`,
         type: 'success',
-        context: 'local'
+        context: 'global'
       });
+      setLoading(false);
+      eSendEvent(eCloseProgressDialog);
     } catch (e) {
+      setLoading(false);
       ToastEvent.show({
         heading: 'Failed to change password',
         message: e.message,
@@ -92,7 +106,7 @@ export const ChangePassword = () => {
       />
 
       <Notice
-        text="Changing password is a non-undoable process. Please make sure you do not close the app while your password is changing and have good internet connection"
+        text="Changing password is a non-undoable process. You will be logged out from all your devices. Please make sure you do not close the app while your password is changing and have good internet connection."
         type="alert"
       />
 
