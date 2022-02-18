@@ -134,7 +134,7 @@ export const PricingPlans = ({
       await sleep(500);
       presentSheet({
         title: 'Thank you for subscribing!',
-        paragraph: `Your Notesnook Pro subscription will be activated within a few hours. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co`,
+        paragraph: `Your Notesnook Pro subscription will be activated soon. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co`,
         action: async () => {
           eSendEvent(eCloseProgressDialog);
         },

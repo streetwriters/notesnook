@@ -205,7 +205,7 @@ const SettingsUserSection = () => {
                         fontSize={SIZE.md}
                         title={
                           !user.isEmailConfirmed
-                            ? 'Confirm your email to get 7 days more'
+                            ? 'Confirm your email'
                             : user.subscription?.provider === 3 &&
                               user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
                             ? 'Manage subscription from desktop app'
