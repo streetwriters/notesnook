@@ -18,15 +18,8 @@ module.exports = {
   rules: {
     'react/display-name': 0,
     'no-unused-vars': 'off',
-    'unused-imports/no-unused-vars': [
-      'warn',
-      {
-        vars: 'all',
-        varsIgnorePattern: '^_',
-        args: 'after-used',
-        argsIgnorePattern: '^_'
-      }
-    ],
+    'react/no-unescaped-entities': 'off',
+    'unused-imports/no-unused-vars': 'off',
     'no-empty': 'off',
     'react/prop-types': 0,
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
