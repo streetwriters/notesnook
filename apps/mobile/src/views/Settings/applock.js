@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutAnimation, View } from 'react-native';
+import { LayoutAnimation, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BiometricService from '../../services/BiometricService';
 import { PressableButton } from '../../components/PressableButton';
@@ -39,7 +39,11 @@ const AppLock = ({ welcome, s = 0 }) => {
     {
       title: 'Maximum privacy (Recommended)',
       value: 'background',
-      desc: 'Your notes are locked immediately when you switch to other apps or background. Screenshots are disabled and app contents are hidden in app switcher.',
+      desc: `Your notes are locked immediately when you switch to other apps or background. ${
+        Platform.OS === 'ios'
+          ? 'App contents are hidden in app switcher'
+          : 'Screenshots are disabled and app contents are hidden in app switcher.'
+      }`,
       activeColor: colors.accent
     }
   ];
