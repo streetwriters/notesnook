@@ -286,30 +286,26 @@ const Input = ({
             paddingTop: 5
           }}
         >
-          {Object.keys(errorList).filter(k => errorList[k] === true).length !== 0 ? (
-            Object.keys(ERRORS_LIST).map(error => (
-              <View
-                key={ERRORS_LIST[error]}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center'
-                }}
-              >
-                <Icon
-                  name={errorList[error] ? 'close' : 'check'}
-                  color={errorList[error] ? 'red' : 'green'}
-                />
+          {Object.keys(errorList).filter(k => errorList[k] === true).length !== 0
+            ? Object.keys(ERRORS_LIST).map(error => (
+                <View
+                  key={ERRORS_LIST[error]}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                  }}
+                >
+                  <Icon
+                    name={errorList[error] ? 'close' : 'check'}
+                    color={errorList[error] ? 'red' : 'green'}
+                  />
 
-                <Paragraph style={{ marginLeft: 5 }} size={SIZE.xs}>
-                  {ERRORS_LIST[error]}
-                </Paragraph>
-              </View>
-            ))
-          ) : (
-            <Paragraph color={colors.green} size={SIZE.xs}>
-              Password is strong.
-            </Paragraph>
-          )}
+                  <Paragraph style={{ marginLeft: 5 }} size={SIZE.xs}>
+                    {ERRORS_LIST[error]}
+                  </Paragraph>
+                </View>
+              ))
+            : null}
         </View>
       )}
     </>
