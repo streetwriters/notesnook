@@ -63,7 +63,7 @@ export const execCommands = {
       if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
         let rng = tinymce.activeEditor.selection.getRng()
         tinymce.activeEditor.execCommand("mceInsertNewLine")
-        tinymce.activeEditor.fire("input");
+        tinymce.activeEditor.fire("input",{data:""})
         tinymce.activeEditor.selection.setRng(rng)
      }  
      editor.undoManager.transact(function() {
@@ -123,7 +123,7 @@ export const execCommands = {
     if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
     tinymce.activeEditor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
     setTimeout(function() {
-      tinymce.activeEditor.fire("input");
+      tinymce.activeEditor.fire("input",{data:""})
     },100)
     }  
   })();
@@ -146,7 +146,7 @@ const setFloat = float => `(function () {
     tinymce.activeEditor.undoManager.transact(function() {
       node.style.float = "${float}";
       setTimeout(function() {
-        tinymce.activeEditor.fire("input");
+        tinymce.activeEditor.fire("input",{data:""})
       },100)
     });
   }
@@ -169,7 +169,7 @@ if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
 
     node.width = originalWidth * ${size}
     setTimeout(function() {
-      tinymce.activeEditor.fire("input");
+      tinymce.activeEditor.fire("input",{data:""})
     },100)
   });
 }

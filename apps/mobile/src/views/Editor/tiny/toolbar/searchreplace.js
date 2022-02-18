@@ -8,7 +8,6 @@ import { TipManager } from '../../../../services/tip-manager';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
 import layoutmanager from '../../../../utils/layout-manager';
 import { SIZE } from '../../../../utils/SizeUtils';
-import { useKeyboard } from '../../../../utils/use-keyboard';
 import useTooltip, { hideAllTooltips, useTooltipHandler } from '../../../../utils/use-tooltip';
 import { EditorWebView, getNote } from '../../Functions';
 import tiny from '../tiny';
@@ -34,6 +33,7 @@ const SearcReplace = () => {
   });
   const switchModeRef = useRef();
   const tooltip = useTooltip();
+  const valueChangeTimer = useRef();
 
   useTooltipHandler('searchreplace', () => {
     let popup = TipManager.popup('searchreplace');
@@ -78,15 +78,14 @@ const SearcReplace = () => {
     tiny.call(
       EditorWebView,
       `tinymce.activeEditor.undoManager.transact(function () {
-        tinymce.activeEditor.plugins.searchreplace.replace("${values.current?.replace}",true${
+          tinymce.activeEditor.plugins.searchreplace.replace("${values.current?.replace}",true${
         all ? ',true' : ''
       });
       setTimeout(function() {
-        tinymce.activeEditor.fire("input");
-      },100)
+        tinyMCE.activeEditor.fire("input",{data:""})
+      },300)
 
-      });
-      `
+        });`
     );
   }
 
@@ -216,7 +215,6 @@ const SearcReplace = () => {
         onPress={() => {
           if (getNote()?.readonly) return;
           hideAllTooltips();
-          layoutmanager.withSpringAnimation(500);
           if (enableReplace) {
             if (focusType === 2) {
               findRef.current?.focus();
@@ -239,6 +237,10 @@ const SearcReplace = () => {
           fwdRef={findRef}
           onChangeText={value => {
             values.current.find = value;
+            valueChangeTimer.current && clearTimeout(valueChangeTimer.current);
+            valueChangeTimer.current = setTimeout(() => {
+              find();
+            }, 300);
           }}
           defaultValue={values.current?.find || properties.selection?.current?.value}
           onFocusInput={() => setFocusType(1)}

@@ -73,7 +73,7 @@ const pre = `(function() {
       });
     });
     tinymce.activeEditor.selection.setRng(rng, true);
-    tinymce.activeEditor.fire("input");
+    tinymce.activeEditor.fire("input",{data:""})
   };
 
   let node = tinymce.activeEditor.selection.getNode();

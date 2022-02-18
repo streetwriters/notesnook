@@ -51,7 +51,7 @@ export const TableCellProperties = ({ data }) => {
         let node = editor.selection.getNode();
         node.style.width = "${width}";
         tableCellNodeOptions();
-        editor.fire("input");
+        editor.fire("input",{data:""});
         })()`
     );
   }
@@ -70,7 +70,7 @@ export const TableCellProperties = ({ data }) => {
           let node = editor.selection.getNode();
           node.style.width = "${width}";
           tableCellNodeOptions();
-          editor.fire("input");
+          editor.fire("input",{data:""});
         })()`
     );
   }
@@ -81,7 +81,7 @@ export const TableCellProperties = ({ data }) => {
       `
       tinymce.activeEditor.execCommand('mceTableCellType', false, { type: '${type}' });
       tableCellNodeOptions();
-      editor.fire("input");
+      editor.fire("input",{data:""});
       `
     );
   }
@@ -92,7 +92,7 @@ export const TableCellProperties = ({ data }) => {
       `
       tinymce.activeEditor.execCommand('mceTableColType', false, { type: '${type}' });
       tableCellNodeOptions();
-      editor.fire("input");
+      editor.fire("input",{data:""});
       `
     );
   }
@@ -247,7 +247,7 @@ export const TableCellProperties = ({ data }) => {
                     let node = editor.selection.getNode();
                     node.style.backgroundColor = "${color}";
                     tableCellNodeOptions();
-                    editor.fire("input");
+                    editor.fire("input",{data:""})
                   })()`
               );
             }}

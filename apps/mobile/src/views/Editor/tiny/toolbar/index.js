@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 import { ActionIcon } from '../../../../components/ActionIcon';
 import { useTracked } from '../../../../provider';
@@ -10,7 +10,7 @@ import { EditorWebView, getNote, setNoteOnly } from '../../Functions';
 import HistoryComponent from '../../HistoryComponent';
 import tiny from '../tiny';
 import { TOOLBAR_CONFIG } from './config';
-import { focusEditor, properties, reFocusEditor, toolbarRef } from './constants';
+import { properties, toolbarRef } from './constants';
 import ToolbarGroup from './group';
 import SearcReplace from './searchreplace';
 import Tooltip from './tooltip';

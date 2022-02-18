@@ -41,7 +41,7 @@ export const TableRowProperties = ({ data }) => {
       `
       tinymce.activeEditor.execCommand('mceTableRowType', false, { type: '${type}' });
       tableRowNodeOptions();
-      editor.fire("input");
+      editor.fire("input",{data:""});
       `
     );
   };
@@ -122,7 +122,7 @@ export const TableRowProperties = ({ data }) => {
                     if (node) {
                         node.style.backgroundColor = "${color}";
                         tableRowNodeOptions();
-                        editor.fire("input");
+                        editor.fire("input",{data:""});
                     }
                     
                   })()`
@@ -167,6 +167,8 @@ export const TableRowProperties = ({ data }) => {
                               });
                             }
                           });
+                          
+                        editor.fire("input",{data:""});
                     }
                     
                   })()`
