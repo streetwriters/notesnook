@@ -69,7 +69,7 @@ export const Reminders = {
   email: {
     key: "email",
     title: "Your email is not confirmed",
-    subtitle: "Confirm your email to get 7 more days of free trial",
+    subtitle: "Please confirm your email to sync your notes",
     action: () => hashNavigate("/email/verify"),
     icon: Icon.Email,
   },

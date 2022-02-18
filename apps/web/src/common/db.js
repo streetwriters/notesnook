@@ -34,6 +34,7 @@ async function initializeDatabase() {
     AUTH_HOST: "http://192.168.10.29:8264",
     SSE_HOST: "http://192.168.10.29:7264",
     ISSUES_HOST: "http://192.168.10.29:2624",
+    SUBSCRIPTIONS_HOST: "http://192.168.10.29:9264",
   });
   // }
 

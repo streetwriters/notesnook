@@ -39,7 +39,7 @@ function EmailVerificationDialog(props) {
   return (
     <Dialog
       isOpen={true}
-      title={"Verify your email"}
+      title={"Confirm your email"}
       description={
         "Check your spam folder if you haven't received an email yet."
       }
@@ -73,7 +73,7 @@ function EmailVerificationDialog(props) {
           alignSelf="stretch"
           sx={{ borderRadius: "default" }}
         >
-          We have sent the confirmation link to your email at{" "}
+          We have sent the email confirmation link at{" "}
           <Text as="b" fontWeight="bold">
             {user.email}
           </Text>

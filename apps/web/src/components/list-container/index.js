@@ -34,6 +34,7 @@ function ListContainer(props) {
       {!props.items.length && props.placeholder ? (
         <>
           {header}
+          <ReminderBar />
           <Flex variant="columnCenterFill">
             {props.isLoading ? <Icon.Loading rotate /> : <props.placeholder />}
           </Flex>

@@ -15,7 +15,10 @@ import useAnnouncements from "./utils/use-announcements";
 import {
   showAnnouncementDialog,
   showBuyDialog,
+  showEmailVerificationDialog,
+  showFeatureDialog,
   showInvalidSystemTimeDialog,
+  showOnboardingDialog,
 } from "./common/dialog-controller";
 import useSystemTheme from "./utils/use-system-theme";
 import { isTesting } from "./utils/platform";
@@ -65,6 +68,7 @@ export default function AppEffects({ setShow }) {
       (async function () {
         await updateLastSynced();
         if (await initUser()) {
+          showOnboardingDialog("new");
           showUpgradeReminderDialogs();
           await sync();
         }

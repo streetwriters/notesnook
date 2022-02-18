@@ -598,6 +598,12 @@ export function showImportDialog() {
   ));
 }
 
+export function showOnboardingDialog(type) {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.OnboardingDialog type={type} onClose={(res) => perform(res)} />
+  ));
+}
+
 export function showInvalidSystemTimeDialog({ serverTime, localTime }) {
   return showDialog((Dialogs) => (
     <Dialogs.Confirm
