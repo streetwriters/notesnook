@@ -253,10 +253,26 @@ const ChooseTheme = () => {
   return (
     <View
       style={{
-        height: 100
+        maxHeight: 170,
+        alignItems: 'center',
+        marginTop: 20
       }}
     >
+      <Heading>Make yourself at home</Heading>
+
+      <Paragraph
+        style={{
+          textAlign: 'center',
+          alignSelf: 'center',
+          maxWidth: '80%'
+        }}
+        size={SIZE.md}
+      >
+        Pick a theme of your choice
+      </Paragraph>
+      <Seperator />
       <AccentColorPicker settings={false} />
+      <Seperator />
     </View>
   );
 };
@@ -275,8 +291,8 @@ const trialstarted: { id: string; steps: TStep[] } = {
     },
 
     {
-      title: 'Make yourself at home',
-      text: 'Pick a theme of your choice',
+      // title: 'Make yourself at home',
+      // text: 'Pick a theme of your choice',
       walkthroughItem: () => <ChooseTheme />,
       button: {
         type: 'next',
