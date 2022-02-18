@@ -5,6 +5,7 @@ import { ReactComponent as E2E } from "../../assets/e2e.svg";
 import { ReactComponent as Note } from "../../assets/note2.svg";
 import { ReactComponent as Nomad } from "../../assets/nomad.svg";
 import { ReactComponent as WorkAnywhere } from "../../assets/workanywhere.svg";
+import { ReactComponent as Friends } from "../../assets/cause.svg";
 import LightUI from "../../assets/light1.png";
 import DarkUI from "../../assets/dark1.png";
 import GooglePlay from "../../assets/play.png";
@@ -45,6 +46,13 @@ const newUserSteps = [
     buttonText: "Next",
   },
   {
+    title: "Join the cause",
+    subtitle:
+      "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions.",
+    component: JoinCause,
+    image: <Friends width={140} />,
+  },
+  {
     image: <Icon.Pro size={60} color="primary" />,
     title: "Notesnook Pro",
     subtitle: "Experience the next level of private note taking",
@@ -55,13 +63,18 @@ const newUserSteps = [
 const proUserSteps = [
   {
     title: "Welcome to Notesnook Pro",
-    subtitle: "Let's make Notesnook your new private note taking home",
+    subtitle: "Thank you. You are the proof that privacy always comes first.",
     buttonText: "Next",
     image: <Nomad width={120} />,
+  },
+  {
+    title: "Style your 'nook",
+    subtitle: "Let's make Notesnook your new note taking home",
+    buttonText: "Next",
     component: AccentSelector,
   },
   {
-    title: "High priority support",
+    title: "We are always listening",
     subtitle: "If you face any issue, you can reach out to us anytime.",
     buttonText: "Next",
     component: Support,
@@ -77,7 +90,7 @@ const trialUserSteps = [
   {
     title: "Congratulations!",
     subtitle: "You 14-day free trial has been activated.",
-    buttonText: "Start taking notes",
+    buttonText: "Continue",
     image: <WorkAnywhere width={160} />,
   },
 ];
@@ -88,6 +101,13 @@ const onboarding = {
   trial: trialUserSteps,
 };
 
+export function interruptedOnboarding() {
+  for (let key in onboarding) {
+    const index = Config.get(key, undefined);
+    if (index >= 0 && index < onboarding[key].length - 1) return key;
+  }
+}
+
 function OnboardingDialog({ onClose: _onClose, type }) {
   const [step, setStep] = usePersistentState(type, 0);
   const steps = onboarding[type];
@@ -97,7 +117,12 @@ function OnboardingDialog({ onClose: _onClose, type }) {
     _onClose();
   }, [_onClose, type, steps]);
 
-  if (!steps || !steps[step]) return null;
+  const onNext = useCallback(() => {
+    if (step === steps.length - 1) onClose();
+    else setStep((s) => ++s);
+  }, []);
+
+  if (!steps || !steps[step] || !type) return null;
   const {
     title,
     subtitle,
@@ -113,18 +138,19 @@ function OnboardingDialog({ onClose: _onClose, type }) {
         <Text variant={"heading"} mt={2}>
           {title}
         </Text>
-        <Text variant={"body"} color="fontTertiary" textAlign={"center"}>
+        <Text
+          variant={"body"}
+          color="fontTertiary"
+          textAlign={"center"}
+          maxWidth="70%"
+        >
           {subtitle}
         </Text>
-        {Component && <Component onClose={onClose} />}
+        {Component && <Component onClose={onClose} onNext={onNext} />}
         {buttonText && (
           <Button
             sx={{ borderRadius: 50, px: 30, mb: 4, mt: Component ? 0 : 4 }}
-            onClick={() => {
-              console.log(step, steps.length);
-              if (step === steps.length - 1) onClose();
-              else setStep((s) => ++s);
-            }}
+            onClick={onNext}
           >
             {buttonText}
           </Button>
@@ -135,21 +161,44 @@ function OnboardingDialog({ onClose: _onClose, type }) {
 }
 export default OnboardingDialog;
 
+function JoinCause({ onNext }) {
+  return (
+    <Flex mb={4} flexDirection={"column"}>
+      <Button
+        as="a"
+        href="https://discord.com/invite/zQBK97EE22"
+        target="_blank"
+        mt={4}
+        variant={"primary"}
+        sx={{ borderRadius: 50, alignSelf: "center", px: 30 }}
+        onClick={() => onNext()}
+      >
+        Join the community
+      </Button>
+      <Button
+        variant={"anchor"}
+        color="fontTertiary"
+        mt={2}
+        onClick={() => onNext()}
+      >
+        Skip for now
+      </Button>
+    </Flex>
+  );
+}
+
 const importers = [
   { title: "Evernote" },
   { title: "Simplenote" },
   { title: "HTML" },
   { title: "Markdown" },
-  { title: "Text" },
   { title: "Google Keep" },
   { title: "Standard Notes" },
 ];
 function Importer({ onClose }) {
   return (
     <Flex my={4} flexDirection={"column"}>
-      <Box
-        sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 1 }}
-      >
+      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1 }}>
         {importers.map((importer) => (
           <Flex
             sx={{
@@ -158,10 +207,11 @@ function Importer({ onClose }) {
               borderRadius: "default",
               border: "1px solid var(--border)",
               alignItems: "center",
+              justifyContent: "center",
               p: 1,
             }}
           >
-            <Text variant={"body"} ml={1}>
+            <Text variant={"body"} textAlign="center" ml={1}>
               {importer.title}
             </Text>
           </Flex>
@@ -173,7 +223,8 @@ function Importer({ onClose }) {
         target="_blank"
         mt={4}
         variant={"primary"}
-        sx={{ borderRadius: 50, alignSelf: "center", width: "40%" }}
+        sx={{ borderRadius: 50, alignSelf: "center", px: 30 }}
+        onClick={() => onClose()}
       >
         Start importing now
       </Button>

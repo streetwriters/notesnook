@@ -89,13 +89,6 @@ class UserStore extends BaseStore {
         }
       });
 
-      await showOnboardingDialog(
-        user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL
-          ? "trial"
-          : isUserPremium()
-          ? "pro"
-          : "new"
-      );
       return true;
     });
   };

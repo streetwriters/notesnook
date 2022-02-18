@@ -14,30 +14,26 @@ import { Box, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
-import { Mutex } from "async-mutex";
 import { formatDate } from "notes-core/utils/date";
 import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
 import { getChangelog } from "../utils/version";
 import { isDesktop } from "../utils/platform";
 
-const DialogMutex = new Mutex();
 function showDialog(dialog) {
   const root = document.getElementById("dialogContainer");
 
   if (root) {
-    return DialogMutex.runExclusive(
-      () =>
-        new Promise((resolve) => {
-          const perform = (result) => {
-            ReactDOM.unmountComponentAtNode(root);
-            hashNavigate("/", { replace: true });
-            resolve(result);
-          };
-          const PropDialog = dialog(Dialogs, perform);
-          ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
-        })
-    );
+    return new Promise((resolve, reject) => {
+      const perform = (result) => {
+        ReactDOM.unmountComponentAtNode(root);
+        hashNavigate("/", { replace: true });
+        resolve(result);
+      };
+      const PropDialog = dialog(Dialogs, perform);
+
+      ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
+    });
   }
   return Promise.reject("No element with id 'dialogContainer'");
 }

@@ -10,7 +10,7 @@ export function useIsUserPremium() {
 }
 
 export function isUserPremium(user) {
-  if (process.env.REACT_APP_CI) return true;
+  // if (process.env.REACT_APP_CI) return true;
   if (!user) user = userstore.get().user;
 
   const subStatus = user?.subscription?.type;

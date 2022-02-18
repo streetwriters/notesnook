@@ -24,6 +24,7 @@ import useSystemTheme from "./utils/use-system-theme";
 import { isTesting } from "./utils/platform";
 import { updateStatus, removeStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
+import { interruptedOnboarding } from "./components/dialogs/onboarding-dialog";
 
 if (process.env.NODE_ENV === "production") {
   loadTrackerScript();
@@ -73,6 +74,8 @@ export default function AppEffects({ setShow }) {
         }
         await resetReminders();
         setIsVaultCreated(await db.vault.exists());
+
+        showOnboardingDialog("new"); //interruptedOnboarding());
       })();
       return () => {
         userCheckStatusEvent.unsubscribe();
