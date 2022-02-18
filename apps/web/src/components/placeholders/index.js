@@ -1,11 +1,8 @@
 import React from "react";
 import { Button, Flex, Text } from "rebass";
-import { useStore } from "../../stores/theme-store";
-import { changeSvgTheme } from "../../utils/css";
 
 const PlaceholderLoader = React.lazy(() => import("./loader"));
 function Placeholder(props) {
-  const accent = useStore((store) => store.accent);
   const { id, text, callToAction } = props;
 
   return (
@@ -16,14 +13,7 @@ function Placeholder(props) {
         sx={{ position: "relative" }}
       >
         <React.Suspense fallback={<div />}>
-          <PlaceholderLoader
-            onLoad={() => {
-              changeSvgTheme(accent);
-            }}
-            name={id}
-            width={"150px"}
-            height={"150px"}
-          />
+          <PlaceholderLoader name={id} width={"150px"} height={"150px"} />
         </React.Suspense>
         <Text
           variant="body"

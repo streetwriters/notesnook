@@ -12,6 +12,7 @@ import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
+import { SUBSCRIPTION_STATUS } from "../common";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -55,7 +56,10 @@ class UserStore extends BaseStore {
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
         const wasUserPremium = isUserPremium();
         this.set((state) => (state.user.subscription = subscription));
-        if (!wasUserPremium && isUserPremium()) showOnboardingDialog("pro");
+        if (!wasUserPremium && isUserPremium())
+          showOnboardingDialog(
+            subscription.type === SUBSCRIPTION_STATUS.TRIAL ? "trial" : "pro"
+          );
       });
 
       EV.subscribe(EVENTS.userEmailConfirmed, () => {

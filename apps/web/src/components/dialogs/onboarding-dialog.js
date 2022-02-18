@@ -4,6 +4,7 @@ import * as Icon from "../icons";
 import { ReactComponent as E2E } from "../../assets/e2e.svg";
 import { ReactComponent as Note } from "../../assets/note2.svg";
 import { ReactComponent as Nomad } from "../../assets/nomad.svg";
+import { ReactComponent as WorkAnywhere } from "../../assets/workanywhere.svg";
 import LightUI from "../../assets/light1.png";
 import DarkUI from "../../assets/dark1.png";
 import GooglePlay from "../../assets/play.png";
@@ -17,6 +18,7 @@ import { db } from "../../common/db";
 import { usePersistentState } from "../../utils/hooks";
 import accents from "../../theme/accents";
 import AccentItem from "../accent-item";
+import { useCallback, useState } from "react";
 
 const newUserSteps = [
   {
@@ -70,20 +72,39 @@ const proUserSteps = [
   },
 ];
 
+const trialUserSteps = [
+  {
+    title: "Congratulations!",
+    subtitle: "You 14-day free trial has been activated.",
+    buttonText: "Start taking notes",
+    image: <WorkAnywhere width={160} />,
+    component: AccentSelector,
+  },
+];
+
 const onboarding = {
   new: newUserSteps,
   pro: proUserSteps,
+  trial: trialUserSteps,
 };
 
-function OnboardingDialog({ onClose, type }) {
+function OnboardingDialog({ onClose: _onClose, type }) {
   const [step, setStep] = usePersistentState(type, 0);
+  const steps = onboarding[type];
+
+  const onClose = useCallback(() => {
+    setStep(steps.length);
+    _onClose();
+  }, [_onClose, setStep, steps.length]);
+
+  if (!steps || !steps[step]) return null;
   const {
     title,
     subtitle,
     image,
     component: Component,
     buttonText,
-  } = onboarding[type][step];
+  } = steps[step];
 
   return (
     <Dialog isOpen={true} width={500}>
@@ -99,7 +120,10 @@ function OnboardingDialog({ onClose, type }) {
         {buttonText && (
           <Button
             sx={{ borderRadius: 50, px: 30, mb: 4 }}
-            onClick={() => setStep((s) => ++s)}
+            onClick={() => {
+              if (step === steps.length - 1) onClose();
+              else setStep((s) => ++s);
+            }}
           >
             {buttonText}
           </Button>
@@ -320,6 +344,8 @@ function CrossPlatform() {
 }
 
 function TrialOffer({ onClose }) {
+  const [error, setError] = useState();
+  const [loading, setLoading] = useState();
   return (
     <Flex
       my={4}
@@ -328,16 +354,30 @@ function TrialOffer({ onClose }) {
       alignItems="center"
     >
       <Features item={{ style: {} }} />
-      <Text
-        variant={"body"}
-        mt={2}
-        bg="bgSecondary"
-        color="icon"
-        p={1}
-        sx={{ borderRadius: "default" }}
-      >
-        <b>Note:</b> Upgrade now and get 50% discount on all plans.
-      </Text>
+      {error ? (
+        <Text
+          variant={"body"}
+          mt={2}
+          bg="errorBg"
+          color="error"
+          p={1}
+          sx={{ borderRadius: "default" }}
+        >
+          {error}
+        </Text>
+      ) : (
+        <Text
+          variant={"body"}
+          mt={2}
+          bg="bgSecondary"
+          color="icon"
+          p={1}
+          sx={{ borderRadius: "default" }}
+        >
+          <b>Note:</b> Upgrade now and get 50% discount on all plans.
+        </Text>
+      )}
+
       <Flex mt={2} width="100%" justifyContent={"center"}>
         <Button
           sx={{ borderRadius: 50, alignSelf: "center", mr: 2, width: "40%" }}
@@ -352,21 +392,29 @@ function TrialOffer({ onClose }) {
           variant={"secondary"}
           sx={{ borderRadius: 50, alignSelf: "center", width: "40%" }}
           onClick={async () => {
-            onClose();
-            await TaskManager.startTask({
-              type: "modal",
-              title: "Activating your trial",
-              subtitle: "Please wait while we activate your 14 day trial.",
-              action: (report) => {
-                report({
-                  text: "This trial is completely free of charge. No credit card or other information is required on your part.",
-                });
-                return db.user.activateTrial();
-              },
-            });
+            try {
+              setLoading(true);
+              const result = await TaskManager.startTask({
+                type: "status",
+                id: "trialActivation",
+                action: (report) => {
+                  report({
+                    text: "Activating trial",
+                  });
+                  return db.user.activateTrial();
+                },
+              });
+              if (result) onClose();
+            } catch (e) {
+              setError(
+                `Could not activate trial. Please try again. Error: ${e.message}`
+              );
+            } finally {
+              setLoading(false);
+            }
           }}
         >
-          Try free for 14 days
+          {loading ? <Icon.Loading size={16} /> : "Try free for 14 days"}
         </Button>
       </Flex>
       <Button
