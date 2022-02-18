@@ -343,7 +343,7 @@ function colorsToMenuItems() {
     label = label.toLowerCase();
     return {
       key: label,
-      title: db.colors.alias(label) || label,
+      title: () => db.colors.alias(label) || label,
       icon: Icon.Circle,
       iconColor: label,
       checked: ({ note }) => {
