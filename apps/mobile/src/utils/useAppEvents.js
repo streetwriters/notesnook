@@ -15,6 +15,7 @@ import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
 import { doInBackground, editing } from '.';
 import { ProFeatures } from '../components/ResultDialog/pro-features';
+import { Walkthrough } from '../components/Walkthrough';
 import {
   clearAllStores,
   initialize,
@@ -202,23 +203,7 @@ export const useAppEvents = () => {
     if (!user) return;
     MMKV.setItem('isUserEmailConfirmed', 'yes');
     await PremiumService.setPremiumStatus();
-    let message = 'You have been rewarded 7 more days of free trial. Enjoy using Notesnook!';
-    presentSheet({
-      title: 'Email confirmed!',
-      paragraph: message,
-      component: (
-        <View
-          style={{
-            paddingHorizontal: 12,
-            paddingBottom: 15,
-            alignItems: 'center'
-          }}
-        >
-          <ProFeatures />
-        </View>
-      )
-    });
-
+    Walkthrough.present('emailconfirmed', false, true);
     if (user?.isEmailConfirmed) {
       clearMessage();
     }
@@ -240,15 +225,7 @@ export const useAppEvents = () => {
   const onAccountStatusChange = async userStatus => {
     if (!PremiumService.get() && userStatus.type === 5) {
       PremiumService.subscriptions.clear();
-      presentSheet({
-        title: 'Notesnook Pro',
-        paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
-        action: async () => {
-          eSendEvent(eCloseProgressDialog);
-        },
-        icon: 'check',
-        actionText: 'Continue'
-      });
+      Walkthrough.present('prouser', false, true);
     }
     await PremiumService.setPremiumStatus();
   };

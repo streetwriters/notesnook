@@ -53,7 +53,7 @@ export const Placeholder = ({ type, w, h, color }) => {
   );
 };
 
-export const SvgToPngView = ({ width, height, src, color, img }) => {
+export const SvgToPngView = ({ width = 250, height = 250, src }) => {
   const [error, setError] = useState(false);
 
   return (

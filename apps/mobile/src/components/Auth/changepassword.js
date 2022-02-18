@@ -22,7 +22,7 @@ export const ChangePassword = () => {
   const [loading, setLoading] = useState(false);
 
   const changePassword = async () => {
-    if (error || !oldPassword || !password) {
+    if (error || !oldPassword.current || !password.current) {
       ToastEvent.show({
         heading: 'All fields required',
         message: 'Fill all the fields and try again.',
@@ -34,7 +34,7 @@ export const ChangePassword = () => {
     eSendEvent(eCloseProgressDialog);
     setLoading(true);
     try {
-      await db.user.changePassword(oldPassword, password);
+      await db.user.changePassword(oldPassword.current, password.current);
       ToastEvent.show({
         heading: `Account password updated`,
         type: 'success',

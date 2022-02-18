@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { LayoutAnimation, Platform, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
@@ -31,9 +31,7 @@ export const Login = ({ changeMode }) => {
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const password = useRef();
-
   const [focused, setFocused] = useState(false);
-
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const insets = useSafeAreaInsets();

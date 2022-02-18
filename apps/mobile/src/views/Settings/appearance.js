@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Appearance, ScrollView, TouchableOpacity, View } from 'react-native';
+import { Appearance, TouchableOpacity, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
@@ -111,82 +112,8 @@ const SettingsAppearanceSection = () => {
               Change the accent color of the app.
             </Paragraph>
           </View>
-          <ScrollView
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            onMoveShouldSetResponderCapture={() => {
-              tabBarRef.current?.setScrollEnabled(false);
-            }}
-            onMomentumScrollEnd={() => {
-              tabBarRef.current?.setScrollEnabled(true);
-            }}
-            style={{
-              borderRadius: 5,
-              padding: 5,
-              marginTop: 10,
-              marginBottom: pv + 5,
-              width: '100%',
-              paddingHorizontal: 12
-            }}
-            nestedScrollEnabled
-            contentContainerStyle={{
-              alignSelf: 'center',
-              flexDirection: 'row',
-              flexWrap: 'wrap'
-            }}
-          >
-            {[
-              '#FF5722',
-              '#FFA000',
-              '#1B5E20',
-              '#008837',
-              '#757575',
-              '#0560ff',
-              '#009688',
-              '#2196F3',
-              '#880E4F',
-              '#9C27B0',
-              '#FF1744',
-              '#B71C1C'
-            ].map(item => (
-              <PressableButton
-                key={item}
-                customColor={
-                  colors.accent === item
-                    ? RGB_Linear_Shade(!colors.night ? -0.2 : 0.2, hexToRGBA(item, 1))
-                    : item
-                }
-                customSelectedColor={item}
-                alpha={!colors.night ? -0.1 : 0.1}
-                opacity={1}
-                onPress={async () => {
-                  await PremiumService.verify(async () => {
-                    changeAccentColor(item);
-                    await MMKV.setStringAsync('accentColor', item);
-                  });
-                }}
-                customStyle={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 10,
-                  marginVertical: 5,
-                  width: DDS.isLargeTablet() ? 40 : 50,
-                  height: DDS.isLargeTablet() ? 40 : 50,
-                  borderRadius: 100
-                }}
-              >
-                {colors.accent === item ? (
-                  <Icon
-                    size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
-                    color="white"
-                    name="check"
-                  />
-                ) : null}
-              </PressableButton>
-            ))}
-            <View style={{ width: 50 }} />
-          </ScrollView>
+
+          <AccentColorPicker />
 
           <CustomButton
             title="Use system theme"
@@ -334,6 +261,101 @@ const SettingsAppearanceSection = () => {
         </>
       )}
     </>
+  );
+};
+
+export const AccentColorPicker = ({ settings = true }) => {
+  const [state, dispatch] = useTracked();
+  const { colors } = state;
+
+  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
+    let newColors = setColorScheme(colors, accent);
+    dispatch({ type: Actions.THEME, colors: newColors });
+  }
+
+  function changeAccentColor(accentColor) {
+    ACCENT.color = accentColor;
+    ACCENT.shade = accentColor + '12';
+    changeColorScheme();
+  }
+
+  return (
+    <ScrollView
+      horizontal={true}
+      showsHorizontalScrollIndicator={false}
+      onMoveShouldSetResponderCapture={() => {
+        if (!settings) return;
+        tabBarRef.current?.setScrollEnabled(false);
+      }}
+      onMomentumScrollEnd={() => {
+        if (!settings) return;
+        tabBarRef.current?.setScrollEnabled(true);
+      }}
+      style={{
+        borderRadius: 5,
+        padding: 5,
+        marginTop: 10,
+        marginBottom: pv + 5,
+        width: '100%',
+        paddingHorizontal: 12,
+        maxWidth: settings ? null : '100%'
+      }}
+      scrollEnabled={true}
+      nestedScrollEnabled={true}
+      contentContainerStyle={{
+        alignSelf: 'center',
+        flexDirection: 'row',
+        flexWrap: 'wrap'
+      }}
+    >
+      {[
+        '#FF5722',
+        '#FFA000',
+        '#1B5E20',
+        '#008837',
+        '#757575',
+        '#0560ff',
+        '#009688',
+        '#2196F3',
+        '#880E4F',
+        '#9C27B0',
+        '#FF1744',
+        '#B71C1C'
+      ].map(item => (
+        <PressableButton
+          key={item}
+          customColor={
+            colors.accent === item
+              ? RGB_Linear_Shade(!colors.night ? -0.2 : 0.2, hexToRGBA(item, 1))
+              : item
+          }
+          customSelectedColor={item}
+          alpha={!colors.night ? -0.1 : 0.1}
+          opacity={1}
+          onPress={async () => {
+            await PremiumService.verify(async () => {
+              changeAccentColor(item);
+              await MMKV.setStringAsync('accentColor', item);
+            });
+          }}
+          customStyle={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 10,
+            marginVertical: 5,
+            width: DDS.isLargeTablet() ? 40 : 50,
+            height: DDS.isLargeTablet() ? 40 : 50,
+            borderRadius: 100
+          }}
+        >
+          {colors.accent === item ? (
+            <Icon size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl} color="white" name="check" />
+          ) : null}
+        </PressableButton>
+      ))}
+      <View style={{ width: 50 }} />
+    </ScrollView>
   );
 };
 

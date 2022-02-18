@@ -23,11 +23,11 @@ import {
 } from '../utils/Events';
 import { editorRef, tabBarRef } from '../utils/Refs';
 import { sleep } from '../utils/TimeUtils';
+import useTooltip, { hideAllTooltips } from '../utils/use-tooltip';
 import { EditorWrapper } from '../views/Editor/EditorWrapper';
 import { checkStatus, EditorWebView, getNote } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
 import { NavigatorStack } from './NavigatorStack';
-import useTooltip, { hideAllTooltips } from '../utils/use-tooltip';
 
 let layoutTimer = null;
 

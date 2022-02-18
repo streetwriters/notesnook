@@ -70,13 +70,13 @@ export function setLoginMessage() {
 const emailMessage = {
   visible: true,
   message: 'Email not confirmed',
-  actionText: 'Confirm now to get 7 more days of free trial',
+  actionText: 'Please confrim your email to sync notes.',
   onPress: () => {
     PremiumService.showVerifyEmailDialog();
   },
   data: {},
   icon: 'email',
-  type: 'normal'
+  type: 'error'
 };
 
 export function setEmailVerifyMessage() {

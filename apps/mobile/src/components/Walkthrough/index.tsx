@@ -11,7 +11,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import walkthroughs, { TStep } from './walkthroughs';
 
-export const Walkthrough = ({ steps }: { steps: TStep[] }) => {
+export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip: boolean }) => {
   const [state] = useTracked();
   const colors = state.colors;
   const [step, setStep] = useState<TStep>(steps && steps[0]);
@@ -33,17 +33,36 @@ export const Walkthrough = ({ steps }: { steps: TStep[] }) => {
     >
       {step.walkthroughItem(colors)}
 
-      <Heading>{step.title}</Heading>
-      <Paragraph
-        style={{
-          textAlign: 'center',
-          alignSelf: 'center',
-          maxWidth: '80%'
-        }}
-        size={SIZE.md}
-      >
-        {step.text}
-      </Paragraph>
+      {step.title ? <Heading>{step.title}</Heading> : null}
+      {step.text ? (
+        <Paragraph
+          style={{
+            textAlign: 'center',
+            alignSelf: 'center',
+            maxWidth: '80%'
+          }}
+          size={SIZE.md}
+        >
+          {step.text}
+        </Paragraph>
+      ) : null}
+      {step.actionButton && (
+        <Button
+          //@ts-ignore
+          style={{
+            height: 30,
+            marginTop: 10
+          }}
+          textStyle={{
+            textDecorationLine: 'underline'
+          }}
+          onPress={async () => {
+            step.actionButton?.action();
+          }}
+          type="transparent"
+          title={step.actionButton.text}
+        />
+      )}
 
       <Button
         //@ts-ignore
@@ -69,43 +88,52 @@ export const Walkthrough = ({ steps }: { steps: TStep[] }) => {
         type="accent"
       />
 
-      <Button
-        //@ts-ignore
-        style={{
-          height: 30,
-          marginTop: 10
-        }}
-        textStyle={{
-          textDecorationLine: 'underline'
-        }}
-        onPress={async () => {
-          eSendEvent(eCloseProgressDialog);
-        }}
-        type="gray"
-        title="Skip introduction"
-      />
+      {canSkip ? (
+        <Button
+          //@ts-ignore
+          style={{
+            height: 30,
+            marginTop: 10
+          }}
+          textStyle={{
+            textDecorationLine: 'underline'
+          }}
+          onPress={async () => {
+            eSendEvent(eCloseProgressDialog);
+          }}
+          type="gray"
+          title="Skip introduction"
+        />
+      ) : null}
     </View>
   );
 };
 
-Walkthrough.present = async (id: 'notebooks') => {
-  let walkthroughState = await MMKV.getItem('walkthroughState');
-  if (walkthroughState) {
-    walkthroughState = JSON.parse(walkthroughState);
-  } else {
+Walkthrough.present = async (
+  id: 'notebooks' | 'trialstarted' | 'emailconfirmed' | 'prouser',
+  canSkip = true,
+  nopersist?: boolean
+) => {
+  if (!nopersist) {
+    let walkthroughState = await MMKV.getItem('walkthroughState');
+    if (walkthroughState) {
+      walkthroughState = JSON.parse(walkthroughState);
+    } else {
+      //@ts-ignore
+      walkthroughState = {};
+    }
     //@ts-ignore
-    walkthroughState = {};
+    if (walkthroughState[id]) return;
+    //@ts-ignore
+    walkthroughState[id] = true;
+    MMKV.setItem('walkthroughState', JSON.stringify(walkthroughState));
   }
-  //@ts-ignore
-  if (walkthroughState[id]) return;
-  //@ts-ignore
-  walkthroughState[id] = true;
-  MMKV.setItem('walkthroughState', JSON.stringify(walkthroughState));
+
   //@ts-ignore
   let walkthrough = walkthroughs[id];
   if (!walkthrough) return;
   presentSheet({
-    component: <Walkthrough steps={walkthrough.steps} />,
+    component: <Walkthrough canSkip={canSkip} steps={walkthrough.steps} />,
     disableClosing: true
   });
 };

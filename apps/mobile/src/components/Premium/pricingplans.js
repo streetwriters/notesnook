@@ -22,6 +22,7 @@ import BaseDialog from '../Dialog/base-dialog';
 import { presentDialog } from '../Dialog/functions';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import { Walkthrough } from '../Walkthrough';
 import { PricingItem } from './pricing-item';
 
 const promoCyclesMonthly = {
@@ -195,12 +196,14 @@ export const PricingPlans = ({
           />
 
           <Button
-            onPress={() => {
-              eSendEvent(eClosePremiumDialog);
-              eSendEvent(eCloseProgressDialog);
-              setTimeout(() => {
-                eSendEvent(eOpenLoginDialog, 1);
-              }, 400);
+            onPress={async () => {
+              try {
+                await db.user.activateTrial();
+                eSendEvent(eClosePremiumDialog);
+                eSendEvent(eCloseProgressDialog);
+                await sleep(300);
+                Walkthrough.present('trialstarted', false, true);
+              } catch (e) {}
             }}
             title={`Try free for 14 days`}
             type="grayAccent"

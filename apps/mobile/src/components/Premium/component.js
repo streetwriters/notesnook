@@ -7,8 +7,15 @@ import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, presentSheet } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import { getElevation } from '../../utils';
-import { eOpenLoginDialog, eOpenResultDialog } from '../../utils/Events';
+import { db } from '../../utils/database';
+import {
+  eClosePremiumDialog,
+  eCloseProgressDialog,
+  eOpenLoginDialog,
+  eOpenResultDialog
+} from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import umami from '../../utils/umami';
 import { ActionIcon } from '../ActionIcon';
 import { AuthMode } from '../Auth';
@@ -19,6 +26,7 @@ import Seperator from '../Seperator';
 import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import { Walkthrough } from '../Walkthrough';
 import { features } from './features';
 import { Group } from './group';
 import { PricingPlans } from './pricing-plans';
@@ -146,8 +154,14 @@ export const Component = ({ close, promo, getRef }) => {
         {userCanRequestTrial ? (
           <Button
             key="calltoaction"
-            onPress={() => {
-              eSendEvent(eOpenResultDialog);
+            onPress={async () => {
+              try {
+                await db.user.activateTrial();
+                eSendEvent(eClosePremiumDialog);
+                eSendEvent(eCloseProgressDialog);
+                await sleep(300);
+                Walkthrough.present('trialstarted', false, true);
+              } catch (e) {}
             }}
             title="Try free for 14 days"
             type="accent"

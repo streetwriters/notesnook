@@ -8,7 +8,8 @@ import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
 import { db } from '../../utils/database';
-import { eCloseLoginDialog, eOpenResultDialog } from '../../utils/Events';
+import { eCloseLoginDialog } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
 import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
 import umami from '../../utils/umami';
@@ -58,7 +59,7 @@ export const Signup = ({ changeMode, welcome, trial }) => {
     if (!validateInfo() || error) return;
     setLoading(true);
     try {
-      await db.user.signup(email.toLowerCase(), password);
+      await db.user.signup(email.current.toLowerCase(), password.current);
       let user = await db.user.getUser();
       setUser(user);
       setLastSynced(await db.lastSynced());
@@ -214,7 +215,36 @@ export const Signup = ({ changeMode, welcome, trial }) => {
               marginBottom={5}
             />
             <Paragraph size={SIZE.xs} color={colors.icon}>
-              By signing up, you agree to our terms of service and privacy policy.
+              By signing up, you agree to our{' '}
+              <Paragraph
+                size={SIZE.xs}
+                onPress={() => {
+                  openLinkInBrowser('https://notesnook.com/tos', colors)
+                    .catch(e => {})
+                    .then(r => {});
+                }}
+                style={{
+                  textDecorationLine: 'underline'
+                }}
+                color={colors.accent}
+              >
+                terms of service{' '}
+              </Paragraph>
+              and{' '}
+              <Paragraph
+                size={SIZE.xs}
+                onPress={() => {
+                  openLinkInBrowser('https://notesnook.com/privacy', colors)
+                    .catch(e => {})
+                    .then(r => {});
+                }}
+                style={{
+                  textDecorationLine: 'underline'
+                }}
+                color={colors.accent}
+              >
+                privacy policy.
+              </Paragraph>
             </Paragraph>
 
             <View

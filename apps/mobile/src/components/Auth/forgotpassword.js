@@ -24,7 +24,7 @@ export const ForgotPassword = () => {
   const [sent, setSent] = useState(false);
 
   const sendRecoveryEmail = async () => {
-    if (!email || error) {
+    if (!email.current || error) {
       ToastEvent.show({
         heading: 'Account email is required.',
         type: 'error',
@@ -38,7 +38,7 @@ export const ForgotPassword = () => {
       if (lastRecoveryEmailTime && Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3) {
         throw new Error('Please wait before requesting another email');
       }
-      await db.user.recoverAccount(email.toLowerCase());
+      await db.user.recoverAccount(email.current.toLowerCase());
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
       ToastEvent.show({
         heading: `Check your email to reset password`,

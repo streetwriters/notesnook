@@ -124,11 +124,17 @@ export const Settings = ({ navigation }) => {
           component: <Issue />
         });
       },
-      desc: `Facing an issue? Click here to create a bug report`
+      desc: `Faced an issue or have a suggestion? Click here to create a bug report`
+    },
+    {
+      name: 'Join our Telegram group',
+      desc: "We are on telegram, let's talk",
+      func: () => {
+        Linking.openURL('https://t.me/notesnook').catch(console.log);
+      }
     },
     {
       name: 'Join our Discord community',
-
       func: async () => {
         presentSheet({
           title: 'Join our Discord Community',
@@ -144,7 +150,7 @@ export const Settings = ({ navigation }) => {
           icon: 'discord',
           action: async () => {
             try {
-              await openLinkInBrowser('https://discord.gg/zQBK97EE22', colors);
+              Linking.openURL('https://discord.gg/zQBK97EE22').catch(console.log);
             } catch (e) {}
           },
           actionText: 'Join Now'
