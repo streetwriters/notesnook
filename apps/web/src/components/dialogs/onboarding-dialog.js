@@ -19,6 +19,7 @@ import { usePersistentState } from "../../utils/hooks";
 import accents from "../../theme/accents";
 import AccentItem from "../accent-item";
 import { useCallback, useState } from "react";
+import Config from "../../utils/config";
 
 const newUserSteps = [
   {
@@ -78,7 +79,6 @@ const trialUserSteps = [
     subtitle: "You 14-day free trial has been activated.",
     buttonText: "Start taking notes",
     image: <WorkAnywhere width={160} />,
-    component: AccentSelector,
   },
 ];
 
@@ -93,9 +93,9 @@ function OnboardingDialog({ onClose: _onClose, type }) {
   const steps = onboarding[type];
 
   const onClose = useCallback(() => {
-    setStep(steps.length);
+    Config.set(type, steps.length);
     _onClose();
-  }, [_onClose, setStep, steps.length]);
+  }, [_onClose, type, steps]);
 
   if (!steps || !steps[step]) return null;
   const {
@@ -119,8 +119,9 @@ function OnboardingDialog({ onClose: _onClose, type }) {
         {Component && <Component onClose={onClose} />}
         {buttonText && (
           <Button
-            sx={{ borderRadius: 50, px: 30, mb: 4 }}
+            sx={{ borderRadius: 50, px: 30, mb: 4, mt: Component ? 0 : 4 }}
             onClick={() => {
+              console.log(step, steps.length);
               if (step === steps.length - 1) onClose();
               else setStep((s) => ++s);
             }}

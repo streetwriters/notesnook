@@ -68,7 +68,6 @@ export default function AppEffects({ setShow }) {
       (async function () {
         await updateLastSynced();
         if (await initUser()) {
-          showOnboardingDialog("new");
           showUpgradeReminderDialogs();
           await sync();
         }
