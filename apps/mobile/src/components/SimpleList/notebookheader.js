@@ -1,22 +1,36 @@
-import React, { useState } from 'react';
-import { Platform, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
 import { useTracked } from '../../provider';
 import { useMenuStore } from '../../provider/stores';
 import { ToastEvent } from '../../services/EventManager';
+import { TipManager } from '../../services/tip-manager';
 import { getTotalNotes } from '../../utils';
 import { db } from '../../utils/database';
 import { SIZE } from '../../utils/SizeUtils';
+import useTooltip, { useTooltipHandler } from '../../utils/use-tooltip';
 import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const NotebookHeader = ({ notebook, onPress, onEditNotebook }) => {
+export const NotebookHeader = ({ notebook, onEditNotebook }) => {
   const [state] = useTracked();
   const { colors } = state;
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(notebook.id));
   const setMenuPins = useMenuStore(state => state.setMenuPins);
   const totalNotes = getTotalNotes(notebook);
+  const tooltip = useTooltip();
+  const shortcutRef = useRef();
+
+  useTooltipHandler('notebookshortcut', () => {
+    const popup = TipManager.popup('notebookshortcut');
+    if (popup) {
+      tooltip.show(shortcutRef, popup, 'top');
+    }
+  });
+
+  useEffect(() => {
+    useTooltip.present('notebookshortcut');
+  }, []);
 
   const onPinNotebook = async () => {
     try {
@@ -36,6 +50,7 @@ export const NotebookHeader = ({ notebook, onPress, onEditNotebook }) => {
 
   return (
     <View
+      ref={tooltip.parent}
       style={{
         marginBottom: 5,
         padding: 0,
@@ -67,6 +82,8 @@ export const NotebookHeader = ({ notebook, onPress, onEditNotebook }) => {
           <ActionIcon
             name={isPinnedToMenu ? 'link-variant-off' : 'link-variant'}
             onPress={onPinNotebook}
+            tooltipText={'Create shortcut in side menu'}
+            fwdRef={shortcutRef}
             customStyle={{
               marginRight: 15,
               width: 40,
@@ -79,6 +96,7 @@ export const NotebookHeader = ({ notebook, onPress, onEditNotebook }) => {
           <ActionIcon
             size={SIZE.lg}
             onPress={onEditNotebook}
+            tooltipText="Edit this notebook"
             name="pencil"
             type="grayBg"
             color={colors.icon}

@@ -23,7 +23,6 @@ export const Empty = React.memo(
       screen === 'Notes' && introCompleted ? 'first-note' : placeholderData.type || type,
       screen === 'Notes' ? 'notes' : null
     );
-
     const color =
       colors[COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'];
     return (

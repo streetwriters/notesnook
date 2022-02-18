@@ -4,7 +4,7 @@ import { useTracked } from '../../provider';
 import { PressableButton } from '../PressableButton';
 import { SIZE } from '../../utils/SizeUtils';
 import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
-import { showTooltip } from '../../utils';
+import { showTooltip, TOOLTIP_POSITIONS } from '../../utils';
 
 export const ActionIcon = ({
   onPress,
@@ -22,7 +22,8 @@ export const ActionIcon = ({
   onLongPress,
   tooltipText,
   type = 'gray',
-  fwdRef
+  fwdRef,
+  tooltipPosition = TOOLTIP_POSITIONS.TOP
 }) => {
   const [state, dispatch] = useTracked();
   const { colors } = state;
@@ -39,7 +40,7 @@ export const ActionIcon = ({
           return;
         }
         if (tooltipText) {
-          showTooltip(event, tooltipText);
+          showTooltip(event, tooltipText, tooltipPosition);
         }
       }}
       disabled={disabled}

@@ -122,6 +122,7 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
                   component: <Sort screen={screen} type={type} />
                 });
               }}
+              tooltipText="Change sorting of items in list"
               fwdRef={sortRef}
               title={groupBy}
               icon={groupOptions.sortDirection === 'asc' ? 'sort-ascending' : 'sort-descending'}
@@ -142,6 +143,9 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
                   width: 25,
                   height: 25
                 }}
+                tooltipText={
+                  listMode == 'compact' ? 'Switch to normal mode' : 'Switch to compact mode'
+                }
                 fwdRef={compactModeRef}
                 color={colors.icon}
                 name={listMode == 'compact' ? 'view-list' : 'view-list-outline'}

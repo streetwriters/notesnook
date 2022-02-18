@@ -68,7 +68,7 @@ const useTooltip = () => {
   return { parent, show };
 };
 
-type TTooltipIdentifiers = 'sectionheader' | 'searchreplace';
+type TTooltipIdentifiers = 'sectionheader' | 'searchreplace' | 'notebookshortcut';
 
 export const useTooltipHandler = (id: TTooltipIdentifiers, callback: () => void) => {
   useEffect(() => {

@@ -2,7 +2,7 @@ import React from 'react';
 import { ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
-import { BUTTON_TYPES, showTooltip } from '../../utils';
+import { BUTTON_TYPES, showTooltip, TOOLTIP_POSITIONS } from '../../utils';
 import { SIZE } from '../../utils/SizeUtils';
 import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
@@ -59,7 +59,7 @@ export const Button = ({
           return;
         }
         if (tooltipText) {
-          showTooltip(event, tooltipText);
+          showTooltip(event, tooltipText, TOOLTIP_POSITIONS.TOP);
         }
       }}
       disabled={loading}

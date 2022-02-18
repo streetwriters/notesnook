@@ -25,7 +25,8 @@ type Context =
   | 'first-note'
   | 'first-editor-launch'
   | 'monographs'
-  | 'trash';
+  | 'trash'
+  | 'topics';
 
 export type TTip = {
   text: string;
@@ -134,7 +135,7 @@ const tips: TTip[] = [
   },
   {
     text: 'Long press on any item in list to open quick actions menu.',
-    contexts: ['notes', 'notebook', 'notebook', 'tags']
+    contexts: ['notes', 'notebook', 'notebook', 'tags', 'topics']
   },
   {
     text: 'Monographs enable you to share your notes in a secure and private way',
@@ -150,11 +151,11 @@ const tips: TTip[] = [
   },
   {
     text: 'A notebook can have unlimited topics with unlimited notes.',
-    contexts: ['notebook']
+    contexts: ['notebook', 'topics']
   },
   {
     text: 'You can multi-select notes and move them to a notebook at once',
-    contexts: ['notebook']
+    contexts: ['notebook', 'topics']
   },
   {
     text: 'Items in trash are kept for 7 days after which they are permanently deleted.',
@@ -186,6 +187,10 @@ const popups: Popup[] = [
   {
     id: 'searchreplace',
     text: 'Switch to search/replace mode'
+  },
+  {
+    id: 'notebookshortcut',
+    text: 'Create shortcut of this notebook in side menu'
   }
 ];
 
@@ -197,7 +202,8 @@ const placeholderTips = [
   'Get Notesnook on all your devices. Or even open it in browser by going to https://app.notesnook.com to access all your notes',
   `With note history, you can restore back to an older version of the note if you accidently deleted something.`,
   `When your heart speaks\, take good notes. - Judith Campbell`,
-  `If other\'s can read your notes\, they are not your notes anymore.`,
   "You can publish a note and share it with anyone. Even if they don't use Notesnook!",
-  'Published notes can be encrypted. Which means only you and the person you share the password with can read them.'
+  'Published notes can be encrypted. Which means only you and the person you share the password with can read them.',
+  'You can change default font size from editor settings at the end of toolbar',
+  'The editor toolbar can be scrolled horizontally to add more formats and blocks'
 ];
