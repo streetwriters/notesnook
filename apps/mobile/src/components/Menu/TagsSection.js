@@ -108,7 +108,7 @@ export const PinItem = React.memo(
 
     const onHeaderStateChange = event => {
       setTimeout(() => {
-        if (event.id === item.name.toLowerCase() + '_navigation') {
+        if (event.id === item.id) {
           setHeaderTextState(event);
         } else {
           if (headerTextState !== null) {
