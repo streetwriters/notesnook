@@ -414,6 +414,7 @@ span.attachment em::before {
 .checklist > li {
   list-style: none;
   margin: 0.25em 0;
+  color: ${pageTheme.colors.pri};
 }
 
 .tox-checklist > li::before,
@@ -440,7 +441,7 @@ span.attachment em::before {
 
 .tox-checklist li.tox-checklist--checked,
 .checklist li.checked {
-  color:${pageTheme.colors.icon}
+  color:${pageTheme.colors.icon};
 }
 
 [dir="rtl"] .tox-checklist > li::before,
