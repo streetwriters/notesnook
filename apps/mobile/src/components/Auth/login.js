@@ -134,7 +134,7 @@ export const Login = ({ changeMode }) => {
           }}
         >
           <BouncingView initialScale={1.2} duration={5000}>
-            <SvgToPngView src={SVG(colors.night ? 'white' : 'black')} height={700} />
+            <SvgToPngView src={SVG(colors.night ? colors.icon : 'black')} height={700} />
           </BouncingView>
         </View>
         <BouncingView initialScale={0.95} duration={3000}>
