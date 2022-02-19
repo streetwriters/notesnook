@@ -510,6 +510,7 @@ export function showEditTagDialog(tagId) {
         tagStore.refresh();
         editorStore.refreshTags();
         noteStore.refresh();
+        appStore.refreshNavItems();
         perform(true);
       }}
     />
