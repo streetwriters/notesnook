@@ -60,6 +60,8 @@ const markdownPatterns = [
   { start: "#### ", format: "h4" },
   { start: "##### ", format: "h5" },
   { start: "###### ", format: "h6" },
+  { start: "- [x]", cmd: "insertChecklist", value: { checked: true } },
+  { start: "- []", cmd: "insertChecklist" },
   { start: "* ", cmd: "InsertUnorderedList" },
   { start: "- ", cmd: "InsertUnorderedList" },
   { start: "> ", format: "blockquote" },
