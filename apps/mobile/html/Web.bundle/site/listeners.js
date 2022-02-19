@@ -74,7 +74,8 @@ function onTitleChange() {
 
     info = document.querySelector(infoBar);
     if (tinymce.activeEditor) {
-      info.querySelector('#infowords').innerText = editor.countWords() + ' words';
+      let count = editor.countWords() || 0;
+      info.querySelector('#infowords').innerText = count + ' words';
       updateInfoBar();
     }
 
@@ -190,7 +191,8 @@ function attachMessageListener() {
         }
 
         info = document.querySelector(infoBar);
-        info.querySelector('#infowords').innerText = editor.countWords() + ' words';
+        let count = editor.countWords() || 0;
+        info.querySelector('#infowords').innerText = count + ' words';
         updateInfoBar();
         break;
       case 'htmldiff':

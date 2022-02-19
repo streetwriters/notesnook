@@ -649,13 +649,13 @@ function updateCount(timer = 1000) {
   countTimer = null;
 
   if (!timer) {
-    let count = editor.countWords();
+    let count = editor.countWords() || 0;
     info = document.querySelector('.info-bar');
     info.querySelector('#infowords').innerText = count + ' words';
     prevCount = count;
   } else {
     countTimer = setTimeout(function () {
-      let count = editor.countWords();
+      let count = editor.countWords() | 0;
       info = document.querySelector('.info-bar');
       info.querySelector('#infowords').innerText = count + ' words';
       prevCount = count;
