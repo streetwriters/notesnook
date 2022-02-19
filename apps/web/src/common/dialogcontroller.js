@@ -463,6 +463,7 @@ export function showEditTopicDialog(notebookId, topicId) {
           .notebook(topic.notebookId)
           .topics.add({ ...topic, title: t });
         notebookStore.setSelectedNotebook(topic.notebookId);
+        appStore.refreshNavItems();
         showToast("success", "Topic edited!");
         perform(true);
       }}
