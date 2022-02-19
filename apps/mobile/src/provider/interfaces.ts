@@ -92,6 +92,8 @@ export interface SettingStore extends State {
   setIntroCompleted: (isIntroCompleted: boolean) => void;
   setSheetKeyboardHandler: (sheetKeyboardHandler: boolean) => void;
   sheetKeyboardHandler: boolean;
+  requestBiometrics: boolean;
+  setRequestBiometrics: (requestBiometrics: boolean) => void;
 }
 
 export interface MenuStore extends State {

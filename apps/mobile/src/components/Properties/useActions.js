@@ -48,6 +48,8 @@ import { sleep } from '../../utils/TimeUtils';
 import { presentDialog } from '../Dialog/functions';
 import { MoveNotes } from '../MoveNoteDialog/movenote';
 import NoteHistory from '../NoteHistory';
+import tiny from '../../views/Editor/tiny/tiny.js';
+import { EditorWebView } from '../../views/Editor/Functions';
 
 export const useActions = ({ close = () => {}, item }) => {
   const [state, dispatch] = useTracked();
@@ -56,7 +58,7 @@ export const useActions = ({ close = () => {}, item }) => {
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const setMenuPins = useMenuStore(state => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(item.id));
-
+  console.log(item.readonly, 'readonly');
   const user = useUserStore(state => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
   const alias =
@@ -65,7 +67,7 @@ export const useActions = ({ close = () => {}, item }) => {
       : item.type === 'color'
       ? db.colors.alias(item.id)
       : item.title;
-  console.log(item);
+
   const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
   const noteInTopic =
     item.type === 'note' &&
@@ -478,7 +480,11 @@ export const useActions = ({ close = () => {}, item }) => {
 
   const toggleReadyOnlyMode = async () => {
     await db.notes.note(item.id).readonly();
-    useEditorStore.getState().setReadonly(db.notes.note(item.id).data.readonly);
+    let current = db.notes.note(item.id).data.readonly;
+    if (useEditorStore.getState().currentEditingNote === item.id) {
+      useEditorStore.getState().setReadonly(current);
+      tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
+    }
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
       Navigation.routeNames.Favorites,
@@ -656,7 +662,7 @@ export const useActions = ({ close = () => {}, item }) => {
     },
     {
       name: 'ReadOnly',
-      title: 'Lock editing',
+      title: 'Read only',
       icon: 'pencil-lock',
       func: toggleReadyOnlyMode,
       on: item.readonly

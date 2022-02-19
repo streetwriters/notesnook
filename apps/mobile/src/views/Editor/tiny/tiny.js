@@ -7,7 +7,12 @@ import { EditorWebView, getWebviewInit, post, textInput } from '../Functions';
  * @param {"design" | "readonly"} mode
  * @returns
  */
-const toogleReadMode = mode => `tinymce.activeEditor.mode.set('${mode}')`;
+const toogleReadMode = mode => `
+tinymce.activeEditor.mode.set('${mode}')
+setTimeout(() => {
+  document.getElementById("titleInput").readOnly = ${mode === 'design' ? 'false' : 'true'};
+},1000);
+`;
 
 const reset = id => `
 sessionId = null;

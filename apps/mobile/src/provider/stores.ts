@@ -256,7 +256,9 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   setDimensions: dimensions => set({ dimensions: dimensions }),
   setAppLoading: appLoading => set({ appLoading }),
   setIntroCompleted: isIntroCompleted => set({ isIntroCompleted }),
-  setSheetKeyboardHandler: sheetKeyboardHandler => set({ sheetKeyboardHandler })
+  setSheetKeyboardHandler: sheetKeyboardHandler => set({ sheetKeyboardHandler }),
+  requestBiometrics: false,
+  setRequestBiometrics: requestBiometrics => set({ requestBiometrics })
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({
@@ -264,16 +266,17 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
   colorNotes: [],
   setMenuPins: () => {
     try {
-      set({ menuPins: db.settings.pins });
+      set({ menuPins: db.settings?.pins || [] });
     } catch (e) {
       setTimeout(() => {
         try {
-          set({ menuPins: db.settings.pins });
+          set({ menuPins: db.settings?.pins || [] });
         } catch (e) {}
       }, 1000);
     }
   },
-  setColorNotes: () => set({ colorNotes: db.colors.all }),
+  //@ts-ignore
+  setColorNotes: () => set({ colorNotes: db.colors?.all || [] }),
   clearAll: () => set({ menuPins: [], colorNotes: [] })
 }));
 

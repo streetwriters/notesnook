@@ -973,6 +973,7 @@ const loadNoteInEditor = async (keepHistory = true) => {
     if (note?.id) {
       eSendEvent('updateTags');
       post('title', title);
+      tiny.call(EditorWebView, tiny.toogleReadMode(note.readonly ? 'readonly' : 'design'));
 
       if (!content || !content.data || content?.data?.length === 0) {
         tiny.call(
