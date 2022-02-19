@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Container from '../components/Container';
 import { useTracked } from '../provider';
-import { useSelectionStore, useSettingStore } from '../provider/stores';
+import { useSelectionStore } from '../provider/stores';
 import { eSendEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import { history } from '../utils';
@@ -20,13 +20,13 @@ import Tags from '../views/Tags';
 import Trash from '../views/Trash';
 
 const Stack = createNativeStackNavigator();
-let homepage = 'Notes';
 export const NavigatorStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
     const { colors } = state;
     const [render, setRender] = React.useState(false);
     const clearSelection = useSelectionStore(state => state.clearSelection);
+    const homepage = React.useRef('Notes');
 
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
@@ -40,7 +40,7 @@ export const NavigatorStack = React.memo(
         let settings = await MMKV.getItem('appSettings');
         if (settings) {
           settings = JSON.parse(settings);
-          homepage = settings.homepage;
+          homepage.current = settings.homepage;
         }
         setRender(true);
         Navigation.setHeaderState(
@@ -65,7 +65,7 @@ export const NavigatorStack = React.memo(
         >
           {render ? (
             <Stack.Navigator
-              initialRouteName={homepage}
+              initialRouteName={homepage.current}
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,

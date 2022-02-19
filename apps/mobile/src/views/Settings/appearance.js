@@ -232,29 +232,33 @@ const SettingsAppearanceSection = () => {
                   </TouchableOpacity>
                 }
               >
-                {MenuItemsList.slice(0, MenuItemsList.length - 1).map(item => (
-                  <MenuItem
-                    key={item.name}
-                    onPress={async () => {
-                      menuRef.current?.hide();
-                      await SettingsService.set('homepage', item.name);
-                      ToastEvent.show({
-                        heading: 'Homepage set to ' + item.name,
-                        message: 'Restart the app for changes to take effect.',
-                        type: 'success'
-                      });
-                    }}
-                    style={{
-                      backgroundColor: settings.homepage === item.name ? colors.nav : 'transparent'
-                    }}
-                    textStyle={{
-                      fontSize: SIZE.md,
-                      color: settings.homepage === item.name ? colors.accent : colors.pri
-                    }}
-                  >
-                    {item.name}
-                  </MenuItem>
-                ))}
+                {MenuItemsList.slice(0, MenuItemsList.length - 1).map(
+                  item =>
+                    item.name !== 'Monographs' && (
+                      <MenuItem
+                        key={item.name}
+                        onPress={async () => {
+                          menuRef.current?.hide();
+                          await SettingsService.set('homepage', item.name);
+                          ToastEvent.show({
+                            heading: 'Homepage set to ' + item.name,
+                            message: 'Restart the app for changes to take effect.',
+                            type: 'success'
+                          });
+                        }}
+                        style={{
+                          backgroundColor:
+                            settings.homepage === item.name ? colors.nav : 'transparent'
+                        }}
+                        textStyle={{
+                          fontSize: SIZE.md,
+                          color: settings.homepage === item.name ? colors.accent : colors.pri
+                        }}
+                      >
+                        {item.name}
+                      </MenuItem>
+                    )
+                )}
               </Menu>
             }
           />
