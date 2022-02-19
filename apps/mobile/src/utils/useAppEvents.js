@@ -21,6 +21,7 @@ import {
   initialize,
   useAttachmentStore,
   useNoteStore,
+  useSettingStore,
   useUserStore
 } from '../provider/stores';
 import Backup from '../services/Backup';
@@ -399,6 +400,11 @@ export const useAppEvents = () => {
       }
 
       if (SettingsService.get().appLockMode === 'background') {
+        if (useSettingStore.getState().requestBiometrics) {
+          console.log('requesting biometrics');
+          useSettingStore.getState().setRequestBiometrics(false);
+          return;
+        }
         if (refValues.current?.prevState === 'background' && !refValues.current?.showingDialog) {
           refValues.current.showingDialog = true;
           refValues.current.prevState = 'active';

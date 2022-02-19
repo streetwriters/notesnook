@@ -4,6 +4,7 @@ import { ToastEvent } from './EventManager';
 import * as Keychain from 'react-native-keychain';
 import { Platform } from 'react-native';
 import { MMKV } from '../utils/mmkv';
+import { useSettingStore } from '../provider/stores';
 
 const CRYPT_CONFIG = Platform.select({
   ios: {
@@ -45,6 +46,7 @@ async function hasInternetCredentials() {
 
 async function getCredentials(title, description) {
   try {
+    useSettingStore.getState().setRequestBiometrics(true);
     await FingerprintScanner.authenticate(
       Platform.select({
         ios: {
@@ -61,6 +63,7 @@ async function getCredentials(title, description) {
     FingerprintScanner.release();
     return await Keychain.getInternetCredentials('nn_vault', CRYPT_CONFIG);
   } catch (e) {
+    useSettingStore.getState().setRequestBiometrics(false);
     FingerprintScanner.release();
     let message = {
       heading: 'Authentication with biometrics failed.',
