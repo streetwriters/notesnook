@@ -46,7 +46,6 @@ export const Folders = ({ navigation }) => {
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
-    Walkthrough.present('notebooks');
     return () => {
       ranAfterInteractions = false;
       navigation.removeListener('focus', onFocus);
@@ -55,6 +54,9 @@ export const Folders = ({ navigation }) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
+      if (notebooks.length === 0) {
+        Walkthrough.present('notebooks');
+      }
       updateSearch();
     }
   }, [notebooks]);
