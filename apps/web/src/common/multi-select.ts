@@ -15,7 +15,11 @@ async function moveNotesToTrash(notes: any[]) {
   if (isMultiselect) {
     if (!(await showMultiDeleteConfirmation(notes.length))) return;
   } else {
-    if (item.locked && !(await Vault.unlockNote(item.id))) return;
+    if (
+      item.locked &&
+      !(await Vault.unlockNote(item.id, "unlock_and_delete_note"))
+    )
+      return;
   }
 
   const items = notes.map((item) => {

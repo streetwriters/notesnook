@@ -339,6 +339,12 @@ function getDialogData(type) {
         subtitle: "Your note will be unencrypted and removed from the vault.",
         positiveButtonText: "Unlock note",
       };
+    case "unlock_and_delete_note":
+      return {
+        title: "Delete note",
+        subtitle: "Please unlock this note to move it to trash.",
+        positiveButtonText: "Unlock & delete",
+      };
     case "change_password":
       return {
         title: "Change vault password",
