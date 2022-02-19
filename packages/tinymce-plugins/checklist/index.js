@@ -11,8 +11,8 @@ const EMPTY_CHECKLIST_HTML = `<ul class="${CLASS_NAMES.list}"><li></li></ul>`;
  * @param {import("tinymce").Editor} editor
  */
 function register(editor) {
-  editor.addCommand("insertChecklist", function () {
-    insertChecklist(editor);
+  editor.addCommand("insertChecklist", function(_api, value) {
+    insertChecklist(editor, value && value.checked);
   });
 
   editor.ui.registry.addToggleButton("checklist", {
@@ -20,14 +20,14 @@ function register(editor) {
     active: false,
     tooltip: "Checklist",
     onAction: () => insertChecklist(editor),
-    onSetup: function (api) {
+    onSetup: function(api) {
       return listState(editor, api.setActive);
     },
   });
 
   editor.on(
     "mousedown",
-    function (event) {
+    function(event) {
       var node = event.target;
       var parent = node.parentElement;
 
@@ -45,7 +45,7 @@ function register(editor) {
   );
 
   let shouldCancelNextTouchEndEvent = false;
-  const onTouchStartEnd = function (event) {
+  const onTouchStartEnd = function(event) {
     if (event.type === "touchend") {
       if (shouldCancelNextTouchEndEvent) {
         event.preventDefault();
@@ -91,27 +91,39 @@ function register(editor) {
 
 /**
  * @param {import("tinymce").Editor} editor
+ * @param {boolean} checked
  */
-function insertChecklist(editor) {
+function insertChecklist(editor, checked = false) {
   const node = editor.selection.getNode();
   if (node.classList.contains(CLASS_NAMES.list)) {
-    editor.undoManager.transact(function () {
+    editor.undoManager.transact(function() {
       editor.execCommand("RemoveList");
     });
   } else {
     editor.execCommand("InsertUnorderedList", false, {
       "list-style-type": "none",
-      "list-attributes": { class: CLASS_NAMES.list },
+      "list-attributes": {
+        class: CLASS_NAMES.list,
+        "data-mce-flag": "temp",
+      },
     });
+
+    if (checked) {
+      const checklist = editor
+        .getDoc()
+        .querySelector(`.${CLASS_NAMES.list}[data-mce-flag="temp"]`);
+      toggleChecklistItem(editor, checklist.firstElementChild);
+      checklist.removeAttribute("data-mce-flag");
+    }
   }
 }
 
 function listState(editor, activate) {
-  var nodeChangeHandler = function (e) {
+  var nodeChangeHandler = function(e) {
     var inList = findUntil(e.parents, isListNode, isTableCellNode);
     if (inList)
       inList =
-        inList.filter(function (list) {
+        inList.filter(function(list) {
           return list.className === CLASS_NAMES.list;
         }).length > 0;
     activate(inList);
@@ -119,7 +131,7 @@ function listState(editor, activate) {
   var parents = editor.dom.getParents(editor.selection.getNode());
   nodeChangeHandler({ parents: parents });
   editor.on("NodeChange", nodeChangeHandler);
-  return function () {
+  return function() {
     return editor.off("NodeChange", nodeChangeHandler);
   };
 }
@@ -139,7 +151,7 @@ function findUntil(xs, pred, until) {
 var isListNode = matchNodeNames(/^(OL|UL|DL)$/);
 var isTableCellNode = matchNodeNames(/^(TH|TD)$/);
 function matchNodeNames(regex) {
-  return function (node) {
+  return function(node) {
     return node && regex.test(node.nodeName);
   };
 }
@@ -149,7 +161,7 @@ function matchNodeNames(regex) {
  * @param {HTMLElement} node
  */
 function toggleChecklistItem(editor, node) {
-  editor.undoManager.transact(function () {
+  editor.undoManager.transact(function() {
     const isChecked = node.classList.contains(CLASS_NAMES.checked);
     if (isChecked) node.classList.remove(CLASS_NAMES.checked);
     else node.classList.add(CLASS_NAMES.checked);
