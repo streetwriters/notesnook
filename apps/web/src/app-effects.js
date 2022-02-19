@@ -75,7 +75,7 @@ export default function AppEffects({ setShow }) {
         await resetReminders();
         setIsVaultCreated(await db.vault.exists());
 
-        showOnboardingDialog("new"); //interruptedOnboarding());
+        showOnboardingDialog(interruptedOnboarding());
       })();
       return () => {
         userCheckStatusEvent.unsubscribe();

@@ -227,7 +227,8 @@ function Settings(props) {
               onClick={async () => {
                 const result = await showPasswordDialog(
                   "change_account_password",
-                  (data) => {
+                  async (data) => {
+                    await db.user.clearSessions();
                     return db.user.changePassword(
                       data.oldPassword,
                       data.newPassword
@@ -236,7 +237,6 @@ function Settings(props) {
                 );
                 if (result) {
                   await showToast("success", "Account password changed!");
-                  await db.user.clearSessions();
                 }
               }}
             >

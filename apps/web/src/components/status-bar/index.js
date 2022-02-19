@@ -173,6 +173,7 @@ function SyncStatus() {
       onClick={sync}
       sx={{ alignItems: "center", justifyContent: "center" }}
       title={status.tooltip}
+      data-test-id={`sync-status-${status.key}`}
     >
       <status.icon size={12} color={status.iconColor} rotate={status.loading} />
       <Text variant="subBody" ml={1}>
