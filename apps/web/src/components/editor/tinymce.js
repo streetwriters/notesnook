@@ -288,10 +288,10 @@ function TinyMCE(props) {
 
           async function onPaste(e) {
             if (e.clipboardData?.items?.length) {
-              e.preventDefault();
               for (let item of e.clipboardData.items) {
                 const file = item.getAsFile();
                 if (!file) continue;
+                e.preventDefault();
                 await attachFile(editor, file);
               }
             }
