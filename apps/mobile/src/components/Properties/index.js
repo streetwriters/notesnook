@@ -125,8 +125,8 @@ Properties.present = (item, buttons = []) => {
   let android = [];
   switch (type) {
     case 'trash':
-      props.push(['PermDelete', 'Restore']);
       props[0] = item;
+      props.push(['PermDelete', 'Restore']);
       break;
     case 'note':
       android = Platform.OS === 'android' ? ['PinToNotif'] : [];
