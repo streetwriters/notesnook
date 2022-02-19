@@ -102,6 +102,7 @@ export default class Content extends Collection {
   }
 
   async _insert(contentItem, getData) {
+    if (!contentItem || !getData) return;
     const content = getContentFromData(contentItem.type, contentItem.data);
     contentItem.data = await content.insertMedia(getData);
     return contentItem;
