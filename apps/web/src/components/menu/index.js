@@ -137,6 +137,7 @@ function Menu({ items, data, title, closeMenu }) {
             }}
             isFocused={focusIndex === index}
             onHover={() => {
+              if (item.isDisabled) return;
               setFocusIndex(index);
               setIsSubmenuOpen((state) => {
                 return item.items?.length ? true : state ? false : state;
