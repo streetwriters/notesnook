@@ -4,6 +4,7 @@
   "description": "Export all your data from OneNote into JSON.",
   "main": "index.js",
   "devDependencies": {
+    "@microsoft/microsoft-graph-types-beta": "^0.23.0-preview",
     "@types/node": "^16.11.10",
     "@types/tap": "^15.0.5",
     "tap": "^15.1.2",
@@ -14,5 +15,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@azure/msal-browser": "^2.22.0",
+    "@azure/msal-node": "^1.6.0",
+    "@azure/msal-node-extensions": "^1.0.0-alpha.15",
+    "@microsoft/microsoft-graph-client": "^3.0.1",
+    "node-html-parser": "github:thecodrr/node-html-parser",
+    "dotenv": "^16.0.0",
+    "isomorphic-fetch": "^3.0.0"
+  }
 }
