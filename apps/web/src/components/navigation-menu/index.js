@@ -28,6 +28,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
+import { toTitleCase } from "../../utils/string";
 
 const navigationHistory = new Map();
 function shouldSelectNavItem(route, pin) {
@@ -158,7 +159,7 @@ function NavigationMenu(props) {
           {colors.map((color) => (
             <NavigationItem
               key={color.id}
-              title={db.colors.alias(color.id)}
+              title={toTitleCase(db.colors.alias(color.id))}
               icon={Circle}
               selected={location === `/colors/${color.id}`}
               color={color.title.toLowerCase()}

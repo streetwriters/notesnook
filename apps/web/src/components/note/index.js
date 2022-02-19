@@ -340,18 +340,18 @@ const topicNoteMenuItems = [
 
 function colorsToMenuItems() {
   return COLORS.map((label) => {
-    label = label.toLowerCase();
+    const lowercase = label.toLowerCase();
     return {
-      key: label,
-      title: () => db.colors.alias(label) || label,
+      key: lowercase,
+      title: () => db.colors.alias(lowercase) || label,
       icon: Icon.Circle,
-      iconColor: label,
+      iconColor: lowercase,
       checked: ({ note }) => {
-        return note.color === label;
+        return note.color === lowercase;
       },
       onClick: ({ note }) => {
         const { id } = note;
-        store.setColor(id, label);
+        store.setColor(id, lowercase);
       },
     };
   });
