@@ -121,15 +121,16 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
 Properties.present = (item, buttons = []) => {
   if (!item) return;
   let type = item?.type;
-  let props = [item];
+  let props = [];
   let android = [];
   switch (type) {
     case 'trash':
       props.push(['PermDelete', 'Restore']);
+      props[0] = item;
       break;
     case 'note':
       android = Platform.OS === 'android' ? ['PinToNotif'] : [];
-      item = db.notes.note(item.id).data;
+      props[0] = db.notes.note(item.id).data;
       props.push([
         'Add to notebook',
         'Share',
@@ -149,19 +150,18 @@ Properties.present = (item, buttons = []) => {
       ]);
       break;
     case 'notebook':
-      item = db.notebooks.notebook(item.id).data;
+      props[0] = db.notebooks.notebook(item.id).data;
       props.push(['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete']);
       break;
     case 'topic':
-      item = db.notebooks.notebook(item.notebookId).topics.topic(item.id)._topic;
+      props[0] = db.notebooks.notebook(item.notebookId).topics.topic(item.id)._topic;
       props.push(['Move notes', 'Edit Topic', 'Add Shortcut', 'Delete']);
       break;
     case 'tag':
-      item = db.tags.tag(item.id);
+      props[0] = db.tags.tag(item.id);
       props.push(['Add Shortcut', 'Delete', 'Rename Tag']);
       break;
   }
-
   presentSheet({
     component: (ref, close) => (
       <Properties
