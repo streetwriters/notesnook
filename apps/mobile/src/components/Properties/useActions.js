@@ -350,6 +350,7 @@ export const useActions = ({ close = () => {}, item }) => {
         if (!value || value === '' || value.trimStart().length == 0) return;
         await db.tags.rename(item.id, db.tags.sanitize(value));
         useTagStore.getState().setTags();
+        useMenuStore.getState().setMenuPins();
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notes,
           Navigation.routeNames.NotesPage,

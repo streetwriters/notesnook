@@ -24,16 +24,19 @@ export const ColorSection = () => {
     }
   }, [loading]);
 
-  return colorNotes.map((item, index) => <ColorItem key={item.id} item={item} index={index} />);
+  return colorNotes.map((item, index) => {
+    let alias = db.colors.alias(item.id);
+    return <ColorItem key={item.id} alias={alias} item={item} index={index} />;
+  });
 };
 
 const ColorItem = React.memo(
-  ({ item, index }) => {
+  ({ item, index, alias }) => {
     const [state] = useTracked();
     const { colors } = state;
     const setColorNotes = useMenuStore(state => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);
-    const alias = db.colors.alias(item.id);
+    alias = db.colors.alias(item.id);
 
     const onHeaderStateChange = event => {
       setTimeout(() => {
@@ -146,7 +149,10 @@ const ColorItem = React.memo(
     );
   },
   (prev, next) => {
+    if (prev.item?.dateModified !== next.item?.dateModified) return false;
+    if (prev.alias !== next.alias) return false;
     if (prev.item?.id !== next.item?.id) return false;
+
     return true;
   }
 );

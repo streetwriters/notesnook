@@ -67,6 +67,11 @@ export const TagsSection = () => {
     Navigation.closeDrawer();
   };
 
+  const renderItem = ({ item, index }) => {
+    let alias = item.type === 'tag' ? db.tags.alias(item.title) : item.title;
+    return <PinItem item={item} index={index} alias={alias} onPress={onPress} />;
+  };
+
   return (
     <View
       style={{
@@ -89,18 +94,18 @@ export const TagsSection = () => {
           flexGrow: 1
         }}
         keyExtractor={(item, index) => item.id}
-        renderItem={({ item, index }) => <PinItem item={item} index={index} onPress={onPress} />}
+        renderItem={renderItem}
       />
     </View>
   );
 };
 
 export const PinItem = React.memo(
-  ({ item, index, onPress, placeholder }) => {
+  ({ item, index, onPress, placeholder, alias }) => {
     const [state] = useTracked();
     const { colors } = state;
     const setMenuPins = useMenuStore(state => state.setMenuPins);
-    const alias = item.type === 'tag' ? db.tags.alias(item.title) : item.title;
+    alias = item.type === 'tag' ? db.tags.alias(item.title) : item.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
     const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
@@ -234,6 +239,8 @@ export const PinItem = React.memo(
     );
   },
   (prev, next) => {
+    if (prev.alias !== next.alias) return false;
+    if (prev.item?.dateModified !== next.item?.dateModified) return false;
     if (prev.item?.id !== next.item?.id) return false;
     return true;
   }
