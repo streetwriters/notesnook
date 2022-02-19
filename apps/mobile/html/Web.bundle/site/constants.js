@@ -599,6 +599,7 @@ pre code {
   background-color: transparent !important;
   font-size: 10pt !important;
   padding: 0px 0px 0px 0px !important;
+  overflow-x:auto;
 }
 
 `;
@@ -1008,6 +1009,7 @@ table[data-mce-selected] th[data-mce-active] {
 .hljs[data-mce-selected="inline-boundary"] {
   background-color: ${pageTheme.colors.nav} !important;
 }
+
 
 code:not(pre code),
 .hljs {

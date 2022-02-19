@@ -179,9 +179,16 @@ function attachMessageListener() {
           globalThis.isClearingNoteData = false;
           reactNativeEventHandler('noteLoaded', true);
         }
+
         if (!value.readOnly) {
           tinymce.activeEditor.mode.set('design');
+          document.getElementById('titleInput').readOnly = false;
+        } else {
+          tinymce.activeEditor.mode.set('design');
+          tinymce.activeEditor.mode.set('readonly');
+          document.getElementById('titleInput').readOnly = true;
         }
+
         info = document.querySelector(infoBar);
         info.querySelector('#infowords').innerText = editor.countWords() + ' words';
         updateInfoBar();
