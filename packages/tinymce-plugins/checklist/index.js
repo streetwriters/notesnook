@@ -112,7 +112,8 @@ function insertChecklist(editor, checked = false) {
       const checklist = editor
         .getDoc()
         .querySelector(`.${CLASS_NAMES.list}[data-mce-flag="temp"]`);
-      toggleChecklistItem(editor, checklist.firstElementChild);
+      if (!checklist) return;
+      toggleChecklistItem(editor, checklist.lastElementChild);
       checklist.removeAttribute("data-mce-flag");
     }
   }
