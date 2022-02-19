@@ -177,36 +177,51 @@ function init_callback(_editor) {
     }
     onChange(e);
   });
-
-  editor.on('touchstart mousedown', function (e) {
-    const { target } = e;
-    if (
-      e.offsetX < 6 &&
-      collapsibleTags[target.tagName] &&
-      target.parentElement &&
-      target.parentElement.tagName === 'BODY'
-    ) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-      editor.undoManager.transact(function () {
-        if (target.classList.contains(COLLAPSED_KEY)) {
-          target.classList.remove(COLLAPSED_KEY);
-        } else {
-          target.classList.add(COLLAPSED_KEY);
-        }
-        collapseElement(target);
-        editor
-          .getHTML()
-          .then(function (html) {
-            reactNativeEventHandler('tiny', html);
-          })
-          .catch(function (e) {
-            reactNativeEventHandler('tinyerror', e.message);
-          });
-      });
+  let shouldCancelNextTouchEndEvent = false;
+  editor.on(
+    'touchstart mousedown',
+    function (e) {
+      const { target } = e;
+      if (e.targetTouches.length !== 1) return;
+      let xPos = e.targetTouches[0].clientX;
+      if (
+        xPos < 45 &&
+        collapsibleTags[target.tagName] &&
+        target.parentElement &&
+        target.parentElement.tagName === 'BODY'
+      ) {
+        e.preventDefault();
+        shouldCancelNextTouchEndEvent = true;
+        editor.undoManager.transact(function () {
+          if (target.classList.contains(COLLAPSED_KEY)) {
+            target.classList.remove(COLLAPSED_KEY);
+          } else {
+            target.classList.add(COLLAPSED_KEY);
+          }
+          collapseElement(target);
+          editor.fire('input', { data: '' });
+        });
+      }
+    },
+    {
+      capture: true,
+      passive: false
     }
-  });
+  );
+
+  editor.on(
+    'touchend',
+    e => {
+      if (shouldCancelNextTouchEndEvent) {
+        e.preventDefault();
+        shouldCancelNextTouchEndEvent = false;
+      }
+    },
+    {
+      capture: true,
+      passive: false
+    }
+  );
 
   editor.on('tap', function (e) {
     if (e.target.classList.contains('mce-content-body') && !e.target.innerText.length > 0) {
