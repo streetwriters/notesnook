@@ -45,10 +45,11 @@ export async function attachFile(editor, selectedFile) {
   }
   if (selectedFile.type.startsWith("image/")) {
     const image = await pickImage(selectedFile);
-    console.log(image);
+    if (!image) return;
     editor.execCommand("mceAttachImage", image);
   } else {
     const file = await pickFile(selectedFile);
+    if (!file) return;
     editor.execCommand("mceAttachFile", file);
   }
 }
@@ -203,5 +204,6 @@ async function addAttachment(file, dataurl) {
       };
     },
   });
+  if (result instanceof Error) throw result;
   return result;
 }
