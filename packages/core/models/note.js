@@ -105,8 +105,8 @@ export default class Note {
     if (!(await checkIsUserPremium(CHECK_IDS.noteColor))) return;
     await this.uncolor();
     let tag = await this._db.colors.add(color, this._note.id);
-    await this._db.notes._collection.addItem({
-      ...this._note,
+    await this._db.notes.add({
+      id: this.id,
       color: tag.title,
     });
   }
@@ -114,8 +114,8 @@ export default class Note {
   async uncolor() {
     if (!this._note.color) return;
     await this._db.colors.untag(this._note.color, this._note.id);
-    await this._db.notes._collection.addItem({
-      ...this._note,
+    await this._db.notes.add({
+      id: this.id,
       color: undefined,
     });
   }
@@ -129,12 +129,12 @@ export default class Note {
 
     let tagItem = await this._db.tags.add(tag, this._note.id);
     if (addItem(this._note.tags, tagItem.title))
-      await this._db.notes._collection.addItem(this._note);
+      await this._db.notes.add(this._note);
   }
 
   async untag(tag) {
     if (deleteItem(this._note.tags, tag)) {
-      await this._db.notes._collection.addItem(this._note);
+      await this._db.notes.add(this._note);
     } else console.error("This note is not tagged by the specified tag.", tag);
     await this._db.tags.untag(tag, this._note.id);
   }
@@ -152,6 +152,6 @@ export default class Note {
   }
 
   readonly() {
-    return this._toggle("readonly")
+    return this._toggle("readonly");
   }
 }
