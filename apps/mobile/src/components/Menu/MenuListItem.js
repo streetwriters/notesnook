@@ -129,6 +129,7 @@ export const MenuListItem = React.memo(
   },
   (prev, next) => {
     if (prev.item.name !== next.item.name) return false;
+    if (prev.rightBtn?.name !== next.rightBtn?.name) return false;
     return true;
   }
 );
