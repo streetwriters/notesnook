@@ -45,14 +45,15 @@ function Editor({ noteId, nonce }) {
   const [isEditorLoading, setIsEditorLoading] = useState(true);
   const sessionId = useStore((store) => store.session.id);
   const sessionState = useStore((store) => store.session.state);
-  const isPreviewMode = useStore((store) => store.session.previewMode);
-  const isReadonly = useStore((store) => store.session.readonly);
+  const sessionType = useStore((store) => store.session.sessionType);
+  const isPreviewMode = sessionType === "preview";
+  const isReadonly = useStore(
+    (store) => store.session.readonly || isPreviewMode
+  );
   const contentId = useStore((store) => store.session.contentId);
-  const contentType = useStore((store) => store.session.content?.type);
   const saveSession = useStore((store) => store.saveSession);
   const newSession = useStore((store) => store.newSession);
   const openSession = useStore((store) => store.openSession);
-  const closePreviewSession = useStore((store) => store.closePreviewSession);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const init = useStore((store) => store.init);
@@ -67,10 +68,10 @@ function Editor({ noteId, nonce }) {
   }, [init]);
 
   const startSession = useCallback(
-    async function startSession(noteId) {
+    async function startSession(noteId, force) {
       if (noteId === 0) newSession(nonce);
       else if (noteId) {
-        await openSession(noteId);
+        await openSession(noteId, force);
       }
     },
     [newSession, openSession, nonce]
@@ -84,19 +85,18 @@ function Editor({ noteId, nonce }) {
   }, []);
 
   const setContent = useCallback(() => {
-    const {
-      id,
-      content: { data },
-    } = editorstore.get().session;
+    const { id } = editorstore.get().session;
     const editor = editorRef.current?.editor;
     if (!editor || !editor.initialized) return;
 
     async function setContents() {
-      if (data) editorSetContent(editor, data);
+      console.log("SET CONTENT");
+      let content = await editorstore.get().getSessionContent();
+      if (content?.data) editorSetContent(editor, content.data);
       else clearContent(editor);
 
       editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
-      if (id) await db.attachments.downloadImages(id);
+      if (id && content) await db.attachments.downloadImages(id);
     }
     setContents();
   }, [clearContent]);
@@ -108,25 +108,13 @@ function Editor({ noteId, nonce }) {
 
   const disablePreviewMode = useCallback(
     async (cancelled) => {
-      const {
-        content,
-        oldContent,
-        oldDateEdited,
-        oldSessionId,
-        oldDateCreated,
-      } = editorstore.get().session;
-
-      closePreviewSession({
-        dateCreated: oldDateCreated,
-        dateEdited: cancelled ? oldDateEdited : Date.now(),
-        sessionId: cancelled ? oldSessionId : Date.now(),
-        content: cancelled ? oldContent : content,
-      });
-      if (cancelled) setContent();
-
-      editorRef.current?.editor?.mode.set("design");
+      const { id, content } = editorstore.get().session;
+      if (!cancelled) {
+        await editorstore.get().setSessionContent(content);
+      }
+      await startSession(id, true);
     },
-    [closePreviewSession, setContent]
+    [startSession]
   );
 
   useEffect(
@@ -160,12 +148,14 @@ function Editor({ noteId, nonce }) {
 
   useEffect(() => {
     const editor = editorRef.current?.editor;
-    if (editor)
-      if (isReadonly) {
-        editor.mode.set("readonly");
-      } else {
-        editor.mode.set("design");
-      }
+    if (!editor) return;
+
+    if (isReadonly) {
+      console.log("READONLy");
+      editor.mode.set("readonly");
+    } else {
+      editor.mode.set("design");
+    }
   }, [isReadonly]);
 
   useEffect(
@@ -228,13 +218,13 @@ function Editor({ noteId, nonce }) {
         />
         {isPreviewMode && (
           <Notice
-            title={"Readonly mode"}
+            title={"Preview"}
             subtitle={`You are previewing note version edited from ${formatDate(
               editorstore.get().session.dateCreated
             )} to ${formatDate(editorstore.get().session.dateEdited)}.`}
             onCancel={() => disablePreviewMode(true)}
             action={{
-              text: "Restore this version",
+              text: "Restore",
               onClick: async () => {
                 await disablePreviewMode(false);
                 await editorstore.get().saveSession();
@@ -261,37 +251,33 @@ function Editor({ noteId, nonce }) {
 
           {isSessionReady && (
             <Suspense fallback={<div />}>
-              {contentType === "tiny" ? (
-                <>
-                  <ReactMCE
-                    editorRef={editorRef}
-                    onFocus={() => toggleProperties(false)}
-                    onSave={saveSession}
-                    sessionId={sessionId}
-                    onChange={(content, editor) => {
-                      if (!content) return;
+              <ReactMCE
+                editorRef={editorRef}
+                onFocus={() => toggleProperties(false)}
+                onSave={saveSession}
+                sessionId={sessionId}
+                onChange={(content, editor) => {
+                  if (!content) return;
 
-                      editorstore.get().setSessionContent({
-                        type: "tiny",
-                        data: content,
-                      });
+                  editorstore.get().setSessionContent({
+                    type: "tiny",
+                    data: content,
+                  });
 
-                      debouncedUpdateWordCount(editor);
-                    }}
-                    changeInterval={100}
-                    onInit={(editor) => {
-                      if (sessionId && editorstore.get().session.contentId) {
-                        setContent();
-                      } else if (nonce) clearContent();
+                  debouncedUpdateWordCount(editor);
+                }}
+                changeInterval={100}
+                onInit={(editor) => {
+                  if (sessionId && editorstore.get().session.contentId) {
+                    setContent();
+                  } else if (nonce) clearContent();
 
-                      setTimeout(() => {
-                        setIsEditorLoading(false);
-                        // a short delay to make sure toolbar has rendered.
-                      }, 100);
-                    }}
-                  />
-                </>
-              ) : null}
+                  setTimeout(() => {
+                    setIsEditorLoading(false);
+                    // a short delay to make sure toolbar has rendered.
+                  }, 100);
+                }}
+              />
             </Suspense>
           )}
         </Flex>

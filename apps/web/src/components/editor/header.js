@@ -30,7 +30,7 @@ function Header({ readonly }) {
 
       {!readonly && id && (
         <Flex alignItems="center" flexWrap="wrap" sx={{ lineHeight: 2.5 }}>
-          {tags.map((tag) => (
+          {tags?.map((tag) => (
             <IconTag
               testId={`tag-${tag}`}
               key={tag}

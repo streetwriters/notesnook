@@ -59,8 +59,10 @@ function Properties() {
     color,
     notebooks,
     attachments,
-    previewMode: isPreviewMode,
+    sessionType,
+    dateCreated,
   } = session;
+  const isPreviewMode = sessionType === "preview";
 
   const changeState = useCallback(
     function changeState(prop, value) {
@@ -225,7 +227,7 @@ function Properties() {
               </>
             )}
           </Card>
-          {!!notebooks?.length && (
+          {notebooks?.length > 0 && (
             <Card title="Referenced In">
               {notebooks.map((ref) => {
                 const notebook = db.notebooks.notebook(ref.id);
@@ -285,7 +287,7 @@ function Properties() {
               })}
             </Card>
           )}
-          {attachments.length > 0 && (
+          {attachments?.length > 0 && (
             <Card
               title="Attachments"
               subtitle={`${attachments.length} attachments`}
@@ -404,6 +406,8 @@ function Properties() {
               const label = `${fromDate}, ${fromTime} — ${
                 fromDate !== toDate ? `${toDate}, ` : ""
               }${toTime}`;
+              const isSelected =
+                isPreviewMode && session.dateCreated === dateCreated;
 
               return (
                 <Flex
@@ -412,6 +416,7 @@ function Properties() {
                   px={2}
                   sx={{
                     cursor: "pointer",
+                    bg: isSelected ? "bgSecondary" : "transparent",
                     ":hover": {
                       bg: "hover",
                     },

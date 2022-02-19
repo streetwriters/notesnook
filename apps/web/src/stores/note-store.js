@@ -3,6 +3,7 @@ import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
 import { store as appStore } from "./app-store";
+import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
@@ -32,6 +33,7 @@ class NoteStore extends BaseStore {
   };
 
   setSelectedNote = (id) => {
+    if (id === 0) selectionStore.get().toggleSelectionMode(false);
     this.set((state) => (state.selectedNote = id));
   };
 
@@ -116,10 +118,10 @@ class NoteStore extends BaseStore {
   };
 
   readonly = async (id) => {
-    const note = db.notes.note(id)
+    const note = db.notes.note(id);
     await note.readonly();
     this.refresh();
-  }
+  };
 
   setColor = async (id, color) => {
     try {
