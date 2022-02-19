@@ -49,7 +49,7 @@ const useTooltip = () => {
     target.current && RNTooltips.Dismiss(target.current);
     currentTargets.push(target.current._nativeTag);
     timers[timers.length] = setTimeout(() => {
-      TipManager.markPopupUsed(popup.id);
+      //TipManager.markPopupUsed(popup.id);
       console.log('tooltip showing', popup.text);
       RNTooltips.Show(target.current, parent.current, {
         text: popup.text,
@@ -72,11 +72,13 @@ type TTooltipIdentifiers = 'sectionheader' | 'searchreplace' | 'notebookshortcut
 
 export const useTooltipHandler = (id: TTooltipIdentifiers, callback: () => void) => {
   useEffect(() => {
+    if (!id) return;
     eSubscribeEvent(id, callback);
     return () => {
       eUnSubscribeEvent(id, callback);
     };
   }, []);
+  return null;
 };
 
 useTooltip.present = (id: TTooltipIdentifiers) => {

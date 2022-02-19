@@ -9,13 +9,11 @@ import {
   presentSheet
 } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import { TipManager } from '../../services/tip-manager';
 import { GROUP } from '../../utils';
 import { COLORS_NOTE } from '../../utils/Colors';
 import { db } from '../../utils/database';
 import { eOpenJumpToDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
-import useTooltip, { useTooltipHandler } from '../../utils/use-tooltip';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 import Sort from '../Sort';
@@ -27,27 +25,9 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
   const { fontScale } = useWindowDimensions();
   const [groupOptions, setGroupOptions] = useState(db.settings?.getGroupOptions(type));
   let groupBy = Object.keys(GROUP).find(key => GROUP[key] === groupOptions.groupBy);
-  const tooltip = useTooltip();
   const jumpToRef = useRef();
   const sortRef = useRef();
   const compactModeRef = useRef();
-
-  useTooltipHandler('sectionheader', () => {
-    let popup =
-      TipManager.popup('sortmenu') || TipManager.popup('jumpto') || TipManager.popup('compactmode');
-    if (!popup) return;
-    switch (popup.id) {
-      case 'sortmenu':
-        tooltip.show(sortRef, popup, 'top');
-        break;
-      case 'jumpto':
-        tooltip.show(jumpToRef, popup, 'top');
-        break;
-      case 'compactmode':
-        tooltip.show(compactModeRef, popup, 'top');
-        break;
-    }
-  });
 
   const settings = useSettingStore(state => state.settings);
   const listMode = type === 'notebooks' ? settings.notebooksListMode : settings.notesListMode;
@@ -69,7 +49,6 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
 
   return (
     <View
-      ref={tooltip.parent}
       style={{
         flexDirection: 'row',
         alignItems: 'center',

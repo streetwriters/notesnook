@@ -83,7 +83,7 @@ export class TipManager {
   static popup(id: string) {
     let pop = popups.find(p => p.id === id);
     //@ts-ignore
-    if (popState[id]) return null;
+    //  if (popState[id]) return null;
 
     return pop;
   }

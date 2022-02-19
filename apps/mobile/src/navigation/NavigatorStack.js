@@ -9,6 +9,7 @@ import Navigation from '../services/Navigation';
 import { history } from '../utils';
 import { MMKV } from '../utils/mmkv';
 import { rootNavigatorRef } from '../utils/Refs';
+import { hideAllTooltips } from '../utils/use-tooltip';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
@@ -32,6 +33,7 @@ export const NavigatorStack = React.memo(
       if (history.selectionMode) {
         clearSelection(true);
       }
+      hideAllTooltips();
       eSendEvent('navigate');
     });
 

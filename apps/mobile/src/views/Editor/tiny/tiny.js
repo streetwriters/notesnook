@@ -11,7 +11,7 @@ const toogleReadMode = mode => `
 tinymce.activeEditor.mode.set('${mode}')
 setTimeout(() => {
   document.getElementById("titleInput").readOnly = ${mode === 'design' ? 'false' : 'true'};
-},1000);
+},300);
 `;
 
 const reset = id => `

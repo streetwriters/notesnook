@@ -32,15 +32,7 @@ const SearcReplace = () => {
     replace: null
   });
   const switchModeRef = useRef();
-  const tooltip = useTooltip();
   const valueChangeTimer = useRef();
-
-  useTooltipHandler('searchreplace', () => {
-    let popup = TipManager.popup('searchreplace');
-    if (popup) {
-      tooltip.show(switchModeRef, popup, 'top');
-    }
-  });
 
   async function searchWithSelection() {
     values.current.find = searchSelection;
@@ -53,13 +45,6 @@ const SearcReplace = () => {
   useEffect(() => {
     searchWithSelection();
   }, [searchSelection]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      findRef.current?.focus();
-      setTimeout(() => useTooltip.present('searchreplace'), 1000);
-    }, 300);
-  }, []);
 
   function find() {
     if (!values.current?.find) return;
@@ -188,7 +173,6 @@ const SearcReplace = () => {
 
   return (
     <View
-      ref={tooltip.parent}
       style={{
         width: '100%',
         backgroundColor: colors.bg,

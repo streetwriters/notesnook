@@ -1,13 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useTracked } from '../../provider';
 import { useMenuStore } from '../../provider/stores';
 import { ToastEvent } from '../../services/EventManager';
-import { TipManager } from '../../services/tip-manager';
 import { getTotalNotes } from '../../utils';
 import { db } from '../../utils/database';
 import { SIZE } from '../../utils/SizeUtils';
-import useTooltip, { useTooltipHandler } from '../../utils/use-tooltip';
 import { ActionIcon } from '../ActionIcon';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -18,19 +16,7 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(notebook.id));
   const setMenuPins = useMenuStore(state => state.setMenuPins);
   const totalNotes = getTotalNotes(notebook);
-  const tooltip = useTooltip();
   const shortcutRef = useRef();
-
-  useTooltipHandler('notebookshortcut', () => {
-    const popup = TipManager.popup('notebookshortcut');
-    if (popup) {
-      tooltip.show(shortcutRef, popup, 'top');
-    }
-  });
-
-  useEffect(() => {
-    useTooltip.present('notebookshortcut');
-  }, []);
 
   const onPinNotebook = async () => {
     try {
@@ -50,7 +36,6 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
 
   return (
     <View
-      ref={tooltip.parent}
       style={{
         marginBottom: 5,
         padding: 0,
