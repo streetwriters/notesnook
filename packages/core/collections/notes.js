@@ -41,7 +41,8 @@ export default class Notes extends Collection {
 
     if (oldNote) note.contentId = oldNote.contentId;
 
-    if (!oldNote && !noteArg.content && !noteArg.contentId) return;
+    if (!oldNote && !noteArg.content && !noteArg.contentId && !noteArg.title)
+      return;
 
     if (noteArg.content && noteArg.content.data && noteArg.content.type) {
       const { type, data } = noteArg.content;
