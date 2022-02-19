@@ -2,7 +2,6 @@ attachTitleInputListeners();
 autosize();
 function reactNativeEventHandler(type, value) {
   if (window.ReactNativeWebView) {
-    console.log('type', type, 'id:', sessionId);
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: type,
@@ -128,7 +127,6 @@ function onUndoChange() {
 
 function init_callback(_editor) {
   editor = _editor;
-  //console.log('init_call', editor);
   setTheme();
 
   editor.on('SelectionChange', function (e) {
@@ -168,7 +166,6 @@ function init_callback(_editor) {
   // });
 
   editor.on('NewBlock', function (e) {
-    console.log('New Block', e);
     const { newBlock } = e;
     let target;
     if (newBlock) {
@@ -219,7 +216,6 @@ function init_callback(_editor) {
 
   editor.on('ScrollIntoView', function (e) {
     e.preventDefault();
-    console.log(e);
     e.elm.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest'
@@ -228,7 +224,6 @@ function init_callback(_editor) {
 
   editor.on('input ExecCommand ObjectResized Redo Undo ListMutation', onChange);
   editor.on('keyup', function (e) {
-    console.log('keyup: ', e);
     if (e.key !== 'Backspace') return;
     onChange(e);
   });
@@ -351,7 +346,6 @@ function tableCellNodeOptions() {
 
 function findNodeParent(nodeName) {
   let node = editor.selection.getNode();
-  console.log('finding node', node);
   let levels = 5;
   for (let i = 0; i < levels; i++) {
     if (!node) return;
@@ -378,7 +372,6 @@ function tableRowNodeOptions() {
 
 function init_tiny(size) {
   loadFontSize();
-  console.log('init tinymce');
   tinymce.init({
     selector: '#tiny_textarea',
     menubar: false,
@@ -495,7 +488,6 @@ function setup_tiny(_editor) {
     icon: 'more-drawer',
     tooltip: 'Table properties',
     onAction: function (e) {
-      console.log(e, 'event');
       reactNativeEventHandler('tableconfig');
     }
   });
@@ -579,12 +571,10 @@ function scrollSelectionIntoView(event) {
     event.data &&
     event.data.endsWith('\n')
   ) {
-    console.log(event);
     clearTimeout(inputKeyTimer);
     inputKeyTimer = setTimeout(function () {
       let node = editor.selection.getNode();
       if (node) {
-        console.log(node, 'scrolling into view');
         node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, 1);
@@ -615,7 +605,6 @@ const onChange = function (event) {
   }
 
   if (prevCount === 0 && event.type !== 'paste') return;
-  console.log(event);
   if (event.type !== 'compositionend') {
     if (!noteedited) {
       noteedited = true;
@@ -649,7 +638,6 @@ function updateCount(timer = 1000) {
     info = document.querySelector('.info-bar');
     info.querySelector('#infowords').innerText = count + ' words';
     prevCount = count;
-    console.log('timer', 'updating here');
   } else {
     countTimer = setTimeout(function () {
       let count = editor.countWords();
