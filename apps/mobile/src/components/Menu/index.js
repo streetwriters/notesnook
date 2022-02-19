@@ -7,11 +7,13 @@ import { Actions } from '../../provider/Actions';
 import { useSettingStore, useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
+import SettingsService from '../../services/SettingsService';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  COLOR_SCHEME_PITCH_BLACK,
   setColorScheme
 } from '../../utils/Colors';
 import { eOpenPremiumDialog } from '../../utils/Events';
@@ -42,9 +44,11 @@ export const Menu = React.memo(
         name: colors.night ? 'Day' : 'Night',
         icon: 'theme-light-dark',
         func: () => {
-          if (!colors.night) {
+          if (!COLOR_SCHEME.night) {
             MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
-            changeColorScheme(COLOR_SCHEME_DARK);
+            changeColorScheme(
+              SettingsService.get().pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK
+            );
           } else {
             MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
             changeColorScheme(COLOR_SCHEME_LIGHT);
