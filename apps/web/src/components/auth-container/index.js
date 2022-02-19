@@ -142,8 +142,13 @@ function AuthContainer(props) {
 
             <Text variant="body" mt={10} fontSize={14} color="icon">
               {testimonial.text} —{" "}
-              <Text as="a" color="icon" href={testimonial.link}>
-                Source
+              <Text
+                as="a"
+                sx={{ fontStyle: "italic" }}
+                color="icon"
+                href={testimonial.link}
+              >
+                source
               </Text>
             </Text>
             <Flex alignItems={"center"} justifyContent="center" mt={2}>
