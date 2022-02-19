@@ -8,8 +8,6 @@ import { showItemDeletedToast } from "./toasts";
 import { TaskManager } from "./task-manager";
 
 async function moveNotesToTrash(notes: any[]) {
-  console.log(notes);
-
   const item = notes[0];
   const isMultiselect = notes.length > 1;
   if (isMultiselect) {
@@ -20,6 +18,7 @@ async function moveNotesToTrash(notes: any[]) {
       !(await Vault.unlockNote(item.id, "unlock_and_delete_note"))
     )
       return;
+    item.locked = false;
   }
 
   const items = notes.map((item) => {

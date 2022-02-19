@@ -51,7 +51,7 @@ function Header(props) {
               size={24}
               title={buttons.back.title}
               onClick={buttons.back.action}
-              sx={{ flexShrink: 0, mr: 2 }}
+              sx={{ flexShrink: 0, mr: 2, cursor: "pointer" }}
               color="text"
               data-test-id="go-back"
             />
