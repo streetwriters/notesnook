@@ -407,6 +407,7 @@ span.attachment em::before {
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
   font-size: 10pt !important;
+  overflow-x:auto !important;
 }
 
 .tox-checklist > li,
@@ -599,7 +600,7 @@ pre code {
   background-color: transparent !important;
   font-size: 10pt !important;
   padding: 0px 0px 0px 0px !important;
-  overflow-x:auto;
+  overflow-x:auto !important;
 }
 
 `;
