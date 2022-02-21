@@ -159,7 +159,7 @@ function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
 }
 
 function createIcon(name, rotate = false) {
-  return function NNIcon(props) {
+  const NNIcon = function NNIcon(props) {
     const [isHovering, setIsHovering] = useState();
     return (
       <AnimatedFlex
@@ -190,6 +190,8 @@ function createIcon(name, rotate = false) {
       </AnimatedFlex>
     );
   };
+  NNIcon.isReactComponent = true;
+  return NNIcon;
 }
 
 export const Plus = createIcon(mdiPlus);

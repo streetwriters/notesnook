@@ -226,7 +226,7 @@ function mapMenuItems(items, data) {
 function resolveProp(prop, data, item) {
   const isFunction = typeof prop === "function";
   if (isFunction) {
-    return prop.name === "NNIcon" ? prop : prop(data, item);
+    return prop.isReactComponent ? prop : prop(data, item);
   }
   return prop;
 }
