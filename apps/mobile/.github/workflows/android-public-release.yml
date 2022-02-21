@@ -1,0 +1,51 @@
+name: Android Release
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@master
+        with:
+          node-version: '16'
+
+      - name: Use specific Java version for the builds
+        uses: joschi/setup-jdk@v2
+        with:
+          java-version: '11'
+          architecture: 'x64'
+
+      - name: Install node modules
+        run: |
+          npm install
+
+      - name: Make Gradlew Executable
+        run: cd android && chmod +x ./gradlew
+
+      - name: Build Android App APKS
+        run: |
+          cd android && ./gradlew assembleRelease --no-daemon
+
+      - name: Sign APK Files
+        id: sign_app
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: android/app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.PUBLIC_SIGNING_KEY }}
+          alias: ${{ secrets.PUBLIC_ALIAS }}
+          keyStorePassword: ${{ secrets.PUBLIC_KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Signed App Bundle
+          path: ${{steps.sign_app.outputs.signedReleaseFile}}
