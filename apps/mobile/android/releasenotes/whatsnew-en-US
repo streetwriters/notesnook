@@ -4,8 +4,6 @@
 - Overhauled App lock UI
 - Added new placeholders with useful tips about app features
 - Added Auto search on typing in Search/Replace
-- Added new walkthrough for notesnooks for new users
-- Added walkthroughs for pro/trial users
 - Allow to opt-out of getting "Backup completed" dialogs on app launch when automatic backups are turned on
 - Disable swipe gestures when selecting multiple notes
 - Fixed Search/Replace does not accept spaces

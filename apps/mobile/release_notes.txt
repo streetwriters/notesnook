@@ -2,7 +2,6 @@
 - Added read only mode for notes
 - Added new placeholders with useful tips about app features
 - Added Auto search on typing in Search/Replace
-- Added new walkthrough for notesnooks for new users
 - Overhauled Auth flows with new UI/UX
 - Overhauled App lock UI
 - Added walkthroughs for pro/trial users
