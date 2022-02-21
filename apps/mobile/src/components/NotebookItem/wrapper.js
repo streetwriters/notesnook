@@ -1,14 +1,14 @@
 import React from 'react';
-import {NotebookItem} from '.';
-import {useSelectionStore} from '../../provider/stores';
-import {eSendEvent} from '../../services/EventManager';
+import { NotebookItem } from '.';
+import { useSelectionStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {history} from '../../utils';
-import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
+import { history } from '../../utils';
+import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
 import SelectionWrapper from '../SelectionWrapper';
 
 export const NotebookWrapper = React.memo(
-  ({item, index,dateBy}) => {
+  ({ item, index, dateBy }) => {
     const isTrash = item.type === 'trash';
     const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
 
@@ -23,7 +23,7 @@ export const NotebookWrapper = React.memo(
 
       let params =
         item.type === 'topic'
-          ? {...item, menu: false}
+          ? { ...item, menu: false }
           : {
               menu: false,
               notebook: item,
@@ -47,7 +47,8 @@ export const NotebookWrapper = React.memo(
         index={index}
         onPress={onPress}
         height={item.type === 'topic' ? 80 : 110}
-        item={item}>
+        item={item}
+      >
         <NotebookItem
           isTopic={item.type === 'topic'}
           item={item}
@@ -59,7 +60,7 @@ export const NotebookWrapper = React.memo(
     );
   },
   (prev, next) => {
-    if (prev.dateBy !== next.dateBy ) {
+    if (prev.dateBy !== next.dateBy) {
       return false;
     }
 

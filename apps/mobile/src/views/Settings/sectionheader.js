@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-	TouchableOpacity
-} from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
@@ -9,9 +7,9 @@ import { useTracked } from '../../provider';
 import layoutmanager from '../../utils/layout-manager';
 import { SIZE } from '../../utils/SizeUtils';
 
-const SectionHeader = ({title, collapsed, setCollapsed}) => {
+const SectionHeader = ({ title, collapsed, setCollapsed }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   return (
     <TouchableOpacity
@@ -32,11 +30,10 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
         marginTop: 5,
         borderBottomWidth: 1,
         borderBottomColor: colors.nav
-      }}>
+      }}
+    >
       {collapsed ? (
-        <Paragraph
-          size={SIZE.md + 1}
-          color={collapsed ? colors.icon : colors.accent}>
+        <Paragraph size={SIZE.md + 1} color={collapsed ? colors.icon : colors.accent}>
           {title}
         </Paragraph>
       ) : (

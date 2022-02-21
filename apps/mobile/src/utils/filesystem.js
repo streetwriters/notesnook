@@ -1,12 +1,12 @@
 import React from 'react';
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-import {ShareComponent} from '../components/ExportDialog/share';
-import {useAttachmentStore} from '../provider/stores';
-import {presentSheet, ToastEvent} from '../services/EventManager';
-import {db} from './database';
+import { ShareComponent } from '../components/ExportDialog/share';
+import { useAttachmentStore } from '../provider/stores';
+import { presentSheet, ToastEvent } from '../services/EventManager';
+import { db } from './database';
 import Storage from './storage';
 
 const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
@@ -18,7 +18,7 @@ async function readEncrypted(filename, key, cipherData) {
     if (!exists) {
       return false;
     }
-   
+
     let output = await Sodium.decryptFile(
       key,
       {
@@ -43,8 +43,8 @@ function randId(prefix) {
     .replace('0.', prefix || '');
 }
 
-async function writeEncrypted(filename, {data, type, key}) {
-  console.log('file input: ', {type, key});
+async function writeEncrypted(filename, { data, type, key }) {
+  console.log('file input: ', { type, key });
   let filepath = cacheDir + `/${randId('imagecache_')}`;
   console.log(filepath);
   await RNFetchBlob.fs.writeFile(filepath, data, 'base64');
@@ -63,7 +63,7 @@ async function writeEncrypted(filename, {data, type, key}) {
 
 async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
-  let {url, headers} = data;
+  let { url, headers } = data;
 
   console.log('uploading file: ', filename, headers);
   try {
@@ -71,9 +71,10 @@ async function uploadFile(filename, data, cancelToken) {
       method: 'PUT',
       headers
     });
+    if (!res.ok) throw new Error(`${res.status}: Unable to resolve upload url`);
     const uploadUrl = await res.text();
-    console.log(uploadUrl);
-    console.log(uploadUrl);
+    if (!uploadUrl) throw new Error('Unable to resolve upload url');
+
     let request = RNFetchBlob.config({
       IOSBackgroundTask: true
     })
@@ -86,9 +87,7 @@ async function uploadFile(filename, data, cancelToken) {
         RNFetchBlob.wrap(`${cacheDir}/${filename}`)
       )
       .uploadProgress((sent, total) => {
-        useAttachmentStore
-          .getState()
-          .setProgress(sent, total, filename, 0, 'upload');
+        useAttachmentStore.getState().setProgress(sent, total, filename, 0, 'upload');
         console.log('uploading: ', sent, total);
       });
     cancelToken.cancel = request.cancel;
@@ -96,8 +95,7 @@ async function uploadFile(filename, data, cancelToken) {
 
     let status = response.info().status;
     let text = await response.text();
-
-    let result = status >= 200 && status < 300 && text.length === 0
+    let result = status >= 200 && status < 300 && text.length === 0;
     useAttachmentStore.getState().remove(filename);
     if (result) {
       let attachment = db.attachments.attachment(filename);
@@ -115,44 +113,72 @@ async function uploadFile(filename, data, cancelToken) {
   }
 }
 
+function valueFromXml(code, xml) {
+  if (!xml.includes(code)) return `Unknown ${code}`;
+  return xml.slice(xml.indexOf(`<${code}>`) + code.length + 2, xml.indexOf(`</${code}>`));
+}
+
+async function fileCheck(response, totalSize) {
+  if (totalSize < 1000) {
+    let text = await response.text();
+    console.log(text);
+    if (text.startsWith('<?xml')) {
+      let errorJson = {
+        Code: valueFromXml('Code', text),
+        Message: valueFromXml('Message', text)
+      };
+      throw new Error(`${errorJson.Code}: ${errorJson.Message}`);
+    }
+  }
+}
+
 async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
-  let {url, headers, metadata} = data;
+  let { url, headers } = data;
 
   console.log('downloading file: ', filename, url);
   let path = `${cacheDir}/${filename}`;
   try {
     let exists = await RNFetchBlob.fs.exists(path);
     if (exists) {
+      console.log(await RNFetchBlob.fs.readFile(path, 'utf8'));
       console.log('file is downloaded');
       return true;
     }
-    console.log('downloading again');
+
     let res = await fetch(url, {
       method: 'GET',
       headers
     });
+    if (!res.ok) throw new Error(`${res.status}: Unable to resolve download url`);
     const downloadUrl = await res.text();
-    console.log(downloadUrl);
+
+    if (!downloadUrl) throw new Error('Unable to resolve download url');
+    let totalSize = 0;
     let request = RNFetchBlob.config({
       path: path,
       IOSBackgroundTask: true
     })
       .fetch('GET', downloadUrl, null)
       .progress((recieved, total) => {
-        useAttachmentStore
-          .getState()
-          .setProgress(0, total, filename, recieved, 'download');
+        useAttachmentStore.getState().setProgress(0, total, filename, recieved, 'download');
+        totalSize = total;
         console.log('downloading: ', recieved, total);
       });
-    
+
     cancelToken.cancel = request.cancel;
     let response = await request;
-    
+    await fileCheck(response, totalSize);
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
     return status >= 200 && status < 300;
   } catch (e) {
+    ToastEvent.show({
+      heading: 'Error downloading file',
+      message: e.message,
+      type: 'error'
+    });
+
     useAttachmentStore.getState().remove(filename);
     RNFetchBlob.fs.unlink(path).catch(console.log);
     console.log('download file error: ', e, url, headers);
@@ -168,7 +194,7 @@ async function deleteFile(filename, data) {
     return true;
   }
 
-  let {url, headers} = data;
+  let { url, headers } = data;
   try {
     let response = await RNFetchBlob.fetch('DELETE', url, headers);
     let status = response.info().status;
@@ -188,9 +214,9 @@ function cancelable(operation) {
   const cancelToken = {
     cancel: () => {}
   };
-  return (filename, {url, headers}) => {
+  return (filename, { url, headers }) => {
     return {
-      execute: () => operation(filename, {url, headers}, cancelToken),
+      execute: () => operation(filename, { url, headers }, cancelToken),
       cancel: async () => {
         await cancelToken.cancel();
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
@@ -205,23 +231,19 @@ async function downloadAttachment(hash, global = true) {
     console.log('attachment not found');
     return;
   }
+
   let folder = {};
   if (Platform.OS === 'android') {
-    folder = await ScopedStorage.openDocumentTree(false);
+    folder = await ScopedStorage.openDocumentTree();
     if (!folder) return;
   } else {
     folder.uri = await Storage.checkAndCreateDir('/downloads/');
   }
 
   try {
-    await db.fs.downloadFile(
-      attachment.metadata.hash,
-      attachment.metadata.hash
-    );
-    if (
-      !(await RNFetchBlob.fs.exists(`${cacheDir}/${attachment.metadata.hash}`))
-    )
-      return;
+    await db.fs.downloadFile(attachment.metadata.hash, attachment.metadata.hash);
+    if (!(await RNFetchBlob.fs.exists(`${cacheDir}/${attachment.metadata.hash}`))) return;
+
     let key = await db.attachments.decryptKey(attachment.key);
     console.log('attachment key', key);
     let info = {
@@ -243,9 +265,13 @@ async function downloadAttachment(hash, global = true) {
       message: attachment.metadata.filename + ' downloaded',
       type: 'success'
     });
-    RNFetchBlob.fs
-      .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
-      .catch(console.log);
+
+    if (attachment.dateUploaded) {
+      console.log('Deleting attachment after download', attachment.dateUploaded);
+      RNFetchBlob.fs
+        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
+        .catch(console.log);
+    }
 
     if (Platform.OS === 'ios') {
       fileUri = folder.uri + `/${attachment.metadata.filename}`;
@@ -255,23 +281,21 @@ async function downloadAttachment(hash, global = true) {
     presentSheet({
       title: `File downloaded`,
       paragraph: `${attachment.metadata.filename} saved to ${
-        Platform.OS === 'android'
-          ? 'selected path'
-          : 'File Manager/Notesnook/downloads'
+        Platform.OS === 'android' ? 'selected path' : 'File Manager/Notesnook/downloads'
       }`,
       icon: 'download',
       context: global ? null : attachment.metadata.hash,
-      component: (
-        <ShareComponent
-          uri={fileUri}
-          name={attachment.metadata.filename}
-          padding={12}
-        />
-      )
+      component: <ShareComponent uri={fileUri} name={attachment.metadata.filename} padding={12} />
     });
     return fileUri;
   } catch (e) {
     console.log('download attachment error: ', e);
+    if (attachment.dateUploaded) {
+      console.log('Deleting attachment on error', attachment.dateUploaded);
+      RNFetchBlob.fs
+        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
+        .catch(console.log);
+    }
     useAttachmentStore.getState().remove(attachment.metadata.hash);
   }
 }

@@ -1,14 +1,16 @@
-const {MMKV} = require('../utils/MMKV');
-import {Platform} from 'react-native';
+const { MMKV } = require('../utils/MMKV');
+import Clipboard from '@react-native-clipboard/clipboard';
+import { Platform } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import Share from 'react-native-share';
-import {presentDialog} from '../components/Dialog/functions';
-import {db} from '../utils/database';
-import {eCloseProgressDialog} from '../utils/Events';
-import {sanitizeFilename} from '../utils/filename';
+import { presentDialog } from '../components/Dialog/functions';
+import { db } from '../utils/database';
+import { eCloseProgressDialog } from '../utils/Events';
+import { sanitizeFilename } from '../utils/filename';
 import storage from '../utils/storage';
-import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
+import { sleep } from '../utils/TimeUtils';
+import { eSendEvent, presentSheet, ToastEvent } from './EventManager';
 import SettingsService from './SettingsService';
 
 const MS_DAY = 86400000;
@@ -19,11 +21,17 @@ async function getDirectoryAndroid() {
   let folder = await ScopedStorage.openDocumentTree(true);
   if (!folder) return null;
   let subfolder;
-  if (folder.name !== 'Notesnook backups') {
-    subfolder = await ScopedStorage.createDirectory(
-      folder.uri,
-      'Notesnook backups'
-    );
+  if (!folder.name.includes('Notesnook backups')) {
+    let folderFiles = await ScopedStorage.listFiles(folder.uri);
+    for (let f of folderFiles) {
+      if (f.type === 'directory' && f.name === 'Notesnook backups') {
+        console.log('folder already exists. reusing');
+        subfolder = f;
+      }
+    }
+    if (!subfolder) {
+      subfolder = await ScopedStorage.createDirectory(folder.uri, 'Notesnook backups');
+    }
   } else {
     subfolder = folder;
   }
@@ -45,6 +53,7 @@ async function checkBackupDirExists(reset = false) {
     dir = exists ? dir : null;
   }
   if (!dir) {
+    // eslint-disable-next-line no-async-promise-executor
     dir = await new Promise(async resolve => {
       if (reset) {
         resolve(await getDirectoryAndroid());
@@ -73,25 +82,22 @@ async function run() {
   RNFetchBlob = require('rn-fetch-blob').default;
   presentSheet({
     title: 'Backing up your data',
-    paragraph:
-      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
-    progress:true
+    paragraph: "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
+    progress: true
   });
   let backup;
   let error;
   try {
-    backup = await db.backup.export(
-      'mobile',
-      SettingsService.get().encryptedBackup
-    );
+    backup = await db.backup.export('mobile', SettingsService.get().encryptedBackup);
+    if (!backup) throw new Error(`Backup returned empty.`);
   } catch (e) {
-    error = true;
+    error = e;
   }
 
   if (!error) {
     try {
       let backupName = 'notesnook_backup_' + Date.now();
-      backupName = sanitizeFilename(backupName, {replacement: '_'});
+      backupName = sanitizeFilename(backupName, { replacement: '_' });
       backupName = backupName + '.nnbackup';
       let path;
       let backupFilePath;
@@ -123,45 +129,89 @@ async function run() {
         type: 'success',
         context: 'global'
       });
-
-      presentSheet({
-        title: 'Backup complete',
-        icon: 'cloud-upload',
-        paragraph:
-          'Share your backup to your cloud storage such as Dropbox or Google Drive so you do not lose it.',
-        actionText: 'Share backup',
-        actionsArray: [
-          {
-            action: () => {
-              if (Platform.OS === 'ios') {
-                Share.open({
-                  url: 'file:/' + backupFilePath,
-                  failOnCancel: false
-                }).catch(console.log);
-              } else {
-                FileViewer.open(backupFilePath, {
-                  showOpenWithDialog: true,
-                  showAppsSuggestions: true,
-                  shareFile: true
-                }).catch(console.log);
-              }
-            },
-            actionText: 'Share'
-          }
-        ]
-      });
+      let dontShowCompleteSheet = await MMKV.getItem('dontShowCompleteSheet');
       console.log(backupFilePath);
+      await sleep(300);
+      if (!dontShowCompleteSheet) {
+        presentSheet({
+          title: 'Backup complete',
+          icon: 'cloud-upload',
+          paragraph: `${
+            Platform.OS === 'android'
+              ? 'Backup file saved in "Notesnook backups" folder on your phone'
+              : 'Backup file is saved in File Manager/Notesnook folder'
+          }. Share your backup to your cloud so you do not lose it.`,
+          actionText: 'Share backup',
+          actionsArray: [
+            {
+              action: () => {
+                if (Platform.OS === 'ios') {
+                  console.log(backupFilePath);
+                  Share.open({
+                    url: 'file:/' + backupFilePath,
+                    failOnCancel: false
+                  }).catch(console.log);
+                } else {
+                  FileViewer.open(backupFilePath, {
+                    showOpenWithDialog: true,
+                    showAppsSuggestions: true,
+                    shareFile: true
+                  }).catch(console.log);
+                }
+              },
+              actionText: 'Share'
+            },
+            {
+              action: async () => {
+                eSendEvent(eCloseProgressDialog);
+                await MMKV.setItem('dontShowCompleteSheet', 'yes');
+              },
+              actionText: 'Never ask again',
+              type: 'grayBg'
+            }
+          ]
+        });
+      } else {
+        eSendEvent(eCloseProgressDialog);
+      }
       return backupFilePath;
     } catch (e) {
       console.log('backup error: ', e);
+      await sleep(300);
       eSendEvent(eCloseProgressDialog);
+      ToastEvent.show({
+        heading: 'Backup failed',
+        message: e.message,
+        type: 'error',
+        context: 'global',
+        actionText: 'Copy logs',
+        func: () => {
+          Clipboard.setString(e.stack);
+          ToastEvent.show({
+            heading: 'Logs copied!',
+            type: 'success',
+            context: 'global'
+          });
+        }
+      });
     }
   } else {
+    await sleep(300);
     eSendEvent(eCloseProgressDialog);
     ToastEvent.show({
       heading: 'Backup failed',
+      message: error?.message || '',
       type: 'error',
-      context: 'local'
+      context: 'global',
+      actionText: 'Copy logs',
+      func: () => {
+        Clipboard.setString(error.stack);
+        ToastEvent.show({
+          heading: 'Logs copied!',
+          type: 'success',
+          context: 'global'
+        });
+      }
     });
 
     return null;

@@ -1,26 +1,23 @@
-import React, {useState} from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {GROUP, SORT} from '../../utils';
-import {db} from '../../utils/database';
-import {refreshNotesPage} from '../../utils/Events';
+import { GROUP, SORT } from '../../utils';
+import { db } from '../../utils/database';
+import { refreshNotesPage } from '../../utils/Events';
 import layoutmanager from '../../utils/layout-manager';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 
-const Sort = ({type, screen}) => {
+const Sort = ({ type, screen }) => {
   const [state] = useTracked();
   const colors = state.colors;
-  const [groupOptions, setGroupOptions] = useState(
-    db.settings.getGroupOptions(type)
-  );
+  const [groupOptions, setGroupOptions] = useState(db.settings.getGroupOptions(type));
 
   const updateGroupOptions = async _groupOptions => {
-
     await db.settings.setGroupOptions(type, _groupOptions);
 
     layoutmanager.withSpringAnimation(600);
@@ -46,19 +43,22 @@ const Sort = ({type, screen}) => {
         width: '100%',
         backgroundColor: colors.bg,
         justifyContent: 'space-between'
-      }}>
+      }}
+    >
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         <Heading
           size={SIZE.xl}
           style={{
             alignSelf: 'center'
-          }}>
+          }}
+        >
           Sort by
         </Heading>
 
@@ -72,11 +72,7 @@ const Sort = ({type, screen}) => {
               ? 'Z - A'
               : 'New - Old'
           }
-          icon={
-            groupOptions.sortDirection === 'asc'
-              ? 'sort-ascending'
-              : 'sort-descending'
-          }
+          icon={groupOptions.sortDirection === 'asc' ? 'sort-ascending' : 'sort-descending'}
           height={25}
           iconPosition="right"
           fontSize={SIZE.sm - 1}
@@ -105,7 +101,8 @@ const Sort = ({type, screen}) => {
           paddingHorizontal: 12,
           paddingBottom: 12,
           alignItems: 'center'
-        }}>
+        }}
+      >
         {groupOptions.groupBy === 'abc' ? (
           <Button
             type={'grayBg'}
@@ -113,7 +110,7 @@ const Sort = ({type, screen}) => {
             height={45}
             iconPosition="left"
             icon={'check'}
-            buttonType={{text: colors.accent}}
+            buttonType={{ text: colors.accent }}
             fontSize={SIZE.sm}
             iconSize={SIZE.md}
           />
@@ -151,7 +148,8 @@ const Sort = ({type, screen}) => {
         style={{
           marginLeft: 12
         }}
-        size={SIZE.lg}>
+        size={SIZE.lg}
+      >
         Group by
       </Heading>
 
@@ -159,22 +157,19 @@ const Sort = ({type, screen}) => {
 
       <View
         style={{
-          paddingHorizontal: 0,
           borderRadius: 0,
           flexDirection: 'row',
           flexWrap: 'wrap',
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         {Object.keys(GROUP).map((item, index) => (
           <Button
             key={item}
             testID={'btn-' + item}
             type={groupOptions.groupBy === GROUP[item] ? 'grayBg' : 'gray'}
             buttonType={{
-              text:
-                groupOptions.groupBy === GROUP[item]
-                  ? colors.accent
-                  : colors.icon
+              text: groupOptions.groupBy === GROUP[item] ? colors.accent : colors.icon
             }}
             onPress={async () => {
               let _groupOptions = {

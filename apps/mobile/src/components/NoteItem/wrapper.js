@@ -1,19 +1,19 @@
 import React from 'react';
 import NoteItem from '.';
-import {notesnook} from '../../../e2e/test.ids';
-import {useSelectionStore, useTrashStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
+import { notesnook } from '../../../e2e/test.ids';
+import { useEditorStore, useSelectionStore, useTrashStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, openVault, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {history} from '../../utils';
-import {db} from '../../utils/database';
-import {eOnLoadNote, eShowMergeDialog} from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {presentDialog} from '../Dialog/functions';
+import { history } from '../../utils';
+import { db } from '../../utils/database';
+import { eOnLoadNote, eShowMergeDialog } from '../../utils/Events';
+import { tabBarRef } from '../../utils/Refs';
+import { presentDialog } from '../Dialog/functions';
 import SelectionWrapper from '../SelectionWrapper';
 
 export const NoteWrapper = React.memo(
-  ({item, index, tags, compactMode, dateBy}) => {
+  ({ item, index, tags, dateBy }) => {
     const isTrash = item.type === 'trash';
     const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
     const onPress = async () => {
@@ -79,6 +79,7 @@ export const NoteWrapper = React.memo(
           }
         });
       } else {
+        useEditorStore.getState().setReadonly(_note?.readonly);
         eSendEvent(eOnLoadNote, _note);
         if (!DDS.isTab) {
           tabBarRef.current?.goToPage(1);
@@ -92,13 +93,14 @@ export const NoteWrapper = React.memo(
         height={100}
         testID={notesnook.ids.note.get(index)}
         onPress={onPress}
-        item={item}>
+        item={item}
+      >
         <NoteItem item={item} dateBy={dateBy} tags={tags} isTrash={isTrash} />
       </SelectionWrapper>
     );
   },
   (prev, next) => {
-    if (prev.dateBy !== next.dateBy ) {
+    if (prev.dateBy !== next.dateBy) {
       return false;
     }
     if (prev.item?.dateEdited !== next.item?.dateEdited) {

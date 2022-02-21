@@ -1,8 +1,8 @@
-import {useEffect, useState} from 'react';
-import {useEditorStore, useTagStore} from '../../provider/stores';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {db} from '../../utils/database';
-import {EditorWebView} from './Functions';
+import { useEffect, useState } from 'react';
+import { useEditorStore, useTagStore } from '../../provider/stores';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { db } from '../../utils/database';
+import { EditorWebView } from './Functions';
 import tiny from './tiny/tiny';
 
 export const useEditorTags = () => {
@@ -19,7 +19,7 @@ export const useEditorTags = () => {
       return;
     }
     let note = db.notes.note(current)?.data;
-    setNote(note ? {...note} : null);
+    setNote(note ? { ...note } : null);
     getTags(note);
   }
 
@@ -28,8 +28,8 @@ export const useEditorTags = () => {
   }, [currentEditingNote, tags]);
 
   function load() {
-      if (!note) return;
-      tiny.call(EditorWebView, renderTags(noteTags));
+    if (!note) return;
+    tiny.call(EditorWebView, renderTags(noteTags));
   }
 
   useEffect(() => {
@@ -42,22 +42,22 @@ export const useEditorTags = () => {
   function getTags(note) {
     if (!note || !note.tags) return [];
     let tags = note.tags
-      .map(t => (db.tags.tag(t) ? {...db.tags.tag(t)} : null))
+      .map(t => (db.tags.tag(t) ? { ...db.tags.tag(t) } : null))
       .filter(t => t !== null);
     setNoteTags(tags);
   }
 
   useEffect(() => {
-    load()
+    load();
   }, [noteTags]);
 
-  const hideTagBar = `
-    toggleNode(".tag-bar-parent","hide"); 
-    clearNode(".tag-bar")`;
-  const showTagBar = `
-    toggleNode(".tag-bar-parent","show");
-    clearNode(".tag-bar")`;
-  const clearNode = `clearNode(".tag-bar")`;
+  // const hideTagBar = `
+  //   toggleNode(".tag-bar-parent","hide");
+  //   clearNode(".tag-bar")`;
+  // const showTagBar = `
+  //   toggleNode(".tag-bar-parent","show");
+  //   clearNode(".tag-bar")`;
+  // const clearNode = `clearNode(".tag-bar")`;
   const renderTags = tags => `(function() {
       clearNode(".tag-bar");
       toggleNode(".tag-bar-parent","show")

@@ -1,11 +1,11 @@
-import {LayoutAnimation, Platform, UIManager} from 'react-native';
-import {Dimensions} from 'react-native';
+import { LayoutAnimation, Platform, UIManager } from 'react-native';
+import { Dimensions } from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
-import {history, SUBSCRIPTION_STATUS} from '../utils';
-import {APP_VERSION} from '../../version';
-import {db} from '../utils/database';
-import {MMKV} from '../utils/mmkv';
+import { history, SUBSCRIPTION_STATUS } from '../utils';
+import { APP_VERSION } from '../../version';
+import { db } from '../utils/database';
+import { MMKV } from '../utils/mmkv';
 import {
   MenuStore,
   MessageStore,
@@ -22,17 +22,17 @@ import {
   Announcement
 } from './interfaces';
 //@ts-ignore
-import {groupArray} from 'notes-core/utils/grouping';
-import {EditorWebView, post} from '../views/Editor/Functions';
+import { groupArray } from 'notes-core/utils/grouping';
+import { EditorWebView, post } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
-import {endSearch} from '../views/Editor/tiny/toolbar/commands';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
+import { endSearch } from '../views/Editor/tiny/toolbar/commands';
 import layoutmanager from '../utils/layout-manager';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
   loading: true,
-  setLoading: loading => set({loading: loading}),
+  setLoading: loading => set({ loading: loading }),
   setNotes: items => {
     if (!items) {
       set({
@@ -48,9 +48,9 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({notes: prev});
+    set({ notes: prev });
   },
-  clearNotes: () => set({notes: []})
+  clearNotes: () => set({ notes: [] })
 }));
 
 export const useNotebookStore = create<NotebookStore>((set, get) => ({
@@ -58,10 +58,7 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
   setNotebooks: items => {
     if (!items) {
       set({
-        notebooks: groupArray(
-          db.notebooks.all,
-          db.settings?.getGroupOptions('notebooks')
-        )
+        notebooks: groupArray(db.notebooks.all, db.settings?.getGroupOptions('notebooks'))
       });
       return;
     }
@@ -73,9 +70,9 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({notebooks: prev});
+    set({ notebooks: prev });
   },
-  clearNotebooks: () => set({notebooks: []})
+  clearNotebooks: () => set({ notebooks: [] })
 }));
 
 export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
@@ -83,10 +80,7 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
   setFavorites: items => {
     if (!items) {
       set({
-        favorites: groupArray(
-          db.notes.favorites,
-          db.settings?.getGroupOptions('favorites')
-        )
+        favorites: groupArray(db.notes.favorites, db.settings?.getGroupOptions('favorites'))
       });
       return;
     }
@@ -98,9 +92,9 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({favorites: prev});
+    set({ favorites: prev });
   },
-  clearFavorites: () => set({favorites: []})
+  clearFavorites: () => set({ favorites: [] })
 }));
 
 export const useTagStore = create<TagStore>((set, get) => ({
@@ -120,9 +114,9 @@ export const useTagStore = create<TagStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({tags: prev});
+    set({ tags: prev });
   },
-  clearTags: () => set({tags: []})
+  clearTags: () => set({ tags: [] })
 }));
 
 export const useTrashStore = create<TrashStore>((set, get) => ({
@@ -142,9 +136,9 @@ export const useTrashStore = create<TrashStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({trash: prev});
+    set({ trash: prev });
   },
-  clearTrash: () => set({trash: []})
+  clearTrash: () => set({ trash: [] })
 }));
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -153,11 +147,11 @@ export const useUserStore = create<UserStore>((set, get) => ({
   lastSynced: 'Never',
   syncing: false,
   verifyUser: false,
-  setUser: user => set({user: user}),
-  setPremium: premium => set({premium: premium}),
-  setSyncing: syncing => set({syncing: syncing}),
-  setLastSynced: lastSynced => set({lastSynced: lastSynced}),
-  setVerifyUser: verified => set({verifyUser: verified})
+  setUser: user => set({ user: user }),
+  setPremium: premium => set({ premium: premium }),
+  setSyncing: syncing => set({ syncing: syncing }),
+  setLastSynced: lastSynced => set({ lastSynced: lastSynced }),
+  setVerifyUser: verified => set({ verifyUser: verified })
 }));
 
 interface AttachmentStore {
@@ -180,8 +174,8 @@ interface AttachmentStore {
     recieved: number,
     type: 'upload' | 'download'
   ) => void;
-  loading: {total: number; current: number};
-  setLoading: (data: {total: number; current: number}) => void;
+  loading: { total: number; current: number };
+  setLoading: (data: { total: number; current: number }) => void;
 }
 
 export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
@@ -202,13 +196,13 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     tinymce.activeEditor._updateAttachmentProgress(progress);
     })()`
     );
-    set({progress: {..._p}});
+    set({ progress: { ..._p } });
   },
   setProgress: (sent, total, hash, recieved, type) => {
     let _p = get().progress;
     if (!_p) return;
-    _p[hash] = {sent, total, hash, recieved, type};
-    let progress = {total, hash, loaded: type === 'download' ? recieved : sent};
+    _p[hash] = { sent, total, hash, recieved, type };
+    let progress = { total, hash, loaded: type === 'download' ? recieved : sent };
     tiny.call(
       EditorWebView,
       `
@@ -217,16 +211,15 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
       tinymce.activeEditor._updateAttachmentProgress(progress);
     })()`
     );
-    set({progress: {..._p}});
+    set({ progress: { ..._p } });
   },
   encryptionProgress: 0,
-  setEncryptionProgress: encryptionProgress =>
-    set({encryptionProgress: encryptionProgress}),
-  loading: {total: 0, current: 0},
-  setLoading: data => set({loading: data})
+  setEncryptionProgress: encryptionProgress => set({ encryptionProgress: encryptionProgress }),
+  loading: { total: 0, current: 0 },
+  setLoading: data => set({ loading: data })
 }));
 
-let {width, height} = Dimensions.get('window');
+let { width, height } = Dimensions.get('window');
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
   settings: {
@@ -254,16 +247,18 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   sheetKeyboardHandler: true,
   fullscreen: false,
   deviceMode: 'mobile',
-  dimensions: {width, height},
+  dimensions: { width, height },
   appLoading: true,
   isIntroCompleted: false,
-  setSettings: settings => set({settings}),
-  setFullscreen: fullscreen => set({fullscreen}),
-  setDeviceMode: mode => set({deviceMode: mode}),
-  setDimensions: dimensions => set({dimensions: dimensions}),
-  setAppLoading: appLoading => set({appLoading}),
-  setIntroCompleted: isIntroCompleted => set({isIntroCompleted}),
-  setSheetKeyboardHandler: sheetKeyboardHandler => set({sheetKeyboardHandler})
+  setSettings: settings => set({ settings }),
+  setFullscreen: fullscreen => set({ fullscreen }),
+  setDeviceMode: mode => set({ deviceMode: mode }),
+  setDimensions: dimensions => set({ dimensions: dimensions }),
+  setAppLoading: appLoading => set({ appLoading }),
+  setIntroCompleted: isIntroCompleted => set({ isIntroCompleted }),
+  setSheetKeyboardHandler: sheetKeyboardHandler => set({ sheetKeyboardHandler }),
+  requestBiometrics: false,
+  setRequestBiometrics: requestBiometrics => set({ requestBiometrics })
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({
@@ -271,42 +266,48 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
   colorNotes: [],
   setMenuPins: () => {
     try {
-      set({menuPins: db.settings.pins});
+      set({ menuPins: db.settings?.pins || [] });
     } catch (e) {
       setTimeout(() => {
         try {
-          set({menuPins: db.settings.pins});
+          set({ menuPins: db.settings?.pins || [] });
         } catch (e) {}
       }, 1000);
     }
   },
-  setColorNotes: () => set({colorNotes: db.colors.all}),
-  clearAll: () => set({menuPins: [], colorNotes: []})
+  //@ts-ignore
+  setColorNotes: () => set({ colorNotes: db.colors?.all || [] }),
+  clearAll: () => set({ menuPins: [], colorNotes: [] })
 }));
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   currentEditingNote: null,
-  setCurrentlyEditingNote: note => set({currentEditingNote: note}),
+  setCurrentlyEditingNote: note => set({ currentEditingNote: note }),
   sessionId: null,
   setSessionId: sessionId => {
     console.log(sessionId, 'session id');
-    set({sessionId});
+    tiny.call(EditorWebView, `sessionId="${sessionId}";`);
+    set({ sessionId });
   },
   searchReplace: false,
   searchSelection: null,
+  readonly: false,
+  setReadonly: readonly => {
+    set({ readonly: readonly });
+  },
   setSearchReplace: searchReplace => {
     if (!searchReplace) {
-      set({searchSelection: null, searchReplace: false});
+      set({ searchSelection: null, searchReplace: false });
       return;
     }
     let func = (value: string) => {
       eUnSubscribeEvent('selectionvalue', func);
       console.log('setSearchReplace:', value, value.length);
-      if ((!value || value.trim() === '') && get().searchReplace) {
+      if (!value && get().searchReplace) {
         endSearch();
         return;
       }
-      set({searchSelection: value, searchReplace: true});
+      set({ searchSelection: value, searchReplace: true });
     };
     eSubscribeEvent('selectionvalue', func);
     tiny.call(
@@ -324,8 +325,8 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
   searchResults: [],
   searching: false,
   searchStatus: null,
-  setSearchResults: results => set({searchResults: results}),
-  setSearchStatus: (searching, status) => set({searching, searchStatus: status})
+  setSearchResults: results => set({ searchResults: results }),
+  setSearchStatus: (searching, status) => set({ searching, searchStatus: status })
 }));
 
 export const useSelectionStore = create<SelectionStore>((set, get) => ({
@@ -334,7 +335,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   setAll: all => {
     //@ts-ignore
     history.selectedItemsList = all;
-    set({selectedItemsList: all});
+    set({ selectedItemsList: all });
   },
   setSelectionMode: mode => {
     if (!mode) {
@@ -359,17 +360,16 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     selectedItems = [...new Set(selectedItems)];
     //@ts-ignore
     history.selectedItemsList = selectedItems;
-    history.selectionMode =
-      selectedItems.length > 0 ? get().selectionMode : false;
+    history.selectionMode = selectedItems.length > 0 ? get().selectionMode : false;
     set({
       selectedItemsList: selectedItems,
       selectionMode: history.selectionMode
     });
   },
-  clearSelection: (noanimation) => {
+  clearSelection: noanimation => {
     history.selectedItemsList = [];
     history.selectionMode = false;
-    set({selectionMode: false, selectedItemsList: []});
+    set({ selectionMode: false, selectedItemsList: [] });
   }
 }));
 
@@ -389,7 +389,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
         layoutmanager.withAnimation();
       }
 
-      set({message: {...message}});
+      set({ message: { ...message } });
     }, 1);
   },
   announcements: [],
@@ -405,7 +405,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
       dialogsCopy.splice(dialogIndex, 1);
       inlineCopy.splice(index, 1);
     }
-    set({announcements: inlineCopy, dialogs: dialogsCopy});
+    set({ announcements: inlineCopy, dialogs: dialogsCopy });
   },
   dialogs: [],
   setAnnouncement: async function () {
@@ -417,7 +417,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
       }
     } catch (e) {
       console.log('ERROR', e);
-      set({announcements: []});
+      set({ announcements: [] });
     } finally {
       let all = await getFiltered(announcements);
 
@@ -473,9 +473,7 @@ async function shouldShowAnnouncement(announcement: Announcement) {
   if (!announcement) return false;
   let removed = (await MMKV.getStringAsync(announcement.id)) === 'removed';
   if (removed) return false;
-  let show = announcement.platforms.some(
-    platform => allowedPlatforms.indexOf(platform) > -1
-  );
+  let show = announcement.platforms.some(platform => allowedPlatforms.indexOf(platform) > -1);
 
   if (announcement.appVersion) {
     return announcement.appVersion === APP_VERSION;

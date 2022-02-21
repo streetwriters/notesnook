@@ -1,21 +1,21 @@
 import React from 'react';
-import {View} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import { View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import {PressableButton} from '../PressableButton';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
+import { PressableButton } from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
-import {useActions} from './use-actions';
+import { useActions } from './use-actions';
 
-export const Items = ({item, buttons, close}) => {
+export const Items = ({ item, buttons, close }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const dimensions = useSettingStore(state => state.dimensions);
-  const actions = useActions({item, close});
+  const actions = useActions({ item, close });
   const data = actions.filter(i => buttons.indexOf(i.name) > -1 && !i.hidden);
 
   let width = dimensions.width > 600 ? 600 : dimensions.width;
@@ -24,7 +24,7 @@ export const Items = ({item, buttons, close}) => {
     ? (width - 24) / columnItemsCount
     : (width - 24) / columnItemsCount;
 
-  const _renderRowItem = ({item, index}) => (
+  const _renderRowItem = ({ item, index }) => (
     <View
       onPress={item.func}
       key={item.name}
@@ -33,7 +33,8 @@ export const Items = ({item, buttons, close}) => {
         alignItems: 'center',
         width: columnItemWidth,
         marginBottom: 10
-      }}>
+      }}
+    >
       <PressableButton
         onPress={item.func}
         type={item.on ? 'shade' : 'grayBg'}
@@ -46,7 +47,8 @@ export const Items = ({item, buttons, close}) => {
           textAlign: 'center',
           textAlignVertical: 'center',
           marginBottom: DDS.isTab ? 7 : 3.5
-        }}>
+        }}
+      >
         <Icon
           name={item.icon}
           size={DDS.isTab ? SIZE.xxl : SIZE.lg}
@@ -60,13 +62,13 @@ export const Items = ({item, buttons, close}) => {
         />
       </PressableButton>
 
-      <Paragraph size={SIZE.xs + 1} style={{textAlign: 'center'}}>
+      <Paragraph size={SIZE.xs + 1} style={{ textAlign: 'center' }}>
         {item.title}
       </Paragraph>
     </View>
   );
 
-  const renderColumnItem = ({item, index}) => (
+  const renderColumnItem = ({ item, index }) => (
     <Button
       buttonType={{
         text: item.on
@@ -109,10 +111,6 @@ export const Items = ({item, buttons, close}) => {
       renderItem={_renderRowItem}
     />
   ) : (
-    <FlatList
-      data={data}
-      keyExtractor={item => item.title}
-      renderItem={renderColumnItem}
-    />
+    <FlatList data={data} keyExtractor={item => item.title} renderItem={renderColumnItem} />
   );
 };

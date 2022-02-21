@@ -14,9 +14,9 @@ import { SIZE } from '../../utils/SizeUtils';
  *
  * @param {TextType | restTypes} props all props
  */
-const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
+const Paragraph = ({ color, size = SIZE.sm, style, ...restProps }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   return (
     <Text
@@ -28,12 +28,11 @@ const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
           fontSize: size || SIZE.sm,
           color: color || colors.pri,
           fontWeight: '400',
-          fontFamily:"OpenSans-Regular"
+          fontFamily: 'OpenSans-Regular'
         },
-        style,
-      ]}>
-        
-      </Text>
+        style
+      ]}
+    ></Text>
   );
 };
 

@@ -1,20 +1,16 @@
 import dayjs from 'dayjs';
 import React from 'react';
-import {Linking, Platform, View} from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
+import { ChangePassword } from '../../components/Auth/change-password';
+import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import {Card} from '../../components/SimpleList/card';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {useMessageStore, useUserStore} from '../../provider/stores';
-import {
-  eSendEvent,
-  presentSheet,
-  ToastEvent
-} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
+import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import Sync from '../../services/Sync';
 import {
@@ -28,10 +24,10 @@ import {
   eOpenPremiumDialog,
   eOpenRecoveryKeyDialog
 } from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {CustomButton} from './button';
-import {verifyUser} from './functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { CustomButton } from './button';
+import { verifyUser } from './functions';
 
 const getTimeLeft = t2 => {
   let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
@@ -43,12 +39,10 @@ const getTimeLeft = t2 => {
 
 const SettingsUserSection = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   const user = useUserStore(state => state.user);
-  const messageBoardState = useMessageStore(state => state.message);
-  const subscriptionDaysLeft =
-    user && getTimeLeft(parseInt(user.subscription?.expiry));
+  const subscriptionDaysLeft = user && getTimeLeft(parseInt(user.subscription?.expiry));
   const isExpired = user && subscriptionDaysLeft.time < 0;
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
@@ -89,7 +83,8 @@ const SettingsUserSection = () => {
               paddingHorizontal: 12,
               marginTop: 15,
               marginBottom: 15
-            }}>
+            }}
+          >
             <View
               style={{
                 alignSelf: 'center',
@@ -97,7 +92,8 @@ const SettingsUserSection = () => {
                 paddingVertical: 12,
                 backgroundColor: colors.bg,
                 borderRadius: 5
-              }}>
+              }}
+            >
               <View
                 style={{
                   justifyContent: 'space-between',
@@ -106,13 +102,15 @@ const SettingsUserSection = () => {
                   paddingBottom: 4,
                   borderBottomWidth: 1,
                   borderColor: colors.accent
-                }}>
+                }}
+              >
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'center',
                     alignItems: 'center'
-                  }}>
+                  }}
+                >
                   <View
                     style={{
                       borderWidth: 1,
@@ -122,12 +120,9 @@ const SettingsUserSection = () => {
                       height: 20,
                       alignItems: 'center',
                       justifyContent: 'center'
-                    }}>
-                    <Icon
-                      size={SIZE.md}
-                      color={colors.accent}
-                      name="account-outline"
-                    />
+                    }}
+                  >
+                    <Icon size={SIZE.md} color={colors.accent} name="account-outline" />
                   </View>
 
                   <Paragraph
@@ -135,7 +130,8 @@ const SettingsUserSection = () => {
                     size={SIZE.sm}
                     style={{
                       marginLeft: 5
-                    }}>
+                    }}
+                  >
                     {user?.email}
                   </Paragraph>
                 </View>
@@ -144,7 +140,8 @@ const SettingsUserSection = () => {
                     borderRadius: 5,
                     padding: 5,
                     paddingVertical: 2.5
-                  }}>
+                  }}
+                >
                   <Heading color={colors.accent} size={SIZE.sm}>
                     {SUBSCRIPTION_STATUS_STRINGS[user.subscription?.type]}
                   </Heading>
@@ -160,12 +157,12 @@ const SettingsUserSection = () => {
                         textAlign: 'center'
                       }}
                       color={
-                        (subscriptionDaysLeft.time > 5 &&
-                          !subscriptionDaysLeft.isHour) ||
+                        (subscriptionDaysLeft.time > 5 && !subscriptionDaysLeft.isHour) ||
                         user.subscription?.type !== 6
                           ? colors.accent
                           : colors.red
-                      }>
+                      }
+                    >
                       {isExpired
                         ? 'Your subscription has ended.'
                         : user.subscription?.type === 1
@@ -176,7 +173,8 @@ const SettingsUserSection = () => {
                       style={{
                         textAlign: 'center'
                       }}
-                      color={colors.pri}>
+                      color={colors.pri}
+                    >
                       {user.subscription?.type === 2
                         ? 'You signed up on ' + startDate
                         : user.subscription?.type === 1
@@ -207,17 +205,14 @@ const SettingsUserSection = () => {
                         fontSize={SIZE.md}
                         title={
                           !user.isEmailConfirmed
-                            ? 'Confirm your email to get 7 days more'
+                            ? 'Confirm your email'
                             : user.subscription?.provider === 3 &&
-                              user.subscription?.type ===
-                                SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+                              user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
                             ? 'Manage subscription from desktop app'
-                            : user.subscription?.type ===
-                                SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+                            : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
                               Platform.OS === 'android'
                             ? `Resubscribe from Google Playstore`
-                            : user.subscription?.type ===
-                              SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
+                            : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
                             ? `Resubscribe to Notesnook Pro (${
                                 PremiumService.getMontlySub().localizedPrice
                               } / mo)`
@@ -237,17 +232,11 @@ const SettingsUserSection = () => {
               user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC &&
               SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
                 <Button
-                  title={
-                    SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
-                  }
+                  title={SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title}
                   onPress={() => {
                     presentSheet({
-                      title:
-                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                          .title,
-                      paragraph:
-                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                          .desc,
+                      title: SUBSCRIPTION_PROVIDER[user?.subscription?.provider].title,
+                      paragraph: SUBSCRIPTION_PROVIDER[user?.subscription?.provider].desc
                     });
                   }}
                   style={{
@@ -281,7 +270,7 @@ const SettingsUserSection = () => {
             {
               name: 'Change password',
               func: async () => {
-                eSendEvent(eOpenLoginDialog, 3);
+                ChangePassword.present();
               },
               desc: 'Setup a new password for your account.'
             },
@@ -291,11 +280,10 @@ const SettingsUserSection = () => {
                 presentSheet({
                   title: 'Syncing your data',
                   paragraph: 'Please wait while we sync all your data.',
-                  progress:true
+                  progress: true
                 });
                 await Sync.run('global', true);
                 eSendEvent(eCloseProgressDialog);
-
               },
               desc: 'Try force sync to resolve issues with syncing.'
             },
@@ -308,9 +296,7 @@ const SettingsUserSection = () => {
                   paragraph: `Please wait while we fetch your subscriptions.`
                 });
                 let subscriptions = await RNIap.getPurchaseHistory();
-                subscriptions.sort(
-                  (a, b) => b.transactionDate - a.transactionDate
-                );
+                subscriptions.sort((a, b) => b.transactionDate - a.transactionDate);
                 let currentSubscription = subscriptions[0];
                 presentSheet({
                   title: 'Notesnook Pro',
@@ -322,13 +308,11 @@ const SettingsUserSection = () => {
                       title: 'Verifying subscription',
                       paragraph: `Please wait while we verify your subscription.`
                     });
-                    await PremiumService.subscriptions.verify(
-                      currentSubscription
-                    );
+                    await PremiumService.subscriptions.verify(currentSubscription);
                     eSendEvent(eCloseProgressDialog);
                   },
                   icon: 'information-outline',
-                  actionText: 'Verify',
+                  actionText: 'Verify'
                 });
               },
               desc: 'Verify your subscription to Notesnook Pro'

@@ -1,10 +1,10 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {PressableButton} from '../PressableButton';
-import {SIZE} from '../../utils/SizeUtils';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import { showTooltip } from '../../utils';
+import { useTracked } from '../../provider';
+import { PressableButton } from '../PressableButton';
+import { SIZE } from '../../utils/SizeUtils';
+import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
+import { showTooltip, TOOLTIP_POSITIONS } from '../../utils';
 
 export const ActionIcon = ({
   onPress,
@@ -21,23 +21,26 @@ export const ActionIcon = ({
   disabled,
   onLongPress,
   tooltipText,
-  type="gray"
+  type = 'gray',
+  fwdRef,
+  tooltipPosition = TOOLTIP_POSITIONS.TOP
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   return (
     <PressableButton
       testID={testID}
+      fwdRef={fwdRef}
       onPress={onPress}
-      hitSlop={{top: top, left: left, right: right, bottom: bottom}}
-      onLongPress={(event) => {
+      hitSlop={{ top: top, left: left, right: right, bottom: bottom }}
+      onLongPress={event => {
         if (onLongPress) {
           onLongPress();
           return;
         }
         if (tooltipText) {
-          showTooltip(event, tooltipText);
+          showTooltip(event, tooltipText, tooltipPosition);
         }
       }}
       disabled={disabled}
@@ -48,14 +51,13 @@ export const ActionIcon = ({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 100,
-        ...customStyle,
-      }}>
+        ...customStyle
+      }}
+    >
       <Icon
         name={name}
         style={iconStyle}
-        color={
-          disabled ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.nav)) : color
-        }
+        color={disabled ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.nav)) : color}
         size={size}
       />
     </PressableButton>

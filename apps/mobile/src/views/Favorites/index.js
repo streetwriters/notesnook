@@ -1,24 +1,19 @@
-import React, {useCallback, useEffect} from 'react';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header';
-import {Placeholder} from '../../components/ListPlaceholders';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
+import { Placeholder } from '../../components/ListPlaceholders';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
 import { useFavoriteStore, useNoteStore } from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager} from '../../utils';
-import {eScrollEvent} from '../../utils/Events';
+import { InteractionManager } from '../../utils';
 
-export const Favorites = ({route, navigation}) => {
+export const Favorites = ({ navigation }) => {
   const favorites = useFavoriteStore(state => state.favorites);
-  const setFavorites = useFavoriteStore(state =>state.setFavorites);
+  const setFavorites = useFavoriteStore(state => state.setFavorites);
   const loading = useNoteStore(state => state.loading);
- 
+
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
@@ -46,12 +41,12 @@ export const Favorites = ({route, navigation}) => {
     Navigation.setHeaderState(
       'Favorites',
       {
-        menu: true,
+        menu: true
       },
       {
         heading: 'Favorites',
-        id: 'favorites_navigation',
-      },
+        id: 'favorites_navigation'
+      }
     );
   }, []);
 
@@ -79,7 +74,7 @@ export const Favorites = ({route, navigation}) => {
       placeholder: 'Search in favorites',
       data: favorites,
       type: 'notes',
-      title: 'Favorites',
+      title: 'Favorites'
     });
   };
 
@@ -101,10 +96,10 @@ export const Favorites = ({route, navigation}) => {
           heading: 'Your favorites',
           paragraph: 'You have not added any notes to favorites yet.',
           button: null,
-          loading: 'Loading your favorites',
+          loading: 'Loading your favorites'
         }}
         headerProps={{
-          heading: 'Favorites',
+          heading: 'Favorites'
         }}
         focused={() => navigation.isFocused()}
         placeholder={<Placeholder type="favorites" />}

@@ -1,68 +1,33 @@
-import http from 'notes-core/utils/http';
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Orientation from 'react-native-orientation';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import SplashScreen from 'react-native-splash-screen';
-import {useAppEvents} from './src/utils/use-app-events';
-import {RootView} from './src/navigation/RootView';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppLoader from './src/components/AppLoader';
-import {useTracked} from './src/provider';
-import {
-  initialize,
-  useMessageStore,
-  useNoteStore,
-  useSettingStore,
-  useUserStore
-} from './src/provider/stores';
-import {DDS} from './src/services/DeviceDetection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from './src/services/EventManager';
+import { RootView } from './src/navigation/RootView';
+import { useTracked } from './src/provider';
+import { initialize, useSettingStore, useUserStore } from './src/provider/stores';
+import { DDS } from './src/services/DeviceDetection';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from './src/services/EventManager';
 import Notifications from './src/services/Notifications';
 import SettingsService from './src/services/SettingsService';
-import {Tracker} from './src/utils';
-import {db} from './src/utils/database';
-import {eDispatchAction} from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
+import { TipManager } from './src/services/tip-manager';
+import { Tracker } from './src/utils';
+import { db } from './src/utils/database';
+import { eDispatchAction } from './src/utils/Events';
+import { MMKV } from './src/utils/mmkv';
+import { useAppEvents } from './src/utils/use-app-events';
 
 let databaseHasLoaded = false;
 
-async function loadDefaultNotes() {
-  try {
-    return true;
- /*    const isCreated = await MMKV.getItem('defaultNoteCreated');
-    if (isCreated) return;
-    const notes = await http.get(
-      'https://app.notesnook.com/notes/index_v14.json'
-    );
-    if (!notes) return;
-    for (let note of notes) {
-      const content = await http.get(note.mobileContent);
-      await db.notes.add({
-        title: note.title,
-        headline: note.headline,
-        localOnly: true,
-        content: {type: 'tiny', data: content}
-      });
-    }
-    await MMKV.setItem('defaultNoteCreated', 'yes');
-    useNoteStore.getState().setNotes(); */
-  } catch (e) {}
-}
-
 const loadDatabase = async () => {
-  SplashScreen.hide();
+  let requireIntro = await MMKV.getItem('introCompleted');
+  useSettingStore.getState().setIntroCompleted(requireIntro ? true : false);
   await db.init();
   Notifications.get();
-  //loadDefaultNotes();
   await checkFirstLaunch();
 };
 
 async function checkFirstLaunch() {
-  let requireIntro = await MMKV.getItem('introCompleted');
-  useSettingStore.getState().setIntroCompleted(requireIntro ? true : false);
+  let requireIntro = useSettingStore.getState().isIntroCompleted;
   if (!requireIntro) {
     await MMKV.setItem(
       'askForRating',
@@ -82,18 +47,10 @@ async function checkFirstLaunch() {
 function checkOrientation() {
   Orientation.getOrientation((e, r) => {
     DDS.checkSmallTab(r);
+    useSettingStore.getState().setDimensions({ width: DDS.width, height: DDS.height });
     useSettingStore
       .getState()
-      .setDimensions({width: DDS.width, height: DDS.height});
-    useSettingStore
-      .getState()
-      .setDeviceMode(
-        DDS.isLargeTablet()
-          ? 'tablet'
-          : DDS.isSmallTab
-          ? 'smallTablet'
-          : 'mobile'
-      );
+      .setDeviceMode(DDS.isLargeTablet() ? 'tablet' : DDS.isSmallTab ? 'smallTablet' : 'mobile');
   });
 }
 
@@ -115,16 +72,14 @@ const App = () => {
     (async () => {
       try {
         await SettingsService.init();
-        if (
-          SettingsService.get().appLockMode &&
-          SettingsService.get().appLockMode !== 'none'
-        ) {
+        if (SettingsService.get().appLockMode && SettingsService.get().appLockMode !== 'none') {
           setVerifyUser(true);
         }
+        await TipManager.init();
         await loadDatabase();
         useUserStore.getState().setUser(await db.user.getUser());
         if (SettingsService.get().telemetry) {
-          Tracker.record('50bf361f-dba0-41f1-9570-93906249a6d3');
+          Tracker.record('3c6890ce-8410-49d5-8831-15fb2eb28a21');
         }
       } catch (e) {
       } finally {

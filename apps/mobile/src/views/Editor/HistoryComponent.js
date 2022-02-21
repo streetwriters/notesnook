@@ -11,7 +11,7 @@ import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 
 const HistoryComponent = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [historyState, setHistoryState] = useState({
     undo: false,
     redo: false
@@ -36,7 +36,8 @@ const HistoryComponent = () => {
         flexDirection: 'row',
         height: 40,
         marginRight: 5
-      }}>
+      }}
+    >
       {Platform.OS === 'ios' && keyboard.keyboardShown ? (
         <ActionIcon
           name="keyboard-close"

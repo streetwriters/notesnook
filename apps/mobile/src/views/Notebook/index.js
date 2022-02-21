@@ -6,29 +6,18 @@ import { Header } from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import { NotebookHeader } from '../../components/SimpleList/notebook-header';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
-import {
-  eOnNewTopicAdded,
-  eOpenAddNotebookDialog,
-  eOpenAddTopicDialog
-} from '../../utils/Events';
+import { eOnNewTopicAdded, eOpenAddNotebookDialog, eOpenAddTopicDialog } from '../../utils/Events';
 
-export const Notebook = ({route, navigation}) => {
+export const Notebook = ({ route, navigation }) => {
   const [topics, setTopics] = useState(
-    groupArray(
-      route?.params.notebook?.topics || [],
-      db.settings.getGroupOptions('topics')
-    )
+    groupArray(route?.params.notebook?.topics || [], db.settings.getGroupOptions('topics'))
   );
-  console.log('params',route?.params.notebook?.topics)
+  console.log('params', route?.params.notebook?.topics);
   const params = useRef(route?.params);
 
   const onLoad = data => {
@@ -37,9 +26,7 @@ export const Notebook = ({route, navigation}) => {
       let notebook = db.notebooks.notebook(params?.current?.notebook?.id)?.data;
       if (notebook) {
         params.current.notebook = notebook;
-        setTopics(
-          groupArray(notebook.topics, db.settings.getGroupOptions('topics'))
-        );
+        setTopics(groupArray(notebook.topics, db.settings.getGroupOptions('topics')));
         params.current.title = params.current.notebook.title;
       }
       updateSearch();
@@ -88,7 +75,7 @@ export const Notebook = ({route, navigation}) => {
 
   const _onPressBottomButton = () => {
     let n = params.current.notebook;
-    eSendEvent(eOpenAddTopicDialog, {notebookId: n.id});
+    eSendEvent(eOpenAddTopicDialog, { notebookId: n.id });
   };
 
   return (
@@ -131,16 +118,13 @@ export const Notebook = ({route, navigation}) => {
         placeholderData={{
           heading: params.current.notebook.title,
           paragraph: 'You have not added any topics yet.',
-          button: 'Add a topic',
+          button: 'Add first topic',
           action: _onPressBottomButton,
           loading: 'Loading notebook topics'
         }}
       />
 
-      <ContainerBottomButton
-        title="Add new topic"
-        onPress={_onPressBottomButton}
-      />
+      <ContainerBottomButton title="Add new topic" onPress={_onPressBottomButton} />
     </>
   );
 };

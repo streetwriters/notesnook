@@ -13,7 +13,7 @@ import BaseDialog from './base-dialog';
 import DialogButtons from './dialog-buttons';
 import DialogHeader from './dialog-header';
 
-export const Dialog = ({context = 'global'}) => {
+export const Dialog = ({ context = 'global' }) => {
   const [state] = useTracked();
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
@@ -32,7 +32,7 @@ export const Dialog = ({context = 'global'}) => {
     input: false,
     inputPlaceholder: 'Enter some text',
     defaultValue: '',
-    disableBackdropClosing:false
+    disableBackdropClosing: false
   });
 
   useEffect(() => {
@@ -48,9 +48,7 @@ export const Dialog = ({context = 'global'}) => {
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
       inputRef.current?.blur();
-      let result = await dialogInfo.positivePress(
-        inputValue || dialogInfo.defaultValue
-      );
+      let result = await dialogInfo.positivePress(inputValue || dialogInfo.defaultValue);
       if (result === false) {
         return;
       }
@@ -59,7 +57,8 @@ export const Dialog = ({context = 'global'}) => {
   };
 
   const show = data => {
-    if (data.context && data.context !== context) return;
+    if (!data.context) data.context = 'global';
+    if (data.context !== context) return;
     setDialogInfo(data);
     setVisible(true);
   };
@@ -93,16 +92,16 @@ export const Dialog = ({context = 'global'}) => {
         closeOnTouch={!dialogInfo.disableBackdropClosing}
         onShow={async () => {
           if (dialogInfo.input) {
-            
             inputRef.current?.setNativeProps({
-              text:dialogInfo.defaultValue
+              text: dialogInfo.defaultValue
             });
             await sleep(300);
             inputRef.current?.focus();
           }
         }}
         visible={true}
-        onRequestClose={hide}>
+        onRequestClose={hide}
+      >
         <View style={style}>
           <DialogHeader
             title={dialogInfo.title}
@@ -117,7 +116,8 @@ export const Dialog = ({context = 'global'}) => {
             <View
               style={{
                 paddingHorizontal: 12
-              }}>
+              }}
+            >
               <Input
                 fwdRef={inputRef}
                 autoCapitalize="none"

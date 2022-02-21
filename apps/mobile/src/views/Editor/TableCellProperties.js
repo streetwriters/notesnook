@@ -19,9 +19,9 @@ import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';
 import { editor_colors, rgbToHex } from './tiny/toolbar/constants';
 
-export const TableCellProperties = ({data}) => {
+export const TableCellProperties = ({ data }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [cellOptions, setCellOptions] = useState(data);
   console.log(data);
 
@@ -51,7 +51,7 @@ export const TableCellProperties = ({data}) => {
         let node = editor.selection.getNode();
         node.style.width = "${width}";
         tableCellNodeOptions();
-        editor.fire("input");
+        editor.fire("input",{data:""});
         })()`
     );
   }
@@ -70,7 +70,7 @@ export const TableCellProperties = ({data}) => {
           let node = editor.selection.getNode();
           node.style.width = "${width}";
           tableCellNodeOptions();
-          editor.fire("input");
+          editor.fire("input",{data:""});
         })()`
     );
   }
@@ -81,7 +81,7 @@ export const TableCellProperties = ({data}) => {
       `
       tinymce.activeEditor.execCommand('mceTableCellType', false, { type: '${type}' });
       tableCellNodeOptions();
-      editor.fire("input");
+      editor.fire("input",{data:""});
       `
     );
   }
@@ -92,7 +92,7 @@ export const TableCellProperties = ({data}) => {
       `
       tinymce.activeEditor.execCommand('mceTableColType', false, { type: '${type}' });
       tableCellNodeOptions();
-      editor.fire("input");
+      editor.fire("input",{data:""});
       `
     );
   }
@@ -101,7 +101,8 @@ export const TableCellProperties = ({data}) => {
     <View
       style={{
         paddingHorizontal: 12
-      }}>
+      }}
+    >
       <Heading size={SIZE.md}>Column Width</Heading>
       <View
         style={{
@@ -110,7 +111,8 @@ export const TableCellProperties = ({data}) => {
           justifyContent: 'space-between',
           borderRadius: 5,
           height: 50
-        }}>
+        }}
+      >
         <Paragraph size={SIZE.md + 2} color={colors.icon}>
           {cellOptions?.width}
         </Paragraph>
@@ -118,7 +120,8 @@ export const TableCellProperties = ({data}) => {
         <View
           style={{
             flexDirection: 'row'
-          }}>
+          }}
+        >
           <ActionIcon
             customStyle={{
               marginRight: 10
@@ -144,7 +147,8 @@ export const TableCellProperties = ({data}) => {
         style={{
           marginBottom: 10
         }}
-        size={SIZE.md}>
+        size={SIZE.md}
+      >
         Cell type
       </Heading>
 
@@ -152,7 +156,8 @@ export const TableCellProperties = ({data}) => {
         style={{
           flexDirection: 'row',
           marginBottom: 10
-        }}>
+        }}
+      >
         <Button
           type={cellOptions.cellType === 'th' ? 'shade' : 'grayBg'}
           icon={cellOptions.cellType === 'th' && 'check'}
@@ -184,7 +189,8 @@ export const TableCellProperties = ({data}) => {
         style={{
           marginBottom: 10
         }}
-        size={SIZE.md}>
+        size={SIZE.md}
+      >
         Column type
       </Heading>
 
@@ -192,7 +198,8 @@ export const TableCellProperties = ({data}) => {
         style={{
           flexDirection: 'row',
           marginBottom: 10
-        }}>
+        }}
+      >
         <Button
           type={cellOptions.colType === 'th' ? 'shade' : 'grayBg'}
           icon={cellOptions.colType === 'th' && 'check'}
@@ -219,16 +226,15 @@ export const TableCellProperties = ({data}) => {
           title="Body"
         />
       </View>
-      <Heading size={SIZE.md}>
-        Cell background color(${cellOptions.backgroundColor})
-      </Heading>
+      <Heading size={SIZE.md}>Cell background color(${cellOptions.backgroundColor})</Heading>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         style={{
           flexDirection: 'row',
           marginTop: 10
-        }}>
+        }}
+      >
         {editor_colors.map(item => (
           <ColorItem
             value={item}
@@ -241,7 +247,7 @@ export const TableCellProperties = ({data}) => {
                     let node = editor.selection.getNode();
                     node.style.backgroundColor = "${color}";
                     tableCellNodeOptions();
-                    editor.fire("input");
+                    editor.fire("input",{data:""})
                   })()`
               );
             }}
@@ -261,6 +267,6 @@ TableCellProperties.present = async data => {
     onClose: () => {
       TableCellProperties.isPresented = false;
     },
-    editor:true
+    editor: true
   });
 };

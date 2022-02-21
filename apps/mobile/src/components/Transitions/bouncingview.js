@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import Animated, {Easing, timing} from 'react-native-reanimated';
+import React, { useEffect, useState } from 'react';
+import Animated, { Easing, timing } from 'react-native-reanimated';
 
 export const BouncingView = ({
   children,
@@ -18,6 +18,7 @@ export const BouncingView = ({
       duration: duration,
       easing: Easing.elastic(1)
     }).start();
+
     return () => {
       if (!animated) return;
       scale.setValue(initialScale);
@@ -35,7 +36,8 @@ export const BouncingView = ({
           ]
         },
         style
-      ]}>
+      ]}
+    >
       {children}
     </Animated.View>
   );

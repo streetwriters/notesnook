@@ -1,15 +1,11 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {Keyboard, TextInput, TouchableOpacity, View} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import React, { createRef, useEffect, useState } from 'react';
+import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {
-  useNotebookStore,
-  useSelectionStore,
-  useSettingStore
-} from '../../provider/stores';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { useNotebookStore, useSelectionStore, useSettingStore } from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -17,20 +13,20 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {getTotalNotes, InteractionManager} from '../../utils';
-import {db} from '../../utils/database';
-import {eOpenMoveNoteDialog} from '../../utils/Events';
-import {pv, SIZE} from '../../utils/SizeUtils';
+import { getTotalNotes, InteractionManager } from '../../utils';
+import { db } from '../../utils/database';
+import { eOpenMoveNoteDialog } from '../../utils/Events';
+import { pv, SIZE } from '../../utils/SizeUtils';
 import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
-import {PressableButton} from '../PressableButton';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import Input from '../Input';
-import {ActionIcon} from '../ActionIcon';
-import {Dialog} from '../Dialog';
-import {presentDialog} from '../Dialog/functions';
+import { ActionIcon } from '../ActionIcon';
+import { Dialog } from '../Dialog';
+import { presentDialog } from '../Dialog/functions';
 import layoutmanager from '../../utils/layout-manager';
 
 let newNotebookTitle = null;
@@ -85,13 +81,11 @@ const MoveNoteDialog = () => {
 
 export default MoveNoteDialog;
 
-const MoveNoteComponent = ({close, note, setNote}) => {
+const MoveNoteComponent = ({ close, note, setNote }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
-  const nbs = useNotebookStore(state =>
-    state.notebooks.filter(n => n?.type === 'notebook')
-  );
+  const nbs = useNotebookStore(state => state.notebooks.filter(n => n?.type === 'notebook'));
   let notebooks = [...db.notebooks.all];
 
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
@@ -140,13 +134,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
   const handlePress = async (item, index) => {
     if (note && item.notes.indexOf(note.id) > -1) {
-      await db.notebooks
-        .notebook(item.notebookId)
-        .topics.topic(item.id)
-        .delete(note.id);
+      await db.notebooks.notebook(item.notebookId).topics.topic(item.id).delete(note.id);
 
       if (note && note.id) {
-        setNote({...db.notes.note(note.id).data});
+        setNote({ ...db.notes.note(note.id).data });
         requestAnimationFrame(() => {
           //layoutmanager.withSpringAnimation(500);
           Navigation.setRoutesToUpdate([
@@ -173,7 +164,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       ...noteIds
     );
     if (note && note.id) {
-      setNote({...db.notes.note(note.id).data});
+      setNote({ ...db.notes.note(note.id).data });
       requestAnimationFrame(() => {
         //layoutmanager.withSpringAnimation(500);
         Navigation.setRoutesToUpdate([
@@ -240,7 +231,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
             paddingHorizontal: 12,
             flexDirection: 'row',
             justifyContent: 'space-between'
-          }}>
+          }}
+        >
           <DialogHeader
             title="Add to notebook"
             paragraph={`Add your notes to notebooks to find them easily.`}
@@ -273,7 +265,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
               style={{
                 width: '100%',
                 marginTop: 10
-              }}>
+              }}
+            >
               <Input
                 fwdRef={notebookInput}
                 onChangeText={value => {
@@ -290,7 +283,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                 button={{
                   icon: 'check',
                   color: notebookInputFocused ? colors.accent : colors.icon,
-                  onPress:addNewNotebook
+                  onPress: addNewNotebook
                 }}
                 onSubmit={addNewNotebook}
                 placeholder="Create a new notebook"
@@ -300,7 +293,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           style={{
             paddingHorizontal: 12
           }}
-          renderItem={({item, index}) => (
+          renderItem={({ item, index }) => (
             <View
               style={{
                 borderWidth: 1,
@@ -308,7 +301,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                 borderRadius: 6,
                 overflow: 'hidden',
                 marginBottom: 10
-              }}>
+              }}
+            >
               <PressableButton
                 onPress={() => {
                   if (!item.topics || item.topics.length === 0) {
@@ -326,7 +320,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                   width: '100%',
                   borderRadius: 5,
                   alignItems: 'flex-start'
-                }}>
+                }}
+              >
                 <View
                   style={{
                     width: '100%',
@@ -335,13 +330,13 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     paddingHorizontal: 12
-                  }}>
+                  }}
+                >
                   <View>
                     <Heading
-                      color={
-                        noteExists.indexOf(item.id) > -1 ? colors.accent : null
-                      }
-                      size={SIZE.md}>
+                      color={noteExists.indexOf(item.id) > -1 ? colors.accent : null}
+                      size={SIZE.md}
+                    >
                       {item.title}
                     </Heading>
                     {item.topics?.length > 0 ? (
@@ -391,7 +386,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                     alignSelf: 'flex-end',
                     maxHeight: 500
                   }}
-                  renderItem={({item, index}) => (
+                  renderItem={({ item, index }) => (
                     <PressableButton
                       onPress={() => handlePress(item, index)}
                       type="gray"
@@ -405,11 +400,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                         flexDirection: 'row',
                         paddingHorizontal: 12,
                         justifyContent: 'space-between'
-                      }}>
+                      }}
+                    >
                       <View>
-                        <Paragraph color={colors.heading}>
-                          {item.title}
-                        </Paragraph>
+                        <Paragraph color={colors.heading}>{item.title}</Paragraph>
                         <Paragraph color={colors.icon} size={SIZE.xs}>
                           {item.notes.length + ' notes'}
                         </Paragraph>

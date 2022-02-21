@@ -1,19 +1,19 @@
 import React from 'react';
-import {ScrollView, View} from 'react-native';
+import { ScrollView, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/database';
-import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import {PressableButton} from '../PressableButton';
+import { db } from '../../utils/database';
+import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 
-export default function Notebooks({note, close}) {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+export default function Notebooks({ note, close }) {
+  const [state] = useTracked();
+  const { colors } = state;
 
   function getNotebooks(item) {
     if (!item.notebooks || item.notebooks.length < 1) return [];
@@ -63,7 +63,7 @@ export default function Notebooks({note, close}) {
     let routeName = 'NotesPage';
     let item = db.notebooks.notebook(notebookId).topics.topic(id)._topic;
 
-    let params = {...item, menu: false};
+    let params = { ...item, menu: false };
     let headerState = {
       heading: item.title,
       id: item.id,
@@ -79,9 +79,11 @@ export default function Notebooks({note, close}) {
         width: '100%',
         borderTopWidth: 1,
         borderTopColor: colors.nav
-      }}>
+      }}
+    >
       {getNotebooks(note).map(item => (
         <PressableButton
+          key={item.id}
           onPress={() => {
             navigateNotebook(item.id);
             close();
@@ -95,7 +97,8 @@ export default function Notebooks({note, close}) {
             flexGrow: 1,
             marginTop: 5,
             paddingVertical: 6
-          }}>
+          }}
+        >
           <Icon
             name="book-outline"
             color={colors.accent}
@@ -109,7 +112,8 @@ export default function Notebooks({note, close}) {
             style={{
               maxWidth: '50%'
             }}
-            size={SIZE.sm}>
+            size={SIZE.sm}
+          >
             {item.title}
           </Heading>
 
@@ -122,9 +126,11 @@ export default function Notebooks({note, close}) {
               borderLeftColor: colors.nav,
               borderLeftWidth: 1,
               paddingLeft: 8
-            }}>
+            }}
+          >
             {item.topics.map(topic => (
               <Button
+                key={topic.id}
                 onPress={() => {
                   navigateTopic(topic.id, item.id);
                   close();
@@ -141,7 +147,7 @@ export default function Notebooks({note, close}) {
                 }}
               />
             ))}
-            <View style={{width: 10}} />
+            <View style={{ width: 10 }} />
           </ScrollView>
         </PressableButton>
       ))}

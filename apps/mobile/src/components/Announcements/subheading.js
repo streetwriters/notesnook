@@ -4,8 +4,7 @@ import { SIZE } from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
 import { getStyle } from './functions';
 
-
-export const SubHeading = ({text, style = {}}) => {
+export const SubHeading = ({ text, style = {} }) => {
   const [state] = useTracked();
   const colors = state.colors;
 
@@ -16,7 +15,8 @@ export const SubHeading = ({text, style = {}}) => {
         marginHorizontal: 12,
         marginTop: 12,
         ...getStyle(style)
-      }}>
+      }}
+    >
       {text}
     </Heading>
   );

@@ -1,23 +1,23 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eCloseProgressDialog, eOpenProgressDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { editing } from '../../utils';
+import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorWebView } from '../../views/Editor/Functions';
+import tiny from '../../views/Editor/tiny/tiny';
+import { reFocusEditor } from '../../views/Editor/tiny/toolbar/constants';
+import { Button } from '../Button';
 import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import tiny from '../../views/Editor/tiny/tiny';
-import {EditorWebView} from '../../views/Editor/Functions';
-import {editing} from '../../utils';
-import {reFocusEditor} from '../../views/Editor/tiny/toolbar/constants';
 
-const GeneralSheet = ({context}) => {
+const GeneralSheet = ({ context = 'global' }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState(null);
   const actionSheetRef = useRef();
@@ -32,14 +32,15 @@ const GeneralSheet = ({context}) => {
       eUnSubscribeEvent(eOpenProgressDialog, open);
       eUnSubscribeEvent(eCloseProgressDialog, close);
     };
-  }, []);
+  }, [visible]);
 
   const open = async data => {
-    if (
-      (data.context && !context) ||
-      (data.context && data.context !== context)
-    ) {
-      return;
+    if (!data.context) data.context = 'global';
+    if (data.context !== context) return;
+    if (visible || dialogData) {
+      setDialogData(null);
+      setVisible(false);
+      await sleep(500);
     }
     setDialogData(data);
     setVisible(true);
@@ -48,7 +49,6 @@ const GeneralSheet = ({context}) => {
       if (editing.keyboardState) {
         tiny.call(EditorWebView, tiny.cacheRange);
         tiny.call(EditorWebView, tiny.blur);
-        console.log('here');
         editor.current.refocus = true;
       }
     }
@@ -56,7 +56,7 @@ const GeneralSheet = ({context}) => {
 
   useEffect(() => {
     (async () => {
-      if (visible) {
+      if (visible && dialogData) {
         if (dialogData.editor) await sleep(100);
         actionSheetRef.current?.setModalVisible(true);
         return;
@@ -70,7 +70,7 @@ const GeneralSheet = ({context}) => {
         }
       }
     })();
-  }, [visible]);
+  }, [visible, dialogData]);
 
   const close = ctx => {
     if ((ctx && !context) || (ctx && ctx !== context)) {
@@ -79,31 +79,28 @@ const GeneralSheet = ({context}) => {
     actionSheetRef.current?.setModalVisible(false);
   };
 
-  return !visible ? null : (
+  return !visible || !dialogData ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
-      gestureEnabled={!dialogData.progress}
-      closeOnTouchBackdrop={!dialogData.progress}
+      gestureEnabled={!dialogData?.progress && !dialogData?.disableClosing}
+      closeOnTouchBackdrop={!dialogData?.progress && !dialogData?.disableClosing}
       onClose={() => {
         dialogData.onClose && dialogData.onClose();
-        if (!dialogData.progress) {
-          setVisible(false);
-          setDialogData(null);
-        }
-      }}>
+        setVisible(false);
+        setDialogData(null);
+      }}
+    >
       <View
         style={{
           justifyContent: 'center',
           alignItems: 'center',
           marginBottom:
-            !dialogData.progress &&
-            !dialogData.icon &&
-            !dialogData.title &&
-            !dialogData.paragraph
+            !dialogData.progress && !dialogData.icon && !dialogData.title && !dialogData.paragraph
               ? 0
               : 10,
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         {dialogData?.progress ? (
           <ActivityIndicator
             style={{
@@ -125,9 +122,7 @@ const GeneralSheet = ({context}) => {
         {dialogData?.title ? <Heading> {dialogData?.title}</Heading> : null}
 
         {dialogData?.paragraph ? (
-          <Paragraph style={{textAlign: 'center'}}>
-            {dialogData?.paragraph}
-          </Paragraph>
+          <Paragraph style={{ textAlign: 'center' }}>{dialogData?.paragraph}</Paragraph>
         ) : null}
       </View>
 
@@ -135,29 +130,19 @@ const GeneralSheet = ({context}) => {
         ? dialogData.component(actionSheetRef, close)
         : dialogData.component}
 
-      {dialogData?.learnMore ? (
-        <Paragraph
-          style={{
-            alignSelf: 'center'
-          }}
-          onPress={dialogData.learnMorePress}
-          color={colors.icon}>
-          <Icon color={colors.icon} name="information-outline" size={14} />{' '}
-          {dialogData.learnMore}
-        </Paragraph>
-      ) : null}
       <View
         style={{
           paddingHorizontal: 12,
           marginBottom: dialogData.valueArray ? 12 : 0
-        }}>
+        }}
+      >
         {dialogData.valueArray &&
           dialogData.valueArray.map(v => (
             <Button
               title={v}
               type="gray"
               key={v}
-              textStyle={{fontWeight: 'normal'}}
+              textStyle={{ fontWeight: 'normal' }}
               fontSize={SIZE.sm}
               icon="check"
               width="100%"
@@ -172,7 +157,8 @@ const GeneralSheet = ({context}) => {
       <View
         style={{
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         {dialogData?.action ? (
           <Button
             onPress={dialogData.action}
@@ -180,7 +166,6 @@ const GeneralSheet = ({context}) => {
             title={dialogData.actionText}
             accentColor={dialogData.iconColor || 'accent'}
             accentText="light"
-            fontSize={SIZE.lg}
             type="accent"
             height={50}
             width="100%"
@@ -204,6 +189,22 @@ const GeneralSheet = ({context}) => {
               fontSize={SIZE.md}
             />
           ))}
+
+        {dialogData?.learnMore ? (
+          <Paragraph
+            style={{
+              alignSelf: 'center',
+              marginTop: 10,
+              textDecorationLine: 'underline'
+            }}
+            size={SIZE.xs}
+            onPress={dialogData.learnMorePress}
+            color={colors.icon}
+          >
+            <Icon color={colors.icon} name="information-outline" size={SIZE.xs} />{' '}
+            {dialogData.learnMore}
+          </Paragraph>
+        ) : null}
       </View>
     </SheetWrapper>
   );

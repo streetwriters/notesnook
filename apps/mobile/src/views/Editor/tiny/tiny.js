@@ -1,31 +1,55 @@
-import {Platform} from 'react-native';
-import {editing} from '../../../utils';
-import {EditorWebView, getWebviewInit, post, textInput} from '../Functions';
+import { Platform } from 'react-native';
+import { editing } from '../../../utils';
+import { EditorWebView, getWebviewInit, post, textInput } from '../Functions';
 
-const reset = `
-isLoading = true;
+/**
+ *
+ * @param {"design" | "readonly"} mode
+ * @returns
+ */
+const toogleReadMode = mode => `
+tinymce.activeEditor.mode.set('${mode}')
+setTimeout(() => {
+  document.getElementById("titleInput").readOnly = ${mode === 'design' ? 'false' : 'true'};
+},300);
+`;
+
+const reset = id => `
+sessionId = null;
 document.getElementById("titleInput").value = '';
-autosize();
-window.prevContent = "";
-globalThis.isClearingNoteData = true;
-tinymce.activeEditor.setHTML('');
+document.getElementById("titleInput").placeholder = "Note title";
+tinymce.activeEditor.mode.set('readonly');
+tinymce.activeEditor.clearContent();
+tinymce.activeEditor.setHTML("<p><br/></p>");
+editor.dom.setAttrib(editor.dom.doc.body, 'data-mce-placeholder', 'Start writing your note here');
+editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', 'Start writing your note here');
+renderChildernInNode([], ".tag-bar");
 tinymce.activeEditor.undoManager.clear();
-info = document.querySelector(infoBar);
-info.querySelector('#infosaved').innerText = "";
-info.querySelector('#infodate').innerText = "";
-info.querySelector('#infowords').innerText = ""
-updateInfoBar()
+document.querySelector('#infosaved').innerText = "";
+document.querySelector('#infodate').innerText = "";
+document.querySelector('#infowords').innerText = "0 words"
+updateInfoBar();
+reactNativeEventHandler('resetcomplete');
+tinymce.activeEditor.mode.set('design');
 document.activeElement.blur();
 window.blur();
+toggleNode(".tag-bar-parent","hide"); 
+clearNode(".tag-bar");
+`;
+
+const setPlaceholder = placeholder => `
+editor.dom.setAttrib(editor.dom.doc.body, 'data-mce-placeholder', "${placeholder}");
+editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', "${placeholder}");
 `;
 
 const removeMarkdown = `
 if (globalThis.tinymce && tinymce.activeEditor) {
+  
   tinymce.activeEditor.plugins.textpattern.setPatterns("")
 }`;
 
 const setMarkdown = `
-if (globalThis.tinymce &&  tinymce.activeEditor) {
+if (globalThis.tinymce && tinymce.activeEditor) {
   tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns);
 }`;
 
@@ -54,7 +78,7 @@ const pre = `(function() {
       });
     });
     tinymce.activeEditor.selection.setRng(rng, true);
-    tinymce.activeEditor.fire("input");
+    tinymce.activeEditor.fire("input",{data:""})
   };
 
   let node = tinymce.activeEditor.selection.getNode();
@@ -178,32 +202,22 @@ function call(webview, func, noqueue) {
 }
 
 export function safeKeyboardDismiss() {
-  console.log('keyboard state', editing.keyboardState)
+  console.log('keyboard state', editing.keyboardState);
   if (!editing.keyboardState) return;
-  if (Platform.OS === "android") {
-    
+  if (Platform.OS === 'android') {
     textInput.current?.focus();
     textInput.current?.blur();
   } else {
-    call(EditorWebView,blur);
+    call(EditorWebView, blur);
   }
-
 }
 
 const undo = `
-	
 tinymce.activeEditor.undoManager.undo();
-
 `;
-const redo = `
-	
-tinymce.activeEditor.undoManager.redo();
+const redo = `tinymce.activeEditor.undoManager.redo();`;
 
-`;
-
-const clearHistory = `
-tinymce.activeEditor.undoManager.clear();
-`;
+const clearHistory = `tinymce.activeEditor.undoManager.clear();`;
 
 const onKeyboardShow = () => {
   if (!editing.movedAway) {
@@ -241,5 +255,7 @@ export default {
   onKeyboardShow,
   pre,
   setMarkdown,
-  removeMarkdown
+  removeMarkdown,
+  setPlaceholder,
+  toogleReadMode
 };

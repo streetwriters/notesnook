@@ -1,13 +1,13 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
 import * as Progress from 'react-native-progress';
-import {useTracked} from '../../provider';
-import {useAttachmentStore} from '../../provider/stores';
-import {SIZE} from '../../utils/SizeUtils';
+import { useTracked } from '../../provider';
+import { useAttachmentStore } from '../../provider/stores';
+import { SIZE } from '../../utils/SizeUtils';
 
 export const ProgressCircle = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const loading = useAttachmentStore(state => state.loading);
   const [prog, setProg] = useState(0);
   const [visible, setVisible] = useState(false);
@@ -50,7 +50,8 @@ export const ProgressCircle = () => {
       style={{
         justifyContent: 'center',
         marginLeft: 10
-      }}>
+      }}
+    >
       <Progress.Circle
         size={SIZE.xxl}
         progress={prog}

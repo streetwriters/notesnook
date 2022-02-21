@@ -1,88 +1,130 @@
 import React from 'react';
-import {ActivityIndicator, useWindowDimensions, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import {Placeholder} from '../ListPlaceholders';
+import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { useTip } from '../../services/tip-manager';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import Seperator from '../Seperator';
+import { Tip } from '../Tip';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Empty = ({
-  loading = true,
-  placeholderData,
-  absolute,
-  headerProps,
-  type,
-  screen,
-}) => {
-  const [state] = useTracked();
-  const {colors} = state;
-  const insets = useSafeAreaInsets();
-  const {height} = useWindowDimensions();
-
-  return (
-    <View
-      style={[
-        {
-          backgroundColor: colors.bg,
-          position: absolute ? 'absolute' : 'relative',
-          zIndex: absolute ? 10 : null,
-          height: height - 250 - insets.top,
-          width: '100%',
-        },
-      ]}>
+export const Empty = React.memo(
+  ({ loading = true, placeholderData, headerProps, type, screen }) => {
+    const [state] = useTracked();
+    const { colors } = state;
+    const insets = useSafeAreaInsets();
+    const { height } = useWindowDimensions();
+    const introCompleted = useSettingStore(state => state.isIntroCompleted);
+    const tip = useTip(
+      screen === 'Notes' && introCompleted ? 'first-note' : placeholderData.type || type,
+      screen === 'Notes' ? 'notes' : null
+    );
+    const color =
+      colors[COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'];
+    return (
       <View
-        style={{
-          flexGrow: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Placeholder
-          color={
-            COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent
-          }
-          w={normalize(150)}
-          h={normalize(150)}
-          type={screen === 'Favorites' ? 'favorites' : type}
-        />
-        <Heading>{placeholderData.heading}</Heading>
-        <Paragraph
-          textBreakStrategy="balanced"
-          style={{
-            textAlign: 'center',
+        style={[
+          {
+            height: height - (140 + insets.top),
             width: '80%',
-          }}
-          color={colors.icon}>
-          {loading ? placeholderData.loading : placeholderData.paragraph}
-        </Paragraph>
-        <Seperator />
-        {placeholderData.button && !loading ? (
-          <Button
-            onPress={placeholderData.action}
-            title={placeholderData.button}
-            icon={placeholderData.buttonIcon || 'plus'}
-            testID={notesnook.buttons.add}
-            type="accent"
-            fontSize={SIZE.md}
-            accentColor="bg"
-            accentText={
-              COLORS_NOTE[headerProps.color?.toLowerCase()]
-                ? headerProps.color
-                : 'accent'
-            }
-          />
-        ) : loading ? (
-          <ActivityIndicator
-            color={
-              COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent
-            }
-          />
-        ) : null}
+            justifyContent: 'center',
+            alignSelf: 'center'
+          }
+        ]}
+      >
+        {!loading ? (
+          <>
+            <Tip
+              color={COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'}
+              tip={tip}
+              style={{
+                backgroundColor: 'transparent',
+                paddingHorizontal: 0
+              }}
+            />
+            {placeholderData.button && (
+              <Button
+                type="grayAccent"
+                title={placeholderData.button}
+                iconPosition="right"
+                icon="arrow-right"
+                onPress={placeholderData.action}
+                accentColor={
+                  COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'
+                }
+                accentText="light"
+                style={{
+                  alignSelf: 'flex-start',
+                  borderRadius: 5,
+                  height: 40
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <View
+              style={{
+                alignSelf: 'center',
+                alignItems: 'flex-start',
+                width: '100%'
+              }}
+            >
+              <Heading>{placeholderData.heading}</Heading>
+              <Paragraph size={SIZE.sm} textBreakStrategy="balanced">
+                {placeholderData.loading}
+              </Paragraph>
+              <Seperator />
+              <ActivityIndicator
+                size={SIZE.lg}
+                color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
+              />
+            </View>
+          </>
+        )}
       </View>
-    </View>
-  );
-};
+    );
+  },
+  (prev, next) => {
+    if (prev.loading === next.loading) return true;
+    return false;
+  }
+);
+
+/**
+ * Make a tips manager.
+ * The tip manager stores many tips. Each tip has following values
+ * 1. Text
+ * 2. contexts: An array of context strings. // Places where the tip can be shown
+ * 3. Button if any.
+ * 4. Image/Gif asset.
+ *
+ * Tip manager adds the following methods -> get(context). Returns a random tip for the following context.
+ *
+ * Tips can be shown in a sheet or in a list. For sheets, GeneralSheet can be used to
+ * render tips.
+ *
+ * Where can the tips be shown and how?
+ * 1. When transitioning, show tips in a sheet. Make sure its useful
+ * 2. Replace placeholders with tips.
+ * 3. Show tips in editor placeholder.
+ * 4. Show tips between list items?
+ *
+ * Tooltips.
+ * Small tooltips can be shown in initial render first time.
+ * Especially for items that are not shown on blank page. Should be
+ * in places where it makes sense and does not interrupt the user.
+ *
+ * Can also be shown when first time entering a screen that
+ * has something that the user might not know of. Like sorting and side menu.
+ *
+ * Todo:
+ * 1. Make a tip manager.
+ * 2. Make a list of tips.
+ * 3. Add images for those tips.
+ * 4. Show tips
+ */

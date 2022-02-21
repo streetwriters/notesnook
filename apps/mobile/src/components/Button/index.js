@@ -1,10 +1,10 @@
 import React from 'react';
-import {ActivityIndicator} from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {BUTTON_TYPES, showTooltip} from '../../utils';
-import {ph, SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { useTracked } from '../../provider';
+import { BUTTON_TYPES, showTooltip, TOOLTIP_POSITIONS } from '../../utils';
+import { SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -33,10 +33,11 @@ export const Button = ({
   hitSlop,
   buttonType = {},
   bold,
-  iconColor
+  iconColor,
+  fwdRef
 }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   const textColor = buttonType.text
     ? buttonType.text
@@ -45,11 +46,11 @@ export const Button = ({
           ? BUTTON_TYPES[type](accentColor, accentText).text
           : BUTTON_TYPES[type].text
       ];
-  const Component = bold ? Heading : Paragraph
-
+  const Component = bold ? Heading : Paragraph;
 
   return (
     <PressableButton
+      fwdRef={fwdRef}
       hitSlop={hitSlop}
       onPress={onPress}
       onLongPress={event => {
@@ -58,7 +59,7 @@ export const Button = ({
           return;
         }
         if (tooltipText) {
-          showTooltip(event, tooltipText);
+          showTooltip(event, tooltipText, TOOLTIP_POSITIONS.TOP);
         }
       }}
       disabled={loading}
@@ -80,7 +81,8 @@ export const Button = ({
         alignItems: 'center',
         flexDirection: 'row',
         ...style
-      }}>
+      }}
+    >
       {loading ? <ActivityIndicator color={textColor} size={fontSize + 4} /> : null}
       {icon && !loading && iconPosition === 'left' ? (
         <Icon
@@ -88,7 +90,6 @@ export const Button = ({
           style={{
             marginRight: 0
           }}
-
           color={iconColor || buttonType.text || textColor}
           size={iconSize}
         />
@@ -105,7 +106,8 @@ export const Button = ({
               marginRight: icon || (loading && iconPosition === 'right') ? 5 : 0
             },
             textStyle
-          ]}>
+          ]}
+        >
           {title}
         </Component>
       )}

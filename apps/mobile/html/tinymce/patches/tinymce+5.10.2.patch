@@ -53,25 +53,8 @@ index e41249b..fb25fc5 100644
      ];
      var handle$1 = function (event, editor, cellSelection) {
        if (event.keyCode === global$1.TAB) {
-diff --git a/node_modules/tinymce/tinymce.js b/node_modules/tinymce/tinymce.js
-index 4cdbfce..464b5fd 100644
---- a/node_modules/tinymce/tinymce.js
-+++ b/node_modules/tinymce/tinymce.js
-@@ -27901,10 +27901,10 @@
-         setEditorCommandState(editor, 'StyleWithCSS', false);
-         setEditorCommandState(editor, 'enableInlineTableEditing', false);
-         setEditorCommandState(editor, 'enableObjectResizing', false);
--        if (hasEditorOrUiFocus(editor)) {
--          editor.focus();
--        }
--        restoreFakeSelection(editor);
-+       // if (hasEditorOrUiFocus(editor)) {
-+          //editor.focus();
-+        // }
-+        //restoreFakeSelection(editor);
-         editor.nodeChanged();
-       }
-     };
+diff --git a/node_modules/tinymce/plugins/textpattern/plugin.js b/node_modules/tinymce/plugins/textpattern/plugin.js
+index 987d753..0e719f0 100644
 --- a/node_modules/tinymce/plugins/textpattern/plugin.js
 +++ b/node_modules/tinymce/plugins/textpattern/plugin.js
 @@ -1330,6 +1330,12 @@
@@ -87,7 +70,7 @@ index 4cdbfce..464b5fd 100644
      var setup = function (editor, patternsState) {
        var charCodes = [
          ',',
-@@ -1341,6 +1347,8 @@
+@@ -1341,18 +1347,44 @@
        ];
        var keyCodes = [32];
        editor.on('keydown', function (e) {
@@ -96,9 +79,29 @@ index 4cdbfce..464b5fd 100644
          if (e.keyCode === 13 && !global$3.modifierPressed(e)) {
            if (handleEnter(editor, patternsState.get())) {
              e.preventDefault();
-@@ -1348,11 +1356,15 @@
+           }
          }
        }, true);
++
++
++      editor.on('input', function (e) {
++        if (isCodeblock(editor)) return;
++
++        if (e.data.endsWith("\n") && !global$3.modifierPressed(e)) {
++          if (handleEnter(editor, patternsState.get())) {
++            e.preventDefault();
++          }
++        }
++
++        if (e.data.endsWith(" ")) {
++          e.preventDefault();
++          global$4.setEditorTimeout(editor, function () {
++            handleInlineKey(editor, patternsState.get());
++          });
++        }
++
++      }, true);
++
        editor.on('keyup', function (e) {
 +        if (isCodeblock(editor)) return;
 +
@@ -108,7 +111,50 @@ index 4cdbfce..464b5fd 100644
        });
        editor.on('keypress', function (e) {
 +        if (isCodeblock(editor)) return;
-+
++          
          if (checkCharCode(charCodes, e)) {
            global$4.setEditorTimeout(editor, function () {
-             handleInlineKey(editor, patternsState.get());     
+             handleInlineKey(editor, patternsState.get());
+diff --git a/node_modules/tinymce/tinymce.js b/node_modules/tinymce/tinymce.js
+index 4cdbfce..9a547bc 100644
+--- a/node_modules/tinymce/tinymce.js
++++ b/node_modules/tinymce/tinymce.js
+@@ -24894,6 +24894,9 @@
+     var inPreBlock = function (requiredState) {
+       return inBlock('pre', requiredState);
+     };
++    var inTableCell = function (requiredState) {
++      return inBlock('td', requiredState) || inBlock('th', requiredState);
++    };
+     var inSummaryBlock = function () {
+       return inBlock('summary', true);
+     };
+@@ -24925,6 +24928,13 @@
+       return evaluateUntil([
+         match([shouldBlockNewLine], newLineAction.none()),
+         match([inSummaryBlock()], newLineAction.br()),
++        match([
++          inTableCell(true),
++          hasShiftKey
++        ], newLineAction.br()),
++        match([
++          inTableCell(true)
++        ], newLineAction.br()),
+         match([
+           inPreBlock(true),
+           shouldPutBrInPre(false),
+@@ -27901,10 +27911,10 @@
+         setEditorCommandState(editor, 'StyleWithCSS', false);
+         setEditorCommandState(editor, 'enableInlineTableEditing', false);
+         setEditorCommandState(editor, 'enableObjectResizing', false);
+-        if (hasEditorOrUiFocus(editor)) {
+-          editor.focus();
+-        }
+-        restoreFakeSelection(editor);
++       // if (hasEditorOrUiFocus(editor)) {
++          //editor.focus();
++        // }
++        //restoreFakeSelection(editor);
+         editor.nodeChanged();
+       }
+     };

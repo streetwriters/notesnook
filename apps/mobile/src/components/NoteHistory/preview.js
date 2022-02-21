@@ -1,33 +1,30 @@
-import React, {useRef} from 'react';
-import {Alert, Platform, View} from 'react-native';
+import React, { useRef } from 'react';
+import { Alert, Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
-import {useTracked} from '../../provider';
-import {useEditorStore} from '../../provider/stores';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useEditorStore } from '../../provider/stores';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/database';
-import {eCloseProgressDialog, eOnLoadNote} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {normalize} from '../../utils/SizeUtils';
-import {getNote, sourceUri} from '../../views/Editor/Functions';
+import { db } from '../../utils/database';
+import { eCloseProgressDialog, eOnLoadNote } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { normalize } from '../../utils/SizeUtils';
+import { getNote, sourceUri } from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Paragraph from '../Typography/Paragraph';
 
-export default function NotePreview({session, content}) {
+export default function NotePreview({ session, content }) {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const webviewRef = useRef();
 
   const onLoad = async () => {
-    let preview = await db.content.insertPlaceholders(
-      content,
-      'placeholder.svg'
-    );
+    let preview = await db.content.insertPlaceholders(content, 'placeholder.svg');
 
-    let theme = {...colors};
+    let theme = { ...colors };
     theme.factor = normalize(1);
 
     webviewRef.current?.injectJavaScript(`
@@ -77,7 +74,7 @@ export default function NotePreview({session, content}) {
     await db.noteHistory.restore(session.id);
     if (useEditorStore.getState()?.currentEditingNote === session?.noteId) {
       if (getNote()) {
-        eSendEvent(eOnLoadNote, {...getNote(), forced: true});
+        eSendEvent(eOnLoadNote, { ...getNote(), forced: true });
       }
     }
     eSendEvent(eCloseProgressDialog, 'note_history');
@@ -99,7 +96,8 @@ export default function NotePreview({session, content}) {
       style={{
         height: session.locked ? null : 600,
         width: '100%'
-      }}>
+      }}
+    >
       <DialogHeader padding={12} title={session.session} />
       {!session.locked ? (
         <WebView
@@ -138,23 +136,18 @@ export default function NotePreview({session, content}) {
             height: 100,
             justifyContent: 'center',
             alignItems: 'center'
-          }}>
-          <Paragraph color={colors.icon}>
-            Preview not available, content is encrypted.
-          </Paragraph>
+          }}
+        >
+          <Paragraph color={colors.icon}>Preview not available, content is encrypted.</Paragraph>
         </View>
       )}
 
       <View
         style={{
           paddingHorizontal: 12
-        }}>
-        <Button
-          onPress={restore}
-          title="Restore this version"
-          type="accent"
-          width="100%"
-        />
+        }}
+      >
+        <Button onPress={restore} title="Restore this version" type="accent" width="100%" />
       </View>
     </View>
   );

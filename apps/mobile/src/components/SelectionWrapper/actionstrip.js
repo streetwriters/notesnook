@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {View } from 'react-native';
-import Clipboard from "@react-native-clipboard/clipboard"
+import { View } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 import Animated, { useValue } from 'react-native-reanimated';
 import { useTracked } from '../../provider';
 import {
   useMenuStore,
   useNotebookStore,
-  useSelectionStore
+  useSelectionStore,
+  useTrashStore
 } from '../../provider/stores';
 import { openVault, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -17,9 +18,9 @@ import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 import { presentDialog } from '../Dialog/functions';
 
-export const ActionStrip = ({note, setActionStrip}) => {
+export const ActionStrip = ({ note, setActionStrip }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const setNotebooks = useNotebookStore(state => state.setNotebooks);
   const setMenuPins = useMenuStore(state => state.setMenuPins);
@@ -38,7 +39,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
       Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes,
+      Navigation.routeNames.Notes
     ]);
   };
 
@@ -63,7 +64,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
           if (db.notes.pinned.length === 3 && !note.pinned) {
             ToastEvent.show({
               heading: 'Cannot pin more than 3 notes',
-              type: 'error',
+              type: 'error'
             });
             return;
           }
@@ -72,7 +73,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
           if (db.notebooks.pinned.length === 3 && !note.pinned) {
             ToastEvent.show({
               heading: 'Cannot pin more than 3 notebooks',
-              type: 'error',
+              type: 'error'
             });
             return;
           }
@@ -81,7 +82,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
         }
         updateNotes();
         setActionStrip(false);
-      },
+      }
     },
     {
       title: 'Add to favorites',
@@ -97,13 +98,11 @@ export const ActionStrip = ({note, setActionStrip}) => {
         setActionStrip(false);
       },
       visible: note.type === 'note',
-      color: !note.favorite ? 'orange' : null,
+      color: !note.favorite ? 'orange' : null
     },
 
     {
-      title: isPinnedToMenu
-        ? 'Remove Shortcut from Menu'
-        : 'Add Shortcut to Menu',
+      title: isPinnedToMenu ? 'Remove Shortcut from Menu' : 'Add Shortcut to Menu',
       icon: isPinnedToMenu ? 'link-variant-remove' : 'link-variant',
       onPress: async () => {
         try {
@@ -111,20 +110,20 @@ export const ActionStrip = ({note, setActionStrip}) => {
             await db.settings.unpin(note.id);
             ToastEvent.show({
               heading: 'Shortcut removed from menu',
-              type: 'success',
+              type: 'success'
             });
           } else {
             if (note.type === 'topic') {
               await db.settings.pin(note.type, {
                 id: note.id,
-                notebookId: note.notebookId,
+                notebookId: note.notebookId
               });
             } else {
-              await db.settings.pin(note.type, {id: note.id});
+              await db.settings.pin(note.type, { id: note.id });
             }
             ToastEvent.show({
               heading: 'Shortcut added to menu',
-              type: 'success',
+              type: 'success'
             });
           }
           setIsPinnedToMenu(db.settings.isPinned(note.id));
@@ -133,7 +132,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
           setActionStrip(false);
         } catch (e) {}
       },
-      visible: note.type !== 'note',
+      visible: note.type !== 'note'
     },
     {
       title: 'Copy Note',
@@ -147,20 +146,19 @@ export const ActionStrip = ({note, setActionStrip}) => {
             locked: true,
             item: note,
             title: 'Copy note',
-            description: 'Unlock note to copy to clipboard.',
+            description: 'Unlock note to copy to clipboard.'
           });
         } else {
-          let delta = await db.notes.note(note.id).content();
-          let text = toTXT(delta);
+          let text = await toTXT(note);
           text = `${note.title}\n \n ${text}`;
           Clipboard.setString(text);
           ToastEvent.show({
             heading: 'Note copied to clipboard',
-            type: 'success',
+            type: 'success'
           });
         }
         setActionStrip(false);
-      },
+      }
     },
     {
       title: 'Restore ' + note.itemType,
@@ -172,20 +170,18 @@ export const ActionStrip = ({note, setActionStrip}) => {
           Navigation.routeNames.Notebooks,
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
-          Navigation.routeNames.Trash,
+          Navigation.routeNames.Trash
         ]);
 
         ToastEvent.show({
           heading:
-            item.type === 'note'
-              ? 'Note restored from trash'
-              : 'Notebook restored from trash',
-          type: 'success',
+            note.type === 'note' ? 'Note restored from trash' : 'Notebook restored from trash',
+          type: 'success'
         });
 
         setActionStrip(false);
       },
-      visible: note.type === 'trash',
+      visible: note.type === 'trash'
     },
     {
       title: 'Delete' + note.itemType,
@@ -204,13 +200,13 @@ export const ActionStrip = ({note, setActionStrip}) => {
             ToastEvent.show({
               heading: 'Permanantly deleted items',
               type: 'success',
-              context: 'local',
+              context: 'local'
             });
           },
-          positiveType: 'errorShade',
+          positiveType: 'errorShade'
         });
         setActionStrip(false);
-      },
+      }
     },
     {
       title: 'Delete' + note.type,
@@ -221,7 +217,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
           await deleteItems(note);
         } catch (e) {}
         setActionStrip(false);
-      },
+      }
     },
     {
       title: 'Close',
@@ -229,8 +225,8 @@ export const ActionStrip = ({note, setActionStrip}) => {
       onPress: () => setActionStrip(false),
       color: colors.light,
       bg: colors.red,
-      visible: true,
-    },
+      visible: true
+    }
   ];
 
   return (
@@ -246,8 +242,9 @@ export const ActionStrip = ({note, setActionStrip}) => {
         flexDirection: 'row',
         justifyContent: 'flex-end',
         alignItems: 'center',
-        opacity: opacity,
-      }}>
+        opacity: opacity
+      }}
+    >
       <Button
         type="accent"
         title="Select"
@@ -263,36 +260,36 @@ export const ActionStrip = ({note, setActionStrip}) => {
         style={{
           borderRadius: 100,
           paddingHorizontal: 12,
-          ...getElevation(5),
+          ...getElevation(5)
         }}
         height={30}
       />
-      {actions.map(
-        item =>
-          item.visible ? (
-            <View
-              key={item.icon}
-              style={{
-                width: width / 1.4 / actions.length,
-                height: width / 1.4 / actions.length,
-                backgroundColor: item.bg || colors.nav,
-                borderRadius: 100,
-                justifyContent: 'center',
-                alignItems: 'center',
-                ...getElevation(5),
-                marginLeft: 15,
-              }}>
-              <ActionIcon
-                color={item.color || colors.heading}
-                onPress={item.onPress}
-                tooltipText={item.title}
-                top={60}
-                bottom={60}
-                name={item.icon}
-                size={width / 2.8 / actions.length}
-              />
-            </View>
-          ) : null,
+      {actions.map(item =>
+        item.visible ? (
+          <View
+            key={item.icon}
+            style={{
+              width: width / 1.4 / actions.length,
+              height: width / 1.4 / actions.length,
+              backgroundColor: item.bg || colors.nav,
+              borderRadius: 100,
+              justifyContent: 'center',
+              alignItems: 'center',
+              ...getElevation(5),
+              marginLeft: 15
+            }}
+          >
+            <ActionIcon
+              color={item.color || colors.heading}
+              onPress={item.onPress}
+              tooltipText={item.title}
+              top={60}
+              bottom={60}
+              name={item.icon}
+              size={width / 2.8 / actions.length}
+            />
+          </View>
+        ) : null
       )}
     </Animated.View>
   );

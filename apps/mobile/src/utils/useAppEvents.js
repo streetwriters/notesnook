@@ -1,6 +1,6 @@
 import NetInfo from '@react-native-community/netinfo';
-import {EV, EVENTS} from 'notes-core/common';
-import React, {useEffect, useRef} from 'react';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { useEffect, useRef } from 'react';
 import {
   Appearance,
   AppState,
@@ -12,15 +12,16 @@ import {
 } from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
-import SplashScreen from 'react-native-splash-screen';
-import {doInBackground, editing} from '.';
-import {ProFeatures} from '../components/ResultDialog/pro-features';
+import { enabled } from 'react-native-privacy-snapshot';
+import { doInBackground, editing } from '.';
+import { ProFeatures } from '../components/ResultDialog/pro-features';
+import { Walkthrough } from '../components/Walkthrough';
 import {
   clearAllStores,
   initialize,
   useAttachmentStore,
   useNoteStore,
+  useSettingStore,
   useUserStore
 } from '../provider/stores';
 import Backup from '../services/Backup';
@@ -49,17 +50,12 @@ import {
   updateNoteInEditor
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
-import {updateStatusBarColor} from './Colors';
-import {db} from './database';
-import {
-  eClearEditor,
-  eCloseProgressDialog,
-  eOpenLoginDialog,
-  refreshNotesPage
-} from './Events';
-import {MMKV} from './mmkv';
+import { updateStatusBarColor } from './Colors';
+import { db } from './database';
+import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage } from './Events';
+import { MMKV } from './mmkv';
 import Storage from './storage';
-import {sleep} from './TimeUtils';
+import { sleep } from './TimeUtils';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
@@ -79,13 +75,13 @@ export const useAppEvents = () => {
     isReconnecting: false
   });
 
-  const onMediaDownloaded = ({hash, groupId, src}) => {
+  const onMediaDownloaded = ({ hash, groupId, src }) => {
     if (groupId?.startsWith('monograph')) return;
     tiny.call(
       EditorWebView,
       `
         (function(){
-          let image = ${JSON.stringify({hash, src})};
+          let image = ${JSON.stringify({ hash, src })};
           tinymce.activeEditor._replaceImage(image);
         })();
         `
@@ -93,16 +89,12 @@ export const useAppEvents = () => {
   };
 
   const onLoadingAttachment = data => {
-    useAttachmentStore
-      .getState()
-      .setLoading(data.total === data.current ? null : data);
+    useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
   };
 
-  const onSodiumProgress = ({total, progress}) => {
+  const onSodiumProgress = ({ total, progress }) => {
     console.log('encryption progress: ', (progress / total).toFixed(2));
-    useAttachmentStore
-      .getState()
-      .setEncryptionProgress((progress / total).toFixed(2));
+    useAttachmentStore.getState().setEncryptionProgress((progress / total).toFixed(2));
   };
 
   useEffect(() => {
@@ -118,10 +110,7 @@ export const useAppEvents = () => {
     EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
 
-    let ubsubsodium = SodiumEventEmitter.addListener(
-      'onSodiumProgress',
-      onSodiumProgress
-    );
+    let ubsubsodium = SodiumEventEmitter.addListener('onSodiumProgress', onSodiumProgress);
 
     eSubscribeEvent('userLoggedIn', setCurrentUser);
 
@@ -145,22 +134,22 @@ export const useAppEvents = () => {
 
   const onSessionExpired = async () => {
     await Storage.write('loginSessionHasExpired', 'expired');
-    eSendEvent(eOpenLoginDialog, 4);
+    eSendEvent('session_expired');
   };
 
-  const onNoteRemoved = async id => {
-    try {
-      await db.notes.remove(id);
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes,
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Trash,
-        Navigation.routeNames.Notebook
-      ]);
-      eSendEvent(eClearEditor, id);
-    } catch (e) {}
-  };
+  // const onNoteRemoved = async id => {
+  //   try {
+  //     await db.notes.remove(id);
+  //     Navigation.setRoutesToUpdate([
+  //       Navigation.routeNames.Favorites,
+  //       Navigation.routeNames.Notes,
+  //       Navigation.routeNames.NotesPage,
+  //       Navigation.routeNames.Trash,
+  //       Navigation.routeNames.Notebook
+  //     ]);
+  //     eSendEvent(eClearEditor, id);
+  //   } catch (e) {}
+  // };
 
   useEffect(() => {
     if (!loading) {
@@ -174,9 +163,8 @@ export const useAppEvents = () => {
           await setCurrentUser();
         } catch (e) {}
       })();
-      refValues.current.removeInternetStateListener = NetInfo.addEventListener(
-        onInternetStateChanged
-      );
+      refValues.current.removeInternetStateListener =
+        NetInfo.addEventListener(onInternetStateChanged);
     }
     return () => {
       refValues.current?.removeInternetStateListener &&
@@ -216,23 +204,7 @@ export const useAppEvents = () => {
     if (!user) return;
     MMKV.setItem('isUserEmailConfirmed', 'yes');
     await PremiumService.setPremiumStatus();
-    let message =
-      'You have been rewarded 7 more days of free trial. Enjoy using Notesnook!';
-    presentSheet({
-      title: 'Email confirmed!',
-      paragraph: message,
-      component: (
-        <View
-          style={{
-            paddingHorizontal: 12,
-            paddingBottom: 15,
-            alignItems: 'center'
-          }}>
-          <ProFeatures />
-        </View>
-      )
-    });
-
+    Walkthrough.present('emailconfirmed', false, true);
     if (user?.isEmailConfirmed) {
       clearMessage();
     }
@@ -254,15 +226,7 @@ export const useAppEvents = () => {
   const onAccountStatusChange = async userStatus => {
     if (!PremiumService.get() && userStatus.type === 5) {
       PremiumService.subscriptions.clear();
-      presentSheet({
-        title: 'Notesnook Pro',
-        paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
-        action: async () => {
-          eSendEvent(eCloseProgressDialog);
-        },
-        icon: 'check',
-        actionText: 'Continue',
-      });
+      Walkthrough.present('prouser', false, true);
     }
     await PremiumService.setPremiumStatus();
   };
@@ -313,7 +277,7 @@ export const useAppEvents = () => {
         eSendEvent(eOpenLoginDialog);
       },
       icon: 'logout',
-      actionText: 'Login',
+      actionText: 'Login'
     });
 
     setTimeout(() => {
@@ -321,7 +285,7 @@ export const useAppEvents = () => {
     }, 1000);
   };
 
-  unsubIAP = () => {
+  const unsubIAP = () => {
     if (refValues.current?.subsriptionSuccessListener) {
       refValues.current.subsriptionSuccessListener?.remove();
       refValues.current.subsriptionSuccessListener = null;
@@ -333,12 +297,10 @@ export const useAppEvents = () => {
   };
 
   const setCurrentUser = async login => {
+    let user;
     try {
-      let user = await db.user.getUser();
-
-      let isUserEmailConfirmed = await MMKV.getStringAsync(
-        'isUserEmailConfirmed'
-      );
+      user = await db.user.getUser();
+      let isUserEmailConfirmed = await MMKV.getStringAsync('isUserEmailConfirmed');
 
       if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
         setUser(user);
@@ -358,9 +320,7 @@ export const useAppEvents = () => {
         }
 
         if (user.isEmailConfirmed) {
-          let hasSavedRecoveryKey = await MMKV.getItem(
-            'userHasSavedRecoveryKey'
-          );
+          let hasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
           if (!hasSavedRecoveryKey) {
             setRecoveryKeyMessage();
           }
@@ -380,8 +340,7 @@ export const useAppEvents = () => {
         setLoginMessage();
       }
     } catch (e) {
-      let user = await db.user.getUser();
-
+      user = await db.user.getUser();
       if (user?.isEmailConfirmed) {
         let hasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
         if (!hasSavedRecoveryKey) {
@@ -398,9 +357,12 @@ export const useAppEvents = () => {
       }
     } finally {
       await PremiumService.setPremiumStatus();
-      if (PremiumService.get()) {
+      user = await db.user.getUser();
+      if (PremiumService.get() && user) {
         if (SettingsService.get().reminder === 'off') {
           await SettingsService.set('reminder', 'daily');
+        }
+        if (Backup.checkBackupRequired()) {
           sleep(2000).then(() => Backup.checkAndRun());
         }
       }
@@ -438,31 +400,20 @@ export const useAppEvents = () => {
       }
 
       if (SettingsService.get().appLockMode === 'background') {
-        if (
-          refValues.current?.prevState === 'background' &&
-          !refValues.current?.showingDialog
-        ) {
+        if (useSettingStore.getState().requestBiometrics) {
+          console.log('requesting biometrics');
+          useSettingStore.getState().setRequestBiometrics(false);
+          return;
+        }
+        if (refValues.current?.prevState === 'background' && !refValues.current?.showingDialog) {
           refValues.current.showingDialog = true;
           refValues.current.prevState = 'active';
-          if (Platform.OS === 'android') {
-            SplashScreen.show();
-          } else {
-            eSendEvent('load_overlay', 'hide');
-          }
+          useUserStore.getState().setVerifyUser(true);
 
-          let result = await BiometricService.validateUser(
-            'Unlock to access your notes'
-          );
+          let result = await BiometricService.validateUser('Unlock to access your notes');
           if (result) {
+            useUserStore.getState().setVerifyUser(false);
             refValues.current.showingDialog = false;
-            if (Platform.OS === 'android') {
-              SplashScreen.hide();
-            } else {
-              eSendEvent('load_overlay', 'show');
-            }
-          } else {
-            RNExitApp.exitApp();
-            return;
           }
         }
       }
@@ -485,10 +436,7 @@ export const useAppEvents = () => {
       }
     } else {
       refValues.current.prevState = 'background';
-      if (
-        getNote()?.locked &&
-        SettingsService.get().appLockMode === 'background'
-      ) {
+      if (getNote()?.locked && SettingsService.get().appLockMode === 'background') {
         eSendEvent(eClearEditor);
       }
       await storeAppState();
@@ -557,6 +505,7 @@ export const useAppEvents = () => {
         eSendEvent(refreshNotesPage);
       }
       if (notesAddedFromIntent || shareExtensionOpened) {
+        eSendEvent('loadingNote', getNote());
         eSendEvent('webviewreset', true);
         MMKV.removeItem('shareExtensionOpened');
       }

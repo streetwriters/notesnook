@@ -2,18 +2,18 @@ import isEmail from 'validator/lib/isEmail';
 
 export function validateEmail(email) {
   if (email && email.length > 0) {
-    return isEmail(email)
+    return isEmail(email);
   } else {
     return false;
   }
 }
 
 export const ERRORS_LIST = {
-  SHORT_PASS: 'Atleast 8 characters',
- // NO_ABC: 'Atleast 1 lowercase letter.',
- // NO_CAPS_ABC: 'Atleast 1 capital letter.',
- // NO_NUM: 'Atleast 1 number',
- // SPECIAL: 'Atleast 1 special character',
+  SHORT_PASS: 'Atleast 8 characters'
+  // NO_ABC: 'Atleast 1 lowercase letter.',
+  // NO_CAPS_ABC: 'Atleast 1 capital letter.',
+  // NO_NUM: 'Atleast 1 number',
+  // SPECIAL: 'Atleast 1 special character',
 };
 
 export function validatePass(password) {
@@ -22,18 +22,18 @@ export function validatePass(password) {
   }
 
   let errors = {
-    SHORT_PASS: true,
-  //  NO_ABC: true,
-  //  NO_CAPS_ABC: true,
-  //  NO_NUM: true,
-   // SPECIAL: true,
+    SHORT_PASS: true
+    //  NO_ABC: true,
+    //  NO_CAPS_ABC: true,
+    //  NO_NUM: true,
+    // SPECIAL: true,
   };
 
   if (password.length >= 8) {
     errors.SHORT_PASS = false;
   }
 
-/*   if (password.match(/[a-z]+/)) {
+  /*   if (password.match(/[a-z]+/)) {
     errors.NO_ABC = false;
   }
   if (password.match(/[A-Z]+/)) {

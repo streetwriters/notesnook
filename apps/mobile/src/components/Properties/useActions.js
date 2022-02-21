@@ -1,11 +1,12 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import React, {useEffect, useState} from 'react';
-import {Platform} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import Share from 'react-native-share';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
+  useEditorStore,
   useMenuStore,
   useSelectionStore,
   useTagStore,
@@ -22,40 +23,42 @@ import {
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
 import SettingsService from '../../services/SettingsService';
-import {editing} from '../../utils';
+import { editing, toTXT } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  COLOR_SCHEME_PITCH_BLACK,
   setColorScheme
 } from '../../utils/Colors';
-import {db} from '../../utils/database';
+import { db } from '../../utils/database';
 import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
   eOpenAttachmentsDialog,
+  eOpenExportDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
-import {deleteItems} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {sleep} from '../../utils/TimeUtils';
-import {presentDialog} from '../Dialog/functions';
+import { deleteItems } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { sleep } from '../../utils/TimeUtils';
+import { presentDialog } from '../Dialog/functions';
+import { MoveNotes } from '../MoveNoteDialog/movenote';
 import NoteHistory from '../NoteHistory';
+import tiny from '../../views/Editor/tiny/tiny.js';
+import { EditorWebView } from '../../views/Editor/Functions';
 
-let htmlToText;
-export const useActions = ({close = () => {}, item}) => {
+export const useActions = ({ close = () => {}, item }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const clearSelection = useSelectionStore(state => state.clearSelection);
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const setMenuPins = useMenuStore(state => state.setMenuPins);
-  const [isPinnedToMenu, setIsPinnedToMenu] = useState(
-    db.settings.isPinned(item.id)
-  );
-
+  const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(item.id));
+  console.log(item.readonly, 'readonly');
   const user = useUserStore(state => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
   const alias =
@@ -65,8 +68,7 @@ export const useActions = ({close = () => {}, item}) => {
       ? db.colors.alias(item.id)
       : item.title;
 
-  const isPublished =
-    item.type === 'note' && db.monographs.isPublished(item.id);
+  const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
   const noteInTopic =
     item.type === 'note' &&
     editing.actionAfterFirstSave.type === 'topic' &&
@@ -116,19 +118,19 @@ export const useActions = ({close = () => {}, item}) => {
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    dispatch({type: Actions.THEME, colors: newColors});
+    dispatch({ type: Actions.THEME, colors: newColors });
   }
 
   function switchTheme() {
     if (!colors.night) {
-      MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+      MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
       let nextTheme = SettingsService.get().pitchBlack
         ? COLOR_SCHEME_PITCH_BLACK
         : COLOR_SCHEME_DARK;
       changeColorScheme(nextTheme);
       return;
     }
-    MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+    MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
     changeColorScheme(COLOR_SCHEME_LIGHT);
   }
 
@@ -164,10 +166,7 @@ export const useActions = ({close = () => {}, item}) => {
       return;
     }
     await db[`${type}s`][type](item.id).pin();
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notes]);
   }
 
   async function pinToNotifications() {
@@ -180,16 +179,11 @@ export const useActions = ({close = () => {}, item}) => {
       return;
     }
     if (item.locked) return;
-    let text = await db.notes.note(item.id).content();
-    htmlToText = htmlToText || require('html-to-text');
-    text = htmlToText.convert(text, {
-      selectors: [{selector: 'img', format: 'skip'}]
-    });
     Notifications.present({
       title: item.title,
       message: item.headline,
       subtitle: item.headline,
-      bigText: text,
+      bigText: await toTXT(item, true),
       ongoing: true,
       actions: ['UNPIN'],
       tag: item.id
@@ -210,18 +204,17 @@ export const useActions = ({close = () => {}, item}) => {
       Navigation.routeNames.Favorites,
       Navigation.routeNames.Trash
     ]);
-    type = item.type === 'trash' ? item.itemType : item.type;
+    let type = item.type === 'trash' ? item.itemType : item.type;
     ToastEvent.show({
-      heading:
-        type === 'note'
-          ? 'Note restored from trash'
-          : 'Notebook restored from trash',
+      heading: type === 'note' ? 'Note restored from trash' : 'Notebook restored from trash',
       type: 'success'
     });
   }
 
   async function copyContent() {
     if (item.locked) {
+      close();
+      await sleep(300);
       openVault({
         copyNote: true,
         novault: true,
@@ -231,13 +224,7 @@ export const useActions = ({close = () => {}, item}) => {
         description: 'Unlock note to copy to clipboard.'
       });
     } else {
-      let text = await db.notes.note(item.id).content();
-      htmlToText = htmlToText || require('html-to-text');
-      text = htmlToText.convert(text, {
-        selectors: [{selector: 'img', format: 'skip'}]
-      });
-      text = `${item.title}\n \n ${text}`;
-      Clipboard.setString(text);
+      Clipboard.setString(await toTXT(item));
       ToastEvent.show({
         heading: 'Note copied to clipboard',
         type: 'success',
@@ -345,7 +332,7 @@ export const useActions = ({close = () => {}, item}) => {
             notebookId: item.notebookId
           });
         } else {
-          await db.settings.pin(item.type, {id: item.id});
+          await db.settings.pin(item.type, { id: item.id });
         }
       }
       setIsPinnedToMenu(db.settings.isPinned(item.id));
@@ -363,6 +350,7 @@ export const useActions = ({close = () => {}, item}) => {
         if (!value || value === '' || value.trimStart().length == 0) return;
         await db.tags.rename(item.id, db.tags.sanitize(value));
         useTagStore.getState().setTags();
+        useMenuStore.getState().setMenuPins();
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notes,
           Navigation.routeNames.NotesPage,
@@ -379,6 +367,7 @@ export const useActions = ({close = () => {}, item}) => {
   async function shareNote() {
     if (item.locked) {
       close();
+      await sleep(300);
       openVault({
         item: item,
         novault: true,
@@ -388,12 +377,10 @@ export const useActions = ({close = () => {}, item}) => {
         description: 'Unlock note to share it.'
       });
     } else {
-      let text = await db.notes.note(item.id).export('txt');
-      let m = `${item.title}\n \n ${text}`;
       Share.open({
         title: 'Share note to',
         failOnCancel: false,
-        message: m
+        message: await toTXT(item)
       });
     }
   }
@@ -486,6 +473,27 @@ export const useActions = ({close = () => {}, item}) => {
     eSendEvent(eOpenAttachmentsDialog, item);
   }
 
+  async function exportNote() {
+    close();
+    await sleep(300);
+    eSendEvent(eOpenExportDialog, [item]);
+  }
+
+  const toggleReadyOnlyMode = async () => {
+    await db.notes.note(item.id).readonly();
+    let current = db.notes.note(item.id).data.readonly;
+    if (useEditorStore.getState().currentEditingNote === item.id) {
+      useEditorStore.getState().setReadonly(current);
+      tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
+    }
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes
+    ]);
+    close();
+  };
+
   const actions = [
     {
       name: 'Dark Mode',
@@ -504,6 +512,17 @@ export const useActions = ({close = () => {}, item}) => {
       icon: 'book-outline',
       func: addTo
     },
+    {
+      name: 'Move notes',
+      title: 'Add notes',
+      icon: 'plus',
+      func: async () => {
+        close();
+        await sleep(300);
+        MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
+      }
+    },
+
     {
       name: 'Pin',
       title: item.pinned ? 'Unpin' : 'Pin to top',
@@ -529,10 +548,7 @@ export const useActions = ({close = () => {}, item}) => {
     },
     {
       name: 'PinToNotif',
-      title:
-        notifPinned !== null
-          ? 'Unpin from Notifications'
-          : 'Pin to Notifications',
+      title: notifPinned !== null ? 'Unpin from Notifications' : 'Pin to Notifications',
       icon: 'bell',
       on: notifPinned !== null,
       func: pinToNotifications
@@ -622,11 +638,7 @@ export const useActions = ({close = () => {}, item}) => {
       name: 'Export',
       title: 'Export',
       icon: 'export',
-      func: async () => {
-        close();
-        await sleep(300);
-        eSendEvent(eOpenExportDialog, [item]);
-      }
+      func: exportNote
     },
     {
       name: 'RemoveTopic',
@@ -638,9 +650,7 @@ export const useActions = ({close = () => {}, item}) => {
     {
       name: 'Delete',
       title:
-        item.type !== 'notebook' && item.type !== 'note'
-          ? 'Delete ' + item.type
-          : 'Move to trash',
+        item.type !== 'notebook' && item.type !== 'note' ? 'Delete ' + item.type : 'Move to trash',
       icon: 'delete-outline',
       type: 'error',
       func: deleteItem
@@ -650,6 +660,13 @@ export const useActions = ({close = () => {}, item}) => {
       title: 'Delete ' + item.itemType,
       icon: 'delete',
       func: deleteTrashItem
+    },
+    {
+      name: 'ReadOnly',
+      title: 'Read only',
+      icon: 'pencil-lock',
+      func: toggleReadyOnlyMode,
+      on: item.readonly
     },
     {
       name: 'History',

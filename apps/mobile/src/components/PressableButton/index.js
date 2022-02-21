@@ -29,28 +29,35 @@ export const PressableButton = ({
   customColor,
   customSelectedColor,
   customAlpha,
-  customOpacity
+  customOpacity,
+  fwdRef
 }) => {
   const [state] = useTracked();
-  const {colors} = state;
-  
-  const selectedColor = customSelectedColor ||
+  const { colors } = state;
+
+  const selectedColor =
+    customSelectedColor ||
     colors[
       type === 'accent'
         ? BUTTON_TYPES[type](accentColor, accentText).selected
         : BUTTON_TYPES[type].selected
     ];
-  const primaryColor = customColor ||
+  const primaryColor =
+    customColor ||
     colors[
       type === 'accent'
         ? BUTTON_TYPES[type](accentColor, accentText).primary
         : BUTTON_TYPES[type].primary
     ];
-  const opacity = customOpacity ? customOpacity : type === 'accent' ? 1 : BUTTON_TYPES[type].opacity;
-  const alpha = customAlpha? customAlpha : colors.night ? 0.04 : -0.04;
+  const opacity = customOpacity
+    ? customOpacity
+    : type === 'accent'
+    ? 1
+    : BUTTON_TYPES[type].opacity;
+  const alpha = customAlpha ? customAlpha : colors.night ? 0.04 : -0.04;
 
   const getStyle = useCallback(
-    ({pressed}) => [
+    ({ pressed }) => [
       {
         backgroundColor: pressed
           ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity || 1))
@@ -60,21 +67,23 @@ export const PressableButton = ({
         borderRadius: noborder ? 0 : br,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 0,
+        marginBottom: 0
       },
-      customStyle,
+      customStyle
     ],
-    [customStyle, noborder, type,colors],
+    [customStyle, noborder, type, colors]
   );
 
   return (
     <Pressable
       testID={testID}
+      ref={fwdRef}
       disabled={disabled}
       hitSlop={hitSlop}
       onPress={onPress}
       onLongPress={onLongPress}
-      style={getStyle}>
+      style={getStyle}
+    >
       {children}
     </Pressable>
   );

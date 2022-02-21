@@ -1,23 +1,14 @@
 import React from 'react';
-import {Text, View} from 'react-native';
-import {color} from 'react-native-reanimated';
+import { Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {SIZE} from '../../utils/SizeUtils';
-import Seperator from '../Seperator';
+import { useTracked } from '../../provider';
+import { SIZE } from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
-import {ProTag} from './pro-tag';
+import { ProTag } from './pro-tag';
 
-export const FeatureBlock = ({
-  vertical,
-  highlight,
-  content,
-  icon,
-  pro,
-  proTagBg
-}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+export const FeatureBlock = ({ vertical, highlight, content, icon, pro, proTagBg }) => {
+  const [state] = useTracked();
+  const { colors } = state;
 
   return vertical ? (
     <View
@@ -25,8 +16,9 @@ export const FeatureBlock = ({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 12,
-        marginBottom: 10,
-      }}>
+        marginBottom: 10
+      }}
+    >
       <Icon color={colors.accent} name="check" size={SIZE.lg} />
 
       <Paragraph
@@ -35,7 +27,8 @@ export const FeatureBlock = ({
           marginLeft: 5,
           flexShrink: 1
         }}
-        size={SIZE.md}>
+        size={SIZE.md}
+      >
         {content}
       </Paragraph>
     </View>
@@ -48,17 +41,18 @@ export const FeatureBlock = ({
         marginRight: 10,
         borderRadius: 5,
         minWidth: 100
-      }}>
+      }}
+    >
       <Icon color={colors.icon} name={icon} size={SIZE.xl} />
       <Paragraph size={SIZE.md}>
-        <Text style={{color: colors.accent}}>{highlight}</Text>
+        <Text style={{ color: colors.accent }}>{highlight}</Text>
         {'\n'}
         {content}
       </Paragraph>
 
       {pro ? (
         <>
-          <View style={{height: 5}} />
+          <View style={{ height: 5 }} />
           <ProTag width={50} size={SIZE.xs} background={proTagBg} />
         </>
       ) : (

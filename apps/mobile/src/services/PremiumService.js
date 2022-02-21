@@ -1,5 +1,6 @@
 import { CHECK_IDS } from 'notes-core/common';
 import React from 'react';
+import { Platform } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import DialogHeader from '../components/Dialog/dialog-header';
 import { CompactFeatures } from '../components/Premium/compact-features';
@@ -8,11 +9,7 @@ import Seperator from '../components/Seperator';
 import { useUserStore } from '../provider/stores';
 import { itemSkus, SUBSCRIPTION_STATUS } from '../utils';
 import { db } from '../utils/database';
-import {
-  eOpenPremiumDialog,
-  eOpenTrialEndingDialog,
-  eShowGetPremium
-} from '../utils/Events';
+import { eOpenPremiumDialog, eOpenTrialEndingDialog, eShowGetPremium } from '../utils/Events';
 import { MMKV } from '../utils/mmkv';
 import { eSendEvent, presentSheet, ToastEvent } from './EventManager';
 
@@ -52,9 +49,7 @@ async function setPremiumStatus() {
 }
 
 function getMontlySub() {
-  let _product = products.find(
-    p => p.productId === 'com.streetwriters.notesnook.sub.mo'
-  );
+  let _product = products.find(p => p.productId === 'com.streetwriters.notesnook.sub.mo');
   if (!_product) {
     _product = {
       localizedPrice: '$4.49'
@@ -66,14 +61,14 @@ function getMontlySub() {
 
 async function getProducts() {
   if (!products || products.length === 0) {
-     products = await RNIap.getSubscriptions(itemSkus);
+    products = await RNIap.getSubscriptions(itemSkus);
   }
   return products;
 }
 
 function get() {
   if (__DEV__) return true;
-  
+
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 
@@ -137,7 +132,7 @@ const onUserStatusCheck = async type => {
       eSendEvent(eShowGetPremium, message);
     }
   }
-  return {type, result: status};
+  return { type, result: status };
 };
 
 const showVerifyEmailDialog = () => {
@@ -149,10 +144,7 @@ const showVerifyEmailDialog = () => {
     action: async () => {
       try {
         let lastEmailTime = await MMKV.getItem('lastEmailTime');
-        if (
-          lastEmailTime &&
-          Date.now() - JSON.parse(lastEmailTime) < 60000 * 2
-        ) {
+        if (lastEmailTime && Date.now() - JSON.parse(lastEmailTime) < 60000 * 2) {
           ToastEvent.show({
             heading: 'Please wait before requesting another email',
             type: 'error',
@@ -180,7 +172,7 @@ const showVerifyEmailDialog = () => {
         });
       }
     },
-    actionText: 'Resend Confirmation Link',
+    actionText: 'Resend Confirmation Link'
   });
 };
 
@@ -197,9 +189,7 @@ const subscriptions = {
     } else {
       _subscriptions = [];
     }
-    let index = _subscriptions.findIndex(
-      s => s.transactionId === subscription.transactionId
-    );
+    let index = _subscriptions.findIndex(s => s.transactionId === subscription.transactionId);
     if (index === -1) {
       _subscriptions.unshift(subscription);
     } else {
@@ -214,19 +204,14 @@ const subscriptions = {
     } else {
       _subscriptions = [];
     }
-    let index = _subscriptions.findIndex(
-      s => s.transactionId === transactionId
-    );
+    let index = _subscriptions.findIndex(s => s.transactionId === transactionId);
     if (index !== -1) {
       _subscriptions.splice(index);
       await MMKV.setItem('subscriptionsIOS', JSON.stringify(_subscriptions));
     }
   },
   verify: async subscription => {
-    console.log(
-      'verifying: ',
-      new Date(subscription.transactionDate).toLocaleString()
-    );
+    console.log('verifying: ', new Date(subscription.transactionDate).toLocaleString());
 
     if (subscription.transactionReceipt) {
       if (Platform.OS === 'ios') {
@@ -243,11 +228,8 @@ const subscriptions = {
           }
         };
         try {
-          let result = await fetch(
-            'https://payments.streetwriters.co/apple/verify',
-            requestData
-          );
-          
+          let result = await fetch('https://payments.streetwriters.co/apple/verify', requestData);
+
           let text = await result.text();
           console.log(text);
           if (!result.ok) {
@@ -328,15 +310,14 @@ const features_list = [
     content: 'A private vault to keep everything imporant always locked'
   },
   {
-    content:
-      'Rich note editing experience with markdown, tables, checklists and more'
+    content: 'Rich note editing experience with markdown, tables, checklists and more'
   },
   {
     content: 'Export your notes in Pdf, markdown and html formats'
   }
 ];
 
-const sheet = (context, promo) => {
+const sheet = (context, promo, trial) => {
   presentSheet({
     context: context,
     component: ref => (
@@ -349,16 +330,11 @@ const sheet = (context, promo) => {
           padding={12}
         />
         <Seperator />
-        <CompactFeatures
-          scrollRef={ref}
-          maxHeight={300}
-          features={features_list}
-          vertical
-        />
+        <CompactFeatures scrollRef={ref} maxHeight={300} features={features_list} vertical />
         <Seperator half />
-        <PricingPlans compact heading={false} promo={promo} />
+        <PricingPlans trial={trial} compact heading={false} promo={promo} />
       </>
-    ),
+    )
   });
 };
 

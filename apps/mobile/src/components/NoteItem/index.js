@@ -1,26 +1,26 @@
-import React, {useEffect} from 'react';
-import {Platform, View} from 'react-native';
+import { decode, EntityLevel } from 'entities';
+import React from 'react';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {useSettingStore, useTagStore} from '../../provider/stores';
-import {eSendEvent} from '../../services/EventManager';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/database';
-import {refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
-import {ActionSheetEvent} from '../DialogManager/recievers';
-import {TimeSince} from '../Menu/TimeSince';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/database';
+import { refreshNotesPage } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
+import { TimeSince } from '../Menu/TimeSince';
 import { Properties } from '../Properties';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const navigateToTopic = topic => {
   let routeName = 'NotesPage';
-  let params = {...topic, menu: false, get: 'topics'};
+  let params = { ...topic, menu: false, get: 'topics' };
   let headerState = {
     heading: topic.title,
     id: topic.id,
@@ -47,21 +47,21 @@ function navigateToTag(item) {
   });
 }
 
-const showActionSheet = (item) => {
+const showActionSheet = item => {
   Properties.present(item);
 };
 
-const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
+const NoteItem = ({ item, isTrash, tags, dateBy = 'dateCreated', noOpen = false }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const settings = useSettingStore(state => state.settings);
   const compactMode = settings.notesListMode === 'compact';
-  const attachmentCount = db.attachments?.ofNote(item.id,'all')?.length || 0;
+  const attachmentCount = db.attachments?.ofNote(item.id, 'all')?.length || 0;
 
   function getNotebook() {
     if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
     let item_notebook = item.notebooks?.slice(0, 1)[0];
-    notebook = db.notebooks.notebook(item_notebook.id);
+    let notebook = db.notebooks.notebook(item_notebook.id);
 
     if (!notebook) return [];
     let topic = notebook.topics.topic(item_notebook.topics[0])?._topic;
@@ -85,7 +85,8 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
         style={{
           flexGrow: 1,
           flexShrink: 1
-        }}>
+        }}
+      >
         {!compactMode ? (
           <View
             style={{
@@ -94,7 +95,8 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
               zIndex: 10,
               elevation: 10,
               marginBottom: 2.5
-            }}>
+            }}
+          >
             {getNotebook().map(_item => (
               <Button
                 title={_item.title}
@@ -126,7 +128,8 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
           style={{
             flexWrap: 'wrap'
           }}
-          size={SIZE.md}>
+          size={SIZE.md}
+        >
           {item.title}
         </Heading>
 
@@ -135,8 +138,11 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
             style={{
               flexWrap: 'wrap'
             }}
-            numberOfLines={2}>
-            {item.headline}
+            numberOfLines={2}
+          >
+            {decode(item.headline, {
+              level: EntityLevel.HTML
+            })}
           </Paragraph>
         ) : null}
 
@@ -148,7 +154,8 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
             width: '100%',
             marginTop: 5,
             height: SIZE.md + 2
-          }}>
+          }}
+        >
           {!isTrash ? (
             <>
               {item.conflicted ? (
@@ -168,9 +175,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
                   marginRight: 6
                 }}
                 time={item[dateBy]}
-                updateFrequency={
-                  Date.now() - item[dateBy] < 60000 ? 2000 : 60000
-                }
+                updateFrequency={Date.now() - item[dateBy] < 60000 ? 2000 : 60000}
               />
 
               {attachmentCount > 0 ? (
@@ -179,7 +184,8 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     marginRight: 6
-                  }}>
+                  }}
+                >
                   <Icon name="attachment" size={SIZE.md} color={colors.icon} />
                   <Paragraph color={colors.icon} size={SIZE.xs}>
                     {attachmentCount}
@@ -189,14 +195,13 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
 
               {item.pinned ? (
                 <Icon
+                  testID="icon-pinned"
                   name="pin-outline"
                   size={SIZE.sm}
                   style={{
                     marginRight: 6
                   }}
-                  color={
-                    COLORS_NOTE[item.color?.toLowerCase()] || colors.accent
-                  }
+                  color={COLORS_NOTE[item.color?.toLowerCase()] || colors.accent}
                 />
               ) : null}
 
@@ -213,6 +218,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
 
               {item.favorite ? (
                 <Icon
+                  testID="icon-star"
                   name="star"
                   size={SIZE.md}
                   style={{
@@ -233,7 +239,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
                         textStyle={{
                           textDecorationLine: 'underline'
                         }}
-                        hitSlop={{top: 8, bottom: 12, left: 0, right: 0}}
+                        hitSlop={{ top: 8, bottom: 12, left: 0, right: 0 }}
                         fontSize={SIZE.xs}
                         style={{
                           borderRadius: 5,
@@ -255,7 +261,8 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
                 size={SIZE.xs}
                 style={{
                   marginRight: 6
-                }}>
+                }}
+              >
                 Deleted on{' '}
                 {item && item.dateDeleted
                   ? new Date(item.dateDeleted).toISOString().slice(0, 10)
@@ -267,7 +274,8 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
                 size={SIZE.xs}
                 style={{
                   marginRight: 6
-                }}>
+                }}
+              >
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
             </>
@@ -279,7 +287,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
         color={colors.pri}
         name="dots-horizontal"
         size={SIZE.xl}
-        onPress={() => showActionSheet(item, isTrash)}
+        onPress={() => !noOpen && showActionSheet(item, isTrash)}
         customStyle={{
           justifyContent: 'center',
           height: 35,

@@ -5,15 +5,9 @@ import * as Progress from 'react-native-progress';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
 import { useAttachmentStore } from '../../provider/stores';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { db } from '../../utils/database';
-import {
-  eCloseAttachmentDialog,
-  eOpenAttachmentsDialog
-} from '../../utils/Events';
+import { eCloseAttachmentDialog, eOpenAttachmentsDialog } from '../../utils/Events';
 import filesystem from '../../utils/filesystem';
 import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
@@ -41,7 +35,7 @@ export const AttachmentDialog = () => {
   const open = item => {
     setNote(item);
     setVisible(true);
-    let _attachments = db.attachments.ofNote(item.id, "all");
+    let _attachments = db.attachments.ofNote(item.id, 'all');
     setAttachments(_attachments);
   };
 
@@ -62,13 +56,15 @@ export const AttachmentDialog = () => {
       fwdRef={actionSheetRef}
       onClose={async () => {
         setVisible(false);
-      }}>
+      }}
+    >
       <View
         style={{
           width: '100%',
           alignSelf: 'center',
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         <DialogHeader title="Attachments" />
         <FlatList
           nestedScrollEnabled
@@ -85,13 +81,14 @@ export const AttachmentDialog = () => {
                 height: 150,
                 justifyContent: 'center',
                 alignItems: 'center'
-              }}>
+              }}
+            >
               <Icon name="attachment" size={60} color={colors.icon} />
               <Paragraph>No attachments on this note</Paragraph>
             </View>
           }
           data={attachments}
-          renderItem={({item, index}) => (
+          renderItem={({ item, index }) => (
             <Attachment attachment={item} note={note} setNote={setNote} />
           )}
         />
@@ -102,7 +99,8 @@ export const AttachmentDialog = () => {
           style={{
             textAlign: 'center',
             marginTop: 10
-          }}>
+          }}
+        >
           <Icon name="shield-key-outline" size={SIZE.xs} color={colors.icon} />
           {'  '}All attachments are end-to-end encrypted.
         </Paragraph>
@@ -128,7 +126,7 @@ function getFileExtension(filename) {
   return ext == null ? '' : ext[1];
 }
 
-export const Attachment = ({attachment, encryption}) => {
+export const Attachment = ({ attachment, encryption }) => {
   const [state] = useTracked();
   const colors = state.colors;
   const progress = useAttachmentStore(state => state.progress);
@@ -149,7 +147,7 @@ export const Attachment = ({attachment, encryption}) => {
       useAttachmentStore.getState().remove(attachment.metadata.hash);
       return;
     }
-    filesystem.downloadAttachment(attachment.metadata.hash,false);
+    filesystem.downloadAttachment(attachment.metadata.hash, false);
   };
 
   useEffect(() => {
@@ -182,20 +180,23 @@ export const Attachment = ({attachment, encryption}) => {
         borderRadius: 5,
         backgroundColor: colors.nav
       }}
-      type="grayBg">
+      type="grayBg"
+    >
       <GeneralSheet context={attachment.metadata.hash} />
       <View
         style={{
           flexShrink: 1,
           flexDirection: 'row',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <View
           style={{
             justifyContent: 'center',
             alignItems: 'center',
             marginLeft: -5
-          }}>
+          }}
+        >
           <Icon name="file" size={SIZE.xxxl} color={colors.icon} />
 
           <Paragraph
@@ -204,7 +205,8 @@ export const Attachment = ({attachment, encryption}) => {
             color={colors.light}
             style={{
               position: 'absolute'
-            }}>
+            }}
+          >
             {getFileExtension(attachment.metadata.filename).toUpperCase()}
           </Paragraph>
         </View>
@@ -213,7 +215,8 @@ export const Attachment = ({attachment, encryption}) => {
           style={{
             flexShrink: 1,
             marginLeft: 10
-          }}>
+          }}
+        >
           <Paragraph
             size={SIZE.sm - 1}
             style={{
@@ -222,18 +225,15 @@ export const Attachment = ({attachment, encryption}) => {
             }}
             numberOfLines={1}
             lineBreakMode="middle"
-            color={colors.pri}>
+            color={colors.pri}
+          >
             {attachment.metadata.filename}
           </Paragraph>
-      
 
           <Paragraph color={colors.icon} size={SIZE.xs}>
             {formatBytes(attachment.length)}{' '}
-            {currentProgress?.type
-              ? '(' + currentProgress.type + 'ing - tap to cancel)'
-              : ''}
+            {currentProgress?.type ? '(' + currentProgress.type + 'ing - tap to cancel)' : ''}
           </Paragraph>
-
         </View>
       </View>
 
@@ -250,7 +250,8 @@ export const Attachment = ({attachment, encryption}) => {
             marginLeft: 5,
             marginTop: 5,
             marginRight: -5
-          }}>
+          }}
+        >
           <Progress.Circle
             size={SIZE.xxl}
             progress={

@@ -1,10 +1,10 @@
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import Paragraph from '../Typography/Paragraph';
 
-export const ProTag = ({width, size, background}) => {
+export const ProTag = ({ width, size, background }) => {
   const [state] = useTracked();
   const colors = state.colors;
 
@@ -13,12 +13,13 @@ export const ProTag = ({width, size, background}) => {
       style={{
         backgroundColor: background || colors.bg,
         borderRadius: 100,
-        width:width || 60,
+        width: width || 60,
         justifyContent: 'center',
         alignItems: 'center',
         paddingVertical: 2.5,
         flexDirection: 'row'
-      }}>
+      }}
+    >
       <Icon
         style={{
           marginRight: 3

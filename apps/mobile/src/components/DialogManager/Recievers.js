@@ -1,4 +1,4 @@
-import {eSendEvent} from '../../services/EventManager';
+import { eSendEvent } from '../../services/EventManager';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,

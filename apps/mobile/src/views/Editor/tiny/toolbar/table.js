@@ -1,26 +1,25 @@
-import React, {useState} from 'react';
-import {View} from 'react-native';
-import {PressableButton} from '../../../../components/PressableButton';
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { PressableButton } from '../../../../components/PressableButton';
 import Heading from '../../../../components/Typography/Heading';
 import Paragraph from '../../../../components/Typography/Paragraph';
-import {useTracked} from '../../../../provider';
-import {eSendEvent} from '../../../../services/EventManager';
-import {eCloseProgressDialog} from '../../../../utils/Events';
-import {SIZE} from '../../../../utils/SizeUtils';
-import {execCommands} from './commands';
-import {formatSelection} from './constants';
+import { useTracked } from '../../../../provider';
+import { eSendEvent } from '../../../../services/EventManager';
+import { eCloseProgressDialog } from '../../../../utils/Events';
+import { SIZE } from '../../../../utils/SizeUtils';
+import { execCommands } from './commands';
+import { formatSelection } from './constants';
 
 export const Table = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [width, setWidth] = useState(400);
   const itemWidth = width / 5;
 
   const rightCells = [5, 10, 15, 20, 25];
   const bottomCells = [21, 22, 23, 24, 25];
   const cells = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25
   ];
 
   function getRowColumns(index) {
@@ -38,7 +37,8 @@ export const Table = () => {
       }}
       style={{
         paddingHorizontal: 12
-      }}>
+      }}
+    >
       <Heading size={SIZE.md}>Select rows x columns</Heading>
 
       <View
@@ -49,7 +49,8 @@ export const Table = () => {
           width: '100%',
           justifyContent: 'center',
           marginTop: 10
-        }}>
+        }}
+      >
         {cells.map((item, index) => (
           <PressableButton
             key={item.toString()}
@@ -57,9 +58,7 @@ export const Table = () => {
               let columnCount = 5;
               let rowNumber = Math.floor(index / columnCount);
               let columnNumber = index - rowNumber * columnCount;
-              formatSelection(
-                execCommands.table(rowNumber + 1, columnNumber + 1)
-              );
+              formatSelection(execCommands.table(rowNumber + 1, columnNumber + 1));
               eSendEvent(eCloseProgressDialog);
             }}
             type="gray"
@@ -77,7 +76,8 @@ export const Table = () => {
               borderTopRightRadius: item === 5 ? 5 : 0,
               borderBottomLeftRadius: item === 21 ? 5 : 0,
               borderBottomRightRadius: item === 25 ? 5 : 0
-            }}>
+            }}
+          >
             <Paragraph size={SIZE.sm} color={colors.pri}>
               {getRowColumns(index)}
             </Paragraph>

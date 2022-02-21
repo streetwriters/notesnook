@@ -1,0 +1,28 @@
+diff --git a/node_modules/react-native-securerandom/android/build.gradle b/node_modules/react-native-securerandom/android/build.gradle
+index e21cdf0..dce08df 100644
+--- a/node_modules/react-native-securerandom/android/build.gradle
++++ b/node_modules/react-native-securerandom/android/build.gradle
+@@ -16,8 +16,6 @@ buildscript {
+ }
+ 
+ apply plugin: 'com.android.library'
+-apply plugin: 'maven'
+-
+ def safeExtGet(prop, fallback) {
+     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+ }
+@@ -116,14 +114,4 @@ afterEvaluate { project ->
+         archives androidSourcesJar
+         archives androidJavadocJar
+     }
+-
+-    task installArchives(type: Upload) {
+-        configuration = configurations.archives
+-        repositories.mavenDeployer {
+-            // Deploy to react-native-event-bridge/maven, ready to publish to npm
+-            repository url: "file://${projectDir}/../android/maven"
+-
+-            configureReactNativePom pom
+-        }
+-    }
+ }

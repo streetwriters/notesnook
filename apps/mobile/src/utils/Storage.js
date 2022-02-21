@@ -5,7 +5,6 @@ import { generateSecureRandom } from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
 import { MMKV } from './mmkv';
 
-
 let RNFetchBlob;
 async function read(key) {
   if (!key) return null;
@@ -14,16 +13,13 @@ async function read(key) {
   if (!data) return null;
   try {
     return JSON.parse(data);
-  } catch(e) {
+  } catch (e) {
     return data;
   }
 }
 
 async function write(key, data) {
-  return await MMKV.setItem(
-    key,
-    typeof data === 'string' ? data : JSON.stringify(data),
-  );
+  return await MMKV.setItem(key, typeof data === 'string' ? data : JSON.stringify(data));
 }
 
 async function readMulti(keys) {
@@ -54,18 +50,18 @@ async function clear() {
 }
 
 async function encrypt(password, data) {
-  if (!password.password && !password.key) return undefined
-  if (password.password && password.password === "" && !password.key) return undefined
+  if (!password.password && !password.key) return undefined;
+  if (password.password && password.password === '' && !password.key) return undefined;
 
   let message = {
     type: 'plain',
-    data: data,
+    data: data
   };
   let result = await Sodium.encrypt(password, message);
 
   return {
     ...result,
-    alg: getAlgorithm(7),
+    alg: getAlgorithm(7)
   };
 }
 
@@ -74,9 +70,9 @@ function getAlgorithm(base64Variant) {
 }
 
 async function decrypt(password, data) {
-  if (!password.password && !password.key) return undefined
-  if (password.password && password.password === "" && !password.key) return undefined
-  let _data = {...data};
+  if (!password.password && !password.key) return undefined;
+  if (password.password && password.password === '' && !password.key) return undefined;
+  let _data = { ...data };
   _data.output = 'plain';
   return await Sodium.decrypt(password, _data);
 }
@@ -89,26 +85,21 @@ function parseAlgorithm(alg) {
     kdfAlgorithm: kdf,
     compressionAlgorithm: compressionAlg,
     isCompress: compressed === '1',
-    base64_variant: base64variant,
+    base64_variant: base64variant
   };
 }
 
 let CRYPT_CONFIG = Platform.select({
   ios: {
-    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
   },
-  android: {},
+  android: {}
 });
 
 async function deriveCryptoKey(name, data) {
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
-    await Keychain.setInternetCredentials(
-      'notesnook',
-      name,
-      credentials.key,
-      CRYPT_CONFIG,
-    );
+    await Keychain.setInternetCredentials('notesnook', name, credentials.key, CRYPT_CONFIG);
     return credentials.key;
   } catch (e) {}
 }
@@ -116,10 +107,7 @@ async function deriveCryptoKey(name, data) {
 async function getCryptoKey(name) {
   try {
     if (await Keychain.hasInternetCredentials('notesnook')) {
-      let credentials = await Keychain.getInternetCredentials(
-        'notesnook',
-        CRYPT_CONFIG,
-      );
+      let credentials = await Keychain.getInternetCredentials('notesnook', CRYPT_CONFIG);
       return credentials.password;
     } else {
       return null;
@@ -143,9 +131,9 @@ async function getRandomBytes(length) {
 }
 
 async function requestPermission() {
-  if (Platform.OS === "ios") return true;
+  if (Platform.OS === 'ios') return true;
 
-  return true
+  return true;
 }
 async function checkAndCreateDir(path) {
   if (!RNFetchBlob) {
@@ -171,19 +159,18 @@ async function checkAndCreateDir(path) {
 }
 
 async function hash(password, email) {
-  let result =  await Sodium.hashPassword(password, email);
-  return result
+  let result = await Sodium.hashPassword(password, email);
+  return result;
 }
 
-async function generateCryptoKey(password,salt) {
+async function generateCryptoKey(password, salt) {
   try {
-    let credentials = await Sodium.deriveKey(password, undefined);
+    let credentials = await Sodium.deriveKey(password, salt || null);
     return credentials;
   } catch (e) {
-    console.log('generateCryptoKey: ', e)
+    console.log('generateCryptoKey: ', e);
   }
 }
-
 
 export default {
   read,

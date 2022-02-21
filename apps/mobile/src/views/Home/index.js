@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
+import { StatusBar } from 'react-native-bars';
+import { ChangePassword } from '../../components/Auth/change-password';
 import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import { Header } from '../../components/Header/index';
@@ -14,8 +16,10 @@ import { db } from '../../utils/database';
 import { eOnLoadNote } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
 import { getNote } from '../Editor/Functions';
+import { Tip } from '../../components/Tip';
+import { TipManager } from '../../services/tip-manager';
 
-export const Home = ({navigation}) => {
+export const Home = ({ navigation }) => {
   const notes = useNoteStore(state => state.notes);
   const setNotes = useNoteStore(state => state.setNotes);
   const loading = useNoteStore(state => state.loading);
@@ -31,12 +35,12 @@ export const Home = ({navigation}) => {
     Navigation.setHeaderState(
       'Notes',
       {
-        menu: true,
+        menu: true
       },
       {
         heading: 'Notes',
-        id: 'notes_navigation',
-      },
+        id: 'notes_navigation'
+      }
     );
   }, []);
 
@@ -74,20 +78,20 @@ export const Home = ({navigation}) => {
       placeholder: 'Type a keyword to search in notes',
       data: db?.notes?.all,
       type: 'notes',
-      title: 'Notes',
+      title: 'Notes'
     });
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
     if (!DDS.isTab) {
       if (getNote()) {
-       eSendEvent(eOnLoadNote, {type: 'new'});
-       editing.currentlyEditing = true;
-       editing.movedAway = false;
+        eSendEvent(eOnLoadNote, { type: 'new' });
+        editing.currentlyEditing = true;
+        editing.movedAway = false;
       }
       tabBarRef.current?.goToPage(1);
     } else {
-      eSendEvent(eOnLoadNote, {type: 'new'});
+      eSendEvent(eOnLoadNote, { type: 'new' });
     }
   }, []);
 
@@ -95,12 +99,7 @@ export const Home = ({navigation}) => {
     <>
       <SelectionHeader screen="Notes" />
       <ContainerTopSection>
-        <Header
-          title="Notes"
-          isBack={false}
-          screen="Notes"
-          action={_onPressBottomButton}
-        />
+        <Header title="Notes" isBack={false} screen="Notes" action={_onPressBottomButton} />
       </ContainerTopSection>
 
       <SimpleList
@@ -113,24 +112,21 @@ export const Home = ({navigation}) => {
         loading={loading}
         sortMenuButton={true}
         headerProps={{
-          heading: 'Notes',
+          heading: 'Notes'
         }}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
         placeholderData={{
-          heading: 'Your notes',
+          heading: 'Notes',
           paragraph: 'You have not added any notes yet.',
           button: 'Add your first note',
           action: _onPressBottomButton,
-          loading: 'Loading your notes.',
+          loading: 'Loading your notes'
         }}
       />
 
       {!notes || notes.length === 0 ? null : (
-        <ContainerBottomButton
-          title="Create a new note"
-          onPress={_onPressBottomButton}
-        />
+        <ContainerBottomButton title="Create a new note" onPress={_onPressBottomButton} />
       )}
     </>
   );

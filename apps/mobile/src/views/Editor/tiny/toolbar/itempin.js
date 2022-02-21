@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
 import { useTracked } from '../../../../provider';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../../../services/EventManager';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
 import { sleep } from '../../../../utils/TimeUtils';
 
-const ToolbarItemPin = ({format, color}) => {
+const ToolbarItemPin = ({ format, color }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [visible, setVisible] = useState(false);
   let scale = useValue(0);
   useEffect(() => {
@@ -26,7 +23,7 @@ const ToolbarItemPin = ({format, color}) => {
     timing(scale, {
       toValue: val,
       duration: time,
-      easing: Easing.in(Easing.ease),
+      easing: Easing.in(Easing.ease)
     }).start();
     await sleep(time);
     animating = false;
@@ -55,9 +52,9 @@ const ToolbarItemPin = ({format, color}) => {
           top: 0,
           transform: [
             {
-              scale: scale,
-            },
-          ],
+              scale: scale
+            }
+          ]
         }}
       />
     )

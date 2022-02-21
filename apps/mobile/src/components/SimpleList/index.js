@@ -1,26 +1,20 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {
-  FlatList,
-  RefreshControl,
-  RefreshControlComponent,
-  View
-} from 'react-native';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {useUserStore} from '../../provider/stores';
-import {eSendEvent} from '../../services/EventManager';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, RefreshControl, View } from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {db} from '../../utils/database';
-import {eScrollEvent} from '../../utils/Events';
-import {sleep} from '../../utils/TimeUtils';
+import { db } from '../../utils/database';
+import { eScrollEvent } from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
-import {NotebookWrapper} from '../NotebookItem/wrapper';
-import {NoteWrapper} from '../NoteItem/wrapper';
+import { NotebookWrapper } from '../NotebookItem/wrapper';
+import { NoteWrapper } from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
-import {Empty} from './empty';
-import {Footer} from './footer';
-import {Header} from './header';
-import {SectionHeader} from './section-header';
+import { Empty } from './empty';
+import { Footer } from './footer';
+import { Header } from './header';
+import { SectionHeader } from './section-header';
 
 let renderItems = {
   note: NoteWrapper,
@@ -31,12 +25,11 @@ let renderItems = {
   header: SectionHeader
 };
 
-const RenderItem = ({item, index, type, ...restArgs}) => {
+const RenderItem = ({ item, index, type, ...restArgs }) => {
   if (!item) return <View />;
   const Item = renderItems[item.itemType || item.type] || View;
   const groupOptions = db.settings?.getGroupOptions(type);
-  const dateBy =
-    groupOptions.sortBy !== 'title' ? groupOptions.sortBy : 'dateEdited';
+  const dateBy = groupOptions.sortBy !== 'title' ? groupOptions.sortBy : 'dateEdited';
 
   let tags =
     item.tags
@@ -52,16 +45,7 @@ const RenderItem = ({item, index, type, ...restArgs}) => {
         };
       })
       .filter(t => t !== null) || [];
-  return (
-    <Item
-      item={item}
-      tags={tags}
-      dateBy={dateBy}
-      index={index}
-      type={type}
-      {...restArgs}
-    />
-  );
+  return <Item item={item} tags={tags} dateBy={dateBy} index={index} type={type} {...restArgs} />;
 };
 
 const SimpleList = ({
@@ -77,7 +61,7 @@ const SimpleList = ({
   ListHeader
 }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
   const syncing = useUserStore(state => state.syncing);
@@ -100,7 +84,7 @@ const SimpleList = ({
   }, [loading]);
 
   const renderItem = React.useCallback(
-    ({item, index}) => (
+    ({ item, index }) => (
       <RenderItem
         item={item}
         index={index}
@@ -133,7 +117,6 @@ const SimpleList = ({
   );
 
   let styles = {
-    height: '100%',
     width: '100%',
     minHeight: 1,
     minWidth: 1,

@@ -1,20 +1,20 @@
-import React, {useState} from 'react';
-import {View} from 'react-native';
+import React, { useState } from 'react';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useMenuStore, useSettingStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { notesnook } from '../../../e2e/test.ids';
+import { useMenuStore, useSettingStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {dWidth} from '../../utils';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/database';
-import {refreshNotesPage} from '../../utils/Events';
+import { dWidth } from '../../utils';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/database';
+import { refreshNotesPage } from '../../utils/Events';
 import layoutmanager from '../../utils/layout-manager';
-import {SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 
-export const ColorTags = ({item, close}) => {
+export const ColorTags = ({ item, close }) => {
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore(state => state.setColorNotes);
   const dimensions = useSettingStore(state => state.dimensions);
@@ -27,7 +27,7 @@ export const ColorTags = ({item, close}) => {
       await db.notes.note(note.id).color(color.name);
     }
     let _note = db.notes.note(note.id).data;
-    setNote({..._note});
+    setNote({ ..._note });
     setColorNotes();
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
@@ -56,7 +56,8 @@ export const ColorTags = ({item, close}) => {
           borderRadius: 100,
           justifyContent: 'center',
           alignItems: 'center'
-        }}>
+        }}
+      >
         {note.color?.toLowerCase() === color.name ? (
           <Icon name="check" color="white" size={SIZE.lg} />
         ) : null}
@@ -75,7 +76,8 @@ export const ColorTags = ({item, close}) => {
         marginTop: 20,
         alignItems: 'center',
         justifyContent: 'space-between'
-      }}>
+      }}
+    >
       {Object.keys(COLORS_NOTE).map(_renderColor)}
     </View>
   );

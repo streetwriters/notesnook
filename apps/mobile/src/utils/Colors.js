@@ -1,11 +1,12 @@
-import {eSendEvent} from '../services/EventManager';
-import {eThemeUpdated} from './Events';
-import {Platform, StatusBar} from 'react-native';
-import {AndroidModule} from '.';
+import { eSendEvent } from '../services/EventManager';
+import { eThemeUpdated } from './Events';
+import { NativeModules, Platform, StatusBar } from 'react-native';
+import { AndroidModule } from '.';
+import { StatusBar as Sbar } from 'react-native-bars';
 
 export const ACCENT = {
   color: '#008837',
-  shade: '#00883712',
+  shade: '#00883712'
 };
 
 export const COLORS_NOTE = {
@@ -15,7 +16,7 @@ export const COLORS_NOTE = {
   green: '#4CAF50',
   blue: '#2196F3',
   purple: '#673AB7',
-  gray: '#9E9E9E',
+  gray: '#9E9E9E'
 };
 
 const fixedColors = {
@@ -38,7 +39,7 @@ const fixedColors = {
   blue: '#2196F3',
   purple: '#673AB7',
   gray: '#9E9E9E',
-  discord:"#5865F2"
+  discord: '#5865F2'
 };
 export var COLOR_SCHEME = {
   ...fixedColors,
@@ -48,7 +49,7 @@ export var COLOR_SCHEME = {
   nav: '#f7f7f7',
   pri: '#424242',
   sec: 'white',
-  light: '#ffffff',
+  light: '#ffffff'
 };
 
 export const COLOR_SCHEME_LIGHT = {
@@ -63,8 +64,8 @@ export const COLOR_SCHEME_LIGHT = {
   sec: '#ffffff',
   light: '#ffffff',
   transGray: '#00000010',
-  border:"#E8E8E8",
-  placeholder:"#a9a9a9"
+  border: '#E8E8E8',
+  placeholder: '#a9a9a9'
 };
 export const COLOR_SCHEME_PITCH_BLACK = {
   ...fixedColors,
@@ -78,8 +79,8 @@ export const COLOR_SCHEME_PITCH_BLACK = {
   sec: 'black',
   light: '#ffffff',
   transGray: '#ffffff10',
-  border:"#383838",
-  placeholder:"#404040"
+  border: '#383838',
+  placeholder: '#404040'
 };
 
 export const COLOR_SCHEME_DARK = {
@@ -94,8 +95,8 @@ export const COLOR_SCHEME_DARK = {
   sec: 'black',
   light: '#ffffff',
   transGray: '#ffffff10',
-  border:"#383838",
-  placeholder:"#404040"
+  border: '#383838',
+  placeholder: '#404040'
 };
 
 export function getCurrentColors() {
@@ -103,13 +104,14 @@ export function getCurrentColors() {
 }
 
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-  COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
+  COLOR_SCHEME = { ...colors, accent: accent.color, shade: accent.shade };
 
-  StatusBar.setBarStyle(
-    COLOR_SCHEME.night ? 'light-content' : 'dark-content',
-    true,
-  );
-    
+  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content', true);
+  // Sbar.pushStackEntry({
+  //   barStyle: COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+  //   animated: true
+  // });
+
   if (Platform.OS === 'android') {
     AndroidModule.setBackgroundColor(COLOR_SCHEME.bg);
     StatusBar.setBackgroundColor('transparent', true);
@@ -128,10 +130,11 @@ export function setAccentColor(color) {
 }
 
 export function updateStatusBarColor() {
-  StatusBar.setBarStyle(
-    COLOR_SCHEME.night ? 'light-content' : 'dark-content',
-    true,
-  );
+  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content', true);
+  // Sbar.pushStackEntry({
+  //   barStyle: COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+  //   animated: true
+  // });
   if (Platform.OS === 'android') {
     StatusBar.setBackgroundColor('transparent', true);
     StatusBar.setTranslucent(true, true);

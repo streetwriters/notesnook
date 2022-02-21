@@ -1,20 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {Platform, StyleSheet, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import React, { useEffect, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import SearchService from '../../services/SearchService';
-import {eScrollEvent} from '../../utils/Events';
-import {ActionIcon} from '../ActionIcon';
-import {SearchInput} from '../SearchInput';
-import {HeaderLeftMenu} from './HeaderLeftMenu';
-import {HeaderRightMenu} from './HeaderRightMenu';
-import {Title} from './title';
+import { eScrollEvent } from '../../utils/Events';
+import { ActionIcon } from '../ActionIcon';
+import { SearchInput } from '../SearchInput';
+import { HeaderLeftMenu } from './HeaderLeftMenu';
+import { HeaderRightMenu } from './HeaderRightMenu';
+import { Title } from './title';
 
 export const Header = React.memo(
-  ({root, title, screen, isBack, color, action, rightButtons, notebook}) => {
+  ({ root, title, screen, isBack, color, action, rightButtons, notebook }) => {
     const [state] = useTracked();
-    const {colors} = state;
+    const { colors } = state;
     const insets = useSafeAreaInsets();
     const [hide, setHide] = useState(true);
 
@@ -46,7 +46,8 @@ export const Header = React.memo(
             borderBottomColor: hide ? 'transparent' : colors.nav,
             justifyContent: 'space-between'
           }
-        ]}>
+        ]}
+      >
         <View style={styles.leftBtnContainer}>
           <HeaderLeftMenu headerMenuState={!isBack} currentScreen={screen} />
 
@@ -59,11 +60,7 @@ export const Header = React.memo(
           />
         </View>
 
-        <HeaderRightMenu
-          rightButtons={rightButtons}
-          action={action}
-          currentScreen={screen}
-        />
+        <HeaderRightMenu rightButtons={rightButtons} action={action} currentScreen={screen} />
       </View>
     );
   },

@@ -1,9 +1,9 @@
 import React from 'react';
-import {Text} from 'react-native';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
+import { Text } from 'react-native';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -29,22 +29,22 @@ const DialogHeader = ({
           justifyContent: 'space-between',
           minHeight: 50,
           paddingHorizontal: padding
-        }}>
+        }}
+      >
         <View
           style={{
             width: '100%'
-          }}>
+          }}
+        >
           <View
             style={{
               flexDirection: 'row',
               justifyContent: centered ? 'center' : 'space-between',
               alignItems: 'center'
-            }}>
+            }}
+          >
             <Heading size={SIZE.xl}>
-              {title}{' '}
-              {titlePart ? (
-                <Text style={{color: colors.accent}}>{titlePart}</Text>
-              ) : null}
+              {title} {titlePart ? <Text style={{ color: colors.accent }}>{titlePart}</Text> : null}
             </Heading>
 
             {button ? (
@@ -69,7 +69,8 @@ const DialogHeader = ({
                 maxWidth: centered ? '90%' : '100%',
                 alignSelf: centered ? 'center' : 'flex-start'
               }}
-              color={paragraphColor || colors.icon}>
+              color={paragraphColor || colors.icon}
+            >
               {paragraph}
             </Paragraph>
           ) : null}

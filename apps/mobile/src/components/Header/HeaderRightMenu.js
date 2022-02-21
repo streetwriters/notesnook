@@ -11,9 +11,9 @@ import { sleep } from '../../utils/TimeUtils';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 
-export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
+export const HeaderRightMenu = ({ currentScreen, action, rightButtons }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
   const menuRef = useRef();
   return (
@@ -27,7 +27,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           }}
           name="magnify"
           color={colors.pri}
-          customStyle={[styles.rightBtn]}
+          customStyle={styles.rightBtn}
         />
       ) : null}
 
@@ -37,13 +37,21 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           testID={notesnook.ids.default.addBtn}
           icon={currentScreen === 'Trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
-          type="accent"
+          type="shade"
+          hitSlop={{
+            top: 10,
+            right: 10,
+            bottom: 10,
+            left: 0
+          }}
           style={{
             marginLeft: 10,
-            width: 40,
-            height: 40,
-            borderRadius: 100,
-            paddingHorizontal: 0
+            width: 32,
+            height: 32,
+            borderRadius: 5,
+            paddingHorizontal: 0,
+            borderWidth: 1,
+            borderColor: colors.accent
           }}
         />
       ) : null}
@@ -66,22 +74,23 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               color={colors.pri}
               customStyle={styles.rightBtn}
             />
-          }>
+          }
+        >
           {rightButtons.map((item, index) => (
-            <MenuItem
-              key={item.title}
-              onPress={async () => {
-                menuRef.current?.hide();
-                await sleep(300);
-                item.func();
+            <Button
+              style={{
+                width: 150,
+                justifyContent: 'flex-start',
+                borderRadius: 0
               }}
-              textStyle={{
-                fontSize: SIZE.md,
-                color: colors.pri
-              }}>
-              <Icon name={item.icon} size={SIZE.md} />
-              {'  ' + item.title}
-            </MenuItem>
+              type="gray"
+              buttonType={{
+                text: colors.pri
+              }}
+              key={item.title}
+              title={item.title}
+              onPress={item.func}
+            />
           ))}
         </Menu>
       ) : null}

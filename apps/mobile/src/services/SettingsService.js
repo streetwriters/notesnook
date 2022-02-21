@@ -5,7 +5,6 @@ import { Actions } from '../provider/Actions';
 import { useSettingStore } from '../provider/stores';
 import { AndroidModule } from '../utils';
 import { getColorScheme } from '../utils/ColorUtils';
-import layoutmanager from '../utils/layout-manager';
 import { MMKV } from '../utils/mmkv';
 import { scale, updateSize } from '../utils/SizeUtils';
 import Notifications from './Notifications';
@@ -27,13 +26,13 @@ export const defaultSettings = {
   telemetry: true,
   notebooksListMode: 'normal',
   notesListMode: 'normal',
-  devMode:false,
-  notifNotes:false,
-  pitchBlack:false,
-  reduceAnimations:false
+  devMode: false,
+  notifNotes: false,
+  pitchBlack: false,
+  reduceAnimations: false
 };
 
-let settings = {...defaultSettings};
+let settings = { ...defaultSettings };
 
 let appLoaded = false;
 
@@ -56,6 +55,7 @@ async function init() {
     if (!settings.appLockMode) {
       settings.appLockMode = 'none';
     }
+    // eslint-disable-next-line no-prototype-builtins
     if (!settings.hasOwnProperty('telemetry')) {
       settings.telemetry = true;
     }
@@ -88,7 +88,7 @@ async function init() {
   }
 
   updateSize();
-  useSettingStore.getState().setSettings({...settings});
+  useSettingStore.getState().setSettings({ ...settings });
   setTheme();
   return;
 }
@@ -96,19 +96,19 @@ async function init() {
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
-    updateEvent({type: Actions.THEME, colors: newColors});
+    updateEvent({ type: Actions.THEME, colors: { ...newColors } });
   }
 };
 
 async function set(name, value) {
   settings[name] = value;
-  settings = {...settings};
+  settings = { ...settings };
   await MMKV.setItem('appSettings', JSON.stringify(settings));
-  useSettingStore.getState().setSettings({...settings});
+  useSettingStore.getState().setSettings({ ...settings });
 }
 
 function get() {
-  return {...settings};
+  return { ...settings };
 }
 
 export default {

@@ -1,19 +1,20 @@
+import { decode, EntityLevel } from 'entities';
 import { Platform } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import RNFetchBlob from 'rn-fetch-blob';
 import showdown from 'showdown';
+import { toTXT } from '../utils';
 import { db } from '../utils/database';
 import { sanitizeFilename } from '../utils/filename';
 import Storage from '../utils/storage';
-
 
 const defaultStyle = `<style>
 .img_size_one {
   width:100%;
 }
 .img_size_two {
-  width:50%; 
+  width:50%;
 }
 .img_size_three {
   width:25%;
@@ -32,9 +33,21 @@ img {
 .img_float_none {
   float:none;
 }
+
 body {
   background-color:transparent !important;
+  color: #505050
 }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #212121
+}
+
 pre.codeblock {
   overflow-x:auto;
 }
@@ -78,12 +91,9 @@ iframe {
   margin-right: -1.5em;
 }
 
-
-
-
 /* TABLE */
 
-.mce-content-body table {
+table {
   table-layout: fixed;
   border-collapse: separate !important;
   border-spacing: 0px;
@@ -91,6 +101,13 @@ iframe {
   border-radius: 5px;
   font-size: 14px;
   min-width: 100% !important;
+}
+
+.table-container {
+  border: 1px solid #e8e8e8 !important;
+  border-radius: 5px;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 tr td,
@@ -107,6 +124,7 @@ tbody tr th {
   border-top: none !important;
 }
 
+
 tfoot tr td,
 tfoot tr th, {
   border-left: none !important;
@@ -121,15 +139,15 @@ tfoot td {
   border-top: 1px solid #e8e8e8 !important;
 }
 
-.mce-content-body td:last-child {
+td:last-child {
   border-right: none !important;
 }
 
-.mce-content-body tbody tr:last-child td {
+tbody tr:last-child td {
   border-bottom: none !important;
 }
 
-.mce-content-body tr:nth-child(even) {
+tr:nth-child(even) {
   background-color: #f7f7f7;
 }
 
@@ -137,30 +155,23 @@ table thead {
   font-weight: bold !important;
 }
 
-.mce-content-body .table-container {
-  border: 1px solid #E8E8E8 !important;
-  border-radius: 5px;
-  overflow-x: auto;
-  max-width: 100%;
-}
-
 td,
 th {
   min-width:100px !important;
 }
 
-.mce-content-body td > *,
-.mce-content-body th > * {
+td > *,
+th > * {
   margin: 0 !important;
 }
 
-.mce-content-body td > * + *,
-.mce-content-body th > * + * {
+td > * + *,
+th > * + * {
   margin-top: 0.75em !important;
 }
 
-.mce-content-body td[data-mce-selected]::after,
-.mce-content-body th[data-mce-selected]::after {
+td[data-mce-selected]::after,
+th[data-mce-selected]::after {
   background-color: #00883712 !important;
   border: 1px solid #00883712 !important;
   bottom: -1px;
@@ -172,53 +183,132 @@ th {
   top: -1px;
 }
 
-.mce-content-body table td:hover {
+table td:hover {
   background-color: #00883712;
 }
 
-.mce-content-body table[data-mce-selected] tr[data-mce-active] {
+table[data-mce-selected] tr[data-mce-active] {
   background-color: #00883712;
   /* color: var(--static); */
 }
 
-.mce-content-body
-  table[data-mce-selected]
+table[data-mce-selected]
   tr[data-mce-active]
   td:not([data-mce-active]),
-.mce-content-body
-  table[data-mce-selected]
+ table[data-mce-selected]
   tr[data-mce-active]
   th:not([data-mce-active]) {
   border-bottom: 1px solid ${'#008837' + 'B3'} !important;
   border-top: 1px solid ${'#008837' + 'B3'} !important;
 }
 
-.mce-content-body
-  table[data-mce-selected]
+table[data-mce-selected]
   tr[data-mce-active]
   td:not([data-mce-active]):first-child,
-.mce-content-body
-  table[data-mce-selected]
+table[data-mce-selected]
   tr[data-mce-active]
   th:not([data-mce-active]):first-child {
   border-left: 1px solid ${'#008837' + 'B3'} !important;
 }
 
-.mce-content-body
-  table[data-mce-selected]
+table[data-mce-selected]
   tr[data-mce-active]
   td:not([data-mce-active]):last-child,
-.mce-content-body
-  table[data-mce-selected]
+table[data-mce-selected]
   tr[data-mce-active]
   th:not([data-mce-active]):last-child {
   border-right: 1px solid ${'#008837' + 'B3'} !important;
 }
 
-.mce-content-body table[data-mce-selected] td[data-mce-active],
-.mce-content-body table[data-mce-selected] th[data-mce-active] {
+table[data-mce-selected] td[data-mce-active],
+table[data-mce-selected] th[data-mce-active] {
   border: 2px solid ${'#008837' + 'B3'} !important;
   background-color: #00883712;
+}
+
+.hljs {
+  color: #383a42;
+  background: #fafafa;
+  border:1px solid #e8e8e8;
+  border-radius: 5px;
+  padding: 3px 5px 0px 5px;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
+    Menlo, monospace !important;
+  font-size: 10pt !important;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #a0a1a7;
+  font-style: italic;
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #a626a4;
+}
+
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #e45649;
+}
+
+.hljs-literal {
+  color: #0184bb;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #50a14f;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #986801;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #4078f2;
+}
+
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #c18401;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 600;
+}
+
+.hljs-link {
+  text-decoration: underline;
+}
+
+hr {
+  border-color: #b1b1b1 !important;
 }
 
 </style>`;
@@ -234,9 +324,10 @@ async function saveToPDF(note) {
   Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/PDF/'));
 
   let html = await db.notes.note(note).export('html');
-  let he = require('he');
-  html = he.decode(html);
-  let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
+  html = decode(html, {
+    level: EntityLevel.HTML
+  });
+  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
   let html3 = html;
   if (html.indexOf('<head>') > -1) {
     let html1 = html.substring(0, html.indexOf('<head>') + 6);
@@ -283,26 +374,15 @@ async function saveToPDF(note) {
 }
 
 async function saveToMarkdown(note) {
-  let path =
-    Platform.OS === 'ios' &&
-    (await Storage.checkAndCreateDir('/exported/Markdown/'));
+  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Markdown/'));
   if (Platform.OS === 'android') {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
     path = file.uri;
   }
 
-
-  let converter = new showdown.Converter();
-  converter.setFlavor('original');
-  let jsdom = require('jsdom-jscore-rn');
-  let dom = jsdom.html();
-  let content = await db.notes.note(note.id).content();
-  let markdown = converter.makeMarkdown(content, dom);
-
-  markdown = await db.notes.note(note.id).export('md', markdown);
-
-  let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
+  let markdown = await db.notes.note(note.id).export('md', markdown);
+  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
 
   let fileUri;
   if (Platform.OS === 'android') {
@@ -329,18 +409,15 @@ async function saveToMarkdown(note) {
 }
 
 async function saveToText(note) {
-  let path =
-    Platform.OS === 'ios' &&
-    (await Storage.checkAndCreateDir('/exported/Text/'));
+  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Text/'));
   if (Platform.OS === 'android') {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
     path = file.uri;
   }
 
-  let text = await db.notes.note(note.id).export('txt');
-
-  let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
+  let text = await toTXT(note);
+  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
 
   let fileUri;
   if (Platform.OS === 'android') {
@@ -367,9 +444,7 @@ async function saveToText(note) {
 }
 
 async function saveToHTML(note) {
-  let path =
-    Platform.OS === 'ios' &&
-    (await Storage.checkAndCreateDir('/exported/Html/'));
+  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Html/'));
   if (Platform.OS === 'android') {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
@@ -377,7 +452,7 @@ async function saveToHTML(note) {
   }
 
   let html = await db.notes.note(note.id).export('html');
-  let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
+  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
   let html3 = html;
   if (html.indexOf('<head>') > -1) {
     let html1 = html.substring(0, html.indexOf('<head>') + 6);

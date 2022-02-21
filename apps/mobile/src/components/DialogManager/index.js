@@ -11,7 +11,8 @@ import { Dialog } from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import GeneralSheet from '../GeneralSheet';
 import ImagePreview from '../ImagePreview';
-import LoginDialog from '../LoginDialog';
+import Auth from '../Auth';
+import { SessionExpired } from '../Auth/session-expired';
 import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
 import PremiumDialog from '../Premium';
@@ -33,10 +34,7 @@ export class DialogManager extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      JSON.stringify(nextProps) !== JSON.stringify(this.props) ||
-      nextState !== this.state
-    );
+    return JSON.stringify(nextProps) !== JSON.stringify(this.props) || nextState !== this.state;
   }
 
   onThemeChange = () => {
@@ -54,14 +52,14 @@ export class DialogManager extends Component {
   }
 
   render() {
-    let {colors} = this.state;
+    let { colors } = this.state;
     return (
       <>
         <Dialog context="global" />
         <AddTopicDialog colors={colors} />
         <AddNotebookDialog colors={colors} />
         <PremiumDialog colors={colors} />
-        <LoginDialog colors={colors} />
+        <Auth colors={colors} />
         <MergeEditor />
         <ExportDialog />
         <RecoveryKeyDialog colors={colors} />
@@ -78,6 +76,7 @@ export class DialogManager extends Component {
         <AttachmentDialog />
         <Expiring />
         <AnnouncementDialog />
+        <SessionExpired />
       </>
     );
   }

@@ -1,14 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import RNFetchBlob from 'rn-fetch-blob';
 import Storage from '../../utils/storage';
-import {ActionIcon} from '../ActionIcon';
+import { ActionIcon } from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
-const {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} = require('../../services/EventManager');
+const { eSubscribeEvent, eUnSubscribeEvent } = require('../../services/EventManager');
 
 const ImagePreview = () => {
   const [visible, setVisible] = useState(false);
@@ -40,7 +37,8 @@ const ImagePreview = () => {
             width: '100%',
             height: '100%',
             backgroundColor: 'black'
-          }}>
+          }}
+        >
           <ImageViewer
             enableImageZoom={true}
             renderIndicator={() => <></>}
@@ -62,7 +60,8 @@ const ImagePreview = () => {
                   zIndex: 999,
                   backgroundColor: 'rgba(0,0,0,0.3)',
                   paddingTop: 30
-                }}>
+                }}
+              >
                 <ActionIcon
                   name="close"
                   color="white"
@@ -78,8 +77,6 @@ const ImagePreview = () => {
               }
             ]}
           />
-
-
         </View>
       </BaseDialog>
     )

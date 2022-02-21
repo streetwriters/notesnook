@@ -1,6 +1,4 @@
-
-export const sleep = (duration) =>
-  new Promise((resolve) => setTimeout(() => resolve(), duration));
+export const sleep = duration => new Promise(resolve => setTimeout(() => resolve(), duration));
 
 export function timeSince(date) {
   let seconds = Math.floor((new Date() - date) / 1000);
@@ -16,7 +14,7 @@ export function timeSince(date) {
 
   interval = Math.floor(seconds / (86400 * 7));
   if (interval > 0.9) {
-    if (interval === 4) return "1mo ago";
+    if (interval === 4) return '1mo ago';
     return interval < 2 ? interval + 'w ago' : interval + 'w ago';
   }
 
@@ -32,12 +30,10 @@ export function timeSince(date) {
   if (interval > 0.9) {
     return interval < 2 ? interval + 'm ago' : interval + 'm ago';
   }
-  return Math.floor(seconds) < 0
-    ? '0s ago'
-    : Math.floor(seconds) + 's ago';
+  return Math.floor(seconds) < 0 ? '0s ago' : Math.floor(seconds) + 's ago';
 }
 
-export const timeConverter = (timestamp) => {
+export const timeConverter = timestamp => {
   if (!timestamp) return;
   let d = new Date(timestamp), // Convert the passed timestamp to milliseconds
     yyyy = d.getFullYear(),
@@ -50,20 +46,7 @@ export const timeConverter = (timestamp) => {
     ampm = 'AM',
     time;
   let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  let months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   if (hh > 12) {
     h = hh - 12;

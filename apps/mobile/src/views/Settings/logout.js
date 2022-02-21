@@ -1,32 +1,25 @@
-import React, {useRef, useState} from 'react';
-import {View} from 'react-native';
+import React, { useState } from 'react';
+import { View } from 'react-native';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import BaseDialog from '../../components/Dialog/base-dialog';
-import DialogButtons from '../../components/Dialog/dialog-buttons';
-import DialogContainer from '../../components/Dialog/dialog-container';
-import DialogHeader from '../../components/Dialog/dialog-header';
-import {presentDialog} from '../../components/Dialog/functions';
-import Input from '../../components/Input';
-import {PressableButton} from '../../components/PressableButton';
-import Seperator from '../../components/Seperator';
-import {Toast} from '../../components/Toast';
+import { presentDialog } from '../../components/Dialog/functions';
+import { PressableButton } from '../../components/PressableButton';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {useUserStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
-import {ToastEvent} from '../../services/EventManager';
-import {db} from '../../utils/database';
-import {SIZE} from '../../utils/SizeUtils';
+import { ToastEvent } from '../../services/EventManager';
+import { db } from '../../utils/database';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
+import { sleep } from '../../utils/TimeUtils';
 
 const AccoutLogoutSection = () => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const [state] = useTracked();
+  const { colors } = state;
   const user = useUserStore(state => state.user);
   const [loading, setLoading] = useState(false);
-  const passwordValue = useRef();
 
   return !user ? null : (
     <>
@@ -39,7 +32,8 @@ const AccoutLogoutSection = () => {
               backgroundColor: colors.bg,
               justifyContent: 'center',
               alignItems: 'center'
-            }}>
+            }}
+          >
             <Heading color={colors.pri} size={SIZE.lg}>
               Logging out
             </Heading>
@@ -52,7 +46,8 @@ const AccoutLogoutSection = () => {
                 height: 10,
                 width: 100,
                 marginTop: 15
-              }}>
+              }}
+            >
               <AnimatedProgress fill={colors.accent} total={8} current={8} />
             </View>
           </View>
@@ -96,12 +91,14 @@ const AccoutLogoutSection = () => {
             paddingHorizontal: 12,
             marginTop: index === 0 ? 25 : 0,
             borderRadius: 0
-          }}>
+          }}
+        >
           <Heading
             color={item.name === 'Logout' ? colors.pri : colors.red}
             style={{
               fontSize: SIZE.md
-            }}>
+            }}
+          >
             {item.name}
           </Heading>
         </PressableButton>
@@ -159,12 +156,14 @@ const AccoutLogoutSection = () => {
           paddingHorizontal: 12,
           marginTop: 25,
           borderColor: colors.red
-        }}>
+        }}
+      >
         <Heading
           color={colors.red}
           style={{
             fontSize: SIZE.md
-          }}>
+          }}
+        >
           Delete account
         </Heading>
         <Paragraph
@@ -172,10 +171,10 @@ const AccoutLogoutSection = () => {
             flexWrap: 'wrap',
             flexBasis: 1
           }}
-          color={colors.red}>
-          Your account will be deleted and all your data will be removed
-          permanantly. Make sure you have saved backup of your notes. This
-          action is IRREVERSIBLE.
+          color={colors.red}
+        >
+          Your account will be deleted and all your data will be removed permanantly. Make sure you
+          have saved backup of your notes. This action is IRREVERSIBLE.
         </Paragraph>
       </PressableButton>
     </>

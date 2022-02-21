@@ -2,18 +2,14 @@ import { Platform } from 'react-native';
 import { useEditorStore } from '../../../../provider/stores';
 import { EditorWebView, textInput } from '../../Functions';
 import tiny from '../tiny';
-import picker from './picker';
 
 export const endSearch = () => {
-  tiny.call(
-    EditorWebView,
-    `tinymce.activeEditor.plugins.searchreplace.done()`
-  );
+  tiny.call(EditorWebView, `tinymce.activeEditor.plugins.searchreplace.done()`);
   textInput.current?.focus();
   useEditorStore.getState().setSearchReplace(false);
   Platform.OS === 'android' && EditorWebView.current?.requestFocus();
   tiny.call(EditorWebView, tiny.focusEditor);
-}
+};
 
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,
@@ -26,26 +22,19 @@ export const execCommands = {
   underline: `tinymce.activeEditor.execCommand('Underline');`,
   superscript: `tinymce.activeEditor.execCommand('Superscript');`,
   subscript: `tinymce.activeEditor.execCommand('Subscript');`,
-  forecolor: color =>
-    `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
-  hilitecolor: color =>
-    `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
-  dforecolor: color =>
-    `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
-  dhilitecolor: color =>
-    `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
+  forecolor: color => `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
+  hilitecolor: color => `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
+  dforecolor: color => `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
+  dhilitecolor: color => `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
 
-  fontname: fontname =>
-    `tinymce.activeEditor.execCommand('FontName',false, '${fontname}');`,
+  fontname: fontname => `tinymce.activeEditor.execCommand('FontName',false, '${fontname}');`,
 
   indent: `tinymce.activeEditor.execCommand('Indent');`,
   outdent: `tinymce.activeEditor.execCommand('Outdent');`,
   blockquote: `tinymce.activeEditor.execCommand('mceBlockQuote');`,
-  link: link =>
-    `tinymce.activeEditor.execCommand('mceInsertLink',false, '${link}');`,
+  link: link => `tinymce.activeEditor.execCommand('mceInsertLink',false, '${link}');`,
   unlink: `tinymce.activeEditor.execCommand('Unlink')`,
-  fontsize: size =>
-    `tinymce.activeEditor.execCommand('FontSize', false, '${size}');`,
+  fontsize: size => `tinymce.activeEditor.execCommand('FontSize', false, '${size}');`,
   removeformat: `tinymce.activeEditor.execCommand('RemoveFormat');`,
   p: `tinymce.activeEditor.execCommand('FormatBlock', false, 'p');`,
   h2: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h2');`,
@@ -53,7 +42,6 @@ export const execCommands = {
   h4: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h4');`,
   h5: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h5');`,
   h6: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h6');`,
-  pre: `tinymce.activeEditor.execCommand('FormatBlock', false, 'pre');`,
   ol: style =>
     `tinymce.activeEditor.execCommand('InsertOrderedList', false, {'list-style-type': "${style}"});`,
   ul: style =>
@@ -75,7 +63,7 @@ export const execCommands = {
       if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
         let rng = tinymce.activeEditor.selection.getRng()
         tinymce.activeEditor.execCommand("mceInsertNewLine")
-        tinymce.activeEditor.fire("input");
+        tinymce.activeEditor.fire("input",{data:""})
         tinymce.activeEditor.selection.setRng(rng)
      }  
      editor.undoManager.transact(function() {
@@ -89,14 +77,14 @@ export const execCommands = {
   pre: `
     tinymce.activeEditor.execCommand('mceInsertCodeBlock')
   `,
-  tablecellprops:`tableCellNodeOptions()`,
+  tablecellprops: `tableCellNodeOptions()`,
   tableprops: "tinymce.activeEditor.execCommand('mceTableProps');",
   tabledelete: "tinymce.activeEditor.execCommand('mceTableDelete');",
   tablesplitcell: "tinymce.activeEditor.execCommand('mceTableSplitCells');",
   tablemergecell: "tinymce.activeEditor.execCommand('mceTableMergeCells');",
   tablerowprops: `tableRowNodeOptions()`,
-  tableinsertrowbefore:`tinymce.activeEditor.execCommand('mceTableInsertRowBefore');`,
-  tableinsertcolbefore:`tinymce.activeEditor.execCommand('mceTableInsertColBefore');`,
+  tableinsertrowbefore: `tinymce.activeEditor.execCommand('mceTableInsertRowBefore');`,
+  tableinsertcolbefore: `tinymce.activeEditor.execCommand('mceTableInsertColBefore');`,
   imageResize25: () => setImageSize(0.25),
   imageResize50: () => setImageSize(0.5),
   imageResize100: () => setImageSize(1),
@@ -135,7 +123,7 @@ export const execCommands = {
     if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
     tinymce.activeEditor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
     setTimeout(function() {
-      tinymce.activeEditor.fire("input");
+      tinymce.activeEditor.fire("input",{data:""})
     },100)
     }  
   })();
@@ -158,7 +146,7 @@ const setFloat = float => `(function () {
     tinymce.activeEditor.undoManager.transact(function() {
       node.style.float = "${float}";
       setTimeout(function() {
-        tinymce.activeEditor.fire("input");
+        tinymce.activeEditor.fire("input",{data:""})
       },100)
     });
   }
@@ -181,7 +169,7 @@ if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
 
     node.width = originalWidth * ${size}
     setTimeout(function() {
-      tinymce.activeEditor.fire("input");
+      tinymce.activeEditor.fire("input",{data:""})
     },100)
   });
 }

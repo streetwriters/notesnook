@@ -1,9 +1,9 @@
-import {createRef} from 'react';
-import {Platform} from 'react-native';
-import {eSendEvent} from '../../../../services/EventManager';
-import {editing} from '../../../../utils';
-import {sleep} from '../../../../utils/TimeUtils';
-import {EditorWebView, textInput} from '../../Functions';
+import { createRef } from 'react';
+import { Platform } from 'react-native';
+import { eSendEvent } from '../../../../services/EventManager';
+import { editing } from '../../../../utils';
+import { sleep } from '../../../../utils/TimeUtils';
+import { EditorWebView, textInput } from '../../Functions';
 import tiny from '../tiny';
 
 export const properties = {
@@ -54,7 +54,8 @@ function trim(str) {
 }
 
 export function rgbToHex(color) {
-  if (color.startsWith("#")) return color;
+  if (color.startsWith('#')) return color;
+  let r, g, b, a;
   if (!color.startsWith('rgba')) {
     color = '' + color;
     if (!color || color.indexOf('rgb') < 0) {
@@ -65,10 +66,10 @@ export function rgbToHex(color) {
       return color;
     }
 
-    var nums = /(.*?)rgb\((\d+),\s*(\d+),\s*(\d+)\)/i.exec(color),
-      r = parseInt(nums[2], 10).toString(16),
-      g = parseInt(nums[3], 10).toString(16),
-      b = parseInt(nums[4], 10).toString(16);
+    var nums = /(.*?)rgb\((\d+),\s*(\d+),\s*(\d+)\)/i.exec(color);
+    r = parseInt(nums[2], 10).toString(16);
+    g = parseInt(nums[3], 10).toString(16);
+    b = parseInt(nums[4], 10).toString(16);
 
     return (
       '#' +
@@ -78,13 +79,11 @@ export function rgbToHex(color) {
     );
   } else {
     let rgba = color;
-    var inParts = rgba.substring(rgba.indexOf('(')).split(','),
-      r = parseInt(trim(inParts[0].substring(1)), 10),
-      g = parseInt(trim(inParts[1]), 10),
-      b = parseInt(trim(inParts[2]), 10),
-      a = parseFloat(
-        trim(inParts[3].substring(0, inParts[3].length - 1))
-      ).toFixed(2);
+    var inParts = rgba.substring(rgba.indexOf('(')).split(',');
+    r = parseInt(trim(inParts[0].substring(1)), 10);
+    g = parseInt(trim(inParts[1]), 10);
+    b = parseInt(trim(inParts[2]), 10);
+    a = parseFloat(trim(inParts[3].substring(0, inParts[3].length - 1))).toFixed(2);
     var outParts = [
       r.toString(16),
       g.toString(16),
@@ -112,16 +111,16 @@ export const INPUT_MODE = {
 
 export const font_names = Platform.select({
   android: [
-    {name: 'Sans', value: 'open sans'},
-    {name: 'Serif', value: 'times new roman'},
-    {name: 'Mono', value: 'courier'},
-    {name: 'Classic', value: 'courier new'}
+    { name: 'Sans', value: 'open sans' },
+    { name: 'Serif', value: 'times new roman' },
+    { name: 'Mono', value: 'courier' },
+    { name: 'Classic', value: 'courier new' }
   ],
   ios: [
-    {name: 'Sans Serif', value: 'open sans'},
-    {name: 'Serif', value: 'times new roman'},
-    {name: 'Mono', value: 'courier'},
-    {name: 'Classic', value: 'courier new'}
+    { name: 'Sans Serif', value: 'open sans' },
+    { name: 'Serif', value: 'times new roman' },
+    { name: 'Mono', value: 'courier' },
+    { name: 'Classic', value: 'courier new' }
   ]
 });
 
@@ -164,15 +163,7 @@ export const editor_colors = [
   '#3d1466'
 ];
 
-export const editor_font_size = [
-  '8pt',
-  '10pt',
-  '12pt',
-  '14pt',
-  '18pt',
-  '24pt',
-  '36pt'
-];
+export const editor_font_size = ['8pt', '10pt', '12pt', '14pt', '18pt', '24pt', '36pt'];
 
 export const unorderedListStyles = ['default', 'circle', 'square'];
 

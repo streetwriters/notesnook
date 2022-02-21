@@ -1,30 +1,20 @@
 import React, { createRef } from 'react';
-import {
-  Keyboard,
-  StyleSheet, TextInput, TouchableOpacity,
-  View
-} from 'react-native';
+import { Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { notesnook } from '../../../e2e/test.ids';
 import { useMenuStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from '../../services/EventManager';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { db } from '../../utils/database';
-import {
-  eCloseAddNotebookDialog,
-  eOpenAddNotebookDialog
-} from '../../utils/Events';
+import { eCloseAddNotebookDialog, eOpenAddNotebookDialog } from '../../utils/Events';
 import { ph, pv, SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
+import { MoveNotes } from '../MoveNoteDialog/movenote';
 import Seperator from '../Seperator';
 import SheetWrapper from '../Sheet';
 import { Toast } from '../Toast';
@@ -94,7 +84,7 @@ export class AddNotebookDialog extends React.Component {
     } else {
       this.setState({
         visible: true,
-        notebook:null
+        notebook: null
       });
     }
     sleep(100).then(r => {
@@ -115,7 +105,7 @@ export class AddNotebookDialog extends React.Component {
   };
 
   onDelete = index => {
-    let {topics} = this.state;
+    let { topics } = this.state;
     let prevTopics = topics;
     refs = [];
     prevTopics.splice(index, 1);
@@ -145,7 +135,7 @@ export class AddNotebookDialog extends React.Component {
     this.setState({
       loading: true
     });
-    let {topics, notebook} = this.state;
+    let { topics, notebook } = this.state;
 
     if (!this.title || this.title?.trim().length === 0) {
       ToastEvent.show({
@@ -173,12 +163,10 @@ export class AddNotebookDialog extends React.Component {
         this.currentInputValue = null;
       }
     }
-
+    let newNotebookId = null;
     if (notebook) {
       if (this.topicsToDelete?.length > 0) {
-        await db.notebooks
-          .notebook(toEdit.id)
-          .topics.delete(...this.topicsToDelete);
+        await db.notebooks.notebook(toEdit.id).topics.delete(...this.topicsToDelete);
         toEdit = db.notebooks.notebook(toEdit.id).data;
       }
 
@@ -189,7 +177,7 @@ export class AddNotebookDialog extends React.Component {
       });
 
       let nextTopics = toEdit.topics.map((topic, index) => {
-        let copy = {...topic};
+        let copy = { ...topic };
         copy.title = prevTopics[index];
         return copy;
       });
@@ -202,11 +190,11 @@ export class AddNotebookDialog extends React.Component {
 
       await db.notebooks.notebook(toEdit.id).topics.add(...nextTopics);
     } else {
-      await db.notebooks.add({
+      newNotebookId = await db.notebooks.add({
         title: this.title,
         description: this.description,
         topics: prevTopics,
-        id:null
+        id: null
       });
     }
     useMenuStore.getState().setMenuPins();
@@ -219,14 +207,17 @@ export class AddNotebookDialog extends React.Component {
       loading: false
     });
     this.close();
+    await sleep(300);
+    if (!notebook) {
+      MoveNotes.present(db.notebooks.notebook(newNotebookId).data);
+    }
   };
 
   onSubmit = (forward = true) => {
     this.hiddenInput.current?.focus();
     let willFocus = true;
-    let {topics} = this.state;
-    if (!this.currentInputValue || this.currentInputValue?.trim().length === 0)
-      return;
+    let { topics } = this.state;
+    if (!this.currentInputValue || this.currentInputValue?.trim().length === 0) return;
 
     let prevTopics = [...topics];
     if (this.prevItem === null) {
@@ -235,7 +226,7 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics
       });
       setTimeout(() => {
-        this.listRef.scrollToEnd({animated: true});
+        this.listRef.scrollToEnd({ animated: true });
       }, 30);
       this.currentInputValue = null;
     } else {
@@ -259,7 +250,7 @@ export class AddNotebookDialog extends React.Component {
 
       if (forward) {
         setTimeout(() => {
-          this.listRef.scrollToEnd({animated: true});
+          this.listRef.scrollToEnd({ animated: true });
         }, 30);
       }
     }
@@ -270,8 +261,8 @@ export class AddNotebookDialog extends React.Component {
   };
 
   render() {
-    const {colors} = this.props;
-    const {topics, visible, topicInputFocused, notebook} = this.state;
+    const { colors } = this.props;
+    const { topics, visible, topicInputFocused, notebook } = this.state;
     if (!visible) return null;
     return (
       <SheetWrapper
@@ -293,13 +284,15 @@ export class AddNotebookDialog extends React.Component {
           });
         }}
         statusBarTranslucent={false}
-        onRequestClose={this.close}>
+        onRequestClose={this.close}
+      >
         <View
           style={{
             maxHeight: DDS.isTab ? '90%' : '100%',
             borderRadius: DDS.isTab ? 5 : 0,
             paddingHorizontal: 12
-          }}>
+          }}
+        >
           <TextInput
             ref={this.hiddenInput}
             style={{
@@ -311,11 +304,7 @@ export class AddNotebookDialog extends React.Component {
             blurOnSubmit={false}
           />
           <DialogHeader
-            title={
-              notebook && notebook.dateCreated
-                ? 'Edit Notebook'
-                : 'New Notebook'
-            }
+            title={notebook && notebook.dateCreated ? 'Edit Notebook' : 'New Notebook'}
             paragraph={
               notebook && notebook.dateCreated
                 ? 'You are editing ' + this.title + ' notebook.'
@@ -392,8 +381,8 @@ export class AddNotebookDialog extends React.Component {
             }}
             keyboardShouldPersistTaps="always"
             keyboardDismissMode="interactive"
-            ListFooterComponent={<View style={{height: 50}} />}
-            renderItem={({item, index}) => (
+            ListFooterComponent={<View style={{ height: 50 }} />}
+            renderItem={({ item, index }) => (
               <TopicItem
                 item={item}
                 onPress={(item, index) => {
@@ -419,11 +408,7 @@ export class AddNotebookDialog extends React.Component {
             width="100%"
             height={50}
             fontSize={SIZE.md}
-            title={
-              notebook && notebook.dateCreated
-                ? 'Save changes'
-                : 'Create notebook'
-            }
+            title={notebook && notebook.dateCreated ? 'Save changes' : 'Create notebook'}
             type="accent"
             onPress={this.addNewNotebook}
           />
@@ -443,7 +428,7 @@ export class AddNotebookDialog extends React.Component {
   }
 }
 
-const TopicItem = ({item, index, colors, onPress, onDelete}) => {
+const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
   const topicRef = ref => (refs[index] = ref);
 
   return (
@@ -455,7 +440,8 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
         backgroundColor: colors.nav,
         borderRadius: 5,
         marginVertical: 5
-      }}>
+      }}
+    >
       <TouchableOpacity
         style={{
           width: '80%',
@@ -489,7 +475,8 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           alignItems: 'center',
           flexDirection: 'row',
           justifyContent: 'flex-end'
-        }}>
+        }}
+      >
         <ActionIcon
           onPress={() => {
             onPress(item, index);

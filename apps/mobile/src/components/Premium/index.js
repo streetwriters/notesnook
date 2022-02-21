@@ -1,8 +1,8 @@
-import React, {createRef} from 'react';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eClosePremiumDialog, eOpenPremiumDialog} from '../../utils/Events';
+import React, { createRef } from 'react';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eClosePremiumDialog, eOpenPremiumDialog } from '../../utils/Events';
 import BaseDialog from '../Dialog/base-dialog';
-import {Component} from './component';
+import { Component } from './component';
 
 class PremiumDialog extends React.Component {
   constructor(props) {
@@ -47,14 +47,12 @@ class PremiumDialog extends React.Component {
   render() {
     return !this.state.visible ? null : (
       <BaseDialog
-        bounce
+        animation="slide"
+        bounce={false}
         background={this.props.colors.bg}
-        onRequestClose={this.onClose}>
-        <Component
-          getRef={() => this.actionSheetRef}
-          promo={this.state.promo}
-          close={this.close}
-        />
+        onRequestClose={this.onClose}
+      >
+        <Component getRef={() => this.actionSheetRef} promo={this.state.promo} close={this.close} />
       </BaseDialog>
     );
   }

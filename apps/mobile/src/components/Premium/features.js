@@ -39,8 +39,7 @@ export const features = [
   },
   {
     title: 'Attach files & images',
-    detail:
-      'Add your documents, PDFs, images and videos, and keep them safe and organized.',
+    detail: 'Add your documents, PDFs, images and videos, and keep them safe and organized.',
     pro: true,
     features: [
       {
@@ -78,8 +77,7 @@ export const features = [
   },
   {
     title: 'Organize yourself in the best way',
-    detail:
-      'We offer multiple ways to keep you organized. The only limit is your imagination.',
+    detail: 'We offer multiple ways to keep you organized. The only limit is your imagination.',
     features: [
       {
         highlight: 'Unlimited',
@@ -208,8 +206,7 @@ export const features = [
   },
   {
     title: 'Personalize & make Notesnook your own',
-    detail:
-      'Change app themes to match your style. Custom themes are coming soon.',
+    detail: 'Change app themes to match your style. Custom themes are coming soon.',
     pro: true,
     features: [
       {

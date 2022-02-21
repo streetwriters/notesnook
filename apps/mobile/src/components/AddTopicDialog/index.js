@@ -1,27 +1,19 @@
-import React, {createRef} from 'react';
-import {Keyboard, LayoutAnimation, UIManager, View} from 'react-native';
-import {
-  Transition,
-  Transitioning,
-  TransitioningView
-} from 'react-native-reanimated';
-import {useMenuStore} from '../../provider/stores';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from '../../services/EventManager';
+import React, { createRef } from 'react';
+import { Keyboard, LayoutAnimation, UIManager, View } from 'react-native';
+import { Transition, Transitioning, TransitioningView } from 'react-native-reanimated';
+import { useMenuStore } from '../../provider/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/database';
-import {eCloseAddTopicDialog, eOpenAddTopicDialog} from '../../utils/Events';
-import {sleep} from '../../utils/TimeUtils';
+import { db } from '../../utils/database';
+import { eCloseAddTopicDialog, eOpenAddTopicDialog } from '../../utils/Events';
+import { sleep } from '../../utils/TimeUtils';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
 import Seperator from '../Seperator';
-import {Toast} from '../Toast';
+import { Toast } from '../Toast';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -41,14 +33,14 @@ export class AddTopicDialog extends React.Component {
 
   addNewTopic = async () => {
     try {
-      this.setState({loading: true});
+      this.setState({ loading: true });
       if (!this.title || this.title?.trim() === '') {
         ToastEvent.show({
           heading: 'Topic title is required',
           type: 'error',
           context: 'local'
         });
-        this.setState({loading: false});
+        this.setState({ loading: false });
         return;
       }
 
@@ -60,7 +52,7 @@ export class AddTopicDialog extends React.Component {
 
         await db.notebooks.notebook(topic.notebookId).topics.add(topic);
       }
-      this.setState({loading: false});
+      this.setState({ loading: false });
       this.close();
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.Notebooks,
@@ -80,7 +72,7 @@ export class AddTopicDialog extends React.Component {
     eUnSubscribeEvent(eCloseAddTopicDialog, this.close);
   }
 
-  open = async ({notebookId, toEdit}) => {
+  open = async ({ notebookId, toEdit }) => {
     let id = notebookId;
     if (id) {
       this.notebook = await db.notebooks.notebook(id).data;
@@ -105,7 +97,7 @@ export class AddTopicDialog extends React.Component {
   };
 
   render() {
-    const {visible} = this.state;
+    const { visible } = this.state;
     if (!visible) return null;
     return (
       <BaseDialog
@@ -123,15 +115,14 @@ export class AddTopicDialog extends React.Component {
         bounce={false}
         statusBarTranslucent={false}
         visible={true}
-        onRequestClose={this.close}>
+        onRequestClose={this.close}
+      >
         <DialogContainer>
           <DialogHeader
             icon="book-outline"
             title={this.toEdit ? 'Edit topic' : 'New topic'}
             paragraph={
-              this.toEdit
-                ? 'Edit title of the topic'
-                : 'Add a new topic in ' + this.notebook.title
+              this.toEdit ? 'Edit title of the topic' : 'Add a new topic in ' + this.notebook.title
             }
             padding={12}
           />
@@ -139,7 +130,8 @@ export class AddTopicDialog extends React.Component {
           <View
             style={{
               paddingHorizontal: 12
-            }}>
+            }}
+          >
             <Input
               fwdRef={this.titleRef}
               onChangeText={value => {

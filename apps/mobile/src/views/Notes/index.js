@@ -1,30 +1,23 @@
-import {groupArray} from 'notes-core/utils/grouping';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header';
+import { groupArray } from 'notes-core/utils/grouping';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
+import { MoveNotes } from '../../components/MoveNoteDialog/movenote';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {useNoteStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useNoteStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {editing, InteractionManager} from '../../utils';
-import {db} from '../../utils/database';
-import {
-  eOnLoadNote,
-  eOpenAddTopicDialog,
-  refreshNotesPage
-} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {tabBarRef} from '../../utils/Refs';
-import {getNote} from '../Editor/Functions';
+import { editing, InteractionManager } from '../../utils';
+import { db } from '../../utils/database';
+import { eOnLoadNote, eOpenAddTopicDialog, refreshNotesPage } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { tabBarRef } from '../../utils/Refs';
+import { getNote } from '../Editor/Functions';
 
 const getNotes = params => {
   if (!params) return [];
@@ -34,9 +27,7 @@ const getNotes = params => {
   } else if (params.get === 'monographs') {
     notes = db.monographs.all;
   } else {
-    notes = db.notebooks
-      .notebook(params.notebookId)
-      ?.topics.topic(params.id)?.all;
+    notes = db.notebooks.notebook(params.notebookId)?.topics.topic(params.id)?.all;
   }
   if (!notes) {
     notes = [];
@@ -55,7 +46,7 @@ function getAlias(params) {
   return alias || '';
 }
 
-export const Notes = ({route, navigation}) => {
+export const Notes = ({ route, navigation }) => {
   const [state] = useTracked();
   const colors = state.colors;
   const params = useRef(route?.params);
@@ -145,9 +136,7 @@ export const Notes = ({route, navigation}) => {
 
   const updateSearch = () => {
     SearchService.update({
-      placeholder: `Search in ${
-        params.current?.type === 'tag' ? '#' + alias : alias
-      }`,
+      placeholder: `Search in ${params.current?.type === 'tag' ? '#' + alias : alias}`,
       data: notes,
       noSearch: false,
       type: 'notes',
@@ -162,23 +151,20 @@ export const Notes = ({route, navigation}) => {
   const _onPressBottomButton = async () => {
     if (params.current?.get === 'monographs') {
       try {
-        await openLinkInBrowser(
-          'https://docs.notesnook.com/monographs/',
-          colors.accent
-        );
+        await openLinkInBrowser('https://docs.notesnook.com/monographs/', colors.accent);
       } catch (e) {}
       return;
     }
     setActionAfterFirstSave();
     if (!DDS.isTab) {
       if (getNote()) {
-        eSendEvent(eOnLoadNote, {type: 'new'});
+        eSendEvent(eOnLoadNote, { type: 'new' });
         editing.currentlyEditing = true;
         editing.movedAway = false;
       }
       tabBarRef.current?.goToPage(1);
     } else {
-      eSendEvent(eOnLoadNote, {type: 'new'});
+      eSendEvent(eOnLoadNote, { type: 'new' });
     }
   };
 
@@ -187,10 +173,7 @@ export const Notes = ({route, navigation}) => {
       params.current?.type === 'tag'
         ? '#' + alias
         : alias.slice(0, 1).toUpperCase() + alias.slice(1),
-    color:
-      params.current?.type === 'color'
-        ? params.current?.title.toLowerCase()
-        : null,
+    color: params.current?.type === 'color' ? params.current?.title.toLowerCase() : null,
     paragraph: params.current?.type === 'topic' ? 'Edit topic' : null,
     onPress: () => {
       if (params.current?.type !== 'topic') return;
@@ -207,30 +190,24 @@ export const Notes = ({route, navigation}) => {
   };
 
   const placeholderData = {
-    heading:
-      params.current?.get === 'monographs' ? 'Your monographs' : 'Your notes',
+    heading: params.current?.get === 'monographs' ? 'Your monographs' : 'Your notes',
     paragraph:
       params.current?.get === 'monographs'
         ? 'You have not published any notes as monographs yet.'
         : 'You have not added any notes yet.',
     button:
-      params.current?.get === 'monographs'
-        ? 'Learn about monographs'
-        : 'Add your first Note',
+      params.current?.get === 'monographs' ? 'Learn more about monographs' : 'Add your first Note',
     action: _onPressBottomButton,
-    buttonIcon:
-      params.current?.get === 'monographs' ? 'information-outline' : null,
+    buttonIcon: params.current?.get === 'monographs' ? 'information-outline' : null,
     loading:
-      params.current?.get === 'monographs'
-        ? 'Loading published notes'
-        : 'Loading your notes.'
+      params.current?.get === 'monographs' ? 'Loading published notes' : 'Loading your notes.',
+    type: params.current?.get === 'monographs' ? 'monographs' : null
   };
 
   const isFocused = () => navigation.isFocused();
 
   const headerRightButtons = [
     {
-      icon: 'pencil',
       title: 'Edit topic',
       func: () => {
         if (params.current?.type !== 'topic') return;
@@ -238,6 +215,13 @@ export const Notes = ({route, navigation}) => {
           notebookId: params.current?.notebookId,
           toEdit: params.current
         });
+      }
+    },
+    {
+      title: 'Move notes',
+      func: () => {
+        if (params.current?.type !== 'topic') return;
+        MoveNotes.present(db.notebooks.notebook(params.current?.notebookId).data, params.current);
       }
     }
   ];
@@ -259,12 +243,9 @@ export const Notes = ({route, navigation}) => {
           screen="NotesPage"
           action={_onPressBottomButton}
           notebook={
-            params.current?.notebookId &&
-            db.notebooks?.notebook(params.current?.notebookId).data
+            params.current?.notebookId && db.notebooks?.notebook(params.current?.notebookId).data
           }
-          rightButtons={
-            params.current?.type !== 'topic' ? null : headerRightButtons
-          }
+          rightButtons={params.current?.type !== 'topic' ? null : headerRightButtons}
         />
       </ContainerTopSection>
       <SimpleList

@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {TouchableOpacity, useWindowDimensions, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
+import React, { useEffect, useRef, useState } from 'react';
+import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -9,37 +9,35 @@ import {
   presentSheet
 } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import {GROUP} from '../../utils';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/database';
-import {eOpenJumpToDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
+import { GROUP } from '../../utils';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/database';
+import { eOpenJumpToDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 import Sort from '../Sort';
 import Heading from '../Typography/Heading';
 
-export const SectionHeader = ({item, index, type, color, screen}) => {
+export const SectionHeader = ({ item, index, type, color, screen }) => {
   const [state] = useTracked();
-  const {colors} = state;
-  const {fontScale} = useWindowDimensions();
-  const [groupOptions, setGroupOptions] = useState(
-    db.settings?.getGroupOptions(type)
-  );
-  let groupBy = Object.keys(GROUP).find(
-    key => GROUP[key] === groupOptions.groupBy
-  );
+  const { colors } = state;
+  const { fontScale } = useWindowDimensions();
+  const [groupOptions, setGroupOptions] = useState(db.settings?.getGroupOptions(type));
+  let groupBy = Object.keys(GROUP).find(key => GROUP[key] === groupOptions.groupBy);
+  const jumpToRef = useRef();
+  const sortRef = useRef();
+  const compactModeRef = useRef();
 
   const settings = useSettingStore(state => state.settings);
-  const listMode =
-    type === 'notebooks' ? settings.notebooksListMode : settings.notesListMode;
+  const listMode = type === 'notebooks' ? settings.notebooksListMode : settings.notesListMode;
 
   groupBy = !groupBy
     ? 'Default'
     : groupBy.slice(0, 1).toUpperCase() + groupBy.slice(1, groupBy.length);
 
   const onUpdate = () => {
-    setGroupOptions({...db.settings?.getGroupOptions(type)});
+    setGroupOptions({ ...db.settings?.getGroupOptions(type) });
   };
 
   useEffect(() => {
@@ -62,17 +60,20 @@ export const SectionHeader = ({item, index, type, color, screen}) => {
         alignSelf: 'center',
         borderRadius: 5,
         marginVertical: 5
-      }}>
+      }}
+    >
       <TouchableOpacity
         onPress={() => {
           eSendEvent(eOpenJumpToDialog, type);
         }}
+        ref={jumpToRef}
         activeOpacity={0.9}
-        hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
+        hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
         style={{
           height: '100%',
           justifyContent: 'center'
-        }}>
+        }}
+      >
         <Heading
           color={COLORS_NOTE[color?.toLowerCase()] || colors.accent}
           size={SIZE.sm}
@@ -80,7 +81,8 @@ export const SectionHeader = ({item, index, type, color, screen}) => {
             minWidth: 60,
             alignSelf: 'center',
             textAlignVertical: 'center'
-          }}>
+          }}
+        >
           {!item.title || item.title === '' ? 'Pinned' : item.title}
         </Heading>
       </TouchableOpacity>
@@ -89,7 +91,8 @@ export const SectionHeader = ({item, index, type, color, screen}) => {
         style={{
           flexDirection: 'row',
           alignItems: 'center'
-        }}>
+        }}
+      >
         {index === 0 ? (
           <>
             <Button
@@ -98,38 +101,36 @@ export const SectionHeader = ({item, index, type, color, screen}) => {
                   component: <Sort screen={screen} type={type} />
                 });
               }}
+              tooltipText="Change sorting of items in list"
+              fwdRef={sortRef}
               title={groupBy}
-              icon={
-                groupOptions.sortDirection === 'asc'
-                  ? 'sort-ascending'
-                  : 'sort-descending'
-              }
+              icon={groupOptions.sortDirection === 'asc' ? 'sort-ascending' : 'sort-descending'}
               height={25}
               style={{
                 borderRadius: 100,
                 paddingHorizontal: 0,
                 backgroundColor: 'transparent',
-                marginRight:
-                  type === 'notes' || type === 'home' || type === 'notebooks'
-                    ? 10
-                    : 0
+                marginRight: type === 'notes' || type === 'home' || type === 'notebooks' ? 10 : 0
               }}
               type="gray"
               iconPosition="right"
             />
+
             {type === 'notes' || type === 'notebooks' || type === 'home' ? (
               <ActionIcon
                 customStyle={{
                   width: 25,
                   height: 25
                 }}
+                tooltipText={
+                  listMode == 'compact' ? 'Switch to normal mode' : 'Switch to compact mode'
+                }
+                fwdRef={compactModeRef}
                 color={colors.icon}
                 name={listMode == 'compact' ? 'view-list' : 'view-list-outline'}
                 onPress={() => {
                   SettingsService.set(
-                    type !== 'notebooks'
-                      ? 'notesListMode'
-                      : 'notebooksListMode',
+                    type !== 'notebooks' ? 'notesListMode' : 'notebooksListMode',
                     listMode === 'normal' ? 'compact' : 'normal'
                   );
                 }}

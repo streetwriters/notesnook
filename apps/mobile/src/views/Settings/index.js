@@ -1,46 +1,38 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Linking, Platform, ScrollView, View} from 'react-native';
-import {Button as MButton} from '../../components/Button/index';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Issue} from '../../components/Github/issue';
-import {Header as TopHeader} from '../../components/Header/index';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Linking, Platform, ScrollView, View } from 'react-native';
+import { APP_VERSION } from '../../../version';
+import { Button as MButton } from '../../components/Button/index';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Issue } from '../../components/Github/issue';
+import { Header as TopHeader } from '../../components/Header/index';
 import Seperator from '../../components/Seperator';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {
-  eSendEvent,
-  presentSheet,
-  ToastEvent
-} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { eSendEvent, presentSheet } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {InteractionManager, STORE_LINK} from '../../utils';
-import {APP_VERSION} from '../../../version';
-import {db} from '../../utils/database';
-import {eScrollEvent, eUpdateSearchState} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
+import { InteractionManager, STORE_LINK } from '../../utils';
+import { eScrollEvent, eUpdateSearchState } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
 import SettingsAppearanceSection from './appearance';
 import SettingsBackupAndRestore from './backup-restore';
-import {CustomButton} from './button';
+import { CustomButton } from './button';
 import SettingsDeveloperOptions from './developeroptions';
 import SettingsGeneralOptions from './general';
 import AccoutLogoutSection from './logout';
 import SettingsPrivacyAndSecurity from './privacy';
 import SectionHeader from './section-header';
 import SettingsUserSection from './user-section';
-import {Update} from '../../components/Update';
-import {checkVersion} from 'react-native-check-version';
 
 const format = ver => {
   let parts = ver.toString().split('');
-
-  return `v${parts[0]}.${parts[1]}.${
-    parts[2]?.startsWith('0') ? parts[2]?.slice(1) : parts[2]
-  }${parts[3] === '0' ? '' : parts[3]} `;
+  return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? parts[2]?.slice(1) : parts[2]}${
+    !parts[3] || parts[2] === '0' ? '' : parts[3]
+  } `;
 };
 
-export const Settings = ({navigation}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+export const Settings = ({ navigation }) => {
+  const [state] = useTracked();
+  const { colors } = state;
   const [collapsed, setCollapsed] = useState(false);
 
   let pageIsLoaded = false;
@@ -132,17 +124,22 @@ export const Settings = ({navigation}) => {
           component: <Issue />
         });
       },
-      desc: `Facing an issue? Click here to create a bug report`
+      desc: `Faced an issue or have a suggestion? Click here to create a bug report`
+    },
+    {
+      name: 'Join our Telegram group',
+      desc: "We are on telegram, let's talk",
+      func: () => {
+        Linking.openURL('https://t.me/notesnook').catch(console.log);
+      }
     },
     {
       name: 'Join our Discord community',
-
       func: async () => {
         presentSheet({
           title: 'Join our Discord Community',
           iconColor: 'discord',
-          paragraph:
-            'We are not ghosts, chat with us and share your experience.',
+          paragraph: 'We are not ghosts, chat with us and share your experience.',
           valueArray: [
             'Talk with us anytime.',
             'Follow the development process',
@@ -153,7 +150,7 @@ export const Settings = ({navigation}) => {
           icon: 'discord',
           action: async () => {
             try {
-              await openLinkInBrowser('https://discord.gg/zQBK97EE22', colors);
+              Linking.openURL('https://discord.gg/zQBK97EE22').catch(console.log);
             } catch (e) {}
           },
           actionText: 'Join Now'
@@ -183,10 +180,7 @@ export const Settings = ({navigation}) => {
       name: 'Roadmap',
       func: async () => {
         try {
-          await openLinkInBrowser(
-            'https://docs.notesnook.com/roadmap/',
-            colors
-          );
+          await openLinkInBrowser('https://docs.notesnook.com/roadmap/', colors);
         } catch (e) {}
       },
       desc: 'See what the future of Notesnook is going to be like.'
@@ -211,7 +205,8 @@ export const Settings = ({navigation}) => {
         style={{
           height: '100%',
           backgroundColor: colors.bg
-        }}>
+        }}
+      >
         <ScrollView
           onScroll={e =>
             eSendEvent(eScrollEvent, {
@@ -222,7 +217,8 @@ export const Settings = ({navigation}) => {
           scrollEventThrottle={1}
           style={{
             paddingHorizontal: 0
-          }}>
+          }}
+        >
           <SettingsUserSection />
 
           <SettingsAppearanceSection />
@@ -235,11 +231,7 @@ export const Settings = ({navigation}) => {
 
           <SettingsDeveloperOptions />
 
-          <SectionHeader
-            collapsed={collapsed}
-            setCollapsed={setCollapsed}
-            title="Other"
-          />
+          <SectionHeader collapsed={collapsed} setCollapsed={setCollapsed} title="Other" />
 
           {!collapsed && (
             <>
@@ -253,25 +245,24 @@ export const Settings = ({navigation}) => {
                   marginTop: 10,
                   backgroundColor: colors.nav,
                   alignSelf: 'center'
-                }}>
+                }}
+              >
                 <Paragraph
                   style={{
                     flexWrap: 'wrap',
                     flexBasis: 1,
                     textAlign: 'center'
                   }}
-                  color={colors.pri}>
-                  It took us a year to bring Notesnook to you. Help us make it
-                  better by rating it on{' '}
-                  {Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}
+                  color={colors.pri}
+                >
+                  It took us a year to bring Notesnook to you. Help us make it better by rating it
+                  on {Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}
                 </Paragraph>
                 <Seperator />
                 <MButton
                   type="accent"
                   width="100%"
-                  title={`Rate us on ${
-                    Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
-                  }`}
+                  title={`Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`}
                   onPress={async () => {
                     try {
                       await Linking.openURL(STORE_LINK);

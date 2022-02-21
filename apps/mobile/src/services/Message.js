@@ -1,21 +1,16 @@
-import {useMessageStore} from '../provider/stores';
-import {
-  eOpenLoginDialog,
-  eOpenRateDialog,
-  eOpenRecoveryKeyDialog
-} from '../utils/Events';
-import {eSendEvent} from './EventManager';
+import { useMessageStore } from '../provider/stores';
+import { eOpenLoginDialog, eOpenRateDialog, eOpenRecoveryKeyDialog } from '../utils/Events';
+import { eSendEvent } from './EventManager';
 import PremiumService from './PremiumService';
-import {verifyUser} from '../views/Settings/functions';
-import {MMKV} from '../utils/mmkv';
-import {Platform} from 'react-native';
+import { verifyUser } from '../views/Settings/functions';
+import { MMKV } from '../utils/mmkv';
+import { Platform } from 'react-native';
+import umami from '../utils/umami';
 
 const rateAppMessage = {
   visible: true,
   message: 'We would love to know what you think',
-  actionText:
-    'Rate Notesnook on ' +
-    `${Platform.OS === 'ios' ? 'App store' : 'Play store'}`,
+  actionText: 'Rate Notesnook on ' + `${Platform.OS === 'ios' ? 'App store' : 'Play store'}`,
   onPress: () => {
     eSendEvent(eOpenRateDialog);
   },
@@ -60,6 +55,7 @@ const loginMessage = {
   message: 'You are not logged in',
   actionText: 'Login to encrypt and sync notes',
   onPress: () => {
+    umami.pageView('/signup', '/welcome/home');
     eSendEvent(eOpenLoginDialog);
   },
   data: {},
@@ -74,13 +70,13 @@ export function setLoginMessage() {
 const emailMessage = {
   visible: true,
   message: 'Email not confirmed',
-  actionText: 'Confirm now to get 7 more days of free trial',
+  actionText: 'Please confrim your email to sync notes.',
   onPress: () => {
     PremiumService.showVerifyEmailDialog();
   },
   data: {},
   icon: 'email',
-  type: 'normal'
+  type: 'error'
 };
 
 export function setEmailVerifyMessage() {

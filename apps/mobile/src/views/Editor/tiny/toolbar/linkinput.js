@@ -1,33 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import isEmail from 'validator/lib/isEmail';
-import isMobilePhone from "validator/lib/isMobilePhone";
+import isMobilePhone from 'validator/lib/isMobilePhone';
 import isURL from 'validator/lib/isURL';
 import { Button } from '../../../../components/Button';
 import Input from '../../../../components/Input';
 import { useTracked } from '../../../../provider';
 import { eSendEvent, ToastEvent } from '../../../../services/EventManager';
-import { editing } from '../../../../utils';
+import { editing, itemSkus } from '../../../../utils';
 import { SIZE } from '../../../../utils/SizeUtils';
 import { EditorWebView } from '../../Functions';
 import tiny from '../tiny';
 import { execCommands } from './commands';
-import {
-  focusEditor,
-  formatSelection,
-  INPUT_MODE,
-  properties
-} from './constants';
+import { focusEditor, formatSelection, INPUT_MODE, properties } from './constants';
 import LinkPreview from './linkpreview';
 
 let inputValue = null;
 
-const ToolbarLinkInput = ({format, value, setVisible}) => {
+const ToolbarLinkInput = ({ format, value, setVisible }) => {
   const [state] = useTracked();
-  const {colors} = state;
-  const [mode, setMode] = useState(
-    value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING
-  );
+  const { colors } = state;
+  const [mode, setMode] = useState(value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING);
 
   const inputRef = useRef();
 
@@ -66,7 +59,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     return () => {
       tiny.call(EditorWebView, tiny.restoreRange);
       tiny.call(EditorWebView, tiny.clearRange);
-    }
+    };
   }, [mode]);
 
   const onChangeText = value => {
@@ -82,7 +75,6 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
       formatSelection(execCommands.unlink);
       setVisible(false);
     } else {
-
       if (!isURL(inputValue) && !isEmail(inputValue) && !isMobilePhone(inputValue)) {
         ToastEvent.show({
           heading: 'Invalid url',
@@ -90,6 +82,9 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
           type: 'error'
         });
         return;
+      }
+      if (isURL(inputValue)) {
+        inputValue = inputValue.indexOf('://') === -1 ? 'http://' + inputValue : inputValue;
       }
       console.log('format:', format, 'value:', inputValue);
       properties.userBlur = true;
@@ -100,7 +95,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
 
     editing.tooltip = null;
     setMode(INPUT_MODE.NO_EDIT);
-    
+
     focusEditor(format, false);
     properties.userBlur = false;
   };
@@ -118,7 +113,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
       style={{
         paddingHorizontal: 6,
         width: '100%'
-      }}>
+      }}
+    >
       {mode === INPUT_MODE.NO_EDIT ? (
         <LinkPreview value={value} setMode={setMode} onSubmit={onSubmit} />
       ) : (
@@ -141,6 +137,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
                   }
                 ].map(button => (
                   <Button
+                    key={button.text}
                     title={button.text}
                     fontSize={SIZE.xs + 1}
                     height={28}

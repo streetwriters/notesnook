@@ -1,34 +1,29 @@
-import React, {useEffect} from 'react';
-import {Keyboard, Platform, View} from 'react-native';
-import Animated, {Easing, sub} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect } from 'react';
+import { Keyboard, Platform, View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useSettingStore} from '../../provider/stores';
-import {
-  editing,
-  getElevation,
-  showTooltip,
-  TOOLTIP_POSITIONS,
-} from '../../utils';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { notesnook } from '../../../e2e/test.ids';
+import { useSelectionStore, useSettingStore } from '../../provider/stores';
+import { editing, getElevation, showTooltip, TOOLTIP_POSITIONS } from '../../utils';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 
 const translateY = new Animated.Value(0);
-export const ContainerBottomButton = ({
-  title,
-  onPress,
-  color = 'accent',
-  shouldShow = false,
-}) => {
+export const ContainerBottomButton = ({ title, onPress, color = 'accent', shouldShow = false }) => {
   const insets = useSafeAreaInsets();
   const deviceMode = useSettingStore(state => state.deviceMode);
+  const selectionMode = useSelectionStore(state => state.selectionMode);
+
+  useEffect(() => {
+    animate(selectionMode ? 150 : 0);
+  }, [selectionMode]);
 
   function animate(translate) {
     Animated.timing(translateY, {
       toValue: translate,
       duration: 250,
-      easing: Easing.elastic(1),
+      easing: Easing.elastic(1)
     }).start();
   }
 
@@ -45,8 +40,8 @@ export const ContainerBottomButton = ({
   };
 
   useEffect(() => {
-   let sub1 = Keyboard.addListener('keyboardDidShow', onKeyboardShow);
-   let sub2 =  Keyboard.addListener('keyboardDidHide', onKeyboardHide);
+    let sub1 = Keyboard.addListener('keyboardDidShow', onKeyboardShow);
+    let sub2 = Keyboard.addListener('keyboardDidHide', onKeyboardHide);
     return () => {
       sub1?.remove();
       sub2?.remove();
@@ -67,13 +62,14 @@ export const ContainerBottomButton = ({
         zIndex: 10,
         transform: [
           {
-            translateY: translateY,
+            translateY: translateY
           },
           {
-            translateX: translateY,
-          },
-        ],
-      }}>
+            translateX: translateY
+          }
+        ]
+      }}
+    >
       <PressableButton
         testID={notesnook.buttons.add}
         type="accent"
@@ -81,20 +77,21 @@ export const ContainerBottomButton = ({
         accentText="light"
         customStyle={{
           ...getElevation(5),
-          borderRadius: 100,
+          borderRadius: 100
         }}
         onLongPress={event => {
           showTooltip(event, title, TOOLTIP_POSITIONS.LEFT);
         }}
-        onPress={onPress}>
+        onPress={onPress}
+      >
         <View
           style={{
             alignItems: 'center',
             justifyContent: 'center',
-            width: '100%',
             height: normalize(60),
-            width: normalize(60),
-          }}>
+            width: normalize(60)
+          }}
+        >
           <Icon
             name={title === 'Clear all trash' ? 'delete' : 'plus'}
             color="white"

@@ -1,13 +1,13 @@
 import React from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {SIZE} from '../../utils/SizeUtils';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { SIZE } from '../../utils/SizeUtils';
 import { timeConverter } from '../../utils/TimeUtils';
 import Paragraph from '../Typography/Paragraph';
 
-export const DateMeta = ({item}) => {
+export const DateMeta = ({ item }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   const getNameFromKey = key => {
     switch (key) {
@@ -30,7 +30,8 @@ export const DateMeta = ({item}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           paddingVertical: 3
-        }}>
+        }}
+      >
         <Paragraph size={SIZE.xs} color={colors.icon}>
           {getNameFromKey(key)}
         </Paragraph>
@@ -48,7 +49,8 @@ export const DateMeta = ({item}) => {
         borderTopWidth: 1,
         borderTopColor: colors.nav,
         paddingHorizontal: 12
-      }}>
+      }}
+    >
       {Object.keys(item).map(renderItem)}
     </View>
   );

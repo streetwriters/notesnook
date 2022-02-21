@@ -1,23 +1,12 @@
 import { EV, EVENTS } from 'notes-core/common';
 import React, { useEffect, useRef } from 'react';
-import {
-  BackHandler,
-  InteractionManager,
-  Keyboard,
-  Platform,
-  Vibration,
-  View
-} from 'react-native';
+import { BackHandler, InteractionManager, Keyboard, Platform, Vibration, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
 import { ActionIcon } from '../../components/ActionIcon';
 import { Properties } from '../../components/Properties';
 import { useTracked } from '../../provider';
-import {
-  useEditorStore,
-  useSettingStore,
-  useUserStore
-} from '../../provider/stores';
+import { useEditorStore, useSettingStore, useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -38,10 +27,12 @@ import {
   eOpenPublishNoteDialog
 } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
+import umami from '../../utils/umami';
 import { EditorTitle } from './EditorTitle';
 import {
   clearEditor,
-  clearTimer, getNote,
+  clearTimer,
+  getNote,
   loadNote,
   setColors,
   startClosingSession
@@ -55,11 +46,9 @@ import { useEditorTags } from './useEditorTags';
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
-  const currentlyEditingNote = useEditorStore(
-    state => state.currentEditingNote
-  );
+  const currentlyEditingNote = useEditorStore(state => state.currentEditingNote);
   const fullscreen = useSettingStore(state => state.fullscreen);
   const user = useUserStore(state => state.user);
   const insets = useSafeAreaInsets();
@@ -68,6 +57,7 @@ const EditorHeader = () => {
   const closing = useRef(false);
   const editorTags = useEditorTags();
   const searchReplace = useEditorStore(state => state.searchReplace);
+  const readonly = useEditorStore(state => state.readonly);
 
   useEffect(() => {
     setColors(colors);
@@ -114,7 +104,7 @@ const EditorHeader = () => {
           useEditorStore.getState().setCurrentlyEditingNote(null);
         }, 1);
         keyboardListener.current?.remove();
-        await clearEditor(true, true, true);
+        await clearEditor();
       }
       closing.current = false;
     }, 1);
@@ -192,31 +182,27 @@ const EditorHeader = () => {
   }, []);
 
   const onNoteRemoved = async id => {
-    try {
-      return;
-      // console.log('NOTE REMOVED', id);
-      // await db.notes.remove(id);
-      // if (id !== getNote().id) return;
-      // Navigation.setRoutesToUpdate([
-      //   Navigation.routeNames.Favorites,
-      //   Navigation.routeNames.Notes,
-      //   Navigation.routeNames.NotesPage,
-      //   Navigation.routeNames.Trash,
-      //   Navigation.routeNames.Notebook
-      // ]);
-    } catch (e) {}
+    // try {
+    //   return;
+    //   // console.log('NOTE REMOVED', id);
+    //   // await db.notes.remove(id);
+    //   // if (id !== getNote().id) return;
+    //   // Navigation.setRoutesToUpdate([
+    //   //   Navigation.routeNames.Favorites,
+    //   //   Navigation.routeNames.Notes,
+    //   //   Navigation.routeNames.NotesPage,
+    //   //   Navigation.routeNames.Trash,
+    //   //   Navigation.routeNames.Notebook
+    //   // ]);
+    // } catch (e) {}
   };
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
-      handleBack.current = BackHandler.addEventListener(
-        'hardwareBackPress',
-        _onBackPress
-      );
+      handleBack.current = BackHandler.addEventListener('hardwareBackPress', _onBackPress);
     }
 
     return () => {
-      clearTimer();
       if (handleBack.current) {
         handleBack.current.remove();
         handleBack.current = null;
@@ -228,10 +214,7 @@ const EditorHeader = () => {
     console.log(item.id);
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
-      keyboardListener.current = Keyboard.addListener(
-        'keyboardDidShow',
-        tiny.onKeyboardShow
-      );
+      keyboardListener.current = Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
           'hardwareBackPress',
@@ -255,10 +238,7 @@ const EditorHeader = () => {
         handleBack.current = null;
       }
 
-      handleBack.current = BackHandler.addEventListener(
-        'hardwareBackPress',
-        _onHardwareBackPress
-      );
+      handleBack.current = BackHandler.addEventListener('hardwareBackPress', _onHardwareBackPress);
       return;
     }
     if (editing.currentlyEditing) {
@@ -278,104 +258,103 @@ const EditorHeader = () => {
       <View
         style={{
           width: '100%',
-          position: 'relative',
           backgroundColor: colors.bg,
-          right: 0,
           marginTop: Platform.OS === 'ios' ? 0 : insets.top,
-          zIndex: 10
-        }}>
+          flexDirection: 'row',
+          paddingHorizontal: 12,
+          height: 50,
+          justifyContent: 'space-between'
+        }}
+      >
         <View
           style={{
             flexDirection: 'row',
-            paddingHorizontal: 12,
-            width: '100%',
-            height: 50,
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center'
-            }}>
-            {deviceMode !== 'mobile' && !fullscreen ? null : (
-              <ActionIcon
-                onLongPress={async () => {
-                  await _onBackPress();
-                  Navigation.popToTop();
-                }}
-                top={50}
-                left={12}
-                testID={notesnook.editor.back}
-                name="arrow-left"
-                color={colors.pri}
-                onPress={_onBackPress}
-                bottom={5}
-                customStyle={{
-                  marginLeft: -5
-                }}
-              />
-            )}
-            {fullscreen ? <View style={{width: 20}} /> : null}
-            {deviceMode !== 'mobile' ? <EditorTitle /> : null}
-          </View>
+            alignItems: 'center',
+            flexGrow: 1,
+            flexShrink: 1
+          }}
+        >
+          {deviceMode !== 'mobile' && !fullscreen ? null : (
+            <ActionIcon
+              onLongPress={async () => {
+                await _onBackPress();
+                Navigation.popToTop();
+              }}
+              top={50}
+              left={12}
+              testID={notesnook.editor.back}
+              name="arrow-left"
+              color={colors.pri}
+              onPress={_onBackPress}
+              bottom={5}
+              customStyle={{
+                marginLeft: -5
+              }}
+            />
+          )}
+          {fullscreen ? <View style={{ width: 20 }} /> : null}
+          {deviceMode !== 'mobile' ? <EditorTitle /> : null}
+        </View>
 
-          <View
-            style={{
-              flexDirection: 'row'
-            }}>
-            <>
-              {!user ||
-              user?.subscription.type === SUBSCRIPTION_STATUS.BASIC ||
-              user?.subscription.type === SUBSCRIPTION_STATUS.TRIAL ? (
-                <ActionIcon
-                  name="crown"
-                  color={colors.yellow}
-                  customStyle={{
-                    marginLeft: 5
-                  }}
-                  top={50}
-                  onPress={async () => {
-                    if (editing.isFocused) {
-                      safeKeyboardDismiss();
-                      editing.isFocused = true;
-                    }
-                    eSendEvent(eOpenPremiumDialog);
-                  }}
-                />
-              ) : null}
+        <View
+          style={{
+            flexDirection: 'row'
+          }}
+        >
+          <>
+            {!user ||
+            user?.subscription.type === SUBSCRIPTION_STATUS.BASIC ||
+            user?.subscription.type === SUBSCRIPTION_STATUS.TRIAL ? (
               <ActionIcon
-                name="magnify"
-                color={searchReplace ? colors.accent : colors.pri}
+                name="crown"
+                color={colors.yellow}
                 customStyle={{
                   marginLeft: 5
                 }}
-                type={searchReplace ? 'grayBg' : 'transparent'}
                 top={50}
-                buttom={10}
-                onLongPress={() => {
-                  if (searchReplace) {
-                    endSearch();
-                    Vibration.vibrate(5, false);
+                onPress={async () => {
+                  if (editing.isFocused) {
+                    safeKeyboardDismiss();
+                    editing.isFocused = true;
                   }
-                }}
-                onPress={() => {
-                  useEditorStore.getState().setSearchReplace(true);
+                  umami.pageView('/pro-screen', '/editor');
+                  eSendEvent(eOpenPremiumDialog);
                 }}
               />
+            ) : null}
+            <ActionIcon
+              name="magnify"
+              color={searchReplace ? colors.accent : colors.pri}
+              customStyle={{
+                marginLeft: 5
+              }}
+              type={searchReplace ? 'grayBg' : 'transparent'}
+              top={50}
+              buttom={10}
+              onLongPress={() => {
+                if (searchReplace) {
+                  endSearch();
+                  Vibration.vibrate(5, false);
+                }
+              }}
+              onPress={() => {
+                useEditorStore.getState().setSearchReplace(true);
+              }}
+            />
 
-              {currentlyEditingNote && (
-                <ActionIcon
-                  name="cloud-upload-outline"
-                  color={colors.pri}
-                  customStyle={{
-                    marginLeft: 5
-                  }}
-                  top={50}
-                  onPress={publishNote}
-                />
-              )}
+            {currentlyEditingNote && !readonly && (
+              <ActionIcon
+                name="cloud-upload-outline"
+                color={colors.pri}
+                customStyle={{
+                  marginLeft: 5
+                }}
+                top={50}
+                onPress={publishNote}
+              />
+            )}
 
+            {!readonly && (
               <ActionIcon
                 name="attachment"
                 color={colors.pri}
@@ -385,36 +364,36 @@ const EditorHeader = () => {
                 top={50}
                 onPress={picker.pick}
               />
+            )}
 
-              {deviceMode !== 'mobile' && !fullscreen ? (
-                <ActionIcon
-                  name="fullscreen"
-                  color={colors.pri}
-                  customStyle={{
-                    marginLeft: 5
-                  }}
-                  top={50}
-                  onPress={() => {
-                    eSendEvent(eOpenFullscreenEditor);
-                    editing.isFullscreen = true;
-                  }}
-                />
-              ) : null}
-
+            {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon
-                name="dots-horizontal"
+                name="fullscreen"
                 color={colors.pri}
                 customStyle={{
                   marginLeft: 5
                 }}
                 top={50}
-                right={50}
-                onPress={showActionsheet}
+                onPress={() => {
+                  eSendEvent(eOpenFullscreenEditor);
+                  editing.isFullscreen = true;
+                }}
               />
+            ) : null}
 
-              <ProgressCircle />
-            </>
-          </View>
+            <ActionIcon
+              name="dots-horizontal"
+              color={colors.pri}
+              customStyle={{
+                marginLeft: 5
+              }}
+              top={50}
+              right={50}
+              onPress={showActionsheet}
+            />
+
+            <ProgressCircle />
+          </>
         </View>
       </View>
     </>

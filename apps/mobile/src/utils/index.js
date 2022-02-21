@@ -1,18 +1,16 @@
-import {createRef} from 'react';
-import {Dimensions, NativeModules, Platform} from 'react-native';
+import { createRef } from 'react';
+import { Dimensions, NativeModules, Platform } from 'react-native';
 import BackgroundService from 'react-native-background-actions';
-import {
-  beginBackgroundTask,
-  endBackgroundTask
-} from 'react-native-begin-background-task';
+import { beginBackgroundTask, endBackgroundTask } from 'react-native-begin-background-task';
 import RNTooltips from 'react-native-tooltips';
-import {useSettingStore} from '../provider/stores';
-import {eSendEvent} from '../services/EventManager';
+import { useSettingStore } from '../provider/stores';
+import { eSendEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import * as ackeeTracker from './ackee';
-import {refreshNotesPage} from './Events';
-import {MMKV} from './mmkv';
-import {tabBarRef} from './Refs';
+import { db } from './database';
+import { refreshNotesPage } from './Events';
+import { MMKV } from './mmkv';
+import { tabBarRef } from './Refs';
 
 export const Tracker = ackeeTracker.create('https://sa.streetwriters.co', {
   ignoreLocalhost: true
@@ -52,7 +50,7 @@ export const InteractionManager = {
 };
 
 export async function setSetting(settings, name, value) {
-  let s = {...settings};
+  let s = { ...settings };
   s[name] = value;
   await MMKV.setStringAsync('appSettings', JSON.stringify(s));
   useSettingStore.getState().setSettings(s);
@@ -65,7 +63,7 @@ export const getElevation = elevation => {
   return {
     elevation,
     shadowColor: 'black',
-    shadowOffset: {width: 0.3 * elevation, height: 0.5 * elevation},
+    shadowOffset: { width: 0.3 * elevation, height: 0.5 * elevation },
     shadowOpacity: 0.2,
     shadowRadius: 0.7 * elevation
   };
@@ -140,6 +138,7 @@ export async function doInBackground(cb) {
       return e.message;
     }
   } else {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       try {
         await BackgroundService.start(async () => {
@@ -333,13 +332,22 @@ export const BUTTON_TYPES = {
   }
 };
 
-let he;
-export function toTXT(html) {
-  let text = html.replace(/<br[^>]*>/gi, '\n').replace(/<[^>]+>/g, '');
-  if (!he) {
-    he = require('he');
+let htmlToText;
+export async function toTXT(note, notitle) {
+  let text;
+  if (note.locked) {
+    text = note.content.data;
+  } else {
+    text = await db.notes.note(note.id).content();
   }
-  return he.decode(text);
+  htmlToText = htmlToText || require('html-to-text');
+  text = htmlToText.convert(text, {
+    selectors: [{ selector: 'img', format: 'skip' }]
+  });
+  if (!notitle) {
+    text = `${note.title}\n \n ${text}`;
+  }
+  return text;
 }
 
 export const TOOLTIP_POSITIONS = {
@@ -349,18 +357,20 @@ export const TOOLTIP_POSITIONS = {
   BOTTOM: 4
 };
 let prevTarget = null;
-export function showTooltip(event, text, position) {
+export function showTooltip(event, text, position = 2) {
   if (!event._targetInst?.ref?.current) return;
   prevTarget && RNTooltips.Dismiss(prevTarget);
   prevTarget = null;
   prevTarget = event._targetInst.ref.current;
-  RNTooltips.Show(event._targetInst.ref.current, tabBarRef.current, {
+  RNTooltips.Show(prevTarget, tabBarRef.current, {
     text: text,
-    tintColor: 'black',
-    corner: 40,
+    tintColor: '#000000',
+    corner: Platform.OS === 'ios' ? 5 : 40,
     textSize: 14,
     position: position,
-    duration: 1000
+    duration: 1000,
+    autoHide: true,
+    clickToHide: true
   });
 }
 

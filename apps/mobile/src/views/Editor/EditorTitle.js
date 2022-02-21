@@ -19,7 +19,7 @@ function animation(v) {
 
 export const EditorTitle = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [title, setTitle] = useState(null);
   const onScroll = async data => {
     if (data.visible === undefined || data.visible === null) return;
@@ -48,22 +48,23 @@ export const EditorTitle = () => {
     <Animated.View
       style={{
         opacity: opacityVal,
-        maxWidth: '100%',
         paddingLeft: 0,
         transform: [
           {
             translateY: translateY
           }
         ]
-      }}>
+      }}
+    >
       <TextInput
         defaultValue={title}
         style={{
           fontFamily: 'OpenSans-SemiBold',
           fontSize: SIZE.xl,
           color: colors.heading,
-          maxWidth: '100%',
-          padding: 0
+          padding: 0,
+          flexShrink: 1,
+          flexWrap: 'wrap'
         }}
         placeholder="Note title"
         placeholderTextColor={colors.placeholder}

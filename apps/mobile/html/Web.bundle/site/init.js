@@ -2,7 +2,6 @@ attachTitleInputListeners();
 autosize();
 function reactNativeEventHandler(type, value) {
   if (window.ReactNativeWebView) {
-    console.log('type', type, 'id:', sessionId);
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: type,
@@ -62,7 +61,7 @@ function loadFontSize() {
 let changeTimer = null;
 const COLLAPSED_KEY = 'c';
 const HIDDEN_KEY = 'h';
-const collapsibleTags = {HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6};
+const collapsibleTags = { HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6 };
 let styleElement;
 
 function addStyle() {
@@ -128,7 +127,6 @@ function onUndoChange() {
 
 function init_callback(_editor) {
   editor = _editor;
-  //console.log('init_call', editor);
   setTheme();
 
   editor.on('SelectionChange', function (e) {
@@ -142,12 +140,12 @@ function init_callback(_editor) {
   editor.on('BeforeAddUndo', onUndoChange);
   editor.on('AddUndo', onUndoChange);
   editor.on('cut', function () {
-    onChange({type: 'cut'});
+    onChange({ type: 'cut' });
     onUndoChange();
   });
   editor.on('copy', onUndoChange);
   editor.on('paste', function () {
-    onChange({type: 'paste'});
+    onChange({ type: 'paste' });
   });
 
   editor.on('focus', function () {
@@ -168,8 +166,7 @@ function init_callback(_editor) {
   // });
 
   editor.on('NewBlock', function (e) {
-    console.log('New Block', e);
-    const {newBlock} = e;
+    const { newBlock } = e;
     let target;
     if (newBlock) {
       target = newBlock.previousElementSibling;
@@ -180,49 +177,60 @@ function init_callback(_editor) {
     }
     onChange(e);
   });
-
-  editor.on('touchstart mousedown', function (e) {
-    const {target} = e;
-    if (
-      e.offsetX < 6 &&
-      collapsibleTags[target.tagName] &&
-      target.parentElement &&
-      target.parentElement.tagName === 'BODY'
-    ) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-      editor.undoManager.transact(function () {
-        if (target.classList.contains(COLLAPSED_KEY)) {
-          target.classList.remove(COLLAPSED_KEY);
-        } else {
-          target.classList.add(COLLAPSED_KEY);
-        }
-        collapseElement(target);
-        editor
-          .getHTML()
-          .then(function (html) {
-            reactNativeEventHandler('tiny', html);
-          })
-          .catch(function (e) {
-            reactNativeEventHandler('tinyerror', e.message);
-          });
-      });
+  let shouldCancelNextTouchEndEvent = false;
+  editor.on(
+    'touchstart mousedown',
+    function (e) {
+      const { target } = e;
+      if (e.targetTouches.length !== 1) return;
+      let xPos = e.targetTouches[0].clientX;
+      if (
+        xPos < 45 &&
+        collapsibleTags[target.tagName] &&
+        target.parentElement &&
+        target.parentElement.tagName === 'BODY'
+      ) {
+        e.preventDefault();
+        shouldCancelNextTouchEndEvent = true;
+        editor.undoManager.transact(function () {
+          if (target.classList.contains(COLLAPSED_KEY)) {
+            target.classList.remove(COLLAPSED_KEY);
+          } else {
+            target.classList.add(COLLAPSED_KEY);
+          }
+          collapseElement(target);
+          editor.fire('input', { data: '' });
+        });
+      }
+    },
+    {
+      capture: true,
+      passive: false
     }
-  });
+  );
+
+  editor.on(
+    'touchend',
+    e => {
+      if (shouldCancelNextTouchEndEvent) {
+        e.preventDefault();
+        shouldCancelNextTouchEndEvent = false;
+      }
+    },
+    {
+      capture: true,
+      passive: false
+    }
+  );
 
   editor.on('tap', function (e) {
-    if (
-      e.target.classList.contains('mce-content-body') &&
-      !e.target.innerText.length > 0
-    ) {
+    if (e.target.classList.contains('mce-content-body') && !e.target.innerText.length > 0) {
       e.preventDefault();
     }
   });
 
   editor.on('ScrollIntoView', function (e) {
     e.preventDefault();
-    console.log(e);
     e.elm.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest'
@@ -231,7 +239,6 @@ function init_callback(_editor) {
 
   editor.on('input ExecCommand ObjectResized Redo Undo ListMutation', onChange);
   editor.on('keyup', function (e) {
-    console.log('keyup: ', e);
     if (e.key !== 'Backspace') return;
     onChange(e);
   });
@@ -354,7 +361,6 @@ function tableCellNodeOptions() {
 
 function findNodeParent(nodeName) {
   let node = editor.selection.getNode();
-  console.log('finding node', node);
   let levels = 5;
   for (let i = 0; i < levels; i++) {
     if (!node) return;
@@ -381,7 +387,6 @@ function tableRowNodeOptions() {
 
 function init_tiny(size) {
   loadFontSize();
-  console.log('init tinymce');
   tinymce.init({
     selector: '#tiny_textarea',
     menubar: false,
@@ -409,8 +414,7 @@ function init_tiny(size) {
     autoresize_bottom_margin: 120,
     table_toolbar:
       'tcellprops trowprops | tableinsertrowafter tableinsertcolafter tabledeleterow tabledeletecol | tableconfig',
-    imagetools_toolbar:
-      'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
+    imagetools_toolbar: 'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     table_responsive_width: false,
@@ -499,7 +503,6 @@ function setup_tiny(_editor) {
     icon: 'more-drawer',
     tooltip: 'Table properties',
     onAction: function (e) {
-      console.log(e, 'event');
       reactNativeEventHandler('tableconfig');
     }
   });
@@ -558,10 +561,7 @@ function setup_tiny(_editor) {
           };
           reader.readAsDataURL(recoveredBlob);
         };
-        xhr.open(
-          'GET',
-          tinymce.activeEditor.selection.getNode().getAttribute('src')
-        );
+        xhr.open('GET', tinymce.activeEditor.selection.getNode().getAttribute('src'));
         xhr.send();
       }
     }
@@ -586,13 +586,11 @@ function scrollSelectionIntoView(event) {
     event.data &&
     event.data.endsWith('\n')
   ) {
-    console.log(event);
     clearTimeout(inputKeyTimer);
     inputKeyTimer = setTimeout(function () {
       let node = editor.selection.getNode();
       if (node) {
-        console.log(node, 'scrolling into view');
-        node.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, 1);
   }
@@ -603,7 +601,9 @@ const onChange = function (event) {
   if (event.type && event.type.toLowerCase() === 'execcommand') {
     if (
       event.command.toLowerCase() === 'mcefocus' ||
-      event.command.toLowerCase() === 'mcerepaint'
+      event.command.toLowerCase() === 'mcerepaint' ||
+      event.command.toLowerCase() === 'mcedirectionrtl' ||
+      event.command.toLowerCase() === 'mcedirectionltr'
     ) {
       return;
     }
@@ -620,7 +620,6 @@ const onChange = function (event) {
   }
 
   if (prevCount === 0 && event.type !== 'paste') return;
-  console.log(event);
   if (event.type !== 'compositionend') {
     if (!noteedited) {
       noteedited = true;
@@ -650,14 +649,13 @@ function updateCount(timer = 1000) {
   countTimer = null;
 
   if (!timer) {
-    let count = editor.countWords();
+    let count = editor.countWords() || 0;
     info = document.querySelector('.info-bar');
     info.querySelector('#infowords').innerText = count + ' words';
     prevCount = count;
-    console.log('timer', 'updating here');
   } else {
     countTimer = setTimeout(function () {
-      let count = editor.countWords();
+      let count = editor.countWords() | 0;
       info = document.querySelector('.info-bar');
       info.querySelector('#infowords').innerText = count + ' words';
       prevCount = count;
