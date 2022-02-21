@@ -202,9 +202,10 @@ function Editor({ noteId, nonce }) {
         className="editorScroll"
         viewStyle={{ display: "flex", flexDirection: "column" }}
       >
-        <Flex
+        <Box
           id="editorToolbar"
           sx={{
+            display: isReadonly ? "none" : "flex",
             bg: "background",
             position: "sticky",
             top: 0,
