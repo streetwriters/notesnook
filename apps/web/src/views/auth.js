@@ -319,8 +319,8 @@ function Auth(props) {
               <Button
                 type="button"
                 variant="icon"
-                mr={20}
-                mt={20}
+                mr={[2, 2, 4]}
+                mt={[2, 2, 4]}
                 alignSelf="end"
                 onClick={data.secondaryAction.onClick}
                 sx={{
@@ -338,8 +338,8 @@ function Auth(props) {
             <Button
               type="button"
               variant="icon"
-              ml={20}
-              mt={20}
+              ml={[2, 2, 4]}
+              mt={[2, 2, 4]}
               alignSelf="start"
               title="Go to app"
               onClick={() => hardNavigate("/")}
