@@ -47,7 +47,7 @@ const ColorItem = React.memo(
             setHeaderTextState(null);
           }
         }
-      }, 600);
+      }, 300);
     };
 
     useEffect(() => {

@@ -120,7 +120,7 @@ export const PinItem = React.memo(
             setHeaderTextState(null);
           }
         }
-      }, 600);
+      }, 300);
     };
 
     useEffect(() => {

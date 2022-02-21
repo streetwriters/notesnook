@@ -12,7 +12,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const MenuListItem = React.memo(
-  ({ item, index, noTextMode, testID, rightBtn }) => {
+  ({ item, index, testID, rightBtn }) => {
     const [state] = useTracked();
     const { colors } = state;
     const [headerTextState, setHeaderTextState] = useState(null);
@@ -47,7 +47,7 @@ export const MenuListItem = React.memo(
             setHeaderTextState(null);
           }
         }
-      }, 600);
+      }, 300);
     };
 
     useEffect(() => {
