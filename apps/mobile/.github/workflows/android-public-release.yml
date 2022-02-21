@@ -57,7 +57,7 @@ jobs:
           repository: streetwriters/notesnook
           token: ${{ secrets.NOTESNOOK_GH_TOKEN }}
           files: |
-            ${{ steps.sign_app.signedReleaseFile0 }}
-            ${{ steps.sign_app.signedReleaseFile1 }}
-            ${{ steps.sign_app.signedReleaseFile2 }}
-            ${{ steps.sign_app.signedReleaseFile3 }}
+            android/app/build/outputs/apk/release/app-arm64-v8a-release-unsigned-signed.apk
+            android/app/build/outputs/apk/release/app-armeabi-v7a-release-unsigned-signed.apk
+            android/app/build/outputs/apk/release/app-x86-release-unsigned-signed.apk
+            android/app/build/outputs/apk/release/app-x86_64-release-unsigned-signed.apk
