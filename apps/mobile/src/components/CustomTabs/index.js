@@ -106,6 +106,7 @@ export default class CustomTabs extends Component {
     if (index === 1) {
       this.nextPage = 0;
       offset = this.props.offsets.a;
+      this.setScrollEnabled(true);
     } else if (index === 2) {
       this.nextPage = 1;
       offset = this.props.offsets.b;
