@@ -21,8 +21,17 @@ async function getDirectoryAndroid() {
   let folder = await ScopedStorage.openDocumentTree(true);
   if (!folder) return null;
   let subfolder;
-  if (folder.name !== 'Notesnook backups') {
-    subfolder = await ScopedStorage.createDirectory(folder.uri, 'Notesnook backups');
+  if (!folder.name.includes('Notesnook backups')) {
+    let folderFiles = await ScopedStorage.listFiles(folder.uri);
+    for (let f of folderFiles) {
+      if (f.type === 'directory' && f.name === 'Notesnook backups') {
+        console.log('folder already exists. reusing');
+        subfolder = f;
+      }
+    }
+    if (!subfolder) {
+      subfolder = await ScopedStorage.createDirectory(folder.uri, 'Notesnook backups');
+    }
   } else {
     subfolder = folder;
   }
@@ -121,6 +130,9 @@ async function run() {
         context: 'global'
       });
       let dontShowCompleteSheet = await MMKV.getItem('dontShowCompleteSheet');
+
+      console.log(backupFilePath);
+
       await sleep(300);
       if (!dontShowCompleteSheet) {
         presentSheet({
@@ -157,6 +169,8 @@ async function run() {
             }
           ]
         });
+      } else {
+        eSendEvent(eCloseProgressDialog);
       }
       return backupFilePath;
     } catch (e) {
