@@ -130,16 +130,17 @@ async function run() {
         context: 'global'
       });
       let dontShowCompleteSheet = await MMKV.getItem('dontShowCompleteSheet');
-
       console.log(backupFilePath);
-
       await sleep(300);
       if (!dontShowCompleteSheet) {
         presentSheet({
           title: 'Backup complete',
           icon: 'cloud-upload',
-          paragraph:
-            'Share your backup to your cloud storage such as Dropbox or Google Drive so you do not lose it.',
+          paragraph: `${
+            Platform.OS === 'android'
+              ? 'Backup file saved in "Notesnook backups" folder on your phone'
+              : 'Backup file is saved in File Manager/Notesnook folder'
+          }. Share your backup to your cloud so you do not lose it.`,
           actionText: 'Share backup',
           actionsArray: [
             {
@@ -165,7 +166,8 @@ async function run() {
                 eSendEvent(eCloseProgressDialog);
                 await MMKV.setItem('dontShowCompleteSheet', 'yes');
               },
-              actionText: 'Never ask again'
+              actionText: 'Never ask again',
+              type: 'grayBg'
             }
           ]
         });
