@@ -48,8 +48,8 @@ jobs:
         id: signed_files
         with:
           msg: ${{ steps.sign_app.signedReleaseFiles }}
-          seperator: ':'
-      
+          separator: ':'
+
       - name: Get version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@master
