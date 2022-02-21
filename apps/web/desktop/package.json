@@ -25,7 +25,7 @@
     "zx": "^2.0.0"
   },
   "scripts": {
-    "build": "esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node",
+    "build": "esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json",
     "pack": "rm -rf ./build && cp -r ../build ./ && npm run build && yarn electron-builder --linux AppImage && ./dist/notesnook_x86_64.AppImage"
   },
   "author": {
