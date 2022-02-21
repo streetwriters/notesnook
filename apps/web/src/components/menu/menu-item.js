@@ -2,7 +2,7 @@ import { Check, ChevronRight, Pro } from "../icons";
 import { useRef } from "react";
 import { Flex, Box, Text, Button } from "rebass";
 
-function MenuItem({ item, isFocused, onHover, onClick }) {
+function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
   const {
     title,
     key,
@@ -32,7 +32,13 @@ function MenuItem({ item, isFocused, onHover, onClick }) {
     );
 
   return (
-    <Flex as="li" flexDirection={"column"} flex={1} onMouseOver={onHover}>
+    <Flex
+      as="li"
+      flexDirection={"column"}
+      flex={1}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <Button
         id={key}
         data-test-id={`menuitem-${key}`}

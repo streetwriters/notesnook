@@ -83,6 +83,7 @@ function useMenuFocus(items, onAction) {
 }
 
 function Menu({ items, data, title, closeMenu }) {
+  const hoverTimeout = useRef();
   const onAction = useCallback(
     (e, item) => {
       e.stopPropagation();
@@ -136,12 +137,19 @@ function Menu({ items, data, title, closeMenu }) {
               else onAction(e, item);
             }}
             isFocused={focusIndex === index}
-            onHover={() => {
+            onMouseEnter={() => {
               if (item.isDisabled) return;
+              clearTimeout(hoverTimeout.current);
               setFocusIndex(index);
-              setIsSubmenuOpen((state) => {
-                return item.items?.length ? true : state ? false : state;
-              });
+              setIsSubmenuOpen(false);
+              if (item.items?.length) {
+                hoverTimeout.current = setTimeout(() => {
+                  setIsSubmenuOpen(true);
+                }, 500);
+              }
+            }}
+            onMouseLeave={() => {
+              clearTimeout(hoverTimeout.current);
             }}
           />
         ))}
