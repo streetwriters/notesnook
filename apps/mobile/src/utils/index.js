@@ -333,7 +333,7 @@ export const BUTTON_TYPES = {
 };
 
 let htmlToText;
-export async function toTXT(note) {
+export async function toTXT(note, notitle) {
   let text;
   if (note.locked) {
     text = note.content.data;
@@ -344,7 +344,9 @@ export async function toTXT(note) {
   text = htmlToText.convert(text, {
     selectors: [{ selector: 'img', format: 'skip' }]
   });
-  text = `${note.title}\n \n ${text}`;
+  if (!notitle) {
+    text = `${note.title}\n \n ${text}`;
+  }
   return text;
 }
 
