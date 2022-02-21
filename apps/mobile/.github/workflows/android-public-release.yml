@@ -44,8 +44,27 @@ jobs:
           keyStorePassword: ${{ secrets.PUBLIC_KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+      - uses: jungwinter/split@v1
+        id: signed_files
         with:
-          name: Signed App Bundle
-          path: ${{steps.sign_app.outputs.signedReleaseFile}}
+          msg: ${{ steps.sign_app.signedReleaseFiles }}
+          separator: ':'
+      
+      - name: Get version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@master
+
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          tag_name: ${{ steps.package-version.outputs.current-version}}-android
+          name: ${{ steps.package-version.outputs.current-version}}-Android
+          repository: streetwriters/notesnook
+          token: ${{ secrets.NOTESNOOK_GH_TOKEN }}
+          files: |
+            ${{ steps.signed_files._0 }}
+            ${{ steps.signed_files._1 }}
+            ${{ steps.signed_files._2 }}
+            ${{ steps.signed_files._3 }}
+            ${{ steps.signed_files._4 }}
