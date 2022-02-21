@@ -183,7 +183,7 @@ export const useActions = ({ close = () => {}, item }) => {
       title: item.title,
       message: item.headline,
       subtitle: item.headline,
-      bigText: await toTXT(item),
+      bigText: await toTXT(item, true),
       ongoing: true,
       actions: ['UNPIN'],
       tag: item.id
