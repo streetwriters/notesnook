@@ -48,7 +48,7 @@ jobs:
         id: signed_files
         with:
           msg: ${{ steps.sign_app.signedReleaseFiles }}
-          separator: ':'
+          seperator: ':'
       
       - name: Get version
         id: package-version
