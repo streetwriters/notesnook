@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { Keyboard, Platform, View } from 'react-native';
-import Animated, { Easing, sub } from 'react-native-reanimated';
+import Animated, { Easing } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useSettingStore } from '../../provider/stores';
+import { useSelectionStore, useSettingStore } from '../../provider/stores';
 import { editing, getElevation, showTooltip, TOOLTIP_POSITIONS } from '../../utils';
 import { normalize, SIZE } from '../../utils/SizeUtils';
 import { PressableButton } from '../PressableButton';
@@ -13,6 +13,11 @@ const translateY = new Animated.Value(0);
 export const ContainerBottomButton = ({ title, onPress, color = 'accent', shouldShow = false }) => {
   const insets = useSafeAreaInsets();
   const deviceMode = useSettingStore(state => state.deviceMode);
+  const selectionMode = useSelectionStore(state => state.selectionMode);
+
+  useEffect(() => {
+    animate(selectionMode ? 150 : 0);
+  }, [selectionMode]);
 
   function animate(translate) {
     Animated.timing(translateY, {

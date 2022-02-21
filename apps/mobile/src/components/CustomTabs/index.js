@@ -20,11 +20,13 @@ export default class CustomTabs extends Component {
     this.responderAllowedScroll = false;
     this.moved = false;
     this.lastOffset = this.props.offsets.a;
+    this.locked = false;
   }
 
   renderItem = ({ item, index }) => this.props.items[index];
 
   onMoveShouldSetResponder = event => {
+    if (this.locked) return;
     if (this.responderAllowedScroll) return;
     this.lastOffset = this.scrollOffset;
     // let x = event.nativeEvent.pageX;
@@ -120,12 +122,14 @@ export default class CustomTabs extends Component {
 
   setScrollEnabled = enabled => {
     this.scrollEnabled = enabled;
+    this.locked = !enabled;
     this.listRef.current?.getNativeScrollRef().setNativeProps({
       scrollEnabled: enabled
     });
   };
 
   onTouchEnd = () => {
+    if (this.locked) return;
     this.responderAllowedScroll = false;
     this.setScrollEnabled(true);
   };
@@ -210,6 +214,7 @@ export default class CustomTabs extends Component {
   };
 
   onListTouchEnd = event => {
+    if (this.locked) return;
     if (this.lastOffset < 30 && event) {
       let width = this.props.dimensions.width;
       let px = event.nativeEvent.pageX;
@@ -255,7 +260,7 @@ export default class CustomTabs extends Component {
           overScrollMode="never"
           maxToRenderPerBatch={100}
           keyboardDismissMode="none"
-          removeClippedSubviews={Platform.OS === 'android'}
+          removeClippedSubviews={false}
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}
           disableIntervalMomentum={true}

@@ -10,6 +10,7 @@ import { db } from '../../utils/database';
 import { eOpenMoveNoteDialog, refreshNotesPage } from '../../utils/Events';
 import { deleteItems } from '../../utils/functions';
 import layoutmanager from '../../utils/layout-manager';
+import { tabBarRef } from '../../utils/Refs';
 import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
 import { ActionIcon } from '../ActionIcon';
@@ -26,6 +27,10 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
   const clearSelection = useSelectionStore(state => state.clearSelection);
 
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    tabBarRef.current?.setScrollEnabled(!selectionMode);
+  }, [selectionMode]);
 
   const addToFavorite = async () => {
     if (selectedItemsList.length > 0) {
