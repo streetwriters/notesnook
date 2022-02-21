@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Box, Flex } from "rebass";
 import {
   Note,
@@ -27,7 +27,10 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import useLocation from "../../hooks/use-location";
+import { FlexScrollContainer } from "../scroll-container";
+import { toTitleCase } from "../../utils/string";
 
+const navigationHistory = new Map();
 function shouldSelectNavItem(route, pin) {
   if (pin.type === "notebook") {
     return route === `/notebooks/${pin.id}`;
@@ -72,7 +75,7 @@ const NAVIGATION_MENU_TABLET_WIDTH = "4em";
 
 function NavigationMenu(props) {
   const { toggleNavigationContainer } = props;
-  const [location] = useLocation();
+  const [location, previousLocation, state] = useLocation();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const colors = useAppStore((store) => store.colors);
   const pins = useAppStore((store) => store.menuPins);
@@ -87,10 +90,17 @@ function NavigationMenu(props) {
   const _navigate = useCallback(
     (path) => {
       toggleNavigationContainer(true);
-      navigate(path);
+      const nestedRoute = findNestedRoute(path);
+      navigate(!nestedRoute || nestedRoute === location ? path : nestedRoute);
     },
-    [toggleNavigationContainer]
+    [location, toggleNavigationContainer]
   );
+
+  useEffect(() => {
+    if (state === "forward" || state === "neutral")
+      navigationHistory.set(location, true);
+    else navigationHistory.delete(previousLocation);
+  }, [location, previousLocation, state]);
 
   return (
     <AnimatedFlex
@@ -126,96 +136,96 @@ function NavigationMenu(props) {
       bg={"bgSecondary"}
       px={0}
     >
-      <Flex
-        flexDirection="column"
-        sx={{
-          overflow: "scroll",
-          scrollbarWidth: "none",
-          "::-webkit-scrollbar": { width: 0, height: 0 },
-          msOverflowStyle: "none",
-        }}
-      >
-        {routes.map((item) => (
-          <NavigationItem
-            key={item.path}
-            title={item.title}
-            icon={item.icon}
-            isNew={item.isNew}
-            selected={
-              item.path === "/"
-                ? location === item.path
-                : location.startsWith(item.path)
-            }
-            onClick={() => {
-              if (!isMobile && location === item.path)
-                return toggleNavigationContainer();
-              _navigate(item.path);
-            }}
-          />
-        ))}
-        {colors.map((color) => (
-          <NavigationItem
-            key={color.id}
-            title={db.colors.alias(color.id)}
-            icon={Circle}
-            selected={location === `/colors/${color.id}`}
-            color={color.title.toLowerCase()}
-            onClick={() => {
-              _navigate(`/colors/${color.id}`);
-            }}
-            menu={{
-              items: [
-                {
-                  key: "rename",
-                  title: () => "Rename color",
-                  onClick: async ({ color }) => {
-                    await showRenameColorDialog(color.id);
-                  },
-                },
-              ],
-              extraData: { color },
-            }}
-          />
-        ))}
-        <Box width="85%" height="0.8px" bg="border" alignSelf="center" my={1} />
-        {pins.map((pin) => (
-          <NavigationItem
-            key={pin.id}
-            title={pin.type === "tag" ? db.tags.alias(pin.id) : pin.title}
-            menu={{
-              items: [
-                {
-                  key: "removeshortcut",
-                  title: () => "Remove shortcut",
-                  onClick: async ({ pin }) => {
-                    await db.settings.unpin(pin.id);
-                    refreshNavItems();
-                  },
-                },
-              ],
-              extraData: { pin },
-            }}
-            icon={
-              pin.type === "notebook"
-                ? Notebook2
-                : pin.type === "tag"
-                ? Tag2
-                : Topic
-            }
-            isShortcut
-            selected={shouldSelectNavItem(location, pin)}
-            onClick={() => {
-              if (pin.type === "notebook") {
-                _navigate(`/notebooks/${pin.id}`);
-              } else if (pin.type === "topic") {
-                _navigate(`/notebooks/${pin.notebookId}/${pin.id}`);
-              } else if (pin.type === "tag") {
-                _navigate(`/tags/${pin.id}`);
+      <FlexScrollContainer>
+        <Flex flexDirection="column">
+          {routes.map((item) => (
+            <NavigationItem
+              key={item.path}
+              title={item.title}
+              icon={item.icon}
+              isNew={item.isNew}
+              selected={
+                item.path === "/"
+                  ? location === item.path
+                  : location.startsWith(item.path)
               }
-            }}
+              onClick={() => {
+                if (!isMobile && location === item.path)
+                  return toggleNavigationContainer();
+                _navigate(item.path);
+              }}
+            />
+          ))}
+          {colors.map((color) => (
+            <NavigationItem
+              key={color.id}
+              title={toTitleCase(db.colors.alias(color.id))}
+              icon={Circle}
+              selected={location === `/colors/${color.id}`}
+              color={color.title.toLowerCase()}
+              onClick={() => {
+                _navigate(`/colors/${color.id}`);
+              }}
+              menu={{
+                items: [
+                  {
+                    key: "rename",
+                    title: () => "Rename color",
+                    onClick: async ({ color }) => {
+                      await showRenameColorDialog(color.id);
+                    },
+                  },
+                ],
+                extraData: { color },
+              }}
+            />
+          ))}
+          <Box
+            width="85%"
+            height="0.8px"
+            bg="border"
+            alignSelf="center"
+            my={1}
           />
-        ))}
-      </Flex>
+          {pins.map((pin) => (
+            <NavigationItem
+              key={pin.id}
+              title={pin.type === "tag" ? db.tags.alias(pin.id) : pin.title}
+              menu={{
+                items: [
+                  {
+                    key: "removeshortcut",
+                    title: () => "Remove shortcut",
+                    onClick: async ({ pin }) => {
+                      await db.settings.unpin(pin.id);
+                      refreshNavItems();
+                    },
+                  },
+                ],
+                extraData: { pin },
+              }}
+              icon={
+                pin.type === "notebook"
+                  ? Notebook2
+                  : pin.type === "tag"
+                  ? Tag2
+                  : Topic
+              }
+              isShortcut
+              selected={shouldSelectNavItem(location, pin)}
+              onClick={() => {
+                if (pin.type === "notebook") {
+                  _navigate(`/notebooks/${pin.id}`);
+                } else if (pin.type === "topic") {
+                  _navigate(`/notebooks/${pin.notebookId}/${pin.id}`);
+                } else if (pin.type === "tag") {
+                  _navigate(`/tags/${pin.id}`);
+                }
+              }}
+            />
+          ))}
+        </Flex>
+      </FlexScrollContainer>
       <Flex flexDirection="column">
         {theme === "light" ? (
           <NavigationItem
@@ -262,3 +272,20 @@ function NavigationMenu(props) {
   );
 }
 export default NavigationMenu;
+
+function findNestedRoute(location) {
+  let level = location.split("/").length;
+  let nestedRoute = undefined;
+  const history = Array.from(navigationHistory.keys());
+  for (let i = history.length - 1; i >= 0; --i) {
+    const route = history[i];
+    if (!navigationHistory.get(route)) continue;
+
+    const routeLevel = route.split("/").length;
+    if (route.startsWith(location) && routeLevel > level) {
+      level = routeLevel;
+      nestedRoute = route;
+    }
+  }
+  return nestedRoute;
+}

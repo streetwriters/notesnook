@@ -60,6 +60,8 @@ const markdownPatterns = [
   { start: "#### ", format: "h4" },
   { start: "##### ", format: "h5" },
   { start: "###### ", format: "h6" },
+  { start: "- [x]", cmd: "insertChecklist", value: { checked: true } },
+  { start: "- []", cmd: "insertChecklist" },
   { start: "* ", cmd: "InsertUnorderedList" },
   { start: "- ", cmd: "InsertUnorderedList" },
   { start: "> ", format: "blockquote" },
@@ -203,9 +205,9 @@ function TinyMCE(props) {
       id={sessionId}
       ref={tinymceRef}
       onFocus={onFocus}
-      onDrop={(e, editor) => {
+      onDrop={async (e, editor) => {
         for (let file of e.dataTransfer.files) {
-          attachFile(editor, file);
+          await attachFile(editor, file);
         }
       }}
       init={{
@@ -286,15 +288,28 @@ function TinyMCE(props) {
             });
           }
 
+          async function onPaste(e) {
+            if (e.clipboardData?.items?.length) {
+              for (let item of e.clipboardData.items) {
+                const file = item.getAsFile();
+                if (!file) continue;
+                e.preventDefault();
+                await attachFile(editor, file);
+              }
+            }
+          }
+
           editor.on("ScrollIntoView", onScrollIntoView);
           editor.on("tap", onTap);
           editor.on(changeEvents, onEditorChange);
           editor.on("keyup", onKeyUp);
+          editor.on("paste", onPaste);
           editor.once("remove", () => {
             editor.off("ScrollIntoView", onScrollIntoView);
             editor.off("tap", onTap);
             editor.off(changeEvents, onEditorChange);
             editor.off("keyup", onKeyUp);
+            editor.off("paste", onPaste);
           });
         },
         toolbar_persist: true,
@@ -351,6 +366,7 @@ function TinyMCE(props) {
         }
       }}
       onKeyDown={(e) => {
+        e.stopPropagation();
         if (e.ctrlKey && e.key === "s") {
           e.preventDefault();
           onSave();

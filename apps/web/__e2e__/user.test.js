@@ -50,14 +50,14 @@ test("login user and change password repeatedly", async ({
   page,
   browserName,
 }) => {
-  test.setTimeout(6 * 60 * 1000);
+  test.setTimeout(2 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");
 
   let currentPassword = USER.password;
   let newPassword = "";
   let email = USER.email;
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 2; i++) {
     await test.step(
       `login user using password ${currentPassword} (${i})`,
       async () => {
@@ -66,7 +66,7 @@ test("login user and change password repeatedly", async ({
           password: currentPassword,
         });
 
-        await page.waitForSelector(getTestId("sync-status-success"));
+        await page.waitForSelector(getTestId("sync-status-synced"));
 
         await page.click(getTestId("navitem-settings"));
 
@@ -151,7 +151,7 @@ test("reset user password after session expiry", async ({
 
     await loginUser({ password: newPassword }, false);
 
-    await page.waitForSelector(getTestId("sync-status-success"));
+    await page.waitForSelector(getTestId("sync-status-synced"));
 
     await logoutUser();
 
@@ -226,7 +226,7 @@ async function recoverAccount(submitRecoveryData) {
 
     await loginUser({ email, password: newPassword }, false);
 
-    await page.waitForSelector(getTestId("sync-status-success"));
+    await page.waitForSelector(getTestId("sync-status-synced"));
 
     await logoutUser();
 

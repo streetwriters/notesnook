@@ -2,30 +2,30 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "1.7.7",
+  "version": "1.8.0",
   "private": true,
   "main": "./build/electron.js",
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "dependencies": {
-    "diary": "^0.1.6",
+    "diary": "^0.3.0",
     "electron-better-ipc": "^2.0.1",
     "electron-serve": "^1.1.0",
-    "electron-updater": "^4.3.8",
-    "node-fetch": "^2.6.1"
+    "electron-updater": "^4.6.5",
+    "node-fetch": "^3.2.0"
   },
   "devDependencies": {
-    "@types/node-fetch": "^2.5.12",
-    "electron": "^16.0.4",
-    "electron-builder": "^22.14.5",
-    "electron-builder-notarize": "^1.2.0",
-    "electron-reloader": "^1.2.1",
-    "esbuild": "^0.13.3",
+    "@types/node-fetch": "^2.6.1",
+    "electron": "^17.0.1",
+    "electron-builder": "^22.14.13",
+    "electron-builder-notarize": "^1.4.0",
+    "electron-reloader": "^1.2.2",
+    "esbuild": "^0.14.23",
     "mvdir": "^1.0.21",
-    "zx": "^2.0.0"
+    "zx": "^5.1.0"
   },
   "scripts": {
-    "build": "esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node",
+    "build": "esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json",
     "pack": "rm -rf ./build && cp -r ../build ./ && npm run build && yarn electron-builder --linux AppImage && ./dist/notesnook_x86_64.AppImage"
   },
   "author": {

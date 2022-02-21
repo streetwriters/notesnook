@@ -3,15 +3,15 @@ import {
   OutputFormat,
   Plaintext,
   SerializedKey,
-} from "nncrypto/dist/src/types";
+} from "@notesnook/crypto/dist/src/types";
 import { expose } from "comlink";
 import WorkerStream from "./workerstream";
-import { NNCrypto } from "nncrypto";
+import { NNCrypto } from "@notesnook/crypto";
 
 var crypto: NNCrypto | null = null;
 async function loadNNCrypto(): Promise<NNCrypto> {
   if (crypto) return crypto;
-  const { NNCrypto } = await import("nncrypto");
+  const { NNCrypto } = await import("@notesnook/crypto");
   return (crypto = new NNCrypto());
 }
 

@@ -89,7 +89,6 @@ import {
   mdiNoteOutline,
   mdiSyncAlert,
   mdiAlertOutline,
-  mdiAlertOctagramOutline,
   mdiEyeOutline,
   mdiEyeOffOutline,
   mdiAttachment,
@@ -126,9 +125,18 @@ import {
   mdiLinkVariantOff,
   mdiNetworkOffOutline,
   mdiCheckNetworkOutline,
+  mdiPencilLockOutline,
+  mdiSort,
+  mdiOrderAlphabeticalAscending,
+  mdiOrderAlphabeticalDescending,
+  mdiOrderNumericDescending,
+  mdiOrderNumericAscending,
+  mdiSelectGroup,
   mdiContentSaveCheckOutline,
   mdiContentSaveAlertOutline,
   mdiCurrencyUsd,
+  mdiAlertOctagonOutline,
+  mdiGithub,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -151,7 +159,7 @@ function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
 }
 
 function createIcon(name, rotate = false) {
-  return function (props) {
+  return function NNIcon(props) {
     const [isHovering, setIsHovering] = useState();
     return (
       <AnimatedFlex
@@ -194,7 +202,7 @@ export const ArrowRight = createIcon(mdiArrowRight);
 export const ArrowDown = createIcon(mdiArrowDown);
 export const Move = createIcon(mdiBookPlusMultipleOutline);
 export const Topic = createIcon(mdiBookmarkOutline);
-export const Alert = createIcon(mdiAlertOctagramOutline);
+export const Alert = createIcon(mdiAlertOctagonOutline);
 export const Vault = createIcon(mdiShieldOutline);
 export const Unlock = createIcon(mdiLockOpenOutline);
 export const Lock = createIcon(mdiLockOutline);
@@ -269,6 +277,7 @@ export const Fullscreen = createIcon(mdiFullscreen);
 export const ExitFullscreen = createIcon(mdiFullscreenExit);
 export const Announcement = createIcon(mdiBullhorn);
 export const Publish = createIcon(mdiCloudUploadOutline);
+export const Colors = createIcon(mdiPaletteOutline);
 export const Published = createIcon(mdiCloudCheckOutline);
 export const Copy = createIcon(mdiContentCopy);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
@@ -284,6 +293,7 @@ export const DetailedView = createIcon(mdiViewSequentialOutline);
 export const MailCheck = createIcon(mdiEmailCheckOutline);
 export const Discord = createIcon(mdiDiscord);
 export const Twitter = createIcon(mdiTwitter);
+export const Github = createIcon(mdiGithub);
 export const Reddit = createIcon(mdiReddit);
 export const Dismiss = createIcon(mdiClose);
 export const File = createIcon(mdiFileOutline);
@@ -323,6 +333,13 @@ export const ShortcutLink = createIcon(mdiLinkVariant);
 export const RemoveShortcutLink = createIcon(mdiLinkVariantOff);
 export const Offline = createIcon(mdiNetworkOffOutline);
 export const Online = createIcon(mdiCheckNetworkOutline);
+export const Readonly = createIcon(mdiPencilLockOutline);
 
+export const SortBy = createIcon(mdiSort);
+export const GroupBy = createIcon(mdiSelectGroup);
+export const OrderAtoZ = createIcon(mdiOrderAlphabeticalAscending);
+export const OrderZtoA = createIcon(mdiOrderAlphabeticalDescending);
+export const OrderOldestNewest = createIcon(mdiOrderNumericDescending);
+export const OrderNewestOldest = createIcon(mdiOrderNumericAscending);
 export const Saved = createIcon(mdiContentSaveCheckOutline);
 export const NotSaved = createIcon(mdiContentSaveAlertOutline);

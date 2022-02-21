@@ -106,6 +106,6 @@ export function hardNavigate(route) {
 
 export function makeURL(route, hash) {
   const url = new URL(route, window.location.origin);
-  url.hash = hash || getCurrentHash();
+  if (!url.hash) url.hash = hash || getCurrentHash();
   return url;
 }

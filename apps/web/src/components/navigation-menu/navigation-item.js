@@ -1,7 +1,6 @@
-import React from "react";
 import { Button, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { useOpenContextMenu } from "../../utils/useContextMenu";
+import { useMenuTrigger } from "../../hooks/use-menu";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 import * as Icons from "../icons";
@@ -9,29 +8,31 @@ import * as Icons from "../icons";
 function NavigationItem(props) {
   const { icon: Icon, color, title, isLoading, isShortcut, isNew } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
+  const { openMenu } = useMenuTrigger();
   const isMobile = useMobile();
   const isTablet = useTablet();
-  const openContextMenu = useOpenContextMenu();
 
   return (
     <Button
       data-test-id={`navitem-${title.toLowerCase()}`}
       variant="icon"
       bg={props.selected ? "border" : "transparent"}
-      p={2}
-      mx={2}
-      mt={[1, 2, 1]}
+      px={2}
+      py={"9px"}
+      mx={1}
+      mt={[1, 2, "3px"]}
       sx={{
         borderRadius: "default",
         position: "relative",
-        ":first-of-type": { mt: 2 },
-        ":last-of-type": { mb: 2 },
+        ":first-of-type": { mt: 1 },
+        ":last-of-type": { mb: 1 },
       }}
       label={title}
       title={title}
-      onContextMenu={(event) => {
+      onContextMenu={(e) => {
         if (!props.menu) return;
-        openContextMenu(event, props.menu.items, props.menu.extraData, false);
+        e.preventDefault();
+        openMenu(props.menu.items, props.menu.extraData, false);
       }}
       onClick={() => {
         if (isMobile) toggleSideMenu(false);

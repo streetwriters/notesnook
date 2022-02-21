@@ -27,8 +27,8 @@ class NotebookStore extends BaseStore {
     this.setSelectedNotebook(this.get().selectedNotebookId);
   };
 
-  delete = async (id) => {
-    await db.notebooks.delete(id);
+  delete = async (...ids) => {
+    await db.notebooks.delete(...ids);
     this.refresh();
     appStore.refreshNavItems();
     noteStore.refresh();

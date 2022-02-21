@@ -49,7 +49,7 @@ function EmailConfirmed() {
             color="icon"
             mt={2}
           >
-            Your account has been verified.
+            Your email has been confirmed.
           </Text>
           <Text
             textAlign="center"
@@ -59,19 +59,7 @@ function EmailConfirmed() {
             mt={2}
             sx={{ wordWrap: "break-word" }}
           >
-            ...and we have also activated your 14 day free trial of{" "}
-            <Text
-              as="a"
-              href="https://notesnook.com/pricing"
-              rel="noreferrer"
-              target="_blank"
-              color="primary"
-            >
-              Notesnook Pro
-            </Text>
-            .
-            <br />
-            Enjoy the nice-teas.
+            Thank you for choosing end-to-end encrypted note taking.
           </Text>
         </Flex>
         <Flex

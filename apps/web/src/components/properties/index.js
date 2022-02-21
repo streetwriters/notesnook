@@ -25,6 +25,7 @@ const tools = [
     label: "Favorite",
   },
   { key: "locked", icon: Icon.Unlock, label: "Lock" },
+  { key: "readonly", icon: Icon.Readonly, label: "Readonly" },
 ];
 
 const metadataItems = [
@@ -45,6 +46,7 @@ function Properties() {
   const [versionHistory, setVersionHistory] = useState([]);
 
   const toggleLocked = useStore((store) => store.toggleLocked);
+  const toggleReadonly = useStore((store) => store.toggleReadonly);
   const setSession = useStore((store) => store.setSession);
   const openPreviewSession = useStore((store) => store.openPreviewSession);
   const setColor = useStore((store) => store.setColor);
@@ -57,8 +59,10 @@ function Properties() {
     color,
     notebooks,
     attachments,
-    readonly: isReadonly,
+    sessionType,
+    dateCreated,
   } = session;
+  const isPreviewMode = sessionType === "preview";
 
   const changeState = useCallback(
     function changeState(prop, value) {
@@ -66,9 +70,14 @@ function Properties() {
         toggleLocked();
         return;
       }
+
       setSession((state) => {
         state.session[prop] = value;
       });
+
+      if (prop === "readonly") {
+        toggleReadonly();
+      }
     },
     [setSession, toggleLocked]
   );
@@ -149,7 +158,7 @@ function Properties() {
               />
             }
           >
-            {!isReadonly && (
+            {!isPreviewMode && (
               <>
                 {tools.map((tool, _) => (
                   <Toggle
@@ -181,7 +190,7 @@ function Properties() {
                 </Text>
               </Flex>
             ))}
-            {!isReadonly && (
+            {!isPreviewMode && (
               <>
                 <Flex
                   py={2}
@@ -218,7 +227,7 @@ function Properties() {
               </>
             )}
           </Card>
-          {!!notebooks?.length && (
+          {notebooks?.length > 0 && (
             <Card title="Referenced In">
               {notebooks.map((ref) => {
                 const notebook = db.notebooks.notebook(ref.id);
@@ -278,7 +287,7 @@ function Properties() {
               })}
             </Card>
           )}
-          {attachments.length > 0 && (
+          {attachments?.length > 0 && (
             <Card
               title="Attachments"
               subtitle={`${attachments.length} attachments`}
@@ -397,6 +406,8 @@ function Properties() {
               const label = `${fromDate}, ${fromTime} — ${
                 fromDate !== toDate ? `${toDate}, ` : ""
               }${toTime}`;
+              const isSelected =
+                isPreviewMode && session.dateCreated === dateCreated;
 
               return (
                 <Flex
@@ -405,6 +416,7 @@ function Properties() {
                   px={2}
                   sx={{
                     cursor: "pointer",
+                    bg: isSelected ? "bgSecondary" : "transparent",
                     ":hover": {
                       bg: "hover",
                     },

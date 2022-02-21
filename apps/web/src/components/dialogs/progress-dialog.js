@@ -3,23 +3,16 @@ import { Box, Flex, Text } from "rebass";
 import Dialog from "./dialog";
 
 function ProgressDialog(props) {
-  const [{ loaded, progress }, setProgress] = useState({
-    loaded: 0,
-    progress: 0,
+  const [{ current, total, text }, setProgress] = useState({
+    current: 0,
+    total: 1,
+    text: "",
   });
-
-  useEffect(() => {
-    if (!props.setProgress) return;
-    const undo = props.setProgress(setProgress);
-    return () => {
-      undo && undo();
-    };
-  }, [props, setProgress]);
 
   useEffect(() => {
     (async function () {
       try {
-        props.onDone(await props.action());
+        props.onDone(await props.action(setProgress));
       } catch (e) {
         props.onDone(e);
       }
@@ -34,19 +27,25 @@ function ProgressDialog(props) {
       onClose={() => {}}
     >
       <Flex flexDirection="column">
-        <Text variant="body">{props.message}</Text>
-        <Text variant="subBody">
-          {loaded} of {props.total}
-        </Text>
-        <Box
-          sx={{
-            alignSelf: "start",
-            my: 1,
-            bg: "primary",
-            height: "2px",
-            width: `${progress}%`,
-          }}
-        />
+        <Text variant="body">{text}</Text>
+        {current > 0 ? (
+          <>
+            <Text variant="subBody">
+              {current} of {total}
+            </Text>
+            <Box
+              sx={{
+                alignSelf: "start",
+                my: 1,
+                bg: "primary",
+                height: "2px",
+                width: `${(current / total) * 100}%`,
+              }}
+            />
+          </>
+        ) : (
+          <Flex my={1} />
+        )}
       </Flex>
     </Dialog>
   );

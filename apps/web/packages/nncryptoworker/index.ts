@@ -4,10 +4,10 @@ import {
   OutputFormat,
   Cipher,
   EncryptionKey,
-} from "nncrypto/dist/src/types";
-import { Chunk } from "streamablefs/dist/src/types";
+  Chunk,
+} from "@notesnook/crypto/dist/src/types";
 import { NNCryptoWorkerModule } from "./src/worker";
-import { INNCrypto, IStreamable } from "nncrypto/dist/src/interfaces";
+import { INNCrypto, IStreamable } from "@notesnook/crypto/dist/src/interfaces";
 import { wrap } from "comlink";
 
 export class NNCryptoWorker implements INNCrypto {

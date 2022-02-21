@@ -9,6 +9,7 @@ import * as Icon from "../icons";
 import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import { showToast } from "../../utils/toast";
+import { Multiselect } from "../../common/multi-select";
 
 function Notebook(props) {
   const { item, index, totalNotes, date } = props;
@@ -104,12 +105,13 @@ const pin = (notebook) => {
 
 const menuItems = [
   {
-    title: () => "Edit",
+    key: "edit",
+    title: "Edit",
     icon: Icon.NotebookEdit,
     onClick: ({ notebook }) => hashNavigate(`/notebooks/${notebook.id}/edit`),
   },
   {
-    key: "pinnotebook",
+    key: "pin",
     icon: Icon.Pin,
     title: ({ notebook }) => (notebook.pinned ? "Unpin" : "Pin"),
     onClick: ({ notebook }) => pin(notebook),
@@ -122,13 +124,14 @@ const menuItems = [
     onClick: ({ notebook }) => appStore.pinItemToMenu(notebook),
   },
   {
-    title: () => "Move to trash",
-    color: "red",
+    key: "movetotrash",
+    title: "Move to trash",
+    color: "error",
+    iconColor: "error",
     icon: Icon.Trash,
-    onClick: async ({ notebook }) => {
-      await store
-        .delete(notebook.id)
-        .then(() => showItemDeletedToast(notebook));
+    onClick: async ({ items }) => {
+      await Multiselect.moveNotebooksToTrash(items);
     },
+    multiSelect: true,
   },
 ];

@@ -2,7 +2,6 @@ import AddNotebookDialog from "./addnotebookdialog";
 import BuyDialog from "./buy-dialog";
 import Confirm from "./confirm";
 import EmailVerificationDialog from "./emailverificationdialog";
-import ExportDialog from "./exportdialog";
 import ImportDialog from "./importdialog";
 import LoadingDialog from "./loadingdialog";
 import ProgressDialog from "./progressdialog";
@@ -15,6 +14,7 @@ import TrackingDetailsDialog from "./trackingdetailsdialog";
 import ReminderDialog from "./reminderdialog";
 import AnnouncementDialog from "./announcementdialog";
 import IssueDialog from "./issuedialog";
+import OnboardingDialog from "./onboarding-dialog";
 
 const Dialogs = {
   AddNotebookDialog,
@@ -22,7 +22,6 @@ const Dialogs = {
   BuyDialog,
   Confirm,
   EmailVerificationDialog,
-  ExportDialog,
   LoadingDialog,
   MoveDialog,
   PasswordDialog,
@@ -34,5 +33,6 @@ const Dialogs = {
   AnnouncementDialog,
   IssueDialog,
   ImportDialog,
+  OnboardingDialog,
 };
 export default Dialogs;

@@ -1,11 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import TitleBox from "./title-box";
 import { useStore } from "../../stores/editor-store";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
-import { Button, Flex, Text } from "rebass";
+import { Flex } from "rebass";
 import IconTag from "../icon-tag";
 import { db } from "../../common/db";
+import { useMenuTrigger } from "../../hooks/use-menu";
 
 function Header({ readonly }) {
   const title = useStore((store) => store.session.title);
@@ -29,7 +30,7 @@ function Header({ readonly }) {
 
       {!readonly && id && (
         <Flex alignItems="center" flexWrap="wrap" sx={{ lineHeight: 2.5 }}>
-          {tags.map((tag) => (
+          {tags?.map((tag) => (
             <IconTag
               testId={`tag-${tag}`}
               key={tag}
@@ -51,19 +52,7 @@ function Header({ readonly }) {
               setTag(tags[tags.length - 1]);
             }}
             customFilter={(item) => tags.indexOf(item.title) === -1}
-            renderSuggestion={(item, isSelected) => (
-              <>
-                <Icon.Tag size={12} sx={{ flexShrink: 0 }} />
-                <Text
-                  variant="subtitle"
-                  fontWeight="body"
-                  ml={1}
-                  sx={{ textOverflow: "ellipsis" }}
-                >
-                  {db.tags.alias(item.id)}
-                </Text>
-              </>
-            )}
+            defaultItems={() => db.tags.all.slice(0, 10)}
           />
         </Flex>
       )}
@@ -77,128 +66,117 @@ function Autosuggest({
   getFields,
   customFilter,
   onRemove,
-  renderSuggestion,
   limit,
-  onAdd,
   onSelect,
+  onAdd,
   sx,
+  defaultItems,
 }) {
   const [filtered, setFiltered] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef();
+  const { openMenu, closeMenu } = useMenuTrigger();
+  const clearInput = useCallback(() => {
+    inputRef.current.value = "";
+  }, []);
+
+  const getInputValue = useCallback(() => {
+    return inputRef.current.value.trim().toLowerCase();
+  }, []);
+
+  const onAction = useCallback(
+    (type, value) => {
+      clearInput();
+      if (type === "select") {
+        onSelect(value);
+      } else if (type === "add") {
+        onAdd(value);
+      }
+    },
+    [onSelect, onAdd, clearInput]
+  );
+
+  useEffect(() => {
+    const filterText = getInputValue();
+    let items = [];
+    if (filterText.length <= 0 && filtered.length <= 0) {
+      closeMenu();
+      return;
+    } else if (filterText.length > 0 && filtered.length <= 0) {
+      items.push({
+        key: "new",
+        title: () => `Create "${filterText}" tag`,
+        icon: Icon.Plus,
+        onClick: () => onAction("add", filterText),
+      });
+    } else {
+      items.push(
+        ...filtered.map((tag) => ({
+          key: tag.id,
+          title: () => tag.title,
+          icon: Icon.Tag,
+          onClick: () => onAction("select", tag),
+        }))
+      );
+    }
+
+    openMenu(items, {
+      type: "autocomplete",
+      positionOptions: {
+        relativeTo: inputRef.current,
+        absolute: true,
+        location: "below",
+      },
+    });
+  }, [filtered, getInputValue, closeMenu, openMenu, onAction]);
+
   return (
-    <Flex
-      flex="1 1 auto"
-      flexDirection="column"
-      sx={{ position: "relative", ...sx }}
-      onBlur={(e) => {
-        if (
-          e.relatedTarget &&
-          e.relatedTarget.classList?.contains("suggestion-item")
-        )
-          return;
-        setFiltered([]);
+    <Input
+      ref={inputRef}
+      variant="clean"
+      width="auto"
+      alignSelf="flex-start"
+      sx={{ width: "auto", border: "none", p: 0, fontSize: "body" }}
+      placeholder="Add a tag..."
+      data-test-id="editor-tag-input"
+      fontSize="subtitle"
+      onFocus={(e) => {
+        if (!e.target.value.trim()) setFiltered(defaultItems());
       }}
-    >
-      <Input
-        ref={inputRef}
-        variant="clean"
-        width="auto"
-        alignSelf="flex-start"
-        sx={{ width: "auto", border: "none", p: 0, fontSize: "body" }}
-        placeholder="Add a tag..."
-        data-test-id="editor-tag-input"
-        fontSize="subtitle"
-        onChange={(e) => {
-          const { value } = e.target;
-          if (!value.length) {
-            setFiltered([]);
-            return;
-          }
-          let filtered = getData().filter((d) => {
-            const fields = getFields(d);
-            return (
-              fields.some((field) => {
-                return field.toLowerCase().startsWith(value.toLowerCase());
-              }) &&
-              (!customFilter || customFilter(d))
-            );
-          });
-          filtered = filtered.slice(0, limit);
-          setFiltered(filtered);
-          if (filtered.length > 0) setSelectedIndex(0);
-          else setSelectedIndex(-1);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            if (selectedIndex > -1) {
-              onSelect(filtered[selectedIndex]);
-            } else {
-              onAdd(e.target.value.toLowerCase());
-            }
-            e.target.value = "";
-            setFiltered([]);
-            setSelectedIndex(-1);
-          } else if (e.target.value === "" && e.key === "Backspace") {
-            onRemove();
-          } else if (e.key === "Escape") {
-            setFiltered([]);
-          } else if (e.key === "ArrowDown") {
-            setSelectedIndex((i) => {
-              if (++i >= filtered.length) return 0;
-              return i;
-            });
-            e.preventDefault();
-          } else if (e.key === "ArrowUp") {
-            setSelectedIndex((i) => {
-              if (--i < 0) return filtered.length - 1;
-              return i;
-            });
-            e.preventDefault();
-          }
-        }}
-      />
-      {filtered.length ? (
-        <Flex
-          flexDirection="column"
-          sx={{
-            position: "absolute",
-            top: 35,
-            border: "1px solid",
-            borderColor: "border",
-            borderRadius: "default",
-            boxShadow: "0px 4px 10px 0px #00000022",
-            zIndex: 2,
-            height: 200,
-            width: 150,
-            overflowX: "hidden",
-          }}
-          bg="background"
-        >
-          {filtered.map((item, index) => (
-            <Button
-              variant="menuitem"
-              className="suggestion-item"
-              key={item.id}
-              onClick={(e) => {
-                onSelect(item);
-                inputRef.current.value = "";
-                setFiltered([]);
-              }}
-              m={0}
-              lineHeight="initial"
-              display="flex"
-              justifyContent="start"
-              alignItems="center"
-              bg={selectedIndex === index ? "hover" : "transparent"}
-              title={`Press enter or click to add this tag`}
-              px={2}
-            >
-              {renderSuggestion(item)}
-            </Button>
-          ))}
-        </Flex>
-      ) : null}
-    </Flex>
+      onBlur={() => setFiltered([])}
+      onChange={(e) => {
+        const { value } = e.target;
+        if (!value.length) {
+          setFiltered([]);
+          return;
+        }
+        let filtered = getData().filter((d) => {
+          const fields = getFields(d);
+          return (
+            fields.some((field) => {
+              return field.toLowerCase().startsWith(value.toLowerCase());
+            }) &&
+            (!customFilter || customFilter(d))
+          );
+        });
+        filtered = filtered.slice(0, limit);
+        setFiltered(filtered);
+      }}
+      onKeyDown={(e) => {
+        const text = getInputValue();
+        if (e.key === "Enter" && !!text && !filtered.length) {
+          onAction("add", text);
+        } else if (!text && e.key === "Backspace") {
+          onRemove();
+          closeMenu();
+        } else if (e.key === "Escape") {
+          closeMenu();
+          e.stopPropagation();
+        } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+          if (e.key === "ArrowDown" && !text) setFiltered(defaultItems());
+
+          e.preventDefault();
+        }
+      }}
+    />
   );
 }

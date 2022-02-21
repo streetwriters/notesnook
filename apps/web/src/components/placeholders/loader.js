@@ -1,5 +1,5 @@
 import { useLayoutEffect } from "react";
-import { ReactComponent as Note } from "../../assets/note.svg";
+import { ReactComponent as Note } from "../../assets/note2.svg";
 import { ReactComponent as Notebook } from "../../assets/notebook.svg";
 import { ReactComponent as Monographs } from "../../assets/monographs.svg";
 import { ReactComponent as Search } from "../../assets/search.svg";

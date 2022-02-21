@@ -11,30 +11,36 @@ import { showToast } from "../../utils/toast";
 
 const menuItems = [
   {
-    title: () => "Rename tag",
+    key: "rename",
+    title: "Rename tag",
     icon: Icon.Edit,
     onClick: ({ tag }) => {
       hashNavigate(`/tags/${tag.id}/edit`);
     },
   },
   {
+    key: "shortcut",
     title: ({ tag }) =>
       db.settings.isPinned(tag.id) ? "Remove shortcut" : "Create shortcut",
     icon: Icon.Shortcut,
     onClick: ({ tag }) => appStore.pinItemToMenu(tag),
   },
   {
+    key: "delete",
     color: "error",
-    title: () => "Delete",
+    iconColor: "error",
+    title: "Delete",
     icon: Icon.DeleteForver,
-    onClick: async ({ tag }) => {
-      if (tag.noteIds.includes(editorStore.get().session.id))
-        editorStore.clearSession();
-
-      await db.tags.remove(tag.id);
-      showToast("success", "Tag deleted!");
+    onClick: async ({ items }) => {
+      for (let tag of items) {
+        if (tag.noteIds.includes(editorStore.get().session.id))
+          await editorStore.clearSession();
+        await db.tags.remove(tag.id);
+      }
+      showToast("success", `${items.length} tags deleted`);
       tagStore.refresh();
     },
+    multiSelect: true,
   },
 ];
 

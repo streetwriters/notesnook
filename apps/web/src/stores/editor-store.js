@@ -19,6 +19,7 @@ const SESSION_STATES = {
 
 const getDefaultSession = (sessionId = Date.now()) => {
   return {
+    sessionType: "default",
     readonly: false,
     state: undefined,
     saveState: 1, // -1 = not saved, 0 = saving, 1 = saved
@@ -35,12 +36,16 @@ const getDefaultSession = (sessionId = Date.now()) => {
     color: undefined,
     dateEdited: 0,
     attachments: [],
-    content: {
-      type: "tiny",
-      data: "",
-    },
   };
 };
+
+const getDefaultPreviewSession = () => ({
+  sessionType: "preview",
+  state: undefined,
+  dateEdited: 0,
+  dateCreated: 0,
+});
+
 const savingMutex = new Mutex();
 class EditorStore extends BaseStore {
   session = getDefaultSession();
@@ -68,51 +73,31 @@ class EditorStore extends BaseStore {
     });
   };
 
+  openPreviewSession = (session) => {
+    this.set((state) => {
+      state.session = {
+        ...getDefaultPreviewSession(),
+        ...session,
+        id: state.session.id,
+        title: state.session.title,
+        state: SESSION_STATES.new,
+      };
+    });
+    appStore.setIsEditorOpen(true);
+  };
+
   openLockedSession = async (note) => {
     this.set((state) => {
       state.session = {
         ...getDefaultSession(note.dateEdited),
         ...note,
+        sessionType: "locked",
         id: undefined, // NOTE: we give a session id only after the note is opened.
-        content: note.content,
         state: SESSION_STATES.unlocked,
       };
     });
     appStore.setIsEditorOpen(true);
     hashNavigate(`/notes/${note.id}/edit`, { replace: true });
-  };
-
-  openPreviewSession = (session) => {
-    const { content, dateCreated, dateEdited } = session;
-    this.set((state) => {
-      state.session.oldContent = state.session.content;
-      state.session.oldDateCreated = state.session.dateCreated;
-      state.session.oldDateEdited = state.session.dateEdited;
-      state.session.oldSessionId = state.session.sessionId;
-
-      state.session.content = content;
-      state.session.sessionId = undefined;
-      state.session.dateCreated = dateCreated;
-      state.session.dateEdited = dateEdited;
-      state.session.readonly = true;
-      state.session.state = SESSION_STATES.new;
-    });
-  };
-
-  closePreviewSession = (newSession) => {
-    this.set((state) => {
-      state.session.content = newSession.content;
-      state.session.sessionId = newSession.sessionId;
-      state.session.dateCreated = newSession.dateCreated;
-      state.session.dateEdited = newSession.dateEdited;
-      state.session.readonly = false;
-      state.session.state = SESSION_STATES.stale;
-
-      delete state.session.oldContent;
-      delete state.session.oldDateCreated;
-      delete state.session.oldDateEdited;
-      delete state.session.oldSessionId;
-    });
   };
 
   openSession = async (noteId, force) => {
@@ -142,14 +127,11 @@ class EditorStore extends BaseStore {
     if (note.conflicted)
       return hashNavigate(`/notes/${noteId}/conflict`, { replace: true });
 
-    let content = await db.content.raw(note.contentId, false);
-
     this.set((state) => {
       const defaultSession = getDefaultSession(note.dateEdited);
       state.session = {
         ...defaultSession,
         ...note,
-        content: content || defaultSession.content,
         state: SESSION_STATES.new,
         attachments: db.attachments.ofNote(note.id, "all") || [],
       };
@@ -157,15 +139,19 @@ class EditorStore extends BaseStore {
     appStore.setIsEditorOpen(true);
   };
 
-  saveSession = (oldSession) => {
+  saveSession = (oldSession, content) => {
     return savingMutex.runExclusive(() => {
       const session = this.get().session;
       if (session.readonly) return; // do not allow saving of readonly session
+
       this.setSaveState(0);
-      return this._saveFn()(session)
+      return this._saveFn()({ ...session, content })
         .then(async (id) => {
           let note = db.notes.note(id)?.data;
-          if (!note) return;
+          if (!note) {
+            this.setSaveState(-1);
+            return;
+          }
 
           /* eslint-disable */
           storeSync: {
@@ -264,14 +250,34 @@ class EditorStore extends BaseStore {
   };
 
   setSessionContent = (content) => {
-    const oldSession = qclone(this.get().session);
-    this.get().session.content = content;
-    return this.saveSession(oldSession);
+    const session = qclone(this.get().session);
+    return this.saveSession(session, content);
+  };
+
+  getSessionContent = async () => {
+    const session = this.get().session;
+    switch (session.sessionType) {
+      case "default":
+        return await db.content.insertPlaceholders(
+          await db.content.raw(session.contentId),
+          "/placeholder.svg"
+        );
+      case "preview":
+        return session.content;
+      case "locked":
+        return session.content;
+      default:
+        return;
+    }
   };
 
   toggleLocked = () => {
     if (this.get().session.locked) noteStore.unlock(this.get().session.id);
     else noteStore.lock(this.get().session.id);
+  };
+
+  toggleReadonly = () => {
+    noteStore.readonly(this.get().session.id);
   };
 
   setColor = (color) => {

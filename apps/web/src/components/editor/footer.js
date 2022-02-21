@@ -43,7 +43,7 @@ function EditorFooter() {
       <Text variant="subBody" color="bgSecondaryText" mr={2}>
         {formatDate(dateEdited || Date.now())}
       </Text>
-      <SaveStateIcon size={13} color="bgSecondaryText" />
+      {SaveStateIcon && <SaveStateIcon size={13} color="bgSecondaryText" />}
     </Flex>
   );
 }

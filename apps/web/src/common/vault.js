@@ -56,9 +56,9 @@ class Vault {
     );
   }
 
-  static unlockNote(id) {
+  static unlockNote(id, type = "unlock_note") {
     return new Promise((resolve) => {
-      return showPasswordDialog("unlock_note", ({ password }) => {
+      return showPasswordDialog(type, ({ password }) => {
         return db.vault
           .remove(id, password)
           .then(() => true)

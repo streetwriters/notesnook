@@ -3,6 +3,7 @@ import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
 import { store as appStore } from "./app-store";
+import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
@@ -32,6 +33,7 @@ class NoteStore extends BaseStore {
   };
 
   setSelectedNote = (id) => {
+    if (id === 0) selectionStore.get().toggleSelectionMode(false);
     this.set((state) => (state.selectedNote = id));
   };
 
@@ -68,13 +70,15 @@ class NoteStore extends BaseStore {
     });
   };
 
-  delete = async (id) => {
+  delete = async (...ids) => {
     const { session, clearSession } = editorStore.get();
-    if (session && session.id === id) {
-      await clearSession();
+    for (let id of ids) {
+      if (session && session.id === id) {
+        await clearSession();
+      }
     }
 
-    await db.notes.delete(id);
+    await db.notes.delete(...ids);
 
     this.refresh();
     appStore.refreshNavItems();
@@ -111,6 +115,12 @@ class NoteStore extends BaseStore {
     this.refresh();
     if (editorStore.get().session.id === id)
       await editorStore.openSession(id, true);
+  };
+
+  readonly = async (id) => {
+    const note = db.notes.note(id);
+    await note.readonly();
+    this.refresh();
   };
 
   setColor = async (id, color) => {

@@ -6,15 +6,14 @@ import ListItem from "../list-item";
 import { showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { db } from "../../common/db";
-import Colors from "../menu/colors";
-import { showExportDialog } from "../../common/dialog-controller";
-import { showItemDeletedToast } from "../../common/toasts";
 import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import { hashNavigate, navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
-import Vault from "../../common/vault";
 import IconTag from "../icon-tag";
+import { COLORS } from "../../common";
+import { exportNotes } from "../../common/export";
+import { Multiselect } from "../../common/multi-select";
 
 function Note(props) {
   const { tags, notebook, item, index, context, attachments, date } = props;
@@ -93,6 +92,9 @@ function Note(props) {
                   sx={{ mr: 1 }}
                   data-test-id={`note-${index}-locked`}
                 />
+              )}
+              {note.favorite && (
+                <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
               )}
               <TimeAgo live={true} datetime={date} locale="short" />
             </>
@@ -193,31 +195,35 @@ const pin = (note) => {
     .catch((error) => showToast("error", error.message));
 };
 
+const formats = [
+  {
+    type: "pdf",
+    title: "PDF",
+    icon: Icon.PDF,
+    subtitle:
+      "Can be opened in any PDF reader like Adobe Acrobat or Foxit Reader.",
+  },
+  {
+    type: "md",
+    title: "Markdown",
+    icon: Icon.Markdown,
+    subtitle: "Can be opened in any plain-text or markdown editor.",
+  },
+  {
+    type: "html",
+    title: "HTML",
+    icon: Icon.HTML,
+    subtitle: "Can be opened in any web browser like Google Chrome.",
+  },
+  {
+    type: "txt",
+    title: "Text",
+    icon: Icon.Text,
+    subtitle: "Can be opened in any plain-text editor.",
+  },
+];
+
 const menuItems = [
-  {
-    key: "colors",
-    title: () => "Colors",
-    component: ({ data }) => <Colors note={data.note} />,
-  },
-  {
-    key: "publish",
-    disabled: ({ note }) => !db.monographs.isPublished(note.id) && note.locked,
-    disableReason: "You cannot publish a locked note.",
-    icon: Icon.Publish,
-    title: ({ note }) =>
-      db.monographs.isPublished(note.id) ? "Unpublish" : "Publish",
-    onClick: async ({ note }) => {
-      await showPublishView(note.id, "bottom");
-    },
-  },
-  {
-    key: "addtonotebook",
-    title: () => "Add to notebook(s)",
-    icon: Icon.AddToNotebook,
-    onClick: async ({ note }) => {
-      await showMoveNoteDialog([note.id]);
-    },
-  },
   {
     key: "pin",
     title: ({ note }) => (note.pinned ? "Unpin" : "Pin"),
@@ -233,21 +239,56 @@ const menuItems = [
     onClick: ({ note }) => store.favorite(note),
   },
   {
-    key: "export",
-    title: () => "Export",
-    icon: Icon.Export,
-    onClick: async ({ note }) => {
-      if (note.locked) {
-        alert("Locked notes cannot be exported currently.");
-        return;
-      }
-      if (await showExportDialog([note.id]))
-        showToast("success", `Note exported successfully!`);
+    key: "addtonotebook",
+    title: "Add to notebook(s)",
+    icon: Icon.AddToNotebook,
+    onClick: async ({ items }) => {
+      await showMoveNoteDialog(items.map((i) => i.id));
     },
+    multiSelect: true,
+  },
+  {
+    key: "colors",
+    title: "Assign color",
+    icon: Icon.Colors,
+    items: colorsToMenuItems(),
+  },
+  {
+    key: "publish",
+    disabled: ({ note }) => !db.monographs.isPublished(note.id) && note.locked,
+    disableReason: "You cannot publish a locked note.",
+    icon: Icon.Publish,
+    title: ({ note }) =>
+      db.monographs.isPublished(note.id) ? "Unpublish" : "Publish",
+    onClick: async ({ note }) => {
+      await showPublishView(note.id, "bottom");
+    },
+  },
+  {
+    key: "export",
+    title: "Export as",
+    icon: Icon.Export,
+    disabled: ({ note }) => note.locked,
+    disableReason: "Locked notes cannot be exported currently.",
+    items: formats.map((format) => ({
+      key: format.type,
+      title: format.title,
+      tooltip: `Export as ${format.title} - ${format.subtitle}`,
+      icon: format.icon,
+      disabled: ({ items }) => format.type === "pdf" && items.length > 1,
+      disableReason: "Multiple notes cannot be exported as PDF.",
+      onClick: async ({ items }) => {
+        await exportNotes(
+          format.type,
+          items.map((i) => i.id)
+        );
+      },
+    })),
+    multiSelect: true,
     isPro: true,
   },
   {
-    key: "unlocknote",
+    key: "lock",
     title: ({ note }) => (note.locked ? "Unlock" : "Lock"),
     icon: Icon.Lock,
     onClick: async ({ note }) => {
@@ -264,17 +305,17 @@ const menuItems = [
   },
   {
     key: "movetotrash",
-    title: () => "Move to trash",
-    color: "red",
+    title: "Move to trash",
+    color: "error",
+    iconColor: "error",
     icon: Icon.Trash,
-    disabled: ({ note }) => db.monographs.isPublished(note.id),
+    disabled: ({ items }) =>
+      items.length === 1 && db.monographs.isPublished(items[0].id),
     disableReason: "Please unpublish this note to move it to trash",
-    onClick: async ({ note }) => {
-      if (note.locked) {
-        if (!(await Vault.unlockNote(note.id))) return;
-      }
-      await store.delete(note.id).then(() => showItemDeletedToast(note));
+    onClick: async ({ items }) => {
+      await Multiselect.moveNotesToTrash(items);
     },
+    multiSelect: true,
   },
 ];
 
@@ -282,16 +323,36 @@ const topicNoteMenuItems = [
   ...menuItems,
   {
     key: "removefromtopic",
-    title: () => "Remove from topic",
+    title: "Remove from topic",
     icon: Icon.TopicRemove,
-    color: "red",
-    onClick: async ({ note, context }) => {
+    color: "error",
+    iconColor: "error",
+    onClick: async ({ items, context }) => {
       await db.notebooks
         .notebook(context.value.id)
         .topics.topic(context.value.topic)
-        .delete(note.id);
+        .delete(...items.map((i) => i.id));
       store.refresh();
-      await showToast("success", "Note removed from topic!");
     },
+    multiSelect: true,
   },
 ];
+
+function colorsToMenuItems() {
+  return COLORS.map((label) => {
+    const lowercase = label.toLowerCase();
+    return {
+      key: lowercase,
+      title: () => db.colors.alias(lowercase) || label,
+      icon: Icon.Circle,
+      iconColor: lowercase,
+      checked: ({ note }) => {
+        return note.color === lowercase;
+      },
+      onClick: ({ note }) => {
+        const { id } = note;
+        store.setColor(id, lowercase);
+      },
+    };
+  });
+}

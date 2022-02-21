@@ -1,5 +1,5 @@
-import { IStreamable } from "nncrypto/dist/src/interfaces";
-import { Chunk } from "streamablefs/dist/src/types";
+import { IStreamable } from "@notesnook/crypto/dist/src/interfaces";
+import { Chunk } from "@notesnook/crypto/dist/src/types";
 import { sendEventWithResult } from "./utils";
 
 export default class WorkerStream

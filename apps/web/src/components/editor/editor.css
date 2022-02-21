@@ -179,6 +179,7 @@ table[data-mce-selected] {
 .checklist > li {
   list-style: none;
   margin: 0.25em 0;
+  color: var(--text);
 }
 
 .tox-checklist > li::before,
@@ -210,8 +211,7 @@ table[data-mce-selected] {
 
 .tox-checklist li.tox-checklist--checked,
 .checklist li.checked {
-  color: var(--fontTertiary) !important;
-  text-decoration: line-through;
+  color: var(--fontTertiary);
 }
 
 [dir="rtl"] .tox-checklist > li::before,

@@ -3,6 +3,7 @@
 const { expect } = require("@playwright/test");
 const { getTestId, NOTE, createNote } = require(".");
 const List = require("./listitemidbuilder");
+const Menu = require("./menuitemidbuilder");
 
 async function isPresent(selector) {
   try {
@@ -59,10 +60,17 @@ async function createNoteAndCheckPresence(
   return noteSelector;
 }
 
+async function checkMenuItemText(itemId, expectedText) {
+  await expect(
+    page.textContent(Menu.new("menuitem").item(itemId).build())
+  ).resolves.toBe(expectedText);
+}
+
 module.exports = {
   isPresent,
   isAbsent,
   isToastPresent,
   checkNotePresence,
   createNoteAndCheckPresence,
+  checkMenuItemText,
 };

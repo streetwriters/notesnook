@@ -14,30 +14,26 @@ import { Box, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
-import { Mutex } from "async-mutex";
 import { formatDate } from "notes-core/utils/date";
 import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
 import { getChangelog } from "../utils/version";
 import { isDesktop } from "../utils/platform";
 
-const DialogMutex = new Mutex();
 function showDialog(dialog) {
   const root = document.getElementById("dialogContainer");
 
   if (root) {
-    return DialogMutex.runExclusive(
-      () =>
-        new Promise((resolve) => {
-          const perform = (result) => {
-            ReactDOM.unmountComponentAtNode(root);
-            hashNavigate("/", { replace: true });
-            resolve(result);
-          };
-          const PropDialog = dialog(Dialogs, perform);
-          ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
-        })
-    );
+    return new Promise((resolve, reject) => {
+      const perform = (result) => {
+        ReactDOM.unmountComponentAtNode(root);
+        hashNavigate("/", { replace: true });
+        resolve(result);
+      };
+      const PropDialog = dialog(Dialogs, perform);
+
+      ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
+    });
   }
   return Promise.reject("No element with id 'dialogContainer'");
 }
@@ -280,15 +276,17 @@ export function showLoadingDialog(dialogData) {
   ));
 }
 
+/**
+ *
+ * @param {{title: string, subtitle?: string, action: Function}} dialogData
+ * @returns
+ */
 export function showProgressDialog(dialogData) {
-  const { title, message, subtitle, total, setProgress, action } = dialogData;
+  const { title, subtitle, action } = dialogData;
   return showDialog((Dialogs, perform) => (
     <Dialogs.ProgressDialog
       title={title}
       subtitle={subtitle}
-      message={message}
-      total={total}
-      setProgress={setProgress}
       action={action}
       onDone={(e) => perform(e)}
     />
@@ -340,6 +338,12 @@ function getDialogData(type) {
         title: "Unlock note",
         subtitle: "Your note will be unencrypted and removed from the vault.",
         positiveButtonText: "Unlock note",
+      };
+    case "unlock_and_delete_note":
+      return {
+        title: "Delete note",
+        subtitle: "Please unlock this note to move it to trash.",
+        positiveButtonText: "Unlock & delete",
       };
     case "change_password":
       return {
@@ -465,6 +469,7 @@ export function showEditTopicDialog(notebookId, topicId) {
           .notebook(topic.notebookId)
           .topics.add({ ...topic, title: t });
         notebookStore.setSelectedNotebook(topic.notebookId);
+        appStore.refreshNavItems();
         showToast("success", "Topic edited!");
         perform(true);
       }}
@@ -512,6 +517,7 @@ export function showEditTagDialog(tagId) {
         tagStore.refresh();
         editorStore.refreshTags();
         noteStore.refresh();
+        appStore.refreshNavItems();
         perform(true);
       }}
     />
@@ -593,6 +599,12 @@ export function showIssueDialog() {
 export function showImportDialog() {
   return showDialog((Dialogs, perform) => (
     <Dialogs.ImportDialog onClose={(res) => perform(res)} />
+  ));
+}
+
+export function showOnboardingDialog(type) {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.OnboardingDialog type={type} onClose={(res) => perform(res)} />
   ));
 }
 

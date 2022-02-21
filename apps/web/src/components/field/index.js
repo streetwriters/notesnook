@@ -74,7 +74,7 @@ function Field(props) {
               fontSize: "subBody",
               fontWeight: "normal",
               color: "fontTertiary",
-              ...styles.label,
+              ...styles.helpText,
             }}
           >
             {helpText}
@@ -133,9 +133,10 @@ function Field(props) {
               right: 0,
               top: 0,
               bottom: 0,
-              px: 1,
+              px: 2,
               cursor: "pointer",
-              borderRadius: "default",
+              borderTopRightRadius: "default",
+              borderBottomRightRadius: "default",
               ":hover": { bg: "border" },
             }}
           >

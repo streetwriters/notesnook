@@ -173,8 +173,9 @@ class MenuItem {
       borderRadius: 0,
       color: "text",
       cursor: "pointer",
-      ":hover:not(:disabled)": {
+      ":hover:not(:disabled),:focus:not(:disabled)": {
         backgroundColor: "hover",
+        boxShadow: "none",
       },
       ":active:not(:disabled)": {
         backgroundColor: "border",

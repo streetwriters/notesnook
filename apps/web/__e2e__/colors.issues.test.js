@@ -25,13 +25,12 @@ test("delete the last note of a color", async ({ page }) => {
   const noteSelector = await createNoteAndCheckPresence();
 
   await useContextMenu(noteSelector, async () => {
-    await clickMenuItem("colors-Red");
+    await clickMenuItem("colors");
+    await clickMenuItem("red");
   });
 
-  expect(await page.isVisible(new Menu("navitem").item("red").build())).toBe(
-    true
-  );
-  await page.waitForTimeout(500);
+  const navItem = new Menu("navitem").item("red").build();
+  await page.waitForSelector(navItem);
 
   await useContextMenu(noteSelector, async () => {
     await clickMenuItem("movetotrash");

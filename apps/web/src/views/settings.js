@@ -227,7 +227,8 @@ function Settings(props) {
               onClick={async () => {
                 const result = await showPasswordDialog(
                   "change_account_password",
-                  (data) => {
+                  async (data) => {
+                    await db.user.clearSessions();
                     return db.user.changePassword(
                       data.oldPassword,
                       data.newPassword
@@ -236,7 +237,6 @@ function Settings(props) {
                 );
                 if (result) {
                   await showToast("success", "Account password changed!");
-                  await db.user.clearSessions();
                 }
               }}
             >
@@ -836,6 +836,7 @@ function AccountStatus(props) {
       remainingDays <= 0 ? (
         <Button
           variant="primary"
+          bg={user.isEmailConfirmed ? "primary" : "error"}
           mt={1}
           onClick={() => {
             if (user.isEmailConfirmed) showBuyDialog();
@@ -844,7 +845,7 @@ function AccountStatus(props) {
         >
           {user.isEmailConfirmed
             ? "Upgrade to Notesnook Pro"
-            : "Confirm your email to get 7 more days"}
+            : "Confirm your email to sync your notes."}
         </Button>
       ) : provider === "Streetwriters" ? (
         <>

@@ -8,6 +8,7 @@ export default function Loader({ title, text }) {
       flex={1}
       justifyContent="center"
       alignItems="center"
+      sx={{ zIndex: 1 }}
     >
       <Loading rotate />
       <Text variant="subtitle" mt={4}>
