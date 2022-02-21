@@ -120,34 +120,44 @@ async function run() {
         type: 'success',
         context: 'global'
       });
+      let dontShowCompleteSheet = await MMKV.getItem('dontShowCompleteSheet');
       await sleep(300);
-      presentSheet({
-        title: 'Backup complete',
-        icon: 'cloud-upload',
-        paragraph:
-          'Share your backup to your cloud storage such as Dropbox or Google Drive so you do not lose it.',
-        actionText: 'Share backup',
-        actionsArray: [
-          {
-            action: () => {
-              if (Platform.OS === 'ios') {
-                Share.open({
-                  url: 'file:/' + backupFilePath,
-                  failOnCancel: false
-                }).catch(console.log);
-              } else {
-                FileViewer.open(backupFilePath, {
-                  showOpenWithDialog: true,
-                  showAppsSuggestions: true,
-                  shareFile: true
-                }).catch(console.log);
-              }
+      if (!dontShowCompleteSheet) {
+        presentSheet({
+          title: 'Backup complete',
+          icon: 'cloud-upload',
+          paragraph:
+            'Share your backup to your cloud storage such as Dropbox or Google Drive so you do not lose it.',
+          actionText: 'Share backup',
+          actionsArray: [
+            {
+              action: () => {
+                if (Platform.OS === 'ios') {
+                  console.log(backupFilePath);
+                  Share.open({
+                    url: 'file:/' + backupFilePath,
+                    failOnCancel: false
+                  }).catch(console.log);
+                } else {
+                  FileViewer.open(backupFilePath, {
+                    showOpenWithDialog: true,
+                    showAppsSuggestions: true,
+                    shareFile: true
+                  }).catch(console.log);
+                }
+              },
+              actionText: 'Share'
             },
-            actionText: 'Share'
-          }
-        ]
-      });
-      console.log(backupFilePath);
+            {
+              action: async () => {
+                eSendEvent(eCloseProgressDialog);
+                await MMKV.setItem('dontShowCompleteSheet', 'yes');
+              },
+              actionText: 'Never ask again'
+            }
+          ]
+        });
+      }
       return backupFilePath;
     } catch (e) {
       console.log('backup error: ', e);
