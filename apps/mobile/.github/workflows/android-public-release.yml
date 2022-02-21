@@ -44,12 +44,6 @@ jobs:
           keyStorePassword: ${{ secrets.PUBLIC_KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
 
-      - uses: JungWinter/split@v2.0.0
-        id: signed_files
-        with:
-          msg: ${{ steps.sign_app.signedReleaseFiles }}
-          separator: ':'
-
       - name: Get version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@master
@@ -63,8 +57,7 @@ jobs:
           repository: streetwriters/notesnook
           token: ${{ secrets.NOTESNOOK_GH_TOKEN }}
           files: |
-            ${{ steps.signed_files._0 }}
-            ${{ steps.signed_files._1 }}
-            ${{ steps.signed_files._2 }}
-            ${{ steps.signed_files._3 }}
-            ${{ steps.signed_files._4 }}
+            ${{ steps.sign_app.signedReleaseFile0 }}
+            ${{ steps.sign_app.signedReleaseFile1 }}
+            ${{ steps.sign_app.signedReleaseFile2 }}
+            ${{ steps.sign_app.signedReleaseFile3 }}
