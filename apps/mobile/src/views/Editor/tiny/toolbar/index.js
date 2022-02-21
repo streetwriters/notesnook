@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Platform, View, ScrollView } from 'react-native';
 import { ActionIcon } from '../../../../components/ActionIcon';
 import { useTracked } from '../../../../provider';
 import { useEditorStore } from '../../../../provider/stores';
@@ -45,8 +45,7 @@ const EditorToolbar = React.memo(
         <View
           style={{
             width: '100%',
-            minHeight: normalize(50),
-            position: 'relative'
+            minHeight: normalize(50)
           }}
         >
           {readonly ? (

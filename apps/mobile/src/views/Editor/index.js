@@ -79,9 +79,8 @@ const Editor = React.memo(
       <>
         <View
           style={{
-            width: '100%',
-            backgroundColor: 'transparent',
             flexGrow: 1,
+            backgroundColor: 'transparent',
             flex: 1
           }}
         >

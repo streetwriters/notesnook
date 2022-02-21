@@ -5,7 +5,6 @@ import {
   Platform,
   SafeAreaView,
   TextInput,
-  useWindowDimensions,
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -57,15 +56,13 @@ export const EditorWrapper = ({ width }) => {
     >
       <SafeAreaView
         style={{
-          width: '100%',
-          height: '100%'
+          flex: 1
         }}
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{
-            width: '100%',
-            height: '100%'
+            flex: 1
           }}
           enabled={!floating}
         >
