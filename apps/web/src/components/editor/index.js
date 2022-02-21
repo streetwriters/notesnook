@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Box, Button, Flex, Text } from "rebass";
 import Properties from "../properties";
 import {
   useStore,
@@ -90,7 +90,6 @@ function Editor({ noteId, nonce }) {
     if (!editor || !editor.initialized) return;
 
     async function setContents() {
-      console.log("SET CONTENT");
       let content = await editorstore.get().getSessionContent();
       if (content?.data) editorSetContent(editor, content.data);
       else clearContent(editor);
@@ -147,16 +146,14 @@ function Editor({ noteId, nonce }) {
   );
 
   useEffect(() => {
+    if (isEditorLoading) return;
     const editor = editorRef.current?.editor;
-    if (!editor) return;
-
     if (isReadonly) {
-      console.log("READONLy");
       editor.mode.set("readonly");
     } else {
       editor.mode.set("design");
     }
-  }, [isReadonly]);
+  }, [isReadonly, isEditorLoading]);
 
   useEffect(
     function newSession() {
@@ -248,7 +245,7 @@ function Editor({ noteId, nonce }) {
           px={[2, 2, 35]}
           mt={[2, 2, 25]}
         >
-          <Header readonly={isPreviewMode || isReadonly} />
+          <Header readonly={isReadonly} />
 
           {isSessionReady && (
             <Suspense fallback={<div />}>
