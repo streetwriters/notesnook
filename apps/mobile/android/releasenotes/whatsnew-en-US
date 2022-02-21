@@ -1,5 +1,18 @@
-- Fixed app hangs and becomes unusable on some phones
-- Improved web clipper in widget to handle tables & codeblocks and remove invalid elements
-- Disable swipe to close gesture in editor as it interferes with editing or scrolling.
+- Add new "Move notes" button in topic properties to quickly move notes to a topic
+- Added read only mode for notes
+- Overhauled Auth flows with new UI/UX
+- Overhauled App lock UI
+- Added new placeholders with useful tips about app features
+- Added Auto search on typing in Search/Replace
+- Added new walkthrough for notesnooks for new users
+- Added walkthroughs for pro/trial users
+- Allow to opt-out of getting "Backup completed" dialogs on app launch when automatic backups are turned on
+- Disable swipe gestures when selecting multiple notes
+- Fixed Search/Replace does not accept spaces
+- Fixed inline markdown transforms not working
+- Fixed tags in editor hide/flicker on opening a note
+- Fixed Home screen widget not launching on Android 12
+- Fixed codeblocks are not scrollable in editor
+- Fixed collapsing/expanding a heading causes cursor to jump
 
 Thank you for using Notesnook!
