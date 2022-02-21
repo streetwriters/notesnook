@@ -36,19 +36,13 @@ jobs:
 
       - name: Sign APK Files
         id: sign_app
-        uses: r0adkll/sign-android-release@v1
+        uses: r0adkll/sign-android-release@master
         with:
           releaseDirectory: android/app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.PUBLIC_SIGNING_KEY }}
           alias: ${{ secrets.PUBLIC_ALIAS }}
           keyStorePassword: ${{ secrets.PUBLIC_KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
-
-      - uses: JungWinter/split@v2.0.0
-        id: signed_files
-        with:
-          msg: ${{ steps.sign_app.signedReleaseFiles }}
-          separator: ':'
 
       - name: Get version
         id: package-version
@@ -63,8 +57,7 @@ jobs:
           repository: streetwriters/notesnook
           token: ${{ secrets.NOTESNOOK_GH_TOKEN }}
           files: |
-            ${{ steps.signed_files._0 }}
-            ${{ steps.signed_files._1 }}
-            ${{ steps.signed_files._2 }}
-            ${{ steps.signed_files._3 }}
-            ${{ steps.signed_files._4 }}
+            ${{ steps.sign_app.signedReleaseFile0 }}
+            ${{ steps.sign_app.signedReleaseFile1 }}
+            ${{ steps.sign_app.signedReleaseFile2 }}
+            ${{ steps.sign_app.signedReleaseFile3 }}
