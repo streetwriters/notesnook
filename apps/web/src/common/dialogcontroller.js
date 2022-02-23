@@ -603,6 +603,8 @@ export function showImportDialog() {
 }
 
 export function showOnboardingDialog(type) {
+  if (!type) return;
+
   return showDialog((Dialogs, perform) => (
     <Dialogs.OnboardingDialog type={type} onClose={(res) => perform(res)} />
   ));
