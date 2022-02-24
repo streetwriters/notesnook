@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View } from 'react-native';
-import Sync from '../../services/Sync';
-import { MMKV } from '../../utils/mmkv';
 import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
 import {
   eSendEvent,
@@ -11,21 +10,21 @@ import {
   presentSheet,
   ToastEvent
 } from '../../services/EventManager';
-import { db } from '../../utils/database';
-import { SIZE } from '../../utils/SizeUtils';
-import Input from '../Input';
-import Heading from '../Typography/Heading';
-import { Button } from '../Button';
-import PremiumService from '../../services/PremiumService';
-import { useUserStore } from '../../provider/stores';
 import { clearMessage } from '../../services/Message';
+import PremiumService from '../../services/PremiumService';
+import Sync from '../../services/Sync';
+import { db } from '../../utils/database';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
-import Paragraph from '../Typography/Paragraph';
 import { ActionIcon } from '../ActionIcon';
-import { Toast } from '../Toast';
-import { Notice } from '../Notice';
+import { Button } from '../Button';
 import { Dialog } from '../Dialog';
 import { presentDialog } from '../Dialog/functions';
+import Input from '../Input';
+import { Toast } from '../Toast';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 function getEmail(email) {
   if (!email) return null;
@@ -98,7 +97,7 @@ export const SessionExpired = () => {
     setLoading(true);
     let user;
     try {
-      await db.user.login(email.toLowerCase(), password);
+      await db.user.login(email.current.toLowerCase(), password);
       user = await db.user.getUser();
       if (!user) throw new Error('Email or password incorrect!');
       PremiumService.setPremiumStatus();
