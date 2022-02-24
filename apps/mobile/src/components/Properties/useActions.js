@@ -496,17 +496,6 @@ export const useActions = ({ close = () => {}, item }) => {
 
   const actions = [
     {
-      name: 'Dark Mode',
-      title: 'Dark mode',
-      icon: 'theme-light-dark',
-      func: switchTheme,
-      switch: true,
-      on: colors.night ? true : false,
-      close: false,
-      nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.night
-    },
-    {
       name: 'Add to notebook',
       title: 'Add to notebook',
       icon: 'book-outline',
@@ -673,6 +662,17 @@ export const useActions = ({ close = () => {}, item }) => {
       title: 'History',
       icon: 'history',
       func: openHistory
+    },
+    {
+      name: 'Dark Mode',
+      title: 'Dark mode',
+      icon: 'theme-light-dark',
+      func: switchTheme,
+      switch: true,
+      on: colors.night ? true : false,
+      close: false,
+      nopremium: true,
+      id: notesnook.ids.dialogs.actionsheet.night
     }
   ];
 
