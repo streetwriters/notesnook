@@ -424,7 +424,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
             restoring || loading || files.length === 0 ? null : (
               <View
                 style={{
-                  height: 50
+                  height: 200
                 }}
               />
             )
