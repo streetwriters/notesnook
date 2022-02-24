@@ -25,8 +25,8 @@ import SettingsUserSection from './user-section';
 
 const format = ver => {
   let parts = ver.toString().split('');
-  return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? parts[2]?.slice(1) : parts[2]}${
-    !parts[3] || parts[2] === '0' ? '' : parts[3]
+  return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? '' : parts[2]}${
+    !parts[3] ? '' : parts[3]
   } `;
 };
 
