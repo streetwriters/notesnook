@@ -97,7 +97,7 @@ export const SessionExpired = () => {
     setLoading(true);
     let user;
     try {
-      await db.user.login(email.current.toLowerCase(), password);
+      await db.user.login(email.current.toLowerCase(), password.current);
       user = await db.user.getUser();
       if (!user) throw new Error('Email or password incorrect!');
       PremiumService.setPremiumStatus();
