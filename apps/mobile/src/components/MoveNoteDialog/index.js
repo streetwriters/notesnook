@@ -75,8 +75,7 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
   const [state, dispatch] = useTracked();
   const { colors } = state;
 
-  const nbs = useNotebookStore(state => state.notebooks.filter(n => n?.type === 'notebook'));
-  let notebooks = [...db.notebooks.all];
+  const notebooks = useNotebookStore(state => state.notebooks.filter(n => n?.type === 'notebook'));
 
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
   const setNotebooks = useNotebookStore(state => state.setNotebooks);
