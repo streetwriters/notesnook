@@ -95,7 +95,7 @@ function getWindow() {
 
 function notifyEditorChange(editor, type) {
   setTimeout(() => {
-    editor.fire("input", { inputType: type });
+    editor.fire("input", { inputType: type, data: "" });
   }, 0);
 }
 

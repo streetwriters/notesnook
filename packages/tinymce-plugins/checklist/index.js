@@ -11,8 +11,8 @@ const EMPTY_CHECKLIST_HTML = `<ul class="${CLASS_NAMES.list}"><li></li></ul>`;
  * @param {import("tinymce").Editor} editor
  */
 function register(editor) {
-  editor.addCommand("insertChecklist", function(_api, value) {
-    insertChecklist(editor, value && value.checked);
+  editor.addCommand("insertChecklist", function() {
+    insertChecklist(editor);
   });
 
   editor.ui.registry.addToggleButton("checklist", {
@@ -30,7 +30,6 @@ function register(editor) {
     function(event) {
       var node = event.target;
       var parent = node.parentElement;
-
       if (
         event.offsetX > 0 ||
         parent.className !== CLASS_NAMES.list ||
@@ -53,12 +52,10 @@ function register(editor) {
       }
       return;
     }
+    if (event.targetTouches && event.targetTouches.length !== 1) return;
 
-    if (event.targetTouches.length !== 1) return;
-
+    let validTouchPoint = 0;
     let xPos = event.targetTouches[0].clientX;
-
-    if (xPos > 55) return;
 
     let node = event.target;
     let parent = node.parentElement;
@@ -71,6 +68,15 @@ function register(editor) {
       node = elements[0];
       parent = node.parentElement;
     }
+
+    if (parent && parent.className === CLASS_NAMES.list) {
+      let rect = parent.getBoundingClientRect();
+      validTouchPoint = rect.x + 38;
+    } else {
+      validTouchPoint = 55;
+    }
+
+    if (xPos > validTouchPoint) return;
 
     if (
       node.nodeName === "LI" &&
@@ -91,9 +97,8 @@ function register(editor) {
 
 /**
  * @param {import("tinymce").Editor} editor
- * @param {boolean} checked
  */
-function insertChecklist(editor, checked = false) {
+function insertChecklist(editor) {
   const node = editor.selection.getNode();
   if (node.classList.contains(CLASS_NAMES.list)) {
     editor.undoManager.transact(function() {
@@ -102,20 +107,8 @@ function insertChecklist(editor, checked = false) {
   } else {
     editor.execCommand("InsertUnorderedList", false, {
       "list-style-type": "none",
-      "list-attributes": {
-        class: CLASS_NAMES.list,
-        "data-mce-flag": "temp",
-      },
+      "list-attributes": { class: CLASS_NAMES.list },
     });
-
-    if (checked) {
-      const checklist = editor
-        .getDoc()
-        .querySelector(`.${CLASS_NAMES.list}[data-mce-flag="temp"]`);
-      if (!checklist) return;
-      toggleChecklistItem(editor, checklist.lastElementChild);
-      checklist.removeAttribute("data-mce-flag");
-    }
   }
 }
 
