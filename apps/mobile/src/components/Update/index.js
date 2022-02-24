@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, useWindowDimensions, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useTracked } from '../../provider';
 import { STORE_LINK } from '../../utils';
@@ -28,7 +28,7 @@ export const Update = ({ version, fwdRef }) => {
         alignItems: 'center',
         width: '100%',
         paddingHorizontal: 12,
-        maxHeight: '96%'
+        maxHeight: '97%'
       }}
     >
       <View
