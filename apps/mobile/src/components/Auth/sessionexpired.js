@@ -221,7 +221,6 @@ export const SessionExpired = () => {
                 positivePress: logout
               });
             }}
-            loading={loading}
             type="errorShade"
             title={loading ? null : 'Logout from this device'}
           />
