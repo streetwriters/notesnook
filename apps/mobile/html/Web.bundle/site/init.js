@@ -182,8 +182,14 @@ function init_callback(_editor) {
     'touchstart mousedown',
     function (e) {
       const { target } = e;
-      if (e.targetTouches.length !== 1) return;
-      let xPos = e.targetTouches[0].clientX;
+      let xPos;
+      if (e.targetTouches) {
+        if (e.targetTouches.length !== 1) return;
+        xPos = e.targetTouches[0].clientX;
+      } else {
+        xPos = e.offsetX;
+      }
+
       if (
         xPos < 45 &&
         collapsibleTags[target.tagName] &&
