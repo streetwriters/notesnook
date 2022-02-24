@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, View } from 'react-native';
+import { Linking, useWindowDimensions, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useTracked } from '../../provider';
 import { STORE_LINK } from '../../utils';
@@ -27,7 +27,8 @@ export const Update = ({ version, fwdRef }) => {
         alignSelf: 'center',
         alignItems: 'center',
         width: '100%',
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        maxHeight: '96%'
       }}
     >
       <View
@@ -56,8 +57,7 @@ export const Update = ({ version, fwdRef }) => {
           fwdRef?.current?.handleChildScrollEnd();
         }}
         style={{
-          width: '100%',
-          maxHeight: 500
+          width: '100%'
         }}
       >
         <Heading size={SIZE.md}>Release notes:</Heading>
