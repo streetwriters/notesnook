@@ -1,38 +1,29 @@
 import React, { createRef, useEffect, useState } from 'react';
-import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, TouchableOpacity, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { useNotebookStore, useSelectionStore, useSettingStore } from '../../provider/stores';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  sendNoteEditedEvent,
-  ToastEvent
-} from '../../services/EventManager';
+import { useNotebookStore, useSelectionStore } from '../../provider/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { getTotalNotes, InteractionManager } from '../../utils';
+import { getTotalNotes } from '../../utils';
 import { db } from '../../utils/database';
 import { eOpenMoveNoteDialog } from '../../utils/Events';
-import { pv, SIZE } from '../../utils/SizeUtils';
-import SheetWrapper from '../Sheet';
+import layoutmanager from '../../utils/layout-manager';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
+import { Dialog } from '../Dialog';
 import DialogHeader from '../Dialog/dialog-header';
+import { presentDialog } from '../Dialog/functions';
+import Input from '../Input';
 import { PressableButton } from '../PressableButton';
+import SheetWrapper from '../Sheet';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import Input from '../Input';
-import { ActionIcon } from '../ActionIcon';
-import { Dialog } from '../Dialog';
-import { presentDialog } from '../Dialog/functions';
-import layoutmanager from '../../utils/layout-manager';
 
 let newNotebookTitle = null;
-let newTopicTitle = null;
 const notebookInput = createRef();
-const topicInput = createRef();
 const actionSheetRef = createRef();
 const MoveNoteDialog = () => {
   const [visible, setVisible] = useState(false);
@@ -56,7 +47,6 @@ const MoveNoteDialog = () => {
 
   const _onClose = () => {
     setVisible(false);
-    newTopicTitle = null;
     newNotebookTitle = null;
     setNote(null);
     Navigation.setRoutesToUpdate([
@@ -241,13 +231,7 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
 
         <FlatList
           nestedScrollEnabled={true}
-          onScrollEndDrag={() => {
-            actionSheetRef.current?.handleChildScrollEnd();
-          }}
           onMomentumScrollEnd={() => {
-            actionSheetRef.current?.handleChildScrollEnd();
-          }}
-          onScrollAnimationEnd={() => {
             actionSheetRef.current?.handleChildScrollEnd();
           }}
           keyboardShouldPersistTaps="always"
@@ -256,7 +240,7 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
           ListFooterComponent={
             <View
               style={{
-                height: 100
+                height: 200
               }}
             />
           }
@@ -372,13 +356,7 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
                   data={item.topics}
                   keyboardShouldPersistTaps="always"
                   keyboardDismissMode="none"
-                  onScrollEndDrag={() => {
-                    actionSheetRef.current?.handleChildScrollEnd();
-                  }}
                   onMomentumScrollEnd={() => {
-                    actionSheetRef.current?.handleChildScrollEnd();
-                  }}
-                  onScrollAnimationEnd={() => {
                     actionSheetRef.current?.handleChildScrollEnd();
                   }}
                   style={{
