@@ -189,29 +189,6 @@ function SyncStatus() {
 
 const syncStatusFilters = [
   {
-    key: "emailNotConfirmed",
-    check: (_syncStatus, user) => !user.isEmailConfirmed,
-    icon: Alert,
-    iconColor: "warn",
-    text: "Sync disabled",
-    tooltip: "Please confirm your email to start syncing.",
-  },
-  {
-    key: "neverSynced",
-    check: (_syncStatus, _user, lastSynced) => !lastSynced,
-    icon: Sync,
-    text: "Synced never",
-    tooltip: "Click to sync your notes.",
-  },
-  {
-    key: "failed",
-    check: (syncStatus) => syncStatus === "failed",
-    icon: SyncError,
-    color: "error",
-    text: "Sync failed",
-    tooltip: "Sync failed to completed. Please try again.",
-  },
-  {
     key: "synced",
     check: (syncStatus) => syncStatus === "synced",
     icon: Sync,
@@ -245,5 +222,28 @@ const syncStatusFilters = [
     iconColor: "error",
     text: "Merge conflicts",
     tooltip: "Please resolve all merge conflicts and run the sync again.",
+  },
+  {
+    key: "emailNotConfirmed",
+    check: (_syncStatus, user) => !user.isEmailConfirmed,
+    icon: Alert,
+    iconColor: "warn",
+    text: "Sync disabled",
+    tooltip: "Please confirm your email to start syncing.",
+  },
+  {
+    key: "neverSynced",
+    check: (_syncStatus, _user, lastSynced) => !lastSynced,
+    icon: Sync,
+    text: "Synced never",
+    tooltip: "Click to sync your notes.",
+  },
+  {
+    key: "failed",
+    check: (syncStatus) => syncStatus === "failed",
+    icon: SyncError,
+    color: "error",
+    text: "Sync failed",
+    tooltip: "Sync failed to completed. Please try again.",
   },
 ];
