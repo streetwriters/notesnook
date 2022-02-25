@@ -6,6 +6,16 @@ import { hasItem } from "../utils/array";
 export default class Content extends Collection {
   async add(content) {
     if (!content) return;
+
+    if (typeof content.data === "object") {
+      if (typeof content.data.data === "string")
+        content.data = content.data.data;
+      else
+        content.data = `<p>Content is invalid: ${JSON.stringify(
+          content.data
+        )}</p>`;
+    }
+
     if (content.remote || content.deleted || content.migrated)
       return await this._collection.addItem(
         await this.extractAttachments(content)
