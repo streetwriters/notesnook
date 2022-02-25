@@ -179,17 +179,27 @@ class Merger {
           if (!note || !note.data) return;
           note = note.data;
 
-          // if hashes are equal do nothing
-          if (
-            !note.locked &&
-            (!remote ||
-              !local ||
+          const isRemoteObject = typeof remote.data === "object";
+          const isLocalObject = typeof local.data === "object";
+          const localHash = isLocalObject ? null : SparkMD5.hash(local.data);
+          const remoteHash = isRemoteObject ? null : SparkMD5.hash(remote.data);
+          if (!note.locked) {
+            // reject all invalid states
+            if (
+              isRemoteObject || // no point in accepting invalid remote object
               !local.data ||
               !remote.data ||
-              remote.data === "undefined" || //TODO not sure about this
-              SparkMD5.hash(local.data) === SparkMD5.hash(remote.data))
-          )
-            return;
+              localHash === remoteHash
+            )
+              return;
+
+            // if we have an invalid content locally but the remote one is valid,
+            // let's accept the remote content.
+            if (isLocalObject && !isRemoteObject) {
+              await this._db.content.add({ id: local.id, ...remote });
+              return;
+            }
+          }
 
           if (remote.deleted || local.deleted || note.locked) {
             // if note is locked or content is deleted we keep the most recent version.
