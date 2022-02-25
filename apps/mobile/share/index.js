@@ -362,7 +362,7 @@ const NotesnookShare = ({ quicknote = false }) => {
 
   const onPress = async () => {
     let content = await getContent();
-    if (!content || content === '') {
+    if (!content || content === '' || typeof content !== 'string') {
       return;
     }
     setLoading(true);

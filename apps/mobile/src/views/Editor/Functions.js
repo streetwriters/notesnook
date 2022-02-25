@@ -773,6 +773,7 @@ async function addToCollection(id) {
 
 export async function saveNote(title, _id, data, type, sessionId, preventUpdate) {
   console.log('saving note:', disableSaving, isSaving, _id, id);
+  if (typeof data !== 'string') return;
   if (disableSaving || (isSaving && !id)) return;
   if (preventUpdate) {
     noteEdited = false;
