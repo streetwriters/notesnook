@@ -65,7 +65,7 @@ export default class FileStorage {
   async deleteFile(filename, localOnly) {
     if (localOnly) return await this.fs.deleteFile(filename);
 
-    const token = await this.tokenManager.getToken();
+    const token = await this.tokenManager.getAccessToken();
     const url = `${hosts.API_HOST}/s3?name=${filename}`;
     return await this.fs.deleteFile(filename, {
       url,
