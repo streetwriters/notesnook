@@ -1,5 +1,5 @@
 import Collection from "./collection";
-import id from "../utils/id";
+import getId from "../utils/id";
 import { deleteItem, hasItem } from "../utils/array";
 import { EV, EVENTS, sendAttachmentsProgressEvent } from "../common";
 import dataurl from "../utils/dataurl";
@@ -42,24 +42,27 @@ export default class Attachments extends Collection {
    *  salt: string,
    *  chunkSize: number,
    *  key: {}
-   * }} attachment
+   * }} attachmentArg
    * @param {string} noteId Optional as attachments will be parsed at extraction time
    * @returns
    */
-  async add(attachment, noteId) {
-    if (!attachment) return console.error("attachment cannot be undefined");
-    if (!attachment.hash) throw new Error("Please provide attachment hash.");
+  async add(attachmentArg, noteId = undefined) {
+    if (!attachmentArg) return console.error("attachment cannot be undefined");
+    if (!attachmentArg.hash) throw new Error("Please provide attachment hash.");
 
-    const oldAttachment = this.all.find(
-      (a) => a.metadata.hash === attachment.hash
-    );
-    if (oldAttachment) {
-      if (!noteId || oldAttachment.noteIds.includes(noteId)) return;
+    const oldAttachment =
+      this.all.find((a) => a.metadata.hash === attachmentArg.hash) || {};
+    let id = oldAttachment.id || getId();
 
-      oldAttachment.noteIds.push(noteId);
-      oldAttachment.dateDeleted = undefined;
-      return this._collection.updateItem(oldAttachment);
-    }
+    const noteIds = oldAttachment.noteIds || [];
+    if (noteId && !noteIds.includes(noteId)) noteIds.push(noteId);
+
+    const attachment = {
+      ...oldAttachment,
+      ...oldAttachment.metadata,
+      ...attachmentArg,
+      noteIds,
+    };
 
     const {
       iv,
@@ -70,8 +73,8 @@ export default class Attachments extends Collection {
       filename,
       salt,
       type,
-      key,
       chunkSize,
+      key,
     } = attachment;
 
     if (
@@ -93,11 +96,13 @@ export default class Attachments extends Collection {
       return;
     }
 
-    const encryptedKey = await this._encryptKey(key);
+    const encryptedKey = attachmentArg.key
+      ? await this._encryptKey(attachmentArg.key)
+      : key;
     const attachmentItem = {
       type: "attachment",
-      id: id(),
-      noteIds: noteId ? [noteId] : [],
+      id,
+      noteIds,
       iv,
       salt,
       length,
@@ -110,9 +115,9 @@ export default class Attachments extends Collection {
         filename,
         type: type || "application/octet-stream",
       },
-      dateCreated: Date.now(),
-      dateModified: undefined,
-      dateUploaded: undefined,
+      dateCreated: attachment.dateCreated || Date.now(),
+      dateModified: attachment.dateModified,
+      dateUploaded: attachment.dateUploaded,
       dateDeleted: undefined,
       failed: attachment.failed,
     };
@@ -226,6 +231,14 @@ export default class Attachments extends Collection {
     attachment.failed = undefined;
     return this._collection.updateItem(attachment);
   }
+
+  reset(id) {
+    const attachment = this.attachment(id);
+    if (!attachment) return;
+    attachment.dateUploaded = undefined;
+    return this._collection.updateItem(attachment);
+  }
+
   markAsFailed(id, reason) {
     const attachment = this.attachment(id);
     if (!attachment) return;
