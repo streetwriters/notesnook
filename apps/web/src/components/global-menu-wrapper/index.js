@@ -27,8 +27,10 @@ function GlobalMenuWrapper() {
             {...props}
             style={{
               ...props.style,
+              zIndex: 1000,
               backgroundColor: isAutocomplete ? "transparent" : "unset",
             }}
+            onClick={(e) => closeMenu()}
             onContextMenu={(e) => {
               e.preventDefault();
               closeMenu();
@@ -47,13 +49,6 @@ function GlobalMenuWrapper() {
       contentElement={(props, children) => (
         <Box
           {...props}
-          onKeyDown={(e) => {
-            if (props.onKeyDown) props.onKeyDown(e);
-            if (e.key === "Escape") {
-              e.stopPropagation();
-              e.preventDefault();
-            }
-          }}
           style={{}}
           sx={{
             top: 0,

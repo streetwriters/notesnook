@@ -5,7 +5,7 @@ import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";
 import { store as selectionStore } from "../../stores/selection-store";
 
-function useMenuFocus(items, onAction) {
+function useMenuFocus(items, onAction, onClose) {
   const [focusIndex, setFocusIndex] = useState(-1);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
 
@@ -61,6 +61,9 @@ function useMenuFocus(items, onAction) {
           case "Enter":
             onAction && onAction(e);
             break;
+          case "Escape":
+            onClose && onClose(e);
+            break;
           default:
             break;
         }
@@ -98,10 +101,14 @@ function Menu({ items, data, title, closeMenu }) {
   );
 
   const [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen] =
-    useMenuFocus(items, (e) => {
-      const item = items[focusIndex];
-      if (item) onAction(e, item);
-    });
+    useMenuFocus(
+      items,
+      (e) => {
+        const item = items[focusIndex];
+        if (item) onAction(e, item);
+      },
+      () => closeMenu()
+    );
 
   const subMenuRef = useRef();
   useEffect(() => {
@@ -200,7 +207,11 @@ function MenuContainer({ title, children }) {
           color="primary"
           py={"8px"}
           px={3}
-          sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
+          sx={{
+            borderBottom: "1px solid",
+            borderBottomColor: "border",
+            wordWrap: "break-word",
+          }}
         >
           {title}
         </Text>
