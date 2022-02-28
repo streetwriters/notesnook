@@ -42,6 +42,14 @@ export default class Lookup {
     return this._byTitle(array, query);
   }
 
+  attachments(array, query) {
+    return search(
+      array,
+      query,
+      (n) => `${n.metadata.filename} ${n.metadata.type} ${n.metadata.hash}`
+    );
+  }
+
   _byTitle(array, query) {
     return search(array, query, (n) => n.title);
   }
