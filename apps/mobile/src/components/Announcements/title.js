@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTracked } from '../../provider';
-import Heading from '../Typography/Heading';
+import Heading from '../ui/typography/heading';
 import { getStyle } from './functions';
 
 export const Title = ({ text, style = {} }) => {

@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import Share from 'react-native-share';
 import { ToastEvent } from '../../services/EventManager';
-import { SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import { SIZE } from '../../utils/size';
+import { Button } from '../ui/button';
 
 export const ShareComponent = ({ uri, name, padding }) => {
   return (

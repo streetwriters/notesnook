@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Linking, Platform, ScrollView, View } from 'react-native';
 import { APP_VERSION } from '../../../version';
-import { Button as MButton } from '../../components/Button/index';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Button as MButton } from '../../components/ui/button/index';
+import { ContainerHeader } from '../../components/container/containerheader';
 import { Issue } from '../../components/Github/issue';
-import { Header as TopHeader } from '../../components/Header/index';
-import Seperator from '../../components/Seperator';
-import Paragraph from '../../components/Typography/Paragraph';
+import { Header as TopHeader } from '../../components/header/index';
+import Seperator from '../../components/ui/seperator';
+import Paragraph from '../../components/ui/typography/paragraph';
 import { useTracked } from '../../provider';
 import { eSendEvent, presentSheet } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { InteractionManager, STORE_LINK } from '../../utils';
-import { eScrollEvent, eUpdateSearchState } from '../../utils/Events';
+import { InteractionManager } from '../../utils';
+import { STORE_LINK } from '../../utils/constants';
+import { eScrollEvent, eUpdateSearchState } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
 import SettingsAppearanceSection from './appearance';
 import SettingsBackupAndRestore from './backup-restore';
@@ -198,9 +199,9 @@ export const Settings = ({ navigation }) => {
 
   return (
     <>
-      <ContainerTopSection>
+      <ContainerHeader>
         <TopHeader title="Settings" isBack={false} screen="Settings" />
-      </ContainerTopSection>
+      </ContainerHeader>
       <View
         style={{
           height: '100%',

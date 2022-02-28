@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTracked } from '../../provider';
-import { SIZE } from '../../utils/SizeUtils';
-import Paragraph from '../Typography/Paragraph';
+import { SIZE } from '../../utils/size';
+import Paragraph from '../ui/typography/paragraph';
 import { getStyle } from './functions';
 
 export const Description = ({ text, style = {} }) => {

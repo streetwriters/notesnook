@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
 import { useTracked } from '../../../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
-import { sleep } from '../../../../utils/TimeUtils';
+import { sleep } from '../../../../utils/time';
 
 const ToolbarItemPin = ({ format, color }) => {
   const [state] = useTracked();

@@ -17,19 +17,19 @@ import Navigation from '../../services/Navigation';
 import Sync from '../../services/Sync';
 import { dHeight } from '../../utils';
 import { db } from '../../utils/database';
-import { eApplyChanges, eShowMergeDialog, refreshNotesPage } from '../../utils/Events';
+import { eApplyChanges, eShowMergeDialog, refreshNotesPage } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
-import { normalize, SIZE } from '../../utils/SizeUtils';
-import { timeConverter } from '../../utils/TimeUtils';
+import { normalize, SIZE } from '../../utils/size';
+import { timeConverter } from '../../utils/time';
 import { getNote, sourceUri, updateNoteInEditor } from '../../views/Editor/Functions';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
-import DialogContainer from '../Dialog/dialog-container';
-import DialogHeader from '../Dialog/dialog-header';
-import Seperator from '../Seperator';
-import Paragraph from '../Typography/Paragraph';
+import { IconButton } from '../ui/icon-button';
+import { Button } from '../ui/button';
+import BaseDialog from '../dialog/base-dialog';
+import DialogButtons from '../dialog/dialog-buttons';
+import DialogContainer from '../dialog/dialog-container';
+import DialogHeader from '../dialog/dialog-header';
+import Seperator from '../ui/seperator';
+import Paragraph from '../ui/typography/paragraph';
 
 const primaryWebView = createRef();
 const secondaryWebView = createRef();
@@ -324,7 +324,7 @@ const MergeEditor = () => {
                 flexShrink: 1
               }}
             >
-              <ActionIcon onPress={close} color={colors.pri} name="arrow-left" />
+              <IconButton onPress={close} color={colors.pri} name="arrow-left" />
               <Paragraph style={{ flexWrap: 'wrap' }} color={colors.icon} size={SIZE.xs}>
                 <Text style={{ color: colors.accent, fontWeight: 'bold' }}>(This Device)</Text>
                 {'\n'}

@@ -5,10 +5,10 @@ import { notesnook } from '../../../e2e/test.ids';
 import { useEditorStore, useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { getCurrentColors } from '../../utils/Colors';
-import { eOnLoadNote } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
+import { getCurrentColors } from '../../utils/color-scheme';
+import { eOnLoadNote } from '../../utils/events';
+import { tabBarRef } from '../../utils/global-refs';
+import { sleep } from '../../utils/time';
 import EditorHeader from './EditorHeader';
 import {
   disableEditing,

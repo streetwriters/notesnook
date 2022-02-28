@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTracked } from '../../provider';
-import Paragraph from '../Typography/Paragraph';
+import Paragraph from '../ui/typography/paragraph';
 import { getStyle } from './functions';
 
 export const Body = ({ text, style = {} }) => {

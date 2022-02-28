@@ -3,10 +3,10 @@ import { View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../../../provider';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
-import { normalize, SIZE } from '../../../../utils/SizeUtils';
+import { normalize, SIZE } from '../../../../utils/size';
 import { formatSelection, properties, rgbToHex } from './constants';
 import { execCommands } from './commands';
-import { MMKV } from '../../../../utils/mmkv';
+import { MMKV } from '../../../../utils/database/mmkv';
 
 const ColorItem = ({ value, format, onCustomPress, checked }) => {
   const [state] = useTracked();

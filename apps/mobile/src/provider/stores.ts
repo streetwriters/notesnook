@@ -1,33 +1,33 @@
-import { LayoutAnimation, Platform, UIManager } from 'react-native';
-import { Dimensions } from 'react-native';
+//@ts-ignore
+import { groupArray } from 'notes-core/utils/grouping';
+import { Dimensions, Platform } from 'react-native';
 import create from 'zustand';
-import PremiumService from '../services/PremiumService';
-import { history, SUBSCRIPTION_STATUS } from '../utils';
 import { APP_VERSION } from '../../version';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
+import PremiumService from '../services/PremiumService';
+import { history } from '../utils';
+import { SUBSCRIPTION_STATUS } from '../utils/constants';
 import { db } from '../utils/database';
-import { MMKV } from '../utils/mmkv';
+import { MMKV } from '../utils/database/mmkv';
+import layoutmanager from '../utils/layout-manager';
+import { EditorWebView } from '../views/Editor/Functions';
+import tiny from '../views/Editor/tiny/tiny';
+import { endSearch } from '../views/Editor/tiny/toolbar/commands';
 import {
+  Announcement,
+  EditorStore,
+  FavoriteStore,
   MenuStore,
   MessageStore,
-  NoteStore,
   NotebookStore,
-  TagStore,
-  TrashStore,
+  NoteStore,
   SearchStore,
   SelectionStore,
   SettingStore,
-  EditorStore,
-  FavoriteStore,
-  UserStore,
-  Announcement
+  TagStore,
+  TrashStore,
+  UserStore
 } from './interfaces';
-//@ts-ignore
-import { groupArray } from 'notes-core/utils/grouping';
-import { EditorWebView, post } from '../views/Editor/Functions';
-import tiny from '../views/Editor/tiny/tiny';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
-import { endSearch } from '../views/Editor/tiny/toolbar/commands';
-import layoutmanager from '../utils/layout-manager';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],

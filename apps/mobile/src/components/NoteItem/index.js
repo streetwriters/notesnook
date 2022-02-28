@@ -7,16 +7,16 @@ import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
 import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { COLORS_NOTE } from '../../utils/Colors';
+import { COLORS_NOTE } from '../../utils/color-scheme';
 import { db } from '../../utils/database';
-import { refreshNotesPage } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import { TimeSince } from '../Menu/TimeSince';
-import { Properties } from '../Properties';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
+import { refreshNotesPage } from '../../utils/events';
+import { SIZE } from '../../utils/size';
+import { IconButton } from '../ui/icon-button';
+import { Button } from '../ui/button';
+import { TimeSince } from '../side-menu/TimeSince';
+import { Properties } from '../properties';
+import Heading from '../ui/typography/heading';
+import Paragraph from '../ui/typography/paragraph';
 
 const navigateToTopic = topic => {
   let routeName = 'NotesPage';
@@ -282,7 +282,7 @@ const NoteItem = ({ item, isTrash, tags, dateBy = 'dateCreated', noOpen = false 
           )}
         </View>
       </View>
-      <ActionIcon
+      <IconButton
         testID={notesnook.listitem.menu}
         color={colors.pri}
         name="dots-horizontal"

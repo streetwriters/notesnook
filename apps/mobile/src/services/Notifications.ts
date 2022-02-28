@@ -1,17 +1,16 @@
-import { useNoteStore } from './../provider/stores';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Platform } from 'react-native';
 import PushNotification, {
   Importance,
   PushNotificationDeliveredObject
 } from 'react-native-push-notification';
-import { eSendEvent } from './EventManager';
-import { db } from '../utils/database';
-import { DDS } from './DeviceDetection';
-import { tabBarRef } from '../utils/Refs';
-import { eOnLoadNote } from '../utils/Events';
 import { editing } from '../utils';
-import { MMKV } from '../utils/mmkv';
+import { db } from '../utils/database';
+import { MMKV } from '../utils/database/mmkv';
+import { eOnLoadNote } from '../utils/events';
+import { tabBarRef } from '../utils/global-refs';
+import { useNoteStore } from './../provider/stores';
+import { DDS } from './DeviceDetection';
+import { eSendEvent } from './EventManager';
 import SettingsService from './SettingsService';
 
 const NOTIFICATION_TAG = 'notesnook';
@@ -20,7 +19,7 @@ let pinned: PushNotificationDeliveredObject[] = [];
 
 function loadNote(id: string, jump: boolean) {
   if (!id || id === 'notesnook_note_input') return;
-  let note = db.notes.note(id).data;
+  let note = db.notes?.note(id).data;
   if (!DDS.isTab && jump) {
     tabBarRef.current?.goToPage(1);
   }
@@ -82,7 +81,7 @@ function init() {
             id: 256266
           });
           await db.init();
-          await db.notes.add({
+          await db.notes?.add({
             content: {
               type: 'tiny',
               //@ts-ignore

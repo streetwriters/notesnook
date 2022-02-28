@@ -1,9 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
-import { PressableButton } from '../../components/PressableButton';
-import Paragraph from '../../components/Typography/Paragraph';
+import { PressableButton } from '../../components/ui/pressable';
+import Paragraph from '../../components/ui/typography/paragraph';
 import { useTracked } from '../../provider';
-import { SIZE } from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/size';
 
 export const CustomButton = ({ title, tagline, customComponent, onPress, color = null }) => {
   const [state] = useTracked();

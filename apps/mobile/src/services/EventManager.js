@@ -5,7 +5,7 @@ import {
   eOpenProgressDialog,
   eOpenVaultDialog,
   eShowToast
-} from '../utils/Events';
+} from '../utils/events';
 const eventManager = new EventManager();
 
 export const eSubscribeEvent = (eventName, action) => {

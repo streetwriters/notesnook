@@ -4,13 +4,13 @@ import { useTracked } from '../../provider';
 import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { getElevation } from '../../utils';
-import { eCloseResultDialog, eOpenResultDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import Seperator from '../Seperator';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
+import { eCloseResultDialog, eOpenResultDialog } from '../../utils/events';
+import { SIZE } from '../../utils/size';
+import { Button } from '../ui/button';
+import BaseDialog from '../dialog/base-dialog';
+import Seperator from '../ui/seperator';
+import Heading from '../ui/typography/heading';
+import Paragraph from '../ui/typography/paragraph';
 import { ProFeatures } from './pro-features';
 
 const ResultDialog = () => {

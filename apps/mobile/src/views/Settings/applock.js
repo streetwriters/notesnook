@@ -2,20 +2,20 @@ import React, { useState } from 'react';
 import { LayoutAnimation, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BiometricService from '../../services/BiometricService';
-import { PressableButton } from '../../components/PressableButton';
-import Seperator from '../../components/Seperator';
-import Heading from '../../components/Typography/Heading';
-import Paragraph from '../../components/Typography/Paragraph';
+import { PressableButton } from '../../components/ui/pressable';
+import Seperator from '../../components/ui/seperator';
+import Heading from '../../components/ui/typography/heading';
+import Paragraph from '../../components/ui/typography/paragraph';
 import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
 import { presentSheet } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import { SIZE } from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/size';
 import { db } from '../../utils/database';
-import { WelcomeNotice } from '../../components/SplashScreen/welcome';
-import { Button } from '../../components/Button';
+import { WelcomeNotice } from '../../components/intro/welcome';
+import { Button } from '../../components/ui/button';
 import { getElevation } from '../../utils';
-import umami from '../../utils/umami';
+import umami from '../../utils/analytics';
 
 const AppLock = ({ welcome, s = 0 }) => {
   const [state] = useTracked();

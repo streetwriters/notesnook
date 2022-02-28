@@ -1,10 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
-import Heading from '../../../../components/Typography/Heading';
+import Heading from '../../../../components/ui/typography/heading';
 import { useTracked } from '../../../../provider';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Paragraph from '../../../../components/Typography/Paragraph';
+import Paragraph from '../../../../components/ui/typography/paragraph';
 const ToolbarListFormat = ({ selected, formatValue, format }) => {
   const [state] = useTracked();
   const { colors } = state;

@@ -6,17 +6,17 @@ import { useTracked } from '../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { db } from '../../utils/database';
-import { eClosePublishNoteDialog, eOpenPublishNoteDialog } from '../../utils/Events';
+import { eClosePublishNoteDialog, eOpenPublishNoteDialog } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import SheetWrapper from '../Sheet';
-import { Button } from '../Button';
-import DialogHeader from '../Dialog/dialog-header';
-import Input from '../Input';
-import Seperator from '../Seperator';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
+import { SIZE } from '../../utils/size';
+import { IconButton } from '../ui/icon-button';
+import SheetWrapper from '../ui/sheet';
+import { Button } from '../ui/button';
+import DialogHeader from '../dialog/dialog-header';
+import Input from '../ui/input';
+import Seperator from '../ui/seperator';
+import Heading from '../ui/typography/heading';
+import Paragraph from '../ui/typography/paragraph';
 import { useAttachmentStore } from '../../provider/stores';
 import { editing } from '../../utils';
 
@@ -203,7 +203,7 @@ const PublishNoteDialog = () => {
                   </Paragraph>
                 </View>
 
-                <ActionIcon
+                <IconButton
                   onPress={() => {
                     Clipboard.setString(publishUrl);
                     ToastEvent.show({
@@ -232,7 +232,7 @@ const PublishNoteDialog = () => {
                 marginBottom: 10
               }}
             >
-              <ActionIcon
+              <IconButton
                 onPress={() => {
                   if (publishing) return;
                   setIsLocked(!isLocked);
@@ -265,7 +265,7 @@ const PublishNoteDialog = () => {
                 alignItems: 'center'
               }}
             >
-              <ActionIcon
+              <IconButton
                 onPress={() => {
                   setSelfDestruct(!selfDestruct);
                 }}

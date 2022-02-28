@@ -3,11 +3,11 @@ import React from 'react';
 import { Linking, Platform, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ChangePassword } from '../../components/Auth/change-password';
-import { Button } from '../../components/Button';
-import Seperator from '../../components/Seperator';
-import Heading from '../../components/Typography/Heading';
-import Paragraph from '../../components/Typography/Paragraph';
+import { ChangePassword } from '../../components/auth/change-password';
+import { Button } from '../../components/ui/button';
+import Seperator from '../../components/ui/seperator';
+import Heading from '../../components/ui/typography/heading';
+import Paragraph from '../../components/ui/typography/paragraph';
 import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
@@ -17,15 +17,15 @@ import {
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
   SUBSCRIPTION_STATUS_STRINGS
-} from '../../utils';
+} from '../../utils/constants';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenRecoveryKeyDialog
-} from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+} from '../../utils/events';
+import { SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
 import { CustomButton } from './button';
 import { verifyUser } from './functions';
 

@@ -3,11 +3,10 @@ import { Platform } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import RNFetchBlob from 'rn-fetch-blob';
-import showdown from 'showdown';
 import { toTXT } from '../utils';
 import { db } from '../utils/database';
-import { sanitizeFilename } from '../utils/filename';
-import Storage from '../utils/storage';
+import { sanitizeFilename } from '../utils/sanitizer';
+import Storage from '../utils/database/storage';
 
 const defaultStyle = `<style>
 .img_size_one {

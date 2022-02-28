@@ -4,13 +4,13 @@ import DocumentPicker from 'react-native-document-picker';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-import { Attachment } from '../../../../components/AttachmentDialog';
+import { AttachmentItem } from '../../../../components/AttachmentDialog/attachment-item';
 import { eSendEvent, presentSheet, ToastEvent } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import { editing } from '../../../../utils';
 import { db } from '../../../../utils/database';
-import { eCloseProgressDialog } from '../../../../utils/Events';
-import { sleep } from '../../../../utils/TimeUtils';
+import { eCloseProgressDialog } from '../../../../utils/events';
+import { sleep } from '../../../../utils/time';
 import { EditorWebView, getNote } from '../../Functions';
 import tiny, { safeKeyboardDismiss } from '../tiny';
 
@@ -28,7 +28,7 @@ const showEncryptionSheet = file => {
           paddingHorizontal: 12
         }}
       >
-        <Attachment
+        <AttachmentItem
           attachment={{
             metadata: {
               filename: file.name

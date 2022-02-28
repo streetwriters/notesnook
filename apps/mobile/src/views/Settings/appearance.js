@@ -4,8 +4,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
-import { PressableButton } from '../../components/PressableButton';
-import Paragraph from '../../components/Typography/Paragraph';
+import { PressableButton } from '../../components/ui/pressable';
+import Paragraph from '../../components/ui/typography/paragraph';
 import { useTracked } from '../../provider';
 import { Actions } from '../../provider/Actions';
 import { useSettingStore } from '../../provider/stores';
@@ -13,7 +13,7 @@ import { DDS } from '../../services/DeviceDetection';
 import { ToastEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
-import { MenuItemsList } from '../../utils';
+import { MenuItemsList } from '../../utils/constants';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -21,11 +21,11 @@ import {
   COLOR_SCHEME_LIGHT,
   COLOR_SCHEME_PITCH_BLACK,
   setColorScheme
-} from '../../utils/Colors';
-import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { pv, SIZE } from '../../utils/SizeUtils';
+} from '../../utils/color-scheme';
+import { hexToRGBA, RGB_Linear_Shade } from '../../utils/color-scheme/utils';
+import { MMKV } from '../../utils/database/mmkv';
+import { tabBarRef } from '../../utils/global-refs';
+import { pv, SIZE } from '../../utils/size';
 import { CustomButton } from './button';
 import SectionHeader from './section-header';
 

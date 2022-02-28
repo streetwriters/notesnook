@@ -5,15 +5,15 @@ import { useMenuStore } from '../../provider/stores';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { db } from '../../utils/database';
-import { eCloseAddTopicDialog, eOpenAddTopicDialog } from '../../utils/Events';
-import { sleep } from '../../utils/TimeUtils';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
-import DialogContainer from '../Dialog/dialog-container';
-import DialogHeader from '../Dialog/dialog-header';
-import Input from '../Input';
-import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import { eCloseAddTopicDialog, eOpenAddTopicDialog } from '../../utils/events';
+import { sleep } from '../../utils/time';
+import BaseDialog from '../dialog/base-dialog';
+import DialogButtons from '../dialog/dialog-buttons';
+import DialogContainer from '../dialog/dialog-container';
+import DialogHeader from '../dialog/dialog-header';
+import Input from '../ui/input';
+import Seperator from '../ui/seperator';
+import { Toast } from '../toast';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {

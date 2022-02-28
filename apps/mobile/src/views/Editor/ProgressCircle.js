@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import * as Progress from 'react-native-progress';
 import { useTracked } from '../../provider';
 import { useAttachmentStore } from '../../provider/stores';
-import { SIZE } from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/size';
 
 export const ProgressCircle = () => {
   const [state] = useTracked();

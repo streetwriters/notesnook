@@ -7,17 +7,17 @@ import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { db } from '../../utils/database';
-import { eCloseAddNotebookDialog, eOpenAddNotebookDialog } from '../../utils/Events';
-import { ph, pv, SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import DialogHeader from '../Dialog/dialog-header';
-import Input from '../Input';
+import { eCloseAddNotebookDialog, eOpenAddNotebookDialog } from '../../utils/events';
+import { ph, pv, SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
+import { IconButton } from '../ui/icon-button';
+import { Button } from '../ui/button';
+import DialogHeader from '../dialog/dialog-header';
+import Input from '../ui/input';
 import { MoveNotes } from '../MoveNoteDialog/movenote';
-import Seperator from '../Seperator';
-import SheetWrapper from '../Sheet';
-import { Toast } from '../Toast';
+import Seperator from '../ui/seperator';
+import SheetWrapper from '../ui/sheet';
+import { Toast } from '../toast';
 
 let refs = [];
 
@@ -477,7 +477,7 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
           justifyContent: 'flex-end'
         }}
       >
-        <ActionIcon
+        <IconButton
           onPress={() => {
             onPress(item, index);
           }}
@@ -485,7 +485,7 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
           size={SIZE.lg - 5}
           color={colors.icon}
         />
-        <ActionIcon
+        <IconButton
           onPress={() => {
             onDelete(index);
           }}

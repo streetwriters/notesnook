@@ -31,7 +31,7 @@ import {
   COLOR_SCHEME_LIGHT,
   COLOR_SCHEME_PITCH_BLACK,
   setColorScheme
-} from '../../utils/Colors';
+} from '../../utils/color-scheme';
 import { db } from '../../utils/database';
 import {
   eOpenAddNotebookDialog,
@@ -41,11 +41,11 @@ import {
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
-} from '../../utils/Events';
+} from '../../utils/events';
 import { deleteItems } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { sleep } from '../../utils/TimeUtils';
-import { presentDialog } from '../Dialog/functions';
+import { MMKV } from '../../utils/database/mmkv';
+import { sleep } from '../../utils/time';
+import { presentDialog } from '../dialog/functions';
 import { MoveNotes } from '../MoveNoteDialog/movenote';
 import NoteHistory from '../NoteHistory';
 import tiny from '../../views/Editor/tiny/tiny.js';

@@ -3,8 +3,8 @@ import { TextInput } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 import { useTracked } from '../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import { SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
 import { post, _onMessage } from './Functions';
 
 const opacityVal = new Animated.Value(0);

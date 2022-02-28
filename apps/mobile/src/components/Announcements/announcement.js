@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, View } from 'react-native';
 import { useTracked } from '../../provider';
 import { useMessageStore, useSelectionStore } from '../../provider/stores';
-import { Button } from '../Button';
+import { Button } from '../ui/button';
 import { allowedOnPlatform, renderItem } from './functions';
 
 export const Announcement = ({ color }) => {

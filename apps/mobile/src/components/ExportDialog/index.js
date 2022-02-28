@@ -8,18 +8,18 @@ import { useTracked } from '../../provider';
 import { ToastEvent } from '../../services/EventManager';
 import Exporter from '../../services/Exporter';
 import { getElevation } from '../../utils';
-import { ph, pv, SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import SheetWrapper from '../Sheet';
-import { Button } from '../Button';
-import DialogHeader from '../Dialog/dialog-header';
-import { PressableButton } from '../PressableButton';
-import Seperator from '../Seperator';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
+import { ph, pv, SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
+import SheetWrapper from '../ui/sheet';
+import { Button } from '../ui/button';
+import DialogHeader from '../dialog/dialog-header';
+import { PressableButton } from '../ui/pressable';
+import Seperator from '../ui/seperator';
+import Heading from '../ui/typography/heading';
+import Paragraph from '../ui/typography/paragraph';
 
 const { eSubscribeEvent, eUnSubscribeEvent } = require('../../services/EventManager');
-const { eOpenExportDialog, eCloseExportDialog } = require('../../utils/Events');
+const { eOpenExportDialog, eCloseExportDialog } = require('../../utils/events');
 
 const ExportDialog = () => {
   const [state] = useTracked();

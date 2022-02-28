@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MMKV } from '../utils/mmkv';
+import { MMKV } from '../utils/database/mmkv';
 
 //@ts-ignore
 Array.prototype.sample = function () {

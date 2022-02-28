@@ -6,8 +6,8 @@ import {
   useTagStore,
   useTrashStore
 } from '../provider/stores';
-import { eOnNewTopicAdded, refreshNotesPage } from '../utils/Events';
-import { rootNavigatorRef, tabBarRef } from '../utils/Refs';
+import { eOnNewTopicAdded, refreshNotesPage } from '../utils/events';
+import { rootNavigatorRef, tabBarRef } from '../utils/global-refs';
 import { eSendEvent } from './EventManager';
 import SettingsService from './SettingsService';
 

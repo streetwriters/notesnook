@@ -23,10 +23,6 @@ export function validatePass(password) {
 
   let errors = {
     SHORT_PASS: true
-    //  NO_ABC: true,
-    //  NO_CAPS_ABC: true,
-    //  NO_NUM: true,
-    // SPECIAL: true,
   };
 
   if (password.length >= 8) {

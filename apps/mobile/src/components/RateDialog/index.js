@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Linking, Platform, View } from 'react-native';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { eCloseRateDialog, eOpenRateDialog } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
-import SheetWrapper from '../Sheet';
-import { Button } from '../Button';
-import Seperator from '../Seperator';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
-import { STORE_LINK } from '../../utils';
+import { eCloseRateDialog, eOpenRateDialog } from '../../utils/events';
+import { MMKV } from '../../utils/database/mmkv';
+import { SIZE } from '../../utils/size';
+import SheetWrapper from '../ui/sheet';
+import { Button } from '../ui/button';
+import Seperator from '../ui/seperator';
+import Heading from '../ui/typography/heading';
+import Paragraph from '../ui/typography/paragraph';
+import { STORE_LINK } from '../../utils/constants';
 import { clearMessage } from '../../services/Message';
 
 const RateDialog = () => {

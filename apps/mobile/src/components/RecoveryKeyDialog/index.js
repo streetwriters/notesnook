@@ -1,31 +1,25 @@
+import Clipboard from '@react-native-clipboard/clipboard';
 import React, { createRef } from 'react';
 import { Platform, View } from 'react-native';
+import FileViewer from 'react-native-file-viewer';
 import QRCode from 'react-native-qrcode-svg';
+import * as ScopedStorage from 'react-native-scoped-storage';
 import Share from 'react-native-share';
 import { LOGO_BASE64 } from '../../assets/images/assets';
-import Clipboard from '@react-native-clipboard/clipboard';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from '../../services/EventManager';
-import { db } from '../../utils/database';
-import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
-import { sanitizeFilename } from '../../utils/filename';
-import { SIZE } from '../../utils/SizeUtils';
-import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
-import SheetWrapper from '../Sheet';
-import { Button } from '../Button';
-import DialogHeader from '../Dialog/dialog-header';
-import Seperator from '../Seperator';
-import Paragraph from '../Typography/Paragraph';
-import FileViewer from 'react-native-file-viewer';
-
-import * as ScopedStorage from 'react-native-scoped-storage';
-import { MMKV } from '../../utils/mmkv';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import { clearMessage } from '../../services/Message';
+import { db } from '../../utils/database';
+import { eOpenRecoveryKeyDialog } from '../../utils/events';
+import { MMKV } from '../../utils/database/mmkv';
+import { sanitizeFilename } from '../../utils/sanitizer';
+import { SIZE } from '../../utils/size';
+import Storage from '../../utils/database/storage';
+import { sleep } from '../../utils/time';
+import { Button } from '../ui/button';
+import DialogHeader from '../dialog/dialog-header';
+import Seperator from '../ui/seperator';
+import SheetWrapper from '../ui/sheet';
+import Paragraph from '../ui/typography/paragraph';
 
 let RNFetchBlob;
 

@@ -1,17 +1,17 @@
 import { groupArray } from 'notes-core/utils/grouping';
 import React, { useEffect, useRef, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header';
-import SelectionHeader from '../../components/SelectionHeader';
-import SimpleList from '../../components/SimpleList';
-import { NotebookHeader } from '../../components/SimpleList/notebook-header';
+import { FloatingButton } from '../../components/container/floating-button';
+import { ContainerHeader } from '../../components/container/containerheader';
+import { Header } from '../../components/header';
+import SelectionHeader from '../../components/selection-header';
+import List from '../../components/list';
+import { NotebookHeader } from '../../components/list/notebook-header';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
-import { eOnNewTopicAdded, eOpenAddNotebookDialog, eOpenAddTopicDialog } from '../../utils/Events';
+import { eOnNewTopicAdded, eOpenAddNotebookDialog, eOpenAddTopicDialog } from '../../utils/events';
 
 export const Notebook = ({ route, navigation }) => {
   const [topics, setTopics] = useState(
@@ -82,15 +82,15 @@ export const Notebook = ({ route, navigation }) => {
     <>
       <SelectionHeader screen="Notebook" />
 
-      <ContainerTopSection>
+      <ContainerHeader>
         <Header
           title={params.current.title}
           isBack={!params.current.menu}
           screen="Notebook"
           action={_onPressBottomButton}
         />
-      </ContainerTopSection>
-      <SimpleList
+      </ContainerHeader>
+      <List
         listData={topics}
         type="topics"
         refreshCallback={() => {
@@ -124,7 +124,7 @@ export const Notebook = ({ route, navigation }) => {
         }}
       />
 
-      <ContainerBottomButton title="Add new topic" onPress={_onPressBottomButton} />
+      <FloatingButton title="Add new topic" onPress={_onPressBottomButton} />
     </>
   );
 };

@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Platform, View, ScrollView } from 'react-native';
-import { ActionIcon } from '../../../../components/ActionIcon';
+import { IconButton } from '../../../../components/ui/icon-button';
 import { useTracked } from '../../../../provider';
 import { useEditorStore } from '../../../../provider/stores';
 import { getElevation } from '../../../../utils';
 import { db } from '../../../../utils/database';
-import { normalize } from '../../../../utils/SizeUtils';
+import { normalize } from '../../../../utils/size';
 import { EditorWebView, getNote, setNoteOnly } from '../../Functions';
 import HistoryComponent from '../../HistoryComponent';
 import tiny from '../tiny';
@@ -49,7 +49,7 @@ const EditorToolbar = React.memo(
           }}
         >
           {readonly ? (
-            <ActionIcon
+            <IconButton
               name="pencil-lock"
               type="grayBg"
               onPress={onPress}

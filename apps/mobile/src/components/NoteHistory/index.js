@@ -6,13 +6,13 @@ import { useTracked } from '../../provider';
 import { presentSheet } from '../../services/EventManager';
 import { db } from '../../utils/database';
 import { openLinkInBrowser } from '../../utils/functions';
-import { SIZE } from '../../utils/SizeUtils';
-import { timeConverter, timeSince } from '../../utils/TimeUtils';
-import DialogHeader from '../Dialog/dialog-header';
-import GeneralSheet from '../GeneralSheet';
-import { PressableButton } from '../PressableButton';
-import Seperator from '../Seperator';
-import Paragraph from '../Typography/Paragraph';
+import { SIZE } from '../../utils/size';
+import { timeConverter, timeSince } from '../../utils/time';
+import DialogHeader from '../dialog/dialog-header';
+import SheetProvider from '../sheet-provider';
+import { PressableButton } from '../ui/pressable';
+import Seperator from '../ui/seperator';
+import Paragraph from '../ui/typography/paragraph';
 import NotePreview from './preview';
 
 export default function NoteHistory({ note, ref }) {
@@ -82,7 +82,7 @@ export default function NoteHistory({ note, ref }) {
 
   return (
     <View>
-      <GeneralSheet context="note_history" />
+      <SheetProvider context="note_history" />
       <DialogHeader
         title="Note history"
         paragraph="Revert back to an older version of this note"

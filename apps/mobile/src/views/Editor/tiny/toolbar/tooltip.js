@@ -4,7 +4,7 @@ import { useTracked } from '../../../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
 import { editing } from '../../../../utils';
 import layoutmanager from '../../../../utils/layout-manager';
-import { normalize } from '../../../../utils/SizeUtils';
+import { normalize } from '../../../../utils/size';
 import { EditorWebView } from '../../Functions';
 import tiny from '../tiny';
 import ColorGroup from './colorgroup';

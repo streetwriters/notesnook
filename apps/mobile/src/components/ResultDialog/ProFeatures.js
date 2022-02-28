@@ -3,10 +3,10 @@ import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
 import { eSendEvent } from '../../services/EventManager';
-import { eCloseProgressDialog, eCloseResultDialog, eOpenPremiumDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import Paragraph from '../Typography/Paragraph';
+import { eCloseProgressDialog, eCloseResultDialog, eOpenPremiumDialog } from '../../utils/events';
+import { SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
+import Paragraph from '../ui/typography/paragraph';
 export const ProFeatures = ({ count = 6 }) => {
   const [state, dispatch] = useTracked();
   const { colors } = state;

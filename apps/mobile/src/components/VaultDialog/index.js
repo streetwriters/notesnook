@@ -20,19 +20,19 @@ import {
   eCloseVaultDialog,
   eOnLoadNote,
   eOpenVaultDialog
-} from '../../utils/Events';
+} from '../../utils/events';
 import { deleteItems } from '../../utils/functions';
-import { tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
+import { tabBarRef } from '../../utils/global-refs';
+import { sleep } from '../../utils/time';
 import { getNote } from '../../views/Editor/Functions';
-import { Button } from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
-import DialogHeader from '../Dialog/dialog-header';
-import Input from '../Input';
-import Seperator from '../Seperator';
-import { Toast } from '../Toast';
-import Paragraph from '../Typography/Paragraph';
+import { Button } from '../ui/button';
+import BaseDialog from '../dialog/base-dialog';
+import DialogButtons from '../dialog/dialog-buttons';
+import DialogHeader from '../dialog/dialog-header';
+import Input from '../ui/input';
+import Seperator from '../ui/seperator';
+import { Toast } from '../toast';
+import Paragraph from '../ui/typography/paragraph';
 
 let Keychain;
 const passInputRef = createRef();
@@ -703,7 +703,7 @@ export class VaultDialog extends Component {
                   onSubmit={() => {
                     changePassword ? changePassInputRef.current?.focus() : this.onPress;
                   }}
-                  autoCompleteType="password"
+                  autoComplete="password"
                   returnKeyLabel={changePassword ? 'Next' : this.state.title}
                   returnKeyType={changePassword ? 'next' : 'done'}
                   secureTextEntry
@@ -755,7 +755,7 @@ export class VaultDialog extends Component {
                   onChangeText={value => {
                     this.newPassword = value;
                   }}
-                  autoCompleteType="password"
+                  autoComplete="password"
                   onSubmit={this.onPress}
                   returnKeyLabel="Change"
                   returnKeyType="done"
@@ -774,7 +774,7 @@ export class VaultDialog extends Component {
                   onChangeText={value => {
                     this.password = value;
                   }}
-                  autoCompleteType="password"
+                  autoComplete="password"
                   returnKeyLabel="Next"
                   returnKeyType="next"
                   secureTextEntry
@@ -794,7 +794,7 @@ export class VaultDialog extends Component {
                   errorMessage="Passwords do not match."
                   onErrorCheck={e => null}
                   marginBottom={0}
-                  autoCompleteType="password"
+                  autoComplete="password"
                   returnKeyLabel="Create"
                   returnKeyType="done"
                   onChangeText={value => {

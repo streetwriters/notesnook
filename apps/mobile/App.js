@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Orientation from 'react-native-orientation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import AppLoader from './src/components/AppLoader';
+import Launcher from './src/components/launcher';
 import { RootView } from './src/navigation/RootView';
 import { useTracked } from './src/provider';
 import { initialize, useSettingStore, useUserStore } from './src/provider/stores';
@@ -10,11 +10,10 @@ import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from './src/services/E
 import Notifications from './src/services/Notifications';
 import SettingsService from './src/services/SettingsService';
 import { TipManager } from './src/services/tip-manager';
-import { Tracker } from './src/utils';
 import { db } from './src/utils/database';
-import { eDispatchAction } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
-import { useAppEvents } from './src/utils/use-app-events';
+import { eDispatchAction } from './src/utils/events';
+import { useAppEvents } from './src/utils/hooks/use-app-events';
+import { MMKV } from './src/utils/database/mmkv';
 
 let databaseHasLoaded = false;
 
@@ -78,9 +77,6 @@ const App = () => {
         await TipManager.init();
         await loadDatabase();
         useUserStore.getState().setUser(await db.user.getUser());
-        if (SettingsService.get().telemetry) {
-          Tracker.record('3c6890ce-8410-49d5-8831-15fb2eb28a21');
-        }
       } catch (e) {
       } finally {
         databaseHasLoaded = true;
@@ -103,7 +99,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <RootView />
-      <AppLoader onLoad={loadMainApp} />
+      <Launcher onLoad={loadMainApp} />
     </SafeAreaProvider>
   );
 };

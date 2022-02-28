@@ -2,12 +2,12 @@ import { getLinkPreview } from 'link-preview-js';
 import React, { useEffect, useState } from 'react';
 import { Image, Linking, ScrollView, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ActionIcon } from '../../../../components/ActionIcon';
-import Heading from '../../../../components/Typography/Heading';
-import Paragraph from '../../../../components/Typography/Paragraph';
+import { IconButton } from '../../../../components/ui/icon-button';
+import Heading from '../../../../components/ui/typography/heading';
+import Paragraph from '../../../../components/ui/typography/paragraph';
 import { useTracked } from '../../../../provider';
 import { openLinkInBrowser } from '../../../../utils/functions';
-import { SIZE } from '../../../../utils/SizeUtils';
+import { SIZE } from '../../../../utils/size';
 import { INPUT_MODE, properties, reFocusEditor } from './constants';
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
@@ -178,7 +178,7 @@ const LinkPreview = ({ setMode, value, onSubmit }) => {
           alignItems: 'center'
         }}
       >
-        <ActionIcon
+        <IconButton
           onPress={() => {
             onSubmit('clear');
           }}
@@ -191,7 +191,7 @@ const LinkPreview = ({ setMode, value, onSubmit }) => {
           size={SIZE.xl}
           color={colors.pri}
         />
-        <ActionIcon
+        <IconButton
           onPress={async () => {
             properties.pauseSelectionChange = true;
             setMode(INPUT_MODE.EDITING);

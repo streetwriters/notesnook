@@ -4,8 +4,8 @@ import { useTracked } from '../../provider';
 import { useMessageStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { eCloseAnnouncementDialog, eOpenAnnouncementDialog } from '../../utils/Events';
-import BaseDialog from '../Dialog/base-dialog';
+import { eCloseAnnouncementDialog, eOpenAnnouncementDialog } from '../../utils/events';
+import BaseDialog from '../dialog/base-dialog';
 import { allowedOnPlatform, renderItem } from './functions';
 
 export const AnnouncementDialog = () => {

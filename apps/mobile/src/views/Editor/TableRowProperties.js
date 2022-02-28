@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { Button } from '../../components/Button';
-import Heading from '../../components/Typography/Heading';
+import { Button } from '../../components/ui/button';
+import Heading from '../../components/ui/typography/heading';
 import { useTracked } from '../../provider';
 import {
   eSendEvent,
@@ -11,7 +11,7 @@ import {
   presentSheet
 } from '../../services/EventManager';
 import layoutmanager from '../../utils/layout-manager';
-import { SIZE } from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/size';
 import { EditorWebView } from './Functions';
 import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';

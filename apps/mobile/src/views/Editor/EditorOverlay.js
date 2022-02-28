@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
-import { Button } from '../../components/Button';
-import Heading from '../../components/Typography/Heading';
-import Paragraph from '../../components/Typography/Paragraph';
+import { Button } from '../../components/ui/button';
+import Heading from '../../components/ui/typography/heading';
+import Paragraph from '../../components/ui/typography/paragraph';
 import { useTracked } from '../../provider';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { editing } from '../../utils';
-import { eOnLoadNote } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
+import { eOnLoadNote } from '../../utils/events';
+import { SIZE } from '../../utils/size';
+import { sleep, timeConverter } from '../../utils/time';
 
 let timer = null;
 let timerError = null;

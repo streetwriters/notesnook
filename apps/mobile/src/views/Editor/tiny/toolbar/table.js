@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { PressableButton } from '../../../../components/PressableButton';
-import Heading from '../../../../components/Typography/Heading';
-import Paragraph from '../../../../components/Typography/Paragraph';
+import { PressableButton } from '../../../../components/ui/pressable';
+import Heading from '../../../../components/ui/typography/heading';
+import Paragraph from '../../../../components/ui/typography/paragraph';
 import { useTracked } from '../../../../provider';
 import { eSendEvent } from '../../../../services/EventManager';
-import { eCloseProgressDialog } from '../../../../utils/Events';
-import { SIZE } from '../../../../utils/SizeUtils';
+import { eCloseProgressDialog } from '../../../../utils/events';
+import { SIZE } from '../../../../utils/size';
 import { execCommands } from './commands';
 import { formatSelection } from './constants';
 

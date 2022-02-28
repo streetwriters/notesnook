@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { Button } from '../../../../components/Button';
-import Input from '../../../../components/Input';
+import { Button } from '../../../../components/ui/button';
+import Input from '../../../../components/ui/input';
 import { useTracked } from '../../../../provider';
 import { useEditorStore, useSettingStore } from '../../../../provider/stores';
-import { TipManager } from '../../../../services/tip-manager';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
+import { hideAllTooltips } from '../../../../utils/hooks/use-tooltip';
 import layoutmanager from '../../../../utils/layout-manager';
-import { SIZE } from '../../../../utils/SizeUtils';
-import useTooltip, { hideAllTooltips, useTooltipHandler } from '../../../../utils/use-tooltip';
+import { SIZE } from '../../../../utils/size';
 import { EditorWebView, getNote } from '../../Functions';
 import tiny from '../tiny';
 import { endSearch } from './commands';

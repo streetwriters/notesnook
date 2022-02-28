@@ -1,12 +1,12 @@
 import { Platform } from 'react-native';
 import { enabled } from 'react-native-privacy-snapshot';
-import { updateEvent } from '../components/DialogManager/recievers';
+import { updateEvent } from '../components/dialog-provider/recievers';
 import { Actions } from '../provider/Actions';
 import { useSettingStore } from '../provider/stores';
 import { AndroidModule } from '../utils';
-import { getColorScheme } from '../utils/ColorUtils';
-import { MMKV } from '../utils/mmkv';
-import { scale, updateSize } from '../utils/SizeUtils';
+import { getColorScheme } from '../utils/color-scheme/utils';
+import { MMKV } from '../utils/database/mmkv';
+import { scale, updateSize } from '../utils/size';
 import Notifications from './Notifications';
 
 export const defaultSettings = {

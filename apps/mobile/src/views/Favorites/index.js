@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from 'react';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header';
-import { Placeholder } from '../../components/ListPlaceholders';
-import SelectionHeader from '../../components/SelectionHeader';
-import SimpleList from '../../components/SimpleList';
+import { ContainerHeader } from '../../components/container/containerheader';
+import { Header } from '../../components/header';
+import { Placeholder } from '../../components/ui/svg';
+import SelectionHeader from '../../components/selection-header';
+import List from '../../components/list';
 import { useFavoriteStore, useNoteStore } from '../../provider/stores';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
@@ -81,10 +81,10 @@ export const Favorites = ({ navigation }) => {
   return (
     <>
       <SelectionHeader screen="Favorites" />
-      <ContainerTopSection>
+      <ContainerHeader>
         <Header title="Favorites" isBack={false} screen="Favorites" />
-      </ContainerTopSection>
-      <SimpleList
+      </ContainerHeader>
+      <List
         listData={favorites}
         type="notes"
         refreshCallback={() => {
@@ -102,7 +102,6 @@ export const Favorites = ({ navigation }) => {
           heading: 'Favorites'
         }}
         focused={() => navigation.isFocused()}
-        placeholder={<Placeholder type="favorites" />}
         placeholderText="Notes you favorite appear here"
       />
     </>

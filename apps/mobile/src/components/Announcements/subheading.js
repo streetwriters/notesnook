@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTracked } from '../../provider';
-import { SIZE } from '../../utils/SizeUtils';
-import Heading from '../Typography/Heading';
+import { SIZE } from '../../utils/size';
+import Heading from '../ui/typography/heading';
 import { getStyle } from './functions';
 
 export const SubHeading = ({ text, style = {} }) => {

@@ -5,25 +5,25 @@ import { StatusBar } from 'react-native-bars';
 import Animated, { useValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
-import CustomTabs from '../components/CustomTabs';
-import { DialogManager } from '../components/DialogManager';
-import { Menu } from '../components/Menu';
-import { Toast } from '../components/Toast';
+import Tabs from '../components/tabs';
+import DialogProvider from '../components/dialog-provider';
+import { SideMenu } from '../components/side-menu';
+import { Toast } from '../components/toast';
 import { useTracked } from '../provider';
 import { useEditorStore, useSettingStore } from '../provider/stores';
 import { DDS } from '../services/DeviceDetection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
 import { editing, setWidthHeight } from '../utils';
-import { updateStatusBarColor } from '../utils/Colors';
+import { updateStatusBarColor } from '../utils/color-scheme';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor
-} from '../utils/Events';
-import { editorRef, tabBarRef } from '../utils/Refs';
-import { sleep } from '../utils/TimeUtils';
-import useTooltip, { hideAllTooltips } from '../utils/use-tooltip';
+} from '../utils/events';
+import { hideAllTooltips } from '../utils/hooks/use-tooltip';
+import { editorRef, tabBarRef } from '../utils/global-refs';
+import { sleep } from '../utils/time';
 import { EditorWrapper } from '../views/Editor/EditorWrapper';
 import { checkStatus, EditorWebView, getNote } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
@@ -76,7 +76,7 @@ export const RootView = React.memo(
       <>
         <NativeStack />
         <Toast />
-        <DialogManager />
+        <DialogProvider />
       </>
     );
   },
@@ -305,7 +305,7 @@ const NativeStack = React.memo(
           width: fullscreen ? 0 : widths[deviceMode].a
         }}
       >
-        <Menu />
+        <SideMenu />
       </View>,
       <View
         key="2"
@@ -351,7 +351,7 @@ const NativeStack = React.memo(
       >
         <StatusBar animated={true} barStyle={colors.night ? 'light-content' : 'dark-content'} />
         {deviceMode ? (
-          <CustomTabs
+          <Tabs
             ref={tabBarRef}
             dimensions={dimensions}
             widths={widths[deviceMode]}

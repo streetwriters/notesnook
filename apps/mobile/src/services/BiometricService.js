@@ -1,9 +1,9 @@
 import FingerprintScanner from 'react-native-fingerprint-scanner';
-import Storage from '../utils/storage';
+import Storage from '../utils/database/storage';
 import { ToastEvent } from './EventManager';
 import * as Keychain from 'react-native-keychain';
 import { Platform } from 'react-native';
-import { MMKV } from '../utils/mmkv';
+import { MMKV } from '../utils/database/mmkv';
 import { useSettingStore } from '../provider/stores';
 
 const CRYPT_CONFIG = Platform.select({

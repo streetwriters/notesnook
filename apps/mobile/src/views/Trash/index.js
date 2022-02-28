@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { presentDialog } from '../../components/Dialog/functions';
-import { Header } from '../../components/Header';
-import { Placeholder } from '../../components/ListPlaceholders';
-import SelectionHeader from '../../components/SelectionHeader';
-import SimpleList from '../../components/SimpleList';
+import { FloatingButton } from '../../components/container/floating-button';
+import { ContainerHeader } from '../../components/container/containerheader';
+import { presentDialog } from '../../components/dialog/functions';
+import { Header } from '../../components/header';
+import { Placeholder } from '../../components/ui/svg';
+import SelectionHeader from '../../components/selection-header';
+import List from '../../components/list';
 import { useSelectionStore, useTrashStore } from '../../provider/stores';
 import { ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -106,10 +106,10 @@ export const Trash = ({ navigation }) => {
   return (
     <>
       <SelectionHeader screen="Trash" />
-      <ContainerTopSection>
+      <ContainerHeader>
         <Header title="Trash" isBack={false} screen="Trash" action={_onPressBottomButton} />
-      </ContainerTopSection>
-      <SimpleList
+      </ContainerHeader>
+      <List
         listData={trash}
         type="trash"
         screen="Trash"
@@ -123,16 +123,11 @@ export const Trash = ({ navigation }) => {
         headerProps={{
           heading: 'Trash'
         }}
-        placeholder={<Placeholder type="trash" />}
         placeholderText="Deleted notes & notebooks appear here."
       />
 
       {trash && trash.length !== 0 ? (
-        <ContainerBottomButton
-          title="Clear all trash"
-          onPress={_onPressBottomButton}
-          shouldShow={true}
-        />
+        <FloatingButton title="Clear all trash" onPress={_onPressBottomButton} shouldShow={true} />
       ) : null}
     </>
   );

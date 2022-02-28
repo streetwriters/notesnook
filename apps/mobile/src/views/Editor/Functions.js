@@ -1,6 +1,6 @@
 import { createRef } from 'react';
 import { Platform } from 'react-native';
-import { presentDialog } from '../../components/Dialog/functions';
+import { presentDialog } from '../../components/dialog/functions';
 import { useEditorStore, useMenuStore, useTagStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import {
@@ -13,8 +13,8 @@ import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import { TipManager } from '../../services/tip-manager';
 import { editing } from '../../utils';
-import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
-import { hexToRGBA } from '../../utils/ColorUtils';
+import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/color-scheme';
+import { hexToRGBA } from '../../utils/color-scheme/utils';
 import { db } from '../../utils/database';
 import {
   eClearEditor,
@@ -22,14 +22,14 @@ import {
   eOpenTagsDialog,
   eShowGetPremium,
   eShowMergeDialog
-} from '../../utils/Events';
+} from '../../utils/events';
 import filesystem from '../../utils/filesystem';
 import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { normalize } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
-import umami from '../../utils/umami';
+import { MMKV } from '../../utils/database/mmkv';
+import { tabBarRef } from '../../utils/global-refs';
+import { normalize } from '../../utils/size';
+import { sleep, timeConverter } from '../../utils/time';
+import umami from '../../utils/analytics';
 import { TableCellProperties } from './TableCellProperties';
 import { TableRowProperties } from './TableRowProperties';
 import tiny from './tiny/tiny';

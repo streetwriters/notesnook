@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { ActionIcon } from '../../components/ActionIcon';
-import { Button } from '../../components/Button';
-import Heading from '../../components/Typography/Heading';
-import Paragraph from '../../components/Typography/Paragraph';
+import { IconButton } from '../../components/ui/icon-button';
+import { Button } from '../../components/ui/button';
+import Heading from '../../components/ui/typography/heading';
+import Paragraph from '../../components/ui/typography/paragraph';
 import { useTracked } from '../../provider';
 import {
   eSendEvent,
@@ -13,7 +13,7 @@ import {
   presentSheet
 } from '../../services/EventManager';
 import layoutmanager from '../../utils/layout-manager';
-import { SIZE } from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/size';
 import { EditorWebView } from './Functions';
 import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';
@@ -122,7 +122,7 @@ export const TableCellProperties = ({ data }) => {
             flexDirection: 'row'
           }}
         >
-          <ActionIcon
+          <IconButton
             customStyle={{
               marginRight: 10
             }}
@@ -133,7 +133,7 @@ export const TableCellProperties = ({ data }) => {
             color={colors.accent}
           />
 
-          <ActionIcon
+          <IconButton
             onPress={decreaseWidth}
             type="grayBg"
             name="minus"

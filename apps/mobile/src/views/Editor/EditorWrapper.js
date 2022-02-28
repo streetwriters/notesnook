@@ -9,13 +9,13 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
-import { PremiumToast } from '../../components/Premium/premium-toast';
+import { PremiumToast } from '../../components/premium/premium-toast';
 import { useTracked } from '../../provider';
 import { useNoteStore, useSettingStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { editing } from '../../utils';
-import { editorRef } from '../../utils/Refs';
-import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
+import { editorRef } from '../../utils/global-refs';
+import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
 import EditorOverlay from './EditorOverlay';
 import { checkStatus, textInput } from './Functions';
 

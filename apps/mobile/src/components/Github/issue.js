@@ -7,15 +7,15 @@ import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import { APP_VERSION } from '../../../version';
 import { db } from '../../utils/database';
-import { eCloseProgressDialog } from '../../utils/Events';
+import { eCloseProgressDialog } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { Button } from '../Button';
-import DialogHeader from '../Dialog/dialog-header';
-import { presentDialog } from '../Dialog/functions';
-import Seperator from '../Seperator';
-import Paragraph from '../Typography/Paragraph';
+import { SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
+import { Button } from '../ui/button';
+import DialogHeader from '../dialog/dialog-header';
+import { presentDialog } from '../dialog/functions';
+import Seperator from '../ui/seperator';
+import Paragraph from '../ui/typography/paragraph';
 import deviceInfoModule from 'react-native-device-info';
 
 export const Issue = () => {

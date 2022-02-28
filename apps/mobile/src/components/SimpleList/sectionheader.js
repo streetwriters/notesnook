@@ -9,15 +9,15 @@ import {
   presentSheet
 } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import { GROUP } from '../../utils';
-import { COLORS_NOTE } from '../../utils/Colors';
+import { GROUP } from '../../utils/constants';
+import { COLORS_NOTE } from '../../utils/color-scheme';
 import { db } from '../../utils/database';
-import { eOpenJumpToDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import Sort from '../Sort';
-import Heading from '../Typography/Heading';
+import { eOpenJumpToDialog } from '../../utils/events';
+import { SIZE } from '../../utils/size';
+import { IconButton } from '../ui/icon-button';
+import { Button } from '../ui/button';
+import Sort from '../sort';
+import Heading from '../ui/typography/heading';
 
 export const SectionHeader = ({ item, index, type, color, screen }) => {
   const [state] = useTracked();
@@ -117,7 +117,7 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
             />
 
             {type === 'notes' || type === 'notebooks' || type === 'home' ? (
-              <ActionIcon
+              <IconButton
                 customStyle={{
                   width: 25,
                   height: 25

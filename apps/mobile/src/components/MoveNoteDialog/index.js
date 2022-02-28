@@ -8,19 +8,19 @@ import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/E
 import Navigation from '../../services/Navigation';
 import { getTotalNotes } from '../../utils';
 import { db } from '../../utils/database';
-import { eOpenMoveNoteDialog } from '../../utils/Events';
+import { eOpenMoveNoteDialog } from '../../utils/events';
 import layoutmanager from '../../utils/layout-manager';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import { Dialog } from '../Dialog';
-import DialogHeader from '../Dialog/dialog-header';
-import { presentDialog } from '../Dialog/functions';
-import Input from '../Input';
-import { PressableButton } from '../PressableButton';
-import SheetWrapper from '../Sheet';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
+import { SIZE } from '../../utils/size';
+import { IconButton } from '../ui/icon-button';
+import { Button } from '../ui/button';
+import { Dialog } from '../dialog';
+import DialogHeader from '../dialog/dialog-header';
+import { presentDialog } from '../dialog/functions';
+import Input from '../ui/input';
+import { PressableButton } from '../ui/pressable';
+import SheetWrapper from '../ui/sheet';
+import Heading from '../ui/typography/heading';
+import Paragraph from '../ui/typography/paragraph';
 
 let newNotebookTitle = null;
 const notebookInput = createRef();
@@ -332,7 +332,7 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
                     ) : null}
                   </View>
 
-                  <ActionIcon
+                  <IconButton
                     name={expanded === item.id ? 'plus' : 'chevron-down'}
                     color={expanded === item.id ? colors.accent : colors.pri}
                     size={SIZE.xl}

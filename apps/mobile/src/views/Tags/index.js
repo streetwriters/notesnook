@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect } from 'react';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header';
-import { Placeholder } from '../../components/ListPlaceholders';
-import SelectionHeader from '../../components/SelectionHeader';
-import SimpleList from '../../components/SimpleList';
+import { ContainerHeader } from '../../components/container/containerheader';
+import { Header } from '../../components/header';
+import { Placeholder } from '../../components/ui/svg';
+import SelectionHeader from '../../components/selection-header';
+import List from '../../components/list';
 import { useTagStore } from '../../provider/stores';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
@@ -67,10 +67,10 @@ export const Tags = ({ navigation }) => {
   return (
     <>
       <SelectionHeader screen="Tags" />
-      <ContainerTopSection>
+      <ContainerHeader>
         <Header title="Tags" isBack={false} screen="Tags" />
-      </ContainerTopSection>
-      <SimpleList
+      </ContainerHeader>
+      <List
         listData={tags}
         type="tags"
         headerProps={{
@@ -84,7 +84,6 @@ export const Tags = ({ navigation }) => {
           button: null,
           loading: 'Loading your tags.'
         }}
-        placeholder={<Placeholder type="tags" />}
         placeholderText="Tags added to notes appear here"
       />
     </>

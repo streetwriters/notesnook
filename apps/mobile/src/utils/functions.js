@@ -5,8 +5,7 @@ import { useMenuStore, useSelectionStore } from '../provider/stores';
 import { eSendEvent, ToastEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import { db } from './database';
-import { eClearEditor } from './Events';
-import layoutmanager from './layout-manager';
+import { eClearEditor } from './events';
 
 export const deleteItems = async item => {
   if (item && db.monographs.isPublished(item.id)) {
@@ -45,7 +44,6 @@ export const deleteItems = async item => {
 
     await db.notes.delete(...ids);
 
-    //layoutmanager.withAnimation(150);
     Navigation.setRoutesToUpdate([Navigation.routeNames.Notes, Navigation.routeNames.NotesPage]);
     eSendEvent(eClearEditor);
   }

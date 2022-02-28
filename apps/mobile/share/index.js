@@ -28,8 +28,8 @@ import isURL from 'validator/lib/isURL';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../src/services/EventManager';
 import { getElevation } from '../src/utils';
 import { db } from '../src/utils/database';
-import Storage from '../src/utils/storage';
-import { sleep } from '../src/utils/TimeUtils';
+import Storage from '../src/utils/database/storage';
+import { sleep } from '../src/utils/time';
 import { Search } from './search';
 import { useShareStore } from './store';
 

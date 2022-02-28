@@ -6,15 +6,15 @@ import { useEditorStore } from '../../provider/stores';
 import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { db } from '../../utils/database';
-import { eCloseProgressDialog, eOnLoadNote } from '../../utils/Events';
+import { eCloseProgressDialog, eOnLoadNote } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
-import { normalize } from '../../utils/SizeUtils';
+import { normalize } from '../../utils/size';
 import { getNote, sourceUri } from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import DialogHeader from '../Dialog/dialog-header';
-import Paragraph from '../Typography/Paragraph';
+import { IconButton } from '../ui/icon-button';
+import { Button } from '../ui/button';
+import DialogHeader from '../dialog/dialog-header';
+import Paragraph from '../ui/typography/paragraph';
 
 export default function NotePreview({ session, content }) {
   const [state] = useTracked();

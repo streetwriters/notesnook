@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import BaseDialog from '../../components/Dialog/base-dialog';
-import { PressableButton } from '../../components/PressableButton';
-import Seperator from '../../components/Seperator';
+import BaseDialog from '../dialog/base-dialog';
+import { PressableButton } from '../ui/pressable';
+import Seperator from '../ui/seperator';
 import { useTracked } from '../../provider';
 import { useMessageStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { getElevation } from '../../utils';
-import { eCloseJumpToDialog, eOpenJumpToDialog, eScrollEvent } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
+import { eCloseJumpToDialog, eOpenJumpToDialog, eScrollEvent } from '../../utils/events';
+import { SIZE } from '../../utils/size';
+import Heading from '../ui/typography/heading';
+import Paragraph from '../ui/typography/paragraph';
 
 const offsets = [];
 let timeout = null;

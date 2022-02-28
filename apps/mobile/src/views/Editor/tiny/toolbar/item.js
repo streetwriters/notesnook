@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { PressableButton } from '../../../../components/PressableButton';
-import Heading from '../../../../components/Typography/Heading';
-import Paragraph from '../../../../components/Typography/Paragraph';
+import { PressableButton } from '../../../../components/ui/pressable';
+import Heading from '../../../../components/ui/typography/heading';
+import Paragraph from '../../../../components/ui/typography/paragraph';
 import { useTracked } from '../../../../provider';
 import { useUserStore } from '../../../../provider/stores';
 import {
@@ -16,9 +16,9 @@ import {
 import PremiumService from '../../../../services/PremiumService';
 import { editing, showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
 import { db } from '../../../../utils/database';
-import { MMKV } from '../../../../utils/mmkv';
-import { normalize, SIZE } from '../../../../utils/SizeUtils';
-import umami from '../../../../utils/umami';
+import { MMKV } from '../../../../utils/database/mmkv';
+import { normalize, SIZE } from '../../../../utils/size';
+import umami from '../../../../utils/analytics';
 import tiny, { safeKeyboardDismiss } from '../tiny';
 import { execCommands } from './commands';
 import {

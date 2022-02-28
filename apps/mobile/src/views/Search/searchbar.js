@@ -2,15 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ActionIcon } from '../../components/ActionIcon';
+import { IconButton } from '../../components/ui/icon-button';
 import { useTracked } from '../../provider';
 import { useSearchStore } from '../../provider/stores';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { eScrollEvent } from '../../utils/Events';
-import { normalize, SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import { eScrollEvent } from '../../utils/events';
+import { normalize, SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
 
 export const SearchBar = () => {
   const [state] = useTracked();
@@ -90,7 +90,7 @@ export const SearchBar = () => {
         borderBottomColor: colors.nav
       }}
     >
-      <ActionIcon
+      <IconButton
         name="arrow-left"
         size={SIZE.xl}
         top={10}
@@ -128,7 +128,7 @@ export const SearchBar = () => {
       />
 
       {value && value.length > 0 ? (
-        <ActionIcon
+        <IconButton
           name="close"
           size={SIZE.md + 2}
           top={20}

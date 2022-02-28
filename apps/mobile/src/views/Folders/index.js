@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { AddNotebookEvent } from '../../components/DialogManager/recievers';
-import { Header } from '../../components/Header';
-import { MoveNotes } from '../../components/MoveNoteDialog/movenote';
-import SelectionHeader from '../../components/SelectionHeader';
-import SimpleList from '../../components/SimpleList';
-import { Walkthrough } from '../../components/Walkthrough';
+import { ContainerHeader } from '../../components/container/containerheader';
+import { FloatingButton } from '../../components/container/floating-button';
+import { AddNotebookEvent } from '../../components/dialog-provider/recievers';
+import { Header } from '../../components/header';
+import List from '../../components/list';
+import SelectionHeader from '../../components/selection-header';
+import { Walkthrough } from '../../components/walkthroughs';
 import { useNotebookStore } from '../../provider/stores';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
@@ -77,10 +76,10 @@ export const Folders = ({ navigation }) => {
   return (
     <>
       <SelectionHeader screen="Notebooks" />
-      <ContainerTopSection>
+      <ContainerHeader>
         <Header title="Notebooks" isBack={false} screen="Notebooks" action={_onPressBottomButton} />
-      </ContainerTopSection>
-      <SimpleList
+      </ContainerHeader>
+      <List
         listData={notebooks}
         type="notebooks"
         screen="Notebooks"
@@ -98,7 +97,7 @@ export const Folders = ({ navigation }) => {
       />
 
       {!notebooks || notebooks.length === 0 ? null : (
-        <ContainerBottomButton title="Create a new notebook" onPress={_onPressBottomButton} />
+        <FloatingButton title="Create a new notebook" onPress={_onPressBottomButton} />
       )}
     </>
   );

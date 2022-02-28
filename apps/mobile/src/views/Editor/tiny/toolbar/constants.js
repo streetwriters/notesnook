@@ -2,7 +2,7 @@ import { createRef } from 'react';
 import { Platform } from 'react-native';
 import { eSendEvent } from '../../../../services/EventManager';
 import { editing } from '../../../../utils';
-import { sleep } from '../../../../utils/TimeUtils';
+import { sleep } from '../../../../utils/time';
 import { EditorWebView, textInput } from '../../Functions';
 import tiny from '../tiny';
 

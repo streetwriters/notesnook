@@ -1,11 +1,11 @@
 import { groupArray } from 'notes-core/utils/grouping';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header';
+import { FloatingButton } from '../../components/container/floating-button';
+import { ContainerHeader } from '../../components/container/containerheader';
+import { Header } from '../../components/header';
 import { MoveNotes } from '../../components/MoveNoteDialog/movenote';
-import SelectionHeader from '../../components/SelectionHeader';
-import SimpleList from '../../components/SimpleList';
+import SelectionHeader from '../../components/selection-header';
+import List from '../../components/list';
 import { useTracked } from '../../provider';
 import { useNoteStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
@@ -14,9 +14,9 @@ import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { editing, InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
-import { eOnLoadNote, eOpenAddTopicDialog, refreshNotesPage } from '../../utils/Events';
+import { eOnLoadNote, eOpenAddTopicDialog, refreshNotesPage } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
-import { tabBarRef } from '../../utils/Refs';
+import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../Editor/Functions';
 
 const getNotes = params => {
@@ -236,7 +236,7 @@ export const Notes = ({ route, navigation }) => {
         }}
         screen="NotesPage"
       />
-      <ContainerTopSection>
+      <ContainerHeader>
         <Header
           title={headerProps.heading}
           isBack={!params.current?.menu}
@@ -247,8 +247,8 @@ export const Notes = ({ route, navigation }) => {
           }
           rightButtons={params.current?.type !== 'topic' ? null : headerRightButtons}
         />
-      </ContainerTopSection>
-      <SimpleList
+      </ContainerHeader>
+      <List
         listData={notes || []}
         type="notes"
         screen="NotesPage"
@@ -262,7 +262,7 @@ export const Notes = ({ route, navigation }) => {
         placeholderData={placeholderData}
       />
       {params.current?.get === 'monographs' ? null : (
-        <ContainerBottomButton
+        <FloatingButton
           title="Create a new note"
           onPress={_onPressBottomButton}
           color={params.current?.type == 'color' ? params.current?.title : null}

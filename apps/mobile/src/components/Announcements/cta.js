@@ -2,14 +2,14 @@ import React from 'react';
 import { View } from 'react-native';
 import { useTracked } from '../../provider';
 import { eSendEvent, presentSheet } from '../../services/EventManager';
-import { eCloseAnnouncementDialog } from '../../utils/Events';
+import { eCloseAnnouncementDialog } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import { SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
 import SettingsBackupAndRestore from '../../views/Settings/backup-restore';
-import { Button } from '../Button';
-import GeneralSheet from '../GeneralSheet';
-import { PricingPlans } from '../Premium/pricing-plans';
+import { Button } from '../ui/button';
+import SheetProvider from '../sheet-provider';
+import { PricingPlans } from '../premium/pricing-plans';
 import { allowedOnPlatform, getStyle } from './functions';
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
@@ -53,7 +53,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
         ...getStyle(style)
       }}
     >
-      <GeneralSheet context="premium_cta" />
+      <SheetProvider context="premium_cta" />
       {buttons.length > 0 &&
         buttons.slice(0, 1).map(item => (
           <Button

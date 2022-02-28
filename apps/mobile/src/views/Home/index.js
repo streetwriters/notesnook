@@ -1,23 +1,19 @@
 import React, { useCallback, useEffect } from 'react';
-import { StatusBar } from 'react-native-bars';
-import { ChangePassword } from '../../components/Auth/change-password';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header/index';
-import SelectionHeader from '../../components/SelectionHeader';
-import SimpleList from '../../components/SimpleList';
+import { FloatingButton } from '../../components/container/floating-button';
+import { ContainerHeader } from '../../components/container/containerheader';
+import { Header } from '../../components/header/index';
+import SelectionHeader from '../../components/selection-header';
+import List from '../../components/list';
 import { useNoteStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { editing, InteractionManager, scrollRef } from '../../utils';
+import { editing, InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
-import { eOnLoadNote } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
+import { eOnLoadNote } from '../../utils/events';
+import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../Editor/Functions';
-import { Tip } from '../../components/Tip';
-import { TipManager } from '../../services/tip-manager';
 
 export const Home = ({ navigation }) => {
   const notes = useNoteStore(state => state.notes);
@@ -98,13 +94,12 @@ export const Home = ({ navigation }) => {
   return (
     <>
       <SelectionHeader screen="Notes" />
-      <ContainerTopSection>
+      <ContainerHeader>
         <Header title="Notes" isBack={false} screen="Notes" action={_onPressBottomButton} />
-      </ContainerTopSection>
+      </ContainerHeader>
 
-      <SimpleList
+      <List
         listData={notes}
-        scrollRef={scrollRef}
         type="notes"
         isHome={true}
         pinned={true}
@@ -126,7 +121,7 @@ export const Home = ({ navigation }) => {
       />
 
       {!notes || notes.length === 0 ? null : (
-        <ContainerBottomButton title="Create a new note" onPress={_onPressBottomButton} />
+        <FloatingButton title="Create a new note" onPress={_onPressBottomButton} />
       )}
     </>
   );

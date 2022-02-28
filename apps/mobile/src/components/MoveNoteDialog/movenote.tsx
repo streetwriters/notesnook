@@ -6,17 +6,17 @@ import { useTracked } from '../../provider';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { db } from '../../utils/database';
-import { eCloseProgressDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import { Dialog } from '../Dialog';
-import DialogHeader from '../Dialog/dialog-header';
-import { presentDialog } from '../Dialog/functions';
-import { PressableButton } from '../PressableButton';
-import Seperator from '../Seperator';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
+import { eCloseProgressDialog } from '../../utils/events';
+import { SIZE } from '../../utils/size';
+import { IconButton } from '../ui/icon-button';
+import { Button } from '../ui/button';
+import { Dialog } from '../dialog';
+import DialogHeader from '../dialog/dialog-header';
+import { presentDialog } from '../dialog/functions';
+import { PressableButton } from '../ui/pressable';
+import Seperator from '../ui/seperator';
+import Heading from '../ui/typography/heading';
+import Paragraph from '../ui/typography/paragraph';
 
 export const MoveNotes = ({
   notebook,
@@ -31,7 +31,7 @@ export const MoveNotes = ({
   const colors = state.colors;
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
 
-  let notes = db.notes.all;
+  let notes = db.notes?.all;
 
   const [selectedNoteIds, setSelectedNoteIds] = useState<String[]>([]);
   const [topic, setTopic] = useState(selectedTopic);
@@ -80,8 +80,8 @@ export const MoveNotes = ({
       });
       return false;
     }
-    await db.notebooks.notebook(currentNotebook.id).topics.add(value);
-    setCurrentNotebook(db.notebooks.notebook(currentNotebook.id).data);
+    await db.notebooks?.notebook(currentNotebook.id).topics.add(value);
+    setCurrentNotebook(db.notebooks?.notebook(currentNotebook.id).data);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
       Navigation.routeNames.Favorites,
@@ -139,7 +139,7 @@ export const MoveNotes = ({
         ) : null}
 
         {selectedNoteIds.indexOf(item.id) > -1 ? (
-          <ActionIcon
+          <IconButton
             customStyle={{
               width: null,
               height: null,
@@ -262,7 +262,7 @@ export const MoveNotes = ({
         <Button
           //@ts-ignore
           onPress={async () => {
-            await db.notes.move(
+            await db.notes?.move(
               {
                 topic: topic.id,
                 id: topic.notebookId
@@ -289,6 +289,8 @@ export const MoveNotes = ({
 
 MoveNotes.present = (notebook: any, topic: any) => {
   presentSheet({
-    component: ref => <MoveNotes fwdRef={ref} notebook={notebook} selectedTopic={topic} />
+    component: (ref: RefObject<ActionSheet>) => (
+      <MoveNotes fwdRef={ref} notebook={notebook} selectedTopic={topic} />
+    )
   });
 };

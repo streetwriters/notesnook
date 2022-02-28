@@ -1,15 +1,15 @@
-const { MMKV } = require('../utils/MMKV');
+const { MMKV } = require('../utils/database/MMKV');
 import Clipboard from '@react-native-clipboard/clipboard';
 import { Platform } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import Share from 'react-native-share';
-import { presentDialog } from '../components/Dialog/functions';
+import { presentDialog } from '../components/dialog/functions';
 import { db } from '../utils/database';
-import { eCloseProgressDialog } from '../utils/Events';
-import { sanitizeFilename } from '../utils/filename';
-import storage from '../utils/storage';
-import { sleep } from '../utils/TimeUtils';
+import { eCloseProgressDialog } from '../utils/events';
+import { sanitizeFilename } from '../utils/sanitizer';
+import storage from '../utils/database/storage';
+import { sleep } from '../utils/time';
 import { eSendEvent, presentSheet, ToastEvent } from './EventManager';
 import SettingsService from './SettingsService';
 

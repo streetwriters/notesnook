@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
-import { ActionIcon } from '../../components/ActionIcon';
+import { IconButton } from '../../components/ui/icon-button';
 import { useTracked } from '../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { editing } from '../../utils';
-import { SIZE } from '../../utils/SizeUtils';
-import { useKeyboard } from '../../utils/use-keyboard';
+import { SIZE } from '../../utils/size';
+import useKeyboard from '../../utils/hooks/use-keyboard';
 import { EditorWebView } from './Functions';
 import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 
@@ -39,7 +39,7 @@ const HistoryComponent = () => {
       }}
     >
       {Platform.OS === 'ios' && keyboard.keyboardShown ? (
-        <ActionIcon
+        <IconButton
           name="keyboard-close"
           color={colors.pri}
           size={SIZE.lg}
@@ -54,7 +54,7 @@ const HistoryComponent = () => {
         />
       ) : null}
 
-      <ActionIcon
+      <IconButton
         name="undo-variant"
         disabled={!historyState.undo}
         color={colors.pri}
@@ -68,7 +68,7 @@ const HistoryComponent = () => {
           tiny.call(EditorWebView, tiny.undo);
         }}
       />
-      <ActionIcon
+      <IconButton
         name="redo-variant"
         disabled={!historyState.redo}
         color={colors.pri}

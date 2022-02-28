@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import BaseDialog from '../../components/Dialog/base-dialog';
-import { presentDialog } from '../../components/Dialog/functions';
-import { PressableButton } from '../../components/PressableButton';
-import Heading from '../../components/Typography/Heading';
-import Paragraph from '../../components/Typography/Paragraph';
+import BaseDialog from '../../components/dialog/base-dialog';
+import { presentDialog } from '../../components/dialog/functions';
+import { PressableButton } from '../../components/ui/pressable';
+import Heading from '../../components/ui/typography/heading';
+import Paragraph from '../../components/ui/typography/paragraph';
 import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
 import { ToastEvent } from '../../services/EventManager';
 import { db } from '../../utils/database';
-import { SIZE } from '../../utils/SizeUtils';
-import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
+import { SIZE } from '../../utils/size';
+import Storage from '../../utils/database/storage';
+import { sleep } from '../../utils/time';
 
 const AccoutLogoutSection = () => {
   const [state] = useTracked();

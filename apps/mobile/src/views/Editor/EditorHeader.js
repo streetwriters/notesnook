@@ -3,8 +3,8 @@ import React, { useEffect, useRef } from 'react';
 import { BackHandler, InteractionManager, Keyboard, Platform, Vibration, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
-import { ActionIcon } from '../../components/ActionIcon';
-import { Properties } from '../../components/Properties';
+import { IconButton } from '../../components/ui/icon-button';
+import { Properties } from '../../components/properties';
 import { useTracked } from '../../provider';
 import { useEditorStore, useSettingStore, useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
@@ -15,7 +15,8 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing, SUBSCRIPTION_STATUS } from '../../utils';
+import { editing } from '../../utils';
+import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
 import {
   eClearEditor,
@@ -25,24 +26,17 @@ import {
   eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenPublishNoteDialog
-} from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import umami from '../../utils/umami';
+} from '../../utils/events';
+import useEditorTags from '../../utils/hooks/useEditorTags';
+import { tabBarRef } from '../../utils/global-refs';
+import umami from '../../utils/analytics';
 import { EditorTitle } from './EditorTitle';
-import {
-  clearEditor,
-  clearTimer,
-  getNote,
-  loadNote,
-  setColors,
-  startClosingSession
-} from './Functions';
+import { clearEditor, getNote, loadNote, setColors, startClosingSession } from './Functions';
 import { ProgressCircle } from './ProgressCircle';
 import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 import { endSearch } from './tiny/toolbar/commands';
 import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
-import { useEditorTags } from './useEditorTags';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -275,7 +269,7 @@ const EditorHeader = () => {
           }}
         >
           {deviceMode !== 'mobile' && !fullscreen ? null : (
-            <ActionIcon
+            <IconButton
               onLongPress={async () => {
                 await _onBackPress();
                 Navigation.popToTop();
@@ -305,7 +299,7 @@ const EditorHeader = () => {
             {!user ||
             user?.subscription.type === SUBSCRIPTION_STATUS.BASIC ||
             user?.subscription.type === SUBSCRIPTION_STATUS.TRIAL ? (
-              <ActionIcon
+              <IconButton
                 name="crown"
                 color={colors.yellow}
                 customStyle={{
@@ -322,7 +316,7 @@ const EditorHeader = () => {
                 }}
               />
             ) : null}
-            <ActionIcon
+            <IconButton
               name="magnify"
               color={searchReplace ? colors.accent : colors.pri}
               customStyle={{
@@ -343,7 +337,7 @@ const EditorHeader = () => {
             />
 
             {currentlyEditingNote && !readonly && (
-              <ActionIcon
+              <IconButton
                 name="cloud-upload-outline"
                 color={colors.pri}
                 customStyle={{
@@ -355,7 +349,7 @@ const EditorHeader = () => {
             )}
 
             {!readonly && (
-              <ActionIcon
+              <IconButton
                 name="attachment"
                 color={colors.pri}
                 customStyle={{
@@ -367,7 +361,7 @@ const EditorHeader = () => {
             )}
 
             {deviceMode !== 'mobile' && !fullscreen ? (
-              <ActionIcon
+              <IconButton
                 name="fullscreen"
                 color={colors.pri}
                 customStyle={{
@@ -381,7 +375,7 @@ const EditorHeader = () => {
               />
             ) : null}
 
-            <ActionIcon
+            <IconButton
               name="dots-horizontal"
               color={colors.pri}
               customStyle={{

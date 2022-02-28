@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import SelectionHeader from '../../components/SelectionHeader';
-import SimpleList from '../../components/SimpleList';
+import { ContainerHeader } from '../../components/container/containerheader';
+import SelectionHeader from '../../components/selection-header';
+import List from '../../components/list';
 import { useSearchStore } from '../../provider/stores';
 import SearchService from '../../services/SearchService';
-import { inputRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
+import { inputRef } from '../../utils/global-refs';
+import { sleep } from '../../utils/time';
 import { SearchBar } from './search-bar';
 
 export const Search = ({ navigation }) => {
@@ -31,10 +31,10 @@ export const Search = ({ navigation }) => {
   return (
     <>
       <SelectionHeader screen="Search" />
-      <ContainerTopSection>
+      <ContainerHeader>
         <SearchBar />
-      </ContainerTopSection>
-      <SimpleList
+      </ContainerHeader>
+      <List
         listData={searchResults}
         type="search"
         screen="Search"

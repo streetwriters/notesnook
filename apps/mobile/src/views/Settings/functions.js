@@ -1,7 +1,7 @@
-import { presentDialog } from '../../components/Dialog/functions';
+import { presentDialog } from '../../components/dialog/functions';
 import { ToastEvent } from '../../services/EventManager';
 import { db } from '../../utils/database';
-import { sleep } from '../../utils/TimeUtils';
+import { sleep } from '../../utils/time';
 
 export async function verifyUser(context, onsuccess, disableBackdropClosing, onclose, closeText) {
   presentDialog({
