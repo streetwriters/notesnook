@@ -7,7 +7,7 @@ import { eSendEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/events';
-import JumpToDialog from '../JumpToDialog';
+import JumpToSectionDialog from '../dialogs/jump-to-section';
 import { NotebookWrapper } from '../list-items/notebook/wrapper';
 import { NoteWrapper } from '../list-items/note/wrapper';
 import TagItem from '../list-items/tag';
@@ -176,7 +176,7 @@ const List = ({
           </>
         }
       />
-      <JumpToDialog
+      <JumpToSectionDialog
         screen={screen}
         data={listData}
         type={screen === 'Notes' ? 'home' : type}

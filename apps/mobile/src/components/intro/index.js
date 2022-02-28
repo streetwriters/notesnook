@@ -11,7 +11,7 @@ import umami from '../../utils/analytics';
 import { MMKV } from '../../utils/database/mmkv';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
-import AppLock from '../../views/Settings/app-lock';
+import AppLock from '../../screens/settings/app-lock';
 import { Button } from '../ui/button';
 import { SvgView } from '../ui/svg';
 import { BouncingView } from '../ui/transitions/bouncing-view';

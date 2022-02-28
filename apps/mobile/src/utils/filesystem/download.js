@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-import { ShareComponent } from '../../components/ExportDialog/share';
+import { ShareComponent } from '../../components/sheets/export-notes/share';
 import { useAttachmentStore } from '../../provider/stores';
 import { presentSheet, ToastEvent } from '../../services/EventManager';
 import { db } from '../database';

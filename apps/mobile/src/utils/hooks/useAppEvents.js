@@ -44,8 +44,8 @@ import {
   getNote,
   getWebviewInit,
   updateNoteInEditor
-} from '../../views/Editor/Functions';
-import tiny from '../../views/Editor/tiny/tiny';
+} from '../../screens/editor/Functions';
+import tiny from '../../screens/editor/tiny/tiny';
 import { updateStatusBarColor } from '../color-scheme';
 import { db } from '../database';
 import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage } from '../events';

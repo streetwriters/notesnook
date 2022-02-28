@@ -46,10 +46,10 @@ import { deleteItems } from '../functions';
 import { MMKV } from '../database/mmkv';
 import { sleep } from '../time';
 import { presentDialog } from '../../components/dialog/functions';
-import { MoveNotes } from '../../components/MoveNoteDialog/movenote';
-import NoteHistory from '../../components/NoteHistory';
-import tiny from '../../views/Editor/tiny/tiny.js';
-import { EditorWebView } from '../../views/Editor/Functions';
+import { MoveNotes } from '../../components/sheets/move-notes/movenote';
+import NoteHistory from '../../components/note-history';
+import tiny from '../../screens/editor/tiny/tiny.js';
+import { EditorWebView } from '../../screens/editor/Functions';
 
 export const useActions = ({ close = () => {}, item }) => {
   const [state, dispatch] = useTracked();

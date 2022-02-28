@@ -28,7 +28,7 @@ import { MMKV } from '../../utils/database/mmkv';
 import { tabBarRef } from '../../utils/global-refs';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
-import SettingsBackupAndRestore from '../../views/Settings/backup-restore';
+import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { IconButton } from '../ui/icon-button';
 import { Button } from '../ui/button';
 import Input from '../ui/input';
@@ -38,7 +38,7 @@ import Seperator from '../ui/seperator';
 import Intro from '../intro';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
-import { Update } from '../update';
+import { Update } from '../sheets/update';
 
 let passwordValue = null;
 let didVerifyUser = false;

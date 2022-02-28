@@ -10,9 +10,9 @@ import { SUBSCRIPTION_STATUS } from '../utils/constants';
 import { db } from '../utils/database';
 import { MMKV } from '../utils/database/mmkv';
 import layoutmanager from '../utils/layout-manager';
-import { EditorWebView } from '../views/Editor/Functions';
-import tiny from '../views/Editor/tiny/tiny';
-import { endSearch } from '../views/Editor/tiny/toolbar/commands';
+import { EditorWebView } from '../screens/editor/Functions';
+import tiny from '../screens/editor/tiny/tiny';
+import { endSearch } from '../screens/editor/tiny/toolbar/commands';
 import {
   Announcement,
   EditorStore,

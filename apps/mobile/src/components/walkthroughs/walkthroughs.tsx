@@ -8,7 +8,7 @@ import { getElevation } from '../../utils';
 import { eOpenAddNotebookDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import useRotator from '../../utils/hooks/use-rotator';
-import { AccentColorPicker } from '../../views/Settings/appearance';
+import { AccentColorPicker } from '../../screens/settings/appearance';
 import { Button } from '../ui/button';
 import { SvgView } from '../ui/svg';
 import { PinItem } from '../side-menu/pinned-section';

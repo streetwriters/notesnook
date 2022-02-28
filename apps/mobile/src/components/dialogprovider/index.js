@@ -1,27 +1,27 @@
 import React from 'react';
 import { useTracked } from '../../provider';
-import { EditorSettings } from '../../views/Editor/EditorSettings';
-import { AddNotebookDialog } from '../AddNotebookDialog';
-import { AddTopicDialog } from '../AddTopicDialog';
-import { AnnouncementDialog } from '../Announcements';
-import { AttachmentDialog } from '../AttachmentDialog';
+import { EditorSettings } from '../../screens/editor/EditorSettings';
+import { AddNotebookSheet } from '../sheets/add-notebook';
+import { AddTopicDialog } from '../dialogs/add-topic';
+import { AnnouncementDialog } from '../announcements';
+import { AttachmentDialog } from '../attachments';
 import Auth from '../auth';
 import { SessionExpired } from '../auth/session-expired';
 import { Dialog } from '../dialog';
-import ExportDialog from '../ExportDialog';
+import ExportNotesSheet from '../sheets/export-notes';
 import ImagePreview from '../image-preview';
-import MergeEditor from '../MergeEditor';
-import MoveNoteDialog from '../MoveNoteDialog';
+import MergeConflicts from '../merge-conflicts';
+import AddToNotebookSheet from '../sheets/add-to';
 import PremiumDialog from '../premium';
 import { Expiring } from '../premium/expiring';
-import PublishNoteDialog from '../PublishNoteDialog';
-import RateDialog from '../RateDialog';
-import RecoveryKeyDialog from '../RecoveryKeyDialog';
-import RestoreDialog from '../RestoreDialog';
-import ResultDialog from '../ResultDialog';
+import PublishNoteSheet from '../sheets/publish-note';
+import RateAppSheet from '../sheets/rate-app';
+import RecoveryKeySheet from '../sheets/recovery-key';
+import RestoreDataSheet from '../sheets/restore-data';
+import ResultDialog from '../dialogs/result';
 import SheetProvider from '../sheet-provider';
-import TagsDialog from '../TagsDialog';
-import { VaultDialog } from '../VaultDialog';
+import ManageTagsSheet from '../sheets/manage-tags';
+import { VaultDialog } from '../dialogs/vault';
 
 function DialogProvider() {
   const [state] = useTracked();
@@ -31,22 +31,22 @@ function DialogProvider() {
     <>
       <Dialog context="global" />
       <AddTopicDialog colors={colors} />
-      <AddNotebookDialog colors={colors} />
+      <AddNotebookSheet colors={colors} />
       <PremiumDialog colors={colors} />
       <Auth colors={colors} />
-      <MergeEditor />
-      <ExportDialog />
-      <RecoveryKeyDialog colors={colors} />
+      <MergeConflicts />
+      <ExportNotesSheet />
+      <RecoveryKeySheet colors={colors} />
       <SheetProvider />
-      <RestoreDialog />
+      <RestoreDataSheet />
       <ResultDialog />
       <VaultDialog colors={colors} />
-      <MoveNoteDialog colors={colors} />
-      <RateDialog />
+      <AddToNotebookSheet colors={colors} />
+      <RateAppSheet />
       <ImagePreview />
       <EditorSettings />
-      <PublishNoteDialog />
-      <TagsDialog />
+      <PublishNoteSheet />
+      <ManageTagsSheet />
       <AttachmentDialog />
       <Expiring />
       <AnnouncementDialog />

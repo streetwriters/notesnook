@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import Orientation from 'react-native-orientation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Launcher from './src/components/launcher';
-import { RootView } from './src/navigation/RootView';
 import { useTracked } from './src/provider';
 import { initialize, useSettingStore, useUserStore } from './src/provider/stores';
 import { DDS } from './src/services/DeviceDetection';
@@ -14,6 +13,7 @@ import { db } from './src/utils/database';
 import { eDispatchAction } from './src/utils/events';
 import { useAppEvents } from './src/utils/hooks/use-app-events';
 import { MMKV } from './src/utils/database/mmkv';
+import { ApplicationHolder } from './src/navigation';
 
 let databaseHasLoaded = false;
 
@@ -98,7 +98,7 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      <RootView />
+      <ApplicationHolder />
       <Launcher onLoad={loadMainApp} />
     </SafeAreaProvider>
   );

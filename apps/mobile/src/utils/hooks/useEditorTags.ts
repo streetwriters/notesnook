@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useEditorStore, useTagStore } from '../../provider/stores';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { db } from '../database';
-import { EditorWebView } from '../../views/Editor/Functions';
-import tiny from '../../views/Editor/tiny/tiny';
+import { EditorWebView } from '../../screens/editor/Functions';
+import tiny from '../../screens/editor/tiny/tiny';
 
 /**
  * A hook that injects/removes tags from tags bar in editor

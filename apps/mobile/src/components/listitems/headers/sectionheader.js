@@ -16,7 +16,7 @@ import { eOpenJumpToDialog } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
 import { IconButton } from '../../ui/icon-button';
 import { Button } from '../../ui/button';
-import Sort from '../../sort';
+import Sort from '../../sheets/sort';
 import Heading from '../../ui/typography/heading';
 
 export const SectionHeader = ({ item, index, type, color, screen }) => {

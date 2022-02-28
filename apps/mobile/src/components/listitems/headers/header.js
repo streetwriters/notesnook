@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useTracked } from '../../../provider';
 import { useMessageStore } from '../../../provider/stores';
 import { COLORS_NOTE } from '../../../utils/color-scheme';
-import { Announcement } from '../../Announcements/announcement';
+import { Announcement } from '../../announcements/announcement';
 import { Card } from '../../list/card';
 
 export const Header = React.memo(
