@@ -64,18 +64,24 @@ function ListItem(props) {
       bg={isSelected ? "shade" : background}
       onContextMenu={(e) => {
         e.preventDefault();
-        let items = props.menu?.items || [];
+        let items = props.menu?.items?.slice() || [];
         let title = props.item.title;
-        let selectedItems = selectionStore.get().selectedItems.slice();
+        let selectedItems = selectionStore
+          .get()
+          .selectedItems.filter((i) => i.type === props.item.type);
 
-        if (isSelected) {
+        if (selectedItems.length > 1) {
           title = `${selectedItems.length} items selected`;
           items = items.filter((item) => item.multiSelect);
         } else if (Config.get("debugMode", false)) {
           items.push(...debugMenuItems(props.item.type));
-        } else if (selectedItems.indexOf(props.item) === -1) {
+        }
+
+        if (selectedItems.indexOf(props.item) === -1) {
           selectedItems.push(props.item);
         }
+
+        if (items.length <= 0) return;
 
         openMenu(items, {
           title,
@@ -122,8 +128,10 @@ function ListItem(props) {
           selectItem(props.item);
         } else {
           selectionStore.toggleSelectionMode(false);
-          selectItem(props.item);
-          props.onClick && props.onClick();
+          if (props.onClick) {
+            selectItem(props.item);
+            props.onClick();
+          }
         }
       }}
       data-test-id={`${props.item.type}-${props.index}`}
