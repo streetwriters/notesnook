@@ -295,6 +295,10 @@ export default class Attachments extends Collection {
     );
   }
 
+  get uploaded() {
+    return this.all.filter((attachment) => attachment.dateUploaded > 0);
+  }
+
   get deleted() {
     return this.all.filter((attachment) => attachment.dateDeleted > 0);
   }
