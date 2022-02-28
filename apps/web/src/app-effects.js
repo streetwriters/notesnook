@@ -120,15 +120,21 @@ export default function AppEffects({ setShow }) {
     const progressEvent = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ type, total, loaded }) => {
-        const [key] = getProcessingStatusFromType(type);
+        const [key, status] = getProcessingStatusFromType(type);
         if (!key) return;
 
         const percent = Math.round((loaded / total) * 100);
+        const text = getStatus(key)?.status || `${status} attachment`;
 
-        updateStatus({
-          key,
-          progress: loaded === total ? 100 : percent,
-        });
+        if (loaded === total) {
+          removeStatus(key);
+        } else {
+          updateStatus({
+            key,
+            status: text,
+            progress: loaded === total ? 100 : percent,
+          });
+        }
       }
     );
 

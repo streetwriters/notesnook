@@ -1,8 +1,9 @@
 import create from "zustand";
 import produce from "immer";
 
-const useStatusStore = create((set) => ({
+const useStatusStore = create((set, get) => ({
   statuses: {},
+  getStatus: (key) => get().statuses[key],
   updateStatus: ({ key, status, progress, icon }) =>
     set(
       produce((state) => {
@@ -29,3 +30,4 @@ export default function useStatus() {
 
 export const updateStatus = useStatusStore.getState().updateStatus;
 export const removeStatus = useStatusStore.getState().removeStatus;
+export const getStatus = useStatusStore.getState().getStatus;
