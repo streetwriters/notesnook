@@ -167,7 +167,9 @@ export default class Attachments extends Collection {
       const note = this._db.notes.note(noteId);
       if (!note) continue;
       const contentId = note.data.contentId;
-      await this._db.content.removeAttachments(contentId, [hash]);
+      await this._db.content.removeAttachments(contentId, [
+        attachment.metadata.hash,
+      ]);
     }
   }
 
