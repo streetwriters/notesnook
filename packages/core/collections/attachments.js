@@ -143,10 +143,26 @@ export default class Attachments extends Collection {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment) return false;
     if (await this._db.fs.deleteFile(hash, localOnly)) {
-      await this._collection.deleteItem(attachment.id);
+      if (!localOnly) {
+        await this.detach(hash);
+      }
+      await this._collection.removeItem(attachment.id);
       return true;
     }
     return false;
+  }
+
+  async detach(hashOrId) {
+    const attachment = this.attachment(hashOrId);
+    if (!attachment) return;
+
+    await this._db.notes.init();
+    for (let noteId of attachment.noteIds) {
+      const note = this._db.notes.note(noteId);
+      if (!note) continue;
+      const contentId = note.data.contentId;
+      await this._db.content.removeAttachments(contentId, [hash]);
+    }
   }
 
   /**

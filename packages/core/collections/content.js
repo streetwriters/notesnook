@@ -120,6 +120,19 @@ export default class Content extends Collection {
 
   /**
    *
+   * @param {string} id
+   * @param {string[]} hashes
+   * @returns {Promise<any>}
+   */
+  async removeAttachments(id, hashes) {
+    const contentItem = await this.raw(id);
+    const content = getContentFromData(contentItem.type, contentItem.data);
+    contentItem.data = content.removeAttachments(hashes);
+    await this.add(contentItem);
+  }
+
+  /**
+   *
    * @param {any} contentItem
    * @returns {Promise<any>}
    */
