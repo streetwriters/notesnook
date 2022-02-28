@@ -114,6 +114,7 @@ export default class Attachments extends Collection {
       dateModified: undefined,
       dateUploaded: undefined,
       dateDeleted: undefined,
+      failed: attachment.failed,
     };
     return this._collection.addItem(attachmentItem);
   }
@@ -219,9 +220,16 @@ export default class Attachments extends Collection {
   }
 
   markAsUploaded(id) {
-    const attachment = this.all.find((a) => a.id === id);
+    const attachment = this.attachment(id);
     if (!attachment) return;
     attachment.dateUploaded = Date.now();
+    attachment.failed = undefined;
+    return this._collection.updateItem(attachment);
+  }
+  markAsFailed(id, reason) {
+    const attachment = this.attachment(id);
+    if (!attachment) return;
+    attachment.failed = reason || true;
     return this._collection.updateItem(attachment);
   }
 
