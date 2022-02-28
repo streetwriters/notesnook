@@ -5,8 +5,8 @@ import isMobilePhone from 'validator/lib/isMobilePhone';
 import isURL from 'validator/lib/isURL';
 import { Button } from '../../../../components/ui/button';
 import Input from '../../../../components/ui/input';
-import { useTracked } from '../../../../provider';
-import { eSendEvent, ToastEvent } from '../../../../services/EventManager';
+import { useThemeStore } from '../../../../stores/theme';
+import { eSendEvent, ToastEvent } from '../../../../services/event-manager';
 import { editing, itemSkus } from '../../../../utils';
 import { SIZE } from '../../../../utils/size';
 import { EditorWebView } from '../../Functions';
@@ -18,8 +18,7 @@ import LinkPreview from './linkpreview';
 let inputValue = null;
 
 const ToolbarLinkInput = ({ format, value, setVisible }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [mode, setMode] = useState(value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING);
 
   const inputRef = useRef();

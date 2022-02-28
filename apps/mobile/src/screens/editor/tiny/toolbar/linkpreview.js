@@ -5,19 +5,18 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { IconButton } from '../../../../components/ui/icon-button';
 import Heading from '../../../../components/ui/typography/heading';
 import Paragraph from '../../../../components/ui/typography/paragraph';
-import { useTracked } from '../../../../provider';
+import { useThemeStore } from '../../../../stores/theme';
 import { openLinkInBrowser } from '../../../../utils/functions';
 import { SIZE } from '../../../../utils/size';
 import { INPUT_MODE, properties, reFocusEditor } from './constants';
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
 import isMobilePhone from 'validator/lib/isMobilePhone';
-import { ToastEvent } from '../../../../services/EventManager';
+import { ToastEvent } from '../../../../services/event-manager';
 
 let prevLink = {};
 const LinkPreview = ({ setMode, value, onSubmit }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [link, setLink] = useState(prevLink.value === value ? prevLink : {});
 
   useEffect(() => {

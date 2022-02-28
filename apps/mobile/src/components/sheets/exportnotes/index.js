@@ -4,9 +4,9 @@ import FileViewer from 'react-native-file-viewer';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useTracked } from '../../../provider';
-import { ToastEvent } from '../../../services/EventManager';
-import Exporter from '../../../services/Exporter';
+import { useThemeStore } from '../../../stores/theme';
+import { ToastEvent } from '../../../services/event-manager';
+import Exporter from '../../../services/exporter';
 import { getElevation } from '../../../utils';
 import { ph, pv, SIZE } from '../../../utils/size';
 import { sleep } from '../../../utils/time';
@@ -18,12 +18,11 @@ import Seperator from '../../ui/seperator';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 
-const { eSubscribeEvent, eUnSubscribeEvent } = require('../../../services/EventManager');
+const { eSubscribeEvent, eUnSubscribeEvent } = require('../../../services/eventmanager');
 const { eOpenExportDialog, eCloseExportDialog } = require('../../../utils/events');
 
 const ExportNotesSheet = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();

@@ -4,9 +4,9 @@ import { Header } from '../../components/header';
 import { Placeholder } from '../../components/ui/svg';
 import SelectionHeader from '../../components/selection-header';
 import List from '../../components/list';
-import { useFavoriteStore, useNoteStore } from '../../provider/stores';
-import Navigation from '../../services/Navigation';
-import SearchService from '../../services/SearchService';
+import { useFavoriteStore, useNoteStore } from '../../stores/stores';
+import Navigation from '../../services/navigation';
+import SearchService from '../../services/search';
 import { InteractionManager } from '../../utils';
 
 export const Favorites = ({ navigation }) => {

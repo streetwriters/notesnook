@@ -3,18 +3,17 @@ import { Platform, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconButton } from '../../components/ui/icon-button';
-import { useTracked } from '../../provider';
-import { useSearchStore } from '../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
-import SearchService from '../../services/SearchService';
+import { useThemeStore } from '../../stores/theme';
+import { useSearchStore } from '../../stores/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
+import SearchService from '../../services/search';
 import { eScrollEvent } from '../../utils/events';
 import { normalize, SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 
 export const SearchBar = () => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [value, setValue] = useState(null);
   const inputRef = useRef();
   const setSearchResults = useSearchStore(state => state.setSearchResults);

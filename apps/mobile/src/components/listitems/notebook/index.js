@@ -2,10 +2,10 @@ import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useTracked } from '../../../provider';
-import { useSettingStore } from '../../../provider/stores';
-import { eSendEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useThemeStore } from '../../../stores/theme';
+import { useSettingStore } from '../../../stores/stores';
+import { eSendEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { getTotalNotes, history } from '../../../utils';
 import { refreshNotesPage } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
@@ -16,8 +16,7 @@ import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 
 export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateBy }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const settings = useSettingStore(state => state.settings);
   const compactMode = settings.notebooksListMode === 'compact';
   const topics = item.topics?.slice(0, 3) || [];

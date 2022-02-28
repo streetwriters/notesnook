@@ -12,8 +12,8 @@ import Input from '../../components/ui/input';
 import { PressableButton } from '../../components/ui/pressable';
 import Seperator from '../../components/ui/seperator';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { EditorWebView, getNote } from './Functions';
@@ -21,8 +21,7 @@ import tiny from './tiny/tiny';
 import ToggleSwitch from 'toggle-switch-react-native';
 
 export const EditorSettings = () => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [settings, setSettings] = useState({
     fontSize: 10,
     directionality: 'ltr'
@@ -220,8 +219,7 @@ export const EditorSettings = () => {
 };
 
 const DropDownMenu = ({ items, onPress, style, title, stub }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const menuRef = useRef();
 
   return (

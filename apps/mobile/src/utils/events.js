@@ -24,8 +24,6 @@ export const eOpenLoginDialog = '511';
 
 export const eCloseLoginDialog = '512';
 
-export const eDispatchAction = '513';
-
 export const eLoginDialogNavigateBack = '514';
 
 export const eOpenSideMenu = '515';

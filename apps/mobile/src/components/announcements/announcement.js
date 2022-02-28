@@ -1,13 +1,12 @@
 import React from 'react';
 import { FlatList, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useMessageStore, useSelectionStore } from '../../provider/stores';
+import { useThemeStore } from '../../stores/theme';
+import { useMessageStore, useSelectionStore } from '../../stores/stores';
 import { Button } from '../ui/button';
 import { allowedOnPlatform, renderItem } from './functions';
 
 export const Announcement = ({ color }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const announcements = useMessageStore(state => state.announcements);
   const remove = useMessageStore(state => state.remove);
   let announcement = announcements.length > 0 ? announcements[0] : null;

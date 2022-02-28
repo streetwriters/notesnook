@@ -1,9 +1,9 @@
 import React, { createRef } from 'react';
 import { Keyboard, LayoutAnimation, UIManager, View } from 'react-native';
 import { Transition, Transitioning, TransitioningView } from 'react-native-reanimated';
-import { useMenuStore } from '../../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useMenuStore } from '../../../stores/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { db } from '../../../utils/database';
 import { eCloseAddTopicDialog, eOpenAddTopicDialog } from '../../../utils/events';
 import { sleep } from '../../../utils/time';

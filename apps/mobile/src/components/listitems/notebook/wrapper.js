@@ -1,8 +1,8 @@
 import React from 'react';
 import { NotebookItem } from '.';
-import { useSelectionStore } from '../../../provider/stores';
-import { eSendEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useSelectionStore } from '../../../stores/stores';
+import { eSendEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { history } from '../../../utils';
 import { eOnNewTopicAdded, refreshNotesPage } from '../../../utils/events';
 import SelectionWrapper from '../selection-wrapper';

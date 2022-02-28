@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { presentSheet } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { presentSheet } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { openLinkInBrowser } from '../../utils/functions';
 import { SIZE } from '../../utils/size';
@@ -18,8 +18,7 @@ import NotePreview from './preview';
 export default function NoteHistory({ note, ref }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   useEffect(() => {
     (async () => {

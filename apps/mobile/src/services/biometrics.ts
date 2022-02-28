@@ -1,10 +1,10 @@
-import FingerprintScanner from 'react-native-fingerprint-scanner';
-import Storage from '../utils/database/storage';
-import { ToastEvent } from './EventManager';
-import * as Keychain from 'react-native-keychain';
 import { Platform } from 'react-native';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
+import * as Keychain from 'react-native-keychain';
+import { useSettingStore } from '../stores/stores';
 import { MMKV } from '../utils/database/mmkv';
-import { useSettingStore } from '../provider/stores';
+import Storage from '../utils/database/storage';
+import { ShowToastEvent, ToastEvent } from './event-manager';
 
 const CRYPT_CONFIG = Platform.select({
   ios: {
@@ -29,10 +29,10 @@ async function enableFingerprintAuth() {
 }
 
 async function isFingerprintAuthEnabled() {
-  return await MMKV.getStringAsync('fingerprintAuthEnabled', 'enabled');
+  return await MMKV.getStringAsync('fingerprintAuthEnabled');
 }
 
-async function storeCredentials(password) {
+async function storeCredentials(password: string) {
   await Keychain.setInternetCredentials('nn_vault', 'notesnookvault', password, CRYPT_CONFIG);
 }
 
@@ -44,33 +44,35 @@ async function hasInternetCredentials() {
   return await Keychain.hasInternetCredentials('nn_vault');
 }
 
-async function getCredentials(title, description) {
+async function getCredentials(title?: string, description?: string) {
   try {
     useSettingStore.getState().setRequestBiometrics(true);
-    await FingerprintScanner.authenticate(
-      Platform.select({
-        ios: {
-          fallbackEnabled: true,
-          description: description
-        },
-        android: {
-          title: title,
-          description: description,
-          deviceCredentialAllowed: true
-        }
-      })
-    );
+
+    let options = Platform.select({
+      ios: {
+        fallbackEnabled: true,
+        description: description
+      },
+      android: {
+        title: title,
+        description: description,
+        deviceCredentialAllowed: true
+      }
+    });
+    //@ts-ignore
+    await FingerprintScanner.authenticate(options);
     FingerprintScanner.release();
-    return await Keychain.getInternetCredentials('nn_vault', CRYPT_CONFIG);
+    return await Keychain.getInternetCredentials('nn_vault');
   } catch (e) {
     useSettingStore.getState().setRequestBiometrics(false);
     FingerprintScanner.release();
-    let message = {
+    let message: ShowToastEvent = {
       heading: 'Authentication with biometrics failed.',
       message: 'Tap "Biometric Unlock" to try again.',
       type: 'error',
       context: 'local'
     };
+    //@ts-ignore
     if (e.name === 'DeviceLocked') {
       message = {
         heading: 'Biometrics authentication failed.',
@@ -78,6 +80,7 @@ async function getCredentials(title, description) {
         type: 'error',
         context: 'local'
       };
+      //@ts-ignore
     } else if (e.name === 'UserFallback') {
       message = {
         heading: 'Authentication cancelled by user.',
@@ -92,9 +95,10 @@ async function getCredentials(title, description) {
   }
 }
 
-async function validateUser(title, description) {
+async function validateUser(title: string, description?: string) {
   try {
     await FingerprintScanner.authenticate(
+      //@ts-ignore
       Platform.select({
         ios: {
           fallbackEnabled: true,
@@ -111,6 +115,7 @@ async function validateUser(title, description) {
     return true;
   } catch (e) {
     FingerprintScanner.release();
+    //@ts-ignore
     if (e.name === 'DeviceLocked') {
       ToastEvent.show({
         heading: 'Biometrics authentication failed.',
@@ -130,7 +135,7 @@ async function validateUser(title, description) {
   }
 }
 
-export default {
+const BiometicService = {
   isBiometryAvailable,
   enableFingerprintAuth,
   isFingerprintAuthEnabled,
@@ -140,3 +145,5 @@ export default {
   hasInternetCredentials,
   validateUser
 };
+
+export default BiometicService;

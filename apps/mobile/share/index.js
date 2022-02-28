@@ -25,7 +25,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
 import isURL from 'validator/lib/isURL';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../src/services/EventManager';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../src/services/event-manager';
 import { getElevation } from '../src/utils';
 import { db } from '../src/utils/database';
 import Storage from '../src/utils/database/storage';

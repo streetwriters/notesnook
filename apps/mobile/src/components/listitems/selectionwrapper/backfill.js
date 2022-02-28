@@ -1,12 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../../provider';
-import { useEditorStore } from '../../../provider/stores';
+import { useThemeStore } from '../../../stores/theme';
+import { useEditorStore } from '../../../stores/stores';
 import { hexToRGBA } from '../../../utils/color-scheme/utils';
 
 export const Filler = ({ item, background }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const currentEditingNote = useEditorStore(state => state.currentEditingNote);
 

@@ -2,7 +2,7 @@ import React, { Component, createRef } from 'react';
 import { Platform } from 'react-native';
 import { Keyboard } from 'react-native';
 import { FlatList, TextInput, View } from 'react-native';
-import { DDS } from '../../services/DeviceDetection';
+import { DDS } from '../../services/device-detection';
 import { editing } from '../../utils';
 
 export default class Tabs extends Component {

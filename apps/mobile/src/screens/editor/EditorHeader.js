@@ -5,16 +5,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
 import { IconButton } from '../../components/ui/icon-button';
 import { Properties } from '../../components/properties';
-import { useTracked } from '../../provider';
-import { useEditorStore, useSettingStore, useUserStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import { useThemeStore } from '../../stores/theme';
+import { useEditorStore, useSettingStore, useUserStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
-} from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+} from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { editing } from '../../utils';
 import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
@@ -39,8 +39,7 @@ import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
 
 const EditorHeader = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
   const currentlyEditingNote = useEditorStore(state => state.currentEditingNote);
   const fullscreen = useSettingStore(state => state.fullscreen);

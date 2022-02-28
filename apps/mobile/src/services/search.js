@@ -1,4 +1,4 @@
-import { useSearchStore } from '../provider/stores';
+import { useSearchStore } from '../stores/stores';
 import { db } from '../utils/database';
 
 let searchInformation = {
@@ -48,9 +48,11 @@ function getSearchInformation() {
   return searchInformation;
 }
 
-export default {
+const SearchService = {
   update,
   getSearchInformation,
   search,
   setTerm
 };
+
+export default SearchService;

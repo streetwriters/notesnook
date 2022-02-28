@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import Share from 'react-native-share';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import { useThemeStore } from '../../stores/theme';
+import { Actions } from '../../stores/Actions';
 import {
   useEditorStore,
   useMenuStore,
   useSelectionStore,
   useTagStore,
   useUserStore
-} from '../../provider/stores';
+} from '../../stores/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -19,10 +19,10 @@ import {
   openVault,
   presentSheet,
   ToastEvent
-} from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
-import Notifications from '../../services/Notifications';
-import SettingsService from '../../services/SettingsService';
+} from '../../services/event-manager';
+import Navigation from '../../services/navigation';
+import Notifications from '../../services/notifications';
+import SettingsService from '../../services/settings';
 import { editing, toTXT } from '..';
 import {
   ACCENT,
@@ -52,8 +52,7 @@ import tiny from '../../screens/editor/tiny/tiny.js';
 import { EditorWebView } from '../../screens/editor/Functions';
 
 export const useActions = ({ close = () => {}, item }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const clearSelection = useSelectionStore(state => state.clearSelection);
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const setMenuPins = useMenuStore(state => state.setMenuPins);
@@ -118,7 +117,7 @@ export const useActions = ({ close = () => {}, item }) => {
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    dispatch({ type: Actions.THEME, colors: newColors });
+    useThemeStore.getState().setColors({ ...newColors });
   }
 
   function switchTheme() {

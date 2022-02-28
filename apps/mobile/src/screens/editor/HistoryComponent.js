@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { IconButton } from '../../components/ui/icon-button';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { editing } from '../../utils';
 import { SIZE } from '../../utils/size';
 import useKeyboard from '../../utils/hooks/use-keyboard';
@@ -10,8 +10,7 @@ import { EditorWebView } from './Functions';
 import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 
 const HistoryComponent = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [historyState, setHistoryState] = useState({
     undo: false,
     redo: false

@@ -1,10 +1,10 @@
 import React from 'react';
 import NoteItem from '.';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useEditorStore, useSelectionStore, useTrashStore } from '../../../provider/stores';
-import { DDS } from '../../../services/DeviceDetection';
-import { eSendEvent, openVault, ToastEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useEditorStore, useSelectionStore, useTrashStore } from '../../../stores/stores';
+import { DDS } from '../../../services/device-detection';
+import { eSendEvent, openVault, ToastEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { history } from '../../../utils';
 import { db } from '../../../utils/database';
 import { eOnLoadNote, eShowMergeDialog } from '../../../utils/events';

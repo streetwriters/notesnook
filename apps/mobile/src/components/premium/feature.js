@@ -1,14 +1,13 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
 import Paragraph from '../ui/typography/paragraph';
 import { ProTag } from './pro-tag';
 
 export const FeatureBlock = ({ vertical, highlight, content, icon, pro, proTagBg }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return vertical ? (
     <View

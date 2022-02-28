@@ -2,10 +2,10 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../../provider';
-import { useAttachmentStore } from '../../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useThemeStore } from '../../../stores/theme';
+import { useAttachmentStore } from '../../../stores/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { db } from '../../../utils/database';
 import { eClosePublishNoteDialog, eOpenPublishNoteDialog } from '../../../utils/events';
 import { openLinkInBrowser } from '../../../utils/functions';
@@ -21,8 +21,7 @@ import Paragraph from '../../ui/typography/paragraph';
 
 let passwordValue = null;
 const PublishNoteSheet = () => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
   const loading = useAttachmentStore(state => state.loading);

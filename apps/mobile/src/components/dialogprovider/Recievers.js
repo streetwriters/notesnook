@@ -1,10 +1,9 @@
-import { eSendEvent } from '../../services/EventManager';
+import { eSendEvent } from '../../services/event-manager';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
   eCloseAddTopicDialog,
   eCloseMoveNoteDialog,
-  eDispatchAction,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
@@ -39,8 +38,4 @@ export const AddTopicEvent = topic => {
 };
 export const HideAddTopicEvent = notebook => {
   eSendEvent(eCloseAddTopicDialog, notebook);
-};
-
-export const updateEvent = data => {
-  eSendEvent(eDispatchAction, data);
 };

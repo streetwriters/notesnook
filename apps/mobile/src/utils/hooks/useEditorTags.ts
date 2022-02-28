@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useEditorStore, useTagStore } from '../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useEditorStore, useTagStore } from '../../stores/stores';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { db } from '../database';
 import { EditorWebView } from '../../screens/editor/Functions';
 import tiny from '../../screens/editor/tiny/tiny';

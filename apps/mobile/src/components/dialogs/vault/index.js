@@ -3,15 +3,15 @@ import React, { Component, createRef } from 'react';
 import { InteractionManager, View } from 'react-native';
 import Share from 'react-native-share';
 import { notesnook } from '../../../../e2e/test.ids';
-import BiometricService from '../../../services/BiometricService';
-import { DDS } from '../../../services/DeviceDetection';
+import BiometricService from '../../../services/biometrics';
+import { DDS } from '../../../services/device-detection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
-} from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+} from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { getElevation, toTXT } from '../../../utils';
 import { db } from '../../../utils/database';
 import {
@@ -124,7 +124,7 @@ export class VaultDialog extends Component {
 
   /**
    *
-   * @param {import('../../../services/EventManager').vaultType} data
+   * @param {import('../../../services/event-manager').vaultType} data
    */
   open = async data => {
     if (!Keychain) {

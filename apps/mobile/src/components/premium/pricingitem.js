@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { getElevation } from '../../utils';
 import { SIZE } from '../../utils/size';
 import { PressableButton } from '../ui/pressable';
@@ -8,8 +8,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
 export const PricingItem = ({ product, onPress, compact }) => {
-  const [state, dispatch] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <PressableButton

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useTracked } from '../../provider/index';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { eCloseLoginDialog, eOpenLoginDialog } from '../../utils/events';
 import { sleep } from '../../utils/time';
 import BaseDialog from '../dialog/base-dialog';
@@ -16,8 +16,7 @@ export const AuthMode = {
 };
 
 const Auth = () => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();

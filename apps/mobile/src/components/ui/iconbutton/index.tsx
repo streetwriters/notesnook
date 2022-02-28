@@ -1,7 +1,7 @@
 import React from 'react';
 import { ColorValue, GestureResponderEvent, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../../provider';
+import { useThemeStore } from '../../../stores/theme';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../utils';
 import { hexToRGBA, RGB_Linear_Shade } from '../../../utils/color-scheme/utils';
 import { SIZE } from '../../../utils/size';
@@ -39,8 +39,7 @@ export const IconButton = ({
   tooltipPosition = TOOLTIP_POSITIONS.TOP,
   ...restProps
 }: IconButtonProps) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const _onLongPress = (event: GestureResponderEvent) => {
     if (onLongPress) {

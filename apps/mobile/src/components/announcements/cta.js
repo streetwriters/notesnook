@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent, presentSheet } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent, presentSheet } from '../../services/event-manager';
 import { eCloseAnnouncementDialog } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
 import { SIZE } from '../../utils/size';
@@ -13,8 +13,7 @@ import { PricingPlans } from '../premium/pricing-plans';
 import { allowedOnPlatform, getStyle } from './functions';
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   let buttons = actions.filter(item => allowedOnPlatform(item.platforms)) || [];
 
   const onPress = async item => {

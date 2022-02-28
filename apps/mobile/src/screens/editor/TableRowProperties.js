@@ -3,13 +3,13 @@ import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button } from '../../components/ui/button';
 import Heading from '../../components/ui/typography/heading';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet
-} from '../../services/EventManager';
+} from '../../services/event-manager';
 import layoutmanager from '../../utils/layout-manager';
 import { SIZE } from '../../utils/size';
 import { EditorWebView } from './Functions';
@@ -18,8 +18,7 @@ import ColorItem from './tiny/toolbar/coloritem';
 import { editor_colors, rgbToHex } from './tiny/toolbar/constants';
 
 export const TableRowProperties = ({ data }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [rowOptions, setRowOptions] = useState(data);
   console.log(data);
 

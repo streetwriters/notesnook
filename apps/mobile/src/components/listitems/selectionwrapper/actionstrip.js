@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Animated, { useValue } from 'react-native-reanimated';
-import { useTracked } from '../../../provider';
+import { useThemeStore } from '../../../stores/theme';
 import {
   useMenuStore,
   useNotebookStore,
   useSelectionStore,
   useTrashStore
-} from '../../../provider/stores';
-import { openVault, ToastEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+} from '../../../stores/stores';
+import { openVault, ToastEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { dWidth, getElevation, toTXT } from '../../../utils';
 import { db } from '../../../utils/database';
 import { deleteItems } from '../../../utils/functions';
@@ -19,8 +19,7 @@ import { Button } from '../../ui/button';
 import { presentDialog } from '../../dialog/functions';
 
 export const ActionStrip = ({ note, setActionStrip }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const setNotebooks = useNotebookStore(state => state.setNotebooks);
   const setMenuPins = useMenuStore(state => state.setMenuPins);

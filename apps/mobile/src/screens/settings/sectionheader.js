@@ -3,13 +3,12 @@ import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import layoutmanager from '../../utils/layout-manager';
 import { SIZE } from '../../utils/size';
 
 const SectionHeader = ({ title, collapsed, setCollapsed }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <TouchableOpacity

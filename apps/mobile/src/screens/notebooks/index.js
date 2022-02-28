@@ -6,9 +6,9 @@ import { Header } from '../../components/header';
 import List from '../../components/list';
 import SelectionHeader from '../../components/selection-header';
 import { Walkthrough } from '../../components/walkthroughs';
-import { useNotebookStore } from '../../provider/stores';
-import Navigation from '../../services/Navigation';
-import SearchService from '../../services/SearchService';
+import { useNotebookStore } from '../../stores/stores';
+import Navigation from '../../services/navigation';
+import SearchService from '../../services/search';
 import { InteractionManager } from '../../utils';
 
 export const Notebooks = ({ navigation }) => {

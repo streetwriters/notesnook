@@ -2,8 +2,8 @@ import React from 'react';
 import { Platform, View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../../provider';
-import { useSettingStore } from '../../../provider/stores';
+import { useThemeStore } from '../../../stores/theme';
+import { useSettingStore } from '../../../stores/stores';
 import layoutmanager from '../../../utils/layout-manager';
 import { PremiumToast } from '../../premium/premium-toast';
 import { Toast } from '../../toast';
@@ -21,8 +21,7 @@ const SheetWrapper = ({
   overlay,
   overlayOpacity = 0.3
 }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
   const sheetKeyboardHandler = useSettingStore(state => state.sheetKeyboardHandler);
   const largeTablet = deviceMode === 'tablet';

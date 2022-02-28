@@ -5,16 +5,16 @@ import { Modal, Platform, SafeAreaView, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
+import { useThemeStore } from '../../stores/theme';
+import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
-} from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
-import Sync from '../../services/Sync';
+} from '../../services/event-manager';
+import Navigation from '../../services/navigation';
+import Sync from '../../services/sync';
 import { dHeight } from '../../utils';
 import { db } from '../../utils/database';
 import { eApplyChanges, eShowMergeDialog, refreshNotesPage } from '../../utils/events';
@@ -50,8 +50,7 @@ function onMediaLoaded({ hash, src }) {
 }
 
 const MergeConflicts = () => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const [primary, setPrimary] = useState(true);
   const [secondary, setSecondary] = useState(true);

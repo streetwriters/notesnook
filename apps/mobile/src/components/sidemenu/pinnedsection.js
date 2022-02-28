@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { useMenuStore, useNoteStore } from '../../provider/stores';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { useMenuStore, useNoteStore } from '../../stores/stores';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
 import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/events';
 import { normalize, SIZE } from '../../utils/size';
@@ -102,8 +102,7 @@ export const TagsSection = () => {
 
 export const PinItem = React.memo(
   ({ item, index, onPress, placeholder, alias }) => {
-    const [state] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
     const setMenuPins = useMenuStore(state => state.setMenuPins);
     alias = item.type === 'tag' ? db.tags.alias(item.title) : item.title;
     const [visible, setVisible] = useState(false);

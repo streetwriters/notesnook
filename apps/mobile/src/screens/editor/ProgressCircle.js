@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import * as Progress from 'react-native-progress';
-import { useTracked } from '../../provider';
-import { useAttachmentStore } from '../../provider/stores';
+import { useThemeStore } from '../../stores/theme';
+import { useAttachmentStore } from '../../stores/stores';
 import { SIZE } from '../../utils/size';
 
 export const ProgressCircle = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
+
   const loading = useAttachmentStore(state => state.loading);
   const [prog, setProg] = useState(0);
   const [visible, setVisible] = useState(false);

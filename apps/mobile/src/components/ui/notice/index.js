@@ -1,13 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../../provider';
+import { useThemeStore } from '../../../stores/theme';
 import { SIZE } from '../../../utils/size';
 import { IconButton } from '../icon-button';
 import Paragraph from '../typography/paragraph';
 
 export const Notice = ({ type, text, size }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const isSmall = size === 'small';
 
   return (

@@ -2,8 +2,8 @@ import { RefObject, useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 //@ts-ignore
 import RNTooltips from 'react-native-tooltips';
-import { useTracked } from '../../provider';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { Popup } from '../../services/tip-manager';
 import useKeyboard from './use-keyboard';
 
@@ -30,8 +30,7 @@ export const hideAllTooltips = async () => {
  * @returns
  */
 const useTooltip = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const parent = useRef();
   let keyboard = useKeyboard();
 

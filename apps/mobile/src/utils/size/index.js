@@ -1,5 +1,5 @@
 import { Dimensions, PixelRatio, Platform } from 'react-native';
-import { DDS } from '../../services/DeviceDetection';
+import { DDS } from '../../services/device-detection';
 
 export const scale = {
   fontScale: 1

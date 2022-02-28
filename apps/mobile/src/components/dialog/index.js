@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { DDS } from '../../services/device-detection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { getElevation } from '../../utils';
 import { eCloseSimpleDialog, eOpenSimpleDialog } from '../../utils/events';
 import { sleep } from '../../utils/time';
@@ -14,8 +14,7 @@ import DialogButtons from './dialog-buttons';
 import DialogHeader from './dialog-header';
 
 export const Dialog = ({ context = 'global' }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const [inputValue, setInputValue] = useState(null);
   const inputRef = useRef();

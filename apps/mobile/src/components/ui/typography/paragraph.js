@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { useTracked } from '../../../provider';
+import { useThemeStore } from '../../../stores/theme';
 import { SIZE } from '../../../utils/size';
 
 /**
@@ -15,8 +15,7 @@ import { SIZE } from '../../../utils/size';
  * @param {TextType | restTypes} props all props
  */
 const Paragraph = ({ color, size = SIZE.sm, style, ...restProps }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <Text

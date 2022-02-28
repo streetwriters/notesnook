@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
 import { eOpenTagsDialog, refreshNotesPage } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -10,8 +10,7 @@ import { sleep } from '../../utils/time';
 import { Button } from '../ui/button';
 
 export const Tags = ({ item, close }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return item.id ? (
     <View

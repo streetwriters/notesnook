@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useMenuStore, useNoteStore } from '../../provider/stores';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { useMenuStore, useNoteStore } from '../../stores/stores';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { COLORS_NOTE } from '../../utils/color-scheme';
 import { db } from '../../utils/database';
 import { refreshNotesPage } from '../../utils/events';
@@ -32,8 +32,7 @@ export const ColorSection = () => {
 
 const ColorItem = React.memo(
   ({ item, index, alias }) => {
-    const [state] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
     const setColorNotes = useMenuStore(state => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);
     alias = db.colors.alias(item.id);

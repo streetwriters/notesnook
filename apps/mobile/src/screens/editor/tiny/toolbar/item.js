@@ -4,16 +4,16 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PressableButton } from '../../../../components/ui/pressable';
 import Heading from '../../../../components/ui/typography/heading';
 import Paragraph from '../../../../components/ui/typography/paragraph';
-import { useTracked } from '../../../../provider';
-import { useUserStore } from '../../../../provider/stores';
+import { useThemeStore } from '../../../../stores/theme';
+import { useUserStore } from '../../../../stores/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet,
   ToastEvent
-} from '../../../../services/EventManager';
-import PremiumService from '../../../../services/PremiumService';
+} from '../../../../services/event-manager';
+import PremiumService from '../../../../services/premium';
 import { editing, showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
 import { db } from '../../../../utils/database';
 import { MMKV } from '../../../../utils/database/mmkv';
@@ -48,8 +48,7 @@ const ToolbarItem = ({
   formatValue,
   fullname
 }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [selected, setSelected] = useState(false);
   const [icon, setIcon] = useState(valueIcon);
   const [color, setColor] = useState(null);

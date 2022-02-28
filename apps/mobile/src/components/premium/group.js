@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
@@ -8,8 +8,7 @@ import { FeatureBlock } from './feature';
 import { ProTag } from './pro-tag';
 
 export const Group = ({ item, index }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <View

@@ -6,11 +6,11 @@ import {
   PressableStateCallbackType,
   ViewStyle
 } from 'react-native';
-import { useTracked } from '../../../provider';
+import { useThemeStore } from '../../../stores/theme';
 import { BUTTON_TYPES } from '../../../utils/constants';
 import { hexToRGBA, RGB_Linear_Shade } from '../../../utils/color-scheme/utils';
 import { br } from '../../../utils/size';
-import { defaultState } from '../../../provider/DefaultState';
+import { defaultState } from '../../../stores/DefaultState';
 
 export interface PressableButtonProps extends PressableProps {
   customStyle?: ViewStyle;
@@ -43,8 +43,7 @@ export const PressableButton = ({
   customOpacity,
   fwdRef
 }: PressableButtonProps) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const selectedColor =
     customSelectedColor ||

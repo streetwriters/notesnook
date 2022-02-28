@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Linking, Platform, View } from 'react-native';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/EventManager';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
 import { eCloseRateDialog, eOpenRateDialog } from '../../../utils/events';
 import { MMKV } from '../../../utils/database/mmkv';
 import { SIZE } from '../../../utils/size';
@@ -10,7 +10,7 @@ import Seperator from '../../ui/seperator';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 import { STORE_LINK } from '../../../utils/constants';
-import { clearMessage } from '../../../services/Message';
+import { clearMessage } from '../../../services/message';
 
 const RateAppSheet = () => {
   const [visible, setVisible] = useState(false);

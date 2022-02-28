@@ -8,10 +8,10 @@ import { db } from '../utils/database';
 import { MMKV } from '../utils/database/mmkv';
 import { eOnLoadNote } from '../utils/events';
 import { tabBarRef } from '../utils/global-refs';
-import { useNoteStore } from './../provider/stores';
-import { DDS } from './DeviceDetection';
-import { eSendEvent } from './EventManager';
-import SettingsService from './SettingsService';
+import { useNoteStore } from '../stores/stores';
+import { DDS } from './device-detection';
+import { eSendEvent } from './event-manager';
+import SettingsService from './settings';
 
 const NOTIFICATION_TAG = 'notesnook';
 const CHANNEL_ID = 'com.streetwriters.notesnook';
@@ -209,7 +209,7 @@ function get(): Promise<PushNotificationDeliveredObject[]> {
   });
 }
 
-export default {
+const Notifications = {
   init,
   present,
   clearAll,
@@ -219,3 +219,5 @@ export default {
   pinQuickNote,
   unpinQuickNote
 };
+
+export default Notifications;

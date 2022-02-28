@@ -2,10 +2,10 @@ import React from 'react';
 import { ActivityIndicator, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { eSendEvent } from '../../services/EventManager';
-import Sync from '../../services/Sync';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import { eSendEvent } from '../../services/event-manager';
+import Sync from '../../services/sync';
 import { eOpenLoginDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { PressableButton } from '../ui/pressable';
@@ -14,8 +14,7 @@ import Paragraph from '../ui/typography/paragraph';
 import { TimeSince } from '../ui/time-since';
 
 export const UserStatus = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
   const syncing = useUserStore(state => state.syncing);
   const lastSynced = useUserStore(state => state.lastSynced);

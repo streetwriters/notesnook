@@ -3,9 +3,9 @@ import { ActivityIndicator, Platform, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import { FlatList } from 'react-native-gesture-handler';
 import * as ScopedStorage from 'react-native-scoped-storage';
-import { useTracked } from '../../../provider';
-import { initialize } from '../../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/EventManager';
+import { useThemeStore } from '../../../stores/theme';
+import { initialize } from '../../../stores/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import { db } from '../../../utils/database';
 import { MMKV } from '../../../utils/database/mmkv';
 import storage from '../../../utils/database/storage';
@@ -77,8 +77,7 @@ const RestoreDataSheet = () => {
 export default RestoreDataSheet;
 
 const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [backupDirectoryAndroid, setBackupDirectoryAndroid] = useState(false);

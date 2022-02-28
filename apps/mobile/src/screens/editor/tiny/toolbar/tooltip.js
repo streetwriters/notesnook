@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { useTracked } from '../../../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
+import { useThemeStore } from '../../../../stores/theme';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
 import { editing } from '../../../../utils';
 import layoutmanager from '../../../../utils/layout-manager';
 import { normalize } from '../../../../utils/size';
@@ -13,8 +13,7 @@ import ToolbarItem from './item';
 import ToolbarLinkInput from './linkinput';
 
 const Tooltip = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [group, setGroup] = useState(null);
   const isColorGroup = /^(hilitecolor|forecolor|)$/.test(group?.type);
   const isInputTooltip = /^(link|video|)$/.test(group?.type);

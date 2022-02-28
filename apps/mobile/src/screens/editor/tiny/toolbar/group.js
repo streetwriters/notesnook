@@ -1,11 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../../../provider';
+import { useThemeStore } from '../../../../stores/theme';
 import ToolbarItem from './item';
 
 const ToolbarGroup = ({ group }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <View

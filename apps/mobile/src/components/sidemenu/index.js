@@ -2,12 +2,12 @@ import React, { useCallback } from 'react';
 import { FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { useSettingStore, useUserStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
-import SettingsService from '../../services/SettingsService';
+import { useThemeStore } from '../../stores/theme';
+import { Actions } from '../../stores/Actions';
+import { useSettingStore, useUserStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
+import { eSendEvent } from '../../services/event-manager';
+import SettingsService from '../../services/settings';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -27,8 +27,7 @@ import { UserStatus } from './user-status';
 
 export const SideMenu = React.memo(
   () => {
-    const [state, dispatch] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
     const deviceMode = useSettingStore(state => state.deviceMode);
     const insets = useSafeAreaInsets();
     const user = useUserStore(state => state.user);
@@ -36,7 +35,7 @@ export const SideMenu = React.memo(
 
     function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
       let newColors = setColorScheme(colors, accent);
-      dispatch({ type: Actions.THEME, colors: newColors });
+      useThemeStore.getState().setColors({ ...newColors });
     }
 
     const BottomItemsList = [

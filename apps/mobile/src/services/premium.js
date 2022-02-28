@@ -6,12 +6,12 @@ import DialogHeader from '../components/dialog/dialog-header';
 import { CompactFeatures } from '../components/premium/compact-features';
 import { PricingPlans } from '../components/premium/pricing-plans';
 import Seperator from '../components/ui/seperator';
-import { useUserStore } from '../provider/stores';
+import { useUserStore } from '../stores/stores';
 import { itemSkus, SUBSCRIPTION_STATUS } from '../utils/constants';
 import { db } from '../utils/database';
 import { eOpenPremiumDialog, eOpenTrialEndingDialog, eShowGetPremium } from '../utils/events';
 import { MMKV } from '../utils/database/mmkv';
-import { eSendEvent, presentSheet, ToastEvent } from './EventManager';
+import { eSendEvent, presentSheet, ToastEvent } from './event-manager';
 
 let premiumStatus = 0;
 let products = [];
@@ -338,7 +338,7 @@ const sheet = (context, promo, trial) => {
   });
 };
 
-export default {
+const PremiumService = {
   verify,
   setPremiumStatus,
   get,
@@ -351,3 +351,5 @@ export default {
   getRemainingTrialDaysStatus,
   sheet
 };
+
+export default PremiumService;

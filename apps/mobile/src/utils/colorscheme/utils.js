@@ -1,6 +1,6 @@
 import { Appearance } from 'react-native';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import SettingsService from '../../services/SettingsService';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import SettingsService from '../../services/settings';
 import {
   ACCENT,
   COLOR_SCHEME,

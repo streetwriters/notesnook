@@ -5,13 +5,13 @@ import { IconButton } from '../../components/ui/icon-button';
 import { Button } from '../../components/ui/button';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet
-} from '../../services/EventManager';
+} from '../../services/event-manager';
 import layoutmanager from '../../utils/layout-manager';
 import { SIZE } from '../../utils/size';
 import { EditorWebView } from './Functions';
@@ -20,8 +20,7 @@ import ColorItem from './tiny/toolbar/coloritem';
 import { editor_colors, rgbToHex } from './tiny/toolbar/constants';
 
 export const TableCellProperties = ({ data }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [cellOptions, setCellOptions] = useState(data);
   console.log(data);
 

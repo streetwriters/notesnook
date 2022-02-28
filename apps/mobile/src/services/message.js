@@ -1,7 +1,7 @@
-import { useMessageStore } from '../provider/stores';
+import { useMessageStore } from '../stores/stores';
 import { eOpenLoginDialog, eOpenRateDialog, eOpenRecoveryKeyDialog } from '../utils/events';
-import { eSendEvent } from './EventManager';
-import PremiumService from './PremiumService';
+import { eSendEvent } from './event-manager';
+import PremiumService from './premium';
 import { verifyUser } from '../screens/settings/functions';
 import { MMKV } from '../utils/database/mmkv';
 import { Platform } from 'react-native';

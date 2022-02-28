@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../../provider';
-import { eSendEvent } from '../../../services/EventManager';
+import { useThemeStore } from '../../../stores/theme';
+import { eSendEvent } from '../../../services/event-manager';
 import {
   eCloseProgressDialog,
   eCloseResultDialog,
@@ -12,8 +12,7 @@ import { SIZE } from '../../../utils/size';
 import { sleep } from '../../../utils/time';
 import Paragraph from '../../ui/typography/paragraph';
 export const ProFeatures = ({ count = 6 }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <>

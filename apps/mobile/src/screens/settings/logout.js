@@ -6,18 +6,17 @@ import { presentDialog } from '../../components/dialog/functions';
 import { PressableButton } from '../../components/ui/pressable';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import BiometricService from '../../services/BiometricService';
-import { ToastEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import BiometricService from '../../services/biometrics';
+import { ToastEvent } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { SIZE } from '../../utils/size';
 import Storage from '../../utils/database/storage';
 import { sleep } from '../../utils/time';
 
 const AccoutLogoutSection = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
   const [loading, setLoading] = useState(false);
 

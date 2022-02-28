@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { TextInput } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { post, _onMessage } from './Functions';
@@ -18,8 +18,8 @@ function animation(v) {
 }
 
 export const EditorTitle = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
+
   const [title, setTitle] = useState(null);
   const onScroll = async data => {
     if (data.visible === undefined || data.visible === null) return;

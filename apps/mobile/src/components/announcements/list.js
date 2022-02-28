@@ -1,13 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import Paragraph from '../ui/typography/paragraph';
 import { getStyle } from './functions';
 
 export const List = ({ items, listType, style = {} }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <View

@@ -2,8 +2,8 @@ import React from 'react';
 import { Linking, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COMMUNITY_SVG, LAUNCH_ROCKET, SUPPORT_SVG, WELCOME_SVG } from '../../assets/images/assets';
-import { TrackedState, useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
+import { ThemeStore, useThemeStore } from '../../stores/theme';
+import { eSendEvent } from '../../services/event-manager';
 import { getElevation } from '../../utils';
 import { eOpenAddNotebookDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -18,7 +18,7 @@ import Paragraph from '../ui/typography/paragraph';
 
 export type TStep = {
   text?: string;
-  walkthroughItem: (colors: TrackedState['colors']) => React.ReactNode;
+  walkthroughItem: (colors: ThemeStore['colors']) => React.ReactNode;
   title?: string;
   button?: {
     type: 'next' | 'done';
@@ -32,8 +32,7 @@ export type TStep = {
 };
 
 const NotebookWelcome = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const data = useRotator([
     {
       title: 'Work and office',
@@ -105,7 +104,7 @@ const notebooks: { id: string; steps: TStep[] } = {
     {
       title: 'Notebook > Topic > Notes',
       text: 'Every Notebook has various topics which are like sections that hold all your notes.',
-      walkthroughItem: (colors: TrackedState['colors']) => (
+      walkthroughItem: (colors: ThemeStore['colors']) => (
         <View
           style={{
             width: '100%',
@@ -247,8 +246,7 @@ const notebooks: { id: string; steps: TStep[] } = {
 };
 
 const ChooseTheme = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <View
@@ -333,8 +331,7 @@ const emailconfirmed: { id: string; steps: TStep[] } = {
 };
 
 const Support = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <View

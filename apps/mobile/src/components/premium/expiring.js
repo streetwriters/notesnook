@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import PremiumService from '../../services/premium';
 import { eOpenPremiumDialog, eOpenResultDialog, eOpenTrialEndingDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
@@ -16,8 +16,7 @@ import { CompactFeatures } from './compact-features';
 import { Offer } from './offer';
 
 export const Expiring = () => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState({
     title: 'Your trial is ending soon',

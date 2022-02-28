@@ -1,18 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import BiometricService from '../../services/BiometricService';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import BiometricService from '../../services/biometrics';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet,
   ToastEvent
-} from '../../services/EventManager';
-import { clearMessage } from '../../services/Message';
-import PremiumService from '../../services/PremiumService';
-import Sync from '../../services/Sync';
+} from '../../services/event-manager';
+import { clearMessage } from '../../services/message';
+import PremiumService from '../../services/premium';
+import Sync from '../../services/sync';
 import { db } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
 import { SIZE } from '../../utils/size';
@@ -37,8 +37,7 @@ function getEmail(email) {
 }
 
 export const SessionExpired = () => {
-  const [state, dispatch] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const email = useRef();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();

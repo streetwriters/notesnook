@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { eSendEvent } from '../../services/EventManager';
-import Sync from '../../services/Sync';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import { eSendEvent } from '../../services/event-manager';
+import Sync from '../../services/sync';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/events';
 import JumpToSectionDialog from '../dialogs/jump-to-section';
@@ -60,8 +60,7 @@ const List = ({
   screen,
   ListHeader
 }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
   const syncing = useUserStore(state => state.syncing);

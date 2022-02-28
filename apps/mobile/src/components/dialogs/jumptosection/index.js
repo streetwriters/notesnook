@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { useTracked } from '../../../provider';
-import { useMessageStore } from '../../../provider/stores';
-import { DDS } from '../../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/EventManager';
+import { useThemeStore } from '../../../stores/theme';
+import { useMessageStore } from '../../../stores/stores';
+import { DDS } from '../../../services/device-detection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
 import { getElevation } from '../../../utils';
 import { eCloseJumpToDialog, eOpenJumpToDialog, eScrollEvent } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
@@ -14,8 +14,7 @@ import Paragraph from '../../ui/typography/paragraph';
 const offsets = [];
 let timeout = null;
 const JumpToSectionDialog = ({ scrollRef, data, type, screen }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const notes = data;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);

@@ -2,9 +2,9 @@ import React, { RefObject, useState } from 'react';
 import { View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
 import { FlatList } from 'react-native-gesture-handler';
-import { useTracked } from '../../../provider';
-import { eSendEvent, presentSheet, ToastEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useThemeStore } from '../../../stores/theme';
+import { eSendEvent, presentSheet, ToastEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { db } from '../../../utils/database';
 import { eCloseProgressDialog } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
@@ -27,8 +27,7 @@ export const MoveNotes = ({
   selectedTopic?: any;
   fwdRef: RefObject<ActionSheet>;
 }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
 
   let notes = db.notes?.all;

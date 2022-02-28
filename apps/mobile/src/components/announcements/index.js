@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useMessageStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { useMessageStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { eCloseAnnouncementDialog, eOpenAnnouncementDialog } from '../../utils/events';
 import BaseDialog from '../dialog/base-dialog';
 import { allowedOnPlatform, renderItem } from './functions';
 
 export const AnnouncementDialog = () => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const [info, setInfo] = useState(null);
   const remove = useMessageStore(state => state.remove);

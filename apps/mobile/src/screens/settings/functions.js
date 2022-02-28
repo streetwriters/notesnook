@@ -1,5 +1,5 @@
 import { presentDialog } from '../../components/dialog/functions';
-import { ToastEvent } from '../../services/EventManager';
+import { ToastEvent } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { sleep } from '../../utils/time';
 

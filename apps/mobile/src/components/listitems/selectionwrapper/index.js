@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useTracked } from '../../../provider';
-import { useSettingStore } from '../../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/EventManager';
+import { useThemeStore } from '../../../stores/theme';
+import { useSettingStore } from '../../../stores/stores';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
 import { history } from '../../../utils';
 import { PressableButton } from '../../ui/pressable';
 import { ActionStrip } from './action-strip';
@@ -9,8 +9,7 @@ import { Filler } from './back-fill';
 import { SelectionIcon } from './selection';
 
 const SelectionWrapper = ({ children, item, background, onLongPress, onPress, testID }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [actionStrip, setActionStrip] = useState(false);
   const settings = useSettingStore(state => state.settings);
   const listMode = item.type === 'notebook' ? settings.notebooksListMode : settings.notesListMode;

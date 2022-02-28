@@ -30,7 +30,6 @@ export class DeviceDetectionService {
     this.isPhoneOrTablet();
     this.isIosOrAndroid();
     this.detectIphoneX();
-    //console.log(size.width > size.height,"CALC")
     this.checkSmallTab(size.width > size.height ? 'LANDSCAPE' : 'PORTRAIT');
   }
 
@@ -49,18 +48,14 @@ export class DeviceDetectionService {
     this.height = Dimensions.get('screen').height;
     let deviceSize = this.getDeviceSize();
 
-    //console.log(deviceSize, orientation, DeviceInfo.isTablet(), 'DATA');
     if (
       (!DeviceInfo.isTablet() && orientation === 'LANDSCAPE') ||
       (DeviceInfo.isTablet() && (orientation === 'PORTRAIT' || deviceSize < 9))
     ) {
-      //console.log('small tab')
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = true;
     } else if (DeviceInfo.isTablet() && orientation === 'LANDSCAPE' && deviceSize > 9) {
-      //console.log('large tab tab')
-      //console.log('setting large tablet');
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = false;
@@ -78,26 +73,6 @@ export class DeviceDetectionService {
   }
 
   isPhoneOrTablet() {
-    /*  if (Platform.isPad) {
-      this.isTab = true;
-      this.isPhone = false;
-    }
-    if (
-      this.pixelDensity < 2 &&
-      (this.adjustedWidth >= 1000 || this.adjustedHeight >= 1000)
-    ) {
-      this.isTab = true;
-      this.isPhone = false;
-    } else if (
-      this.pixelDensity === 2 &&
-      (this.adjustedWidth >= 1920 || this.adjustedHeight >= 1920)
-    ) {
-      this.isTab = true;
-      this.isPhone = false;
-    } else {
-      this.isTab = false;
-      this.isPhone = true;
-    } */
     if (DeviceInfo.isTablet()) {
       this.isTab = true;
       this.isPhone = false;

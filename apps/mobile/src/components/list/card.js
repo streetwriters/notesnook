@@ -1,16 +1,15 @@
 import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { useMessageStore, useSelectionStore } from '../../provider/stores';
+import { useThemeStore } from '../../stores/theme';
+import { useMessageStore, useSelectionStore } from '../../stores/stores';
 import { hexToRGBA } from '../../utils/color-scheme/utils';
 import { SIZE } from '../../utils/size';
 import { PressableButton } from '../ui/pressable';
 import Paragraph from '../ui/typography/paragraph';
 
 export const Card = ({ color }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   color = color ? color : colors.accent;
 
   const selectionMode = useSelectionStore(state => state.selectionMode);

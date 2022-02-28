@@ -10,10 +10,6 @@ export function validateEmail(email) {
 
 export const ERRORS_LIST = {
   SHORT_PASS: 'Atleast 8 characters'
-  // NO_ABC: 'Atleast 1 lowercase letter.',
-  // NO_CAPS_ABC: 'Atleast 1 capital letter.',
-  // NO_NUM: 'Atleast 1 number',
-  // SPECIAL: 'Atleast 1 special character',
 };
 
 export function validatePass(password) {
@@ -28,19 +24,6 @@ export function validatePass(password) {
   if (password.length >= 8) {
     errors.SHORT_PASS = false;
   }
-
-  /*   if (password.match(/[a-z]+/)) {
-    errors.NO_ABC = false;
-  }
-  if (password.match(/[A-Z]+/)) {
-    errors.NO_CAPS_ABC = false;
-  }
-  if (password.match(/[0-9]+/)) {
-    errors.NO_NUM = false;
-  }
-  if (password.match(/[$@#&!_]+/)) {
-    errors.SPECIAL = false;
-  } */
   return errors;
 }
 
@@ -51,9 +34,4 @@ export function validateUsername(username) {
   } else {
     return false;
   }
-}
-
-export async function checkPremiumUser() {
-  //let user = await db.user.get();
-  return false;
 }

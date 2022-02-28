@@ -1,14 +1,13 @@
 import React from 'react';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { useSettingStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
+import Navigation from '../../services/navigation';
 import { IconButton } from '../ui/icon-button';
 
 export const LeftMenus = ({ currentScreen, headerMenuState }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
 
   const onLeftButtonPress = () => {

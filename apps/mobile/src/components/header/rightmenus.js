@@ -2,16 +2,15 @@ import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Menu from 'react-native-reanimated-material-menu';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { useSettingStore } from '../../stores/stores';
+import Navigation from '../../services/navigation';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import { IconButton } from '../ui/icon-button';
 
 export const RightMenus = ({ currentScreen, action, rightButtons }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
   const menuRef = useRef();
   return (

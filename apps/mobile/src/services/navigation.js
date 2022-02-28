@@ -5,11 +5,11 @@ import {
   useNoteStore,
   useTagStore,
   useTrashStore
-} from '../provider/stores';
+} from '../stores/stores';
 import { eOnNewTopicAdded, refreshNotesPage } from '../utils/events';
 import { rootNavigatorRef, tabBarRef } from '../utils/global-refs';
-import { eSendEvent } from './EventManager';
-import SettingsService from './SettingsService';
+import { eSendEvent } from './event-manager';
+import SettingsService from './settings';
 
 let currentScreen = 'Notes';
 let homeLoaded = false;
@@ -167,7 +167,7 @@ function closeDrawer() {
   tabBarRef.current?.closeDrawer();
 }
 
-export default {
+const Navigation = {
   navigate,
   goBack,
   push,
@@ -184,3 +184,5 @@ export default {
   getHomeLoaded,
   setHomeLoaded
 };
+
+export default Navigation;

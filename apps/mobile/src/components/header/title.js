@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { eOnNewTopicAdded, eScrollEvent } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
 export const Title = ({ heading, headerColor, screen, notebook }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [hide, setHide] = useState(screen === 'Notebook' ? true : false);
 
   const onScroll = data => {

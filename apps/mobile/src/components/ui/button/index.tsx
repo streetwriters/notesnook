@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, ColorValue, TextStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../../provider';
+import { useThemeStore } from '../../../stores/theme';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../utils';
 import { BUTTON_TYPES } from '../../../utils/constants';
 import { SIZE } from '../../../utils/size';
@@ -53,8 +53,7 @@ export const Button = ({
   fwdRef,
   ...restProps
 }: ButtonProps) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const textColor = buttonType?.text
     ? buttonType.text

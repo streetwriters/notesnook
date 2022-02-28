@@ -1,9 +1,9 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
 import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -12,8 +12,7 @@ import { PressableButton } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
 
 export default function Notebooks({ note, close }) {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   function getNotebooks(item) {
     if (!item.notebooks || item.notebooks.length < 1) return [];

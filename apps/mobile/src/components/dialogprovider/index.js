@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { EditorSettings } from '../../screens/editor/EditorSettings';
 import { AddNotebookSheet } from '../sheets/add-notebook';
 import { AddTopicDialog } from '../dialogs/add-topic';
@@ -24,8 +24,7 @@ import ManageTagsSheet from '../sheets/manage-tags';
 import { VaultDialog } from '../dialogs/vault';
 
 function DialogProvider() {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <>

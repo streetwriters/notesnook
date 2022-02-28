@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { eCloseProgressDialog } from '../../utils/events';
 import { Button } from '../ui/button';
@@ -12,8 +12,7 @@ import { Notice } from '../ui/notice';
 import Seperator from '../ui/seperator';
 
 export const ChangePassword = () => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const passwordInputRef = useRef();
   const password = useRef();
   const oldPasswordInputRef = useRef();

@@ -2,9 +2,9 @@ import React from 'react';
 import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import { useThemeStore } from '../../stores/theme';
+import { useSettingStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import { PressableButton } from '../ui/pressable';
@@ -12,8 +12,7 @@ import Paragraph from '../ui/typography/paragraph';
 import { useActions } from '../../utils/hooks/use-actions';
 
 export const Items = ({ item, buttons, close }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const dimensions = useSettingStore(state => state.dimensions);
   const actions = useActions({ item, close });
   const data = actions.filter(i => buttons.indexOf(i.name) > -1 && !i.hidden);

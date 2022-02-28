@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { Text } from 'react-native';
-import { useTracked } from '../../../provider';
+import { useThemeStore } from '../../../stores/theme';
 import { SIZE } from '../../../utils/size';
 
 /**
@@ -16,8 +16,7 @@ import { SIZE } from '../../../utils/size';
  * @param {TextType | restTypes} props all props
  */
 const Heading = ({ color, size = SIZE.xl, style, ...restProps }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <Text

@@ -6,12 +6,12 @@ import { Header } from '../../components/header';
 import { MoveNotes } from '../../components/sheets/move-notes/movenote';
 import SelectionHeader from '../../components/selection-header';
 import List from '../../components/list';
-import { useTracked } from '../../provider';
-import { useNoteStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
-import SearchService from '../../services/SearchService';
+import { useThemeStore } from '../../stores/theme';
+import { useNoteStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
+import SearchService from '../../services/search';
 import { editing, InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 import { eOnLoadNote, eOpenAddTopicDialog, refreshNotesPage } from '../../utils/events';
@@ -47,8 +47,7 @@ function getAlias(params) {
 }
 
 export const Notes = ({ route, navigation }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const params = useRef(route?.params);
   const [notes, setNotes] = useState(getNotes(params.current) || []);
   const loading = useNoteStore(state => state.loading);

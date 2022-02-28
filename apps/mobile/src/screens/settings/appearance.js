@@ -6,13 +6,13 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
 import { PressableButton } from '../../components/ui/pressable';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { useSettingStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { ToastEvent } from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
-import SettingsService from '../../services/SettingsService';
+import { useThemeStore } from '../../stores/theme';
+import { Actions } from '../../stores/Actions';
+import { useSettingStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
+import { ToastEvent } from '../../services/event-manager';
+import PremiumService from '../../services/premium';
+import SettingsService from '../../services/settings';
 import { MenuItemsList } from '../../utils/constants';
 import {
   ACCENT,
@@ -30,14 +30,13 @@ import { CustomButton } from './button';
 import SectionHeader from './section-header';
 
 const SettingsAppearanceSection = () => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const settings = useSettingStore(state => state.settings);
   const [collapsed, setCollapsed] = useState(true);
   const menuRef = useRef();
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    dispatch({ type: Actions.THEME, colors: newColors });
+    useThemeStore.getState().setColors({ ...newColors });
   }
 
   function changeAccentColor(accentColor) {
@@ -269,12 +268,11 @@ const SettingsAppearanceSection = () => {
 };
 
 export const AccentColorPicker = ({ settings = true }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    dispatch({ type: Actions.THEME, colors: newColors });
+    useThemeStore.getState().setColors({ ...newColors });
   }
 
   function changeAccentColor(accentColor) {

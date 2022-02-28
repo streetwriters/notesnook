@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { normalize, SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import { PressableButton } from '../ui/pressable';
@@ -13,8 +13,7 @@ import Paragraph from '../ui/typography/paragraph';
 
 export const MenuItem = React.memo(
   ({ item, index, testID, rightBtn }) => {
-    const [state] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
     const [headerTextState, setHeaderTextState] = useState(null);
     let isFocused = headerTextState?.id === item.name.toLowerCase() + '_navigation';
 

@@ -1,6 +1,6 @@
 import { Platform, StatusBar } from 'react-native';
 import { AndroidModule } from '..';
-import { eSendEvent } from '../../services/EventManager';
+import { eSendEvent } from '../../services/event-manager';
 import { eThemeUpdated } from '../events';
 
 export const ACCENT = {
@@ -46,9 +46,14 @@ export var COLOR_SCHEME = {
   bg: '#ffffff',
   navbg: '#f7f7f7',
   nav: '#f7f7f7',
-  pri: '#424242',
-  sec: 'white',
-  light: '#ffffff'
+  input: 'transparent',
+  heading: '#212121',
+  pri: '#505050',
+  sec: '#ffffff',
+  light: '#ffffff',
+  transGray: '#00000010',
+  border: '#E8E8E8',
+  placeholder: '#a9a9a9'
 };
 
 export const COLOR_SCHEME_LIGHT = {

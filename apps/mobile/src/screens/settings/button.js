@@ -2,12 +2,11 @@ import React from 'react';
 import { View } from 'react-native';
 import { PressableButton } from '../../components/ui/pressable';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
 
 export const CustomButton = ({ title, tagline, customComponent, onPress, color = null }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   return (
     <PressableButton
       onPress={onPress}

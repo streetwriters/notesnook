@@ -20,25 +20,25 @@ import {
   useNoteStore,
   useSettingStore,
   useUserStore
-} from '../../provider/stores';
-import Backup from '../../services/Backup';
-import BiometricService from '../../services/BiometricService';
+} from '../../stores/stores';
+import Backup from '../../services/backup';
+import BiometricService from '../../services/biometrics';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet,
   ToastEvent
-} from '../../services/EventManager';
+} from '../../services/event-manager';
 import {
   clearMessage,
   setEmailVerifyMessage,
   setLoginMessage,
   setRecoveryKeyMessage
-} from '../../services/Message';
-import PremiumService from '../../services/PremiumService';
-import SettingsService from '../../services/SettingsService';
-import Sync from '../../services/Sync';
+} from '../../services/message';
+import PremiumService from '../../services/premium';
+import SettingsService from '../../services/settings';
+import Sync from '../../services/sync';
 import {
   EditorWebView,
   getNote,

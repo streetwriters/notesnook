@@ -2,10 +2,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Container from '../components/container';
-import { useTracked } from '../provider';
-import { useSelectionStore } from '../provider/stores';
-import { eSendEvent } from '../services/EventManager';
-import Navigation from '../services/Navigation';
+import { useThemeStore } from '../stores/theme';
+import { useSelectionStore } from '../stores/stores';
+import { eSendEvent } from '../services/event-manager';
+import Navigation from '../services/navigation';
 import { history } from '../utils';
 import { hideAllTooltips } from '../utils/hooks/use-tooltip';
 import { MMKV } from '../utils/database/mmkv';
@@ -23,8 +23,7 @@ import Trash from '../screens/trash';
 const Stack = createNativeStackNavigator();
 export const NavigationStack = React.memo(
   () => {
-    const [state, dispatch] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
     const [render, setRender] = React.useState(false);
     const clearSelection = useSelectionStore(state => state.clearSelection);
     const homepage = React.useRef('Notes');

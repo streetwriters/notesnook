@@ -1,11 +1,10 @@
 import React from 'react';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import Heading from '../ui/typography/heading';
 import { getStyle } from './functions';
 
 export const Title = ({ text, style = {} }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <Heading

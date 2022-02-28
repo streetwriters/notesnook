@@ -7,9 +7,9 @@ import { Issue } from '../../components/sheets/github/issue';
 import { Header as TopHeader } from '../../components/header/index';
 import Seperator from '../../components/ui/seperator';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
-import { eSendEvent, presentSheet } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent, presentSheet } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { InteractionManager } from '../../utils';
 import { STORE_LINK } from '../../utils/constants';
 import { eScrollEvent, eUpdateSearchState } from '../../utils/events';
@@ -32,8 +32,7 @@ const format = ver => {
 };
 
 export const Settings = ({ navigation }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [collapsed, setCollapsed] = useState(false);
 
   let pageIsLoaded = false;

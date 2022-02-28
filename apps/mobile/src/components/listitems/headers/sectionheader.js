@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { useTracked } from '../../../provider';
-import { useSettingStore } from '../../../provider/stores';
+import { useThemeStore } from '../../../stores/theme';
+import { useSettingStore } from '../../../stores/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet
-} from '../../../services/EventManager';
-import SettingsService from '../../../services/SettingsService';
+} from '../../../services/event-manager';
+import SettingsService from '../../../services/settings';
 import { GROUP } from '../../../utils/constants';
 import { COLORS_NOTE } from '../../../utils/color-scheme';
 import { db } from '../../../utils/database';
@@ -20,8 +20,7 @@ import Sort from '../../sheets/sort';
 import Heading from '../../ui/typography/heading';
 
 export const SectionHeader = ({ item, index, type, color, screen }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const { fontScale } = useWindowDimensions();
   const [groupOptions, setGroupOptions] = useState(db.settings?.getGroupOptions(type));
   let groupBy = Object.keys(GROUP).find(key => GROUP[key] === groupOptions.groupBy);

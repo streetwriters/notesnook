@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import Paragraph from '../ui/typography/paragraph';
@@ -16,8 +16,7 @@ const DialogButtons = ({
   doneText,
   positiveType
 }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <View

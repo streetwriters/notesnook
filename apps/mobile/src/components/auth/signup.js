@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { Dimensions, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
-import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
-import PremiumService from '../../services/PremiumService';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
+import { eSendEvent, ToastEvent } from '../../services/event-manager';
+import { clearMessage, setEmailVerifyMessage } from '../../services/message';
+import PremiumService from '../../services/premium';
 import { db } from '../../utils/database';
 import { eCloseLoginDialog } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
@@ -24,8 +24,7 @@ import Paragraph from '../ui/typography/paragraph';
 import { SVG } from './background';
 
 export const Signup = ({ changeMode, welcome, trial }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const email = useRef();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();

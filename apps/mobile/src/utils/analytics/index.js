@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { MMKV } from '../database/mmkv';
-import { useSettingStore } from '../../provider/stores';
+import { useSettingStore } from '../../stores/stores';
 
 const WEBSITE_ID = `3c6890ce-8410-49d5-8831-15fb2eb28a21`;
 const baseUrl = `https://analytics.streetwriters.co/api/collect`;

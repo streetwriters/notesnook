@@ -3,16 +3,15 @@ import { View } from 'react-native';
 import { PressableButton } from '../../../../components/ui/pressable';
 import Heading from '../../../../components/ui/typography/heading';
 import Paragraph from '../../../../components/ui/typography/paragraph';
-import { useTracked } from '../../../../provider';
-import { eSendEvent } from '../../../../services/EventManager';
+import { useThemeStore } from '../../../../stores/theme';
+import { eSendEvent } from '../../../../services/event-manager';
 import { eCloseProgressDialog } from '../../../../utils/events';
 import { SIZE } from '../../../../utils/size';
 import { execCommands } from './commands';
 import { formatSelection } from './constants';
 
 export const Table = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [width, setWidth] = useState(400);
   const itemWidth = width / 5;
 

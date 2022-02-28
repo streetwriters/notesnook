@@ -6,10 +6,10 @@ import { Header } from '../../components/header';
 import { Placeholder } from '../../components/ui/svg';
 import SelectionHeader from '../../components/selection-header';
 import List from '../../components/list';
-import { useSelectionStore, useTrashStore } from '../../provider/stores';
-import { ToastEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
-import SearchService from '../../services/SearchService';
+import { useSelectionStore, useTrashStore } from '../../stores/stores';
+import { ToastEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
+import SearchService from '../../services/search';
 import { InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 

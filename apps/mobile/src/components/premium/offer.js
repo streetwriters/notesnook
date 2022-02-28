@@ -1,12 +1,11 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
 import Paragraph from '../ui/typography/paragraph';
 
 export const Offer = ({ off = '30', text = 'on yearly plan, offer ends soon', padding = 0 }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <Paragraph

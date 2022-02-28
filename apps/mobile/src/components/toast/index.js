@@ -4,9 +4,9 @@ import Animated, { Easing, useValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { DDS } from '../../services/device-detection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { dHeight, getElevation } from '../../utils';
 import { eHideToast, eShowToast } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -18,8 +18,7 @@ const { timing } = Animated;
 
 let toastMessages = [];
 export const Toast = ({ context = 'global' }) => {
-  const [state, dispatch] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [keyboard, setKeyboard] = useState(false);
   const [data, setData] = useState({});
   const [toastStyle, setToastStyle] = useState({

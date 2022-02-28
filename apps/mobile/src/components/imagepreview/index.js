@@ -5,7 +5,7 @@ import RNFetchBlob from 'rn-fetch-blob';
 import Storage from '../../utils/database/storage';
 import { IconButton } from '../ui/icon-button';
 import BaseDialog from '../dialog/base-dialog';
-const { eSubscribeEvent, eUnSubscribeEvent } = require('../../services/EventManager');
+const { eSubscribeEvent, eUnSubscribeEvent } = require('../../services/eventmanager');
 
 const ImagePreview = () => {
   const [visible, setVisible] = useState(false);

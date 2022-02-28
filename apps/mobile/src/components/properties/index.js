@@ -1,8 +1,8 @@
 import React from 'react';
 import { Platform, ScrollView, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { presentSheet } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { DDS } from '../../services/device-detection';
+import { presentSheet } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { SIZE } from '../../utils/size';
 import Heading from '../ui/typography/heading';
@@ -17,8 +17,7 @@ import { Tags } from './tags';
 import { Topics } from './topics';
 
 export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const alias = item
     ? item.type === 'tag'

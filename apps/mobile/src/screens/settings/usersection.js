@@ -8,11 +8,11 @@ import { Button } from '../../components/ui/button';
 import Seperator from '../../components/ui/seperator';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
-import Sync from '../../services/Sync';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
+import PremiumService from '../../services/premium';
+import Sync from '../../services/sync';
 import {
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
@@ -38,8 +38,7 @@ const getTimeLeft = t2 => {
 };
 
 const SettingsUserSection = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const user = useUserStore(state => state.user);
   const subscriptionDaysLeft = user && getTimeLeft(parseInt(user.subscription?.expiry));

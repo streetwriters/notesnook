@@ -2,25 +2,25 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NativeModules, Platform, StatusBar, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import {
   useFavoriteStore,
   useMessageStore,
   useNoteStore,
   useSettingStore,
   useUserStore
-} from '../../provider/stores';
-import BiometricService from '../../services/BiometricService';
-import { DDS } from '../../services/DeviceDetection';
+} from '../../stores/stores';
+import BiometricService from '../../services/biometrics';
+import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet,
   ToastEvent
-} from '../../services/EventManager';
-import { setRateAppMessage } from '../../services/Message';
-import PremiumService from '../../services/PremiumService';
+} from '../../services/event-manager';
+import { setRateAppMessage } from '../../services/message';
+import PremiumService from '../../services/premium';
 import { editing } from '../../utils';
 import { db } from '../../utils/database';
 import { eOpenAnnouncementDialog } from '../../utils/events';
@@ -44,8 +44,7 @@ let passwordValue = null;
 let didVerifyUser = false;
 
 const Launcher = ({ onLoad }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const setNotes = useNoteStore(state => state.setNotes);
   const setFavorites = useFavoriteStore(state => state.setFavorites);
   const _setLoading = useNoteStore(state => state.setLoading);

@@ -1,10 +1,10 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useRef, useState } from 'react';
 import { Linking, Platform, Text, TextInput, View } from 'react-native';
-import { useTracked } from '../../../provider';
-import { useUserStore } from '../../../provider/stores';
-import { eSendEvent, ToastEvent } from '../../../services/EventManager';
-import PremiumService from '../../../services/PremiumService';
+import { useThemeStore } from '../../../stores/theme';
+import { useUserStore } from '../../../stores/stores';
+import { eSendEvent, ToastEvent } from '../../../services/event-manager';
+import PremiumService from '../../../services/premium';
 import { APP_VERSION } from '../../../../version';
 import { db } from '../../../utils/database';
 import { eCloseProgressDialog } from '../../../utils/events';
@@ -19,8 +19,7 @@ import Paragraph from '../../ui/typography/paragraph';
 import deviceInfoModule from 'react-native-device-info';
 
 export const Issue = () => {
-  const [state, dispatch] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const body = useRef(null);
   const title = useRef(null);
   const user = useUserStore(state => state.user);

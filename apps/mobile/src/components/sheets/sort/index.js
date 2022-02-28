@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../../provider';
-import { eSendEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useThemeStore } from '../../../stores/theme';
+import { eSendEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { GROUP, SORT } from '../../../utils/constants';
 import { db } from '../../../utils/database';
 import { refreshNotesPage } from '../../../utils/events';
@@ -13,8 +13,7 @@ import Seperator from '../../ui/seperator';
 import Heading from '../../ui/typography/heading';
 
 const Sort = ({ type, screen }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [groupOptions, setGroupOptions] = useState(db.settings.getGroupOptions(type));
 
   const updateGroupOptions = async _groupOptions => {

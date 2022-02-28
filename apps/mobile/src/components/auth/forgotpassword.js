@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { ToastEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { DDS } from '../../services/device-detection';
+import { ToastEvent } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
 import { IconButton } from '../ui/icon-button';
@@ -15,8 +15,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
 export const ForgotPassword = () => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const email = useRef();
   const emailInputRef = useRef();
   const [error, setError] = useState(false);

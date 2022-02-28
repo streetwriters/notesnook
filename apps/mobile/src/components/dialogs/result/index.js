@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../../provider';
-import { DDS } from '../../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/EventManager';
+import { useThemeStore } from '../../../stores/theme';
+import { DDS } from '../../../services/device-detection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
 import { getElevation } from '../../../utils';
 import { eCloseResultDialog, eOpenResultDialog } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
@@ -14,8 +14,7 @@ import Paragraph from '../../ui/typography/paragraph';
 import { ProFeatures } from './pro-features';
 
 const ResultDialog = () => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
     title: 'Thank you for signing up!',

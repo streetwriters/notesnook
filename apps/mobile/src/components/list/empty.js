@@ -1,8 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
+import { useThemeStore } from '../../stores/theme';
+import { useSettingStore } from '../../stores/stores';
 import { useTip } from '../../services/tip-manager';
 import { COLORS_NOTE } from '../../utils/color-scheme';
 import { SIZE } from '../../utils/size';
@@ -14,8 +14,7 @@ import Paragraph from '../ui/typography/paragraph';
 
 export const Empty = React.memo(
   ({ loading = true, placeholderData, headerProps, type, screen }) => {
-    const [state] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
     const insets = useSafeAreaInsets();
     const { height } = useWindowDimensions();
     const introCompleted = useSettingStore(state => state.isIntroCompleted);

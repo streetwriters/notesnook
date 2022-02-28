@@ -1,11 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useSelectionStore } from '../../provider/stores';
+import { useThemeStore } from '../../stores/theme';
+import { useSelectionStore } from '../../stores/stores';
 
 export const ContainerHeader = ({ children }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const selectionMode = useSelectionStore(state => state.selectionMode);
 
   return !selectionMode ? (

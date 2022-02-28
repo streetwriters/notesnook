@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LayoutAnimation, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent, presentSheet } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent, presentSheet } from '../../services/event-manager';
 import { eCloseProgressDialog } from '../../utils/events';
 import { MMKV } from '../../utils/database/mmkv';
 import { SIZE } from '../../utils/size';
@@ -12,8 +12,7 @@ import Paragraph from '../ui/typography/paragraph';
 import walkthroughs, { TStep } from './walkthroughs';
 
 export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip: boolean }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [step, setStep] = useState<TStep>(steps && steps[0]);
 
   const next = () => {

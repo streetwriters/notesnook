@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../../provider';
-import { useTagStore } from '../../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useThemeStore } from '../../../stores/theme';
+import { useTagStore } from '../../../stores/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { db } from '../../../utils/database';
 import { eCloseTagsDialog, eOpenTagsDialog } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
@@ -15,8 +15,7 @@ import SheetWrapper from '../../ui/sheet';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 const ManageTagsSheet = () => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const [note, setNote] = useState(null);
   const allTags = useTagStore(state => state.tags);
@@ -216,8 +215,7 @@ const ManageTagsSheet = () => {
 export default ManageTagsSheet;
 
 const TagItem = ({ tag, note, setNote }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
 
   const onPress = async () => {
     let prevNote = { ...note };

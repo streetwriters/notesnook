@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { DDS } from '../../services/device-detection';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { dWidth, editing, getElevation } from '../../utils';
 import { eCloseActionSheet, eOpenPremiumDialog, eShowGetPremium } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -22,8 +22,7 @@ let currentMsg = {
   desc: ''
 };
 export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [msg, setMsg] = useState(currentMsg);
 
   const open = event => {

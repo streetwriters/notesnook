@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Platform, View, ScrollView } from 'react-native';
 import { IconButton } from '../../../../components/ui/icon-button';
-import { useTracked } from '../../../../provider';
-import { useEditorStore } from '../../../../provider/stores';
+import { useThemeStore } from '../../../../stores/theme';
+import { useEditorStore } from '../../../../stores/stores';
 import { getElevation } from '../../../../utils';
 import { db } from '../../../../utils/database';
 import { normalize } from '../../../../utils/size';
@@ -17,8 +17,7 @@ import Tooltip from './tooltip';
 
 const EditorToolbar = React.memo(
   () => {
-    const [state] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
     const config = TOOLBAR_CONFIG;
     const searchReplace = useEditorStore(state => state.searchReplace);
     const readonly = useEditorStore(state => state.readonly);

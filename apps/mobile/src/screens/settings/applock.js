@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { LayoutAnimation, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import BiometricService from '../../services/BiometricService';
+import BiometricService from '../../services/biometrics';
 import { PressableButton } from '../../components/ui/pressable';
 import Seperator from '../../components/ui/seperator';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { presentSheet } from '../../services/EventManager';
-import SettingsService from '../../services/SettingsService';
+import { useThemeStore } from '../../stores/theme';
+import { useSettingStore } from '../../stores/stores';
+import { presentSheet } from '../../services/event-manager';
+import SettingsService from '../../services/settings';
 import { SIZE } from '../../utils/size';
 import { db } from '../../utils/database';
 import { WelcomeNotice } from '../../components/intro/welcome';
@@ -18,8 +18,7 @@ import { getElevation } from '../../utils';
 import umami from '../../utils/analytics';
 
 const AppLock = ({ welcome, s = 0 }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const settings = useSettingStore(state => state.settings);
   const [step, setStep] = useState(s);
 

@@ -1,12 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
+import { useThemeStore } from '../../stores/theme';
+import { DDS } from '../../services/device-detection';
 import { getElevation } from '../../utils';
 
 const DialogContainer = ({ width, height, ...restProps }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <View

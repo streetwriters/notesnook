@@ -2,18 +2,17 @@ import React, { useEffect } from 'react';
 import Orientation from 'react-native-orientation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Launcher from './src/components/launcher';
-import { useTracked } from './src/provider';
-import { initialize, useSettingStore, useUserStore } from './src/provider/stores';
-import { DDS } from './src/services/DeviceDetection';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from './src/services/EventManager';
-import Notifications from './src/services/Notifications';
-import SettingsService from './src/services/SettingsService';
+import { ApplicationHolder } from './src/navigation';
+import { useThemeStore } from './src/stores/theme';
+import { initialize, useSettingStore, useUserStore } from './src/stores/stores';
+import { DDS } from './src/services/device-detection';
+import { eSendEvent } from './src/services/event-manager';
+import Notifications from './src/services/notifications';
+import SettingsService from './src/services/settings';
 import { TipManager } from './src/services/tip-manager';
 import { db } from './src/utils/database';
-import { eDispatchAction } from './src/utils/events';
-import { useAppEvents } from './src/utils/hooks/use-app-events';
 import { MMKV } from './src/utils/database/mmkv';
-import { ApplicationHolder } from './src/navigation';
+import { useAppEvents } from './src/utils/hooks/use-app-events';
 
 let databaseHasLoaded = false;
 
@@ -55,14 +54,12 @@ function checkOrientation() {
 
 const loadMainApp = () => {
   if (databaseHasLoaded) {
-    SettingsService.setAppLoaded();
     eSendEvent('load_overlay');
     initialize();
   }
 };
 checkOrientation();
 const App = () => {
-  const [, dispatch] = useTracked();
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
   const appEvents = useAppEvents();
 
@@ -83,17 +80,6 @@ const App = () => {
         loadMainApp();
       }
     })();
-  }, []);
-
-  const _dispatch = data => {
-    dispatch(data);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent(eDispatchAction, _dispatch);
-    return () => {
-      eUnSubscribeEvent(eDispatchAction, _dispatch);
-    };
   }, []);
 
   return (

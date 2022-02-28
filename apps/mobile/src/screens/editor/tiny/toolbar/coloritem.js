@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../../../provider';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
+import { useThemeStore } from '../../../../stores/theme';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
 import { normalize, SIZE } from '../../../../utils/size';
 import { formatSelection, properties, rgbToHex } from './constants';
 import { execCommands } from './commands';
 import { MMKV } from '../../../../utils/database/mmkv';
 
 const ColorItem = ({ value, format, onCustomPress, checked }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [selected, setSelected] = useState(false);
   const isChecked = value !== '' && (selected || checked);
   const isNil = value === '';

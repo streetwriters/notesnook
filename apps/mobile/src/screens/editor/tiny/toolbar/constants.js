@@ -1,6 +1,6 @@
 import { createRef } from 'react';
 import { Platform } from 'react-native';
-import { eSendEvent } from '../../../../services/EventManager';
+import { eSendEvent } from '../../../../services/event-manager';
 import { editing } from '../../../../utils';
 import { sleep } from '../../../../utils/time';
 import { EditorWebView, textInput } from '../../Functions';

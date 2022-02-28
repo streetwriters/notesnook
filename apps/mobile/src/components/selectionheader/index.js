@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { BackHandler, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { useSelectionStore } from '../../provider/stores';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { useSelectionStore } from '../../stores/stores';
+import { eSendEvent, ToastEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
 import { eOpenMoveNoteDialog, refreshNotesPage } from '../../utils/events';
 import { deleteItems } from '../../utils/functions';
@@ -17,8 +17,7 @@ import { IconButton } from '../ui/icon-button';
 import Heading from '../ui/typography/heading';
 
 export const SelectionHeader = React.memo(({ screen, type, extras }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);

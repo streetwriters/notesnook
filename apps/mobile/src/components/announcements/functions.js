@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { View } from 'react-native';
-import { allowedPlatforms } from '../../provider/stores';
+import { allowedPlatforms } from '../../stores/stores';
 import { ProFeatures } from '../dialogs/result/pro-features';
 import { Body } from './body';
 import { Cta } from './cta';

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { editing } from '../../utils';
 import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -16,8 +16,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
 const SheetProvider = ({ context = 'global' }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState(null);
   const actionSheetRef = useRef();

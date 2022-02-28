@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { Button } from '../../../../components/ui/button';
 import Input from '../../../../components/ui/input';
-import { useTracked } from '../../../../provider';
-import { useEditorStore, useSettingStore } from '../../../../provider/stores';
+import { useThemeStore } from '../../../../stores/theme';
+import { useEditorStore, useSettingStore } from '../../../../stores/stores';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
 import { hideAllTooltips } from '../../../../utils/hooks/use-tooltip';
 import layoutmanager from '../../../../utils/layout-manager';
@@ -14,8 +14,7 @@ import { endSearch } from './commands';
 import { properties } from './constants';
 
 const SearcReplace = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [focusType, setFocusType] = useState(0);
   const [enableReplace, setEnableReplace] = useState(false);
   const [menu, setMenu] = useState(false);

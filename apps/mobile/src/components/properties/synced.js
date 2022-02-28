@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
 import { openLinkInBrowser } from '../../utils/functions';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
@@ -11,8 +11,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
 export const Synced = ({ item, close }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
   const lastSynced = useUserStore(state => state.lastSynced);
 

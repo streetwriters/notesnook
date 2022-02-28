@@ -1,5 +1,5 @@
 import RNFetchBlob from 'rn-fetch-blob';
-import { useAttachmentStore } from '../../provider/stores';
+import { useAttachmentStore } from '../../stores/stores';
 import { db } from '../database';
 import { cacheDir } from './utils';
 

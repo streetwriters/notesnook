@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { enabled } from 'react-native-privacy-snapshot';
 import ToggleSwitch from 'toggle-switch-react-native';
-import { useTracked } from '../../provider';
-import { useSettingStore, useUserStore } from '../../provider/stores';
-import BiometricService from '../../services/BiometricService';
-import { eSubscribeEvent, eUnSubscribeEvent, openVault } from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
-import SettingsService from '../../services/SettingsService';
+import { useThemeStore } from '../../stores/theme';
+import { useSettingStore, useUserStore } from '../../stores/stores';
+import BiometricService from '../../services/biometrics';
+import { eSubscribeEvent, eUnSubscribeEvent, openVault } from '../../services/event-manager';
+import PremiumService from '../../services/premium';
+import SettingsService from '../../services/settings';
 import { AndroidModule, InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 import AppLock from './app-lock';
@@ -15,8 +15,7 @@ import { CustomButton } from './button';
 import SectionHeader from './section-header';
 
 const SettingsPrivacyAndSecurity = () => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const settings = useSettingStore(state => state.settings);
   const [collapsed, setCollapsed] = useState(true);
   const user = useUserStore(state => state.user);

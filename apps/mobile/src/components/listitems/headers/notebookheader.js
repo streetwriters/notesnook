@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../../provider';
-import { useMenuStore } from '../../../provider/stores';
-import { ToastEvent } from '../../../services/EventManager';
+import { useThemeStore } from '../../../stores/theme';
+import { useMenuStore } from '../../../stores/stores';
+import { ToastEvent } from '../../../services/event-manager';
 import { getTotalNotes } from '../../../utils';
 import { db } from '../../../utils/database';
 import { SIZE } from '../../../utils/size';
@@ -11,8 +11,7 @@ import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 
 export const NotebookHeader = ({ notebook, onEditNotebook }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(notebook.id));
   const setMenuPins = useMenuStore(state => state.setMenuPins);
   const totalNotes = getTotalNotes(notebook);

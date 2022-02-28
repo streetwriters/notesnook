@@ -1,13 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
 import { timeConverter } from '../../utils/time';
 import Paragraph from '../ui/typography/paragraph';
 
 export const DateMeta = ({ item }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const getNameFromKey = key => {
     switch (key) {

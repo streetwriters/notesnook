@@ -1,11 +1,10 @@
 import React from 'react';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import Paragraph from '../ui/typography/paragraph';
 import { getStyle } from './functions';
 
 export const Body = ({ text, style = {} }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <Paragraph

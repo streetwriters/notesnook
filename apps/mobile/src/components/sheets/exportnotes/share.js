@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import Share from 'react-native-share';
-import { ToastEvent } from '../../../services/EventManager';
+import { ToastEvent } from '../../../services/event-manager';
 import { SIZE } from '../../../utils/size';
 import { Button } from '../../ui/button';
 

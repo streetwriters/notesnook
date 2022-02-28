@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, Text, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
+import PremiumService from '../../services/premium';
 import { db } from '../../utils/database';
 import {
   eClosePremiumDialog,
@@ -45,8 +45,7 @@ export const PricingPlans = ({
   trial = false,
   showTrialOption = true
 }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
   const [product, setProduct] = useState(null);
   const [products, setProducts] = useState([]);

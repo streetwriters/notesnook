@@ -1,4 +1,4 @@
-import { eSendEvent } from '../../services/EventManager';
+import { eSendEvent } from '../../services/event-manager';
 import { eCloseSimpleDialog, eOpenSimpleDialog } from '../../utils/events';
 
 type DialogInfo = {

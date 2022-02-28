@@ -2,10 +2,10 @@ import React, { createRef, useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useTracked } from '../../../provider';
-import { useNotebookStore, useSelectionStore } from '../../../provider/stores';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/EventManager';
-import Navigation from '../../../services/Navigation';
+import { useThemeStore } from '../../../stores/theme';
+import { useNotebookStore, useSelectionStore } from '../../../stores/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { getTotalNotes } from '../../../utils';
 import { db } from '../../../utils/database';
 import { eOpenMoveNoteDialog } from '../../../utils/events';
@@ -72,8 +72,7 @@ const AddToNotebookSheet = () => {
 export default AddToNotebookSheet;
 
 const MoveNoteComponent = ({ close, note, setNote }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const notebooks = useNotebookStore(state => state.notebooks.filter(n => n?.type === 'notebook'));
 

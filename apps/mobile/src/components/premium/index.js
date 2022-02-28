@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { eClosePremiumDialog, eOpenPremiumDialog } from '../../utils/events';
 import BaseDialog from '../dialog/base-dialog';
 import { Component } from './component';

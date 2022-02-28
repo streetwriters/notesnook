@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import * as Progress from 'react-native-progress';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { useAttachmentStore } from '../../provider/stores';
+import { useThemeStore } from '../../stores/theme';
+import { useAttachmentStore } from '../../stores/stores';
 import { db } from '../../utils/database';
 import filesystem from '../../utils/filesystem';
 import { SIZE } from '../../utils/size';
@@ -29,8 +29,7 @@ function getFileExtension(filename) {
 }
 
 export const AttachmentItem = ({ attachment, encryption }) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const progress = useAttachmentStore(state => state.progress);
   const [currentProgress, setCurrentProgress] = useState(
     encryption

@@ -4,7 +4,7 @@ import Animated, { Easing } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useSelectionStore, useSettingStore } from '../../provider/stores';
+import { useSelectionStore, useSettingStore } from '../../stores/stores';
 import { editing, getElevation, showTooltip, TOOLTIP_POSITIONS } from '../../utils';
 import { normalize, SIZE } from '../../utils/size';
 import { PressableButton } from '../ui/pressable';

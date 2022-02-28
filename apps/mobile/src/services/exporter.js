@@ -483,9 +483,11 @@ async function saveToHTML(note) {
   };
 }
 
-export default {
+const Exporter = {
   saveToHTML,
   saveToText,
   saveToMarkdown,
   saveToPDF
 };
+
+export default Exporter;

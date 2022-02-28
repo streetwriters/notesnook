@@ -1,13 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
 import Heading from '../../../../components/ui/typography/heading';
-import { useTracked } from '../../../../provider';
+import { useThemeStore } from '../../../../stores/theme';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Paragraph from '../../../../components/ui/typography/paragraph';
 const ToolbarListFormat = ({ selected, formatValue, format }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const ordered_lists = {
     default: ['1.', '2.', '3.'],
     'lower-alpha': ['a.', 'b.', 'c.'],

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
+import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import Heading from '../ui/typography/heading';
@@ -17,8 +17,7 @@ const DialogHeader = ({
   centered,
   titlePart
 }) => {
-  const [state, dispatch] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
 
   return (
     <>

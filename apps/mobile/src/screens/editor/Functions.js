@@ -1,16 +1,16 @@
 import { createRef } from 'react';
 import { Platform } from 'react-native';
 import { presentDialog } from '../../components/dialog/functions';
-import { useEditorStore, useMenuStore, useTagStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import { useEditorStore, useMenuStore, useTagStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
-} from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
-import PremiumService from '../../services/PremiumService';
+} from '../../services/event-manager';
+import Navigation from '../../services/navigation';
+import PremiumService from '../../services/premium';
 import { TipManager } from '../../services/tip-manager';
 import { editing } from '../../utils';
 import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/color-scheme';

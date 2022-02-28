@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import SearchService from '../../services/SearchService';
+import { useThemeStore } from '../../stores/theme';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import SearchService from '../../services/search';
 import { eScrollEvent } from '../../utils/events';
 import { IconButton } from '../ui/icon-button';
 import { SearchInput } from '../SearchInput';
@@ -13,8 +13,7 @@ import { Title } from './title';
 
 export const Header = React.memo(
   ({ root, title, screen, isBack, color, action, rightButtons, notebook }) => {
-    const [state] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
     const insets = useSafeAreaInsets();
     const [hide, setHide] = useState(true);
 

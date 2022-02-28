@@ -1,9 +1,9 @@
 import { Linking } from 'react-native';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import { history } from '.';
-import { useMenuStore, useSelectionStore } from '../provider/stores';
-import { eSendEvent, ToastEvent } from '../services/EventManager';
-import Navigation from '../services/Navigation';
+import { useMenuStore, useSelectionStore } from '../stores/stores';
+import { eSendEvent, ToastEvent } from '../services/event-manager';
+import Navigation from '../services/navigation';
 import { db } from './database';
 import { eClearEditor } from './events';
 

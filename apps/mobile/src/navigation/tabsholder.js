@@ -7,13 +7,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
 import Tabs from '../components/tabs';
-import { useTracked } from '../provider';
-import { useEditorStore, useSettingStore } from '../provider/stores';
+import { useThemeStore } from '../stores/theme';
+import { useEditorStore, useSettingStore } from '../stores/stores';
 import { EditorWrapper } from '../screens/editor/EditorWrapper';
 import { checkStatus, EditorWebView, getNote } from '../screens/editor/Functions';
 import tiny from '../screens/editor/tiny/tiny';
-import { DDS } from '../services/DeviceDetection';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
+import { DDS } from '../services/device-detection';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
 import { editing, setWidthHeight } from '../utils';
 import { updateStatusBarColor } from '../utils/color-scheme';
 import {
@@ -70,8 +70,7 @@ const onChangeTab = async obj => {
 
 export const TabsHolder = React.memo(
   () => {
-    const [state] = useTracked();
-    const { colors } = state;
+    const colors = useThemeStore(state => state.colors);
 
     const deviceMode = useSettingStore(state => state.deviceMode);
     const setFullscreen = useSettingStore(state => state.setFullscreen);

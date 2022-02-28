@@ -10,9 +10,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
 import { PremiumToast } from '../../components/premium/premium-toast';
-import { useTracked } from '../../provider';
-import { useNoteStore, useSettingStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import { useThemeStore } from '../../stores/theme';
+import { useNoteStore, useSettingStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
 import { editing } from '../../utils';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
@@ -20,8 +20,7 @@ import EditorOverlay from './EditorOverlay';
 import { checkStatus, textInput } from './Functions';
 
 export const EditorWrapper = ({ width }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
   const loading = useNoteStore(state => state.loading);
   const insets = useSafeAreaInsets();
@@ -49,7 +48,7 @@ export const EditorWrapper = ({ width }) => {
       style={{
         width: width[deviceMode].c,
         height: '100%',
-        backgroundColor: state.colors.bg,
+        backgroundColor: colors.bg,
         borderLeftWidth: DDS.isTab ? 1 : 0,
         borderLeftColor: DDS.isTab ? colors.nav : 'transparent'
       }}

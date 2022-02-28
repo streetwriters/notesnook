@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
-import { eSendEvent } from '../services/EventManager';
-import Navigation from '../services/Navigation';
+import { eSendEvent } from '../services/event-manager';
+import Navigation from '../services/navigation';
 import { refreshNotesPage } from './events';
 
 export const STORE_LINK =

@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../../provider/index';
+import { useThemeStore } from '../../../stores/theme';
 import {
   ERRORS_LIST,
   validateEmail,
   validatePass,
   validateUsername
-} from '../../../services/Validation';
+} from '../../../services/validation';
 import { getElevation } from '../../../utils';
 import { SIZE } from '../../../utils/size';
 import { IconButton } from '../icon-button';
@@ -74,8 +74,7 @@ const Input = ({
   containerStyle = {},
   ...restProps
 }: InputProps) => {
-  const [state] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const [error, setError] = useState(false);
   const [focus, setFocus] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);

@@ -1,10 +1,10 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import NetInfo from '@react-native-community/netinfo';
-import { initialize, useUserStore } from '../provider/stores';
+import { initialize, useUserStore } from '../stores/stores';
 import { doInBackground } from '../utils';
 import { db } from '../utils/database';
 import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
-import { ToastEvent } from './EventManager';
+import { ToastEvent } from './event-manager';
 
 let retryCount = 0;
 const run = async (context = 'global', forced) => {
@@ -68,6 +68,8 @@ const run = async (context = 'global', forced) => {
   return result;
 };
 
-export default {
+const Sync = {
   run
 };
+
+export default Sync;

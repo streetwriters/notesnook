@@ -7,10 +7,11 @@ export const SvgView = ({
   height = 250,
   src
 }: {
-  width: number | string;
-  height: number | number;
-  src: string;
+  width?: number | string;
+  height?: number | number;
+  src?: string;
 }) => {
+  if (!src) return null;
   return (
     <View
       style={{

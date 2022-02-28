@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 import { Alert, Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
-import { useTracked } from '../../provider';
-import { useEditorStore } from '../../provider/stores';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useThemeStore } from '../../stores/theme';
+import { useEditorStore } from '../../stores/stores';
+import { eSendEvent, ToastEvent } from '../../services/event-manager';
+import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
 import { eCloseProgressDialog, eOnLoadNote } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
@@ -17,8 +17,7 @@ import DialogHeader from '../dialog/dialog-header';
 import Paragraph from '../ui/typography/paragraph';
 
 export default function NotePreview({ session, content }) {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const webviewRef = useRef();
 
   const onLoad = async () => {

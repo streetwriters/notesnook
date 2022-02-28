@@ -3,12 +3,12 @@ import { Platform, TouchableOpacity, View } from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Seperator from '../../components/ui/seperator';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useTracked } from '../../provider';
-import { useSettingStore, useUserStore } from '../../provider/stores';
-import Backup from '../../services/Backup';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
-import SettingsService from '../../services/SettingsService';
+import { useThemeStore } from '../../stores/theme';
+import { useSettingStore, useUserStore } from '../../stores/stores';
+import Backup from '../../services/backup';
+import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
+import PremiumService from '../../services/premium';
+import SettingsService from '../../services/settings';
 import { eCloseProgressDialog, eOpenLoginDialog, eOpenRestoreDialog } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
 import { MMKV } from '../../utils/database/mmkv';
@@ -19,8 +19,7 @@ import { verifyUser } from './functions';
 import SectionHeader from './section-header';
 
 const SettingsBackupAndRestore = ({ isSheet }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
   const settings = useSettingStore(state => state.settings);
   const user = useUserStore(state => state.user);
   const [collapsed, setCollapsed] = useState(isSheet ? false : true);

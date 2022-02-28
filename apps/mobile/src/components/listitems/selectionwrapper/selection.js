@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../../provider';
-import { Actions } from '../../../provider/Actions';
-import { useSelectionStore } from '../../../provider/stores';
+import { useThemeStore } from '../../../stores/theme';
+import { Actions } from '../../../stores/Actions';
+import { useSelectionStore } from '../../../stores/stores';
 import { SIZE } from '../../../utils/size';
 
 export const SelectionIcon = ({ setActionStrip, item, compactMode }) => {
-  const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);

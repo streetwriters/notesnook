@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { LAUNCH_ROCKET } from '../../assets/images/assets';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, presentSheet } from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
+import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
+import { eSendEvent, presentSheet } from '../../services/event-manager';
+import PremiumService from '../../services/premium';
 import { getElevation } from '../../utils';
 import { db } from '../../utils/database';
 import {
@@ -32,8 +32,7 @@ import { Group } from './group';
 import { PricingPlans } from './pricing-plans';
 
 export const Component = ({ close, promo, getRef }) => {
-  const [state, dispatch] = useTracked();
-  const colors = state.colors;
+  const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
   const userCanRequestTrial =
     user && (!user.subscription || !user.subscription.expiry) ? true : false;

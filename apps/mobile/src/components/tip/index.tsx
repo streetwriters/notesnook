@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, TextStyle, View, ViewStyle } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent, presentSheet } from '../../services/EventManager';
+import { useThemeStore } from '../../stores/theme';
+import { eSendEvent, presentSheet } from '../../services/event-manager';
 import { TTip } from '../../services/tip-manager';
 import { eCloseProgressDialog } from '../../utils/events';
 import { MMKV } from '../../utils/database/mmkv';
@@ -9,7 +9,7 @@ import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import Seperator from '../ui/seperator';
 import Paragraph from '../ui/typography/paragraph';
-import { defaultState } from '../../provider/DefaultState';
+import { defaultState } from '../../stores/DefaultState';
 
 export const Tip = ({
   tip,
@@ -26,8 +26,7 @@ export const Tip = ({
   noImage?: boolean;
   color?: keyof typeof defaultState['colors'];
 }) => {
-  const [state] = useTracked();
-  const { colors } = state;
+  const colors = useThemeStore(state => state.colors);
 
   return tip ? (
     <View
