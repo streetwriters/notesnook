@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
 import { ContainerHeader } from '../../components/container/containerheader';
 import { Header } from '../../components/header';
-import { Placeholder } from '../../components/ui/svg';
-import SelectionHeader from '../../components/selection-header';
 import List from '../../components/list';
-import { useTagStore } from '../../stores/stores';
+import SelectionHeader from '../../components/selection-header';
 import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
+import { useTagStore } from '../../stores/stores';
 import { InteractionManager } from '../../utils';
 
 export const Tags = ({ navigation }) => {

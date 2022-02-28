@@ -5,7 +5,13 @@ import { SIZE } from '../../../utils/size';
 import { IconButton } from '../icon-button';
 import Paragraph from '../typography/paragraph';
 
-export const Notice = ({ type, text, size }) => {
+export interface NoticeProps {
+  type?: 'alert' | 'information';
+  text: string;
+  size?: 'small' | 'large';
+}
+
+export const Notice = ({ type = 'alert', text, size = 'large' }: NoticeProps) => {
   const colors = useThemeStore(state => state.colors);
   const isSmall = size === 'small';
 
@@ -22,8 +28,8 @@ export const Notice = ({ type, text, size }) => {
         size={isSmall ? SIZE.xs + 1 : SIZE.xxl}
         name={type}
         customStyle={{
-          width: isSmall ? null : 40,
-          height: isSmall ? null : 40
+          width: isSmall ? undefined : 40,
+          height: isSmall ? undefined : 40
         }}
         color={type === 'alert' ? colors.errorText : colors.accent}
       />

@@ -1,21 +1,15 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, TextProps } from 'react-native';
 import { Text } from 'react-native';
 import { useThemeStore } from '../../../stores/theme';
 import { SIZE } from '../../../utils/size';
 
-/**
- *
- * @typedef {import('react-native').TextProps} TextType
- * @typedef {Object} restTypes
- * @property {string} color color
- * @property {number} size color
- */
-/**
- *
- * @param {TextType | restTypes} props all props
- */
-const Heading = ({ color, size = SIZE.xl, style, ...restProps }) => {
+interface HeadingProps extends TextProps {
+  color?: string;
+  size?: number;
+}
+
+const Heading = ({ color, size = SIZE.xl, style, ...restProps }: HeadingProps) => {
   const colors = useThemeStore(state => state.colors);
 
   return (
@@ -27,8 +21,8 @@ const Heading = ({ color, size = SIZE.xl, style, ...restProps }) => {
         {
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
-          fontFamily: Platform.OS === 'android' ? 'OpenSans-SemiBold' : null,
-          fontWeight: Platform.OS === 'ios' ? '600' : null
+          fontFamily: Platform.OS === 'android' ? 'OpenSans-SemiBold' : undefined,
+          fontWeight: Platform.OS === 'ios' ? '600' : undefined
         },
         style
       ]}

@@ -1,20 +1,14 @@
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, TextProps } from 'react-native';
 import { useThemeStore } from '../../../stores/theme';
 import { SIZE } from '../../../utils/size';
 
-/**
- *
- * @typedef {import('react-native').TextProps} TextType
- * @typedef {Object} restTypes
- * @property {string} color color
- * @property {number} size color
- */
-/**
- *
- * @param {TextType | restTypes} props all props
- */
-const Paragraph = ({ color, size = SIZE.sm, style, ...restProps }) => {
+interface ParagraphProps extends TextProps {
+  color?: string;
+  size?: number;
+}
+
+const Paragraph = ({ color, size = SIZE.sm, style, ...restProps }: ParagraphProps) => {
   const colors = useThemeStore(state => state.colors);
 
   return (

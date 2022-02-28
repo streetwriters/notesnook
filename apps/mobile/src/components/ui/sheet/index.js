@@ -2,9 +2,8 @@ import React from 'react';
 import { Platform, View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeStore } from '../../../stores/theme';
 import { useSettingStore } from '../../../stores/stores';
-import layoutmanager from '../../../utils/layout-manager';
+import { useThemeStore } from '../../../stores/theme';
 import { PremiumToast } from '../../premium/premium-toast';
 import { Toast } from '../../toast';
 import { BouncingView } from '../transitions/bouncing-view';
@@ -57,8 +56,6 @@ const SheetWrapper = ({
       onClose();
     }
   };
-
-  console.log('Sheet keyboard handler', sheetKeyboardHandler);
 
   return (
     <ActionSheet
