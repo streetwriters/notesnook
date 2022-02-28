@@ -5,7 +5,7 @@ import { ContainerHeader } from '../../components/container/containerheader';
 import { Header } from '../../components/header';
 import SelectionHeader from '../../components/selection-header';
 import List from '../../components/list';
-import { NotebookHeader } from '../../components/list/notebook-header';
+import { NotebookHeader } from '../../components/list-items/headers/notebook-header';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';

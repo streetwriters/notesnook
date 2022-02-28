@@ -14,9 +14,9 @@ import TagItem from '../list-items/tag';
 import { Empty } from './empty';
 import { Footer } from '../list-items/footer';
 import { Header } from '../list-items/headers/header';
-import { SectionHeader } from './section-header';
+import { SectionHeader } from '../list-items/headers/section-header';
 
-let renderItems = {
+const renderItems = {
   note: NoteWrapper,
   notebook: NotebookWrapper,
   topic: NotebookWrapper,

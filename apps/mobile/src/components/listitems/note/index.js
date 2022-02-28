@@ -13,7 +13,7 @@ import { refreshNotesPage } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
 import { IconButton } from '../../ui/icon-button';
 import { Button } from '../../ui/button';
-import { TimeSince } from '../../side-menu/TimeSince';
+import { TimeSince } from '../../ui/time-since';
 import { Properties } from '../../properties';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';

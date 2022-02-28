@@ -11,7 +11,7 @@ import { SIZE } from '../../utils/size';
 import { PressableButton } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
-import { TimeSince } from './TimeSince';
+import { TimeSince } from '../ui/time-since';
 
 export const UserStatus = () => {
   const [state] = useTracked();

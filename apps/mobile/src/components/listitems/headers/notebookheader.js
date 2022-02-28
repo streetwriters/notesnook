@@ -1,14 +1,14 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useMenuStore } from '../../provider/stores';
-import { ToastEvent } from '../../services/EventManager';
-import { getTotalNotes } from '../../utils';
-import { db } from '../../utils/database';
-import { SIZE } from '../../utils/size';
-import { IconButton } from '../ui/icon-button';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import { useTracked } from '../../../provider';
+import { useMenuStore } from '../../../provider/stores';
+import { ToastEvent } from '../../../services/EventManager';
+import { getTotalNotes } from '../../../utils';
+import { db } from '../../../utils/database';
+import { SIZE } from '../../../utils/size';
+import { IconButton } from '../../ui/icon-button';
+import Heading from '../../ui/typography/heading';
+import Paragraph from '../../ui/typography/paragraph';
 
 export const NotebookHeader = ({ notebook, onEditNotebook }) => {
   const [state] = useTracked();
