@@ -109,19 +109,17 @@ export default class Sync {
     let { lastSynced } = await this._performChecks();
     if (force) lastSynced = 0;
 
-    if (full) {
-      // We request and merge remote attachments beforehand to handle
-      // all possible conflicts that will occur if a user attaches
-      // the same file/image on both his devices. Since both files
-      // will have the same hash but different encryption key, it
-      // will cause problems on the local device.
-      await this._mergeAttachments(lastSynced);
+    // We request and merge remote attachments beforehand to handle
+    // all possible conflicts that will occur if a user attaches
+    // the same file/image on both his devices. Since both files
+    // will have the same hash but different encryption key, it
+    // will cause problems on the local device.
+    await this._mergeAttachments(lastSynced);
 
-      // All pending attachments are uploaded before anything else.
-      // This is done to ensure that when any note arrives on user's
-      // device, its attachments can be downloaded.
-      await this._uploadAttachments();
-    }
+    // All pending attachments are uploaded before anything else.
+    // This is done to ensure that when any note arrives on user's
+    // device, its attachments can be downloaded.
+    await this._uploadAttachments();
 
     // We collect, encrypt, and ready local changes before asking
     // the server for remote changes. This is done to ensure we
