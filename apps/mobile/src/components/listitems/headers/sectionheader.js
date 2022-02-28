@@ -128,10 +128,11 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
                 color={colors.icon}
                 name={listMode == 'compact' ? 'view-list' : 'view-list-outline'}
                 onPress={() => {
-                  SettingsService.set(
-                    type !== 'notebooks' ? 'notesListMode' : 'notebooksListMode',
-                    listMode === 'normal' ? 'compact' : 'normal'
-                  );
+                  let settings = {};
+                  settings[type !== 'notebooks' ? 'notesListMode' : 'notebooksListMode'] =
+                    listMode === 'normal' ? 'compact' : 'normal';
+
+                  SettingsService.set(settings);
                 }}
                 size={SIZE.lg - 2}
               />

@@ -150,7 +150,7 @@ const SettingsBackupAndRestore = ({ isSheet }) => {
       });
       return;
     }
-    await SettingsService.set('encryptedBackup', !settings.encryptedBackup);
+    await SettingsService.set({ encryptedBackup: !settings.encryptedBackup });
   };
 
   const updateAskForBackup = async () => {
@@ -232,7 +232,7 @@ const SettingsBackupAndRestore = ({ isSheet }) => {
                   activeOpacity={0.9}
                   onPress={async () => {
                     if (item.value === 'useroff') {
-                      await SettingsService.set('reminder', item.value);
+                      await SettingsService.set({ reminder: item.value });
                     } else {
                       await PremiumService.verify(async () => {
                         if (Platform.OS === 'android') {
@@ -242,7 +242,7 @@ const SettingsBackupAndRestore = ({ isSheet }) => {
                             return;
                           }
                         }
-                        await SettingsService.set('reminder', item.value);
+                        await SettingsService.set({ reminder: item.value });
                       });
                     }
                     updateAskForBackup();

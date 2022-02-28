@@ -9,11 +9,11 @@ import {
 } from '../utils/events';
 const eventManager = new EventManager();
 
-export const eSubscribeEvent = (eventName: string, action?: () => void) => {
+export const eSubscribeEvent = (eventName: string, action?: (data: any) => void) => {
   eventManager.subscribe(eventName, action);
 };
 
-export const eUnSubscribeEvent = (eventName: string, action?: () => void) => {
+export const eUnSubscribeEvent = (eventName: string, action?: (data: any) => void) => {
   eventManager.unsubscribe(eventName, action);
 };
 

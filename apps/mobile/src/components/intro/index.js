@@ -156,7 +156,7 @@ const Intro = () => {
                   maxWidth: 500
                 }}
                 onPress={async () => {
-                  await SettingsService.set('telemetry', !isTelemetryEnabled);
+                  await SettingsService.set({ telemetry: !isTelemetryEnabled });
                 }}
               >
                 <Icon

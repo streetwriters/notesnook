@@ -143,7 +143,7 @@ function pinQuickNote(launch: boolean) {
 
 async function unpinQuickNote() {
   remove('notesnook_note_input', 256266 + '');
-  SettingsService.set('notifNotes', false);
+  SettingsService.set({ notifNotes: false });
 }
 
 function present({

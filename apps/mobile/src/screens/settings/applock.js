@@ -94,7 +94,7 @@ const AppLock = ({ welcome, s = 0 }) => {
                 key={item.title}
                 type={settings.appLockMode === item.value ? 'grayBg' : 'transparent'}
                 onPress={() => {
-                  SettingsService.set('appLockMode', item.value);
+                  SettingsService.set({ appLockMode: item.value });
                 }}
                 customStyle={{
                   justifyContent: 'flex-start',

@@ -17,7 +17,7 @@ export const SettingsGeneralOptions = ({ isSheet }) => {
     } else {
       Notifications.pinQuickNote();
     }
-    SettingsService.set('notifNotes', !settings.notifNotes);
+    SettingsService.set({ notifNotes: !settings.notifNotes });
   };
 
   const generalList = [

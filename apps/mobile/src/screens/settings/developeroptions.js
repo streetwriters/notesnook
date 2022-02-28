@@ -12,7 +12,7 @@ const SettingsDeveloperOptions = ({ isSheet }) => {
   const [collapsed, setCollapsed] = useState(isSheet ? false : true);
 
   const toggleDevMode = () => {
-    SettingsService.set('devMode', !settings.devMode);
+    SettingsService.set({ devMode: !settings.devMode });
   };
 
   const devModeList = [

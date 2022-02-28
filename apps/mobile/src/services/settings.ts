@@ -1,4 +1,4 @@
-import { Platform, Settings } from 'react-native';
+import { Platform } from 'react-native';
 import { enabled } from 'react-native-privacy-snapshot';
 import { SettingStore } from '../stores/interfaces';
 import { useSettingStore } from '../stores/stores';
@@ -16,20 +16,10 @@ async function init() {
   if (!settingsJson) {
     await MMKV.setItem('appSettings', JSON.stringify(settingsJson));
   } else {
-    settings = JSON.parse(settingsJson);
-    if (!settings.appLockMode) {
-      settings.appLockMode = 'none';
-    }
-    // eslint-disable-next-line no-prototype-builtins
-    if (!settings.hasOwnProperty('telemetry')) {
-      settings.telemetry = true;
-    }
-    if (!settings.notesListMode) {
-      settings.notesListMode = 'normal';
-    }
-    if (!settings.notebooksListMode) {
-      settings.notebooksListMode = 'normal';
-    }
+    settings = {
+      ...settings,
+      ...JSON.parse(settingsJson)
+    };
   }
   if (settings.notifNotes) {
     Notifications.pinQuickNote(true);
@@ -63,9 +53,12 @@ const setTheme = async () => {
   useThemeStore.getState().setColors({ ...newColors });
 };
 
-async function set(name: keyof SettingStore['settings'], value: any) {
+async function set(next: Partial<SettingStore['settings']>) {
   let settings = get();
-  settings[name] = value;
+  settings = {
+    ...settings,
+    ...next
+  };
   useSettingStore.getState().setSettings(settings);
   await MMKV.setItem('appSettings', JSON.stringify(settings));
 }

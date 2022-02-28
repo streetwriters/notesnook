@@ -73,7 +73,7 @@ const SettingsPrivacyAndSecurity = () => {
             title="Enable telemetry"
             tagline="Help improve Notesnook by sending completely anonymized private analytics and bug reports."
             onPress={() => {
-              SettingsService.set('telemetry', !settings.telemetry);
+              SettingsService.set({ telemetry: !settings.telemetry });
             }}
             maxWidth="90%"
             customComponent={
@@ -84,7 +84,7 @@ const SettingsPrivacyAndSecurity = () => {
                 size="small"
                 animationSpeed={150}
                 onToggle={isOn => {
-                  SettingsService.set('telemetry', isOn);
+                  SettingsService.set({ telemetry: isOn });
                 }}
               />
             }
@@ -99,7 +99,7 @@ const SettingsPrivacyAndSecurity = () => {
                 ? AndroidModule.setSecureMode(!settings.privacyScreen)
                 : enabled(true);
 
-              SettingsService.set('privacyScreen', !settings.privacyScreen);
+              SettingsService.set({ privacyScreen: !settings.privacyScreen });
             }}
             maxWidth="90%"
             customComponent={
@@ -111,7 +111,7 @@ const SettingsPrivacyAndSecurity = () => {
                 animationSpeed={150}
                 onToggle={isOn => {
                   Platform.OS === 'android' ? AndroidModule.setSecureMode(isOn) : enabled(true);
-                  SettingsService.set('privacyScreen', isOn);
+                  SettingsService.set({ privacyScreen: isOn });
                 }}
               />
             }

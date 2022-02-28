@@ -6,14 +6,12 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
 import { PressableButton } from '../../components/ui/pressable';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../stores/theme';
-import { Actions } from '../../stores/Actions';
-import { useSettingStore } from '../../stores/stores';
 import { DDS } from '../../services/device-detection';
 import { ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import { MenuItemsList } from '../../utils/constants';
+import { useSettingStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -23,6 +21,7 @@ import {
   setColorScheme
 } from '../../utils/color-scheme';
 import { hexToRGBA, RGB_Linear_Shade } from '../../utils/color-scheme/utils';
+import { MenuItemsList } from '../../utils/constants';
 import { MMKV } from '../../utils/database/mmkv';
 import { tabBarRef } from '../../utils/global-refs';
 import { pv, SIZE } from '../../utils/size';
@@ -39,21 +38,14 @@ const SettingsAppearanceSection = () => {
     useThemeStore.getState().setColors({ ...newColors });
   }
 
-  function changeAccentColor(accentColor) {
-    ACCENT.color = accentColor;
-    ACCENT.shade = accentColor + '12';
-    changeColorScheme();
-  }
-
   const switchTheme = async () => {
     if (SettingsService.get().useSystemTheme) {
-      await SettingsService.set('useSystemTheme', false);
+      await SettingsService.set({ useSystemTheme: false });
     } else {
       await PremiumService.verify(async () => {
-        await SettingsService.set(
-          'useSystemTheme',
-          SettingsService.get().useSystemTheme ? false : true
-        );
+        await SettingsService.set({
+          useSystemTheme: !SettingsService.get().useSystemTheme
+        });
         if (SettingsService.get().useSystemTheme) {
           await MMKV.setStringAsync(
             'theme',
@@ -68,7 +60,7 @@ const SettingsAppearanceSection = () => {
   };
 
   const pitchBlack = async () => {
-    await SettingsService.set('pitchBlack', SettingsService.get().pitchBlack ? false : true);
+    await SettingsService.set({ pitchBlack: !SettingsService.get().pitchBlack });
     let theme = await MMKV.getStringAsync('theme');
     if (!theme) return;
     theme = JSON.parse(theme);
@@ -79,13 +71,6 @@ const SettingsAppearanceSection = () => {
       changeColorScheme(COLOR_SCHEME_DARK);
     }
   };
-
-  // const reduceAnimations = async () => {
-  //   await SettingsService.set(
-  //     'reduceAnimations',
-  //     SettingsService.get().reduceAnimations ? false : true
-  //   );
-  // };
 
   return (
     <>
@@ -238,7 +223,7 @@ const SettingsAppearanceSection = () => {
                         key={item.name}
                         onPress={async () => {
                           menuRef.current?.hide();
-                          await SettingsService.set('homepage', item.name);
+                          await SettingsService.set({ homepage: item.name });
                           ToastEvent.show({
                             heading: 'Homepage set to ' + item.name,
                             message: 'Restart the app for changes to take effect.',
