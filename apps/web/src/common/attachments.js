@@ -23,3 +23,25 @@ export async function downloadAttachment(hash) {
     isUploaded: !!attachment.dateUploaded,
   });
 }
+
+export async function checkAttachment(hash) {
+  const attachment = db.attachments.attachment(hash);
+  if (!attachment) return { failed: "Attachment not found." };
+
+  try {
+    const size = await FS.getUploadedFileSize(hash);
+    if (size <= 0) return { failed: "File length is 0." };
+  } catch (e) {
+    return { failed: e.message };
+  }
+  return { success: true };
+}
+
+const ABYTES = 17;
+export function getTotalSize(attachments) {
+  let size = 0;
+  for (let attachment of attachments) {
+    size += attachment.length + ABYTES;
+  }
+  return size;
+}

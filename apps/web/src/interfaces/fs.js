@@ -9,6 +9,7 @@ import hosts from "notes-core/utils/constants";
 import { sendAttachmentsProgressEvent } from "notes-core/common";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
+import { db } from "../common/db";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -130,7 +131,7 @@ async function hashStream(reader) {
 async function readEncrypted(filename, key, cipherData) {
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle) {
-    console.error(`File not found. Filename: ${filename}`);
+    console.error(`File not found. (File hash: ${filename})`);
     return null;
   }
 
@@ -163,7 +164,7 @@ async function readEncrypted(filename, key, cipherData) {
 async function uploadFile(filename, requestOptions) {
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle)
-    throw new Error(`File stream not found. Filename: ${filename}`);
+    throw new Error(`File stream not found. (File hash: ${filename})`);
   const TOTAL_PARTS = Math.ceil(
     fileHandle.file.chunks / UPLOAD_PART_REQUIRED_CHUNKS
   );
@@ -264,6 +265,12 @@ async function uploadFile(filename, requestOptions) {
     if (!fileHandle.file.type?.startsWith("image/")) {
       await streamablefs.deleteFile(filename);
     }
+
+    if ((await getUploadedFileSize(filename)) <= 0) {
+      const error = `Upload verification failed: file size is 0. Please upload this file again. (File hash: ${filename})`;
+      throw new Error(error);
+    }
+
     return true;
   } catch (e) {
     if (e.handle) e.handle();
@@ -313,8 +320,9 @@ async function downloadFile(filename, requestOptions) {
 
     const contentLength = response.headers["content-length"];
     if (contentLength === "0") {
-      console.error("Abort: file length is 0.", filename);
-      return false;
+      const error = `File length is 0. Please upload this file again from the attachment manager. (File hash: ${filename})`;
+      await db.attachments.markAsFailed(filename, error);
+      throw new Error(error);
     }
 
     const distributor = new ChunkDistributor(chunkSize + ABYTES);
@@ -376,16 +384,33 @@ async function saveFile(filename, fileMetadata) {
 
 async function deleteFile(filename, requestOptions) {
   if (!requestOptions) return await streamablefs.deleteFile(filename);
+  if (!requestOptions && !(await streamablefs.exists(filename))) return true;
 
-  const { url, headers } = requestOptions;
-  if (!(await streamablefs.exists(filename))) return true;
+  try {
+    const { url, headers } = requestOptions;
+    const response = await axios.delete(url, {
+      headers: headers,
+    });
 
-  const response = await axios.delete(url, {
-    headers: headers,
+    const result = isSuccessStatusCode(response.status);
+    if (result) await streamablefs.deleteFile(filename);
+    return result;
+  } catch (e) {
+    handleS3Error(e, "Could not delete file");
+    return false;
+  }
+}
+
+async function getUploadedFileSize(filename) {
+  const url = `${hosts.API_HOST}/s3?name=${filename}`;
+  const token = await db.user.tokenManager.getAccessToken();
+
+  const attachmentInfo = await axios.head(url, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  const result = isSuccessStatusCode(response.status);
-  if (result) await streamablefs.deleteFile(filename);
-  return result;
+
+  const contentLength = parseInt(attachmentInfo.headers["content-length"]);
+  return isNaN(contentLength) ? 0 : contentLength;
 }
 
 function clearFileStorage() {
@@ -404,6 +429,7 @@ const FS = {
   hashStream,
   writeEncryptedFile,
   clearFileStorage,
+  getUploadedFileSize,
 };
 export default FS;
 
