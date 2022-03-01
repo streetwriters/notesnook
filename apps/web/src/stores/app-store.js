@@ -5,6 +5,7 @@ import { store as notebookStore } from "./notebook-store";
 import { store as trashStore } from "./trash-store";
 import { store as tagStore } from "./tag-store";
 import { store as editorstore } from "./editor-store";
+import { store as attachmentStore } from "./attachment-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
@@ -30,6 +31,7 @@ class AppStore extends BaseStore {
     notebookStore.refresh();
     trashStore.refresh();
     tagStore.refresh();
+    attachmentStore.refresh();
     this.refreshNavItems();
   };
 

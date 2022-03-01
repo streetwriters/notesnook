@@ -1,5 +1,6 @@
 import createStore from "../common/store";
 import { store as noteStore } from "./note-store";
+import { store as attachmentStore } from "./attachment-store";
 import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common/db";
@@ -35,7 +36,7 @@ const getDefaultSession = (sessionId = Date.now()) => {
     context: undefined,
     color: undefined,
     dateEdited: 0,
-    attachments: [],
+    attachmentsLength: 0,
   };
 };
 
@@ -133,7 +134,7 @@ class EditorStore extends BaseStore {
         ...defaultSession,
         ...note,
         state: SESSION_STATES.new,
-        attachments: db.attachments.ofNote(note.id, "all") || [],
+        attachmentsLength: db.attachments.ofNote(note.id, "all")?.length || 0,
       };
     });
     appStore.setIsEditorOpen(true);
@@ -180,9 +181,12 @@ class EditorStore extends BaseStore {
           this.set((state) => {
             state.session.id = note.id;
             state.session.notebooks = note.notebooks;
-            state.session.attachments = attachments;
             state.session.saveState = 1;
+            state.session.attachmentsLength = attachments.length;
           });
+
+          if (attachments?.length !== oldSession.attachmentsLength)
+            attachmentStore.refresh();
 
           if (!oldSession) {
             noteStore.refresh();
@@ -190,7 +194,6 @@ class EditorStore extends BaseStore {
           }
 
           if (
-            attachments?.length !== oldSession.attachments.length ||
             note.headline !== oldSession.headline ||
             note.title !== oldSession.title
           )

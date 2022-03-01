@@ -33,7 +33,7 @@ class NoteStore extends BaseStore {
   };
 
   setSelectedNote = (id) => {
-    if (id === 0) selectionStore.get().toggleSelectionMode(false);
+    if (!id) selectionStore.get().toggleSelectionMode(false);
     this.set((state) => (state.selectedNote = id));
   };
 
