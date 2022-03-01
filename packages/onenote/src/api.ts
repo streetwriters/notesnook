@@ -1,33 +1,30 @@
 import "isomorphic-fetch"; // or import the fetch polyfill you installed
 import {
-  OnenoteNotebook,
-  GraphAPIResponse,
-  OnenoteSection,
-  OnenoteSectionGroup,
+  Entity,
   OnenotePage,
-  OnenoteResource,
-} from "./types";
-import { Client, GraphError } from "@microsoft/microsoft-graph-client";
+  Notebook as OnenoteNotebook,
+  OnenoteSection,
+  SectionGroup as OnenoteSectionGroup,
+} from "@microsoft/microsoft-graph-types-beta";
 
-const token = `EwBoA8l6BAAUwihrrCrmQ4wuIJX5mbj7rQla6TUAARll4kg9eV/QH+DwI1/+z2MVG93Pq2KZSdA8E5ui19TId6g1rGjQbb439wCWaIOCtKU60WbFNRWfSwkjGiMmCkmOE1AGe1Kz/TBvWilsIOUXNalOJOEHBI38KrcYLOQU7jNs0Zwtd/Ikz2jqZBny1yyYbjwR+m9Az+ntVi02/L4bpLnf2aCoRL1DEum3e4+ON/V1edCA4jHzYs1jGU7vFceKKIccwnkp+I8tJZzGeaxyRl3R3raL2jc4SN56UBjbRR7TWTLImpRXrW3I+qjfuLi/HVUtdBBiP+bS2d1Jz7KgCoHaDZTsOS2aYBmjv8hPqP9QOgbWfq3WJQnQkLabwlgDZgAACBshWhx2XBDxOAISW96Za0H+cH2w/qmQ1rWeX1ohyyTdBaR2N2TR2GzHhGUAkzABC+uzCo0KPA5ZSbt6QrlAcnioeKjuPW6dYhRPgg4DLJ52xmeC4UW6R9mMZ84HL70p1+UBz/YM9LOkU/6tcde85S6O76bEvLDI574ArJoI6XqmqkvKMnzcmDOd9DCPaOoQdbCm6K59E/d5unQBbopi6L1ZZhYEGOyx1I6fv7k33UJ4Uqahp5pm7GHltIW/lGmF0tYyuqdt0eovlaYbcgosJdIma1ILGli+CCoyvUm1JVZT24Yf1XMNLVhe1O0WrawDSLIY0A3rXQY0CW9DGWXNBtaS1CdFQc2KdhkylWfEAwftiZteOkiB+MvCJIO6XOLo2CGpR7YPB5+jxcrVjynJ8JC3AfqbDzIvQiuKW/So4Gd/fmJifNIieSySfZY0U0K9TWZf6wXKlI99a0A9seOZTMrQRTGlOiC2SeEED5Arw8lHsmVYWI+XTMKkkmhVn/rETTsfhNxz7DyjKp793gniq0IL1GvRnW8Hy2IgkAEtzrbmhNH0GJS6VW0pl1YvTlQxnCGRWpkJ5DOjgOqNmZYKLmS2FfxLmbyME4+CmqPHGrSX412jx7gRcSiftayek5NKX5AXTBUEaFzkXIY7T9oq8+GgAOTrJKUumCQxDc7eZyAvlhKrdA2emmwi6ukAdr4Tl2r4idyTm1IIT/Hw6kBuSPEgTVKvAJHopIvDf54Baqan5BVxVFW19GQR5zxZxCkCO7tYdQI=`;
+import { GraphAPIResponse } from "./types";
+import { Client } from "@microsoft/microsoft-graph-client";
+import { Content } from "./content";
+
 const msGraphClient = Client.init({
   authProvider: async (done) => {
-    done(null, token);
-    // return;
-    // if ("window" in global) {
-    //   const { authenticate } = await import("./auth/browser");
-    //   const result = await authenticate();
-    //   if (result) done(null, result.accessToken);
-    //   else done("Could not get access token", null);
-    // } else {
-    //   const { authenticate } = await import("./auth/node");
-    //   const result = await authenticate();
-    //   console.log(result?.accessToken);
-    //   if (result) done(null, result.accessToken);
-    //   else done("Could not get access token", null);
-    // }
+    if ("window" in global) {
+      const { authenticate } = await import("./auth/browser");
+      const result = await authenticate();
+      if (result) done(null, result.accessToken);
+      else done("Could not get access token", null);
+    } else {
+      const { authenticate } = await import("./auth/node");
+      const result = await authenticate();
+      if (result) done(null, result.accessToken);
+      else done("Could not get access token", null);
+    }
   },
-  defaultVersion: "beta",
 });
 
 const defaultProperties = [
@@ -37,57 +34,106 @@ const defaultProperties = [
   "id",
 ] as const;
 
-export async function getNotebooks(): Promise<OnenoteNotebook[]> {
+type ItemType = "notebook" | "sectionGroup" | "section" | "page";
+type Op = "fetch" | "process";
+type ProgressPayload = {
+  type: ItemType;
+  op: Op;
+  total: number;
+  current: number;
+};
+
+interface IProgressReporter {
+  report: (payload: ProgressPayload) => void;
+}
+
+export async function getNotebooks(
+  reporter?: IProgressReporter
+): Promise<OnenoteNotebook[]> {
   let notebooks: OnenoteNotebook[] = await getAll(
     `/me/onenote/notebooks`,
-    defaultProperties
+    defaultProperties,
+    "notebook",
+    reporter
   );
-  for (let notebook of notebooks) {
-    if (!notebook.id) continue;
-    notebook.sections = await getSections("notebooks", notebook.id);
-    notebook.sectionGroups = await getSectionGroups(
-      "sectionGroups",
-      notebook.id
-    );
-  }
-  return notebooks;
+
+  return await processAll(
+    notebooks,
+    async (notebook: OnenoteNotebook) => {
+      if (!notebook.id) return;
+
+      notebook.sections = await getSections("notebooks", notebook.id, reporter);
+      notebook.sectionGroups = await getSectionGroups(
+        "sectionGroups",
+        notebook.id,
+        reporter
+      );
+    },
+    "notebook",
+    reporter
+  );
 }
 
 async function getSections(
-  type: "notebooks" | "sectionGroups",
-  parentId: string
+  parentType: "notebooks" | "sectionGroups",
+  parentId: string,
+  reporter?: IProgressReporter
 ): Promise<OnenoteSection[]> {
   let sections: OnenoteSection[] = await getAll(
-    `/me/onenote/${type}/${parentId}/sections`,
-    defaultProperties
+    `/me/onenote/${parentType}/${parentId}/sections`,
+    defaultProperties,
+    "section",
+    reporter
   );
-  for (let section of sections) {
-    if (!section.id) continue;
-    section.pages = await getPages(section.id);
-  }
-  return sections;
+
+  return await processAll(
+    sections,
+    async (section) => {
+      if (!section.id) return;
+      section.pages = await getPages(section.id, reporter);
+    },
+    "section",
+    reporter
+  );
 }
 
 async function getSectionGroups(
-  type: "notebooks" | "sectionGroups",
-  parentId: string
+  parentType: "notebooks" | "sectionGroups",
+  parentId: string,
+  reporter?: IProgressReporter
 ): Promise<OnenoteSectionGroup[]> {
   let sectionGroups: OnenoteSectionGroup[] = await getAll(
-    `/me/onenote/${type}/${parentId}/sectionGroups`,
-    defaultProperties
+    `/me/onenote/${parentType}/${parentId}/sectionGroups`,
+    defaultProperties,
+    "sectionGroup",
+    reporter
   );
-  for (let sectionGroup of sectionGroups) {
-    if (!sectionGroup.id) continue;
-    sectionGroup.sections = await getSections("sectionGroups", sectionGroup.id);
-    sectionGroup.sectionGroups = await getSectionGroups(
-      "sectionGroups",
-      sectionGroup.id
-    );
-  }
-  return sectionGroups;
+
+  return await processAll(
+    sectionGroups,
+    async (sectionGroup) => {
+      if (!sectionGroup.id) return;
+
+      sectionGroup.sections = await getSections(
+        "sectionGroups",
+        sectionGroup.id,
+        reporter
+      );
+      sectionGroup.sectionGroups = await getSectionGroups(
+        "sectionGroups",
+        sectionGroup.id,
+        reporter
+      );
+    },
+    "sectionGroup",
+    reporter
+  );
 }
 
-export async function getPages(sectionId: string): Promise<OnenotePage[]> {
+export async function getPages(
+  sectionId: string,
+  reporter?: IProgressReporter
+): Promise<OnenotePage[]> {
   let pages: OnenotePage[] = await getAll(
     `/me/onenote/sections/${sectionId}/pages`,
     [
@@ -98,42 +144,39 @@ export async function getPages(sectionId: string): Promise<OnenotePage[]> {
       "level",
       "order",
       "userTags",
-    ]
+    ],
+    "page",
+    reporter
   );
-  for (let page of pages) {
-    if (!page.id) continue;
-    console.log("getting page content for", page.id, page.contentUrl);
-    page.content = await getPageContent(page.id);
-  }
-  return pages;
+
+  return await processAll(
+    pages,
+    async (page) => {
+      if (!page.id) return;
+      page.content = await getPageContent(page.id);
+    },
+    "page",
+    reporter
+  );
 }
 
-export async function getPageContent(pageId: string): Promise<string | null> {
+export async function getPageContent(pageId: string): Promise<Content | null> {
   try {
     const stream = <NodeJS.ReadableStream | null>(
       await msGraphClient.api(`/me/onenote/pages/${pageId}/content`).getStream()
     );
     if (!stream) return null;
 
-    return (await convertStream(stream)).toString("utf8");
+    const html = (await convertStream(stream)).toString("utf8");
+    return new Content(html, { attachmentResolver: resolveDataUrl });
   } catch (e) {
-    if (e instanceof GraphError)
-      console.error(
-        "A graph error occured while getting content of page:",
-        pageId,
-        "Error code:",
-        e.code
-      );
-    else if (e instanceof Error)
-      console.error(
-        "An error occured while getting content of page",
-        pageId,
-        "Error message:",
-        e.message
-      );
-
-    return null;
+    console.error(
+      "An error occured while getting page content.",
+      "Error message:",
+      (<Error>e).message
+    );
   }
+  return null;
 }
 
 export async function resolveDataUrl(url: string): Promise<Buffer | null> {
@@ -145,15 +188,13 @@ export async function resolveDataUrl(url: string): Promise<Buffer | null> {
 
     return await convertStream(stream);
   } catch (e) {
-    if (e instanceof Error)
-      console.error(
-        "An error occured while resolving data url.",
-        "Error message:",
-        e.message
-      );
-
-    return null;
+    console.error(
+      "An error occured while resolving data url.",
+      "Error message:",
+      (<Error>e).message
+    );
   }
+  return null;
 }
 
 function convertStream(stream: NodeJS.ReadableStream): Promise<Buffer> {
@@ -165,9 +206,30 @@ function convertStream(stream: NodeJS.ReadableStream): Promise<Buffer> {
   });
 }
 
+async function processAll<T extends Entity>(
+  items: T[],
+  process: (item: T) => Promise<void>,
+  type: ItemType,
+  reporter?: IProgressReporter
+): Promise<T[]> {
+  for (let i = 0; i < items.length; ++i) {
+    reporter?.report({
+      op: "process",
+      type,
+      total: items.length,
+      current: i + 1,
+    });
+    const item = items[i];
+    await process(item);
+  }
+  return items;
+}
+
 async function getAll<T, TKeys extends keyof T>(
   url: string,
-  properties: readonly TKeys[]
+  properties: readonly TKeys[],
+  type: ItemType,
+  reporter?: IProgressReporter
 ): Promise<T[]> {
   let items: T[] = [];
 
@@ -175,6 +237,13 @@ async function getAll<T, TKeys extends keyof T>(
   let skip = 0;
   let limit = 100;
   while (!response || !!response["@odata.nextLink"]) {
+    reporter?.report({
+      op: "fetch",
+      type,
+      total: skip + limit,
+      current: skip,
+    });
+
     response = <GraphAPIResponse<T[]>>await msGraphClient
       .api(url)
       .top(limit)
@@ -189,9 +258,13 @@ async function getAll<T, TKeys extends keyof T>(
     if (!response || !response.value) break;
     items.push(...response.value);
     skip += limit;
-
-    console.log("Fetched", url, "total:", items.length);
   }
 
+  reporter?.report({
+    op: "fetch",
+    type,
+    total: items.length,
+    current: items.length,
+  });
   return items;
 }

@@ -39,9 +39,14 @@ export interface IElementHandler {
   process(type: string, element: HTMLElement): Promise<string | undefined>;
 }
 
+type AttachmentResolver = (url: string) => Promise<Buffer | null>;
+type ContentOptions = {
+  attachmentResolver: AttachmentResolver;
+};
+
 export class Content {
   document: HTMLRootElement;
-  constructor(html: string, private readonly client: Client) {
+  constructor(html: string, private readonly options: ContentOptions) {
     this.document = parse(html);
   }
 
@@ -79,6 +84,17 @@ export class Content {
           break;
         case "img":
         case "object": {
+          const data = await downloadAttachment(
+            element,
+            ["data-fullres", "src", "data"],
+            this.options.attachmentResolver
+          );
+          if (!data) {
+            element.remove();
+            break;
+          }
+          element.setAttribute("data", data);
+
           if (handler) {
             const result = await handler.process(elementType, element);
             if (!!result) element.replaceWith(result);
@@ -149,4 +165,22 @@ function objectToStyles(input: Record<string, string>): string {
     output.push(`${key}:${input[key]}`);
   }
   return output.join(";");
+}
+
+async function downloadAttachment(
+  element: HTMLElement,
+  attributes: string[],
+  resolver: AttachmentResolver
+): Promise<string | false> {
+  let src = null;
+  for (let attribute of attributes) {
+    src = element.getAttribute(attribute);
+    if (src) break;
+  }
+  if (!src) return false;
+
+  const data = await resolver(src);
+  if (!data) throw new Error(`Failed to download attachment at ${src}.`);
+
+  return data.toString("base64");
 }
