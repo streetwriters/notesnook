@@ -15,6 +15,7 @@ import ReminderDialog from "./reminderdialog";
 import AnnouncementDialog from "./announcementdialog";
 import IssueDialog from "./issuedialog";
 import OnboardingDialog from "./onboarding-dialog";
+import AttachmentsDialog from "./attachmentsdialog";
 
 const Dialogs = {
   AddNotebookDialog,
@@ -34,5 +35,6 @@ const Dialogs = {
   IssueDialog,
   ImportDialog,
   OnboardingDialog,
+  AttachmentsDialog,
 };
 export default Dialogs;

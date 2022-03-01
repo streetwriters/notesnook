@@ -19,6 +19,7 @@ import {
   showLoadingDialog,
   showBuyDialog,
   showPasswordDialog,
+  showAttachmentsDialog,
 } from "../common/dialog-controller";
 import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
 import { db } from "../common/db";
@@ -243,6 +244,12 @@ function Settings(props) {
               <Tip
                 text="Change account password"
                 tip="Set a new password for your account"
+              />
+            </Button>
+            <Button variant="list" onClick={() => showAttachmentsDialog()}>
+              <Tip
+                text="Manage attachments"
+                tip="Re-upload, delete & manage your attachments."
               />
             </Button>
             <Button variant="list" onClick={() => sync(true, true)}>

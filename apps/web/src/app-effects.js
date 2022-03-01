@@ -3,6 +3,7 @@ import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import { useStore as useThemeStore } from "./stores/theme-store";
+import { useStore as useAttachmentStore } from "./stores/attachment-store";
 import { resetReminders } from "./common/reminders";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
@@ -15,14 +16,12 @@ import useAnnouncements from "./utils/use-announcements";
 import {
   showAnnouncementDialog,
   showBuyDialog,
-  showEmailVerificationDialog,
-  showFeatureDialog,
   showInvalidSystemTimeDialog,
   showOnboardingDialog,
 } from "./common/dialog-controller";
 import useSystemTheme from "./utils/use-system-theme";
 import { isTesting } from "./utils/platform";
-import { updateStatus, removeStatus } from "./hooks/use-status";
+import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./components/dialogs/onboarding-dialog";
 
@@ -39,6 +38,7 @@ export default function AppEffects({ setShow }) {
   const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
+  const initAttachments = useAttachmentStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
   const setTheme = useThemeStore((store) => store.setTheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
@@ -64,6 +64,7 @@ export default function AppEffects({ setShow }) {
         }
       );
 
+      initAttachments();
       refreshNavItems();
       initNotes();
       (async function () {
@@ -82,6 +83,7 @@ export default function AppEffects({ setShow }) {
       };
     },
     [
+      initAttachments,
       sync,
       updateLastSynced,
       refreshNavItems,

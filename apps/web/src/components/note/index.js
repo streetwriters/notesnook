@@ -5,6 +5,7 @@ import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
 import { showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
+import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { db } from "../../common/db";
 import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
@@ -16,10 +17,17 @@ import { exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 
 function Note(props) {
-  const { tags, notebook, item, index, context, attachments, date } = props;
+  const { tags, notebook, item, index, context, date } = props;
   const note = item;
   const isOpened = useStore((store) => store.selectedNote === note.id);
   const isCompact = useStore((store) => store.viewMode === "compact");
+  const attachments = useAttachmentStore((store) =>
+    store.attachments.filter((a) => a.noteIds.includes(note.id))
+  );
+  const failed = useMemo(
+    () => attachments.filter((a) => a.failed),
+    [attachments]
+  );
 
   const primary = useMemo(() => {
     if (!note.color) return "primary";
@@ -112,10 +120,17 @@ function Note(props) {
                 mr={1}
               />
 
-              {attachments > 0 && (
+              {attachments.length > 0 && (
                 <Flex mr={1}>
                   <Icon.Attachment size={13} color="fontTertiary" />
-                  <Text ml={"2px"}>{attachments}</Text>
+                  <Text ml={"2px"}>{attachments.length}</Text>
+                </Flex>
+              )}
+
+              {failed.length > 0 && (
+                <Flex mr={1} title={`Errors in ${failed.length} attachments.`}>
+                  <Icon.AttachmentError size={13} color="error" />
+                  <Text ml={"2px"}>{failed.length}</Text>
                 </Flex>
               )}
 
@@ -180,7 +195,6 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
-    prevProps.attachments === nextProps.attachments &&
     prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags)
   );

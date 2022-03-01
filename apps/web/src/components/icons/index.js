@@ -137,6 +137,12 @@ import {
   mdiCurrencyUsd,
   mdiAlertOctagonOutline,
   mdiGithub,
+  mdiAlertCircleOutline,
+  mdiProgressUpload,
+  mdiRenameBox,
+  mdiFormTextbox,
+  mdiCheckAll,
+  mdiCloudOffOutline,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -248,12 +254,14 @@ export const DarkMode = createIcon(mdiWeatherNight);
 export const LightMode = createIcon(mdiWeatherSunny);
 export const Theme = createIcon(mdiThemeLightDark);
 export const Checkmark = createIcon(mdiCheck);
+export const DoubleCheckmark = createIcon(mdiCheckAll);
 export const CheckCircle = createIcon(mdiCheckCircle);
 export const CheckCircleOutline = createIcon(mdiCheckCircleOutline);
 export const Properties = createIcon(mdiDotsVertical);
 export const Markdown = createIcon(mdiLanguageMarkdownOutline);
 export const PDF = createIcon(mdiFilePdfBox);
 export const Attachment = createIcon(mdiAttachment);
+export const AttachmentError = createIcon(mdiAlertCircleOutline);
 export const Write = createIcon(mdiPencilOutline);
 export const HTML = createIcon(mdiLanguageHtml5);
 export const Text = createIcon(mdiFormatTitle);
@@ -345,3 +353,8 @@ export const OrderOldestNewest = createIcon(mdiOrderNumericDescending);
 export const OrderNewestOldest = createIcon(mdiOrderNumericAscending);
 export const Saved = createIcon(mdiContentSaveCheckOutline);
 export const NotSaved = createIcon(mdiContentSaveAlertOutline);
+
+export const Reupload = createIcon(mdiProgressUpload);
+export const Rename = createIcon(mdiFormTextbox);
+export const Upload = createIcon(mdiCloudOffOutline);
+export const Uploaded = createIcon(mdiCloudCheckOutline);

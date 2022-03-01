@@ -1,21 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
 import * as Icon from "../icons";
-import { Flex, Text, Button, Box } from "rebass";
+import { Flex, Text } from "rebass";
 import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
-import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import { navigate } from "../../navigation";
 import IconTag from "../icon-tag";
-import { formatBytes, truncateFilename } from "../../utils/filename";
 import ScrollContainer from "../scroll-container";
-import { downloadAttachment } from "../../common/attachments";
 import { formatDate } from "notes-core/utils/date";
 import Vault from "../../common/vault";
 import TimeAgo from "../time-ago";
+import Attachment from "../attachment";
+import { formatBytes } from "../../utils/filename";
+import { getTotalSize } from "../../common/attachments";
 
 const tools = [
   { key: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -42,7 +43,6 @@ const metadataItems = [
 ];
 
 function Properties() {
-  const [attachmentsStatus, setAttachmentsStatus] = useState({});
   const [versionHistory, setVersionHistory] = useState([]);
 
   const toggleLocked = useStore((store) => store.toggleLocked);
@@ -52,16 +52,11 @@ function Properties() {
   const setColor = useStore((store) => store.setColor);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-
   const session = useStore((store) => store.session);
-  const {
-    id: sessionId,
-    color,
-    notebooks,
-    attachments,
-    sessionType,
-    dateCreated,
-  } = session;
+  const attachments = useAttachmentStore((store) =>
+    store.attachments.filter((a) => a.noteIds.includes(session.id))
+  );
+  const { id: sessionId, color, notebooks, sessionType, dateCreated } = session;
   const isPreviewMode = sessionType === "preview";
 
   const changeState = useCallback(
@@ -81,31 +76,6 @@ function Properties() {
     },
     [setSession, toggleLocked]
   );
-
-  useEffect(() => {
-    const event = AppEventManager.subscribe(
-      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-      ({ hash, type, total, loaded }) => {
-        if (!attachments.find((a) => a.metadata.hash === hash)) return;
-        const percent = Math.round((loaded / total) * 100);
-        setAttachmentsStatus((status) => {
-          const copy = { ...status };
-          copy[hash] =
-            percent >= 100
-              ? null
-              : {
-                  type,
-                  loaded,
-                  progress: percent,
-                };
-          return copy;
-        });
-      }
-    );
-    return () => {
-      event.unsubscribe();
-    };
-  }, [attachments]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -290,100 +260,13 @@ function Properties() {
           {attachments?.length > 0 && (
             <Card
               title="Attachments"
-              subtitle={`${attachments.length} attachments`}
+              subtitle={`${attachments.length} attachments | ${formatBytes(
+                getTotalSize(attachments)
+              )} occupied`}
             >
-              {attachments.map((attachment) => {
-                const attachmentStatus =
-                  attachmentsStatus[attachment.metadata.hash];
-                return (
-                  <Flex
-                    key={attachment.id}
-                    py={1}
-                    px={2}
-                    sx={{
-                      borderBottom: "1px solid var(--border)",
-                      ":last-of-type": { borderBottom: "none" },
-                      ":hover .attachment-download-btn": {
-                        opacity: 1,
-                      },
-                    }}
-                    title={attachment.metadata.filename}
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Flex flexDirection="column" flex={1}>
-                      <Text
-                        variant="body"
-                        fontSize="subtitle"
-                        sx={{
-                          whiteSpace: "nowrap",
-                          textOverflow: "ellipsis",
-                          overflow: "hidden",
-                        }}
-                      >
-                        {truncateFilename(attachment.metadata.filename)}
-                      </Text>
-                      {attachmentStatus && (
-                        <Box
-                          sx={{
-                            my: 1,
-                            bg: "primary",
-                            height: "2px",
-                            width: `${attachmentStatus.progress}%`,
-                          }}
-                        />
-                      )}
-                      <Flex mt={1}>
-                        {attachmentStatus ? (
-                          <Text variant="subBody">
-                            {formatBytes(attachmentStatus.loaded, 1)} of{" "}
-                            {formatBytes(attachment.length, 1)} (
-                            {attachmentStatus.type}ing)
-                          </Text>
-                        ) : (
-                          <Text variant="subBody">
-                            {formatBytes(attachment.length, 1)}
-                          </Text>
-                        )}
-                      </Flex>
-                    </Flex>
-
-                    <Box>
-                      {attachmentStatus ? (
-                        <Button
-                          title="Cancel download"
-                          variant="tool"
-                          p={1}
-                          m={1}
-                          sx={{ ":hover": { bg: "hover" } }}
-                          onClick={async () => {
-                            await db.fs.cancel(
-                              attachment.metadata.hash,
-                              "download"
-                            );
-                          }}
-                        >
-                          <Icon.Close size={16} />
-                        </Button>
-                      ) : (
-                        <Button
-                          className="attachment-download-btn"
-                          title="Download attachment"
-                          variant="tool"
-                          p={1}
-                          m={1}
-                          sx={{ ":hover": { bg: "hover" }, opacity: 0 }}
-                          onClick={async () => {
-                            await downloadAttachment(attachment.metadata.hash);
-                          }}
-                        >
-                          <Icon.Download size={16} />
-                        </Button>
-                      )}
-                    </Box>
-                  </Flex>
-                );
-              })}
+              {attachments.map((attachment, i) => (
+                <Attachment item={attachment} index={i} isCompact />
+              ))}
             </Card>
           )}
           <Card

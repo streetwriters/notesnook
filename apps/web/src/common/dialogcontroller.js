@@ -602,6 +602,12 @@ export function showImportDialog() {
   ));
 }
 
+export function showAttachmentsDialog() {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.AttachmentsDialog onClose={(res) => perform(res)} />
+  ));
+}
+
 export function showOnboardingDialog(type) {
   if (!type) return;
 

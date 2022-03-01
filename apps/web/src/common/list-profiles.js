@@ -12,6 +12,7 @@ import {
 } from "./height-calculator";
 import { db } from "./db";
 import { getTotalNotes } from ".";
+import Attachment from "../components/attachment";
 
 function createProfile(item, itemHeight, estimatedItemHeight) {
   return { item, itemHeight, estimatedItemHeight };
@@ -25,7 +26,6 @@ const NotesProfile = createProfile(
       item={item}
       tags={getTags(item)}
       notebook={getNotebook(item.notebooks, context?.type)}
-      attachments={getAttachmentsCount(item.id)}
       date={getDate(item, type)}
       context={context}
     />
@@ -76,6 +76,12 @@ const TrashProfile = createProfile(
   Math.max(MAX_HEIGHTS.note, MAX_HEIGHTS.notebook)
 );
 
+const AttachmentProfile = createProfile(
+  (index, item, type) => <Attachment index={index} item={item} />,
+  (item) => getNoteHeight(item),
+  Math.max(MAX_HEIGHTS.note, MAX_HEIGHTS.notebook)
+);
+
 const Profiles = {
   home: NotesProfile,
   notebooks: NotebooksProfile,
@@ -83,7 +89,9 @@ const Profiles = {
   tags: TagsProfile,
   topics: TopicsProfile,
   trash: TrashProfile,
+  attachments: AttachmentProfile,
 };
+
 export default Profiles;
 
 function getTags(item) {
@@ -115,10 +123,6 @@ function getNotebook(notebooks, contextType) {
     dateEdited: notebook.dateEdited,
     topic: { id: topicId, title: topic.title },
   };
-}
-
-function getAttachmentsCount(noteId) {
-  return db.attachments.ofNote(noteId, "all").length;
 }
 
 function getDate(item, groupType) {

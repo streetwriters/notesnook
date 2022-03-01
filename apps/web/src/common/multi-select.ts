@@ -1,6 +1,7 @@
 import { showMultiDeleteConfirmation } from "./dialog-controller";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
+import { store as attachmentStore } from "../stores/attachment-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import Vault from "./vault";
@@ -88,8 +89,36 @@ async function deleteTopics(notebookId: string, topics: any[]) {
   showToast("success", `${topics.length} topics deleted`);
 }
 
+async function deleteAttachments(attachments: any[]) {
+  if (
+    !window.confirm(
+      "Are you sure you want to permanently delete these attachments? This action is IRREVERSIBLE."
+    )
+  )
+    return;
+
+  await TaskManager.startTask({
+    type: "status",
+    id: "deleteAttachments",
+    action: async (report) => {
+      for (let i = 0; i < attachments.length; ++i) {
+        const attachment = attachments[i];
+        report({
+          text: `Deleting ${attachments.length} attachments...`,
+          current: i,
+          total: attachments.length,
+        });
+        console.log(attachment);
+        await attachmentStore.permanentDelete(attachment.metadata.hash);
+      }
+    },
+  });
+  showToast("success", `${attachments.length} attachments deleted`);
+}
+
 export const Multiselect = {
   moveNotebooksToTrash,
   moveNotesToTrash,
   deleteTopics,
+  deleteAttachments,
 };
