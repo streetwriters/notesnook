@@ -45,6 +45,7 @@ type ProgressPayload = {
 
 interface IProgressReporter {
   report: (payload: ProgressPayload) => void;
+  error: (e: Error) => void;
 }
 
 export async function getNotebooks(
@@ -130,7 +131,7 @@ async function getSectionGroups(
   );
 }
 
-export async function getPages(
+async function getPages(
   sectionId: string,
   reporter?: IProgressReporter
 ): Promise<OnenotePage[]> {
@@ -160,7 +161,10 @@ export async function getPages(
   );
 }
 
-export async function getPageContent(pageId: string): Promise<Content | null> {
+async function getPageContent(
+  pageId: string,
+  reporter?: IProgressReporter
+): Promise<Content | null> {
   try {
     const stream = <NodeJS.ReadableStream | null>(
       await msGraphClient.api(`/me/onenote/pages/${pageId}/content`).getStream()
@@ -168,18 +172,19 @@ export async function getPageContent(pageId: string): Promise<Content | null> {
     if (!stream) return null;
 
     const html = (await convertStream(stream)).toString("utf8");
-    return new Content(html, { attachmentResolver: resolveDataUrl });
+    return new Content(html, {
+      attachmentResolver: (url) => resolveDataUrl(url, reporter),
+    });
   } catch (e) {
-    console.error(
-      "An error occured while getting page content.",
-      "Error message:",
-      (<Error>e).message
-    );
+    reporter?.error(<Error>e);
   }
   return null;
 }
 
-export async function resolveDataUrl(url: string): Promise<Buffer | null> {
+async function resolveDataUrl(
+  url: string,
+  reporter?: IProgressReporter
+): Promise<Buffer | null> {
   try {
     const stream = <NodeJS.ReadableStream | null>(
       await msGraphClient.api(url).getStream()
@@ -188,11 +193,7 @@ export async function resolveDataUrl(url: string): Promise<Buffer | null> {
 
     return await convertStream(stream);
   } catch (e) {
-    console.error(
-      "An error occured while resolving data url.",
-      "Error message:",
-      (<Error>e).message
-    );
+    reporter?.error(<Error>e);
   }
   return null;
 }
@@ -251,7 +252,7 @@ async function getAll<T, TKeys extends keyof T>(
       .select(<string[]>(<unknown>properties))
       .get()
       .catch((e) => {
-        console.error(e.message, url);
+        reporter?.error(e);
         return undefined;
       });
 

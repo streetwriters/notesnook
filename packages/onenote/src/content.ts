@@ -1,6 +1,5 @@
 import { HTMLElement, parse } from "node-html-parser";
 import { HTMLRootElement } from "node-html-parser/dist/nodes/html";
-import { Client } from "@microsoft/microsoft-graph-client";
 
 /**
  * List of invalid attributes we should remove part of our
@@ -45,13 +44,13 @@ type ContentOptions = {
 };
 
 export class Content {
-  document: HTMLRootElement;
+  #document: HTMLRootElement;
   constructor(html: string, private readonly options: ContentOptions) {
-    this.document = parse(html);
+    this.#document = parse(html);
   }
 
   async transform(handler?: IElementHandler): Promise<string> {
-    const elements = this.document.querySelectorAll(cssSelector);
+    const elements = this.#document.querySelectorAll(cssSelector);
     for (let element of elements) {
       if (!element) continue;
 
@@ -61,12 +60,12 @@ export class Content {
       switch (elementType) {
         case "checklist":
           let siblings: HTMLElement[] = [];
-          const ul = this.document.createElement("ul");
+          const ul = this.#document.createElement("ul");
           ul.classList.add("checklist");
 
           let next = element;
           while (next && next.getAttribute("data-tag")?.startsWith("to-do")) {
-            const li = this.document.createElement("li");
+            const li = this.#document.createElement("li");
             li.innerHTML = next.innerHTML;
             if (next.getAttribute("data-tag") === "to-do:completed")
               li.classList.add("checked");
@@ -109,7 +108,7 @@ export class Content {
 
   get raw(): string {
     return (
-      this.document.querySelector("body")?.outerHTML || this.document.outerHTML
+      this.#document.querySelector("body")?.outerHTML || this.#document.outerHTML
     );
   }
 }
