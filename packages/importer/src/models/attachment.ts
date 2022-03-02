@@ -48,17 +48,9 @@ const attributeMap: Record<string, Attribute> = {
 };
 
 export function attachmentToHTML(attachment: Attachment): string {
-  let tag: "img" | "span";
-  switch (attachment.mime) {
-    case "image/gif":
-    case "image/jpeg":
-    case "image/png":
-      tag = "img";
-      break;
-    default:
-      tag = "span";
-      break;
-  }
+  let tag: "img" | "span" = attachment.mime.startsWith("image/")
+    ? "img"
+    : "span";
 
   let attributes: string[] = [`class="attachment"`];
   for (let attr in attributeMap) {

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@notesnook/enex": "^1.0.3",
+    "@notesnook/znel": "file:../znel",
     "@standardnotes/common": "^1.8.0",
     "@standardnotes/features": "^1.25.0",
     "fflate": "^0.7.3",

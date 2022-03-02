@@ -1,0 +1,31 @@
+{
+  "name": "@notesnook/znel",
+  "private": false,
+  "version": "1.0.0",
+  "description": "A fully tested type-safe Zoho Notebook .znel parser used in Notesnook Importer.",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@types/node": "^16.11.10",
+    "@types/tap": "^15.0.5",
+    "fdir": "^5.1.0",
+    "tap": "^15.1.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  },
+  "scripts": {
+    "test": "tap --ts --no-check-coverage --no-coverage",
+    "build": "tsc"
+  },
+  "author": "Abdullah Atta <abdullahatta@streetwriters.co>",
+  "license": "MIT",
+  "dependencies": {
+    "base64-arraybuffer": "^1.0.2",
+    "node-html-parser": "github:thecodrr/node-html-parser",
+    "spark-md5": "^3.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/streetwriters/notesnook.git",
+    "directory": "packages/znel"
+  }
+}

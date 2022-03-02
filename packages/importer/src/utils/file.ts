@@ -6,18 +6,23 @@ export interface IFile {
   path?: string;
   createdAt?: number;
   modifiedAt?: number;
+  parent?: IFile;
 }
 
 const textDecoder = new TextDecoder();
 export class File {
   constructor(private readonly file: IFile) {}
 
+  get parent(): IFile | undefined {
+    return this.file.parent;
+  }
+
   get name(): string {
     return this.file.name;
   }
 
   get nameWithoutExtension(): string {
-    return path.basename(this.file.name, false);
+    return path.basename(this.file.name, "");
   }
 
   get directory(): string | undefined {
@@ -36,8 +41,9 @@ export class File {
   }
 
   get extension(): string | undefined {
-    return (
-      this.path ? path.extname(this.path) : path.extname(this.name)
+    return (this.path
+      ? path.extname(this.path)
+      : path.extname(this.name)
     ).toLowerCase();
   }
 
@@ -51,5 +57,14 @@ export class File {
 
   get modifiedAt(): number | undefined {
     return this.file.modifiedAt;
+  }
+
+  toJSON(): any {
+    return {
+      name: this.name,
+      path: this.path,
+      createdAt: this.createdAt,
+      modifiedAt: this.modifiedAt,
+    };
   }
 }
