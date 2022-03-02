@@ -62,12 +62,11 @@ export function attachmentToHTML(attachment: Attachment): string {
 
   switch (tag) {
     case "img":
-      return `<img ${attributes.join(" ")}
-      alt="${attachment.filename}" />`;
+      return `<img ${attributes.join(" ")} alt="${attachment.filename}" />`;
     case "span":
-      return `<span ${attributes.join(" ")}
-      contenteditable="false"
-      title="${attachment.filename}">
+      return `<span ${attributes.join(" ")} contenteditable="false" title="${
+        attachment.filename
+      }">
       <em>&nbsp;</em>
       <span class="filename">${attachment.filename}</span>
     </span>`;

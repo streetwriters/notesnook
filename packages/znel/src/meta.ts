@@ -8,7 +8,7 @@ import {
 } from "./utils";
 import { HTMLElement } from "node-html-parser";
 
- type ZNoteType =
+export type ZNoteType =
   | "note/image"
   | "note/sketch"
   | "note/checklist"
@@ -45,12 +45,12 @@ export class ZMeta implements IZnelElement {
     return getAsString(this.#metaElement, "ZNoteColor");
   }
 
-  get noteType(): ZNoteType | null {
-    return <ZNoteType | null>getAsString(this.#metaElement, "ZNoteType");
+  get noteType(): ZNoteType {
+    return <ZNoteType>getAsStringRequired(this.#metaElement, "ZNoteType");
   }
 
   validate() {
-    this.title;
+    this.title && this.noteType;
   }
 }
 

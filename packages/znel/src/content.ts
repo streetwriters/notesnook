@@ -1,4 +1,5 @@
 import { HTMLElement } from "node-html-parser";
+import { ZNoteType } from "./meta";
 
 /**
  * List of invalid attributes we should remove part of our
@@ -28,7 +29,7 @@ const validStyles: string[] = [
  */
 const invalidElements: string[] = [
   "znresource",
-  ".checklist"
+  ".checklist",
 ];
 const cssSelector: string = [
   ...validAttributes.map((attr) => `[${attr}]`),
@@ -42,18 +43,26 @@ export interface IElementHandler {
 
 export class ZContent {
   #contentElement: HTMLElement;
-  constructor(contentElement: HTMLElement) {
+  #type: ZNoteType;
+  constructor(contentElement: HTMLElement, type: ZNoteType) {
     this.#contentElement = contentElement;
+    this.#type = type;
   }
 
   async toHtml(handler?: IElementHandler): Promise<string> {
     const contentElement = this.#contentElement.querySelector("content");
     if (!contentElement) throw new Error("Invalid content.");
+    
+    // a checklist note directly contains checkboxes so we need to handle
+    // this separately.
+    if (this.#type === "note/checklist" && handler) {
+      const result = await handler.process("znchecklist", contentElement);
+      if (!!result) return result;
+    }
 
     const elements = contentElement.querySelectorAll(cssSelector);
     for (let element of elements) {
-      let elementType =
-        filterAttributes(element) || element.tagName.toLowerCase();
+      let elementType = element.classList.contains("checklist") ?  "znchecklist" : filterAttributes(element) || element.tagName.toLowerCase();
 
       switch (elementType) {
         case "znchecklist":
@@ -124,6 +133,5 @@ function filterAttributes(element: HTMLElement): string | null {
     }
   }
 
-  if (element.classList.contains("checklist")) elementType = "checklist";
   return elementType;
 }

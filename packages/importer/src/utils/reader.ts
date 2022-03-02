@@ -5,9 +5,7 @@
 export class Reader {
   private _offset = 0;
   private currentClamp = 0;
-  private textDecoder = new (typeof TextDecoder !== "undefined"
-    ? TextDecoder
-    : require("text-encoding").TextDecoder)();
+  private textDecoder = new TextDecoder();
 
   public constructor(private readonly array: Uint8Array) {}
 

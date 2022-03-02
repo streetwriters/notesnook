@@ -51,7 +51,7 @@ export class Znel implements IZnelElement {
 get content(): ZContent {
   const zcontentElement = this.#znoteElement.querySelector("zcontent");
   if (!zcontentElement) throw new Error("Invalid znel. No ZContent element found");
-  return new ZContent(zcontentElement);
+  return new ZContent(zcontentElement, this.metadata.noteType);
 }
   
   validate() {
