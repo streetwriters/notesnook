@@ -71,7 +71,12 @@ export const IconButton = ({
       <Icon
         name={name}
         style={iconStyle}
-        color={restProps.disabled ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.nav)) : color}
+        color={
+          restProps.disabled
+            ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.nav))
+            : //@ts-ignore
+              colors[color] || color
+        }
         size={size}
       />
     </PressableButton>

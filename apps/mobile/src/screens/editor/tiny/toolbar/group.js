@@ -1,11 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../../../stores/theme';
 import ToolbarItem from './item';
 
 const ToolbarGroup = ({ group }) => {
-  const colors = useThemeStore(state => state.colors);
-
   return (
     <View
       style={{

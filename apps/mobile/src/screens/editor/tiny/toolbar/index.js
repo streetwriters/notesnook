@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { Platform, View, ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { IconButton } from '../../../../components/ui/icon-button';
-import { useThemeStore } from '../../../../stores/theme';
 import { useEditorStore } from '../../../../stores/stores';
+import { useThemeStore } from '../../../../stores/theme';
 import { getElevation } from '../../../../utils';
 import { db } from '../../../../utils/database';
 import { normalize } from '../../../../utils/size';
@@ -17,7 +17,6 @@ import Tooltip from './tooltip';
 
 const EditorToolbar = React.memo(
   () => {
-    const colors = useThemeStore(state => state.colors);
     const config = TOOLBAR_CONFIG;
     const searchReplace = useEditorStore(state => state.searchReplace);
     const readonly = useEditorStore(state => state.readonly);
@@ -52,7 +51,7 @@ const EditorToolbar = React.memo(
               name="pencil-lock"
               type="grayBg"
               onPress={onPress}
-              color={colors.accent}
+              color="accent"
               customStyle={{
                 position: 'absolute',
                 bottom: 20,
@@ -75,7 +74,6 @@ const EditorToolbar = React.memo(
                       width: '100%',
                       maxWidth: '100%',
                       minHeight: normalize(50),
-                      backgroundColor: colors.bg,
                       paddingLeft: 6,
                       zIndex: 11
                     }}
@@ -94,14 +92,7 @@ const EditorToolbar = React.memo(
                       typeof item !== 'string' ? (
                         <ToolbarGroup key={item[0].format} group={item} />
                       ) : (
-                        <View
-                          style={{
-                            height: 30,
-                            width: 2,
-                            marginHorizontal: 2,
-                            backgroundColor: colors.nav
-                          }}
-                        />
+                        <Seperator key={index + '-seperator'} />
                       )
                     )}
                   </ScrollView>
@@ -115,5 +106,19 @@ const EditorToolbar = React.memo(
   },
   () => true
 );
+
+const Seperator = () => {
+  const colors = useThemeStore(state => state.colors);
+  return (
+    <View
+      style={{
+        height: 30,
+        width: 2,
+        marginHorizontal: 2,
+        backgroundColor: colors.nav
+      }}
+    />
+  );
+};
 
 export default EditorToolbar;
