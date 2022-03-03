@@ -80,7 +80,8 @@ export const Login = ({ changeMode }) => {
       });
       eSendEvent(eCloseLoginDialog);
       await SettingsService.set({
-        sessionExpired: false
+        sessionExpired: false,
+        userEmailConfirmed: user.isEmailConfirmed
       });
       eSendEvent('userLoggedIn', true);
       await sleep(500);

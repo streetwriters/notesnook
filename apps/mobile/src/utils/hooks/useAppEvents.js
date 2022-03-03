@@ -136,8 +136,9 @@ export const useAppEvents = () => {
   };
 
   useEffect(() => {
+    let sub;
     if (!loading) {
-      AppState.addEventListener('change', onAppStateChanged);
+      sub = AppState.addEventListener('change', onAppStateChanged);
       (async () => {
         try {
           let url = await Linking.getInitialURL();
@@ -153,7 +154,7 @@ export const useAppEvents = () => {
     return () => {
       refValues.current?.removeInternetStateListener &&
         refValues.current?.removeInternetStateListener();
-      AppState.removeEventListener('change', onAppStateChanged);
+      sub?.remove();
       unsubIAP();
     };
   }, [loading]);

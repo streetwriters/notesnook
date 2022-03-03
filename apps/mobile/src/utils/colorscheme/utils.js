@@ -83,11 +83,14 @@ export function getColorScheme() {
 }
 
 export const toggleDarkMode = async () => {
+  let settings = SettingsService.get();
   await SettingsService.set({
     theme: {
-      ...SettingsService.get().theme,
-      dark: !SettingsService.get().dark
+      ...settings.theme,
+      dark: !settings.theme?.dark
     }
   });
-  getColorScheme();
+  setTimeout(() => {
+    getColorScheme();
+  }, 1);
 };

@@ -13,6 +13,19 @@ import { DDS } from './device-detection';
 async function migrate(settings: SettingStore['settings']) {
   if (settings.migrated) return true;
 
+  let introCompleted = await MMKV.getItem('introCompleted');
+
+  if (!introCompleted) {
+    console.log('no need to migrate');
+    settings.migrated = true;
+    set(settings);
+    return;
+  }
+
+  settings.introCompleted = true;
+  MMKV.removeItem('introCompleted');
+  console.log('migrated introCompleted', introCompleted);
+
   let askForRating = await MMKV.getItem('askForRating');
   if (askForRating) {
     if (askForRating === 'completed' || askForRating === 'never') {
@@ -33,13 +46,6 @@ async function migrate(settings: SettingStore['settings']) {
     settings.rateApp = askForBackup.timestamp;
     MMKV.removeItem('askForBackup');
     console.log('migrated askForBackup', askForBackup);
-  }
-
-  let introCompleted = await MMKV.getItem('introCompleted');
-  if (introCompleted) {
-    settings.introCompleted = true;
-    MMKV.removeItem('introCompleted');
-    console.log('migrated introCompleted', introCompleted);
   }
 
   let lastBackupDate = await MMKV.getItem('backupDate');
@@ -137,12 +143,14 @@ async function setPrivacyScreen(settings: SettingStore['settings']) {
 
 async function set(next: Partial<SettingStore['settings']>) {
   let settings = get();
+
   settings = {
     ...settings,
     ...next
   };
+
   useSettingStore.getState().setSettings(settings);
-  await MMKV.setItem('appSettings', JSON.stringify(settings));
+  setTimeout(async () => await MMKV.setItem('appSettings', JSON.stringify(settings)), 1);
 }
 
 async function toggle(id: keyof SettingStore['settings']) {
