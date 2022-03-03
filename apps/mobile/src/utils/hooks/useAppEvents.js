@@ -14,13 +14,12 @@ import { enabled } from 'react-native-privacy-snapshot';
 import { doInBackground, editing } from '..';
 import { Walkthrough } from '../../components/walkthroughs';
 import {
-  clearAllStores,
-  initialize,
-  useAttachmentStore,
-  useNoteStore,
-  useSettingStore,
-  useUserStore
-} from '../../stores/stores';
+  EditorWebView,
+  getNote,
+  getWebviewInit,
+  updateNoteInEditor
+} from '../../screens/editor/Functions';
+import tiny from '../../screens/editor/tiny/tiny';
 import Backup from '../../services/backup';
 import BiometricService from '../../services/biometrics';
 import {
@@ -40,17 +39,17 @@ import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
 import Sync from '../../services/sync';
 import {
-  EditorWebView,
-  getNote,
-  getWebviewInit,
-  updateNoteInEditor
-} from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
+  clearAllStores,
+  initialize,
+  useAttachmentStore,
+  useNoteStore,
+  useSettingStore,
+  useUserStore
+} from '../../stores/stores';
 import { updateStatusBarColor } from '../color-scheme';
 import { db } from '../database';
-import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage } from '../events';
 import { MMKV } from '../database/mmkv';
-import Storage from '../database/storage';
+import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage } from '../events';
 import { sleep } from '../time';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
@@ -84,68 +83,57 @@ export const useAppEvents = () => {
     );
   };
 
-  const onLoadingAttachment = data => {
+  const onLoadingAttachmentProgress = data => {
     useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
   };
 
-  const onSodiumProgress = ({ total, progress }) => {
+  const onFileEncryptionProgress = ({ total, progress }) => {
     console.log('encryption progress: ', (progress / total).toFixed(2));
     useAttachmentStore.getState().setEncryptionProgress((progress / total).toFixed(2));
   };
 
   useEffect(() => {
-    Appearance.addChangeListener(SettingsService.setTheme);
-    Linking.addEventListener('url', onUrlRecieved);
+    let subs = [
+      Appearance.addChangeListener(SettingsService.setTheme),
+      Linking.addEventListener('url', onUrlRecieved),
+      SodiumEventEmitter.addListener('onSodiumProgress', onFileEncryptionProgress)
+    ];
+
     EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
-    EV.subscribe(EVENTS.databaseSyncRequested, partialSync);
+    EV.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
     EV.subscribe(EVENTS.userLoggedOut, onLogout);
     EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
     EV.subscribe(EVENTS.userSessionExpired, onSessionExpired);
     EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
     EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
     EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
-    EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
-
-    let ubsubsodium = SodiumEventEmitter.addListener('onSodiumProgress', onSodiumProgress);
+    EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
 
     eSubscribeEvent('userLoggedIn', setCurrentUser);
 
     return () => {
-      ubsubsodium?.remove();
       eUnSubscribeEvent('userLoggedIn', setCurrentUser);
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
-      EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
+      EV.unsubscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
       EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
       EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
       EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
-      EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
+      EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
       EV.unsubscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
+      EV.unsubscribeAll();
 
-      Appearance.removeChangeListener(SettingsService.setTheme);
-      Linking.removeEventListener('url', onUrlRecieved);
+      subs.forEach(sub => sub?.remove());
     };
   }, []);
 
   const onSessionExpired = async () => {
-    await Storage.write('loginSessionHasExpired', 'expired');
+    await SettingsService.set({
+      sessionExpired: true
+    });
     eSendEvent('session_expired');
   };
-
-  // const onNoteRemoved = async id => {
-  //   try {
-  //     await db.notes.remove(id);
-  //     Navigation.setRoutesToUpdate([
-  //       Navigation.routeNames.Favorites,
-  //       Navigation.routeNames.Notes,
-  //       Navigation.routeNames.NotesPage,
-  //       Navigation.routeNames.Trash,
-  //       Navigation.routeNames.Notebook
-  //     ]);
-  //     eSendEvent(eClearEditor, id);
-  //   } catch (e) {}
-  // };
 
   useEffect(() => {
     if (!loading) {
@@ -229,7 +217,7 @@ export const useAppEvents = () => {
     await PremiumService.setPremiumStatus();
   };
 
-  const partialSync = async () => {
+  const onRequestPartialSync = async () => {
     try {
       setSyncing(true);
       let res = await doInBackground(async () => {
@@ -300,71 +288,55 @@ export const useAppEvents = () => {
     let user;
     try {
       user = await db.user.getUser();
-      let isUserEmailConfirmed = await MMKV.getStringAsync('isUserEmailConfirmed');
+      if (!user) {
+        await PremiumService.setPremiumStatus();
+        return setLoginMessage();
+      }
 
-      if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
-        setUser(user);
+      let userEmailConfirmed = SettingsService.get().userEmailConfirmed;
+      setUser(user);
+      if (SettingsService.get().sessionExpired) {
         syncedOnLaunch.current = true;
         return;
       }
-      if (user) {
-        setUser(user);
-        clearMessage();
-        attachIAPListeners();
 
-        user = await db.user.fetchUser();
-        if (user.isEmailConfirmed && isUserEmailConfirmed === 'no') {
-          setTimeout(() => {
-            onEmailVerified();
-          }, 1000);
-        }
+      clearMessage();
+      attachIAPListeners();
 
-        if (user.isEmailConfirmed && !SettingsService.get().recoveryKeySaved) {
-          setRecoveryKeyMessage();
-        }
-
-        await Sync.run();
-        setUser(user);
+      user = await db.user.fetchUser();
+      if (user.isEmailConfirmed && !userEmailConfirmed) {
+        setTimeout(() => {
+          onEmailVerified();
+        }, 1000);
         SettingsService.set({
-          userEmailConfirmed: user.isEmailConfirmed
+          userEmailConfirmed: true
         });
-
-        if (!user.isEmailConfirmed) {
-          setEmailVerifyMessage();
-        }
-      } else {
-        setLoginMessage();
-      }
-    } catch (e) {
-      user = await db.user.getUser();
-      if (user?.isEmailConfirmed && !SettingsService.get().recoveryKeySaved) {
-        setRecoveryKeyMessage();
       }
 
-      if (user && !user.isEmailConfirmed) {
-        setEmailVerifyMessage();
-      } else if (!user) {
-        setLoginMessage();
-      } else {
-        console.log('unknown error', e);
-      }
-    } finally {
-      await PremiumService.setPremiumStatus();
-      user = await db.user.getUser();
-      if (PremiumService.get() && user) {
-        if (SettingsService.get().reminder === 'off') {
-          await SettingsService.set({ reminder: 'daily' });
-        }
-        if (Backup.checkBackupRequired()) {
-          sleep(2000).then(() => Backup.checkAndRun());
-        }
-      }
-      refValues.current.isUserReady = true;
-      if (login) {
-        eSendEvent(eCloseProgressDialog);
-      }
-      syncedOnLaunch.current = true;
+      await Sync.run();
+      setUser(user);
+    } catch (e) {}
+
+    await PremiumService.setPremiumStatus();
+    user = await db.user.getUser();
+    if (user?.isEmailConfirmed && !SettingsService.get().recoveryKeySaved) {
+      setRecoveryKeyMessage();
     }
+    if (!user.isEmailConfirmed) setEmailVerifyMessage();
+
+    if (PremiumService.get() && user) {
+      if (SettingsService.get().reminder === 'off') {
+        await SettingsService.set({ reminder: 'daily' });
+      }
+      if (Backup.checkBackupRequired()) {
+        sleep(2000).then(() => Backup.checkAndRun());
+      }
+    }
+    refValues.current.isUserReady = true;
+    if (login) {
+      eSendEvent(eCloseProgressDialog);
+    }
+    syncedOnLaunch.current = true;
   };
 
   const onSuccessfulSubscription = async subscription => {
@@ -447,7 +419,7 @@ export const useAppEvents = () => {
     if (!refValues.current?.isUserReady) {
       return;
     }
-    if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
+    if (SettingsService.get().sessionExpired) {
       refValues.current.isReconnecting = false;
       return;
     }

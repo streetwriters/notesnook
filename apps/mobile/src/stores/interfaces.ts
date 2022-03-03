@@ -86,6 +86,7 @@ export type Settings = {
   showBackupCompleteSheet: boolean;
   lastRecoveryEmailTime?: number;
   lastVerificationEmailTime?: number;
+  sessionExpired: boolean;
 };
 
 type Dimensions = {

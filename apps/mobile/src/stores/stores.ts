@@ -255,7 +255,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
       accent: ACCENT.color,
       dark: false
     },
-    showBackupCompleteSheet: true
+    showBackupCompleteSheet: true,
+    sessionExpired: false
   },
   sheetKeyboardHandler: true,
   fullscreen: false,
@@ -405,7 +406,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
   },
   announcements: [],
   remove: async id => {
-    MMKV.setStringAsync(id, 'removed');
+    MMKV.setItem(id, 'removed');
 
     const inlineCopy = get().announcements.slice();
     const dialogsCopy = get().dialogs.slice();

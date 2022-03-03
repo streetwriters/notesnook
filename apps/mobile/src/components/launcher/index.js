@@ -2,73 +2,80 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NativeModules, Platform, StatusBar, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
-import { useThemeStore } from '../../stores/theme';
+import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
+import BiometricService from '../../services/biometrics';
+import { DDS } from '../../services/device-detection';
+import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
+import { setRateAppMessage } from '../../services/message';
+import PremiumService from '../../services/premium';
+import SettingsService from '../../services/settings';
 import {
+  initialize,
   useFavoriteStore,
   useMessageStore,
   useNoteStore,
   useSettingStore,
   useUserStore
 } from '../../stores/stores';
-import BiometricService from '../../services/biometrics';
-import { DDS } from '../../services/device-detection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  presentSheet,
-  ToastEvent
-} from '../../services/event-manager';
-import { setRateAppMessage } from '../../services/message';
-import PremiumService from '../../services/premium';
+import { useThemeStore } from '../../stores/theme';
 import { editing } from '../../utils';
 import { db } from '../../utils/database';
-import { eOpenAnnouncementDialog } from '../../utils/events';
 import { MMKV } from '../../utils/database/mmkv';
+import { eOpenAnnouncementDialog } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
-import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
-import { IconButton } from '../ui/icon-button';
-import { Button } from '../ui/button';
-import Input from '../ui/input';
-import { SvgView } from '../ui/svg';
 import { SVG } from '../auth/background';
-import Seperator from '../ui/seperator';
 import Intro from '../intro';
+import { Update } from '../sheets/update';
+import { Button } from '../ui/button';
+import { IconButton } from '../ui/icon-button';
+import Input from '../ui/input';
+import Seperator from '../ui/seperator';
+import { SvgView } from '../ui/svg';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
-import { Update } from '../sheets/update';
-import SettingsService from '../../services/settings';
 
-let passwordValue = null;
-let didVerifyUser = false;
-
-const Launcher = ({ onLoad }) => {
+const Launcher = () => {
   const colors = useThemeStore(state => state.colors);
   const setNotes = useNoteStore(state => state.setNotes);
   const setFavorites = useFavoriteStore(state => state.setFavorites);
-  const _setLoading = useNoteStore(state => state.setLoading);
-  const _loading = useNoteStore(state => state.loading);
+  const setLoading = useNoteStore(state => state.setLoading);
+  const loading = useNoteStore(state => state.loading);
   const user = useUserStore(state => state.user);
   const verifyUser = useUserStore(state => state.verifyUser);
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
   const deviceMode = useSettingStore(state => state.deviceMode);
-  const pwdInput = useRef();
+  const passwordInputRef = useRef();
+  const password = useRef();
   const [requireIntro, setRequireIntro] = useState({
     updated: false,
     value: false
   });
+  const dbInitCompleted = useRef(false);
 
-  const load = async () => {
-    if (verifyUser) {
+  const loadNotes = async () => {
+    if (verifyUser || !loading) {
       return;
     }
     await restoreEditorState();
     await db.notes.init();
     setNotes();
     setFavorites();
-    _setLoading(false);
+    setLoading(false);
+  };
+
+  const init = async () => {
+    if (!dbInitCompleted.current) {
+      await db.init();
+      initialize();
+      useUserStore.getState().setUser(await db.user.getUser());
+      dbInitCompleted.current = true;
+    }
+
+    if (!verifyUser) {
+      loadNotes();
+    }
   };
 
   const hideSplashScreen = async () => {
@@ -92,36 +99,39 @@ const Launcher = ({ onLoad }) => {
   }, [requireIntro, verifyUser]);
 
   useEffect(() => {
-    (async () => {
-      let introCompleted = SettingsService.get().introCompleted;
-      setRequireIntro({
-        updated: true,
-        value: !introCompleted
-      });
-    })();
-    if (!_loading) {
-      (async () => {
-        await sleep(500);
-        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
-          eSendEvent('session_expired');
-          return;
-        }
+    let introCompleted = SettingsService.get().introCompleted;
+    setRequireIntro({
+      updated: true,
+      value: !introCompleted
+    });
+  }, []);
 
-        if (await checkAppUpdateAvailable()) return;
-        if (await checkForRateAppRequest()) return;
-        if (await checkNeedsBackup()) return;
-        if (await PremiumService.getRemainingTrialDaysStatus()) return;
-
-        await useMessageStore.getState().setAnnouncement();
-        if (!requireIntro) {
-          let dialogs = useMessageStore.getState().dialogs;
-          if (dialogs.length > 0) {
-            eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
-          }
-        }
-      })();
+  useEffect(() => {
+    if (!loading) {
+      doAppLoadActions();
     }
-  }, [_loading]);
+  }, [loading]);
+
+  const doAppLoadActions = async () => {
+    await sleep(500);
+    if (SettingsService.get().sessionExpired) {
+      eSendEvent('session_expired');
+      return;
+    }
+
+    if (await checkAppUpdateAvailable()) return;
+    if (await checkForRateAppRequest()) return;
+    if (await checkNeedsBackup()) return;
+    if (await PremiumService.getRemainingTrialDaysStatus()) return;
+
+    await useMessageStore.getState().setAnnouncement();
+    if (!requireIntro) {
+      let dialogs = useMessageStore.getState().dialogs;
+      if (dialogs.length > 0) {
+        eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
+      }
+    }
+  };
 
   const checkAppUpdateAvailable = async () => {
     try {
@@ -183,23 +193,6 @@ const Launcher = ({ onLoad }) => {
     return false;
   };
 
-  useEffect(() => {
-    eSubscribeEvent('load_overlay', load);
-    if (!verifyUser) {
-      if (!didVerifyUser) {
-        onLoad();
-      } else {
-        load();
-      }
-    }
-    if (verifyUser) {
-      onUnlockBiometrics();
-    }
-    return () => {
-      eUnSubscribeEvent('load_overlay', load);
-    };
-  }, [verifyUser]);
-
   const onUnlockBiometrics = async () => {
     if (!(await BiometricService.isBiometryAvailable())) {
       ToastEvent.show({
@@ -210,23 +203,29 @@ const Launcher = ({ onLoad }) => {
     }
     let verified = await BiometricService.validateUser('Unlock to access your notes', '');
     if (verified) {
-      didVerifyUser = true;
       setVerifyUser(false);
-      passwordValue = null;
+      password.current = null;
     }
   };
 
+  useEffect(() => {
+    if (verifyUser) {
+      onUnlockBiometrics();
+    }
+    init();
+  }, [verifyUser]);
+
   const onSubmit = async () => {
-    if (!passwordValue) return;
+    if (!password.current) return;
     try {
-      let verified = await db.user.verifyPassword(passwordValue);
+      let verified = await db.user.verifyPassword(password.current);
       if (verified) {
-        didVerifyUser = true;
         setVerifyUser(false);
-        passwordValue = null;
+        password.current = null;
       }
     } catch (e) {}
   };
+
   return verifyUser ? (
     <View
       style={{
@@ -300,10 +299,10 @@ const Launcher = ({ onLoad }) => {
           {user ? (
             <>
               <Input
-                fwdRef={pwdInput}
+                fwdRef={passwordInputRef}
                 secureTextEntry
                 placeholder="Enter account password"
-                onChangeText={v => (passwordValue = v)}
+                onChangeText={v => (password.current = v)}
                 onSubmit={onSubmit}
               />
             </>
@@ -347,7 +346,7 @@ const Launcher = ({ onLoad }) => {
         </View>
       </View>
     </View>
-  ) : requireIntro.value && !_loading ? (
+  ) : requireIntro.value && !loading ? (
     <Intro />
   ) : null;
 };

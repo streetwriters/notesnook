@@ -83,7 +83,9 @@ export const SessionExpired = () => {
       if (!res) throw new Error('no token found');
       if (db.user.tokenManager._isTokenExpired(res)) throw new Error('token expired');
       if (!(await Sync.run())) throw new Error('e');
-      await MMKV.removeItem('loginSessionHasExpired');
+      await SettingsService.set({
+        sessionExpired: false
+      });
       setVisible(false);
     } catch (e) {
       console.log(e);
@@ -112,7 +114,9 @@ export const SessionExpired = () => {
         context: 'global'
       });
       setVisible(false);
-      await MMKV.removeItem('loginSessionHasExpired');
+      await SettingsService.set({
+        sessionExpired: false
+      });
       eSendEvent('userLoggedIn', true);
       await sleep(500);
       presentSheet({

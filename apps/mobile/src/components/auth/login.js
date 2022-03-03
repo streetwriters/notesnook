@@ -23,6 +23,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { SVG } from './background';
 import { ForgotPassword } from './forgot-password';
+import SettingsService from '../../services/settings';
 
 export const Login = ({ changeMode }) => {
   const colors = useThemeStore(state => state.colors);
@@ -78,7 +79,9 @@ export const Login = ({ changeMode }) => {
         context: 'global'
       });
       eSendEvent(eCloseLoginDialog);
-      await MMKV.removeItem('loginSessionHasExpired');
+      await SettingsService.set({
+        sessionExpired: false
+      });
       eSendEvent('userLoggedIn', true);
       await sleep(500);
       presentSheet({
