@@ -26,7 +26,7 @@ const Intro = () => {
   const colors = useThemeStore(state => state.colors);
 
   const introCompleted = useSettingStore(state => state.settings.introCompleted);
-  const isTelemetryEnabled = useSettingStore(state => state.settings.isTelemetryEnabled);
+  const isTelemetryEnabled = useSettingStore(state => state.settings.telemetry);
   const { height } = useWindowDimensions();
 
   const opacity = useValue(0);
