@@ -17,8 +17,8 @@ import Paragraph from '../../ui/typography/paragraph';
 
 export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateBy }) => {
   const colors = useThemeStore(state => state.colors);
-  const settings = useSettingStore(state => state.settings);
-  const compactMode = settings.notebooksListMode === 'compact';
+  const notebooksListMode = useSettingStore(state => state.settings.notebooksListMode);
+  const compactMode = notebooksListMode === 'compact';
   const topics = item.topics?.slice(0, 3) || [];
   const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {

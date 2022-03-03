@@ -28,8 +28,13 @@ export const SectionHeader = ({ item, index, type, color, screen }) => {
   const sortRef = useRef();
   const compactModeRef = useRef();
 
-  const settings = useSettingStore(state => state.settings);
-  const listMode = type === 'notebooks' ? settings.notebooksListMode : settings.notesListMode;
+  const notebooksListMode = useSettingStore(state => state.settings.notebooksListMode);
+  const notesListMode = useSettingStore(state => state.settings.notesListMode);
+  const listMode = type === 'notebooks' ? notebooksListMode : notesListMode;
+
+  useEffect(() => {
+    console.log('rerender section header');
+  });
 
   groupBy = !groupBy
     ? 'Default'

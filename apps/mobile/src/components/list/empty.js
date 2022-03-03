@@ -17,8 +17,7 @@ export const Empty = React.memo(
     const colors = useThemeStore(state => state.colors);
     const insets = useSafeAreaInsets();
     const { height } = useWindowDimensions();
-    const settings = useSettingStore(state => state.settings);
-    const introCompleted = settings.introCompleted;
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
 
     const tip = useTip(
       screen === 'Notes' && introCompleted ? 'first-note' : placeholderData.type || type,

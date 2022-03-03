@@ -25,9 +25,8 @@ const SVG_Z = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245.487 113.
 const Intro = () => {
   const colors = useThemeStore(state => state.colors);
 
-  const settings = useSettingStore(state => state.settings);
-  const introCompleted = settings.introCompleted;
-  const isTelemetryEnabled = settings.telemetry;
+  const introCompleted = useSettingStore(state => state.settings.introCompleted);
+  const isTelemetryEnabled = useSettingStore(state => state.settings.isTelemetryEnabled);
   const { height } = useWindowDimensions();
 
   const opacity = useValue(0);

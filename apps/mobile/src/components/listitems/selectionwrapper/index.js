@@ -11,8 +11,9 @@ import { SelectionIcon } from './selection';
 const SelectionWrapper = ({ children, item, background, onLongPress, onPress, testID }) => {
   const colors = useThemeStore(state => state.colors);
   const [actionStrip, setActionStrip] = useState(false);
-  const settings = useSettingStore(state => state.settings);
-  const listMode = item.type === 'notebook' ? settings.notebooksListMode : settings.notesListMode;
+  const notebooksListMode = useSettingStore(state => state.settings.notebooksListMode);
+  const notesListMode = useSettingStore(state => state.settings.notesListMode);
+  const listMode = item.type === 'notebook' ? notebooksListMode : notesListMode;
   const compactMode = (item.type === 'notebook' || item.type === 'note') && listMode === 'compact';
 
   const _onLongPress = () => {

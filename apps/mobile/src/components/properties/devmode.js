@@ -8,9 +8,9 @@ import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 
 export const DevMode = ({ item }) => {
-  const settings = useSettingStore(state => state.settings);
+  const devMode = useSettingStore(state => state.settings.devMode);
 
-  return settings.devMode ? (
+  return devMode ? (
     <View
       style={{
         width: '100%',

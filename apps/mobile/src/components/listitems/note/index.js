@@ -53,8 +53,8 @@ const showActionSheet = item => {
 
 const NoteItem = ({ item, isTrash, tags, dateBy = 'dateCreated', noOpen = false }) => {
   const colors = useThemeStore(state => state.colors);
-  const settings = useSettingStore(state => state.settings);
-  const compactMode = settings.notesListMode === 'compact';
+  const notesListMode = useSettingStore(state => state.settings.notesListMode);
+  const compactMode = notesListMode === 'compact';
   const attachmentCount = db.attachments?.ofNote(item.id, 'all')?.length || 0;
 
   function getNotebook() {

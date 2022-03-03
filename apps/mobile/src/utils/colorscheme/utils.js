@@ -90,7 +90,5 @@ export const toggleDarkMode = async () => {
       dark: !settings.theme?.dark
     }
   });
-  setTimeout(() => {
-    getColorScheme();
-  }, 1);
+  getColorScheme();
 };

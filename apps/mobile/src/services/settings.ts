@@ -143,7 +143,6 @@ async function setPrivacyScreen(settings: SettingStore['settings']) {
 
 async function set(next: Partial<SettingStore['settings']>) {
   let settings = get();
-
   settings = {
     ...settings,
     ...next

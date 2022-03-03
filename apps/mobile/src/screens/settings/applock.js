@@ -19,7 +19,8 @@ import umami from '../../utils/analytics';
 
 const AppLock = ({ welcome, s = 0 }) => {
   const colors = useThemeStore(state => state.colors);
-  const settings = useSettingStore(state => state.settings);
+  const appLockMode = useSettingStore(state => state.settings.appLockMode);
+
   const [step, setStep] = useState(s);
 
   const modes = [
@@ -92,7 +93,7 @@ const AppLock = ({ welcome, s = 0 }) => {
             {modes.map(item => (
               <PressableButton
                 key={item.title}
-                type={settings.appLockMode === item.value ? 'grayBg' : 'transparent'}
+                type={appLockMode === item.value ? 'grayBg' : 'transparent'}
                 onPress={() => {
                   SettingsService.set({ appLockMode: item.value });
                 }}
@@ -104,21 +105,21 @@ const AppLock = ({ welcome, s = 0 }) => {
                   marginTop: 0,
                   marginBottom: 12,
                   borderWidth: 1,
-                  borderColor: settings.appLockMode === item.value ? item.activeColor : colors.nav
+                  borderColor: appLockMode === item.value ? item.activeColor : colors.nav
                 }}
                 style={{
                   marginBottom: 10
                 }}
               >
                 <Heading
-                  color={settings.appLockMode === item.value ? item.activeColor : colors.pri}
+                  color={appLockMode === item.value ? item.activeColor : colors.pri}
                   style={{ maxWidth: '95%' }}
                   size={SIZE.md}
                 >
                   {item.title}
                 </Heading>
                 <Paragraph
-                  color={settings.appLockMode === item.value ? item.activeColor : colors.icon}
+                  color={appLockMode === item.value ? item.activeColor : colors.icon}
                   style={{ maxWidth: '95%' }}
                   size={SIZE.sm}
                 >
