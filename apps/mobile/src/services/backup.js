@@ -35,13 +35,15 @@ async function getDirectoryAndroid() {
   } else {
     subfolder = folder;
   }
-  MMKV.setItem('backupStorageDir', JSON.stringify(subfolder));
+  SettingsService.set({
+    backupDirectoryAndroid: subfolder
+  });
   return subfolder;
 }
 
 async function checkBackupDirExists(reset = false) {
   if (Platform.OS === 'ios') return true;
-  let dir = await MMKV.getItem('backupStorageDir');
+  let dir = SettingsService.get().backupDirectoryAndroid;
   if (reset) dir = null;
   if (dir) {
     dir = JSON.parse(dir);
@@ -106,7 +108,9 @@ async function presentBackupCompleteSheet(backupFilePath) {
       {
         action: async () => {
           eSendEvent(eCloseProgressDialog);
-          await MMKV.setItem('dontShowCompleteSheet', 'yes');
+          SettingsService.set({
+            showBackupCompleteSheet: false
+          });
         },
         actionText: 'Never ask again',
         type: 'grayBg'
@@ -116,13 +120,10 @@ async function presentBackupCompleteSheet(backupFilePath) {
 }
 
 async function updateNextBackupTime() {
-  await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
-  await MMKV.setItem(
-    'askForBackup',
-    JSON.stringify({
-      timestamp: Date.now() + 86400000 * 3
-    })
-  );
+  SettingsService.set({
+    nextBackupRequestTime: Date.now() + 86400000 * 3,
+    lastBackupDate: Date.now()
+  });
 }
 
 async function run() {
@@ -176,10 +177,10 @@ async function run() {
       context: 'global'
     });
 
-    let dontShowCompleteSheet = await MMKV.getItem('dontShowCompleteSheet');
+    let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
     console.log(backupFilePath);
     await sleep(300);
-    if (!dontShowCompleteSheet) {
+    if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
     } else {
       eSendEvent(eCloseProgressDialog);
@@ -193,7 +194,7 @@ async function run() {
 }
 
 async function getLastBackupDate() {
-  return await MMKV.getItem('backupDate');
+  return SettingsService.get().lastBackupDate;
 }
 
 async function checkBackupRequired(type) {

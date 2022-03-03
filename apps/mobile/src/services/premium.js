@@ -12,6 +12,7 @@ import { db } from '../utils/database';
 import { eOpenPremiumDialog, eOpenTrialEndingDialog, eShowGetPremium } from '../utils/events';
 import { MMKV } from '../utils/database/mmkv';
 import { eSendEvent, presentSheet, ToastEvent } from './event-manager';
+import SettingsService from './settings';
 
 let premiumStatus = 0;
 let products = [];
@@ -143,8 +144,8 @@ const showVerifyEmailDialog = () => {
       'We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder.',
     action: async () => {
       try {
-        let lastEmailTime = await MMKV.getItem('lastEmailTime');
-        if (lastEmailTime && Date.now() - JSON.parse(lastEmailTime) < 60000 * 2) {
+        let lastVerificationEmailTime = SettingsService.get().lastVerificationEmailTime;
+        if (lastVerificationEmailTime && Date.now() - lastVerificationEmailTime < 60000 * 2) {
           ToastEvent.show({
             heading: 'Please wait before requesting another email',
             type: 'error',
@@ -154,7 +155,9 @@ const showVerifyEmailDialog = () => {
           return;
         }
         await db.user.sendVerificationEmail();
-        await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
+        SettingsService.set({
+          lastVerificationEmailTime: Date.now()
+        });
 
         ToastEvent.show({
           heading: 'Verification email sent!',

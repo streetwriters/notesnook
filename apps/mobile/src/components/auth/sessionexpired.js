@@ -25,6 +25,7 @@ import Input from '../ui/input';
 import { Toast } from '../toast';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import SettingsService from '../../services/settings';
 
 function getEmail(email) {
   if (!email) return null;
@@ -54,7 +55,9 @@ export const SessionExpired = () => {
     try {
       await db.user.logout();
       await BiometricService.resetCredentials();
-      await Storage.write('introCompleted', 'true');
+      await SettingsService.set({
+        introCompleted: true
+      });
       setVisible(false);
     } catch (e) {
       ToastEvent.show({

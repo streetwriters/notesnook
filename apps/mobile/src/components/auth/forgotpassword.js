@@ -13,6 +13,7 @@ import Input from '../ui/input';
 import Seperator from '../ui/seperator';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import SettingsService from '../../services/settings';
 
 export const ForgotPassword = () => {
   const colors = useThemeStore(state => state.colors);
@@ -33,12 +34,14 @@ export const ForgotPassword = () => {
     }
     setLoading(true);
     try {
-      let lastRecoveryEmailTime = await MMKV.getItem('lastRecoveryEmailTime');
+      let lastRecoveryEmailTime = SettingsService.get().lastRecoveryEmailTime;
       if (lastRecoveryEmailTime && Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3) {
         throw new Error('Please wait before requesting another email');
       }
       await db.user.recoverAccount(email.current.toLowerCase());
-      await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
+      SettingsService.set({
+        lastRecoveryEmailTime: Date.now()
+      });
       ToastEvent.show({
         heading: `Check your email to reset password`,
         message: `Recovery email has been sent to ${email.current.toLowerCase()}`,

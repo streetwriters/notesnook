@@ -12,17 +12,14 @@ import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
 import { useSettingStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
+import { ACCENT, COLOR_SCHEME, setColorScheme } from '../../utils/color-scheme';
 import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  COLOR_SCHEME_PITCH_BLACK,
-  setColorScheme
-} from '../../utils/color-scheme';
-import { hexToRGBA, RGB_Linear_Shade } from '../../utils/color-scheme/utils';
+  getColorScheme,
+  hexToRGBA,
+  RGB_Linear_Shade,
+  toggleDarkMode
+} from '../../utils/color-scheme/utils';
 import { MenuItemsList } from '../../utils/constants';
-import { MMKV } from '../../utils/database/mmkv';
 import { tabBarRef } from '../../utils/global-refs';
 import { pv, SIZE } from '../../utils/size';
 import { CustomButton } from './button';
@@ -33,43 +30,26 @@ const SettingsAppearanceSection = () => {
   const settings = useSettingStore(state => state.settings);
   const [collapsed, setCollapsed] = useState(true);
   const menuRef = useRef();
-  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-    let newColors = setColorScheme(colors, accent);
-    useThemeStore.getState().setColors({ ...newColors });
-  }
 
   const switchTheme = async () => {
     if (SettingsService.get().useSystemTheme) {
       await SettingsService.set({ useSystemTheme: false });
     } else {
-      await PremiumService.verify(async () => {
-        await SettingsService.set({
-          useSystemTheme: !SettingsService.get().useSystemTheme
-        });
-        if (SettingsService.get().useSystemTheme) {
-          await MMKV.setStringAsync(
-            'theme',
-            JSON.stringify({ night: Appearance.getColorScheme() === 'dark' })
-          );
-          changeColorScheme(
-            Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT
-          );
+      if (!PremiumService.get()) return;
+      await SettingsService.set({
+        useSystemTheme: !SettingsService.get().useSystemTheme,
+        theme: {
+          ...SettingsService.get().theme,
+          dark: Appearance.getColorScheme() === 'dark'
         }
       });
+      getColorScheme();
     }
   };
 
   const pitchBlack = async () => {
     await SettingsService.set({ pitchBlack: !SettingsService.get().pitchBlack });
-    let theme = await MMKV.getStringAsync('theme');
-    if (!theme) return;
-    theme = JSON.parse(theme);
-    if (!theme.night) return;
-    if (SettingsService.get().pitchBlack) {
-      changeColorScheme(COLOR_SCHEME_PITCH_BLACK);
-    } else {
-      changeColorScheme(COLOR_SCHEME_DARK);
-    }
+    getColorScheme();
   };
 
   return (
@@ -153,18 +133,7 @@ const SettingsAppearanceSection = () => {
           <CustomButton
             title="Dark mode"
             tagline="Switch on dark mode at night to protect your eyes."
-            onPress={async () => {
-              if (!colors.night) {
-                await MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
-                changeColorScheme(
-                  SettingsService.get().pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK
-                );
-              } else {
-                await MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
-
-                changeColorScheme(COLOR_SCHEME_LIGHT);
-              }
-            }}
+            onPress={toggleDarkMode}
             maxWidth="90%"
             customComponent={
               <ToggleSwitch
@@ -173,16 +142,7 @@ const SettingsAppearanceSection = () => {
                 offColor={colors.icon}
                 size="small"
                 animationSpeed={150}
-                onToggle={async () => {
-                  if (!colors.night) {
-                    await MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
-                    changeColorScheme(COLOR_SCHEME_DARK);
-                  } else {
-                    await MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
-
-                    changeColorScheme(COLOR_SCHEME_LIGHT);
-                  }
-                }}
+                onToggle={toggleDarkMode}
               />
             }
           />
@@ -322,7 +282,12 @@ export const AccentColorPicker = ({ settings = true }) => {
           onPress={async () => {
             await PremiumService.verify(async () => {
               changeAccentColor(item);
-              await MMKV.setStringAsync('accentColor', item);
+              SettingsService.set({
+                theme: {
+                  accent: item,
+                  dark: SettingsService.get().theme.dark
+                }
+              });
             });
           }}
           customStyle={{

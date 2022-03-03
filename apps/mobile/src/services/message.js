@@ -6,6 +6,7 @@ import { verifyUser } from '../screens/settings/functions';
 import { MMKV } from '../utils/database/mmkv';
 import { Platform } from 'react-native';
 import umami from '../utils/analytics';
+import SettingsService from './settings';
 
 const rateAppMessage = {
   visible: true,
@@ -35,7 +36,9 @@ const recoveryKeyMessage = {
       },
       true,
       async () => {
-        await MMKV.setItem('userHasSavedRecoveryKey', 'true');
+        SettingsService.set({
+          recoveryKeySaved: true
+        });
         clearMessage();
       },
       'I have saved my key already'

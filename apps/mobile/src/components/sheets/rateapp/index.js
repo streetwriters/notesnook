@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Linking, Platform, View } from 'react-native';
+import { Linking, View } from 'react-native';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
+import { clearMessage } from '../../../services/message';
+import SettingsService from '../../../services/settings';
+import { STORE_LINK } from '../../../utils/constants';
 import { eCloseRateDialog, eOpenRateDialog } from '../../../utils/events';
-import { MMKV } from '../../../utils/database/mmkv';
 import { SIZE } from '../../../utils/size';
-import SheetWrapper from '../../ui/sheet';
 import { Button } from '../../ui/button';
 import Seperator from '../../ui/seperator';
+import SheetWrapper from '../../ui/sheet';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
-import { STORE_LINK } from '../../../utils/constants';
-import { clearMessage } from '../../../services/message';
 
 const RateAppSheet = () => {
   const [visible, setVisible] = useState(false);
@@ -38,21 +38,25 @@ const RateAppSheet = () => {
     actionSheetRef.current?.hide();
   };
 
+  const onClose = async () => {
+    SettingsService.set({
+      rateApp: Date.now() + 86400000 * 7
+    });
+    setVisible(false);
+    clearMessage();
+  };
+
+  const rateApp = async () => {
+    await Linking.openURL(STORE_LINK);
+    SettingsService.set({
+      rateApp: false
+    });
+    setVisible(false);
+    clearMessage();
+  };
+
   return !visible ? null : (
-    <SheetWrapper
-      centered={false}
-      fwdRef={actionSheetRef}
-      onClose={async () => {
-        await MMKV.setItem(
-          'askForRating',
-          JSON.stringify({
-            timestamp: Date.now() + 86400000 * 2
-          })
-        );
-        setVisible(false);
-        clearMessage();
-      }}
-    >
+    <SheetWrapper centered={false} fwdRef={actionSheetRef} onClose={onClose}>
       <View
         style={{
           width: '100%',
@@ -68,12 +72,7 @@ const RateAppSheet = () => {
 
         <Seperator half />
         <Button
-          onPress={async () => {
-            await Linking.openURL(STORE_LINK);
-            await MMKV.setItem('askForRating', 'completed');
-            setVisible(false);
-            clearMessage();
-          }}
+          onPress={rateApp}
           fontSize={SIZE.md}
           width="100%"
           height={50}
@@ -92,7 +91,9 @@ const RateAppSheet = () => {
         >
           <Button
             onPress={async () => {
-              await MMKV.setItem('askForRating', 'never');
+              SettingsService.set({
+                rateApp: false
+              });
               setVisible(false);
               clearMessage();
             }}
@@ -103,16 +104,7 @@ const RateAppSheet = () => {
             title="Never"
           />
           <Button
-            onPress={async () => {
-              await MMKV.setItem(
-                'askForRating',
-                JSON.stringify({
-                  timestamp: Date.now() + 86400000 * 2
-                })
-              );
-              setVisible(false);
-              clearMessage();
-            }}
+            onPress={onClose}
             fontSize={SIZE.md}
             width="48%"
             height={50}

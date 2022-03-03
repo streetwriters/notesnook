@@ -28,6 +28,7 @@ import {
   TrashStore,
   UserStore
 } from './interfaces';
+import { ACCENT } from '../utils/color-scheme';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -242,20 +243,30 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     devMode: false,
     notifNotes: false,
     pitchBlack: false,
-    reduceAnimations: false
+    reduceAnimations: false,
+    rateApp: false,
+    migrated: false,
+    introCompleted: false,
+    nextBackupRequestTime: undefined,
+    lastBackupDate: undefined,
+    userEmailConfirmed: false,
+    recoveryKeySaved: false,
+    theme: {
+      accent: ACCENT.color,
+      dark: false
+    },
+    showBackupCompleteSheet: true
   },
   sheetKeyboardHandler: true,
   fullscreen: false,
   deviceMode: 'mobile',
   dimensions: { width, height },
   appLoading: true,
-  isIntroCompleted: false,
   setSettings: settings => set({ settings }),
   setFullscreen: fullscreen => set({ fullscreen }),
   setDeviceMode: mode => set({ deviceMode: mode }),
   setDimensions: dimensions => set({ dimensions: dimensions }),
   setAppLoading: appLoading => set({ appLoading }),
-  setIntroCompleted: isIntroCompleted => set({ isIntroCompleted }),
   setSheetKeyboardHandler: sheetKeyboardHandler => set({ sheetKeyboardHandler }),
   requestBiometrics: false,
   setRequestBiometrics: requestBiometrics => set({ requestBiometrics })

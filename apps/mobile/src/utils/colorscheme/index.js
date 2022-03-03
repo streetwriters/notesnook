@@ -1,6 +1,7 @@
 import { Platform, StatusBar } from 'react-native';
 import { AndroidModule } from '..';
 import { eSendEvent } from '../../services/event-manager';
+import { useThemeStore } from '../../stores/theme';
 import { eThemeUpdated } from '../events';
 
 export const ACCENT = {
@@ -109,6 +110,8 @@ export function getCurrentColors() {
 
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   COLOR_SCHEME = { ...colors, accent: accent.color, shade: accent.shade };
+
+  useThemeStore.getState().setColors({ ...COLOR_SCHEME });
 
   StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content', true);
   if (Platform.OS === 'android') {

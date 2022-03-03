@@ -198,7 +198,9 @@ export const useAppEvents = () => {
     let user = await db.user.getUser();
     setUser(user);
     if (!user) return;
-    MMKV.setItem('isUserEmailConfirmed', 'yes');
+    SettingsService.set({
+      userEmailConfirmed: true
+    });
     await PremiumService.setPremiumStatus();
     Walkthrough.present('emailconfirmed', false, true);
     if (user?.isEmailConfirmed) {
@@ -263,7 +265,9 @@ export const useAppEvents = () => {
     setSyncing(false);
     setLoginMessage();
     await PremiumService.setPremiumStatus();
-    await MMKV.setItem('introCompleted', 'true');
+    SettingsService.set({
+      introCompleted: true
+    });
     presentSheet({
       title: reason ? reason : 'User logged out',
       paragraph: `You have been logged out of your account.`,
@@ -315,33 +319,26 @@ export const useAppEvents = () => {
           }, 1000);
         }
 
-        if (user.isEmailConfirmed) {
-          let hasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
-          if (!hasSavedRecoveryKey) {
-            setRecoveryKeyMessage();
-          }
+        if (user.isEmailConfirmed && !SettingsService.get().recoveryKeySaved) {
+          setRecoveryKeyMessage();
         }
 
         await Sync.run();
+        setUser(user);
+        SettingsService.set({
+          userEmailConfirmed: user.isEmailConfirmed
+        });
+
         if (!user.isEmailConfirmed) {
           setEmailVerifyMessage();
-          MMKV.setItem('isUserEmailConfirmed', 'no');
-          return;
-        } else {
-          MMKV.setItem('isUserEmailConfirmed', 'yes');
         }
-
-        setUser(user);
       } else {
         setLoginMessage();
       }
     } catch (e) {
       user = await db.user.getUser();
-      if (user?.isEmailConfirmed) {
-        let hasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
-        if (!hasSavedRecoveryKey) {
-          setRecoveryKeyMessage();
-        }
+      if (user?.isEmailConfirmed && !SettingsService.get().recoveryKeySaved) {
+        setRecoveryKeyMessage();
       }
 
       if (user && !user.isEmailConfirmed) {

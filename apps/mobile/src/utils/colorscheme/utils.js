@@ -1,8 +1,5 @@
 import { Appearance } from 'react-native';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import SettingsService from '../../services/settings';
 import {
-  ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
@@ -10,8 +7,7 @@ import {
   setAccentColor,
   setColorScheme
 } from '.';
-import { eThemeUpdated } from '../events';
-import { MMKV } from '../database/mmkv';
+import SettingsService from '../../services/settings';
 
 const isValidHex = hex => /^#([A-Fa-f0-9]{3,4}){1,2}$/.test(hex);
 const getChunksFromString = (st, chunkSize) => st.match(new RegExp(`.{${chunkSize}}`, 'g'));
@@ -69,23 +65,9 @@ export const RGB_Linear_Shade = (p, rgba) => {
   );
 };
 
-export async function getColorScheme(useSystemTheme) {
-  let accentColor = await MMKV.getItem('accentColor');
-  let theme = await MMKV.getItem('theme');
-  let isPitchBlack = SettingsService.get().pitchBlack;
-  const darkTheme = isPitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK;
-
-  if (!accentColor) {
-    await MMKV.setItem('accentColor', ACCENT.color);
-    accentColor = ACCENT.color;
-  }
-
-  if (!theme) {
-    await MMKV.setItem('theme', JSON.stringify({ night: false }));
-    theme = COLOR_SCHEME_LIGHT;
-  } else {
-    theme = JSON.parse(theme);
-  }
+export function getColorScheme() {
+  let { pitchBlack, theme, useSystemTheme } = SettingsService.get();
+  const darkTheme = pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK;
 
   if (useSystemTheme) {
     Appearance.getColorScheme() === 'dark'
@@ -95,16 +77,17 @@ export async function getColorScheme(useSystemTheme) {
     return COLOR_SCHEME;
   }
 
-  setColorScheme(theme.night ? darkTheme : COLOR_SCHEME_LIGHT);
-  setAccentColor(accentColor);
-
-  eSendEvent(eThemeUpdated);
+  setColorScheme(theme.dark ? darkTheme : COLOR_SCHEME_LIGHT);
+  setAccentColor(theme.accent);
   return COLOR_SCHEME;
 }
 
-export const onThemeUpdate = (func = () => {}) => {
-  return eSubscribeEvent(eThemeUpdated, func);
-};
-export const clearThemeUpdateListener = (func = () => {}) => {
-  return eUnSubscribeEvent(eThemeUpdated, func);
+export const toggleDarkMode = async () => {
+  await SettingsService.set({
+    theme: {
+      ...SettingsService.get().theme,
+      dark: !SettingsService.get().dark
+    }
+  });
+  getColorScheme();
 };

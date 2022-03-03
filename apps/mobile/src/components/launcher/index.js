@@ -39,6 +39,7 @@ import Intro from '../intro';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { Update } from '../sheets/update';
+import SettingsService from '../../services/settings';
 
 let passwordValue = null;
 let didVerifyUser = false;
@@ -92,7 +93,7 @@ const Launcher = ({ onLoad }) => {
 
   useEffect(() => {
     (async () => {
-      let introCompleted = await MMKV.getItem('introCompleted');
+      let introCompleted = SettingsService.get().introCompleted;
       setRequireIntro({
         updated: true,
         value: !introCompleted
@@ -158,25 +159,18 @@ const Launcher = ({ onLoad }) => {
   };
 
   const checkForRateAppRequest = async () => {
-    let askForRating = await MMKV.getItem('askForRating');
-    if (askForRating !== 'never' || askForRating !== 'completed') {
-      askForRating = JSON.parse(askForRating);
-      if (askForRating?.timestamp < Date.now()) {
-        if (!useMessageStore.getState().message.visible) {
-          setRateAppMessage();
-        }
-        return true;
-      }
+    let rateApp = SettingsService.get().rateApp;
+    if (rateApp && rateApp < Date.now() && useMessageStore.getState().message.visible) {
+      setRateAppMessage();
+      return true;
     }
     return false;
   };
 
   const checkNeedsBackup = async () => {
-    let settingsStore = useSettingStore.getState();
-    let askForBackup = await MMKV.getItem('askForBackup');
-    if (settingsStore.settings.reminder === 'off' || !settingsStore.settings.reminder) {
-      askForBackup = JSON.parse(askForBackup);
-      if (askForBackup?.timestamp < Date.now()) {
+    let { nextBackupRequestTime, reminder } = SettingsService.get();
+    if (reminder === 'off' || !reminder) {
+      if (nextBackupRequestTime < Date.now()) {
         presentSheet({
           title: 'Backup & restore',
           paragraph: 'Please enable automatic backups to keep your data safe',

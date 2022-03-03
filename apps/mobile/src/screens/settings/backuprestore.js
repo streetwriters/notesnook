@@ -23,18 +23,7 @@ const SettingsBackupAndRestore = ({ isSheet }) => {
   const settings = useSettingStore(state => state.settings);
   const user = useUserStore(state => state.user);
   const [collapsed, setCollapsed] = useState(isSheet ? false : true);
-  const [backupDir, setBackupDir] = useState(null);
-
-  useEffect(() => {
-    if (!isSheet) {
-      MMKV.getItem('backupStorageDir').then(dir => {
-        if (dir) {
-          setBackupDir(JSON.parse(dir));
-          console.log(dir);
-        }
-      });
-    }
-  }, []);
+  const backupDirectoryAndroid = settings.backupDirectoryAndroid;
 
   const optItems = isSheet
     ? []
@@ -95,16 +84,11 @@ const SettingsBackupAndRestore = ({ isSheet }) => {
 
   if (Platform.OS === 'android' && !isSheet) {
     optItems.push({
-      name: backupDir ? 'Change backups directory' : 'Select backups directory',
+      name: backupDirectoryAndroid ? 'Change backups directory' : 'Select backups directory',
       func: async () => {
         let dir;
         try {
-          dir = await Backup.checkBackupDirExists(true);
-          if (!dir) {
-            dir = MMKV.getItem('backupStorageDir');
-            dir = JSON.parse(dir);
-          }
-          setBackupDir(dir);
+          let dir = await Backup.checkBackupDirExists(true);
         } catch (e) {
         } finally {
           if (!dir) {
@@ -115,7 +99,7 @@ const SettingsBackupAndRestore = ({ isSheet }) => {
           }
         }
       },
-      desc: backupDir ? backupDir.name : 'No backup directory selected'
+      desc: backupDirectoryAndroid ? backupDirectoryAndroid.name : 'No backup directory selected'
     });
   }
 
@@ -154,12 +138,9 @@ const SettingsBackupAndRestore = ({ isSheet }) => {
   };
 
   const updateAskForBackup = async () => {
-    await MMKV.setItem(
-      'askForBackup',
-      JSON.stringify({
-        timestamp: Date.now() + 86400000 * 3
-      })
-    );
+    SettingsService.set({
+      nextBackupRequestTime: Date.now() + 86400000 * 3
+    });
   };
 
   return (

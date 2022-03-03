@@ -20,6 +20,7 @@ import { Button } from '../../ui/button';
 import Seperator from '../../ui/seperator';
 import SheetWrapper from '../../ui/sheet';
 import Paragraph from '../../ui/typography/paragraph';
+import SettingsService from '../../../services/settings';
 
 const actionSheetRef = createRef();
 let RNFetchBlob;
@@ -163,9 +164,8 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
     try {
       let files = [];
       if (Platform.OS === 'android') {
-        let backupDirectory = await MMKV.getItem('backupStorageDir');
+        let backupDirectory = SettingsService.get().backupDirectoryAndroid;
         if (backupDirectory) {
-          backupDirectory = JSON.parse(backupDirectory);
           setBackupDirectoryAndroid(backupDirectory);
           files = await ScopedStorage.listFiles(backupDirectory.uri);
         } else {
@@ -369,7 +369,9 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                             subfolder = folder;
                           }
                           console.log(subfolder, folder);
-                          MMKV.setItem('backupStorageDir', JSON.stringify(subfolder));
+                          SettingsService.set({
+                            backupDirectoryAndroid: subfolder
+                          });
                           setBackupDirectoryAndroid(subfolder);
                           setLoading(true);
                           checkBackups();

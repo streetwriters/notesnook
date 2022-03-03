@@ -20,6 +20,7 @@ import DialogHeader from '../../dialog/dialog-header';
 import Seperator from '../../ui/seperator';
 import SheetWrapper from '../../ui/sheet';
 import Paragraph from '../../ui/typography/paragraph';
+import SettingsService from '../../../services/settings';
 
 let RNFetchBlob;
 
@@ -69,7 +70,9 @@ class RecoveryKeySheet extends React.Component {
         visible: false
       });
     });
-    MMKV.setItem('userHasSavedRecoveryKey', 'true');
+    SettingsService.set({
+      recoveryKeySaved: true
+    });
     clearMessage();
     // if (this.signup) {
     //   this.signup = false;

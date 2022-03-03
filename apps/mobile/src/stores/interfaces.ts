@@ -1,3 +1,4 @@
+import { FileType } from 'react-native-scoped-storage';
 import { State } from 'zustand';
 
 export type Item = {
@@ -70,6 +71,21 @@ export type Settings = {
   notifNotes?: boolean;
   pitchBlack?: boolean;
   reduceAnimations?: boolean;
+  rateApp?: boolean | number;
+  migrated?: boolean;
+  introCompleted?: boolean;
+  nextBackupRequestTime?: number | undefined;
+  lastBackupDate?: number | undefined;
+  userEmailConfirmed?: boolean;
+  recoveryKeySaved?: boolean;
+  theme: {
+    accent: string;
+    dark: false;
+  };
+  backupDirectoryAndroid?: FileType | null;
+  showBackupCompleteSheet: boolean;
+  lastRecoveryEmailTime?: number;
+  lastVerificationEmailTime?: number;
 };
 
 type Dimensions = {
@@ -88,8 +104,6 @@ export interface SettingStore extends State {
   setDimensions: (dimensions: Dimensions) => void;
   appLoading: boolean;
   setAppLoading: (appLoading: boolean) => void;
-  isIntroCompleted: boolean;
-  setIntroCompleted: (isIntroCompleted: boolean) => void;
   setSheetKeyboardHandler: (sheetKeyboardHandler: boolean) => void;
   sheetKeyboardHandler: boolean;
   requestBiometrics: boolean;

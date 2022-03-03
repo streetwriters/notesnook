@@ -14,6 +14,7 @@ import { db } from '../../utils/database';
 import { SIZE } from '../../utils/size';
 import Storage from '../../utils/database/storage';
 import { sleep } from '../../utils/time';
+import SettingsService from '../../services/settings';
 
 const AccoutLogoutSection = () => {
   const colors = useThemeStore(state => state.colors);
@@ -67,7 +68,9 @@ const AccoutLogoutSection = () => {
                   await sleep(10);
                   await db.user.logout();
                   await BiometricService.resetCredentials();
-                  await Storage.write('introCompleted', 'true');
+                  await SettingsService.set({
+                    introCompleted: true
+                  });
                   setLoading(false);
                 } catch (e) {
                   setLoading(false);
@@ -121,7 +124,9 @@ const AccoutLogoutSection = () => {
                   setLoading(true);
                   await db.user.deleteUser(value);
                   await BiometricService.resetCredentials();
-                  await Storage.write('introCompleted', 'true');
+                  SettingsService.set({
+                    introCompleted: true
+                  });
                   setLoading(false);
                 } else {
                   setLoading(false);

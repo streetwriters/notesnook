@@ -1,15 +1,14 @@
 import React from 'react';
 import { Image, TextStyle, View, ViewStyle } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
 import { TTip } from '../../services/tip-manager';
-import { eCloseProgressDialog } from '../../utils/events';
+import { ThemeStore, useThemeStore } from '../../stores/theme';
 import { MMKV } from '../../utils/database/mmkv';
+import { eCloseProgressDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import Seperator from '../ui/seperator';
 import Paragraph from '../ui/typography/paragraph';
-import { defaultState } from '../../stores/DefaultState';
 
 export const Tip = ({
   tip,
@@ -24,7 +23,7 @@ export const Tip = ({
   textStyle?: TextStyle;
   neverShowAgain: boolean;
   noImage?: boolean;
-  color?: keyof typeof defaultState['colors'];
+  color?: keyof ThemeStore['colors'];
 }) => {
   const colors = useThemeStore(state => state.colors);
 

@@ -2,24 +2,14 @@ import React, { useCallback } from 'react';
 import { FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
-import { useThemeStore } from '../../stores/theme';
-import { Actions } from '../../stores/Actions';
-import { useSettingStore, useUserStore } from '../../stores/stores';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent } from '../../services/event-manager';
-import SettingsService from '../../services/settings';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  COLOR_SCHEME_PITCH_BLACK,
-  setColorScheme
-} from '../../utils/color-scheme';
-import { eOpenPremiumDialog } from '../../utils/events';
-import { MenuItemsList, SUBSCRIPTION_STATUS } from '../../utils/constants';
-import { MMKV } from '../../utils/database/mmkv';
+import { useSettingStore, useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
 import umami from '../../utils/analytics';
+import { toggleDarkMode } from '../../utils/color-scheme/utils';
+import { MenuItemsList, SUBSCRIPTION_STATUS } from '../../utils/constants';
+import { eOpenPremiumDialog } from '../../utils/events';
 import { ColorSection } from './color-section';
 import { MenuItem } from './menu-item';
 import { TagsSection } from './pinned-section';
@@ -33,26 +23,11 @@ export const SideMenu = React.memo(
     const user = useUserStore(state => state.user);
     const noTextMode = false;
 
-    function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-      let newColors = setColorScheme(colors, accent);
-      useThemeStore.getState().setColors({ ...newColors });
-    }
-
     const BottomItemsList = [
       {
         name: colors.night ? 'Day' : 'Night',
         icon: 'theme-light-dark',
-        func: () => {
-          if (!COLOR_SCHEME.night) {
-            MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
-            changeColorScheme(
-              SettingsService.get().pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK
-            );
-          } else {
-            MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
-            changeColorScheme(COLOR_SCHEME_LIGHT);
-          }
-        },
+        func: toggleDarkMode,
         switch: true,
         on: !!colors.night,
         close: false

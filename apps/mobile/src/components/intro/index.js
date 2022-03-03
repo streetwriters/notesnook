@@ -24,9 +24,9 @@ const SVG_Z = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245.487 113.
 
 const Intro = () => {
   const colors = useThemeStore(state => state.colors);
-  const isIntroCompleted = useSettingStore(state => state.isIntroCompleted);
-  const setIntroCompleted = useSettingStore(state => state.setIntroCompleted);
+
   const settings = useSettingStore(state => state.settings);
+  const introCompleted = settings.introCompleted;
   const isTelemetryEnabled = settings.telemetry;
   const { height } = useWindowDimensions();
 
@@ -36,7 +36,7 @@ const Intro = () => {
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
-    if (!isIntroCompleted) {
+    if (!introCompleted) {
       umami.pageView('/welcome', '', []);
       setTimeout(() => {
         timing(opacity, {
@@ -51,14 +51,16 @@ const Intro = () => {
         }).start();
       }, 15);
     }
-  }, [isIntroCompleted]);
+  }, [introCompleted]);
 
   const hide = async () => {
-    setIntroCompleted(true);
+    SettingsService.set({
+      introCompleted: true
+    });
   };
 
   return (
-    !isIntroCompleted && (
+    !introCompleted && (
       <Animated.View
         testID="notesnook.splashscreen"
         style={{
@@ -185,7 +187,9 @@ const Intro = () => {
                   AppLock.present(true);
                   await sleep(500);
                   await hide();
-                  await MMKV.setItem('introCompleted', 'true');
+                  SettingsService.set({
+                    introCompleted: true
+                  });
                   umami.pageView('/home', '/welcome');
                 }}
                 style={{

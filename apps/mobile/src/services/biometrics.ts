@@ -6,7 +6,7 @@ import { MMKV } from '../utils/database/mmkv';
 import Storage from '../utils/database/storage';
 import { ShowToastEvent, ToastEvent } from './event-manager';
 
-const CRYPT_CONFIG = Platform.select({
+const KeychainConfig = Platform.select({
   ios: {
     accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
   },
@@ -33,7 +33,7 @@ async function isFingerprintAuthEnabled() {
 }
 
 async function storeCredentials(password: string) {
-  await Keychain.setInternetCredentials('nn_vault', 'notesnookvault', password, CRYPT_CONFIG);
+  await Keychain.setInternetCredentials('nn_vault', 'notesnookvault', password, KeychainConfig);
 }
 
 async function resetCredentials() {

@@ -2,16 +2,13 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import Share from 'react-native-share';
+import { editing, toTXT } from '..';
 import { notesnook } from '../../../e2e/test.ids';
-import { useThemeStore } from '../../stores/theme';
-import { Actions } from '../../stores/Actions';
-import {
-  useEditorStore,
-  useMenuStore,
-  useSelectionStore,
-  useTagStore,
-  useUserStore
-} from '../../stores/stores';
+import { presentDialog } from '../../components/dialog/functions';
+import NoteHistory from '../../components/note-history';
+import { MoveNotes } from '../../components/sheets/move-notes/movenote';
+import { EditorWebView } from '../../screens/editor/Functions';
+import tiny from '../../screens/editor/tiny/tiny.js';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -22,16 +19,15 @@ import {
 } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import Notifications from '../../services/notifications';
-import SettingsService from '../../services/settings';
-import { editing, toTXT } from '..';
 import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  COLOR_SCHEME_PITCH_BLACK,
-  setColorScheme
-} from '../color-scheme';
+  useEditorStore,
+  useMenuStore,
+  useSelectionStore,
+  useTagStore,
+  useUserStore
+} from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
+import { toggleDarkMode } from '../color-scheme/utils';
 import { db } from '../database';
 import {
   eOpenAddNotebookDialog,
@@ -43,13 +39,7 @@ import {
   eOpenPublishNoteDialog
 } from '../events';
 import { deleteItems } from '../functions';
-import { MMKV } from '../database/mmkv';
 import { sleep } from '../time';
-import { presentDialog } from '../../components/dialog/functions';
-import { MoveNotes } from '../../components/sheets/move-notes/movenote';
-import NoteHistory from '../../components/note-history';
-import tiny from '../../screens/editor/tiny/tiny.js';
-import { EditorWebView } from '../../screens/editor/Functions';
 
 export const useActions = ({ close = () => {}, item }) => {
   const colors = useThemeStore(state => state.colors);
@@ -115,22 +105,8 @@ export const useActions = ({ close = () => {}, item }) => {
     };
   }, [item]);
 
-  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-    let newColors = setColorScheme(colors, accent);
-    useThemeStore.getState().setColors({ ...newColors });
-  }
-
   function switchTheme() {
-    if (!colors.night) {
-      MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
-      let nextTheme = SettingsService.get().pitchBlack
-        ? COLOR_SCHEME_PITCH_BLACK
-        : COLOR_SCHEME_DARK;
-      changeColorScheme(nextTheme);
-      return;
-    }
-    MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
-    changeColorScheme(COLOR_SCHEME_LIGHT);
+    toggleDarkMode();
   }
 
   function addTo() {

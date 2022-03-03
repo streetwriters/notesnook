@@ -3,42 +3,30 @@ import Orientation from 'react-native-orientation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Launcher from './src/components/launcher';
 import { ApplicationHolder } from './src/navigation';
-import { useThemeStore } from './src/stores/theme';
-import { initialize, useSettingStore, useUserStore } from './src/stores/stores';
 import { DDS } from './src/services/device-detection';
 import { eSendEvent } from './src/services/event-manager';
 import Notifications from './src/services/notifications';
 import SettingsService from './src/services/settings';
 import { TipManager } from './src/services/tip-manager';
+import { initialize, useSettingStore, useUserStore } from './src/stores/stores';
 import { db } from './src/utils/database';
-import { MMKV } from './src/utils/database/mmkv';
 import { useAppEvents } from './src/utils/hooks/use-app-events';
 
 let databaseHasLoaded = false;
 
 const loadDatabase = async () => {
-  let requireIntro = await MMKV.getItem('introCompleted');
-  useSettingStore.getState().setIntroCompleted(requireIntro ? true : false);
   await db.init();
   Notifications.get();
-  await checkFirstLaunch();
+  await configureFirstLaunch();
 };
 
-async function checkFirstLaunch() {
-  let requireIntro = useSettingStore.getState().isIntroCompleted;
-  if (!requireIntro) {
-    await MMKV.setItem(
-      'askForRating',
-      JSON.stringify({
-        timestamp: Date.now() + 86400000 * 2
-      })
-    );
-    await MMKV.setItem(
-      'askForBackup',
-      JSON.stringify({
-        timestamp: Date.now() + 86400000 * 3
-      })
-    );
+async function configureFirstLaunch() {
+  let introCompleted = SettingsService.get().introCompleted;
+  if (!introCompleted) {
+    await SettingsService.set({
+      rateApp: Date.now() + 86400000 * 2,
+      nextBackupRequestTime: Date.now() + 86400000 * 3
+    });
   }
 }
 

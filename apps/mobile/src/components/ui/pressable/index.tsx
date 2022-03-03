@@ -6,18 +6,17 @@ import {
   PressableStateCallbackType,
   ViewStyle
 } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
-import { BUTTON_TYPES } from '../../../utils/constants';
+import { ThemeStore, useThemeStore } from '../../../stores/theme';
 import { hexToRGBA, RGB_Linear_Shade } from '../../../utils/color-scheme/utils';
+import { BUTTON_TYPES } from '../../../utils/constants';
 import { br } from '../../../utils/size';
-import { defaultState } from '../../../stores/DefaultState';
 
 export interface PressableButtonProps extends PressableProps {
   customStyle?: ViewStyle;
   noborder?: boolean;
   type?: keyof typeof BUTTON_TYPES;
-  accentColor?: keyof typeof defaultState['colors'];
-  accentText?: keyof typeof defaultState['colors'];
+  accentColor?: keyof ThemeStore['colors'];
+  accentText?: keyof ThemeStore['colors'];
   customColor?: ColorValue;
   customSelectedColor?: ColorValue;
   customAlpha?: number;
