@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import "./editor.css";
 import "@streetwriters/tinymce-plugins/codeblock/styles.css";
-import "@streetwriters/tinymce-plugins/collapsibleheaders/styles.css";
 import "tinymce/tinymce";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import "file-loader?name=static/js/icons/default/icons.js&esModule=false!tinymce/icons/default/icons.min.js";
