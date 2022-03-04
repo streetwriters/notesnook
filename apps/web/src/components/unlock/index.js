@@ -58,18 +58,30 @@ function Unlock(props) {
       alignItems="center"
       mx={2}
     >
-      <Flex justifyContent="center" alignItems="center">
+      <Flex
+        justifyContent="center"
+        alignItems="center"
+        flexDirection={"column"}
+      >
+        <Icon.Lock size={100} sx={{ opacity: 0.2 }} />
         <Text
           data-test-id="unlock-note-title"
           variant="heading"
-          ml={2}
-          fontSize={48}
+          fontSize={36}
+          mx={100}
+          mt={25}
+          textAlign="center"
         >
           {note?.title || "Open note"}
         </Text>
       </Flex>
-      <Text variant="body" color="gray" textAlign="center">
-        Please enter the password to open this note for editing.
+      <Text
+        variant="subheading"
+        color="fontTertiary"
+        mt={20}
+        textAlign="center"
+      >
+        Please enter the password to unlock this note
       </Text>
       <Field
         id="vaultPassword"
@@ -106,6 +118,7 @@ function Unlock(props) {
         variant="primary"
         data-test-id="unlock-note-submit"
         disabled={isUnlocking}
+        sx={{ borderRadius: 100, px: 30 }}
         onClick={async () => {
           await submit();
         }}
