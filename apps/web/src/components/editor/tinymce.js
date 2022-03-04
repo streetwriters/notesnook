@@ -280,7 +280,7 @@ function TinyMCE(props) {
           }
 
           function onKeyUp(e) {
-            if (e.key !== "Backspace") return;
+            if (e.key !== "Backspace" && e.key !== "Enter") return;
             if (!editor.getHTML) return;
 
             editor.getHTML().then((html) => {
