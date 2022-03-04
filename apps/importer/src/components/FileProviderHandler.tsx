@@ -1,21 +1,18 @@
 import { Flex, Input, Text } from "@theme-ui/components";
-import { ProviderFactory } from "@notesnook/importer";
 import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { IProvider } from "@notesnook/importer/dist/src/providers/provider";
-import { Providers } from "@notesnook/importer/dist/src/providers/providerfactory";
 import { StepContainer } from "./StepContainer";
 import { Accordion } from "./Accordion";
+import { IFileProvider } from "@notesnook/importer";
 
-type FileSelectorProps = {
-  provider?: Providers;
+type FileProviderHandlerProps = {
+  provider?: IFileProvider;
   onFilesChanged: (files: File[]) => void;
 };
 
-export function FileSelector(props: FileSelectorProps) {
-  const { provider: providerName, onFilesChanged } = props;
+export function FileProviderHandler(props: FileProviderHandlerProps) {
+  const { provider, onFilesChanged } = props;
   const [files, setFiles] = useState<File[]>([]);
-  const [provider, setProvider] = useState<IProvider | undefined>();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles((files) => {
@@ -34,11 +31,7 @@ export function FileSelector(props: FileSelectorProps) {
 
   useEffect(() => {
     setFiles([]);
-    setProvider(undefined);
-
-    if (!providerName) return;
-    setProvider(ProviderFactory.getProvider(providerName));
-  }, [providerName]);
+  }, [provider]);
 
   return (
     <StepContainer sx={{ flexDirection: "column", alignItems: "stretch" }}>

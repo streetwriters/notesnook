@@ -2,29 +2,41 @@ import {
   PublicClientApplication,
   AuthenticationResult,
 } from "@azure/msal-browser";
-import { AuthConfig } from "./config";
+import { AuthConfig, SCOPES } from "./config";
 
-const client = new PublicClientApplication({
-  auth: {
-    clientId: AuthConfig.clientId,
-    authority: "https://login.windows-ppe.net/common/",
-  },
-  cache: {
-    cacheLocation: "sessionStorage",
-    storeAuthStateInCookie: false,
-  },
-});
+let client: PublicClientApplication | undefined;
 
-export async function authenticate(): Promise<AuthenticationResult | null> {
+function getClient(config: AuthConfig): PublicClientApplication {
+  if (!client)
+    client = new PublicClientApplication({
+      auth: {
+        clientId: config.clientId,
+        redirectUri: "http://localhost:3000/",
+      },
+      cache: {
+        cacheLocation: "localStorage",
+        storeAuthStateInCookie: false,
+        secureCookies: false,
+      },
+    });
+  return client;
+}
+
+export async function authenticate(
+  config: AuthConfig
+): Promise<AuthenticationResult | null> {
+  const client = getClient(config);
+  const accounts = client.getAllAccounts();
   return await client
     .acquireTokenSilent({
-      scopes: AuthConfig.scopes,
+      scopes: SCOPES,
+      account: accounts[0],
     })
     .catch(() => {
       console.error("Cache miss.");
       if (!client) return null;
       return client.acquireTokenPopup({
-        scopes: AuthConfig.scopes,
+        scopes: SCOPES,
       });
     });
 }

@@ -1,7 +1,7 @@
 import { ContentType, Note } from "../../models/note";
 import showdown from "showdown";
 import {
-  IProvider,
+  IFileProvider,
   iterate,
   ProviderResult,
   ProviderSettings,
@@ -11,7 +11,8 @@ import { path } from "../../utils/path";
 import parse from "node-html-parser";
 
 const converter = new showdown.Converter();
-export class Markdown implements IProvider {
+export class Markdown implements IFileProvider {
+  type: "file" = "file";
   public supportedExtensions = [".md", ".txt"];
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";

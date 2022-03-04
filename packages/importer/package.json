@@ -10,12 +10,14 @@
   },
   "dependencies": {
     "@notesnook/enex": "^1.0.2",
+    "@notesnook/onenote": "file:../onenote",
     "fflate": "^0.7.1",
     "node-html-parser": "github:thecodrr/node-html-parser",
     "showdown": "github:thecodrr/showdown",
     "spark-md5": "^3.0.2"
   },
   "devDependencies": {
+    "@microsoft/microsoft-graph-types-beta": "^0.25.0-preview",
     "@node-rs/xxhash": "^1.0.1",
     "@types/node": "^12.20.37",
     "@types/showdown": "^1.9.4",

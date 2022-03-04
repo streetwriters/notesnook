@@ -2,7 +2,7 @@ import {
   AuthenticationResult,
   PublicClientApplication,
 } from "@azure/msal-node";
-import { AuthConfig } from "./config";
+import { AuthConfig, SCOPES } from "./config";
 import {
   PersistenceCachePlugin,
   FilePersistence,
@@ -10,35 +10,39 @@ import {
 
 let client: PublicClientApplication | undefined;
 
-async function init(): Promise<PublicClientApplication> {
-  const persistence = await FilePersistence.create("./tokenCache.json");
+async function getClient(config: AuthConfig): Promise<PublicClientApplication> {
+  if (!client) {
+    const persistence = await FilePersistence.create("./tokenCache.json");
 
-  return new PublicClientApplication({
-    auth: {
-      authority: "https://login.microsoftonline.com/common",
-      clientId: AuthConfig.clientId,
-      clientSecret: AuthConfig.clientSecret,
-    },
-    cache: {
-      cachePlugin: new PersistenceCachePlugin(persistence),
-    },
-  });
+    client = new PublicClientApplication({
+      auth: {
+        authority: "https://login.microsoftonline.com/common",
+        clientId: config.clientId,
+      },
+      cache: {
+        cachePlugin: new PersistenceCachePlugin(persistence),
+      },
+    });
+  }
+  return client;
 }
 
-export async function authenticate(): Promise<AuthenticationResult | null> {
-  if (!client) client = await init();
+export async function authenticate(
+  config: AuthConfig
+): Promise<AuthenticationResult | null> {
+  const client = await getClient(config);
   const accountInfo = await client.getTokenCache().getAllAccounts();
 
   return await client
     .acquireTokenSilent({
-      scopes: AuthConfig.scopes,
+      scopes: SCOPES,
       account: accountInfo[0],
     })
     .catch(() => {
       console.error("Cache miss.");
       if (!client) return null;
       return client.acquireTokenByDeviceCode({
-        scopes: AuthConfig.scopes,
+        scopes: SCOPES,
         deviceCodeCallback: (res) => {
           console.log(res.message);
         },

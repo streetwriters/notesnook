@@ -1,7 +1,7 @@
 import { ContentType, Note } from "../../models/note";
 import { File } from "../../utils/file";
 import {
-  IProvider,
+  IFileProvider,
   iterate,
   ProviderResult,
   ProviderSettings,
@@ -9,7 +9,8 @@ import {
 import { parse } from "node-html-parser";
 import { path } from "../../utils/path";
 
-export class HTML implements IProvider {
+export class HTML implements IFileProvider {
+  type: "file" = "file";
   public supportedExtensions = [".html"];
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";

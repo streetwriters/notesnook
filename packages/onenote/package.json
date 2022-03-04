@@ -2,7 +2,7 @@
   "name": "@notesnook/onenote",
   "version": "1.0.0",
   "description": "Export all your data from OneNote into JSON.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "devDependencies": {
     "@microsoft/microsoft-graph-types-beta": "^0.23.0-preview",
     "@types/node": "^16.11.10",
@@ -12,7 +12,7 @@
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",

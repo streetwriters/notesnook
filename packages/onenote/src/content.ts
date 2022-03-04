@@ -50,7 +50,10 @@ export class Content {
   }
 
   async transform(handler?: IElementHandler): Promise<string> {
-    const elements = this.#document.querySelectorAll(cssSelector);
+    const body = this.#document.querySelector("body");
+    const elements = body?.querySelectorAll(cssSelector);
+    if (!body || !elements) return "";
+
     for (let element of elements) {
       if (!element) continue;
 
@@ -103,7 +106,7 @@ export class Content {
         }
       }
     }
-    return this.raw;
+    return body.innerHTML;
   }
 
   get raw(): string {

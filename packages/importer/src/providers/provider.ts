@@ -1,29 +1,41 @@
 import { Note } from "../models/note";
 import { File } from "../utils/file";
 import { IHasher } from "../utils/hasher";
-import { TransformError } from "../utils/transformerror";
 
-export interface IProvider {
-  supportedExtensions: string[];
-  validExtensions: string[];
+export type ProviderType = "network" | "file";
+
+interface IBaseProvider<T extends ProviderType> {
+  type: T;
   version: string;
   name: string;
+}
+
+export interface IFileProvider extends IBaseProvider<"file"> {
+  supportedExtensions: string[];
+  validExtensions: string[];
   process(files: File[], settings: ProviderSettings): Promise<ProviderResult>;
 }
 
+export interface INetworkProvider<TSettings> extends IBaseProvider<"network"> {
+  process(settings: TSettings): Promise<ProviderResult>;
+}
+
+export type IProvider = IFileProvider | INetworkProvider<unknown>;
+
 export interface ProviderSettings {
+  clientType: "browser" | "node";
   hasher: IHasher;
 }
 
 export type ProviderResult = {
-  errors: TransformError[];
+  errors: Error[];
   notes: Note[];
 };
 
 type ProcessAction = (
   file: File,
   notes: Note[],
-  errors: TransformError[]
+  errors: Error[]
 ) => Promise<boolean>;
 
 /**
@@ -31,17 +43,17 @@ type ProcessAction = (
  * manner. All errors are collected for later processing.
  */
 export async function iterate(
-  provider: IProvider,
+  provider: IFileProvider,
   files: File[],
   process: ProcessAction
 ): Promise<ProviderResult> {
   const notes: Note[] = [];
-  const errors: TransformError[] = [];
+  const errors: Error[] = [];
 
   for (const file of files) {
     if (file.extension) {
       if (!provider.validExtensions.includes(file.extension)) {
-        errors.push(new TransformError("Invalid file type.", file));
+        errors.push(new Error(`Invalid file type: ${file.name}`));
         continue;
       } else if (!provider.supportedExtensions.includes(file.extension))
         continue;
@@ -50,7 +62,7 @@ export async function iterate(
     try {
       if (!(await process(file, notes, errors))) continue;
     } catch (e) {
-      errors.push(new TransformError((<Error>e).message, file));
+      errors.push(<Error>e);
     }
   }
 

@@ -1,15 +1,23 @@
-import { ProviderFactory, Providers } from "./src/providers/providerfactory";
-import type { IFile } from "./src/utils/file";
+import {
+  IFileProvider,
+  ProviderResult,
+  ProviderSettings,
+} from "./src/providers/provider";
 import { unpack } from "./src/utils/archiver";
-import { ProviderResult, ProviderSettings } from "./src/providers/provider";
-
-export function transform(
-  files: IFile[],
-  provider: Providers,
-  settings: ProviderSettings
-): Promise<ProviderResult> {
-  return ProviderFactory.getProvider(provider).process(unpack(files), settings);
-}
+import { IFile } from "./src/utils/file";
 
 export { pack } from "./src/utils/archiver";
-export { ProviderFactory };
+export { ProviderFactory } from "./src/providers/providerfactory";
+export {
+  IFileProvider,
+  INetworkProvider,
+  IProvider,
+} from "./src/providers/provider";
+
+export function transform(
+  provider: IFileProvider,
+  files: IFile[],
+  settings: ProviderSettings
+): Promise<ProviderResult> {
+  return provider.process(unpack(files), settings);
+}

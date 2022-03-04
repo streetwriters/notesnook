@@ -1,4 +1,3 @@
-import "isomorphic-fetch"; // or import the fetch polyfill you installed
 import {
   Entity,
   OnenotePage,
@@ -6,26 +5,10 @@ import {
   OnenoteSection,
   SectionGroup as OnenoteSectionGroup,
 } from "@microsoft/microsoft-graph-types-beta";
-
-import { GraphAPIResponse } from "./types";
-import { Client } from "@microsoft/microsoft-graph-client";
+import { GraphAPIResponse, IProgressReporter, ItemType } from "./types";
+import { Client, GraphError } from "@microsoft/microsoft-graph-client";
 import { Content } from "./content";
-
-const msGraphClient = Client.init({
-  authProvider: async (done) => {
-    if ("window" in global) {
-      const { authenticate } = await import("./auth/browser");
-      const result = await authenticate();
-      if (result) done(null, result.accessToken);
-      else done("Could not get access token", null);
-    } else {
-      const { authenticate } = await import("./auth/node");
-      const result = await authenticate();
-      if (result) done(null, result.accessToken);
-      else done("Could not get access token", null);
-    }
-  },
-});
+import { AuthConfig } from "./auth/config";
 
 const defaultProperties = [
   "createdDateTime",
@@ -34,238 +17,281 @@ const defaultProperties = [
   "id",
 ] as const;
 
-type ItemType = "notebook" | "sectionGroup" | "section" | "page";
-type Op = "fetch" | "process";
-type ProgressPayload = {
-  type: ItemType;
-  op: Op;
-  total: number;
-  current: number;
-};
-
-interface IProgressReporter {
-  report: (payload: ProgressPayload) => void;
-  error: (e: Error) => void;
-}
-
-export async function getNotebooks(
-  reporter?: IProgressReporter
-): Promise<OnenoteNotebook[]> {
-  let notebooks: OnenoteNotebook[] = await getAll(
-    `/me/onenote/notebooks`,
-    defaultProperties,
-    "notebook",
-    reporter
-  );
-
-  return await processAll(
-    notebooks,
-    async (notebook: OnenoteNotebook) => {
-      if (!notebook.id) return;
-
-      notebook.sections = await getSections("notebooks", notebook.id, reporter);
-      notebook.sectionGroups = await getSectionGroups(
-        "sectionGroups",
-        notebook.id,
-        reporter
-      );
-    },
-    "notebook",
-    reporter
-  );
-}
-
-async function getSections(
-  parentType: "notebooks" | "sectionGroups",
-  parentId: string,
-  reporter?: IProgressReporter
-): Promise<OnenoteSection[]> {
-  let sections: OnenoteSection[] = await getAll(
-    `/me/onenote/${parentType}/${parentId}/sections`,
-    defaultProperties,
-    "section",
-    reporter
-  );
-
-  return await processAll(
-    sections,
-    async (section) => {
-      if (!section.id) return;
-      section.pages = await getPages(section.id, reporter);
-    },
-    "section",
-    reporter
-  );
-}
-
-async function getSectionGroups(
-  parentType: "notebooks" | "sectionGroups",
-  parentId: string,
-  reporter?: IProgressReporter
-): Promise<OnenoteSectionGroup[]> {
-  let sectionGroups: OnenoteSectionGroup[] = await getAll(
-    `/me/onenote/${parentType}/${parentId}/sectionGroups`,
-    defaultProperties,
-    "sectionGroup",
-    reporter
-  );
-
-  return await processAll(
-    sectionGroups,
-    async (sectionGroup) => {
-      if (!sectionGroup.id) return;
-
-      sectionGroup.sections = await getSections(
-        "sectionGroups",
-        sectionGroup.id,
-        reporter
-      );
-      sectionGroup.sectionGroups = await getSectionGroups(
-        "sectionGroups",
-        sectionGroup.id,
-        reporter
-      );
-    },
-    "sectionGroup",
-    reporter
-  );
-}
-
-async function getPages(
-  sectionId: string,
-  reporter?: IProgressReporter
-): Promise<OnenotePage[]> {
-  let pages: OnenotePage[] = await getAll(
-    `/me/onenote/sections/${sectionId}/pages`,
-    [
-      "id",
-      "title",
-      "createdDateTime",
-      "lastModifiedDateTime",
-      "level",
-      "order",
-      "userTags",
-    ],
-    "page",
-    reporter
-  );
-
-  return await processAll(
-    pages,
-    async (page) => {
-      if (!page.id) return;
-      page.content = await getPageContent(page.id);
-    },
-    "page",
-    reporter
-  );
-}
-
-async function getPageContent(
-  pageId: string,
-  reporter?: IProgressReporter
-): Promise<Content | null> {
-  try {
-    const stream = <NodeJS.ReadableStream | null>(
-      await msGraphClient.api(`/me/onenote/pages/${pageId}/content`).getStream()
-    );
-    if (!stream) return null;
-
-    const html = (await convertStream(stream)).toString("utf8");
-    return new Content(html, {
-      attachmentResolver: (url) => resolveDataUrl(url, reporter),
+export class OneNoteClient {
+  #client: Client;
+  #reporter?: IProgressReporter;
+  constructor(authConfig: AuthConfig, reporter?: IProgressReporter) {
+    this.#reporter = reporter;
+    this.#client = Client.init({
+      authProvider: async (done) => {
+        if ("window" in global) {
+          const { authenticate } = await import("./auth/browser");
+          const result = await authenticate(authConfig);
+          if (result) done(null, result.accessToken);
+          else done("Could not get access token", null);
+        } else {
+          const { authenticate } = await import("./auth/node");
+          const result = await authenticate(authConfig);
+          if (result) done(null, result.accessToken);
+          else done("Could not get access token", null);
+        }
+      },
     });
-  } catch (e) {
-    reporter?.error(<Error>e);
   }
-  return null;
-}
 
-async function resolveDataUrl(
-  url: string,
-  reporter?: IProgressReporter
-): Promise<Buffer | null> {
-  try {
-    const stream = <NodeJS.ReadableStream | null>(
-      await msGraphClient.api(url).getStream()
+  async getNotebooks(): Promise<OnenoteNotebook[]> {
+    let notebooks: OnenoteNotebook[] = await this.#getAll(
+      `/me/onenote/notebooks`,
+      "notebook",
+      defaultProperties
     );
-    if (!stream) return null;
 
-    return await convertStream(stream);
-  } catch (e) {
-    reporter?.error(<Error>e);
+    return await this.#processAll(
+      notebooks,
+      "notebook",
+      async (notebook: OnenoteNotebook) => {
+        if (!notebook.id) return;
+
+        notebook.sections = await this.#getSections(notebook, "notebooks");
+        notebook.sectionGroups = await this.#getSectionGroups(
+          notebook,
+          "sectionGroups"
+        );
+      }
+    );
   }
-  return null;
-}
 
-function convertStream(stream: NodeJS.ReadableStream): Promise<Buffer> {
-  const chunks: Buffer[] = [];
-  return new Promise((resolve, reject) => {
-    stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-    stream.on("error", (err) => reject(err));
-    stream.on("end", () => resolve(Buffer.concat(chunks)));
-  });
-}
+  async #getSections(
+    parent: OnenoteNotebook | OnenoteSectionGroup,
+    parentType: "notebooks" | "sectionGroups"
+  ): Promise<OnenoteSection[]> {
+    let sections: OnenoteSection[] = await this.#getAll(
+      `/me/onenote/${parentType}/${parent.id}/sections`,
+      "section",
+      defaultProperties
+    );
 
-async function processAll<T extends Entity>(
-  items: T[],
-  process: (item: T) => Promise<void>,
-  type: ItemType,
-  reporter?: IProgressReporter
-): Promise<T[]> {
-  for (let i = 0; i < items.length; ++i) {
-    reporter?.report({
+    return await this.#processAll(
+      sections,
+      "section",
+      async (section) => {
+        if (!section.id) return;
+        if (parentType === "notebooks") section.parentNotebook = parent;
+        else if (parentType === "sectionGroups")
+          section.parentSectionGroup = parent;
+
+        section.pages = await this.#getPages(section);
+      }
+    );
+  }
+
+  async #getSectionGroups(
+    parent: OnenoteNotebook | OnenoteSectionGroup,
+    parentType: "notebooks" | "sectionGroups"
+  ): Promise<OnenoteSectionGroup[]> {
+    let sectionGroups: OnenoteSectionGroup[] = await this.#getAll(
+      `/me/onenote/${parentType}/${parent.id}/sectionGroups`,
+      "sectionGroup",
+      defaultProperties
+    );
+
+    return await this.#processAll(
+      sectionGroups,
+      "sectionGroup",
+      async (sectionGroup) => {
+        if (!sectionGroup.id) return;
+
+        if (parentType === "notebooks") sectionGroup.parentNotebook = parent;
+        else if (parentType === "sectionGroups")
+          sectionGroup.parentSectionGroup = parent;
+
+        sectionGroup.sections = await this.#getSections(
+          sectionGroup,
+          "sectionGroups"
+        );
+        sectionGroup.sectionGroups = await this.#getSectionGroups(
+          sectionGroup,
+          "sectionGroups"
+        );
+      }
+    );
+  }
+
+  async #getPages(section: OnenoteSection): Promise<OnenotePage[]> {
+    let pages: OnenotePage[] = await this.#getAll(
+      `/me/onenote/sections/${section.id}/pages`,
+      "page",
+      [
+        "id",
+        "title",
+        "createdDateTime",
+        "lastModifiedDateTime",
+        "level",
+        "order",
+        "userTags",
+      ]
+    );
+
+    return await this.#processAll(
+      pages,
+      "page",
+      async (page) => {
+        if (!page.id) return;
+        page.parentSection = section;
+        page.content = await this.#getPageContent(page);
+      }
+    );
+  }
+
+  async #getPageContent(page: OnenotePage): Promise<Content | null> {
+    try {
+      const stream = <NodeJS.ReadableStream | null>(
+        await this.#client
+          .api(`/me/onenote/pages/${page.id}/content`)
+          .getStream()
+      );
+      if (!stream) return null;
+
+      const html = (await convertStream(stream)).toString("utf8");
+      return new Content(html, {
+        attachmentResolver: (url) => this.#resolveDataUrl(url, page),
+      });
+    } catch (e) {
+      const error = <Error>e;
+      const pageRef = page.title || page.id;
+      const notebook = page.parentSection?.parentNotebook?.displayName;
+      const section = page.parentSection?.displayName;
+      let errorMessage = `Failed to get page content for page "${pageRef}" in ${notebook} > ${section}`;
+      this.#handleError(error, errorMessage);
+    }
+    return null;
+  }
+
+  async #processAll<T extends Entity>(
+    items: T[],
+    type: ItemType,
+    process: (item: T) => Promise<void>
+  ): Promise<T[]> {
+    this.#reporter?.report({
       op: "process",
       type,
       total: items.length,
-      current: i + 1,
+      current: 0,
     });
-    const item = items[i];
-    await process(item);
+
+    for (let i = 0; i < items.length; ++i) {
+      const item = items[i];
+      await process(item);
+
+      this.#reporter?.report({
+        op: "process",
+        type,
+        total: items.length,
+        current: i + 1,
+      });
+    }
+    return items;
   }
-  return items;
-}
 
-async function getAll<T, TKeys extends keyof T>(
-  url: string,
-  properties: readonly TKeys[],
-  type: ItemType,
-  reporter?: IProgressReporter
-): Promise<T[]> {
-  let items: T[] = [];
+  async #getAll<T, TKeys extends keyof T>(
+    url: string,
+    type: ItemType,
+    properties: readonly TKeys[]
+  ): Promise<T[]> {
+    let items: T[] = [];
 
-  let response: GraphAPIResponse<T[]> | undefined = undefined;
-  let skip = 0;
-  let limit = 100;
-  while (!response || !!response["@odata.nextLink"]) {
-    reporter?.report({
-      op: "fetch",
-      type,
-      total: skip + limit,
-      current: skip,
-    });
-
-    response = <GraphAPIResponse<T[]>>await msGraphClient
-      .api(url)
-      .top(limit)
-      .skip(skip)
-      .select(<string[]>(<unknown>properties))
-      .get()
-      .catch((e) => {
-        reporter?.error(e);
-        return undefined;
+    let response: GraphAPIResponse<T[]> | undefined = undefined;
+    let skip = 0;
+    let limit = 100;
+    while (!response || !!response["@odata.nextLink"]) {
+      this.#reporter?.report({
+        op: "fetch",
+        type,
+        total: skip + limit,
+        current: skip,
       });
 
-    if (!response || !response.value) break;
-    items.push(...response.value);
-    skip += limit;
+      response = <GraphAPIResponse<T[]>>await this.#client
+        .api(url)
+        .top(limit)
+        .skip(skip)
+        .select(<string[]>(<unknown>properties))
+        .get()
+        .catch(async (e) => {
+          const error = <Error>e;
+          let errorMessage = `Failed to get ${type}`;
+          this.#handleError(error, errorMessage);
+          return undefined;
+        });
+
+      if (!response || !response.value) break;
+      items.push(...response.value);
+      skip += limit;
+    }
+
+    this.#reporter?.report({
+      op: "fetch",
+      type,
+      total: items.length,
+      current: items.length,
+    });
+    return items;
   }
 
-  reporter?.report({
-    op: "fetch",
-    type,
-    total: items.length,
-    current: items.length,
+  async #resolveDataUrl(url: string, page: OnenotePage): Promise<Buffer | null> {
+    try {
+      const stream = <NodeJS.ReadableStream | null>(
+        await this.#client.api(url).getStream()
+      );
+      if (!stream) return null;
+      return await convertStream(stream);
+    } catch (e) {
+      const error = <Error>e;
+      const pageRef = page.title || page.id;
+      const notebook = page.parentSection?.parentNotebook?.displayName;
+      const section = page.parentSection?.displayName;
+      let errorMessage = `Failed to resolve attachment in page "${pageRef}" in ${notebook} > ${section}`;
+      this.#handleError(error, errorMessage);
+    }
+    return null;
+  }
+
+  #handleError(e: Error, message: string) {
+    const error = <Error>e;
+    let errorMessage = message;
+    if (error.message) errorMessage += ` (original error: ${error.message}).`;
+    if (error instanceof GraphError) {
+      errorMessage += ` (Request failed with status code: ${error.statusCode}).`;
+    }
+    this.#reporter?.error(new Error(errorMessage));
+  }
+}
+
+function convertStream(
+  stream: NodeJS.ReadableStream | ReadableStream
+): Promise<Buffer> {
+  return new Promise(async (resolve, reject) => {
+    if (stream instanceof ReadableStream) {
+      const chunks: Buffer[] = [];
+      const reader = stream.getReader();
+
+      await reader
+        .read()
+        .then(function processText({ done, value }): Promise<any> | void {
+          if (done) {
+            resolve(Buffer.concat(chunks));
+            return;
+          }
+
+          chunks.push(Buffer.from(value));
+          return reader.read().then(processText);
+        });
+    } else {
+      const chunks: Buffer[] = [];
+
+      stream.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+      stream.on("error", (err) => reject(err));
+      stream.on("end", () => resolve(Buffer.concat(chunks)));
+    }
   });
-  return items;
 }

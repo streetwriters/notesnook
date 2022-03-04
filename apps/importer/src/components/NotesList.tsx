@@ -4,17 +4,14 @@ import { Accordion } from "./Accordion";
 
 type NotesListProps = {
   notes: Note[];
-  filesLength: number;
   onNoteSelected: (note: Note) => void;
 };
 export function NotesList(props: NotesListProps) {
-  const { notes, filesLength, onNoteSelected } = props;
+  const { notes, onNoteSelected } = props;
 
   return (
     <Accordion
-      title={`${notes.length} notes found in ${filesLength} ${
-        filesLength > 1 ? "files" : "file"
-      }`}
+      title={`${notes.length} notes found`}
       sx={{
         border: "1px solid var(--theme-ui-colors-border)",
         mt: 2,

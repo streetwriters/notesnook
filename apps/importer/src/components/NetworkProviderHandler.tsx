@@ -1,66 +1,53 @@
-import { Button, Text } from "@theme-ui/components";
-import { pack, transform } from "@notesnook/importer";
-import { useCallback, useEffect, useState } from "react";
+import { Text, Button } from "@theme-ui/components";
+import { StepContainer } from "./StepContainer";
+import { INetworkProvider, pack } from "@notesnook/importer";
 import {
   ProviderResult,
   ProviderSettings,
 } from "@notesnook/importer/dist/src/providers/provider";
-import { Providers } from "@notesnook/importer/dist/src/providers/providerfactory";
-import { IFile } from "@notesnook/importer/dist/src/utils/file";
 import { xxhash64 } from "hash-wasm";
+import { OneNote } from "@notesnook/importer/dist/src/providers/onenote";
+import { useCallback, useEffect, useState } from "react";
 import { Note } from "@notesnook/importer/dist/src/models/note";
-import { StepContainer } from "./StepContainer";
+import saveAs from "file-saver";
 import { NotePreview } from "./NotePreview";
-import { ImportErrors } from "./ImportErrors";
 import { ImportHelp } from "./ImportHelp";
-import { saveAs } from "file-saver";
+import { ImportErrors } from "./ImportErrors";
 import { NotesList } from "./NotesList";
 
-type ResultProps = {
-  files: File[];
-  provider: Providers | undefined;
-};
-
-type Progress = {
-  total: number;
-  done: number;
+type NetworkProviderHandlerProps = {
+  provider: INetworkProvider<unknown>;
 };
 
 const settings: ProviderSettings = {
+  clientType: "browser",
   hasher: { type: "xxh64", hash: (data) => xxhash64(data) },
 };
 
-export function ImportResult(props: ResultProps) {
-  const { provider, files } = props;
+export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
+  const { provider } = props;
 
-  const [progress, setProgress] = useState<Progress>({ total: 0, done: 0 });
+  const [progress, setProgress] = useState<string | null>();
   const [result, setResult] = useState<ProviderResult | undefined>();
   const [selectedNote, setSelectedNote] = useState<Note | undefined>();
-  useEffect(() => {
+  const startImport = useCallback(() => {
     (async () => {
       if (!provider) return;
 
-      setProgress({ total: 0, done: 0 });
+      setProgress(null);
       let result: ProviderResult = { notes: [], errors: [] };
-      for (let file of files) {
-        const providerFile: IFile = {
-          name: file.name,
-          data: await file.arrayBuffer(),
-          modifiedAt: file.lastModified,
-        };
-        const transformResult = await transform(
-          [providerFile],
-          provider,
-          settings
-        );
-        result.notes.push(...transformResult.notes);
-        result.errors.push(...transformResult.errors);
-        setProgress((p) => ({ total: files.length, done: p.done + 1 }));
+      if (provider instanceof OneNote) {
+        result = await provider.process({
+          ...settings,
+          clientId: "4952c7cf-9c02-4fb7-b867-b87727bb52d8",
+          report: setProgress,
+        });
       }
-      setProgress({ total: 0, done: 0 });
+
+      setProgress(null);
       setResult(result);
     })();
-  }, [provider, files]);
+  }, [provider]);
 
   const downloadAsZip = useCallback(() => {
     if (!result) return;
@@ -78,17 +65,19 @@ export function ImportResult(props: ResultProps) {
         alignItems: "stretch",
       }}
     >
-      <Text variant="title">Your notes are ready for download</Text>
-      {progress.total > 0 ? (
-        <Text variant="body">
-          Processing files ({progress.done}/{progress.total})
-        </Text>
+      {progress ? (
+        <>
+          <Text variant="title">Importing your notes from {provider.name}</Text>
+          <Text variant="body" sx={{ textAlign: "center", my: 4 }}>
+            {progress}
+          </Text>
+        </>
       ) : result ? (
         <>
+          <Text variant="title">Your notes are ready for download</Text>
           <Text variant="body" sx={{ color: "fontTertiary" }}></Text>
           <NotesList
             notes={result?.notes}
-            filesLength={files.length}
             onNoteSelected={(note) => setSelectedNote(note)}
           />
           {result.errors.length > 0 && <ImportErrors errors={result.errors} />}
@@ -101,7 +90,18 @@ export function ImportResult(props: ResultProps) {
             Download ZIP file
           </Button>
         </>
-      ) : null}
+      ) : (
+        <>
+          <Text variant="title">Connect your {provider.name} account</Text>
+          <Button
+            variant="primary"
+            onClick={startImport}
+            sx={{ my: 4, alignSelf: "center" }}
+          >
+            Login &amp; start importing
+          </Button>
+        </>
+      )}
       {selectedNote && (
         <NotePreview
           note={selectedNote}
