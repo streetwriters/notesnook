@@ -316,10 +316,12 @@ span.diff-ins {
 pre.codeblock {
   overflow-x:auto;
 }
-img {
+img,
+video {
   max-width:100% !important;
   height:auto !important;
   border-radius:5px !important;
+  margin-bottom:10px
 }
 .tox .tox-edit-area__iframe {
   background-color:transparent !important;
@@ -333,9 +335,12 @@ body {
   background-color:transparent !important;
   font-size:${DEFAULT_FONT_SIZE}
 }
+.mce-preview-object,
 iframe {
   max-width:100% !important;
   background-color:transparent !important;
+  height:auto !important;
+  border-radius:5px !important;
 }
 
 h1,
