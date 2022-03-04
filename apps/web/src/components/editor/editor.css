@@ -75,6 +75,7 @@
   height: 100%;
   padding-bottom: 150px;
   margin: 0px !important;
+  background-color: transparent !important;
   /* overflow-x: hidden; */
 }
 
