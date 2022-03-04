@@ -1,11 +1,11 @@
-const { addPluginToPluginManager } = require("../utils");
+const { addPluginToPluginManager, notifyEditorChange } = require("../utils");
 
 const COLLAPSED_KEY = "c";
 const HIDDEN_KEY = "h";
 const collapsibleTags = { HR: 1, H2: 2, H3: 3, H4: 4, H5: 5 };
 
 function register(editor) {
-  editor.on("mousedown touchstart", function (e) {
+  editor.on("mousedown touchstart", function(e) {
     const { target } = e;
     if (
       e.offsetX < 0 &&
@@ -15,24 +15,24 @@ function register(editor) {
       e.preventDefault();
       e.stopImmediatePropagation();
       e.stopPropagation();
-      editor.undoManager.transact(() => {
-        if (target.classList.contains(COLLAPSED_KEY)) {
-          target.classList.remove(COLLAPSED_KEY);
-        } else {
-          target.classList.add(COLLAPSED_KEY);
-        }
-        collapseElement(target);
-      });
+      if (target.classList.contains(COLLAPSED_KEY)) {
+        target.classList.remove(COLLAPSED_KEY);
+      } else {
+        target.classList.add(COLLAPSED_KEY);
+      }
+      collapseElement(target);
+      notifyEditorChange(editor, "headingCollapsed");
     }
   });
 
-  editor.on("NewBlock", function (event) {
+  editor.on("NewBlock", function(event) {
     const { newBlock } = event;
     if (!newBlock) return;
     const target = newBlock.previousElementSibling;
     if (target && target.classList.contains(COLLAPSED_KEY)) {
       target.classList.remove(COLLAPSED_KEY);
       collapseElement(target);
+      notifyEditorChange(editor, "headingCollapsed");
     }
   });
 }
