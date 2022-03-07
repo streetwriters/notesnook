@@ -191,7 +191,7 @@ function init_callback(_editor) {
       }
 
       if (
-        xPos < 45 &&
+        xPos < 10 &&
         collapsibleTags[target.tagName] &&
         target.parentElement &&
         target.parentElement.tagName === 'BODY'
