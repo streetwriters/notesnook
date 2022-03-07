@@ -318,7 +318,22 @@ function setTheme() {
   color: white !important;
   background: ${pageTheme.colors.accent} !important;
 }
-  
+
+
+img::selection,
+video::selection,
+iframe::selection,
+.mce-preview-object::selection {
+  color: white !important;
+  background: transparent !important;
+} {
+  color: white !important;
+  background: transparent !important;
+} {
+  color: white !important;
+  background: transparent !important;
+}
+
 
 .mce-content-body a[data-mce-selected] {
   box-shadow: none !important;

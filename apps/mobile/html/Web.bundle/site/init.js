@@ -321,8 +321,10 @@ video {
   max-width:100% !important;
   height:auto !important;
   border-radius:5px !important;
-  margin-bottom:10px
+  margin-bottom:10px;
 }
+
+
 .tox .tox-edit-area__iframe {
   background-color:transparent !important;
 }
