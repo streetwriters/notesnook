@@ -1,77 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import * as Progress from 'react-native-progress';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
 import { useAttachmentStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
+import { formatBytes } from '../../utils';
 import { db } from '../../utils/database';
-import filesystem from '../../utils/filesystem';
+import { useAttachmentProgress } from '../../utils/hooks/use-attachment-progress';
 import { SIZE } from '../../utils/size';
 import SheetProvider from '../sheet-provider';
 import { IconButton } from '../ui/icon-button';
 import Paragraph from '../ui/typography/paragraph';
-
-function formatBytes(bytes, decimals = 2) {
-  if (bytes === 0) return '0 Bytes';
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
+import Actions from './actions';
 
 function getFileExtension(filename) {
   var ext = /^.+\.([^.]+)$/.exec(filename);
   return ext == null ? '' : ext[1];
 }
 
-export const AttachmentItem = ({ attachment, encryption }) => {
+export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
   const colors = useThemeStore(state => state.colors);
-  const progress = useAttachmentStore(state => state.progress);
-  const [currentProgress, setCurrentProgress] = useState(
-    encryption
-      ? {
-          type: 'encrypt'
-        }
-      : null
-  );
+  const [currentProgress, setCurrentProgress] = useAttachmentProgress(attachment, encryption);
   const encryptionProgress = encryption
     ? useAttachmentStore(state => state.encryptionProgress)
     : null;
 
-  const onPress = async () => {
-    if (currentProgress) {
-      db.fs.cancel(attachment.metadata.hash, 'download');
-      useAttachmentStore.getState().remove(attachment.metadata.hash);
-      return;
-    }
-    filesystem.downloadAttachment(attachment.metadata.hash, false);
+  const onPress = () => {
+    Actions.present(attachment, setAttachments, attachment.metadata.hash);
   };
-
-  useEffect(() => {
-    let prog = progress[attachment.metadata.hash];
-    if (prog) {
-      let type = prog.type;
-      let loaded = prog.type === 'download' ? prog.recieved : prog.sent;
-      prog = loaded / prog.total;
-      prog = (prog * 100).toFixed(0);
-      console.log('progress: ', prog);
-      console.log(prog);
-      setCurrentProgress({
-        value: prog,
-        percent: prog + '%',
-        type: type
-      });
-    } else {
-      setCurrentProgress(null);
-    }
-  }, [progress]);
-
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={onPress}
       style={{
         flexDirection: 'row',
         marginVertical: 5,
@@ -173,13 +133,12 @@ export const AttachmentItem = ({ attachment, encryption }) => {
           />
         </TouchableOpacity>
       ) : (
-        <IconButton
-          onPress={() => !encryption && onPress(attachment)}
-          name="download"
-          size={SIZE.lg}
-          color={colors.pri}
-        />
+        <>
+          {attachment.failed ? (
+            <IconButton onPress={onPress} name="alert-circle-outline" color={colors.errorText} />
+          ) : null}
+        </>
       )}
-    </View>
+    </TouchableOpacity>
   );
 };

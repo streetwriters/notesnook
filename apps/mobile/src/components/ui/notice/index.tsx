@@ -25,7 +25,7 @@ export const Notice = ({ type = 'alert', text, size = 'large' }: NoticeProps) =>
       }}
     >
       <IconButton
-        size={isSmall ? SIZE.xs + 1 : SIZE.xxl}
+        size={isSmall ? SIZE.lg + 1 : SIZE.xxl}
         name={type}
         customStyle={{
           width: isSmall ? undefined : 40,

@@ -16,6 +16,8 @@ export const DateMeta = ({ item }) => {
         return 'Last edited at:';
       case 'dateDeleted':
         return 'Deleted at:';
+      case 'dateUploaded':
+        return 'Uploaded at:';
       default:
         return key;
     }

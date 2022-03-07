@@ -48,9 +48,9 @@ export async function writeEncrypted(filename, { data, type, key }) {
 }
 
 export async function deleteFile(filename, data) {
+  let delFilePath = cacheDir + `/${filename}`;
   if (!data) {
     if (!filename) return;
-    let delFilePath = cacheDir + `/${filename}`;
     RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
     return true;
   }
@@ -59,7 +59,9 @@ export async function deleteFile(filename, data) {
   try {
     let response = await RNFetchBlob.fetch('DELETE', url, headers);
     let status = response.info().status;
-    return status >= 200 && status < 300;
+    if (status >= 200 && status < 300) {
+      RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
+    }
   } catch (e) {
     console.log('delete file: ', e, url, headers);
     return false;

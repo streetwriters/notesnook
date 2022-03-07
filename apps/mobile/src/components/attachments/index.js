@@ -2,12 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { useThemeStore } from '../../stores/theme';
 import { db } from '../../utils/database';
 import { eCloseAttachmentDialog, eOpenAttachmentsDialog } from '../../utils/events';
+import filesystem from '../../utils/filesystem';
 import { SIZE } from '../../utils/size';
 import DialogHeader from '../dialog/dialog-header';
+import { Toast } from '../toast';
+import Input from '../ui/input';
+import Seperator from '../ui/seperator';
 import SheetWrapper from '../ui/sheet';
 import Paragraph from '../ui/typography/paragraph';
 import { AttachmentItem } from './attachment-item';
@@ -17,6 +21,8 @@ export const AttachmentDialog = () => {
   const [note, setNote] = useState(null);
   const actionSheetRef = useRef();
   const [attachments, setAttachments] = useState([]);
+  const attachmentSearchValue = useRef();
+  const searchTimer = useRef();
 
   useEffect(() => {
     eSubscribeEvent(eOpenAttachmentsDialog, open);
@@ -27,11 +33,15 @@ export const AttachmentDialog = () => {
     };
   }, [visible]);
 
-  const open = item => {
-    setNote(item);
+  const open = data => {
+    if (data?.id) {
+      setNote(data);
+      let _attachments = db.attachments.ofNote(data.id, 'all');
+      setAttachments(_attachments);
+    } else {
+      setAttachments([...db.attachments.all]);
+    }
     setVisible(true);
-    let _attachments = db.attachments.ofNote(item.id, 'all');
-    setAttachments(_attachments);
   };
 
   useEffect(() => {
@@ -45,6 +55,27 @@ export const AttachmentDialog = () => {
     setVisible(false);
   };
 
+  const onChangeText = text => {
+    attachmentSearchValue.current = text;
+    console.log(attachmentSearchValue.current?.length);
+    if (!attachmentSearchValue.current || attachmentSearchValue.current === '') {
+      console.log('resetting all');
+      setAttachments([...db.attachments.all]);
+    }
+    console.log(attachments.length);
+    clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      let results = db.lookup.attachments(db.attachments.all, attachmentSearchValue.current);
+      console.log('results', results.length, attachments.length);
+      if (results.length === 0) return;
+      setAttachments(results);
+    }, 300);
+  };
+
+  const renderItem = ({ item, index }) => (
+    <AttachmentItem setAttachments={setAttachments} attachment={item} />
+  );
+
   return !visible ? null : (
     <SheetWrapper
       centered={false}
@@ -53,6 +84,7 @@ export const AttachmentDialog = () => {
         setVisible(false);
       }}
     >
+      <Toast context="local" />
       <View
         style={{
           width: '100%',
@@ -60,7 +92,34 @@ export const AttachmentDialog = () => {
           paddingHorizontal: 12
         }}
       >
-        <DialogHeader title="Attachments" />
+        <DialogHeader
+          title={note ? 'Attachments' : 'Manage attachments'}
+          paragraph="Tap on an attachment to view properties"
+          button={{
+            title: 'Check all',
+            type: 'accent',
+            onPress: async () => {
+              for (let attachment of attachments) {
+                let result = await filesystem.checkAttachment(attachment.metadata.hash);
+                if (result.failed) {
+                  db.attachments.markAsFailed(attachment.metadata.hash, result.failed);
+                }
+              }
+              setAttachments([...db.attachments.all]);
+            }
+          }}
+        />
+        <Seperator />
+        {!note ? (
+          <Input
+            placeholder="Filter attachments by filename, type or hash"
+            onChangeText={onChangeText}
+            onSubmit={() => {
+              onChangeText(attachmentSearchValue.current);
+            }}
+          />
+        ) : null}
+
         <FlatList
           nestedScrollEnabled
           overScrollMode="never"
@@ -79,13 +138,19 @@ export const AttachmentDialog = () => {
               }}
             >
               <Icon name="attachment" size={60} color={colors.icon} />
-              <Paragraph>No attachments on this note</Paragraph>
+              <Paragraph>{note ? `No attachments on this note` : `No attachments`}</Paragraph>
             </View>
           }
+          ListFooterComponent={
+            <View
+              style={{
+                height: 350
+              }}
+            />
+          }
           data={attachments}
-          renderItem={({ item, index }) => (
-            <AttachmentItem attachment={item} note={note} setNote={setNote} />
-          )}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
         />
 
         <Paragraph

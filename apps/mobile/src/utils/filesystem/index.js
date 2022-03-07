@@ -1,4 +1,4 @@
-import { downloadAttachment, downloadFile } from './download';
+import { downloadAttachment, downloadFile, getUploadedFileSize, checkAttachment } from './download';
 import { clearFileStorage, deleteFile, exists, readEncrypted, writeEncrypted } from './io';
 import { uploadFile } from './upload';
 import { cancelable } from './utils';
@@ -11,5 +11,7 @@ export default {
   deleteFile,
   exists,
   downloadAttachment,
-  clearFileStorage
+  clearFileStorage,
+  getUploadedFileSize,
+  checkAttachment
 };

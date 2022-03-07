@@ -20,6 +20,7 @@ import {
 } from '../../utils/constants';
 import {
   eCloseProgressDialog,
+  eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenRecoveryKeyDialog
@@ -265,6 +266,13 @@ const SettingsUserSection = () => {
                 });
               },
               desc: 'Recover your data using the recovery key if your password is lost.'
+            },
+            {
+              name: 'Manage attachments',
+              func: () => {
+                eSendEvent(eOpenAttachmentsDialog);
+              },
+              desc: 'Manage all attachments in one place.'
             },
             {
               name: 'Change password',

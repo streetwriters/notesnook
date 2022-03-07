@@ -9,6 +9,7 @@ import { presentSheet, ToastEvent } from '../../services/event-manager';
 import { db } from '../database';
 import Storage from '../database/storage';
 import { cacheDir, fileCheck } from './utils';
+import hosts from 'notes-core/utils/constants';
 
 export async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
@@ -54,7 +55,14 @@ export async function downloadFile(filename, data, cancelToken) {
     ToastEvent.show({
       heading: 'Error downloading file',
       message: e.message,
-      type: 'error'
+      type: 'error',
+      context: 'global'
+    });
+    ToastEvent.show({
+      heading: 'Error downloading file',
+      message: e.message,
+      type: 'error',
+      context: 'local'
     });
 
     useAttachmentStore.getState().remove(filename);
@@ -137,4 +145,30 @@ export async function downloadAttachment(hash, global = true) {
     }
     useAttachmentStore.getState().remove(attachment.metadata.hash);
   }
+}
+
+export async function getUploadedFileSize(hash) {
+  const url = `${hosts.API_HOST}/s3?name=${hash}`;
+  const token = await db.user.tokenManager.getAccessToken();
+
+  const attachmentInfo = await fetch(url, {
+    method: 'HEAD',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const contentLength = parseInt(attachmentInfo.headers['content-length']);
+  return isNaN(contentLength) ? 0 : contentLength;
+}
+
+export async function checkAttachment(hash) {
+  const attachment = db.attachments.attachment(hash);
+  if (!attachment) return { failed: 'Attachment not found.' };
+
+  try {
+    const size = await getUploadedFileSize(hash);
+    if (size <= 0) return { failed: 'File length is 0.' };
+  } catch (e) {
+    return { failed: e.message };
+  }
+  return { success: true };
 }

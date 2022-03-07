@@ -48,7 +48,7 @@ const santizeUri = uri => {
   return uri;
 };
 
-const file = async () => {
+const file = async fileOptions => {
   try {
     let options = {
       mode: 'import',
@@ -104,7 +104,7 @@ const file = async () => {
       type: 'url'
     });
     console.log('decoded uri: ', uri);
-    let result = await attachFile(uri, hash, file.type, file.name, 'file');
+    let result = await attachFile(uri, hash, file.type, file.name, fileOptions);
     console.log('attach file: ', result);
 
     setTimeout(() => {
@@ -143,7 +143,7 @@ const file = async () => {
   }
 };
 
-const camera = async () => {
+const camera = async options => {
   try {
     await db.attachments.generateKey();
     eSendEvent(eCloseProgressDialog);
@@ -156,7 +156,7 @@ const camera = async () => {
         quality: 0.8,
         mediaType: 'photo'
       },
-      handleImageResponse
+      response => handleImageResponse(response, options)
     );
   } catch (e) {
     ToastEvent.show({
@@ -169,7 +169,7 @@ const camera = async () => {
   }
 };
 
-const gallery = async () => {
+const gallery = async options => {
   try {
     await db.attachments.generateKey();
     eSendEvent(eCloseProgressDialog);
@@ -183,7 +183,7 @@ const gallery = async () => {
         mediaType: 'photo',
         selectionLimit: 1
       },
-      handleImageResponse
+      response => handleImageResponse(response, options)
     );
   } catch (e) {
     ToastEvent.show({
@@ -196,7 +196,7 @@ const gallery = async () => {
   }
 };
 
-const pick = async () => {
+const pick = async options => {
   if (!PremiumService.get()) {
     let user = await db.user.getUser();
     if (editing.isFocused) {
@@ -210,28 +210,40 @@ const pick = async () => {
     }
     return;
   }
+
+  if (options?.reupload) {
+    if (options?.type.startsWith('image')) {
+      gallery(options);
+    } else {
+      file(options);
+    }
+    return;
+  }
+
   if (editing.isFocused) {
     safeKeyboardDismiss();
     editing.isFocused = true;
   }
+
   presentSheet({
+    context: options?.context,
     actionsArray: [
       {
         action: async () => {
           eSendEvent(eCloseProgressDialog);
           await sleep(400);
-          await file();
+          await file(options);
         },
         actionText: 'Attach a file',
         icon: 'file'
       },
       {
-        action: camera,
+        action: () => camera(options),
         actionText: 'Open camera',
         icon: 'camera'
       },
       {
-        action: gallery,
+        action: () => gallery(options),
         actionText: 'Select image from gallery',
         icon: 'image-multiple'
       }
@@ -241,7 +253,7 @@ const pick = async () => {
   return;
 };
 
-const handleImageResponse = async response => {
+const handleImageResponse = async (response, options) => {
   if (
     response.didCancel ||
     response.errorMessage ||
@@ -267,8 +279,9 @@ const handleImageResponse = async response => {
     uri: uri,
     type: 'url'
   });
+
   let fileName = image.originalFileName || image.fileName;
-  let result = await attachFile(uri, hash, image.type, fileName, 'image');
+  let result = await attachFile(uri, hash, image.type, fileName, options);
   if (!result) return;
   tiny.call(
     EditorWebView,
@@ -293,11 +306,22 @@ const handleImageResponse = async response => {
   );
 };
 
-async function attachFile(uri, hash, type, filename) {
+async function attachFile(uri, hash, type, filename, options) {
   try {
     let exists = db.attachments.exists(hash);
     let encryptionInfo;
-    if (!exists) {
+
+    if (options?.hash && options.hash !== hash) {
+      ToastEvent.show({
+        heading: 'Please select the same file for reuploading',
+        message: `Expected hash ${options.hash} but got ${hash}.`,
+        type: 'error',
+        context: 'local'
+      });
+      return false;
+    }
+
+    if (!exists || options?.reupload) {
       let key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,
@@ -309,6 +333,7 @@ async function attachFile(uri, hash, type, filename) {
       encryptionInfo.alg = `xcha-stream`;
       encryptionInfo.size = encryptionInfo.length;
       encryptionInfo.key = key;
+      if (options?.reupload && exists) await db.attachments.reset(hash);
     } else {
       encryptionInfo = { hash: hash };
     }

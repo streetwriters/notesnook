@@ -23,35 +23,38 @@ import SheetProvider from '../sheet-provider';
 import ManageTagsSheet from '../sheets/manage-tags';
 import { VaultDialog } from '../dialogs/vault';
 
-function DialogProvider() {
-  const colors = useThemeStore(state => state.colors);
+const DialogProvider = React.memo(
+  () => {
+    const colors = useThemeStore(state => state.colors);
 
-  return (
-    <>
-      <Dialog context="global" />
-      <AddTopicDialog colors={colors} />
-      <AddNotebookSheet colors={colors} />
-      <PremiumDialog colors={colors} />
-      <Auth colors={colors} />
-      <MergeConflicts />
-      <ExportNotesSheet />
-      <RecoveryKeySheet colors={colors} />
-      <SheetProvider />
-      <RestoreDataSheet />
-      <ResultDialog />
-      <VaultDialog colors={colors} />
-      <AddToNotebookSheet colors={colors} />
-      <RateAppSheet />
-      <ImagePreview />
-      <EditorSettings />
-      <PublishNoteSheet />
-      <ManageTagsSheet />
-      <AttachmentDialog />
-      <Expiring />
-      <AnnouncementDialog />
-      <SessionExpired />
-    </>
-  );
-}
+    return (
+      <>
+        <Dialog context="global" />
+        <AddTopicDialog colors={colors} />
+        <AddNotebookSheet colors={colors} />
+        <PremiumDialog colors={colors} />
+        <Auth colors={colors} />
+        <MergeConflicts />
+        <ExportNotesSheet />
+        <RecoveryKeySheet colors={colors} />
+        <SheetProvider />
+        <RestoreDataSheet />
+        <ResultDialog />
+        <VaultDialog colors={colors} />
+        <AddToNotebookSheet colors={colors} />
+        <RateAppSheet />
+        <ImagePreview />
+        <EditorSettings />
+        <PublishNoteSheet />
+        <ManageTagsSheet />
+        <AttachmentDialog />
+        <Expiring />
+        <AnnouncementDialog />
+        <SessionExpired />
+      </>
+    );
+  },
+  () => true
+);
 
-export default React.memo(DialogProvider, () => true);
+export default DialogProvider;

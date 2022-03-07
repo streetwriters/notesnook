@@ -76,7 +76,7 @@ export const ToastEvent = {
     message,
     type = 'error',
     context,
-    duration,
+    duration = 3000,
     func,
     actionText
   }: ShowToastEvent) =>

@@ -72,9 +72,8 @@ const SheetProvider = ({ context = 'global' }) => {
   }, [visible, dialogData]);
 
   const close = ctx => {
-    if ((ctx && !context) || (ctx && ctx !== context)) {
-      return;
-    }
+    if (!ctx) ctx = 'global';
+    if (ctx !== context) return;
     actionSheetRef.current?.setModalVisible(false);
   };
 

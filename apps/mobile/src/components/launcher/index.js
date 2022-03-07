@@ -110,6 +110,9 @@ const Launcher = () => {
     if (!loading) {
       doAppLoadActions();
     }
+    return () => {
+      dbInitCompleted.current = false;
+    };
   }, [loading]);
 
   const doAppLoadActions = async () => {

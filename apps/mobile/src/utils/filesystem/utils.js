@@ -16,7 +16,6 @@ export function extractValueFromXmlTag(code, xml) {
 export async function fileCheck(response, totalSize) {
   if (totalSize < 1000) {
     let text = await response.text();
-    console.log(text);
     if (text.startsWith('<?xml')) {
       let errorJson = {
         Code: extractValueFromXmlTag('Code', text),
