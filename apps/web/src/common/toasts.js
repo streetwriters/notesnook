@@ -3,32 +3,6 @@ import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
 
-function showNotesMovedToast(note, noteIds, notebook) {
-  let actions;
-
-  const newNotebook = db.notebooks.notebook(notebook.id);
-  let verb =
-    noteIds.length > 1 ? "added" : note.notebook?.id ? "moved" : "added";
-  let messageText = noteIds.length > 1 ? `${noteIds.length} notes` : "Note";
-  messageText += ` ${verb} to "${newNotebook.title}"`;
-
-  if (noteIds.length === 1) {
-    const undoAction = async () => {
-      toast.hide();
-      if (note.notebook?.id) {
-        db.notes.move(note.notebook, note.id);
-        const notebook = db.notebooks.notebook(note.notebook.id);
-        showToast("success", `Note moved back to "${notebook.title}"`);
-      } else {
-        await newNotebook.topics.topic(notebook.topic).delete(note.id);
-        showToast("success", `Note removed from "${newNotebook.title}"`);
-      }
-    };
-    actions = [{ text: "Undo", onClick: undoAction }];
-  }
-  var toast = showToast("success", messageText, actions);
-}
-
 async function showUnpinnedToast(itemId, itemType) {
   const noun = itemType === "note" ? "Note" : "Notebook";
   const messageText = `${noun} unpinned successfully!`;
@@ -68,9 +42,4 @@ async function showUndoableToast(message, onAction, onPermanentAction, onUndo) {
   var toast = showToast("success", message, actions);
 }
 
-export {
-  showNotesMovedToast,
-  showUnpinnedToast,
-  showItemDeletedToast,
-  showUndoableToast,
-};
+export { showUnpinnedToast, showItemDeletedToast, showUndoableToast };

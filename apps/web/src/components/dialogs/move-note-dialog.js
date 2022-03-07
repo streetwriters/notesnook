@@ -1,237 +1,298 @@
-import React from "react";
-import { Flex, Text } from "rebass";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { db } from "../../common/db";
 import Dialog from "./dialog";
-import { showNotesMovedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import Field from "../field";
 import { store as notestore } from "../../stores/note-store";
+import { useStore, store } from "../../stores/notebook-store";
 import { getTotalNotes } from "../../common";
+import Accordion from "../accordion";
 
-class MoveDialog extends React.Component {
-  _inputRef;
-  selectedNotebook;
-  selectedTopic;
-  state = {
-    currentOpenedIndex: -1,
-    notebooks: db.notebooks.all,
-  };
+function MoveDialog({ onClose, noteIds }) {
+  const [selected, setSelected] = useState([]);
 
-  refresh() {
-    this.setState({ notebooks: db.notebooks.all });
-    notestore.refresh();
-  }
+  const refreshNotebooks = useStore((store) => store.refresh);
+  const getAllNotebooks = useCallback(() => {
+    refreshNotebooks();
+    return store.get().notebooks.filter((a) => a.type !== "header");
+  }, [refreshNotebooks]);
 
-  async addNotebook(input) {
-    if (input.value.length > 0) {
-      await db.notebooks.add({
-        title: input.value,
-      });
-      this.setState({ notebooks: db.notebooks.all });
-      input.value = "";
-    }
-  }
-
-  async addTopic(notebook, input) {
-    if (input.value.length > 0) {
-      await db.notebooks.notebook(notebook).topics.add(input.value);
-      this.setState({ notebooks: db.notebooks.all });
-      input.value = "";
-    }
-  }
-
-  _topicHasNotes(topic, noteIds) {
-    return noteIds.some((id) => topic.notes.indexOf(id) > -1);
-  }
-
-  async _addNoteToTopic(notebook, topic) {
-    const { noteIds } = this.props;
-    if (this._topicHasNotes(topic, noteIds)) {
-      await db.notebooks
-        .notebook(topic.notebookId)
-        .topics.topic(topic.id)
-        .delete(...noteIds);
-      this.refresh();
-      return;
-    }
-    try {
-      const nb = {
-        id: notebook.id,
-        topic: topic.id,
-      };
-      const note = db.notes.note(noteIds[0]).data;
-      await db.notes.move(nb, ...noteIds);
-      showNotesMovedToast(note, noteIds, nb);
-      this.refresh();
-    } catch (e) {
-      showToast("error", e.message);
-      console.error(e);
-    }
-  }
-
-  render() {
-    const { notebooks, currentOpenedIndex } = this.state;
-    const props = this.props;
-    return (
-      <Dialog
-        isOpen={true}
-        title={"Add to Notebook"}
-        description={"Organize your notes by adding them to notebooks."}
-        icon={Icon.Move}
-        onClose={props.onClose}
-        width={"30%"}
-        negativeButton={{
-          text: "Done",
-          onClick: props.onClose,
-        }}
-      >
-        <Flex flexDirection="column" flex={1} sx={{ overflowY: "hidden" }}>
-          <Field
-            inputRef={(ref) => (this.inputRef = ref)}
-            data-test-id="mnd-new-notebook-title"
-            label="Add a new notebook"
-            id="notebook-title"
-            name="notebook-title"
-            helpText="Press enter to confirm"
-            placeholder="Enter new notebook title"
-            action={{
-              onClick: async () => {
-                await this.addNotebook(this.inputRef);
-              },
-              icon: Icon.Plus,
-            }}
-            onKeyUp={async (e) => {
-              if (e.key === "Enter") await this.addNotebook(e.target);
-            }}
-          />
-          <Flex
-            mt={1}
-            variant="columnFill"
-            sx={{
-              borderRadius: "default",
-              border: "1px solid var(--border)",
-            }}
-          >
-            {notebooks.map((notebook, index) => (
-              <Flex variant="columnFill" key={notebook.id}>
-                <Item
-                  data-test-id={`notebook-${index}`}
-                  icon={Icon.Notebook}
-                  title={notebook.title}
-                  totalNotes={getTotalNotes(notebook)}
-                  onClick={(e) => {
-                    this.setState({
-                      currentOpenedIndex:
-                        this.state.currentOpenedIndex === index ? -1 : index,
-                      isAddingTopic: !notebook.topics.length,
-                    });
+  return (
+    <Dialog
+      isOpen={true}
+      title={"Add to notebook"}
+      description={"You can add a single note to multiple notebooks & topics."}
+      onClose={onClose}
+      width={"30%"}
+      positiveButton={{
+        text: "Finish",
+        disabled: !selected.length,
+        onClick: async () => {
+          for (let item of selected) {
+            try {
+              if (item.type === "remove") {
+                await db.notebooks
+                  .notebook(item.id)
+                  .topics.topic(item.topic)
+                  .delete(...noteIds);
+              } else if (item.type === "add") {
+                await db.notes.move(item, ...noteIds);
+              }
+            } catch (e) {
+              showToast("error", e.message);
+              console.error(e);
+            }
+          }
+          notestore.refresh();
+          showToast(
+            "success",
+            `Added ${noteIds.length} notes to ${selected.length} topics`
+          );
+          onClose();
+        },
+      }}
+      negativeButton={{
+        text: "Cancel",
+        onClick: onClose,
+      }}
+    >
+      <Flex flexDirection="column" mt={1} sx={{ overflowY: "hidden" }}>
+        <FilteredList
+          testId="mnd-new-notebook-title"
+          placeholders={{
+            empty: "Add a new notebook",
+            filter: "Filter notebooks",
+          }}
+          getAll={getAllNotebooks}
+          filter={(notebooks, query) => db.lookup.notebooks(notebooks, query)}
+          onCreateNewItem={(title) =>
+            db.notebooks.add({
+              title,
+            })
+          }
+          refreshItems={refreshNotebooks}
+          itemName="notebook"
+          renderItem={(notebook, index) => {
+            const selectedTopics = selected.filter((s) => s.id === notebook.id);
+            return (
+              <Accordion
+                key={notebook.id}
+                title={
+                  <Flex flexDirection={"column"} sx={{ px: 1 }}>
+                    <Text variant={"body"}>{notebook.title}</Text>
+                    <Text variant={"subBody"} fontWeight="normal">
+                      {getTotalNotes(notebook)} notes &amp;{" "}
+                      {notebook.topics.length} topics{" "}
+                      {selectedTopics.length
+                        ? ` & ${selectedTopics.length} selected`
+                        : ""}
+                    </Text>
+                  </Flex>
+                }
+                sx={{ mb: 1 }}
+              >
+                <FilteredList
+                  placeholders={{
+                    empty: "Add a new topic",
+                    filter: "Filter topics",
                   }}
-                  action={
-                    currentOpenedIndex === index && (
-                      <Icon.Plus
-                        data-test-id="mnd-new-topic"
-                        size={20}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          this.setState({
-                            isAddingTopic: true,
+                  itemName="topic"
+                  filter={(topics, query) => db.lookup.topics(topics, query)}
+                  getAll={() => db.notebooks.notebook(notebook).topics.all}
+                  onCreateNewItem={async (title) => {
+                    await db.notebooks.notebook(notebook).topics.add(title);
+                  }}
+                  refreshItems={refreshNotebooks}
+                  renderItem={(topic, topicIndex) => {
+                    const isSelected = selected.find(
+                      (s) => s.topic === topic.id
+                    );
+                    const hasNotes = topicHasNotes(topic, noteIds);
+
+                    return (
+                      <Item
+                        data-test-id={`notebook-${index}-topic-${topicIndex}`}
+                        key={topic.id}
+                        onClick={() => {
+                          const opType = topicHasNotes(topic, noteIds)
+                            ? "remove"
+                            : "add";
+                          setSelected((s) => {
+                            const copy = s.slice();
+                            const index = copy.findIndex(
+                              (i) => i.topic === topic.id
+                            );
+                            if (index === -1)
+                              copy.push({
+                                id: notebook.id,
+                                topic: topic.id,
+                                type: opType,
+                              });
+                            else copy.splice(index, 1);
+                            return copy;
                           });
                         }}
+                        indent={1}
+                        icon={Icon.Topic}
+                        title={topic.title}
+                        totalNotes={topic.notes.length}
+                        action={
+                          isSelected && hasNotes ? (
+                            <Icon.Close
+                              title="Notes will be removed from this topic."
+                              size={16}
+                              color="error"
+                            />
+                          ) : hasNotes ? (
+                            <Icon.DoubleCheckmark
+                              title="Some of the notes are already in this topic."
+                              size={16}
+                              color="primary"
+                            />
+                          ) : isSelected ? (
+                            <Icon.Checkmark
+                              title="Notes will be added to this topic."
+                              size={16}
+                              color="primary"
+                            />
+                          ) : null
+                        }
                       />
-                    )
-                  }
-                />
-                <Flex
-                  variant="columnFill"
-                  style={{
-                    display: currentOpenedIndex === index ? "flex" : "none",
+                    );
                   }}
-                >
-                  {this.state.isAddingTopic && (
-                    <Field
-                      autoFocus
-                      inputRef={(ref) => (this.inputRef = ref)}
-                      data-test-id="mnd-new-topic-title"
-                      id="topic-title"
-                      name="topic-title"
-                      placeholder="Enter new topic title (press enter to confirm)"
-                      action={{
-                        onClick: () => {
-                          this.setState({
-                            isAddingTopic: false,
-                          });
-                        },
-                        icon: Icon.Close,
-                      }}
-                      onKeyUp={async (e) => {
-                        if (e.key === "Enter")
-                          await this.addTopic(notebook, e.target);
-                      }}
-                    />
-                  )}
-                  {notebook.topics.map((topic, topicIndex) => (
-                    <Item
-                      data-test-id={`notebook-${index}-topic-${topicIndex}`}
-                      key={topic.id}
-                      onClick={() => this._addNoteToTopic(notebook, topic)}
-                      indent={1}
-                      icon={Icon.Topic}
-                      title={topic.title}
-                      totalNotes={topic.notes.length}
-                      action={
-                        this._topicHasNotes(topic, props.noteIds) ? (
-                          <Text color="error" fontSize="body">
-                            Remove note
-                          </Text>
-                        ) : (
-                          <Text color="primary" fontSize="body">
-                            Add note
-                          </Text>
-                        )
-                      }
-                    />
-                  ))}
-                </Flex>
-              </Flex>
-            ))}
-          </Flex>
-        </Flex>
-      </Dialog>
-    );
-  }
+                />
+              </Accordion>
+            );
+          }}
+        />
+      </Flex>
+    </Dialog>
+  );
+}
+
+function topicHasNotes(topic, noteIds) {
+  return noteIds.some((id) => topic.notes.indexOf(id) > -1);
+}
+
+function FilteredList({
+  placeholders,
+  testId,
+  getAll,
+  filter,
+  onCreateNewItem,
+  renderItem,
+  refreshItems,
+  itemName,
+}) {
+  const [items, setItems] = useState([]);
+  const [query, setQuery] = useState();
+  const noItemsFound = items.length <= 0 && query?.length > 0;
+  const inputRef = useRef();
+
+  const refresh = useCallback(() => {
+    refreshItems();
+    setItems(getAll());
+  }, [refreshItems, getAll]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const _filter = useCallback(
+    (query) => {
+      setItems(() => {
+        const items = getAll();
+        if (!query) {
+          return items;
+        }
+        return filter(items, query);
+      });
+      setQuery(query);
+    },
+    [getAll, filter]
+  );
+
+  const _createNewItem = useCallback(
+    async (title) => {
+      await onCreateNewItem(title);
+      refresh();
+      setQuery();
+      inputRef.current.value = "";
+    },
+    [inputRef, refresh, onCreateNewItem]
+  );
+
+  return (
+    <>
+      <Field
+        inputRef={inputRef}
+        data-test-id={testId}
+        autoFocus
+        placeholder={
+          items.length <= 0 ? placeholders.empty : placeholders.filter
+        }
+        onChange={(e) => {
+          _filter(e.target.value);
+        }}
+        onKeyUp={async (e) => {
+          if (e.key === "Enter" && noItemsFound) {
+            await _createNewItem(query);
+          }
+        }}
+        action={
+          items.length <= 0
+            ? {
+                icon: Icon.Plus,
+                onClick: async () => await _createNewItem(query),
+              }
+            : { icon: Icon.Search, onClick: () => _filter(query) }
+        }
+      />
+      <Flex flexDirection="column" mt={1} sx={{ overflowY: "hidden" }}>
+        {noItemsFound && (
+          <Button
+            variant={"secondary"}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              py: 2,
+            }}
+            onClick={async () => {
+              await _createNewItem(query);
+            }}
+          >
+            <Text variant={"body"}>{`Add "${query}" ${itemName}`}</Text>
+            <Icon.Plus size={16} color="primary" />
+          </Button>
+        )}
+        {items.map(renderItem)}
+      </Flex>
+    </>
+  );
 }
 export default MoveDialog;
 
 function Item(props) {
-  const { icon: Icon, indent = 0, title, totalNotes, onClick, action } = props;
+  const { indent = 0, title, totalNotes, onClick, action } = props;
   return (
-    <Flex
+    <Button
+      variant={"list"}
       data-test-id={props["data-test-id"]}
       p={1}
       justifyContent="space-between"
       alignItems="center"
-      pr={2}
-      pl={!indent ? 2 : indent * 30}
-      sx={{
-        borderWidth: 1,
-        borderBottomColor: "border",
-        borderBottomStyle: "solid",
-        cursor: "pointer",
-        ":hover": { borderBottomColor: "primary" },
-      }}
+      pl={!indent ? 2 : indent * 15}
       onClick={onClick}
+      sx={{ display: "flex" }}
     >
-      <Flex alignItems="center" justifyContent="center">
-        <Icon />
-        <Flex ml={1} flexDirection="column">
-          <Text as="span" color="text" fontSize="body">
-            {title}
-          </Text>
-          <Text variant="subBody">{totalNotes + " Notes"}</Text>
-        </Flex>
+      <Flex flexDirection="column">
+        <Text variant="body">{title}</Text>
+        <Text variant="subBody">{totalNotes + " notes"}</Text>
       </Flex>
       {action}
-    </Flex>
+    </Button>
   );
 }
