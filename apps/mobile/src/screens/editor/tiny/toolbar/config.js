@@ -194,6 +194,12 @@ export const TOOLBAR_CONFIG = [
       })
     },
     {
+      format: 'h1',
+      type: 'format',
+      showTitle: false,
+      fullname: 'Heading 1'
+    },
+    {
       format: 'h2',
       type: 'format',
       showTitle: false,
@@ -212,13 +218,6 @@ export const TOOLBAR_CONFIG = [
           type: 'format',
           showTitle: false,
           fullname: 'Paragraph'
-        },
-        {
-          format: 'h2',
-          text: 'Heading 2',
-          type: 'format',
-          showTitle: false,
-          fullname: 'Heading 2'
         },
         {
           format: 'h3',

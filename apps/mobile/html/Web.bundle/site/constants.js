@@ -26,6 +26,7 @@ const markdownPatterns = [
   { start: '*', end: '*', format: 'italic' },
   { start: '**', end: '**', format: 'bold' },
   { start: '`', end: '`', format: 'code' },
+  { start: '# ', format: 'h1' },
   { start: '## ', format: 'h2' },
   { start: '### ', format: 'h3' },
   { start: '#### ', format: 'h4' },
@@ -617,6 +618,16 @@ pre code {
   font-size: 10pt !important;
   padding: 0px 0px 0px 0px !important;
   overflow-x:auto !important;
+}
+
+
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  background-color: ${pageTheme.colors.icon};
 }
 
 `;

@@ -26,9 +26,7 @@ export const execCommands = {
   hilitecolor: color => `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
   dforecolor: color => `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
   dhilitecolor: color => `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
-
   fontname: fontname => `tinymce.activeEditor.execCommand('FontName',false, '${fontname}');`,
-
   indent: `tinymce.activeEditor.execCommand('Indent');`,
   outdent: `tinymce.activeEditor.execCommand('Outdent');`,
   blockquote: `tinymce.activeEditor.execCommand('mceBlockQuote');`,
@@ -37,6 +35,7 @@ export const execCommands = {
   fontsize: size => `tinymce.activeEditor.execCommand('FontSize', false, '${size}');`,
   removeformat: `tinymce.activeEditor.execCommand('RemoveFormat');`,
   p: `tinymce.activeEditor.execCommand('FormatBlock', false, 'p');`,
+  h1: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h2');`,
   h2: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h2');`,
   h3: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h3');`,
   h4: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h4');`,
