@@ -630,6 +630,9 @@ export function showInvalidSystemTimeDialog({ serverTime, localTime }) {
           <br />
           Local time:{" "}
           {formatDate(localTime, { dateStyle: "medium", timeStyle: "medium" })}
+          <br />
+          Please sync your system time with{" "}
+          <a href="https://time.is">https://time.is/</a>.
         </>
       }
       yesText="Reload app"
