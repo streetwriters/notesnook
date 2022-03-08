@@ -272,41 +272,7 @@ body {
   ${margins} 
 }
 
-.mce-content-body h2::before,
-h3::before,
-h4::before,
-h5::before,
-h6::before {
-  font-size: 11px;
-  font-weight: normal;
-  letter-spacing: 1.1px;
-  padding: 1px 3px 1px 3px;
-  margin-left: -12px;
-  margin-right: 5px;
-  cursor: row-resize;
-  margin-top:-3px;
-  vertical-align:middle;
-  }
-  
-  .mce-content-body h2::before {
-  content: "H2";
-  }
-  
-  .mce-content-body h3::before {
-  content: "H3";
-  }
-  
-  .mce-content-body h4::before {
-  content: "H4";
-  }
-  
-  .mce-content-body h5::before {
-  content: "H5";
-  }
 
-  .h {
-    display: none;
-  }
 span.diff-del {
   background-color: #FDB0C0;  
 }
@@ -353,6 +319,59 @@ h5,
 h6,
 strong {
   font-weight:600 !important;
+}
+
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  opacity: 1;
+  cursor: row-resize;
+  margin-right: 3.5px;
+  margin-left: -15px;
+  content: "";
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' role='presentation' style='stroke-width: 0px; stroke: rgb(59, 59, 59); width: 14px; height: 14px;'%3E%3Cpath d='M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z' style='fill: rgb(59, 59, 59);'%3E%3C/path%3E%3C/svg%3E")
+    no-repeat 50% 50%;
+  mask-size: cover;
+  border: none;
+}
+
+h1::before {
+  margin-bottom: -2px;
+}
+
+ h2::before {
+  margin-bottom: -5px;
+}
+ h3::before {
+  margin-bottom: -6px;
+}
+h4::before {
+  margin-bottom: -7px;
+}
+h5::before {
+  margin-bottom: -6px;
+  width: 20px;
+  height: 20px;
+}
+h6::before {
+  margin-bottom: -5px;
+  width: 18px;
+  height: 18px;
+}
+
+.c::before {
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' role='presentation' style='stroke-width: 0px; stroke: rgb(59, 59, 59); width: 14px; height: 14px;'%3E%3Cpath d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58' style='fill: rgb(59, 59, 59);'%3E%3C/path%3E%3C/svg%3E")
+    no-repeat 50% 50%;
+}
+
+.h {
+  display: none !important;
 }
 `;
 
