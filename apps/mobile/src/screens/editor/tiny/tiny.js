@@ -14,15 +14,15 @@ setTimeout(() => {
 },300);
 `;
 
-const reset = id => `
+const reset = placeholder => `
 sessionId = null;
 document.getElementById("titleInput").value = '';
 document.getElementById("titleInput").placeholder = "Note title";
 tinymce.activeEditor.mode.set('readonly');
 tinymce.activeEditor.clearContent();
 tinymce.activeEditor.setHTML("<p><br/></p>");
-editor.dom.setAttrib(editor.dom.doc.body, 'data-mce-placeholder', 'Start writing your note here');
-editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', 'Start writing your note here');
+editor.dom.setAttrib(editor.dom.doc.body, 'data-mce-placeholder', "${placeholder}");
+editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', "${placeholder}");
 renderChildernInNode([], ".tag-bar");
 tinymce.activeEditor.undoManager.clear();
 document.querySelector('#infosaved').innerText = "";

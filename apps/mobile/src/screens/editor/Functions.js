@@ -693,11 +693,14 @@ export async function clearEditor() {
     noteEdited = false;
     db.fs.cancel(getNote()?.id);
     clearNote();
-    tiny.call(EditorWebView, tiny.reset());
+    placeholderTip = TipManager.placeholderTip();
+    tiny.call(EditorWebView, tiny.reset(placeholderTip));
     //EditorWebView.current?.reload();
     await waitForEvent('resetcomplete');
-    placeholderTip = TipManager.placeholderTip();
-    tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
+    if (!note) {
+      tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
+    }
+
     editing.focusType = null;
     eSendEvent('historyEvent', {
       undo: 0,
@@ -922,7 +925,9 @@ export async function onWebViewLoad(premium, colors) {
     }
   }, 300);
   setColors(colors);
-  tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
+  if (!note) {
+    tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
+  }
 }
 
 async function restoreEditorState() {
