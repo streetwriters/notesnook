@@ -2,7 +2,7 @@ const { addPluginToPluginManager, notifyEditorChange } = require("../utils");
 
 const COLLAPSED_KEY = "c";
 const HIDDEN_KEY = "h";
-const collapsibleTags = { HR: 1, H2: 2, H3: 3, H4: 4, H5: 5 };
+const collapsibleTags = { H1: 1, HR: 2, H2: 3, H3: 4, H4: 5, H5: 6, H6: 7 };
 
 function register(editor) {
   editor.on("mousedown touchstart", function(e) {
