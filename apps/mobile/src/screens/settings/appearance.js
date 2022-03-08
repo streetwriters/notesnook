@@ -35,7 +35,6 @@ const SettingsAppearanceSection = () => {
     if (SettingsService.get().useSystemTheme) {
       await SettingsService.set({ useSystemTheme: false });
     } else {
-      if (!PremiumService.get()) return;
       await SettingsService.set({
         useSystemTheme: !SettingsService.get().useSystemTheme,
         theme: {

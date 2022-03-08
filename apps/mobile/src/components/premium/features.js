@@ -207,17 +207,19 @@ export const features = [
   {
     title: 'Personalize & make Notesnook your own',
     detail: 'Change app themes to match your style. Custom themes are coming soon.',
-    pro: true,
+
     features: [
       {
         highlight: 'Automatic',
         content: 'dark mode',
-        icon: 'theme-light-dark'
+        icon: 'theme-light-dark',
+        pro: false
       },
       {
         highlight: 'Change accent',
         content: 'color',
-        icon: 'invert-colors'
+        icon: 'invert-colors',
+        pro: true
       }
     ]
   }
