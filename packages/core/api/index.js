@@ -161,6 +161,7 @@ class Database {
 
       this.evtSource.onopen = async () => {
         console.log("SSE: opened channel successfully!");
+        EV.publish(EVENTS.databaseSyncRequested, true, false);
       };
 
       this.evtSource.onerror = function (error) {

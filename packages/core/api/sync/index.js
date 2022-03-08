@@ -162,7 +162,7 @@ export default class Sync {
   _scheduleSync() {
     this.stopAutoSync();
     this._autoSyncTimeout = setTimeout(() => {
-      EV.publish(EVENTS.databaseSyncRequested);
+      EV.publish(EVENTS.databaseSyncRequested, false, false);
     }, this._autoSyncInterval);
   }
 
