@@ -35,7 +35,7 @@ const ColorItem = React.memo(
     const colors = useThemeStore(state => state.colors);
     const setColorNotes = useMenuStore(state => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);
-    alias = db.colors.alias(item.id);
+    alias = db.colors.alias(item.id) || '';
 
     const onHeaderStateChange = event => {
       setTimeout(() => {
@@ -148,6 +148,7 @@ const ColorItem = React.memo(
     );
   },
   (prev, next) => {
+    if (!next.item) return false;
     if (prev.item?.dateModified !== next.item?.dateModified) return false;
     if (prev.alias !== next.alias) return false;
     if (prev.item?.id !== next.item?.id) return false;

@@ -218,8 +218,12 @@ export const useAppEvents = () => {
     await PremiumService.setPremiumStatus();
   };
 
-  const onRequestPartialSync = async () => {
+  const onRequestPartialSync = async (full, force) => {
     try {
+      if (full || force) {
+        Sync.run('global', force, full);
+        return;
+      }
       setSyncing(true);
       let res = await doInBackground(async () => {
         try {
@@ -235,11 +239,7 @@ export const useAppEvents = () => {
       setSyncing(false);
       let status = await NetInfo.fetch();
       if (status.isConnected && status.isInternetReachable) {
-        ToastEvent.show({
-          heading: 'Sync failed',
-          message: e.message,
-          context: 'global'
-        });
+        ToastEvent.error(e, 'Sync failed', 'global');
       }
     } finally {
       setSyncing(false);
@@ -313,8 +313,6 @@ export const useAppEvents = () => {
           userEmailConfirmed: true
         });
       }
-
-      await Sync.run();
       setUser(user);
     } catch (e) {}
 
