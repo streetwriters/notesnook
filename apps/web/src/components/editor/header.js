@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import TitleBox from "./title-box";
 import { useStore } from "../../stores/editor-store";
 import { Input } from "@rebass/forms";
@@ -14,6 +14,10 @@ function Header({ readonly }) {
   const tags = useStore((store) => store.session.tags);
   const setTag = useStore((store) => store.setTag);
   const setSession = useStore((store) => store.setSession);
+
+  const filterableTags = useMemo(() => {
+    return db.tags.all.filter((t) => tags.every((tag) => tag !== t.title));
+  }, [tags]);
 
   return (
     <>
@@ -42,17 +46,16 @@ function Header({ readonly }) {
             />
           ))}
           <Autosuggest
-            getData={() => db.tags.all}
-            getFields={(item) => [db.tags.alias(item.id)]}
-            limit={10}
+            filter={(query) =>
+              db.lookup.tags(filterableTags, query).slice(0, 10)
+            }
             onAdd={(value) => setTag(value)}
             onSelect={(item) => setTag(item.title)}
             onRemove={() => {
               if (tags.length <= 0) return;
               setTag(tags[tags.length - 1]);
             }}
-            customFilter={(item) => tags.indexOf(item.title) === -1}
-            defaultItems={() => db.tags.all.slice(0, 10)}
+            defaultItems={filterableTags.slice(0, 10)}
           />
         </Flex>
       )}
@@ -61,22 +64,13 @@ function Header({ readonly }) {
 }
 export default Header;
 
-function Autosuggest({
-  getData,
-  getFields,
-  customFilter,
-  onRemove,
-  limit,
-  onSelect,
-  onAdd,
-  sx,
-  defaultItems,
-}) {
+function Autosuggest({ filter, onRemove, onSelect, onAdd, defaultItems }) {
   const [filtered, setFiltered] = useState([]);
   const inputRef = useRef();
   const { openMenu, closeMenu } = useMenuTrigger();
   const clearInput = useCallback(() => {
     inputRef.current.value = "";
+    inputRef.current.focus();
   }, []);
 
   const getInputValue = useCallback(() => {
@@ -85,12 +79,12 @@ function Autosuggest({
 
   const onAction = useCallback(
     (type, value) => {
-      clearInput();
       if (type === "select") {
         onSelect(value);
       } else if (type === "add") {
         onAdd(value);
       }
+      clearInput();
     },
     [onSelect, onAdd, clearInput]
   );
@@ -129,6 +123,12 @@ function Autosuggest({
     });
   }, [filtered, getInputValue, closeMenu, openMenu, onAction]);
 
+  useEffect(() => {
+    const text = getInputValue();
+    const isFocused = document.activeElement === inputRef.current;
+    if (isFocused && !text) setFiltered(defaultItems);
+  }, [defaultItems, getInputValue]);
+
   return (
     <Input
       ref={inputRef}
@@ -140,26 +140,16 @@ function Autosuggest({
       data-test-id="editor-tag-input"
       fontSize="subtitle"
       onFocus={(e) => {
-        if (!e.target.value.trim()) setFiltered(defaultItems());
+        const text = getInputValue();
+        if (!text) setFiltered(defaultItems);
       }}
-      onBlur={() => setFiltered([])}
       onChange={(e) => {
         const { value } = e.target;
         if (!value.length) {
           setFiltered([]);
           return;
         }
-        let filtered = getData().filter((d) => {
-          const fields = getFields(d);
-          return (
-            fields.some((field) => {
-              return field.toLowerCase().startsWith(value.toLowerCase());
-            }) &&
-            (!customFilter || customFilter(d))
-          );
-        });
-        filtered = filtered.slice(0, limit);
-        setFiltered(filtered);
+        setFiltered(filter(value));
       }}
       onKeyDown={(e) => {
         const text = getInputValue();
@@ -167,12 +157,12 @@ function Autosuggest({
           onAction("add", text);
         } else if (!text && e.key === "Backspace") {
           onRemove();
-          closeMenu();
+          setFiltered([]);
         } else if (e.key === "Escape") {
-          closeMenu();
+          setFiltered([]);
           e.stopPropagation();
         } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-          if (e.key === "ArrowDown" && !text) setFiltered(defaultItems());
+          if (e.key === "ArrowDown" && !text) setFiltered(defaultItems);
 
           e.preventDefault();
         }
