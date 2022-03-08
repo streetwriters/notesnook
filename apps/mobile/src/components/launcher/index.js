@@ -55,7 +55,7 @@ const Launcher = () => {
   const dbInitCompleted = useRef(false);
 
   const loadNotes = async () => {
-    if (verifyUser || !loading) {
+    if (verifyUser) {
       return;
     }
     await restoreEditorState();
