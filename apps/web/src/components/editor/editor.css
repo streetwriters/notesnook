@@ -389,6 +389,7 @@ table thead {
   COLLAPSIBLE HEADERS
 */
 
+.editorScroll h1::before,
 .editorScroll h2::before,
 .editorScroll h3::before,
 .editorScroll h4::before,
@@ -412,12 +413,17 @@ table thead {
   border: none;
 }
 
+.editorScroll:hover h1::before,
 .editorScroll:hover h2::before,
 .editorScroll:hover h3::before,
 .editorScroll:hover h4::before,
 .editorScroll:hover h5::before,
 .editorScroll:hover h6::before {
   opacity: 1;
+}
+
+.mce-content-body h1::before {
+  margin-bottom: -2px;
 }
 
 .mce-content-body h2::before {

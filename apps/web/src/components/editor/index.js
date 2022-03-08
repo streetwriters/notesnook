@@ -32,6 +32,8 @@ function editorSetContent(editor, content) {
   editor.setHTML(content);
 
   updateWordCount(editor);
+
+  editor.focus();
 }
 
 function updateWordCount(editor) {

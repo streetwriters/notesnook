@@ -54,6 +54,7 @@ const markdownPatterns = [
   { start: "**", end: "**", format: "bold" },
   { start: "~~", end: "~~", format: "strikethrough" },
   { start: "`", end: "`", cmd: "mceInsertInlineCode" },
+  { start: "# ", format: "h1" },
   { start: "## ", format: "h2" },
   { start: "### ", format: "h3" },
   { start: "#### ", format: "h4" },
@@ -237,7 +238,7 @@ function TinyMCE(props) {
           toolbar_mode: "scrolling",
         },
         block_formats:
-          "Paragraph=p; Header 2=h2; Header 3=h3; Header 4=h4; Header 5=h5; Header 6=h6; Code=pre",
+          "Paragraph=p; Header 1=h1; Header 2=h2; Header 3=h3; Header 4=h4; Header 5=h5; Header 6=h6; Code=pre",
         textpattern_patterns: markdownPatterns,
         placeholder: placeholder || "Start writing your note here...",
         target_list: false,
