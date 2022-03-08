@@ -6,8 +6,7 @@ import { db } from '../utils/database';
 import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
 import { ToastEvent } from './event-manager';
 
-let retryCount = 0;
-const run = async (context = 'global', forced) => {
+const run = async (context = 'global', forced = false, full = true) => {
   let result = false;
   const userstore = useUserStore.getState();
   if (!userstore.user) {
@@ -19,7 +18,7 @@ const run = async (context = 'global', forced) => {
   try {
     let res = await doInBackground(async () => {
       try {
-        return await db.sync(true, forced);
+        return await db.sync(full, forced);
       } catch (e) {
         errorStack = e.stack;
         return e.message;
@@ -31,7 +30,7 @@ const run = async (context = 'global', forced) => {
       return false;
     }
     if (typeof res === 'string') throw new Error(res);
-    retryCount = 0;
+
     result = true;
   } catch (e) {
     result = false;
