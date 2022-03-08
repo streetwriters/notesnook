@@ -66,8 +66,8 @@ class UserStore extends BaseStore {
         hashNavigate("/confirmed");
       });
 
-      EV.subscribe(EVENTS.databaseSyncRequested, async () => {
-        await appStore.sync(false);
+      EV.subscribe(EVENTS.databaseSyncRequested, async (full, force) => {
+        await appStore.sync(full, force);
       });
 
       EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
@@ -83,9 +83,9 @@ class UserStore extends BaseStore {
         }
       });
 
-      onPageVisibilityChanged(async (documentHidden) => {
+      onPageVisibilityChanged(async function (type, documentHidden) {
         if (!documentHidden) {
-          await db.connectSSE();
+          await db.connectSSE({ force: type === "online" });
         }
       });
 

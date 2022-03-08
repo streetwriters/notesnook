@@ -71,7 +71,6 @@ export default function AppEffects({ setShow }) {
         await updateLastSynced();
         if (await initUser()) {
           showUpgradeReminderDialogs();
-          await sync();
         }
         await resetReminders();
         setIsVaultCreated(await db.vault.exists());

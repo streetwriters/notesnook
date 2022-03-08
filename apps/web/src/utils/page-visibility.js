@@ -11,15 +11,17 @@ if (typeof document.hidden !== "undefined") {
   visibilityChange = "webkitvisibilitychange";
 }
 
-// // If the page is hidden, pause the video;
-// // if the page is shown, play the video
-// function handleVisibilityChange() {
-//   if (document[hidden]) {
-//   } else {
-//   }
-// }
-
 export function onPageVisibilityChanged(handler) {
+  onDeviceOnline(() => handler("online", false));
+
   // Handle page visibility change
-  document.addEventListener(visibilityChange, () => handler(document[hidden]));
+  document.addEventListener(visibilityChange, () =>
+    handler("visibilitychange", document[hidden])
+  );
+}
+
+function onDeviceOnline(handler) {
+  window.addEventListener("online", function () {
+    handler && handler();
+  });
 }

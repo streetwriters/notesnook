@@ -202,7 +202,7 @@ function InlineCalltoActions({ item }) {
           )
         )
         .map((action, index) => (
-          <CalltoAction action={action} index={index} />
+          <CalltoAction key={action.title} action={action} index={index} />
         ))}
     </Flex>
   );
@@ -266,6 +266,7 @@ export function Features({ item }) {
     >
       {features.map((feature) => (
         <Flex
+          key={feature.title}
           p={1}
           sx={{
             borderRadius: "default",
