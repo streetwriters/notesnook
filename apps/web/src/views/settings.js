@@ -319,7 +319,6 @@ function Settings(props) {
               title="Follow system theme"
               onTip="Switch app theme according to browser theme"
               offTip="Keep app theme independent"
-              premium="customize"
               onToggled={toggleFollowSystemTheme}
               isToggled={followSystemTheme}
             />
