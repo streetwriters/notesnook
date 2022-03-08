@@ -136,11 +136,22 @@ class Database {
     this.evtSource = null;
   }
 
+  /**
+   *
+   * @param {{force: boolean, error: any}} args
+   */
   async connectSSE(args) {
     await this.sseMutex.runExclusive(async () => {
       if (args && !!args.error) return;
 
-      if (!NNEventSource) return;
+      const forceReconnect = args && args.force;
+      if (
+        !NNEventSource ||
+        (!forceReconnect &&
+          this.evtSource &&
+          this.evtSource.readyState === this.evtSource.OPEN)
+      )
+        return;
       this.disconnectSSE();
 
       let token = await this.user.tokenManager.getAccessToken();
