@@ -30,7 +30,10 @@ function GlobalMenuWrapper() {
               zIndex: 1000,
               backgroundColor: isAutocomplete ? "transparent" : "unset",
             }}
-            onClick={(e) => closeMenu()}
+            onClick={(e) => {
+              if (e.target.closest(".menuContainer")) return;
+              closeMenu();
+            }}
             onContextMenu={(e) => {
               e.preventDefault();
               closeMenu();

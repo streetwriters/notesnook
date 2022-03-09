@@ -140,8 +140,10 @@ function Menu({ items, data, title, closeMenu }) {
             index={index}
             item={item}
             onClick={(e) => {
-              if (item.items?.length) setIsSubmenuOpen(true);
-              else onAction(e, item);
+              if (item.items?.length) {
+                setFocusIndex(index);
+                setIsSubmenuOpen(true);
+              } else onAction(e, item);
             }}
             isFocused={focusIndex === index}
             onMouseEnter={() => {
@@ -184,6 +186,7 @@ export default React.memo(Menu);
 function MenuContainer({ title, children }) {
   return (
     <Flex
+      className="menuContainer"
       as="ul"
       tabIndex={-1}
       bg="background"

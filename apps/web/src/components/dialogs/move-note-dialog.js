@@ -79,6 +79,7 @@ function MoveDialog({ onClose, noteIds }) {
             return (
               <Accordion
                 key={notebook.id}
+                testId={`notebook-${index}`}
                 title={
                   <Flex flexDirection={"column"} sx={{ px: 1 }}>
                     <Text variant={"body"}>{notebook.title}</Text>
@@ -98,6 +99,7 @@ function MoveDialog({ onClose, noteIds }) {
                     empty: "Add a new topic",
                     filter: "Filter topics",
                   }}
+                  testId="mnd-new-topic-title"
                   itemName="topic"
                   filter={(topics, query) => db.lookup.topics(topics, query)}
                   getAll={() => db.notebooks.notebook(notebook).topics.all}

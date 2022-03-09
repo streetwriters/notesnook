@@ -154,15 +154,13 @@ async function addNoteToNotebook() {
 
   await page.click(List.new("notebook").atIndex(0).build());
 
-  await page.click(getTestId("mnd-new-topic"));
-
   await page.type(getTestId("mnd-new-topic-title"), "Topic 1");
 
   await page.press(getTestId("mnd-new-topic-title"), "Enter");
 
   await page.click(List.new("notebook").atIndex(0).topic(0).build());
 
-  await page.click(getTestId("dialog-no"));
+  await page.click(getTestId("dialog-yes"));
 
   await expect(isToastPresent()).resolves.toBeTruthy();
 

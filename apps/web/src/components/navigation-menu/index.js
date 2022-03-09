@@ -159,7 +159,7 @@ function NavigationMenu(props) {
           {colors.map((color) => (
             <NavigationItem
               key={color.id}
-              title={toTitleCase(db.colors.alias(color.id))}
+              title={db.colors.alias(color.id)}
               icon={Circle}
               selected={location === `/colors/${color.id}`}
               color={color.title.toLowerCase()}
