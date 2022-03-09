@@ -697,10 +697,6 @@ export async function clearEditor() {
     tiny.call(EditorWebView, tiny.reset(placeholderTip));
     //EditorWebView.current?.reload();
     await waitForEvent('resetcomplete');
-    if (!note) {
-      tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
-    }
-
     editing.focusType = null;
     eSendEvent('historyEvent', {
       undo: 0,
@@ -925,9 +921,6 @@ export async function onWebViewLoad(premium, colors) {
     }
   }, 300);
   setColors(colors);
-  if (!note) {
-    tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
-  }
 }
 
 async function restoreEditorState() {
