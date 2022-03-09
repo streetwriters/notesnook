@@ -67,7 +67,12 @@ const NewFeature = ({ features }: { features: FeatureType[] }) => {
 
 NewFeature.present = () => {
   const { version, introCompleted } = SettingsService.get();
-  if (!introCompleted) return;
+  if (!introCompleted) {
+    SettingsService.set({
+      version: APP_VERSION
+    });
+    return;
+  }
   if (version && version === APP_VERSION) return false;
   SettingsService.set({
     version: APP_VERSION
