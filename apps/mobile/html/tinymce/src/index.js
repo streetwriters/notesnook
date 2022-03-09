@@ -26,6 +26,7 @@ import '@streetwriters/tinymce-plugins/attachmentshandler';
 import '@streetwriters/tinymce-plugins/blockescape';
 import '@streetwriters/tinymce-plugins/contenthandler';
 import '@streetwriters/tinymce-plugins/bettertable';
+import '@streetwriters/tinymce-plugins/collapsibleheaders';
 
 require.context(
   'file-loader?name=[path][name].[ext]&context=node_modules/tinymce!tinymce/skins',

@@ -627,7 +627,15 @@ h3::before,
 h4::before,
 h5::before,
 h6::before {
-  background-color: ${pageTheme.colors.icon};
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' role='presentation' style='stroke-width: 0px; stroke: rgb(59, 59, 59); width: 14px; height: 14px;'%3E%3Cpath d='M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z' style='fill: ${
+    pageTheme.colors.icon
+  };'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.c::before {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' role='presentation' style='stroke-width: 0px; stroke: rgb(59, 59, 59); width: 14px; height: 14px;'%3E%3Cpath d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58' style='fill: ${
+    pageTheme.colors.icon
+  };'%3E%3C/path%3E%3C/svg%3E");
 }
 
 `;

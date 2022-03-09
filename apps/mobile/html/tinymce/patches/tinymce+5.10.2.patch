@@ -54,7 +54,7 @@ index e41249b..fb25fc5 100644
      var handle$1 = function (event, editor, cellSelection) {
        if (event.keyCode === global$1.TAB) {
 diff --git a/node_modules/tinymce/plugins/textpattern/plugin.js b/node_modules/tinymce/plugins/textpattern/plugin.js
-index 987d753..0e719f0 100644
+index 987d753..c3b988a 100644
 --- a/node_modules/tinymce/plugins/textpattern/plugin.js
 +++ b/node_modules/tinymce/plugins/textpattern/plugin.js
 @@ -1330,6 +1330,12 @@
@@ -87,13 +87,13 @@ index 987d753..0e719f0 100644
 +      editor.on('input', function (e) {
 +        if (isCodeblock(editor)) return;
 +
-+        if (e.data.endsWith("\n") && !global$3.modifierPressed(e)) {
++        if (e.data && e.data.endsWith("\n") && !global$3.modifierPressed(e)) {
 +          if (handleEnter(editor, patternsState.get())) {
 +            e.preventDefault();
 +          }
 +        }
 +
-+        if (e.data.endsWith(" ")) {
++        if (e.data && e.data.endsWith(" ")) {
 +          e.preventDefault();
 +          global$4.setEditorTimeout(editor, function () {
 +            handleInlineKey(editor, patternsState.get());

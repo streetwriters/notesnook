@@ -59,9 +59,6 @@ function loadFontSize() {
 }
 
 let changeTimer = null;
-const COLLAPSED_KEY = 'c';
-const HIDDEN_KEY = 'h';
-const collapsibleTags = { HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6 };
 let styleElement;
 
 function addStyle() {
@@ -74,46 +71,9 @@ function addStyle() {
   body {
     font-size:${DEFAULT_FONT_SIZE} !important;
   }
-  .mce-content-body .c::before{
-    background-color:${pageTheme.colors.accent};
-    border-radius:3px;
-    color:white;
-  }
   `;
 }
 
-function toggleElementVisibility(element, toggleState) {
-  if (!toggleState) element.classList.remove(HIDDEN_KEY);
-  else element.classList.add(HIDDEN_KEY);
-}
-
-function collapseElement(target) {
-  let sibling = target.nextSibling;
-  const isTargetCollapsed = target.classList.contains(COLLAPSED_KEY);
-  let skip = false;
-
-  while (
-    sibling &&
-    (!collapsibleTags[sibling.tagName] ||
-      collapsibleTags[sibling.tagName] > collapsibleTags[target.tagName])
-  ) {
-    const isCollapsed = sibling.classList.contains(COLLAPSED_KEY);
-    if (!isTargetCollapsed) {
-      if (isCollapsed) {
-        skip = true;
-        toggleElementVisibility(sibling, isTargetCollapsed);
-      } else if (skip && collapsibleTags[sibling.tagName]) {
-        skip = false;
-      }
-    }
-    if (!skip) {
-      toggleElementVisibility(sibling, isTargetCollapsed);
-    }
-    addStyle();
-    if (!sibling.nextSibling) break;
-    sibling = sibling.nextSibling;
-  }
-}
 let undoTimer = null;
 function onUndoChange() {
   clearTimeout(undoTimer);
@@ -152,83 +112,6 @@ function init_callback(_editor) {
     reactNativeEventHandler('focus', 'editor');
   });
 
-  // editor.on('SetContent', function (event) {
-  //   if (globalThis.isClearingNoteData) {
-  //     globalThis.isClearingNoteData = false;
-  //     return;
-  //   }
-  //   setTimeout(function () {
-  //     editor.undoManager.transact(function () {});
-  //   }, 1000);
-  //   if (!event.paste) {
-  //     reactNativeEventHandler('noteLoaded', true);
-  //   }
-  // });
-
-  editor.on('NewBlock', function (e) {
-    const { newBlock } = e;
-    let target;
-    if (newBlock) {
-      target = newBlock.previousElementSibling;
-    }
-    if (target && target.classList.contains(COLLAPSED_KEY)) {
-      target.classList.remove(COLLAPSED_KEY);
-      collapseElement(target);
-    }
-    onChange(e);
-  });
-  let shouldCancelNextTouchEndEvent = false;
-  editor.on(
-    'touchstart mousedown',
-    function (e) {
-      const { target } = e;
-      let xPos;
-      if (e.targetTouches) {
-        if (e.targetTouches.length !== 1) return;
-        xPos = e.targetTouches[0].clientX;
-      } else {
-        xPos = e.offsetX;
-      }
-
-      if (
-        xPos < 10 &&
-        collapsibleTags[target.tagName] &&
-        target.parentElement &&
-        target.parentElement.tagName === 'BODY'
-      ) {
-        e.preventDefault();
-        shouldCancelNextTouchEndEvent = true;
-        editor.undoManager.transact(function () {
-          if (target.classList.contains(COLLAPSED_KEY)) {
-            target.classList.remove(COLLAPSED_KEY);
-          } else {
-            target.classList.add(COLLAPSED_KEY);
-          }
-          collapseElement(target);
-          editor.fire('input', { data: '' });
-        });
-      }
-    },
-    {
-      capture: true,
-      passive: false
-    }
-  );
-
-  editor.on(
-    'touchend',
-    e => {
-      if (shouldCancelNextTouchEndEvent) {
-        e.preventDefault();
-        shouldCancelNextTouchEndEvent = false;
-      }
-    },
-    {
-      capture: true,
-      passive: false
-    }
-  );
-
   editor.on('tap', function (e) {
     if (e.target.classList.contains('mce-content-body') && !e.target.innerText.length > 0) {
       e.preventDefault();
@@ -252,7 +135,7 @@ function init_callback(_editor) {
 
 const plugins = [
   'checklist advlist autolink textpattern hr lists link noneditable image bettertable',
-  'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
+  'searchreplace codeblock inlinecode keyboardquirks attachmentshandler collapsibleheaders',
   'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
 ];
 
@@ -329,15 +212,11 @@ h5::before,
 h6::before {
   opacity: 1;
   cursor: row-resize;
-  margin-right: 3.5px;
+  margin-right: 7px;
   margin-left: -15px;
-  content: "";
   width: 24px;
   height: 24px;
   display: inline-block;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' role='presentation' style='stroke-width: 0px; stroke: rgb(59, 59, 59); width: 14px; height: 14px;'%3E%3Cpath d='M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z' style='fill: rgb(59, 59, 59);'%3E%3C/path%3E%3C/svg%3E")
-    no-repeat 50% 50%;
-  mask-size: cover;
   border: none;
 }
 
@@ -365,10 +244,7 @@ h6::before {
   height: 18px;
 }
 
-.c::before {
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' role='presentation' style='stroke-width: 0px; stroke: rgb(59, 59, 59); width: 14px; height: 14px;'%3E%3Cpath d='M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58' style='fill: rgb(59, 59, 59);'%3E%3C/path%3E%3C/svg%3E")
-    no-repeat 50% 50%;
-}
+
 
 .h {
   display: none !important;
