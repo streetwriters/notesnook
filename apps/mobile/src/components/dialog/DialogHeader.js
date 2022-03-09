@@ -53,6 +53,7 @@ const DialogHeader = ({
                   borderRadius: 100,
                   paddingHorizontal: 12
                 }}
+                loading={button.loading}
                 fontSize={13}
                 title={button.title}
                 type={button.type || 'grayBg'}

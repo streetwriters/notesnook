@@ -23,6 +23,7 @@ export const AttachmentDialog = () => {
   const [attachments, setAttachments] = useState([]);
   const attachmentSearchValue = useRef();
   const searchTimer = useRef();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     eSubscribeEvent(eOpenAttachmentsDialog, open);
@@ -98,14 +99,17 @@ export const AttachmentDialog = () => {
           button={{
             title: 'Check all',
             type: 'accent',
+            loading: loading,
             onPress: async () => {
+              setLoading(true);
               for (let attachment of attachments) {
                 let result = await filesystem.checkAttachment(attachment.metadata.hash);
                 if (result.failed) {
                   db.attachments.markAsFailed(attachment.metadata.hash, result.failed);
+                  setAttachments([...db.attachments.all]);
                 }
               }
-              setAttachments([...db.attachments.all]);
+              setLoading(false);
             }
           }}
         />
