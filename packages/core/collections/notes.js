@@ -90,7 +90,8 @@ export default class Notes extends Collection {
       dateModified: note.dateModified,
     };
 
-    await this.merge(note);
+    await this._resolveColorAndTags(note);
+    await this._collection.addItem(note);
     return note.id;
   }
 
