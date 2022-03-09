@@ -1,11 +1,17 @@
 module.exports = {
-  parser: '@babel/eslint-parser',
+  parser: '@typescript-eslint/parser',
   env: {
     browser: true,
     es2021: true,
     'react-native/react-native': true
   },
-  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:prettier/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended'
+  ],
   parserOptions: {
     ecmaFeatures: {
       jsx: true
@@ -14,7 +20,7 @@ module.exports = {
     es6: true,
     sourceType: 'module'
   },
-  plugins: ['react', 'react-native', 'prettier', 'unused-imports'],
+  plugins: ['react', 'react-native', 'prettier', 'unused-imports', '@typescript-eslint'],
   rules: {
     'react/display-name': 0,
     'no-unused-vars': 'off',
@@ -22,7 +28,7 @@ module.exports = {
     'unused-imports/no-unused-vars': 'off',
     'no-empty': 'off',
     'react/prop-types': 0,
-    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
+    'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx', 'ts', 'tsx'] }],
     'prettier/prettier': [
       'error',
       {},
