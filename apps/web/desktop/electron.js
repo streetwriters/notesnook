@@ -1,3 +1,4 @@
+require("isomorphic-fetch");
 const { app, BrowserWindow, nativeTheme, shell } = require("electron");
 const path = require("path");
 const os = require("os");

@@ -26,6 +26,7 @@ function format(version, hash, type) {
  * @param {"web"|"desktop"} type
  */
 function formatVersion(version) {
+  if (!version) return "";
   const [major, minor, bugfix0, bugfix1] = version.toString().split("");
   return `${major}.${minor}.${bugfix0}${bugfix1 || ""}`;
 }

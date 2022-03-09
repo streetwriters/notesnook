@@ -1,8 +1,15 @@
 const { autoUpdater } = require("electron-updater");
 const { EVENTS } = require("./events");
 const { sendMessageToRenderer } = require("./ipc/utils");
+const { getChangelog } = require("../src/utils/version");
 
 async function configureAutoUpdater() {
+  autoUpdater.setFeedURL({
+    provider: "generic",
+    url: `https://notesnook.com/releases/${process.platform}/`,
+    useMultipleRangeRequest: false,
+  });
+
   autoUpdater.autoDownload = false;
   autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = false;
@@ -10,7 +17,9 @@ async function configureAutoUpdater() {
   autoUpdater.addListener("checking-for-update", () => {
     sendMessageToRenderer(EVENTS.checkingForUpdate);
   });
-  autoUpdater.addListener("update-available", (info) => {
+  autoUpdater.addListener("update-available", async (info) => {
+    info.releaseNotes = await getChangelog(info.version);
+    console.log("Get release notes!", info.releaseNotes);
     sendMessageToRenderer(EVENTS.updateAvailable, info);
   });
   autoUpdater.addListener("download-progress", (progress) => {

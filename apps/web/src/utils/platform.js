@@ -22,55 +22,77 @@ export function getPlatform() {
 }
 
 export function getDownloadLink(platform) {
+  const baseurl = `https://notesnook.com/downloads/${platform.toLowerCase()}`;
   switch (platform) {
     case "iOS":
       return [
         {
+          type: "Install from App Store",
           link: "https://apps.apple.com/pk/app/notesnook-take-private-notes/id1544027013",
         },
       ];
     case "Android":
       return [
         {
+          type: "Install from Google Play Store",
           link: "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook",
+        },
+        {
+          type: "Download .apk (arm64-v8a)",
+          link: `${baseurl}/notesnook-arm64-v8a.apk`,
+        },
+        {
+          type: "Download .apk (armeabi-v7a)",
+          link: `${baseurl}/notesnook-armeabi-v7a.apk`,
+        },
+        {
+          type: "Download .apk (x86)",
+          link: `${baseurl}/notesnook-x86.apk`,
+        },
+        {
+          type: "Download .apk (x86_64)",
+          link: `${baseurl}/notesnook-x86_64.apk`,
         },
       ];
     case "macOS":
       return [
         {
-          type: "x64",
-          link: "https://github.com/streetwriters/notesnook/releases/latest/download/notesnook_x64.dmg",
+          type: "Download .dmg (x64)",
+          link: `${baseurl}/notesnook_x64.dmg`,
         },
         {
-          type: "arm64",
-          link: "https://github.com/streetwriters/notesnook/releases/latest/download/notesnook_amd64.dmg",
+          type: "Download .dmg (arm64)",
+          link: `${baseurl}/notesnook_arm64.dmg`,
         },
       ];
     case "Windows":
       return [
         {
-          type: ".exe",
-          link: "https://github.com/streetwriters/notesnook/releases/latest/download/notesnook_x64.exe",
+          type: "Download .exe (x64)",
+          link: `${baseurl}/notesnook_x64.exe`,
         },
       ];
     case "Linux":
       return [
         {
-          type: ".AppImage",
-          link: "https://github.com/streetwriters/notesnook/releases/latest/download/notesnook_x86_64.AppImage",
+          type: "Download .AppImage",
+          link: `${baseurl}/notesnook_x86_64.AppImage`,
         },
         {
-          type: ".deb",
-          link: "https://github.com/streetwriters/notesnook/releases/latest/download/notesnook_x86_64.deb",
+          type: "Download .deb",
+          link: `${baseurl}/notesnook_amd64.deb`,
         },
         {
-          type: ".rpm",
-          link: "https://github.com/streetwriters/notesnook/releases/latest/download/notesnook_x86_64.rpm",
+          type: "Download .rpm",
+          link: `${baseurl}/notesnook_x86_64.rpm`,
         },
       ];
     default:
       return [
-        { link: "https://github.com/streetwriters/notesnook/releases/latest/" },
+        {
+          type: "Download",
+          link: "https://github.com/streetwriters/notesnook/releases/",
+        },
       ];
   }
 }

@@ -1,6 +1,5 @@
 import ReactDOM from "react-dom";
 import { Box, Button, Flex, Text } from "rebass";
-import { closeOpenedDialog } from "../../common/dialog-controller";
 import Config from "../../utils/config";
 import { getDownloadLink, getPlatform } from "../../utils/platform";
 import DropdownButton from "../dropdown-button";
@@ -17,18 +16,11 @@ const nativeFeatures = [
 
 const platform = getPlatform();
 const isMobile = platform === "Android" || platform === "iOS";
-const storeName = platform === "Android" ? "Play Store" : "App Store";
 function getOptions(onClose) {
   return getDownloadLink(platform).map((item) => ({
     key: item.type || item.link,
     title: () => {
-      switch (platform) {
-        case "iOS":
-        case "Android":
-          return `Install from ${storeName}`;
-        default:
-          return `Download (${item.type})`;
-      }
+      return `${item.type}`;
     },
     onClick: () => {
       window.open(item.link, "_blank");

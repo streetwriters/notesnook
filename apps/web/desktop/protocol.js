@@ -2,7 +2,6 @@ const { protocol } = require("electron");
 const { isDevelopment, getPath } = require("./utils");
 const fs = require("fs");
 const path = require("path");
-const fetch = require("node-fetch").default;
 const { logger } = require("./logger");
 const { Blob } = require("buffer");
 
