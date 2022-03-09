@@ -299,7 +299,6 @@ export const useActions = ({ close = () => {}, item }) => {
     try {
       if (isPinnedToMenu) {
         await db.settings.unpin(item.id);
-        return;
       } else {
         if (item.type === 'topic') {
           await db.settings.pin(item.type, {

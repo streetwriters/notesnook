@@ -17,94 +17,96 @@ import SheetWrapper from '../ui/sheet';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
-export const TagsSection = () => {
-  const menuPins = useMenuStore(state => state.menuPins);
-  const loading = useNoteStore(state => state.loading);
-  const setMenuPins = useMenuStore(state => state.setMenuPins);
+export const TagsSection = React.memo(
+  () => {
+    const menuPins = useMenuStore(state => state.menuPins);
+    const loading = useNoteStore(state => state.loading);
+    const setMenuPins = useMenuStore(state => state.setMenuPins);
 
-  useEffect(() => {
-    if (!loading) {
-      setMenuPins();
-    }
-  }, [loading]);
+    useEffect(() => {
+      if (!loading) {
+        setMenuPins();
+      }
+    }, [loading]);
 
-  const onPress = item => {
-    let params = {};
-    if (item.type === 'notebook') {
-      params = {
-        notebook: item,
-        title: item.title,
-        menu: true
-      };
-      eSendEvent(eOnNewTopicAdded, params);
-      Navigation.navigate('Notebook', params, {
-        heading: item.title,
-        id: item.id,
-        type: item.type
-      });
-    } else if (item.type === 'tag') {
-      params = {
-        ...item,
-        type: 'tag',
-        menu: true,
-        get: 'tagged'
-      };
-      eSendEvent(refreshNotesPage, params);
-      Navigation.navigate('NotesPage', params, {
-        heading: '#' + db.tags.alias(item.id),
-        id: item.id,
-        type: item.type
-      });
-    } else {
-      params = { ...item, menu: true, get: 'topics' };
-      eSendEvent(refreshNotesPage, params);
-      Navigation.navigate('NotesPage', params, {
-        heading: item.title,
-        id: item.id,
-        type: item.type
-      });
-    }
-    Navigation.closeDrawer();
-  };
+    const onPress = item => {
+      let params = {};
+      if (item.type === 'notebook') {
+        params = {
+          notebook: item,
+          title: item.title,
+          menu: true
+        };
+        eSendEvent(eOnNewTopicAdded, params);
+        Navigation.navigate('Notebook', params, {
+          heading: item.title,
+          id: item.id,
+          type: item.type
+        });
+      } else if (item.type === 'tag') {
+        params = {
+          ...item,
+          type: 'tag',
+          menu: true,
+          get: 'tagged'
+        };
+        eSendEvent(refreshNotesPage, params);
+        Navigation.navigate('NotesPage', params, {
+          heading: '#' + db.tags.alias(item.id),
+          id: item.id,
+          type: item.type
+        });
+      } else {
+        params = { ...item, menu: true, get: 'topics' };
+        eSendEvent(refreshNotesPage, params);
+        Navigation.navigate('NotesPage', params, {
+          heading: item.title,
+          id: item.id,
+          type: item.type
+        });
+      }
+      Navigation.closeDrawer();
+    };
+    const renderItem = ({ item, index }) => {
+      let alias = item ? (item.type === 'tag' ? db.tags.alias(item.title) : item.title) : null;
+      return <PinItem item={item} index={index} alias={alias} onPress={onPress} />;
+    };
 
-  const renderItem = ({ item, index }) => {
-    let alias = item.type === 'tag' ? db.tags.alias(item.title) : item.title;
-    return <PinItem item={item} index={index} alias={alias} onPress={onPress} />;
-  };
-
-  return (
-    <View
-      style={{
-        flexGrow: 1
-      }}
-    >
-      <FlatList
-        data={menuPins}
+    return (
+      <View
         style={{
           flexGrow: 1
         }}
-        ListEmptyComponent={
-          <Notice
-            size="small"
-            type="information"
-            text="Add shortcuts for notebooks, topics and tags here."
-          />
-        }
-        contentContainerStyle={{
-          flexGrow: 1
-        }}
-        keyExtractor={(item, index) => item.id}
-        renderItem={renderItem}
-      />
-    </View>
-  );
-};
+      >
+        <FlatList
+          data={menuPins}
+          style={{
+            flexGrow: 1
+          }}
+          ListEmptyComponent={
+            <Notice
+              size="small"
+              type="information"
+              text="Add shortcuts for notebooks, topics and tags here."
+            />
+          }
+          contentContainerStyle={{
+            flexGrow: 1
+          }}
+          keyExtractor={(item, index) => item.id}
+          renderItem={renderItem}
+        />
+      </View>
+    );
+  },
+  () => true
+);
 
 export const PinItem = React.memo(
   ({ item, index, onPress, placeholder, alias }) => {
     const colors = useThemeStore(state => state.colors);
     const setMenuPins = useMenuStore(state => state.setMenuPins);
-    alias = item.type === 'tag' ? db.tags.alias(item.title) : item.title;
+    alias = !item ? '' : item.type === 'tag' ? db.tags.alias(item.title) : item.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
     const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
@@ -238,6 +240,7 @@ export const PinItem = React.memo(
     );
   },
   (prev, next) => {
+    if (!next.item) return false;
     if (prev.alias !== next.alias) return false;
     if (prev.item?.dateModified !== next.item?.dateModified) return false;
     if (prev.item?.id !== next.item?.id) return false;

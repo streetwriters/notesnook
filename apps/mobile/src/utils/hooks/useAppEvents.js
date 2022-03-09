@@ -165,6 +165,7 @@ export const useAppEvents = () => {
   };
 
   const onSyncComplete = async () => {
+    console.log('sync complete');
     initialize();
     setLastSynced(await db.lastSynced());
     if (getNote()) {
@@ -219,6 +220,7 @@ export const useAppEvents = () => {
   };
 
   const onRequestPartialSync = async (full, force) => {
+    console.log('auto sync request', full, force);
     try {
       if (full || force) {
         Sync.run('global', force, full);

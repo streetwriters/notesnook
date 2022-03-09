@@ -13,22 +13,25 @@ import { PressableButton } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
-export const ColorSection = () => {
-  const colorNotes = useMenuStore(state => state.colorNotes);
-  const loading = useNoteStore(state => state.loading);
-  const setColorNotes = useMenuStore(state => state.setColorNotes);
+export const ColorSection = React.memo(
+  () => {
+    const colorNotes = useMenuStore(state => state.colorNotes);
+    const loading = useNoteStore(state => state.loading);
+    const setColorNotes = useMenuStore(state => state.setColorNotes);
 
-  useEffect(() => {
-    if (!loading) {
-      setColorNotes();
-    }
-  }, [loading]);
+    useEffect(() => {
+      if (!loading) {
+        setColorNotes();
+      }
+    }, [loading]);
 
-  return colorNotes.map((item, index) => {
-    let alias = db.colors.alias(item.id);
-    return <ColorItem key={item.id} alias={alias} item={item} index={index} />;
-  });
-};
+    return colorNotes.map((item, index) => {
+      let alias = db.colors.alias(item.id);
+      return <ColorItem key={item.id} alias={alias} item={item} index={index} />;
+    });
+  },
+  () => true
+);
 
 const ColorItem = React.memo(
   ({ item, index, alias }) => {

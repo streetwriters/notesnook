@@ -20,7 +20,8 @@ export const SideMenu = React.memo(
     const colors = useThemeStore(state => state.colors);
     const deviceMode = useSettingStore(state => state.deviceMode);
     const insets = useSafeAreaInsets();
-    const user = useUserStore(state => state.user);
+    const subscriptionType = useUserStore(state => state.user?.subscription?.type);
+    console.log(subscriptionType);
     const noTextMode = false;
 
     const BottomItemsList = [
@@ -98,9 +99,8 @@ export const SideMenu = React.memo(
               paddingHorizontal: 12
             }}
           >
-            {!user ||
-            user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL ||
-            user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC ? (
+            {subscriptionType === SUBSCRIPTION_STATUS.TRIAL ||
+            subscriptionType === SUBSCRIPTION_STATUS.BASIC ? (
               <MenuItem testID={pro.name} key={pro.name} item={pro} index={0} ignore={true} />
             ) : null}
 
