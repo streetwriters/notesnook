@@ -256,7 +256,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
       dark: false
     },
     showBackupCompleteSheet: true,
-    sessionExpired: false
+    sessionExpired: false,
+    version: null
   },
   sheetKeyboardHandler: true,
   fullscreen: false,

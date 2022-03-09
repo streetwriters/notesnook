@@ -6,7 +6,7 @@ import SelectionHeader from '../../components/selection-header';
 import List from '../../components/list';
 import { useNoteStore } from '../../stores/stores';
 import { DDS } from '../../services/device-detection';
-import { eSendEvent } from '../../services/event-manager';
+import { eSendEvent, presentSheet } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
 import { editing, InteractionManager } from '../../utils';
@@ -14,6 +14,10 @@ import { db } from '../../utils/database';
 import { eOnLoadNote } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../editor/Functions';
+import { presentDialog } from '../../components/dialog/functions';
+import Paragraph from '../../components/ui/typography/paragraph';
+import Heading from '../../components/ui/typography/heading';
+import NewFeature from '../../components/sheets/new-feature';
 
 export const Home = ({ navigation }) => {
   const notes = useNoteStore(state => state.notes);

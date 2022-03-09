@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import picker from '../../screens/editor/tiny/toolbar/picker';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
+import PremiumService from '../../services/premium';
 import { useAttachmentStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
 import { formatBytes } from '../../utils';
@@ -42,6 +43,14 @@ const Actions = ({ attachment, setAttachments }) => {
     {
       name: 'Reupload',
       onPress: async () => {
+        if (PremiumService.get()) {
+          ToastEvent.show({
+            heading: 'Upgrade to pro',
+            type: 'error',
+            context: 'local'
+          });
+          return;
+        }
         await picker.pick({
           reupload: true,
           hash: attachment.metadata.hash,

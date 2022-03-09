@@ -8,11 +8,11 @@ import { Button } from '../../components/ui/button';
 import Seperator from '../../components/ui/seperator';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
 import Sync from '../../services/sync';
+import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
 import {
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
@@ -21,7 +21,6 @@ import {
 import {
   eCloseProgressDialog,
   eOpenAttachmentsDialog,
-  eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenRecoveryKeyDialog
 } from '../../utils/events';

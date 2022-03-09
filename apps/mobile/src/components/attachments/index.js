@@ -98,7 +98,7 @@ export const AttachmentDialog = () => {
           paragraph="Tap on an attachment to view properties"
           button={{
             title: 'Check all',
-            type: 'accent',
+            type: 'grayAccent',
             loading: loading,
             onPress: async () => {
               setLoading(true);

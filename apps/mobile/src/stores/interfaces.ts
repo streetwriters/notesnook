@@ -87,6 +87,7 @@ export type Settings = {
   lastRecoveryEmailTime?: number;
   lastVerificationEmailTime?: number;
   sessionExpired: boolean;
+  version: number | null;
 };
 
 type Dimensions = {

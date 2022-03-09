@@ -36,6 +36,7 @@ import { SvgView } from '../ui/svg';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { Walkthrough } from '../walkthroughs';
+import NewFeature from '../sheets/new-feature/index';
 
 const Launcher = () => {
   const colors = useThemeStore(state => state.colors);
@@ -124,6 +125,7 @@ const Launcher = () => {
       return;
     }
 
+    if (NewFeature.present()) return;
     if (await checkAppUpdateAvailable()) return;
     if (await checkForRateAppRequest()) return;
     if (await checkNeedsBackup()) return;
