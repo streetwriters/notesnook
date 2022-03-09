@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Android App APKS
         run: |
-          ENVFILE=.env.public cd android && ./gradlew assembleRelease --no-daemon
+          cd android && ENVFILE=.env.public ./gradlew assembleRelease --no-daemon
 
       - name: Sign APK Files
         id: sign_app
