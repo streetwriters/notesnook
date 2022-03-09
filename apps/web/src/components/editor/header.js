@@ -46,6 +46,7 @@ function Header({ readonly }) {
             />
           ))}
           <Autosuggest
+            sessionId={id}
             filter={(query) =>
               db.lookup.tags(filterableTags, query).slice(0, 10)
             }
@@ -64,7 +65,14 @@ function Header({ readonly }) {
 }
 export default Header;
 
-function Autosuggest({ filter, onRemove, onSelect, onAdd, defaultItems }) {
+function Autosuggest({
+  sessionId,
+  filter,
+  onRemove,
+  onSelect,
+  onAdd,
+  defaultItems,
+}) {
   const [filtered, setFiltered] = useState([]);
   const inputRef = useRef();
   const { openMenu, closeMenu } = useMenuTrigger();
@@ -127,7 +135,12 @@ function Autosuggest({ filter, onRemove, onSelect, onAdd, defaultItems }) {
     const text = getInputValue();
     const isFocused = document.activeElement === inputRef.current;
     if (isFocused && !text) setFiltered(defaultItems);
+    console.log(isFocused, text);
   }, [defaultItems, getInputValue]);
+
+  useEffect(() => {
+    setFiltered([]);
+  }, [sessionId]);
 
   return (
     <Input
