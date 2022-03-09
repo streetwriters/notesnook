@@ -190,6 +190,8 @@ test("select all & backspace should clear all content in editor", async () => {
 
   await page.focus(".mce-content-body");
 
+  await page.keyboard.press("Home");
+
   await page.keyboard.press("Shift+End");
 
   await page.waitForTimeout(500);
