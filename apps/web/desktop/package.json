@@ -12,7 +12,8 @@
     "electron-better-ipc": "^2.0.1",
     "electron-serve": "^1.1.0",
     "electron-updater": "^4.6.5",
-    "isomorphic-fetch": "^3.0.0"
+    "isomorphic-fetch": "^3.0.0",
+    "showdown": "^2.0.3"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.6.1",

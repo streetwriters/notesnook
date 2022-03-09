@@ -1,7 +1,7 @@
 const { autoUpdater } = require("electron-updater");
 const { EVENTS } = require("./events");
 const { sendMessageToRenderer } = require("./ipc/utils");
-const { getChangelog } = require("../src/utils/version");
+const { getChangelog } = require("./changelog");
 
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
