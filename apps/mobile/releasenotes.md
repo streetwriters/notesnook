@@ -1,24 +1,15 @@
-- Add new "Move notes" button in topic properties to quickly move notes to a topic
-- Overhauled Auth flows with new UI/UX
-- Overhauled App lock UI
-- Added new placeholders with useful tips about app features
-- Added Auto search on typing in Search/Replace
-- Added new walkthrough for notesnooks for new users
-- Added read only mode for notes
-- Added walkthroughs for pro/trial users
-- Allow to opt-out of getting "Backup completed" dialogs on app launch when automatic backups are turned on
-- Disable swipe gestures when selecting multiple notes
-- Fixed Search/Replace does not accept spaces
-- Fixed inline markdown transforms not working
-- Fixed tags in editor hide/flicker on opening a note
-- Fixed Home screen widget not launching on Android 12
-- Fixed codeblocks are not scrollable in editor
-- Fixed collapsing/expanding a heading causes cursor to jump on iOS
-- Do not show title in notification pinned note
-- Do not lock app if requesting fingerprint unlock for vault
-- Reuse backup folder if it exists in subfolders of selected directory on android
-- Fixed app hangs and becomes unusable on some phones
-- Improved web clipper in widget to handle tables & codeblocks and remove invalid elements
-- Disable swipe to close gesture in editor as it interferes with editing or scrolling.
+# What's new
+- Added a "new feature" introduction sheet
+- Now you can view and manage all file & image attachments from Settings
+- Changed collapse/expand heading icons
+- Enabled auto day/night theme switching for free users
+- Enabled h1 heading in editor
+- New version update sheet will now link to github repo for users who have downloaded the app from github
+- Improved auto syncing
+
+# What's fixed
+- Fixed auto-sync not working on mobile devices
+- Fixed announcement not hiding on iOS
+- Fixed placeholder showing behind opened note
 
 Thank you for using Notesnook!

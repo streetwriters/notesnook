@@ -1,7 +1,12 @@
-- Fixed relogin failing on session expired screen
-- Fixed sorting of Notebooks in "Add to notebook" sheet
-- Fixed nested checklist items can't be toggled in editor
-- Fixed can't scroll to the end of Notebooks in "Add to notebook" sheet
-- Moved "Dark mode" button in note properties to the end
+- Added a "new feature" introduction sheet
+- Now you can view and manage all file & image attachments from Settings
+- Changed collapse/expand heading icons
+- Enabled auto day/night theme switching for free users
+- Enabled h1 heading in editor
+- New version update sheet will now link to github repo for users who have downloaded the app from github
+- Improved auto syncing
+- Fixed auto-sync not working on mobile devices
+- Fixed announcement not hiding on iOS
+- Fixed placeholder showing behind opened note
 
 Thank you for using Notesnook!
