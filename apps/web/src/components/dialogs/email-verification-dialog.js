@@ -5,6 +5,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
 import { useState } from "react";
 import { useSessionState } from "../../utils/hooks";
+import Accordion from "../accordion";
 
 var interval = 0;
 function EmailVerificationDialog(props) {
@@ -66,7 +67,7 @@ function EmailVerificationDialog(props) {
         disabled: isSending,
       }}
     >
-      <Flex flexDirection="column" alignItems="flex-start">
+      <Flex flexDirection="column">
         <Text
           as="span"
           variant="body"
@@ -79,6 +80,17 @@ function EmailVerificationDialog(props) {
           </Text>
           .
         </Text>
+        <Accordion
+          title={"What do I do if I am not getting the email?"}
+          sx={{ mt: 2, bg: "bgSecondary", borderRadius: "default" }}
+        >
+          <Text variant={"body"} px={1} pb={1}>
+            If you didn't get an email from us or the confirmation link isn't
+            working,{" "}
+            <b>please send us an email from your registered email address</b>{" "}
+            and we will manually confirm your account.
+          </Text>
+        </Accordion>
       </Flex>
     </Dialog>
   );
