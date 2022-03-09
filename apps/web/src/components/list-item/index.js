@@ -70,6 +70,8 @@ function ListItem(props) {
       bg={isSelected ? "shade" : background}
       onContextMenu={(e) => {
         e.preventDefault();
+        e.stopPropagation();
+
         let items = props.menu?.items?.slice() || [];
         let title = props.item.title;
         let selectedItems = selectionStore
