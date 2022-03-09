@@ -35,6 +35,7 @@ import Seperator from '../ui/seperator';
 import { SvgView } from '../ui/svg';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { Walkthrough } from '../walkthroughs';
 
 const Launcher = () => {
   const colors = useThemeStore(state => state.colors);
@@ -63,6 +64,7 @@ const Launcher = () => {
     setNotes();
     setFavorites();
     setLoading(false);
+    Walkthrough.init();
   };
 
   const init = async () => {

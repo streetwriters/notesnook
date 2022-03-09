@@ -55,6 +55,8 @@ export const Notebooks = ({ navigation }) => {
     if (navigation.isFocused()) {
       if (notebooks.length === 0) {
         Walkthrough.present('notebooks');
+      } else {
+        Walkthrough.update('notebooks');
       }
       updateSearch();
     }

@@ -107,6 +107,22 @@ export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip
     </View>
   );
 };
+let walkthroughState: { [name: string]: boolean } = {};
+
+Walkthrough.update = async (id: 'notebooks' | 'trialstarted' | 'emailconfirmed' | 'prouser') => {
+  console.log('walkthrough state', walkthroughState);
+  if (walkthroughState[id]) return;
+  walkthroughState[id] = true;
+  MMKV.setItem('walkthroughState', JSON.stringify(walkthroughState));
+};
+
+Walkthrough.init = async () => {
+  let json = await MMKV.getItem('walkthroughState');
+  if (walkthroughState) {
+    walkthroughState = JSON.parse(json);
+    console.log(walkthroughState);
+  }
+};
 
 Walkthrough.present = async (
   id: 'notebooks' | 'trialstarted' | 'emailconfirmed' | 'prouser',
@@ -114,18 +130,9 @@ Walkthrough.present = async (
   nopersist?: boolean
 ) => {
   if (!nopersist) {
-    let walkthroughState = await MMKV.getItem('walkthroughState');
-    if (walkthroughState) {
-      walkthroughState = JSON.parse(walkthroughState);
-    } else {
-      //@ts-ignore
-      walkthroughState = {};
-    }
-    //@ts-ignore
     if (walkthroughState[id]) return;
     //@ts-ignore
-    walkthroughState[id] = true;
-    MMKV.setItem('walkthroughState', JSON.stringify(walkthroughState));
+    Walkthrough.update(id);
   }
 
   //@ts-ignore
