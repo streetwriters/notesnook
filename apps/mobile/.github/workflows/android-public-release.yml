@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Android App APKS
         run: |
-          cd android && ./gradlew assembleRelease --no-daemon
+          ENVFILE=.env.public cd android && ./gradlew assembleRelease --no-daemon
 
       - name: Sign APK Files
         id: sign_app
@@ -50,11 +50,11 @@ jobs:
 
       - name: Rename
         run: |
-            cd android/app/build/outputs/apk/release/
-            mv app-arm64-v8a-release-unsigned-signed.apk notesnook-arm64-v8a.apk
-            mv app-armeabi-v7a-release-unsigned-signed.apk notesnook-armeabi-v7a.apk
-            mv app-x86-release-unsigned-signed.apk notesnook-x86.apk
-            mv app-x86_64-release-unsigned-signed.apk notesnook-x86_64.apk
+          cd android/app/build/outputs/apk/release/
+          mv app-arm64-v8a-release-unsigned-signed.apk notesnook-arm64-v8a.apk
+          mv app-armeabi-v7a-release-unsigned-signed.apk notesnook-armeabi-v7a.apk
+          mv app-x86-release-unsigned-signed.apk notesnook-x86.apk
+          mv app-x86_64-release-unsigned-signed.apk notesnook-x86_64.apk
 
       - name: Publish
         uses: softprops/action-gh-release@v1
