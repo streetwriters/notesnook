@@ -118,7 +118,7 @@ Walkthrough.update = async (id: 'notebooks' | 'trialstarted' | 'emailconfirmed' 
 
 Walkthrough.init = async () => {
   let json = await MMKV.getItem('walkthroughState');
-  if (walkthroughState) {
+  if (json) {
     walkthroughState = JSON.parse(json);
     console.log(walkthroughState);
   }
