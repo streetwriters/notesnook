@@ -4,6 +4,7 @@ import { useThemeStore } from '../../stores/theme';
 import { useMessageStore, useSelectionStore } from '../../stores/stores';
 import { Button } from '../ui/button';
 import { allowedOnPlatform, renderItem } from './functions';
+import { SIZE } from '../../utils/size';
 
 export const Announcement = ({ color }) => {
   const colors = useThemeStore(state => state.colors);
@@ -28,21 +29,31 @@ export const Announcement = ({ color }) => {
         }}
       >
         <Button
-          type="errorShade"
+          type="error"
           icon="close"
           height={null}
           onPress={() => {
             remove(announcement.id);
           }}
-          iconSize={22}
+          hitSlop={{
+            left: 10,
+            top: 0,
+            bottom: 10,
+            right: 0
+          }}
+          title="Hide"
+          iconSize={16}
+          fontSize={SIZE.xs + 1}
           style={{
             borderRadius: 100,
-            paddingHorizontal: 0,
             position: 'absolute',
             top: 10,
-            right: 10
+            right: 12,
+            paddingVertical: 2,
+            paddingHorizontal: 6
           }}
         />
+
         <View>
           <FlatList
             style={{
