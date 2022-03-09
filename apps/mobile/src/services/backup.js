@@ -46,7 +46,6 @@ async function checkBackupDirExists(reset = false) {
   let dir = SettingsService.get().backupDirectoryAndroid;
   if (reset) dir = null;
   if (dir) {
-    dir = JSON.parse(dir);
     let allDirs = await ScopedStorage.getPersistedUriPermissions();
     let exists = allDirs.findIndex(d => {
       return d === dir.uri || dir.uri.includes(d);
