@@ -74,10 +74,56 @@ index 987d753..4c33998 100644
            global$4.setEditorTimeout(editor, function () {
              handleInlineKey(editor, patternsState.get());
 diff --git a/node_modules/tinymce/tinymce.js b/node_modules/tinymce/tinymce.js
-index 4cdbfce..3a4897a 100644
+index 4cdbfce..fec0cc4 100644
 --- a/node_modules/tinymce/tinymce.js
 +++ b/node_modules/tinymce/tinymce.js
-@@ -24894,6 +24894,9 @@
+@@ -9036,6 +9036,9 @@
+     var shouldKeepStyles = function (editor) {
+       return editor.getParam('keep_styles', true);
+     };
++    var getKeepElements = function (editor) {
++      return editor.getParam('keep_elements', []);
++    };
+     var shouldEndContainerOnEmptyBlock = function (editor) {
+       return editor.getParam('end_container_on_empty_block', false);
+     };
+@@ -24583,13 +24586,18 @@
+           dom.setAttrib(block, 'style', null);
+           dom.setAttrib(block, 'class', null);
+         } else {
++          const toKeepElements = getKeepElements(editor);
++          const keepStyles = shouldKeepStyles(editor);
+           do {
+-            if (textInlineElements[node.nodeName]) {
++            if (textInlineElements[node.nodeName] && toKeepElements[node.nodeName]) {
+               if (isCaretNode(node) || isBookmarkNode$1(node)) {
+                 continue;
+               }
+               clonedNode = node.cloneNode(false);
+               dom.setAttrib(clonedNode, 'id', '');
++              const style = dom.getAttrib(clonedNode, "style");
++              dom.setAttrib(clonedNode, 'style', filterStyles(style, keepStyles));
++              
+               if (block.hasChildNodes()) {
+                 clonedNode.appendChild(block.firstChild);
+                 block.appendChild(clonedNode);
+@@ -24604,6 +24612,15 @@
+         emptyBlock(caretNode);
+         return block;
+       };
++      var filterStyles = function (style, toKeep) {
++        const styles = style.split(";");
++        const arr = [];
++        for (let style of styles) {
++          const [key] = style.trim().split(":");
++          if (toKeep.some((i) => i === key)) arr.push(style);
++        }
++        return arr.join(";");
++      }
+       var isCaretAtStartOrEndOfBlock = function (start) {
+         var node, name;
+         var normalizedOffset = normalizeZwspOffset(start, container, offset);
+@@ -24894,6 +24911,9 @@
      var inPreBlock = function (requiredState) {
        return inBlock('pre', requiredState);
      };
@@ -87,7 +133,7 @@ index 4cdbfce..3a4897a 100644
      var inSummaryBlock = function () {
        return inBlock('summary', true);
      };
-@@ -24925,6 +24928,13 @@
+@@ -24925,6 +24945,13 @@
        return evaluateUntil([
          match([shouldBlockNewLine], newLineAction.none()),
          match([inSummaryBlock()], newLineAction.br()),

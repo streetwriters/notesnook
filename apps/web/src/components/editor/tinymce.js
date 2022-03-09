@@ -212,7 +212,8 @@ function TinyMCE(props) {
       }}
       init={{
         //experimental
-        keep_styles: false,
+        keep_styles: ["font-family", "text-align"],
+        keep_elements: { SPAN: true },
 
         menubar: false,
         statusbar: false,
