@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { SUBSCRIPTION_STATUS } from "../common";
+import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { db } from "../common/db";
 import Config from "./config";
 import { isUserPremium } from "../hooks/use-is-user-premium";

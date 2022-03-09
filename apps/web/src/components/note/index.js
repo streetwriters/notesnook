@@ -12,7 +12,7 @@ import { showToast } from "../../utils/toast";
 import { hashNavigate, navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
 import IconTag from "../icon-tag";
-import { COLORS } from "../../common";
+import { COLORS } from "../../common/constants";
 import { exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
 
@@ -353,6 +353,7 @@ const topicNoteMenuItems = [
 ];
 
 function colorsToMenuItems() {
+  console.log(COLORS);
   return COLORS.map((label) => {
     const lowercase = label.toLowerCase();
     return {

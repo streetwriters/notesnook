@@ -21,7 +21,8 @@ import {
   showPasswordDialog,
   showAttachmentsDialog,
 } from "../common/dialog-controller";
-import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
+import { SUBSCRIPTION_STATUS } from "../common/constants";
+import { createBackup, verifyAccount } from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";

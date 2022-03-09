@@ -12,7 +12,7 @@ import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import { SUBSCRIPTION_STATUS } from "../common";
+import { SUBSCRIPTION_STATUS } from "../common/constants";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;

@@ -1,4 +1,4 @@
-import { SUBSCRIPTION_STATUS } from "../common";
+import { SUBSCRIPTION_STATUS } from "../common/constants";
 import {
   useStore as useUserStore,
   store as userstore,

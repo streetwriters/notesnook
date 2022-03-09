@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import * as Icon from "../icons";
 import { Flex, Text } from "rebass";
 import { useStore } from "../../stores/editor-store";
-import { COLORS } from "../../common";
+import { COLORS } from "../../common/constants";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
