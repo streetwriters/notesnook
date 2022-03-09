@@ -65,6 +65,7 @@ function init() {
         case 'UNPIN':
           //@ts-ignore
           remove(notification.tag, notification.id);
+          break;
         case 'Hide':
           unpinQuickNote();
           break;
