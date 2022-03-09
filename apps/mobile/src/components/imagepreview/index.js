@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import RNFetchBlob from 'rn-fetch-blob';
-import Storage from '../../utils/database/storage';
-import { IconButton } from '../ui/icon-button';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import BaseDialog from '../dialog/base-dialog';
-const { eSubscribeEvent, eUnSubscribeEvent } = require('../../services/eventmanager');
+import { IconButton } from '../ui/icon-button';
 
 const ImagePreview = () => {
   const [visible, setVisible] = useState(false);

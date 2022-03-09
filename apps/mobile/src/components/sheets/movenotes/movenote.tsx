@@ -32,7 +32,7 @@ export const MoveNotes = ({
 
   let notes = db.notes?.all;
 
-  const [selectedNoteIds, setSelectedNoteIds] = useState<String[]>([]);
+  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [topic, setTopic] = useState(selectedTopic);
   //@ts-ignore
   notes = notes.filter(note => topic?.notes.indexOf(note.id) === -1);

@@ -42,7 +42,7 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
       return;
     }
     let prev = get().notes;
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let item = items[i];
       let index = prev.findIndex(v => v.id === item.id);
       if (index !== -1) {
@@ -64,7 +64,7 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
       return;
     }
     let prev = get().notebooks;
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let item = items[i];
       let index = prev.findIndex(v => v.id === item.id);
       if (index !== -1) {
@@ -86,7 +86,7 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
       return;
     }
     let prev = get().favorites;
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let item = items[i];
       let index = prev.findIndex(v => v.id === item.id);
       if (index !== -1) {
@@ -108,7 +108,7 @@ export const useTagStore = create<TagStore>((set, get) => ({
       return;
     }
     let prev = get().tags;
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let item = items[i];
       let index = prev.findIndex(v => v.id === item.id);
       if (index !== -1) {
@@ -130,7 +130,7 @@ export const useTrashStore = create<TrashStore>((set, get) => ({
       return;
     }
     let prev = get().trash;
-    for (var i = 0; i < items.length; i++) {
+    for (let i = 0; i < items.length; i++) {
       let item = items[i];
       let index = prev.findIndex(v => v.id === item.id);
       if (index !== -1) {
@@ -450,7 +450,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 const getFiltered = async (announcements: Announcement[]) => {
   if (!announcements) return [];
   let filtered: Announcement[] = [];
-  for (var announcement of announcements) {
+  for (let announcement of announcements) {
     if (await shouldShowAnnouncement(announcement)) {
       filtered.push(announcement);
     }

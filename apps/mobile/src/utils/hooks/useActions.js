@@ -222,7 +222,7 @@ export const useActions = ({ close = () => {}, item }) => {
       return;
     }
 
-    if (!user.isEmailConfirmed) {
+    if (!user?.isEmailConfirmed) {
       ToastEvent.show({
         heading: 'Email is not verified',
         message: 'Please verify your email first.',

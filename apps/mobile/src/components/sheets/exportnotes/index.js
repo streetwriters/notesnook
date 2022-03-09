@@ -17,9 +17,8 @@ import { PressableButton } from '../../ui/pressable';
 import Seperator from '../../ui/seperator';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
-
-const { eSubscribeEvent, eUnSubscribeEvent } = require('../../../services/eventmanager');
-const { eOpenExportDialog, eCloseExportDialog } = require('../../../utils/events');
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
+import { eOpenExportDialog, eCloseExportDialog } from '../../../utils/events';
 
 const ExportNotesSheet = () => {
   const colors = useThemeStore(state => state.colors);
