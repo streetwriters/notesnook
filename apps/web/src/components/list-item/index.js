@@ -8,7 +8,7 @@ import { useMenuTrigger } from "../../hooks/use-menu";
 import Config from "../../utils/config";
 import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 function debugMenuItems(type) {
   if (!type) return [];
@@ -57,6 +57,12 @@ function ListItem(props) {
   });
 
   const selectItem = useSelectionStore((store) => store.selectItem);
+
+  useEffect(() => {
+    return () => {
+      selectionStore.toggleSelectionMode(false);
+    };
+  }, []);
 
   return (
     <Flex

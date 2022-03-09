@@ -270,9 +270,14 @@ function Settings(props) {
                   showToast("success", "You have been logged out.");
                 }
               }}
+              sx={{ ":hover": { borderColor: "error" } }}
+              bg="errorBg"
+              mx={-2}
+              px={2}
             >
               <Tip
                 text="Logout"
+                color="error"
                 tip="Log out of your account and clear all data."
               />
             </Button>

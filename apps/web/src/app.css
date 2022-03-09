@@ -70,7 +70,16 @@
       url("./assets/fonts/open-sans-v20-latin-700italic.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
-.unselectable {
+.selectable {
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+* {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;

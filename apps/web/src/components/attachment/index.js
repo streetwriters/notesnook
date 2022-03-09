@@ -118,7 +118,9 @@ function Attachment({ item, isCompact, index }) {
                 <Text mr={1}>{attachment.noteIds.length} notes</Text>
               )}
               {attachment.metadata.hash && (
-                <Text mr={0}>{attachment.metadata.hash}</Text>
+                <Text className="selectable" mr={0}>
+                  {attachment.metadata.hash}
+                </Text>
               )}
             </Flex>
           </Flex>

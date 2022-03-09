@@ -156,7 +156,7 @@ function Description({ item }) {
 
 function Text({ value, ...restProps }) {
   return (
-    <RebassText variant={"body"} {...restProps}>
+    <RebassText className="selectable" variant={"body"} {...restProps}>
       {value}
     </RebassText>
   );

@@ -55,7 +55,7 @@ function StatusBar() {
                 size={7}
                 color={user.isEmailConfirmed ? "success" : "warn"}
               />
-              <Text variant="subBody" color="bgSecondaryText" ml={1}>
+              <Text className="selectable" variant="subBody" color="bgSecondaryText" ml={1}>
                 {user.email}
                 {user.isEmailConfirmed ? "" : " (not verified)"}
               </Text>

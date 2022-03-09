@@ -33,6 +33,7 @@ function EditorFooter() {
   return (
     <Flex alignItems="center">
       <Text
+        className="selectable"
         data-test-id="editor-word-count"
         variant="subBody"
         color="bgSecondaryText"
@@ -40,7 +41,12 @@ function EditorFooter() {
       >
         {totalWords + " words"}
       </Text>
-      <Text variant="subBody" color="bgSecondaryText" mr={2}>
+      <Text
+        className="selectable"
+        variant="subBody"
+        color="bgSecondaryText"
+        mr={2}
+      >
         {formatDate(dateEdited || Date.now())}
       </Text>
       {SaveStateIcon && <SaveStateIcon size={13} color="bgSecondaryText" />}

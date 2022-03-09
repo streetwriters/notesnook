@@ -27,6 +27,7 @@ function RecoveryKeyDialog(props) {
     <Dialog
       isOpen={true}
       title="Backup your recovery key"
+      width={400}
       positiveButton={{
         text: "I have backed up my key",
         onClick: () => {
@@ -48,6 +49,7 @@ function RecoveryKeyDialog(props) {
             to recover your data.
           </Text>
           <Text
+            className="selectable"
             mt={2}
             bg="bgSecondary"
             p={2}

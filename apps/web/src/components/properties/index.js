@@ -155,7 +155,11 @@ function Properties() {
                 <Text variant="body" color="fontTertiary">
                   {item.label}
                 </Text>
-                <Text variant="body" color="fontTertiary">
+                <Text
+                  className="selectable"
+                  variant="body"
+                  color="fontTertiary"
+                >
                   {item.value(session[item.key])}
                 </Text>
               </Flex>
