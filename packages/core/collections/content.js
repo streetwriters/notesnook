@@ -10,7 +10,7 @@ export default class Content extends Collection {
     if (typeof content.data === "object") {
       if (typeof content.data.data === "string")
         content.data = content.data.data;
-      else
+      else if (!content.data.iv && !content.data.cipher)
         content.data = `<p>Content is invalid: ${JSON.stringify(
           content.data
         )}</p>`;
