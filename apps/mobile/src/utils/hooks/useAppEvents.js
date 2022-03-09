@@ -291,8 +291,8 @@ export const useAppEvents = () => {
     let user;
     try {
       user = await db.user.getUser();
+      await PremiumService.setPremiumStatus();
       if (!user) {
-        await PremiumService.setPremiumStatus();
         return setLoginMessage();
       }
 
@@ -307,6 +307,8 @@ export const useAppEvents = () => {
       attachIAPListeners();
 
       user = await db.user.fetchUser();
+      setUser(user);
+      await PremiumService.setPremiumStatus();
       if (user.isEmailConfirmed && !userEmailConfirmed) {
         setTimeout(() => {
           onEmailVerified();
@@ -315,10 +317,8 @@ export const useAppEvents = () => {
           userEmailConfirmed: true
         });
       }
-      setUser(user);
     } catch (e) {}
 
-    await PremiumService.setPremiumStatus();
     user = await db.user.getUser();
     if (user?.isEmailConfirmed && !SettingsService.get().recoveryKeySaved) {
       setRecoveryKeyMessage();

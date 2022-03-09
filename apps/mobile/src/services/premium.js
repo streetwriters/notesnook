@@ -91,9 +91,11 @@ async function verify(callback, error) {
 const onUserStatusCheck = async type => {
   let user = await db.user.getUser();
   let userstore = useUserStore.getState();
-  premiumStatus = user.subscription?.type || 0;
-  userstore.setPremium(get());
-  userstore.setUser(user);
+  premiumStatus = user?.subscription?.type || 0;
+  if (userstore?.premium !== get()) {
+    userstore.setPremium(get());
+  }
+
   let status = get();
   let message = null;
   if (!status) {
