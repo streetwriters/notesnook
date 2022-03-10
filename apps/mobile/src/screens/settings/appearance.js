@@ -12,11 +12,12 @@ import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
 import { useSettingStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
-import { ACCENT, COLOR_SCHEME, setColorScheme } from '../../utils/color-scheme';
+import { ACCENT, COLOR_SCHEME, setAccentColor, setColorScheme } from '../../utils/color-scheme';
 import {
   getColorScheme,
   hexToRGBA,
   RGB_Linear_Shade,
+  switchAccentColor,
   toggleDarkMode
 } from '../../utils/color-scheme/utils';
 import { MenuItemsList } from '../../utils/constants';
@@ -213,16 +214,8 @@ const SettingsAppearanceSection = () => {
 
 export const AccentColorPicker = ({ settings = true }) => {
   const colors = useThemeStore(state => state.colors);
-
-  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-    let newColors = setColorScheme(colors, accent);
-    useThemeStore.getState().setColors({ ...newColors });
-  }
-
-  function changeAccentColor(accentColor) {
-    ACCENT.color = accentColor;
-    ACCENT.shade = accentColor + '12';
-    changeColorScheme();
+  function changeAccentColor(color) {
+    switchAccentColor(color);
   }
 
   return (

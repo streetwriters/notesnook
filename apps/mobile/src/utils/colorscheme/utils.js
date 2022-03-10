@@ -76,11 +76,22 @@ export function getColorScheme() {
 
     return COLOR_SCHEME;
   }
-
-  setColorScheme(theme.dark ? darkTheme : COLOR_SCHEME_LIGHT);
   setAccentColor(theme.accent);
+  setColorScheme(theme.dark ? darkTheme : COLOR_SCHEME_LIGHT);
   return COLOR_SCHEME;
 }
+
+export const switchAccentColor = async color => {
+  setAccentColor(color);
+  let settings = SettingsService.get();
+  await SettingsService.set({
+    theme: {
+      ...settings.theme,
+      accent: color
+    }
+  });
+  getColorScheme();
+};
 
 export const toggleDarkMode = async () => {
   let settings = SettingsService.get();
