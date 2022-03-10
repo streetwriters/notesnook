@@ -1,15 +1,14 @@
 import React from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { Linking, View } from 'react-native';
+import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
+import { useThemeStore } from '../../stores/theme';
 import { eCloseAnnouncementDialog } from '../../utils/events';
-import { openLinkInBrowser } from '../../utils/functions';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
-import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
-import { Button } from '../ui/button';
-import SheetProvider from '../sheet-provider';
 import { PricingPlans } from '../premium/pricing-plans';
+import SheetProvider from '../sheet-provider';
+import { Button } from '../ui/button';
 import { allowedOnPlatform, getStyle } from './functions';
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
@@ -22,9 +21,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
       await sleep(500);
     }
     if (item.type === 'link') {
-      try {
-        await openLinkInBrowser(item.data, colors);
-      } catch (e) {}
+      Linking.openURL(item.data).catch(console.log);
     } else if (item.type === 'promo') {
       presentSheet({
         component: (
@@ -49,48 +46,101 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
     <View
       style={{
         paddingHorizontal: 12,
-        ...getStyle(style)
+        ...getStyle(style),
+        flexDirection: inline ? 'row' : 'column'
       }}
     >
       <SheetProvider context="premium_cta" />
-      {buttons.length > 0 &&
-        buttons.slice(0, 1).map(item => (
-          <Button
-            key={item.title}
-            title={item.title}
-            fontSize={SIZE.md}
-            buttonType={{
-              color: color ? color : colors.accent,
-              text: colors.light,
-              selected: color ? color : colors.accent,
-              opacity: 1
-            }}
-            onPress={() => onPress(item)}
-            width={'100%'}
-            style={{
-              marginBottom: 5
-            }}
-          />
-        ))}
 
-      {buttons.length > 1 &&
-        buttons.slice(1, 2).map((item, index) => (
-          <Button
-            key={item.title}
-            title={item.title}
-            fontSize={SIZE.xs}
-            type="gray"
-            onPress={() => onPress(item)}
-            width={null}
-            height={20}
-            style={{
-              minWidth: '50%'
-            }}
-            textStyle={{
-              textDecorationLine: 'underline'
-            }}
-          />
-        ))}
+      {inline ? (
+        <>
+          {buttons.length > 0 &&
+            buttons.slice(0, 1).map(item => (
+              <Button
+                key={item.title}
+                title={item.title}
+                fontSize={SIZE.sm}
+                type="transparent"
+                textStyle={{
+                  textDecorationLine: 'underline'
+                }}
+                onPress={() => onPress(item)}
+                bold
+                style={{
+                  height: 30,
+                  alignSelf: 'flex-start',
+                  paddingHorizontal: 0,
+                  marginTop: -6
+                }}
+              />
+            ))}
+
+          {buttons.length > 1 &&
+            buttons.slice(1, 2).map((item, index) => (
+              <Button
+                key={item.title}
+                title={item.title}
+                fontSize={SIZE.sm}
+                type="gray"
+                onPress={() => onPress(item)}
+                width={null}
+                height={30}
+                style={{
+                  alignSelf: 'flex-start',
+                  paddingHorizontal: 0,
+                  marginTop: -6,
+                  marginLeft: 12
+                }}
+                textStyle={{
+                  textDecorationLine: 'underline'
+                }}
+              />
+            ))}
+        </>
+      ) : (
+        <>
+          {buttons.length > 0 &&
+            buttons.slice(0, 1).map(item => (
+              <Button
+                key={item.title}
+                title={item.title}
+                fontSize={SIZE.md}
+                buttonType={{
+                  color: color ? color : colors.accent,
+                  text: colors.light,
+                  selected: color ? color : colors.accent,
+                  opacity: 1
+                }}
+                onPress={() => onPress(item)}
+                width={250}
+                style={{
+                  marginBottom: 5,
+                  borderRadius: 100
+                }}
+              />
+            ))}
+
+          {buttons.length > 1 &&
+            buttons.slice(1, 2).map((item, index) => (
+              <Button
+                key={item.title}
+                title={item.title}
+                fontSize={SIZE.xs + 1}
+                type="gray"
+                onPress={() => onPress(item)}
+                width={null}
+                height={30}
+                style={{
+                  minWidth: '50%',
+                  marginTop: 5
+                }}
+                textStyle={{
+                  textDecorationLine: 'underline'
+                }}
+              />
+            ))}
+        </>
+      )}
     </View>
   );
 };

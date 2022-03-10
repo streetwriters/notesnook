@@ -51,7 +51,9 @@ export const AnnouncementDialog = () => {
           maxHeight: DDS.isTab ? '90%' : '100%',
           borderRadius: DDS.isTab ? 10 : 0,
           overflow: 'hidden',
-          marginBottom: DDS.isTab ? 20 : 0
+          marginBottom: DDS.isTab ? 20 : 0,
+          borderTopRightRadius: 10,
+          borderTopLeftRadius: 10
         }}
       >
         <FlatList

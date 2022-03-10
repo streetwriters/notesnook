@@ -130,13 +130,15 @@ const Launcher = () => {
     if (await checkForRateAppRequest()) return;
     if (await checkNeedsBackup()) return;
     if (await PremiumService.getRemainingTrialDaysStatus()) return;
-
     await useMessageStore.getState().setAnnouncement();
-    if (!requireIntro) {
-      let dialogs = useMessageStore.getState().dialogs;
-      if (dialogs.length > 0) {
-        eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
-      }
+
+    if (!requireIntro.value) {
+      useMessageStore.subscribe(state => {
+        let dialogs = state.announcements;
+        if (dialogs.length > 0) {
+          eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
+        }
+      });
     }
   };
 

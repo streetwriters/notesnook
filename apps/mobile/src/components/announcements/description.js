@@ -4,15 +4,16 @@ import { SIZE } from '../../utils/size';
 import Paragraph from '../ui/typography/paragraph';
 import { getStyle } from './functions';
 
-export const Description = ({ text, style = {} }) => {
+export const Description = ({ text, style = {}, inline }) => {
   const colors = useThemeStore(state => state.colors);
   return (
     <Paragraph
-      size={SIZE.md}
       style={{
         marginHorizontal: 12,
-        ...getStyle(style)
+        ...getStyle(style),
+        textAlign: inline ? 'left' : style?.textAlign
       }}
+      size={inline ? SIZE.sm : SIZE.md}
     >
       {text}
     </Paragraph>
