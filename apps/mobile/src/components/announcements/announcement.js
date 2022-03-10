@@ -49,8 +49,9 @@ export const Announcement = ({ color }) => {
             position: 'absolute',
             top: 10,
             right: 12,
-            paddingVertical: 2,
-            paddingHorizontal: 6
+            paddingVertical: 4,
+            paddingHorizontal: 6,
+            zIndex: 999
           }}
         />
 
