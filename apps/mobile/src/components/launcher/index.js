@@ -131,10 +131,9 @@ const Launcher = () => {
     if (await checkNeedsBackup()) return;
     if (await PremiumService.getRemainingTrialDaysStatus()) return;
     await useMessageStore.getState().setAnnouncement();
-
-    if (!requireIntro.value) {
+    if (!requireIntro?.value) {
       useMessageStore.subscribe(state => {
-        let dialogs = state.announcements;
+        let dialogs = state.dialogs;
         if (dialogs.length > 0) {
           eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
         }
