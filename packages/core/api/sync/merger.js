@@ -48,7 +48,7 @@ class Merger {
   async _mergeItem(remoteItem, get, add) {
     remoteItem = await this._deserialize(remoteItem);
     let localItem = await get(remoteItem.id);
-    if (localItem.localOnly) return;
+    if (localItem && localItem.localOnly) return;
 
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
       await add(remoteItem);
@@ -65,7 +65,7 @@ class Merger {
   async _mergeItemWithConflicts(remoteItem, get, add, markAsConflicted) {
     remoteItem = await this._deserialize(remoteItem);
     let localItem = await get(remoteItem.id);
-    if (localItem.localOnly) return;
+    if (localItem && localItem.localOnly) return;
 
     if (!localItem) {
       await add(remoteItem);
@@ -161,13 +161,21 @@ class Merger {
 
     await this._mergeArray(
       notes,
-      (id) => this._db.notes.note(id),
+      (id) => {
+        const note = this._db.notes.note(id);
+        if (note) return note.data;
+        return;
+      },
       (item) => this._db.notes.merge(item)
     );
 
     await this._mergeArray(
       notebooks,
-      (id) => this._db.notebooks.notebook(id),
+      (id) => {
+        const notebook = this._db.notebooks.notebook(id);
+        if (notebook) return notebook.data;
+        return;
+      },
       (item) => this._db.notebooks.merge(item)
     );
 
