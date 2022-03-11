@@ -47,7 +47,7 @@ class Collector {
     return array.reduce((prev, item) => {
       if (!item) return prev;
       if (item.localOnly) {
-        prev.push({ id: item.id, deleted: true });
+        prev.push({ id: item.id, deleted: true, dateModified: Date.now() });
       } else if (
         item.dateModified > this._lastSyncedTimestamp ||
         item.migrated
