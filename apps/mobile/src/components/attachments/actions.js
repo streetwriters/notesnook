@@ -43,7 +43,7 @@ const Actions = ({ attachment, setAttachments }) => {
     {
       name: 'Reupload',
       onPress: async () => {
-        if (PremiumService.get()) {
+        if (!PremiumService.get()) {
           ToastEvent.show({
             heading: 'Upgrade to pro',
             type: 'error',
