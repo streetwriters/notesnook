@@ -24,7 +24,8 @@ function useMenuFocus(items, onAction, onClose) {
 
   const onKeyDown = useCallback(
     (e) => {
-      const isSeperator = (i) => items && items[i]?.type === "seperator";
+      const isSeperator = (i) =>
+        items && (items[i]?.type === "seperator" || items[i]?.isDisabled);
       const moveDown = (i) => (i < items.length - 1 ? ++i : 0);
       const moveUp = (i) => (i > 0 ? --i : items.length - 1);
       const hasSubmenu = (i) => items && items[i]?.hasSubmenu;
@@ -45,12 +46,16 @@ function useMenuFocus(items, onAction, onClose) {
           case "ArrowUp":
             if (isSubmenuOpen) break;
             nextIndex = moveUp(i);
-            if (isSeperator(nextIndex)) nextIndex = moveUp(nextIndex);
+            while (isSeperator(nextIndex)) {
+              nextIndex = moveUp(nextIndex);
+            }
             break;
           case "ArrowDown":
             if (isSubmenuOpen) break;
             nextIndex = moveDown(i);
-            if (isSeperator(nextIndex)) nextIndex = moveDown(nextIndex);
+            while (isSeperator(nextIndex)) {
+              nextIndex = moveDown(nextIndex);
+            }
             break;
           case "ArrowRight":
             openSubmenu(i);
@@ -147,7 +152,11 @@ function Menu({ items, data, title, closeMenu }) {
             }}
             isFocused={focusIndex === index}
             onMouseEnter={() => {
-              if (item.isDisabled) return;
+              if (item.isDisabled) {
+                setFocusIndex(-1);
+                return;
+              }
+
               clearTimeout(hoverTimeout.current);
               setFocusIndex(index);
               setIsSubmenuOpen(false);
