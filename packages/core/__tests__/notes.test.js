@@ -261,6 +261,21 @@ test("deleting a colored note should remove it from that color", () =>
     // TODO expect(color.noteIds.indexOf(id)).toBe(-1);
   }));
 
+test("note's content should follow note's localOnly property", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.note(id).localOnly();
+    let note = db.notes.note(id);
+    expect(note._note.localOnly).toBe(true);
+    let content = await db.content.raw(note._note.contentId);
+    expect(content.localOnly).toBe(true);
+
+    await db.notes.note(id).localOnly();
+    note = db.notes.note(id);
+    expect(note._note.localOnly).toBe(false);
+    content = await db.content.raw(note._note.contentId);
+    expect(content.localOnly).toBe(false);
+  }));
+
 test("grouping items where item.title is empty or undefined shouldn't throw", () => {
   expect(
     groupArray([{ title: "" }], {

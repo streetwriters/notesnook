@@ -63,6 +63,13 @@ export default class Notes extends Collection {
       if (oldNote) note.dateEdited = Date.now();
     }
 
+    if (noteArg.localOnly !== undefined) {
+      await this._db.content.add({
+        id: note.contentId,
+        localOnly: !!noteArg.localOnly,
+      });
+    }
+
     const noteTitle = getNoteTitle(note, oldNote);
     if (oldNote && oldNote.title !== noteTitle) note.dateEdited = Date.now();
 

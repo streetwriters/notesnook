@@ -163,6 +163,10 @@ export default class Note {
     return this._db.notes.add({ id: this._note.id, [prop]: !this._note[prop] });
   }
 
+  localOnly() {
+    return this._toggle("localOnly");
+  }
+
   favorite() {
     return this._toggle("favorite");
   }

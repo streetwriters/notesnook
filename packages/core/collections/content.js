@@ -21,7 +21,7 @@ export default class Content extends Collection {
         await this.extractAttachments(content)
       );
 
-    const oldContent = await this.raw(content.id, false);
+    const oldContent = await this.raw(content.id);
     if (content.id && oldContent) {
       content = {
         ...oldContent,

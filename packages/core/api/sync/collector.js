@@ -45,9 +45,15 @@ class Collector {
   _collect(array) {
     if (!array.length) return [];
     return array.reduce((prev, item) => {
-      if (!item || item.localOnly) return prev;
-      if (item.dateModified > this._lastSyncedTimestamp || item.migrated)
+      if (!item) return prev;
+      if (item.localOnly) {
+        prev.push({ id: item.id, deleted: true });
+      } else if (
+        item.dateModified > this._lastSyncedTimestamp ||
+        item.migrated
+      ) {
         prev.push(item);
+      }
       return prev;
     }, []);
   }
