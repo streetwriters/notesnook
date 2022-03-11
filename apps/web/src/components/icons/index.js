@@ -34,6 +34,7 @@ import {
   mdiHomeOutline,
   mdiRecycle,
   mdiSync,
+  mdiSyncOff,
   mdiLoading,
   mdiExportVariant,
   mdiArrowExpandDown,
@@ -237,6 +238,7 @@ export const Settings = createIcon(mdiCogOutline);
 export const Home = createIcon(mdiHomeOutline);
 export const Restore = createIcon(mdiRecycle);
 export const Sync = createIcon(mdiSync);
+export const SyncOff = createIcon(mdiSyncOff);
 export const SyncError = createIcon(mdiSyncAlert);
 export const Loading = createIcon(mdiLoading, true);
 export const Export = createIcon(mdiExportVariant);

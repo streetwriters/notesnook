@@ -1,11 +1,11 @@
 export const COLORS = [
-  "Red",
-  "Orange",
-  "Yellow",
-  "Green",
-  "Blue",
-  "Purple",
-  "Gray",
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+  "gray",
 ];
 
 export const SUBSCRIPTION_STATUS = {

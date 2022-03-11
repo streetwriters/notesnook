@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import * as Icon from "../icons";
 import { Flex, Text } from "rebass";
-import { useStore } from "../../stores/editor-store";
+import { useStore, store } from "../../stores/editor-store";
 import { COLORS } from "../../common/constants";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
+import { store as noteStore } from "../../stores/note-store";
 import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import { navigate } from "../../navigation";
@@ -27,6 +28,7 @@ const tools = [
   },
   { key: "locked", icon: Icon.Unlock, label: "Lock" },
   { key: "readonly", icon: Icon.Readonly, label: "Readonly" },
+  { key: "localOnly", icon: Icon.SyncOff, label: "Disable sync" },
 ];
 
 const metadataItems = [
@@ -45,11 +47,7 @@ const metadataItems = [
 function Properties() {
   const [versionHistory, setVersionHistory] = useState([]);
 
-  const toggleLocked = useStore((store) => store.toggleLocked);
-  const toggleReadonly = useStore((store) => store.toggleReadonly);
-  const setSession = useStore((store) => store.setSession);
   const openPreviewSession = useStore((store) => store.openPreviewSession);
-  const setColor = useStore((store) => store.setColor);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const session = useStore((store) => store.session);
@@ -61,20 +59,24 @@ function Properties() {
 
   const changeState = useCallback(
     function changeState(prop, value) {
-      if (prop === "locked") {
-        toggleLocked();
-        return;
-      }
-
-      setSession((state) => {
-        state.session[prop] = value;
-      });
-
-      if (prop === "readonly") {
-        toggleReadonly();
+      switch (prop) {
+        case "locked":
+          return store.get().session.locked
+            ? noteStore.unlock(sessionId)
+            : noteStore.lock(sessionId);
+        case "readonly":
+          return noteStore.readonly(sessionId);
+        case "localOnly":
+          return noteStore.localOnly(sessionId);
+        case "pinned":
+          return noteStore.pin(sessionId);
+        case "favorite":
+          return noteStore.favorite(sessionId);
+        default:
+          return;
       }
     },
-    [setSession, toggleLocked]
+    [sessionId]
   );
 
   useEffect(() => {
@@ -130,7 +132,7 @@ function Properties() {
           >
             {!isPreviewMode && (
               <>
-                {tools.map((tool, _) => (
+                {tools.map((tool) => (
                   <Toggle
                     {...tool}
                     key={tool.key}
@@ -179,7 +181,7 @@ function Properties() {
                       key={label}
                       justifyContent="space-between"
                       alignItems="center"
-                      onClick={() => setColor(label)}
+                      onClick={() => noteStore.get().setColor(sessionId, label)}
                       sx={{
                         cursor: "pointer",
                         position: "relative",

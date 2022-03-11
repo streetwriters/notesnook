@@ -129,6 +129,13 @@ class NoteStore extends BaseStore {
     return id;
   };
 
+  localOnly = async (id) => {
+    const note = db.notes.note(id);
+    await note.localOnly();
+    this._syncEditor(note.id, "localOnly", !note.data.localOnly);
+    this.refresh();
+  };
+
   setColor = async (id, color) => {
     try {
       let note = db.notes.note(id);

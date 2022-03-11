@@ -124,6 +124,8 @@ function Note(props) {
                 <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
               )}
 
+              {note.localOnly && <Icon.SyncOff size={13} sx={{ mr: 1 }} />}
+
               <TimeAgo
                 sx={{ flexShrink: 0 }}
                 locale="en_short"
@@ -202,6 +204,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevProps.date === nextProps.date &&
     prevItem.pinned === nextItem.pinned &&
     prevItem.favorite === nextItem.favorite &&
+    prevItem.localOnly === nextItem.localOnly &&
     prevItem.headline === nextItem.headline &&
     prevItem.title === nextItem.title &&
     prevItem.locked === nextItem.locked &&
@@ -348,6 +351,24 @@ const menuItems = [
       }
     },
     isPro: true,
+  },
+  {
+    key: "sync-disable",
+    title: ({ note }) => (note.localOnly ? "Enable sync" : "Disable sync"),
+    icon: ({ note }) => (note.localOnly ? Icon.Sync : Icon.SyncOff),
+    onClick: async ({ note }) => {
+      if (
+        note.localOnly ||
+        (await confirm({
+          title: "Disable sync for this item?",
+          message:
+            "Turning sync off for this item will automatically delete it from all other devices. Are you sure you want to continue?",
+          yesText: "Yes",
+          noText: "No",
+        }))
+      )
+        await store.get().localOnly(note.id);
+    },
   },
   {
     key: "movetotrash",

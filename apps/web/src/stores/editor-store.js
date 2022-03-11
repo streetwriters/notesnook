@@ -30,6 +30,7 @@ const getDefaultSession = (sessionId = Date.now()) => {
     title: "",
     id: undefined,
     pinned: false,
+    localOnly: false,
     favorite: false,
     locked: false,
     tags: [],
@@ -272,20 +273,6 @@ class EditorStore extends BaseStore {
       default:
         return;
     }
-  };
-
-  toggleLocked = () => {
-    if (this.get().session.locked) noteStore.unlock(this.get().session.id);
-    else noteStore.lock(this.get().session.id);
-  };
-
-  toggleReadonly = () => {
-    noteStore.readonly(this.get().session.id);
-  };
-
-  setColor = (color) => {
-    //this._setTagOrColor("color", color);
-    return noteStore.setColor(this.get().session.id, color);
   };
 
   setTag = (tag) => {
