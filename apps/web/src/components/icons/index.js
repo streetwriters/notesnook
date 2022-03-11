@@ -143,6 +143,7 @@ import {
   mdiFormTextbox,
   mdiCheckAll,
   mdiCloudOffOutline,
+  mdiContentDuplicate,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -290,6 +291,7 @@ export const Publish = createIcon(mdiCloudUploadOutline);
 export const Colors = createIcon(mdiPaletteOutline);
 export const Published = createIcon(mdiCloudCheckOutline);
 export const Copy = createIcon(mdiContentCopy);
+export const Duplicate = createIcon(mdiContentDuplicate);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
 export const NotebookEdit = createIcon(mdiBookEditOutline);
 export const DeleteForver = createIcon(mdiDeleteForeverOutline);

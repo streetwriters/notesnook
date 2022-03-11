@@ -314,6 +314,26 @@ const menuItems = [
     isPro: true,
   },
   {
+    key: "duplicate",
+    title: "Duplicate",
+    disabled: ({ note }) => note.locked,
+    disableReason: "Locked notes cannot be duplicated",
+    icon: Icon.Duplicate,
+    onClick: async ({ note }) => {
+      const id = await store.get().duplicate(note);
+      if (
+        await confirm({
+          title: "Open duplicated note?",
+          message: "Do you want to open the duplicated note?",
+          noText: "No",
+          yesText: "Yes",
+        })
+      ) {
+        hashNavigate(`/notes/${id}/edit`, { replace: true });
+      }
+    },
+  },
+  {
     key: "lock",
     title: ({ note }) => (note.locked ? "Unlock" : "Lock"),
     icon: Icon.Lock,

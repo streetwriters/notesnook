@@ -123,6 +123,12 @@ class NoteStore extends BaseStore {
     this.refresh();
   };
 
+  duplicate = async (note) => {
+    const id = await db.notes.note(note).duplicate();
+    this.refresh();
+    return id;
+  };
+
   setColor = async (id, color) => {
     try {
       let note = db.notes.note(id);
