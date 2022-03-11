@@ -38,9 +38,8 @@ function transformer(data, type) {
   if (type === "application/json") return JSON.stringify(data);
   else {
     return Object.entries(data)
-      .map(
-        ([key, value]) =>
-          `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+      .map(([key, value]) =>
+        value ? `${encodeURIComponent(key)}=${encodeURIComponent(value)}` : ""
       )
       .join("&");
   }
@@ -58,7 +57,7 @@ async function handleResponse(response) {
     if (response.ok) {
       return json;
     }
-    throw new Error(errorTransformer(json));
+    throw new RequestError(errorTransformer(json));
   } else {
     if (response.status === 429) throw new Error("You are being rate limited.");
 
@@ -106,26 +105,41 @@ function getAuthorizationHeader(token) {
 }
 
 function errorTransformer(errorJson) {
+  let errorMessage = "Unknown error.";
+  let errorCode = "unknown";
+
   if (!errorJson.error && !errorJson.errors && !errorJson.error_description)
-    return "Unknown error.";
-  const { error, error_description, errors } = errorJson;
+    return { description: errorMessage, code: errorCode, data: {} };
+  const { error, error_description, errors, data } = errorJson;
 
   if (errors) {
-    return errors.join("\n");
+    errorMessage = errors.join("\n");
   }
 
   switch (error) {
     case "invalid_grant": {
       switch (error_description) {
         case "invalid_username_or_password":
-          return "Username or password incorrect.";
+          errorMessage = "Username or password incorrect.";
+          errorCode = error_description;
+          break;
         default:
-          return error_description || error;
+          errorMessage = error_description || error;
+          errorCode = error || "invalid_grant";
+          break;
       }
     }
     default:
-      return error_description || error;
+      errorMessage = error_description || "An unknown error occured.";
+      errorCode = error;
+      break;
   }
+
+  return {
+    description: errorMessage,
+    code: errorCode,
+    data: data ? JSON.parse(data) : undefined,
+  };
 }
 
 /**
@@ -149,26 +163,10 @@ async function fetchWrapped(input, init) {
   }
 }
 
-// /**
-//  *
-//  * @param {RequestInfo} resource
-//  * @param {RequestInit} options
-//  * @returns
-//  */
-// async function fetchWithTimeout(resource, options = {}) {
-//   try {
-//     const { timeout = 8000 } = options;
-
-//     const controller = new AbortController();
-//     const id = setTimeout(() => controller.abort(), timeout);
-//     const response = await fetch(resource, {
-//       ...options,
-//       signal: controller.signal,
-//     });
-//     clearTimeout(id);
-//     return response;
-//   } catch (e) {
-//     if (e.name === "AbortError") throw new Error("Request timed out.");
-//     throw e;
-//   }
-// }
+class RequestError extends Error {
+  constructor(error) {
+    super(error.description);
+    this.code = error.code;
+    this.data = error.data;
+  }
+}

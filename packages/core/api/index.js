@@ -24,6 +24,7 @@ import Attachments from "../collections/attachments";
 import Debug from "./debug";
 import { Mutex } from "async-mutex";
 import NoteHistory from "../collections/note-history";
+import MFAManager from "./mfa-manager";
 
 /**
  * @type {EventSource}
@@ -89,6 +90,7 @@ class Database {
     await this._validate();
 
     this.user = new UserManager(this.storage, this);
+    this.mfa = new MFAManager(this.storage, this);
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);

@@ -61,7 +61,7 @@ class UserManager {
     return await this.login(email, password, hashedPassword);
   }
 
-  async login(email, password, hashedPassword) {
+  async login(email, password, code, hashedPassword = undefined) {
     if (!hashedPassword) {
       hashedPassword = await this._storage.hash(password, email);
     }
@@ -70,6 +70,7 @@ class UserManager {
       await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
         username: email,
         password: hashedPassword,
+        code,
         grant_type: "password",
         scope: "notesnook.sync offline_access openid IdentityServerApi",
         client_id: "notesnook",
