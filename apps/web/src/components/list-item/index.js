@@ -124,7 +124,11 @@ function ListItem(props) {
         maxWidth: "100%",
       }}
       onKeyPress={(e) => {
-        if (e.key === "Enter") e.target.click();
+        if (e.key === "Enter") {
+          e.target.click();
+        } else {
+          if (props.onKeyPress) props.onKeyPress(e);
+        }
       }}
       flexDirection={isCompact ? "row" : "column"}
       justifyContent={isCompact ? "space-between" : "center"}

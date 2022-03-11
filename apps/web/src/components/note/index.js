@@ -3,7 +3,7 @@ import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
-import { showMoveNoteDialog } from "../../common/dialog-controller";
+import { confirm, showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { db } from "../../common/db";
@@ -44,6 +44,18 @@ function Note(props) {
       body={note.headline}
       id={note.id}
       index={index}
+      onKeyPress={async (e) => {
+        if (e.key === "Delete") {
+          await confirm({
+            title: "Delete note?",
+            message:
+              "This item will be kept in your Trash for 7 days after which it will be permanently removed",
+            noText: "No",
+            yesText: "Yes",
+            yesAction: () => Multiselect.moveNotesToTrash([item]),
+          });
+        }
+      }}
       colors={{
         primary,
         text: note.color ? primary : "text",
