@@ -25,17 +25,17 @@ function PublishView(props) {
     setPublishId(db.monographs.monograph(noteId));
   }, [noteId]);
 
-  // useEffect(() => {
-  //   window.addEventListener("keydown", onKeyDown);
-  //   window.addEventListener("click", onWindowClick);
-  //   window.addEventListener("blur", onWindowClick);
+  useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("click", onWindowClick);
+    window.addEventListener("blur", onWindowClick);
 
-  //   return () => {
-  //     window.removeEventListener("click", onWindowClick);
-  //     window.removeEventListener("keydown", onKeyDown);
-  //     window.removeEventListener("blur", onWindowClick);
-  //   };
-  // }, []);
+    return () => {
+      window.removeEventListener("click", onWindowClick);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("blur", onWindowClick);
+    };
+  }, []);
 
   useEffect(() => {
     const attachmentsLoadingEvent = EV.subscribe(
