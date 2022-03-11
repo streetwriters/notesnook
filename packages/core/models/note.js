@@ -101,6 +101,26 @@ export default class Note {
     return content.data;
   }
 
+  async duplicate() {
+    const content = await this._db.content.raw(this._note.contentId);
+    return await this._db.notes.add({
+      ...this._note,
+      id: undefined,
+      content: {
+        type: content.type,
+        data: content.data,
+      },
+      readonly: false,
+      favorite: false,
+      pinned: false,
+      contentId: null,
+      title: this._note.title + " (Copy)",
+      dateEdited: null,
+      dateCreated: null,
+      dateModified: null,
+    });
+  }
+
   async color(color) {
     if (!(await checkIsUserPremium(CHECK_IDS.noteColor))) return;
     await this.uncolor();
