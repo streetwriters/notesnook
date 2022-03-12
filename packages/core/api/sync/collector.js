@@ -20,7 +20,7 @@ class Collector {
       notebooks: await this._encrypt(this._collect(this._db.notebooks.raw)),
       content: await this._encrypt(this._collect(await this._db.content.all())),
       attachments: await this._encrypt(
-        this._collect(this._db.attachments.uploaded)
+        this._collect(this._db.attachments.syncable)
       ),
       settings: await this._encrypt(this._collect([this._db.settings.raw])),
       vaultKey: await this._serialize(await this._db.vault._getKey()),
