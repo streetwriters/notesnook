@@ -453,6 +453,16 @@ export const useActions = ({ close = () => {}, item }) => {
     eSendEvent(eOpenExportDialog, [item]);
   }
 
+  async function toggleLocalOnly() {
+    db.notes.note(item.id).localOnly();
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes
+    ]);
+    close();
+  }
+
   const toggleReadyOnlyMode = async () => {
     await db.notes.note(item.id).readonly();
     let current = db.notes.note(item.id).data.readonly;
@@ -460,6 +470,16 @@ export const useActions = ({ close = () => {}, item }) => {
       useEditorStore.getState().setReadonly(current);
       tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
     }
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes
+    ]);
+    close();
+  };
+
+  const duplicateNote = async () => {
+    await db.notes.note(item.id).duplicate();
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
       Navigation.routeNames.Favorites,
@@ -632,10 +652,24 @@ export const useActions = ({ close = () => {}, item }) => {
       on: item.readonly
     },
     {
+      name: 'Local only',
+      title: 'Local only',
+      icon: 'sync-off',
+      func: toggleLocalOnly,
+      on: item.localOnly
+    },
+
+    {
       name: 'History',
       title: 'History',
       icon: 'history',
       func: openHistory
+    },
+    {
+      name: 'Duplicate',
+      title: 'Duplicate',
+      icon: 'content-duplicate',
+      func: duplicateNote
     },
     {
       name: 'Dark Mode',

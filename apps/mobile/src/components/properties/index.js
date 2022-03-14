@@ -144,6 +144,8 @@ Properties.present = (item, buttons = []) => {
         'RemoveTopic',
         'History',
         'ReadOnly',
+        'Local only',
+        'Duplicate',
         ...android,
         ...buttons
       ]);
@@ -161,6 +163,7 @@ Properties.present = (item, buttons = []) => {
       props.push(['Add Shortcut', 'Delete', 'Rename Tag']);
       break;
   }
+  if (!props[0]) return;
   presentSheet({
     component: (ref, close) => (
       <Properties
