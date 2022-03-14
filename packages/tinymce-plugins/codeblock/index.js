@@ -57,7 +57,6 @@ var toggleCodeBlock = function(editor, api, type) {
   if (isCodeBlockActive) {
     var content = editor.selection.getContent({ format: "text" });
     if (content.length > 0) {
-      console.log(content);
       node.innerHTML = newlineToBR(
         node.innerText.replace(content.trim(), "").trim()
       );
@@ -340,6 +339,5 @@ function getFormattedText(childNode) {
 
   const text = clone.innerText || clone.textContent;
   formattingNode.remove();
-  console.log(text);
   return text;
 }
