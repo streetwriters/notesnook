@@ -68,8 +68,8 @@ var toggleCodeBlock = function(editor, api, type) {
     }
   } else {
     var content = editor.selection.getContent({ format: "text" }); //.replace(/^\n/gm, "");
-    if (type === "shortcut") content = "<br>";
-    if (!content) content = "<br>";
+    if (type === "shortcut") content = "\n";
+    if (!content) content = "\n";
     insertCodeBlock(editor, content);
   }
 };
@@ -93,7 +93,7 @@ function insertCodeBlock(editor, content, language) {
   });
 }
 
-function blurCodeBlock(editor, block, content = "<br>") {
+function blurCodeBlock(editor, block, content = "\n") {
   editor.undoManager.transact(function() {
     const p = document.createElement("p");
     p.innerHTML = newlineToBR(content).trim();
