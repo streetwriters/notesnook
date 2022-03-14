@@ -159,10 +159,7 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
           size={SIZE.xl}
         /> */}
 
-        {screen === 'Trash' ||
-        screen === 'Notebooks' ||
-        screen === 'Notebook' ||
-        type === 'topic' ? null : (
+        {screen === 'Trash' || screen === 'Notebooks' || screen === 'Notebook' ? null : (
           <IconButton
             onPress={async () => {
               //setSelectionMode(false);

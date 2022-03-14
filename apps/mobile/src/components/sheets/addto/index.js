@@ -2,20 +2,20 @@ import React, { createRef, useEffect, useState } from 'react';
 import { Keyboard, TouchableOpacity, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useThemeStore } from '../../../stores/theme';
-import { useNotebookStore, useSelectionStore } from '../../../stores/stores';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
+import { useNotebookStore, useSelectionStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/theme';
 import { getTotalNotes } from '../../../utils';
 import { db } from '../../../utils/database';
 import { eOpenMoveNoteDialog } from '../../../utils/events';
 import layoutmanager from '../../../utils/layout-manager';
 import { SIZE } from '../../../utils/size';
-import { IconButton } from '../../ui/icon-button';
-import { Button } from '../../ui/button';
 import { Dialog } from '../../dialog';
 import DialogHeader from '../../dialog/dialog-header';
 import { presentDialog } from '../../dialog/functions';
+import { Button } from '../../ui/button';
+import { IconButton } from '../../ui/icon-button';
 import Input from '../../ui/input';
 import { PressableButton } from '../../ui/pressable';
 import SheetWrapper from '../../ui/sheet';
@@ -58,20 +58,16 @@ const AddToNotebookSheet = () => {
     ]);
   };
 
-  const update = note => {
-    setNote(note);
-  };
-
   return !visible ? null : (
     <SheetWrapper fwdRef={actionSheetRef} onClose={_onClose}>
-      <MoveNoteComponent close={close} note={note} setNote={update} />
+      <MoveNoteComponent note={note} />
     </SheetWrapper>
   );
 };
 
 export default AddToNotebookSheet;
 
-const MoveNoteComponent = ({ close, note, setNote }) => {
+const MoveNoteComponent = ({ note }) => {
   const colors = useThemeStore(state => state.colors);
 
   const notebooks = useNotebookStore(state => state.notebooks.filter(n => n?.type === 'notebook'));
@@ -121,47 +117,28 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
   };
 
   const handlePress = async (item, index) => {
-    if (note && item.notes.indexOf(note.id) > -1) {
-      await db.notebooks.notebook(item.notebookId).topics.topic(item.id).delete(note.id);
+    let noteIds = selectedItemsList.length > 0 ? selectedItemsList.map(n => n.id) : [note?.id];
 
-      if (note && note.id) {
-        setNote({ ...db.notes.note(note.id).data });
-        requestAnimationFrame(() => {
-          //layoutmanager.withSpringAnimation(500);
-          Navigation.setRoutesToUpdate([
-            Navigation.routeNames.NotesPage,
-            Navigation.routeNames.Favorites,
-            Navigation.routeNames.Notes
-          ]);
-        });
-      }
-      setNotebooks();
-      updateNoteExists();
-
-      return;
+    if (getCount(item)) {
+      await db.notebooks
+        .notebook(item.notebookId)
+        .topics.topic(item.id)
+        .delete(...noteIds);
+    } else {
+      await db.notes.move(
+        {
+          topic: item.id,
+          id: item.notebookId
+        },
+        ...noteIds
+      );
     }
 
-    let noteIds = [];
-    selectedItemsList.forEach(i => noteIds.push(i.id));
-
-    await db.notes.move(
-      {
-        topic: item.id,
-        id: item.notebookId
-      },
-      ...noteIds
-    );
-    if (note && note.id) {
-      setNote({ ...db.notes.note(note.id).data });
-      requestAnimationFrame(() => {
-        //layoutmanager.withSpringAnimation(500);
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes
-        ]);
-      });
-    }
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes
+    ]);
     setNotebooks();
     updateNoteExists();
   };
@@ -171,18 +148,29 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
   }, []);
 
   const updateNoteExists = () => {
-    if (!note?.id) return;
+    if (!note?.id && selectedItemsList?.length === 0) return;
+
+    let notes = selectedItemsList.length > 0 ? selectedItemsList.map(n => n.id) : [note?.id];
+    console.log(notes);
     let ids = [];
     let notebooks = db.notebooks.all;
     for (let i = 0; i < notebooks.length; i++) {
       if (notebooks[i].topics) {
         for (let t = 0; t < notebooks[i].topics.length; t++) {
-          if (notebooks[i].topics[t].notes.indexOf(note.id) > -1) {
-            ids.push(notebooks[i].id);
+          let topic = notebooks[i].topics[t];
+          for (let id of notes) {
+            if (topic.notes.indexOf(id) > -1) {
+              console.log('found', ids.indexOf(notebooks[i].id));
+              if (ids.indexOf(notebooks[i].id) === -1) {
+                ids.push(notebooks[i].id);
+              }
+              if (ids.indexOf(topic.id) === -1) ids.push(topic.id);
+            }
           }
         }
       }
     }
+    console.log('ids: ', ids);
     setNoteExists(ids);
   };
 
@@ -198,6 +186,20 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
         return addNewTopic(value, item);
       }
     });
+  };
+
+  const getCount = topic => {
+    if (!topic) return;
+    let notes = selectedItemsList.length > 0 ? selectedItemsList.map(n => n.id) : [note?.id];
+    let count = 0;
+    for (let id of notes) {
+      if (topic.notes.indexOf(id) > -1) {
+        count++;
+      }
+    }
+    return count > 0 && notes.length > 0
+      ? `${count} of ${notes.length} selected notes exist in this topic. (Tap to remove)`
+      : null;
   };
 
   return (
@@ -367,7 +369,7 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
                       onPress={() => handlePress(item, index)}
                       type="gray"
                       customStyle={{
-                        height: 50,
+                        minHeight: 50,
                         borderTopWidth: index === 0 ? 0 : 1,
                         borderTopColor: index === 0 ? null : colors.nav,
                         width: '100%',
@@ -375,7 +377,8 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
                         alignItems: 'center',
                         flexDirection: 'row',
                         paddingHorizontal: 12,
-                        justifyContent: 'space-between'
+                        justifyContent: 'space-between',
+                        paddingVertical: 12
                       }}
                     >
                       <View>
@@ -383,8 +386,23 @@ const MoveNoteComponent = ({ close, note, setNote }) => {
                         <Paragraph color={colors.icon} size={SIZE.xs}>
                           {item.notes.length + ' notes'}
                         </Paragraph>
+                        {getCount(item) ? (
+                          <View
+                            style={{
+                              backgroundColor: colors.nav,
+                              borderRadius: 5,
+                              paddingHorizontal: 5,
+                              paddingVertical: 2,
+                              marginTop: 5
+                            }}
+                          >
+                            <Paragraph color={colors.icon} size={SIZE.xs}>
+                              {getCount(item)}
+                            </Paragraph>
+                          </View>
+                        ) : null}
                       </View>
-                      {note && item.notes.indexOf(note.id) > -1 ? (
+                      {noteExists.indexOf(item.id) > -1 ? (
                         <Button
                           onPress={() => handlePress(item, index)}
                           icon="check"
