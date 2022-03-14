@@ -244,7 +244,7 @@ export default class Attachments extends Collection {
   markAsFailed(id, reason) {
     const attachment = this.attachment(id);
     if (!attachment) return;
-    attachment.failed = reason || true;
+    attachment.failed = reason;
     return this._collection.updateItem(attachment);
   }
 
