@@ -59,9 +59,11 @@ export async function deleteFile(filename, data) {
   try {
     let response = await RNFetchBlob.fetch('DELETE', url, headers);
     let status = response.info().status;
-    if (status >= 200 && status < 300) {
+    let ok = status >= 200 && status < 300;
+    if (ok) {
       RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
     }
+    return ok;
   } catch (e) {
     console.log('delete file: ', e, url, headers);
     return false;
