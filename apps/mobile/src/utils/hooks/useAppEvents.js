@@ -168,6 +168,7 @@ export const useAppEvents = () => {
     console.log('sync complete');
     initialize();
     setLastSynced(await db.lastSynced());
+    setSyncing(false);
     if (getNote()) {
       await updateNoteInEditor();
     }
@@ -292,6 +293,7 @@ export const useAppEvents = () => {
     try {
       user = await db.user.getUser();
       await PremiumService.setPremiumStatus();
+      setLastSynced(await db.lastSynced());
       if (!user) {
         return setLoginMessage();
       }
