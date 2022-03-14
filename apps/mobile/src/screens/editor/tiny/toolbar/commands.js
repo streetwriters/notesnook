@@ -35,7 +35,7 @@ export const execCommands = {
   fontsize: size => `tinymce.activeEditor.execCommand('FontSize', false, '${size}');`,
   removeformat: `tinymce.activeEditor.execCommand('RemoveFormat');`,
   p: `tinymce.activeEditor.execCommand('FormatBlock', false, 'p');`,
-  h1: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h2');`,
+  h1: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h1');`,
   h2: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h2');`,
   h3: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h3');`,
   h4: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h4');`,
