@@ -106,8 +106,10 @@ export const AttachmentDialog = () => {
                 let result = await filesystem.checkAttachment(attachment.metadata.hash);
                 if (result.failed) {
                   db.attachments.markAsFailed(attachment.metadata.hash, result.failed);
-                  setAttachments([...db.attachments.all]);
+                } else {
+                  db.attachments.markAsFailed(attachment.id, null);
                 }
+                setAttachments([...db.attachments.all]);
               }
               setLoading(false);
             }

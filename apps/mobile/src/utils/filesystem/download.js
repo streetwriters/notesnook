@@ -156,7 +156,9 @@ export async function getUploadedFileSize(hash) {
     headers: { Authorization: `Bearer ${token}` }
   });
 
-  const contentLength = parseInt(attachmentInfo.headers['content-length']);
+  const contentLength = parseInt(attachmentInfo.headers?.get('content-length'));
+  console.log('contentLength:', contentLength, attachmentInfo.headers);
+
   return isNaN(contentLength) ? 0 : contentLength;
 }
 

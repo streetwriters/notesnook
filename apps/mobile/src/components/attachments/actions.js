@@ -1,6 +1,7 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import picker from '../../screens/editor/tiny/toolbar/picker';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
@@ -8,24 +9,31 @@ import { useAttachmentStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
 import { formatBytes } from '../../utils';
 import { db } from '../../utils/database';
-import { eCloseProgressDialog } from '../../utils/events';
+import { eCloseAttachmentDialog, eCloseProgressDialog } from '../../utils/events';
 import filesystem from '../../utils/filesystem';
 import { useAttachmentProgress } from '../../utils/hooks/use-attachment-progress';
 import { SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
 import { Dialog } from '../dialog';
 import { presentDialog } from '../dialog/functions';
+import { openNote } from '../list-items/note/wrapper';
 import { DateMeta } from '../properties/date-meta';
 import { Button } from '../ui/button';
 import { Notice } from '../ui/notice';
+import { PressableButton } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
-const Actions = ({ attachment, setAttachments }) => {
+const Actions = ({ attachment, setAttachments, fwdRef }) => {
   const colors = useThemeStore(state => state.colors);
   const contextId = attachment.metadata.hash;
   const [filename, setFilename] = useState(attachment.metadata.filename);
   const [currentProgress, setCurrentProgress] = useAttachmentProgress(attachment);
   const [failed, setFailed] = useState(attachment.failed);
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState({
+    name: null
+  });
 
   const actions = [
     {
@@ -63,11 +71,26 @@ const Actions = ({ attachment, setAttachments }) => {
     {
       name: 'Run file check',
       onPress: async () => {
+        setLoading({
+          name: 'Run file check'
+        });
         let res = await filesystem.checkAttachment(attachment.metadata.hash);
         if (res.failed) {
           db.attachments.markAsFailed(attachment.id, res.failed);
           setFailed(res.failed);
+        } else {
+          setFailed(null);
+          db.attachments.markAsFailed(attachment.id, null);
         }
+        ToastEvent.show({
+          heading: 'File check passed',
+          type: 'success',
+          context: 'local'
+        });
+        setAttachments([...db.attachments.all]);
+        setLoading({
+          name: null
+        });
       },
       icon: 'file-check'
     },
@@ -105,16 +128,44 @@ const Actions = ({ attachment, setAttachments }) => {
       icon: 'delete-outline'
     }
   ];
-  console.log(attachment);
+
+  const getNotes = () => {
+    let allNotes = db.notes.all;
+    let attachmentNotes = attachment.noteIds?.map(id => {
+      let index = allNotes?.findIndex(note => id === note.id);
+      if (index !== -1) {
+        return allNotes[index];
+      } else {
+        return {
+          type: 'notfound',
+          title: `Note with id ${id} does not exist.`,
+          id: id
+        };
+      }
+    });
+    return attachmentNotes;
+  };
+
+  useEffect(() => {
+    setNotes(getNotes());
+  }, [attachment]);
 
   return (
-    <View>
+    <ScrollView
+      onMomentumScrollEnd={() => {
+        fwdRef?.current?.handleChildScrollEnd();
+      }}
+      nestedScrollEnabled={true}
+      style={{
+        maxHeight: '100%'
+      }}
+    >
       <Dialog context={contextId} />
       <View
         style={{
-          marginBottom: 12,
           borderBottomWidth: 1,
-          borderBottomColor: colors.nav
+          borderBottomColor: colors.nav,
+          marginBottom: notes && notes.length > 0 ? 0 : 12
         }}
       >
         <Heading
@@ -180,6 +231,50 @@ const Actions = ({ attachment, setAttachments }) => {
         <DateMeta item={attachment} />
       </View>
 
+      {notes && notes.length > 0 ? (
+        <View
+          style={{
+            borderBottomWidth: 1,
+            borderBottomColor: colors.nav,
+            marginBottom: 12,
+            paddingVertical: 12
+          }}
+        >
+          <>
+            <Heading
+              style={{
+                paddingHorizontal: 12
+              }}
+              size={SIZE.sm}
+            >
+              List of notes:
+            </Heading>
+
+            {notes.map(item => (
+              <PressableButton
+                onPress={async () => {
+                  if (item.type === 'notfound') return;
+                  eSendEvent(eCloseProgressDialog, contextId);
+                  await sleep(150);
+                  eSendEvent(eCloseAttachmentDialog);
+                  await sleep(300);
+                  openNote(item, item.type === 'trash');
+                }}
+                customStyle={{
+                  paddingVertical: 12,
+                  alignItems: 'flex-start',
+
+                  paddingHorizontal: 12
+                }}
+                key={item.id}
+              >
+                <Paragraph size={SIZE.xs + 1}>{item.title}</Paragraph>
+              </PressableButton>
+            ))}
+          </>
+        </View>
+      ) : null}
+
       {actions.map(item => (
         <Button
           key={item.name}
@@ -193,6 +288,7 @@ const Actions = ({ attachment, setAttachments }) => {
           onPress={item.onPress}
           title={item.name}
           icon={item.icon}
+          loading={loading?.name === item.name}
           type={item.on ? 'shade' : 'gray'}
           fontSize={SIZE.sm}
           style={{
@@ -217,14 +313,14 @@ const Actions = ({ attachment, setAttachments }) => {
           />
         ) : null}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 Actions.present = (attachment, set, context) => {
   presentSheet({
     context: context,
-    component: <Actions setAttachments={set} attachment={attachment} />
+    component: ref => <Actions fwdRef={ref} setAttachments={set} attachment={attachment} />
   });
 };
 
