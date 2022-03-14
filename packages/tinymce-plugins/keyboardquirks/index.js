@@ -36,9 +36,12 @@ function firstLineBackspaceQuirk(editor) {
     if (e.key !== "Backspace" && e.key !== "Delete") return;
 
     const selectionStartElement = editor.selection.getStart(true);
+    const body = editor.getBody();
+    const isEmpty = body.childElementCount === 1;
     if (
-      selectionStartElement === editor.getBody().firstElementChild &&
-      !selectionStartElement.textContent.trim()
+      selectionStartElement === body.firstElementChild &&
+      !selectionStartElement.textContent.trim() &&
+      !isEmpty
     ) {
       selectionStartElement.remove();
     }
