@@ -20,7 +20,9 @@ function register(editor) {
   addCodeBlockToolbar(editor);
 
   editor.addCommand("mceInsertCodeBlock", function(api, args) {
-    toggleCodeBlock(editor, api, args);
+    if (args.code) {
+      insertCodeBlock(editor, args.code, args.language);
+    } else toggleCodeBlock(editor, api, args);
   });
 
   editor.ui.registry.addToggleButton("codeblock", {
@@ -73,9 +75,9 @@ var toggleCodeBlock = function(editor, api, type) {
   }
 };
 
-function insertCodeBlock(editor, content) {
+function insertCodeBlock(editor, content, language) {
   editor.undoManager.transact(function() {
-    const pre = createCodeBlock(content);
+    const pre = createCodeBlock(content, language);
     editor.dom.setAttrib(pre, "data-mce-id", "__mcenew");
     editor.focus();
     editor.insertContent(`${pre.outerHTML}${EMPTY_LINE}`);
@@ -86,6 +88,8 @@ function insertCodeBlock(editor, content) {
       editor.selection.select(insertedPre, true);
       editor.selection.collapse(true);
       editor.nodeChanged({ selectionChange: true });
+
+      if (language) refreshHighlighting(editor);
     }, 0);
   });
 }
@@ -285,10 +289,17 @@ function processPastedContent(node) {
 
   if (node.childNodes) {
     for (let childNode of node.childNodes) {
+      const isFontMonospace =
+        childNode.style &&
+        childNode.style.fontFamily &&
+        childNode.style.fontFamily.includes("monospace");
+
       if (childNode.tagName === "PRE") {
         childNode.className = "hljs";
-        const code = childNode.textContent || childNode.innerText;
-        childNode.innerHTML = code;
+        childNode.innerHTML = getFormattedText(childNode);
+      } else if (isFontMonospace) {
+        const node = createCodeBlock(getFormattedText(childNode));
+        childNode.replaceWith(node);
       }
     }
   }
@@ -314,4 +325,21 @@ function debounce(func, wait, immediate) {
     timeout = setTimeout(later, wait);
     if (callNow) func.apply(context, args);
   };
+}
+
+function getFormattedText(childNode) {
+  const clone = childNode.cloneNode(true);
+  clone.classList.add("mce--monoblock");
+
+  const formattingNode = document.createElement("div");
+  formattingNode.style.position = "absolute";
+  formattingNode.style.top = "-10000px";
+  formattingNode.style.left = "-10000px";
+  formattingNode.appendChild(clone);
+  document.body.appendChild(formattingNode);
+
+  const text = clone.innerText || clone.textContent;
+  formattingNode.remove();
+  console.log(text);
+  return text;
 }
