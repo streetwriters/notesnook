@@ -202,6 +202,15 @@ export default class Notes extends Collection {
       if (itemData.color) {
         await this._db.colors.untag(itemData.color, id);
       }
+
+      const attachments = this._db.attachments.ofNote(itemData.id, "all");
+      for (let attachment of attachments) {
+        await this._db.attachments.delete(
+          attachment.metadata.hash,
+          itemData.id
+        );
+      }
+
       // await this._collection.removeItem(id);
       if (moveToTrash) await this._db.trash.add(itemData);
       else {

@@ -177,7 +177,7 @@ export default class Attachments extends Collection {
    * Get specified type of attachments of a note
    * @param {string} noteId
    * @param {"files"|"images"|"all"} type
-   * @returns
+   * @returns {Array}
    */
   ofNote(noteId, type) {
     let attachments = [];
