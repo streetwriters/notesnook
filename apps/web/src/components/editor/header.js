@@ -135,7 +135,6 @@ function Autosuggest({
     const text = getInputValue();
     const isFocused = document.activeElement === inputRef.current;
     if (isFocused && !text) setFiltered(defaultItems);
-    console.log(isFocused, text);
   }, [defaultItems, getInputValue]);
 
   useEffect(() => {

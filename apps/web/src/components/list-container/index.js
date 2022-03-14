@@ -66,7 +66,7 @@ function ListContainer(props) {
                   if (isNaN(endIndex)) return;
                   setSelectedItems([
                     ...selectionStore.get().selectedItems,
-                    ...items.slice(focusedItemIndex.current, endIndex + 1),
+                    ...items.slice(focusedItemIndex.current + 1, endIndex + 1),
                   ]);
                   listItem.firstElementChild.focus();
                 }
