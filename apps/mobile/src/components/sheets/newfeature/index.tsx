@@ -44,7 +44,7 @@ const NewFeature = ({ features }: { features: FeatureType[] }) => {
             marginBottom: 10
           }}
         >
-          <Heading size={SIZE.lg}>{item.title}</Heading>
+          <Heading size={SIZE.lg - 2}>{item.title}</Heading>
           <Paragraph>{item.body}</Paragraph>
         </View>
       ))}
@@ -66,17 +66,17 @@ const NewFeature = ({ features }: { features: FeatureType[] }) => {
 };
 
 NewFeature.present = () => {
-  const { version, introCompleted } = SettingsService.get();
-  if (!introCompleted) {
-    SettingsService.set({
-      version: APP_VERSION
-    });
-    return;
-  }
-  if (version && version === APP_VERSION) return false;
-  SettingsService.set({
-    version: APP_VERSION
-  });
+  // const { version, introCompleted } = SettingsService.get();
+  // if (!introCompleted) {
+  //   SettingsService.set({
+  //     version: APP_VERSION
+  //   });
+  //   return;
+  // }
+  // if (version && version === APP_VERSION) return false;
+  // SettingsService.set({
+  //   version: APP_VERSION
+  // });
   presentSheet({
     component: <NewFeature features={features} />
   });
