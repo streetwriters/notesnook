@@ -544,7 +544,10 @@ const onChange = function (event) {
         reactNativeEventHandler('tiny', html);
       })
       .catch(function (e) {
-        reactNativeEventHandler('tinyerror', e.message);
+        reactNativeEventHandler('tinyerror', {
+          message: e?.message,
+          stack: e?.stack
+        });
       });
 
     onUndoChange();

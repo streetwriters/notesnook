@@ -95,6 +95,7 @@ export const Toast = ({ context = 'global' }) => {
       clearTimeout(hideTimeout.current);
     }
     let msg = toastMessages.length > 1 ? toastMessages.shift() : null;
+
     if (msg) {
       timing(toastOpacity, {
         toValue: 0,
@@ -116,9 +117,9 @@ export const Toast = ({ context = 'global' }) => {
         duration: 150,
         easing: Easing.inOut(Easing.ease)
       }).start(async () => {
+        toastMessages.shift();
         await sleep(100);
         toastTranslate.setValue(-dHeight);
-        toastMessages.shift();
         setData({});
         if (hideTimeout.current) {
           clearTimeout(hideTimeout.current);
