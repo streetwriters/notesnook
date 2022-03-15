@@ -463,11 +463,8 @@ export const _onMessage = async evt => {
   }
   switch (message.type) {
     case 'tinyerror':
-      ToastEvent.show({
-        heading: 'Error saving note',
-        message: message.value,
-        type: 'error'
-      });
+      console.log('tinyerror', message.value);
+      ToastEvent.error(message.value, 'Error saving note', 'global');
       break;
     case 'tableconfig':
       showTableOptionsTooltip();
@@ -830,7 +827,6 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
 
     if (!locked) {
       let noteId = await db.notes.add(noteData);
-      id = noteId;
       if (!_id || saveCounter < 3) {
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notes,
@@ -840,6 +836,7 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
         ]);
       }
       if (!_id) {
+        id = noteId;
         await addToCollection(noteId);
       }
 
@@ -855,6 +852,7 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
           useEditorStore.getState().setCurrentlyEditingNote(noteId);
         });
       }
+      _id = noteId;
     } else {
       noteData.contentId = note.contentId;
       await db.vault.save(noteData);
@@ -868,8 +866,10 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
 
       lastEditTime = n + 10;
       let n = db.notes.note(_id)?.data?.dateEdited;
-      tiny.call(EditorWebView, tiny.updateDateEdited(n ? timeConverter(n) : ''));
-      tiny.call(EditorWebView, tiny.updateSavingState(!n ? '' : 'Saved'));
+      tiny.call(
+        EditorWebView,
+        tiny.updateDateEdited(n ? timeConverter(n) : '') + tiny.updateSavingState(!n ? '' : 'Saved')
+      );
     }
   } catch (e) {
     if (e.message === 'ERR_VAULT_LOCKED') {
