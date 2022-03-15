@@ -239,12 +239,9 @@ const ToolbarItem = ({
       return;
     }
 
-    if (
-      (format === 'link' && properties.selection.current?.length === 0) ||
-      !properties.selection
-    ) {
+    if (!properties.selection) {
       ToastEvent.show({
-        heading: 'No selection',
+        heading: 'No text selected',
         message: 'Select some text before adding a link.',
         type: 'error'
       });

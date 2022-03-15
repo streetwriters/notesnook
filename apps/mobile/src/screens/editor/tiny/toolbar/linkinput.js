@@ -54,11 +54,6 @@ const ToolbarLinkInput = ({ format, value, setVisible }) => {
         }, 1000);
       }
     }
-
-    return () => {
-      tiny.call(EditorWebView, tiny.restoreRange);
-      tiny.call(EditorWebView, tiny.clearRange);
-    };
   }, [mode]);
 
   const onChangeText = value => {
@@ -87,19 +82,28 @@ const ToolbarLinkInput = ({ format, value, setVisible }) => {
       }
       console.log('format:', format, 'value:', inputValue);
       properties.userBlur = true;
-      tiny.call(EditorWebView, tiny.restoreRange);
-      tiny.call(EditorWebView, tiny.clearRange);
+      console.log('set range on submit');
       formatSelection(execCommands[format](inputValue));
+      tiny.call(EditorWebView, tiny.clearRange);
     }
 
     editing.tooltip = null;
-    setMode(INPUT_MODE.NO_EDIT);
+
+    if (inputValue) {
+      properties.pauseSelectionChange = true;
+      eSendEvent('showTooltip', {
+        data: null,
+        value: inputValue,
+        type: 'link'
+      });
+    }
 
     focusEditor(format, false);
     properties.userBlur = false;
   };
 
   const onBlur = async () => {
+    console.log('clear range on blur');
     tiny.call(EditorWebView, tiny.clearRange);
     formatSelection(`current_selection_range = null`);
     if (properties.userBlur) return;
