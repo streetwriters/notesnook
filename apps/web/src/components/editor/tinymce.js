@@ -296,7 +296,6 @@ function TinyMCE(props) {
            * @param {ClipboardEvent} e
            */
           async function onPaste(e) {
-            if (handlePasteFromVSCode(e)) return;
             if (e.clipboardData?.items?.length) {
               for (let item of e.clipboardData.items) {
                 const file = item.getAsFile();
@@ -305,30 +304,6 @@ function TinyMCE(props) {
                 await attachFile(editor, file);
               }
             }
-          }
-
-          /**
-           *
-           * @param {ClipboardEvent} e
-           */
-          function handlePasteFromVSCode(e) {
-            let vscodeEditorData =
-              e.clipboardData.getData("vscode-editor-data");
-            if (!!vscodeEditorData?.trim()) {
-              const { mode } = JSON.parse(vscodeEditorData);
-              if (mode) {
-                e.preventDefault();
-
-                const code = e.clipboardData.getData("text/plain");
-                editor.execCommand("mceInsertCodeblock", false, {
-                  code,
-                  language: mode,
-                });
-
-                return true;
-              }
-            }
-            return false;
           }
 
           editor.on("ScrollIntoView", onScrollIntoView);
@@ -349,9 +324,11 @@ function TinyMCE(props) {
         browser_spellcheck: true,
         inline: true,
         fixed_toolbar_container: "#editorToolbar",
-        paste_postprocess: function (_, args) {
+        paste_postprocess: async function (_, args) {
           const { node } = args;
-          processPastedContent(node);
+          const editor = tinymceRef.current.editor || args.target;
+          if (!editor || !editor.dom) return;
+          processPastedContent(editor, node);
         },
         invalid_styles: {
           span: "--progress",
