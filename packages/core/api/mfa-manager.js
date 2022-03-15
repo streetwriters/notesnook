@@ -77,11 +77,16 @@ class MFAManager {
     );
   }
 
-  async codes() {
+  /**
+   * Generate new 2FA recovery codes or get count of valid recovery codes.
+   * @param {boolean} generate
+   * @returns
+   */
+  async codes(generate = false) {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
-      `${constants.AUTH_HOST}${ENDPOINTS.recoveryCodes}`,
+      `${constants.AUTH_HOST}${ENDPOINTS.recoveryCodes}?generate=${generate}`,
       token
     );
   }
