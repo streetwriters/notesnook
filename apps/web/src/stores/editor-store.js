@@ -186,12 +186,12 @@ class EditorStore extends BaseStore {
             state.session.attachmentsLength = attachments.length;
           });
 
-          if (attachments?.length !== oldSession.attachmentsLength)
-            attachmentStore.refresh();
-
           if (!oldSession) {
             noteStore.refresh();
+            attachmentStore.refresh();
             return;
+          } else if (attachments?.length !== oldSession.attachmentsLength) {
+            attachmentStore.refresh();
           }
 
           if (
