@@ -2,11 +2,11 @@ import { FeatureType } from './src/components/sheets/new-feature';
 
 export const features: FeatureType[] = [
   {
-    title: 'Manage attachments',
-    body: 'Now you can go to Settings to view and manage all file & image attachments from one place.'
+    title: 'Create duplicate notes',
+    body: 'You can now create exact duplicates of a note. Go to Note Properties > Duplicate note to try'
   },
   {
-    title: 'Automatic system theme',
-    body: 'User on basic plan can now enable automatic system theme switching (Day/Night). Go to Settings > Appearence to enable it.'
+    title: 'Manage syncing of individual notes',
+    body: 'Mark a note as local only to remove it from other devices and disable syncing. Any changes will not be synced'
   }
 ];
