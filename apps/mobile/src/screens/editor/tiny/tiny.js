@@ -131,7 +131,10 @@ autosize();
 `;
 
 const cacheRange = `current_selection_range = editor.selection.getRng();`;
-const restoreRange = `editor.selection.setRng(current_selection_range);`;
+const restoreRange = `
+if (current_selection_range) {
+  editor.selection.setRng(current_selection_range);
+}`;
 const clearRange = `current_selection_range = null`;
 
 const toggleFormat = format => {
