@@ -5,7 +5,11 @@ const {
   getCurrentLine,
 } = require("../utils");
 const { createCodeBlock, isCodeBlock, state, newlineToBR } = require("./utils");
-const { addCodeBlockToolbar, refreshHighlighting } = require("./toolbar");
+const {
+  addCodeBlockToolbar,
+  refreshHighlighting,
+  getLanguageFromClassList,
+} = require("./toolbar");
 
 const TAB = `\u00A0\u00A0`;
 const TAB_SEQUENCE = ["\u00A0", "\u0020"];
@@ -233,6 +237,7 @@ var registerHandlers = function(editor) {
   }
 
   function onKeyUp(e) {
+    if (e.ctrlKey && e.key === "A") return;
     if (e.code === "Enter") {
       const node = state.activeBlock;
       if (!node) return;
@@ -254,16 +259,48 @@ var registerHandlers = function(editor) {
     setTimeout(() => editor.insertContent(TAB.repeat(indent)), 0);
   }
 
+  async function onSetContent(e) {
+    if (e.paste) {
+      const body = editor.getBody();
+      const codeblocks = body.querySelectorAll(`pre,table.highlight`);
+      for (let codeblock of codeblocks) {
+        processPastedContent(editor, codeblock);
+        state.activeBlock = codeblock;
+        await refreshHighlighting(editor);
+      }
+      state.activeBlock = null;
+    }
+  }
+
+  async function onPaste(e) {
+    if (handlePasteFromVSCode(e)) return;
+  }
+
+  function handlePasteFromVSCode(e) {
+    let vscodeEditorData = e.clipboardData.getData("vscode-editor-data");
+    if (!!vscodeEditorData?.trim()) {
+      const { mode } = JSON.parse(vscodeEditorData);
+      if (mode) {
+        e.preventDefault();
+
+        const code = e.clipboardData.getData("text/plain");
+        editor.execCommand("mceInsertCodeblock", false, {
+          code,
+          language: mode,
+        });
+
+        return true;
+      }
+    }
+    return false;
+  }
+
+  editor.on("paste", onPaste);
+  editor.on("SetContent", onSetContent);
   editor.on("BeforeExecCommand", onBeforeExecCommand);
   editor.on("BeforeSetContent", onBeforeSetContent);
   editor.on("keydown", onKeyDown);
   editor.on("keyup", onKeyUp);
-  return function() {
-    editor.off("BeforeExecCommand", onBeforeExecCommand);
-    editor.off("BeforeSetContent", onBeforeSetContent);
-    editor.off("keydown", onKeyDown);
-    editor.off("keyup", onKeyUp);
-  };
 };
 
 function deindent(line, tabLength) {
@@ -278,28 +315,44 @@ function deindent(line, tabLength) {
   addPluginToPluginManager("codeblock", register);
 })();
 
+const languageIdentifiers = ["lang-", "language-", "brush:"]
+  .map((id) => `[class*="${id}"]`)
+  .join(",");
 /**
  * Call this function in paste_postprocess function in tinymce.init.
  * This basically removes all internal formatting of code blocks and applies
  * the necessary formatting for consistency.
  */
-function processPastedContent(node) {
+function processPastedContent(editor, node) {
   if (!node) return;
 
-  if (node.childNodes) {
-    for (let childNode of node.childNodes) {
-      const isFontMonospace =
-        childNode.style &&
-        childNode.style.fontFamily &&
-        childNode.style.fontFamily.includes("monospace");
+  for (let childNode of node.childNodes) {
+    const isFontMonospace =
+      childNode.style &&
+      childNode.style.fontFamily &&
+      childNode.style.fontFamily.includes("monospace");
 
-      if (childNode.tagName === "PRE") {
-        childNode.className = "hljs";
-        childNode.innerHTML = getFormattedText(childNode);
-      } else if (isFontMonospace) {
-        const node = createCodeBlock(getFormattedText(childNode));
-        childNode.replaceWith(node);
-      }
+    const isGithub =
+      childNode.classList &&
+      childNode.classList.contains("highlight") &&
+      childNode.hasAttribute("data-tagsearch-lang");
+
+    const isPre = childNode.tagName === "PRE";
+    if (isPre) {
+      const languageNode = childNode.querySelector(languageIdentifiers);
+      const language = getLanguageFromClassList(languageNode || childNode);
+      const node = createCodeBlock(getFormattedText(childNode), language);
+      childNode.replaceWith(node);
+    } else if (isGithub) {
+      let language = childNode.getAttribute("data-tagsearch-lang");
+      if (language) language = language.toLowerCase();
+      const node = createCodeBlock(getFormattedText(childNode), language);
+      childNode.replaceWith(node);
+    } else if (isFontMonospace) {
+      const node = createCodeBlock(getFormattedText(childNode));
+      childNode.replaceWith(node);
+    } else if (childNode.childNodes.length > 0) {
+      processPastedContent(editor, childNode);
     }
   }
 }
@@ -339,5 +392,5 @@ function getFormattedText(childNode) {
 
   const text = clone.innerText || clone.textContent;
   formattingNode.remove();
-  return text;
+  return text.replace(/\t/gm, "  ");
 }

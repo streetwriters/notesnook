@@ -3,3 +3,4 @@ yarn-error.log
 dist/
 tinymce/
 test-results/
+__tests__/host/init.js
