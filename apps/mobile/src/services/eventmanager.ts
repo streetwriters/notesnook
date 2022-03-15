@@ -75,7 +75,7 @@ export const ToastEvent = {
     heading,
     message,
     type = 'error',
-    context,
+    context = 'global',
     duration = 3000,
     func,
     actionText
