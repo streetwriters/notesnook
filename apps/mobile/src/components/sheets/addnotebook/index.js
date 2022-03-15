@@ -288,7 +288,7 @@ export class AddNotebookSheet extends React.Component {
       >
         <View
           style={{
-            maxHeight: DDS.isTab ? '90%' : '100%',
+            maxHeight: DDS.isTab ? '90%' : '96%',
             borderRadius: DDS.isTab ? 5 : 0,
             paddingHorizontal: 12
           }}

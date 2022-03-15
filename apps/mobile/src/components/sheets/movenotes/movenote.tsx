@@ -1,5 +1,5 @@
 import React, { RefObject, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
 import { FlatList } from 'react-native-gesture-handler';
 import { useThemeStore } from '../../../stores/theme';
@@ -106,9 +106,7 @@ export const MoveNotes = ({
           paddingVertical: 12,
           justifyContent: 'space-between',
           paddingHorizontal: 12,
-          marginBottom: 10,
-          flexDirection: 'row',
-          minHeight: 50
+          flexDirection: 'row'
         }}
       >
         <View
@@ -116,11 +114,11 @@ export const MoveNotes = ({
             flexShrink: 1
           }}
         >
-          <Paragraph color={item?.id === topic?.id ? colors.accent : colors.pri}>
+          <Paragraph numberOfLines={1} color={item?.id === topic?.id ? colors.accent : colors.pri}>
             {item.title}
           </Paragraph>
           {item.type == 'note' && item.headline ? (
-            <Paragraph color={colors.icon} size={SIZE.xs + 1}>
+            <Paragraph numberOfLines={1} color={colors.icon} size={SIZE.xs + 1}>
               {item.headline}
             </Paragraph>
           ) : null}
@@ -159,7 +157,8 @@ export const MoveNotes = ({
   return (
     <View
       style={{
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        maxHeight: Platform.OS === 'ios' ? '96%' : '97%'
       }}
     >
       <Dialog context="local" />
