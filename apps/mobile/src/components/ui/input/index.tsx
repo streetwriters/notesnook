@@ -174,6 +174,7 @@ const Input = ({
     paddingBottom: 2.5,
     flexGrow: 1,
     height: height || 50,
+    flexShrink: 1,
     fontFamily: 'OpenSans-Regular',
     //@ts-ignore
     ...inputStyle
