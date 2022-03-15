@@ -7,7 +7,7 @@ const ENDPOINTS = {
   enable: "/mfa/enable",
   disable: "/mfa/disable",
   reset: "/mfa/reset",
-  recoveryCodes: "/mfa/recovery_codes",
+  recoveryCodes: "/mfa/codes",
 };
 
 class MFAManager {
@@ -53,6 +53,35 @@ class MFAManager {
     return await http.post(
       `${constants.AUTH_HOST}${ENDPOINTS.enable}`,
       { type, code },
+      token
+    );
+  }
+
+  async disable() {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    return await http.post(
+      `${constants.AUTH_HOST}${ENDPOINTS.disable}`,
+      null,
+      token
+    );
+  }
+
+  async reset() {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    return await http.post(
+      `${constants.AUTH_HOST}${ENDPOINTS.reset}`,
+      null,
+      token
+    );
+  }
+
+  async codes() {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    return await http.get(
+      `${constants.AUTH_HOST}${ENDPOINTS.recoveryCodes}`,
       token
     );
   }
