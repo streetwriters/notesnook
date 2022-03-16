@@ -60,7 +60,9 @@ test("login user", async () =>
 test("login user with wrong password", () =>
   databaseTest().then(async (db) => {
     fetch.mockResponseOnce(
-      JSON.stringify({ error: "Username or password is incorrect." }),
+      JSON.stringify({
+        error_description: "Username or password is incorrect.",
+      }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
     await expect(
@@ -117,10 +119,8 @@ test("refresh user's token", () =>
         headers: { "Content-Type": "application/json" },
       }
     );
-    const {
-      access_token,
-      refresh_token,
-    } = await db.user.tokenManager.getToken();
+    const { access_token, refresh_token } =
+      await db.user.tokenManager.getToken();
     expect(refresh_token).toBe("new_refresh_token");
     expect(access_token).toBe("new_token");
   }));
