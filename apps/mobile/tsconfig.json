@@ -16,5 +16,5 @@
     "maxNodeModuleJsDepth": 20,
     "downlevelIteration": true
   },
-  "exclude": ["babel.config.js", "metro.config.js", "jest.config.js", "android", "ios"]
+  "exclude": ["babel.config.js", "metro.config.js", "jest.config.js", "android", "ios", "html"]
 }
