@@ -1,9 +1,10 @@
-- Added a "new feature" introduction sheet
-- Now you can view and manage all file & image attachments from Settings
-- Changed collapse/expand heading icons
-- Enabled auto day/night theme switching for free users
-- Enabled h1 heading in editor
-- Fixed auto-sync not working on mobile devices
-- Fixed placeholder showing behind opened note
+- Create duplicate of a note
+- Mark a note as local only if you don't want it to be synced
+- Added a less intrusive announcement UI
+- Allow adding/removing notes from inside topics
+- Fixed all uploads giving error on file check
+- Fixed pro users unable to reupload files
+- Fixed deleting attachments not working
+- Fixed theme not persisted on app reloads
 
 Thank you for using Notesnook!
