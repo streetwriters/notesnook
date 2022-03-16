@@ -323,9 +323,11 @@ export default class Attachments extends Collection {
   }
 
   get syncable() {
-    return this.all.filter(
-      (attachment) => attachment.dateUploaded > 0 || attachment.deleted
-    );
+    return this._collection
+      .getRaw()
+      .filter(
+        (attachment) => attachment.dateUploaded > 0 || attachment.deleted
+      );
   }
 
   get deleted() {
