@@ -4,7 +4,6 @@
 - Added a less intrusive announcement UI
 - Allow adding/removing notes from inside topics with multi-select
 - Remove unnecessary read/write external storage permissions on android
-- 
 
 # What's fixed
 - All uploads giving error "File length is 0" on running file check
