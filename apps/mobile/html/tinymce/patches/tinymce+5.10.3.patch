@@ -21,7 +21,7 @@ index a240d41..e8b38f4 100644
      'table-merge-cells': '<svg width="24" height="24"><path fill-rule="nonzero" d="M19 4a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6c0-1.1.9-2 2-2h14zM5 15.5V18h3v-2.5H5zm14-5h-9V18h9v-7.5zM19 6h-4v2.5h4V6zM8 6H5v2.5h3V6zm5 0h-3v2.5h3V6zm-8 7.5h3v-3H5v3z"/></svg>',
      'table-row-numbering-rtl': '<svg width="24" height="24"><path d="M6 4a2 2 0 00-2 2v13c0 1.1.9 2 2 2h12a2 2 0 002-2V6a2 2 0 00-2-2H6zm0 12h8v3H6v-3zm11 0c.6 0 1 .4 1 1v1a1 1 0 01-2 0v-1c0-.6.4-1 1-1zM6 11h8v3H6v-3zm11 0c.6 0 1 .4 1 1v1a1 1 0 01-2 0v-1c0-.6.4-1 1-1zM6 6h8v3H6V6zm11 0c.6 0 1 .4 1 1v1a1 1 0 11-2 0V7c0-.6.4-1 1-1z"/></svg>',
 diff --git a/node_modules/tinymce/plugins/table/plugin.js b/node_modules/tinymce/plugins/table/plugin.js
-index e41249b..fb25fc5 100644
+index c707290..4e49eb6 100644
 --- a/node_modules/tinymce/plugins/table/plugin.js
 +++ b/node_modules/tinymce/plugins/table/plugin.js
 @@ -1875,7 +1875,8 @@
@@ -54,7 +54,7 @@ index e41249b..fb25fc5 100644
      var handle$1 = function (event, editor, cellSelection) {
        if (event.keyCode === global$1.TAB) {
 diff --git a/node_modules/tinymce/plugins/textpattern/plugin.js b/node_modules/tinymce/plugins/textpattern/plugin.js
-index 987d753..c3b988a 100644
+index 05ccbd1..cc3fb87 100644
 --- a/node_modules/tinymce/plugins/textpattern/plugin.js
 +++ b/node_modules/tinymce/plugins/textpattern/plugin.js
 @@ -1330,6 +1330,12 @@
@@ -116,10 +116,10 @@ index 987d753..c3b988a 100644
            global$4.setEditorTimeout(editor, function () {
              handleInlineKey(editor, patternsState.get());
 diff --git a/node_modules/tinymce/tinymce.js b/node_modules/tinymce/tinymce.js
-index 4cdbfce..9a547bc 100644
+index 755049c..807bc93 100644
 --- a/node_modules/tinymce/tinymce.js
 +++ b/node_modules/tinymce/tinymce.js
-@@ -24894,6 +24894,9 @@
+@@ -24897,6 +24897,9 @@
      var inPreBlock = function (requiredState) {
        return inBlock('pre', requiredState);
      };
@@ -129,7 +129,7 @@ index 4cdbfce..9a547bc 100644
      var inSummaryBlock = function () {
        return inBlock('summary', true);
      };
-@@ -24925,6 +24928,13 @@
+@@ -24928,6 +24931,13 @@
        return evaluateUntil([
          match([shouldBlockNewLine], newLineAction.none()),
          match([inSummaryBlock()], newLineAction.br()),
@@ -143,7 +143,7 @@ index 4cdbfce..9a547bc 100644
          match([
            inPreBlock(true),
            shouldPutBrInPre(false),
-@@ -27901,10 +27911,10 @@
+@@ -27904,10 +27914,10 @@
          setEditorCommandState(editor, 'StyleWithCSS', false);
          setEditorCommandState(editor, 'enableInlineTableEditing', false);
          setEditorCommandState(editor, 'enableObjectResizing', false);
