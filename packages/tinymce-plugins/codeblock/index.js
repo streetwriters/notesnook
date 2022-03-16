@@ -24,9 +24,7 @@ function register(editor) {
   addCodeBlockToolbar(editor);
 
   editor.addCommand("mceInsertCodeBlock", function(api, args) {
-    if (args.code) {
-      insertCodeBlock(editor, args.code, args.language);
-    } else toggleCodeBlock(editor, api, args);
+    toggleCodeBlock(editor, api, args);
   });
 
   editor.ui.registry.addToggleButton("codeblock", {
@@ -284,11 +282,7 @@ var registerHandlers = function(editor) {
         e.preventDefault();
 
         const code = e.clipboardData.getData("text/plain");
-        editor.execCommand("mceInsertCodeblock", false, {
-          code,
-          language: mode,
-        });
-
+        insertCodeBlock(editor, code, mode);
         return true;
       }
     }
