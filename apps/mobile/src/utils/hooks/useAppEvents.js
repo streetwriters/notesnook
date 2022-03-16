@@ -109,10 +109,10 @@ export const useAppEvents = () => {
     EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
 
-    eSubscribeEvent('userLoggedIn', setCurrentUser);
+    eSubscribeEvent('userLoggedIn', onUserUpdated);
 
     return () => {
-      eUnSubscribeEvent('userLoggedIn', setCurrentUser);
+      eUnSubscribeEvent('userLoggedIn', onUserUpdated);
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
       EV.unsubscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
@@ -145,7 +145,7 @@ export const useAppEvents = () => {
           if (url?.startsWith('https://app.notesnook.com/account/verified')) {
             await onEmailVerified();
           }
-          await setCurrentUser();
+          await onUserUpdated();
         } catch (e) {}
       })();
       refValues.current.removeInternetStateListener =
@@ -288,8 +288,8 @@ export const useAppEvents = () => {
     }
   };
 
-  const setCurrentUser = async login => {
-    console.log(`setCurrentUser: ${login}`);
+  const onUserUpdated = async login => {
+    console.log(`onUserUpdated: ${login}`);
     let user;
     try {
       user = await db.user.getUser();
