@@ -30,7 +30,7 @@ export const execCommands = {
   indent: `tinymce.activeEditor.execCommand('Indent');`,
   outdent: `tinymce.activeEditor.execCommand('Outdent');`,
   blockquote: `tinymce.activeEditor.execCommand('mceBlockQuote');`,
-  link: link => `tinymce.activeEditor.execCommand('mceInsertLink',false, '${link}');`,
+  link: link => `tinymce.activeEditor.execCommand('mceInsertLink',false, "${link}");`,
   unlink: `tinymce.activeEditor.execCommand('Unlink')`,
   fontsize: size => `tinymce.activeEditor.execCommand('FontSize', false, '${size}');`,
   removeformat: `tinymce.activeEditor.execCommand('RemoveFormat');`,

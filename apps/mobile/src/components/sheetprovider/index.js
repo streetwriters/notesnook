@@ -46,8 +46,7 @@ const SheetProvider = ({ context = 'global' }) => {
     if (data.editor) {
       editor.current.refocus = false;
       if (editing.keyboardState) {
-        tiny.call(EditorWebView, tiny.cacheRange);
-        tiny.call(EditorWebView, tiny.blur);
+        tiny.call(EditorWebView, tiny.cacheRange + tiny.blur);
         editor.current.refocus = true;
       }
     }
@@ -63,8 +62,7 @@ const SheetProvider = ({ context = 'global' }) => {
         if (editor.current.refocus) {
           editing.isFocused = true;
           await reFocusEditor();
-          tiny.call(EditorWebView, tiny.restoreRange);
-          tiny.call(EditorWebView, tiny.clearRange);
+          tiny.call(EditorWebView, tiny.restoreRange + tiny.clearRange);
           editor.current.refocus = false;
         }
       }

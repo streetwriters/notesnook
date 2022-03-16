@@ -313,8 +313,7 @@ export const loadNote = async item => {
     }
     requestedReload = true;
     updateSessionStatus();
-    tiny.call(EditorWebView, tiny.notLoading);
-    tiny.call(EditorWebView, tiny.toogleReadMode('design'));
+    tiny.call(EditorWebView, tiny.notLoading + tiny.toogleReadMode('design'));
   } else {
     if (id === item.id && !item.forced) {
       console.log('note is already opened in editor');
@@ -1001,8 +1000,10 @@ const loadNoteInEditor = async (keepHistory = true) => {
       }
 
       setColors();
-      tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(note.dateEdited)));
-      tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
+      tiny.call(
+        EditorWebView,
+        tiny.updateDateEdited(timeConverter(note.dateEdited)) + tiny.updateSavingState('Saved')
+      );
     } else {
       tiny.call(EditorWebView, tiny.toogleReadMode('design'));
       await restoreEditorState();
