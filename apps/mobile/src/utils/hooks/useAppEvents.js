@@ -289,10 +289,15 @@ export const useAppEvents = () => {
   };
 
   const setCurrentUser = async login => {
+    console.log(`setCurrentUser: ${login}`);
     let user;
     try {
       user = await db.user.getUser();
       await PremiumService.setPremiumStatus();
+      if (login) {
+        await Sync.run();
+        eSendEvent(eCloseProgressDialog);
+      }
       setLastSynced(await db.lastSynced());
       if (!user) {
         return setLoginMessage();
@@ -308,8 +313,11 @@ export const useAppEvents = () => {
       clearMessage();
       attachIAPListeners();
 
-      user = await db.user.fetchUser();
-      setUser(user);
+      if (!login) {
+        user = await db.user.fetchUser();
+        setUser(user);
+      }
+
       await PremiumService.setPremiumStatus();
       if (user.isEmailConfirmed && !userEmailConfirmed) {
         setTimeout(() => {
@@ -336,9 +344,7 @@ export const useAppEvents = () => {
       }
     }
     refValues.current.isUserReady = true;
-    if (login) {
-      eSendEvent(eCloseProgressDialog);
-    }
+
     syncedOnLaunch.current = true;
   };
 
