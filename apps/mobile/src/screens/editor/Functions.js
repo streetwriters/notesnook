@@ -658,15 +658,12 @@ function onNoteChange(wait = 300) {
   clearTimeout(timer);
   timer = null;
   noteEdited = false;
-  let _sid = sessionId;
-  let params = [title, id, content.data, content.type, sessionId];
+  let params = [title, id, content.data, content.type, sessionId, historySessionId];
   timer = setTimeout(() => {
-    //console.log('saving note', params[1], _sid, sessionId);
     if (!params[1]) {
-      console.log('update id to', id);
       params[1] = id;
     }
-    saveNote(...params, _sid !== sessionId);
+    saveNote(...params);
   }, wait);
 }
 
@@ -766,11 +763,11 @@ async function addToCollection(id) {
   }
 }
 
-export async function saveNote(title, _id, data, type, sessionId, preventUpdate) {
+export async function saveNote(title, _id, data, type, _sessionId, _historySessionId) {
   console.log('saving note:', disableSaving, isSaving, _id, id);
   if (typeof data !== 'string') return;
   if (disableSaving || (isSaving && !id)) return;
-  if (preventUpdate) {
+  if (_sessionId !== sessionId) {
     noteEdited = false;
   }
   isSaving = true;
@@ -791,21 +788,14 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
       locked = _note.locked;
     }
 
-    if (!sessionId) {
-      historySessionId = note?.dateEdited || Date.now();
-      sessionId = historySessionId;
-    }
-
-    if (isContentInvalid(data)) {
-      if (sessionId === historySessionId) {
-        sessionId = note?.dateEdited;
-        historySessionId = sessionId;
-      } else {
-        sessionId = note?.dateEdited;
-      }
+    if (isContentInvalid(data) || !_historySessionId) {
+      _historySessionId = note?.dateEdited || Date.now();
+      historySessionId = _historySessionId;
       console.log('new session begins');
     }
 
+    console.log('compare ids:', _sessionId === sessionId, _historySessionId === historySessionId);
+    console.log(sessionId, historySessionId);
     let noteData = {
       title,
       content: {
@@ -813,15 +803,15 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
         type: type
       },
       id: _id,
-      sessionId: isContentInvalid(data) ? null : sessionId
+      sessionId: isContentInvalid(data) ? null : _historySessionId
     };
 
     console.log(
       'Note Saved:::',
       'historySessionId:',
-      historySessionId,
-      'preventUpdate',
-      preventUpdate
+      _historySessionId,
+      'preventUpdate: ',
+      sessionId === _sessionId
     );
 
     if (!locked) {
@@ -839,7 +829,7 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
         await addToCollection(noteId);
       }
 
-      if (!_id && !preventUpdate) {
+      if (!_id && sessionId === _sessionId) {
         if (!title || title === '') {
           console.log('posting title now');
           post('titleplaceholder', db.notes.note(noteId)?.data?.title || '');
@@ -856,7 +846,7 @@ export async function saveNote(title, _id, data, type, sessionId, preventUpdate)
       noteData.contentId = note.contentId;
       await db.vault.save(noteData);
     }
-    if (!preventUpdate) {
+    if (sessionId === _sessionId) {
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites,
