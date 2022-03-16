@@ -10,9 +10,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
 import { PremiumToast } from '../../components/premium/premium-toast';
-import { useThemeStore } from '../../stores/theme';
-import { useNoteStore, useSettingStore } from '../../stores/stores';
 import { DDS } from '../../services/device-detection';
+import { useNoteStore, useSettingStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
 import { editing } from '../../utils';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';

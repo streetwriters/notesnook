@@ -210,5 +210,6 @@ const placeholderTips = [
   `Arguing that you don't care about the right to privacy because you have nothing to hide is no different than saying you don't care about free speech because you have nothing to say.” ― Edward Snowden `,
   `Privacy is not something that I'm merely entitled to, it's an absolute prerequisite.” ― Marlon Brando `,
   `You can disable syncing on notes you don't want to be synced or stored anywhere other than your phone.`,
-  `We value your feedback so join us on Discord/Telegram and share your experiences and ideas. Let's build the best (and private) note taking app together.`
+  `We value your feedback so join us on Discord/Telegram and share your experiences and ideas. Let's build the best (and private) note taking app together.`,
+  `You can view & restore older versions of a note if you delete something accidentally by going to Note properties -> History`
 ];
