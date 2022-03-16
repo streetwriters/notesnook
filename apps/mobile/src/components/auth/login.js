@@ -204,13 +204,11 @@ export const Login = ({ changeMode }) => {
               onChangeText={value => {
                 password.current = value;
               }}
-              onErrorCheck={e => setError(e)}
               returnKeyLabel="Done"
               returnKeyType="done"
               secureTextEntry
               autoComplete="password"
               autoCapitalize="none"
-              validationType="password"
               autoCorrect={false}
               placeholder="Password"
               marginBottom={0}
