@@ -257,7 +257,7 @@ async function uploadFile(filename, requestOptions) {
         }
       )
       .catch((e) => {
-        throw new Error("Could not complete multi-part upload.", e);
+        throw new S3Error("Could not complete multi-part upload.", e);
       });
 
     await fileHandle.addAdditionalData("uploaded", true);

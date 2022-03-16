@@ -20,7 +20,7 @@ function Toolbar(props) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
-  const setSession = useStore((store) => store.setSession);
+  const setTitle = useStore((store) => store.setTitle);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const clearSession = useStore((store) => store.clearSession);
   const title = useStore((store) => store.session.title);
@@ -185,9 +185,7 @@ function Toolbar(props) {
           color="text"
           onChange={(e) => {
             const title = e.target.value;
-            setSession((state) => {
-              state.session.title = title;
-            });
+            setTitle(sessionId, title);
           }}
           sx={{
             p: 0,

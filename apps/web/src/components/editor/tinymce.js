@@ -45,7 +45,6 @@ import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { EV, EVENTS } from "notes-core/common";
 import { downloadAttachment } from "../../common/attachments";
-import debounce from "just-debounce-it";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -261,18 +260,17 @@ function TinyMCE(props) {
             }
           }
 
-          const onEditorChange = debounce((e) => {
+          const onEditorChange = async (e) => {
             if (
               e.type === "execcommand" &&
               ignoredCommand.includes(e.command.toLowerCase())
             )
               return;
-            if (!editor.getHTML) return;
 
-            editor.getHTML().then((html) => {
-              onChange(html, editor);
-            });
-          }, changeInterval);
+            if (!editor.getHTML) return;
+            const html = await editor.getHTML();
+            onChange(html, editor);
+          };
 
           function onScrollIntoView(e) {
             e.preventDefault();
@@ -306,18 +304,12 @@ function TinyMCE(props) {
             }
           }
 
+          editor.onEditorChange = onEditorChange;
           editor.on("ScrollIntoView", onScrollIntoView);
           editor.on("tap", onTap);
           editor.on(changeEvents, onEditorChange);
           editor.on("keyup", onKeyUp);
           editor.on("paste", onPaste);
-          editor.once("remove", () => {
-            editor.off("ScrollIntoView", onScrollIntoView);
-            editor.off("tap", onTap);
-            editor.off(changeEvents, onEditorChange);
-            editor.off("keyup", onKeyUp);
-            editor.off("paste", onPaste);
-          });
         },
         toolbar_persist: true,
         toolbar_sticky: false,

@@ -2,9 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Text, Flex } from "rebass";
 import { Input } from "@rebass/forms";
 
-var changeTimeout;
 function TitleBox(props) {
-  const { title, setTitle, changeInterval, shouldFocus, readonly } = props;
+  const { title, setTitle, shouldFocus, readonly } = props;
 
   const [height, setHeight] = useState(0);
   const inputRef = useRef();
@@ -32,7 +31,7 @@ function TitleBox(props) {
 
   useEffect(() => {
     if (!inputRef.current) return;
-    clearTimeout(changeTimeout);
+    console.log("TITLE!", title);
     inputRef.current.value = title;
     resize();
   }, [title, resize]);
@@ -76,11 +75,7 @@ function TitleBox(props) {
         }}
         onChange={(e) => {
           resize();
-          clearTimeout(changeTimeout);
-          changeTimeout = setTimeout(
-            setTitle.bind(this, e.target.value),
-            changeInterval
-          );
+          setTitle(e.target.value);
         }}
       />
     </Flex>
@@ -88,6 +83,7 @@ function TitleBox(props) {
 }
 
 export default React.memo(TitleBox, (prevProps, nextProps) => {
+  console.log("React.memo", prevProps.title === nextProps.title);
   return (
     prevProps.shouldFocus === nextProps.shouldFocus &&
     prevProps.title === nextProps.title &&

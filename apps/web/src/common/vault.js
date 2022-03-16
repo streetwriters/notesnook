@@ -82,6 +82,8 @@ class Vault {
             case db.vault.ERRORS.vaultLocked:
               return Vault.unlockVault();
             default:
+              showToast("error", message);
+              console.error(message);
               return false;
           }
         })

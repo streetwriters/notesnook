@@ -141,77 +141,64 @@ class EditorStore extends BaseStore {
     appStore.setIsEditorOpen(true);
   };
 
-  saveSession = (oldSession, content) => {
-    return savingMutex.runExclusive(() => {
-      const session = this.get().session;
-      if (session.readonly) return; // do not allow saving of readonly session
+  saveSession = async (sessionId, session) => {
+    const currentSession = this.get().session;
+    if (currentSession.readonly) return; // do not allow saving of readonly session
 
-      this.setSaveState(0);
-      return this._saveFn()({ ...session, content })
-        .then(async (id) => {
-          let note = db.notes.note(id)?.data;
-          if (!note) {
-            this.setSaveState(-1);
-            return;
-          }
+    this.setSaveState(0);
 
-          /* eslint-disable */
-          storeSync: {
-            if (oldSession?.tags?.length !== session.tags.length)
-              tagStore.refresh();
+    try {
+      const id = await this._getSaveFn()({ ...session, id: sessionId });
+      if (currentSession && currentSession.id !== sessionId) return;
 
-            if (oldSession?.color !== session.color) appStore.refreshNavItems();
+      let note = db.notes.note(id)?.data;
+      if (!note) throw new Error("Note not saved.");
 
-            if (!oldSession?.context) break storeSync;
+      if (currentSession.context) {
+        const { type, value } = currentSession.context;
+        if (type === "topic") await db.notes.move(value, id);
+        else if (type === "color") await db.notes.note(id).color(value);
+        else if (type === "tag") await db.notes.note(id).tag(value);
+        // update the note.
+        note = db.notes.note(id)?.data;
+      }
 
-            const { type, value } = oldSession.context;
-            if (type === "topic") await db.notes.move(value, id);
-            else if (type === "color") await db.notes.note(id).color(value);
-            else if (type === "tag") await db.notes.note(id).tag(value);
+      const shouldRefreshNotes =
+        currentSession.context ||
+        !sessionId ||
+        note.title !== currentSession.title ||
+        note.headline !== currentSession.headline;
+      if (shouldRefreshNotes) noteStore.refresh();
 
-            // update the note.
-            note = db.notes.note(id)?.data;
-          }
-          /* eslint-enable */
+      const attachments = db.attachments.ofNote(id, "all");
+      if (attachments.length !== currentSession.attachmentsLength) {
+        attachmentStore.refresh();
+      }
 
-          if (!this.get().session.id) {
-            noteStore.setSelectedNote(id);
-          }
+      this.set((state) => {
+        for (let key in session) {
+          if (key === "content") continue;
+          state.session[key] = session[key];
+        }
 
-          const attachments = db.attachments.ofNote(note.id, "all");
-          this.set((state) => {
-            state.session.id = note.id;
-            state.session.notebooks = note.notebooks;
-            state.session.saveState = 1;
-            state.session.attachmentsLength = attachments.length;
-          });
+        state.session.notebooks = note.notebooks;
+        state.session.context = null;
+        state.session.id = note.id;
+        state.session.saveState = 1;
+        state.session.attachmentsLength = attachments.length;
+      });
 
-          if (!oldSession) {
-            noteStore.refresh();
-            attachmentStore.refresh();
-            return;
-          } else if (attachments?.length !== oldSession.attachmentsLength) {
-            attachmentStore.refresh();
-          }
-
-          if (
-            note.headline !== oldSession.headline ||
-            note.title !== oldSession.title
-          )
-            noteStore.refresh();
-
-          if (!oldSession.id) {
-            hashNavigate(`/notes/${id}/edit`, { replace: true });
-          }
-        })
-        .catch((err) => {
-          this.setSaveState(-1);
-          console.error(err);
-          if (session.locked) {
-            hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
-          }
-        });
-    });
+      if (!sessionId) {
+        noteStore.setSelectedNote(id);
+        hashNavigate(`/notes/${id}/edit`, { replace: true });
+      }
+    } catch (err) {
+      this.setSaveState(-1);
+      console.error(err);
+      if (session.locked) {
+        hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
+      }
+    }
   };
 
   newSession = async (nonce) => {
@@ -247,15 +234,16 @@ class EditorStore extends BaseStore {
     if (shouldNavigate) hashNavigate(`/`, { replace: true });
   };
 
-  setSession = (set) => {
-    const oldSession = qclone(this.get().session);
-    this.set(set);
-    return this.saveSession(oldSession);
+  setTitle = (sessionId, title) => {
+    return this.saveSession(sessionId, { title });
   };
 
-  setSessionContent = (content) => {
-    const session = qclone(this.get().session);
-    return this.saveSession(session, content);
+  toggle = (sessionId, name, value) => {
+    return this.saveSession(sessionId, { [name]: value });
+  };
+
+  saveSessionContent = (noteId, sessionId, content) => {
+    return this.saveSession(noteId, { sessionId, content });
   };
 
   getSessionContent = async () => {
@@ -298,7 +286,7 @@ class EditorStore extends BaseStore {
    * @param {Boolean} isLocked
    * @returns {(note: any) => Promise<string>}
    */
-  _saveFn = () => {
+  _getSaveFn = () => {
     return this.get().session.locked
       ? db.vault.save.bind(db.vault)
       : db.notes.add.bind(db.notes);

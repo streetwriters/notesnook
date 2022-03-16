@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import TitleBox from "./title-box";
-import { useStore } from "../../stores/editor-store";
+import { useStore, store } from "../../stores/editor-store";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import { Flex } from "rebass";
@@ -13,8 +13,8 @@ function Header({ readonly }) {
   const id = useStore((store) => store.session.id);
   const tags = useStore((store) => store.session.tags);
   const setTag = useStore((store) => store.setTag);
-  const setSession = useStore((store) => store.setSession);
-
+  const setTitle = useStore((store) => store.setTitle);
+  console.log(title, id);
   const filterableTags = useMemo(() => {
     return db.tags.all.filter((t) => tags.every((tag) => tag !== t.title));
   }, [tags]);
@@ -24,12 +24,10 @@ function Header({ readonly }) {
       <TitleBox
         readonly={readonly}
         title={title}
-        changeInterval={100}
-        setTitle={(title) =>
-          setSession((state) => {
-            state.session.title = title;
-          })
-        }
+        setTitle={(title) => {
+          const sessionId = store.get().session.id;
+          setTitle(sessionId, title);
+        }}
       />
 
       {!readonly && id && (

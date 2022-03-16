@@ -1,4 +1,5 @@
 const { Page, test, expect } = require("@playwright/test");
+const List = require("./utils/listitemidbuilder");
 const {
   createNote,
   NOTE,
@@ -6,6 +7,7 @@ const {
   getEditorTitle,
   getEditorContent,
   getEditorContentAsHTML,
+  editNote,
 } = require("./utils");
 const {
   checkNotePresence,
@@ -229,4 +231,83 @@ test("last line doesn't get saved if it's font is different", async () => {
   const content = await getEditorContentAsHTML();
 
   expect(content).toMatchSnapshot(`last-line-with-different-font.txt`);
+});
+
+test("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
+  page,
+}) => {
+  await createNoteAndCheckPresence({
+    title: "Test note 1",
+    content: "53ad8e4e40ebebd0f400498d",
+  });
+
+  await createNoteAndCheckPresence({
+    title: "Test note 2",
+    content: "f054d19e9a2f46eff7b9bb25",
+  });
+
+  const selector1 = `[data-item-index="1"] div`;
+  const selector2 = `[data-item-index="2"] div`;
+
+  for (let i = 0; i < 10; ++i) {
+    await page.click(selector2);
+
+    await editNote(null, `Test note 1 (${i}) `, true);
+
+    await page.click(selector1);
+
+    await editNote(null, `Test note 2 (${i})`, true);
+
+    await page.waitForTimeout(100);
+  }
+
+  await page.click(selector1);
+  expect(await getEditorContent()).toMatchSnapshot(
+    `fast-switch-and-edit-note-2.txt`
+  );
+
+  await page.click(selector2);
+  expect(await getEditorContent()).toMatchSnapshot(
+    `fast-switch-and-edit-note-1.txt`
+  );
+});
+
+test("editing a note and switching immediately to another note and editing the title shouldn't overlap both notes", async ({
+  page,
+}, { setTimeout }) => {
+  setTimeout(0);
+  await createNoteAndCheckPresence({
+    title: "Test note 1",
+    content: "53ad8e4e40ebebd0f400498d",
+  });
+
+  await createNoteAndCheckPresence({
+    title: "Test note 2",
+    content: "f054d19e9a2f46eff7b9bb25",
+  });
+
+  const selector1 = `[data-item-index="1"] div`;
+  const selector2 = `[data-item-index="2"] div`;
+
+  for (let i = 0; i < 10; ++i) {
+    await page.click(selector2);
+
+    await editNote(`Test note 2 (${i})`, null, true);
+
+    await page.click(selector1);
+
+    await editNote(`Test note 2 (${i})`, null, true);
+
+    await page.waitForTimeout(100);
+  }
+
+  await page.click(selector1);
+  expect(await getEditorTitle()).toMatchSnapshot(
+    `fast-switch-and-edit-note-title-2.txt`
+  );
+
+  await page.click(selector2);
+  expect(await getEditorTitle()).toMatchSnapshot(
+    `fast-switch-and-edit-note-title-1.txt`
+  );
 });

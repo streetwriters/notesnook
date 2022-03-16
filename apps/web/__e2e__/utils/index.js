@@ -45,7 +45,7 @@ async function createNote(note, actionButtonId) {
   await editNote(note.title, note.content);
 }
 
-async function editNote(title, content) {
+async function editNote(title, content, noDelay = false) {
   await page.waitForSelector(".mce-content-body");
 
   // await page.waitForTimeout(1000);
@@ -57,14 +57,14 @@ async function editNote(title, content) {
     });
 
   if (content) {
-    await page.waitForTimeout(100);
+    if (!noDelay) await page.waitForTimeout(100);
 
     await page.focus(".mce-content-body");
 
     await page.type(".mce-content-body", content);
   }
 
-  await page.waitForTimeout(200);
+  if (!noDelay) await page.waitForTimeout(200);
 }
 
 async function downloadFile(downloadActionSelector, encoding) {

@@ -154,9 +154,9 @@ class NoteStore extends BaseStore {
    * @private
    */
   _syncEditor = (noteId, action, value) => {
-    const { session, setSession } = editorStore.get();
+    const { session, toggle } = editorStore.get();
     if (session.id !== noteId) return false;
-    setSession((state) => (state.session[action] = value), true);
+    toggle(session.id, action, value);
     return true;
   };
 }

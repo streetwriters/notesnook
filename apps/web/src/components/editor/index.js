@@ -19,9 +19,9 @@ import Toolbar from "./toolbar";
 import EditorLoading from "./loading";
 import { db } from "../../common/db";
 import { AppEventManager, AppEvents } from "../../common/app-events";
-import debounce from "just-debounce-it";
 import { FlexScrollContainer } from "../scroll-container";
 import { formatDate } from "notes-core/utils/date";
+import { debounce, debounceWithId } from "../../utils/debounce";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 // const EMPTY_CONTENT = "<p><br></p>";
@@ -40,7 +40,17 @@ function updateWordCount(editor) {
   if (!editor.countWords) return;
   AppEventManager.publish(AppEvents.UPDATE_WORD_COUNT, editor.countWords());
 }
+
+function onEditorChange(noteId, sessionId, content) {
+  if (!content) return;
+
+  editorstore.get().saveSessionContent(noteId, sessionId, {
+    type: "tiny",
+    data: content,
+  });
+}
 const debouncedUpdateWordCount = debounce(updateWordCount, 1000);
+const debouncedOnEditorChange = debounceWithId(onEditorChange, 100);
 
 function Editor({ noteId, nonce }) {
   const editorRef = useRef();
@@ -109,9 +119,9 @@ function Editor({ noteId, nonce }) {
 
   const disablePreviewMode = useCallback(
     async (cancelled) => {
-      const { id, content } = editorstore.get().session;
+      const { id, sessionId, content } = editorstore.get().session;
       if (!cancelled) {
-        await editorstore.get().setSessionContent(content);
+        await editorstore.get().saveSessionContent(id, sessionId, content);
       }
       await startSession(id, true);
     },
@@ -257,13 +267,8 @@ function Editor({ noteId, nonce }) {
                 onSave={saveSession}
                 sessionId={sessionId}
                 onChange={(content, editor) => {
-                  if (!content) return;
-
-                  editorstore.get().setSessionContent({
-                    type: "tiny",
-                    data: content,
-                  });
-
+                  const { id, sessionId } = editorstore.get().session;
+                  debouncedOnEditorChange(sessionId, id, sessionId, content);
                   debouncedUpdateWordCount(editor);
                 }}
                 changeInterval={100}
