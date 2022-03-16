@@ -136,11 +136,11 @@ export const Login = ({ changeMode }) => {
             overflow: 'hidden'
           }}
         >
-          <BouncingView initialScale={1.2} duration={5000}>
+          <BouncingView initialScale={1.05} duration={5000}>
             <SvgView src={SVG(colors.night ? colors.icon : 'black')} height={700} />
           </BouncingView>
         </View>
-        <BouncingView initialScale={0.95} duration={3000}>
+        <BouncingView initialScale={0.98} duration={3000}>
           <View
             style={{
               width: '100%',
