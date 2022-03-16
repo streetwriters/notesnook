@@ -64,6 +64,10 @@ export default function AppEffects({ setShow }) {
         }
       );
 
+      EV.subscribe(EVENTS.databaseSyncRequested, async (full, force) => {
+        await sync(full, force);
+      });
+
       initAttachments();
       refreshNavItems();
       initNotes();

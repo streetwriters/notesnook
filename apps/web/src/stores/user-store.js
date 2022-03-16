@@ -42,11 +42,7 @@ class UserStore extends BaseStore {
     return db.user.fetchUser().then(async (user) => {
       if (!user) return false;
 
-      EV.remove(
-        EVENTS.userSubscriptionUpdated,
-        EVENTS.userEmailConfirmed,
-        EVENTS.databaseSyncRequested
-      );
+      EV.remove(EVENTS.userSubscriptionUpdated, EVENTS.userEmailConfirmed);
 
       this.set((state) => {
         state.user = user;
@@ -64,10 +60,6 @@ class UserStore extends BaseStore {
 
       EV.subscribe(EVENTS.userEmailConfirmed, () => {
         hashNavigate("/confirmed");
-      });
-
-      EV.subscribe(EVENTS.databaseSyncRequested, async (full, force) => {
-        await appStore.sync(full, force);
       });
 
       EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
