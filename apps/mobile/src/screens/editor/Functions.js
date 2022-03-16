@@ -899,7 +899,7 @@ export async function saveNote(title, _id, data, type, _sessionId, _historySessi
   }
   isSaving = false;
 }
-
+let isInitalLaunch = true;
 export async function onWebViewLoad(premium, colors) {
   eSendEvent('resetcomplete');
   setTimeout(() => {
@@ -910,6 +910,11 @@ export async function onWebViewLoad(premium, colors) {
     }
   }, 300);
   setColors(colors);
+
+  if (isInitalLaunch) {
+    tiny.call(EditorWebView, tiny.setPlaceholder(placeholderTip));
+    isInitalLaunch = false;
+  }
 }
 
 async function restoreEditorState() {
