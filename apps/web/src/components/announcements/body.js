@@ -41,9 +41,23 @@ export default function AnnouncementBody({ id, components, type }) {
 
         switch (item.type) {
           case "title":
-            return <Title item={item} fontSize="subheading" />;
+            return (
+              <Title
+                item={{ ...item, style: { ...item.style, textAlign: "left" } }}
+                fontSize="subtitle"
+              />
+            );
           case "description":
-            return <Description item={item} />;
+            return (
+              <Description
+                item={{
+                  ...item,
+                  style: { ...item.style, textAlign: "left", marginTop: 1 },
+                }}
+                fontSize="body"
+                color="text"
+              />
+            );
           case "callToActions":
             return <InlineCalltoActions item={item} />;
           case "text":
@@ -71,7 +85,7 @@ export default function AnnouncementBody({ id, components, type }) {
           case "subheading":
             return <Title item={item} fontSize={"title"} />;
           case "description":
-            return <Description item={item} />;
+            return <Description item={item} fontSize="subtitle" />;
           case "callToActions":
             return <CalltoActions item={item} />;
           case "features":
@@ -131,7 +145,7 @@ function Title({ item, fontSize }) {
   const { text, style } = item;
   return (
     <Text
-      value={text}
+      value={text.toUpperCase()}
       variant="heading"
       mx={HORIZONTAL_MARGIN}
       fontSize={fontSize}
@@ -140,14 +154,15 @@ function Title({ item, fontSize }) {
   );
 }
 
-function Description({ item }) {
+function Description({ item, fontSize, color }) {
   const { text, style } = item;
   return (
     <Text
       value={text}
-      variant="title"
+      variant="body"
       fontWeight="normal"
-      color="fontTertiary"
+      fontSize={fontSize}
+      color={color || "fontTertiary"}
       mx={HORIZONTAL_MARGIN}
       sx={mapStyle(style)}
     />
@@ -180,7 +195,24 @@ function CalltoActions({ item }) {
           )
         )
         .map((action, index) => (
-          <CalltoAction action={action} index={index} />
+          <CalltoAction
+            action={action}
+            index={index}
+            variant={
+              index === 0
+                ? "primary"
+                : index === 1
+                ? "secondary"
+                : index === 2
+                ? "tertiary"
+                : "shade"
+            }
+            sx={{
+              ":first-of-type": {
+                mr: 1,
+              },
+            }}
+          />
         ))}
     </Flex>
   );
@@ -189,12 +221,7 @@ function CalltoActions({ item }) {
 function InlineCalltoActions({ item }) {
   const { actions, style } = item;
   return (
-    <Flex
-      px={2}
-      justifyContent="center"
-      alignItems="center"
-      sx={mapStyle(style)}
-    >
+    <Flex px={2} sx={mapStyle(style)}>
       {actions
         ?.filter((cta) =>
           cta.platforms.some(
@@ -202,31 +229,34 @@ function InlineCalltoActions({ item }) {
           )
         )
         .map((action, index) => (
-          <CalltoAction key={action.title} action={action} index={index} />
+          <CalltoAction
+            key={action.title}
+            action={action}
+            variant={"anchor"}
+            sx={{
+              textDecoration: "underline",
+              textDecorationLine: "underline",
+              textDecorationColor:
+                index === 0 ? "var(--dimPrimary)" : "var(--bgSecondary)",
+              color: index === 0 ? "primary" : "fontTertiary",
+              fontWeight: "bold",
+              ":first-of-type": {
+                mr: 1,
+              },
+            }}
+          />
         ))}
     </Flex>
   );
 }
 
-function CalltoAction({ action, index }) {
+function CalltoAction({ action, variant, sx }) {
   return (
     <Button
       as={action.type === "link" ? "a" : "button"}
       href={action.type === "link" ? action.data : ""}
-      variant={
-        index === 0
-          ? "primary"
-          : index === 1
-          ? "secondary"
-          : index === 2
-          ? "tertiary"
-          : "shade"
-      }
-      sx={{
-        ":first-of-type": {
-          mr: 1,
-        },
-      }}
+      variant={variant}
+      sx={sx}
       onClick={async () => {
         closeOpenedDialog();
         trackEvent(ANALYTICS_EVENTS.announcementCta, action.data);
