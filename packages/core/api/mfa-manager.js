@@ -6,7 +6,6 @@ const ENDPOINTS = {
   setup: "/mfa/setup",
   enable: "/mfa/enable",
   disable: "/mfa/disable",
-  reset: "/mfa/reset",
   recoveryCodes: "/mfa/codes",
 };
 
@@ -67,26 +66,16 @@ class MFAManager {
     );
   }
 
-  async reset() {
-    const token = await this.tokenManager.getAccessToken();
-    if (!token) return;
-    return await http.post(
-      `${constants.AUTH_HOST}${ENDPOINTS.reset}`,
-      null,
-      token
-    );
-  }
-
   /**
    * Generate new 2FA recovery codes or get count of valid recovery codes.
    * @param {boolean} generate
    * @returns
    */
-  async codes(generate = false) {
+  async codes() {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
     return await http.get(
-      `${constants.AUTH_HOST}${ENDPOINTS.recoveryCodes}?generate=${generate}`,
+      `${constants.AUTH_HOST}${ENDPOINTS.recoveryCodes}`,
       token
     );
   }
