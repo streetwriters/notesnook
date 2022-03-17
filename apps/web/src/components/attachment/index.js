@@ -7,7 +7,11 @@ import { reuploadAttachment } from "../editor/plugins/picker";
 import { store } from "../../stores/attachment-store";
 import { db } from "../../common/db";
 import { Multiselect } from "../../common/multi-select";
-import { showAttachmentsDialog } from "../../common/dialog-controller";
+import {
+  closeOpenedDialog,
+  showAttachmentsDialog,
+} from "../../common/dialog-controller";
+import { hashNavigate } from "../../navigation";
 
 const workStatusMap = {
   recheck: "Rechecking...",
@@ -133,6 +137,26 @@ function Attachment({ item, isCompact, index }) {
 export default Attachment;
 
 const menuItems = [
+  {
+    key: "notes",
+    title: "Notes",
+    icon: Icon.References,
+    items: ({ attachment }) =>
+      attachment.noteIds.reduce((prev, curr) => {
+        const note = db.notes.note(curr);
+        if (!note) prev.push({ key: curr, title: `Note with id ${curr}` });
+        else
+          prev.push({
+            key: note.id,
+            title: note.title,
+            onClick: () => {
+              hashNavigate(`/notes/${curr}/edit`);
+              closeOpenedDialog();
+            },
+          });
+        return prev;
+      }, []),
+  },
   {
     key: "recheck",
     title: () => "Recheck",

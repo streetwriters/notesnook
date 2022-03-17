@@ -165,7 +165,6 @@ function mapMenuItems(items, data) {
       disabled,
       hidden,
       checked,
-      items,
       isPro,
       isNew,
       type,
@@ -186,6 +185,7 @@ function mapMenuItems(items, data) {
     const icon = resolveProp(item.icon, data, item);
     const isChecked = resolveProp(checked, data, item);
     const isDisabled = resolveProp(disabled, data, item);
+    const items = resolveProp(item.items, data, item);
     const onClick =
       typeof _onClick === "function" && _onClick.bind(this, data, item);
 

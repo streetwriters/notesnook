@@ -140,11 +140,11 @@ import {
   mdiGithub,
   mdiAlertCircleOutline,
   mdiProgressUpload,
-  mdiRenameBox,
   mdiFormTextbox,
   mdiCheckAll,
   mdiCloudOffOutline,
   mdiContentDuplicate,
+  mdiVectorLink,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -362,3 +362,4 @@ export const Reupload = createIcon(mdiProgressUpload);
 export const Rename = createIcon(mdiFormTextbox);
 export const Upload = createIcon(mdiCloudOffOutline);
 export const Uploaded = createIcon(mdiCloudCheckOutline);
+export const References = createIcon(mdiVectorLink);

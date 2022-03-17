@@ -40,7 +40,6 @@ function showDialog(dialog) {
 
 export function closeOpenedDialog() {
   const root = document.getElementById("dialogContainer");
-  if (!root.childElementCount) return;
   ReactDOM.unmountComponentAtNode(root);
 }
 
