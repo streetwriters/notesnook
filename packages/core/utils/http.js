@@ -116,17 +116,18 @@ function errorTransformer(errorJson) {
     errorMessage = errors.join("\n");
   }
 
-  switch (error) {
+  outer: switch (error) {
     case "invalid_grant": {
       switch (error_description) {
         case "invalid_username_or_password":
           errorMessage = "Username or password incorrect.";
           errorCode = error_description;
-          break;
+          break outer;
         default:
           errorMessage = error_description || error;
           errorCode = error || "invalid_grant";
-          break;
+          console.log(errorMessage, errorCode);
+          break outer;
       }
     }
     default:
