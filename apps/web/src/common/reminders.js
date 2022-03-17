@@ -4,7 +4,10 @@ import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
-import { showRecoveryKeyDialog } from "../common/dialog-controller";
+import {
+  showBackupDialog,
+  showRecoveryKeyDialog,
+} from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { isDesktop } from "../utils/platform";
 import saveFile from "../commands/save-file";
@@ -35,7 +38,7 @@ export async function shouldAddRecoveryKeyBackupReminder() {
 
   const recoveryKeyBackupDate = Config.get("recoveryKeyBackupDate", 0);
   if (!recoveryKeyBackupDate) return true;
-  return dayjs(recoveryKeyBackupDate).add(7, "d").isBefore(dayjs());
+  return dayjs(recoveryKeyBackupDate).add(30, "d").isBefore(dayjs());
 }
 
 export async function shouldAddLoginReminder() {
@@ -99,7 +102,7 @@ export async function resetReminders() {
       saveFile(filePath, data);
       showToast("success", `Backup saved at ${filePath}.`);
     } else if (isUserPremium()) {
-      await createBackup(true);
+      await showBackupDialog();
     }
   }
   if (await shouldAddLoginReminder()) {

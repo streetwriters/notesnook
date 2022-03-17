@@ -107,6 +107,12 @@ export function showBuyDialog(plan, couponCode) {
   ));
 }
 
+export function showBackupDialog() {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.BackupDialog onClose={() => perform(false)} />
+  ));
+}
+
 export function confirm({
   title,
   subtitle,
