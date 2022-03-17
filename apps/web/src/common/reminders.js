@@ -9,7 +9,7 @@ import {
   showRecoveryKeyDialog,
 } from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
-import { isDesktop } from "../utils/platform";
+import { isDesktop, isTesting } from "../utils/platform";
 import saveFile from "../commands/save-file";
 import { PATHS } from "@notesnook/desktop/paths";
 import { isUserPremium } from "../hooks/use-is-user-premium";
@@ -101,7 +101,7 @@ export async function resetReminders() {
       const filePath = `${directory}/${filename}.${ext}`;
       saveFile(filePath, data);
       showToast("success", `Backup saved at ${filePath}.`);
-    } else if (isUserPremium()) {
+    } else if (isUserPremium() && !isTesting()) {
       await showBackupDialog();
     }
   }

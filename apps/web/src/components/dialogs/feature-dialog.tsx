@@ -1,12 +1,10 @@
-import React from "react";
 import { Text, Flex } from "rebass";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { getHomeRoute, hardNavigate } from "../../navigation";
 import { appVersion } from "../../utils/version";
-import Tag from "../tag";
-import IconTag from "../icon-tag";
 import Config from "../../utils/config";
+import { isTesting } from "../../utils/platform";
 
 type CallToAction = {
   title: string;
@@ -81,7 +79,7 @@ const features: Record<FeatureKeys, Feature> = {
         `${appVersion.numerical}:highlights`,
         false
       ) as boolean;
-      return !hasShown;
+      return !isTesting() && !hasShown;
     },
   },
 };
