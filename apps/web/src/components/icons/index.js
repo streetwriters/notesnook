@@ -145,6 +145,8 @@ import {
   mdiCloudOffOutline,
   mdiContentDuplicate,
   mdiVectorLink,
+  mdiCodeString,
+  mdiCodeBraces,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -363,3 +365,4 @@ export const Rename = createIcon(mdiFormTextbox);
 export const Upload = createIcon(mdiCloudOffOutline);
 export const Uploaded = createIcon(mdiCloudCheckOutline);
 export const References = createIcon(mdiVectorLink);
+export const Codeblock = createIcon(mdiCodeBraces);

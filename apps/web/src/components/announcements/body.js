@@ -55,7 +55,7 @@ export default function AnnouncementBody({ id, components, type }) {
                   style: { ...item.style, textAlign: "left", marginTop: 1 },
                 }}
                 fontSize="body"
-                color="text"
+                color="icon"
               />
             );
           case "callToActions":

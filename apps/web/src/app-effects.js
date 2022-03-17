@@ -16,6 +16,7 @@ import useAnnouncements from "./utils/use-announcements";
 import {
   showAnnouncementDialog,
   showBuyDialog,
+  showFeatureDialog,
   showInvalidSystemTimeDialog,
   showOnboardingDialog,
 } from "./common/dialog-controller";
@@ -79,7 +80,8 @@ export default function AppEffects({ setShow }) {
         await resetReminders();
         setIsVaultCreated(await db.vault.exists());
 
-        showOnboardingDialog(interruptedOnboarding());
+        await showOnboardingDialog(interruptedOnboarding());
+        await showFeatureDialog("highlights");
       })();
       return () => {
         userCheckStatusEvent.unsubscribe();

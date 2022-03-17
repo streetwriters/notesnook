@@ -4,6 +4,7 @@ export const appVersion = {
     process.env.REACT_APP_GIT_HASH,
     process.env.REACT_APP_PLATFORM
   ),
+  clean: formatVersion(process.env.REACT_APP_VERSION),
   numerical: parseInt(process.env.REACT_APP_VERSION),
 };
 
