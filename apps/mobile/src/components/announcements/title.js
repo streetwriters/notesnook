@@ -63,7 +63,7 @@ export const Title = ({ text, style = {}, inline }) => {
       style={{
         marginHorizontal: 12,
         ...getStyle(style),
-        marginTop: style.marginTop || 12
+        marginTop: style?.marginTop || 12
       }}
     >
       {text}

@@ -1,5 +1,6 @@
 import { FileType } from 'react-native-scoped-storage';
 import { State } from 'zustand';
+import 'notes-core/types';
 
 export type Item = {
   id: string;
@@ -38,11 +39,11 @@ export interface TrashStore extends State {
 }
 
 export interface UserStore extends State {
-  user: Object | null;
+  user: User | null | undefined;
   premium: boolean;
   lastSynced: string;
   syncing: boolean;
-  setUser: (user: Object | null) => void;
+  setUser: (user: User | null | undefined) => void;
   setPremium: (premium: boolean) => void;
   setSyncing: (syncing: boolean) => void;
   setLastSynced: (lastSynced: string) => void;

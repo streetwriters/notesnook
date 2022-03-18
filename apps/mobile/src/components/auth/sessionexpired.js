@@ -26,6 +26,8 @@ import { Toast } from '../toast';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import SettingsService from '../../services/settings';
+import TwoFactorVerification from './two-factor';
+import SheetProvider from '../sheet-provider';
 
 function getEmail(email) {
   if (!email) return null;
@@ -96,12 +98,17 @@ export const SessionExpired = () => {
     }
   };
 
-  const login = async () => {
+  const login = async (mfa, callback) => {
     if (error) return;
     setLoading(true);
     let user;
     try {
-      await db.user.login(email.current.toLowerCase(), password.current);
+      if (mfa) {
+        await db.user.mfaLogin(email.current.toLowerCase(), password.current, mfa);
+      } else {
+        await db.user.login(email.current.toLowerCase(), password.current);
+      }
+      callback && callback(true);
       user = await db.user.getUser();
       if (!user) throw new Error('Email or password incorrect!');
       PremiumService.setPremiumStatus();
@@ -113,7 +120,6 @@ export const SessionExpired = () => {
         type: 'success',
         context: 'global'
       });
-      setVisible(false);
       await SettingsService.set({
         sessionExpired: false,
         userEmailConfirmed: user.isEmailConfirmed
@@ -126,16 +132,25 @@ export const SessionExpired = () => {
         progress: true
       });
     } catch (e) {
-      setLoading(false);
-      ToastEvent.show({
-        heading: user ? 'Failed to sync' : 'Login failed',
-        message: e.message,
-        type: 'error',
-        context: 'local'
-      });
+      callback && callback(true);
+      if (e.message === 'MFA Required') {
+        TwoFactorVerification.present(async mfa => {
+          if (mfa) {
+            await login(mfa);
+          }
+        }, e.data);
+      } else {
+        console.log(e.stack);
+        setLoading(false);
+        ToastEvent.show({
+          heading: user ? 'Failed to sync' : 'Login failed',
+          message: e.message,
+          type: 'error',
+          context: 'local'
+        });
+      }
     }
   };
-
   return (
     visible && (
       <Modal
@@ -146,6 +161,7 @@ export const SessionExpired = () => {
         }}
         visible={true}
       >
+        <SheetProvider context="two_factor_verify" />
         <View
           style={{
             width: focused ? '100%' : '99.9%',

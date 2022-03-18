@@ -23,30 +23,30 @@ import { IconButton } from '../icon-button';
 import Paragraph from '../typography/paragraph';
 
 interface InputProps extends TextInputProps {
-  fwdRef: RefObject<any>;
-  validationType: 'password' | 'email' | 'confirmPassword' | 'username';
-  loading: boolean;
-  onSubmit: (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void | undefined;
-  onErrorCheck: (error: boolean) => void;
-  errorMessage: string;
-  customColor: ColorValue;
-  customValidator: () => string;
-  marginBottom: number;
-  button: {
+  fwdRef?: RefObject<any>;
+  validationType?: 'password' | 'email' | 'confirmPassword' | 'username';
+  loading?: boolean;
+  onSubmit?: (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void | undefined;
+  onErrorCheck?: (error: boolean) => void;
+  errorMessage?: string;
+  customColor?: ColorValue;
+  customValidator?: () => string;
+  marginBottom?: number;
+  button?: {
     icon: string;
     color: ColorValue;
     onPress: () => void;
   };
-  buttons: React.ReactNode;
+  buttons?: React.ReactNode;
   onBlurInput?: () => void;
   onPress?: () => void;
-  height: number;
-  fontSize: number;
+  height?: number;
+  fontSize?: number;
   onFocusInput?: () => void;
-  marginRight: number;
-  buttonLeft: React.ReactNode;
-  inputStyle: TextInputProps['style'];
-  containerStyle: ViewStyle;
+  marginRight?: number;
+  buttonLeft?: React.ReactNode;
+  inputStyle?: TextInputProps['style'];
+  containerStyle?: ViewStyle;
 }
 
 const Input = ({
@@ -93,7 +93,7 @@ const Input = ({
     if (!validationType) return;
     if (!value || value?.length === 0) {
       setError(false);
-      onErrorCheck(false);
+      onErrorCheck && onErrorCheck(false);
       setErrorList({
         SHORT_PASS: true
       });
@@ -112,7 +112,7 @@ const Input = ({
         isError = validateUsername(value);
         break;
       case 'confirmPassword':
-        isError = value === customValidator();
+        isError = customValidator && value === customValidator();
         break;
     }
 
@@ -125,11 +125,11 @@ const Input = ({
         }
       });
       setError(hasError);
-      onErrorCheck(hasError);
+      onErrorCheck && onErrorCheck(hasError);
       setErrorList(isError);
     } else {
       setError(!isError);
-      onErrorCheck(!isError);
+      onErrorCheck && onErrorCheck(!isError);
     }
   };
 

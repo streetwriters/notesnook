@@ -24,6 +24,8 @@ import Paragraph from '../ui/typography/paragraph';
 import { SVG } from './background';
 import { ForgotPassword } from './forgot-password';
 import SettingsService from '../../services/settings';
+import SheetProvider from '../sheet-provider';
+import TwoFactorVerification from './two-factor';
 
 export const Login = ({ changeMode }) => {
   const colors = useThemeStore(state => state.colors);
@@ -61,12 +63,19 @@ export const Login = ({ changeMode }) => {
     };
   }, []);
 
-  const login = async () => {
+  const login = async (mfa, callback) => {
     if (!validateInfo() || error) return;
     setLoading(true);
     let user;
     try {
-      await db.user.login(email.current.toLowerCase(), password.current);
+      if (mfa) {
+        console.log('mfa details', mfa);
+        await db.user.mfaLogin(email.current.toLowerCase(), password.current, mfa);
+      } else {
+        await db.user.login(email.current.toLowerCase(), password.current);
+      }
+      callback && callback(true);
+
       user = await db.user.getUser();
       if (!user) throw new Error('Email or password incorrect!');
       PremiumService.setPremiumStatus();
@@ -91,14 +100,27 @@ export const Login = ({ changeMode }) => {
         progress: true
       });
     } catch (e) {
-      console.log(e.stack);
-      setLoading(false);
-      ToastEvent.show({
-        heading: user ? 'Failed to sync' : 'Login failed',
-        message: e.message,
-        type: 'error',
-        context: 'local'
-      });
+      callback && callback(false);
+      console.log('Login error', e.message, e.data);
+      if (e.message === 'Multifactor authentication required.') {
+        TwoFactorVerification.present(async mfa => {
+          if (mfa) {
+            console.log(mfa);
+            await login(mfa);
+          } else {
+            setLoading(false);
+          }
+        }, e.data);
+      } else {
+        console.log(e.stack);
+        setLoading(false);
+        ToastEvent.show({
+          heading: user ? 'Failed to sync' : 'Login failed',
+          message: e.message,
+          type: 'error',
+          context: 'local'
+        });
+      }
     }
   };
 
@@ -119,6 +141,7 @@ export const Login = ({ changeMode }) => {
       />
 
       <ForgotPassword />
+      <SheetProvider context="two_factor_verify" />
 
       {loading ? <BaseDialog transparent={true} visible={true} animation="fade" /> : null}
       <View

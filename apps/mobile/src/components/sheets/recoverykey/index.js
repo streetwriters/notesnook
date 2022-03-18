@@ -8,19 +8,18 @@ import Share from 'react-native-share';
 import { LOGO_BASE64 } from '../../../assets/images/assets';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import { clearMessage } from '../../../services/message';
+import SettingsService from '../../../services/settings';
 import { db } from '../../../utils/database';
+import Storage from '../../../utils/database/storage';
 import { eOpenRecoveryKeyDialog } from '../../../utils/events';
-import { MMKV } from '../../../utils/database/mmkv';
 import { sanitizeFilename } from '../../../utils/sanitizer';
 import { SIZE } from '../../../utils/size';
-import Storage from '../../../utils/database/storage';
 import { sleep } from '../../../utils/time';
-import { Button } from '../../ui/button';
 import DialogHeader from '../../dialog/dialog-header';
+import { Button } from '../../ui/button';
 import Seperator from '../../ui/seperator';
 import SheetWrapper from '../../ui/sheet';
 import Paragraph from '../../ui/typography/paragraph';
-import SettingsService from '../../../services/settings';
 
 let RNFetchBlob;
 

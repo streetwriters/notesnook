@@ -4,8 +4,25 @@ import { View } from 'react-native';
 import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
+import { PressableButtonProps } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+
+type DialogHeaderProps = {
+  icon?: string;
+  title?: string;
+  paragraph?: string;
+  button?: {
+    onPress?: () => void;
+    loading?: boolean;
+    title?: string;
+    type?: PressableButtonProps['type'];
+  };
+  paragraphColor?: string;
+  padding?: number;
+  centered?: boolean;
+  titlePart?: string;
+};
 
 const DialogHeader = ({
   icon,
@@ -16,7 +33,7 @@ const DialogHeader = ({
   padding,
   centered,
   titlePart
-}) => {
+}: DialogHeaderProps) => {
   const colors = useThemeStore(state => state.colors);
 
   return (
@@ -42,7 +59,7 @@ const DialogHeader = ({
               alignItems: 'center'
             }}
           >
-            <Heading size={SIZE.xl}>
+            <Heading style={{ textAlign: centered ? 'center' : 'left' }} size={SIZE.xl}>
               {title} {titlePart ? <Text style={{ color: colors.accent }}>{titlePart}</Text> : null}
             </Heading>
 

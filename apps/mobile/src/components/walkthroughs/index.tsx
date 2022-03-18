@@ -130,6 +130,10 @@ Walkthrough.present = async (
   nopersist?: boolean
 ) => {
   if (!nopersist) {
+    if (!walkthroughState || Object.keys(walkthroughState).length === 0) {
+      console.log('late init of walkthrough state');
+      await Walkthrough.init();
+    }
     if (walkthroughState[id]) return;
     //@ts-ignore
     Walkthrough.update(id);

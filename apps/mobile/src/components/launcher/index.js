@@ -179,7 +179,7 @@ const Launcher = React.memo(
 
     const checkForRateAppRequest = async () => {
       let rateApp = SettingsService.get().rateApp;
-      if (rateApp && rateApp < Date.now() && !useMessageStore.getState().message.visible) {
+      if (rateApp && rateApp < Date.now() && !useMessageStore.getState().message?.visible) {
         setRateAppMessage();
         return true;
       }

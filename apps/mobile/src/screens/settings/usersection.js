@@ -26,6 +26,7 @@ import {
 } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
+import TwoFactorAuth from './2fa';
 import { CustomButton } from './button';
 import { verifyUser } from './functions';
 
@@ -335,6 +336,8 @@ const SettingsUserSection = () => {
               />
             )
           )}
+
+          <TwoFactorAuth />
         </>
       ) : null}
     </>

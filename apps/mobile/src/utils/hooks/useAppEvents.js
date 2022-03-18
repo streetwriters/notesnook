@@ -42,6 +42,7 @@ import {
   clearAllStores,
   initialize,
   useAttachmentStore,
+  useMessageStore,
   useNoteStore,
   useSettingStore,
   useUserStore
@@ -295,7 +296,9 @@ export const useAppEvents = () => {
       user = await db.user.getUser();
       await PremiumService.setPremiumStatus();
       if (login) {
+        console.log('sync started');
         await Sync.run();
+        console.log('hide progress dialog');
         eSendEvent(eCloseProgressDialog);
       }
       setLastSynced(await db.lastSynced());
@@ -330,7 +333,11 @@ export const useAppEvents = () => {
     } catch (e) {}
 
     user = await db.user.getUser();
-    if (user?.isEmailConfirmed && !SettingsService.get().recoveryKeySaved) {
+    if (
+      user?.isEmailConfirmed &&
+      !SettingsService.get().recoveryKeySaved &&
+      !useMessageStore.getState().message?.visible
+    ) {
       setRecoveryKeyMessage();
     }
     if (!user.isEmailConfirmed) setEmailVerifyMessage();

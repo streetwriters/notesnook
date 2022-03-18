@@ -23,6 +23,7 @@ import AccoutLogoutSection from './logout';
 import SettingsPrivacyAndSecurity from './privacy';
 import SectionHeader from './section-header';
 import SettingsUserSection from './user-section';
+import TwoFactorAuth from './2fa';
 
 const format = ver => {
   let parts = ver.toString().split('');
