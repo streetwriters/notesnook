@@ -47,11 +47,33 @@ class MFAManager {
    * @returns
    */
   async enable(type, code) {
+    return this._enable(type, code, false);
+  }
+
+  /**
+   *
+   * @param {"app" | "sms" | "email"} type
+   * @param {string} code
+   * @returns
+   */
+  async enableFallback(type, code) {
+    return this._enable(type, code);
+  }
+
+  /**
+   *
+   * @param {"app" | "sms" | "email"} type
+   * @param {string} code
+   * @param {boolean} isFallback
+   * @private
+   * @returns
+   */
+  async _enable(type, code, isFallback) {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
     return await http.post(
       `${constants.AUTH_HOST}${ENDPOINTS.enable}`,
-      { type, code },
+      { type, code, isFallback },
       token
     );
   }
