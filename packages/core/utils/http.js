@@ -164,7 +164,7 @@ async function fetchWrapped(input, init) {
   }
 }
 
-class RequestError extends Error {
+export class RequestError extends Error {
   constructor(error) {
     super(error.description);
     this.code = error.code;

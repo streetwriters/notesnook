@@ -3,10 +3,11 @@ import constants from "../utils/constants";
 import TokenManager from "./token-manager";
 
 const ENDPOINTS = {
-  setup: "/mfa/setup",
-  enable: "/mfa/enable",
-  disable: "/mfa/disable",
+  setup: "/mfa",
+  enable: "/mfa",
+  disable: "/mfa",
   recoveryCodes: "/mfa/codes",
+  send: "/mfa/send",
 };
 
 class MFAManager {
@@ -57,7 +58,7 @@ class MFAManager {
    * @returns
    */
   async enableFallback(type, code) {
-    return this._enable(type, code);
+    return this._enable(type, code, true);
   }
 
   /**
@@ -71,7 +72,7 @@ class MFAManager {
   async _enable(type, code, isFallback) {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
-    return await http.post(
+    return await http.patch(
       `${constants.AUTH_HOST}${ENDPOINTS.enable}`,
       { type, code, isFallback },
       token
@@ -81,9 +82,8 @@ class MFAManager {
   async disable() {
     const token = await this.tokenManager.getAccessToken();
     if (!token) return;
-    return await http.post(
+    return await http.delete(
       `${constants.AUTH_HOST}${ENDPOINTS.disable}`,
-      null,
       token
     );
   }
@@ -98,6 +98,23 @@ class MFAManager {
     if (!token) return;
     return await http.get(
       `${constants.AUTH_HOST}${ENDPOINTS.recoveryCodes}`,
+      token
+    );
+  }
+
+  /**
+   * @param {"sms" | "email"} method
+   * @param {string} phoneNumber
+   * @returns
+   */
+  async sendCode(method, token) {
+    if (!token) throw new Error("Token is required to make this request.");
+
+    return await http.post(
+      `${constants.AUTH_HOST}${ENDPOINTS.send}`,
+      {
+        type: method,
+      },
       token
     );
   }
