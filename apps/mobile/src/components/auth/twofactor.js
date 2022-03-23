@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/theme';
@@ -12,6 +12,8 @@ import { PressableButton } from '../ui/pressable';
 import Seperator from '../ui/seperator';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { db } from '../../utils/database/index';
+import { ToastEvent } from '../../services/event-manager';
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const colors = useThemeStore(state => state.colors);
@@ -23,6 +25,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const { seconds, start } = useTimer(currentMethod.method);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef();
+  const [sending, setSending] = useState(false);
 
   const codeHelpText = {
     app: 'Enter the 6 digit code from your authenticator app to continue logging in',
@@ -100,6 +103,27 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     );
   };
 
+  useEffect(() => {
+    if (currentMethod.method === 'sms' || currentMethod.method === 'email') {
+      onSendCode();
+    }
+  }, [currentMethod.method]);
+
+  const onSendCode = async () => {
+    if (seconds || sending) return;
+    // TODO
+    setSending(true);
+    try {
+      console.log('sending code');
+      await db.mfa.sendCode(currentMethod.method, mfaInfo.token);
+      start(60);
+      setSending(false);
+    } catch (e) {
+      setSending(false);
+      ToastEvent.error(e, 'Error sending 2FA Code', 'local');
+    }
+  };
+
   return (
     <View>
       <View
@@ -137,14 +161,12 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
 
         <Seperator />
 
-        {currentMethod.method === 'sms' || currentMethod === 'email' ? (
+        {currentMethod.method === 'sms' || currentMethod.method === 'email' ? (
           <Button
-            onPress={() => {
-              if (seconds) return;
-              start(60);
-            }}
+            onPress={onSendCode}
             type={seconds ? 'gray' : 'transparent'}
-            title={`${seconds ? `Resend code in (${seconds})` : 'Send code'}`}
+            title={sending ? '' : `${seconds ? `Resend code in (${seconds})` : 'Send code'}`}
+            loading={sending}
             height={30}
           />
         ) : null}

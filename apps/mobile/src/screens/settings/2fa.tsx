@@ -46,11 +46,13 @@ const TwoFactorAuth = ({ isSheet }: { isSheet: boolean }) => {
   const mfaSettingsList = user?.mfa.isEnabled
     ? [
         {
-          name: 'Add secondary 2FA methods',
+          name: user.mfa.secondaryMethod
+            ? 'Reconfigure fallback 2FA method'
+            : 'Add fallback 2FA method',
           func: () => {
             MFASheet.present(true);
           },
-          desc: 'Add alternate 2FA methods to protect your account'
+          desc: 'You can use fallback 2FA method incase you are unable to login via primary method'
         },
         {
           name: 'View recovery codes',
@@ -64,7 +66,7 @@ const TwoFactorAuth = ({ isSheet }: { isSheet: boolean }) => {
         {
           name: 'Disable Two Factor Authentication',
           func: disable2fa,
-          desc: 'Increased security for your account'
+          desc: 'Decreased security for your account'
         }
       ]
     : [
@@ -216,6 +218,7 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
 
   const [loading, setLoading] = useState(method?.id === 'app' ? true : false);
   const [enabling, setEnabling] = useState(false);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     if (method?.id === 'app') {
@@ -237,7 +240,14 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
     try {
       if (!method) return;
       setEnabling(true);
-      await db.mfa?.enable(method.id, code.current);
+      if (recovery) {
+        console.log('enabling secondary method for 2FA');
+        await db.mfa?.enableFallback(method.id, code.current);
+      } else {
+        console.log('enabling primary method for 2FA');
+        await db.mfa?.enable(method.id, code.current);
+      }
+
       let user = await db.user?.fetchUser();
       useUserStore.getState().setUser(user);
       onSuccess && onSuccess(method);
@@ -252,7 +262,7 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
 
   const onSendCode = async () => {
     console.log('send code');
-    if (!method) return;
+    if (!method || sending) return;
     if (method.id === 'app' && authenticatorDetails.sharedKey) {
       Clipboard.setString(authenticatorDetails.sharedKey);
       ToastEvent.show({
@@ -266,8 +276,8 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
     try {
       console.log('seconds', seconds);
       if (seconds) throw new Error('Please wait a few seconds before resending code');
-      if (method.id === 'sms' && !phoneNumber.current) return;
-
+      if (method.id === 'sms' && !phoneNumber.current) throw new Error('Phone number not entered');
+      setSending(true);
       await db.mfa?.setup(method?.id, phoneNumber.current);
 
       if (method.id === 'sms') {
@@ -275,13 +285,15 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
         setId(method.id + phoneNumber.current);
       }
       await sleep(300);
-      start(60, method.id + phoneNumber.current);
+      start(60, method.id === 'sms' ? method.id + phoneNumber.current : method.id);
+      setSending(false);
       ToastEvent.show({
         heading: `2FA code sent via ${method.id}.`,
         type: 'success',
         context: 'local'
       });
     } catch (e) {
+      setSending(false);
       const error = e as Error;
       console.log('Send code:', error.message);
       ToastEvent.error(error, 'Error sending 2FA code');
@@ -335,8 +347,11 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
               buttons={
                 <Button
                   onPress={onSendCode}
+                  loading={sending}
                   title={
-                    method.id === 'app'
+                    sending
+                      ? null
+                      : method.id === 'app'
                       ? 'Copy'
                       : `${seconds ? `Resend code in (${seconds})` : 'Send code'}`
                   }
@@ -599,14 +614,16 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
         }}
       />
 
-      <Button
-        title="Setup secondary 2FA method"
-        type="gray"
-        height={25}
-        onPress={() => {
-          MFASheet.present(true);
-        }}
-      />
+      {!recovery ? (
+        <Button
+          title="Setup secondary 2FA method"
+          type="gray"
+          height={25}
+          onPress={() => {
+            MFASheet.present(true);
+          }}
+        />
+      ) : null}
     </View>
   );
 };
