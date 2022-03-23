@@ -28,6 +28,8 @@ import Field from "../field";
 import { useSessionState } from "../../utils/hooks";
 import { exportToPDF } from "../../common/export";
 import { useTimer } from "../../hooks/use-timer";
+import { phone } from "phone";
+import { showMultifactorDialog } from "../../common/dialog-controller";
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
 export type AuthenticatorType = "app" | "sms" | "email";
@@ -144,11 +146,25 @@ const steps = {
         ? "phone"
         : "auth app"
     }, you can login to Notesnook using your recovery codes. Each code can only be used once!`,
-    component: BackupRecoveryCodes,
+    component: ({ onNext, onClose, onError }) => (
+      <BackupRecoveryCodes
+        onClose={onClose}
+        onNext={onNext}
+        onError={onError}
+        authenticatorType={authenticatorType}
+      />
+    ),
     next: "finish",
   }),
-  finish: (): Step => ({
-    component: TwoFactorEnabled,
+  finish: (authenticatorType: AuthenticatorType): Step => ({
+    component: ({ onNext, onClose, onError }) => (
+      <TwoFactorEnabled
+        onClose={onClose}
+        onNext={onNext}
+        onError={onError}
+        authenticatorType={authenticatorType}
+      />
+    ),
   }),
 } as const;
 
@@ -521,6 +537,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
   const { onSubmitCode } = props;
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string>();
+  const [phoneNumber, setPhoneNumber] = useState<string>();
   const { elapsed, enabled, setEnabled } = useTimer(`2fa.sms`, 60);
   const inputRef = useRef<HTMLInputElement>();
 
@@ -544,8 +561,21 @@ function SetupSMS(props: SetupAuthenticatorProps) {
           input: { flex: 1 },
         }}
         placeholder={"+1234567890"}
+        onChange={() => {
+          const number = inputRef.current?.value;
+          if (!number) return setError("");
+          const validationResult = phone(number);
+
+          if (validationResult.isValid) {
+            setPhoneNumber(validationResult.phoneNumber);
+            setError("");
+          } else {
+            setPhoneNumber("");
+            setError("Please enter a valid phone number with country code.");
+          }
+        }}
         action={{
-          disabled: isSending || !enabled,
+          disabled: error || isSending || !enabled,
           component: (
             <Text variant={"body"}>
               {isSending ? (
@@ -558,13 +588,14 @@ function SetupSMS(props: SetupAuthenticatorProps) {
             </Text>
           ),
           onClick: async () => {
-            if (!inputRef.current?.value) {
+            if (!phoneNumber) {
               setError("Please provide a phone number.");
               return;
             }
+
             setIsSending(true);
             try {
-              await db.mfa!.setup("sms", inputRef.current?.value);
+              await db.mfa!.setup("sms", phoneNumber);
               setEnabled(false);
             } catch (e) {
               const error = e as Error;
@@ -591,7 +622,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
   );
 }
 
-function BackupRecoveryCodes(props: StepComponentProps) {
+function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
   const { onNext, onError } = props;
   const [codes, setCodes] = useState<string[]>([]);
   const recoveryCodesRef = useRef<HTMLDivElement>();
@@ -654,7 +685,7 @@ function BackupRecoveryCodes(props: StepComponentProps) {
       id="2faForm"
       onSubmit={(e) => {
         e.preventDefault();
-        onNext();
+        onNext(props.authenticatorType);
       }}
     >
       <Box
@@ -700,7 +731,10 @@ function BackupRecoveryCodes(props: StepComponentProps) {
   );
 }
 
-function TwoFactorEnabled(props: StepComponentProps) {
+type TwoFactorEnabledProps = StepComponentProps & {
+  authenticatorType: AuthenticatorType;
+};
+function TwoFactorEnabled(props: TwoFactorEnabledProps) {
   return (
     <Flex
       flexDirection={"column"}
@@ -717,6 +751,19 @@ function TwoFactorEnabled(props: StepComponentProps) {
       </Text>
       <Button mt={2} sx={{ borderRadius: 100, px: 6 }} onClick={props.onClose}>
         Done
+      </Button>
+
+      <Button
+        variant={"anchor"}
+        mt={2}
+        onClick={() => {
+          props.onClose && props.onClose();
+          setTimeout(async () => {
+            await showMultifactorDialog(props.authenticatorType);
+          }, 100);
+        }}
+      >
+        Setup a fallback 2FA method
       </Button>
     </Flex>
   );
@@ -777,7 +824,6 @@ function VerifyAuthenticatorForm(props: VerifyAuthenticatorFormProps) {
         helpText={codeHelpText}
         label="Enter the 6-digit code"
         sx={{ alignItems: "center", mt: 2 }}
-        autoFocus
         required
         placeholder="010101"
         min={99999}
