@@ -289,7 +289,7 @@ function Settings(props) {
           </>
         )}
 
-        {isLoggedIn && (
+        {isLoggedIn && user.mfa && (
           <>
             <Header
               title="Two-factor authentication"
