@@ -40,31 +40,14 @@ const features: Record<FeatureKeys, Feature> = {
     subtitle: `Welcome to v${appVersion.clean}`,
     subFeatures: [
       {
-        title: "Duplicate notes",
+        title: "Two-factor authentication",
         subtitle: (
           <>
-            Tired of copy-pasting notes? Wish there were templates? Not anymore.{" "}
-            <Code text="Right click > Duplicate" /> on a note to create its
-            duplicate.
+            Add an additional layer of security for your notes by enabling 2FA
+            from <Code text="Settings" />.
           </>
         ),
-        icon: Icon.Duplicate,
-      },
-      {
-        title: "Disable sync for specific notes",
-        subtitle: (
-          <>
-            Make any note 100% offline by{" "}
-            <Code text="Right click > Disable sync" /> on a note.
-          </>
-        ),
-        icon: Icon.Sync,
-      },
-      {
-        title: "Improved pasting of code",
-        subtitle:
-          "Pasting code from anywhere (GitHub, VSCode etc.) will now keep the highlighting & formatting intact.",
-        icon: Icon.Codeblock,
+        icon: Icon.MFAAuthenticator,
       },
     ],
     cta: {
