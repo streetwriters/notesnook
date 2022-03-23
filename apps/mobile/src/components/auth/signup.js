@@ -177,7 +177,9 @@ export const Signup = ({ changeMode, welcome, trial }) => {
               autoCapitalize="none"
               errorMessage="Email is invalid"
               placeholder="Email"
-              onSubmit={() => {}}
+              onSubmit={() => {
+                passwordInputRef.current?.focus();
+              }}
             />
 
             <Input
@@ -194,6 +196,9 @@ export const Signup = ({ changeMode, welcome, trial }) => {
               validationType="password"
               autoCorrect={false}
               placeholder="Password"
+              onSubmit={() => {
+                confirmPasswordInputRef.current?.focus();
+              }}
             />
 
             <Input
@@ -212,6 +217,7 @@ export const Signup = ({ changeMode, welcome, trial }) => {
               customValidator={() => password.current}
               placeholder="Confirm password"
               marginBottom={5}
+              onSubmit={signup}
             />
             <Paragraph size={SIZE.xs} color={colors.icon}>
               By signing up, you agree to our{' '}

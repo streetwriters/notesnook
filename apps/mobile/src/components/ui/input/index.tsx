@@ -21,10 +21,11 @@ import { getElevation } from '../../../utils';
 import { SIZE } from '../../../utils/size';
 import { IconButton } from '../icon-button';
 import Paragraph from '../typography/paragraph';
+import phone from 'phone';
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<any>;
-  validationType?: 'password' | 'email' | 'confirmPassword' | 'username';
+  validationType?: 'password' | 'email' | 'confirmPassword' | 'username' | 'phonenumber';
   loading?: boolean;
   onSubmit?: (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void | undefined;
   onErrorCheck?: (error: boolean) => void;
@@ -114,6 +115,19 @@ const Input = ({
       case 'confirmPassword':
         isError = customValidator && value === customValidator();
         break;
+      case 'phonenumber':
+        // eslint-disable-next-line no-case-declarations
+        let result = phone(value, {
+          strictDetection: true,
+          validateMobilePrefix: true
+        });
+        console.log(result);
+        isError = result.isValid;
+        if (result.isValid) {
+          onChangeText && onChangeText(result.phoneNumber);
+        }
+
+        break;
     }
 
     if (validationType === 'password') {
@@ -135,6 +149,7 @@ const Input = ({
 
   const onChange = (value: string) => {
     onChangeText && onChangeText(value);
+    setShowError(false);
     validate(value);
   };
 
@@ -201,7 +216,7 @@ const Input = ({
             editable={!loading}
             onChangeText={onChange}
             onBlur={onBlur}
-            keyboardType={validationType === 'email' ? 'email-address' : 'default'}
+            keyboardType={validationType === 'email' ? 'email-address' : restProps.keyboardType}
             importantForAutofill="yes"
             importantForAccessibility="yes"
             keyboardAppearance={colors.night ? 'dark' : 'light'}

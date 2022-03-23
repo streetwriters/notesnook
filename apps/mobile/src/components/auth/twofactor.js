@@ -114,7 +114,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     // TODO
     setSending(true);
     try {
-      console.log('sending code');
+      console.log('sending code', currentMethod.method, mfaInfo.token);
       await db.mfa.sendCode(currentMethod.method, mfaInfo.token);
       start(60);
       setSending(false);
@@ -148,7 +148,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
         >
           {currentMethod.method
             ? 'Two factor authentication'
-            : 'Other methods for two-factor authentication'}
+            : 'Select methods for two-factor authentication'}
         </Heading>
         <Paragraph
           style={{
@@ -180,7 +180,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               maxLength={currentMethod.method === 'recoveryCode' ? 8 : 6}
               fwdRef={inputRef}
               textAlign="center"
-              keyboardType="numeric"
               onChangeText={value => {
                 code.current = value;
                 onNext();
@@ -193,6 +192,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 letterSpacing: 10,
                 width: null
               }}
+              keyboardType={currentMethod.method === 'recoveryCode' ? 'default' : 'numeric'}
               containerStyle={{
                 height: 60,
                 borderWidth: 0,
@@ -276,7 +276,8 @@ TwoFactorVerification.present = (onMfaLogin, data) => {
     context: 'two_factor_verify',
     onClose: () => {
       onMfaLogin();
-    }
+    },
+    disableClosing: true
   });
 };
 

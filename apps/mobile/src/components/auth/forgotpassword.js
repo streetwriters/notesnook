@@ -1,19 +1,18 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import { useThemeStore } from '../../stores/theme';
 import { DDS } from '../../services/device-detection';
 import { ToastEvent } from '../../services/event-manager';
+import SettingsService from '../../services/settings';
+import { useThemeStore } from '../../stores/theme';
 import { db } from '../../utils/database';
-import { MMKV } from '../../utils/database/mmkv';
-import { IconButton } from '../ui/icon-button';
-import { Button } from '../ui/button';
 import DialogHeader from '../dialog/dialog-header';
+import { Button } from '../ui/button';
+import { IconButton } from '../ui/icon-button';
 import Input from '../ui/input';
 import Seperator from '../ui/seperator';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
-import SettingsService from '../../services/settings';
 
 export const ForgotPassword = () => {
   const colors = useThemeStore(state => state.colors);

@@ -1,6 +1,6 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import { ActivityIndicator, Linking, Platform, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -15,7 +15,7 @@ import { SvgView } from '../../components/ui/svg';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
-import { useSettingStore, useUserStore } from '../../stores/stores';
+import { useUserStore } from '../../stores/stores';
 import { ThemeStore, useThemeStore } from '../../stores/theme';
 import { db } from '../../utils/database';
 import Storage from '../../utils/database/storage';
@@ -32,7 +32,9 @@ const TwoFactorAuth = ({ isSheet }: { isSheet: boolean }) => {
   const user = useUserStore(state => state.user);
 
   const enable2fa = () => {
-    MFASheet.present();
+    verifyUser('global', async () => {
+      MFASheet.present();
+    });
   };
 
   const disable2fa = () => {
@@ -50,7 +52,9 @@ const TwoFactorAuth = ({ isSheet }: { isSheet: boolean }) => {
             ? 'Reconfigure fallback 2FA method'
             : 'Add fallback 2FA method',
           func: () => {
-            MFASheet.present(true);
+            verifyUser('global', async () => {
+              MFASheet.present(true);
+            });
           },
           desc: 'You can use fallback 2FA method incase you are unable to login via primary method'
         },
@@ -64,14 +68,14 @@ const TwoFactorAuth = ({ isSheet }: { isSheet: boolean }) => {
           desc: 'View and save recovery codes for to recover your account'
         },
         {
-          name: 'Disable Two Factor Authentication',
+          name: 'Disable two-factor authentication',
           func: disable2fa,
           desc: 'Decreased security for your account'
         }
       ]
     : [
         {
-          name: 'Enable Two Factor Authentication',
+          name: 'Enable two-factor authentication',
           func: enable2fa,
           desc: 'Increased security for your account'
         }
@@ -219,6 +223,7 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
   const [loading, setLoading] = useState(method?.id === 'app' ? true : false);
   const [enabling, setEnabling] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (method?.id === 'app') {
@@ -262,9 +267,14 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
 
   const onSendCode = async () => {
     console.log('send code');
+    if (error) return;
     if (!method || sending) return;
     if (method.id === 'app' && authenticatorDetails.sharedKey) {
       Clipboard.setString(authenticatorDetails.sharedKey);
+      if (authenticatorDetails.authenticatorUri) {
+        await Linking.openURL(authenticatorDetails.authenticatorUri).catch(console.log);
+      }
+
       ToastEvent.show({
         heading: `Code copied!`,
         type: 'success',
@@ -339,23 +349,32 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
                   ? authenticatorDetails?.sharedKey || ''
                   : undefined
               }
-              onChangeText={value => (phoneNumber.current = value)}
+              multiline={method.id === 'app'}
+              onChangeText={value => {
+                phoneNumber.current = value;
+              }}
               placeholder={method?.id === 'email' ? 'Enter email address' : '+1234567890'}
               onSubmit={() => {
                 onSendCode();
               }}
+              onErrorCheck={e => setError(e)}
+              validationType="phonenumber"
+              keyboardType="phone-pad"
+              errorMessage="Please enter a valid phone number with country code"
               buttons={
-                <Button
-                  onPress={onSendCode}
-                  loading={sending}
-                  title={
-                    sending
-                      ? null
-                      : method.id === 'app'
-                      ? 'Copy'
-                      : `${seconds ? `Resend code in (${seconds})` : 'Send code'}`
-                  }
-                />
+                error ? null : (
+                  <Button
+                    onPress={onSendCode}
+                    loading={sending}
+                    title={
+                      sending
+                        ? null
+                        : method.id === 'app'
+                        ? 'Copy'
+                        : `${seconds ? `Resend code in (${seconds})` : 'Send code'}`
+                    }
+                  />
+                )
               }
             />
 
@@ -595,7 +614,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
       <Seperator />
       <DialogHeader
         centered={true}
-        title={recovery ? 'Secondary method for 2FA enabled' : 'Two-factor authentication enabled!'}
+        title={recovery ? 'Fallback method for 2FA enabled' : 'Two-factor authentication enabled!'}
         paragraph="Your account is now 100% secure against unauthorized logins."
         padding={12}
       />
