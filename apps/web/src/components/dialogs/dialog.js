@@ -133,7 +133,7 @@ function Dialog(props) {
                 {...props.positiveButton.props}
                 variant="dialog"
                 data-test-id="dialog-yes"
-                autoFocus
+                autoFocus={props.positiveButton.autoFocus}
                 disabled={props.positiveButton.disabled || false}
                 onClick={
                   !props.positiveButton.disabled

@@ -36,11 +36,10 @@ class Default {
         filter: "brightness(98%)",
       },
       outline: "none",
-      ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
-        {
-          filter: "brightness(90%)",
-          bg: "bgSecondary",
-        },
+      ":focus-visible:not(:active)": {
+        filter: "brightness(90%)",
+        bg: "bgSecondary",
+      },
       ":disabled": {
         opacity: 0.5,
         cursor: "not-allowed",

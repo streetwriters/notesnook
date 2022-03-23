@@ -169,7 +169,7 @@ function Auth(props: AuthProps) {
                 alignSelf: "end",
                 alignItems: "center",
               }}
-              onClick={() => db.user.logout()}
+              onClick={() => db.user?.logout()}
               color="error"
             >
               <Logout size={16} sx={{ mr: 1 }} color="error" /> Logout

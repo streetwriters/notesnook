@@ -607,7 +607,7 @@ export function showImportDialog() {
   ));
 }
 
-export function showMultifactorDialog(primaryMethod = undefined) {
+export function showMultifactorDialog(primaryMethod = "") {
   return showDialog((Dialogs, perform) => (
     <Dialogs.MultifactorDialog
       onClose={(res) => perform(res)}
