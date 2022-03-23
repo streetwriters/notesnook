@@ -1,15 +1,8 @@
-- Create duplicate of a note from Note properties
-- Mark a note as local only if you don't want it to be synced
-- Added a less intrusive announcement UI
-- Allow adding/removing notes from inside topics with multi-select
-- Fixed All uploads giving error "File length is 0" on running file check
-- Fixed Pro users unable to reupload files
-- Fixed Deleting attachments from attachment manager not working
-- Fixed Last synced is "never" on app launch
-- Fixed Link not added to selected text sometimes
-- Fixed Adding H1 heading adds a H2 heading
-- Fixed Add button not showing in Move note sheet
-- Fixed Sync not running on login
-- Fixed Theme not persisted on app reloads
+- Two-factor authentication
+- Fix collapse heading icon not showing correctly
+- Fix items in search are not updated properly
+- Improve login/signup UX
+- Do not show progress on backup
+
 
 Thank you for using Notesnook!
