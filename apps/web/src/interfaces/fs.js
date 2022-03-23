@@ -549,7 +549,7 @@ function parseS3Error(data) {
 }
 
 function handleS3Error(e, message) {
-  if (axios.isAxiosError(e)) {
+  if (axios.isAxiosError(e) && e.response?.data) {
     const error = parseS3Error(e.response.data);
     showToast("error", `${message}: [${error.Code}] ${error.Message}`);
   } else {
