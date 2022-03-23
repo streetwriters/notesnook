@@ -15,6 +15,7 @@ import IconTag from "../icon-tag";
 import { COLORS } from "../../common/constants";
 import { exportNotes } from "../../common/export";
 import { Multiselect } from "../../common/multi-select";
+import { store as selectionStore } from "../../stores/selection-store";
 
 function Note(props) {
   const { tags, notebook, item, index, context, date } = props;
@@ -46,14 +47,10 @@ function Note(props) {
       index={index}
       onKeyPress={async (e) => {
         if (e.key === "Delete") {
-          await confirm({
-            title: "Delete note?",
-            message:
-              "This item will be kept in your Trash for 7 days after which it will be permanently removed",
-            noText: "No",
-            yesText: "Yes",
-            yesAction: () => Multiselect.moveNotesToTrash([item]),
-          });
+          let selectedItems = selectionStore
+            .get()
+            .selectedItems.filter((i) => i.type === item.type && i !== item);
+          await Multiselect.moveNotesToTrash([item, ...selectedItems]);
         }
       }}
       colors={{

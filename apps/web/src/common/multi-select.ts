@@ -10,10 +10,9 @@ import { TaskManager } from "./task-manager";
 
 async function moveNotesToTrash(notes: any[]) {
   const item = notes[0];
-  const isMultiselect = notes.length > 1;
-  if (isMultiselect) {
-    if (!(await showMultiDeleteConfirmation(notes.length))) return;
-  } else {
+  if (!(await showMultiDeleteConfirmation(notes.length))) return;
+
+  if (notes.length === 1) {
     if (
       item.locked &&
       !(await Vault.unlockNote(item.id, "unlock_and_delete_note"))
@@ -38,11 +37,7 @@ async function moveNotesToTrash(notes: any[]) {
     },
   });
 
-  if (isMultiselect) {
-    showToast("success", `${items.length} notes moved to trash`);
-  } else {
-    showItemDeletedToast(item);
-  }
+  showToast("success", `${items.length} notes moved to trash`);
 }
 
 async function moveNotebooksToTrash(notebooks: any[]) {
