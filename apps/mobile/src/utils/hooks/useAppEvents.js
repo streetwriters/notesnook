@@ -342,14 +342,17 @@ export const useAppEvents = () => {
     }
     if (!user.isEmailConfirmed) setEmailVerifyMessage();
 
-    if (PremiumService.get() && user) {
-      if (SettingsService.get().reminder === 'off') {
-        await SettingsService.set({ reminder: 'daily' });
-      }
-      if (Backup.checkBackupRequired()) {
-        sleep(2000).then(() => Backup.checkAndRun());
+    if (!login) {
+      if (PremiumService.get() && user) {
+        if (SettingsService.get().reminder === 'off') {
+          await SettingsService.set({ reminder: 'daily' });
+        }
+        if (Backup.checkBackupRequired()) {
+          sleep(2000).then(() => Backup.checkAndRun());
+        }
       }
     }
+
     refValues.current.isUserReady = true;
 
     syncedOnLaunch.current = true;
