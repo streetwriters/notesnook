@@ -88,6 +88,7 @@ export const Reminders = {
   },
 };
 
+var openedToast = null;
 export async function resetReminders() {
   const reminders = [];
 
@@ -102,12 +103,25 @@ export async function resetReminders() {
       saveFile(filePath, data);
       showToast("success", `Backup saved at ${filePath}.`);
     } else if (isUserPremium() && !isTesting()) {
-      const toast = showToast(
+      if (openedToast !== null) return;
+      openedToast = showToast(
         "success",
         "Your backup is ready for download.",
         [
-          { text: "Later", onClick: () => toast?.hide(), type: "text" },
-          { text: "Download", onClick: () => createBackup(), type: "primary" },
+          {
+            text: "Later",
+            onClick: () => {
+              createBackup(false);
+              openedToast?.hide();
+              openedToast = null;
+            },
+            type: "text",
+          },
+          {
+            text: "Download",
+            onClick: () => createBackup(true),
+            type: "primary",
+          },
         ],
         0
       );
