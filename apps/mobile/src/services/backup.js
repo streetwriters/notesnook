@@ -5,7 +5,6 @@ import Share from 'react-native-share';
 import RNFetchBlob from 'rn-fetch-blob';
 import { presentDialog } from '../components/dialog/functions';
 import { db } from '../utils/database';
-import { MMKV } from '../utils/database/mmkv';
 import storage from '../utils/database/storage';
 import { eCloseProgressDialog } from '../utils/events';
 import { sanitizeFilename } from '../utils/sanitizer';
@@ -129,11 +128,6 @@ async function run() {
   let androidBackupDirectory = await checkBackupDirExists();
   if (!androidBackupDirectory) return;
 
-  presentSheet({
-    title: 'Backing up your data',
-    paragraph: "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
-    progress: true
-  });
   let backup;
 
   try {
@@ -178,16 +172,11 @@ async function run() {
 
     let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
     console.log(backupFilePath);
-    await sleep(300);
     if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
-    } else {
-      eSendEvent(eCloseProgressDialog);
     }
     return backupFilePath;
   } catch (e) {
-    await sleep(300);
-    eSendEvent(eCloseProgressDialog);
     ToastEvent.error(e, 'Backup failed!');
   }
 }
