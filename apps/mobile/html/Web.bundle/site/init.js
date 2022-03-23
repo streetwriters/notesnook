@@ -202,6 +202,8 @@ h5,
 h6,
 strong {
   font-weight:600 !important;
+  position:relative;
+  padding-left:10px;
 }
 
 h1::before,
@@ -218,33 +220,33 @@ h6::before {
   height: 24px;
   display: inline-block;
   border: none;
+  position:absolute;
+  margin-left: -25px;
 }
 
 h1::before {
-  margin-bottom: -2px;
+  top:2px;
 }
 
  h2::before {
-  margin-bottom: -5px;
+  top:5px;
 }
  h3::before {
-  margin-bottom: -6px;
+  top:2px;
 }
 h4::before {
-  margin-bottom: -7px;
+  top:0px;
 }
 h5::before {
-  margin-bottom: -6px;
+  top:0px;
   width: 20px;
   height: 20px;
 }
 h6::before {
-  margin-bottom: -5px;
+  top:-1px;
   width: 18px;
   height: 18px;
 }
-
-
 
 .h {
   display: none !important;
