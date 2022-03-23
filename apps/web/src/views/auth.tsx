@@ -24,6 +24,7 @@ import { isTesting } from "../utils/platform";
 import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
 import { RequestError } from "notes-core/utils/http";
 import { useTimer } from "../hooks/use-timer";
+import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 
 type LoginFormData = {
   email: string;
@@ -276,6 +277,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         }
 
         await userstore.signup(form);
+        trackEvent(ANALYTICS_EVENTS.accountCreated);
         openURL("/notes/#/welcome");
       }}
     >

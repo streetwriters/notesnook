@@ -2,6 +2,20 @@ import Config from "./config";
 import { getPlatform } from "./platform";
 import { appVersion } from "./version";
 
+declare global {
+  interface Window {
+    umami?: {
+      trackEvent: (
+        value: string,
+        type: string,
+        url?: string,
+        websiteId?: string
+      ) => void;
+      trackView: (url: string, referrer?: string, websiteId?: string) => void;
+    };
+  }
+}
+
 export function loadTrackerScript() {
   if (Config.get("telemetry") === "false") return;
   var script = document.createElement("script");
@@ -18,8 +32,14 @@ export function loadTrackerScript() {
   script.onload = function () {
     trackVisit();
   };
-  firstScriptElement.parentNode.insertBefore(script, firstScriptElement);
+  firstScriptElement.parentNode?.insertBefore(script, firstScriptElement);
 }
+
+type TrackerEvent = {
+  name: string;
+  description: string;
+  type?: "event" | "view";
+};
 
 export const ANALYTICS_EVENTS = {
   version: {
@@ -53,22 +73,30 @@ export const ANALYTICS_EVENTS = {
     name: "announcement:cta",
     description: "Sent whenever you an announcement CTA is invoked.",
   },
-};
+  accountCreated: {
+    name: "/account/created",
+    description: "Sent when you create an account.",
+    type: "view",
+  },
+} as const;
 
-export function trackEvent(event, eventMessage) {
+export function trackEvent(event: TrackerEvent, eventMessage?: string) {
   if (Config.get("telemetry") === "false") return;
-  if (window.umami) {
+  if (!window.umami) return;
+  if (event.type === "event" && eventMessage)
     window.umami.trackEvent(eventMessage, event.name);
-  }
+  else trackVisit(event.name);
 }
 
-export function trackVisit() {
+export function trackVisit(url: string = "/") {
   if (Config.get("telemetry") === "false") return;
-  if (window.umami) {
-    window.umami.trackView("/");
+  const platform = getPlatform();
+  if (!window.umami || !platform) return;
+
+  window.umami.trackView(url);
+  if (url === "/")
     trackEvent(
       ANALYTICS_EVENTS.version,
-      `${appVersion.formatted}-${getPlatform().toLowerCase()}`
+      `${appVersion.formatted}-${platform.toLowerCase()}`
     );
-  }
 }
