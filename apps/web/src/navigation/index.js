@@ -104,8 +104,9 @@ export function hardNavigate(route) {
   window.open(makeURL(route, getCurrentHash()), "_self");
 }
 
-export function makeURL(route, hash) {
+export function makeURL(route, hash, search) {
   const url = new URL(route, window.location.origin);
   if (!url.hash) url.hash = hash || getCurrentHash();
+  url.search = search || getQueryString();
   return url;
 }

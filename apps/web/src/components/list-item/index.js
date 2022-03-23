@@ -58,12 +58,6 @@ function ListItem(props) {
 
   const selectItem = useSelectionStore((store) => store.selectItem);
 
-  useEffect(() => {
-    return () => {
-      selectionStore.toggleSelectionMode(false);
-    };
-  }, []);
-
   return (
     <Flex
       ref={listItemRef}

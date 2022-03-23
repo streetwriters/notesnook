@@ -120,16 +120,10 @@ function Dialog(props) {
           >
             {props.negativeButton && (
               <RebassButton
-                variant="primary"
+                variant="dialog"
                 data-test-id="dialog-no"
                 onClick={props.negativeButton.onClick}
                 color="text"
-                fontWeight="bold"
-                bg={"transparent"}
-                sx={{
-                  opacity: props.negativeButton.disabled ? 0.7 : 1,
-                  ":hover": { bg: "bgSecondary" },
-                }}
               >
                 {props.negativeButton.text || "Cancel"}
               </RebassButton>
@@ -137,15 +131,9 @@ function Dialog(props) {
             {props.positiveButton && (
               <RebassButton
                 {...props.positiveButton.props}
-                variant="primary"
-                color="primary"
-                fontWeight="bold"
-                bg={"transparent"}
+                variant="dialog"
                 data-test-id="dialog-yes"
-                sx={{
-                  opacity: props.positiveButton.disabled ? 0.7 : 1,
-                  ":hover": { bg: "bgSecondary" },
-                }}
+                autoFocus={props.positiveButton.autoFocus}
                 disabled={props.positiveButton.disabled || false}
                 onClick={
                   !props.positiveButton.disabled

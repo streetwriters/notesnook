@@ -19,7 +19,9 @@ import {
   showLoadingDialog,
   showBuyDialog,
   showPasswordDialog,
+  showMultifactorDialog,
   showAttachmentsDialog,
+  show2FARecoveryCodesDialog,
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, verifyAccount } from "../common";
@@ -129,6 +131,7 @@ const otherItems = [
 function Settings(props) {
   const [groups, setGroups] = useState({
     appearance: false,
+    mfa: false,
     backup: false,
     importer: false,
     privacy: false,
@@ -153,6 +156,7 @@ function Settings(props) {
     (store) => store.toggleEncryptBackups
   );
   const user = useUserStore((store) => store.user);
+  const refreshUser = useUserStore((store) => store.refreshUser);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const [backupReminderOffset, setBackupReminderOffset] = usePersistentState(
     "backupReminderOffset",
@@ -284,6 +288,93 @@ function Settings(props) {
             </Button>
           </>
         )}
+
+        {isLoggedIn && user.mfa && (
+          <>
+            <Header
+              title="Two-factor authentication"
+              isOpen={groups.mfa}
+              onClick={() => {
+                setGroups((g) => ({ ...g, mfa: !g.mfa }));
+              }}
+            />
+            {groups.mfa &&
+              (user.mfa.isEnabled ? (
+                <>
+                  <Button
+                    variant="list"
+                    onClick={async () => {
+                      if (await verifyAccount()) {
+                        await showMultifactorDialog(user.mfa.primaryMethod);
+                        await refreshUser();
+                      }
+                    }}
+                  >
+                    <Tip
+                      text={
+                        user.mfa.secondaryMethod
+                          ? "Reconfigure fallback 2FA method"
+                          : "Add fallback 2FA method"
+                      }
+                      tip="You can use the fallback 2FA method in case you are unable to login via the primary method."
+                    />
+                  </Button>
+
+                  <Button
+                    variant="list"
+                    onClick={async () => {
+                      if (await verifyAccount()) {
+                        await show2FARecoveryCodesDialog(
+                          user.mfa.primaryMethod
+                        );
+                        await refreshUser();
+                      }
+                    }}
+                  >
+                    <Tip
+                      text="View recovery codes"
+                      tip={`Recovery codes can be used to login in case you cannot use any of the other 2FA methods. You have ${user.mfa.remainingValidCodes} recovery codes left.`}
+                    />
+                  </Button>
+                  <Button
+                    variant="list"
+                    onClick={async () => {
+                      if (await verifyAccount()) {
+                        await db.mfa.disable();
+                        showToast(
+                          "success",
+                          "Two-factor authentication disabled."
+                        );
+                        await refreshUser();
+                      }
+                    }}
+                  >
+                    <Tip
+                      text="Disable two-factor authentication"
+                      tip="You can disable 2FA if you want to reset or change 2FA settings."
+                    />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="list"
+                    onClick={async () => {
+                      if (await verifyAccount()) {
+                        await showMultifactorDialog();
+                        await refreshUser();
+                      }
+                    }}
+                  >
+                    <Tip
+                      text="Enable two-factor authentication"
+                      tip="Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to sign in."
+                    />
+                  </Button>
+                </>
+              ))}
+          </>
+        )}
         <Header
           title="Appearance"
           isOpen={groups.appearance}
@@ -364,6 +455,7 @@ function Settings(props) {
             setGroups((g) => ({ ...g, backup: !g.backup }));
           }}
         />
+
         {groups.backup && (
           <>
             <Button

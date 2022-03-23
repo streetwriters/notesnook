@@ -88,6 +88,7 @@ export const Reminders = {
   },
 };
 
+var openedToast = null;
 export async function resetReminders() {
   const reminders = [];
 
@@ -102,7 +103,28 @@ export async function resetReminders() {
       saveFile(filePath, data);
       showToast("success", `Backup saved at ${filePath}.`);
     } else if (isUserPremium() && !isTesting()) {
-      await showBackupDialog();
+      if (openedToast !== null) return;
+      openedToast = showToast(
+        "success",
+        "Your backup is ready for download.",
+        [
+          {
+            text: "Later",
+            onClick: () => {
+              createBackup(false);
+              openedToast?.hide();
+              openedToast = null;
+            },
+            type: "text",
+          },
+          {
+            text: "Download",
+            onClick: () => createBackup(true),
+            type: "primary",
+          },
+        ],
+        0
+      );
     }
   }
   if (await shouldAddLoginReminder()) {

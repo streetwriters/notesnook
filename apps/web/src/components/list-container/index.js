@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Flex, Button } from "rebass";
 import * as Icon from "../icons";
 import { Virtuoso } from "react-virtuoso";
@@ -28,6 +28,12 @@ function ListContainer(props) {
     () => props.items.filter((v) => v.type === "header"),
     [props.items]
   );
+
+  useEffect(() => {
+    return () => {
+      selectionStore.toggleSelectionMode(false);
+    };
+  }, []);
 
   return (
     <Flex variant="columnFill">

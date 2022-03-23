@@ -136,6 +136,10 @@ import {
   mdiContentSaveCheckOutline,
   mdiContentSaveAlertOutline,
   mdiCurrencyUsd,
+  mdiCellphoneKey,
+  mdiEmailOutline,
+  mdiMessageLockOutline,
+  mdiShieldCheckOutline,
   mdiAlertOctagonOutline,
   mdiGithub,
   mdiAlertCircleOutline,
@@ -144,8 +148,10 @@ import {
   mdiCheckAll,
   mdiCloudOffOutline,
   mdiContentDuplicate,
+  mdiPrinterOutline,
+  mdiRefresh,
+  mdiRestore,
   mdiVectorLink,
-  mdiCodeString,
   mdiCodeBraces,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
@@ -175,6 +181,7 @@ function createIcon(name, rotate = false) {
       <AnimatedFlex
         flexShrink={0}
         id={props.id}
+        className={props.className}
         title={props.title}
         variant={props.variant}
         whileHover={{ scale: 1.1 }}
@@ -295,6 +302,7 @@ export const Publish = createIcon(mdiCloudUploadOutline);
 export const Colors = createIcon(mdiPaletteOutline);
 export const Published = createIcon(mdiCloudCheckOutline);
 export const Copy = createIcon(mdiContentCopy);
+export const Refresh = createIcon(mdiRefresh);
 export const Duplicate = createIcon(mdiContentDuplicate);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
 export const NotebookEdit = createIcon(mdiBookEditOutline);
@@ -314,6 +322,7 @@ export const Reddit = createIcon(mdiReddit);
 export const Dismiss = createIcon(mdiClose);
 export const File = createIcon(mdiFileOutline);
 export const Download = createIcon(mdiArrowDown);
+export const Print = createIcon(mdiPrinterOutline);
 export const ImageDownload = createIcon(mdiImage);
 export const Billboard = createIcon(mdiBillboard);
 export const Cellphone = createIcon(mdiCellphone);
@@ -360,6 +369,11 @@ export const OrderNewestOldest = createIcon(mdiOrderNumericAscending);
 export const Saved = createIcon(mdiContentSaveCheckOutline);
 export const NotSaved = createIcon(mdiContentSaveAlertOutline);
 
+export const MFAAuthenticator = createIcon(mdiCellphoneKey);
+export const MFAEmail = createIcon(mdiEmailOutline);
+export const MFARecoveryCode = createIcon(mdiRestore);
+export const MFASMS = createIcon(mdiMessageLockOutline);
+export const MFAEnabled = createIcon(mdiShieldCheckOutline);
 export const Reupload = createIcon(mdiProgressUpload);
 export const Rename = createIcon(mdiFormTextbox);
 export const Upload = createIcon(mdiCloudOffOutline);

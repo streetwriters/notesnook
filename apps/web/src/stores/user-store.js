@@ -18,6 +18,9 @@ class UserStore extends BaseStore {
   isLoggedIn = false;
   isLoggingIn = false;
   isSigningIn = false;
+  /**
+   * @type {User}
+   */
   user = undefined;
 
   init = () => {
@@ -85,17 +88,25 @@ class UserStore extends BaseStore {
     });
   };
 
-  login = (form, skipInit = false) => {
+  refreshUser = async () => {
+    return db.user.fetchUser().then(async (user) => {
+      this.set((state) => (state.user = user));
+    });
+  };
+
+  login = async (form, skipInit = false) => {
     this.set((state) => (state.isLoggingIn = true));
-    return db.user
-      .login(form.email.toLowerCase(), form.password)
-      .then(() => {
-        if (skipInit) return true;
-        return this.init();
-      })
-      .finally(() => {
-        this.set((state) => (state.isLoggingIn = false));
-      });
+    const { email, password, code, method } = form;
+
+    try {
+      if (code) await db.user.mfaLogin(email, password, { code, method });
+      else await db.user.login(email, password);
+
+      if (skipInit) return true;
+      return this.init();
+    } finally {
+      this.set((state) => (state.isLoggingIn = false));
+    }
   };
 
   signup = (form) => {

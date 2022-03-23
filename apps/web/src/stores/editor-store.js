@@ -231,7 +231,8 @@ class EditorStore extends BaseStore {
     });
     noteStore.setSelectedNote(0);
     this.toggleProperties(false);
-    if (shouldNavigate) hashNavigate(`/`, { replace: true });
+    if (shouldNavigate)
+      hashNavigate(`/notes/create`, { replace: true, addNonce: true });
   };
 
   setTitle = (sessionId, title) => {

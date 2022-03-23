@@ -16,6 +16,7 @@ class NoteStore extends BaseStore {
   notes = [];
   context = undefined;
   selectedNote = 0;
+  nonce = 0;
   viewMode = Config.get("notes:viewMode", "detailed");
 
   setViewMode = (viewMode) => {
@@ -43,6 +44,7 @@ class NoteStore extends BaseStore {
         db.notes.all,
         db.settings.getGroupOptions("home")
       );
+      state.nonce = Math.random();
     });
     this.refreshContext();
   };
