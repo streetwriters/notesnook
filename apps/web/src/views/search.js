@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ListContainer from "../components/list-container";
 import SearchPlaceholder from "../components/placeholders/search-placeholder";
 import { db } from "../common/db";
@@ -40,6 +40,31 @@ function Search({ type }) {
   });
   const [results, setResults] = useState([]);
   const context = useNoteStore((store) => store.context);
+  const nonce = useNoteStore((store) => store.nonce);
+  const cachedQuery = useRef();
+
+  const onSearch = useCallback(
+    async (query) => {
+      if (!query) return;
+      cachedQuery.current = query;
+
+      const [lookupType, items] = await typeToItems(type, context);
+      setResults([]);
+
+      if (items.length <= 0) {
+        showToast("error", `There are no items to search in.`);
+        return;
+      }
+      setSearchState({ isSearching: true, totalItems: items.length });
+      const results = await db.lookup[lookupType](items, query);
+      setResults(results);
+      setSearchState({ isSearching: false, totalItems: 0 });
+      if (!results.length) {
+        showToast("error", `Nothing found for "${query}".`);
+      }
+    },
+    [context, type]
+  );
 
   const title = useMemo(() => {
     switch (type) {
@@ -77,6 +102,10 @@ function Search({ type }) {
     }
   }, [type, context]);
 
+  useEffect(() => {
+    onSearch(cachedQuery.current);
+  }, [nonce, onSearch]);
+
   if (!title) return hardNavigate("/");
 
   return (
@@ -84,25 +113,7 @@ function Search({ type }) {
       <Text variant="subtitle" mx={2}>
         Searching {title}
       </Text>
-      <SearchBox
-        onSearch={async (query) => {
-          if (!query) return;
-          const [lookupType, items] = await typeToItems(type, context);
-          setResults([]);
-
-          if (items.length <= 0) {
-            showToast("error", `There are no items to search in.`);
-            return;
-          }
-          setSearchState({ isSearching: true, totalItems: items.length });
-          const results = await db.lookup[lookupType](items, query);
-          setResults(results);
-          setSearchState({ isSearching: false, totalItems: 0 });
-          if (!results.length) {
-            showToast("error", `Nothing found for "${query}".`);
-          }
-        }}
-      />
+      <SearchBox onSearch={onSearch} />
       {searchState.isSearching ? (
         <Flex
           flex="1"
