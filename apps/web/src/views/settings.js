@@ -292,7 +292,7 @@ function Settings(props) {
         {isLoggedIn && (
           <>
             <Header
-              title="2-factor authentication"
+              title="Two-factor authentication"
               isOpen={groups.mfa}
               onClick={() => {
                 setGroups((g) => ({ ...g, mfa: !g.mfa }));
@@ -343,14 +343,14 @@ function Settings(props) {
                         await db.mfa.disable();
                         showToast(
                           "success",
-                          "2-factor authentication disabled."
+                          "Two-factor authentication disabled."
                         );
                         await refreshUser();
                       }
                     }}
                   >
                     <Tip
-                      text="Disable 2-factor authentication"
+                      text="Disable two-factor authentication"
                       tip="You can disable 2FA if you want to reset or change 2FA settings."
                     />
                   </Button>
@@ -367,7 +367,7 @@ function Settings(props) {
                     }}
                   >
                     <Tip
-                      text="Enable 2-factor authentication"
+                      text="Enable two-factor authentication"
                       tip="Two-factor authentication adds an additional layer of security to your account by requiring more than just a password to sign in."
                     />
                   </Button>
