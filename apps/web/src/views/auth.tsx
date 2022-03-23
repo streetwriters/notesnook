@@ -9,6 +9,7 @@ import {
   MFAEmail,
   MFARecoveryCode,
   ArrowRight,
+  Logout,
 } from "../components/icons";
 import Field from "../components/field";
 import { getQueryParams, hardNavigate, makeURL } from "../navigation";
@@ -157,6 +158,24 @@ function Auth(props: AuthProps) {
           >
             Jump to app <ArrowRight size={18} sx={{ ml: 1 }} />
           </Button>
+        ) : route === "sessionExpiry" ? (
+          <>
+            <Button
+              variant={"secondary"}
+              sx={{
+                display: "flex",
+                mt: 2,
+                mr: 2,
+                alignSelf: "end",
+                alignItems: "center",
+              }}
+              onClick={() => db.user.logout()}
+              color="error"
+            >
+              <Logout size={16} sx={{ mr: 1 }} color="error" /> Logout
+              permanently
+            </Button>
+          </>
         ) : null}
 
         {Route && (
