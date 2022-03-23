@@ -377,7 +377,7 @@ const menuItems = [
       items.length === 1 && db.monographs.isPublished(items[0].id),
     disableReason: "Please unpublish this note to move it to trash",
     onClick: async ({ items }) => {
-      await Multiselect.moveNotesToTrash(items);
+      await Multiselect.moveNotesToTrash(items, items.length > 1);
     },
     multiSelect: true,
   },

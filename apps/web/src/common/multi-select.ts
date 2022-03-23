@@ -8,9 +8,9 @@ import Vault from "./vault";
 import { showItemDeletedToast } from "./toasts";
 import { TaskManager } from "./task-manager";
 
-async function moveNotesToTrash(notes: any[]) {
+async function moveNotesToTrash(notes: any[], confirm = true) {
   const item = notes[0];
-  if (!(await showMultiDeleteConfirmation(notes.length))) return;
+  if (confirm && !(await showMultiDeleteConfirmation(notes.length))) return;
 
   if (notes.length === 1) {
     if (
