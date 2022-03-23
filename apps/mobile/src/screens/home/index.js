@@ -1,23 +1,19 @@
 import React, { useCallback, useEffect } from 'react';
-import { FloatingButton } from '../../components/container/floating-button';
 import { ContainerHeader } from '../../components/container/containerheader';
+import { FloatingButton } from '../../components/container/floating-button';
 import { Header } from '../../components/header/index';
-import SelectionHeader from '../../components/selection-header';
 import List from '../../components/list';
-import { useNoteStore } from '../../stores/stores';
+import SelectionHeader from '../../components/selection-header';
 import { DDS } from '../../services/device-detection';
-import { eSendEvent, presentSheet } from '../../services/event-manager';
+import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
+import { useNoteStore } from '../../stores/stores';
 import { editing, InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 import { eOnLoadNote } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../editor/Functions';
-import { presentDialog } from '../../components/dialog/functions';
-import Paragraph from '../../components/ui/typography/paragraph';
-import Heading from '../../components/ui/typography/heading';
-import NewFeature from '../../components/sheets/new-feature';
 
 export const Home = ({ navigation }) => {
   const notes = useNoteStore(state => state.notes);
@@ -78,7 +74,8 @@ export const Home = ({ navigation }) => {
       placeholder: 'Type a keyword to search in notes',
       data: db?.notes?.all,
       type: 'notes',
-      title: 'Notes'
+      title: 'Notes',
+      get: () => db.notes.all
     });
   };
 

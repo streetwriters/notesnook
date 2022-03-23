@@ -19,7 +19,7 @@ import { openLinkInBrowser } from '../../utils/functions';
 import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../editor/Functions';
 
-const getNotes = params => {
+const getNotes = (params, group = true) => {
   if (!params) return [];
   let notes = [];
   if (params.type !== 'topic' && params.get !== 'monographs') {
@@ -32,7 +32,7 @@ const getNotes = params => {
   if (!notes) {
     notes = [];
   }
-  return groupArray(notes, db.settings?.getGroupOptions('notes'));
+  return group ? groupArray(notes, db.settings?.getGroupOptions('notes')) : notes;
 };
 
 function getAlias(params) {
@@ -128,7 +128,7 @@ export const Notes = ({ route, navigation }) => {
   }, []);
 
   useEffect(() => {
-    if (navigation.isFocused()) {
+    if (navigation?.isFocused()) {
       updateSearch();
     }
   }, [notes]);
@@ -143,7 +143,11 @@ export const Notes = ({ route, navigation }) => {
       title:
         params.current?.type === 'tag'
           ? '#' + alias
-          : alias.slice(0, 1).toUpperCase() + alias.slice(1)
+          : alias.slice(0, 1).toUpperCase() + alias.slice(1),
+
+      get: () => {
+        return getNotes(params.current, false);
+      }
     });
   };
 

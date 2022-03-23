@@ -40,7 +40,7 @@ export const Empty = React.memo(
           <>
             <Tip
               color={COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'}
-              tip={tip}
+              tip={tip || { text: placeholderData.paragraph }}
               style={{
                 backgroundColor: 'transparent',
                 paddingHorizontal: 0

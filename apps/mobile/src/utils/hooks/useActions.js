@@ -393,6 +393,7 @@ export const useActions = ({ close = () => {}, item }) => {
     } else {
       try {
         close();
+        console.log('moving note to trash');
         await deleteItems(item);
       } catch (e) {}
     }

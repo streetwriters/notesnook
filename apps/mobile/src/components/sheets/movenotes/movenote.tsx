@@ -17,6 +17,7 @@ import { PressableButton } from '../../ui/pressable';
 import Seperator from '../../ui/seperator';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
+import SearchService from '../../../services/search';
 
 export const MoveNotes = ({
   notebook,
@@ -274,6 +275,7 @@ export const MoveNotes = ({
               Navigation.routeNames.Notebooks,
               Navigation.routeNames.Notebook
             ]);
+            SearchService.updateAndSearch();
             eSendEvent(eCloseProgressDialog);
           }}
           title="Move selected notes"

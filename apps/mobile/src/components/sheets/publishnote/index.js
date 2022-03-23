@@ -18,6 +18,7 @@ import Seperator from '../../ui/seperator';
 import SheetWrapper from '../../ui/sheet';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
+import SearchService from '../../../services/search';
 
 let passwordValue = null;
 const PublishNoteSheet = () => {

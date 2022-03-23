@@ -33,6 +33,7 @@ import Input from '../../ui/input';
 import Seperator from '../../ui/seperator';
 import { Toast } from '../../toast';
 import Paragraph from '../../ui/typography/paragraph';
+import SearchService from '../../../services/search';
 
 let Keychain;
 const passInputRef = createRef();
@@ -199,6 +200,7 @@ export class VaultDialog extends Component {
     ]);
     this.password = null;
     this.confirmPassword = null;
+    SearchService.updateAndSearch();
     this.setState({
       visible: false,
       note: {},

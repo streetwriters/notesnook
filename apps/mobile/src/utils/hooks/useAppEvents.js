@@ -299,6 +299,7 @@ export const useAppEvents = () => {
         console.log('sync started');
         await Sync.run();
         console.log('hide progress dialog');
+        await sleep(300);
         eSendEvent(eCloseProgressDialog);
       }
       setLastSynced(await db.lastSynced());

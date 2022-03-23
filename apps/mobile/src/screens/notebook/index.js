@@ -69,7 +69,11 @@ export const Notebook = ({ route, navigation }) => {
       placeholder: `Search in "${params.current.title}"`,
       data: topics,
       type: 'topics',
-      title: params.current.title
+      title: params.current.title,
+      get: () => {
+        let notebook = db.notebooks.notebook(params?.current?.notebook?.id)?.data;
+        return notebook.topics;
+      }
     });
   };
 

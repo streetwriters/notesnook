@@ -10,6 +10,7 @@ import { useNotebookStore } from '../../stores/stores';
 import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
 import { InteractionManager } from '../../utils';
+import { db } from '../../utils/database';
 
 export const Notebooks = ({ navigation }) => {
   const notebooks = useNotebookStore(state => state.notebooks);
@@ -67,7 +68,8 @@ export const Notebooks = ({ navigation }) => {
       placeholder: 'Type a keyword to search in notebooks',
       data: notebooks,
       type: 'notebooks',
-      title: 'Notebooks'
+      title: 'Notebooks',
+      get: () => db.notebooks.all
     });
   }, []);
 

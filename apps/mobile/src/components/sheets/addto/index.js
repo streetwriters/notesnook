@@ -4,6 +4,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import { notesnook } from '../../../../e2e/test.ids';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
+import SearchService from '../../../services/search';
 import { useNotebookStore, useSelectionStore } from '../../../stores/stores';
 import { useThemeStore } from '../../../stores/theme';
 import { getTotalNotes } from '../../../utils';
@@ -141,6 +142,7 @@ const MoveNoteComponent = ({ note }) => {
     ]);
     setNotebooks();
     updateNoteExists();
+    SearchService.updateAndSearch();
   };
 
   useEffect(() => {

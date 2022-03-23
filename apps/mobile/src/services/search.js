@@ -4,7 +4,8 @@ import { db } from '../utils/database';
 let searchInformation = {
   placeholder: 'Search in all notes',
   data: [],
-  type: 'notes'
+  type: 'notes',
+  get: null
 };
 
 let keyword = null;
@@ -17,7 +18,7 @@ function setTerm(term) {
   keyword = term;
 }
 
-async function search() {
+async function search(silent) {
   let searchstore = useSearchStore.getState();
 
   let term = keyword;
@@ -25,7 +26,9 @@ async function search() {
     searchstore.setSearchResults([]);
     return;
   }
-  searchstore.setSearchStatus(true, `Searching for "${term}" in ${searchInformation.title}`);
+  if (!silent) {
+    searchstore.setSearchStatus(true, `Searching for "${term}" in ${searchInformation.title}`);
+  }
 
   let results;
   if (!searchInformation.type) return;
@@ -48,11 +51,18 @@ function getSearchInformation() {
   return searchInformation;
 }
 
+function updateAndSearch() {
+  if (!keyword || keyword === '') return;
+  searchInformation.data = searchInformation.get() || [];
+  search(true);
+}
+
 const SearchService = {
   update,
   getSearchInformation,
   search,
-  setTerm
+  setTerm,
+  updateAndSearch
 };
 
 export default SearchService;

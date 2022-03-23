@@ -6,6 +6,7 @@ import { eSendEvent, ToastEvent } from '../services/event-manager';
 import Navigation from '../services/navigation';
 import { db } from './database';
 import { eClearEditor } from './events';
+import SearchService from '../services/search';
 
 export const deleteItems = async item => {
   if (item && db.monographs.isPublished(item.id)) {
@@ -110,6 +111,8 @@ export const deleteItems = async item => {
   useSelectionStore.getState().clearSelection(true);
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
+  console.log('running search again');
+  SearchService.updateAndSearch();
 };
 
 export const openLinkInBrowser = async (link, colors) => {

@@ -15,6 +15,7 @@ import Notebooks from './notebooks';
 import { Synced } from './synced';
 import { Tags } from './tags';
 import { Topics } from './topics';
+import SearchService from '../../services/search';
 
 export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => {
   const colors = useThemeStore(state => state.colors);
@@ -102,7 +103,16 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
 
       {item.type === 'note' ? <ColorTags close={close} item={item} /> : null}
 
-      <Items item={item} buttons={buttons} close={close} />
+      <Items
+        item={item}
+        buttons={buttons}
+        close={() => {
+          close();
+          setTimeout(() => {
+            SearchService.updateAndSearch();
+          }, 1000);
+        }}
+      />
       <Synced item={item} close={close} />
       <DevMode item={item} />
 

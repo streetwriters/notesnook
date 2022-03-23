@@ -8,6 +8,7 @@ import { useFavoriteStore, useNoteStore } from '../../stores/stores';
 import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
 import { InteractionManager } from '../../utils';
+import { db } from '../../utils/database';
 
 export const Favorites = ({ navigation }) => {
   const favorites = useFavoriteStore(state => state.favorites);
@@ -74,7 +75,8 @@ export const Favorites = ({ navigation }) => {
       placeholder: 'Search in favorites',
       data: favorites,
       type: 'notes',
-      title: 'Favorites'
+      title: 'Favorites',
+      get: () => db.notes.favorites
     });
   };
 

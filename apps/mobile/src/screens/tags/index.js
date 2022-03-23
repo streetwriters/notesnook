@@ -7,6 +7,7 @@ import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
 import { useTagStore } from '../../stores/stores';
 import { InteractionManager } from '../../utils';
+import { db } from '../../utils/database';
 
 export const Tags = ({ navigation }) => {
   const tags = useTagStore(state => state.tags);
@@ -59,7 +60,8 @@ export const Tags = ({ navigation }) => {
       placeholder: 'Search in tags',
       data: tags,
       type: 'tags',
-      title: 'Tags'
+      title: 'Tags',
+      get: () => db.tags.all
     });
   };
 
