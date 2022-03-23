@@ -316,7 +316,7 @@ function Settings(props) {
                           ? "Reconfigure fallback 2FA method"
                           : "Add fallback 2FA method"
                       }
-                      tip="You can use the fallback 2FA method if you cannot login via the primary method."
+                      tip="You can use the fallback 2FA method in case you are unable to login via the primary method."
                     />
                   </Button>
 

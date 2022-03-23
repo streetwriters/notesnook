@@ -102,7 +102,15 @@ export async function resetReminders() {
       saveFile(filePath, data);
       showToast("success", `Backup saved at ${filePath}.`);
     } else if (isUserPremium() && !isTesting()) {
-      await showBackupDialog();
+      const toast = showToast(
+        "success",
+        "Your backup is ready for download.",
+        [
+          { text: "Later", onClick: () => toast?.hide(), type: "text" },
+          { text: "Download", onClick: () => createBackup(), type: "primary" },
+        ],
+        0
+      );
     }
   }
   if (await shouldAddLoginReminder()) {

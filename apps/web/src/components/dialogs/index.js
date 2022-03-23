@@ -17,7 +17,6 @@ import IssueDialog from "./issuedialog";
 import { MultifactorDialog, RecoveryCodesDialog } from "./multi-factor-dialog";
 import OnboardingDialog from "./onboarding-dialog";
 import AttachmentsDialog from "./attachmentsdialog";
-import BackupDialog from "./backupdialog";
 
 const Dialogs = {
   AddNotebookDialog,
@@ -40,6 +39,5 @@ const Dialogs = {
   RecoveryCodesDialog,
   OnboardingDialog,
   AttachmentsDialog,
-  BackupDialog,
 };
 export default Dialogs;
