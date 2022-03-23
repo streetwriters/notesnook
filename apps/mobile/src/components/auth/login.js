@@ -218,7 +218,9 @@ export const Login = ({ changeMode }) => {
               autoCapitalize="none"
               errorMessage="Email is invalid"
               placeholder="Email"
-              onSubmit={() => {}}
+              onSubmit={() => {
+                passwordInputRef.current?.focus();
+              }}
             />
 
             <Input
