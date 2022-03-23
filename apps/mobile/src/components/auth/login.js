@@ -236,6 +236,7 @@ export const Login = ({ changeMode }) => {
               autoCorrect={false}
               placeholder="Password"
               marginBottom={0}
+              onSubmit={login}
             />
             <Button
               title="Forgot your password?"
