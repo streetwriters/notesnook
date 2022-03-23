@@ -124,11 +124,19 @@ async function updateNextBackupTime() {
   });
 }
 
-async function run() {
+async function run(progress) {
   let androidBackupDirectory = await checkBackupDirExists();
   if (!androidBackupDirectory) return;
 
   let backup;
+
+  if (progress) {
+    presentSheet({
+      title: 'Backing up your data',
+      paragraph: "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
+      progress: true
+    });
+  }
 
   try {
     backup = await db.backup.export('mobile', SettingsService.get().encryptedBackup);
@@ -172,11 +180,15 @@ async function run() {
 
     let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
     console.log(backupFilePath);
+    await sleep(300);
     if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
+    } else {
+      progress && eSendEvent(eCloseProgressDialog);
     }
     return backupFilePath;
   } catch (e) {
+    progress && eSendEvent(eCloseProgressDialog);
     ToastEvent.error(e, 'Backup failed!');
   }
 }

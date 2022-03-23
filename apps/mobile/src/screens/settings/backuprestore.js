@@ -112,10 +112,10 @@ const SettingsBackupAndRestore = ({ isSheet }) => {
           await sleep(300);
         }
         if (!user) {
-          await Backup.run();
+          await Backup.run(true);
           return;
         }
-        verifyUser(null, Backup.run);
+        verifyUser(null, () => Backup.run(true));
       },
       desc: 'Backup your data to phone storage'
     },
