@@ -131,12 +131,16 @@ export const SessionExpired = () => {
         paragraph: 'Please wait while we sync all your data.',
         progress: true
       });
+      setLoading(false);
     } catch (e) {
-      callback && callback(true);
-      if (e.message === 'MFA Required') {
+      callback && callback(false);
+      if (e.message === 'Multifactor authentication required.') {
         TwoFactorVerification.present(async mfa => {
           if (mfa) {
+            console.log(mfa);
             await login(mfa);
+          } else {
+            setLoading(false);
           }
         }, e.data);
       } else {
