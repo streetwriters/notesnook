@@ -8,6 +8,7 @@ import {
   MFASMS,
   MFAEmail,
   MFARecoveryCode,
+  ArrowRight,
 } from "../components/icons";
 import Field from "../components/field";
 import { getQueryParams, hardNavigate, makeURL } from "../navigation";
@@ -142,6 +143,22 @@ function Auth(props: AuthProps) {
           overflowY: "auto",
         }}
       >
+        {route === "login" || route === "signup" || route === "recover" ? (
+          <Button
+            sx={{
+              display: "flex",
+              mt: 2,
+              mr: 2,
+              alignSelf: "end",
+              alignItems: "center",
+            }}
+            variant={"secondary"}
+            onClick={() => openURL("/notes/")}
+          >
+            Jump to app <ArrowRight size={18} sx={{ ml: 1 }} />
+          </Button>
+        ) : null}
+
         {Route && (
           <Route
             navigate={(route, formData) => {
@@ -335,14 +352,17 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         title: "Logging you in",
         subtitle: "Please wait while you are authenticated.",
       }}
-      onSubmit={(form) => login(form, navigate)}
+      onSubmit={async (form) => {
+        if (!user) return;
+        await login({ email: user.email, password: form.password }, navigate);
+      }}
     >
       <AuthField
         id="email"
         type="email"
         autoComplete={"false"}
         label="Enter email"
-        defaultValue={maskEmail(user!.email)}
+        defaultValue={user ? maskEmail(user.email) : undefined}
         autoFocus
         disabled
       />
@@ -470,6 +490,36 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
     60
   );
 
+  const sendCode = useCallback(
+    async (selectedMethod, token) => {
+      setIsSending(true);
+      try {
+        await db.mfa!.sendCode(selectedMethod, token);
+        setEnabled(false);
+      } catch (e) {
+        const error = e as Error;
+        console.error(error);
+        showToast("error", error.message);
+      } finally {
+        setIsSending(false);
+      }
+    },
+    [setEnabled]
+  );
+
+  useEffect(() => {
+    if (
+      !formData ||
+      formData.selectedMethod === "recoveryCode" ||
+      formData.selectedMethod === "app"
+    )
+      return;
+
+    (async function () {
+      await sendCode(formData.selectedMethod, formData.token);
+    })();
+  }, [formData, sendCode]);
+
   if (!formData) {
     openURL("/");
     return null;
@@ -515,24 +565,14 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                     {isSending ? (
                       <Loading size={18} />
                     ) : enabled ? (
-                      `Send code`
+                      `Resend code`
                     ) : (
-                      `Resend (${elapsed})`
+                      `Resend in ${elapsed}`
                     )}
                   </Text>
                 ),
                 onClick: async () => {
-                  setIsSending(true);
-                  try {
-                    await db.mfa!.sendCode(selectedMethod, token);
-                    setEnabled(false);
-                  } catch (e) {
-                    const error = e as Error;
-                    console.error(error);
-                    showToast("error", error.message);
-                  } finally {
-                    setIsSending(false);
-                  }
+                  await sendCode(selectedMethod, token);
                 },
               }
             : undefined
