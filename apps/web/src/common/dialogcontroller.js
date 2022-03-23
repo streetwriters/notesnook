@@ -607,6 +607,24 @@ export function showImportDialog() {
   ));
 }
 
+export function showMultifactorDialog(primaryMethod = undefined) {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.MultifactorDialog
+      onClose={(res) => perform(res)}
+      primaryMethod={primaryMethod}
+    />
+  ));
+}
+
+export function show2FARecoveryCodesDialog(primaryMethod) {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.RecoveryCodesDialog
+      onClose={(res) => perform(res)}
+      primaryMethod={primaryMethod}
+    />
+  ));
+}
+
 export function showAttachmentsDialog() {
   return showDialog((Dialogs, perform) => (
     <Dialogs.AttachmentsDialog onClose={(res) => perform(res)} />

@@ -3,13 +3,18 @@ import { TaskManager } from "./task-manager";
 import { zip } from "../utils/zip";
 import { saveAs } from "file-saver";
 
-async function exportToPDF(content: string): Promise<boolean> {
+export async function exportToPDF(
+  title: string,
+  content: string
+): Promise<boolean> {
   if (!content) return false;
   const { default: printjs } = await import("print-js");
   return new Promise(async (resolve) => {
     printjs({
       printable: content,
       type: "raw-html",
+      documentTitle: title,
+      header: '<h3 class="custom-h3">My custom header</h3>',
       onPrintDialogClose: () => {
         resolve(false);
       },
@@ -30,7 +35,7 @@ export async function exportNotes(
     action: async (report) => {
       if (format === "pdf") {
         const note = db.notes!.note(noteIds[0]);
-        return await exportToPDF(await note.export("html", null));
+        return await exportToPDF(note.title, await note.export("html", null));
       }
 
       var files = [];

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Flex, Text } from "rebass";
+import { Button, Flex, Text } from "rebass";
 import { Input, Label } from "@rebass/forms";
 import * as Icon from "../icons";
 
@@ -48,6 +48,8 @@ function Field(props) {
     placeholder,
     validatePassword,
     onError,
+    inputMode,
+    pattern,
     variant = "input",
     as = "input",
   } = props;
@@ -96,6 +98,8 @@ function Field(props) {
           disabled={disabled}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          inputMode={inputMode}
+          pattern={pattern}
           type={type || "text"}
           sx={{
             ...styles.input,
@@ -148,10 +152,11 @@ function Field(props) {
           </Flex>
         )}
         {action && (
-          <Flex
+          <Button
+            type="button"
+            variant={"secondary"}
             data-test-id={action.testId}
             onClick={action.onClick}
-            variant="rowCenter"
             sx={{
               position: "absolute",
               right: "2px",
@@ -162,9 +167,10 @@ function Field(props) {
               borderRadius: "default",
               ":hover": { bg: "border" },
             }}
+            disabled={action.disabled}
           >
-            <action.icon size={20} />
-          </Flex>
+            {action.component ? action.component : <action.icon size={20} />}
+          </Button>
         )}
       </Flex>
       {validatePassword && (

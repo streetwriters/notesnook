@@ -21,19 +21,27 @@ const ROUTES = {
   },
   "/signup": {
     component: () => import("./views/auth"),
-    props: { type: "signup" },
+    props: { route: "signup" },
   },
   "/sessionexpired": {
     component: () => import("./views/auth"),
-    props: { type: "sessionexpired" },
+    props: { route: "sessionExpiry" },
   },
   "/login": {
     component: () => import("./views/auth"),
-    props: { type: "login" },
+    props: { route: "login" },
   },
   "/recover": {
     component: () => import("./views/auth"),
-    props: { type: "recover" },
+    props: { route: "recover" },
+  },
+  "/mfa/code": {
+    component: () => import("./views/auth"),
+    props: { route: "login" },
+  },
+  "/mfa/select": {
+    component: () => import("./views/auth"),
+    props: { route: "login" },
   },
   default: { component: () => import("./app"), props: {} },
 };
