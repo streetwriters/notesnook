@@ -9,7 +9,7 @@ class ButtonFactory {
       anchor: new Anchor(),
       tool: new Tool(),
       icon: new Icon(),
-      shade: new Shade(),
+      dialog: new Dialog(),
       statusitem: new StatusItem(),
       menuitem: new MenuItem(),
     };
@@ -36,9 +36,11 @@ class Default {
         filter: "brightness(98%)",
       },
       outline: "none",
-      ":focus-visible:not(:active)": {
-        boxShadow: "0px 0px 0px 2px var(--text)",
-      },
+      ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
+        {
+          filter: "brightness(90%)",
+          bg: "bgSecondary",
+        },
       ":disabled": {
         opacity: 0.5,
         cursor: "not-allowed",
@@ -57,9 +59,24 @@ class Primary {
   }
 }
 
-class Shade {
+class Dialog {
   constructor() {
-    return { variant: "buttons.primary", color: "primary", bg: "shade" };
+    return {
+      variant: "buttons.primary",
+      color: "primary",
+      fontWeight: "bold",
+      bg: "transparent",
+      ":hover": { bg: "bgSecondary" },
+      ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
+        {
+          bg: "hover",
+          filter: "brightness(90%)",
+        },
+      ":disabled": {
+        opacity: 0.7,
+        cursor: "not-allowed",
+      },
+    };
   }
 }
 
