@@ -157,7 +157,7 @@ const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
 
   const getMethods = () => {
     if (!recovery) return mfaMethods;
-    return mfaMethods.filter(m => m.id !== user?.mfa.primaryMethod);
+    return mfaMethods.filter(m => m.id !== user?.mfa?.primaryMethod);
   };
 
   return (
