@@ -45,10 +45,10 @@ const TwoFactorAuth = ({ isSheet }: { isSheet: boolean }) => {
     });
   };
 
-  const mfaSettingsList = user?.mfa.isEnabled
+  const mfaSettingsList = user?.mfa?.isEnabled
     ? [
         {
-          name: user.mfa.secondaryMethod
+          name: user.mfa?.secondaryMethod
             ? 'Reconfigure fallback 2FA method'
             : 'Add fallback 2FA method',
           func: () => {
