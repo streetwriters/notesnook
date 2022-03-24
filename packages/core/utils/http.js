@@ -131,7 +131,7 @@ function errorTransformer(errorJson) {
       }
     }
     default:
-      errorMessage = error_description || "An unknown error occured.";
+      errorMessage = error_description || error || "An unknown error occurred.";
       errorCode = error;
       break;
   }
