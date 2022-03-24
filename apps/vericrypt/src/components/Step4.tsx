@@ -2,6 +2,10 @@ import { Flex, Text, Image, Textarea } from "@theme-ui/components";
 import { StepContainer } from "./StepContainer";
 import DevtoolsRequestsFilter from "../assets/screenshots/devtools_requests_filter.png";
 import DevtoolsRequestsCopy from "../assets/screenshots/devtools_requests_copy.png";
+
+import DevtoolsRequestsFilterFirefox from "../assets/screenshots/firefox/network_tab_firefox.png";
+import DevtoolsRequestsCopyFirefox from "../assets/screenshots/firefox/copy_curl_request.png";
+
 import { Accordion } from "./Accordion";
 import { getCombo } from "../utils/keycombos";
 import Platform from "platform";
@@ -82,10 +86,52 @@ const steps = {
       <Image src={DevtoolsRequestsCopy} width={400} sx={{ mt: 1 }} />
     </Flex>,
   ],
+  firefox: [
+    "Focus the Notesnook tab in your browser.",
+    <>
+      Press <KeyCombo combo={getCombo("chromium", "developerTools")} /> to open
+      Developer Tools.
+    </>,
+    <>
+      Switch to the <Code text="Network" /> tab.
+    </>,
+    <Flex sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        In the filter input, type <Code text="sync" /> to filter out sync
+        requests.
+      </Text>
+      <Image src={DevtoolsRequestsFilterFirefox} width={400} sx={{ mt: 1 }} />
+    </Flex>,
+    <>
+      At this point, you probably won't see anything useful. Try editing one of
+      your notes and syncing. Make sure to keep the <Code text="Network" /> tab
+      open.
+    </>,
+    <>
+      In the requests table in <Code text="Network" /> tab, you'll now see 3 or
+      more new requests popup.
+    </>,
+    <>
+      We are interested in only the <Code text="sync" /> request. Right click on
+      this request to open the context menu.
+    </>,
+    <Flex sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        From the context menu, go to <Code text="Copy" /> &amp; click on{" "}
+        <Code text="Copy as cURL" />.
+      </Text>
+      <Image src={DevtoolsRequestsCopyFirefox} width={400} sx={{ mt: 1 }} />
+    </Flex>,
+  ],
 };
 
 const isChromium = Platform.name === "Chrome";
-const instructions = isChromium ? steps.chromium : null;
+const isFirefox = Platform.name === "Firefox";
+const instructions = isChromium
+  ? steps.chromium
+  : isFirefox
+  ? steps.firefox
+  : null;
 
 export function PasteEncryptedData(props: PasteEncryptedDataProps) {
   const [error, setError] = useState<string | undefined>();
@@ -94,7 +140,21 @@ export function PasteEncryptedData(props: PasteEncryptedDataProps) {
   >();
 
   return (
-    <StepContainer as="form" sx={{ flexDirection: "column" }}>
+    <StepContainer
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (encryptedData) {
+          document.getElementById("encrypted_data")?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+        return false;
+      }}
+      id="step_4"
+      as="form"
+      sx={{ flexDirection: "column" }}
+    >
       <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
         <Text variant="title">Paste raw encrypted data</Text>
         <Code
@@ -164,6 +224,7 @@ export function PasteEncryptedData(props: PasteEncryptedDataProps) {
       {error ? <ErrorsList errors={[error]} /> : null}
       {encryptedData && (
         <Flex
+          id="encrypted_data"
           sx={{
             bg: "shade",
             border: "2px solid var(--theme-ui-colors-primary)",

@@ -56,7 +56,7 @@ export function Hero() {
         An open source utility to verify Notesnook data encryption in a
         verifiable &amp; easy way.
       </Text>
-      <Flex sx={{ mt: 2 }}>
+      <Flex sx={{ mt: 2, zIndex: 10 }}>
         <Text variant="body" sx={{ px: 1 }}>
           v{appVersion}
         </Text>

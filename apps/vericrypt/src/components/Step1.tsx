@@ -5,7 +5,19 @@ import { getPackageUrl } from "../utils/links";
 
 export function LoginToNotesnook() {
   return (
-    <StepContainer as="form" sx={{ flexDirection: "column" }}>
+    <StepContainer
+      onSubmit={(e) => {
+        e.preventDefault();
+        document.getElementById("step_2")?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        return false;
+      }}
+      onSubmitCapture={() => false}
+      as="form"
+      sx={{ flexDirection: "column" }}
+    >
       <Text variant="title">Welcome to Vericrypt</Text>
       <Text as="p" variant="body" sx={{ mt: 1 }}>
         Trust is a huge problem in closed source end-to-end encrypted

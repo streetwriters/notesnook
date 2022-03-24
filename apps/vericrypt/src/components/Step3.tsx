@@ -9,7 +9,21 @@ type EnterAccountPasswordProps = {
 
 export function EnterAccountPassword(props: EnterAccountPasswordProps) {
   return (
-    <StepContainer as="form" sx={{ flexDirection: "column" }}>
+    <StepContainer
+      onSubmit={(e) => {
+        e.preventDefault();
+        document.getElementById("step_4")?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        return false;
+      }}
+      onSubmitCapture={() => false}
+      inputMode="text"
+      id="step_3"
+      as="form"
+      sx={{ flexDirection: "column" }}
+    >
       <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
         <Text variant="title">Account password</Text>
         <Code

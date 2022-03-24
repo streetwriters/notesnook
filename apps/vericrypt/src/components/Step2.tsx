@@ -3,6 +3,11 @@ import { StepContainer } from "./StepContainer";
 import DevtoolsApplicationTab from "../assets/screenshots/devtools_application_tab.png";
 import DevtoolsSelectDB from "../assets/screenshots/devtools_select_db.png";
 import DevtoolsSalt from "../assets/screenshots/devtools_salt.png";
+
+import DevtoolsFirefoxStorageTab from "../assets/screenshots/firefox/firefox_storage_tab.png";
+import DevtoolsSelectDBFirefox from "../assets/screenshots//firefox/firefox_keyvalue_pairs.png";
+import DevtoolsSaltFirefox from "../assets/screenshots/firefox/firefox_user_object.png";
+
 import { Accordion } from "./Accordion";
 import { getCombo } from "../utils/keycombos";
 import Platform from "platform";
@@ -52,16 +57,77 @@ const steps = {
       <Image src={DevtoolsSalt} width={400} sx={{ mt: 1 }} />
     </Flex>,
   ],
+  firefox: [
+    "Focus the Notesnook tab in your browser.",
+    <>
+      Press <KeyCombo combo={getCombo("firefox", "developerTools")} /> to open
+      Developer Tools.
+    </>,
+    <Flex sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        Switch to the <Code text="Storage" /> tab.
+      </Text>
+      <Image src={DevtoolsFirefoxStorageTab} width={300} sx={{ mt: 1 }} />
+    </Flex>,
+    <>
+      From the side menu, expand <Code text="IndexedDB" /> which is under the
+      Storage heading.
+    </>,
+    `You'll see a number of databases . Expand the one that starts with "Notesnook".`,
+
+    <Flex sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        Click on <Code text="keyvaluepairs" />.
+      </Text>
+      <Image src={DevtoolsSelectDBFirefox} width={200} sx={{ mt: 1 }} />
+    </Flex>,
+    <>
+      On the right panel, you'll see an input with the placeholder "Start from
+      key" at the top. Type <Code text="user" /> in that input. If you don't see
+      the 'user' object, scroll down in key-value pair list and the search
+      again.
+    </>,
+    `At the top of the list, you'll see an entry with key "user". Expand the value.`,
+    <Flex sx={{ flexDirection: "column" }}>
+      <Text as="p">
+        You'll see a key named <Code text="salt" />. Right click and copy the
+        value against it.
+      </Text>
+      <Image src={DevtoolsSaltFirefox} width={400} sx={{ mt: 1 }} />
+    </Flex>,
+  ],
 };
 
 const isChromium = Platform.name === "Chrome";
-const instructions = isChromium ? steps.chromium : null;
+const isFirefox = Platform.name === "Firefox";
+const instructions = isChromium
+  ? steps.chromium
+  : isFirefox
+  ? steps.firefox
+  : null;
 
+console.log(Platform.name);
 export function GetAccountSalt(props: GetAccountSaltProps) {
   const [isSaltValid, setIsSaltValid] = useState<boolean>();
 
   return (
-    <StepContainer as="form" sx={{ flexDirection: "column" }}>
+    <StepContainer
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (isSaltValid) {
+          document.getElementById("step_3")?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+        return false;
+      }}
+      onSubmitCapture={() => false}
+      inputMode="text"
+      id="step_2"
+      as="form"
+      sx={{ flexDirection: "column" }}
+    >
       <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
         <Text variant="title">Account salt</Text>
         <Code

@@ -21,23 +21,27 @@ export function DecryptedResult(props: DecryptedResultProps) {
 
   useEffect(() => {
     (async function() {
-      const data: any = {
-        notes: [],
-        notebooks: [],
-        content: [],
-        attachments: [],
-      };
-      const crypto = new NNCrypto();
-      const key = await crypto.exportKey(props.password, props.salt);
-      for (let arrayKey in data) {
-        const array = data[arrayKey];
-        for (let encryptedItem of (props.data as any)[arrayKey]) {
-          const { data } = await crypto.decrypt(key, encryptedItem, "text");
-          array.push(JSON.parse(data as string));
+      try {
+        const data: any = {
+          notes: [],
+          notebooks: [],
+          content: [],
+          attachments: [],
+        };
+        const crypto = new NNCrypto();
+        const key = await crypto.exportKey(props.password, props.salt);
+        for (let arrayKey in data) {
+          const array = data[arrayKey];
+          for (let encryptedItem of (props.data as any)[arrayKey]) {
+            const { data } = await crypto.decrypt(key, encryptedItem, "text");
+            array.push(JSON.parse(data as string));
+          }
         }
+        setDecryptedData(JSON.stringify(data, undefined, "  "));
+        setIsDecrypting(false);
+      } catch (e) {
+        setIsDecrypting(false);
       }
-      setDecryptedData(JSON.stringify(data, undefined, "  "));
-      setIsDecrypting(false);
     })();
   }, [props]);
 
