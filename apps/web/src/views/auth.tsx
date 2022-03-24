@@ -37,7 +37,7 @@ type MFALoginFormData = LoginFormData & {
 };
 
 type SignupFormData = LoginFormData & {
-  confirmPassword: string;
+  "confirm-password": string;
 };
 
 type AccountRecoveryFormData = {
@@ -272,7 +272,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         subtitle: "Please wait while we finalize your account.",
       }}
       onSubmit={async (form) => {
-        if (form.password !== form.confirmPassword) {
+        if (form.password !== form["confirm-password"]) {
           throw new Error("Passwords do not match.");
         }
 
@@ -303,7 +303,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             type="password"
             autoComplete="confirm-password"
             label="Confirm password"
-            defaultValue={form?.confirmPassword}
+            defaultValue={form?.["confirm-password"]}
           />
           <SubmitButton
             text="Create account"
