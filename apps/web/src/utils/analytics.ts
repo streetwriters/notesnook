@@ -83,9 +83,8 @@ export const ANALYTICS_EVENTS = {
 export function trackEvent(event: TrackerEvent, eventMessage?: string) {
   if (Config.get("telemetry") === "false") return;
   if (!window.umami) return;
-  if (event.type === "event" && eventMessage)
-    window.umami.trackEvent(eventMessage, event.name);
-  else trackVisit(event.name);
+  if (event.type === "view") trackVisit(event.name);
+  else if (eventMessage) window.umami.trackEvent(eventMessage, event.name);
 }
 
 export function trackVisit(url: string = "/") {
