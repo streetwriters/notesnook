@@ -237,6 +237,10 @@ PODS:
     - React-Core
   - react-native-begin-background-task (0.1.0):
     - React
+  - react-native-config (1.4.5):
+    - react-native-config/App (= 1.4.5)
+  - react-native-config/App (1.4.5):
+    - React-Core
   - react-native-document-picker (7.1.3):
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
@@ -407,6 +411,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-background-actions (from `../node_modules/react-native-background-actions`)
   - react-native-begin-background-task (from `../node_modules/react-native-begin-background-task`)
+  - react-native-config (from `../node_modules/react-native-config`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
@@ -453,7 +458,7 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNTooltips (from `../node_modules/react-native-tooltips`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
-  - SexyTooltip (from `https://github.com/prscX/SexyTooltip.git`)
+  - SexyTooltip (from `https://github.com/ammarahm-ed/SexyTooltip.git`)
   - "toolbar-android (from `../node_modules/@react-native-community/toolbar-android`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -508,6 +513,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-background-actions"
   react-native-begin-background-task:
     :path: "../node_modules/react-native-begin-background-task"
+  react-native-config:
+    :path: "../node_modules/react-native-config"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
   react-native-fingerprint-scanner:
@@ -601,7 +608,7 @@ EXTERNAL SOURCES:
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   SexyTooltip:
-    :git: https://github.com/prscX/SexyTooltip.git
+    :git: https://github.com/ammarahm-ed/SexyTooltip.git
   toolbar-android:
     :path: "../node_modules/@react-native-community/toolbar-android"
   Yoga:
@@ -609,8 +616,8 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   SexyTooltip:
-    :commit: 2fbe10260fb1b0f7dcd9822681a6970ce88112af
-    :git: https://github.com/prscX/SexyTooltip.git
+    :commit: bb13cf11a7c19b635f10047fc04d857dd6cb6553
+    :git: https://github.com/ammarahm-ed/SexyTooltip.git
 
 SPEC CHECKSUMS:
   Base64: cecfb41a004124895a7bcee567a89bae5a89d49b
@@ -640,6 +647,7 @@ SPEC CHECKSUMS:
   React-logger: b08f354e4c928ff794ca477347fea0922aaf11c3
   react-native-background-actions: a466fde06b54e52adf037ca9b217df460596f120
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
+  react-native-config: 6502b1879f97ed5ac570a029961fc35ea606cd14
   react-native-document-picker: ec07866a30707f23660c0f3ae591d669d3e89096
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-get-random-values: 30b3f74ca34e30e2e480de48e4add2706a40ac8f
@@ -684,12 +692,12 @@ SPEC CHECKSUMS:
   RNSecureRandom: 0dcee021fdb3d50cd5cee5db0ebf583c42f5af0e
   RNShare: 3185c074441b7e8897014d95ba982434a0a024a1
   RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
-  RNTooltips: 47a992eb7b12f624e5a8a40f0990fbef49dcb83e
+  RNTooltips: 5424d4bf0b3d441104127943b1115cc7f0616b1f
   RNVectorIcons: 4143ba35feebab8fdbe6bc43d1e776b393d47ac8
   SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd
   toolbar-android: 2a73856e98b750d7e71ce4644d3f41cc98211719
   Yoga: 5cbf25add73edb290e1067017690f7ebf56c5468
 
-PODFILE CHECKSUM: 69a787dbce9f45b28a09e255a4ae39a9cfe82d20
+PODFILE CHECKSUM: caa8e050bad1a0f4d452e7e74a6dc724578310b1
 
 COCOAPODS: 1.11.2

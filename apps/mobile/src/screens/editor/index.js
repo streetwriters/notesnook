@@ -1,0 +1,137 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Platform, View } from 'react-native';
+import WebView from 'react-native-webview';
+import { notesnook } from '../../../e2e/test.ids';
+import { useEditorStore, useUserStore } from '../../stores/stores';
+import { DDS } from '../../services/device-detection';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { getCurrentColors } from '../../utils/color-scheme';
+import { eOnLoadNote } from '../../utils/events';
+import { tabBarRef } from '../../utils/global-refs';
+import { sleep } from '../../utils/time';
+import EditorHeader from './EditorHeader';
+import {
+  disableEditing,
+  EditorWebView,
+  getNote,
+  onWebViewLoad,
+  sourceUri,
+  _onMessage,
+  _onShouldStartLoadWithRequest
+} from './Functions';
+import tiny from './tiny/tiny';
+import EditorToolbar from './tiny/toolbar';
+import { useEditor } from './use-editor';
+
+const source = { uri: sourceUri + 'index.html' };
+
+const style = {
+  height: '100%',
+  maxHeight: '100%',
+  width: '100%',
+  alignSelf: 'center',
+  backgroundColor: 'transparent'
+};
+
+const Editor = React.memo(
+  () => {
+    const premiumUser = useUserStore(state => state.premium);
+    const sessionId = useEditorStore(state => state.sessionId);
+    const [resetting, setResetting] = useState(false);
+    const editorRef = useRef();
+    const editor = useEditor(editorRef);
+
+    const onLoad = async () => {
+      await onWebViewLoad(premiumUser, getCurrentColors());
+    };
+
+    useEffect(() => {
+      if (premiumUser) {
+        tiny.call(EditorWebView, tiny.setMarkdown, true);
+      }
+    }, [premiumUser]);
+
+    const onResetRequested = async preventSave => {
+      if (!getNote()) {
+        eSendEvent('loadingNote', null);
+      }
+      setResetting(true);
+      await sleep(10);
+      setResetting(false);
+      if (!DDS.isTab && tabBarRef.current?.page === 0) {
+        console.log('Editor out of bounds');
+        return;
+      }
+      if (preventSave) {
+        disableEditing();
+      }
+
+      if (getNote()) {
+        eSendEvent(eOnLoadNote, { ...getNote(), forced: true });
+      }
+      console.log('resetting editor');
+    };
+
+    useEffect(() => {
+      eSubscribeEvent('webviewreset', onResetRequested);
+      return () => {
+        eUnSubscribeEvent('webviewreset', onResetRequested);
+      };
+    }, []);
+
+    return resetting ? null : (
+      <>
+        <View
+          style={{
+            flexGrow: 1,
+            backgroundColor: 'transparent',
+            flex: 1
+          }}
+        >
+          <EditorHeader />
+          <WebView
+            testID={notesnook.editor.id}
+            ref={EditorWebView}
+            onLoad={onLoad}
+            onRenderProcessGone={() => {
+              onResetRequested();
+            }}
+            onError={() => {
+              onResetRequested();
+            }}
+            injectedJavaScript={`globalThis.sessionId="${sessionId}";`}
+            javaScriptEnabled={true}
+            focusable={true}
+            keyboardDisplayRequiresUserAction={false}
+            onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+            cacheMode="LOAD_DEFAULT"
+            cacheEnabled={true}
+            domStorageEnabled={true}
+            bounces={false}
+            allowFileAccess={true}
+            scalesPageToFit={true}
+            renderLoading={() => <View />}
+            startInLoadingState
+            hideKeyboardAccessoryView={true}
+            allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
+            allowFileAccessFromFileURLs={true}
+            allowUniversalAccessFromFileURLs={true}
+            originWhitelist={['*']}
+            source={{
+              uri: 'http://192.168.10.3:3000'
+            }}
+            style={style}
+            autoManageStatusBarEnabled={false}
+            onMessage={editor.onMessage}
+          />
+        </View>
+        <EditorToolbar />
+      </>
+    );
+  },
+  () => true
+);
+
+export default Editor;
+
+// test uri "http://192.168.10.8:3000/index.html"

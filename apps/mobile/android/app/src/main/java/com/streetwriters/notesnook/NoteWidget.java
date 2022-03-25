@@ -16,14 +16,11 @@ public class NoteWidget extends AppWidgetProvider {
                                 int appWidgetId) {
 
         Intent intent = new Intent(context, ShareActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-       ;
-        CharSequence widgetText = context.getString(R.string.appwidget_text);
-        // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.note_widget);
         views.setOnClickPendingIntent(R.id.widget_button, pendingIntent);
-        // Instruct the widget manager to update the widget
+
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 

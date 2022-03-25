@@ -1,5 +1,8 @@
-- Fixed app hangs and becomes unusable on some phones
-- Improved web clipper in widget to handle tables & codeblocks and remove invalid elements
-- Disable swipe to close gesture in editor as it interferes with editing or scrolling.
+- Two-factor authentication
+- Fix collapse heading icon not showing correctly
+- Fix items in search are not updated properly
+- Improve login/signup UX
+- Do not show progress on backup
+
 
 Thank you for using Notesnook!

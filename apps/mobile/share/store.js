@@ -1,17 +1,21 @@
 import { Appearance } from 'react-native';
 import create from 'zustand';
-import { ACCENT, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setAccentColor } from '../src/utils/Colors';
-import { MMKV } from '../src/utils/mmkv';
+import { ACCENT, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../src/utils/color-scheme';
+import { MMKV } from '../src/utils/database/mmkv';
 
 export const useShareStore = create((set, get) => ({
   colors: Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT,
   accent: ACCENT,
   setAccent: async () => {
-    let accent = await MMKV.getItem('accentColor');
-    if (accent) {
-      accent = {
-        color: accent,
-        shade: accent + '12'
+    let appSettings = await MMKV.getItem('appSettings');
+
+    if (appSettings) {
+      appSettings = JSON.parse(appSettings);
+      let accentColor = appSettings.theme?.accent || ACCENT.color;
+
+      let accent = {
+        color: accentColor,
+        shade: accentColor + '12'
       };
       set({ accent: accent });
     }

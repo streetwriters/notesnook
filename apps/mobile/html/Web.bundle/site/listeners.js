@@ -74,7 +74,8 @@ function onTitleChange() {
 
     info = document.querySelector(infoBar);
     if (tinymce.activeEditor) {
-      info.querySelector('#infowords').innerText = editor.countWords() + ' words';
+      let count = editor.countWords() || 0;
+      info.querySelector('#infowords').innerText = count + ' words';
       updateInfoBar();
     }
 
@@ -153,8 +154,9 @@ function attachMessageListener() {
         isLoading = true;
         globalThis.isClearingNoteData = false;
         tinymce.activeEditor.mode.set('readonly');
-        if (!isInvalidValue(value)) {
-          tinymce.activeEditor.setHTML(value);
+        let html = value.data;
+        if (!isInvalidValue(html)) {
+          tinymce.activeEditor.setHTML(html);
           let timeout = 0;
           if (value.length > 400000) {
             timeout = 900;
@@ -178,9 +180,19 @@ function attachMessageListener() {
           globalThis.isClearingNoteData = false;
           reactNativeEventHandler('noteLoaded', true);
         }
-        tinymce.activeEditor.mode.set('design');
+
+        if (!value.readOnly) {
+          tinymce.activeEditor.mode.set('design');
+          document.getElementById('titleInput').readOnly = false;
+        } else {
+          tinymce.activeEditor.mode.set('design');
+          tinymce.activeEditor.mode.set('readonly');
+          document.getElementById('titleInput').readOnly = true;
+        }
+
         info = document.querySelector(infoBar);
-        info.querySelector('#infowords').innerText = editor.countWords() + ' words';
+        let count = editor.countWords() || 0;
+        info.querySelector('#infowords').innerText = count + ' words';
         updateInfoBar();
         break;
       case 'htmldiff':

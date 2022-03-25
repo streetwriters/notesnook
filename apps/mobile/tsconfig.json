@@ -12,13 +12,9 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "skipLibCheck": false
+    "skipLibCheck": false,
+    "maxNodeModuleJsDepth": 10,
+    "downlevelIteration": true
   },
-  "include": ["./node_modules/notes-core","."],
-  "exclude": [
-    "node_modules",
-    "babel.config.js",
-    "metro.config.js",
-    "jest.config.js"
-  ]
+  "exclude": ["babel.config.js", "metro.config.js", "jest.config.js", "android", "ios", "html"]
 }

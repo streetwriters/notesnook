@@ -1,0 +1,11 @@
+# What's new
+- Two-factor authentication
+
+# What's fixed
+- Fix collapse heading icon not showing correctly
+- Fix items in search are not updated properly
+- Improve login/signup UX
+- Do not show progress on backup
+
+
+Thank you for using Notesnook!

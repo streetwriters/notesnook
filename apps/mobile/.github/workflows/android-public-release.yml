@@ -1,0 +1,71 @@
+name: Android Github Release
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@master
+        with:
+          node-version: '16'
+
+      - name: Use specific Java version for the builds
+        uses: joschi/setup-jdk@v2
+        with:
+          java-version: '11'
+          architecture: 'x64'
+
+      - name: Install node modules
+        run: |
+          npm install
+
+      - name: Make Gradlew Executable
+        run: cd android && chmod +x ./gradlew
+
+      - name: Build Android App APKS
+        run: |
+          cd android && ENVFILE=.env.public ./gradlew assembleRelease --no-daemon
+
+      - name: Sign APK Files
+        id: sign_app
+        uses: r0adkll/sign-android-release@master
+        with:
+          releaseDirectory: android/app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.PUBLIC_SIGNING_KEY }}
+          alias: ${{ secrets.PUBLIC_ALIAS }}
+          keyStorePassword: ${{ secrets.PUBLIC_KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
+
+      - name: Get version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@master
+
+      - name: Rename
+        run: |
+          cd android/app/build/outputs/apk/release/
+          mv app-arm64-v8a-release-unsigned-signed.apk notesnook-arm64-v8a.apk
+          mv app-armeabi-v7a-release-unsigned-signed.apk notesnook-armeabi-v7a.apk
+          mv app-x86-release-unsigned-signed.apk notesnook-x86.apk
+          mv app-x86_64-release-unsigned-signed.apk notesnook-x86_64.apk
+
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          tag_name: ${{ steps.package-version.outputs.current-version}}-android
+          name: Notesnook Android v${{ steps.package-version.outputs.current-version}}
+          repository: streetwriters/notesnook
+          token: ${{ secrets.NOTESNOOK_GH_TOKEN }}
+          files: |
+            android/app/build/outputs/apk/release/notesnook-arm64-v8a.apk
+            android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
+            android/app/build/outputs/apk/release/notesnook-x86.apk
+            android/app/build/outputs/apk/release/notesnook-x86_64.apk

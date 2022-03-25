@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.streetwriters.notesnook">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -11,7 +12,9 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-     
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove"/>
+
     <application
         android:name=".MainApplication"
         android:allowBackup="false"
@@ -22,7 +25,7 @@
         android:theme="@style/BootTheme"
         android:largeHeap="true"
         android:usesCleartextTraffic="true">
-        <receiver android:exported="true" android:name=".NoteWidget">
+        <receiver android:exported="false" android:name=".NoteWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -73,6 +76,8 @@
             android:noHistory="true"
             android:screenOrientation="unspecified"
             android:exported="true"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/AppThemeB">
             <intent-filter android:label="Make Note">
@@ -84,9 +89,7 @@
             </intent-filter>
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/*" />
             </intent-filter>
         </activity>

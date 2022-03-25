@@ -1,10 +1,10 @@
 import React from 'react';
-import { AppRegistry, LayoutAnimation, LogBox, Platform, UIManager } from 'react-native';
+import { AppRegistry, LogBox, Platform, UIManager } from 'react-native';
 import 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { enableScreens } from 'react-native-screens';
 import { name as appName } from './app.json';
-import Notifications from './src/services/Notifications';
+import Notifications from './src/services/notifications';
 global.Buffer = require('buffer').Buffer;
 enableScreens(true);
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -14,20 +14,14 @@ if (__DEV__) {
   LogBox.ignoreAllLogs();
 }
 
-let Provider;
 let App;
 let NotesnookShare;
 Notifications.init();
 let QuickNoteIOS;
 
 const AppProvider = () => {
-  Provider = require('./src/provider').Provider;
   App = require('./App').default;
-  return (
-    <Provider>
-      <App />
-    </Provider>
-  );
+  return <App />;
 };
 
 AppRegistry.registerComponent(appName, () => AppProvider);

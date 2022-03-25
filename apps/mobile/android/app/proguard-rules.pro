@@ -46,3 +46,5 @@
 -keep class net.jpountz.** { *; }
 -keep class com.goterl.** { *; }
 -keepclassmembers class * extends com.sun.jna.* { public *; }
+
+-keep class com.streetwriters.notesnook.BuildConfig { *; }

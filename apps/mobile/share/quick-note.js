@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Appearance, SafeAreaView } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../src/utils/Colors';
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../src/utils/color-scheme';
 import NotesnookShare from './index';
 
 export default class QuickNoteIOS extends Component {

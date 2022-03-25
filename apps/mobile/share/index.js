@@ -25,11 +25,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
 import isURL from 'validator/lib/isURL';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../src/services/EventManager';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../src/services/event-manager';
 import { getElevation } from '../src/utils';
 import { db } from '../src/utils/database';
-import Storage from '../src/utils/storage';
-import { sleep } from '../src/utils/TimeUtils';
+import Storage from '../src/utils/database/storage';
+import { sleep } from '../src/utils/time';
 import { Search } from './search';
 import { useShareStore } from './store';
 
@@ -362,7 +362,7 @@ const NotesnookShare = ({ quicknote = false }) => {
 
   const onPress = async () => {
     let content = await getContent();
-    if (!content || content === '') {
+    if (!content || content === '' || typeof content !== 'string') {
       return;
     }
     setLoading(true);

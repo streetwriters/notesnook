@@ -2,7 +2,6 @@ attachTitleInputListeners();
 autosize();
 function reactNativeEventHandler(type, value) {
   if (window.ReactNativeWebView) {
-    console.log('type', type, 'id:', sessionId);
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: type,
@@ -60,9 +59,6 @@ function loadFontSize() {
 }
 
 let changeTimer = null;
-const COLLAPSED_KEY = 'c';
-const HIDDEN_KEY = 'h';
-const collapsibleTags = {HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6};
 let styleElement;
 
 function addStyle() {
@@ -75,46 +71,9 @@ function addStyle() {
   body {
     font-size:${DEFAULT_FONT_SIZE} !important;
   }
-  .mce-content-body .c::before{
-    background-color:${pageTheme.colors.accent};
-    border-radius:3px;
-    color:white;
-  }
   `;
 }
 
-function toggleElementVisibility(element, toggleState) {
-  if (!toggleState) element.classList.remove(HIDDEN_KEY);
-  else element.classList.add(HIDDEN_KEY);
-}
-
-function collapseElement(target) {
-  let sibling = target.nextSibling;
-  const isTargetCollapsed = target.classList.contains(COLLAPSED_KEY);
-  let skip = false;
-
-  while (
-    sibling &&
-    (!collapsibleTags[sibling.tagName] ||
-      collapsibleTags[sibling.tagName] > collapsibleTags[target.tagName])
-  ) {
-    const isCollapsed = sibling.classList.contains(COLLAPSED_KEY);
-    if (!isTargetCollapsed) {
-      if (isCollapsed) {
-        skip = true;
-        toggleElementVisibility(sibling, isTargetCollapsed);
-      } else if (skip && collapsibleTags[sibling.tagName]) {
-        skip = false;
-      }
-    }
-    if (!skip) {
-      toggleElementVisibility(sibling, isTargetCollapsed);
-    }
-    addStyle();
-    if (!sibling.nextSibling) break;
-    sibling = sibling.nextSibling;
-  }
-}
 let undoTimer = null;
 function onUndoChange() {
   clearTimeout(undoTimer);
@@ -128,7 +87,6 @@ function onUndoChange() {
 
 function init_callback(_editor) {
   editor = _editor;
-  //console.log('init_call', editor);
   setTheme();
 
   editor.on('SelectionChange', function (e) {
@@ -142,87 +100,26 @@ function init_callback(_editor) {
   editor.on('BeforeAddUndo', onUndoChange);
   editor.on('AddUndo', onUndoChange);
   editor.on('cut', function () {
-    onChange({type: 'cut'});
+    onChange({ type: 'cut' });
     onUndoChange();
   });
   editor.on('copy', onUndoChange);
   editor.on('paste', function () {
-    onChange({type: 'paste'});
+    onChange({ type: 'paste' });
   });
 
   editor.on('focus', function () {
     reactNativeEventHandler('focus', 'editor');
   });
 
-  // editor.on('SetContent', function (event) {
-  //   if (globalThis.isClearingNoteData) {
-  //     globalThis.isClearingNoteData = false;
-  //     return;
-  //   }
-  //   setTimeout(function () {
-  //     editor.undoManager.transact(function () {});
-  //   }, 1000);
-  //   if (!event.paste) {
-  //     reactNativeEventHandler('noteLoaded', true);
-  //   }
-  // });
-
-  editor.on('NewBlock', function (e) {
-    console.log('New Block', e);
-    const {newBlock} = e;
-    let target;
-    if (newBlock) {
-      target = newBlock.previousElementSibling;
-    }
-    if (target && target.classList.contains(COLLAPSED_KEY)) {
-      target.classList.remove(COLLAPSED_KEY);
-      collapseElement(target);
-    }
-    onChange(e);
-  });
-
-  editor.on('touchstart mousedown', function (e) {
-    const {target} = e;
-    if (
-      e.offsetX < 6 &&
-      collapsibleTags[target.tagName] &&
-      target.parentElement &&
-      target.parentElement.tagName === 'BODY'
-    ) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-      editor.undoManager.transact(function () {
-        if (target.classList.contains(COLLAPSED_KEY)) {
-          target.classList.remove(COLLAPSED_KEY);
-        } else {
-          target.classList.add(COLLAPSED_KEY);
-        }
-        collapseElement(target);
-        editor
-          .getHTML()
-          .then(function (html) {
-            reactNativeEventHandler('tiny', html);
-          })
-          .catch(function (e) {
-            reactNativeEventHandler('tinyerror', e.message);
-          });
-      });
-    }
-  });
-
   editor.on('tap', function (e) {
-    if (
-      e.target.classList.contains('mce-content-body') &&
-      !e.target.innerText.length > 0
-    ) {
+    if (e.target.classList.contains('mce-content-body') && !e.target.innerText.length > 0) {
       e.preventDefault();
     }
   });
 
   editor.on('ScrollIntoView', function (e) {
     e.preventDefault();
-    console.log(e);
     e.elm.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest'
@@ -231,7 +128,6 @@ function init_callback(_editor) {
 
   editor.on('input ExecCommand ObjectResized Redo Undo ListMutation', onChange);
   editor.on('keyup', function (e) {
-    console.log('keyup: ', e);
     if (e.key !== 'Backspace') return;
     onChange(e);
   });
@@ -239,7 +135,7 @@ function init_callback(_editor) {
 
 const plugins = [
   'checklist advlist autolink textpattern hr lists link noneditable image bettertable',
-  'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
+  'searchreplace codeblock inlinecode keyboardquirks attachmentshandler collapsibleheaders',
   'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
 ];
 
@@ -259,41 +155,7 @@ body {
   ${margins} 
 }
 
-.mce-content-body h2::before,
-h3::before,
-h4::before,
-h5::before,
-h6::before {
-  font-size: 11px;
-  font-weight: normal;
-  letter-spacing: 1.1px;
-  padding: 1px 3px 1px 3px;
-  margin-left: -12px;
-  margin-right: 5px;
-  cursor: row-resize;
-  margin-top:-3px;
-  vertical-align:middle;
-  }
-  
-  .mce-content-body h2::before {
-  content: "H2";
-  }
-  
-  .mce-content-body h3::before {
-  content: "H3";
-  }
-  
-  .mce-content-body h4::before {
-  content: "H4";
-  }
-  
-  .mce-content-body h5::before {
-  content: "H5";
-  }
 
-  .h {
-    display: none;
-  }
 span.diff-del {
   background-color: #FDB0C0;  
 }
@@ -303,11 +165,15 @@ span.diff-ins {
 pre.codeblock {
   overflow-x:auto;
 }
-img {
+img,
+video {
   max-width:100% !important;
   height:auto !important;
   border-radius:5px !important;
+  margin-bottom:10px;
 }
+
+
 .tox .tox-edit-area__iframe {
   background-color:transparent !important;
 }
@@ -320,9 +186,12 @@ body {
   background-color:transparent !important;
   font-size:${DEFAULT_FONT_SIZE}
 }
+.mce-preview-object,
 iframe {
   max-width:100% !important;
   background-color:transparent !important;
+  height:auto !important;
+  border-radius:5px !important;
 }
 
 h1,
@@ -333,6 +202,54 @@ h5,
 h6,
 strong {
   font-weight:600 !important;
+  position:relative;
+  padding-left:10px;
+}
+
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  opacity: 1;
+  cursor: row-resize;
+  margin-right: 7px;
+  margin-left: -15px;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  border: none;
+  position:absolute;
+  margin-left: -25px;
+}
+
+h1::before {
+  top:2px;
+}
+
+ h2::before {
+  top:5px;
+}
+ h3::before {
+  top:2px;
+}
+h4::before {
+  top:0px;
+}
+h5::before {
+  top:0px;
+  width: 20px;
+  height: 20px;
+}
+h6::before {
+  top:-1px;
+  width: 18px;
+  height: 18px;
+}
+
+.h {
+  display: none !important;
 }
 `;
 
@@ -354,7 +271,6 @@ function tableCellNodeOptions() {
 
 function findNodeParent(nodeName) {
   let node = editor.selection.getNode();
-  console.log('finding node', node);
   let levels = 5;
   for (let i = 0; i < levels; i++) {
     if (!node) return;
@@ -381,7 +297,6 @@ function tableRowNodeOptions() {
 
 function init_tiny(size) {
   loadFontSize();
-  console.log('init tinymce');
   tinymce.init({
     selector: '#tiny_textarea',
     menubar: false,
@@ -409,8 +324,7 @@ function init_tiny(size) {
     autoresize_bottom_margin: 120,
     table_toolbar:
       'tcellprops trowprops | tableinsertrowafter tableinsertcolafter tabledeleterow tabledeletecol | tableconfig',
-    imagetools_toolbar:
-      'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
+    imagetools_toolbar: 'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     table_responsive_width: false,
@@ -499,7 +413,6 @@ function setup_tiny(_editor) {
     icon: 'more-drawer',
     tooltip: 'Table properties',
     onAction: function (e) {
-      console.log(e, 'event');
       reactNativeEventHandler('tableconfig');
     }
   });
@@ -558,10 +471,7 @@ function setup_tiny(_editor) {
           };
           reader.readAsDataURL(recoveredBlob);
         };
-        xhr.open(
-          'GET',
-          tinymce.activeEditor.selection.getNode().getAttribute('src')
-        );
+        xhr.open('GET', tinymce.activeEditor.selection.getNode().getAttribute('src'));
         xhr.send();
       }
     }
@@ -586,13 +496,11 @@ function scrollSelectionIntoView(event) {
     event.data &&
     event.data.endsWith('\n')
   ) {
-    console.log(event);
     clearTimeout(inputKeyTimer);
     inputKeyTimer = setTimeout(function () {
       let node = editor.selection.getNode();
       if (node) {
-        console.log(node, 'scrolling into view');
-        node.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+        node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, 1);
   }
@@ -622,7 +530,6 @@ const onChange = function (event) {
   }
 
   if (prevCount === 0 && event.type !== 'paste') return;
-  console.log(event);
   if (event.type !== 'compositionend') {
     if (!noteedited) {
       noteedited = true;
@@ -639,7 +546,10 @@ const onChange = function (event) {
         reactNativeEventHandler('tiny', html);
       })
       .catch(function (e) {
-        reactNativeEventHandler('tinyerror', e.message);
+        reactNativeEventHandler('tinyerror', {
+          message: e?.message,
+          stack: e?.stack
+        });
       });
 
     onUndoChange();
@@ -652,14 +562,13 @@ function updateCount(timer = 1000) {
   countTimer = null;
 
   if (!timer) {
-    let count = editor.countWords();
+    let count = editor.countWords() || 0;
     info = document.querySelector('.info-bar');
     info.querySelector('#infowords').innerText = count + ' words';
     prevCount = count;
-    console.log('timer', 'updating here');
   } else {
     countTimer = setTimeout(function () {
-      let count = editor.countWords();
+      let count = editor.countWords() | 0;
       info = document.querySelector('.info-bar');
       info.querySelector('#infowords').innerText = count + ' words';
       prevCount = count;
