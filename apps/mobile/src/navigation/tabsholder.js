@@ -7,15 +7,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
 import Tabs from '../components/tabs';
-import { useThemeStore } from '../stores/theme';
-import { useEditorStore, useSettingStore } from '../stores/stores';
 import { EditorWrapper } from '../screens/editor/EditorWrapper';
-import { checkStatus, EditorWebView, getNote } from '../screens/editor/Functions';
-import tiny from '../screens/editor/tiny/tiny';
 import { DDS } from '../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
+import { useEditorStore, useSettingStore } from '../stores/stores';
+import { useThemeStore } from '../stores/theme';
 import { editing, setWidthHeight } from '../utils';
-import { updateStatusBarColor } from '../utils/color-scheme';
+import { db } from '../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -24,49 +22,7 @@ import {
 } from '../utils/events';
 import { editorRef, tabBarRef } from '../utils/global-refs';
 import { hideAllTooltips } from '../utils/hooks/use-tooltip';
-import { sleep } from '../utils/time';
 import { NavigationStack } from './navigation-stack';
-
-let layoutTimer = null;
-
-const onChangeTab = async obj => {
-  if (obj.i === 1) {
-    editing.movedAway = false;
-    activateKeepAwake();
-    eSendEvent('navigate');
-    eSendEvent(eClearEditor, 'addHandler');
-    if (!editing.isRestoringState && (!editing.currentlyEditing || !getNote())) {
-      if (editing.overlay) {
-        editing.overlay = false;
-        return;
-      }
-      eSendEvent(eOnLoadNote, { type: 'new' });
-      editing.currentlyEditing = true;
-    }
-    if (getNote()) {
-      await checkStatus();
-    }
-    sleep(1000).then(() => {
-      updateStatusBarColor();
-    });
-  } else {
-    if (obj.from === 1) {
-      updateStatusBarColor();
-      deactivateKeepAwake();
-      eSendEvent(eClearEditor, 'removeHandler');
-      setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
-      if (getNote()?.locked) {
-        eSendEvent(eClearEditor);
-      }
-      eSendEvent('showTooltip');
-      editing.movedAway = true;
-      if (editing.currentlyEditing) {
-        tiny.call(EditorWebView, tiny.blur);
-      }
-    }
-    editing.isFocused = false;
-  }
-};
 
 export const TabsHolder = React.memo(
   () => {
@@ -355,3 +311,29 @@ export const TabsHolder = React.memo(
   },
   () => true
 );
+
+let layoutTimer = null;
+
+const onChangeTab = async obj => {
+  if (obj.i === 1) {
+    editing.movedAway = false;
+    editing.isFocused = true;
+    activateKeepAwake();
+    if (!editing.currentlyEditing) {
+      eSendEvent(eOnLoadNote, { type: 'new' });
+    }
+  } else {
+    if (obj.from === 1) {
+      deactivateKeepAwake();
+      editing.movedAway = true;
+      editing.isFocused = false;
+      eSendEvent(eClearEditor, 'removeHandler');
+      setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
+      let id = useEditorStore.getState().currentEditingNote;
+      let note = db.notes.note(id);
+      if (note?.locked) {
+        eSendEvent(eClearEditor);
+      }
+    }
+  }
+};

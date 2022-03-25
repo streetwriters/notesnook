@@ -13,11 +13,10 @@ import { PremiumToast } from '../../components/premium/premium-toast';
 import { DDS } from '../../services/device-detection';
 import { useNoteStore, useSettingStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
-import { editing } from '../../utils';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
 import EditorOverlay from './EditorOverlay';
-import { checkStatus, textInput } from './Functions';
+import { textInput } from './tiptap/utils';
 
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore(state => state.colors);
@@ -28,9 +27,9 @@ export const EditorWrapper = ({ width }) => {
 
   const onAppStateChanged = async state => {
     if (state === 'active') {
-      if (!editing.movedAway) {
-        await checkStatus(false);
-      }
+      // if (!editing.movedAway) {
+      //   await checkStatus(false);
+      // }
     }
   };
 

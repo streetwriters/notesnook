@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import { editing } from '../../../utils';
-import { EditorWebView, getWebviewInit, post, textInput } from '../Functions';
+import { EditorWebView, getWebviewInit, post } from '../Functions';
+import { textInput } from '../tiptap/utils';
 
 /**
  *
@@ -211,7 +212,7 @@ export function safeKeyboardDismiss() {
     textInput.current?.focus();
     textInput.current?.blur();
   } else {
-    call(EditorWebView, blur);
+    // call(EditorWebView, blur);
   }
 }
 

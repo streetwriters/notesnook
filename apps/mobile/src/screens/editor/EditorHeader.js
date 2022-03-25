@@ -3,10 +3,8 @@ import React, { useEffect, useRef } from 'react';
 import { BackHandler, InteractionManager, Keyboard, Platform, Vibration, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
-import { IconButton } from '../../components/ui/icon-button';
 import { Properties } from '../../components/properties';
-import { useThemeStore } from '../../stores/theme';
-import { useEditorStore, useSettingStore, useUserStore } from '../../stores/stores';
+import { IconButton } from '../../components/ui/icon-button';
 import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
@@ -15,7 +13,10 @@ import {
   ToastEvent
 } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
+import { useEditorStore, useSettingStore, useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
 import { editing } from '../../utils';
+import umami from '../../utils/analytics';
 import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
 import {
@@ -27,18 +28,16 @@ import {
   eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/events';
-import useEditorTags from '../../utils/hooks/useEditorTags';
 import { tabBarRef } from '../../utils/global-refs';
-import umami from '../../utils/analytics';
 import { EditorTitle } from './EditorTitle';
-import { clearEditor, getNote, loadNote, setColors, startClosingSession } from './Functions';
+import { clearEditor, getNote, setColors, startClosingSession } from './Functions';
 import { ProgressCircle } from './ProgressCircle';
 import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 import { endSearch } from './tiny/toolbar/commands';
 import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
 
-const EditorHeader = () => {
+const EditorHeader = ({ editor }) => {
   const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
   const currentlyEditingNote = useEditorStore(state => state.currentEditingNote);
@@ -48,19 +47,11 @@ const EditorHeader = () => {
   const handleBack = useRef();
   const keyboardListener = useRef();
   const closing = useRef(false);
-  const editorTags = useEditorTags();
+  //const editorTags = useEditorTags();
   const searchReplace = useEditorStore(state => state.searchReplace);
   const readonly = useEditorStore(state => state.readonly);
 
-  useEffect(() => {
-    setColors(colors);
-  }, [colors]);
-
   const _onBackPress = async () => {
-    editing.lastClosedTime = Date.now();
-    if (deviceMode === 'mobile') {
-      startClosingSession();
-    }
     setTimeout(async () => {
       closing.current = true;
       if (deviceMode !== 'mobile' && fullscreen) {
@@ -76,16 +67,12 @@ const EditorHeader = () => {
         y: 0,
         animated: false
       });
-      editing.isFocused = false;
-      editing.currentlyEditing = false;
-      editing.focusType = null;
-      safeKeyboardDismiss();
+
       if (deviceMode !== 'mobile') {
         if (fullscreen) {
           eSendEvent(eCloseFullscreenEditor);
         }
       } else {
-        startClosingSession();
         if (deviceMode === 'mobile') {
           tabBarRef.current?.goToPage(0);
         }
@@ -96,10 +83,10 @@ const EditorHeader = () => {
         setTimeout(() => {
           useEditorStore.getState().setCurrentlyEditingNote(null);
         }, 1);
+        editing.currentlyEditing = false;
         keyboardListener.current?.remove();
-        await clearEditor();
+        editor?.reset();
       }
-      closing.current = false;
     }, 1);
   };
 
@@ -174,21 +161,7 @@ const EditorHeader = () => {
     };
   }, []);
 
-  const onNoteRemoved = async id => {
-    // try {
-    //   return;
-    //   // console.log('NOTE REMOVED', id);
-    //   // await db.notes.remove(id);
-    //   // if (id !== getNote().id) return;
-    //   // Navigation.setRoutesToUpdate([
-    //   //   Navigation.routeNames.Favorites,
-    //   //   Navigation.routeNames.Notes,
-    //   //   Navigation.routeNames.NotesPage,
-    //   //   Navigation.routeNames.Trash,
-    //   //   Navigation.routeNames.Notebook
-    //   // ]);
-    // } catch (e) {}
-  };
+  const onNoteRemoved = async id => {};
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
@@ -204,10 +177,11 @@ const EditorHeader = () => {
   }, [fullscreen]);
 
   const load = async item => {
-    console.log(item.id);
-    await loadNote(item);
+    //console.log(item.id);
+    // await loadNote(item);
+    console.log('load called');
     InteractionManager.runAfterInteractions(() => {
-      keyboardListener.current = Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
+      //keyboardListener.current = Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
           'hardwareBackPress',

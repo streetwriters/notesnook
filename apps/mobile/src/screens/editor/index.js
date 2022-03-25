@@ -1,27 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
 import { useEditorStore, useUserStore } from '../../stores/stores';
-import { DDS } from '../../services/device-detection';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { getCurrentColors } from '../../utils/color-scheme';
-import { eOnLoadNote } from '../../utils/events';
-import { tabBarRef } from '../../utils/global-refs';
-import { sleep } from '../../utils/time';
 import EditorHeader from './EditorHeader';
-import {
-  disableEditing,
-  EditorWebView,
-  getNote,
-  onWebViewLoad,
-  sourceUri,
-  _onMessage,
-  _onShouldStartLoadWithRequest
-} from './Functions';
-import tiny from './tiny/tiny';
-import EditorToolbar from './tiny/toolbar';
-import { useEditor } from './use-editor';
+import { sourceUri, _onShouldStartLoadWithRequest } from './Functions';
+import { useEditor } from './tiptap/use-editor';
 
 const source = { uri: sourceUri + 'index.html' };
 
@@ -37,49 +21,9 @@ const Editor = React.memo(
   () => {
     const premiumUser = useUserStore(state => state.premium);
     const sessionId = useEditorStore(state => state.sessionId);
-    const [resetting, setResetting] = useState(false);
-    const editorRef = useRef();
-    const editor = useEditor(editorRef);
+    const editor = useEditor();
 
-    const onLoad = async () => {
-      await onWebViewLoad(premiumUser, getCurrentColors());
-    };
-
-    useEffect(() => {
-      if (premiumUser) {
-        tiny.call(EditorWebView, tiny.setMarkdown, true);
-      }
-    }, [premiumUser]);
-
-    const onResetRequested = async preventSave => {
-      if (!getNote()) {
-        eSendEvent('loadingNote', null);
-      }
-      setResetting(true);
-      await sleep(10);
-      setResetting(false);
-      if (!DDS.isTab && tabBarRef.current?.page === 0) {
-        console.log('Editor out of bounds');
-        return;
-      }
-      if (preventSave) {
-        disableEditing();
-      }
-
-      if (getNote()) {
-        eSendEvent(eOnLoadNote, { ...getNote(), forced: true });
-      }
-      console.log('resetting editor');
-    };
-
-    useEffect(() => {
-      eSubscribeEvent('webviewreset', onResetRequested);
-      return () => {
-        eUnSubscribeEvent('webviewreset', onResetRequested);
-      };
-    }, []);
-
-    return resetting ? null : (
+    return editor.loading ? null : (
       <>
         <View
           style={{
@@ -88,17 +32,17 @@ const Editor = React.memo(
             flex: 1
           }}
         >
-          <EditorHeader />
+          <EditorHeader editor={editor} />
           <WebView
             testID={notesnook.editor.id}
-            ref={EditorWebView}
-            onLoad={onLoad}
-            onRenderProcessGone={() => {
-              onResetRequested();
-            }}
-            onError={() => {
-              onResetRequested();
-            }}
+            ref={editor.ref}
+            onLoad={editor.onLoad}
+            // onRenderProcessGone={() => {
+            //   onResetRequested();
+            // }}
+            // onError={() => {
+            //   onResetRequested();
+            // }}
             injectedJavaScript={`globalThis.sessionId="${sessionId}";`}
             javaScriptEnabled={true}
             focusable={true}
@@ -118,14 +62,13 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: 'http://192.168.10.3:3000'
+              uri: 'http://192.168.10.6:3000'
             }}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={editor.onMessage}
           />
         </View>
-        <EditorToolbar />
       </>
     );
   },
