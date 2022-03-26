@@ -27,6 +27,7 @@ export function NotesList(props: NotesListProps) {
       >
         {notes.map((note, index) => (
           <Flex
+            key={note.title + note.dateCreated}
             sx={{
               flexDirection: "column",
               p: 2,

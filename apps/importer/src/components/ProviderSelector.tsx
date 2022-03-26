@@ -36,7 +36,7 @@ export function ProviderSelector(props: ProviderSelectorProps) {
         >
           <option value=""></option>
           {ProviderFactory.getAvailableProviders().map((provider) => (
-            <option value={provider}>
+            <option key={provider} value={provider}>
               {ProviderFactory.getProvider(provider as Providers).name}
             </option>
           ))}

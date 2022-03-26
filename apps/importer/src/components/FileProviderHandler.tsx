@@ -3,16 +3,33 @@ import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { StepContainer } from "./StepContainer";
 import { Accordion } from "./Accordion";
-import { IFileProvider } from "@notesnook/importer";
+import { IFileProvider, transform } from "@notesnook/importer";
+import { xxhash64 } from "hash-wasm";
+import {
+  ProviderResult,
+  ProviderSettings,
+} from "@notesnook/importer/dist/src/providers/provider";
+import { IFile } from "@notesnook/importer/dist/src/utils/file";
 
 type FileProviderHandlerProps = {
-  provider?: IFileProvider;
-  onFilesChanged: (files: File[]) => void;
+  provider: IFileProvider;
+  onTransformFinished: (result: ProviderResult) => void;
+};
+
+type Progress = {
+  total: number;
+  done: number;
+};
+
+const settings: ProviderSettings = {
+  clientType: "browser",
+  hasher: { type: "xxh64", hash: (data) => xxhash64(data) },
 };
 
 export function FileProviderHandler(props: FileProviderHandlerProps) {
-  const { provider, onFilesChanged } = props;
+  const { provider, onTransformFinished } = props;
   const [files, setFiles] = useState<File[]>([]);
+  const [progress, setProgress] = useState<Progress>({ total: 0, done: 0 });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles((files) => {
@@ -20,18 +37,41 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       return newFiles;
     });
   }, []);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: provider?.supportedExtensions?.concat(".zip"),
   });
 
   useEffect(() => {
-    onFilesChanged(files);
-  }, [files, onFilesChanged]);
-
-  useEffect(() => {
     setFiles([]);
   }, [provider]);
+
+  useEffect(() => {
+    (async () => {
+      if (!provider || !files.length) return;
+
+      setProgress({ total: 0, done: 0 });
+      let result: ProviderResult = { notes: [], errors: [] };
+      for (let file of files) {
+        const providerFile: IFile = {
+          name: file.name,
+          data: await file.arrayBuffer(),
+          modifiedAt: file.lastModified,
+        };
+        const transformResult = await transform(
+          provider,
+          [providerFile],
+          settings
+        );
+        result.notes.push(...transformResult.notes);
+        result.errors.push(...transformResult.errors);
+        setProgress((p) => ({ total: files.length, done: p.done + 1 }));
+      }
+      setProgress({ total: 0, done: 0 });
+      onTransformFinished(result);
+    })();
+  }, [provider, files, onTransformFinished]);
 
   return (
     <StepContainer sx={{ flexDirection: "column", alignItems: "stretch" }}>
@@ -77,6 +117,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
           >
             {files.map((file, index) => (
               <Flex
+                key={file.name}
                 sx={{
                   flexDirection: "column",
                   p: 2,
@@ -100,6 +141,11 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
             ))}
           </Flex>
         </Accordion>
+      ) : null}
+      {progress.total > 0 ? (
+        <Text variant="body">
+          Processing files ({progress.done}/{progress.total})
+        </Text>
       ) : null}
     </StepContainer>
   );
