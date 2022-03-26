@@ -22,7 +22,7 @@
   "devDependencies": {
     "@microsoft/microsoft-graph-types-beta": "^0.25.0-preview",
     "@node-rs/xxhash": "^1.0.1",
-    "@standardnotes/snjs": "^2.41.0",
+    "@standardnotes/snjs": "^2.92.3",
     "@types/kendo-ui": "^2022.1.0",
     "@types/node": "^12.20.42",
     "@types/showdown": "^1.9.4",

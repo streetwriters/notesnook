@@ -1,10 +1,7 @@
 import type { AppDataField, BackupFile } from "@standardnotes/snjs";
 import { ComponentArea, EditorFeatureDescription, NoteType } from "@standardnotes/features";
 import { ContentType } from "@standardnotes/common";
-import type { RawPayload } from "@standardnotes/snjs/dist/@types/protocol/payloads/generator";
-import type { NoteContent } from "@standardnotes/snjs/dist/@types/models/app/note";
-import type { TagContent } from "@standardnotes/snjs/dist/@types/models/app/tag";
-import type { ComponentContent } from "@standardnotes/snjs/dist/@types/models/app/component";
+import {RawPayload, NoteContent, TagContent, ComponentContent} from "@standardnotes/snjs";
 
 enum ProtocolVersion {
   V001 = "001",
