@@ -8,3 +8,5 @@ Supported providers:
 4. HTML
 5. Markdown/Text
 6. Standard Notes
+7. OneNote
+8. Zoho Notebook
