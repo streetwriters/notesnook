@@ -2,7 +2,7 @@ import { ContentType, Note } from "../../models/note";
 import { KeepNote, listToHTML } from "./types";
 import { parse } from "node-html-parser";
 import {
-  IProvider,
+  IFileProvider,
   iterate,
   ProviderResult,
   ProviderSettings,
@@ -28,7 +28,8 @@ const colorMap: Record<string, string | undefined> = {
   brown: "orange",
 };
 
-export class GoogleKeep implements IProvider {
+export class GoogleKeep implements IFileProvider {
+  type: "file" = "file";
   public supportedExtensions = [".json"];
   public validExtensions = [
     ...this.supportedExtensions,

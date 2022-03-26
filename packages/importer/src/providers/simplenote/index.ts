@@ -1,17 +1,17 @@
 import { ContentType, Note } from "../../models/note";
 import { SimplenoteExport } from "./types";
 import {
-  IProvider,
+  IFileProvider,
   iterate,
   ProviderResult,
   ProviderSettings,
 } from "../provider";
 import { File } from "../../utils/file";
 import showdown from "showdown";
-import { TransformError } from "../../utils/transformerror";
 
 const converter = new showdown.Converter();
-export class Simplenote implements IProvider {
+export class Simplenote implements IFileProvider {
+  type: "file" = "file";
   public supportedExtensions = [".json"];
   public validExtensions = [".txt", ...this.supportedExtensions];
   public version = "1.0.0";
@@ -33,9 +33,8 @@ export class Simplenote implements IProvider {
           !activeNote.lastModified
         ) {
           errors.push(
-            new TransformError(
-              "Invalid note. content, creationDate & lastModified properties are required.",
-              file
+            new Error(
+              `Invalid note. content, creationDate & lastModified properties are required. (File: ${file.name})`
             )
           );
           continue;

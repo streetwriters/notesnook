@@ -2,9 +2,8 @@ import hljs from "highlight.js";
 import showdown from "showdown";
 import { Content, ContentType, Note } from "../../models/note";
 import { File } from "../../utils/file";
-import { TransformError } from "../../utils/transformerror";
 import {
-  IProvider,
+  IFileProvider,
   iterate,
   ProviderResult,
   ProviderSettings,
@@ -37,7 +36,8 @@ const defaultEditorDescription = (item: SNNote): EditorDescription => {
   };
 };
 
-export class StandardNotes implements IProvider {
+export class StandardNotes implements IFileProvider {
+  public type: "file" = "file";
   public supportedExtensions = [".txt"];
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";
@@ -53,16 +53,13 @@ export class StandardNotes implements IProvider {
 
       let data: SNBackup = <SNBackup>JSON.parse(file.text);
       if (!data.items) {
-        errors.push(new TransformError("Invalid backup file.", file));
+        errors.push(new Error("Invalid backup file."));
         return false;
       }
 
       if (data.version !== ProtocolVersion.V004) {
         errors.push(
-          new TransformError(
-            `Unsupported backup file version: ${data.version}.`,
-            file
-          )
+          new Error(`Unsupported backup file version: ${data.version}.`)
         );
         return false;
       }

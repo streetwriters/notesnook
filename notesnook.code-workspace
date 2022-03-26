@@ -10,7 +10,7 @@
     },
     {
       "name": "🚀 @notesnook/vericrypt",
-      "path": "apps/vericrypt",
+      "path": "apps/vericrypt"
     },
     {
       "name": "📦 @notesnook/crypto",
@@ -23,6 +23,10 @@
     {
       "name": "📦 @notesnook/importer",
       "path": "packages/importer"
+    },
+    {
+      "name": "📦 @notesnook/onenote",
+      "path": "packages/onenote"
     },
     {
       "name": "📦 @streetwriters/tinymce-plugins",

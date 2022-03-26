@@ -1,6 +1,6 @@
 import { Enex } from "@notesnook/enex";
 import {
-  IProvider,
+  IFileProvider,
   iterate,
   ProviderResult,
   ProviderSettings,
@@ -10,7 +10,8 @@ import { ElementHandler } from "./elementhandlers";
 import { File } from "../../utils/file";
 import { path } from "../../utils/path";
 
-export class Evernote implements IProvider {
+export class Evernote implements IFileProvider {
+  type: "file" = "file";
   public supportedExtensions = [".enex"];
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";

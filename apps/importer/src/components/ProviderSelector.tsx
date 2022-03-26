@@ -1,10 +1,10 @@
 import { Flex, Select, Text } from "@theme-ui/components";
-import { ProviderFactory } from "@notesnook/importer";
+import { IProvider, ProviderFactory } from "@notesnook/importer";
 import { Providers } from "@notesnook/importer/dist/src/providers/providerfactory";
 import { StepContainer } from "./StepContainer";
 
 type ProviderSelectorProps = {
-  onProviderChanged: (provider: Providers) => void;
+  onProviderChanged: (provider: IProvider) => void;
 };
 
 export function ProviderSelector(props: ProviderSelectorProps) {
@@ -31,12 +31,12 @@ export function ProviderSelector(props: ProviderSelectorProps) {
           }}
           onChange={(e) => {
             const providerName: Providers = e.target.value as Providers;
-            props.onProviderChanged(providerName);
+            props.onProviderChanged(ProviderFactory.getProvider(providerName));
           }}
         >
           <option value=""></option>
           {ProviderFactory.getAvailableProviders().map((provider) => (
-            <option value={provider}>
+            <option key={provider} value={provider}>
               {ProviderFactory.getProvider(provider as Providers).name}
             </option>
           ))}

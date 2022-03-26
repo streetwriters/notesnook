@@ -100,6 +100,7 @@ export function NotePreview(props: NotePreviewProps) {
         <Flex my={1}>
           {notebooks?.map((notebook) => (
             <Flex
+              key={notebook.notebook + notebook.topic}
               sx={{
                 alignItems: "center",
                 bg: "bgSecondary",
@@ -119,6 +120,7 @@ export function NotePreview(props: NotePreviewProps) {
           ))}
           {tags?.map((tag) => (
             <Text
+              key={tag}
               variant="subBody"
               sx={{
                 bg: "bgSecondary",
