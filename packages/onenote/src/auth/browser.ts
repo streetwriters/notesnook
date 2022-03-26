@@ -33,7 +33,6 @@ export async function authenticate(
       account: accounts[0],
     })
     .catch(() => {
-      console.error("Cache miss.");
       if (!client) return null;
       return client.acquireTokenPopup({
         scopes: SCOPES,

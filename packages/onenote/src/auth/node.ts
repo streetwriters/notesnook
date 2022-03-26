@@ -39,7 +39,6 @@ export async function authenticate(
       account: accountInfo[0],
     })
     .catch(() => {
-      console.error("Cache miss.");
       if (!client) return null;
       return client.acquireTokenByDeviceCode({
         scopes: SCOPES,
