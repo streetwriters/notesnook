@@ -71,18 +71,15 @@ export class OneNoteClient {
       defaultProperties
     );
 
-    return await this.#processAll(
-      sections,
-      "section",
-      async (section) => {
-        if (!section.id) return;
-        if (parentType === "notebooks") section.parentNotebook = parent;
-        else if (parentType === "sectionGroups")
-          section.parentSectionGroup = parent;
+    return await this.#processAll(sections, "section", async (section) => {
+      if (!section.id) return;
+      if (parentType === "notebooks")
+        section.parentNotebook = this.#getParent(parent);
+      else if (parentType === "sectionGroups")
+        section.parentSectionGroup = this.#getParent(parent);
 
-        section.pages = await this.#getPages(section);
-      }
-    );
+      section.pages = await this.#getPages(section);
+    });
   }
 
   async #getSectionGroups(
@@ -101,9 +98,10 @@ export class OneNoteClient {
       async (sectionGroup) => {
         if (!sectionGroup.id) return;
 
-        if (parentType === "notebooks") sectionGroup.parentNotebook = parent;
+        if (parentType === "notebooks")
+          sectionGroup.parentNotebook = this.#getParent(parent);
         else if (parentType === "sectionGroups")
-          sectionGroup.parentSectionGroup = parent;
+          sectionGroup.parentSectionGroup = this.#getParent(parent);
 
         sectionGroup.sections = await this.#getSections(
           sectionGroup,
@@ -132,15 +130,16 @@ export class OneNoteClient {
       ]
     );
 
-    return await this.#processAll(
-      pages,
-      "page",
-      async (page) => {
-        if (!page.id) return;
-        page.parentSection = section;
-        page.content = await this.#getPageContent(page);
-      }
-    );
+    return await this.#processAll(pages, "page", async (page) => {
+      if (!page.id) return;
+      page.parentSection = {
+        parentSectionGroup: section.parentSectionGroup,
+        parentNotebook: section.parentNotebook,
+        id: section.id,
+        displayName: section.displayName,
+      };
+      page.content = await this.#getPageContent(page);
+    });
   }
 
   async #getPageContent(page: OnenotePage): Promise<Content | null> {
@@ -238,7 +237,10 @@ export class OneNoteClient {
     return items;
   }
 
-  async #resolveDataUrl(url: string, page: OnenotePage): Promise<Buffer | null> {
+  async #resolveDataUrl(
+    url: string,
+    page: OnenotePage
+  ): Promise<Buffer | null> {
     try {
       const stream = <NodeJS.ReadableStream | null>(
         await this.#client.api(url).getStream()
@@ -265,13 +267,17 @@ export class OneNoteClient {
     }
     this.#reporter?.error(new Error(errorMessage));
   }
+
+  #getParent(parent: OnenoteNotebook | OnenoteSectionGroup) {
+    return { id: parent.id, displayName: parent.displayName };
+  }
 }
 
 function convertStream(
   stream: NodeJS.ReadableStream | ReadableStream
 ): Promise<Buffer> {
   return new Promise(async (resolve, reject) => {
-    if (stream instanceof ReadableStream) {
+    if (isWebStream(stream)) {
       const chunks: Buffer[] = [];
       const reader = stream.getReader();
 
@@ -294,4 +300,10 @@ function convertStream(
       stream.on("end", () => resolve(Buffer.concat(chunks)));
     }
   });
+}
+
+function isWebStream(
+  stream: NodeJS.ReadableStream | ReadableStream
+): stream is ReadableStream {
+  return "ReadableStream" in globalThis && stream instanceof ReadableStream;
 }

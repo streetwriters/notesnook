@@ -111,8 +111,13 @@ export class Content {
 
   get raw(): string {
     return (
-      this.#document.querySelector("body")?.outerHTML || this.#document.outerHTML
+      this.#document.querySelector("body")?.outerHTML ||
+      this.#document.outerHTML
     );
+  }
+
+  toJSON(): string {
+    return this.raw;
   }
 }
 
