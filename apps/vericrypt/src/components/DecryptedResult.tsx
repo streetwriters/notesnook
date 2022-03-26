@@ -8,6 +8,7 @@ import { Code } from "./Code";
 import { getSourceUrl } from "../utils/links";
 import * as clipboard from "clipboard-polyfill/text";
 import { Accordion } from "./Accordion";
+import { ErrorsList } from "./ErrorsList";
 
 type DecryptedResultProps = {
   password: string;
@@ -19,6 +20,7 @@ type DecryptedResultProps = {
 export function DecryptedResult(props: DecryptedResultProps) {
   const [isDecrypting, setIsDecrypting] = useState(true);
   const [decryptedData, setDecryptedData] = useState<string>();
+  const [error, setError] = useState<string | undefined>();
 
   useEffect(() => {
     (async function() {
@@ -39,12 +41,27 @@ export function DecryptedResult(props: DecryptedResultProps) {
           }
         }
         setDecryptedData(JSON.stringify(data, undefined, "  "));
-        setIsDecrypting(false);
       } catch (e) {
+        const error = e as Error;
+        setError(error.message);
+      } finally {
         setIsDecrypting(false);
       }
     })();
   }, [props]);
+
+  if (error)
+    return (
+      <StepContainer
+        as="form"
+        sx={{
+          flexDirection: "column",
+        }}
+      >
+        <Text variant="title">Decryption failed</Text>
+        <ErrorsList errors={[error]} />
+      </StepContainer>
+    );
 
   if (isDecrypting)
     return (

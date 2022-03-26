@@ -32,7 +32,7 @@ function App() {
   const [password, setPassword] = useState<string>();
   const [salt, setSalt] = useState<string>();
   const [key, setKey] = useState<string>();
-  const [data, setData] = useState<SyncRequestBody>();
+  const [data, setData] = useState<SyncRequestBody | undefined>();
 
   return (
     <ThemeProvider theme={ThemeFactory.construct()}>

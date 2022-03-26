@@ -11,13 +11,13 @@ import { getCombo } from "../utils/keycombos";
 import Platform from "platform";
 import { KeyCombo } from "./KeyCombo";
 import { Code } from "./Code";
-import { CURLParser } from "parse-curl-js-fixed";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ErrorsList } from "./ErrorsList";
 import { getSourceUrl } from "../utils/links";
+import { parseCURL } from "../utils/curlparser";
 
 type PasteEncryptedDataProps = {
-  onEncryptedDataPasted: (data: SyncRequestBody) => void;
+  onEncryptedDataPasted: (data?: SyncRequestBody) => void;
 };
 
 type EncryptedSyncItem = {
@@ -134,27 +134,18 @@ const instructions = isChromium
   : null;
 
 export function PasteEncryptedData(props: PasteEncryptedDataProps) {
+  const { onEncryptedDataPasted } = props;
   const [error, setError] = useState<string | undefined>();
   const [encryptedData, setEncryptedData] = useState<
     SyncRequestBody | undefined
   >();
 
+  useEffect(() => {
+    onEncryptedDataPasted(encryptedData);
+  }, [encryptedData, onEncryptedDataPasted]);
+
   return (
-    <StepContainer
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (encryptedData) {
-          document.getElementById("encrypted_data")?.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-        }
-        return false;
-      }}
-      id="step_4"
-      as="form"
-      sx={{ flexDirection: "column" }}
-    >
+    <StepContainer id="step_4" as="form" sx={{ flexDirection: "column" }}>
       <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
         <Text variant="title">Paste raw encrypted data</Text>
         <Code
@@ -198,23 +189,26 @@ export function PasteEncryptedData(props: PasteEncryptedDataProps) {
           try {
             setError(undefined);
             const curlRequest = e.target.value;
-            if (!curlRequest) return;
-            const parsed = new CURLParser(curlRequest).parse();
+            if (!curlRequest) return setEncryptedData(undefined);
+            const parsed = parseCURL(curlRequest);
+
             if (parsed.url !== "https://api.notesnook.com/sync") {
-              setError(
+              throw new Error(
                 "Invalid cURL request. URL must be https://api.notesnook.com/sync."
               );
             }
 
-            const syncData: SyncRequestBody = parsed.body.data;
+            if (!parsed.data)
+              throw new Error("Invalid cURL request. No data found.");
+
+            const syncData: SyncRequestBody = JSON.parse(parsed.data);
             if (syncData.notes.length <= 0 && syncData.content.length <= 0) {
-              setError(
+              throw new Error(
                 "Empty cURL request. Make sure the request body contains at least 1 note or 1 content."
               );
             }
+
             setEncryptedData(syncData);
-            e.target.value = JSON.stringify(syncData, undefined, "  ");
-            props.onEncryptedDataPasted(syncData);
           } catch (e) {
             const error = e as Error;
             setError(error.message);
@@ -224,7 +218,6 @@ export function PasteEncryptedData(props: PasteEncryptedDataProps) {
       {error ? <ErrorsList errors={[error]} /> : null}
       {encryptedData && (
         <Flex
-          id="encrypted_data"
           sx={{
             bg: "shade",
             border: "2px solid var(--theme-ui-colors-primary)",
