@@ -9,6 +9,10 @@
       "path": "apps/importer"
     },
     {
+      "name": "🚀 @notesnook/vericrypt",
+      "path": "apps/vericrypt",
+    },
+    {
       "name": "📦 @notesnook/crypto",
       "path": "packages/crypto"
     },
