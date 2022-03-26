@@ -26,8 +26,8 @@ type ProvidersMap = {
 export type Providers = keyof ProvidersMap;
 
 export class ProviderFactory {
-  static getAvailableProviders(): string[] {
-    return Object.keys(providerMap);
+  static getAvailableProviders(): Providers[] {
+    return Object.keys(providerMap) as Providers[];
   }
 
   static getProvider<TProvider extends Providers>(
