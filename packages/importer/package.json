@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@notesnook/enex": "^1.0.2",
-    "@notesnook/onenote": "file:../onenote",
+    "@notesnook/onenote": "^1.0.0",
     "fflate": "^0.7.1",
     "node-html-parser": "github:thecodrr/node-html-parser",
     "showdown": "github:thecodrr/showdown",
