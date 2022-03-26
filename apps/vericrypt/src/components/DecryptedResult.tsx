@@ -1,4 +1,4 @@
-import { Flex, Button, Text } from "@theme-ui/components";
+import { Flex, Button, Text, Link } from "@theme-ui/components";
 import { StepContainer } from "./StepContainer";
 import { SyncRequestBody } from "./Step4";
 import { NNCrypto } from "@notesnook/crypto";
@@ -7,6 +7,7 @@ import { FcDataEncryption } from "react-icons/fc";
 import { Code } from "./Code";
 import { getSourceUrl } from "../utils/links";
 import * as clipboard from "clipboard-polyfill/text";
+import { Accordion } from "./Accordion";
 
 type DecryptedResultProps = {
   password: string;
@@ -94,6 +95,40 @@ export function DecryptedResult(props: DecryptedResultProps) {
       >
         {decryptedData}
       </Text>
+      <Accordion
+        title="What happens now?"
+        sx={{
+          border: "1px solid var(--theme-ui-colors-border)",
+          mt: 2,
+          borderRadius: "default",
+        }}
+      >
+        <Text as="p" variant="body" sx={{ mx: 2 }}>
+          Congratulations! You successfully verified Notesnook's data encryption
+          claims.
+        </Text>
+        <Text as="p" variant="body" sx={{ mx: 2, mt: 2 }}>
+          Of course, this is just one part (a very crucial one) of proving that
+          you can trust Notesnook with your data. If you have any other
+          preservations, let us know by reaching out to us at{" "}
+          <Link href="mailto:support@streetwriters.co">
+            support@streetwriters.co
+          </Link>{" "}
+          or{" "}
+          <Link href="https://discord.gg/">joining our Discord community</Link>.
+          We'll do our best to alleviate all your worries.
+        </Text>
+        <Text as="p" variant="body" sx={{ mx: 2, mt: 2, fontWeight: "bold" }}>
+          What about open sourcing Notesnook?
+        </Text>
+        <Text as="p" variant="body" sx={{ mx: 2, my: 2 }}>
+          Open sourcing is another part of garnering our users' trust. We have{" "}
+          <Link href="https://notesnook.com/roadmap">plans</Link> to begin open
+          sourcing in May but open sourcing will not make this tool obsolete.
+          Verifying the integrity of encrypted data at any point in time is very
+          important even if the software is open source.
+        </Text>
+      </Accordion>
       <Flex sx={{ alignSelf: "center", mt: 4 }}>
         <Button
           variant="secondary"

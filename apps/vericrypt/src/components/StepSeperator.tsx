@@ -49,15 +49,13 @@ export function StepSeperator(props: StepSeperatorProps) {
               },
             }}
             title={props.tooltip}
+            onClick={async () => {
+              if (showPopup) return setShowPopup(false);
+              if (!showPopup && props.onShowPopup)
+                setShowPopup(await props.onShowPopup());
+            }}
           >
-            <props.icon
-              size={20}
-              onClick={async () => {
-                if (showPopup) return setShowPopup(false);
-                if (!showPopup && props.onShowPopup)
-                  setShowPopup(await props.onShowPopup());
-              }}
-            />
+            <props.icon size={20} />
           </Flex>
         )}
         {showPopup && props.popup && (

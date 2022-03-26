@@ -207,9 +207,9 @@ export function PasteEncryptedData(props: PasteEncryptedDataProps) {
             }
 
             const syncData: SyncRequestBody = parsed.body.data;
-            if (syncData.notes.length <= 0 || syncData.content.length <= 0) {
+            if (syncData.notes.length <= 0 && syncData.content.length <= 0) {
               setError(
-                "Empty cURL request. Make sure the request body contains at least 1 note & 1 content."
+                "Empty cURL request. Make sure the request body contains at least 1 note or 1 content."
               );
             }
             setEncryptedData(syncData);

@@ -15,7 +15,9 @@ export function Footer() {
       }}
     >
       <Text variant="body">Notesnook Vericrypt (v{appVersion})</Text>
-      <Text variant="subBody">© 2021 Streetwriters LLC</Text>
+      <Text variant="subBody">
+        © {new Date().getFullYear()} Streetwriters LLC
+      </Text>
     </Flex>
   );
 }

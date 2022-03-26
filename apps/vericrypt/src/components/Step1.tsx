@@ -56,7 +56,12 @@ export function LoginToNotesnook() {
         you can even disconnect your internet to make sure we aren't just saying
         that.
       </Text>
-      <Button sx={{ alignSelf: "center", mt: 2 }}>Login to Notesnook</Button>
+      <Button
+        sx={{ alignSelf: "center", mt: 2 }}
+        onClick={() => window.open("https://app.notesnook.com/login", "_blank")}
+      >
+        Login to Notesnook
+      </Button>
     </StepContainer>
   );
 }

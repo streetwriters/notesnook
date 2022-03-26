@@ -53,8 +53,8 @@ export function Hero() {
           color: "fontTertiary",
         }}
       >
-        An open source utility to verify Notesnook data encryption in a
-        verifiable &amp; easy way.
+        An open source utility to verify Notesnook data encryption claims in a
+        provable way.
       </Text>
       <Flex sx={{ mt: 2, zIndex: 10 }}>
         <Text variant="body" sx={{ px: 1 }}>
