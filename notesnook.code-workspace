@@ -10,7 +10,11 @@
     },
     {
       "name": "🚀 @notesnook/vericrypt",
-      "path": "apps/vericrypt"
+      "path": "apps/vericrypt",
+    },
+    {
+      "name": "📦 @notesnook/crypto",
+      "path": "packages/crypto"
     },
     {
       "name": "📦 @notesnook/enex",

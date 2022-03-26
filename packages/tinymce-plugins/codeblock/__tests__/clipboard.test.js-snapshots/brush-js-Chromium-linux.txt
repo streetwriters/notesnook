@@ -1,0 +1,1 @@
+<pre class="hljs language-javascript" spellcheck="false"><span class="hljs-title function_">cloneNode</span>();<br><span class="hljs-title function_">cloneNode</span>(deep);<br></pre>

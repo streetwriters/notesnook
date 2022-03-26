@@ -22,9 +22,22 @@ function addCodeBlockToolbar(editor) {
   maplanguagesToMenuItems();
   setupChangeLanguageButton(editor);
 
+  editor.ui.registry.addButton("copyCode", {
+    icon: "copy",
+    tooltip: "Copy code",
+    onAction: async () => {
+      await copyToClipboard(
+        state.activeBlock.innerText,
+        state.activeBlock.outerHTML
+      );
+    },
+  });
+
   editor.ui.registry.addContextToolbar("codeblock-selection", {
     predicate: (node) => {
       if (node.nodeName === TAGNAME) {
+        if (state.activeBlock === node) return true;
+
         state.activeBlock = node;
         const languageShortname = parseCodeblockLanguage(node);
         const language = languages.find(
@@ -37,7 +50,7 @@ function addCodeBlockToolbar(editor) {
       }
       return false;
     },
-    items: "copy languages",
+    items: "copyCode languages",
     position: "node",
   });
 }
@@ -79,12 +92,15 @@ function changeLanguageSelectLabel(text) {
 function parseCodeblockLanguage(node) {
   if (!node || node.tagName !== TAGNAME) return;
 
-  const languageAliases = getLanguageFromClassList(node).split("-");
-  if (languageAliases.length <= 1) return;
-  return languageAliases[1];
+  const languageAlias = getLanguageFromClassList(node);
+  if (!languageAlias) return;
+  return languageAlias;
 }
 
 async function applyHighlighting(editor, language) {
+  const node = state.activeBlock;
+  if (!node) return;
+
   // load hljs into the editor window which can be the iframe
   // or the main window. This is required so language definitions
   // can be loaded.
@@ -92,8 +108,6 @@ async function applyHighlighting(editor, language) {
 
   if (!language) return;
   if (!hljs.getLanguage(language)) await loadLanguage(editor, language);
-
-  const node = state.activeBlock;
 
   persistSelection(node, () => {
     const code = hljs.highlight(node.innerText, {
@@ -107,10 +121,9 @@ async function applyHighlighting(editor, language) {
 }
 
 function changeCodeblockClassName(node, className) {
-  const language = getLanguageFromClassList(node);
-  if (language === className) return;
-  if (!!language) node.classList.replace(language, className);
-  else node.classList.add(className);
+  node.className = "";
+  node.classList.add("hljs");
+  node.classList.add(className);
 }
 
 /**
@@ -118,11 +131,27 @@ function changeCodeblockClassName(node, className) {
  * @param {Element} node
  */
 function getLanguageFromClassList(node) {
-  for (let className of node.classList.values()) {
-    if (className.startsWith("language") || className.startsWith("lang"))
-      return className;
+  let lang = undefined;
+  const classes = Array.from(node.classList.values());
+  for (let i = 0; i < classes.length; ++i) {
+    const className = classes[i];
+    if (className === "brush:") {
+      lang = classes[i + 1];
+    } else if (className.startsWith("brush:")) {
+      lang = className.split(":")[1];
+    } else if (
+      className.startsWith("lang-") ||
+      className.startsWith("language-")
+    ) {
+      lang = className.split("-")[1];
+    }
   }
-  return "";
+
+  if (!lang) return;
+  const language = languages.find(
+    (l) => l.shortname === lang || (l.aliases && l.aliases.indexOf(lang) > -1)
+  );
+  return language ? language.shortname : undefined;
 }
 
 async function refreshHighlighting(editor) {
@@ -158,4 +187,17 @@ function loadScript(editor, url) {
   });
 }
 
-module.exports = { addCodeBlockToolbar, refreshHighlighting };
+module.exports = {
+  addCodeBlockToolbar,
+  refreshHighlighting,
+  getLanguageFromClassList,
+};
+
+function copyToClipboard(text, html) {
+  return navigator.clipboard.write([
+    new ClipboardItem({
+      "text/plain": new Blob([text], { type: "text/plain" }),
+      "text/html": new Blob([html], { type: "text/html" }),
+    }),
+  ]);
+}
