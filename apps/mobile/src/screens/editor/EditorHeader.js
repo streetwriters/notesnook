@@ -32,7 +32,6 @@ import { EditorTitle } from './EditorTitle';
 import { ProgressCircle } from './ProgressCircle';
 import { safeKeyboardDismiss } from './tiny/tiny';
 import { endSearch } from './tiny/toolbar/commands';
-import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
 import { editorController, editorState } from './tiptap/utils';
 
@@ -52,46 +51,31 @@ const EditorHeader = ({ editor }) => {
 
   const _onBackPress = async () => {
     setTimeout(async () => {
-      closing.current = true;
       if (deviceMode !== 'mobile' && fullscreen) {
-        eSendEvent(eCloseFullscreenEditor);
-        return;
-      }
-      if (deviceMode === 'mobile') {
-        editorState().movedAway = true;
-      }
-      eSendEvent('showTooltip');
-      toolbarRef.current?.scrollTo({
-        x: 0,
-        y: 0,
-        animated: false
-      });
-
-      if (deviceMode !== 'mobile') {
         if (fullscreen) {
           eSendEvent(eCloseFullscreenEditor);
         }
-      } else {
-        if (deviceMode === 'mobile') {
-          tabBarRef.current?.goToPage(0);
-        }
-        eSendEvent('historyEvent', {
-          undo: 0,
-          redo: 0
-        });
-        setTimeout(() => {
-          useEditorStore.getState().setCurrentlyEditingNote(null);
-        }, 1);
-        editorState().currentlyEditing = false;
-        keyboardListener.current?.remove();
-        editor?.reset();
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Notebook
-        ]);
+        return;
       }
+
+      if (deviceMode === 'mobile') {
+        editorState().movedAway = true;
+        tabBarRef.current?.goToPage(0);
+      }
+      eSendEvent('historyEvent', {
+        undo: 0,
+        redo: 0
+      });
+      setImmediate(() => useEditorStore.getState().setCurrentlyEditingNote(null));
+      editorState().currentlyEditing = false;
+      keyboardListener.current?.remove();
+      editor?.reset();
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+        Navigation.routeNames.Notebook
+      ]);
     }, 1);
   };
 
