@@ -3,19 +3,19 @@ import { ThemeProvider } from "@theme-ui/theme-provider";
 import "./App.css";
 import { ThemeFactory } from "./theme";
 import { useState } from "react";
-import { Providers } from "@notesnook/importer/dist/src/providers/providerfactory";
 import { StepSeperator } from "./components/StepSeperator";
 import { ProviderSelector } from "./components/ProviderSelector";
-import { FileSelector } from "./components/FileSelector";
+import { FileProviderHandler } from "./components/FileProviderHandler";
 import { ImportResult } from "./components/ImportResult";
 import { Hero } from "./components/Hero";
 import { Footer } from "./components/Footer";
+import { IProvider } from "@notesnook/importer";
+import { NetworkProviderHandler } from "./components/NetworkProviderHandler";
+import { ProviderResult } from "@notesnook/importer/dist/src/providers/provider";
 
 function App() {
-  const [selectedProvider, setSelectedProvider] = useState<
-    Providers | undefined
-  >();
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<IProvider>();
+  const [providerResult, setProviderResult] = useState<ProviderResult>();
 
   return (
     <ThemeProvider theme={ThemeFactory.construct()}>
@@ -29,21 +29,28 @@ function App() {
         >
           <ProviderSelector onProviderChanged={setSelectedProvider} />
 
-          {selectedProvider && (
+          {selectedProvider ? (
             <>
               <StepSeperator />
-              <FileSelector
-                provider={selectedProvider}
-                onFilesChanged={setSelectedFiles}
-              />
+              {selectedProvider.type === "file" ? (
+                <FileProviderHandler
+                  provider={selectedProvider}
+                  onTransformFinished={setProviderResult}
+                />
+              ) : selectedProvider.type === "network" ? (
+                <NetworkProviderHandler
+                  provider={selectedProvider}
+                  onTransformFinished={setProviderResult}
+                />
+              ) : null}
             </>
-          )}
-          {selectedFiles.length > 0 && selectedProvider && (
+          ) : null}
+          {providerResult ? (
             <>
               <StepSeperator />
-              <ImportResult files={selectedFiles} provider={selectedProvider} />
+              <ImportResult result={providerResult} />{" "}
             </>
-          )}
+          ) : null}
         </Flex>
         <Footer />
       </Flex>

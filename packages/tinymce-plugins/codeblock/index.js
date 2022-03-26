@@ -5,7 +5,11 @@ const {
   getCurrentLine,
 } = require("../utils");
 const { createCodeBlock, isCodeBlock, state, newlineToBR } = require("./utils");
-const { addCodeBlockToolbar, refreshHighlighting } = require("./toolbar");
+const {
+  addCodeBlockToolbar,
+  refreshHighlighting,
+  getLanguageFromClassList,
+} = require("./toolbar");
 
 const TAB = `\u00A0\u00A0`;
 const TAB_SEQUENCE = ["\u00A0", "\u0020"];
@@ -55,7 +59,6 @@ var toggleCodeBlock = function(editor, api, type) {
   if (isCodeBlockActive) {
     var content = editor.selection.getContent({ format: "text" });
     if (content.length > 0) {
-      console.log(content);
       node.innerHTML = newlineToBR(
         node.innerText.replace(content.trim(), "").trim()
       );
@@ -67,15 +70,15 @@ var toggleCodeBlock = function(editor, api, type) {
     }
   } else {
     var content = editor.selection.getContent({ format: "text" }); //.replace(/^\n/gm, "");
-    if (type === "shortcut") content = "<br>";
-    if (!content) content = "<br>";
+    if (type === "shortcut") content = "\n";
+    if (!content) content = "\n";
     insertCodeBlock(editor, content);
   }
 };
 
-function insertCodeBlock(editor, content) {
+function insertCodeBlock(editor, content, language) {
   editor.undoManager.transact(function() {
-    const pre = createCodeBlock(content);
+    const pre = createCodeBlock(content, language);
     editor.dom.setAttrib(pre, "data-mce-id", "__mcenew");
     editor.focus();
     editor.insertContent(`${pre.outerHTML}${EMPTY_LINE}`);
@@ -86,11 +89,13 @@ function insertCodeBlock(editor, content) {
       editor.selection.select(insertedPre, true);
       editor.selection.collapse(true);
       editor.nodeChanged({ selectionChange: true });
+
+      if (language) refreshHighlighting(editor);
     }, 0);
   });
 }
 
-function blurCodeBlock(editor, block, content = "<br>") {
+function blurCodeBlock(editor, block, content = "\n") {
   editor.undoManager.transact(function() {
     const p = document.createElement("p");
     p.innerHTML = newlineToBR(content).trim();
@@ -230,6 +235,7 @@ var registerHandlers = function(editor) {
   }
 
   function onKeyUp(e) {
+    if (e.ctrlKey && e.key === "A") return;
     if (e.code === "Enter") {
       const node = state.activeBlock;
       if (!node) return;
@@ -251,16 +257,44 @@ var registerHandlers = function(editor) {
     setTimeout(() => editor.insertContent(TAB.repeat(indent)), 0);
   }
 
+  async function onSetContent(e) {
+    if (e.paste) {
+      const body = editor.getBody();
+      const codeblocks = body.querySelectorAll(`pre,table.highlight`);
+      for (let codeblock of codeblocks) {
+        processPastedContent(editor, codeblock);
+        state.activeBlock = codeblock;
+        await refreshHighlighting(editor);
+      }
+      state.activeBlock = null;
+    }
+  }
+
+  async function onPaste(e) {
+    if (handlePasteFromVSCode(e)) return;
+  }
+
+  function handlePasteFromVSCode(e) {
+    let vscodeEditorData = e.clipboardData.getData("vscode-editor-data");
+    if (!!vscodeEditorData?.trim()) {
+      const { mode } = JSON.parse(vscodeEditorData);
+      if (mode) {
+        e.preventDefault();
+
+        const code = e.clipboardData.getData("text/plain");
+        insertCodeBlock(editor, code, mode);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  editor.on("paste", onPaste);
+  editor.on("SetContent", onSetContent);
   editor.on("BeforeExecCommand", onBeforeExecCommand);
   editor.on("BeforeSetContent", onBeforeSetContent);
   editor.on("keydown", onKeyDown);
   editor.on("keyup", onKeyUp);
-  return function() {
-    editor.off("BeforeExecCommand", onBeforeExecCommand);
-    editor.off("BeforeSetContent", onBeforeSetContent);
-    editor.off("keydown", onKeyDown);
-    editor.off("keyup", onKeyUp);
-  };
 };
 
 function deindent(line, tabLength) {
@@ -275,21 +309,44 @@ function deindent(line, tabLength) {
   addPluginToPluginManager("codeblock", register);
 })();
 
+const languageIdentifiers = ["lang-", "language-", "brush:"]
+  .map((id) => `[class*="${id}"]`)
+  .join(",");
 /**
  * Call this function in paste_postprocess function in tinymce.init.
  * This basically removes all internal formatting of code blocks and applies
  * the necessary formatting for consistency.
  */
-function processPastedContent(node) {
+function processPastedContent(editor, node) {
   if (!node) return;
 
-  if (node.childNodes) {
-    for (let childNode of node.childNodes) {
-      if (childNode.tagName === "PRE") {
-        childNode.className = "hljs";
-        const code = childNode.textContent || childNode.innerText;
-        childNode.innerHTML = code;
-      }
+  for (let childNode of node.childNodes) {
+    const isFontMonospace =
+      childNode.style &&
+      childNode.style.fontFamily &&
+      childNode.style.fontFamily.includes("monospace");
+
+    const isGithub =
+      childNode.classList &&
+      childNode.classList.contains("highlight") &&
+      childNode.hasAttribute("data-tagsearch-lang");
+
+    const isPre = childNode.tagName === "PRE";
+    if (isPre) {
+      const languageNode = childNode.querySelector(languageIdentifiers);
+      const language = getLanguageFromClassList(languageNode || childNode);
+      const node = createCodeBlock(getFormattedText(childNode), language);
+      childNode.replaceWith(node);
+    } else if (isGithub) {
+      let language = childNode.getAttribute("data-tagsearch-lang");
+      if (language) language = language.toLowerCase();
+      const node = createCodeBlock(getFormattedText(childNode), language);
+      childNode.replaceWith(node);
+    } else if (isFontMonospace) {
+      const node = createCodeBlock(getFormattedText(childNode));
+      childNode.replaceWith(node);
+    } else if (childNode.childNodes.length > 0) {
+      processPastedContent(editor, childNode);
     }
   }
 }
@@ -314,4 +371,20 @@ function debounce(func, wait, immediate) {
     timeout = setTimeout(later, wait);
     if (callNow) func.apply(context, args);
   };
+}
+
+function getFormattedText(childNode) {
+  const clone = childNode.cloneNode(true);
+  clone.classList.add("mce--monoblock");
+
+  const formattingNode = document.createElement("div");
+  formattingNode.style.position = "absolute";
+  formattingNode.style.top = "-10000px";
+  formattingNode.style.left = "-10000px";
+  formattingNode.appendChild(clone);
+  document.body.appendChild(formattingNode);
+
+  const text = clone.innerText || clone.textContent;
+  formattingNode.remove();
+  return text.replace(/\t/gm, "  ");
 }

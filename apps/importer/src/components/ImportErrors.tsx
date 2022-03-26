@@ -14,14 +14,16 @@ export function ImportErrors(props: ImportErrorsProps) {
       color="#E53935"
     >
       <Flex sx={{ flexDirection: "column", px: 2, pb: 2 }}>
-        <Text variant="body" sx={{ color: "error" }}>
-          {props.errors.map((error, index) => (
-            <>
-              {index + 1}. {error.message} ({error.file.name})
-              <br />
-            </>
-          ))}
-        </Text>
+        {props.errors.map((error, index) => (
+          <Text
+            variant="body"
+            sx={{ color: "error", my: 1, fontFamily: "monospace" }}
+          >
+            {index + 1}. {error.message}{" "}
+            {error.file ? `(${error.file.name})` : ""}
+            <br />
+          </Text>
+        ))}
         <Button
           sx={{ bg: "error", color: "static", alignSelf: "start", mt: 2 }}
           onClick={() =>

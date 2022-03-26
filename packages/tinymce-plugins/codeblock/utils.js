@@ -3,11 +3,12 @@ const state = {
   activeBlock: null,
   languages: [],
 };
-function createCodeBlock(content) {
+function createCodeBlock(content, language) {
   const pre = document.createElement(TAGNAME);
   pre.spellcheck = false;
   pre.classList.add("hljs");
-  pre.innerHTML = newlineToBR(content);
+  if (language) pre.classList.add(`language-${language}`);
+  pre.innerHTML = newlineToBR(escapeHtml(content));
   return pre;
 }
 
@@ -17,6 +18,13 @@ function isCodeBlock(node) {
 
 function newlineToBR(html) {
   return html.replace(/\n/gm, "<br>");
+}
+
+function escapeHtml(html) {
+  var text = document.createTextNode(html);
+  var p = document.createElement("p");
+  p.appendChild(text);
+  return p.innerHTML;
 }
 
 module.exports = {

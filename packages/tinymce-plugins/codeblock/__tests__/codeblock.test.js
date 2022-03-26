@@ -1,4 +1,5 @@
 const { Page, test, expect } = require("@playwright/test");
+const { clipboardData } = require("./clipboardData");
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);

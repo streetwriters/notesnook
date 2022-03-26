@@ -1,0 +1,33 @@
+{
+  "name": "@notesnook/onenote",
+  "private": false,
+  "version": "1.0.0",
+  "description": "A fully type-safe OneNote API client for NodeJS & browser to recursively download all OneNote notebooks.",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@microsoft/microsoft-graph-types-beta": "^0.23.0-preview",
+    "@types/node": "^16.11.10",
+    "@types/tap": "^15.0.5",
+    "tap": "^15.1.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Abdullah Atta <abdullahatta@streetwriters.co>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/streetwriters/notesnook.git",
+    "directory": "packages/onenote"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^2.22.0",
+    "@azure/msal-node": "^1.6.0",
+    "@azure/msal-node-extensions": "^1.0.0-alpha.15",
+    "@microsoft/microsoft-graph-client": "^3.0.1",
+    "dotenv": "^16.0.0",
+    "isomorphic-fetch": "^3.0.0"
+  }
+}

@@ -1,7 +1,7 @@
 import { ContentType, Note, Notebook } from "../../models/note";
 import { File, IFile } from "../../utils/file";
 import {
-  IProvider,
+  IFileProvider,
   iterate,
   ProviderResult,
   ProviderSettings,
@@ -11,7 +11,8 @@ import { ZNotebook } from "./types";
 import { Znel } from "@notesnook/znel";
 import { ElementHandler } from "./elementhandlers";
 
-export class ZohoNotebook implements IProvider {
+export class ZohoNotebook implements IFileProvider {
+  public type: "file" = "file";
   public supportedExtensions = [".znel"];
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";

@@ -74,9 +74,13 @@ function getLines(node) {
 }
 
 function persistSelection(node, action) {
-  let saved = rangy.getSelection(getWindow()).saveCharacterRanges(node);
-  action();
-  rangy.getSelection(getWindow()).restoreCharacterRanges(node, saved);
+  try {
+    let saved = rangy.getSelection(getWindow()).saveCharacterRanges(node);
+    action();
+    rangy.getSelection(getWindow()).restoreCharacterRanges(node, saved);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 function addPluginToPluginManager(name, register) {
