@@ -12,6 +12,7 @@ import { db } from '../../../../utils/database';
 import { eCloseProgressDialog } from '../../../../utils/events';
 import { sleep } from '../../../../utils/time';
 import { EditorWebView, getNote } from '../../Functions';
+import { editorState } from '../../tiptap/utils';
 import tiny, { safeKeyboardDismiss } from '../tiny';
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
@@ -199,9 +200,9 @@ const gallery = async options => {
 const pick = async options => {
   if (!PremiumService.get()) {
     let user = await db.user.getUser();
-    if (editing.isFocused) {
+    if (editorState().isFocused) {
       safeKeyboardDismiss();
-      editing.isFocused = true;
+      editorState().isFocused = true;
     }
     if (user && !PremiumService.get() && !user.isEmailConfirmed) {
       PremiumService.showVerifyEmailDialog();
@@ -220,9 +221,9 @@ const pick = async options => {
     return;
   }
 
-  if (editing.isFocused) {
+  if (editorState().isFocused) {
     safeKeyboardDismiss();
-    editing.isFocused = true;
+    editorState().isFocused = true;
   }
 
   presentSheet({

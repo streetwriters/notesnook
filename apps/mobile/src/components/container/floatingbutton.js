@@ -4,6 +4,7 @@ import Animated, { Easing } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
+import { editorState } from '../../screens/editor/tiptap/utils';
 import { useSelectionStore, useSettingStore } from '../../stores/stores';
 import { editing, getElevation, showTooltip, TOOLTIP_POSITIONS } from '../../utils';
 import { normalize, SIZE } from '../../utils/size';
@@ -28,13 +29,13 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
   }
 
   const onKeyboardHide = async () => {
-    editing.keyboardState = false;
+    editorState().keyboardState = false;
     if (deviceMode !== 'mobile') return;
     animate(0);
   };
 
   const onKeyboardShow = async () => {
-    editing.keyboardState = true;
+    editorState().keyboardState = true;
     if (deviceMode !== 'mobile') return;
     animate(150);
   };

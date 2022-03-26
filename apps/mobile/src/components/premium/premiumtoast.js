@@ -13,6 +13,7 @@ import tiny from '../../screens/editor/tiny/tiny';
 import { Button } from '../ui/button';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { editorState } from '../../screens/editor/tiptap/utils';
 
 export const translatePrem = new Animated.Value(-dWidth);
 export const opacityPrem = new Animated.Value(0);
@@ -94,7 +95,7 @@ export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
   const onPress = async () => {
     open(null);
     eSendEvent(eCloseActionSheet);
-    if (editing.isFocused) {
+    if (editorState().isFocused) {
       tiny.call(EditorWebView, tiny.blur);
     }
     await sleep(300);

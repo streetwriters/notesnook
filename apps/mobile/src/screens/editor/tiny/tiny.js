@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { editing } from '../../../utils';
 import { EditorWebView, getWebviewInit, post } from '../Functions';
-import { textInput } from '../tiptap/utils';
+import { editorState, textInput } from '../tiptap/utils';
 
 /**
  *
@@ -206,8 +206,8 @@ function call(webview, func, noqueue) {
 }
 
 export function safeKeyboardDismiss() {
-  console.log('keyboard state', editing.keyboardState);
-  if (!editing.keyboardState) return;
+  console.log('keyboard state', editorState().keyboardState);
+  if (!editorState().keyboardState) return;
   if (Platform.OS === 'android') {
     textInput.current?.focus();
     textInput.current?.blur();
@@ -224,10 +224,10 @@ const redo = `tinymce.activeEditor.undoManager.redo();`;
 const clearHistory = `tinymce.activeEditor.undoManager.clear();`;
 
 const onKeyboardShow = () => {
-  if (!editing.movedAway) {
-    editing.isFocused = true;
+  if (!editorState().movedAway) {
+    editorState().isFocused = true;
     if (Platform.OS === 'ios') {
-      if (editing.focusType === 'title') return;
+      if (editorState().focusType === 'title') return;
       call(EditorWebView, keyboardStateChanged);
     }
   }

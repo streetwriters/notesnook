@@ -16,7 +16,7 @@ import { useThemeStore } from '../../stores/theme';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
 import EditorOverlay from './EditorOverlay';
-import { textInput } from './tiptap/utils';
+import { editorController, editorState, textInput } from './tiptap/utils';
 
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore(state => state.colors);
@@ -27,9 +27,9 @@ export const EditorWrapper = ({ width }) => {
 
   const onAppStateChanged = async state => {
     if (state === 'active') {
-      // if (!editing.movedAway) {
-      //   await checkStatus(false);
-      // }
+      if (!editorState().movedAway) {
+        editorController.current.onReady();
+      }
     }
   };
 

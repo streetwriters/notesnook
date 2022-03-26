@@ -3,16 +3,15 @@ import { groupArray } from 'notes-core/utils/grouping';
 import { Dimensions, Platform } from 'react-native';
 import create from 'zustand';
 import { APP_VERSION } from '../../version';
+import { endSearch } from '../screens/editor/tiny/toolbar/commands';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
 import PremiumService from '../services/premium';
 import { history } from '../utils';
+import { ACCENT } from '../utils/color-scheme';
 import { SUBSCRIPTION_STATUS } from '../utils/constants';
 import { db } from '../utils/database';
 import { MMKV } from '../utils/database/mmkv';
 import layoutmanager from '../utils/layout-manager';
-import { EditorWebView } from '../screens/editor/Functions';
-import tiny from '../screens/editor/tiny/tiny';
-import { endSearch } from '../screens/editor/tiny/toolbar/commands';
 import {
   Announcement,
   EditorStore,
@@ -28,7 +27,6 @@ import {
   TrashStore,
   UserStore
 } from './interfaces';
-import { ACCENT } from '../utils/color-scheme';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -185,18 +183,18 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     let _p = get().progress;
     if (!_p) return;
     _p[hash] = null;
-    tiny.call(
-      EditorWebView,
-      `
-    (function() {
-      let progress = ${JSON.stringify({
-        loaded: 1,
-        total: 1,
-        hash
-      })}
-    tinymce.activeEditor._updateAttachmentProgress(progress);
-    })()`
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `
+    // (function() {
+    //   let progress = ${JSON.stringify({
+    //     loaded: 1,
+    //     total: 1,
+    //     hash
+    //   })}
+    // tinymce.activeEditor._updateAttachmentProgress(progress);
+    // })()`
+    // );
     set({ progress: { ..._p } });
   },
   setProgress: (sent, total, hash, recieved, type) => {
@@ -204,14 +202,14 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     if (!_p) return;
     _p[hash] = { sent, total, hash, recieved, type };
     let progress = { total, hash, loaded: type === 'download' ? recieved : sent };
-    tiny.call(
-      EditorWebView,
-      `
-    (function() {
-      let progress = ${JSON.stringify(progress)}
-      tinymce.activeEditor._updateAttachmentProgress(progress);
-    })()`
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `
+    // (function() {
+    //   let progress = ${JSON.stringify(progress)}
+    //   tinymce.activeEditor._updateAttachmentProgress(progress);
+    // })()`
+    // );
     set({ progress: { ..._p } });
   },
   encryptionProgress: 0,
@@ -321,14 +319,14 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       set({ searchSelection: value, searchReplace: true });
     };
     eSubscribeEvent('selectionvalue', func);
-    tiny.call(
-      EditorWebView,
-      `(function() {
-      if (editor) {
-        reactNativeEventHandler('selectionvalue',editor.selection.getContent());
-      }
-    })();`
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `(function() {
+    //   if (editor) {
+    //     reactNativeEventHandler('selectionvalue',editor.selection.getContent());
+    //   }
+    // })();`
+    // );
   }
 }));
 

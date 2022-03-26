@@ -1,23 +1,24 @@
 import { groupArray } from 'notes-core/utils/grouping';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FloatingButton } from '../../components/container/floating-button';
 import { ContainerHeader } from '../../components/container/containerheader';
+import { FloatingButton } from '../../components/container/floating-button';
 import { Header } from '../../components/header';
-import { MoveNotes } from '../../components/sheets/move-notes/movenote';
-import SelectionHeader from '../../components/selection-header';
 import List from '../../components/list';
-import { useThemeStore } from '../../stores/theme';
-import { useNoteStore } from '../../stores/stores';
+import SelectionHeader from '../../components/selection-header';
+import { MoveNotes } from '../../components/sheets/move-notes/movenote';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
-import { editing, InteractionManager } from '../../utils';
+import { useMenuStore, useNoteStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
+import { InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 import { eOnLoadNote, eOpenAddTopicDialog, refreshNotesPage } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
 import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../editor/Functions';
+import { editorState } from '../editor/tiptap/utils';
 
 const getNotes = (params, group = true) => {
   if (!params) return [];
@@ -46,6 +47,44 @@ function getAlias(params) {
   return alias || '';
 }
 
+async function onNoteCreated(id, params) {
+  if (!params.current || !id) return;
+  switch (params.current.type) {
+    case 'topic': {
+      await db.notes.move(
+        {
+          topic: params.current.id,
+          id: params.current.notebook
+        },
+        id
+      );
+      editorState().onNoteCreated = null;
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Notebooks,
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Notebook
+      ]);
+      break;
+    }
+    case 'tag': {
+      await db.notes.note(id).tag(params.current.id);
+      editorState().onNoteCreated = null;
+      Navigation.setRoutesToUpdate([Navigation.routeNames.Tags, Navigation.routeNames.NotesPage]);
+      break;
+    }
+    case 'color': {
+      await db.notes.note(id).color(params.current.id);
+      editorState().onNoteCreated = null;
+      Navigation.setRoutesToUpdate([Navigation.routeNames.NotesPage]);
+      useMenuStore.getState().setColorNotes();
+      break;
+    }
+    default: {
+      break;
+    }
+  }
+}
+
 export const Notes = ({ route, navigation }) => {
   const colors = useThemeStore(state => state.colors);
   const params = useRef(route?.params);
@@ -70,19 +109,13 @@ export const Notes = ({ route, navigation }) => {
     eSubscribeEvent(refreshNotesPage, init);
     return () => {
       eUnSubscribeEvent(refreshNotesPage, init);
-      editing.actionAfterFirstSave = {
-        type: null
-      };
+      editorState().onNoteCreated = null;
     };
   }, []);
 
   const setActionAfterFirstSave = () => {
     if (params.current?.get === 'monographs') return;
-    editing.actionAfterFirstSave = {
-      type: params.current?.type,
-      id: params.current?.id,
-      notebook: params.current?.notebookId
-    };
+    editorState().onNoteCreated = id => onNoteCreated(id, params);
   };
 
   const init = data => {
@@ -110,18 +143,14 @@ export const Notes = ({ route, navigation }) => {
     InteractionManager.runAfterInteractions(() => {
       setNotes([]);
     }, 150);
-    editing.actionAfterFirstSave = {
-      type: null
-    };
+    editorState().onNoteCreated = null;
   }, []);
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
-      editing.actionAfterFirstSave = {
-        type: null
-      };
+      editorState().onNoteCreated = null;
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
@@ -162,8 +191,8 @@ export const Notes = ({ route, navigation }) => {
     if (!DDS.isTab) {
       if (getNote()) {
         eSendEvent(eOnLoadNote, { type: 'new' });
-        editing.currentlyEditing = true;
-        editing.movedAway = false;
+        editorState().currentlyEditing = true;
+        editorState().movedAway = false;
       }
       tabBarRef.current?.goToPage(1);
     } else {

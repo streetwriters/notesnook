@@ -8,6 +8,7 @@ import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
 import Tabs from '../components/tabs';
 import { EditorWrapper } from '../screens/editor/EditorWrapper';
+import { editorState } from '../screens/editor/tiptap/utils';
 import { DDS } from '../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
 import { useEditorStore, useSettingStore } from '../stores/stores';
@@ -151,10 +152,10 @@ export const TabsHolder = React.memo(
         if (current === 'tablet') {
           tabBarRef.current?.goToIndex(0);
         } else {
-          if (!editing.movedAway) {
+          if (!editorState().movedAway) {
             tabBarRef.current?.goToIndex(2);
           } else {
-            console.log('index one', editing.movedAway);
+            console.log('index one', editorState().movedAway);
             tabBarRef.current?.goToIndex(1);
           }
         }
@@ -316,17 +317,17 @@ let layoutTimer = null;
 
 const onChangeTab = async obj => {
   if (obj.i === 1) {
-    editing.movedAway = false;
-    editing.isFocused = true;
+    editorState().movedAway = false;
+    editorState().isFocused = true;
     activateKeepAwake();
-    if (!editing.currentlyEditing) {
+    if (!editorState().currentlyEditing) {
       eSendEvent(eOnLoadNote, { type: 'new' });
     }
   } else {
     if (obj.from === 1) {
       deactivateKeepAwake();
-      editing.movedAway = true;
-      editing.isFocused = false;
+      editorState().movedAway = true;
+      editorState().isFocused = false;
       eSendEvent(eClearEditor, 'removeHandler');
       setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
       let id = useEditorStore.getState().currentEditingNote;

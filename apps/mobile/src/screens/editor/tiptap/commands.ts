@@ -1,10 +1,10 @@
-import { RefObject } from 'react';
+import { createRef, MutableRefObject, RefObject } from 'react';
 import { Platform } from 'react-native';
 import WebView from 'react-native-webview';
 import { sleep } from '../../../utils/time';
 import { textInput } from './utils';
 
-function call(webview: RefObject<WebView> | null, func?: string) {
+function call(webview: RefObject<WebView | undefined>, func?: string) {
   if (!webview || !func) return;
   webview.current?.injectJavaScript(func);
 }
@@ -14,8 +14,8 @@ const fn = (fn: string) => `(() => {
 })();`;
 
 class Commands {
-  ref: RefObject<WebView> | null = null;
-  constructor(ref: RefObject<WebView>) {
+  ref = createRef<WebView | undefined>();
+  constructor(ref: MutableRefObject<WebView | undefined>) {
     this.ref = ref;
   }
 
@@ -50,9 +50,9 @@ statusBar.current.set({date:"",saved:""});
     );
   };
 
-  setSessionId = (id: string) => call(this.ref, fn(`globalThis.sessionId = "${id}"`));
+  setSessionId = (id: string | null) => call(this.ref, fn(`globalThis.sessionId = "${id}"`));
 
-  setStatus = (date: string, saved: string) =>
+  setStatus = (date: string | undefined, saved: string) =>
     call(this.ref, fn(`statusBar.current.set({date:"${date}",saved:"${saved}"})`));
 }
 

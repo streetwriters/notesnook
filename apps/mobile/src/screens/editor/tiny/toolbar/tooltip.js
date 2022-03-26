@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { useThemeStore } from '../../../../stores/theme';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
-import { editing } from '../../../../utils';
+import { useThemeStore } from '../../../../stores/theme';
 import layoutmanager from '../../../../utils/layout-manager';
 import { normalize } from '../../../../utils/size';
 import { EditorWebView } from '../../Functions';
+import { editorState } from '../../tiptap/utils';
 import tiny from '../tiny';
 import ColorGroup from './colorgroup';
 import { properties } from './constants';
@@ -28,7 +28,7 @@ const Tooltip = () => {
   const show = async data => {
     properties.userBlur = true;
     if (!data) {
-      editing.tooltip = null;
+      editorState().tooltip = null;
       if (group) {
         layoutmanager.withAnimation(150);
         setGroup(null);
@@ -36,14 +36,14 @@ const Tooltip = () => {
       return;
     }
     if (!data) return;
-    editing.tooltip = data.title;
+    editorState().tooltip = data.title;
     if (!data.type) {
       data.type = data.title;
     }
     layoutmanager.withSpringAnimation(200);
     setGroup(data);
     setTimeout(() => {
-      if (editing.tooltip !== 'link') {
+      if (editorState().tooltip !== 'link') {
         properties.pauseSelectionChange = false;
       }
       tiny.call(

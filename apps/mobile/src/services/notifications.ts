@@ -12,6 +12,7 @@ import { useNoteStore } from '../stores/stores';
 import { DDS } from './device-detection';
 import { eSendEvent } from './event-manager';
 import SettingsService from './settings';
+import { editorState } from '../screens/editor/tiptap/utils';
 
 const NOTIFICATION_TAG = 'notesnook';
 const CHANNEL_ID = 'com.streetwriters.notesnook';
@@ -36,7 +37,7 @@ function init() {
   if (Platform.OS === 'ios') return;
   PushNotification.configure({
     onNotification: async function (notification) {
-      editing.movedAway = false;
+      editorState().movedAway = false;
       MMKV.removeItem('appState');
       if (useNoteStore?.getState()?.loading === false) {
         //@ts-ignore

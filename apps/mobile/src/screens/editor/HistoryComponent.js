@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { IconButton } from '../../components/ui/icon-button';
-import { useThemeStore } from '../../stores/theme';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { editing } from '../../utils';
-import { SIZE } from '../../utils/size';
+import { useThemeStore } from '../../stores/theme';
 import useKeyboard from '../../utils/hooks/use-keyboard';
+import { SIZE } from '../../utils/size';
 import { EditorWebView } from './Functions';
 import tiny, { safeKeyboardDismiss } from './tiny/tiny';
+import { editorState } from './tiptap/utils';
 
 const HistoryComponent = () => {
   const colors = useThemeStore(state => state.colors);
@@ -16,7 +16,7 @@ const HistoryComponent = () => {
     redo: false
   });
   const keyboard = useKeyboard();
-  editing.keyboardState = keyboard.keyboardShown;
+  editorState().keyboardState = keyboard.keyboardShown;
 
   const onHistoryChange = data => {
     setHistoryState(data);
@@ -47,7 +47,7 @@ const HistoryComponent = () => {
             height: 35
           }}
           onPress={() => {
-            editing.keyboardState = true;
+            editorState().keyboardState = true;
             safeKeyboardDismiss();
           }}
         />

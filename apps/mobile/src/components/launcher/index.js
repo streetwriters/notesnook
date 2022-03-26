@@ -37,6 +37,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { Walkthrough } from '../walkthroughs';
 import NewFeature from '../sheets/new-feature/index';
+import { editorState } from '../../screens/editor/tiptap/utils';
 
 const Launcher = React.memo(
   () => {
@@ -166,9 +167,9 @@ const Launcher = React.memo(
           !appState.movedAway &&
           Date.now() < appState.timestamp + 3600000
         ) {
-          editing.isRestoringState = true;
-          editing.currentlyEditing = true;
-          editing.movedAway = false;
+          editorState().currentlyEditing = true;
+          editorState().isRestoringState = true;
+          editorState().movedAway = false;
           if (!DDS.isTab) {
             tabBarRef.current?.goToPage(1);
           }

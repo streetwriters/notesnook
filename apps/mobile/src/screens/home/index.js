@@ -9,11 +9,12 @@ import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
 import { useNoteStore } from '../../stores/stores';
-import { editing, InteractionManager } from '../../utils';
+import { InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 import { eOnLoadNote } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../editor/Functions';
+import { editorState } from '../editor/tiptap/utils';
 
 export const Home = ({ navigation }) => {
   const notes = useNoteStore(state => state.notes);
@@ -83,8 +84,8 @@ export const Home = ({ navigation }) => {
     if (!DDS.isTab) {
       if (getNote()) {
         eSendEvent(eOnLoadNote, { type: 'new' });
-        editing.currentlyEditing = true;
-        editing.movedAway = false;
+        editorState().currentlyEditing = true;
+        editorState().movedAway = false;
       }
       tabBarRef.current?.goToPage(1);
     } else {

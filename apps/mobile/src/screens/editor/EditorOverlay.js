@@ -10,6 +10,7 @@ import { editing } from '../../utils';
 import { eOnLoadNote } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep, timeConverter } from '../../utils/time';
+import { editorState } from './tiptap/utils';
 
 let timer = null;
 let timerError = null;
@@ -21,7 +22,7 @@ const EditorOverlay = () => {
   const opacity = useValue(1);
 
   const load = async _loading => {
-    editing.overlay = true;
+    editorState().overlay = true;
     clearTimeout(timer);
     clearTimeout(timerError);
     clearTimeout(timerClosing);
@@ -42,7 +43,7 @@ const EditorOverlay = () => {
       clearTimeout(timerError);
       clearTimeout(timerClosing);
       setError(false);
-      editing.overlay = false;
+      editorState().overlay = false;
       timing(opacity, {
         toValue: 0,
         duration: 150,

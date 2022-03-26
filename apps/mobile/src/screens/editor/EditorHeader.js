@@ -36,6 +36,7 @@ import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 import { endSearch } from './tiny/toolbar/commands';
 import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
+import { editorState } from './tiptap/utils';
 
 const EditorHeader = ({ editor }) => {
   const colors = useThemeStore(state => state.colors);
@@ -59,7 +60,7 @@ const EditorHeader = ({ editor }) => {
         return;
       }
       if (deviceMode === 'mobile') {
-        editing.movedAway = true;
+        editorState().movedAway = true;
       }
       eSendEvent('showTooltip');
       toolbarRef.current?.scrollTo({
@@ -83,7 +84,7 @@ const EditorHeader = ({ editor }) => {
         setTimeout(() => {
           useEditorStore.getState().setCurrentlyEditingNote(null);
         }, 1);
-        editing.currentlyEditing = false;
+        editorState().currentlyEditing = false;
         keyboardListener.current?.remove();
         editor?.reset();
       }
@@ -122,9 +123,9 @@ const EditorHeader = ({ editor }) => {
       });
       return;
     }
-    if (editing.isFocused) {
+    if (editorState().isFocused) {
       safeKeyboardDismiss();
-      editing.isFocused = true;
+      editorState().isFocused = true;
     }
     eSendEvent(eOpenPublishNoteDialog, note);
   };
@@ -142,9 +143,9 @@ const EditorHeader = ({ editor }) => {
       return;
     }
 
-    if (editing.isFocused || editing.keyboardState) {
+    if (editorState().isFocused || editorState().keyboardState) {
       safeKeyboardDismiss();
-      editing.isFocused = true;
+      editorState().isFocused = true;
     }
 
     Properties.present(note, ['Dark Mode']);
@@ -208,13 +209,13 @@ const EditorHeader = ({ editor }) => {
       handleBack.current = BackHandler.addEventListener('hardwareBackPress', _onHardwareBackPress);
       return;
     }
-    if (editing.currentlyEditing) {
+    if (editorState().currentlyEditing) {
       await _onBackPress();
     }
   };
 
   const _onHardwareBackPress = async () => {
-    if (editing.currentlyEditing) {
+    if (editorState().currentlyEditing) {
       await _onBackPress();
       return true;
     }
@@ -280,9 +281,9 @@ const EditorHeader = ({ editor }) => {
                 }}
                 top={50}
                 onPress={async () => {
-                  if (editing.isFocused) {
+                  if (editorState().isFocused) {
                     safeKeyboardDismiss();
-                    editing.isFocused = true;
+                    editorState().isFocused = true;
                   }
                   umami.pageView('/pro-screen', '/editor');
                   eSendEvent(eOpenPremiumDialog);
@@ -343,7 +344,7 @@ const EditorHeader = ({ editor }) => {
                 top={50}
                 onPress={() => {
                   eSendEvent(eOpenFullscreenEditor);
-                  editing.isFullscreen = true;
+                  editorState().isFullscreen = true;
                 }}
               />
             ) : null}

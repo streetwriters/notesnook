@@ -2,6 +2,7 @@ import React, { Component, createRef } from 'react';
 import { Platform } from 'react-native';
 import { Keyboard } from 'react-native';
 import { FlatList, TextInput, View } from 'react-native';
+import { editorState } from '../../screens/editor/tiptap/utils';
 import { DDS } from '../../services/device-detection';
 import { editing } from '../../utils';
 
@@ -34,7 +35,7 @@ export default class Tabs extends Component {
     this.hideKeyboardIfVisible();
     let cOffset = this.scrollOffset.toFixed(0);
     let pOffset = this.props.offsets.b.toFixed(0);
-    // let heightCheck = !editing.tooltip
+    // let heightCheck = !editorState().tooltip
     //   ? this.props.dimensions.height - 70
     //   : this.props.dimensions.height - 140;
 
@@ -86,13 +87,13 @@ export default class Tabs extends Component {
   hideKeyboardIfVisible(close) {
     if (!close && this.nextPage === 1) return;
     if (Platform.OS === 'ios') return;
-    if (editing.movedAway) return;
+    if (editorState().movedAway) return;
 
     if (
-      (editing.keyboardState || editing.isFocused) &&
+      (editorState().keyboardState || editorState().isFocused) &&
       this.scrollOffset < this.props.offsets.b - 50
     ) {
-      editing.keyboardState = false;
+      editorState().keyboardState = false;
       Keyboard.dismiss();
     }
   }
@@ -270,7 +271,7 @@ export default class Tabs extends Component {
           snapToAlignment="start"
           snapToOffsets={[this.props.offsets.a, this.props.offsets.b, this.props.offsets.c]}
           contentOffset={{
-            x: editing.movedAway ? this.props.offsets.a : this.props.offsets.b
+            x: editorState().movedAway ? this.props.offsets.a : this.props.offsets.b
           }}
           data={['drawer', 'navigation', 'editor']}
           renderItem={this.renderItem}

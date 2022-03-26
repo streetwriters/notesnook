@@ -2,10 +2,11 @@ import React from 'react';
 import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
-import { useEditorStore, useUserStore } from '../../stores/stores';
+import { useUserStore } from '../../stores/stores';
 import EditorHeader from './EditorHeader';
 import { sourceUri, _onShouldStartLoadWithRequest } from './Functions';
 import { useEditor } from './tiptap/use-editor';
+import { editorController } from './tiptap/utils';
 
 const source = { uri: sourceUri + 'index.html' };
 
@@ -20,8 +21,8 @@ const style = {
 const Editor = React.memo(
   () => {
     const premiumUser = useUserStore(state => state.premium);
-    const sessionId = useEditorStore(state => state.sessionId);
     const editor = useEditor();
+    editorController.current = editor;
 
     return editor.loading ? null : (
       <>
@@ -43,7 +44,7 @@ const Editor = React.memo(
             // onError={() => {
             //   onResetRequested();
             // }}
-            injectedJavaScript={`globalThis.sessionId="${sessionId}";`}
+            injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
             javaScriptEnabled={true}
             focusable={true}
             keyboardDisplayRequiresUserAction={false}

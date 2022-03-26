@@ -34,7 +34,7 @@ export function timeSince(date: number) {
   return Math.floor(seconds) < 0 ? '0s ago' : Math.floor(seconds) + 's ago';
 }
 
-export const timeConverter = (timestamp: number) => {
+export const timeConverter = (timestamp: number | undefined | null) => {
   if (!timestamp) return;
   let d = new Date(timestamp), // Convert the passed timestamp to milliseconds
     yyyy = d.getFullYear(),

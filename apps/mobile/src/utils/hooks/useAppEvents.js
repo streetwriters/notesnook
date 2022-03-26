@@ -13,13 +13,7 @@ import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
 import { doInBackground, editing } from '..';
 import { Walkthrough } from '../../components/walkthroughs';
-import {
-  EditorWebView,
-  getNote,
-  getWebviewInit,
-  updateNoteInEditor
-} from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
+import { editorState } from '../../screens/editor/tiptap/utils';
 import Backup from '../../services/backup';
 import BiometricService from '../../services/biometrics';
 import {
@@ -42,6 +36,7 @@ import {
   clearAllStores,
   initialize,
   useAttachmentStore,
+  useEditorStore,
   useMessageStore,
   useNoteStore,
   useSettingStore,
@@ -73,15 +68,15 @@ export const useAppEvents = () => {
 
   const onMediaDownloaded = ({ hash, groupId, src }) => {
     if (groupId?.startsWith('monograph')) return;
-    tiny.call(
-      EditorWebView,
-      `
-        (function(){
-          let image = ${JSON.stringify({ hash, src })};
-          tinymce.activeEditor._replaceImage(image);
-        })();
-        `
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `
+    //     (function(){
+    //       let image = ${JSON.stringify({ hash, src })};
+    //       tinymce.activeEditor._replaceImage(image);
+    //     })();
+    //     `
+    // );
   };
 
   const onLoadingAttachmentProgress = data => {
@@ -170,8 +165,10 @@ export const useAppEvents = () => {
     initialize();
     setLastSynced(await db.lastSynced());
     setSyncing(false);
-    if (getNote()) {
-      await updateNoteInEditor();
+    let id = useEditorStore.getState().currentEditingNote;
+    let note = id && db.notes.note(id).data;
+    if (note) {
+      //await updateNoteInEditor();
     }
   };
 
@@ -407,9 +404,7 @@ export const useAppEvents = () => {
       await reconnectSSE();
 
       await checkIntentState();
-      if (getWebviewInit()) {
-        await MMKV.removeItem('appState');
-      }
+      await MMKV.removeItem('appState');
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
         try {
@@ -421,7 +416,9 @@ export const useAppEvents = () => {
       }
     } else {
       refValues.current.prevState = 'background';
-      if (getNote()?.locked && SettingsService.get().appLockMode === 'background') {
+      let id = useEditorStore.getState().currentEditingNote;
+      let note = id && db.notes.note(id).data;
+      if (note?.locked && SettingsService.get().appLockMode === 'background') {
         eSendEvent(eClearEditor);
       }
       await storeAppState();
@@ -462,12 +459,14 @@ export const useAppEvents = () => {
   }
 
   async function storeAppState() {
-    if (editing.currentlyEditing) {
-      if (getNote()?.locked) return;
+    if (editorState().currentlyEditing) {
+      let id = useEditorStore.getState().currentEditingNote;
+      let note = id && db.notes.note(id).data;
+      if (note?.locked) return;
       let state = JSON.stringify({
-        editing: editing.currentlyEditing,
-        note: getNote(),
-        movedAway: editing.movedAway,
+        editing: editorState().currentlyEditing,
+        note: note,
+        movedAway: editorState().movedAway,
         timestamp: Date.now()
       });
       await MMKV.setItem('appState', state);
@@ -490,7 +489,9 @@ export const useAppEvents = () => {
         eSendEvent(refreshNotesPage);
       }
       if (notesAddedFromIntent || shareExtensionOpened) {
-        eSendEvent('loadingNote', getNote());
+        let id = useEditorStore.getState().currentEditingNote;
+        let note = id && db.notes.note(id).data;
+        eSendEvent('loadingNote', note);
         eSendEvent('webviewreset', true);
         MMKV.removeItem('shareExtensionOpened');
       }

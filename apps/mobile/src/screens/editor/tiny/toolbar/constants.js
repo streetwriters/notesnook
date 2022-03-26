@@ -4,6 +4,7 @@ import { eSendEvent } from '../../../../services/event-manager';
 import { editing } from '../../../../utils';
 import { sleep } from '../../../../utils/time';
 import { EditorWebView, textInput } from '../../Functions';
+import { editorState } from '../../tiptap/utils';
 import tiny from '../tiny';
 
 export const properties = {
@@ -34,13 +35,13 @@ export async function focusEditor(format, kill = true) {
 }
 
 export async function reFocusEditor() {
-  if (editing.isFocused === true) {
+  if (editorState().isFocused === true) {
     if (Platform.OS === 'android') {
       await sleep(300);
       textInput.current?.focus();
     }
     await sleep(300);
-    if (editing.focusType == 'editor') {
+    if (editorState().focusType == 'editor') {
       focusEditor(null, false);
     } else {
       Platform.OS === 'android' && EditorWebView.current?.requestFocus();
