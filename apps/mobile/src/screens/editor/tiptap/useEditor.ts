@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import WebView from 'react-native-webview';
 import { DDS } from '../../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import { TipManager } from '../../../services/tip-manager';
 import { useEditorStore } from '../../../stores/stores';
 import { useThemeStore } from '../../../stores/theme';
@@ -11,32 +12,8 @@ import { eOnLoadNote } from '../../../utils/events';
 import { tabBarRef } from '../../../utils/global-refs';
 import { timeConverter } from '../../../utils/time';
 import Commands from './commands';
-import { EditorState } from './types';
+import { EditorState, Note, Content, AppState, SavePayload } from './types';
 import { defaultState, EditorEvents, isEditorLoaded, makeSessionId, post } from './utils';
-
-type Note = {
-  [name: string]: any;
-  id: string | null;
-  type: string;
-  contentId: string;
-  title: string;
-  locked: boolean;
-  conflicted: boolean;
-  dateEdited: number;
-};
-
-type Content = {
-  data?: string;
-  type: string;
-};
-
-type SavePayload = {
-  title?: string;
-  id?: string | null;
-  data?: Content['data'];
-  type?: Content['type'];
-  sessionId?: string | null;
-};
 
 export const useEditor = () => {
   const [loading, setLoading] = useState(false);
@@ -48,7 +25,6 @@ export const useEditor = () => {
   const commands = useMemo(() => new Commands(editorRef), []);
   const sessionHistoryId = useRef<number>();
   const state = useRef<Partial<EditorState>>(defaultState);
-  console.log('state: ', defaultState);
   const placeholderTip = useRef(TipManager.placeholderTip());
 
   const postMessage = useCallback(
@@ -68,13 +44,16 @@ export const useEditor = () => {
 
   useEffect(() => {
     console.log('sessionId:', sessionId);
-    commands.setSessionId(sessionId);
-    if (sessionId) {
-      (async () => {
+    async () => {
+      await commands.setSessionId(sessionId);
+      if (sessionId) {
         if (!state.current?.ready) return;
-        onReady();
-      })();
-    }
+        await onReady();
+      }
+    };
+    return () => {
+      state.current.saveCount = 0;
+    };
   }, [sessionId, loading]);
 
   const overlay = (show: boolean, data = { type: 'new' }) => {
@@ -100,13 +79,13 @@ export const useEditor = () => {
     timers.current[id] = setTimeout(fn, duration);
   }, []);
 
-  const reset = useCallback(() => {
+  const reset = useCallback(async () => {
     currentNote.current = null;
     currentContent.current = null;
     useEditorStore.getState().setCurrentlyEditingNote(null);
-    commands.clearContent();
+    await commands.clearContent();
     placeholderTip.current = TipManager.placeholderTip();
-    commands.setPlaceholder(placeholderTip.current);
+    await commands.setPlaceholder(placeholderTip.current);
   }, []);
 
   const saveNote = useCallback(
@@ -115,7 +94,7 @@ export const useEditor = () => {
       try {
         if (id && !db.notes?.note(id)) {
           useEditorStore.getState().setCurrentlyEditingNote(null);
-          reset();
+          await reset();
           return;
         }
         let note = id ? (db.notes?.note(id)?.data as Note) : null;
@@ -166,7 +145,19 @@ export const useEditor = () => {
         }
         if (id && sessionId === currentSessionId) {
           note = db.notes?.note(id)?.data as Note;
-          commands.setStatus(timeConverter(note.dateEdited), 'Saved');
+          await commands.setStatus(timeConverter(note.dateEdited), 'Saved');
+
+          if (
+            currentNote.current?.title !== note.title ||
+            currentNote.current?.headline !== note.headline
+          ) {
+            Navigation.setRoutesToUpdate([
+              Navigation.routeNames.NotesPage,
+              Navigation.routeNames.Favorites,
+              Navigation.routeNames.Notes,
+              Navigation.routeNames.Notebook
+            ]);
+          }
         }
 
         return id;
@@ -203,18 +194,22 @@ export const useEditor = () => {
       const editorState = useEditorStore.getState();
 
       if (item && item.type === 'new') {
-        currentNote.current && reset();
-        setSessionId(makeSessionId());
-        commands.focus();
+        currentNote.current && (await reset());
+        let nextSessionId = makeSessionId(item);
+        setSessionId(nextSessionId);
+        await commands.setSessionId(nextSessionId);
+        await commands.focus();
       } else {
         if (!item.forced && currentNote.current?.id === item.id) return;
         overlay(true, item);
-        currentNote.current && reset();
+        currentNote.current && (await reset());
         await loadContent(item);
-        setSessionId(makeSessionId(item));
+        let nextSessionId = makeSessionId(item);
+        setSessionId(nextSessionId);
+        await commands.setSessionId(nextSessionId);
         editorState.setCurrentlyEditingNote(item.id);
         currentNote.current = item;
-        commands.setStatus(timeConverter(item.dateEdited), 'Saved');
+        await commands.setStatus(timeConverter(item.dateEdited), 'Saved');
         await postMessage(EditorEvents.title, item.title);
         await postMessage(EditorEvents.html, currentContent.current?.data);
         overlay(false);
@@ -265,9 +260,7 @@ export const useEditor = () => {
           });
           break;
       }
-      if (message.type.startsWith('native:')) {
-        eSendEvent(message.type, message);
-      }
+      eSendEvent(message.type, message);
     },
     [sessionId]
   );
@@ -283,7 +276,7 @@ export const useEditor = () => {
       let params = {
         title,
         data: content,
-        type: 'tiptap',
+        type: 'tiny',
         sessionId,
         id: currentNote.current?.id
       };
@@ -291,18 +284,18 @@ export const useEditor = () => {
       withTimer(
         currentNote.current?.id || 'newnote',
         () => {
-          if (currentNote.current && !params.id) {
+          if (currentNote.current && !params.id && params.sessionId === sessionId) {
             params.id = currentNote.current?.id;
           }
           saveNote(params);
         },
-        300
+        500
       );
     },
     []
   );
 
-  const onLoad = useCallback(() => {
+  const onLoad = useCallback(async () => {
     console.log('on editor load');
     state.current.ready = true;
     onReady();
@@ -311,38 +304,31 @@ export const useEditor = () => {
       console.log('force reload note');
       loadNote({ ...currentNote.current, forced: true });
     } else {
-      commands.setPlaceholder(placeholderTip.current);
+      await commands.setPlaceholder(placeholderTip.current);
       restoreEditorState();
     }
   }, [state, currentNote, loadNote]);
 
   async function restoreEditorState() {
-    let appState = await MMKV.getItem('appState');
-    if (appState) {
-      appState = JSON.parse(appState);
-
+    let json = await MMKV.getItem('appState');
+    if (json) {
+      let appState = JSON.parse(json) as AppState;
       if (
-        //@ts-ignore
         appState.editing &&
-        //@ts-ignore
-        appState.note &&
-        //@ts-ignore
-        !appState.note.locked &&
-        //@ts-ignore
-        appState.note.id &&
-        //@ts-ignore
+        !appState.note?.locked &&
+        appState.note?.id &&
         Date.now() < appState.timestamp + 3600000
       ) {
         state.current.isRestoringState = true;
-        //@ts-ignore
         overlay(true, appState.note);
         state.current.currentlyEditing = true;
         if (!DDS.isTab) {
           tabBarRef.current?.goToPage(1);
         }
         setTimeout(() => {
-          //@ts-ignore
-          loadNote(appState.note);
+          if (appState.note) {
+            loadNote(appState.note);
+          }
         }, 1);
         MMKV.removeItem('appState');
         state.current.movedAway = false;

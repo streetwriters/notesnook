@@ -85,6 +85,12 @@ const EditorHeader = ({ editor }) => {
         editorState().currentlyEditing = false;
         keyboardListener.current?.remove();
         editor?.reset();
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.Notebook
+        ]);
       }
     }, 1);
   };

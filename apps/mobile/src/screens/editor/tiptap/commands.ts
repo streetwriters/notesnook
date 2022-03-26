@@ -2,16 +2,36 @@ import { createRef, MutableRefObject, RefObject } from 'react';
 import { Platform } from 'react-native';
 import WebView from 'react-native-webview';
 import { sleep } from '../../../utils/time';
-import { textInput } from './utils';
+import { getResponse, randId, textInput } from './utils';
 
-function call(webview: RefObject<WebView | undefined>, func?: string) {
-  if (!webview || !func) return;
-  webview.current?.injectJavaScript(func);
+type Action = { job: string; id: string };
+
+async function call(webview: RefObject<WebView | undefined>, action?: Action) {
+  if (!webview || !action) return;
+  setImmediate(() => webview.current?.injectJavaScript(action.job));
+  let response = await getResponse(action.id);
+  console.log('webview job: ', action.id, response ? response.value : response);
+  if (!response) {
+    console.warn('webview job failed', action.id, action.job);
+  }
+  return response ? response.value : response;
 }
 
-const fn = (fn: string) => `(() => {
-    ${fn}
-})();`;
+const fn = (fn: string) => {
+  let id = randId('fn_');
+  return {
+    job: `(async () => {
+      try {
+        let response = true;
+        ${fn}
+        post("${id}",response);
+      } catch(e) {
+        logger('error', "webview: ", e.message, e.stack);
+      }
+    })();`,
+    id: id
+  };
+};
 
 class Commands {
   ref = createRef<WebView | undefined>();
@@ -23,26 +43,28 @@ class Commands {
     if (!this.ref) return;
     if (Platform.OS === 'android') {
       this.ref.current?.requestFocus();
-      setTimeout(() => {
+      setTimeout(async () => {
         if (!this.ref) return;
         textInput.current?.focus();
         this.ref?.current?.requestFocus();
-        call(this.ref, fn(`editor.commands.focus()`));
+        await call(this.ref, fn(`editor.commands.focus()`));
       }, 1);
     } else {
       await sleep(200);
-      call(this.ref, fn(`editor.commands.focus()`));
+      await call(this.ref, fn(`editor.commands.focus()`));
     }
   };
 
-  blur = () => call(this.ref, fn(`editor.commands.blur();editorTitle.current?.blur()`));
+  blur = async () => await call(this.ref, fn(`editor.commands.blur();editorTitle.current?.blur()`));
 
-  clearContent = () => {
-    this.blur();
-    call(
+  clearContent = async () => {
+    await call(
       this.ref,
       fn(
-        `editor?.commands.clearContent(false);
+        `
+editor.commands.blur();
+editorTitle.current?.blur();
+editor?.commands.clearContent(false);
 editorController.setTitle(null);
 statusBar.current.set({date:"",saved:""});
         `
@@ -50,13 +72,14 @@ statusBar.current.set({date:"",saved:""});
     );
   };
 
-  setSessionId = (id: string | null) => call(this.ref, fn(`globalThis.sessionId = "${id}"`));
+  setSessionId = async (id: string | null) =>
+    await call(this.ref, fn(`globalThis.sessionId = "${id}"`));
 
-  setStatus = (date: string | undefined, saved: string) =>
-    call(this.ref, fn(`statusBar.current.set({date:"${date}",saved:"${saved}"})`));
+  setStatus = async (date: string | undefined, saved: string) =>
+    await call(this.ref, fn(`statusBar.current.set({date:"${date}",saved:"${saved}"})`));
 
-  setPlaceholder = (placeholder: string) => {
-    call(
+  setPlaceholder = async (placeholder: string) => {
+    await call(
       this.ref,
       fn(`
     const element = document.querySelector(".is-editor-empty");

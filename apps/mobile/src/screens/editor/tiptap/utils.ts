@@ -26,7 +26,7 @@ export const EditorEvents: { [name: string]: string } = {
   status: 'native:status'
 };
 
-function randId(prefix: string) {
+export function randId(prefix: string) {
   return Math.random()
     .toString(36)
     .replace('0.', prefix || '');
@@ -51,7 +51,7 @@ export async function post(ref: MutableRefObject<WebView | undefined>, type: str
     value,
     sessionId: sessionId
   };
-  ref.current?.postMessage(JSON.stringify(message));
+  setImmediate(() => ref.current?.postMessage(JSON.stringify(message)));
   let response = await getResponse(type);
   console.log('post: ', type, sessionId, 'result:', !!response);
   return response;
@@ -64,7 +64,7 @@ type WebviewResponseData = {
   value: any;
 };
 
-const getResponse = async (type: string): Promise<WebviewResponseData | false> => {
+export const getResponse = async (type: string): Promise<WebviewResponseData | false> => {
   return new Promise(resolve => {
     let callback = (data: WebviewResponseData) => {
       eUnSubscribeEvent(type, callback);

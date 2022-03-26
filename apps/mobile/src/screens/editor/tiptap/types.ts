@@ -13,4 +13,37 @@ export type EditorState = {
   isRestoringState: boolean;
   keyboardState: boolean;
   ready: boolean;
+  saveCount: 0;
+};
+
+export type Note = {
+  [name: string]: any;
+  id: string | null;
+  type: string;
+  contentId: string;
+  title: string;
+  locked: boolean;
+  conflicted: boolean;
+  dateEdited: number;
+  headline: string;
+};
+
+export type Content = {
+  data?: string;
+  type: string;
+};
+
+export type SavePayload = {
+  title?: string;
+  id?: string | null;
+  data?: Content['data'];
+  type?: Content['type'];
+  sessionId?: string | null;
+};
+
+export type AppState = {
+  note?: Note;
+  editing: boolean;
+  movedAway: boolean;
+  timestamp: number;
 };
