@@ -31,6 +31,10 @@
     {
       "name": "📦 @streetwriters/tinymce-plugins",
       "path": "packages/tinymce-plugins"
+    },
+    {
+      "name": "📦 @notesnook/znel",
+      "path": "packages/znel"
     }
   ],
   "settings": {

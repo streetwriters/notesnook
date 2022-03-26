@@ -22,7 +22,7 @@ for (let providerName of ProviderFactory.getAvailableProviders()) {
           a.data = undefined;
         });
       });
-      tap.matchSnapshot(JSON.stringify(output), providerName);
+      tap.matchSnapshot(JSON.stringify(output.notes), providerName);
     }
   );
 

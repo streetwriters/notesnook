@@ -3,6 +3,7 @@ import { path } from "./path";
 import { Note } from "../models/note";
 import { File, IFile } from "./file";
 import SparkMD5 from "spark-md5";
+import { Tar, TarFile } from "./tar";
 
 const metadataFilename = "metadata.json";
 const noteDataFilename = "note.json";
@@ -20,14 +21,26 @@ type NoteFiles = {
   hash: string;
 };
 
+type Unpacker = (file: IFile) => IFile[];
+
+const unpackers: Record<string, Unpacker> = {
+  ".zip": unzip,
+  ".znote": untar,
+};
+
+function isArchive(file: IFile) {
+  return file.name.endsWith(".zip") || file.name.endsWith(".znote");
+}
+
 export function unpack(files: IFile[], root?: string): File[] {
   const extracted: File[] = [];
 
   for (let file of files) {
-    if (file.name.endsWith(".zip")) {
+    if (isArchive(file)) {
       try {
-        const root = path.basename(file.name, false);
-        extracted.push(...unpack(unzip(file), root));
+        const root = path.basename(file.name, "");
+        const unpacker = unpackers[path.extname(file.name)];
+        extracted.push(...unpack(unpacker(file), root));
       } catch (e) {
         console.error(e);
         continue;
@@ -90,7 +103,35 @@ function unzip(file: IFile): IFile[] {
   for (let entry in entries) {
     const data = entries[entry];
     if (!data || data.length <= 0) continue;
-    extracted.push({ data, name: path.basename(entry, true), path: entry });
+    extracted.push({
+      data,
+      name: path.basename(entry),
+      path: entry,
+      parent: file,
+    });
+  }
+
+  return extracted;
+}
+
+function untar(file: IFile): IFile[] {
+  const extracted: IFile[] = [];
+  let entries: Map<string, TarFile> | undefined;
+  if (file.data instanceof Uint8Array || file.data instanceof Buffer) {
+    entries = Tar.fromUint8Array(file.data).files;
+  } else if (file.data instanceof ArrayBuffer) {
+    entries = Tar.fromUint8Array(new Uint8Array(file.data)).files;
+  }
+
+  if (!entries) return extracted;
+
+  for (let [filePath, tarFile] of entries?.entries()) {
+    extracted.push({
+      data: tarFile.read(),
+      name: tarFile.header.name,
+      path: filePath,
+      parent: file,
+    });
   }
 
   return extracted;
