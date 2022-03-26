@@ -136,6 +136,4 @@ function editorSetContent(editor, content, removePlaceholder = true) {
   editor.undoManager.reset();
   editor.undoManager.clear();
   editor.setDirty(false);
-
-  editor.focus();
 }

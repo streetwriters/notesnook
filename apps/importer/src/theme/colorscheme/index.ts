@@ -1,4 +1,3 @@
-import Color from "color";
 import { DarkColorScheme } from "./dark";
 import { LightColorScheme } from "./light";
 
@@ -9,7 +8,7 @@ const colorSchemes = {
 
 class ColorSchemeFactory {
   static construct<TTheme extends keyof typeof colorSchemes>(theme: TTheme) {
-    return colorSchemes[theme].construct(Color("#008837"));
+    return colorSchemes[theme].construct("#008837");
   }
 }
 export default ColorSchemeFactory;

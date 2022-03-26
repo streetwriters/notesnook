@@ -6,7 +6,8 @@ export function Hero() {
     <Flex
       sx={{
         flexDirection: "column",
-        my: 150,
+        mt: 150,
+        mb: 100,
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -41,6 +42,21 @@ export function Hero() {
         >
           Notesnook Web
         </Link>
+      </Flex>
+      <Flex
+        sx={{
+          bg: "bgSecondary",
+          flexDirection: "column",
+          width: 400,
+          mt: 4,
+          p: 2,
+          borderRadius: "default",
+        }}
+      >
+        <Text variant="subtitle">What's new in v{appVersion}</Text>
+        <Text variant="body" sx={{ whiteSpace: "pre-wrap" }}>
+          {process.env.REACT_APP_CHANGELOG}
+        </Text>
       </Flex>
     </Flex>
   );

@@ -36,9 +36,12 @@ function firstLineBackspaceQuirk(editor) {
     if (e.key !== "Backspace" && e.key !== "Delete") return;
 
     const selectionStartElement = editor.selection.getStart(true);
+    const body = editor.getBody();
+    const isEmpty = body.childElementCount === 1;
     if (
-      selectionStartElement === editor.getBody().firstElementChild &&
-      !selectionStartElement.textContent.trim()
+      selectionStartElement === body.firstElementChild &&
+      !selectionStartElement.textContent.trim() &&
+      !isEmpty
     ) {
       selectionStartElement.remove();
     }
@@ -185,18 +188,14 @@ function androidGboardEnterKeyQuirk(editor) {
       e.preventDefault();
 
       const range = editor.selection.getRng();
+      if (!range.startContainer) return;
 
-      let sibling;
-      let parentElement = range.startContainer.parentElement;
+      let closestParagraph = range.startContainer.parentElement.closest("p");
+      if (!closestParagraph) return;
 
-      while (
-        parentElement.parentElement &&
-        !parentElement.parentElement.classList.contains("mce-content-body")
-      ) {
-        parentElement = parentElement.parentElement;
-      }
-      sibling = parentElement.nextElementSibling;
+      const sibling = closestParagraph.nextElementSibling;
       if (!sibling) return;
+
       editor.selection.setCursorLocation(sibling, 0);
     }
   });

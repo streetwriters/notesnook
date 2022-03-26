@@ -22,10 +22,10 @@ module.exports = {
     command: `serve __tests__/host/`,
     port: 5000,
     timeout: 60 * 1000,
-    reuseExistingServer: false, //!IS_CI,
+    reuseExistingServer: true,
   },
+
   // Look for test files in thcleare "tests" directory, relative to this configuration file
-  // testDir: "__tests__",
 
   // Each test is given 30 seconds
   timeout: 30000,

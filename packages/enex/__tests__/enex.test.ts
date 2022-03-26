@@ -15,6 +15,12 @@ tap.test("enex should be parsed correctly", async () => {
     const enexFile = fs.readFileSync(filePath, "utf-8");
     const enex = new Enex(enexFile);
     tap.matchSnapshot(toJSON(enex), path.basename(filePath));
+    enex.notes.forEach((note) => {
+      note.resources?.forEach((res) => {
+        tap.ok(res.attributes?.hash);
+        tap.ok(note.content.raw.indexOf(res.attributes?.hash!) > -1);
+      });
+    });
   }
 });
 

@@ -1,6 +1,8 @@
 import { IEnexElement } from "./types";
 import { getAsBoolean, getAsNumber, getAsString } from "./utils";
 import { HTMLElement } from "node-html-parser";
+import SparkMD5 from "spark-md5";
+import {decode} from "base64-arraybuffer"
 
 enum MimeTypes {
   GIF = "image/gif",
@@ -53,7 +55,7 @@ export class Resource implements IEnexElement {
     );
     if (!resourceAttributeElement) return null;
 
-    return new ResourceAttributes(resourceAttributeElement);
+    return new ResourceAttributes(this.data, resourceAttributeElement);
   }
 
   validate() {
@@ -63,8 +65,10 @@ export class Resource implements IEnexElement {
 
 class ResourceAttributes {
   #resourceAttributesElement: HTMLElement;
-  constructor(resourceAttributesElement: HTMLElement) {
+  #resourceData: string;
+  constructor(resourceData: string, resourceAttributesElement: HTMLElement) {
     this.#resourceAttributesElement = resourceAttributesElement;
+    this.#resourceData = resourceData;
   }
 
   get latitude(): number | null {
@@ -84,12 +88,8 @@ class ResourceAttributes {
   }
 
   get hash(): string | null {
-    if (!this.sourceUrl) return null;
-    const parts = this.sourceUrl.split("+");
-    if (parts.length < 4) return null;
-    const hash = parts[2];
-    if (hash.length !== 32) return null;
-    return hash;
+    if (!this.#resourceData) return null;
+    return SparkMD5.ArrayBuffer.hash(decode(this.#resourceData));
   }
 
   get cameraMake(): string | null {

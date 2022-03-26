@@ -1,38 +1,73 @@
-const { addPluginToPluginManager } = require("../utils");
+const { addPluginToPluginManager, notifyEditorChange } = require("../utils");
 
 const COLLAPSED_KEY = "c";
 const HIDDEN_KEY = "h";
-const collapsibleTags = { HR: 1, H2: 2, H3: 3, H4: 4, H5: 5 };
+const collapsibleTags = { H1: 1, HR: 2, H2: 3, H3: 4, H4: 5, H5: 6, H6: 7 };
 
 function register(editor) {
-  editor.on("mousedown touchstart", function (e) {
-    const { target } = e;
-    if (
-      e.offsetX < 0 &&
-      collapsibleTags[target.tagName] &&
-      target.parentElement.tagName === "DIV"
-    ) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-      editor.undoManager.transact(() => {
+  let shouldCancelNextTouchEndEvent = false;
+  editor.on(
+    "mousedown touchstart",
+    function(e) {
+      const { target } = e;
+      const isTouchDevice = e.targetTouches;
+      let triggerOffset = 0;
+      let offsetX;
+
+      if (isTouchDevice) {
+        if (e.targetTouches.length !== 1) return;
+        triggerOffset = 15;
+        offsetX = e.targetTouches[0].clientX;
+      } else {
+        offsetX = e.offsetX;
+      }
+      if (
+        offsetX < triggerOffset &&
+        collapsibleTags[target.tagName] &&
+        (target.parentElement.tagName === "DIV" ||
+          target.parentElement.tagName === "BODY")
+      ) {
+        shouldCancelNextTouchEndEvent = true;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        e.stopPropagation();
         if (target.classList.contains(COLLAPSED_KEY)) {
           target.classList.remove(COLLAPSED_KEY);
         } else {
           target.classList.add(COLLAPSED_KEY);
         }
         collapseElement(target);
-      });
+        notifyEditorChange(editor, "headingCollapsed");
+      }
+    },
+    {
+      capture: true,
+      passive: false,
     }
-  });
+  );
 
-  editor.on("NewBlock", function (event) {
+  editor.on(
+    "touchend",
+    (e) => {
+      if (shouldCancelNextTouchEndEvent) {
+        e.preventDefault();
+        shouldCancelNextTouchEndEvent = false;
+      }
+    },
+    {
+      capture: true,
+      passive: false,
+    }
+  );
+
+  editor.on("NewBlock", function(event) {
     const { newBlock } = event;
     if (!newBlock) return;
     const target = newBlock.previousElementSibling;
     if (target && target.classList.contains(COLLAPSED_KEY)) {
       target.classList.remove(COLLAPSED_KEY);
       collapseElement(target);
+      notifyEditorChange(editor, "headingCollapsed");
     }
   });
 }

@@ -6,11 +6,11 @@ function register(editor) {
   editor.ui.registry.addToggleButton("inlinecode", {
     icon: "sourcecode",
     tooltip: "Inline code",
-    onAction: function () {
+    onAction: function() {
       return toggleInlineCode(editor);
     },
-    onSetup: function (api) {
-      var nodeChangeHandler = function (e) {
+    onSetup: function(api) {
+      var nodeChangeHandler = function(e) {
         if (
           e.element.tagName === TAGNAME &&
           !e.element.innerHTML.trim().length
@@ -21,13 +21,13 @@ function register(editor) {
       };
 
       editor.on("NodeChange", nodeChangeHandler);
-      return function () {
-        return editor.off("NodeChange", nodeChangeHandler);
+      return function() {
+        editor.off("NodeChange", nodeChangeHandler);
       };
     },
   });
 
-  editor.addCommand("mceInsertInlineCode", function () {
+  editor.addCommand("mceInsertInlineCode", function() {
     toggleInlineCode(editor);
   });
 }
@@ -38,11 +38,20 @@ function toggleInlineCode(editor) {
     const range = editor.selection.getRng();
     const node = editor.selection.getNode();
 
-    if (node.tagName !== TAGNAME && range.startOffset === range.endOffset) {
-      editor.selection.setContent(`<code spellcheck="false">&#xFEFF;</code>`);
+    if (!!node.closest("code")) {
+      editor.execCommand("mceToggleFormat", false, "code");
+    } else if (
+      node.tagName !== TAGNAME &&
+      range.startOffset === range.endOffset
+    ) {
+      editor.selection.setContent(
+        `<code spellcheck="false">&#xFEFF;</code>&#xFEFF;`
+      );
     } else {
       const content = editor.selection.getContent();
-      editor.selection.setContent(`<code spellcheck="false">${content}</code>`);
+      editor.selection.setContent(
+        `<code spellcheck="false">${content}</code>&#xFEFF;`
+      );
     }
   });
 }

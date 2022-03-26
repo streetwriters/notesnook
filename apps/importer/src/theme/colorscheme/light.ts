@@ -1,10 +1,10 @@
-import Color from "color";
+import { colord } from "colord";
 import { StaticColors } from "./static";
 
 export class LightColorScheme {
-  static construct(accent: Color) {
+  static construct(accent: string) {
     return {
-      primary: accent.hex().toString(),
+      primary: colord(accent).toHex(),
       background: "white",
       bgTransparent: "#ffffff99",
       accent: "white",
@@ -20,7 +20,9 @@ export class LightColorScheme {
       secondary: "white",
       icon: "#3b3b3b",
       disabled: "#9b9b9b",
-      placeholder: Color("#000000").alpha(0.6).hex().toString(),
+      placeholder: colord("#000000")
+        .alpha(0.6)
+        .toHex(),
       ...StaticColors.construct(accent),
     };
   }

@@ -9,6 +9,14 @@
       "path": "apps/importer"
     },
     {
+      "name": "🚀 @notesnook/vericrypt",
+      "path": "apps/vericrypt"
+    },
+    {
+      "name": "📦 @notesnook/crypto",
+      "path": "packages/crypto"
+    },
+    {
       "name": "📦 @notesnook/enex",
       "path": "packages/enex"
     },
@@ -21,7 +29,7 @@
       "path": "packages/onenote"
     },
     {
-      "name": "📦 @streetwritersco/tinymce-plugins",
+      "name": "📦 @streetwriters/tinymce-plugins",
       "path": "packages/tinymce-plugins"
     }
   ],
