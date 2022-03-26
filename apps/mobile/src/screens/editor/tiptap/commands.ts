@@ -54,6 +54,18 @@ statusBar.current.set({date:"",saved:""});
 
   setStatus = (date: string | undefined, saved: string) =>
     call(this.ref, fn(`statusBar.current.set({date:"${date}",saved:"${saved}"})`));
+
+  setPlaceholder = (placeholder: string) => {
+    call(
+      this.ref,
+      fn(`
+    const element = document.querySelector(".is-editor-empty");
+    if (element) {
+      element.setAttribute("data-placeholder","${placeholder}");
+    }
+    `)
+    );
+  };
 }
 
 export default Commands;

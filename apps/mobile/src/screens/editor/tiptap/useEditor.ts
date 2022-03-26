@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import WebView from 'react-native-webview';
 import { DDS } from '../../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
+import { TipManager } from '../../../services/tip-manager';
 import { useEditorStore } from '../../../stores/stores';
 import { useThemeStore } from '../../../stores/theme';
 import { db } from '../../../utils/database';
@@ -48,6 +49,8 @@ export const useEditor = () => {
   const sessionHistoryId = useRef<number>();
   const state = useRef<Partial<EditorState>>(defaultState);
   console.log('state: ', defaultState);
+  const placeholderTip = useRef(TipManager.placeholderTip());
+
   const postMessage = useCallback(
     async (type: string, data: any) => await post(editorRef, type, data),
     []
@@ -102,6 +105,8 @@ export const useEditor = () => {
     currentContent.current = null;
     useEditorStore.getState().setCurrentlyEditingNote(null);
     commands.clearContent();
+    placeholderTip.current = TipManager.placeholderTip();
+    commands.setPlaceholder(placeholderTip.current);
   }, []);
 
   const saveNote = useCallback(
@@ -306,6 +311,7 @@ export const useEditor = () => {
       console.log('force reload note');
       loadNote({ ...currentNote.current, forced: true });
     } else {
+      commands.setPlaceholder(placeholderTip.current);
       restoreEditorState();
     }
   }, [state, currentNote, loadNote]);

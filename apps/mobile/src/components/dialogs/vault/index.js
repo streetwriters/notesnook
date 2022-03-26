@@ -34,6 +34,7 @@ import Seperator from '../../ui/seperator';
 import { Toast } from '../../toast';
 import Paragraph from '../../ui/typography/paragraph';
 import SearchService from '../../../services/search';
+import { editorController } from '../../../screens/editor/tiptap/utils';
 
 let Keychain;
 const passInputRef = createRef();
@@ -390,7 +391,7 @@ export class VaultDialog extends Component {
       return;
     } else {
       await db.vault.add(this.state.note.id);
-      if (this.state.note.id === getNote()?.id) {
+      if (this.state.note.id === editorController.current?.note?.id) {
         eSendEvent(eClearEditor);
       }
       this.close();
@@ -500,7 +501,7 @@ export class VaultDialog extends Component {
     }
     if (this.state.note?.id) {
       await db.vault.add(this.state.note.id);
-      if (this.state.note.id === getNote()?.id) {
+      if (this.state.note.id === editorController.current?.note?.id) {
         eSendEvent(eClearEditor);
       }
       this.setState({

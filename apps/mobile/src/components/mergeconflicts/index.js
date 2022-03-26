@@ -30,6 +30,7 @@ import DialogContainer from '../dialog/dialog-container';
 import DialogHeader from '../dialog/dialog-header';
 import Seperator from '../ui/seperator';
 import Paragraph from '../ui/typography/paragraph';
+import { editorController } from '../../screens/editor/tiptap/utils';
 
 const primaryWebView = createRef();
 const secondaryWebView = createRef();
@@ -161,7 +162,7 @@ const MergeConflicts = () => {
       Navigation.routeNames.Favorites,
       Navigation.routeNames.Notes
     ]);
-    if (getNote()?.id === note.id) {
+    if (editorController.current?.note?.id === note.id) {
       updateNoteInEditor();
     }
     close();

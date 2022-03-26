@@ -1,19 +1,18 @@
 import React, { useRef } from 'react';
-import { Alert, Platform, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
-import { useThemeStore } from '../../stores/theme';
-import { useEditorStore } from '../../stores/stores';
+import { getNote, sourceUri } from '../../screens/editor/Functions';
+import { editorController } from '../../screens/editor/tiptap/utils';
 import { eSendEvent, ToastEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
+import { useEditorStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
 import { db } from '../../utils/database';
 import { eCloseProgressDialog, eOnLoadNote } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
 import { normalize } from '../../utils/size';
-import { getNote, sourceUri } from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
-import { IconButton } from '../ui/icon-button';
-import { Button } from '../ui/button';
 import DialogHeader from '../dialog/dialog-header';
+import { Button } from '../ui/button';
 import Paragraph from '../ui/typography/paragraph';
 
 export default function NotePreview({ session, content }) {
@@ -72,8 +71,8 @@ export default function NotePreview({ session, content }) {
   async function restore() {
     await db.noteHistory.restore(session.id);
     if (useEditorStore.getState()?.currentEditingNote === session?.noteId) {
-      if (getNote()) {
-        eSendEvent(eOnLoadNote, { ...getNote(), forced: true });
+      if (editorController.current?.note) {
+        eSendEvent(eOnLoadNote, { ...editorController.current?.note, forced: true });
       }
     }
     eSendEvent(eCloseProgressDialog, 'note_history');

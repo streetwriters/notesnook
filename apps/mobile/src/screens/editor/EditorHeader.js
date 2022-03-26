@@ -1,6 +1,6 @@
 import { EV, EVENTS } from 'notes-core/common';
 import React, { useEffect, useRef } from 'react';
-import { BackHandler, InteractionManager, Keyboard, Platform, Vibration, View } from 'react-native';
+import { BackHandler, InteractionManager, Platform, Vibration, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
 import { Properties } from '../../components/properties';
@@ -15,7 +15,6 @@ import {
 import Navigation from '../../services/navigation';
 import { useEditorStore, useSettingStore, useUserStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
-import { editing } from '../../utils';
 import umami from '../../utils/analytics';
 import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
@@ -30,13 +29,12 @@ import {
 } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { EditorTitle } from './EditorTitle';
-import { clearEditor, getNote, setColors, startClosingSession } from './Functions';
 import { ProgressCircle } from './ProgressCircle';
-import tiny, { safeKeyboardDismiss } from './tiny/tiny';
+import { safeKeyboardDismiss } from './tiny/tiny';
 import { endSearch } from './tiny/toolbar/commands';
 import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
-import { editorState } from './tiptap/utils';
+import { editorController, editorState } from './tiptap/utils';
 
 const EditorHeader = ({ editor }) => {
   const colors = useThemeStore(state => state.colors);
@@ -114,7 +112,7 @@ const EditorHeader = ({ editor }) => {
       return;
     }
 
-    let note = getNote() && db.notes.note(getNote().id).data;
+    let note = db.notes.note(editorController.current?.note?.id)?.data;
     if (note.locked) {
       ToastEvent.show({
         heading: 'Locked notes cannot be published',
@@ -131,7 +129,7 @@ const EditorHeader = ({ editor }) => {
   };
 
   const showActionsheet = async () => {
-    let note = getNote() && db.notes.note(getNote().id).data;
+    let note = db.notes.note(editorController.current?.note?.id)?.data;
 
     if (!note) {
       ToastEvent.show({

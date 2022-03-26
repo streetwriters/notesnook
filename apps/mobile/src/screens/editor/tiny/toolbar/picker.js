@@ -12,7 +12,7 @@ import { db } from '../../../../utils/database';
 import { eCloseProgressDialog } from '../../../../utils/events';
 import { sleep } from '../../../../utils/time';
 import { EditorWebView, getNote } from '../../Functions';
-import { editorState } from '../../tiptap/utils';
+import { editorController, editorState } from '../../tiptap/utils';
 import tiny, { safeKeyboardDismiss } from '../tiny';
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
@@ -338,7 +338,7 @@ async function attachFile(uri, hash, type, filename, options) {
     } else {
       encryptionInfo = { hash: hash };
     }
-    await db.attachments.add(encryptionInfo, getNote()?.id);
+    await db.attachments.add(encryptionInfo, editorController.current?.note?.id);
     if (Platform.OS === 'ios') await RNFetchBlob.fs.unlink(uri);
 
     return true;

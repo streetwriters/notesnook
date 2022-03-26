@@ -18,7 +18,7 @@ import { eOnLoadNote, eOpenAddTopicDialog, refreshNotesPage } from '../../utils/
 import { openLinkInBrowser } from '../../utils/functions';
 import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../editor/Functions';
-import { editorState } from '../editor/tiptap/utils';
+import { editorController, editorState } from '../editor/tiptap/utils';
 
 const getNotes = (params, group = true) => {
   if (!params) return [];
@@ -189,7 +189,7 @@ export const Notes = ({ route, navigation }) => {
     }
     setActionAfterFirstSave();
     if (!DDS.isTab) {
-      if (getNote()) {
+      if (editorController.current?.note) {
         eSendEvent(eOnLoadNote, { type: 'new' });
         editorState().currentlyEditing = true;
         editorState().movedAway = false;

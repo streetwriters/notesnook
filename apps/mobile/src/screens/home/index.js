@@ -14,7 +14,7 @@ import { db } from '../../utils/database';
 import { eOnLoadNote } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../editor/Functions';
-import { editorState } from '../editor/tiptap/utils';
+import { editorController, editorState } from '../editor/tiptap/utils';
 
 export const Home = ({ navigation }) => {
   const notes = useNoteStore(state => state.notes);
@@ -82,7 +82,7 @@ export const Home = ({ navigation }) => {
 
   const _onPressBottomButton = React.useCallback(async () => {
     if (!DDS.isTab) {
-      if (getNote()) {
+      if (!editorController.current?.note) {
         eSendEvent(eOnLoadNote, { type: 'new' });
         editorState().currentlyEditing = true;
         editorState().movedAway = false;

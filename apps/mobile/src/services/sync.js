@@ -5,6 +5,7 @@ import { doInBackground } from '../utils';
 import { db } from '../utils/database';
 import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
 import { ToastEvent } from './event-manager';
+import { editorController } from '../screens/editor/tiptap/utils';
 
 const run = async (context = 'global', forced = false, full = true) => {
   let result = false;
@@ -59,7 +60,7 @@ const run = async (context = 'global', forced = false, full = true) => {
   } finally {
     userstore.setLastSynced(await db.lastSynced());
     initialize();
-    if (getNote()?.id) {
+    if (editorController.current?.note?.id) {
       await updateNoteInEditor();
     }
     userstore.setSyncing(false);

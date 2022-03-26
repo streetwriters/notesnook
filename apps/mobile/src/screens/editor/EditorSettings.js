@@ -19,6 +19,7 @@ import { sleep } from '../../utils/time';
 import { EditorWebView, getNote } from './Functions';
 import tiny from './tiny/tiny';
 import ToggleSwitch from 'toggle-switch-react-native';
+import { editorController } from './tiptap/utils';
 
 export const EditorSettings = () => {
   const colors = useThemeStore(state => state.colors);
@@ -144,7 +145,7 @@ export const EditorSettings = () => {
           changeDirection(${settings.directionality === 'rtl' ? false : true})
         `
         );
-        eSendEvent('loadingNote', getNote());
+        eSendEvent('loadingNote', editorController.current?.note);
         await sleep(100);
         EditorWebView.current?.reload();
       }
