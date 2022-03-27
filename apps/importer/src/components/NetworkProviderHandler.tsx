@@ -33,6 +33,10 @@ export function NetworkProviderHandler(props: NetworkProviderHandlerProps) {
         result = await provider.process({
           ...settings,
           clientId: "4952c7cf-9c02-4fb7-b867-b87727bb52d8",
+          redirectUri:
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:3000"
+              : "https://importer.notesnook.com",
           report: setProgress,
         });
       }
