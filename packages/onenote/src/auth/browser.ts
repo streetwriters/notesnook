@@ -11,7 +11,7 @@ function getClient(config: AuthConfig): PublicClientApplication {
     client = new PublicClientApplication({
       auth: {
         clientId: config.clientId,
-        redirectUri: "http://localhost:3000/",
+        redirectUri: config.redirectUri,
       },
       cache: {
         cacheLocation: "localStorage",
