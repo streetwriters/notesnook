@@ -20,6 +20,7 @@ import { ElementHandler } from "./elementhandlers";
 
 type OneNoteSettings = ProviderSettings & {
   clientId: string;
+  redirectUri?: string;
   report?: (message: string) => void;
 };
 
@@ -34,7 +35,7 @@ export class OneNote implements INetworkProvider<OneNoteSettings> {
 
     const progressCache: Record<string, ProgressPayload> = {};
     const client = new OneNoteClient(
-      { clientId: settings.clientId },
+      { clientId: settings.clientId, redirectUri: settings.redirectUri },
       {
         error: (e) => {
           errors.push(e);
