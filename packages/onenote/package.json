@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/onenote",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A fully type-safe OneNote API client for NodeJS & browser to recursively download all OneNote notebooks.",
   "main": "dist/index.js",
   "devDependencies": {
