@@ -15,17 +15,17 @@ export default class CachedCollection extends IndexedCollection {
     let data = await this.indexer.readMulti(this.indexer.indices);
     if (this.map && this.map.dispose) this.map.dispose();
 
-    const encryptionKey =
-      this.encryptionKeyFactory && (await this.encryptionKeyFactory());
-    if (encryptionKey) {
-      for (let item of data) {
-        const [_key, value] = item;
-        const decryptedValue = JSON.parse(
-          await this.indexer.decrypt(encryptionKey, value)
-        );
-        item[1] = decryptedValue;
-      }
-    }
+    // const encryptionKey =
+    //   this.encryptionKeyFactory && (await this.encryptionKeyFactory());
+    // if (encryptionKey) {
+    //   for (let item of data) {
+    //     const [_key, value] = item;
+    //     const decryptedValue = JSON.parse(
+    //       await this.indexer.decrypt(encryptionKey, value)
+    //     );
+    //     item[1] = decryptedValue;
+    //   }
+    // }
 
     this.map = new MapStub.Map(data, this.type);
   }

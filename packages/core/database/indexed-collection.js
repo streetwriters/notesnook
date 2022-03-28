@@ -37,17 +37,19 @@ export default class IndexedCollection {
     delete item.remote;
     delete item.migrated;
 
-    if (await this.getEncryptionKey()) {
-      const encrypted = await this.indexer.encrypt(
-        await this.getEncryptionKey(),
-        JSON.stringify(item)
-      );
-      encrypted.dateModified = item.dateModified;
-      encrypted.localOnly = item.localOnly;
-      encrypted.migrated = item.migrated;
-      encrypted.id = item.id;
-      await this.indexer.write(item.id, encrypted);
-    } else await this.indexer.write(item.id, item);
+    // if (await this.getEncryptionKey()) {
+    //   const encrypted = await this.indexer.encrypt(
+    //     await this.getEncryptionKey(),
+    //     JSON.stringify(item)
+    //   );
+    //   encrypted.dateModified = item.dateModified;
+    //   encrypted.localOnly = item.localOnly;
+    //   encrypted.migrated = item.migrated;
+    //   encrypted.id = item.id;
+    //   await this.indexer.write(item.id, encrypted);
+    // } else
+
+    await this.indexer.write(item.id, item);
   }
 
   removeItem(id) {
@@ -72,11 +74,12 @@ export default class IndexedCollection {
     const item = await this.indexer.read(id);
     if (!item) return;
 
-    if ((await this.getEncryptionKey()) && item.iv && item.cipher) {
-      return JSON.parse(
-        await this.indexer.decrypt(await this.getEncryptionKey(), item)
-      );
-    } else return item;
+    // if ((await this.getEncryptionKey()) && item.iv && item.cipher) {
+    //   return JSON.parse(
+    //     await this.indexer.decrypt(await this.getEncryptionKey(), item)
+    //   );
+    // } else
+    return item;
   }
 
   async getItems(indices) {
