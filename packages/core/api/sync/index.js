@@ -48,7 +48,7 @@ const ITEM_TYPE_MAP = {
   attachments: "attachment",
   content: "content",
   notes: "note",
-  notebooks: "notebooks",
+  notebooks: "notebook",
   settings: "settings",
 };
 
@@ -177,7 +177,7 @@ export default class Sync {
         if (!item) {
           continue;
         }
-
+        console.log(item, type, array);
         if (await this.sendItemToServer(type, item, lastSynced)) {
           await this._queue.dequeue(id);
           sendSyncProgressEvent("upload", total, i + 1);

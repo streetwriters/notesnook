@@ -59,6 +59,11 @@ class RealtimeMerger {
       attachment: {
         set: async (item) => {
           const remoteAttachment = await this._deserialize(item);
+          if (remoteAttachment.deleted) {
+            await this._db.attachments.merge(remoteAttachment);
+            return;
+          }
+
           const localAttachment = this._db.attachments.attachment(
             remoteAttachment.metadata.hash
           );

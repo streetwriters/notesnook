@@ -61,15 +61,28 @@ class Collector {
     }, []);
   }
 
-  _map(item) {
+  // _map(item) {
+  //   return {
+  //     id: item.id,
+  //     v: CURRENT_DATABASE_VERSION,
+  //     iv: item.iv,
+  //     cipher: item.cipher,
+  //     length: item.length,
+  //     alg: item.alg,
+  //     dateModified: item.dateModified,
+  //   };
+  // }
+
+  async _map(item) {
+    // in case of resolved content
+    delete item.resolved;
+    // turn the migrated flag off so we don't keep syncing this item repeated
+    delete item.migrated;
+
     return {
       id: item.id,
       v: CURRENT_DATABASE_VERSION,
-      iv: item.iv,
-      cipher: item.cipher,
-      length: item.length,
-      alg: item.alg,
-      dateModified: item.dateModified,
+      ...(await this._serialize(item)),
     };
   }
 
