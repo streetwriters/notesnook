@@ -77,9 +77,13 @@ export default class Sync {
       await this._connection.stop();
     });
 
-    this._connection.on("SyncItem", async (type, item, current, total) => {
+    let ignoredIds = {};
+    this._connection.on("SyncItem", async (type, itemJSON, current, total) => {
+      const item = JSON.parse(itemJSON);
+      ignoredIds[item.id] = true;
+
       this.stopAutoSync();
-      await this._realtimeMerger.mergeItem(type, JSON.parse(item));
+      await this._realtimeMerger.mergeItem(type, item);
       EV.publish(EVENTS.appRefreshRequested);
       console.log("sync item", type, item, current, total);
       sendSyncProgressEvent("download", total, current);
@@ -87,7 +91,8 @@ export default class Sync {
     });
 
     this._connection.on("RemoteSyncCompleted", async () => {
-      await this._realTimeSync(false, false);
+      await this._realTimeSync(false, false, ignoredIds);
+      ignoredIds = {};
     });
   }
 
@@ -136,7 +141,7 @@ export default class Sync {
     await this.startAutoSync();
   }
 
-  async _realTimeSync(full, force) {
+  async _realTimeSync(full, force, ignoredIds) {
     console.log("STARTING REALTIME SYNC");
     if (this._connection.state !== signalr.HubConnectionState.Connected)
       await this._connection.start();
@@ -179,6 +184,8 @@ export default class Sync {
       const total = itemIds.length;
       for (let i = 0; i < total; ++i) {
         const id = itemIds[i];
+        if (ignoredIds && ignoredIds[id]) continue;
+
         const [arrayKey, itemId] = id.split(":");
 
         const array = data[arrayKey] || [];
