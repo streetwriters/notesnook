@@ -81,9 +81,13 @@ export default class Sync {
       this.stopAutoSync();
       await this._realtimeMerger.mergeItem(type, JSON.parse(item));
       EV.publish(EVENTS.appRefreshRequested);
-      console.log("sync item", item, current, total);
+      console.log("sync item", type, item, current, total);
       sendSyncProgressEvent("download", total, current);
       await this.startAutoSync();
+    });
+
+    this._connection.on("RemoteSyncCompleted", async () => {
+      await this._realTimeSync(false, false);
     });
   }
 
@@ -133,6 +137,7 @@ export default class Sync {
   }
 
   async _realTimeSync(full, force) {
+    console.log("STARTING REALTIME SYNC");
     if (this._connection.state !== signalr.HubConnectionState.Connected)
       await this._connection.start();
 
@@ -193,10 +198,14 @@ export default class Sync {
 
       if (!(await this._connection.invoke("SyncCompleted", lastSynced)))
         lastSynced = oldLastSynced;
-    } else if (serverResponse) lastSynced = serverResponse.lastSynced;
-    else lastSynced = oldLastSynced;
+    } else if (serverResponse) {
+      lastSynced = serverResponse.lastSynced;
+    } else {
+      lastSynced = oldLastSynced;
+    }
 
     await this._db.storage.write("lastSynced", lastSynced);
+    console.log("REALTIME SYNC DONE!");
     return true;
   }
 
