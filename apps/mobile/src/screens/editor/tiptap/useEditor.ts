@@ -79,13 +79,16 @@ export const useEditor = () => {
     timers.current[id] = setTimeout(fn, duration);
   }, []);
 
-  const reset = useCallback(async () => {
+  const reset = useCallback(async (resetState = true) => {
     currentNote.current = null;
     currentContent.current = null;
-    useEditorStore.getState().setCurrentlyEditingNote(null);
     await commands.clearContent();
-    placeholderTip.current = TipManager.placeholderTip();
-    await commands.setPlaceholder(placeholderTip.current);
+    console.log('reset state: ', resetState);
+    if (resetState) {
+      useEditorStore.getState().setCurrentlyEditingNote(null);
+      placeholderTip.current = TipManager.placeholderTip();
+      await commands.setPlaceholder(placeholderTip.current);
+    }
   }, []);
 
   const saveNote = useCallback(
@@ -201,13 +204,13 @@ export const useEditor = () => {
         await commands.focus();
       } else {
         if (!item.forced && currentNote.current?.id === item.id) return;
+        editorState.setCurrentlyEditingNote(item.id);
         overlay(true, item);
-        currentNote.current && (await reset());
+        currentNote.current && (await reset(false));
         await loadContent(item);
         let nextSessionId = makeSessionId(item);
         setSessionId(nextSessionId);
         await commands.setSessionId(nextSessionId);
-        editorState.setCurrentlyEditingNote(item.id);
         currentNote.current = item;
         await commands.setStatus(timeConverter(item.dateEdited), 'Saved');
         await postMessage(EditorEvents.title, item.title);
