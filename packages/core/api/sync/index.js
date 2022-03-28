@@ -73,10 +73,15 @@ export default class Sync {
       })
       .build();
 
+    EV.subscribe(EVENTS.userLoggedOut, async () => {
+      await this._connection.stop();
+    });
+
     this._connection.on("SyncItem", async (type, item, current, total) => {
       this.stopAutoSync();
       await this._realtimeMerger.mergeItem(type, JSON.parse(item));
       EV.publish(EVENTS.appRefreshRequested);
+      console.log("sync item", item, current, total);
       sendSyncProgressEvent("download", total, current);
       await this.startAutoSync();
     });
