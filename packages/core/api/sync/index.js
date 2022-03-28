@@ -77,22 +77,34 @@ export default class Sync {
       await this._connection.stop();
     });
 
-    let ignoredIds = {};
-    this._connection.on("SyncItem", async (type, itemJSON, current, total) => {
-      const item = JSON.parse(itemJSON);
-      ignoredIds[item.id] = true;
+    let syncs = {};
+    this._connection.on(
+      "SyncItem",
+      async (syncId, type, itemJSON, current, total) => {
+        const ignoredIds = (syncs[syncId] = syncs[syncId] || {});
 
-      this.stopAutoSync();
-      await this._realtimeMerger.mergeItem(type, item);
-      EV.publish(EVENTS.appRefreshRequested);
-      console.log("sync item", type, item, current, total);
-      sendSyncProgressEvent("download", total, current);
-      await this.startAutoSync();
-    });
+        const item = JSON.parse(itemJSON);
+        ignoredIds[item.id] = true;
 
-    this._connection.on("RemoteSyncCompleted", async () => {
+        this.stopAutoSync();
+        await this._realtimeMerger.mergeItem(type, item);
+        EV.publish(EVENTS.appRefreshRequested);
+
+        sendSyncProgressEvent("download", total, current);
+        await this.startAutoSync();
+      }
+    );
+
+    this._connection.on("RemoteSyncCompleted", async (syncId) => {
+      const ignoredIds = syncs[syncId];
+      console.log(
+        "Remote sync completed",
+        ignoredIds,
+        this._connection.connectionId
+      );
+
       await this._realTimeSync(false, false, ignoredIds);
-      ignoredIds = {};
+      syncs[syncId] = {};
     });
   }
 
@@ -142,7 +154,7 @@ export default class Sync {
   }
 
   async _realTimeSync(full, force, ignoredIds) {
-    console.log("STARTING REALTIME SYNC");
+    console.log("STARTING REALTIME SYNC", ignoredIds);
     if (this._connection.state !== signalr.HubConnectionState.Connected)
       await this._connection.start();
 
@@ -184,9 +196,9 @@ export default class Sync {
       const total = itemIds.length;
       for (let i = 0; i < total; ++i) {
         const id = itemIds[i];
-        if (ignoredIds && ignoredIds[id]) continue;
-
         const [arrayKey, itemId] = id.split(":");
+
+        if (ignoredIds && ignoredIds[itemId]) continue;
 
         const array = data[arrayKey] || [];
         const item = array.find((item) => item.id === itemId);
@@ -194,7 +206,6 @@ export default class Sync {
         if (!item) {
           continue;
         }
-        console.log(item, type, array);
         if (await this.sendItemToServer(type, item, lastSynced)) {
           await this._queue.dequeue(id);
           sendSyncProgressEvent("upload", total, i + 1);
