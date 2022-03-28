@@ -41,7 +41,8 @@ export default class Notes extends Collection {
 
     if (oldNote) note.contentId = oldNote.contentId;
 
-    if (!oldNote && !noteArg.content && !noteArg.contentId) return;
+    if (!oldNote && !noteArg.content && !noteArg.contentId && !noteArg.title)
+      return;
 
     if (noteArg.content && noteArg.content.data && noteArg.content.type) {
       const { type, data } = noteArg.content;
@@ -60,6 +61,13 @@ export default class Notes extends Collection {
 
       note.headline = getNoteHeadline(note, content);
       if (oldNote) note.dateEdited = Date.now();
+    }
+
+    if (noteArg.localOnly !== undefined) {
+      await this._db.content.add({
+        id: note.contentId,
+        localOnly: !!noteArg.localOnly,
+      });
     }
 
     const noteTitle = getNoteTitle(note, oldNote);
@@ -82,13 +90,15 @@ export default class Notes extends Collection {
       favorite: !!note.favorite,
       localOnly: !!note.localOnly,
       conflicted: !!note.conflicted,
+      readonly: !!note.readonly,
 
       dateCreated: note.dateCreated,
       dateEdited: note.dateEdited || note.dateCreated || Date.now(),
       dateModified: note.dateModified,
     };
 
-    await this.merge(note);
+    await this._resolveColorAndTags(note);
+    await this._collection.addItem(note);
     return note.id;
   }
 
@@ -193,6 +203,15 @@ export default class Notes extends Collection {
       if (itemData.color) {
         await this._db.colors.untag(itemData.color, id);
       }
+
+      const attachments = this._db.attachments.ofNote(itemData.id, "all");
+      for (let attachment of attachments) {
+        await this._db.attachments.delete(
+          attachment.metadata.hash,
+          itemData.id
+        );
+      }
+
       // await this._collection.removeItem(id);
       if (moveToTrash) await this._db.trash.add(itemData);
       else {

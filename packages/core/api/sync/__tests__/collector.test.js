@@ -43,11 +43,12 @@ test("note edited before last synced time should not get included in collector",
     expect(data.notes.length).toBe(0);
   }));
 
-test("localOnly note should not get included in collector", () =>
+test("localOnly note should get included as a deleted item in collector", () =>
   databaseTest().then(async (db) => {
     await db.notes.add({ ...TEST_NOTE, localOnly: true });
 
     const data = await db.syncer._collector.collect(0);
 
-    expect(data.notes.length).toBe(0);
+    expect(data.notes.length).toBe(1);
+    expect(data.notes[0].cipher.includes(`"deleted":true`)).toBe(true);
   }));

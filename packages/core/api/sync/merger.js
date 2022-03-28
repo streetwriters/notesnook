@@ -48,6 +48,7 @@ class Merger {
   async _mergeItem(remoteItem, get, add) {
     remoteItem = await this._deserialize(remoteItem);
     let localItem = await get(remoteItem.id);
+    if (localItem && localItem.localOnly) return;
 
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
       await add(remoteItem);
@@ -64,6 +65,7 @@ class Merger {
   async _mergeItemWithConflicts(remoteItem, get, add, markAsConflicted) {
     remoteItem = await this._deserialize(remoteItem);
     let localItem = await get(remoteItem.id);
+    if (localItem && localItem.localOnly) return;
 
     if (!localItem) {
       await add(remoteItem);
@@ -127,6 +129,11 @@ class Merger {
 
     await this._mergeArrayWithConflicts(attachments, async (item) => {
       const remoteAttachment = await this._deserialize(item);
+      if (remoteAttachment.deleted) {
+        await this._db.attachments.merge(remoteAttachment);
+        return;
+      }
+
       const localAttachment = this._db.attachments.attachment(
         remoteAttachment.metadata.hash
       );
@@ -159,13 +166,21 @@ class Merger {
 
     await this._mergeArray(
       notes,
-      (id) => this._db.notes.note(id),
+      (id) => {
+        const note = this._db.notes.note(id);
+        if (note) return note.data;
+        return;
+      },
       (item) => this._db.notes.merge(item)
     );
 
     await this._mergeArray(
       notebooks,
-      (id) => this._db.notebooks.notebook(id),
+      (id) => {
+        const notebook = this._db.notebooks.notebook(id);
+        if (notebook) return notebook.data;
+        return;
+      },
       (item) => this._db.notebooks.merge(item)
     );
 
@@ -179,17 +194,27 @@ class Merger {
           if (!note || !note.data) return;
           note = note.data;
 
-          // if hashes are equal do nothing
-          if (
-            !note.locked &&
-            (!remote ||
-              !local ||
+          const isRemoteObject = typeof remote.data === "object";
+          const isLocalObject = typeof local.data === "object";
+          const localHash = isLocalObject ? null : SparkMD5.hash(local.data);
+          const remoteHash = isRemoteObject ? null : SparkMD5.hash(remote.data);
+          if (!note.locked) {
+            // reject all invalid states
+            if (
+              isRemoteObject || // no point in accepting invalid remote object
               !local.data ||
               !remote.data ||
-              remote.data === "undefined" || //TODO not sure about this
-              SparkMD5.hash(local.data) === SparkMD5.hash(remote.data))
-          )
-            return;
+              localHash === remoteHash
+            )
+              return;
+
+            // if we have an invalid content locally but the remote one is valid,
+            // let's accept the remote content.
+            if (isLocalObject && !isRemoteObject) {
+              await this._db.content.add({ id: local.id, ...remote });
+              return;
+            }
+          }
 
           if (remote.deleted || local.deleted || note.locked) {
             // if note is locked or content is deleted we keep the most recent version.

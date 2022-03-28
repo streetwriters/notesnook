@@ -69,6 +69,18 @@ class Tiny {
     return this.document.outerHTML || this.document.body.innerHTML;
   }
 
+  removeAttachments(hashes) {
+    const query = hashes.map((h) => `[data-hash="${h}"]`).join(",");
+    const attachmentElements = this.document.querySelectorAll(query);
+
+    for (var i = 0; i < attachmentElements.length; ++i) {
+      const attachment = attachmentElements[i];
+      attachment.remove();
+    }
+
+    return this.document.outerHTML || this.document.body.innerHTML;
+  }
+
   async extractAttachments(store) {
     const attachments = [];
     const attachmentElements = this.document.querySelectorAll("img,span");

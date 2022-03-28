@@ -1,3 +1,4 @@
+import "../types";
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
@@ -17,6 +18,7 @@ const ENDPOINTS = {
   verifyUser: "/account/verify",
   revoke: "/connect/revocation",
   recoverAccount: "/account/recover",
+  activateTrial: "/subscriptions/trial",
 };
 
 class UserManager {
@@ -57,10 +59,21 @@ class UserManager {
       client_id: "notesnook",
     });
     EV.publish(EVENTS.userSignedUp);
-    return await this.login(email, password, hashedPassword);
+    return await this._login({ email, password, hashedPassword });
   }
 
-  async login(email, password, hashedPassword) {
+  async login(email, password) {
+    return this._login({ email, password });
+  }
+
+  async mfaLogin(email, password, { code, method }) {
+    return this._login({ email, password, code, method });
+  }
+
+  /**
+   * @private
+   */
+  async _login({ email, password, hashedPassword, code, method }) {
     if (!hashedPassword) {
       hashedPassword = await this._storage.hash(password, email);
     }
@@ -72,6 +85,8 @@ class UserManager {
         grant_type: "password",
         scope: "notesnook.sync offline_access openid IdentityServerApi",
         client_id: "notesnook",
+        "mfa:code": code,
+        "mfa:method": method,
       })
     );
 
@@ -102,6 +117,17 @@ class UserManager {
     );
   }
 
+  async activateTrial() {
+    const token = await this.tokenManager.getAccessToken();
+    if (!token) return false;
+    await http.post(
+      `${constants.SUBSCRIPTIONS_HOST}${ENDPOINTS.activateTrial}`,
+      null,
+      token
+    );
+    return true;
+  }
+
   async logout(revoke = true, reason) {
     try {
       if (revoke) await this.tokenManager.revokeToken();
@@ -119,6 +145,10 @@ class UserManager {
     return this._storage.write("user", user);
   }
 
+  /**
+   *
+   * @returns {Promise<User>}
+   */
   getUser() {
     return this._storage.read("user");
   }
@@ -149,6 +179,10 @@ class UserManager {
     return true;
   }
 
+  /**
+   *
+   * @returns {Promise<User>}
+   */
   async fetchUser() {
     try {
       let token = await this.tokenManager.getAccessToken();

@@ -233,13 +233,15 @@ export default class Vault {
 
   /** @private */
   async _lockNote(note, password) {
-    let { id, content: { type, data } = {}, contentId, sessionId } = note;
+    let { id, content: { type, data } = {}, sessionId } = note;
+
+    note = this._db.notes.note(id).data;
+    const contentId = note.contentId;
+    if (!contentId) throw new Error("Cannot lock note because it is empty.");
 
     // Case: when note is being newly locked
-    if (!data || !type || !contentId) {
-      note = this._db.notes.note(id).data;
+    if (!data || !type) {
       if (note.locked) return;
-      contentId = note.contentId;
       let content = await this._db.content.raw(contentId, false);
       // NOTE:
       // At this point, the note already has all the attachments extracted

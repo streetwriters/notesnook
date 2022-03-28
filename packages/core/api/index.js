@@ -24,6 +24,7 @@ import Attachments from "../collections/attachments";
 import Debug from "./debug";
 import { Mutex } from "async-mutex";
 import NoteHistory from "../collections/note-history";
+import MFAManager from "./mfa-manager";
 
 /**
  * @type {EventSource}
@@ -89,6 +90,7 @@ class Database {
     await this._validate();
 
     this.user = new UserManager(this.storage, this);
+    this.mfa = new MFAManager(this.storage, this);
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
@@ -142,11 +144,22 @@ class Database {
     this.evtSource = null;
   }
 
+  /**
+   *
+   * @param {{force: boolean, error: any}} args
+   */
   async connectSSE(args) {
     await this.sseMutex.runExclusive(async () => {
       if (args && !!args.error) return;
 
-      if (!NNEventSource) return;
+      const forceReconnect = args && args.force;
+      if (
+        !NNEventSource ||
+        (!forceReconnect &&
+          this.evtSource &&
+          this.evtSource.readyState === this.evtSource.OPEN)
+      )
+        return;
       this.disconnectSSE();
 
       let token = await this.user.tokenManager.getAccessToken();
@@ -156,6 +169,7 @@ class Database {
 
       this.evtSource.onopen = async () => {
         console.log("SSE: opened channel successfully!");
+        EV.publish(EVENTS.databaseSyncRequested, true, false);
       };
 
       this.evtSource.onerror = function (error) {

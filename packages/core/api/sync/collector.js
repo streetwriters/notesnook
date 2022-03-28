@@ -19,7 +19,7 @@ class Collector {
       notes: this._collect(await this._db.notes.encrypted()),
       notebooks: this._collect(await this._db.notebooks.encrypted()),
       content: this._collect(await this._db.content.encrypted()),
-      attachments: this._collect(await this._db.attachments.encrypted()),
+      attachments: this._collect(this._collect(this._db.attachments.syncable)),
       settings: await this._encrypt(this._collect([this._db.settings.raw])),
       vaultKey: await this._serialize(await this._db.vault._getKey()),
     };
@@ -43,9 +43,15 @@ class Collector {
   _collect(array) {
     if (!array.length) return [];
     return array.reduce((prev, item) => {
-      if (!item || item.localOnly) return prev;
-      if (item.dateModified > this._lastSyncedTimestamp || item.migrated)
-        prev.push(this._map(item));
+      if (!item) return prev;
+      if (item.localOnly) {
+        prev.push({ id: item.id, deleted: true, dateModified: Date.now() });
+      } else if (
+        item.dateModified > this._lastSyncedTimestamp ||
+        item.migrated
+      ) {
+        prev.push(item);
+      }
       return prev;
     }, []);
   }

@@ -6,12 +6,22 @@ import { hasItem } from "../utils/array";
 export default class Content extends Collection {
   async add(content) {
     if (!content) return;
+
+    if (typeof content.data === "object") {
+      if (typeof content.data.data === "string")
+        content.data = content.data.data;
+      else if (!content.data.iv && !content.data.cipher)
+        content.data = `<p>Content is invalid: ${JSON.stringify(
+          content.data
+        )}</p>`;
+    }
+
     if (content.remote || content.deleted || content.migrated)
       return await this._collection.addItem(
         await this.extractAttachments(content)
       );
 
-    const oldContent = await this.raw(content.id, false);
+    const oldContent = await this.raw(content.id);
     if (content.id && oldContent) {
       content = {
         ...oldContent,
@@ -102,9 +112,23 @@ export default class Content extends Collection {
   }
 
   async _insert(contentItem, getData) {
+    if (!contentItem || !getData) return;
     const content = getContentFromData(contentItem.type, contentItem.data);
     contentItem.data = await content.insertMedia(getData);
     return contentItem;
+  }
+
+  /**
+   *
+   * @param {string} id
+   * @param {string[]} hashes
+   * @returns {Promise<any>}
+   */
+  async removeAttachments(id, hashes) {
+    const contentItem = await this.raw(id);
+    const content = getContentFromData(contentItem.type, contentItem.data);
+    contentItem.data = content.removeAttachments(hashes);
+    await this.add(contentItem);
   }
 
   /**
@@ -118,6 +142,7 @@ export default class Content extends Collection {
 
     const allAttachments = this._db.attachments.all;
     const content = getContentFromData(contentItem.type, contentItem.data);
+    if (!content) return contentItem;
     const { data, attachments } = await content.extractAttachments(
       (data, type) => this._db.attachments.save(data, type)
     );

@@ -206,7 +206,7 @@ export default class Sync {
   _scheduleSync() {
     this.stopAutoSync();
     this._autoSyncTimeout = setTimeout(() => {
-      EV.publish(EVENTS.databaseSyncRequested);
+      EV.publish(EVENTS.databaseSyncRequested, false, false);
     }, this._autoSyncInterval);
   }
 
@@ -230,7 +230,7 @@ export default class Sync {
     const attachments = this._db.attachments.pending;
     for (var i = 0; i < attachments.length; ++i) {
       const attachment = attachments[i];
-      const { hash, filename } = attachment.metadata;
+      const { hash } = attachment.metadata;
       sendAttachmentsProgressEvent("upload", hash, attachments.length, i);
 
       try {
@@ -239,9 +239,9 @@ export default class Sync {
 
         await this._db.attachments.markAsUploaded(attachment.id);
       } catch (e) {
-        throw new Error(
-          `Failed to upload the following attachment: "${filename}". Please try attaching this file again. (Reference error: ${e.message})`
-        );
+        console.error(e, attachment);
+        const error = e.message;
+        await this._db.attachments.markAsFailed(attachment.id, error);
       }
     }
     sendAttachmentsProgressEvent("upload", null, attachments.length);
