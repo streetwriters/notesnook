@@ -145,7 +145,9 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function pinToNotifications() {
+    console.log('pinToNotifications');
     if (Platform.OS === 'ios') return;
+
     if (notifPinned !== null) {
       Notifications.remove(item.id, notifPinned.identifier);
       await sleep(1000);
@@ -154,11 +156,13 @@ export const useActions = ({ close = () => {}, item }) => {
       return;
     }
     if (item.locked) return;
+    let html = await db.notes.note(item.id).content();
+    let text = await toTXT(item);
     Notifications.present({
       title: item.title,
-      message: item.headline,
-      subtitle: item.headline,
-      bigText: await toTXT(item, true),
+      message: item.headline || text,
+      subtitle: item.headline || text,
+      bigText: html,
       ongoing: true,
       actions: ['UNPIN'],
       tag: item.id
