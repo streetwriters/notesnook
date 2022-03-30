@@ -34,3 +34,12 @@ function deleteAtIndex(array, index) {
   array.splice(index, 1);
   return true;
 }
+
+export function toChunks(array, chunkSize) {
+  let chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const chunk = array.slice(i, i + chunkSize);
+    chunks.push(chunk);
+  }
+  return chunks;
+}

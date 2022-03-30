@@ -1,7 +1,6 @@
 import Collection from "./collection";
-import { qclone } from "qclone";
 import { makeId } from "../utils/id";
-import { deleteItem, deleteItems, hasItem } from "../utils/array";
+import { deleteItems, hasItem } from "../utils/array";
 import setManipulator from "../utils/set";
 
 export default class Tags extends Collection {
@@ -115,10 +114,7 @@ export default class Tags extends Collection {
   sanitize(tag) {
     if (!tag) return;
     let sanitized = tag.toLocaleLowerCase();
-    sanitized = sanitized.replace(
-      /[+!@#$%^&*()+\{\}\]\[:;'"<>?\/\.\s=,]+/g,
-      ""
-    );
+    sanitized = sanitized.replace(/[+!@#$%^&*()+{}\][:;'"<>?/.\s=,]+/g, "");
     return sanitized.trim();
   }
 }

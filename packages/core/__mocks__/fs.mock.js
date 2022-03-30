@@ -11,7 +11,7 @@ function hasItem(key) {
  * 3. We encrypt the Uint8Array
  * 4. We save the encrypted Uint8Array
  */
-async function writeEncrypted(filename, { data, type, key }) {
+async function writeEncrypted(filename, { data }) {
   const { hash, type: hashType } = hashBuffer(data);
   if (!filename) filename = hash;
   if (hasItem(filename)) return { hash, hashType };
@@ -35,7 +35,7 @@ function hashBuffer(data) {
   };
 }
 
-async function readEncrypted(filename, key, cipherData) {
+async function readEncrypted(filename) {
   const cipher = fs[filename];
   if (!cipher) {
     console.error(`File not found. Filename: ${filename}`);
@@ -44,17 +44,17 @@ async function readEncrypted(filename, key, cipherData) {
   return cipher.data;
 }
 
-async function uploadFile(filename, requestOptions) {
+async function uploadFile(filename) {
   let cipher = fs[filename];
   if (!cipher) throw new Error(`File not found. Filename: ${filename}`);
   return true;
 }
 
-async function downloadFile(filename, requestOptions) {
+async function downloadFile(filename) {
   return hasItem(filename);
 }
 
-async function deleteFile(filename, requestOptions) {
+async function deleteFile(filename) {
   if (!hasItem(filename)) return true;
   delete fs[filename];
   return true;

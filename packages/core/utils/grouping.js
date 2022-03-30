@@ -1,7 +1,7 @@
 import "../types";
 import fastsort from "fast-sort";
 import dayjs from "dayjs";
-import { getWeekGroupFromTimestamp, months } from "./date";
+import { getWeekGroupFromTimestamp } from "./date";
 
 /**
  *
@@ -13,8 +13,7 @@ const getSortSelectors = (options) => [
   { desc: (t) => t.pinned },
   {
     [options.sortDirection]: (item) => {
-      if (options.sortBy === "title")
-        return item.alias || item.title;
+      if (options.sortBy === "title") return item.alias || item.title;
       return item[options.sortBy];
     },
   },

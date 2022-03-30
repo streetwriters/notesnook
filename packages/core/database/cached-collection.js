@@ -3,11 +3,12 @@ import IndexedCollection from "./indexed-collection";
 import MapStub from "../utils/map";
 
 export default class CachedCollection extends IndexedCollection {
-  constructor(context, type, encryptionKeyFactory) {
-    super(context, type, encryptionKeyFactory);
+  constructor(context, type, eventManager) {
+    super(context, type, eventManager);
     this.type = type;
     this.map = new Map();
-    this.encryptionKeyFactory = encryptionKeyFactory;
+    // this.eventManager = eventManager;
+    // this.encryptionKeyFactory = encryptionKeyFactory;
   }
 
   async init() {

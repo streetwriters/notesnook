@@ -27,7 +27,7 @@ describe.each([
       note = db.notes.note(id);
       check(note, value);
       expect(db[collection].all[0].title).toBe(value);
-      expect(db[collection].all[0].noteIds.length).toBe(1);
+      expect(db[collection].all[0].noteIds).toHaveLength(1);
     }));
 
   test(`${action} 2 notes`, () =>
@@ -38,7 +38,7 @@ describe.each([
       note = db.notes.note(id2);
       await note[action](value);
       expect(db[collection].all[0].title).toBe(value);
-      expect(db[collection].all[0].noteIds.length).toBe(2);
+      expect(db[collection].all[0].noteIds).toHaveLength(2);
     }));
 
   test(`${unaction} from note`, () =>
@@ -50,7 +50,7 @@ describe.each([
       await note[unaction](value);
       note = db.notes.note(id);
       check(note, undefined);
-      expect(db[collection].all.length).toBe(0);
+      expect(db[collection].all).toHaveLength(0);
     }));
 
   test(`get ${collection}`, () =>

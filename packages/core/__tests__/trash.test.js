@@ -12,7 +12,7 @@ beforeEach(() => StorageInterface.clear());
 
 test("trash should be empty", () =>
   databaseTest().then((db) => {
-    expect(db.trash.all.length).toBe(0);
+    expect(db.trash.all).toHaveLength(0);
   }));
 
 test("permanently delete a note", () =>
@@ -21,18 +21,18 @@ test("permanently delete a note", () =>
     const note = db.notes.note(noteId);
 
     let sessions = await db.noteHistory.get(noteId);
-    expect(sessions.length).toBe(1);
+    expect(sessions).toHaveLength(1);
 
     await db.notes.delete(noteId);
-    expect(db.trash.all.length).toBe(1);
+    expect(db.trash.all).toHaveLength(1);
     expect(await note.content()).toBeDefined();
     await db.trash.delete(db.trash.all[0].id);
-    expect(db.trash.all.length).toBe(0);
+    expect(db.trash.all).toHaveLength(0);
     const content = await db.content.raw(note.data.contentId);
     expect(content.deleted).toBe(true);
 
     sessions = await db.noteHistory.get(noteId);
-    expect(sessions.length).toBe(0);
+    expect(sessions).toHaveLength(0);
 }));
 
 test("restore a deleted note that was in a notebook", () =>
@@ -41,7 +41,7 @@ test("restore a deleted note that was in a notebook", () =>
     await db.notebooks.notebook(nbId).topics.topic("hello").add(id);
     await db.notes.delete(id);
     await db.trash.restore(db.trash.all[0].id);
-    expect(db.trash.all.length).toBe(0);
+    expect(db.trash.all).toHaveLength(0);
 
     let note = db.notes.note(id);
 
@@ -62,7 +62,7 @@ test("delete a locked note", () =>
     await db.vault.create("password");
     await db.vault.add(id);
     await db.notes.delete(id);
-    expect(db.trash.all.length).toBe(1);
+    expect(db.trash.all).toHaveLength(1);
     expect(await db.content.get(note.data.contentId)).toBeDefined();
   }));
 
@@ -72,10 +72,10 @@ test("restore a deleted locked note", () =>
     await db.vault.create("password");
     await db.vault.add(id);
     await db.notes.delete(id);
-    expect(db.trash.all.length).toBe(1);
+    expect(db.trash.all).toHaveLength(1);
     expect(await db.content.get(note.data.contentId)).toBeDefined();
     await db.trash.restore(db.trash.all[0].id);
-    expect(db.trash.all.length).toBe(0);
+    expect(db.trash.all).toHaveLength(0);
     note = db.notes.note(id);
     expect(note).toBeDefined();
   }));
@@ -117,7 +117,7 @@ test("restore a deleted notebook", () =>
     let note = db.notes.note(noteId);
     const noteNotebook = note.notebooks.find((n) => n.id === id);
     expect(noteNotebook).toBeDefined();
-    expect(noteNotebook.topics.length).toBe(1);
+    expect(noteNotebook.topics).toHaveLength(1);
 
     expect(notebook.topics.topic(noteNotebook.topics[0])).toBeDefined();
   }));
@@ -156,11 +156,11 @@ test("permanently delete items older than 7 days", () =>
       dateDeleted: sevenDaysEarlier,
     });
 
-    expect(db.trash.all.length).toBe(2);
+    expect(db.trash.all).toHaveLength(2);
 
     await db.trash.cleanup();
 
-    expect(db.trash.all.length).toBe(0);
+    expect(db.trash.all).toHaveLength(0);
   }));
 
 test("trash cleanup should not delete items newer than 7 days", () =>
@@ -171,11 +171,11 @@ test("trash cleanup should not delete items newer than 7 days", () =>
     await db.notebooks.delete(notebookId);
     await db.notes.delete(noteId);
 
-    expect(db.trash.all.length).toBe(2);
+    expect(db.trash.all).toHaveLength(2);
 
     await db.trash.cleanup();
 
-    expect(db.trash.all.length).toBe(2);
+    expect(db.trash.all).toHaveLength(2);
   }));
 
 test("clear trash should delete note content", () =>
@@ -185,22 +185,22 @@ test("clear trash should delete note content", () =>
     const notebookId = await db.notebooks.add(TEST_NOTEBOOK);
 
     let sessions = await db.noteHistory.get(noteId);
-    expect(sessions.length).toBe(1);
+    expect(sessions).toHaveLength(1);
 
     let note = { ...db.notes.note(noteId).data };
 
     await db.notebooks.delete(notebookId);
     await db.notes.delete(noteId);
 
-    expect(db.trash.all.length).toBe(2);
+    expect(db.trash.all).toHaveLength(2);
 
     await db.trash.clear();
 
-    expect(db.trash.all.length).toBe(0);
+    expect(db.trash.all).toHaveLength(0);
 
     const content = await db.content.raw(note.contentId);
     expect(content.deleted).toBe(true);
 
     sessions = await db.noteHistory.get(note.id);
-    expect(sessions.length).toBe(0);
+    expect(sessions).toHaveLength(0);
   }));

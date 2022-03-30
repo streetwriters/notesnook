@@ -1,10 +1,11 @@
-import { EV, EVENTS } from "../common";
+import { EVENTS } from "../common";
 import Indexer from "./indexer";
 
 export default class IndexedCollection {
-  constructor(context, type, encryptionKeyFactory) {
+  constructor(context, type, eventManager) {
     this.indexer = new Indexer(context, type);
-    this.encryptionKeyFactory = encryptionKeyFactory;
+    this.eventManager = eventManager;
+    // this.encryptionKeyFactory = encryptionKeyFactory;
   }
 
   clear() {
@@ -28,7 +29,7 @@ export default class IndexedCollection {
 
   async updateItem(item) {
     if (!item.id) throw new Error("The item must contain the id field.");
-    EV.publish(EVENTS.databaseUpdated, item);
+    this.eventManager.publish(EVENTS.databaseUpdated, item.remote);
 
     // if item is newly synced, remote will be true.
     if (!item.remote) item.dateModified = Date.now();
@@ -53,7 +54,7 @@ export default class IndexedCollection {
   }
 
   removeItem(id) {
-    EV.publish(EVENTS.databaseUpdated, id);
+    this.eventManager.publish(EVENTS.databaseUpdated, id);
     return this.updateItem({
       id,
       deleted: true,
@@ -61,7 +62,7 @@ export default class IndexedCollection {
   }
 
   async deleteItem(id) {
-    EV.publish(EVENTS.databaseUpdated, id);
+    this.eventManager.publish(EVENTS.databaseUpdated, id);
     await this.indexer.deindex(id);
     return await this.indexer.remove(id);
   }

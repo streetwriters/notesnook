@@ -1,11 +1,11 @@
 var storage = {};
 
 async function read(key) {
-  return new Promise((resolve, reject) => resolve(storage[key]));
+  return new Promise((resolve) => resolve(storage[key]));
 }
 
 async function readMulti(keys) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const result = [];
     keys.forEach((key) => {
       result.push([key, storage[key]]);
@@ -59,7 +59,7 @@ async function getCryptoKey(name) {
   return storage[name].key;
 }
 
-async function hash(password, userId) {
+async function hash(password) {
   return password;
 }
 

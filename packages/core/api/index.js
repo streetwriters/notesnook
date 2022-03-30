@@ -9,10 +9,9 @@ import Vault from "./vault";
 import Lookup from "./lookup";
 import Content from "../collections/content";
 import Backup from "../database/backup";
-import Conflicts from "./sync/conflicts";
 import Session from "./session";
 import Constants from "../utils/constants";
-import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
+import { EV, EVENTS } from "../common";
 import Settings from "./settings";
 import Migrations from "./migrations";
 import Outbox from "./outbox";
@@ -25,6 +24,7 @@ import Debug from "./debug";
 import { Mutex } from "async-mutex";
 import NoteHistory from "../collections/note-history";
 import MFAManager from "./mfa-manager";
+import EventManager from "../utils/event-manager";
 
 /**
  * @type {EventSource}
@@ -46,6 +46,7 @@ class Database {
     this.sseMutex = new Mutex();
     this.lastHeartbeat = undefined; // { local: 0, server: 0 };
     this.timeErrorFailures = 0;
+    this.eventManager = new EventManager();
 
     this.storage = new Storage(storage);
     this.fs = new FileStorage(fs, storage);
@@ -73,7 +74,6 @@ class Database {
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.deinit();
       await this.fs.clear();
-      this.syncer.stopAutoSync();
       this.disconnectSSE();
     });
     EV.subscribe(EVENTS.databaseCollectionInitiated, async (collectionName) => {
@@ -93,7 +93,6 @@ class Database {
     this.mfa = new MFAManager(this.storage, this);
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
-    this.conflicts = new Conflicts(this);
     this.lookup = new Lookup(this);
     this.backup = new Backup(this);
     this.settings = new Settings(this);
@@ -103,27 +102,21 @@ class Database {
     this.offers = new Offers();
     this.debug = new Debug();
 
-    const factory = () => this.user.getEncryptionKey();
     // collections
     /** @type {Notes} */
-    this.notes = await Notes.new(this, "notes", factory, true, true);
+    this.notes = await Notes.new(this, "notes", true, true);
     /** @type {Notebooks} */
-    this.notebooks = await Notebooks.new(this, "notebooks", factory);
+    this.notebooks = await Notebooks.new(this, "notebooks");
     /** @type {Tags} */
-    this.tags = await Tags.new(this, "tags", factory);
+    this.tags = await Tags.new(this, "tags");
     /** @type {Tags} */
-    this.colors = await Tags.new(this, "colors", factory);
+    this.colors = await Tags.new(this, "colors");
     /** @type {Content} */
-    this.content = await Content.new(this, "content", factory, false);
+    this.content = await Content.new(this, "content", false);
     /** @type {Attachments} */
-    this.attachments = await Attachments.new(this, "attachments", factory);
+    this.attachments = await Attachments.new(this, "attachments");
     /**@type {NoteHistory} */
-    this.noteHistory = await NoteHistory.new(
-      this,
-      "notehistory",
-      factory,
-      false
-    );
+    this.noteHistory = await NoteHistory.new(this, "notehistory", false);
 
     this.trash = new Trash(this);
 
@@ -169,7 +162,7 @@ class Database {
 
       this.evtSource.onopen = async () => {
         console.log("SSE: opened channel successfully!");
-        EV.publish(EVENTS.databaseSyncRequested, true, false);
+        this.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
       };
 
       this.evtSource.onerror = function (error) {
@@ -186,7 +179,7 @@ class Database {
         }
 
         switch (type) {
-          case "heartbeat":
+          case "heartbeat": {
             const { t: serverTime } = data;
             const localTime = Date.now();
 
@@ -215,29 +208,29 @@ class Database {
             this.lastHeartbeat.local = localTime;
             this.lastHeartbeat.server = serverTime;
             break;
-          case "upgrade":
+          }
+          case "upgrade": {
             const user = await this.user.getUser();
             user.subscription = data;
             await this.user.setUser(user);
             EV.publish(EVENTS.userSubscriptionUpdated, data);
             break;
-          case "userDeleted":
+          }
+          case "userDeleted": {
             await this.user.logout(false, "Account Deleted");
             break;
-          case "userPasswordChanged":
+          }
+          case "userPasswordChanged": {
             await this.user.logout(true, "Password Changed");
             break;
-          case "emailConfirmed":
+          }
+          case "emailConfirmed": {
             const token = await this.storage.read("token");
             await this.user.tokenManager._refreshToken(token);
             await this.user.fetchUser(true);
             EV.publish(EVENTS.userEmailConfirmed);
             break;
-          // case "sync":
-          //   if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) break;
-
-          //   await this.syncer.remoteSync(data);
-          //   break;
+          }
         }
       };
     });

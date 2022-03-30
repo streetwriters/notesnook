@@ -4,7 +4,6 @@ import {
   databaseTest,
   noteTest,
   groupedTest,
-  LONG_TEXT,
   TEST_NOTE,
   TEST_NOTEBOOK,
   IMG_CONTENT,
@@ -177,7 +176,7 @@ test("add note to topic", () =>
     let topic = topics.topic("Home");
     await topic.add(id);
     topic = topics.topic("Home");
-    expect(topic.all.length).toBe(1);
+    expect(topic.all).toHaveLength(1);
     expect(topic.totalNotes).toBe(1);
     expect(db.notebooks.notebook(notebookId).totalNotes).toBe(1);
     let note = db.notes.note(id);
@@ -192,7 +191,7 @@ test("duplicate note to topic should not be added", () =>
     let topic = topics.topic("Home");
     await topic.add(id);
     topic = topics.topic("Home");
-    expect(topic.all.length).toBe(1);
+    expect(topic.all).toHaveLength(1);
   }));
 
 test("add the same note to 2 notebooks", () =>
@@ -212,7 +211,7 @@ test("add the same note to 2 notebooks", () =>
     await db.notes.move({ id: notebookId2, topic: topic2.id }, id);
 
     let note = db.notes.note(id);
-    expect(note.notebooks.length).toBe(2);
+    expect(note.notebooks).toHaveLength(2);
     expect(topics2.topic(topic2.id).has(id)).toBe(true);
   }));
 
@@ -336,8 +335,8 @@ test("repairing notebook references should reinclude the missing noteIds", () =>
     const noteId = await db.notes.add(note);
     await db.notes.repairReferences();
     note = db.notes.note(noteId);
-    expect(notebook.topics.all[0].notes.length).toBe(0);
-    expect(note.notebooks.length).toBe(0);
+    expect(notebook.topics.all[0].notes).toHaveLength(0);
+    expect(note.notebooks).toHaveLength(0);
   }));
 
 test("repairing notebook references should delete non-existent notebooks", () =>
@@ -347,7 +346,7 @@ test("repairing notebook references should delete non-existent notebooks", () =>
   }).then(async ({ db, id }) => {
     await db.notes.repairReferences();
     let note = db.notes.note(id);
-    expect(note.notebooks.length).toBe(0);
+    expect(note.notebooks).toHaveLength(0);
   }));
 
 test("adding a note with an invalid tag should clean the tag array", () =>
@@ -361,5 +360,5 @@ test("adding a note with an invalid tag should clean the tag array", () =>
     ).resolves.toBe("helloworld");
 
     const note = db.notes.note("helloworld");
-    expect(note.tags.length).toBe(0);
+    expect(note.tags).toHaveLength(0);
   }));

@@ -8,10 +8,6 @@ test("intersection", () => {
   expect(Set.intersection([1, 1, 2], [2, 2, 3])).toStrictEqual([2]);
 });
 
-test("union", () => {
-  expect(Set.union([1, 2, 2], [2, 3])).toStrictEqual([1, 2, 3]);
-});
-
 test("difference", () => {
   expect(Set.difference([1, 1, 2], [2, 3, 3])).toStrictEqual([1, 3]);
 });

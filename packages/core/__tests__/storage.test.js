@@ -1,5 +1,6 @@
 import StorageInterface from "../__mocks__/storage.mock";
 import Storage from "../database/storage";
+
 const storage = new Storage(StorageInterface);
 test("add a value", async () => {
   await storage.write("hello", "world");

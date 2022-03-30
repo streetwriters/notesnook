@@ -55,12 +55,12 @@ test("import encrypted backup", () =>
 
 test("import tempered backup", () =>
   noteTest().then(() =>
-    notebookTest().then(async ({ db, id }) => {
+    notebookTest().then(async ({ db }) => {
       const exp = await db.backup.export("node");
       StorageInterface.clear();
       const backup = JSON.parse(exp);
       backup.data.hello = "world";
-      await expect(db.backup.import(backup)).rejects.toThrowError(/tempered/);
+      await expect(db.backup.import(backup)).rejects.toThrow(/tempered/);
     })
   ));
 
@@ -118,13 +118,9 @@ describe.each([
       ).toBeTruthy();
 
       const tableContent = allContent.find((a) => a.data.includes("<table"));
-      if (tableContent) {
-        expect(
-          tableContent.data.startsWith(
-            `<div class="table-container" contenteditable="false">`
-          )
-        );
-      }
+      expect(
+        !tableContent || tableContent.data.includes(`class="table-container"`)
+      ).toBe(true);
     });
   });
 

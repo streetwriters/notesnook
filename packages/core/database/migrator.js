@@ -1,4 +1,3 @@
-import { CURRENT_DATABASE_VERSION } from "../common";
 import { migrations } from "../migrations";
 
 class Migrator {
@@ -20,7 +19,7 @@ class Migrator {
         if (migrate) item = migrate(item);
         item.migrated = true;
 
-        if (!!collection.dbCollection.merge) {
+        if (collection.dbCollection.merge) {
           await collection.dbCollection.merge(item);
         } else {
           await collection.dbCollection.add(item);

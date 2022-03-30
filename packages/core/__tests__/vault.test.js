@@ -22,9 +22,7 @@ test("unlock vault", () =>
 
 test("unlock non-existent vault", () =>
   databaseTest().then(async (db) => {
-    db.vault
-      .unlock("password")
-      .catch((err) => expect(err.message).toBe("ERR_NO_VAULT"));
+    await expect(db.vault.unlock("password")).rejects.toThrow(/ERR_NO_VAULT/);
   }));
 
 test("unlock vault with wrong password", () =>
@@ -97,9 +95,9 @@ test("save a locked note", () =>
     const content = await db.content.raw(note.contentId);
     const contentData = JSON.parse(content.data.cipher);
 
-    expect(contentData.iv).not.toBeDefined();
-    expect(contentData.cipher).not.toBeDefined();
-    expect(contentData.key).not.toBeDefined();
+    expect(contentData.iv).toBeUndefined();
+    expect(contentData.cipher).toBeUndefined();
+    expect(contentData.key).toBeUndefined();
   }));
 
 test("save an edited locked note", () =>
@@ -116,9 +114,9 @@ test("save an edited locked note", () =>
     const content = await db.content.raw(note.contentId);
     const contentData = JSON.parse(content.data.cipher);
 
-    expect(contentData.iv).not.toBeDefined();
-    expect(contentData.cipher).not.toBeDefined();
-    expect(contentData.key).not.toBeDefined();
+    expect(contentData.iv).toBeUndefined();
+    expect(contentData.cipher).toBeUndefined();
+    expect(contentData.key).toBeUndefined();
   }));
 
 test("change vault password", () =>

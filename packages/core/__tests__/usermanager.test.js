@@ -1,4 +1,4 @@
-import { enableFetchMocks, disableFetchMocks } from "jest-fetch-mock";
+import { enableFetchMocks } from "jest-fetch-mock";
 import { StorageInterface, databaseTest } from "./utils";
 
 const SUCCESS_LOGIN_RESPONSE = {

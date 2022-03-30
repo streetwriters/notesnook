@@ -19,7 +19,7 @@ export default class Lookup {
       if (
         !note.locked &&
         !!note.contentId &&
-        contents.hasOwnProperty(note.contentId)
+        Object.prototype.hasOwnProperty.call(contents, note.contentId)
       )
         text += contents[note.contentId]["data"];
       return text;

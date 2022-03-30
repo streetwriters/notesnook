@@ -98,7 +98,7 @@ export default class Note {
 
   async content() {
     const content = await this._db.content.raw(this._note.contentId);
-    return content.data;
+    return content ? content.data : null;
   }
 
   async duplicate() {

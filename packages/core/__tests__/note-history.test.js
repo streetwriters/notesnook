@@ -1,25 +1,19 @@
-import {
-  databaseTest,
-  delay,
-  noteTest,
-  StorageInterface,
-  TEST_NOTE,
-} from "./utils";
+import { delay, noteTest, StorageInterface, TEST_NOTE } from "./utils";
 
 beforeEach(async () => {
   StorageInterface.clear();
 });
 
-async function sessionTest(db, noteId) {
-  let note = await db.notes.note(noteId).data;
-  let content = {
-    data: await db.notes.note(noteId).content(),
-    type: "tiny",
-  };
-  let session = await db.noteHistory.add(noteId, note.dateEdited, content);
+// async function sessionTest(db, noteId) {
+//   let note = await db.notes.note(noteId).data;
+//   let content = {
+//     data: await db.notes.note(noteId).content(),
+//     type: "tiny",
+//   };
+//   let session = await db.noteHistory.add(noteId, note.dateEdited, content);
 
-  return session;
-}
+//   return session;
+// }
 
 test("new history session should be automatically created on note save", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
@@ -67,7 +61,7 @@ test("restoring an old session should replace note's content", () =>
       sessionId: Date.now() + 10000,
     });
 
-    const [_, firstVersion] = await db.noteHistory.get(id);
+    const [, firstVersion] = await db.noteHistory.get(id);
     await db.noteHistory.restore(firstVersion.id);
 
     await expect(db.notes.note(id).content()).resolves.toBe(
@@ -106,7 +100,7 @@ test("serialized session data should get deserialized", () =>
     await db.noteHistory.deserialize(json);
 
     let history = await db.noteHistory.get(id);
-    expect(history.length).toBe(1);
+    expect(history).toHaveLength(1);
 
     let content = await db.noteHistory.content(history[0].id);
     expect(content).toMatchObject(TEST_NOTE.content);
@@ -117,7 +111,7 @@ test("clear a note's sessions", () =>
     await db.noteHistory.clearSessions(id);
 
     let history = await db.noteHistory.get(id);
-    expect(history.length).toBe(0);
+    expect(history).toHaveLength(0);
   }));
 
 test("remove a single session by sessionId", () =>
@@ -127,14 +121,14 @@ test("remove a single session by sessionId", () =>
 
       await db.noteHistory.remove(sessionId);
       let history = await db.noteHistory.get(sessionId);
-      expect(history.length).toBe(0);
+      expect(history).toHaveLength(0);
     }
   ));
 
 test("return empty array if no history available", () =>
   noteTest().then(async ({ db, id }) => {
     let history = await db.noteHistory.get(id);
-    expect(history.length).toBe(0);
+    expect(history).toHaveLength(0);
   }));
 
 test("session should not be added to history if values are null or undefined", () =>

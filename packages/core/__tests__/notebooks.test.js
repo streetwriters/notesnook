@@ -132,7 +132,7 @@ test("merge notebook when local notebook is also edited should merge noteIds too
 
     await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
 
-    expect(notebook.topics.all[0].notes.length).toBe(2);
+    expect(notebook.topics.all[0].notes).toHaveLength(2);
   }));
 
 test("merging notebook when local notebook is not edited should not update remote notebook dateEdited", () =>

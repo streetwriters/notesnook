@@ -148,33 +148,6 @@ class Tiny {
 }
 export default Tiny;
 
-function getHeadlineFromText(text) {
-  for (var i = 0; i < text.length; ++i) {
-    const char = text[i];
-    if (char === "\n" || char === "\t" || char === "\r" || char === ".") {
-      if (char === ".") ++i;
-      return text.substring(0, i);
-    }
-  }
-  return text;
-}
-
-function getTitleFromText(text) {
-  var title = "";
-  var count = 0;
-  for (var i = 0; i < text.length; ++i) {
-    const char = text[i];
-    if (char === "\n" || char === "\t" || char === "\r" || char === " ") {
-      ++count;
-      title += " ";
-      if (count === 4) {
-        return title;
-      }
-    } else title += char;
-  }
-  return title;
-}
-
 function getDatasetAttribute(element, attribute) {
   return element.getAttribute(`data-${attribute}`);
 }

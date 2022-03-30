@@ -2,12 +2,7 @@ import "../types";
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
-import {
-  EV,
-  EVENTS,
-  setUserPersonalizationBytes,
-  USER_PERSONALIZATION_HASH,
-} from "../common";
+import { EV, EVENTS, setUserPersonalizationBytes } from "../common";
 
 const ENDPOINTS = {
   signup: "/users",

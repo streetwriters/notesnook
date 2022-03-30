@@ -13,15 +13,8 @@ class Conflicts {
     }
   }
 
-  async check() {
-    let hasConflicts = await this._db.storage.read("hasConflicts");
-    if (hasConflicts) {
-      const mergeConflictError = new Error(
-        "Merge conflicts detected. Please resolve all conflicts to continue syncing."
-      );
-      mergeConflictError.code = "MERGE_CONFLICT";
-      throw mergeConflictError;
-    }
+  check() {
+    return this._db.storage.read("hasConflicts");
   }
 }
 export default Conflicts;

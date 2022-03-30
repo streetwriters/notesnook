@@ -1,7 +1,4 @@
 import { CURRENT_DATABASE_VERSION } from "../../common";
-import { getContentFromData } from "../../content-types";
-import { diff } from "../../utils/array";
-import Database from "../index";
 
 class Collector {
   /**

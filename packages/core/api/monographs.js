@@ -27,7 +27,7 @@ class Monographs {
     } catch (e) {
       console.error(e);
     }
-    if (!!monographs) this.monographs = monographs;
+    if (monographs) this.monographs = monographs;
   }
 
   /**

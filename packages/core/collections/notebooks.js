@@ -1,6 +1,5 @@
 import Collection from "./collection";
 import Notebook from "../models/notebook";
-import sort from "fast-sort";
 import getId from "../utils/id";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { qclone } from "qclone";

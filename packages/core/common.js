@@ -3,7 +3,7 @@ import EventManager from "./utils/event-manager";
 export const EV = new EventManager();
 
 export async function checkIsUserPremium(type) {
-  if (process.env.NODE_ENV === "test") return true;
+  // if (process.env.NODE_ENV === "test") return true;
 
   const results = await EV.publishWithResult(EVENTS.userCheckStatus, type);
   if (typeof results === "boolean") return results;
@@ -19,7 +19,7 @@ export function sendAttachmentsProgressEvent(type, groupId, total, current) {
   });
 }
 
-export function sendSyncProgressEvent(type, total, current) {
+export function sendSyncProgressEvent(EV, type, total, current) {
   EV.publish(EVENTS.syncProgress, {
     type,
     total,
@@ -50,6 +50,7 @@ export const EVENTS = {
   userSessionExpired: "user:sessionExpired",
   databaseSyncRequested: "db:syncRequested",
   syncProgress: "sync:progress",
+  syncCompleted: "sync:completed",
   databaseMigrated: "db:migrated",
   databaseUpdated: "db:updated",
   databaseCollectionInitiated: "db:collectionInitiated",

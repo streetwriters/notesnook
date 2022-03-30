@@ -6,10 +6,10 @@ test("img src is empty after extract attachments", async () => {
   const result = await tiny.extractAttachments(async () => {
     return { key: "hello", metadata: { hash: "helloworld" } };
   });
-  expect(result.attachments.length).toBe(1);
+  expect(result.attachments).toHaveLength(1);
   expect(result.data).not.toContain(`src="data:image/png;`);
   expect(result.data).not.toContain(`src=`);
-  expect(result.data).toContain(`data-hash=\"helloworld\"`);
+  expect(result.data).toContain(`data-hash="helloworld"`);
 });
 
 test("img src is present after insert attachments", async () => {

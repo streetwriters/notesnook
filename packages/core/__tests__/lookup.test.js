@@ -1,11 +1,7 @@
 import {
   StorageInterface,
-  databaseTest,
   noteTest,
-  groupedTest,
-  LONG_TEXT,
   TEST_NOTE,
-  TEST_NOTEBOOK,
   notebookTest,
   TEST_NOTEBOOK2,
 } from "./utils";
@@ -26,7 +22,7 @@ test("search notes", () =>
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
     let filtered = await db.lookup.notes(db.notes.all, "note of the world");
-    expect(filtered.length).toBe(1);
+    expect(filtered).toHaveLength(1);
   }));
 
 test("search notes with a locked note", () =>
@@ -37,7 +33,7 @@ test("search notes with a locked note", () =>
     await db.vault.create("password");
     await db.vault.add(noteId);
     let filtered = await db.lookup.notes(db.notes.all, "note of the world");
-    expect(filtered.length).toBe(1);
+    expect(filtered).toHaveLength(1);
   }));
 
 test("search notes with an empty note", () =>
@@ -49,7 +45,7 @@ test("search notes with an empty note", () =>
       content: { type: "tiny", data: "<p><br></p>" },
     });
     let filtered = await db.lookup.notes(db.notes.all, "heavy tune");
-    expect(filtered.length).toBe(1);
+    expect(filtered).toHaveLength(1);
   }));
 
 test("search notebooks", () =>
@@ -63,5 +59,5 @@ test("search topics", () =>
   notebookTest().then(async ({ db, id }) => {
     const topics = db.notebooks.notebook(id).topics.all;
     let filtered = db.lookup.topics(topics, "hello");
-    expect(filtered.length).toBe(1);
+    expect(filtered).toHaveLength(1);
   }));
