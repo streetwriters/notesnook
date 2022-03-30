@@ -151,22 +151,25 @@ class Sync {
     const serverResponse = await new Promise((resolve, reject) => {
       let serverLastSynced = 0;
       let _synced = false;
-
+      let items = [];
       this.connection.stream("FetchItems", lastSynced).subscribe({
-        next: async (/** @type {SyncTransferItem} */ syncStatus) => {
+        next: (/** @type {SyncTransferItem} */ syncStatus) => {
           const { item, synced, lastSynced } = syncStatus;
           serverLastSynced = lastSynced;
           _synced = synced;
           if (synced || !item) return;
-
-          await this.onSyncItem(syncStatus);
+          items.push(syncStatus);
         },
         complete: () => {
-          resolve({ synced: _synced, lastSynced: serverLastSynced });
+          resolve({ synced: _synced, lastSynced: serverLastSynced, items });
         },
         error: reject,
       });
     });
+
+    for (let item of serverResponse.items) {
+      await this.onSyncItem(item);
+    }
 
     if (await this.conflicts.check()) {
       throw new Error(
@@ -174,7 +177,7 @@ class Sync {
       );
     }
 
-    return serverResponse;
+    return { lastSynced: serverResponse.lastSynced };
   }
 
   async collect(lastSynced) {
@@ -316,10 +319,12 @@ class Sync {
    */
   async onSyncItem(syncStatus) {
     const { current, item: itemJSON, itemType, total } = syncStatus;
+    sendSyncProgressEvent(this.db.eventManager, "download", total, current);
     const item = JSON.parse(itemJSON);
 
-    await this.merger.mergeItem(itemType, item);
-    sendSyncProgressEvent(this.db.eventManager, "download", total, current);
+    await this.merger.mergeItem(itemType, item).then(() => {
+      console.log("Merge complete", item.id);
+    });
   }
 
   /**
