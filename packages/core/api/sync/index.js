@@ -100,12 +100,18 @@ class Sync {
     });
 
     this.connection.on("SyncItem", async (syncStatus) => {
-      await this.onSyncItem.call(this, syncStatus);
+      await this.onSyncItem(syncStatus);
+      sendSyncProgressEvent(
+        this.db.eventManager,
+        "download",
+        syncStatus.total,
+        syncStatus.current
+      );
     });
 
-    this.connection.on("RemoteSyncCompleted", () =>
-      this.onRemoteSyncCompleted()
-    );
+    this.connection.on("RemoteSyncCompleted", () => {
+      this.onRemoteSyncCompleted();
+    });
   }
 
   /**
@@ -151,25 +157,37 @@ class Sync {
     const serverResponse = await new Promise((resolve, reject) => {
       let serverLastSynced = 0;
       let _synced = false;
-      let items = [];
+
+      let counter = { count: 0 };
       this.connection.stream("FetchItems", lastSynced).subscribe({
-        next: (/** @type {SyncTransferItem} */ syncStatus) => {
-          const { item, synced, lastSynced } = syncStatus;
+        next: async (/** @type {SyncTransferItem} */ syncStatus) => {
+          const { total, item, synced, lastSynced } = syncStatus;
           serverLastSynced = lastSynced;
           _synced = synced;
-          if (synced || !item) return;
-          items.push(syncStatus);
+          try {
+            if (synced || !item) return;
+
+            counter.count++;
+            await this.onSyncItem(syncStatus, counter);
+
+            const progress = counter.count;
+            sendSyncProgressEvent(
+              this.db.eventManager,
+              "download",
+              total,
+              progress
+            );
+          } catch (e) {
+            reject(e);
+          } finally {
+            if (--counter.count <= 0)
+              resolve({ synced: _synced, lastSynced: serverLastSynced });
+          }
         },
-        complete: () => {
-          resolve({ synced: _synced, lastSynced: serverLastSynced, items });
-        },
+        complete: () => {},
         error: reject,
       });
     });
-
-    for (let item of serverResponse.items) {
-      await this.onSyncItem(item);
-    }
 
     if (await this.conflicts.check()) {
       throw new Error(
@@ -177,7 +195,7 @@ class Sync {
       );
     }
 
-    return { lastSynced: serverResponse.lastSynced };
+    return serverResponse;
   }
 
   async collect(lastSynced) {
@@ -317,14 +335,11 @@ class Sync {
    * @param {SyncTransferItem} syncStatus
    * @private
    */
-  async onSyncItem(syncStatus) {
-    const { current, item: itemJSON, itemType, total } = syncStatus;
-    sendSyncProgressEvent(this.db.eventManager, "download", total, current);
+  onSyncItem(syncStatus) {
+    const { item: itemJSON, itemType } = syncStatus;
     const item = JSON.parse(itemJSON);
 
-    await this.merger.mergeItem(itemType, item).then(() => {
-      console.log("Merge complete", item.id);
-    });
+    return this.merger.mergeItem(itemType, item);
   }
 
   /**
