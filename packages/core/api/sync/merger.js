@@ -122,6 +122,7 @@ class Merger {
 
     const deserialized = JSON.parse(decrypted);
     deserialized.remote = true;
+    deserialized.synced = true;
     if (!migrate) return deserialized;
     return this._migrate(deserialized, item.v);
   }

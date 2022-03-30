@@ -29,11 +29,13 @@ export default class IndexedCollection {
 
   async updateItem(item) {
     if (!item.id) throw new Error("The item must contain the id field.");
-    this.eventManager.publish(EVENTS.databaseUpdated, item.remote);
+    this.eventManager.publish(EVENTS.databaseUpdated, item.id, item);
 
     // if item is newly synced, remote will be true.
-    if (!item.remote) item.dateModified = Date.now();
-
+    if (!item.remote) {
+      item.dateModified = Date.now();
+      item.synced = false;
+    }
     // the item has become local now, so remove the flags
     delete item.remote;
     delete item.migrated;

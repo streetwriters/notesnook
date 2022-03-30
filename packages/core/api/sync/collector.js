@@ -49,7 +49,7 @@ class Collector {
       if (item.localOnly) {
         prev.push({ id: item.id, deleted: true, dateModified: Date.now() });
       } else if (
-        item.dateModified > this._lastSyncedTimestamp ||
+        (item.dateModified > this._lastSyncedTimestamp && !item.synced) ||
         item.migrated
       ) {
         prev.push(item);
@@ -75,6 +75,7 @@ class Collector {
     delete item.resolved;
     // turn the migrated flag off so we don't keep syncing this item repeated
     delete item.migrated;
+    delete item.synced;
 
     return {
       id: item.id,

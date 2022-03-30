@@ -15,7 +15,6 @@ import Conflicts from "./conflicts";
 import { SyncQueue } from "./syncqueue";
 import { AutoSync } from "./auto-sync";
 import { toChunks } from "../../utils/array";
-import id from "../../utils/id";
 
 const ITEM_TYPE_MAP = {
   attachments: "attachment",
@@ -27,7 +26,6 @@ const ITEM_TYPE_MAP = {
 
 /**
  * @typedef {{
- *  syncId: string,
  *  item: string,
  *  itemType: string,
  *  lastSynced: number,
@@ -44,7 +42,6 @@ const ITEM_TYPE_MAP = {
  *  lastSynced: number,
  *  current: number,
  *  total: number,
- *  syncId: string
  * }} BatchedSyncTransferItem
  */
 
@@ -58,14 +55,12 @@ export default class SyncManager {
     this.syncMutex = new Mutex();
   }
 
-  start(full, force) {
+  async start(full, force) {
     if (this.syncMutex.isLocked()) return false;
-    return this.syncMutex
-      .runExclusive(() => {
-        this.sync.autoSync.stop();
-        return this.sync.start(full, force);
-      })
-      .finally(() => this.sync.autoSync.start());
+    return this.syncMutex.runExclusive(async () => {
+      await this.sync.autoSync.start();
+      return this.sync.start(full, force);
+    });
   }
 
   async acquireLock(callback) {
@@ -86,13 +81,11 @@ class Sync {
    */
   constructor(db) {
     this.db = db;
-    this.runningSyncs = {};
     this.conflicts = new Conflicts(db);
     this.collector = new Collector(db);
     this.queue = new SyncQueue(db.storage);
     this.merger = new Merger(db);
     this.autoSync = new AutoSync(db, 1000);
-    this.syncId = null;
 
     const tokenManager = new TokenManager(db.storage);
     this.connection = new signalr.HubConnectionBuilder()
@@ -107,13 +100,11 @@ class Sync {
     });
 
     this.connection.on("SyncItem", async (syncStatus) => {
-      this.autoSync.stop();
       await this.onSyncItem.call(this, syncStatus);
-      await this.autoSync.start();
     });
 
-    this.connection.on("RemoteSyncCompleted", (syncId) =>
-      this.onRemoteSyncCompleted(syncId)
+    this.connection.on("RemoteSyncCompleted", () =>
+      this.onRemoteSyncCompleted()
     );
   }
 
@@ -123,18 +114,16 @@ class Sync {
    * @param {boolean} force
    * @param {Object} ignoredIds
    */
-  async start(full, force, ignoredIds) {
+  async start(full, force) {
     this.connection.onclose(() => {
       throw new Error("Connection closed.");
     });
 
-    this.syncId = this.getSyncId();
-
     const { lastSynced, oldLastSynced } = await this.init(force);
 
-    const serverResponse = full ? await this.fetch(lastSynced) : null;
+    const { newLastSynced, data } = await this.collect(lastSynced);
 
-    const { newLastSynced, data } = await this.collect(lastSynced, ignoredIds);
+    const serverResponse = full ? await this.fetch(lastSynced) : null;
 
     if (await this.send(data, newLastSynced)) {
       await this.stop(newLastSynced);
@@ -188,12 +177,10 @@ class Sync {
     return serverResponse;
   }
 
-  async collect(lastSynced, ignoredIds) {
+  async collect(lastSynced) {
     const newLastSynced = Date.now();
 
     let data = await this.collector.collect(lastSynced);
-    if (ignoredIds)
-      data = this.collector.filter(data, (item) => !ignoredIds[item.id]);
 
     let { syncedAt } = await this.queue.get();
     if (syncedAt) {
@@ -221,6 +208,8 @@ class Sync {
     if (areAllEmpty(data)) return false;
 
     const { itemIds } = await this.queue.get();
+    if (!itemIds) return false;
+
     const total = itemIds.length;
 
     const arrays = itemIds.reduce(
@@ -264,7 +253,6 @@ class Sync {
         total,
         items,
         types,
-        syncId: this.syncId,
       });
 
       if (result) {
@@ -273,20 +261,17 @@ class Sync {
           this.db.eventManager,
           "upload",
           total,
-          index + ids.length,
-          items
+          index + ids.length
         );
       }
     }
-    return await this.connection.invoke(
-      "SyncCompleted",
-      lastSynced,
-      this.syncId
-    );
+    return await this.connection.invoke("SyncCompleted", lastSynced);
   }
 
   async stop(lastSynced) {
-    await this.db.storage.write("lastSynced", lastSynced);
+    const storedLastSynced = await this.db.lastSynced();
+    if (lastSynced > storedLastSynced)
+      await this.db.storage.write("lastSynced", lastSynced);
     this.db.eventManager.publish(EVENTS.syncCompleted);
   }
 
@@ -321,10 +306,8 @@ class Sync {
   /**
    * @private
    */
-  async onRemoteSyncCompleted(syncId) {
-    const ignoredIds = this.runningSyncs[syncId];
-    await this.start(false, false, ignoredIds);
-    this.runningSyncs[syncId] = {};
+  async onRemoteSyncCompleted() {
+    await this.start(false, false);
   }
 
   /**
@@ -332,15 +315,8 @@ class Sync {
    * @private
    */
   async onSyncItem(syncStatus) {
-    const { current, id: syncId, item: itemJSON, itemType, total } = syncStatus;
+    const { current, item: itemJSON, itemType, total } = syncStatus;
     const item = JSON.parse(itemJSON);
-
-    if (syncId) {
-      this.runningSyncs[syncId] = {
-        ...this.runningSyncs[syncId],
-        [item.id]: true,
-      };
-    }
 
     await this.merger.mergeItem(itemType, item);
     sendSyncProgressEvent(this.db.eventManager, "download", total, current);
@@ -356,9 +332,5 @@ class Sync {
     if (!batch) return false;
     const result = await this.connection.invoke("SyncItem", batch);
     return result === 1;
-  }
-
-  getSyncId() {
-    return id();
   }
 }

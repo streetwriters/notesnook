@@ -10,11 +10,14 @@ export class AutoSync {
     this.db = db;
     this.interval = interval;
     this.timeout = null;
+    this.isAutoSyncing = false;
   }
 
   async start() {
     if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) return;
+    if (this.isAutoSyncing) return;
 
+    this.isAutoSyncing = true;
     this.databaseUpdatedEvent = this.db.eventManager.subscribeSingle(
       EVENTS.databaseUpdated,
       this.schedule.bind(this)
@@ -22,6 +25,7 @@ export class AutoSync {
   }
 
   stop() {
+    this.isAutoSyncing = false;
     clearTimeout(this.timeout);
     if (this.databaseUpdatedEvent) this.databaseUpdatedEvent.unsubscribe();
   }
@@ -29,9 +33,12 @@ export class AutoSync {
   /**
    * @private
    */
-  schedule() {
-    this.stop();
+  schedule(id, item) {
+    if (item && item.remote) return;
+
+    clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
+      console.log("SYNC REQUESTED by", id);
       this.db.eventManager.publish(EVENTS.databaseSyncRequested, false, false);
     }, this.interval);
   }
