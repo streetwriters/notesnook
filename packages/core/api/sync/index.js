@@ -15,6 +15,7 @@ import Conflicts from "./conflicts";
 import { SyncQueue } from "./syncqueue";
 import { AutoSync } from "./auto-sync";
 import { toChunks } from "../../utils/array";
+import id from "../../utils/id";
 
 const ITEM_TYPE_MAP = {
   attachments: "attachment",
@@ -26,7 +27,7 @@ const ITEM_TYPE_MAP = {
 
 /**
  * @typedef {{
- *  id: string,
+ *  syncId: string,
  *  item: string,
  *  itemType: string,
  *  lastSynced: number,
@@ -43,6 +44,7 @@ const ITEM_TYPE_MAP = {
  *  lastSynced: number,
  *  current: number,
  *  total: number,
+ *  syncId: string
  * }} BatchedSyncTransferItem
  */
 
@@ -90,6 +92,7 @@ class Sync {
     this.queue = new SyncQueue(db.storage);
     this.merger = new Merger(db);
     this.autoSync = new AutoSync(db, 1000);
+    this.syncId = null;
 
     const tokenManager = new TokenManager(db.storage);
     this.connection = new signalr.HubConnectionBuilder()
@@ -124,6 +127,8 @@ class Sync {
     this.connection.onclose(() => {
       throw new Error("Connection closed.");
     });
+
+    this.syncId = this.getSyncId();
 
     const { lastSynced, oldLastSynced } = await this.init(force);
 
@@ -259,6 +264,7 @@ class Sync {
         total,
         items,
         types,
+        syncId: this.syncId,
       });
 
       if (result) {
@@ -267,11 +273,16 @@ class Sync {
           this.db.eventManager,
           "upload",
           total,
-          index + ids.length
+          index + ids.length,
+          items
         );
       }
     }
-    return await this.connection.invoke("SyncCompleted", lastSynced);
+    return await this.connection.invoke(
+      "SyncCompleted",
+      lastSynced,
+      this.syncId
+    );
   }
 
   async stop(lastSynced) {
@@ -324,10 +335,12 @@ class Sync {
     const { current, id: syncId, item: itemJSON, itemType, total } = syncStatus;
     const item = JSON.parse(itemJSON);
 
-    this.runningSyncs[syncId] = {
-      ...this.runningSyncs[syncId],
-      [item.id]: true,
-    };
+    if (syncId) {
+      this.runningSyncs[syncId] = {
+        ...this.runningSyncs[syncId],
+        [item.id]: true,
+      };
+    }
 
     await this.merger.mergeItem(itemType, item);
     sendSyncProgressEvent(this.db.eventManager, "download", total, current);
@@ -343,5 +356,9 @@ class Sync {
     if (!batch) return false;
     const result = await this.connection.invoke("SyncItem", batch);
     return result === 1;
+  }
+
+  getSyncId() {
+    return id();
   }
 }
