@@ -230,7 +230,7 @@ class Sync {
 
         arrays.types.push(type);
         arrays.items.push(JSON.stringify(item));
-        arrays.ids.push(itemId);
+        arrays.ids.push(id);
 
         return arrays;
       },

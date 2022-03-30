@@ -33,10 +33,11 @@ export class SyncQueue {
     const { itemIds } = syncQueue;
     for (let id of ids) {
       const index = itemIds.findIndex((i) => i === id);
-      if (index <= -1) return;
+      if (index <= -1) continue;
       syncQueue.itemIds.splice(index, 1);
     }
-    await this.save(syncQueue);
+    if (syncQueue.itemIds.length <= 0) await this.save(null);
+    else await this.save(syncQueue);
   }
 
   /**
