@@ -34,6 +34,8 @@ import { TableCellProperties } from './TableCellProperties';
 import { TableRowProperties } from './TableRowProperties';
 import tiny from './tiny/tiny';
 import { IMAGE_TOOLTIP_CONFIG, TABLE_TOOLTIP_CONFIG } from './tiny/toolbar/config';
+import Config from 'react-native-config';
+import { formatDate } from 'notes-core/utils/date';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -710,13 +712,8 @@ async function setNoteInEditorAfterSaving(oldId, currentId) {
     note = db.notes.note(id);
     if (note) {
       note = note.data;
-    } else {
-      await sleep(500);
-      note = db.notes.note(id);
-      if (note) {
-        note = note.data;
-      }
     }
+    console.log('setting note in editor after saving');
   }
 }
 
@@ -825,7 +822,7 @@ export async function saveNote(title, _id, data, type, _sessionId, _historySessi
         ]);
       }
       if (!_id) {
-        id = noteId;
+        if (sessionId === _sessionId) id = noteId;
         await addToCollection(noteId);
       }
 
@@ -855,9 +852,11 @@ export async function saveNote(title, _id, data, type, _sessionId, _historySessi
 
       lastEditTime = n + 10;
       let n = db.notes.note(_id)?.data?.dateEdited;
+
       tiny.call(
         EditorWebView,
-        tiny.updateDateEdited(n ? timeConverter(n) : '') + tiny.updateSavingState(!n ? '' : 'Saved')
+        tiny.updateDateEdited(Config.isTesting ? 'test date' : n ? timeConverter(n) : '') +
+          tiny.updateSavingState(!n ? '' : 'Saved')
       );
     }
   } catch (e) {
@@ -995,9 +994,11 @@ const loadNoteInEditor = async (keepHistory = true) => {
       }
 
       setColors();
+
       tiny.call(
         EditorWebView,
-        tiny.updateDateEdited(timeConverter(note.dateEdited)) + tiny.updateSavingState('Saved')
+        tiny.updateDateEdited(Config.isTesting ? 'test date' : timeConverter(note.dateEdited)) +
+          tiny.updateSavingState('Saved')
       );
     } else {
       tiny.call(EditorWebView, tiny.toogleReadMode('design'));
