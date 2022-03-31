@@ -4,6 +4,7 @@ import { Linking, Platform, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ChangePassword } from '../../components/auth/change-password';
+import { Progress } from '../../components/sheets/progress';
 import { Button } from '../../components/ui/button';
 import Seperator from '../../components/ui/seperator';
 import Heading from '../../components/ui/typography/heading';
@@ -284,11 +285,7 @@ const SettingsUserSection = () => {
             {
               name: 'Having problems with syncing?',
               func: async () => {
-                presentSheet({
-                  title: 'Syncing your data',
-                  paragraph: 'Please wait while we sync all your data.',
-                  progress: true
-                });
+                Progress.present();
                 await Sync.run('global', true);
                 eSendEvent(eCloseProgressDialog);
               },

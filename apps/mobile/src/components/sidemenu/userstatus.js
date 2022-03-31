@@ -12,6 +12,8 @@ import { PressableButton } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { TimeSince } from '../ui/time-since';
+import useSyncProgress from '../../utils/hooks/use-sync-progress';
+import * as Progress from 'react-native-progress';
 
 export const UserStatus = () => {
   const colors = useThemeStore(state => state.colors);
@@ -19,6 +21,7 @@ export const UserStatus = () => {
   const syncing = useUserStore(state => state.syncing);
   const lastSynced = useUserStore(state => state.lastSynced);
   const insets = useSafeAreaInsets();
+  const { progress } = useSyncProgress();
 
   return (
     <View
@@ -82,7 +85,7 @@ export const UserStatus = () => {
                   'never'
                 )
               ) : (
-                'Syncing your notes'
+                `Syncing your notes${progress ? ` (${progress.current}/${progress.total})` : ''}`
               )}{' '}
               <Icon
                 name="checkbox-blank-circle"
@@ -103,7 +106,20 @@ export const UserStatus = () => {
 
           {user ? (
             syncing ? (
-              <ActivityIndicator size={SIZE.lg} color={colors.accent} />
+              <>
+                <Progress.Circle
+                  size={SIZE.xl}
+                  progress={progress ? progress.current / progress.total : 0.1}
+                  textStyle={{
+                    fontSize: 8
+                  }}
+                  animated={true}
+                  color={colors.accent}
+                  unfilledColor={colors.nav}
+                  borderWidth={0}
+                  thickness={2}
+                />
+              </>
             ) : (
               <Icon color={colors.accent} name="sync" size={SIZE.lg} />
             )
