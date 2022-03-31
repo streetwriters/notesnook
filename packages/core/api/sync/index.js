@@ -282,7 +282,7 @@ class Sync {
           this.db.eventManager,
           "upload",
           total,
-          index + ids.length
+          index * ids.length
         );
       }
     }
