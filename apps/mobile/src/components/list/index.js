@@ -58,7 +58,8 @@ const List = ({
     heading: 'Home'
   },
   screen,
-  ListHeader
+  ListHeader,
+  warning
 }) => {
   const colors = useThemeStore(state => state.colors);
   const scrollRef = useRef();
@@ -170,6 +171,7 @@ const List = ({
                 color={headerProps.color}
                 type={type}
                 screen={screen}
+                warning={warning}
               />
             )}
           </>

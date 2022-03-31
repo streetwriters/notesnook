@@ -8,7 +8,7 @@ import { SIZE } from '../../utils/size';
 import { PressableButton } from '../ui/pressable';
 import Paragraph from '../ui/typography/paragraph';
 
-export const Card = ({ color }) => {
+export const Card = ({ color, warning }) => {
   const colors = useThemeStore(state => state.colors);
   color = color ? color : colors.accent;
 
@@ -16,7 +16,7 @@ export const Card = ({ color }) => {
   const messageBoardState = useMessageStore(state => state.message);
   const announcement = useMessageStore(state => state.announcement);
 
-  return !messageBoardState.visible || selectionMode || announcement ? null : (
+  return !messageBoardState.visible || selectionMode || announcement || warning ? null : (
     <PressableButton
       onPress={messageBoardState.onPress}
       type="gray"

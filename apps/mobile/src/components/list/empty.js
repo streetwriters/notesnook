@@ -11,6 +11,7 @@ import Seperator from '../ui/seperator';
 import { Tip } from '../tip';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { notesnook } from '../../../e2e/test.ids';
 
 export const Empty = React.memo(
   ({ loading = true, placeholderData, headerProps, type, screen }) => {
@@ -48,6 +49,7 @@ export const Empty = React.memo(
             />
             {placeholderData.button && (
               <Button
+                testID={notesnook.buttons.add}
                 type="grayAccent"
                 title={placeholderData.button}
                 iconPosition="right"

@@ -20,19 +20,28 @@ import { tabBarRef } from '../../utils/global-refs';
 import { getNote } from '../editor/Functions';
 
 const getNotes = (params, group = true) => {
-  if (!params) return [];
+  if (!params)
+    return {
+      notes: [],
+      synced: true
+    };
   let notes = [];
+  let isSynced = true;
   if (params.type !== 'topic' && params.get !== 'monographs') {
     notes = db.notes[params.get](params.id);
   } else if (params.get === 'monographs') {
     notes = db.monographs.all;
   } else {
     notes = db.notebooks.notebook(params.notebookId)?.topics.topic(params.id)?.all;
+    isSynced = db.notebooks.notebook(params.notebookId)?.topics.topic(params.id)?.synced();
   }
   if (!notes) {
     notes = [];
   }
-  return group ? groupArray(notes, db.settings?.getGroupOptions('notes')) : notes;
+  return {
+    notes: group ? groupArray(notes, db.settings?.getGroupOptions('notes')) : notes,
+    synced: isSynced
+  };
 };
 
 function getAlias(params) {
@@ -46,15 +55,26 @@ function getAlias(params) {
   return alias || '';
 }
 
+function getIsSynced(params) {
+  if (params.type === 'topic') {
+    let topic = db.notebooks.notebook(params.notebookId)?.topics.topic(params.id);
+    return !topic ? true : topic?.synced();
+  }
+  return true;
+}
+
 export const Notes = ({ route, navigation }) => {
   const colors = useThemeStore(state => state.colors);
   const params = useRef(route?.params);
-  const [notes, setNotes] = useState(getNotes(params.current) || []);
+  const [notes, setNotes] = useState(getNotes(params.current).notes || []);
   const loading = useNoteStore(state => state.loading);
   const alias = getAlias(params);
+  const [warning, setWarning] = useState(!getIsSynced(params.current));
 
   const onLoad = () => {
-    let _notes = getNotes(params.current);
+    let data = getNotes(params.current);
+    let _notes = data.notes;
+    setWarning(!data.synced);
     setNotes(_notes);
     if (!params.current) return;
     if (
@@ -88,7 +108,6 @@ export const Notes = ({ route, navigation }) => {
   const init = data => {
     if (data) params.current = data;
 
-    setActionAfterFirstSave();
     onLoad();
     Navigation.setHeaderState('NotesPage', params, {
       heading:
@@ -101,6 +120,7 @@ export const Notes = ({ route, navigation }) => {
   };
 
   const onFocus = () => {
+    setActionAfterFirstSave();
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('NotesPage', init);
     }, 150);
@@ -146,7 +166,7 @@ export const Notes = ({ route, navigation }) => {
           : alias.slice(0, 1).toUpperCase() + alias.slice(1),
 
       get: () => {
-        return getNotes(params.current, false);
+        return getNotes(params.current, false).notes;
       }
     });
   };
@@ -255,6 +275,13 @@ export const Notes = ({ route, navigation }) => {
         listData={notes || []}
         type="notes"
         screen="NotesPage"
+        warning={
+          warning
+            ? {
+                title: 'Some notes in this topic are not synced'
+              }
+            : null
+        }
         refreshCallback={_refreshCallback}
         headerProps={headerProps}
         loading={loading}
