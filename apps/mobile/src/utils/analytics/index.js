@@ -62,6 +62,7 @@ async function saveAnalytics(route, value = true) {
  */
 
 async function pageView(route, prevRoute = '', conditions = ['/welcome'], once = true) {
+  if (__DEV__) return;
   if (!(await canUpdateAnalytics(route, conditions)) && once) return;
   let body = {
     payload: {
@@ -93,6 +94,7 @@ async function pageView(route, prevRoute = '', conditions = ['/welcome'], once =
 }
 
 async function sendEvent(type, value, once = true) {
+  if (__DEV__) return;
   if (!(await canUpdateAnalytics(type)) && once) return;
   let body = {
     payload: {
