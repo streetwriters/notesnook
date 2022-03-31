@@ -15,6 +15,7 @@ import Conflicts from "./conflicts";
 import { SyncQueue } from "./syncqueue";
 import { AutoSync } from "./auto-sync";
 import { toChunks } from "../../utils/array";
+import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 
 const ITEM_TYPE_MAP = {
   attachments: "attachment",
@@ -58,8 +59,10 @@ export default class SyncManager {
   async start(full, force) {
     if (this.syncMutex.isLocked()) return false;
     return this.syncMutex.runExclusive(async () => {
+      console.time("sync");
       await this.sync.autoSync.start();
-      return this.sync.start(full, force);
+      await this.sync.start(full, force);
+      console.timeEnd("sync");
     });
   }
 
@@ -92,6 +95,7 @@ class Sync {
       .withUrl(`${Constants.API_HOST}/hubs/sync`, {
         accessTokenFactory: () => tokenManager.getAccessToken(),
       })
+      .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
       .build();
 
     EV.subscribe(EVENTS.userLoggedOut, async () => {
@@ -155,27 +159,28 @@ class Sync {
 
   async fetch(lastSynced) {
     const serverResponse = await new Promise((resolve, reject) => {
-      let counter = { count: 0 };
+      let counter = { count: 0, queue: 0 };
       this.connection.stream("FetchItems", lastSynced).subscribe({
-        next: async (/** @type {SyncTransferItem} */ syncStatus) => {
+        next: (/** @type {SyncTransferItem} */ syncStatus) => {
           const { total, item, synced, lastSynced } = syncStatus;
           try {
             if (synced || !item) return;
 
-            counter.count++;
-            await this.onSyncItem(syncStatus, counter);
-
-            const progress = total - counter.count;
-            sendSyncProgressEvent(
-              this.db.eventManager,
-              `download`,
-              total,
-              progress
-            );
+            ++counter.count;
+            ++counter.queue;
+            const progress = counter.count;
+            this.onSyncItem(syncStatus).then(() => {
+              sendSyncProgressEvent(
+                this.db.eventManager,
+                `download`,
+                total,
+                progress
+              );
+            });
           } catch (e) {
             reject(e);
           } finally {
-            if (--counter.count <= 0) resolve({ synced, lastSynced });
+            if (--counter.queue <= 0) resolve({ synced, lastSynced });
           }
         },
         complete: () => {},
@@ -225,8 +230,6 @@ class Sync {
     const { itemIds } = await this.queue.get();
     if (!itemIds) return false;
 
-    const total = itemIds.length;
-
     const arrays = itemIds.reduce(
       (arrays, id) => {
         const [arrayKey, itemId] = id.split(":");
@@ -251,6 +254,8 @@ class Sync {
       arrays.types.push("vaultKey");
       arrays.items.push(JSON.stringify(data.vaultKey));
     }
+
+    let total = arrays.ids.length;
 
     arrays.ids = toChunks(arrays.ids, 30);
     arrays.types = toChunks(arrays.types, 30);

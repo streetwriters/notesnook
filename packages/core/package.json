@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@microsoft/signalr": "^6.0.3",
+    "@microsoft/signalr-protocol-msgpack": "^6.0.3",
     "@stablelib/blake2s": "^1.0.1",
     "async-mutex": "^0.3.2",
     "base64-arraybuffer": "^1.0.1",
