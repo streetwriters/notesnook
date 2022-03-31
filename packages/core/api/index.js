@@ -237,7 +237,7 @@ class Database {
   }
 
   async lastSynced() {
-    return this.storage.read("lastSynced");
+    return (await this.storage.read("lastSynced")) || 0;
   }
 
   sync(full = true, force = false) {

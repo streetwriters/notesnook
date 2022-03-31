@@ -181,6 +181,26 @@ test.skip(
   60 * 1000
 );
 
+test(
+  "issue: running force sync from device A makes device B always download everything",
+  async () => {
+    const deviceA = await initializeDevice("deviceA");
+    const deviceB = await initializeDevice("deviceB");
+
+    await syncAndWait(deviceA, deviceB, true);
+
+    const handler = jest.fn();
+    deviceB.eventManager.subscribe(EVENTS.syncProgress, handler);
+
+    await deviceB.sync(true);
+
+    expect(handler).not.toHaveBeenCalled();
+
+    await cleanup(deviceB);
+  },
+  60 * 1000
+);
+
 /**
  *
  * @param {string} id
@@ -240,13 +260,13 @@ function waitForSyncCompleted(device) {
  * @param {Database} deviceB
  * @returns
  */
-function syncAndWait(deviceA, deviceB) {
+function syncAndWait(deviceA, deviceB, force = false) {
   return new Promise((resolve) => {
     const ref = deviceB.eventManager.subscribe(EVENTS.syncCompleted, () => {
       ref.unsubscribe();
       resolve();
     });
-    deviceA.sync(true);
+    deviceA.sync(true, force);
   });
 }
 

@@ -109,8 +109,8 @@ class Sync {
       );
     });
 
-    this.connection.on("RemoteSyncCompleted", () => {
-      this.onRemoteSyncCompleted();
+    this.connection.on("RemoteSyncCompleted", (lastSynced) => {
+      this.onRemoteSyncCompleted(lastSynced);
     });
   }
 
@@ -120,7 +120,7 @@ class Sync {
    * @param {boolean} force
    * @param {Object} ignoredIds
    */
-  async start(full, force) {
+  async start(full, force, serverLastSynced) {
     this.connection.onclose(() => {
       throw new Error("Connection closed.");
     });
@@ -136,7 +136,7 @@ class Sync {
     } else if (serverResponse) {
       await this.stop(serverResponse.lastSynced);
     } else {
-      await this.stop(oldLastSynced);
+      await this.stop(serverLastSynced || oldLastSynced);
     }
   }
 
@@ -146,7 +146,7 @@ class Sync {
 
     await this.conflicts.recalculate();
 
-    let lastSynced = (await this.db.lastSynced()) || 0;
+    let lastSynced = await this.db.lastSynced();
     if (isForceSync) lastSynced = 0;
 
     const oldLastSynced = lastSynced;
@@ -155,15 +155,10 @@ class Sync {
 
   async fetch(lastSynced) {
     const serverResponse = await new Promise((resolve, reject) => {
-      let serverLastSynced = 0;
-      let _synced = false;
-
       let counter = { count: 0 };
       this.connection.stream("FetchItems", lastSynced).subscribe({
         next: async (/** @type {SyncTransferItem} */ syncStatus) => {
           const { total, item, synced, lastSynced } = syncStatus;
-          serverLastSynced = lastSynced;
-          _synced = synced;
           try {
             if (synced || !item) return;
 
@@ -173,15 +168,14 @@ class Sync {
             const progress = total - counter.count;
             sendSyncProgressEvent(
               this.db.eventManager,
-              "download",
+              `download`,
               total,
               progress
             );
           } catch (e) {
             reject(e);
           } finally {
-            if (--counter.count <= 0)
-              resolve({ synced: _synced, lastSynced: serverLastSynced });
+            if (--counter.count <= 0) resolve({ synced, lastSynced });
           }
         },
         complete: () => {},
@@ -327,8 +321,8 @@ class Sync {
   /**
    * @private
    */
-  async onRemoteSyncCompleted() {
-    await this.start(false, false);
+  async onRemoteSyncCompleted(lastSynced) {
+    await this.start(false, false, lastSynced);
   }
 
   /**
