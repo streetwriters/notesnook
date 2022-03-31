@@ -10,6 +10,7 @@ export const STORE_LINK =
 
 export const GROUP = {
   default: 'default',
+  None: 'none',
   abc: 'abc',
   year: 'year',
   week: 'week',
