@@ -28,7 +28,6 @@ export default class NoteHistory extends Collection {
     this.sessionContent = await SessionContent.new(
       this._db,
       "sessioncontent",
-      this._collection.encryptionKeyFactory,
       false
     );
   }
@@ -70,6 +69,7 @@ export default class NoteHistory extends Collection {
       sessionContentId: makeSessionContentId(sessionId),
       noteId,
       dateCreated: oldSession ? oldSession.dateCreated : Date.now(),
+      localOnly: true,
     };
 
     if (locked) {

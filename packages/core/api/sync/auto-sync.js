@@ -34,7 +34,7 @@ export class AutoSync {
    * @private
    */
   schedule(id, item) {
-    if (item && item.remote) return;
+    if (item && (item.remote || item.localOnly)) return;
 
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {

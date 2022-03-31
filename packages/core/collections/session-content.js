@@ -17,6 +17,7 @@ export default class SessionContent extends Collection {
       data: compressed || content.data,
       type: content.type,
       compressed: !!compressed,
+      localOnly: true,
       locked,
     });
   }
