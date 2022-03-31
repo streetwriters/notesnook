@@ -127,7 +127,7 @@ class Sync {
 
     const { lastSynced, oldLastSynced } = await this.init(force);
 
-    const { newLastSynced, data } = await this.collect(lastSynced);
+    const { newLastSynced, data } = await this.collect(lastSynced, force);
 
     const serverResponse = full ? await this.fetch(lastSynced) : null;
 
@@ -170,7 +170,7 @@ class Sync {
             counter.count++;
             await this.onSyncItem(syncStatus, counter);
 
-            const progress = counter.count;
+            const progress = total - counter.count;
             sendSyncProgressEvent(
               this.db.eventManager,
               "download",
@@ -198,10 +198,10 @@ class Sync {
     return serverResponse;
   }
 
-  async collect(lastSynced) {
+  async collect(lastSynced, force) {
     const newLastSynced = Date.now();
 
-    let data = await this.collector.collect(lastSynced);
+    let data = await this.collector.collect(lastSynced, force);
 
     let { syncedAt } = await this.queue.get();
     if (syncedAt) {

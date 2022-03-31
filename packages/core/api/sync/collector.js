@@ -9,20 +9,28 @@ class Collector {
     this._db = db;
   }
 
-  async collect(lastSyncedTimestamp) {
+  async collect(lastSyncedTimestamp, isForceSync) {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.getEncryptionKey();
     return {
       // notes: this._collect(await this._db.notes.encrypted()),
       // notebooks: this._collect(await this._db.notebooks.encrypted()),
       // content: this._collect(await this._db.content.encrypted()),
-      notes: await this._encrypt(this._collect(this._db.notes.raw)),
-      notebooks: await this._encrypt(this._collect(this._db.notebooks.raw)),
-      content: await this._encrypt(this._collect(await this._db.content.all())),
-      attachments: await this._encrypt(
-        this._collect(this._collect(this._db.attachments.syncable))
+      notes: await this._encrypt(
+        this._collect(this._db.notes.raw, isForceSync)
       ),
-      settings: await this._encrypt(this._collect([this._db.settings.raw])),
+      notebooks: await this._encrypt(
+        this._collect(this._db.notebooks.raw, isForceSync)
+      ),
+      content: await this._encrypt(
+        this._collect(await this._db.content.all(), isForceSync)
+      ),
+      attachments: await this._encrypt(
+        this._collect(this._db.attachments.syncable, isForceSync)
+      ),
+      settings: await this._encrypt(
+        this._collect([this._db.settings.raw], isForceSync)
+      ),
       vaultKey: await this._serialize(await this._db.vault._getKey()),
     };
   }
@@ -42,14 +50,15 @@ class Collector {
    * @param {Array} array
    * @returns {Array}
    */
-  _collect(array) {
+  _collect(array, isForceSync) {
     if (!array.length) return [];
     return array.reduce((prev, item) => {
       if (!item) return prev;
+      const isSyncable = !item.synced || isForceSync;
       if (item.localOnly) {
         prev.push({ id: item.id, deleted: true, dateModified: Date.now() });
       } else if (
-        (item.dateModified > this._lastSyncedTimestamp && !item.synced) ||
+        (item.dateModified > this._lastSyncedTimestamp && isSyncable) ||
         item.migrated
       ) {
         prev.push(item);
