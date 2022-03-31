@@ -199,11 +199,15 @@ h2,
 h3,
 h4,
 h5,
-h6,
-strong {
+h6 {
   font-weight:600 !important;
   position:relative;
   padding-left:10px;
+}
+
+strong {
+  font-weight:600 !important;
+  position:relative;
 }
 
 h1::before,
