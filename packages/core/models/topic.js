@@ -1,5 +1,4 @@
 import { qclone } from "qclone";
-import sort from "fast-sort";
 import { deleteItem, findById } from "../utils/array";
 
 export default class Topic {

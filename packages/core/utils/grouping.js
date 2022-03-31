@@ -47,10 +47,15 @@ export function groupArray(
     sortDirection: "desc",
   }
 ) {
-  const keySelector = KEY_SELECTORS[options.groupBy || "default"];
   if (options.sortBy && options.sortDirection)
     fastsort(array).by(getSortSelectors(options));
 
+  if (options.groupBy === "none") {
+    array.splice(0, 0, { title: "All", type: "header" });
+    return array;
+  }
+
+  const keySelector = KEY_SELECTORS[options.groupBy || "default"];
   let groups = new Map();
   array.forEach((item) => {
     let groupTitle = item.pinned
