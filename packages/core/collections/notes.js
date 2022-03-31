@@ -151,6 +151,10 @@ export default class Notes extends Collection {
     return this._getTagItems(colorId, "colors");
   }
 
+  exists(id) {
+    return this._collection.exists(id);
+  }
+
   /**
    * @private
    */

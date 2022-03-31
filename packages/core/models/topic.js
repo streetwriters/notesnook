@@ -94,11 +94,18 @@ export default class Topic {
   }
 
   get all() {
-    const notes = this._topic.notes.reduce((arr, noteId) => {
+    return this._topic.notes.reduce((arr, noteId) => {
       let note = this._db.notes.note(noteId);
       if (note) arr.push(note.data);
       return arr;
     }, []);
-    return sort(notes).desc((note) => note.dateCreated);
+  }
+
+  synced() {
+    const notes = this._topic.notes;
+    for (let id of notes) {
+      if (!this._db.notes.exists(id)) return false;
+    }
+    return true;
   }
 }

@@ -178,4 +178,9 @@ export default class Note {
   readonly() {
     return this._toggle("readonly");
   }
+
+  synced() {
+    const contentExists = this._db.content.exists(this.data.contentId);
+    return contentExists;
+  }
 }

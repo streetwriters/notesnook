@@ -76,6 +76,10 @@ export default class Content extends Collection {
     return this._collection.getItems(ids);
   }
 
+  exists(id) {
+    return this._collection.exists(id);
+  }
+
   async all() {
     return Object.values(
       await this._collection.getItems(this._collection.indexer.indices)
