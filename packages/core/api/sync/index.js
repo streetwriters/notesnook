@@ -59,10 +59,8 @@ export default class SyncManager {
   async start(full, force) {
     if (this.syncMutex.isLocked()) return false;
     return this.syncMutex.runExclusive(async () => {
-      console.time("sync");
       await this.sync.autoSync.start();
       await this.sync.start(full, force);
-      console.timeEnd("sync");
     });
   }
 
@@ -163,25 +161,24 @@ class Sync {
       this.connection.stream("FetchItems", lastSynced).subscribe({
         next: (/** @type {SyncTransferItem} */ syncStatus) => {
           const { total, item, synced, lastSynced } = syncStatus;
-          try {
-            if (synced || !item) return;
+          if (synced || !item) return;
 
-            ++counter.count;
-            ++counter.queue;
-            const progress = counter.count;
-            this.onSyncItem(syncStatus).then(() => {
+          ++counter.count;
+          ++counter.queue;
+          const progress = counter.count;
+          this.onSyncItem(syncStatus)
+            .then(() => {
               sendSyncProgressEvent(
                 this.db.eventManager,
                 `download`,
                 total,
                 progress
               );
+            })
+            .catch(reject)
+            .finally(() => {
+              if (--counter.queue <= 0) resolve({ synced, lastSynced });
             });
-          } catch (e) {
-            reject(e);
-          } finally {
-            if (--counter.queue <= 0) resolve({ synced, lastSynced });
-          }
         },
         complete: () => {},
         error: reject,
