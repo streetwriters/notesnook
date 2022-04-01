@@ -13,6 +13,7 @@ import { store as userstore } from "../stores/user-store";
 import FileSaver from "file-saver";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
+import { showFilePicker } from "../components/editor/plugins/picker";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -98,6 +99,53 @@ export async function createBackup(save = true) {
   }
 }
 
+export async function selectBackupFile() {
+  const file = await showFilePicker({
+    acceptedFileTypes: ".nnbackup,application/json",
+  });
+  if (!file) return;
+
+  const reader = new FileReader();
+  const backup = await new Promise((resolve, reject) => {
+    reader.addEventListener("load", (event) => {
+      const text = event.target.result;
+      try {
+        resolve(JSON.parse(text));
+      } catch (e) {
+        alert(
+          "Error: Could not read the backup file provided. Either it's corrupted or invalid."
+        );
+        resolve();
+      }
+    });
+    reader.readAsText(file);
+  });
+  console.log(file, backup);
+  return { file, backup };
+}
+
+export async function importBackup() {
+  const { backup } = await selectBackupFile();
+  await restoreBackupFile(backup);
+}
+
+export async function restoreBackupFile(backup) {
+  console.log("[restore]", backup);
+  if (backup.data.iv && backup.data.salt) {
+    await showPasswordDialog("ask_backup_password", async ({ password }) => {
+      const error = await restore(backup, password);
+      return !error;
+    });
+  } else {
+    await showLoadingDialog({
+      title: "Restoring backup",
+      subtitle:
+        "Please do NOT close your browser or shut down your PC until the process completes.",
+      action: () => restore(backup),
+    });
+  }
+}
+
 export function getTotalNotes(notebook) {
   return notebook.topics.reduce((sum, topic) => {
     return sum + topic.notes.length;
@@ -136,5 +184,15 @@ export async function showUpgradeReminderDialogs() {
     await showReminderDialog("trialexpired");
   } else if (isTrial && consumed >= 75) {
     await showReminderDialog("trialexpiring");
+  }
+}
+
+async function restore(backup, password) {
+  try {
+    await db.backup.import(backup, password);
+    showToast("success", "Backup restored!");
+  } catch (e) {
+    console.error(e);
+    await showToast("error", `Could not restore the backup: ${e.message || e}`);
   }
 }

@@ -4,7 +4,7 @@ import { initializeDatabase } from "../common/db";
 const memory = {
   isAppLoaded: false,
 };
-export default function useDatabase() {
+export default function useDatabase(persistence) {
   const [isAppLoaded, setIsAppLoaded] = useState(memory.isAppLoaded);
 
   useEffect(() => {
@@ -12,11 +12,11 @@ export default function useDatabase() {
 
     (async () => {
       await import("../app.css");
-      await initializeDatabase();
+      await initializeDatabase(persistence);
       setIsAppLoaded(true);
       memory.isAppLoaded = true;
     })();
-  }, []);
+  }, [persistence]);
 
   return [isAppLoaded];
 }

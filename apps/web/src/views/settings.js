@@ -24,7 +24,7 @@ import {
   show2FARecoveryCodesDialog,
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
-import { createBackup, verifyAccount } from "../common";
+import { createBackup, importBackup, verifyAccount } from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
@@ -44,35 +44,6 @@ import useZoomFactor from "../hooks/use-zoom-factor";
 import debounce from "just-debounce-it";
 import { PATHS } from "@notesnook/desktop/paths";
 import { openPath } from "../commands/open";
-
-function importBackup() {
-  return new Promise((resolve, reject) => {
-    const importFileElem = document.getElementById("restore-backup");
-    importFileElem.click();
-    importFileElem.onchange = function () {
-      const file = importFileElem.files[0];
-      if (!file) return reject("No file selected.");
-      if (!file.name.endsWith(".nnbackup")) {
-        return reject(
-          "The given file does not have .nnbackup extension. Only files with .nnbackup extension are supported."
-        );
-      }
-      const reader = new FileReader();
-      reader.addEventListener("load", (event) => {
-        const text = event.target.result;
-        try {
-          resolve(JSON.parse(text));
-        } catch (e) {
-          alert(
-            "Error: Could not read the backup file provided. Either it's corrupted or invalid."
-          );
-          resolve();
-        }
-      });
-      reader.readAsText(file);
-    };
-  });
-}
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -469,52 +440,14 @@ function Settings(props) {
                 tip="Create a backup file of all your data"
               />
             </Button>
-            <input
-              type="file"
-              id="restore-backup"
-              hidden
-              accept=".nnbackup,application/json"
-            />
+
             <Button
               variant="list"
               onClick={async () => {
-                try {
-                  if (!isLoggedIn)
-                    throw new Error(
-                      "You must be logged in to restore backups."
-                    );
-
-                  const backup = await importBackup();
-
-                  async function restore(password) {
-                    await db.backup.import(backup, password);
-                    await refreshApp();
-                    showToast("success", "Backup restored!");
-                  }
-
-                  if (backup.data.iv && backup.data.salt) {
-                    await showPasswordDialog(
-                      "ask_backup_password",
-                      async ({ password }) => {
-                        const error = await restore(password);
-                        return !error;
-                      }
-                    );
-                  } else {
-                    await showLoadingDialog({
-                      title: "Restoring backup",
-                      subtitle:
-                        "Please do NOT close your browser or shut down your PC until the process completes.",
-                      action: restore,
-                    });
-                  }
-                } catch (e) {
-                  console.error(e);
-                  await showToast(
-                    "error",
-                    `Could not restore the backup: ${e.message || e}`
-                  );
-                }
+                if (!isLoggedIn)
+                  throw new Error("You must be logged in to restore backups.");
+                await importBackup();
+                await refreshApp();
               }}
             >
               <Tip
