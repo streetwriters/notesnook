@@ -180,7 +180,6 @@ export default class Note {
   }
 
   synced() {
-    const contentExists = this._db.content.exists(this.data.contentId);
-    return contentExists;
+    return !this.data.contentId || this._db.content.exists(this.data.contentId);
   }
 }

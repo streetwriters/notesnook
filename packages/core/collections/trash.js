@@ -133,7 +133,7 @@ export default class Trash {
     let [item] = this._getItem(id);
     if (item.itemType === "note") {
       const { contentId } = item;
-      return this._db.content.exists(contentId);
+      return !contentId || this._db.content.exists(contentId);
     } else return true;
   }
 }
