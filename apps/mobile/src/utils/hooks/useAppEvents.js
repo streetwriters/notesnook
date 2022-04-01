@@ -298,13 +298,6 @@ export const useAppEvents = () => {
     try {
       user = await db.user.getUser();
       await PremiumService.setPremiumStatus();
-      if (login) {
-        console.log('sync started');
-        await Sync.run();
-        console.log('hide progress dialog');
-        await sleep(300);
-        eSendEvent(eCloseProgressDialog);
-      }
       setLastSynced(await db.lastSynced());
       if (!user) {
         return setLoginMessage();
