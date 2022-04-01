@@ -260,7 +260,7 @@ class Sync {
     arrays.types = toChunks(arrays.types, 30);
     arrays.items = toChunks(arrays.items, 30);
 
-    let index = 0;
+    let done = 0;
     for (let i = 0; i < arrays.ids.length; ++i) {
       const ids = arrays.ids[i];
       const items = arrays.items[i];
@@ -268,20 +268,16 @@ class Sync {
 
       const result = await this.sendBatchToServer({
         lastSynced,
-        current: ++index,
+        current: i,
         total,
         items,
         types,
       });
 
       if (result) {
+        done += ids.length;
         await this.queue.dequeue(...ids);
-        sendSyncProgressEvent(
-          this.db.eventManager,
-          "upload",
-          total,
-          index * ids.length
-        );
+        sendSyncProgressEvent(this.db.eventManager, "upload", total, done);
       }
     }
     return await this.connection.invoke("SyncCompleted", lastSynced);

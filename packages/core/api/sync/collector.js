@@ -10,6 +10,8 @@ class Collector {
   }
 
   async collect(lastSyncedTimestamp, isForceSync) {
+    await this._db.notes.init();
+
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.getEncryptionKey();
     return {
@@ -55,14 +57,15 @@ class Collector {
     return array.reduce((prev, item) => {
       if (!item) return prev;
       const isSyncable = !item.synced || isForceSync;
+      const isUnsynced =
+        item.dateModified > this._lastSyncedTimestamp || isForceSync;
+
       if (item.localOnly) {
         prev.push({ id: item.id, deleted: true, dateModified: Date.now() });
-      } else if (
-        (item.dateModified > this._lastSyncedTimestamp && isSyncable) ||
-        item.migrated
-      ) {
+      } else if ((isUnsynced && isSyncable) || item.migrated) {
         prev.push(item);
       }
+
       return prev;
     }, []);
   }
