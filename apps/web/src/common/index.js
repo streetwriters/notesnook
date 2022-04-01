@@ -67,6 +67,9 @@ export function notesFromContext(context) {
     case "favorite":
       notes = db.notes.favorites;
       break;
+    case "monographs":
+      notes = db.monographs.all;
+      break;
     default:
       return [];
   }

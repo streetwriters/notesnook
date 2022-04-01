@@ -4,6 +4,7 @@ import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { useStore as useMonographStore } from "../../stores/monograph-store";
 import { useStore, store } from "../../stores/editor-store";
 import { showToast } from "../../utils/toast";
 import { AnimatedInput } from "../animated";
@@ -27,10 +28,11 @@ function Toolbar(props) {
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const [isTitleVisible, setIsTitleVisible] = useState(false);
+  const monographs = useMonographStore((store) => store.monographs);
 
   const isNotePublished = useMemo(
     () => sessionId && db.monographs.isPublished(sessionId),
-    [sessionId]
+    [sessionId, monographs]
   );
 
   useEffect(() => {

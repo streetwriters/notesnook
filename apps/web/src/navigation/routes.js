@@ -11,7 +11,6 @@ import { navigate } from "../navigation";
 import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
-import Monographs from "../views/monographs";
 import { showToast } from "../utils/toast";
 
 const routes = {
@@ -167,12 +166,20 @@ const routes = {
     title: "Settings",
     component: <Settings />,
   }),
-  "/monographs": () => ({
-    key: "monographs",
-    type: "monographs",
-    title: "Monographs",
-    component: <Monographs />,
-  }),
+  "/monographs": () => {
+    notestore.setContext({ type: "monographs" });
+    return {
+      key: "notes",
+      title: "Monographs",
+      type: "notes",
+      component: <Notes />,
+      buttons: {
+        search: {
+          title: "Search monograph notes",
+        },
+      },
+    };
+  },
   "/search/:type": ({ type }) => ({
     type: "search",
     title: "Search",
