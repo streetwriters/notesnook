@@ -270,11 +270,13 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   );
 };
 
-TwoFactorVerification.present = (onMfaLogin, data) => {
+TwoFactorVerification.present = (onMfaLogin, data, context) => {
+  console.log('presenting sheet');
   presentSheet({
     component: <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />,
-    context: 'two_factor_verify',
+    context: context || 'two_factor_verify',
     onClose: () => {
+      console.log('on close called');
       onMfaLogin();
     },
     disableClosing: true

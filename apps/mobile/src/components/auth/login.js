@@ -97,8 +97,16 @@ export const Login = ({ changeMode }) => {
       Progress.present();
     } catch (e) {
       callback && callback(false);
-      console.log('Login error', e.message, e.data);
+      console.log(
+        'Login error',
+        e.message,
+        e.data,
+        e.message === 'Multifactor authentication required.'
+      );
       if (e.message === 'Multifactor authentication required.') {
+        console.log(TwoFactorVerification.present, 'calling 2fa');
+        setLoading(false);
+        await sleep(300);
         TwoFactorVerification.present(async mfa => {
           if (mfa) {
             console.log(mfa);
@@ -137,8 +145,8 @@ export const Login = ({ changeMode }) => {
       />
 
       <ForgotPassword />
-      <SheetProvider context="two_factor_verify" />
 
+      <SheetProvider context="two_factor_verify" />
       {loading ? <BaseDialog transparent={true} visible={true} animation="fade" /> : null}
       <View
         style={{
