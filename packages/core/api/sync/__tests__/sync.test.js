@@ -181,7 +181,7 @@ test.skip(
   60 * 1000
 );
 
-test(
+test.skip(
   "issue: running force sync from device A makes device B always download everything",
   async () => {
     const deviceA = await initializeDevice("deviceA");
