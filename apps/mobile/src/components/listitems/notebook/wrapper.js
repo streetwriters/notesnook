@@ -60,6 +60,7 @@ export const NotebookWrapper = React.memo(
     );
   },
   (prev, next) => {
+    if (prev.item.title !== next.item.title) return false;
     if (prev.dateBy !== next.dateBy) {
       return false;
     }
