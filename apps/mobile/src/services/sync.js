@@ -20,7 +20,8 @@ const run = async (context = 'global', forced = false, full = true) => {
   try {
     let res = await doInBackground(async () => {
       try {
-        return await db.sync(full, forced);
+        await db.sync(full, forced);
+        return true;
       } catch (e) {
         error = e;
         return e.message;
