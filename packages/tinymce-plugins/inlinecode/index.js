@@ -1,4 +1,4 @@
-const { addPluginToPluginManager } = require("../utils");
+const { addPluginToPluginManager, notifyEditorChange } = require("../utils");
 
 const TAGNAME = "CODE";
 
@@ -37,9 +37,10 @@ function toggleInlineCode(editor) {
     editor.focus();
     const range = editor.selection.getRng();
     const node = editor.selection.getNode();
-
-    if (!!node.closest("code")) {
-      editor.execCommand("mceToggleFormat", false, "code");
+    const code = node.closest("code");
+    if (code) {
+      code.replaceWith(code.innerText);
+      notifyEditorChange(editor, "toggle-code");
     } else if (
       node.tagName !== TAGNAME &&
       range.startOffset === range.endOffset
