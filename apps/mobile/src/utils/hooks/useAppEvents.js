@@ -37,7 +37,7 @@ import {
 } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import Sync from '../../services/sync';
+import Sync, { ignoredMessages } from '../../services/sync';
 import {
   clearAllStores,
   initialize,
@@ -244,30 +244,11 @@ export const useAppEvents = () => {
 
   const onRequestPartialSync = async (full, force) => {
     console.log('auto sync request', full, force);
-    try {
-      if (full || force) {
-        Sync.run('global', force, full);
-        return;
-      }
-      setSyncing(true);
-      let res = await doInBackground(async () => {
-        try {
-          await db.sync(false);
-          return true;
-        } catch (e) {
-          return e.message;
-        }
-      });
-      if (res !== true) throw new Error(res);
-      setLastSynced(await db.lastSynced());
-    } catch (e) {
+    if (full || force) {
+      await Sync.run('global', force, full);
       setSyncing(false);
-      let status = await NetInfo.fetch();
-      if (status.isConnected && status.isInternetReachable) {
-        console.log(e.message, AppState.currentState);
-        ToastEvent.error(e, 'Sync failed', 'global');
-      }
-    } finally {
+    } else {
+      await Sync.run('global', false, false);
       setSyncing(false);
     }
   };
