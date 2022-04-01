@@ -161,7 +161,11 @@ class Sync {
       this.connection.stream("FetchItems", lastSynced).subscribe({
         next: (/** @type {SyncTransferItem} */ syncStatus) => {
           const { total, item, synced, lastSynced } = syncStatus;
-          if (synced || !item) return;
+          if (synced) {
+            resolve({ synced, lastSynced });
+            return;
+          }
+          if (!item) return;
 
           ++counter.count;
           ++counter.queue;
