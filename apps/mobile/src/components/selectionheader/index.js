@@ -198,6 +198,7 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
             customStyle={{
               marginLeft: 10
             }}
+            testID="select-minus"
             color={colors.pri}
             name="minus"
             size={SIZE.xl}
