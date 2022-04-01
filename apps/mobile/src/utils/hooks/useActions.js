@@ -255,8 +255,9 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   const checkNoteSynced = () => {
-    if (item.type !== 'note') return true;
-    if (!db.notes.note(item.id).synced()) {
+    if (item.type !== 'note' || item.itemType !== 'note') return true;
+    let isTrash = item.itemType === 'note';
+    if (!isTrash && !db.notes.note(item.id).synced()) {
       ToastEvent.show({
         context: 'local',
         heading: 'Note not synced',
@@ -265,6 +266,17 @@ export const useActions = ({ close = () => {}, item }) => {
       });
       return false;
     }
+
+    if (isTrash && !db.trash.synced(item.id)) {
+      ToastEvent.show({
+        context: 'local',
+        heading: 'Note not synced',
+        message: 'Please run sync before making changes',
+        type: 'error'
+      });
+      return false;
+    }
+
     return true;
   };
 
