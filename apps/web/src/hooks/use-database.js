@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 import { initializeDatabase } from "../common/db";
+import { loadTrackerScript } from "../utils/analytics";
+
+if (process.env.NODE_ENV === "production") {
+  loadTrackerScript();
+  console.log = () => {};
+}
 
 const memory = {
   isAppLoaded: false,

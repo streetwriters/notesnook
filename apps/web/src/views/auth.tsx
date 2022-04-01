@@ -277,7 +277,6 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         }
 
         await userstore.signup(form);
-        trackEvent(ANALYTICS_EVENTS.accountCreated);
         openURL("/notes/#/welcome");
       }}
     >

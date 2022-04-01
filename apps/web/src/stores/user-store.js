@@ -13,6 +13,7 @@ import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { hashNavigate } from "../navigation";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
+import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -114,6 +115,7 @@ class UserStore extends BaseStore {
     return db.user
       .signup(form.email.toLowerCase(), form.password)
       .then(() => {
+        trackEvent(ANALYTICS_EVENTS.accountCreated);
         return this.init();
       })
       .finally(() => {

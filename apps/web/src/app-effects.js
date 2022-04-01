@@ -26,11 +26,6 @@ import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./components/dialogs/onboarding-dialog";
 
-if (process.env.NODE_ENV === "production") {
-  loadTrackerScript();
-  console.log = () => {};
-}
-
 export default function AppEffects({ setShow }) {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
   const sync = useStore((store) => store.sync);
