@@ -1,3 +1,4 @@
+import _ from "notes-core/types";
 import { EVENTS } from "@notesnook/desktop/events";
 import { render } from "react-dom";
 import { AppEventManager } from "./common/app-events";
