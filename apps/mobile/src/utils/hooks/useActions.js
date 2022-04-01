@@ -255,6 +255,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   const checkNoteSynced = () => {
+    if (item.type !== 'note') return true;
     if (!db.notes.note(item.id).synced()) {
       ToastEvent.show({
         context: 'local',
