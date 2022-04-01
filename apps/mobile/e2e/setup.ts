@@ -1,3 +1,3 @@
 beforeAll(async () => {
-    await device.launchApp();
+  await device.launchApp();
 });

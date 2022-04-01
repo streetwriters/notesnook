@@ -13,8 +13,16 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": false,
-    "maxNodeModuleJsDepth": 5,
+    "maxNodeModuleJsDepth": 6,
     "downlevelIteration": true
   },
-  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
+  "exclude": [
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js",
+    "android",
+    "ios",
+    "html",
+    "e2e"
+  ]
 }

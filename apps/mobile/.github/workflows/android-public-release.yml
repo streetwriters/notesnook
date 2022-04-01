@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Android App APKS
         run: |
-          cd android && ./gradlew assembleRelease --no-daemon
+          cd android && ENVFILE=.env.public ./gradlew assembleRelease --no-daemon
 
       - name: Sign APK Files
         id: sign_app
@@ -48,16 +48,24 @@ jobs:
         id: package-version
         uses: martinbeentjes/npm-get-version-action@master
 
+      - name: Rename
+        run: |
+          cd android/app/build/outputs/apk/release/
+          mv app-arm64-v8a-release-unsigned-signed.apk notesnook-arm64-v8a.apk
+          mv app-armeabi-v7a-release-unsigned-signed.apk notesnook-armeabi-v7a.apk
+          mv app-x86-release-unsigned-signed.apk notesnook-x86.apk
+          mv app-x86_64-release-unsigned-signed.apk notesnook-x86_64.apk
+
       - name: Publish
         uses: softprops/action-gh-release@v1
         with:
           draft: true
           tag_name: ${{ steps.package-version.outputs.current-version}}-android
-          name: ${{ steps.package-version.outputs.current-version}}-Android
+          name: Notesnook Android v${{ steps.package-version.outputs.current-version}}
           repository: streetwriters/notesnook
           token: ${{ secrets.NOTESNOOK_GH_TOKEN }}
           files: |
-            ${{ steps.sign_app.signedReleaseFile0 }}
-            ${{ steps.sign_app.signedReleaseFile1 }}
-            ${{ steps.sign_app.signedReleaseFile2 }}
-            ${{ steps.sign_app.signedReleaseFile3 }}
+            android/app/build/outputs/apk/release/notesnook-arm64-v8a.apk
+            android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
+            android/app/build/outputs/apk/release/notesnook-x86.apk
+            android/app/build/outputs/apk/release/notesnook-x86_64.apk

@@ -59,9 +59,6 @@ function loadFontSize() {
 }
 
 let changeTimer = null;
-const COLLAPSED_KEY = 'c';
-const HIDDEN_KEY = 'h';
-const collapsibleTags = { HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6 };
 let styleElement;
 
 function addStyle() {
@@ -74,46 +71,9 @@ function addStyle() {
   body {
     font-size:${DEFAULT_FONT_SIZE} !important;
   }
-  .mce-content-body .c::before{
-    background-color:${pageTheme.colors.accent};
-    border-radius:3px;
-    color:white;
-  }
   `;
 }
 
-function toggleElementVisibility(element, toggleState) {
-  if (!toggleState) element.classList.remove(HIDDEN_KEY);
-  else element.classList.add(HIDDEN_KEY);
-}
-
-function collapseElement(target) {
-  let sibling = target.nextSibling;
-  const isTargetCollapsed = target.classList.contains(COLLAPSED_KEY);
-  let skip = false;
-
-  while (
-    sibling &&
-    (!collapsibleTags[sibling.tagName] ||
-      collapsibleTags[sibling.tagName] > collapsibleTags[target.tagName])
-  ) {
-    const isCollapsed = sibling.classList.contains(COLLAPSED_KEY);
-    if (!isTargetCollapsed) {
-      if (isCollapsed) {
-        skip = true;
-        toggleElementVisibility(sibling, isTargetCollapsed);
-      } else if (skip && collapsibleTags[sibling.tagName]) {
-        skip = false;
-      }
-    }
-    if (!skip) {
-      toggleElementVisibility(sibling, isTargetCollapsed);
-    }
-    addStyle();
-    if (!sibling.nextSibling) break;
-    sibling = sibling.nextSibling;
-  }
-}
 let undoTimer = null;
 function onUndoChange() {
   clearTimeout(undoTimer);
@@ -152,77 +112,6 @@ function init_callback(_editor) {
     reactNativeEventHandler('focus', 'editor');
   });
 
-  // editor.on('SetContent', function (event) {
-  //   if (globalThis.isClearingNoteData) {
-  //     globalThis.isClearingNoteData = false;
-  //     return;
-  //   }
-  //   setTimeout(function () {
-  //     editor.undoManager.transact(function () {});
-  //   }, 1000);
-  //   if (!event.paste) {
-  //     reactNativeEventHandler('noteLoaded', true);
-  //   }
-  // });
-
-  editor.on('NewBlock', function (e) {
-    const { newBlock } = e;
-    let target;
-    if (newBlock) {
-      target = newBlock.previousElementSibling;
-    }
-    if (target && target.classList.contains(COLLAPSED_KEY)) {
-      target.classList.remove(COLLAPSED_KEY);
-      collapseElement(target);
-    }
-    onChange(e);
-  });
-  let shouldCancelNextTouchEndEvent = false;
-  editor.on(
-    'touchstart mousedown',
-    function (e) {
-      const { target } = e;
-      if (e.targetTouches.length !== 1) return;
-      let xPos = e.targetTouches[0].clientX;
-      if (
-        xPos < 45 &&
-        collapsibleTags[target.tagName] &&
-        target.parentElement &&
-        target.parentElement.tagName === 'BODY'
-      ) {
-        e.preventDefault();
-        shouldCancelNextTouchEndEvent = true;
-        editor.undoManager.transact(function () {
-          if (target.classList.contains(COLLAPSED_KEY)) {
-            target.classList.remove(COLLAPSED_KEY);
-          } else {
-            target.classList.add(COLLAPSED_KEY);
-          }
-          collapseElement(target);
-          editor.fire('input', { data: '' });
-        });
-      }
-    },
-    {
-      capture: true,
-      passive: false
-    }
-  );
-
-  editor.on(
-    'touchend',
-    e => {
-      if (shouldCancelNextTouchEndEvent) {
-        e.preventDefault();
-        shouldCancelNextTouchEndEvent = false;
-      }
-    },
-    {
-      capture: true,
-      passive: false
-    }
-  );
-
   editor.on('tap', function (e) {
     if (e.target.classList.contains('mce-content-body') && !e.target.innerText.length > 0) {
       e.preventDefault();
@@ -246,7 +135,7 @@ function init_callback(_editor) {
 
 const plugins = [
   'checklist advlist autolink textpattern hr lists link noneditable image bettertable',
-  'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
+  'searchreplace codeblock inlinecode keyboardquirks attachmentshandler collapsibleheaders',
   'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
 ];
 
@@ -266,41 +155,7 @@ body {
   ${margins} 
 }
 
-.mce-content-body h2::before,
-h3::before,
-h4::before,
-h5::before,
-h6::before {
-  font-size: 11px;
-  font-weight: normal;
-  letter-spacing: 1.1px;
-  padding: 1px 3px 1px 3px;
-  margin-left: -12px;
-  margin-right: 5px;
-  cursor: row-resize;
-  margin-top:-3px;
-  vertical-align:middle;
-  }
-  
-  .mce-content-body h2::before {
-  content: "H2";
-  }
-  
-  .mce-content-body h3::before {
-  content: "H3";
-  }
-  
-  .mce-content-body h4::before {
-  content: "H4";
-  }
-  
-  .mce-content-body h5::before {
-  content: "H5";
-  }
 
-  .h {
-    display: none;
-  }
 span.diff-del {
   background-color: #FDB0C0;  
 }
@@ -310,11 +165,15 @@ span.diff-ins {
 pre.codeblock {
   overflow-x:auto;
 }
-img {
+img,
+video {
   max-width:100% !important;
   height:auto !important;
   border-radius:5px !important;
+  margin-bottom:10px;
 }
+
+
 .tox .tox-edit-area__iframe {
   background-color:transparent !important;
 }
@@ -327,9 +186,12 @@ body {
   background-color:transparent !important;
   font-size:${DEFAULT_FONT_SIZE}
 }
+.mce-preview-object,
 iframe {
   max-width:100% !important;
   background-color:transparent !important;
+  height:auto !important;
+  border-radius:5px !important;
 }
 
 h1,
@@ -337,9 +199,61 @@ h2,
 h3,
 h4,
 h5,
-h6,
+h6 {
+  font-weight:600 !important;
+  position:relative;
+  padding-left:10px;
+}
+
 strong {
   font-weight:600 !important;
+  position:relative;
+}
+
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  opacity: 1;
+  cursor: row-resize;
+  margin-right: 7px;
+  margin-left: -15px;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  border: none;
+  position:absolute;
+  margin-left: -25px;
+}
+
+h1::before {
+  top:2px;
+}
+
+ h2::before {
+  top:5px;
+}
+ h3::before {
+  top:2px;
+}
+h4::before {
+  top:0px;
+}
+h5::before {
+  top:0px;
+  width: 20px;
+  height: 20px;
+}
+h6::before {
+  top:-1px;
+  width: 18px;
+  height: 18px;
+}
+
+.h {
+  display: none !important;
 }
 `;
 
@@ -636,7 +550,10 @@ const onChange = function (event) {
         reactNativeEventHandler('tiny', html);
       })
       .catch(function (e) {
-        reactNativeEventHandler('tinyerror', e.message);
+        reactNativeEventHandler('tinyerror', {
+          message: e?.message,
+          stack: e?.stack
+        });
       });
 
     onUndoChange();

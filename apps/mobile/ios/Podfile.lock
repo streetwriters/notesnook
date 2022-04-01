@@ -237,6 +237,10 @@ PODS:
     - React-Core
   - react-native-begin-background-task (0.1.0):
     - React
+  - react-native-config (1.4.5):
+    - react-native-config/App (= 1.4.5)
+  - react-native-config/App (1.4.5):
+    - React-Core
   - react-native-document-picker (7.1.3):
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
@@ -407,6 +411,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-background-actions (from `../node_modules/react-native-background-actions`)
   - react-native-begin-background-task (from `../node_modules/react-native-begin-background-task`)
+  - react-native-config (from `../node_modules/react-native-config`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
@@ -508,6 +513,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-background-actions"
   react-native-begin-background-task:
     :path: "../node_modules/react-native-begin-background-task"
+  react-native-config:
+    :path: "../node_modules/react-native-config"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
   react-native-fingerprint-scanner:
@@ -640,6 +647,7 @@ SPEC CHECKSUMS:
   React-logger: b08f354e4c928ff794ca477347fea0922aaf11c3
   react-native-background-actions: a466fde06b54e52adf037ca9b217df460596f120
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
+  react-native-config: 6502b1879f97ed5ac570a029961fc35ea606cd14
   react-native-document-picker: ec07866a30707f23660c0f3ae591d669d3e89096
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-get-random-values: 30b3f74ca34e30e2e480de48e4add2706a40ac8f

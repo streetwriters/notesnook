@@ -1,10 +1,9 @@
 {
-    "testEnvironment": "./environment",
-    "testRunner": "jest-circus/runner",
-    "setupFilesAfterEnv": ["./setup.ts"],
-    "testTimeout": 120000,
-    "testRegex": "\\index.e2e\\.js$",
-    "reporters": ["detox/runners/jest/streamlineReporter"],
-    "verbose": true
+  "testEnvironment": "./environment",
+  "testRunner": "jest-circus/runner",
+  "setupFilesAfterEnv": ["./setup.ts"],
+  "testTimeout": 120000,
+  "testRegex": "\\.e2e\\.js$",
+  "reporters": ["detox/runners/jest/streamlineReporter"],
+  "verbose": true
 }
-

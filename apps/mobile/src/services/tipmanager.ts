@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MMKV } from '../utils/mmkv';
+import { MMKV } from '../utils/database/mmkv';
 
 //@ts-ignore
 Array.prototype.sample = function () {
@@ -205,5 +205,11 @@ const placeholderTips = [
   "You can publish a note and share it with anyone. Even if they don't use Notesnook!",
   'Published notes can be encrypted. Which means only you and the person you share the password with can read them.',
   'You can change default font size from editor settings at the end of toolbar',
-  'The editor toolbar can be scrolled horizontally to add more formats and blocks'
+  'The editor toolbar can be scrolled horizontally to add more formats and blocks',
+  `To be left alone is the most precious thing one can ask of the modern world. - Anthony Burgess`,
+  `Arguing that you don't care about the right to privacy because you have nothing to hide is no different than saying you don't care about free speech because you have nothing to say.” ― Edward Snowden `,
+  `Privacy is not something that I'm merely entitled to, it's an absolute prerequisite.” ― Marlon Brando `,
+  `You can disable syncing on notes you don't want to be synced or stored anywhere other than your phone.`,
+  `We value your feedback so join us on Discord/Telegram and share your experiences and ideas. Let's build the best (and private) note taking app together.`,
+  `You can view & restore older versions of a note if you delete something accidentally by going to Note properties -> History`
 ];
