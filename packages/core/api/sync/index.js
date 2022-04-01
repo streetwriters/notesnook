@@ -157,7 +157,7 @@ class Sync {
 
   async fetch(lastSynced) {
     const serverResponse = await new Promise((resolve, reject) => {
-      let counter = { count: 0, queue: 0 };
+      let counter = { count: 0, queue: null };
       this.connection.stream("FetchItems", lastSynced).subscribe({
         next: (/** @type {SyncTransferItem} */ syncStatus) => {
           const { total, item, synced, lastSynced } = syncStatus;
@@ -166,17 +166,15 @@ class Sync {
             return;
           }
           if (!item) return;
+          if (counter.queue === null) counter.queue = total;
 
-          ++counter.count;
-          ++counter.queue;
-          const progress = counter.count;
           this.onSyncItem(syncStatus)
             .then(() => {
               sendSyncProgressEvent(
                 this.db.eventManager,
                 `download`,
                 total,
-                progress
+                ++counter.count
               );
             })
             .catch(reject)
