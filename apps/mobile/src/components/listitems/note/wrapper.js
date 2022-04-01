@@ -16,15 +16,14 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
   let _note = item;
   if (!isTrash) {
     _note = db.notes.note(item.id).data;
-  }
-
-  if (!db.notes.note(item.id)?.synced()) {
-    presentDialog({
-      title: 'Note not synced',
-      negativeText: 'Ok',
-      paragraph: 'Please sync again to open this note for editing'
-    });
-    return;
+    if (!db.notes.note(item.id)?.synced()) {
+      presentDialog({
+        title: 'Note not synced',
+        negativeText: 'Ok',
+        paragraph: 'Please sync again to open this note for editing'
+      });
+      return;
+    }
   }
 
   if (history.selectedItemsList.length > 0 && history.selectionMode) {
