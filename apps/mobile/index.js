@@ -1,11 +1,17 @@
 import React from 'react';
 import { AppRegistry, LogBox, Platform, UIManager } from 'react-native';
+import Config from 'react-native-config';
 import 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { enableScreens } from 'react-native-screens';
 import { name as appName } from './app.json';
 import Notifications from './src/services/notifications';
 global.Buffer = require('buffer').Buffer;
+
+if (Config.isTesting) {
+  Date.prototype.toLocaleString = () => 'XX-XX-XX';
+}
+
 enableScreens(true);
 UIManager.setLayoutAnimationEnabledExperimental &&
   UIManager.setLayoutAnimationEnabledExperimental(true);
