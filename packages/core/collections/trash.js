@@ -128,6 +128,14 @@ export default class Trash {
       await this.delete(item.id);
     }
   }
+
+  synced(id) {
+    let [item] = this._getItem(id);
+    if (item.itemType === "note") {
+      const { contentId } = item;
+      return this._db.content.exists(contentId);
+    } else return true;
+  }
 }
 
 function collectionNameFromItem(item) {
