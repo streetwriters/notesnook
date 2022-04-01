@@ -13,6 +13,7 @@ const ENDPOINTS = {
   verifyUser: "/account/verify",
   revoke: "/connect/revocation",
   recoverAccount: "/account/recover",
+  resetUser: "/users/reset",
   activateTrial: "/subscriptions/trial",
 };
 
@@ -146,6 +147,17 @@ class UserManager {
    */
   getUser() {
     return this._storage.read("user");
+  }
+
+  async resetUser(removeAttachments = true) {
+    let token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    await http.post(
+      `${constants.API_HOST}${ENDPOINTS.resetUser}`,
+      { removeAttachments },
+      token
+    );
+    return true;
   }
 
   async updateUser(user) {
@@ -308,6 +320,8 @@ class UserManager {
         password: new_password,
         salt,
       });
+
+      if (!(await this.resetUser(false))) return;
 
       if (attachmentsKey) {
         const userEncryptionKey = await this.getEncryptionKey();
