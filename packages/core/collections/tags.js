@@ -35,6 +35,7 @@ export default class Tags extends Collection {
       id,
       title: tag.title,
       noteIds: setManipulator.union(notes, noteIds),
+      localOnly: true,
     };
 
     await this._collection.addItem(tag);
