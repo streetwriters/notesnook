@@ -55,7 +55,12 @@ function StatusBar() {
                 size={7}
                 color={user.isEmailConfirmed ? "success" : "warn"}
               />
-              <Text className="selectable" variant="subBody" color="bgSecondaryText" ml={1}>
+              <Text
+                className="selectable"
+                variant="subBody"
+                color="bgSecondaryText"
+                ml={1}
+              >
                 {user.email}
                 {user.isEmailConfirmed ? "" : " (not verified)"}
               </Text>
@@ -163,7 +168,7 @@ function SyncStatus() {
   const user = useUserStore((state) => state.user);
 
   const status = syncStatusFilters.find((f) =>
-    f.check(syncStatus, user, lastSynced)
+    f.check(syncStatus.key, user, lastSynced)
   );
 
   return (
@@ -175,13 +180,25 @@ function SyncStatus() {
       title={status.tooltip}
       data-test-id={`sync-status-${status.key}`}
     >
-      <status.icon size={12} color={status.iconColor} rotate={status.loading} />
-      <Text variant="subBody" ml={1}>
-        {typeof status.text === "string" ? (
-          status.text
-        ) : (
-          <status.text lastSynced={lastSynced} />
-        )}
+      {syncStatus.progress ? (
+        <Text variant={"subBody"}>{syncStatus.progress}%</Text>
+      ) : (
+        <status.icon
+          size={12}
+          color={status.iconColor}
+          rotate={status.loading}
+        />
+      )}
+      <Text variant="subBody" ml={status.text ? "3px" : 0}>
+        {status.text ? (
+          <>
+            {typeof status.text === "string" ? (
+              status.text
+            ) : (
+              <status.text lastSynced={lastSynced} syncStatus={syncStatus} />
+            )}{" "}
+          </>
+        ) : null}
       </Text>
     </Button>
   );
@@ -192,12 +209,12 @@ const syncStatusFilters = [
     key: "synced",
     check: (syncStatus) => syncStatus === "synced",
     icon: Sync,
-    text: ({ lastSynced }) => (
-      <>
-        {"Synced "}
-        <TimeAgo live={true} datetime={lastSynced} />
-      </>
-    ),
+    text: ({ lastSynced }) =>
+      lastSynced ? (
+        <TimeAgo live={true} locale="en_short" datetime={lastSynced} />
+      ) : (
+        "click to sync"
+      ),
     tooltip: "All changes are synced.",
   },
   {
@@ -205,7 +222,7 @@ const syncStatusFilters = [
     check: (syncStatus) => syncStatus === "syncing",
     icon: Sync,
     loading: true,
-    text: "Syncing",
+    text: ({ syncStatus }) => <>{syncStatus.type || "sync"}ing</>,
     tooltip: "Syncing your notes...",
   },
   {
@@ -213,7 +230,7 @@ const syncStatusFilters = [
     check: (syncStatus) => syncStatus === "completed",
     icon: Checkmark,
     iconColor: "success",
-    text: "Sync completed",
+    text: "",
   },
   {
     key: "conflicts",
@@ -230,13 +247,6 @@ const syncStatusFilters = [
     iconColor: "warn",
     text: "Sync disabled",
     tooltip: "Please confirm your email to start syncing.",
-  },
-  {
-    key: "neverSynced",
-    check: (_syncStatus, _user, lastSynced) => !lastSynced,
-    icon: Sync,
-    text: "Synced never",
-    tooltip: "Click to sync your notes.",
   },
   {
     key: "failed",

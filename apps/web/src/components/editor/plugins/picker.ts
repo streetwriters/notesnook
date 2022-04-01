@@ -129,7 +129,7 @@ async function getEncryptionKey(): Promise<SerializedKey> {
 
 type FilePickerOptions = { acceptedFileTypes: MimeType };
 
-function showFilePicker({
+export function showFilePicker({
   acceptedFileTypes,
 }: FilePickerOptions): Promise<File | undefined> {
   return new Promise((resolve) => {

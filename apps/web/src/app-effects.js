@@ -26,11 +26,6 @@ import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";
 import { interruptedOnboarding } from "./components/dialogs/onboarding-dialog";
 
-if (process.env.NODE_ENV === "production") {
-  loadTrackerScript();
-  console.log = () => {};
-}
-
 export default function AppEffects({ setShow }) {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
   const sync = useStore((store) => store.sync);
@@ -38,6 +33,7 @@ export default function AppEffects({ setShow }) {
   const isFocusMode = useStore((store) => store.isFocusMode);
   const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
+  const initStore = useStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const initAttachments = useAttachmentStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
@@ -65,10 +61,14 @@ export default function AppEffects({ setShow }) {
         }
       );
 
-      EV.subscribe(EVENTS.databaseSyncRequested, async (full, force) => {
-        await sync(full, force);
-      });
+      db.eventManager.subscribe(
+        EVENTS.databaseSyncRequested,
+        async (full, force) => {
+          await sync(full, force);
+        }
+      );
 
+      initStore();
       initAttachments();
       refreshNavItems();
       initNotes();
@@ -88,6 +88,7 @@ export default function AppEffects({ setShow }) {
       };
     },
     [
+      initStore,
       initAttachments,
       sync,
       updateLastSynced,

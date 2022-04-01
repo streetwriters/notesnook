@@ -249,6 +249,8 @@ const formats = [
   },
 ];
 
+const notFullySyncedText =
+  "Cannot perform this action because note is not fully synced.";
 const menuItems = [
   {
     key: "pin",
@@ -281,28 +283,37 @@ const menuItems = [
   },
   {
     key: "publish",
-    disabled: ({ note }) => !db.monographs.isPublished(note.id) && note.locked,
-    disableReason: "You cannot publish a locked note.",
+    disabled: ({ note }) => {
+      if (!db.notes.note(note.id).synced()) return notFullySyncedText;
+      if (!db.monographs.isPublished(note.id) && note.locked)
+        return "You cannot publish a locked note.";
+    },
     icon: Icon.Publish,
     title: ({ note }) =>
       db.monographs.isPublished(note.id) ? "Unpublish" : "Publish",
     onClick: async ({ note }) => {
-      await showPublishView(note.id, "bottom");
+      const isPublished = db.monographs.isPublished(note.id);
+      if (isPublished) await db.monographs.unpublish(note.id);
+      else await showPublishView(note.id, "bottom");
     },
   },
   {
     key: "export",
     title: "Export as",
     icon: Icon.Export,
-    disabled: ({ note }) => note.locked,
-    disableReason: "Locked notes cannot be exported currently.",
+    disabled: ({ note }) => {
+      if (!db.notes.note(note.id).synced()) return notFullySyncedText;
+      if (note.locked) return "Locked notes cannot be exported currently.";
+    },
     items: formats.map((format) => ({
       key: format.type,
       title: format.title,
       tooltip: `Export as ${format.title} - ${format.subtitle}`,
       icon: format.icon,
-      disabled: ({ items }) => format.type === "pdf" && items.length > 1,
-      disableReason: "Multiple notes cannot be exported as PDF.",
+      disabled: ({ items }) =>
+        format.type === "pdf" && items.length > 1
+          ? "Multiple notes cannot be exported as PDF."
+          : false,
       onClick: async ({ items }) => {
         await exportNotes(
           format.type,
@@ -316,8 +327,10 @@ const menuItems = [
   {
     key: "duplicate",
     title: "Duplicate",
-    disabled: ({ note }) => note.locked,
-    disableReason: "Locked notes cannot be duplicated",
+    disabled: ({ note }) => {
+      if (!db.notes.note(note.id).synced()) return notFullySyncedText;
+      if (note.locked) return "Locked notes cannot be duplicated";
+    },
     icon: Icon.Duplicate,
     onClick: async ({ note }) => {
       const id = await store.get().duplicate(note);
@@ -335,6 +348,8 @@ const menuItems = [
   },
   {
     key: "lock",
+    disabled: ({ note }) =>
+      !db.notes.note(note.id).synced() ? notFullySyncedText : false,
     title: ({ note }) => (note.locked ? "Unlock" : "Lock"),
     icon: Icon.Lock,
     onClick: async ({ note }) => {
@@ -351,6 +366,8 @@ const menuItems = [
   },
   {
     key: "sync-disable",
+    disabled: ({ note }) =>
+      !db.notes.note(note.id).synced() ? notFullySyncedText : false,
     title: ({ note }) => (note.localOnly ? "Enable sync" : "Disable sync"),
     icon: ({ note }) => (note.localOnly ? Icon.Sync : Icon.SyncOff),
     onClick: async ({ note }) => {
@@ -373,9 +390,18 @@ const menuItems = [
     color: "error",
     iconColor: "error",
     icon: Icon.Trash,
-    disabled: ({ items }) =>
-      items.length === 1 && db.monographs.isPublished(items[0].id),
-    disableReason: "Please unpublish this note to move it to trash",
+    disabled: ({ items }) => {
+      const areAllSynced = items.reduce((prev, curr) => {
+        if (!prev || !db.notes.note(curr.id).synced()) return false;
+        return prev;
+      }, true);
+      if (!areAllSynced) return notFullySyncedText;
+
+      if (items.length !== 1) return false;
+
+      if (db.monographs.isPublished(items[0].id))
+        return "Please unpublish this note to move it to trash";
+    },
     onClick: async ({ items }) => {
       await Multiselect.moveNotesToTrash(items, items.length > 1);
     },
@@ -403,7 +429,6 @@ const topicNoteMenuItems = [
 ];
 
 function colorsToMenuItems() {
-  console.log(COLORS);
   return COLORS.map((label) => {
     const lowercase = label.toLowerCase();
     return {

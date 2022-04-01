@@ -9,6 +9,7 @@ import * as clipboard from "clipboard-polyfill/text";
 import ThemeProvider from "../theme-provider";
 import { showToast } from "../../utils/toast";
 import { EV, EVENTS } from "notes-core/common";
+import { useStore } from "../../stores/monograph-store";
 import { closeOpenedDialog } from "../../common/dialog-controller";
 
 function PublishView(props) {
@@ -18,6 +19,8 @@ function PublishView(props) {
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState();
+  const publishNote = useStore((store) => store.publish);
+  const unpublishNote = useStore((store) => store.unpublish);
 
   const noteTitle = useMemo(() => db.notes.note(noteId)?.title, [noteId]);
 
@@ -190,7 +193,7 @@ function PublishView(props) {
               const password =
                 document.getElementById("publishPassword")?.value;
 
-              const publishId = await db.monographs.publish(noteId, {
+              const publishId = await publishNote(noteId, {
                 selfDestruct,
                 password,
               });
@@ -226,7 +229,7 @@ function PublishView(props) {
             onClick={async () => {
               try {
                 setIsPublishing(true);
-                await db.monographs.unpublish(noteId);
+                await unpublishNote(noteId);
                 setPublishId();
                 onClose(true);
                 showToast("success", "Note unpublished.");

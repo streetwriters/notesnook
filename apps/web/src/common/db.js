@@ -1,21 +1,14 @@
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
-//const EventSource = NativeEventSource || EventSourcePolyfill;
-// OR: may also need to set as global property
-//global.EventSource =  NativeEventSource || EventSourcePolyfill;
 
-global.HTMLParser = new DOMParser().parseFromString(
-  "<body></body>",
-  "text/html"
-);
 /**
  * @type {import("notes-core/api").default}
  */
 var db;
-async function initializeDatabase() {
+async function initializeDatabase(persistence) {
   const { default: Database } = await import("notes-core/api");
-  const { default: Storage } = await import("../interfaces/storage");
+  const { NNStorage } = await import("../interfaces/storage");
   const { default: FS } = await import("../interfaces/fs");
-  db = new Database(Storage, EventSource, FS);
+  db = new Database(new NNStorage(persistence), EventSource, FS);
 
   // if (isTesting()) {
   // db.host({

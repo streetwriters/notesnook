@@ -2,7 +2,6 @@ import { formatDate } from "notes-core/utils/date";
 import React, { useEffect, useRef } from "react";
 import { Text } from "rebass";
 import { register, format, cancel, render } from "timeago.js";
-import en_short from "timeago.js/lib/lang/en_short";
 
 const shortLocale = [
   ["now", "now"],
@@ -20,8 +19,25 @@ const shortLocale = [
   ["1yr", "in 1yr"],
   ["%syr", "in %syr"],
 ];
+
+const enShortLocale = [
+  ["now", "now"],
+  ["%ss ago", "in %ss"],
+  ["1m ago", "in 1m"],
+  ["%sm ago", "in %sm"],
+  ["1h ago", "in 1h"],
+  ["%sh ago", "in %sh"],
+  ["1d ago", "in 1d"],
+  ["%sd ago", "in %sd"],
+  ["1w ago", "in 1w"],
+  ["%sw ago", "in %sw"],
+  ["1mo ago", "in 1mo"],
+  ["%smo ago", "in %smo"],
+  ["1yr ago", "in 1yr"],
+  ["%syr ago", "in %syr"],
+];
 register("short", (_n, index) => shortLocale[index]);
-register("en_short", en_short);
+register("en_short", (_n, index) => enShortLocale[index]);
 
 function TimeAgo({ datetime, live, locale, opts, ...restProps }) {
   const timeRef = useRef();

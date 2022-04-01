@@ -39,7 +39,8 @@ function showDialog(dialog) {
 }
 
 export function closeOpenedDialog() {
-  const root = document.getElementById("dialogContainer");
+  const root = document.getElementById("ReactModalPortal");
+  if (!root) return;
   ReactDOM.unmountComponentAtNode(root);
 }
 
@@ -137,6 +138,10 @@ export function confirm({
       }}
     />
   ));
+}
+
+export function showError(title, message) {
+  return confirm({ title, message, yesText: "Okay" });
 }
 
 export function showMultiDeleteConfirmation(length) {

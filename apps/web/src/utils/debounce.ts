@@ -1,25 +1,3 @@
-// type GenericFunction<TArgs, TReturn> = (...args: TArgs[]) => TReturn;
-
-// export function debounce<TArgs>(fn: GenericFunction<TArgs, unknown>, wait: number) {
-//   let timeout: NodeJS.Timeout | null = null;
-//   let debounceId: string | null = null;
-
-//   var debounceWrapper = function (id: string, ...args: TArgs) {
-//     if (!wait) {
-//       return fn.apply(this, args);
-//     }
-
-//     if (id === debounceId) clearTimeout(timeout);
-//     debounceId = id;
-
-//     timeout = setTimeout(() => {
-//       fn(...args);
-//     }, wait);
-//   };
-
-//   return debounceWrapper;
-// }
-
 export function debounce<F extends (...args: any) => any>(
   func: F,
   waitFor: number
@@ -45,7 +23,6 @@ export function debounceWithId<F extends (...args: any) => any>(
     if (timeout && id === debounceId) clearTimeout(timeout);
     debounceId = id;
     timeout = setTimeout(() => {
-      console.log(id, debounceId);
       func(...args);
     }, waitFor);
   };

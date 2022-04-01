@@ -161,7 +161,6 @@ function mapMenuItems(items, data) {
       key,
       onClick: _onClick,
       color,
-      disableReason,
       disabled,
       hidden,
       checked,
@@ -189,7 +188,7 @@ function mapMenuItems(items, data) {
     const onClick =
       typeof _onClick === "function" && _onClick.bind(this, data, item);
 
-    const tooltip = (isDisabled && disableReason) || item.tooltip || title;
+    const tooltip = isDisabled || item.tooltip || title;
     const isPremium = isPro && !isUserPremium();
     const hasSubmenu = items?.length > 0;
 

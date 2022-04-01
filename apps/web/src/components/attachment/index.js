@@ -161,8 +161,8 @@ const menuItems = [
     key: "recheck",
     title: () => "Recheck",
     icon: Icon.DoubleCheckmark,
-    disabled: ({ attachment }) => !attachment.dateUploaded,
-    disableReason: "This attachment is not uploaded yet.",
+    disabled: ({ attachment }) =>
+      !attachment.dateUploaded ? "This attachment is not uploaded yet." : false,
     onClick: async ({ items }) => {
       await store.recheck(items.map((i) => i.metadata.hash));
     },
@@ -182,8 +182,8 @@ const menuItems = [
     title: ({ attachment }) =>
       attachment.status?.type === "download" ? "Cancel download" : "Download",
     icon: Icon.Download,
-    disabled: ({ attachment }) => !attachment.dateUploaded,
-    disableReason: "This attachment is not uploaded yet.",
+    disabled: ({ attachment }) =>
+      !attachment.dateUploaded ? "This attachment is not uploaded yet." : false,
     onClick: async ({ attachment }) => {
       const isDownloading = attachment.status?.type === "download";
       if (isDownloading) {

@@ -9,20 +9,56 @@ import { store as attachmentStore } from "./attachment-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
+import { EVENTS } from "notes-core/common";
 
 var syncStatusTimeout = 0;
+const BATCH_SIZE = 50;
 class AppStore extends BaseStore {
   // default state
   isSideMenuOpen = false;
   isFocusMode = false;
   isEditorOpen = false;
   isVaultCreated = false;
-  syncStatus = "synced";
+  syncStatus = {
+    key: "synced",
+    progress: null,
+    type: null,
+  };
   colors = [];
   globalMenu = { items: [], data: {} };
   reminders = [];
   menuPins = [];
   lastSynced = 0;
+
+  init = () => {
+    let count = 0;
+    db.eventManager.subscribe(
+      EVENTS.syncProgress,
+      ({ type, total, current }) => {
+        if (total === current) return;
+        this.set((state) => {
+          state.syncStatus = {
+            key: "syncing",
+            progress: ((current / total) * 100).toFixed(),
+            type,
+          };
+        });
+
+        if (type === "download" && ++count >= BATCH_SIZE) {
+          count = 0;
+          this.refresh();
+        }
+      }
+    );
+
+    db.eventManager.subscribe(EVENTS.syncCompleted, () => {
+      this.set((state) => {
+        state.syncStatus = { key: "synced" };
+      });
+      count = 0;
+      this.refresh();
+    });
+  };
 
   refresh = async () => {
     await this.updateLastSynced();
@@ -135,15 +171,13 @@ class AppStore extends BaseStore {
   sync = async (full = true, force = false) => {
     clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
-    this.set((state) => (state.isSyncing = true));
 
-    this.set((state) => (state.syncStatus = "syncing"));
+    this.updateSyncStatus("syncing");
     return db
       .sync(full, force)
-      .then(async (result) => {
-        if (!result) return;
+      .then(async () => {
+        if (full) this.updateSyncStatus("completed");
         await this.updateLastSynced();
-        this.set((state) => (state.syncStatus = "completed"));
         return await this.refresh();
       })
       .catch(async (err) => {
@@ -153,18 +187,26 @@ class AppStore extends BaseStore {
           if (editorstore.get().session.id)
             editorstore.openSession(editorstore.get().session.id, true);
           await this.refresh();
-          this.set((state) => (state.syncStatus = "conflicts"));
+          this.updateSyncStatus("conflicts");
         } else {
-          this.set((state) => (state.syncStatus = "failed"));
+          this.updateSyncStatus("failed");
         }
       })
       .finally(() => {
-        if (this.get().syncStatus === "conflicts") return;
+        if (this.get().syncStatus.key === "conflicts") return;
 
         syncStatusTimeout = setTimeout(() => {
-          this.set((state) => (state.syncStatus = "synced"));
+          this.updateSyncStatus("synced");
         }, 3000);
       });
+  };
+
+  /**
+   *
+   * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed"} key
+   */
+  updateSyncStatus = (key) => {
+    this.set((state) => (state.syncStatus.key = key));
   };
 }
 

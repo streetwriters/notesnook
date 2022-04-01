@@ -14,7 +14,6 @@ function Header({ readonly }) {
   const tags = useStore((store) => store.session.tags);
   const setTag = useStore((store) => store.setTag);
   const setTitle = useStore((store) => store.setTitle);
-  console.log(title, id);
   const filterableTags = useMemo(() => {
     return db.tags.all.filter((t) => tags.every((tag) => tag !== t.title));
   }, [tags]);

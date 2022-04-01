@@ -92,7 +92,7 @@ export function trackVisit(url: string = "/") {
   const platform = getPlatform();
   if (!window.umami || !platform) return;
 
-  window.umami.trackView(url);
+  window.umami.trackView(url, window.document.referrer);
   if (url === "/")
     trackEvent(
       ANALYTICS_EVENTS.version,

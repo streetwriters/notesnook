@@ -176,9 +176,12 @@ async function uploadFile(filename, requestOptions) {
     uploadId = "",
   } = fileHandle.file.additionalData || {};
 
-  if (uploaded) return true;
-
   try {
+    if (uploaded) {
+      await checkUpload(filename);
+      return true;
+    }
+
     const { headers, cancellationToken } = requestOptions;
 
     const initiateMultiPartUpload = await axios
@@ -265,16 +268,21 @@ async function uploadFile(filename, requestOptions) {
     if (!fileHandle.file.type?.startsWith("image/")) {
       await streamablefs.deleteFile(filename);
     }
-
-    if ((await getUploadedFileSize(filename)) <= 0) {
-      const error = `Upload verification failed: file size is 0. Please upload this file again. (File hash: ${filename})`;
-      throw new Error(error);
-    }
-
+    await checkUpload(filename);
     return true;
   } catch (e) {
+    reportProgress(undefined, { type: "upload", hash: filename });
     if (e.handle) e.handle();
     else handleS3Error(e);
+
+    return false;
+  }
+}
+
+async function checkUpload(filename) {
+  if ((await getUploadedFileSize(filename)) <= 0) {
+    const error = `Upload verification failed: file size is 0. Please upload this file again. (File hash: ${filename})`;
+    throw new Error(error);
   }
 }
 
@@ -402,15 +410,20 @@ async function deleteFile(filename, requestOptions) {
 }
 
 async function getUploadedFileSize(filename) {
-  const url = `${hosts.API_HOST}/s3?name=${filename}`;
-  const token = await db.user.tokenManager.getAccessToken();
+  try {
+    const url = `${hosts.API_HOST}/s3?name=${filename}`;
+    const token = await db.user.tokenManager.getAccessToken();
 
-  const attachmentInfo = await axios.head(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+    const attachmentInfo = await axios.head(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  const contentLength = parseInt(attachmentInfo.headers["content-length"]);
-  return isNaN(contentLength) ? 0 : contentLength;
+    const contentLength = parseInt(attachmentInfo.headers["content-length"]);
+    return isNaN(contentLength) ? 0 : contentLength;
+  } catch (e) {
+    console.error(e);
+    return 0;
+  }
 }
 
 function clearFileStorage() {
@@ -552,8 +565,10 @@ function handleS3Error(e, message) {
   if (axios.isAxiosError(e) && e.response?.data) {
     const error = parseS3Error(e.response.data);
     showToast("error", `${message}: [${error.Code}] ${error.Message}`);
-  } else {
+  } else if (message) {
     showToast("error", `${message}: ${e.message}`);
+  } else {
+    showToast("error", e.message);
   }
 }
 

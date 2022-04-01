@@ -14,7 +14,7 @@ if (process.env.REACT_APP_PLATFORM === "desktop") require("./commands");
 const ROUTES = {
   "/account/recovery": {
     component: () => import("./views/recovery"),
-    props: {},
+    props: { route: "methods" },
   },
   "/account/verified": {
     component: () => import("./views/email-confirmed"),

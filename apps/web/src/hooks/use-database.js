@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { initializeDatabase } from "../common/db";
+import { loadTrackerScript } from "../utils/analytics";
+
+if (process.env.NODE_ENV === "production") {
+  loadTrackerScript();
+  console.log = () => {};
+}
 
 const memory = {
   isAppLoaded: false,
 };
-export default function useDatabase() {
+export default function useDatabase(persistence) {
   const [isAppLoaded, setIsAppLoaded] = useState(memory.isAppLoaded);
 
   useEffect(() => {
@@ -12,11 +18,11 @@ export default function useDatabase() {
 
     (async () => {
       await import("../app.css");
-      await initializeDatabase();
+      await initializeDatabase(persistence);
       setIsAppLoaded(true);
       memory.isAppLoaded = true;
     })();
-  }, []);
+  }, [persistence]);
 
   return [isAppLoaded];
 }

@@ -277,7 +277,6 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
         }
 
         await userstore.signup(form);
-        trackEvent(ANALYTICS_EVENTS.accountCreated);
         openURL("/notes/#/welcome");
       }}
     >
@@ -433,7 +432,13 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
         subtitle: "Please wait while we send you recovery instructions.",
       }}
       onSubmit={async (form) => {
+        if (!form.email) {
+          setSuccess(undefined);
+          return;
+        }
+
         const url = await db.user?.recoverAccount(form.email.toLowerCase());
+        console.log(url);
         if (isTesting()) return openURL(url);
         setSuccess(
           `Recovery email sent. Please check your inbox (and spam folder) for further instructions.`
@@ -441,12 +446,19 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       }}
     >
       {success ? (
-        <Flex bg="background" p={2} mt={2} sx={{ borderRadius: "default" }}>
-          <CheckCircle size={20} color="primary" />
-          <Text variant="body" color="primary" ml={2}>
-            {success}
-          </Text>
-        </Flex>
+        <>
+          <Flex bg="background" p={2} mt={2} sx={{ borderRadius: "default" }}>
+            <CheckCircle size={20} color="primary" />
+            <Text variant="body" color="primary" ml={2}>
+              {success}
+            </Text>
+          </Flex>
+          <SubmitButton
+            text="Send again"
+            disabled={!isAppLoaded}
+            loading={!isAppLoaded}
+          />
+        </>
       ) : (
         <>
           <AuthField
@@ -722,7 +734,7 @@ type AuthFormProps<TType extends AuthRoutes> = {
     | ((form?: AuthFormData[TType]) => React.ReactNode);
 };
 
-function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
+export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
   const { title, subtitle, children } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
@@ -832,7 +844,7 @@ type AuthFieldProps = {
     onClick?: () => void | Promise<void>;
   };
 };
-function AuthField(props: AuthFieldProps) {
+export function AuthField(props: AuthFieldProps) {
   return (
     <Field
       type={props.type}
@@ -869,7 +881,7 @@ type SubmitButtonProps = {
   disabled?: boolean;
   loading?: boolean;
 };
-function SubmitButton(props: SubmitButtonProps) {
+export function SubmitButton(props: SubmitButtonProps) {
   return (
     <Button
       data-test-id="submitButton"
