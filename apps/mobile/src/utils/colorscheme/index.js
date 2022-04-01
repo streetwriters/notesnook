@@ -26,7 +26,7 @@ const fixedColors = {
   normal: 'black',
   icon: 'gray',
   transGray: '#00000010',
-  errorBg: '#FFB6C1',
+  errorBg: '#f4433620',
   errorText: '#ff6961',
   successBg: '#DFF2BF',
   successText: '#4F8A10',
