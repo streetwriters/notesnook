@@ -67,6 +67,36 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
     }
   };
 
+  const deleteItem = async () => {
+    presentDialog({
+      title: `Delete ${selectedItemsList.length > 1 ? 'items' : 'item'}`,
+      paragraph: `Are you sure you want to delete ${
+        selectedItemsList.length > 1 ? 'these items permanently?' : 'this item permanently?'
+      }`,
+      positiveText: 'Delete',
+      negativeText: 'Cancel',
+      positivePress: async () => {
+        if (selectedItemsList.length > 0) {
+          let noteIds = [];
+          selectedItemsList.forEach(item => {
+            noteIds.push(item.id);
+          });
+          await db.trash.delete(...noteIds);
+          Navigation.setRoutesToUpdate([
+            Navigation.routeNames.Tags,
+            Navigation.routeNames.Notes,
+            Navigation.routeNames.Notebooks,
+            Navigation.routeNames.NotesPage,
+            Navigation.routeNames.Favorites,
+            Navigation.routeNames.Trash
+          ]);
+          clearSelection();
+        }
+      },
+      positiveType: 'errorShade'
+    });
+  };
+
   const onBackPress = () => {
     layoutmanager.withSpringAnimation(500);
     clearSelection();
@@ -245,15 +275,27 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
         )}
 
         {screen === 'Trash' ? (
-          <IconButton
-            customStyle={{
-              marginLeft: 10
-            }}
-            color={colors.pri}
-            onPress={restoreItem}
-            name="delete-restore"
-            size={SIZE.xl - 3}
-          />
+          <>
+            <IconButton
+              customStyle={{
+                marginLeft: 10
+              }}
+              color={colors.pri}
+              onPress={restoreItem}
+              name="delete-restore"
+              size={SIZE.xl - 3}
+            />
+
+            <IconButton
+              customStyle={{
+                marginLeft: 10
+              }}
+              color={colors.pri}
+              onPress={deleteItem}
+              name="delete"
+              size={SIZE.xl - 3}
+            />
+          </>
         ) : null}
       </View>
     </View>
