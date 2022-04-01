@@ -92,6 +92,29 @@ export const useAppEvents = () => {
     console.log('encryption progress: ', (progress / total).toFixed(2));
     useAttachmentStore.getState().setEncryptionProgress((progress / total).toFixed(2));
   };
+  const onSyncProgress = ({ type, total, current }) => {
+    console.log(type, total, current);
+    if (type !== 'download') return;
+    if (total < 10 || current % 10 === 0) {
+      initialize();
+    }
+  };
+
+  useEffect(() => {
+    if (!loading) {
+      const eventManager = db?.eventManager;
+      eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress);
+      eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
+      eventManager?.subscribe(EVENTS.syncCompleted, onSyncComplete);
+    }
+
+    return () => {
+      const eventManager = db?.eventManager;
+      eventManager?.unsubscribe(EVENTS.syncCompleted, onSyncComplete);
+      eventManager?.unsubscribe(EVENTS.syncProgress, onSyncProgress);
+      eventManager?.unsubscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
+    };
+  }, [loading]);
 
   useEffect(() => {
     let subs = [
@@ -99,9 +122,7 @@ export const useAppEvents = () => {
       Linking.addEventListener('url', onUrlRecieved),
       SodiumEventEmitter.addListener('onSodiumProgress', onFileEncryptionProgress)
     ];
-
     EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
-    EV.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
     EV.subscribe(EVENTS.userLoggedOut, onLogout);
     EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
     EV.subscribe(EVENTS.userSessionExpired, onSessionExpired);
@@ -109,14 +130,13 @@ export const useAppEvents = () => {
     EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
     EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
-
     eSubscribeEvent('userLoggedIn', onUserUpdated);
 
     return () => {
       eUnSubscribeEvent('userLoggedIn', onUserUpdated);
-      EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
+
       EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
-      EV.unsubscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
+      EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
       EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
       EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
@@ -170,6 +190,7 @@ export const useAppEvents = () => {
     initialize();
     setLastSynced(await db.lastSynced());
     setSyncing(false);
+    eSendEvent(eCloseProgressDialog, 'sync_progress');
     if (getNote()) {
       await updateNoteInEditor();
     }
@@ -243,6 +264,7 @@ export const useAppEvents = () => {
       setSyncing(false);
       let status = await NetInfo.fetch();
       if (status.isConnected && status.isInternetReachable) {
+        console.log(e.message, AppState.currentState);
         ToastEvent.error(e, 'Sync failed', 'global');
       }
     } finally {

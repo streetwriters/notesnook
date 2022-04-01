@@ -1,10 +1,12 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import NetInfo from '@react-native-community/netinfo';
+import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
 import { initialize, useUserStore } from '../stores/stores';
 import { doInBackground } from '../utils';
 import { db } from '../utils/database';
-import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
 import { ToastEvent } from './event-manager';
+
+const ignoredMessages = ['Sync already running', 'Not allowed to start service intent'];
 
 const run = async (context = 'global', forced = false, full = true) => {
   let result = false;
@@ -34,7 +36,8 @@ const run = async (context = 'global', forced = false, full = true) => {
     result = true;
   } catch (e) {
     result = false;
-    if (e.message !== 'Sync already running' && userstore.user) {
+    console.log(e.stack);
+    if (!ignoredMessages.find(im => e.message?.includes(im)) && userstore.user) {
       userstore.setSyncing(false);
       let status = await NetInfo.fetch();
       if (status.isConnected && status.isInternetReachable) {
