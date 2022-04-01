@@ -40,14 +40,24 @@ const features: Record<FeatureKeys, Feature> = {
     subtitle: `Welcome to v${appVersion.clean}`,
     subFeatures: [
       {
-        title: "Two-factor authentication",
+        title: "Sync over Websockets",
         subtitle: (
           <>
-            Add an additional layer of security for your notes by enabling 2FA
-            from <Code text="Settings" />.
+            HTTP sync has been replaced with Websockets sync which is faster &
+            more reliable &amp; also offers realtime sync progress.
           </>
         ),
-        icon: Icon.MFAAuthenticator,
+        icon: Icon.Sync,
+      },
+      {
+        title: "Group by none",
+        subtitle: (
+          <>
+            We went and added an option to disable grouping in lists. To use
+            click on <Code text="List options > Group by > None" />.
+          </>
+        ),
+        icon: Icon.GroupBy,
       },
     ],
     cta: {
