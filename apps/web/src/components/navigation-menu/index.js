@@ -28,7 +28,6 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
-import { toTitleCase } from "../../utils/string";
 
 const navigationHistory = new Map();
 function shouldSelectNavItem(route, pin) {
@@ -80,11 +79,7 @@ function NavigationMenu(props) {
   const colors = useAppStore((store) => store.colors);
   const pins = useAppStore((store) => store.menuPins);
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
-  const isSyncing = useAppStore((store) => store.syncStatus === "syncing");
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
-  const sync = useAppStore((store) => store.sync);
-  const theme = useThemeStore((store) => store.theme);
-  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const isMobile = useMobile();
 
   const _navigate = useCallback(
@@ -227,7 +222,7 @@ function NavigationMenu(props) {
         </Flex>
       </FlexScrollContainer>
       <Flex flexDirection="column">
-        {theme === "light" ? (
+        {/* {theme === "light" ? (
           <NavigationItem
             title="Dark mode"
             icon={DarkMode}
@@ -239,17 +234,8 @@ function NavigationMenu(props) {
             icon={LightMode}
             onClick={toggleNightMode}
           />
-        )}
-        {isLoggedIn ? (
-          <>
-            <NavigationItem
-              title="Sync"
-              isLoading={isSyncing}
-              icon={Sync}
-              onClick={sync}
-            />
-          </>
-        ) : (
+        )} */}
+        {!isLoggedIn && (
           <NavigationItem
             title="Login"
             icon={Login}

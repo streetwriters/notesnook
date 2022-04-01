@@ -5,6 +5,7 @@ import {
   showCreateTagDialog,
   showEditTagDialog,
   showEmailVerificationDialog,
+  showError,
   showFeatureDialog,
   showOnboardingDialog,
 } from "../common/dialog-controller";
@@ -27,6 +28,7 @@ import { hashNavigate } from ".";
 import { Suspense } from "react";
 import EditorLoading from "../components/editor/loading";
 import EditorPlaceholder from "../components/editor/-placeholder";
+import { db } from "../common/db";
 const Editor = React.lazy(() => import("../components/editor"));
 
 const hashroutes = {
@@ -69,6 +71,7 @@ const hashroutes = {
   },
   "/notes/:noteId/edit": ({ noteId }) => {
     closeOpenedDialog();
+
     return (
       <Suspense fallback={<EditorLoading />}>
         <Editor noteId={noteId} />

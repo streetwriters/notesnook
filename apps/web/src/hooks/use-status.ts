@@ -1,10 +1,22 @@
 import create from "zustand";
 import produce from "immer";
 
-const useStatusStore = create((set, get) => ({
+type Status = {
+  key: string;
+  status: string;
+  progress?: number;
+  icon?: string | null;
+};
+interface IStatusStore {
+  statuses: Record<string, Status>;
+  getStatus: (key: string) => Status;
+  updateStatus: (status: Status) => void;
+  removeStatus: (key: string) => void;
+}
+const useStatusStore = create<IStatusStore>((set, get) => ({
   statuses: {},
-  getStatus: (key) => get().statuses[key],
-  updateStatus: ({ key, status, progress, icon }) =>
+  getStatus: (key: string) => get().statuses[key],
+  updateStatus: ({ key, status, progress, icon }: Status) =>
     set(
       produce((state) => {
         if (!key) return;

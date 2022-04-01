@@ -31,7 +31,6 @@ function TitleBox(props) {
 
   useEffect(() => {
     if (!inputRef.current) return;
-    console.log("TITLE!", title);
     inputRef.current.value = title;
     resize();
   }, [title, resize]);
@@ -83,7 +82,6 @@ function TitleBox(props) {
 }
 
 export default React.memo(TitleBox, (prevProps, nextProps) => {
-  console.log("React.memo", prevProps.title === nextProps.title);
   return (
     prevProps.shouldFocus === nextProps.shouldFocus &&
     prevProps.title === nextProps.title &&

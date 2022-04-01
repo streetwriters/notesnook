@@ -22,6 +22,7 @@ import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
 import { formatDate } from "notes-core/utils/date";
 import { debounce, debounceWithId } from "../../utils/debounce";
+import { showError } from "../../common/dialog-controller";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 // const EMPTY_CONTENT = "<p><br></p>";
@@ -94,6 +95,7 @@ function Editor({ noteId, nonce }) {
     if (!editor || !editor.initialized) return;
     editor.clearContent();
     updateWordCount(editor);
+    editor.focus(); // TODO
   }, []);
 
   const setContent = useCallback(() => {
@@ -102,6 +104,14 @@ function Editor({ noteId, nonce }) {
     if (!editor || !editor.initialized) return;
 
     async function setContents() {
+      if (!db.notes.note(noteId)?.synced()) {
+        await showError(
+          "Note not synced",
+          "This note is not fully synced. Please sync again to open this note for editing."
+        );
+        return;
+      }
+
       let content = await editorstore.get().getSessionContent();
       if (content?.data) editorSetContent(editor, content.data);
       else clearContent(editor);

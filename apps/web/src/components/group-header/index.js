@@ -9,6 +9,7 @@ import useMobile from "../../utils/use-mobile";
 
 const groupByToTitleMap = {
   [undefined]: "Default",
+  none: "None",
   default: "Default",
   abc: "A - Z",
   year: "Year",
@@ -84,6 +85,7 @@ const menuItems = [
     title: "Group by",
     icon: Icon.GroupBy,
     items: map([
+      { key: "none", title: "None" },
       { key: "default", title: "Default" },
       { key: "year", title: "Year" },
       { key: "month", title: "Month" },
@@ -168,7 +170,7 @@ function GroupHeader(props) {
   ]);
   const isCompact = useMemo(() => viewMode === "compact", [viewMode]);
 
-  if (!title) return null;
+  // if (!title) return null;
 
   return (
     <Flex
