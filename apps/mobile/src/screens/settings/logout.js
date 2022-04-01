@@ -9,12 +9,13 @@ import Paragraph from '../../components/ui/typography/paragraph';
 import { useThemeStore } from '../../stores/theme';
 import { useUserStore } from '../../stores/stores';
 import BiometricService from '../../services/biometrics';
-import { ToastEvent } from '../../services/event-manager';
+import { eSendEvent, ToastEvent } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { SIZE } from '../../utils/size';
 import Storage from '../../utils/database/storage';
 import { sleep } from '../../utils/time';
 import SettingsService from '../../services/settings';
+import { eCloseSimpleDialog } from '../../utils/events';
 
 const AccoutLogoutSection = () => {
   const colors = useThemeStore(state => state.colors);
@@ -64,6 +65,7 @@ const AccoutLogoutSection = () => {
               positiveText: 'Logout',
               positivePress: async () => {
                 try {
+                  eSendEvent(eCloseSimpleDialog);
                   setLoading(true);
                   await sleep(10);
                   await db.user.logout();
