@@ -104,7 +104,7 @@ function Editor({ noteId, nonce }) {
     if (!editor || !editor.initialized) return;
 
     async function setContents() {
-      if (!db.notes.note(noteId)?.synced()) {
+      if (!db.notes.note(id)?.synced()) {
         await showError(
           "Note not synced",
           "This note is not fully synced. Please sync again to open this note for editing."
