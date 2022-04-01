@@ -12,12 +12,11 @@ import SearchService from '../../services/search';
 import { InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 import { eOnNewTopicAdded, eOpenAddNotebookDialog, eOpenAddTopicDialog } from '../../utils/events';
-
+import { qclone } from 'qclone';
 export const Notebook = ({ route, navigation }) => {
   const [topics, setTopics] = useState(
-    groupArray(route?.params.notebook?.topics || [], db.settings.getGroupOptions('topics'))
+    groupArray(qclone(route?.params.notebook?.topics) || [], db.settings.getGroupOptions('topics'))
   );
-  console.log('params', route?.params.notebook?.topics);
   const params = useRef(route?.params);
 
   const onLoad = data => {
@@ -26,7 +25,7 @@ export const Notebook = ({ route, navigation }) => {
       let notebook = db.notebooks.notebook(params?.current?.notebook?.id)?.data;
       if (notebook) {
         params.current.notebook = notebook;
-        setTopics(groupArray(notebook.topics, db.settings.getGroupOptions('topics')));
+        setTopics(groupArray(qclone(notebook.topics), db.settings.getGroupOptions('topics')));
         params.current.title = params.current.notebook.title;
       }
       updateSearch();
@@ -38,7 +37,7 @@ export const Notebook = ({ route, navigation }) => {
     return () => {
       eUnSubscribeEvent(eOnNewTopicAdded, onLoad);
     };
-  }, []);
+  }, [topics]);
 
   const onFocus = async () => {
     InteractionManager.runAfterInteractions(() => {
