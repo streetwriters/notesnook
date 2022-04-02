@@ -152,11 +152,65 @@ describe('NOTEBOOKS', () => {
     await notVisibleById(note.title);
   });
 
-  //todo
-  // add note to notebook from home
-  // remove note from a notebook from add-notebook sheet
-  // edit notebook title
-  // edit notebook description
-  // add a topic from edit-notebook sheet
-  //
+  it('Add/Remove note to notebook from home', async () => {
+    await prepare();
+    await navigate('Notebooks');
+    await tapByText('Skip introduction');
+    await sleep(500);
+    await createNotebook('Notebook 1', true, true);
+    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await navigate('Notes');
+    let note = await createNote();
+    await tapById(notesnook.listitem.menu);
+    await tapById('icon-Add to notebook');
+    await sleep(500);
+    await tapByText('Notebook 1');
+    await tapByText('Topic');
+    await visibleById('icon-check');
+    await tapByText('Topic');
+    await notVisibleById('icon-check');
+  });
+
+  it('Edit notebook title, description and add a topic', async () => {
+    await prepare();
+    await navigate('Notebooks');
+    await tapByText('Skip introduction');
+    await sleep(500);
+    await createNotebook();
+    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await visibleByText('Notebook 1');
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText('Edit notebook');
+    await sleep(500);
+    await elementById(notesnook.ids.dialogs.notebook.inputs.title).typeText(' (Edited)');
+    await elementById(notesnook.ids.dialogs.notebook.inputs.description).clearText();
+    await elementById(notesnook.ids.dialogs.notebook.inputs.description).typeText(
+      'Description of Notebook 1 (Edited)'
+    );
+    await elementById(notesnook.ids.dialogs.notebook.inputs.topic).typeText('Topic 2');
+    await tapById('topic-add-button');
+    await tapByText('Save changes');
+    await sleep(500);
+    await visibleByText('Notebook 1 (Edited)');
+    await visibleByText('Description of Notebook 1 (Edited)');
+    await visibleByText('Topic 2');
+  });
+
+  it('Move notebook to trash', async () => {
+    await prepare();
+    await navigate('Notebooks');
+    await tapByText('Skip introduction');
+    await sleep(500);
+    await createNotebook('Notebook 1', false, false);
+    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await visibleByText('Notebook 1');
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText('Move to trash');
+    await sleep(4000);
+    await navigate('Trash');
+    await visibleByText('Notebook 1');
+  });
 });
