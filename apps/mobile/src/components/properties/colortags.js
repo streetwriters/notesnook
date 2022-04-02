@@ -58,7 +58,7 @@ export const ColorTags = ({ item, close }) => {
         }}
       >
         {note.color?.toLowerCase() === color.name ? (
-          <Icon name="check" color="white" size={SIZE.lg} />
+          <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
         ) : null}
       </PressableButton>
     );

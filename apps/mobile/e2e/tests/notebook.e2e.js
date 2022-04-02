@@ -213,4 +213,37 @@ describe('NOTEBOOKS', () => {
     await navigate('Trash');
     await visibleByText('Notebook 1');
   });
+
+  it('Pin notebook to side menu', async () => {
+    await prepare();
+    await navigate('Notebooks');
+    await tapByText('Skip introduction');
+    await sleep(500);
+    await createNotebook('Notebook 1', false, false);
+    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await visibleByText('Notebook 1');
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText('Add Shortcut');
+    let menu = elementById(notesnook.ids.default.header.buttons.left);
+    await menu.tap();
+    await visibleByText('Notebook 1');
+  });
+
+  it('Pin topic to side menu', async () => {
+    await prepare();
+    await navigate('Notebooks');
+    await tapByText('Skip introduction');
+    await sleep(500);
+    await createNotebook('Notebook 1');
+    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await tapByText('Notebook 1');
+    await tapById(notesnook.ids.notebook.menu);
+    await tapByText('Add Shortcut');
+    let menu = elementById(notesnook.ids.default.header.buttons.left);
+    await menu.tap();
+    await menu.tap();
+    await visibleByText('Topic');
+  });
 });

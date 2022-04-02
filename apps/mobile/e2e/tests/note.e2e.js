@@ -1,5 +1,14 @@
 const { notesnook } = require('../test.ids');
-const { navigate, tapById, visibleByText, createNote, prepare, visibleById } = require('./utils');
+const {
+  navigate,
+  tapById,
+  visibleByText,
+  createNote,
+  prepare,
+  visibleById,
+  notVisibleById,
+  elementById
+} = require('./utils');
 const { sleep } = require('./utils');
 
 describe('NOTE TESTS', () => {
@@ -73,6 +82,20 @@ describe('NOTE TESTS', () => {
     await tapById(notesnook.listitem.menu);
     await tapById('icon-Export');
     await visibleByText('PDF');
+  });
+
+  it('Assign colors to a note', async () => {
+    await prepare();
+    let note = await createNote();
+    await tapById(notesnook.listitem.menu);
+    await tapById(notesnook.ids.dialogs.actionsheet.color('red'));
+    await visibleById('icon-check');
+    await tapById(notesnook.ids.dialogs.actionsheet.color('red'));
+    await notVisibleById('icon-check');
+    await tapById(notesnook.ids.dialogs.actionsheet.color('green'));
+    await device.pressBack();
+    await navigate('Green');
+    await visibleByText(note.body);
   });
 
   it('Delete & restore a note', async () => {

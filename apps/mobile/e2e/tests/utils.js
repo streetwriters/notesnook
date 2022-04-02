@@ -51,6 +51,10 @@ export async function notVisibleById(id) {
   await expect(elementById(id)).not.toBeVisible();
 }
 
+export async function notVisibleByText(text) {
+  await expect(elementByText(text)).not.toBeVisible();
+}
+
 export async function createNote() {
   let title = 'Test note description that ';
   let body = 'Test note description that is very long and should not fit in text.';

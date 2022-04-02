@@ -147,6 +147,7 @@ const ManageTagsSheet = () => {
             color: colors.accent,
             size: SIZE.lg
           }}
+          testID="tag-input"
           fwdRef={inputRef}
           autoCapitalize="none"
           onChangeText={v => {
