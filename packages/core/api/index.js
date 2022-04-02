@@ -25,6 +25,7 @@ import { Mutex } from "async-mutex";
 import NoteHistory from "../collections/note-history";
 import MFAManager from "./mfa-manager";
 import EventManager from "../utils/event-manager";
+import Pricing from "./pricing";
 
 /**
  * @type {EventSource}
@@ -101,6 +102,7 @@ class Database {
     this.monographs = new Monographs(this);
     this.offers = new Offers();
     this.debug = new Debug();
+    this.pricing = new Pricing();
 
     // collections
     /** @type {Notes} */
