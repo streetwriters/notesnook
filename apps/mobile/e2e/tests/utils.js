@@ -55,9 +55,9 @@ export async function notVisibleByText(text) {
   await expect(elementByText(text)).not.toBeVisible();
 }
 
-export async function createNote() {
-  let title = 'Test note description that ';
-  let body = 'Test note description that is very long and should not fit in text.';
+export async function createNote(_title, _body) {
+  let title = _title || 'Test note description that ';
+  let body = _body || 'Test note description that is very long and should not fit in text.';
 
   await tapById(notesnook.buttons.add);
   await elementById(notesnook.editor.id).tap({

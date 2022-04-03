@@ -91,7 +91,7 @@ describe('VAULT', () => {
     await visibleById(notesnook.listitem.menu);
   });
 
-  it.only('Delete vault with locked notes', async () => {
+  it('Delete vault with locked notes', async () => {
     await prepare();
     await createNote();
     await lockNote();

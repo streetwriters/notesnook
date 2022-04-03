@@ -215,6 +215,7 @@ export const Settings = ({ navigation }) => {
               screen: 'Settings'
             })
           }
+          testID="scrollview"
           scrollEventThrottle={1}
           style={{
             paddingHorizontal: 0

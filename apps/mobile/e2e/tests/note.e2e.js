@@ -7,7 +7,10 @@ const {
   prepare,
   visibleById,
   notVisibleById,
-  elementById
+  elementById,
+  tapByText,
+  matchSnapshot,
+  elementByText
 } = require('./utils');
 const { sleep } = require('./utils');
 
