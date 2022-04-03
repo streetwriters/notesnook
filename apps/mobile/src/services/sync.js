@@ -1,4 +1,5 @@
 import NetInfo from '@react-native-community/netinfo';
+import { EVENTS } from 'notes-core/common';
 import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
 import { initialize, useUserStore } from '../stores/stores';
 import { doInBackground } from '../utils';
@@ -50,7 +51,7 @@ const run = async (context = 'global', forced = false, full = true) => {
     if (getNote()?.id) {
       await updateNoteInEditor();
     }
-
+    db.eventManager.publish(EVENTS.syncCompleted);
     console.log('sync done');
     userstore.setSyncing(false);
   }
