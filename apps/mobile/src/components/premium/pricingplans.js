@@ -24,6 +24,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { Walkthrough } from '../walkthroughs';
 import { PricingItem } from './pricing-item';
+import { usePricing } from '../../utils/hooks/use-pricing';
 
 const promoCyclesMonthly = {
   1: 'first month',
@@ -37,39 +38,23 @@ const promoCyclesYearly = {
   3: 'first 3 years'
 };
 
-export const PricingPlans = ({
-  promo,
-  marginTop,
-  heading = true,
-  compact = false,
-  trial = false,
-  showTrialOption = true
-}) => {
+export const PricingPlans = ({ promo, marginTop, heading = true, compact = false }) => {
   const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
   const [product, setProduct] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [offers, setOffers] = useState(null);
   const [buying, setBuying] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [upgrade, setUpgrade] = useState(!showTrialOption);
+  const userCanRequestTrial =
+    user && (!user.subscription || !user.subscription.expiry) ? true : false;
+  const [upgrade, setUpgrade] = useState(!userCanRequestTrial);
+  const yearlyPlan = usePricing('yearly');
+  const monthlyPlan = usePricing('monthly');
 
   const getSkus = async () => {
     try {
       setLoading(true);
-      let products = await PremiumService.getProducts();
-      if (products.length > 0) {
-        let offers = {
-          monthly: products.find(p => p.productId === 'com.streetwriters.notesnook.sub.mo'),
-          yearly: products.find(p => p.productId === 'com.streetwriters.notesnook.sub.yr')
-        };
-        setOffers(offers);
-
-        if (promo?.promoCode) {
-          getPromo(promo?.promoCode);
-        }
-
-        setProducts(products);
+      if (promo?.promoCode) {
+        getPromo(promo?.promoCode);
       }
       setLoading(false);
     } catch (e) {
@@ -242,15 +227,31 @@ export const PricingPlans = ({
           {user && !product ? (
             <>
               {heading ? (
-                <Heading
-                  style={{
-                    alignSelf: 'center',
-                    marginTop: marginTop || 20,
-                    marginBottom: 20
-                  }}
-                >
-                  Choose a plan
-                </Heading>
+                <>
+                  {monthlyPlan && monthlyPlan?.info?.discount > 0 ? (
+                    <View
+                      style={{
+                        alignSelf: 'center',
+                        marginTop: marginTop || 20,
+                        marginBottom: 20
+                      }}
+                    >
+                      <Heading color={colors.accent}>
+                        Get {monthlyPlan?.info?.discount}% off in {monthlyPlan?.info?.country}
+                      </Heading>
+                    </View>
+                  ) : (
+                    <Heading
+                      style={{
+                        alignSelf: 'center',
+                        marginTop: marginTop || 20,
+                        marginBottom: 20
+                      }}
+                    >
+                      Choose a plan
+                    </Heading>
+                  )}
+                </>
               ) : null}
 
               <View
@@ -261,11 +262,11 @@ export const PricingPlans = ({
                 }}
               >
                 <PricingItem
-                  onPress={() => buySubscription(offers?.monthly)}
+                  onPress={() => buySubscription(monthlyPlan?.product)}
                   compact={compact}
                   product={{
                     type: 'monthly',
-                    data: offers?.monthly,
+                    data: monthlyPlan?.product,
                     info: 'Pay monthly, cancel anytime.'
                   }}
                 />
@@ -280,11 +281,11 @@ export const PricingPlans = ({
                 )}
 
                 <PricingItem
-                  onPress={() => buySubscription(offers?.yearly)}
+                  onPress={() => buySubscription(yearlyPlan?.product)}
                   compact={compact}
                   product={{
                     type: 'yearly',
-                    data: offers?.yearly,
+                    data: yearlyPlan?.product,
                     info: 'Pay yearly'
                   }}
                 />
