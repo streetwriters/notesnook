@@ -226,7 +226,7 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
 
           {user && !product ? (
             <>
-              {heading ? (
+              {heading || monthlyPlan?.info?.discount > 0 ? (
                 <>
                   {monthlyPlan && monthlyPlan?.info?.discount > 0 ? (
                     <View
