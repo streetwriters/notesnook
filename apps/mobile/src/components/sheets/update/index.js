@@ -21,7 +21,7 @@ export const Update = ({ version, fwdRef }) => {
     ? version.notes.replace('Thank you for using Notesnook!', '').split('- ')
     : ['Bug fixes and performance improvements'];
   notes = notes.map(n => n.replace(/\n/g, ''));
-  const isGithubRelease = Config.GITHUB_RELEASE;
+  const isGithubRelease = Config.GITHUB_RELEASE === 'true';
 
   const getSupportedAbi = () => {
     let abi = deviceInfoModule.supportedAbisSync();
