@@ -39,6 +39,7 @@ export type SavePayload = {
   data?: Content['data'];
   type?: Content['type'];
   sessionId?: string | null;
+  sessionHistoryId?: number;
 };
 
 export type AppState = {

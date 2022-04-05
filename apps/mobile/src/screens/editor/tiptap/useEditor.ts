@@ -87,6 +87,7 @@ export const useEditor = () => {
   const reset = useCallback(async (resetState = true) => {
     currentNote.current = null;
     currentContent.current = null;
+    sessionHistoryId.current = undefined;
     await commands.clearContent();
     console.log('reset state: ', resetState);
     if (resetState) {
@@ -97,7 +98,14 @@ export const useEditor = () => {
   }, []);
 
   const saveNote = useCallback(
-    async ({ title, id, data, type, sessionId: currentSessionId }: SavePayload) => {
+    async ({
+      title,
+      id,
+      data,
+      type,
+      sessionId: currentSessionId,
+      sessionHistoryId: currentSessionHistoryId
+    }: SavePayload) => {
       console.log('saving note', id);
       try {
         if (id && !db.notes?.note(id)) {
@@ -109,17 +117,9 @@ export const useEditor = () => {
         let locked = note?.locked;
         if (note?.conflicted) return;
 
-        if (!sessionHistoryId.current) {
-          if (note) {
-            sessionHistoryId.current = note.dateEdited;
-          } else {
-            sessionHistoryId.current = Date.now();
-          }
-        }
-
         let noteData: Partial<Note> = {
           id,
-          sessionId: sessionHistoryId.current
+          sessionId: currentSessionHistoryId
         };
 
         if (title) {
@@ -205,6 +205,7 @@ export const useEditor = () => {
         currentNote.current && (await reset());
         let nextSessionId = makeSessionId(item);
         setSessionId(nextSessionId);
+        sessionHistoryId.current = Date.now();
         await commands.setSessionId(nextSessionId);
         await commands.focus();
       } else {
@@ -214,6 +215,7 @@ export const useEditor = () => {
         currentNote.current && (await reset(false));
         await loadContent(item);
         let nextSessionId = makeSessionId(item);
+        sessionHistoryId.current = item.dateEdited;
         setSessionId(nextSessionId);
         await commands.setSessionId(nextSessionId);
         currentNote.current = item;
@@ -309,7 +311,8 @@ export const useEditor = () => {
         data: content,
         type: 'tiny',
         sessionId,
-        id: currentNote.current?.id
+        id: currentNote.current?.id,
+        sessionHistoryId: sessionHistoryId.current
       };
 
       withTimer(
