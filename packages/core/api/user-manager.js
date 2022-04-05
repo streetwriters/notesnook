@@ -228,6 +228,7 @@ class UserManager {
     const user = await this.getUser();
     if (!user) return;
     const key = await this._storage.getCryptoKey(`_uk_@${user.email}`);
+    if (!key) return;
     return { key, salt: user.salt };
   }
 
@@ -261,6 +262,7 @@ class UserManager {
       );
       return JSON.parse(plainData);
     } catch (e) {
+      console.error(e);
       throw new Error(
         `Could not get attachments encryption key. Please make sure you have Internet access. Error: ${e.message}`
       );
@@ -312,9 +314,8 @@ class UserManager {
 
     const attachmentsKey = await this.getAttachmentsKey();
     data.encryptionKey = data.encryptionKey || (await this.getEncryptionKey());
-
     await this._db.outbox.add(type, data, async () => {
-      await this._db.sync(true, true);
+      if (data.encryptionKey) await this._db.sync(true, true);
 
       await this._storage.deriveCryptoKey(`_uk_@${email}`, {
         password: new_password,
