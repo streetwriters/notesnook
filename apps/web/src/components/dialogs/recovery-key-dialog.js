@@ -55,11 +55,12 @@ function RecoveryKeyDialog(props) {
             p={2}
             fontFamily="monospace"
             fontSize="body"
+            color="text"
             sx={{ borderRadius: "default", overflowWrap: "anywhere" }}
           >
             {key}
           </Text>
-          <Flex justifyContent="space-around" alignItems="center">
+          <Flex justifyContent="space-around" alignItems="center" mt={4}>
             <Suspense fallback={<div />}>
               <QRCode
                 value={key}

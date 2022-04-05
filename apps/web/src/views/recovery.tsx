@@ -557,6 +557,7 @@ export function RecoveryForm<T extends RecoveryRoutes>(
           setForm(form);
           await props.onSubmit(form);
         } catch (e) {
+          console.error(e);
           const error = e as Error;
           setError(error.message);
         } finally {

@@ -707,6 +707,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             textAlign="center"
             fontWeight="body"
             fontFamily={"monospace"}
+            color="text"
           >
             {code}
           </Text>
