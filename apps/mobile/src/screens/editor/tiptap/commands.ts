@@ -1,7 +1,9 @@
 import { createRef, MutableRefObject, RefObject } from 'react';
 import { Platform } from 'react-native';
 import WebView from 'react-native-webview';
+import { db } from '../../../utils/database';
 import { sleep } from '../../../utils/time';
+import { Note } from './types';
 import { getResponse, randId, textInput } from './utils';
 
 type Action = { job: string; id: string };
@@ -86,6 +88,23 @@ statusBar.current.set({date:"",saved:""});
     if (element) {
       element.setAttribute("data-placeholder","${placeholder}");
     }
+    `)
+    );
+  };
+
+  setTags = async (note: Note | null | undefined) => {
+    if (!note) return;
+    let tags = note.tags
+      .map((t: any) =>
+        db.tags?.tag(t) ? { title: db.tags.tag(t).title, alias: db.tags.tag(t).alias } : null
+      )
+      .filter((t: any) => t !== null);
+    await call(
+      this.ref,
+      fn(`
+      if (typeof editorTags !== "undefined" && editorTags.current) {
+        editorTags.current.setTags(${JSON.stringify(tags)});
+      }
     `)
     );
   };

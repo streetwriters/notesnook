@@ -4,11 +4,11 @@ import { DDS } from '../../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import { TipManager } from '../../../services/tip-manager';
-import { useEditorStore } from '../../../stores/stores';
+import { useEditorStore, useTagStore } from '../../../stores/stores';
 import { useThemeStore } from '../../../stores/theme';
 import { db } from '../../../utils/database';
 import { MMKV } from '../../../utils/database/mmkv';
-import { eOnLoadNote } from '../../../utils/events';
+import { eOnLoadNote, eOpenTagsDialog } from '../../../utils/events';
 import { tabBarRef } from '../../../utils/global-refs';
 import { timeConverter } from '../../../utils/time';
 import Commands from './commands';
@@ -26,11 +26,16 @@ export const useEditor = () => {
   const sessionHistoryId = useRef<number>();
   const state = useRef<Partial<EditorState>>(defaultState);
   const placeholderTip = useRef(TipManager.placeholderTip());
+  const tags = useTagStore(state => state.tags);
 
   const postMessage = useCallback(
     async (type: string, data: any) => await post(editorRef, type, data),
     []
   );
+
+  useEffect(() => {
+    commands.setTags(currentNote.current);
+  }, [tags]);
 
   useEffect(() => {
     let unsub = useThemeStore.subscribe(state => {
@@ -215,6 +220,7 @@ export const useEditor = () => {
         await commands.setStatus(timeConverter(item.dateEdited), 'Saved');
         await postMessage(EditorEvents.title, item.title);
         await postMessage(EditorEvents.html, currentContent.current?.data);
+        await commands.setTags(currentNote.current);
         overlay(false);
       }
     },
@@ -261,6 +267,28 @@ export const useEditor = () => {
             type: message.type,
             title: message.value
           });
+          break;
+        case 'editor-event:newtag':
+          if (!currentNote.current) return;
+          eSendEvent(eOpenTagsDialog, currentNote.current);
+          break;
+        case 'editor-event:tag':
+          if (message.value) {
+            if (!currentNote.current) return;
+            db.notes
+              //@ts-ignore
+              ?.note(currentNote.current?.id)
+              .untag(message.value)
+              .then(async () => {
+                useTagStore.getState().setTags();
+                await commands.setTags(currentNote.current);
+                Navigation.setRoutesToUpdate([
+                  Navigation.routeNames.Notes,
+                  Navigation.routeNames.NotesPage,
+                  Navigation.routeNames.Tags
+                ]);
+              });
+          }
           break;
       }
       eSendEvent(message.type, message);
