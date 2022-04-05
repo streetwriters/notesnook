@@ -45,7 +45,6 @@ const EditorHeader = ({ editor }) => {
   const handleBack = useRef();
   const keyboardListener = useRef();
   const closing = useRef(false);
-  //const editorTags = useEditorTags();
   const searchReplace = useEditorStore(state => state.searchReplace);
   const readonly = useEditorStore(state => state.readonly);
 
@@ -102,7 +101,7 @@ const EditorHeader = ({ editor }) => {
       return;
     }
 
-    let note = db.notes.note(editorController.current?.note?.id)?.data;
+    let note = db.notes.note(editorController.current?.note.current?.id)?.data;
     if (note.locked) {
       ToastEvent.show({
         heading: 'Locked notes cannot be published',
@@ -119,7 +118,7 @@ const EditorHeader = ({ editor }) => {
   };
 
   const showActionsheet = async () => {
-    let note = db.notes.note(editorController.current?.note?.id)?.data;
+    let note = db.notes.note(editorController.current?.note?.current)?.data;
 
     if (!note) {
       ToastEvent.show({
