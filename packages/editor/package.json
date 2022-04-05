@@ -1,0 +1,26 @@
+{
+  "name": "notesnook-editor",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./",
+  "dependencies": {
+    "@tiptap/extension-history": "^2.0.0-beta.21",
+    "@tiptap/extension-character-count": "^2.0.0-beta.24",
+    "@tiptap/extension-placeholder": "^2.0.0-beta.45",
+    "@tiptap/react": "^2.0.0-beta.98",
+    "@tiptap/starter-kit": "^2.0.0-beta.150"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.11",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.5.2",
+    "web-vitals": "^1.1.2"
+  },
+  "scripts": {
+    "build": "react-scripts build"
+  }
+}
