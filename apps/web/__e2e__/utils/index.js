@@ -19,7 +19,7 @@ async function loginUser(user = USER, navigate = true) {
 
   await page.click(getTestId("submitButton"));
 
-  await page.waitForSelector(getTestId("navitem-sync"));
+  await page.waitForSelector(getTestId("sync-status-synced"));
 }
 
 const NOTEBOOK = {

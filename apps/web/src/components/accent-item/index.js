@@ -15,10 +15,11 @@ function AccentItem(props) {
       variant="rowCenter"
       sx={{ position: "relative" }}
       onClick={async () => {
-        if (isUserPremium()) setAccent(code);
-        else {
-          await showBuyDialog();
-        }
+        await showBuyDialog();
+        // if (isUserPremium()) setAccent(code);
+        // else {
+        //   await showBuyDialog();
+        // }
       }}
       key={label}
     >

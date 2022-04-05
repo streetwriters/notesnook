@@ -85,7 +85,11 @@ type FeatureDialogProps = {
 function FeatureDialog(props: FeatureDialogProps) {
   const { featureName } = props;
   const feature = features[featureName];
-  if (!feature || (feature.shouldShow && !feature.shouldShow())) return null;
+  if (!feature || (feature.shouldShow && !feature.shouldShow())) {
+    props.onClose(false);
+    return null;
+  }
+
   return (
     <Dialog
       isOpen={true}

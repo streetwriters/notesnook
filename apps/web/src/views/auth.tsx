@@ -22,9 +22,10 @@ import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { isTesting } from "../utils/platform";
 import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
-import { RequestError } from "notes-core/utils/http";
 import { useTimer } from "../hooks/use-timer";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
+// @ts-ignore
+import { RequestError } from "notes-core/utils/http";
 
 type LoginFormData = {
   email: string;
@@ -910,9 +911,10 @@ async function login(
     Config.set("sessionExpired", false);
     openURL("/");
   } catch (e) {
-    if (e instanceof RequestError && e.code === "mfa_required") {
+    const error = e as any;
+    if (error.code === "mfa_required") {
       const { primaryMethod, phoneNumber, secondaryMethod, token } =
-        e.data as MFAErrorData;
+        error.data as MFAErrorData;
 
       if (!primaryMethod)
         throw new Error(

@@ -33,7 +33,6 @@ import { showToast } from "../utils/toast";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "notes-core/common";
-import { openPaddleDialog } from "../common/checkout";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
 import { isDesktop } from "../utils/platform";
@@ -908,7 +907,7 @@ function AccountStatus(props) {
                   "error",
                   "Failed to update. Please reach out to us at support@streetwriters.co so we can help you resolve the issue."
                 );
-              await openPaddleDialog(user.subscription.updateURL);
+              window.open(user.subscription.updateURL, "_blank");
             }}
           >
             <Tip
@@ -925,7 +924,7 @@ function AccountStatus(props) {
                   "error",
                   "Failed to cancel subscription. Please reach out to us at support@streetwriters.co so we can help you resolve the issue."
                 );
-              await openPaddleDialog(user.subscription.cancelURL);
+              window.open(user.subscription.cancelURL, "_blank");
             }}
           >
             <Tip

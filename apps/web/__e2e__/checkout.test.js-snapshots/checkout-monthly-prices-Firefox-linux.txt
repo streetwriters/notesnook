@@ -1,4 +1,0 @@
-subtotal: $10
-tax: $0
-discount: $0
-total: $10/mo
