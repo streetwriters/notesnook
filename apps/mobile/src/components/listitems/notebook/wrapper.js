@@ -1,11 +1,13 @@
 import React from 'react';
 import { NotebookItem } from '.';
-import { useSelectionStore } from '../../../stores/stores';
-import { eSendEvent } from '../../../services/event-manager';
+import { eSendEvent, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
+import { useSelectionStore, useTrashStore } from '../../../stores/stores';
 import { history } from '../../../utils';
 import { eOnNewTopicAdded, refreshNotesPage } from '../../../utils/events';
+import { presentDialog } from '../../dialog/functions';
 import SelectionWrapper from '../selection-wrapper';
+import { db } from '../../../utils/database';
 
 export const NotebookWrapper = React.memo(
   ({ item, index, dateBy }) => {
@@ -19,6 +21,43 @@ export const NotebookWrapper = React.memo(
       } else {
         history.selectedItemsList = [];
       }
+
+      if (isTrash) {
+        presentDialog({
+          title: `Restore ${item.itemType}`,
+          paragraph: `Restore or delete ${item.itemType} forever`,
+          positiveText: 'Restore',
+          negativeText: 'Delete',
+          positivePress: async () => {
+            await db.trash.restore(item.id);
+            Navigation.setRoutesToUpdate([
+              Navigation.routeNames.Tags,
+              Navigation.routeNames.Notes,
+              Navigation.routeNames.Notebooks,
+              Navigation.routeNames.NotesPage,
+              Navigation.routeNames.Favorites,
+              Navigation.routeNames.Trash
+            ]);
+            useSelectionStore.getState().setSelectionMode(false);
+            ToastEvent.show({
+              heading: 'Restore successful',
+              type: 'success'
+            });
+          },
+          onClose: async () => {
+            await db.trash.delete(item.id);
+            useTrashStore.getState().setTrash();
+            useSelectionStore.getState().setSelectionMode(false);
+            ToastEvent.show({
+              heading: 'Permanantly deleted items',
+              type: 'success',
+              context: 'local'
+            });
+          }
+        });
+        return;
+      }
+
       let routeName = item.type === 'topic' ? 'NotesPage' : 'Notebook';
 
       let params =
@@ -60,6 +99,7 @@ export const NotebookWrapper = React.memo(
     );
   },
   (prev, next) => {
+    if (prev.item.title !== next.item.title) return false;
     if (prev.dateBy !== next.dateBy) {
       return false;
     }

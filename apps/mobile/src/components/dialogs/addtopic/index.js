@@ -129,11 +129,13 @@ export class AddTopicDialog extends React.Component {
           <Seperator half />
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: 12,
+              zIndex: 10
             }}
           >
             <Input
               fwdRef={this.titleRef}
+              testID="input-title"
               onChangeText={value => {
                 this.title = value;
               }}

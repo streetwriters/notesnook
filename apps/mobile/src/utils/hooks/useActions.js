@@ -58,13 +58,6 @@ export const useActions = ({ close = () => {}, item }) => {
       : item.title;
 
   const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
-  const noteInTopic =
-    item.type === 'note' &&
-    editing.actionAfterFirstSave.type === 'topic' &&
-    db.notebooks
-      .notebook(editing.actionAfterFirstSave.notebook)
-      .topics.topic(editing.actionAfterFirstSave.id)
-      .has(item.id);
 
   useEffect(() => {
     if (item.id === null) return;
@@ -88,6 +81,16 @@ export const useActions = ({ close = () => {}, item }) => {
       setNotifPinned(null);
     }
   }
+
+  const isNoteInTopic = () => {
+    if (item.type !== 'note' || editing.actionAfterFirstSave?.type !== 'topic') return;
+    console.log(editing.actionAfterFirstSave, 'save item');
+
+    return db.notebooks
+      .notebook(editing.actionAfterFirstSave.notebook)
+      .topics.topic(editing.actionAfterFirstSave.id)
+      .has(item.id);
+  };
 
   const onUpdate = async type => {
     if (type === 'unpin') {
@@ -145,7 +148,10 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function pinToNotifications() {
+    if (!checkNoteSynced()) return;
+    console.log('pinToNotifications');
     if (Platform.OS === 'ios') return;
+
     if (notifPinned !== null) {
       Notifications.remove(item.id, notifPinned.identifier);
       await sleep(1000);
@@ -154,11 +160,13 @@ export const useActions = ({ close = () => {}, item }) => {
       return;
     }
     if (item.locked) return;
+    let html = await db.notes.note(item.id).content();
+    let text = await toTXT(item);
     Notifications.present({
       title: item.title,
-      message: item.headline,
-      subtitle: item.headline,
-      bigText: await toTXT(item, true),
+      message: item.headline || text,
+      subtitle: item.headline || text,
+      bigText: html,
       ongoing: true,
       actions: ['UNPIN'],
       tag: item.id
@@ -169,6 +177,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function restoreTrashItem() {
+    if (!checkNoteSynced()) return;
     close();
     await db.trash.restore(item.id);
     Navigation.setRoutesToUpdate([
@@ -187,6 +196,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function copyContent() {
+    if (!checkNoteSynced()) return;
     if (item.locked) {
       close();
       await sleep(300);
@@ -209,6 +219,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function publishNote() {
+    if (!checkNoteSynced()) return;
     if (!user) {
       ToastEvent.show({
         heading: 'Login required',
@@ -243,8 +254,35 @@ export const useActions = ({ close = () => {}, item }) => {
     eSendEvent(eOpenPublishNoteDialog, item);
   }
 
+  const checkNoteSynced = () => {
+    if (item.type !== 'note' || item.itemType !== 'note') return true;
+    let isTrash = item.itemType === 'note';
+    if (!isTrash && !db.notes.note(item.id).synced()) {
+      ToastEvent.show({
+        context: 'local',
+        heading: 'Note not synced',
+        message: 'Please run sync before making changes',
+        type: 'error'
+      });
+      return false;
+    }
+
+    if (isTrash && !db.trash.synced(item.id)) {
+      ToastEvent.show({
+        context: 'local',
+        heading: 'Note not synced',
+        message: 'Please run sync before making changes',
+        type: 'error'
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   async function addToVault() {
     if (!item.id) return;
+    if (!checkNoteSynced()) return;
     if (item.locked) {
       close();
       await sleep(300);
@@ -339,6 +377,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function shareNote() {
+    if (!checkNoteSynced()) return;
     if (item.locked) {
       close();
       await sleep(300);
@@ -360,6 +399,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function deleteItem() {
+    if (!checkNoteSynced()) return;
     close();
     if (item.type === 'tag') {
       await sleep(300);
@@ -413,6 +453,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function deleteTrashItem() {
+    if (!checkNoteSynced()) return;
     close();
     await sleep(300);
     presentDialog({
@@ -455,6 +496,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function toggleLocalOnly() {
+    if (!checkNoteSynced()) return;
     db.notes.note(item.id).localOnly();
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
@@ -480,6 +522,7 @@ export const useActions = ({ close = () => {}, item }) => {
   };
 
   const duplicateNote = async () => {
+    if (!checkNoteSynced()) return;
     await db.notes.note(item.id).duplicate();
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
@@ -627,7 +670,7 @@ export const useActions = ({ close = () => {}, item }) => {
     {
       name: 'RemoveTopic',
       title: 'Remove from topic',
-      hidden: !noteInTopic,
+      hidden: !isNoteInTopic(),
       icon: 'minus-circle-outline',
       func: removeNoteFromTopic
     },

@@ -60,6 +60,9 @@ const SheetWrapper = ({
   return (
     <ActionSheet
       ref={fwdRef}
+      testIDs={{
+        backdrop: 'sheet-backdrop'
+      }}
       drawUnderStatusBar={false}
       containerStyle={style}
       gestureEnabled={gestureEnabled}

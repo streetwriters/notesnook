@@ -43,6 +43,7 @@ export const EditorWrapper = ({ width }) => {
 
   return (
     <View
+      testID="editor-wrapper"
       ref={editorRef}
       style={{
         width: width[deviceMode].c,

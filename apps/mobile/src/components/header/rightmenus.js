@@ -22,6 +22,7 @@ export const RightMenus = ({ currentScreen, action, rightButtons }) => {
               menu: false
             });
           }}
+          testID="icon-search"
           name="magnify"
           color={colors.pri}
           customStyle={styles.rightBtn}

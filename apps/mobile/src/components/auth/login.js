@@ -25,7 +25,7 @@ import Paragraph from '../ui/typography/paragraph';
 import { SVG } from './background';
 import { ForgotPassword } from './forgot-password';
 import TwoFactorVerification from './two-factor';
-
+import { Progress } from '../sheets/progress';
 export const Login = ({ changeMode }) => {
   const colors = useThemeStore(state => state.colors);
   const email = useRef();
@@ -66,11 +66,12 @@ export const Login = ({ changeMode }) => {
     if (!validateInfo() || error) return;
     setLoading(true);
     let user;
+    console.log(mfa);
     try {
       if (mfa) {
-        console.log('mfa details', mfa);
         await db.user.mfaLogin(email.current.toLowerCase(), password.current, mfa);
       } else {
+        console.log(email.current, password.current);
         await db.user.login(email.current.toLowerCase(), password.current);
       }
       callback && callback(true);
@@ -93,15 +94,19 @@ export const Login = ({ changeMode }) => {
       });
       eSendEvent('userLoggedIn', true);
       await sleep(500);
-      presentSheet({
-        title: 'Syncing your data',
-        paragraph: 'Please wait while we sync all your data.',
-        progress: true
-      });
+      Progress.present();
     } catch (e) {
       callback && callback(false);
-      console.log('Login error', e.message, e.data);
+      console.log(
+        'Login error',
+        e.message,
+        e.data,
+        e.message === 'Multifactor authentication required.'
+      );
       if (e.message === 'Multifactor authentication required.') {
+        console.log(TwoFactorVerification.present, 'calling 2fa');
+        setLoading(false);
+        await sleep(300);
         TwoFactorVerification.present(async mfa => {
           if (mfa) {
             console.log(mfa);
@@ -140,8 +145,8 @@ export const Login = ({ changeMode }) => {
       />
 
       <ForgotPassword />
-      <SheetProvider context="two_factor_verify" />
 
+      <SheetProvider context="two_factor_verify" />
       {loading ? <BaseDialog transparent={true} visible={true} animation="fade" /> : null}
       <View
         style={{
@@ -209,6 +214,7 @@ export const Login = ({ changeMode }) => {
               onChangeText={value => {
                 email.current = value;
               }}
+              testID="input.email"
               onErrorCheck={e => setError(e)}
               returnKeyLabel="Next"
               returnKeyType="next"
@@ -228,6 +234,7 @@ export const Login = ({ changeMode }) => {
               onChangeText={value => {
                 password.current = value;
               }}
+              testID="input.password"
               returnKeyLabel="Done"
               returnKeyType="done"
               secureTextEntry
@@ -236,7 +243,7 @@ export const Login = ({ changeMode }) => {
               autoCorrect={false}
               placeholder="Password"
               marginBottom={0}
-              onSubmit={login}
+              onSubmit={() => login()}
             />
             <Button
               title="Forgot your password?"
@@ -269,7 +276,7 @@ export const Login = ({ changeMode }) => {
                   borderRadius: 100
                 }}
                 loading={loading}
-                onPress={login}
+                onPress={() => login()}
                 //  width="100%"
                 type="accent"
                 title={loading ? null : 'Login to your account'}

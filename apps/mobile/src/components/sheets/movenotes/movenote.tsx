@@ -95,6 +95,7 @@ export const MoveNotes = ({
   const renderItem = ({ item, index }) => {
     return (
       <PressableButton
+        testID="listitem.select"
         onPress={() => {
           if (item.type == 'topic') {
             setTopic(topic ? null : item);

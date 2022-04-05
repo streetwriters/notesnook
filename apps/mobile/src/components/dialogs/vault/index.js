@@ -335,6 +335,7 @@ export class VaultDialog extends Component {
     });
     try {
       let verified = await db.user.verifyPassword(this.password);
+      if (!(await db.user.getUser())) verified = true;
       if (verified) {
         await db.vault.delete(this.state.deleteAll);
         eSendEvent('vaultUpdated');
@@ -542,7 +543,7 @@ export class VaultDialog extends Component {
 
   _openInEditor(note) {
     this.close();
-    InteractionManager.runAfterInteractions(() => {
+    InteractionManager.runAfterInteractions(async () => {
       eSendEvent(eOnLoadNote, note);
       if (!DDS.isTab) {
         tabBarRef.current?.goToPage(1);

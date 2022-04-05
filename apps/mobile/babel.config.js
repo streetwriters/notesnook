@@ -5,6 +5,10 @@ const configs = {
       presets: ['module:metro-react-native-babel-preset'],
       plugins: ['@babel/plugin-transform-named-capturing-groups-regex']
     },
+    test: {
+      presets: ['module:metro-react-native-babel-preset'],
+      plugins: ['@babel/plugin-transform-named-capturing-groups-regex']
+    },
     production: {
       presets: ['module:metro-react-native-babel-preset'],
       plugins: ['transform-remove-console', '@babel/plugin-transform-named-capturing-groups-regex']

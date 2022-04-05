@@ -4,6 +4,7 @@ import { Linking, Platform, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ChangePassword } from '../../components/auth/change-password';
+import { Progress } from '../../components/sheets/progress';
 import { Button } from '../../components/ui/button';
 import Seperator from '../../components/ui/seperator';
 import Heading from '../../components/ui/typography/heading';
@@ -24,6 +25,7 @@ import {
   eOpenPremiumDialog,
   eOpenRecoveryKeyDialog
 } from '../../utils/events';
+import { usePricing } from '../../utils/hooks/use-pricing';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import TwoFactorAuth from './2fa';
@@ -46,6 +48,7 @@ const SettingsUserSection = () => {
   const isExpired = user && subscriptionDaysLeft.time < 0;
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
+  const monthlyPlan = usePricing('monthly');
 
   const manageSubscription = () => {
     if (!user.isEmailConfirmed) {
@@ -213,12 +216,8 @@ const SettingsUserSection = () => {
                               Platform.OS === 'android'
                             ? `Resubscribe from Google Playstore`
                             : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
-                            ? `Resubscribe to Notesnook Pro (${
-                                PremiumService.getMontlySub().localizedPrice
-                              } / mo)`
-                            : `Subscribe to Notesnook Pro (${
-                                PremiumService.getMontlySub().localizedPrice
-                              } / mo)`
+                            ? `Resubscribe to Notesnook Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
+                            : `Subscribe to Notesnook Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
                         }
                         height={50}
                         type="accent"
@@ -284,11 +283,7 @@ const SettingsUserSection = () => {
             {
               name: 'Having problems with syncing?',
               func: async () => {
-                presentSheet({
-                  title: 'Syncing your data',
-                  paragraph: 'Please wait while we sync all your data.',
-                  progress: true
-                });
+                Progress.present();
                 await Sync.run('global', true);
                 eSendEvent(eCloseProgressDialog);
               },

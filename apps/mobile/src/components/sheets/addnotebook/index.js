@@ -364,6 +364,7 @@ export class AddNotebookSheet extends React.Component {
             }}
             blurOnSubmit={false}
             button={{
+              testID: 'topic-add-button',
               icon: this.state.editTopic ? 'check' : 'plus',
               onPress: this.onSubmit,
               color: topicInputFocused ? colors.accent : colors.icon

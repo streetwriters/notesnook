@@ -168,6 +168,7 @@ export const Signup = ({ changeMode, welcome, trial }) => {
               onChangeText={value => {
                 email.current = value;
               }}
+              testID="input.email"
               onErrorCheck={e => setError(e)}
               returnKeyLabel="Next"
               returnKeyType="next"
@@ -187,6 +188,7 @@ export const Signup = ({ changeMode, welcome, trial }) => {
               onChangeText={value => {
                 password.current = value;
               }}
+              testID="input.password"
               onErrorCheck={e => setError(e)}
               returnKeyLabel="Next"
               returnKeyType="next"
@@ -206,6 +208,7 @@ export const Signup = ({ changeMode, welcome, trial }) => {
               onChangeText={value => {
                 confirmPassword.current = value;
               }}
+              testID="input.confirmPassword"
               onErrorCheck={e => setError(e)}
               returnKeyLabel="Signup"
               returnKeyType="done"

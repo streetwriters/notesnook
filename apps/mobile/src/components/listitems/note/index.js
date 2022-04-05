@@ -207,6 +207,7 @@ const NoteItem = ({ item, isTrash, tags, dateBy = 'dateCreated', noOpen = false 
               {item.locked ? (
                 <Icon
                   name="lock"
+                  testID="note-locked-icon"
                   size={SIZE.sm}
                   style={{
                     marginRight: 6

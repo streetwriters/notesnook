@@ -12,10 +12,27 @@ import { tabBarRef } from '../../../utils/global-refs';
 import { presentDialog } from '../../dialog/functions';
 import SelectionWrapper from '../selection-wrapper';
 
+const present = () =>
+  presentDialog({
+    title: 'Note not synced',
+    negativeText: 'Ok',
+    paragraph: 'Please sync again to open this note for editing'
+  });
+
 export const openNote = async (item, isTrash, setSelectedItem) => {
   let _note = item;
+
   if (!isTrash) {
     _note = db.notes.note(item.id).data;
+    if (!db.notes.note(item.id)?.synced()) {
+      present();
+      return;
+    }
+  } else {
+    if (!db.trash.synced(item.id)) {
+      present();
+      return;
+    }
   }
 
   if (history.selectedItemsList.length > 0 && history.selectionMode) {

@@ -123,6 +123,7 @@ export const SectionHeader = React.memo(
                     width: 25,
                     height: 25
                   }}
+                  testID="icon-compact-mode"
                   tooltipText={
                     listMode == 'compact' ? 'Switch to normal mode' : 'Switch to compact mode'
                   }

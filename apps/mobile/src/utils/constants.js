@@ -10,6 +10,7 @@ export const STORE_LINK =
 
 export const GROUP = {
   default: 'default',
+  None: 'none',
   abc: 'abc',
   year: 'year',
   week: 'week',
@@ -29,7 +30,13 @@ export const itemSkus = [
   'com.streetwriters.notesnook.sub.mo.15',
   'com.streetwriters.notesnook.sub.mo.ofr',
   'com.streetwriters.notesnook.sub.yr.trialoffer',
-  'com.streetwriters.notesnook.sub.mo.trialoffer'
+  'com.streetwriters.notesnook.sub.mo.trialoffer',
+  'com.streetwriters.notesnook.sub.mo.tier1',
+  'com.streetwriters.notesnook.sub.yr.tier1',
+  'com.streetwriters.notesnook.sub.mo.tier2',
+  'com.streetwriters.notesnook.sub.yr.tier2',
+  'com.streetwriters.notesnook.sub.mo.tier3',
+  'com.streetwriters.notesnook.sub.yr.tier3'
 ];
 
 export const SUBSCRIPTION_STATUS = {

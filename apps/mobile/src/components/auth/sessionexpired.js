@@ -28,6 +28,7 @@ import Paragraph from '../ui/typography/paragraph';
 import SettingsService from '../../services/settings';
 import TwoFactorVerification from './two-factor';
 import SheetProvider from '../sheet-provider';
+import { Progress } from '../sheets/progress';
 
 function getEmail(email) {
   if (!email) return null;
@@ -109,6 +110,7 @@ export const SessionExpired = () => {
         await db.user.login(email.current.toLowerCase(), password.current);
       }
       callback && callback(true);
+      setVisible(false);
       user = await db.user.getUser();
       if (!user) throw new Error('Email or password incorrect!');
       PremiumService.setPremiumStatus();
@@ -126,11 +128,7 @@ export const SessionExpired = () => {
       });
       eSendEvent('userLoggedIn', true);
       await sleep(500);
-      presentSheet({
-        title: 'Syncing your data',
-        paragraph: 'Please wait while we sync all your data.',
-        progress: true
-      });
+      Progress.present();
       setLoading(false);
     } catch (e) {
       callback && callback(false);
@@ -218,7 +216,7 @@ export const SessionExpired = () => {
             autoCapitalize="none"
             autoCorrect={false}
             placeholder="Password"
-            onSubmit={login}
+            onSubmit={() => login()}
           />
 
           <Button
@@ -227,7 +225,7 @@ export const SessionExpired = () => {
               width: '100%'
             }}
             loading={loading}
-            onPress={login}
+            onPress={() => login()}
             type="accent"
             title={loading ? null : 'Login'}
           />

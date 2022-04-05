@@ -37,6 +37,7 @@ interface InputProps extends TextInputProps {
     icon: string;
     color: ColorValue;
     onPress: () => void;
+    testID?: string;
   };
   buttons?: React.ReactNode;
   onBlurInput?: () => void;
@@ -257,6 +258,7 @@ const Input = ({
 
             {button && (
               <IconButton
+                testID={button.testID}
                 name={button.icon}
                 size={SIZE.xl}
                 top={10}

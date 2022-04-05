@@ -122,6 +122,7 @@ export const Dialog = ({ context = 'global' }) => {
               onChangeText={value => {
                 setInputValue(value);
               }}
+              testID="input-value"
               secureTextEntry={dialogInfo.secureTextEntry}
               //defaultValue={dialogInfo.defaultValue}
               onSubmit={onPressPositive}

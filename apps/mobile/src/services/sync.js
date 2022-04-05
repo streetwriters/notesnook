@@ -1,11 +1,13 @@
-import Clipboard from '@react-native-clipboard/clipboard';
 import NetInfo from '@react-native-community/netinfo';
+import { EVENTS } from 'notes-core/common';
+import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
 import { initialize, useUserStore } from '../stores/stores';
 import { doInBackground } from '../utils';
 import { db } from '../utils/database';
-import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
 import { ToastEvent } from './event-manager';
 import { editorController } from '../screens/editor/tiptap/utils';
+
+export const ignoredMessages = ['Sync already running', 'Not allowed to start service intent'];
 
 const run = async (context = 'global', forced = false, full = true) => {
   let result = false;
@@ -15,46 +17,33 @@ const run = async (context = 'global', forced = false, full = true) => {
     return true;
   }
   userstore.setSyncing(true);
-  let errorStack = null;
+  let error = null;
+  console.log('Sync.run started');
   try {
     let res = await doInBackground(async () => {
       try {
-        return await db.sync(full, forced);
+        await db.sync(full, forced);
+        return true;
       } catch (e) {
-        errorStack = e.stack;
+        error = e;
         return e.message;
       }
     });
-
     if (!res) {
       initialize();
       return false;
     }
-    if (typeof res === 'string') throw new Error(res);
+    if (typeof res === 'string') throw error;
 
+    userstore.setSyncing(false);
     result = true;
   } catch (e) {
     result = false;
-    if (e.message !== 'Sync already running' && userstore.user) {
+    if (!ignoredMessages.find(im => e.message?.includes(im)) && userstore.user) {
       userstore.setSyncing(false);
       let status = await NetInfo.fetch();
       if (status.isConnected && status.isInternetReachable) {
-        ToastEvent.show({
-          heading: 'Sync failed',
-          message: e.message,
-          context: context,
-          actionText: 'Copy logs',
-          func: () => {
-            if (errorStack) {
-              Clipboard.setString(errorStack);
-              ToastEvent.show({
-                heading: 'Logs copied!',
-                type: 'success',
-                context: 'global'
-              });
-            }
-          }
-        });
+        ToastEvent.error(e, 'Sync failed', context);
       }
     }
   } finally {
@@ -63,6 +52,8 @@ const run = async (context = 'global', forced = false, full = true) => {
     if (editorController.current?.note?.id) {
       await updateNoteInEditor();
     }
+    db.eventManager.publish(EVENTS.syncCompleted);
+    console.log('sync done');
     userstore.setSyncing(false);
   }
   return result;

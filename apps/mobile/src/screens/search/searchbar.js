@@ -109,6 +109,7 @@ export const SearchBar = () => {
 
       <TextInput
         ref={inputRef}
+        testID="search-input"
         style={{
           fontSize: SIZE.md + 1,
           fontFamily: 'OpenSans-Regular',

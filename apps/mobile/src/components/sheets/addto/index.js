@@ -408,6 +408,7 @@ const MoveNoteComponent = ({ note }) => {
                         <Button
                           onPress={() => handlePress(item, index)}
                           icon="check"
+                          testID="icon-check"
                           iconColor={colors.accent}
                           iconSize={SIZE.lg}
                           height={35}

@@ -38,6 +38,7 @@ const DialogProvider = React.memo(
         <ExportNotesSheet />
         <RecoveryKeySheet colors={colors} />
         <SheetProvider />
+        <SheetProvider context="sync_progress" />
         <RestoreDataSheet />
         <ResultDialog />
         <VaultDialog colors={colors} />
