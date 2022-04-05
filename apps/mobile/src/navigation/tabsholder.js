@@ -1,7 +1,7 @@
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useRef } from 'react';
 import { Platform, View } from 'react-native';
-import { StatusBar } from 'react-native-bars';
+import { NavigationBar, StatusBar } from 'react-native-bars';
 import Animated, { useValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
@@ -291,6 +291,7 @@ export const TabsHolder = React.memo(
         }}
       >
         <StatusBar animated={true} barStyle={colors.night ? 'light-content' : 'dark-content'} />
+        <NavigationBar barStyle={colors.night ? 'light-content' : 'dark-content'} />
         {deviceMode ? (
           <Tabs
             ref={tabBarRef}

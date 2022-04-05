@@ -89,8 +89,14 @@ const Launcher = React.memo(
       setTimeout(async () => {
         if (Platform.OS === 'android') {
           NativeModules.RNBars.setStatusBarStyle(!colors.night ? 'light-content' : 'dark-content');
+          NativeModules.RNBars.setNavigationBarStyle(
+            !colors.night ? 'light-content' : 'dark-content'
+          );
           await sleep(5);
           NativeModules.RNBars.setStatusBarStyle(colors.night ? 'light-content' : 'dark-content');
+          NativeModules.RNBars.setNavigationBarStyle(
+            colors.night ? 'light-content' : 'dark-content'
+          );
         } else {
           StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
         }
