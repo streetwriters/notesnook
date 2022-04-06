@@ -25,7 +25,7 @@ async function logoutUser() {
 
   await page.click(getTestId("dialog-yes"));
 
-  expect(await isAbsent(getTestId("navitem-sync"))).toBe(true);
+  expect(await isAbsent(getTestId("sync-status-synced"))).toBe(true);
 }
 
 async function forceExpireSession() {
@@ -38,7 +38,7 @@ async function forceExpireSession() {
 test("login user", async () => {
   await loginUser();
 
-  expect(await isPresent(getTestId("navitem-sync"))).toBe(true);
+  expect(await isPresent(getTestId("sync-status-completed"))).toBe(true);
 });
 
 test("logout user", async () => {
@@ -53,8 +53,8 @@ test("login user and change password repeatedly", async ({
   test.setTimeout(2 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");
 
-  let currentPassword = USER.password;
-  let newPassword = "";
+  let currentPassword = USER.CURRENT.password;
+  let newPassword = USER.NEW.password;
   let email = USER.email;
 
   for (let i = 0; i < 2; i++) {
@@ -84,6 +84,10 @@ test("login user and change password repeatedly", async ({
 
         await logoutUser();
 
+        await page.reload();
+
+        await page.waitForTimeout(2000);
+
         const cPassword = currentPassword;
         currentPassword = newPassword;
         newPassword = cPassword;
@@ -104,9 +108,9 @@ test("reset user password using recovery key", async ({
 
     await page.waitForSelector(getTestId("step-recovery-key"));
 
-    await page.fill(getTestId("recovery_key"), currentKey);
+    await page.fill(getTestId("recoveryKey"), currentKey);
 
-    await page.click(getTestId("step-next"));
+    await page.click(getTestId("submitButton"));
   });
 });
 
@@ -117,11 +121,11 @@ test("reset user password after session expiry", async ({
   test.setTimeout(2 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");
 
-  let newPassword = "";
-  let newKey = "";
+  let currentPassword = USER.CURRENT.password;
+  let currentKey = USER.CURRENT.key;
 
-  let currentPassword = USER.password;
-  let currentKey = "";
+  let newPassword = USER.NEW.password;
+  let newKey = USER.NEW.key;
 
   let email = USER.email;
 
@@ -136,18 +140,20 @@ test("reset user password after session expiry", async ({
 
     await page.waitForSelector(getTestId("step-new-password"));
 
-    await page.fill(getTestId("new_password"), newPassword);
+    await page.fill(getTestId("password"), newPassword);
 
-    await page.click(getTestId("step-next"));
+    await page.fill(getTestId("confirmPassword"), newPassword);
+
+    await page.click(getTestId("submitButton"));
 
     await page.waitForSelector(getTestId("step-finished"));
 
-    const actualRecoveryKey = await page.innerText(
-      getTestId("new-recovery-key")
-    );
+    const actualRecoveryKey = await page.innerText(getTestId("recoveryKey"));
     expect(actualRecoveryKey).toBe(newKey);
 
-    await page.click(getTestId("step-finish"));
+    await page.click(getTestId("dialog-yes"));
+
+    await page.click(getTestId("submitButton"));
 
     await loginUser({ password: newPassword }, false);
 
@@ -179,16 +185,16 @@ test("reset user password using old password", async ({
 
     await page.fill(getTestId("old_password"), currentPassword);
 
-    await page.click(getTestId("step-next"));
+    await page.click(getTestId("submitButton"));
   });
 });
 
 async function recoverAccount(submitRecoveryData) {
-  let newPassword = "";
-  let newKey = "";
+  let currentPassword = USER.CURRENT.password;
+  let currentKey = USER.CURRENT.key;
 
-  let currentPassword = USER.password;
-  let currentKey = "";
+  let newPassword = USER.NEW.password;
+  let newKey = USER.NEW.key;
 
   let email = USER.email;
 
@@ -201,28 +207,32 @@ async function recoverAccount(submitRecoveryData) {
 
     await page.click(getTestId("submitButton"));
 
-    await page.waitForSelector(getTestId("step-recovery-options"));
+    await page.waitForNavigation({ url: /account\/recovery/ });
+
+    await page.waitForSelector(getTestId("step-recovery-methods"));
 
     await submitRecoveryData({ currentPassword, currentKey });
 
     await page.waitForSelector(getTestId("step-backup-data"));
 
-    await page.click(getTestId("step-next"));
+    await page.click(getTestId("submitButton"));
 
     await page.waitForSelector(getTestId("step-new-password"));
 
-    await page.fill(getTestId("new_password"), newPassword);
+    await page.fill(getTestId("password"), newPassword);
 
-    await page.click(getTestId("step-next"));
+    await page.fill(getTestId("confirmPassword"), newPassword);
+
+    await page.click(getTestId("submitButton"));
 
     await page.waitForSelector(getTestId("step-finished"));
 
-    const actualRecoveryKey = await page.innerText(
-      getTestId("new-recovery-key")
-    );
+    const actualRecoveryKey = await page.innerText(getTestId("recoveryKey"));
     expect(actualRecoveryKey).toBe(newKey);
 
-    await page.click(getTestId("step-finish"));
+    await page.click(getTestId("dialog-yes"));
+
+    await page.click(getTestId("submitButton"));
 
     await loginUser({ email, password: newPassword }, false);
 

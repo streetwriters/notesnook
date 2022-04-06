@@ -71,6 +71,7 @@
     "@types/hookrouter": "^2.2.5",
     "@types/node-fetch": "^2.5.10",
     "@types/quill": "^2.0.5",
+    "@types/react-modal": "^3.13.1",
     "@types/rebass": "^4.0.10",
     "@types/rebass__forms": "^4.0.6",
     "babel-eslint": "^10.1.0",

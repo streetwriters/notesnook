@@ -109,8 +109,6 @@ test("change plans", async ({ page }, info) => {
 
   await loginUser();
 
-  await page.waitForNavigation({ url: /notes/ });
-
   await page.goto("/notes/#/buy/");
 
   await page.waitForSelector(getTestId("see-all-plans"));

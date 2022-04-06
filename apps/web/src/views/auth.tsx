@@ -23,9 +23,6 @@ import AuthContainer from "../components/auth-container";
 import { isTesting } from "../utils/platform";
 import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
 import { useTimer } from "../hooks/use-timer";
-import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
-// @ts-ignore
-import { RequestError } from "notes-core/utils/http";
 
 type LoginFormData = {
   email: string;
@@ -440,7 +437,10 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
 
         const url = await db.user?.recoverAccount(form.email.toLowerCase());
         console.log(url);
-        if (isTesting()) return openURL(url);
+        if (isTesting()) {
+          window.open(url, "_self");
+          return;
+        }
         setSuccess(
           `Recovery email sent. Please check your inbox (and spam folder) for further instructions.`
         );

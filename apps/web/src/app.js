@@ -32,7 +32,9 @@ function App() {
       <ThemeProvider>
         {isAppLoaded && (
           <Suspense fallback={<div style={{ display: "none" }} />}>
-            <GlobalMenuWrapper />
+            <div id="menu-wrapper">
+              <GlobalMenuWrapper />
+            </div>
             <AppEffects setShow={setShow} />
             {isMobile && (
               <MobileAppEffects

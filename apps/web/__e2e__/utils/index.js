@@ -7,7 +7,14 @@ dotenv.config({ path: path.join(__dirname, ".env.local") });
 
 const USER = {
   email: process.env.USER_EMAIL,
-  password: process.env.USER_PASSWORD,
+  CURRENT: {
+    password: "",
+    key: "",
+  },
+  NEW: {
+    password: process.env.USER_PASSWORD,
+    key: "",
+  },
 };
 
 async function loginUser(user = USER, navigate = true) {
@@ -15,11 +22,14 @@ async function loginUser(user = USER, navigate = true) {
 
   if (user.email) await page.fill(getTestId("email"), user.email);
 
-  await page.fill(getTestId("password"), user.password);
+  await page.fill(
+    getTestId("password"),
+    user.password || USER.CURRENT.password
+  );
 
   await page.click(getTestId("submitButton"));
 
-  await page.waitForSelector(getTestId("sync-status-synced"));
+  await page.waitForSelector(getTestId("sync-status-completed"));
 }
 
 const NOTEBOOK = {
