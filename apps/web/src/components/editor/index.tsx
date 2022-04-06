@@ -23,26 +23,31 @@ import { FlexScrollContainer } from "../scroll-container";
 import { formatDate } from "notes-core/utils/date";
 import { debounce, debounceWithId } from "../../utils/debounce";
 import { showError } from "../../common/dialog-controller";
+import "./tiptap.css";
+import { CharacterCounter, IEditor } from "./tiptap";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
+const TipTap = React.lazy(() => import("./tiptap"));
 // const EMPTY_CONTENT = "<p><br></p>";
-function editorSetContent(editor, content) {
-  const editorScroll = document.querySelector(".editorScroll");
-  if (editorScroll) editorScroll.scrollTop = 0;
+// function editorSetContent(editor, content) {
+//   const editorScroll = document.querySelector(".editorScroll");
+//   if (editorScroll) editorScroll.scrollTop = 0;
 
-  editor.setHTML(content);
+//   editor.setHTML(content);
 
-  updateWordCount(editor);
+//   updateWordCount(editor);
 
-  editor.focus();
+//   editor.focus();
+// }
+
+function updateWordCount(counter?: CharacterCounter) {
+  AppEventManager.publish(
+    AppEvents.UPDATE_WORD_COUNT,
+    counter ? counter.words() : 0
+  );
 }
 
-function updateWordCount(editor) {
-  if (!editor.countWords) return;
-  AppEventManager.publish(AppEvents.UPDATE_WORD_COUNT, editor.countWords());
-}
-
-function onEditorChange(noteId, sessionId, content) {
+function onEditorChange(noteId: string, sessionId: string, content: string) {
   if (!content) return;
 
   editorstore.get().saveSessionContent(noteId, sessionId, {
@@ -53,9 +58,13 @@ function onEditorChange(noteId, sessionId, content) {
 const debouncedUpdateWordCount = debounce(updateWordCount, 1000);
 const debouncedOnEditorChange = debounceWithId(onEditorChange, 100);
 
-function Editor({ noteId, nonce }) {
-  const editorRef = useRef();
-  const [isEditorLoading, setIsEditorLoading] = useState(true);
+function Editor({
+  noteId,
+  nonce,
+}: {
+  noteId?: string | number;
+  nonce?: string;
+}) {
   const sessionId = useStore((store) => store.session.id);
   const sessionState = useStore((store) => store.session.state);
   const sessionType = useStore((store) => store.session.sessionType);
@@ -71,17 +80,18 @@ function Editor({ noteId, nonce }) {
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const init = useStore((store) => store.init);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const isSessionReady = useMemo(
-    () => nonce || sessionId || editorRef.current?.editor?.initialized,
-    [nonce, sessionId, editorRef]
-  );
+  const isSessionReady = useMemo(() => nonce || sessionId, [nonce, sessionId]);
+  const [editor, setEditor] = useState<IEditor>();
+  // const editor = useRef<IEditor>();
+  // const [content, setContent] = useState<string>();
+  // const [isEditorFocused, setIsEditorFocused] = useState<boolean>();
 
   useEffect(() => {
     init();
   }, [init]);
 
   const startSession = useCallback(
-    async function startSession(noteId, force) {
+    async function startSession(noteId: string | number, force?: boolean) {
       if (noteId === 0) newSession(nonce);
       else if (noteId) {
         await openSession(noteId, force);
@@ -91,20 +101,18 @@ function Editor({ noteId, nonce }) {
   );
 
   const clearContent = useCallback(() => {
-    const editor = editorRef.current?.editor;
-    if (!editor || !editor.initialized) return;
+    if (!editor) return;
     editor.clearContent();
-    updateWordCount(editor);
-    editor.focus(); // TODO
-  }, []);
+    editor.focus();
+    updateWordCount();
+  }, [editor]);
 
-  const setContent = useCallback(() => {
+  const setEditorContent = useCallback(() => {
     const { id } = editorstore.get().session;
-    const editor = editorRef.current?.editor;
-    if (!editor || !editor.initialized) return;
-
     async function setContents() {
-      if (!db.notes.note(id)?.synced()) {
+      if (!editor) return;
+      // TODO move this somewhere more appropriate
+      if (!db.notes?.note(id)?.synced()) {
         await showError(
           "Note not synced",
           "This note is not fully synced. Please sync again to open this note for editing."
@@ -113,18 +121,22 @@ function Editor({ noteId, nonce }) {
       }
 
       let content = await editorstore.get().getSessionContent();
-      if (content?.data) editorSetContent(editor, content.data);
-      else clearContent(editor);
+      if (content?.data) {
+        editor.setContent(content.data);
+        editor.focus();
+      } else clearContent();
 
-      editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
-      if (id && content) await db.attachments.downloadImages(id);
+      editorstore.set(
+        (state: any) => (state.session.state = SESSION_STATES.stale)
+      );
+      if (id && content) await db.attachments?.downloadImages(id);
     }
     setContents();
-  }, [clearContent]);
+  }, [clearContent, editor]);
 
   const enabledPreviewMode = useCallback(() => {
-    const editor = editorRef.current?.editor;
-    editor.mode.set("readonly");
+    //   const editor = editorRef.current?.editor;
+    //   editor.mode.set("readonly");
   }, []);
 
   const disablePreviewMode = useCallback(
@@ -152,30 +164,31 @@ function Editor({ noteId, nonce }) {
       // there can be notes that only have a title so we need to
       // handle that.
       if (!contentId && (!title || !!nonce)) return;
-      setContent();
+      setEditorContent();
     },
-    [sessionId, contentId, setContent]
+    [sessionId, contentId, setEditorContent]
   );
 
   useEffect(
     function openPreviewSession() {
       if (!isPreviewMode || sessionState !== SESSION_STATES.new) return;
 
-      setContent();
+      setEditorContent();
       enabledPreviewMode();
     },
-    [isPreviewMode, sessionState, setContent, enabledPreviewMode]
+    [isPreviewMode, sessionState, setEditorContent, enabledPreviewMode]
   );
 
-  useEffect(() => {
-    if (isEditorLoading) return;
-    const editor = editorRef.current?.editor;
-    if (isReadonly) {
-      editor.mode.set("readonly");
-    } else {
-      editor.mode.set("design");
-    }
-  }, [isReadonly, isEditorLoading]);
+  //   useEffect(() => {
+  //     if (isEditorLoading) return;
+  //     const editor = editorRef.current?.editor;
+  //     if (!editor) return;
+  //     if (isReadonly) {
+  //       editor.mode.set("readonly");
+  //     } else {
+  //       editor.mode.set("design");
+  //     }
+  //   }, [isReadonly, isEditorLoading]);
 
   useEffect(
     function newSession() {
@@ -188,6 +201,7 @@ function Editor({ noteId, nonce }) {
 
   useEffect(() => {
     (async () => {
+      if (noteId === undefined) return;
       await startSession(noteId);
     })();
   }, [startSession, noteId, nonce]);
@@ -203,7 +217,7 @@ function Editor({ noteId, nonce }) {
         overflow: "hidden",
       }}
     >
-      {isEditorLoading ? (
+      {!editor ? (
         <Flex
           sx={{
             position: "absolute",
@@ -219,6 +233,7 @@ function Editor({ noteId, nonce }) {
       <Toolbar />
       <FlexScrollContainer
         className="editorScroll"
+        style={{}}
         viewStyle={{ display: "flex", flexDirection: "column" }}
       >
         <Box
@@ -271,39 +286,46 @@ function Editor({ noteId, nonce }) {
 
           {isSessionReady && (
             <Suspense fallback={<div />}>
-              <ReactMCE
-                editorRef={editorRef}
-                onFocus={() => toggleProperties(false)}
-                onSave={saveSession}
-                sessionId={sessionId}
-                onChange={(content, editor) => {
+              <TipTap
+                onFocus={() => {
+                  toggleProperties(false);
+                }}
+                onInit={(_editor) => {
+                  setEditor(_editor);
+                }}
+                onDestroy={() => {
+                  setEditor(undefined);
+                }}
+                onChange={(content, counter) => {
                   const { id, sessionId } = editorstore.get().session;
                   debouncedOnEditorChange(sessionId, id, sessionId, content);
-                  debouncedUpdateWordCount(editor);
-                }}
-                changeInterval={100}
-                onInit={(editor) => {
-                  if (sessionId && editorstore.get().session.contentId) {
-                    setContent();
-                  } else if (nonce) clearContent();
-
-                  setTimeout(() => {
-                    setIsEditorLoading(false);
-                    // a short delay to make sure toolbar has rendered.
-                  }, 100);
+                  if (counter) debouncedUpdateWordCount(counter);
                 }}
               />
             </Suspense>
           )}
         </Flex>
       </FlexScrollContainer>
-      {arePropertiesVisible && <Properties noteId={noteId} />}
+      {arePropertiesVisible && <Properties />}
     </Flex>
   );
 }
 export default Editor;
 
-function Notice({ title, subtitle, onCancel, action }) {
+function Notice({
+  title,
+  subtitle,
+  onCancel,
+  action,
+}: {
+  title: string;
+  subtitle: string;
+  onCancel: () => void;
+  action?: {
+    text: string;
+    onClick: () => void;
+  };
+}) {
   return (
     <Flex
       bg="bgSecondary"

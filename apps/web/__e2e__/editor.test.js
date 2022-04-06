@@ -125,7 +125,7 @@ test("creating a new title-only note should add it to the list", async () => {
   await createNoteAndCheckPresence({ title: "Hello World" });
 });
 
-test("format changes should get saved", async () => {
+test.skip("format changes should get saved", async () => {
   const selector = await createNoteAndCheckPresence();
 
   await page.click(getTestId("notes-action-button"));
@@ -178,7 +178,7 @@ test("opening an empty titled note should empty out editor contents", async () =
 test("focus should not jump to editor while typing in title input", async () => {
   await page.click(getTestId("notes-action-button"));
 
-  await page.waitForSelector(".mce-content-body");
+  await page.waitForSelector(".ProseMirror");
 
   await page.type(getTestId("editor-title"), "Hello", { delay: 200 });
 
@@ -190,7 +190,7 @@ test("focus should not jump to editor while typing in title input", async () => 
 test("select all & backspace should clear all content in editor", async () => {
   const selector = await createNoteAndCheckPresence();
 
-  await page.focus(".mce-content-body");
+  await page.focus(".ProseMirror");
 
   await page.keyboard.press("Home");
 
@@ -206,12 +206,12 @@ test("select all & backspace should clear all content in editor", async () => {
 
   await page.click(selector);
 
-  await page.waitForSelector(".mce-content-body");
+  await page.waitForSelector(".ProseMirror");
 
   await expect(getEditorContent()).resolves.toBe("");
 });
 
-test("last line doesn't get saved if it's font is different", async () => {
+test.skip("last line doesn't get saved if it's font is different", async () => {
   const selector = await createNoteAndCheckPresence();
 
   await page.keyboard.press("Enter");
@@ -220,7 +220,7 @@ test("last line doesn't get saved if it's font is different", async () => {
 
   await page.click(`div[title="Serif"]`);
 
-  await page.type(".mce-content-body", "I am another line in Serif font.");
+  await page.type(".ProseMirror", "I am another line in Serif font.");
 
   await page.waitForTimeout(200);
 
@@ -235,7 +235,7 @@ test("last line doesn't get saved if it's font is different", async () => {
 
 test("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
   page,
-}) => {
+}, { setTimeout }) => {
   await createNoteAndCheckPresence({
     title: "Test note 1",
     content: "53ad8e4e40ebebd0f400498d",
