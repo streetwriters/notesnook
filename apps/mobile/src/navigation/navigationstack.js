@@ -83,8 +83,8 @@ export const NavigationStack = React.memo(
               <Stack.Screen name="NotesPage" component={Notes} />
               <Stack.Screen name="Tags" component={Tags} />
               <Stack.Screen name="Notebook" component={Notebook} />
-              <Stack.Screen name="Settings" component={Settings} />
               <Stack.Screen name="Search" component={Search} />
+              <Stack.Screen name="Settings" component={Settings} />
             </Stack.Navigator>
           ) : null}
         </NavigationContainer>

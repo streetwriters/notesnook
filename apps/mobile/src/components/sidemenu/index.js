@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { FlatList, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
+import Settings from '../../screens/settings';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent } from '../../services/event-manager';
 import { useSettingStore, useUserStore } from '../../stores/stores';

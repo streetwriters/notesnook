@@ -81,7 +81,7 @@ export type Settings = {
   recoveryKeySaved?: boolean;
   theme: {
     accent: string;
-    dark: false;
+    dark: boolean;
   };
   backupDirectoryAndroid?: FileType | null;
   showBackupCompleteSheet: boolean;

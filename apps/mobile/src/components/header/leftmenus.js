@@ -6,11 +6,12 @@ import { DDS } from '../../services/device-detection';
 import Navigation from '../../services/navigation';
 import { IconButton } from '../ui/icon-button';
 
-export const LeftMenus = ({ currentScreen, headerMenuState }) => {
+export const LeftMenus = ({ currentScreen, headerMenuState, onBackPress }) => {
   const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
 
   const onLeftButtonPress = () => {
+    if (onBackPress) return onBackPress();
     if (headerMenuState) {
       Navigation.openDrawer();
       return;

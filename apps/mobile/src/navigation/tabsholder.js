@@ -26,6 +26,7 @@ import { editorRef, tabBarRef } from '../utils/global-refs';
 import { hideAllTooltips } from '../utils/hooks/use-tooltip';
 import { sleep } from '../utils/time';
 import { NavigationStack } from './navigation-stack';
+import Settings from '../screens/settings';
 
 let layoutTimer = null;
 
@@ -335,6 +336,7 @@ export const TabsHolder = React.memo(
       >
         <StatusBar animated={true} barStyle={colors.night ? 'light-content' : 'dark-content'} />
         <NavigationBar barStyle={colors.night ? 'light-content' : 'dark-content'} />
+
         {deviceMode ? (
           <Tabs
             ref={tabBarRef}

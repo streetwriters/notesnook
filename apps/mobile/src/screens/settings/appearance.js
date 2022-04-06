@@ -212,7 +212,7 @@ const SettingsAppearanceSection = () => {
   );
 };
 
-export const AccentColorPicker = ({ settings = true }) => {
+export const AccentColorPicker = ({ settings = true, wrap = false }) => {
   const colors = useThemeStore(state => state.colors);
   function changeAccentColor(color) {
     switchAccentColor(color);
@@ -234,9 +234,9 @@ export const AccentColorPicker = ({ settings = true }) => {
         borderRadius: 5,
         padding: 5,
         marginTop: 10,
-        marginBottom: pv + 5,
+        marginBottom: wrap ? 0 : pv + 5,
         width: '100%',
-        paddingHorizontal: 12,
+        paddingHorizontal: wrap ? 0 : 12,
         maxWidth: settings ? null : '100%'
       }}
       scrollEnabled={true}
@@ -244,7 +244,10 @@ export const AccentColorPicker = ({ settings = true }) => {
       contentContainerStyle={{
         alignSelf: 'center',
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        maxWidth: wrap ? '100%' : null,
+        alignContent: wrap && 'flex-start',
+        justifyContent: wrap && 'flex-start'
       }}
     >
       {[
