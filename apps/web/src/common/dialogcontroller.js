@@ -21,27 +21,21 @@ import { getChangelog } from "../utils/version";
 import { isDesktop } from "../utils/platform";
 
 function showDialog(dialog) {
-  const root = document.getElementById("dialogContainer");
-
-  if (root) {
-    return new Promise((resolve, reject) => {
-      const perform = (result) => {
-        ReactDOM.unmountComponentAtNode(root);
-        hashNavigate("/", { replace: true });
-        resolve(result);
-      };
-      const PropDialog = dialog(Dialogs, perform);
-
-      ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
-    });
-  }
-  return Promise.reject("No element with id 'dialogContainer'");
+  return new Promise((resolve, reject) => {
+    const container = document.createElement("div");
+    const perform = (result) => {
+      ReactDOM.unmountComponentAtNode(container);
+      hashNavigate("/", { replace: true, notify: false });
+      resolve(result);
+    };
+    const PropDialog = dialog(Dialogs, perform);
+    ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, container);
+  });
 }
 
 export function closeOpenedDialog() {
-  const root = document.getElementById("ReactModalPortal");
-  if (!root) return;
-  ReactDOM.unmountComponentAtNode(root);
+  const dialogs = document.querySelectorAll(".ReactModalPortal");
+  dialogs.forEach((elem) => elem.remove());
 }
 
 export function showEditNotebookDialog(notebookId) {

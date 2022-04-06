@@ -40,24 +40,15 @@ const features: Record<FeatureKeys, Feature> = {
     subtitle: `Welcome to v${appVersion.clean}`,
     subFeatures: [
       {
-        title: "Sync over Websockets",
+        title: "Region-based pricing",
         subtitle: (
           <>
-            HTTP sync has been replaced with Websockets sync which is faster &
-            more reliable &amp; also offers realtime sync progress.
+            You can now get Notesnook Pro at a much discounted price depending
+            on where you are located. It works by default — no special codes
+            required.
           </>
         ),
-        icon: Icon.Sync,
-      },
-      {
-        title: "Group by none",
-        subtitle: (
-          <>
-            We went and added an option to disable grouping in lists. To use
-            click on <Code text="List options > Group by > None" />.
-          </>
-        ),
-        icon: Icon.GroupBy,
+        icon: Icon.Pro,
       },
     ],
     cta: {
@@ -85,7 +76,11 @@ type FeatureDialogProps = {
 function FeatureDialog(props: FeatureDialogProps) {
   const { featureName } = props;
   const feature = features[featureName];
-  if (!feature || (feature.shouldShow && !feature.shouldShow())) return null;
+  if (!feature || (feature.shouldShow && !feature.shouldShow())) {
+    props.onClose(false);
+    return null;
+  }
+
   return (
     <Dialog
       isOpen={true}

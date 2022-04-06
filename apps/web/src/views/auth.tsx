@@ -22,9 +22,7 @@ import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { isTesting } from "../utils/platform";
 import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
-import { RequestError } from "notes-core/utils/http";
 import { useTimer } from "../hooks/use-timer";
-import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 
 type LoginFormData = {
   email: string;
@@ -439,7 +437,10 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
 
         const url = await db.user?.recoverAccount(form.email.toLowerCase());
         console.log(url);
-        if (isTesting()) return openURL(url);
+        if (isTesting()) {
+          window.open(url, "_self");
+          return;
+        }
         setSuccess(
           `Recovery email sent. Please check your inbox (and spam folder) for further instructions.`
         );
@@ -910,9 +911,10 @@ async function login(
     Config.set("sessionExpired", false);
     openURL("/");
   } catch (e) {
-    if (e instanceof RequestError && e.code === "mfa_required") {
+    const error = e as any;
+    if (error.code === "mfa_required") {
       const { primaryMethod, phoneNumber, secondaryMethod, token } =
-        e.data as MFAErrorData;
+        error.data as MFAErrorData;
 
       if (!primaryMethod)
         throw new Error(

@@ -12,6 +12,7 @@ function GlobalMenuWrapper() {
   return (
     <Modal
       role="menu"
+      portalClassName="menu-portal"
       isOpen={isOpen}
       shouldCloseOnEsc
       shouldReturnFocusAfterClose

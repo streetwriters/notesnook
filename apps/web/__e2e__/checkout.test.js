@@ -40,6 +40,7 @@ async function getPrices() {
  * @param {string} prices
  */
 function roundOffPrices(prices) {
+  console.log(prices);
   return prices.replaceAll(/(\d+.\d+)/gm, (str, price) => {
     price = parseFloat(price);
     return isNaN(price) ? 0 : Math.ceil(Math.round(price) / 10) * 10;
@@ -57,7 +58,14 @@ async function getPaddleFrame(selector = "inlineComplianceBarContainer") {
   return paddleFrame;
 }
 
-async function changeCountry(paddleFrame, countryCode, pinCode) {
+/**
+ *
+ * @param {Page} page
+ * @param {*} paddleFrame
+ * @param {*} countryCode
+ * @param {*} pinCode
+ */
+async function changeCountry(page, paddleFrame, countryCode, pinCode) {
   await paddleFrame.selectOption(
     getPaddleTestId("countriesSelect"),
     countryCode,
@@ -71,6 +79,11 @@ async function changeCountry(paddleFrame, countryCode, pinCode) {
 
   await paddleFrame.waitForSelector(
     getPaddleTestId("inlineComplianceBarContainer")
+  );
+
+  await page.waitForSelector(
+    getTestId(`checkout-plan-country-${countryCode}`),
+    { state: "attached" }
   );
 }
 
@@ -91,10 +104,16 @@ async function forEachPlan(action) {
   }
 }
 
-test("change plans", async ({ page }) => {
+test("change plans", async ({ page }, info) => {
+  info.setTimeout(0);
+
   await loginUser();
 
-  await page.goto("/#/buy/");
+  await page.goto("/notes/#/buy/");
+
+  await page.waitForSelector(getTestId("see-all-plans"));
+
+  await page.click(getTestId("see-all-plans"));
 
   await forEachPlan(async (plan) => {
     await expect(
@@ -108,21 +127,31 @@ test("confirm plan prices", async ({ page }) => {
 
   await page.goto("/#/buy/");
 
+  await page.waitForSelector(getTestId("see-all-plans"));
+
+  await page.click(getTestId("see-all-plans"));
+
   await forEachPlan(async (plan) => {
     const prices = roundOffPrices((await getPrices()).join("\n"));
     expect(prices).toMatchSnapshot(`checkout-${plan.key}-prices.txt`);
   });
 });
 
-test("changing locale should show localized prices", async ({ page }) => {
+test("changing locale should show localized prices", async ({ page }, info) => {
+  info.setTimeout(0);
+
   await loginUser();
 
   await page.goto("/#/buy/");
 
+  await page.waitForSelector(getTestId("see-all-plans"));
+
+  await page.click(getTestId("see-all-plans"));
+
   await forEachPlan(async (plan) => {
     const paddleFrame = await getPaddleFrame();
 
-    await changeCountry(paddleFrame, "IN", "110001");
+    await changeCountry(page, paddleFrame, "IN", "110001");
 
     const prices = roundOffPrices((await getPrices()).join("\n"));
     expect(prices).toMatchSnapshot(`checkout-${plan.key}-IN-prices.txt`);
@@ -132,11 +161,15 @@ test("changing locale should show localized prices", async ({ page }) => {
 test("applying coupon should change discount & total price", async ({ page }, {
   setTimeout,
 }) => {
-  setTimeout(60 * 1000);
+  setTimeout(0);
 
   await loginUser();
 
   await page.goto("/#/buy/");
+
+  await page.waitForSelector(getTestId("see-all-plans"));
+
+  await page.click(getTestId("see-all-plans"));
 
   await forEachPlan(async (plan) => {
     await getPaddleFrame();
@@ -146,6 +179,10 @@ test("applying coupon should change discount & total price", async ({ page }, {
 
     await getPaddleFrame();
 
+    await page.waitForSelector(getTestId(`checkout-plan-coupon-applied`), {
+      state: "attached",
+    });
+
     const prices = roundOffPrices((await getPrices()).join("\n"));
 
     expect(prices).toMatchSnapshot(
@@ -154,13 +191,18 @@ test("applying coupon should change discount & total price", async ({ page }, {
   });
 });
 
-test("apply coupon through url", async ({ page }) => {
+test("apply coupon through url", async ({ page }, { setTimeout }) => {
+  setTimeout(0);
   await loginUser();
 
   for (let plan of plans) {
     await page.goto(`/#/buy/${plan.key}/${plan.coupon}`);
 
     await getPaddleFrame();
+
+    await page.waitForSelector(getTestId(`checkout-plan-coupon-applied`), {
+      state: "attached",
+    });
 
     const prices = roundOffPrices((await getPrices()).join("\n"));
     expect(prices).toMatchSnapshot(
@@ -172,21 +214,29 @@ test("apply coupon through url", async ({ page }) => {
 test("apply coupon after changing country", async ({ page }, {
   setTimeout,
 }) => {
-  setTimeout(60 * 1000);
+  setTimeout(0);
 
   await loginUser();
 
   await page.goto("/#/buy/");
 
+  await page.waitForSelector(getTestId("see-all-plans"));
+
+  await page.click(getTestId("see-all-plans"));
+
   await forEachPlan(async (plan) => {
     const paddleFrame = await getPaddleFrame();
 
-    await changeCountry(paddleFrame, "IN", "110001");
+    await changeCountry(page, paddleFrame, "IN", "110001");
 
     await page.fill(getTestId("checkout-coupon-code"), plan.coupon);
     await page.press(getTestId("checkout-coupon-code"), "Enter");
 
     await getPaddleFrame();
+
+    await page.waitForSelector(getTestId(`checkout-plan-coupon-applied`), {
+      state: "attached",
+    });
 
     const prices = roundOffPrices((await getPrices()).join("\n"));
     expect(prices).toMatchSnapshot(

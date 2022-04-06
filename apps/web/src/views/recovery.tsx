@@ -251,6 +251,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
 
   return (
     <RecoveryForm
+      testId="step-recovery-methods"
       type="methods"
       title="Choose a recovery method"
       subtitle="How do you want to recover your account?"
@@ -263,6 +264,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
     >
       {recoveryMethods.map((method, index) => (
         <Button
+          data-test-id={method.testId}
           type="submit"
           variant={"secondary"}
           mt={2}
@@ -298,6 +300,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
 
   return (
     <RecoveryForm
+      testId="step-recovery-key"
       type="method:key"
       title="Recover your account"
       subtitle={"Use a data recovery key to reset your account password."}
@@ -343,6 +346,7 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
 
   return (
     <RecoveryForm
+      testId="step-backup-file"
       type="method:backup"
       title="Recover your account"
       subtitle={
@@ -399,6 +403,7 @@ function BackupData(props: BaseRecoveryComponentProps<"backup">) {
 
   return (
     <RecoveryForm
+      testId="step-backup-data"
       type="backup"
       title="Backup your data"
       subtitle={
@@ -424,6 +429,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
 
   return (
     <RecoveryForm
+      testId="step-new-password"
       type="new"
       title="Reset account password"
       subtitle={
@@ -494,6 +500,7 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
 
   return (
     <RecoveryForm
+      testId="step-finished"
       type="final"
       title="Recovery successful!"
       subtitle={"Your account has been recovered."}
@@ -511,6 +518,7 @@ function Final(_props: BaseRecoveryComponentProps<"final">) {
 }
 
 type RecoveryFormProps<TType extends RecoveryRoutes> = {
+  testId: string;
   title: string;
   subtitle: string | JSX.Element;
   loading?: { title: string; subtitle: string };
@@ -524,7 +532,7 @@ type RecoveryFormProps<TType extends RecoveryRoutes> = {
 export function RecoveryForm<T extends RecoveryRoutes>(
   props: RecoveryFormProps<T>
 ) {
-  const { title, subtitle, children } = props;
+  const { title, subtitle, children, testId } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
   const formRef = useRef<HTMLFormElement>();
@@ -536,6 +544,7 @@ export function RecoveryForm<T extends RecoveryRoutes>(
   return (
     <Flex
       ref={formRef}
+      data-test-id={testId}
       as="form"
       id="authForm"
       flexDirection="column"
@@ -557,6 +566,7 @@ export function RecoveryForm<T extends RecoveryRoutes>(
           setForm(form);
           await props.onSubmit(form);
         } catch (e) {
+          console.error(e);
           const error = e as Error;
           setError(error.message);
         } finally {
