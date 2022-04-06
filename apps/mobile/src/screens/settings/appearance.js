@@ -212,6 +212,82 @@ const SettingsAppearanceSection = () => {
   );
 };
 
+export const HomagePageSelector = () => {
+  const colors = useThemeStore(state => state.colors);
+  const settings = useSettingStore(state => state.settings);
+  const menuRef = useRef();
+  const [width, setWidth] = useState(0);
+  return (
+    <View
+      onLayout={event => {
+        setWidth(event.nativeEvent.layout.width);
+      }}
+      style={{
+        width: '100%'
+      }}
+    >
+      <Menu
+        ref={menuRef}
+        animationDuration={200}
+        style={{
+          borderRadius: 5,
+          backgroundColor: colors.bg,
+          width: width,
+          marginTop: 60
+        }}
+        button={
+          <PressableButton
+            onPress={async () => {
+              await PremiumService.verify(menuRef.current?.show);
+            }}
+            type="grayBg"
+            customStyle={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: 10,
+              width: '100%',
+              justifyContent: 'space-between',
+              padding: 12
+            }}
+          >
+            <Paragraph>{settings.homepage}</Paragraph>
+            <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+          </PressableButton>
+        }
+      >
+        {MenuItemsList.slice(0, MenuItemsList.length - 1).map(
+          item =>
+            item.name !== 'Monographs' && (
+              <MenuItem
+                key={item.name}
+                onPress={async () => {
+                  menuRef.current?.hide();
+                  await SettingsService.set({ homepage: item.name });
+                  ToastEvent.show({
+                    heading: 'Homepage set to ' + item.name,
+                    message: 'Restart the app for changes to take effect.',
+                    type: 'success'
+                  });
+                }}
+                style={{
+                  backgroundColor: settings.homepage === item.name ? colors.nav : 'transparent',
+                  width: '100%',
+                  maxWidth: width
+                }}
+                textStyle={{
+                  fontSize: SIZE.md,
+                  color: settings.homepage === item.name ? colors.accent : colors.pri
+                }}
+              >
+                {item.name}
+              </MenuItem>
+            )
+        )}
+      </Menu>
+    </View>
+  );
+};
+
 export const AccentColorPicker = ({ settings = true, wrap = false }) => {
   const colors = useThemeStore(state => state.colors);
   function changeAccentColor(color) {

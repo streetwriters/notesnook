@@ -8,7 +8,8 @@ import { SettingSection } from './types';
 
 export const SectionGroup = ({ item }: { item: SettingSection }) => {
   const colors = useThemeStore(state => state.colors);
-  return (
+  const isHidden = item.hidden && item.hidden(null);
+  return isHidden ? null : (
     <View
       style={{
         marginVertical: item.sections ? 10 : 0
@@ -19,10 +20,10 @@ export const SectionGroup = ({ item }: { item: SettingSection }) => {
           style={{
             paddingHorizontal: 12
           }}
-          color={colors.icon}
-          size={SIZE.sm}
+          color={colors.accent}
+          size={SIZE.xs}
         >
-          {item.name}
+          {item.name.toUpperCase()}
         </Heading>
       ) : null}
 

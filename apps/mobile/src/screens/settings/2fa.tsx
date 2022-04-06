@@ -151,7 +151,7 @@ type MFAStepProps = {
   method?: MFAMethod;
   isSetup?: boolean;
 };
-const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
+export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
 
@@ -209,7 +209,7 @@ const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   );
 };
 
-const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
+export const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
   const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
   const [authenticatorDetails, setAuthenticatorDetails] = useState({
@@ -437,7 +437,7 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
   );
 };
 
-const MFARecoveryCodes = ({ method, recovery, onSuccess, isSetup = true }: MFAStepProps) => {
+export const MFARecoveryCodes = ({ method, recovery, onSuccess, isSetup = true }: MFAStepProps) => {
   const colors = useThemeStore(state => state.colors);
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -647,7 +647,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
   );
 };
 
-const MFASheet = ({ recovery }: { recovery?: boolean }) => {
+export const MFASheet = ({ recovery }: { recovery?: boolean }) => {
   const [step, setStep] = useState<MFAStep>({
     id: 'mfapick',
     props: {
