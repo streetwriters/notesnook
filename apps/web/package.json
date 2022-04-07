@@ -7,6 +7,7 @@
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "dependencies": {
+    "@brixtol/currency-symbols": "^1.1.1",
     "@mdi/js": "^6.5.95",
     "@mdi/react": "^1.4.0",
     "@notesnook/crypto": "^1.0.0",
@@ -20,7 +21,6 @@
     "clipboard-polyfill": "^3.0.3",
     "cogo-toast": "^4.2.3",
     "compressorjs": "^1.0.7",
-    "currency-symbol-map": "^5.0.1",
     "dayjs": "^1.10.4",
     "emotion-theming": "^10.0.19",
     "event-source-polyfill": "^1.0.25",

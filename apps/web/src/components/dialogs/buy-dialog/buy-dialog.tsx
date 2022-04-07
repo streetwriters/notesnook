@@ -3,7 +3,6 @@ import { Text, Flex, Button } from "rebass";
 import * as Icon from "../../icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { useStore as useThemeStore } from "../../../stores/theme-store";
-import getSymbolFromCurrency from "currency-symbol-map";
 import Modal from "react-modal";
 import { useTheme } from "emotion-theming";
 import { ReactComponent as Rocket } from "../../../assets/rocket.svg";
@@ -20,6 +19,7 @@ import { showToast } from "../../../utils/toast";
 import { TaskManager } from "../../../common/task-manager";
 import { db } from "../../../common/db";
 import { useCheckoutStore } from "./store";
+import { getCurrencySymbol } from "./helpers";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -251,7 +251,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
         <Icon.Loading sx={{ mt: 4 }} />
       ) : (
         <Text variant={"body"} fontSize="title" mt={4}>
-          Starting from {getSymbolFromCurrency(plan.currency)}
+          Starting from {getCurrencySymbol(plan.currency)}
           {plan.price.gross}
           {formatPeriod(plan.period)}
         </Text>
@@ -523,7 +523,7 @@ function formatPrice(
   negative = false
 ) {
   const formattedPeriod = period ? formatPeriod(period) : "";
-  const currencySymbol = getSymbolFromCurrency(currency);
+  const currencySymbol = getCurrencySymbol(currency);
   const prefix = negative ? "-" : "";
   return `${prefix}${currencySymbol}${price}${formattedPeriod}`;
 }
