@@ -19,6 +19,7 @@ import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
 import { getChangelog } from "../utils/version";
 import { isDesktop } from "../utils/platform";
+import { pluralize } from "../utils/string";
 
 function showDialog(dialog) {
   return new Promise((resolve, reject) => {
@@ -257,9 +258,11 @@ export function showExportDialog(noteIds) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.ExportDialog
       noteIds={noteIds}
-      title={
-        noteIds.length > 1 ? `Export ${noteIds.length} notes` : "Export note"
-      }
+      title={`Export ${noteIds.length} ${pluralize(
+        noteIds.length,
+        "note",
+        "notes"
+      )}`}
       icon={Icon.Export}
       onClose={() => perform(false)}
       onDone={() => perform(true)}

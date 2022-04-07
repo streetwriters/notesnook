@@ -151,6 +151,7 @@ export async function restoreBackupFile(backup) {
 
 export function getTotalNotes(notebook) {
   return notebook.topics.reduce((sum, topic) => {
+    if (!topic || !topic.notes) return sum;
     return sum + topic.notes.length;
   }, 0);
 }

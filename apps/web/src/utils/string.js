@@ -20,3 +20,13 @@ export function countWords(str) {
   if (!str.length) return 0;
   return str.split(/\W+\S/).length;
 }
+
+/**
+ *
+ * @param {string} count
+ * @param {string} singular
+ * @param {string} plural
+ */
+export function pluralize(count, singular, plural) {
+  return !count || count > 1 ? `${count} ${plural}` : `${count} ${singular}`;
+}
