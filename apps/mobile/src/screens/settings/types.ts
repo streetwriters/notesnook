@@ -1,9 +1,9 @@
 import { Settings } from '../../stores/interfaces';
 
 export type SettingSection = {
-  type?: 'screen' | 'switch' | 'component';
-  name?: string;
-  description?: string | (() => string);
+  type?: 'screen' | 'switch' | 'component' | 'danger';
+  name?: string | ((current: any) => string);
+  description?: string | ((current: any) => string);
   icon?: string;
   property?: keyof Settings;
   sections?: SettingSection[];

@@ -33,10 +33,16 @@ import AppLock from './app-lock';
 import { verifyUser } from './functions';
 import { SectionGroup } from './section-group';
 import { RouteParams, SettingSection } from './types';
-import SettingsUserSection from './user-section';
+import SettingsUserSection, { getTimeLeft } from './user-section';
 import Sync from '../../services/sync';
 import { MFARecoveryCodes, MFASheet } from './2fa';
 import { db } from '../../utils/database';
+import { SUBSCRIPTION_STATUS } from '../../utils/constants';
+import dayjs from 'dayjs';
+import BiometicService from '../../services/biometrics';
+import { presentDialog } from '../../components/dialog/functions';
+import { checkVersion } from 'react-native-check-version';
+import { Update } from '../../components/sheets/update';
 const format = (ver: number) => {
   let parts = ver.toString().split('');
   return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? '' : parts[2]}${
@@ -48,6 +54,42 @@ const groups: SettingSection[] = [
   {
     name: 'account',
     sections: [
+      {
+        useHook: () => useUserStore(state => state.user),
+        name: current => {
+          const user = current;
+          const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+          const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+          return isBasic
+            ? 'Subscribe to Pro'
+            : isTrial
+            ? 'Your free trial has started'
+            : 'Subscription details';
+        },
+        type: 'component',
+        component: 'subscription',
+        icon: 'crown',
+        description: current => {
+          const user = current;
+          const subscriptionDaysLeft = user && getTimeLeft(parseInt(user.subscription?.expiry));
+          const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
+          const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
+
+          return user.subscription?.type === 2
+            ? 'You signed up on ' + startDate
+            : user.subscription?.type === 1
+            ? 'Your free trial will end on ' + expiryDate
+            : user.subscription?.type === 6
+            ? subscriptionDaysLeft.time < -3
+              ? 'Your subscription has ended'
+              : 'Your account will be downgraded to Basic in 3 days'
+            : user.subscription?.type === 7
+            ? `Your subscription will end on ${expiryDate}.`
+            : user.subscription?.type === 5
+            ? `Your subscription will renew on ${expiryDate}.`
+            : 'Never hesitate to choose privacy';
+        }
+      },
       {
         type: 'screen',
         name: 'Account Settings',
@@ -187,6 +229,56 @@ const groups: SettingSection[] = [
               });
             },
             description: 'Verify your subscription to Notesnook Pro'
+          },
+          {
+            name: 'Log out',
+            description: 'Clear all your data and reset the app.',
+            icon: 'logout'
+          },
+          {
+            type: 'danger',
+            name: 'Delete account',
+            icon: 'alert',
+            description: `All your data will be removed permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.`,
+            modifer: () => {
+              presentDialog({
+                title: 'Delete account',
+                paragraphColor: 'red',
+                paragraph:
+                  'All your data will be removed permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.',
+                positiveType: 'errorShade',
+                input: true,
+                inputPlaceholder: 'Enter account password',
+                positiveText: 'Delete',
+                positivePress: async value => {
+                  try {
+                    let verified = await db.user?.verifyPassword(value);
+                    if (verified) {
+                      await db.user?.deleteUser(value);
+                      await BiometicService.resetCredentials();
+                      SettingsService.set({
+                        introCompleted: true
+                      });
+                    } else {
+                      ToastEvent.show({
+                        heading: 'Incorrect password',
+                        message: 'The account password you entered is incorrect',
+                        type: 'error',
+                        context: 'global'
+                      });
+                    }
+                  } catch (e) {
+                    console.log(e);
+                    ToastEvent.show({
+                      heading: 'Failed to delete account',
+                      message: e.message,
+                      type: 'error',
+                      context: 'global'
+                    });
+                  }
+                }
+              });
+            }
           }
         ]
       },
@@ -542,7 +634,14 @@ const groups: SettingSection[] = [
         modifer: async () => {
           Linking.openURL('https://docs.notesnook.com');
         },
-        description: 'Learn about every feature and how it works.'
+        description: 'Learn about every feature and how it works.',
+        icon: 'file-document'
+      },
+      {
+        type: 'switch',
+        name: 'Debug mode',
+        description: 'Show debug options on items',
+        property: 'devMode'
       }
     ]
   },
@@ -619,7 +718,7 @@ const groups: SettingSection[] = [
             await Linking.openURL('https://notesnook.com');
           } catch (e) {}
         },
-        description: 'Notesnook app can be downloaded on all platforms'
+        description: 'Get Notesnook app on your desktop and access all notes'
       },
       {
         name: 'Roadmap',
@@ -632,7 +731,20 @@ const groups: SettingSection[] = [
         description: 'See what the future of Notesnook is going to be like.'
       },
       {
-        name: 'About Notesnook',
+        name: 'Check for updates',
+        icon: 'cellphone-arrow-down',
+        description: 'Check for new version of Notesnook',
+        modifer: async () => {
+          const version = await checkVersion();
+          if (!version.needsUpdate) return false;
+          presentSheet({
+            component: ref => <Update version={version} fwdRef={ref} />
+          });
+        }
+      },
+      {
+        name: 'App version',
+        icon: 'alpha-v',
         modifer: async () => {
           try {
             await Linking.openURL('https://notesnook.com');

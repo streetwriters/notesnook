@@ -35,7 +35,7 @@ import { CustomButton } from './button';
 import { verifyUser } from './functions';
 import { TimeSince } from '../../components/ui/time-since';
 
-const getTimeLeft = t2 => {
+export const getTimeLeft = t2 => {
   let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
   return {
     time: dayjs(t2).diff(dayjs(), daysRemaining === 0 ? 'hours' : 'days'),
@@ -52,6 +52,12 @@ const SettingsUserSection = ({ item }) => {
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
   const monthlyPlan = usePricing('monthly');
+  const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+  const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+  const isPro = user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM;
+  const isNotPro =
+    user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+    user.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
 
   const lastSynced = useUserStore(state => state.lastSynced);
 
@@ -141,7 +147,8 @@ const SettingsUserSection = ({ item }) => {
 
                     <View
                       style={{
-                        marginLeft: 10
+                        marginLeft: 10,
+                        flexGrow: 1
                       }}
                     >
                       <Heading color={colors.accent} size={SIZE.xs + 1}>
@@ -160,19 +167,22 @@ const SettingsUserSection = ({ item }) => {
                       </Paragraph>
                     </View>
                   </View>
-
-                  <Button
-                    height={35}
-                    style={{
-                      borderRadius: 100,
-                      paddingHorizontal: 12
-                    }}
-                    fontSize={SIZE.xs}
-                    type="accent"
-                    title="GET PRO"
-                  />
                 </View>
               </View>
+
+              {/* {isNotPro ? (
+                <Button
+                  height={30}
+                  style={{
+                    borderRadius: 100,
+                    paddingHorizontal: 12
+                  }}
+                  fontSize={SIZE.xs}
+                  type="accent"
+                  title={`GET PRO (${monthlyPlan?.product?.localizedPrice} / mo)`}
+                />
+              ) : null} */}
+
               <View>
                 {user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC ? (
                   <View>
@@ -217,38 +227,6 @@ const SettingsUserSection = ({ item }) => {
                     </Paragraph>
                   </View>
                 ) : null}
-
-                {/* {user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
-                  user.subscription?.type !== SUBSCRIPTION_STATUS.BETA && (
-                    <>
-                      <Seperator />
-                      <Button
-                        onPress={manageSubscription}
-                        style={{
-                          paddingHorizontal: 24,
-                          borderRadius: 100,
-                          height: 40,
-                          alignSelf: 'flex-end'
-                        }}
-                        fontSize={SIZE.sm}
-                        title={
-                          !user.isEmailConfirmed
-                            ? 'Confirm your email'
-                            : user.subscription?.provider === 3 &&
-                              user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
-                            ? 'Manage subscription from desktop app'
-                            : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-                              Platform.OS === 'android'
-                            ? `Resubscribe from Google Playstore`
-                            : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
-                            ? `Resubscribe to Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
-                            : `Get Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
-                        }
-                        height={50}
-                        type="accent"
-                      />
-                    </>
-                  )} */}
               </View>
 
               {user?.subscription?.provider &&
