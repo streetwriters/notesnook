@@ -1,121 +1,19 @@
 import { NavigationProp, StackActions, useNavigation } from '@react-navigation/native';
-import dayjs from 'dayjs';
 import React, { ReactElement } from 'react';
-import { Linking, Platform, View } from 'react-native';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
-import { Button } from '../../components/ui/button';
 import { PressableButton } from '../../components/ui/pressable';
 import Seperator from '../../components/ui/seperator';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
-import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import { useSettingStore, useUserStore } from '../../stores/stores';
+import { useSettingStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
-import { SUBSCRIPTION_PROVIDER, SUBSCRIPTION_STATUS } from '../../utils/constants';
-import { eOpenPremiumDialog } from '../../utils/events';
-import { usePricing } from '../../utils/hooks/use-pricing';
 import { SIZE } from '../../utils/size';
 import { AccentColorPicker, HomagePageSelector } from './appearance';
 import { AutomaticBackupsSelector } from './backup-restore';
+import { Subscription } from './subscription';
 import { RouteParams, SettingSection } from './types';
-import { getTimeLeft } from './user-section';
-
-const Subscription = () => {
-  const user: any = useUserStore(state => state.user);
-  const monthlyPlan = usePricing('monthly');
-  const colors = useThemeStore(state => state.colors);
-  const isNotPro =
-    user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
-    user.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
-
-  const manageSubscription = () => {
-    if (!user.isEmailConfirmed) {
-      PremiumService.showVerifyEmailDialog();
-      return;
-    }
-    if (
-      user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-      Platform.OS === 'android'
-    ) {
-      if (user.subscription?.provider === 3) {
-        ToastEvent.show({
-          heading: 'Subscribed on web',
-          message: 'Open your web browser to manage your subscription.',
-          type: 'success'
-        });
-        return;
-      }
-      Linking.openURL('https://play.google.com/store/account/subscriptions');
-
-      /**
-       *   
-       * Platform.OS === 'ios'
-          ? 'https://apps.apple.com/account/subscriptions'
-          : 'https://play.google.com/store/account/subscriptions'
-       */
-    } else {
-      eSendEvent(eOpenPremiumDialog);
-    }
-  };
-
-  return (
-    <View>
-      {isNotPro ? (
-        <Button
-          height={35}
-          style={{
-            borderRadius: 100,
-            paddingHorizontal: 16,
-            alignSelf: 'flex-start'
-          }}
-          fontSize={SIZE.sm}
-          type="accent"
-          onPress={manageSubscription}
-          title={
-            !user.isEmailConfirmed
-              ? 'Confirm your email'
-              : user.subscription?.provider === 3 &&
-                user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
-              ? 'Manage subscription from desktop app'
-              : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-                Platform.OS === 'android'
-              ? `Resubscribe from Google Playstore`
-              : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
-              ? `Resubscribe to Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
-              : `Get Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
-          }
-        />
-      ) : null}
-
-      {user?.subscription?.provider &&
-      user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
-      user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC &&
-      SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
-        <Button
-          title={SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title}
-          onPress={() => {
-            presentSheet({
-              title: SUBSCRIPTION_PROVIDER[user?.subscription?.provider].title,
-              paragraph: SUBSCRIPTION_PROVIDER[user?.subscription?.provider].desc
-            });
-          }}
-          style={{
-            alignSelf: 'flex-start',
-            paddingHorizontal: 0
-          }}
-          fontSize={SIZE.sm}
-          textStyle={{
-            fontWeight: 'normal'
-          }}
-          height={30}
-          type="transparent"
-        />
-      ) : null}
-    </View>
-  );
-};
 
 const components: { [name: string]: ReactElement } = {
   colorpicker: <AccentColorPicker wrap={true} />,
