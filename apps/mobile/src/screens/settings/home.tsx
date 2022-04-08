@@ -289,6 +289,7 @@ const groups: SettingSection[] = [
                   try {
                     let verified = await db.user?.verifyPassword(value);
                     if (verified) {
+                      eSendEvent('settings-loading', true);
                       await db.user?.deleteUser(value);
                       await BiometicService.resetCredentials();
                       SettingsService.set({
@@ -302,11 +303,14 @@ const groups: SettingSection[] = [
                         context: 'global'
                       });
                     }
+
+                    eSendEvent('settings-loading', false);
                   } catch (e) {
+                    eSendEvent('settings-loading', false);
                     console.log(e);
                     ToastEvent.show({
                       heading: 'Failed to delete account',
-                      message: e.message,
+                      message: e?.message,
                       type: 'error',
                       context: 'global'
                     });
@@ -813,7 +817,7 @@ const Home = ({ navigation }: NativeStackScreenProps<RouteParams, 'SettingsHome'
       </ContainerHeader>
 
       {loading && (
-        <BaseDialog visible={true}>
+        <BaseDialog bounce={false} visible={true}>
           <View
             style={{
               width: '100%',
