@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Linking, Platform, View } from 'react-native';
 import { enabled } from 'react-native-privacy-snapshot';
 import { APP_VERSION } from '../../../version';
@@ -9,7 +9,14 @@ import { Header } from '../../components/header';
 import { Issue } from '../../components/sheets/github/issue';
 import { Progress } from '../../components/sheets/progress';
 import BackupService from '../../services/backup';
-import { eSendEvent, openVault, presentSheet, ToastEvent } from '../../services/event-manager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  openVault,
+  presentSheet,
+  ToastEvent
+} from '../../services/event-manager';
 import Notifications from '../../services/notifications';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
@@ -18,9 +25,11 @@ import { useThemeStore } from '../../stores/theme';
 import { AndroidModule } from '../../utils';
 import { toggleDarkMode } from '../../utils/color-scheme/utils';
 
+import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import * as RNIap from 'react-native-iap';
 import {
   eCloseProgressDialog,
+  eCloseSimpleDialog,
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenRecoveryKeyDialog,
@@ -43,6 +52,10 @@ import BiometicService from '../../services/biometrics';
 import { presentDialog } from '../../components/dialog/functions';
 import { checkVersion } from 'react-native-check-version';
 import { Update } from '../../components/sheets/update';
+import BaseDialog from '../../components/dialog/base-dialog';
+import Heading from '../../components/ui/typography/heading';
+import Paragraph from '../../components/ui/typography/paragraph';
+import { SIZE } from '../../utils/size';
 const format = (ver: number) => {
   let parts = ver.toString().split('');
   return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? '' : parts[2]}${
@@ -233,7 +246,29 @@ const groups: SettingSection[] = [
           {
             name: 'Log out',
             description: 'Clear all your data and reset the app.',
-            icon: 'logout'
+            icon: 'logout',
+            modifer: () => {
+              presentDialog({
+                title: 'Logout',
+                paragraph: 'Clear all your data and reset the app.',
+                positiveText: 'Logout',
+                positivePress: async () => {
+                  try {
+                    eSendEvent(eCloseSimpleDialog);
+                    await sleep(100);
+                    eSendEvent('settings-loading', true);
+                    await db.user?.logout();
+                    await BiometicService.resetCredentials();
+                    await SettingsService.set({
+                      introCompleted: true
+                    });
+                    eSendEvent('settings-loading', false);
+                  } catch (e) {
+                    eSendEvent('settings-loading', false);
+                  }
+                }
+              });
+            }
           },
           {
             type: 'danger',
@@ -758,99 +793,18 @@ const groups: SettingSection[] = [
 
 const Home = ({ navigation }: NativeStackScreenProps<RouteParams, 'SettingsHome'>) => {
   const colors = useThemeStore(state => state.colors);
-
-  const otherItems = [
-    {
-      name: 'Terms of service',
-      func: async () => {
-        try {
-          await openLinkInBrowser('https://notesnook.com/tos', colors);
-        } catch (e) {}
-      },
-      desc: 'Read our terms of service'
-    },
-    {
-      name: 'Privacy policy',
-      func: async () => {
-        try {
-          await openLinkInBrowser('https://notesnook.com/privacy', colors);
-        } catch (e) {}
-      },
-      desc: 'Read our privacy policy'
-    },
-    {
-      name: `Report an issue`,
-      func: async () => {
-        presentSheet({
-          component: <Issue />
-        });
-      },
-      desc: `Faced an issue or have a suggestion? Click here to create a bug report`
-    },
-    {
-      name: 'Join our Telegram group',
-      desc: "We are on telegram, let's talk",
-      func: () => {
-        Linking.openURL('https://t.me/notesnook').catch(console.log);
-      }
-    },
-    {
-      name: 'Join our Discord community',
-      func: async () => {
-        presentSheet({
-          title: 'Join our Discord Community',
-          iconColor: 'discord',
-          paragraph: 'We are not ghosts, chat with us and share your experience.',
-          valueArray: [
-            'Talk with us anytime.',
-            'Follow the development process',
-            'Give suggestions and report issues.',
-            'Get early access to new features',
-            'Meet other people using Notesnook'
-          ],
-          icon: 'discord',
-          action: async () => {
-            try {
-              Linking.openURL('https://discord.gg/zQBK97EE22').catch(console.log);
-            } catch (e) {}
-          },
-          actionText: 'Join Now'
-        });
-      },
-      desc: 'We are not ghosts, chat with us and share your experience.'
-    },
-    {
-      name: 'Download on desktop',
-      func: async () => {
-        try {
-          await openLinkInBrowser('https://notesnook.com', colors);
-        } catch (e) {}
-      },
-      desc: 'Notesnook app can be downloaded on all platforms'
-    },
-
-    {
-      name: 'Roadmap',
-      func: async () => {
-        try {
-          await openLinkInBrowser('https://docs.notesnook.com/roadmap/', colors);
-        } catch (e) {}
-      },
-      desc: 'See what the future of Notesnook is going to be like.'
-    },
-    {
-      name: 'About Notesnook',
-      func: async () => {
-        try {
-          await openLinkInBrowser('https://notesnook.com', colors);
-        } catch (e) {}
-      },
-      desc: format(APP_VERSION)
-    }
-  ];
+  const [loading, setLoading] = useState(false);
 
   const renderItem = ({ item, index }: { item: SettingSection; index: number }) =>
     item.name === 'account' ? <SettingsUserSection item={item} /> : <SectionGroup item={item} />;
+
+  useEffect(() => {
+    eSubscribeEvent('settings-loading', setLoading);
+
+    return () => {
+      eUnSubscribeEvent('settings-loading', setLoading);
+    };
+  }, []);
 
   return (
     <View>
@@ -858,9 +812,44 @@ const Home = ({ navigation }: NativeStackScreenProps<RouteParams, 'SettingsHome'
         <Header title="Settings" isBack={false} screen="Settings" />
       </ContainerHeader>
 
+      {loading && (
+        <BaseDialog visible={true}>
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: colors.bg,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}
+          >
+            <Heading color={colors.pri} size={SIZE.lg}>
+              Logging out
+            </Heading>
+            <Paragraph color={colors.icon}>
+              Please wait while we log out and clear app data.
+            </Paragraph>
+            <View
+              style={{
+                flexDirection: 'row',
+                height: 10,
+                width: 100,
+                marginTop: 15
+              }}
+            >
+              <AnimatedProgress fill={colors.accent} total={8} current={8} />
+            </View>
+          </View>
+        </BaseDialog>
+      )}
+
       <FlatList
         data={groups}
-        keyExtractor={(item, index) => item.name || index.toString()}
+        keyExtractor={(item, index) =>
+          typeof item.name === 'function'
+            ? item.name({}) || index.toString()
+            : item.name || index.toString()
+        }
         ListFooterComponent={<View style={{ height: 200 }} />}
         renderItem={renderItem}
       />
