@@ -1,39 +1,25 @@
 import dayjs from 'dayjs';
 import React from 'react';
-import { Linking, Platform, Text, View } from 'react-native';
-import * as RNIap from 'react-native-iap';
+import { Linking, Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ChangePassword } from '../../components/auth/change-password';
-import { Progress } from '../../components/sheets/progress';
 import { Button } from '../../components/ui/button';
 import Seperator from '../../components/ui/seperator';
+import { TimeSince } from '../../components/ui/time-since';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
-import Sync from '../../services/sync';
 import { useUserStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
-
-import { SectionItem } from './section-item';
 import {
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
   SUBSCRIPTION_STATUS_STRINGS
 } from '../../utils/constants';
-import {
-  eCloseProgressDialog,
-  eOpenAttachmentsDialog,
-  eOpenPremiumDialog,
-  eOpenRecoveryKeyDialog
-} from '../../utils/events';
+import { eOpenPremiumDialog } from '../../utils/events';
 import { usePricing } from '../../utils/hooks/use-pricing';
 import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import TwoFactorAuth from './2fa';
-import { CustomButton } from './button';
-import { verifyUser } from './functions';
-import { TimeSince } from '../../components/ui/time-since';
+import { SectionItem } from './section-item';
 
 export const getTimeLeft = t2 => {
   let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
