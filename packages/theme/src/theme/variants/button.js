@@ -7,8 +7,11 @@ class ButtonFactory {
       tertiary: new Tertiary(),
       list: new List(),
       anchor: new Anchor(),
-      menu: new Menu(),
+      tool: new Tool(),
       icon: new Icon(),
+      dialog: new Dialog(),
+      statusitem: new StatusItem(),
+      menuitem: new MenuItem(),
     };
   }
 }
@@ -23,8 +26,23 @@ class Default {
       fontSize: "body",
       borderRadius: "default",
       cursor: "pointer",
-      ":focus": {
-        outline: "none",
+      p: 2,
+      py: "7.5px",
+      transition: "filter 200ms ease-in, box-shadow 200ms ease-out",
+      ":hover:not(:disabled)": {
+        filter: "brightness(90%)",
+      },
+      ":active": {
+        filter: "brightness(98%)",
+      },
+      outline: "none",
+      ":focus-visible:not(:active)": {
+        filter: "brightness(90%)",
+        bg: "bgSecondary",
+      },
+      ":disabled": {
+        opacity: 0.5,
+        cursor: "not-allowed",
       },
     };
   }
@@ -36,9 +54,26 @@ class Primary {
       variant: "buttons.default",
       color: "static",
       bg: "primary",
-      transition: "opacity 300ms linear",
-      ":hover": {
-        opacity: 0.8,
+    };
+  }
+}
+
+class Dialog {
+  constructor() {
+    return {
+      variant: "buttons.primary",
+      color: "primary",
+      fontWeight: "bold",
+      bg: "transparent",
+      ":hover": { bg: "bgSecondary" },
+      ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
+        {
+          bg: "hover",
+          filter: "brightness(90%)",
+        },
+      ":disabled": {
+        opacity: 0.7,
+        cursor: "not-allowed",
       },
     };
   }
@@ -46,7 +81,11 @@ class Primary {
 
 class Secondary {
   constructor() {
-    return { variant: "buttons.default", color: "text", bg: "bgSecondary" };
+    return {
+      variant: "buttons.default",
+      color: "text",
+      bg: "border",
+    };
   }
 }
 
@@ -58,6 +97,9 @@ class Tertiary {
       bg: "transparent",
       border: "2px solid",
       borderColor: "border",
+      ":hover": {
+        borderColor: "primary",
+      },
     };
   }
 }
@@ -73,6 +115,7 @@ class List {
       textAlign: "left",
       py: 2,
       px: 0,
+      cursor: "pointer",
       ":hover": {
         borderBottomColor: "primary",
       },
@@ -88,6 +131,11 @@ class Anchor {
       fontSize: "subBody",
       p: 0,
       m: 0,
+      px: 0,
+      py: 0,
+      ":hover": {
+        textDecoration: "underline",
+      },
     };
   }
 }
@@ -99,22 +147,54 @@ class Icon {
       color: "text",
       borderRadius: "none",
       ":hover": {
-        backgroundColor: "shade",
+        backgroundColor: "hover",
+        filter: "brightness(90%)",
       },
     };
   }
 }
 
-class Menu {
+class Tool {
   constructor() {
     return {
       variant: "buttons.default",
       color: "text",
-      fontSize: 14,
-      p: 2,
-      borderRadius: "none",
+      backgroundColor: "bgSecondary",
+      borderRadius: "default",
       ":hover": {
-        backgroundColor: "shade",
+        backgroundColor: "hover",
+      },
+    };
+  }
+}
+
+class StatusItem {
+  constructor() {
+    return {
+      variant: "buttons.icon",
+      p: 0,
+      py: 1,
+      px: 1,
+    };
+  }
+}
+
+class MenuItem {
+  constructor() {
+    return {
+      variant: "buttons.default",
+      // bg: "transparent",
+      py: "8px",
+      px: 3,
+      borderRadius: 0,
+      color: "text",
+      cursor: "pointer",
+      ":hover:not(:disabled),:focus:not(:disabled)": {
+        backgroundColor: "hover",
+        boxShadow: "none",
+      },
+      ":active:not(:disabled)": {
+        backgroundColor: "border",
       },
     };
   }

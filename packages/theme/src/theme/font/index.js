@@ -5,14 +5,15 @@ class FontFactory {
     return {
       fontSizes: new FontSizeFactory(scale),
       fontWeights: {
+        normal: 400,
         body: 400,
-        heading: 400,
-        bold: 400
+        heading: 600,
+        bold: 600,
       },
       fonts: {
-        body: "DM Sans, sans-serif",
-        heading: `"DM Serif Text", serif`
-      }
+        body: `Open Sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Oxygen-Sans,Ubuntu,Cantarell,sans-serif;`,
+        heading: `Open Sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Oxygen-Sans,Ubuntu,Cantarell,sans-serif;`,
+      },
     };
   }
 }

@@ -38,6 +38,7 @@ class Title {
     return {
       variant: "text.heading",
       fontSize: "title",
+      fontWeight: "bold",
     };
   }
 }
@@ -46,6 +47,7 @@ class Subtitle {
     return {
       variant: "text.heading",
       fontSize: "subtitle",
+      fontWeight: "bold",
     };
   }
 }
@@ -58,7 +60,11 @@ class Body {
 
 class SubBody {
   constructor() {
-    return { variant: "text.default", fontSize: "subBody" };
+    return {
+      variant: "text.default",
+      fontSize: "subBody",
+      color: "fontTertiary",
+    };
   }
 }
 
