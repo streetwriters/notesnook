@@ -140,7 +140,7 @@ export const Tip = ({
 
 Tip.present = async (tip: TTip) => {
   if (!tip) return;
-  let dontShow = await MMKV.getItem('neverShowSheetTips');
+  let dontShow = MMKV.getString('neverShowSheetTips');
   if (dontShow) return;
   presentSheet({
     component: (

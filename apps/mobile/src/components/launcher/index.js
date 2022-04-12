@@ -163,7 +163,7 @@ const Launcher = React.memo(
     };
 
     const restoreEditorState = async () => {
-      let appState = await MMKV.getItem('appState');
+      let appState = MMKV.getString('appState');
       if (appState) {
         appState = JSON.parse(appState);
         if (

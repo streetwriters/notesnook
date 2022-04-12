@@ -257,7 +257,6 @@ export default class Tabs extends Component {
           scrollToOverflowEnabled={false}
           scrollsToTop={false}
           scrollEventThrottle={10}
-          directionalLockEnabled
           overScrollMode="never"
           maxToRenderPerBatch={100}
           keyboardDismissMode="none"

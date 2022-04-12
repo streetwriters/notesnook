@@ -15,12 +15,13 @@ const App = () => {
   useEffect(() => {
     (async () => {
       try {
-        await SettingsService.init();
+        SettingsService.init();
+
         let appLockMode = SettingsService.get().appLockMode;
         if (appLockMode && appLockMode !== 'none') {
           useUserStore.getState().setVerifyUser(true);
         }
-        await TipManager.init();
+        TipManager.init();
         Notifications.get();
         await SettingsService.onFirstLaunch();
       } catch (e) {}

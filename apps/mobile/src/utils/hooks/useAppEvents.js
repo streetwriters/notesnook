@@ -468,14 +468,14 @@ export const useAppEvents = () => {
         movedAway: editing.movedAway,
         timestamp: Date.now()
       });
-      await MMKV.setItem('appState', state);
+      MMKV.setString('appState', state);
     }
   }
 
   async function checkIntentState() {
     try {
-      let notesAddedFromIntent = await MMKV.getItem('notesAddedFromIntent');
-      let shareExtensionOpened = await MMKV.getItem('shareExtensionOpened');
+      let notesAddedFromIntent = MMKV.getString('notesAddedFromIntent');
+      let shareExtensionOpened = MMKV.getString('shareExtensionOpened');
       if (notesAddedFromIntent) {
         if (Platform.OS === 'ios') {
           await db.init();
