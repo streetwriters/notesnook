@@ -38,12 +38,12 @@ const SettingsUserSection = ({ item }) => {
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
   const monthlyPlan = usePricing('monthly');
-  const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
-  const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-  const isPro = user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM;
+  const isBasic = user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+  const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+  const isPro = user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM;
   const isNotPro =
-    user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
-    user.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
+    user?.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+    user?.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
 
   const lastSynced = useUserStore(state => state.lastSynced);
 

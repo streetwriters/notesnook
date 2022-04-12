@@ -69,6 +69,7 @@ const groups: SettingSection[] = [
     sections: [
       {
         useHook: () => useUserStore(state => state.user),
+        hidden: current => !current,
         name: current => {
           const user = current;
           const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
