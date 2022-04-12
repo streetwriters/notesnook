@@ -327,7 +327,9 @@ export const useAppEvents = () => {
           userEmailConfirmed: true
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      ToastEvent.error(e, 'An error occured', 'global');
+    }
 
     user = await db.user.getUser();
     if (
