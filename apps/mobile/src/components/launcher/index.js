@@ -37,6 +37,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { Walkthrough } from '../walkthroughs';
 import NewFeature from '../sheets/new-feature/index';
+import BackupService from '../../services/backup';
 
 const Launcher = React.memo(
   () => {
@@ -138,6 +139,16 @@ const Launcher = React.memo(
       if (await checkNeedsBackup()) return;
       if (await PremiumService.getRemainingTrialDaysStatus()) return;
       await useMessageStore.getState().setAnnouncement();
+
+      if (PremiumService.get() && user) {
+        if (SettingsService.get().reminder === 'off') {
+          SettingsService.set({ reminder: 'daily' });
+        }
+        if (BackupService.checkBackupRequired()) {
+          sleep(2000).then(() => BackupService.checkAndRun());
+        }
+      }
+
       if (!requireIntro?.value) {
         useMessageStore.subscribe(state => {
           let dialogs = state.dialogs;
