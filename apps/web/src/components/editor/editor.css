@@ -454,3 +454,7 @@ table thead {
 .h {
   display: none;
 }
+
+.tox .tox-toolbar-overlord {
+  background-color: transparent !important;
+}

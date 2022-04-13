@@ -111,11 +111,11 @@ textarea,
 
 ::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--primary);
-  color: var(--static);
+  background-color: var(--dimPrimary);
+  color: var(--text);
 }
 
 ::selection {
-  background-color: var(--primary);
-  color: var(--static);
+  background-color: var(--dimPrimary);
+  color: var(--text);
 }
