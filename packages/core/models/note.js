@@ -123,11 +123,11 @@ export default class Note {
 
   async color(color) {
     if (!(await checkIsUserPremium(CHECK_IDS.noteColor))) return;
-    await this.uncolor();
-    let tag = await this._db.colors.add(color, this._note.id);
+    if (this._note.color)
+      await this._db.colors.untag(this._note.color, this._note.id);
     await this._db.notes.add({
       id: this.id,
-      color: tag.title,
+      color,
     });
   }
 
