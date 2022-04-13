@@ -104,7 +104,7 @@ function getAuthorizationHeader(token) {
   return token ? { Authorization: "Bearer " + token } : {};
 }
 
-function errorTransformer(errorJson) {
+export function errorTransformer(errorJson) {
   let errorMessage = "Unknown error.";
   let errorCode = "unknown";
 

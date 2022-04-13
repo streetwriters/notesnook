@@ -16,6 +16,7 @@ import { SyncQueue } from "./syncqueue";
 import { AutoSync } from "./auto-sync";
 import { toChunks } from "../../utils/array";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
+import { errorTransformer, RequestError } from "../../utils/http";
 
 const ITEM_TYPE_MAP = {
   attachments: "attachment",
@@ -60,7 +61,25 @@ export default class SyncManager {
     if (this.syncMutex.isLocked()) return false;
     return this.syncMutex.runExclusive(async () => {
       await this.sync.autoSync.start();
-      await this.sync.start(full, force);
+      try {
+        await this.sync.start(full, force);
+      } catch (e) {
+        // TODO: a very hacky way to parse out a JSON error
+        // from the errors given by SignalR
+        let jsonError = /\{.*\}/gm.exec(e.message);
+        if (jsonError) {
+          jsonError = jsonError[0];
+          let parsed = null;
+          try {
+            parsed = errorTransformer(JSON.parse(jsonError));
+          } catch {
+            throw e;
+          }
+
+          if (parsed) throw new RequestError(parsed);
+        }
+        throw e;
+      }
     });
   }
 
