@@ -59,9 +59,9 @@ function Search({ type }) {
       const results = await db.lookup[lookupType](items, query);
       setResults(results);
       setSearchState({ isSearching: false, totalItems: 0 });
-      if (!results.length) {
-        showToast("error", `Nothing found for "${query}".`);
-      }
+      // if (!results.length) {
+      //   showToast("error", `Nothing found for "${query}".`);
+      // }
     },
     [context, type]
   );
@@ -136,7 +136,15 @@ function Search({ type }) {
           context={context}
           type={type}
           items={results}
-          placeholder={SearchPlaceholder}
+          placeholder={() => (
+            <SearchPlaceholder
+              text={
+                cachedQuery.current
+                  ? `Nothing found for "${cachedQuery.current}"`
+                  : undefined
+              }
+            />
+          )}
         />
       )}
     </>
