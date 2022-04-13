@@ -40,12 +40,12 @@ function Toolbar(props) {
     if (!editorScroll) return;
 
     function onScroll(e) {
-      const headerOffset = document.querySelector(".editorTitle").scrollHeight;
-      const hideOffset = headerOffset + 60;
-      if (e.target.scrollTop > hideOffset && !isTitleVisible)
-        setIsTitleVisible(true);
-      else if (e.target.scrollTop <= hideOffset && isTitleVisible)
-        setIsTitleVisible(false);
+      // const headerOffset = document.querySelector(".editorTitle").scrollHeight;
+      // const hideOffset = headerOffset + 60;
+      // if (e.target.scrollTop > hideOffset && !isTitleVisible)
+      //   setIsTitleVisible(true);
+      // else if (e.target.scrollTop <= hideOffset && isTitleVisible)
+      //   setIsTitleVisible(false);
     }
     editorScroll.addEventListener("scroll", onScroll);
     return () => {

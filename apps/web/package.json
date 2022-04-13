@@ -11,6 +11,7 @@
     "@mdi/react": "^1.4.0",
     "@notesnook/crypto": "^1.0.0",
     "@notesnook/desktop": "file:desktop",
+    "@notesnook/theme": "file:../themeprovider",
     "@rebass/forms": "^4.0.6",
     "@streetwriters/tinymce-plugins": "^1.5.18",
     "@tinymce/tinymce-react": "^3.13.0",

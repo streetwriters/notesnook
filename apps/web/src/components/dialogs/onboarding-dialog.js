@@ -17,10 +17,10 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { TaskManager } from "../../common/task-manager";
 import { db } from "../../common/db";
 import { usePersistentState } from "../../utils/hooks";
-import accents from "../../theme/accents";
 import AccentItem from "../accent-item";
 import { useCallback, useState } from "react";
 import Config from "../../utils/config";
+import { getAllAccents } from "@notesnook/theme";
 
 const newUserSteps = [
   {
@@ -249,7 +249,7 @@ function AccentSelector() {
           gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr",
         }}
       >
-        {accents.map((color) => (
+        {getAllAccents().map((color) => (
           <AccentItem key={color.code} code={color.code} label={color.label} />
         ))}
       </Box>

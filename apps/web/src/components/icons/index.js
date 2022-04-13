@@ -159,6 +159,7 @@ import { AnimatedFlex } from "../animated";
 
 function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
   const theme = useTheme();
+
   return (
     <MDIIcon
       title={title}

@@ -3,7 +3,7 @@ import { Text, Flex } from "rebass";
 import { Input } from "@rebass/forms";
 
 function TitleBox(props) {
-  const { title, setTitle, shouldFocus, readonly } = props;
+  const { title, setTitle, shouldFocus, readonly, placeholder } = props;
 
   const [height, setHeight] = useState(0);
   const inputRef = useRef();
@@ -54,7 +54,7 @@ function TitleBox(props) {
         data-test-id="editor-title"
         className="editorTitle"
         autoFocus={shouldFocus}
-        placeholder="Note title"
+        placeholder={placeholder}
         as="textarea"
         width="100%"
         minHeight={[30, 30, 60]}
@@ -85,6 +85,7 @@ export default React.memo(TitleBox, (prevProps, nextProps) => {
   return (
     prevProps.shouldFocus === nextProps.shouldFocus &&
     prevProps.title === nextProps.title &&
-    prevProps.readonly === nextProps.readonly
+    prevProps.readonly === nextProps.readonly &&
+    prevProps.placeholder === nextProps.placeholder
   );
 });

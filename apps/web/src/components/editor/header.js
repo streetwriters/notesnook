@@ -22,6 +22,7 @@ function Header({ readonly }) {
     <>
       <TitleBox
         readonly={readonly}
+        placeholder={"Note title"}
         title={title}
         setTitle={(title) => {
           const sessionId = store.get().session.id;

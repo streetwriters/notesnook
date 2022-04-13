@@ -229,7 +229,7 @@ function TinyMCE(props) {
         inline_boundaries_selector: "a[href]",
         toolbar: simple
           ? false
-          : `bold italic underline strikethrough inlinecode | fontselect | blockquote codeblock | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image attachment media link table | ltr rtl | searchreplace`,
+          : `bold italic underline strikethrough inlinecode | fontselect | blockquote codeblock | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript | numlist bullist checklist | forecolor backcolor removeformat | hr | image attachment media link table | ltr rtl | searchreplace`,
         font_formats:
           "Serif=serif; Classic=courier new; Monospace=courier; System font=Open Sans",
         quickbars_selection_toolbar: false,

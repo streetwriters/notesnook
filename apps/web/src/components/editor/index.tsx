@@ -282,7 +282,7 @@ function Editor({
           px={[2, 2, 35]}
           mt={[2, 2, 25]}
         >
-          <Header readonly={isReadonly} />
+          {/* <Header readonly={isReadonly} /> */}
 
           {isSessionReady && (
             <Suspense fallback={<div />}>

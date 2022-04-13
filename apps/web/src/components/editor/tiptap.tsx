@@ -1,6 +1,7 @@
 import { EditorContent, HTMLContent } from "@tiptap/react";
-import { useTiptap } from "notesnook-editor";
-import { useEffect } from "react";
+import { Toolbar, useTiptap } from "notesnook-editor";
+import { Box } from "rebass";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 
 export type CharacterCounter = {
   words: () => number;
@@ -21,6 +22,9 @@ type TipTapProps = {
 };
 
 function TipTap(props: TipTapProps) {
+  const theme = useThemeStore((store) => store.theme);
+  const accent = useThemeStore((store) => store.accent);
+
   const { onInit, onChange, onFocus, onDestroy } = props;
   let counter: CharacterCounter | undefined;
   const editor = useTiptap(
@@ -28,7 +32,6 @@ function TipTap(props: TipTapProps) {
       autofocus: "start",
       onFocus,
       onCreate: ({ editor }) => {
-        console.log("CREATING NEW EDITOR");
         counter = editor.storage.characterCount as CharacterCounter;
         if (onInit)
           onInit({
@@ -36,6 +39,7 @@ function TipTap(props: TipTapProps) {
             setContent: (content) => {
               editor.commands.clearContent(false);
               editor.commands.setContent(content, false);
+              console.log("SETTING CONTENT", content);
             },
             clearContent: () => editor.commands.clearContent(false),
           });
@@ -44,18 +48,25 @@ function TipTap(props: TipTapProps) {
         if (onChange) onChange(editor.getHTML(), counter);
       },
       onDestroy,
+      injectCSS: false,
+      theme,
+      accent,
+      scale: 1,
     },
-    []
+    [theme, accent]
   );
 
   return (
-    <EditorContent
-      style={{ flex: 1, cursor: "text" }}
-      onClick={() => {
-        editor?.commands.focus();
-      }}
-      editor={editor}
-    />
+    <Box>
+      <Toolbar editor={editor} theme={theme} accent={accent} />
+      <EditorContent
+        style={{ flex: 1, cursor: "text" }}
+        onClick={() => {
+          editor?.commands.focus();
+        }}
+        editor={editor}
+      />
+    </Box>
   );
 }
 export default TipTap;

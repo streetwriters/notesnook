@@ -7,7 +7,6 @@ import { useStore as useThemeStore } from "../stores/theme-store";
 import { useStore as useSettingStore } from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
-import accents from "../theme/accents";
 import {
   showEmailVerificationDialog,
   showImportDialog,
@@ -44,6 +43,7 @@ import useZoomFactor from "../hooks/use-zoom-factor";
 import debounce from "just-debounce-it";
 import { PATHS } from "@notesnook/desktop/paths";
 import { openPath } from "../commands/open";
+import { getAllAccents } from "@notesnook/theme";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -367,7 +367,7 @@ function Settings(props) {
                 borderRadius: "default",
               }}
             >
-              {accents.map((color) => (
+              {getAllAccents().map((color) => (
                 <AccentItem
                   key={color.code}
                   code={color.code}
