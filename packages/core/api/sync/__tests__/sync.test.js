@@ -1,7 +1,7 @@
 import Database from "../../index";
 import { NodeStorageInterface } from "../../../__mocks__/node-storage.mock";
 import FS from "../../../__mocks__/fs.mock";
-import { EV, EVENTS } from "../../../common";
+import { CHECK_IDS, EV, EVENTS } from "../../../common";
 import EventSource from "eventsource";
 import { delay } from "../../../__tests__/utils";
 
@@ -201,25 +201,89 @@ test.skip(
   60 * 1000
 );
 
+test.skip(
+  "issue: colors are not properly created if multiple notes are synced together",
+  async () => {
+    const deviceA = await initializeDevice("deviceA", [CHECK_IDS.noteColor]);
+    const deviceB = await initializeDevice("deviceB", [CHECK_IDS.noteColor]);
+
+    const noteIds = [];
+    for (let i = 0; i < 3; ++i) {
+      const id = await deviceA.notes.add({
+        content: {
+          type: "tiny",
+          data: `<p>deviceA=true</p>`,
+        },
+      });
+      noteIds.push(id);
+    }
+
+    await syncAndWait(deviceA, deviceB);
+
+    for (let noteId of noteIds) {
+      await deviceA.notes.note(noteId).color("purple");
+      expect(deviceB.notes.note(noteId)).toBeTruthy();
+      expect(deviceB.notes.note(noteId).data.color).toBeUndefined();
+    }
+
+    await syncAndWait(deviceA, deviceB);
+
+    const purpleColor = deviceB.colors.tag("purple");
+    console.log(purpleColor.noteIds, noteIds);
+    expect(noteIds.every((id) => purpleColor.noteIds.indexOf(id) > -1)).toBe(
+      true
+    );
+
+    await cleanup(deviceA, deviceB);
+  },
+  60 * 1000
+);
+
+test.skip(
+  "issue: running force sync from device A makes device B always download everything",
+  async () => {
+    const deviceA = await initializeDevice("deviceA");
+    const deviceB = await initializeDevice("deviceB");
+
+    await syncAndWait(deviceA, deviceB, true);
+
+    const handler = jest.fn();
+    deviceB.eventManager.subscribe(EVENTS.syncProgress, handler);
+
+    await deviceB.sync(true);
+
+    expect(handler).not.toHaveBeenCalled();
+
+    await cleanup(deviceB);
+  },
+  60 * 1000
+);
+
 /**
  *
  * @param {string} id
  * @returns {Promise<Database>}
  */
-async function initializeDevice(id, isUserPremium = false) {
-  EV.subscribe(EVENTS.userCheckStatus, async (type) => ({
-    type,
-    result: isUserPremium,
-  }));
+async function initializeDevice(id, capabilities = []) {
+  EV.subscribe(EVENTS.userCheckStatus, async (type) => {
+    return {
+      type,
+      result: capabilities.indexOf(type) > -1,
+    };
+  });
 
   const device = new Database(new NodeStorageInterface(), EventSource, FS);
   device.host({
-    API_HOST: "http://192.168.10.29:5264",
-    AUTH_HOST: "http://192.168.10.29:8264",
-    SSE_HOST: "http://192.168.10.29:7264",
-    ISSUES_HOST: "http://192.168.10.29:2624",
-    SUBSCRIPTIONS_HOST: "http://192.168.10.29:9264",
+    API_HOST: "http://192.168.43.221:5264",
+    AUTH_HOST: "http://192.168.43.221:8264",
+    SSE_HOST: "http://192.168.43.221:7264",
+    ISSUES_HOST: "http://192.168.43.221:2624",
+    SUBSCRIPTIONS_HOST: "http://192.168.43.221:9264",
   });
+
+  await device.init(id);
+  await device.user.login("enkaboot@gmail.com", process.env.PASSWORD);
+  await device.user.resetUser(false);
 
   device.eventManager.subscribe(
     EVENTS.databaseSyncRequested,
@@ -228,10 +292,8 @@ async function initializeDevice(id, isUserPremium = false) {
     }
   );
 
-  await device.init(id);
-  await device.user.login("enkaboot@gmail.com", "Allatonce1.1");
+  await syncAndWait(device, device);
 
-  await waitForSyncCompleted(device);
   return device;
 }
 
@@ -250,7 +312,9 @@ async function cleanup(...devices) {
  */
 function waitForSyncCompleted(device) {
   return new Promise((resolve) =>
-    device.eventManager.subscribe(EVENTS.syncCompleted, () => resolve())
+    device.eventManager.subscribe(EVENTS.syncCompleted, () => {
+      resolve();
+    })
   );
 }
 
