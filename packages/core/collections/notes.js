@@ -9,7 +9,6 @@ import { deleteItem } from "../utils/array";
 export default class Notes extends Collection {
   async merge(remoteNote) {
     if (!remoteNote) return;
-    if (remoteNote.deleted) return await this._collection.addItem(remoteNote);
 
     const id = remoteNote.id;
     const localNote = this._collection.getItem(id);
@@ -20,6 +19,8 @@ export default class Notes extends Collection {
         await this._db.tags.untag(tag, id);
       }
     }
+
+    if (remoteNote.deleted) return await this._collection.addItem(remoteNote);
 
     await this._resolveColorAndTags(remoteNote);
 
@@ -268,7 +269,9 @@ export default class Notes extends Collection {
   async _resolveColorAndTags(note) {
     const { color, tags, id } = note;
 
-    if (color) await this._db.colors.add(color, id);
+    if (color) {
+      await this._db.colors.add(color, id);
+    }
 
     if (tags && tags.length) {
       for (let i = 0; i < tags.length; ++i) {
