@@ -141,7 +141,7 @@ class EditorStore extends BaseStore {
 
   saveSession = async (sessionId, session) => {
     const currentSession = this.get().session;
-    if (currentSession.readonly) return; // do not allow saving of readonly session
+    if (currentSession.readonly && session.readonly !== false) return; // do not allow saving of readonly session
 
     this.setSaveState(0);
 
