@@ -26,6 +26,7 @@ export default class Tabs extends Component {
   renderItem = ({ item, index }) => this.props.items[index];
 
   onMoveShouldSetResponder = event => {
+    console.log(this.locked);
     if (this.locked) return false;
     if (this.responderAllowedScroll) return false;
     this.lastOffset = this.scrollOffset;
@@ -36,12 +37,17 @@ export default class Tabs extends Component {
     let aOffset = this.props.offsets.a.toFixed(0);
     let page0Width = pOffset - aOffset;
 
+    console.log(this.page, this.currentDrawerState);
     if (
       (this.page === 0 && !this.currentDrawerState && x > 80 && x < page0Width - 80) ||
-      DDS.isLargeTablet() ||
-      cOffset > pOffset - 50 ||
-      DDS.isSmallTab
+      DDS.isLargeTablet()
     ) {
+      this.responderAllowedScroll = false;
+      this.setScrollEnabled(false);
+      return false;
+    }
+
+    if (cOffset > pOffset - 50 || DDS.isSmallTab) {
       this.responderAllowedScroll = false;
       this.setScrollEnabled(false);
       return false;
@@ -119,6 +125,10 @@ export default class Tabs extends Component {
     });
   };
 
+  unlock = () => {
+    this.locked = false;
+  };
+
   onTouchEnd = () => {
     this.locked = false;
     this.responderAllowedScroll = false;
@@ -173,6 +183,7 @@ export default class Tabs extends Component {
   scrollEndTimeout = null;
 
   onScrollEnd = () => {
+    console.log('scroll end', this.scrollOffset);
     if (this.scrollEndTimeout) {
       clearTimeout(this.scrollEndTimeout);
       this.scrollEndTimeout = null;
