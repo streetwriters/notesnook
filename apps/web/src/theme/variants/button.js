@@ -146,9 +146,9 @@ class Icon {
       variant: "buttons.default",
       color: "text",
       borderRadius: "none",
-      ":hover": {
-        backgroundColor: "hover",
-        filter: "brightness(90%)",
+      ":hover:not(disabled)": {
+        backgroundColor: "bgSecondaryHover",
+        filter: "brightness(100%)",
       },
     };
   }

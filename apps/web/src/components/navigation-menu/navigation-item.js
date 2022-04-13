@@ -6,7 +6,15 @@ import useTablet from "../../utils/use-tablet";
 import * as Icons from "../icons";
 
 function NavigationItem(props) {
-  const { icon: Icon, color, title, isLoading, isShortcut, isNew } = props;
+  const {
+    icon: Icon,
+    color,
+    title,
+    isLoading,
+    isShortcut,
+    isNew,
+    children,
+  } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const { openMenu } = useMenuTrigger();
   const isMobile = useMobile();
@@ -15,7 +23,6 @@ function NavigationItem(props) {
   return (
     <Button
       data-test-id={`navitem-${title.toLowerCase()}`}
-      variant="icon"
       bg={props.selected ? "border" : "transparent"}
       px={2}
       py={"9px"}
@@ -26,6 +33,10 @@ function NavigationItem(props) {
         position: "relative",
         ":first-of-type": { mt: 1 },
         ":last-of-type": { mb: 1 },
+        ":hover:not(:disabled)": {
+          bg: "bgSecondaryHover",
+          filter: "brightness(100%)",
+        },
       }}
       label={title}
       title={title}
@@ -76,6 +87,7 @@ function NavigationItem(props) {
       >
         {title}
       </Text>
+      {children}
     </Button>
   );
 }

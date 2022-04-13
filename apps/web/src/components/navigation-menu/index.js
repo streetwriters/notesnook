@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Box, Flex } from "rebass";
+import { Box, Button, Flex } from "rebass";
 import {
   Note,
   Notebook,
@@ -13,7 +13,6 @@ import {
   Topic,
   DarkMode,
   LightMode,
-  Sync,
   Login,
   Circle,
 } from "../icons";
@@ -61,13 +60,11 @@ const routes = [
   { title: "Trash", path: "/trash", icon: Trash },
 ];
 
-const bottomRoutes = [
-  {
-    title: "Settings",
-    path: "/settings",
-    icon: Settings,
-  },
-];
+const settings = {
+  title: "Settings",
+  path: "/settings",
+  icon: Settings,
+};
 
 const NAVIGATION_MENU_WIDTH = "10em";
 const NAVIGATION_MENU_TABLET_WIDTH = "4em";
@@ -81,6 +78,11 @@ function NavigationMenu(props) {
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const isMobile = useMobile();
+  const theme = useThemeStore((store) => store.theme);
+  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const setFollowSystemTheme = useThemeStore(
+    (store) => store.setFollowSystemTheme
+  );
 
   const _navigate = useCallback(
     (path) => {
@@ -242,17 +244,41 @@ function NavigationMenu(props) {
             onClick={() => hardNavigate("/login")}
           />
         )}
-        {bottomRoutes.map((item) => (
-          <NavigationItem
-            key={item.path}
-            title={item.title}
-            icon={item.icon}
-            onClick={() => {
-              _navigate(item.path);
+
+        <NavigationItem
+          key={settings.path}
+          title={settings.title}
+          icon={settings.icon}
+          onClick={() => {
+            _navigate(settings.path);
+          }}
+          selected={location.startsWith(settings.path)}
+        >
+          <Button
+            variant={"icon"}
+            title="Toggle dark/light mode"
+            sx={{
+              position: "absolute",
+              right: "2px",
+              bg: "transparent",
+              borderRadius: "default",
+              ":hover:not(disabled)": {
+                bg: "background",
+              },
             }}
-            selected={location.startsWith(item.path)}
-          />
-        ))}
+            onClick={(e) => {
+              e.stopPropagation();
+              setFollowSystemTheme(false);
+              toggleNightMode();
+            }}
+          >
+            {theme === "dark" ? (
+              <DarkMode size={16} />
+            ) : (
+              <LightMode size={16} />
+            )}
+          </Button>
+        </NavigationItem>
       </Flex>
     </AnimatedFlex>
   );

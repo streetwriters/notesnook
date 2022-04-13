@@ -10,6 +10,7 @@ class LightColorSchemeFactory {
       accent: "white",
       bgSecondary: "#f7f7f7",
       bgSecondaryText: "#5E5E5E",
+      bgSecondaryHover: "#dbdbdb",
       border: "#e5e5e5",
       hover: "#f0f0f0",
       fontSecondary: "white",
