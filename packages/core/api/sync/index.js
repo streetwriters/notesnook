@@ -16,7 +16,6 @@ import { SyncQueue } from "./syncqueue";
 import { AutoSync } from "./auto-sync";
 import { toChunks } from "../../utils/array";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
-import { errorTransformer, RequestError } from "../../utils/http";
 
 const ITEM_TYPE_MAP = {
   attachments: "attachment",
@@ -64,19 +63,10 @@ export default class SyncManager {
       try {
         await this.sync.start(full, force);
       } catch (e) {
-        // TODO: a very hacky way to parse out a JSON error
-        // from the errors given by SignalR
-        let jsonError = /\{.*\}/gm.exec(e.message);
-        if (jsonError) {
-          jsonError = jsonError[0];
-          let parsed = null;
-          try {
-            parsed = errorTransformer(JSON.parse(jsonError));
-          } catch {
-            throw e;
-          }
-
-          if (parsed) throw new RequestError(parsed);
+        var isHubException = e.message.includes("HubException:");
+        if (isHubException) {
+          var actualError = /HubException: (.*)/gm.exec(e.message);
+          if (actualError.length > 1) throw new Error(actualError[1]);
         }
         throw e;
       }
@@ -111,6 +101,9 @@ class Sync {
     this.connection = new signalr.HubConnectionBuilder()
       .withUrl(`${Constants.API_HOST}/hubs/sync`, {
         accessTokenFactory: () => tokenManager.getAccessToken(),
+        skipNegotiation: true,
+        transport: signalr.HttpTransportType.WebSockets,
+        logger: signalr.LogLevel.Debug,
       })
       .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
       .build();
