@@ -23,7 +23,7 @@ function NavigationItem(props) {
   return (
     <Button
       data-test-id={`navitem-${title.toLowerCase()}`}
-      bg={props.selected ? "border" : "transparent"}
+      bg={props.selected ? "bgSecondaryHover" : "transparent"}
       px={2}
       py={"9px"}
       mx={1}

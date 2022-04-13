@@ -74,7 +74,8 @@ const menuItems = [
           return (
             parent?.key === "sortBy" &&
             item.key === "title" &&
-            groupOptions.groupBy !== "abc"
+            groupOptions.groupBy !== "abc" &&
+            groupOptions.groupBy !== "none"
           );
         },
       },
