@@ -146,6 +146,7 @@ class Database {
   async connectSSE(args) {
     await this.sseMutex.runExclusive(async () => {
       if (args && !!args.error) return;
+      this.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
 
       const forceReconnect = args && args.force;
       if (
@@ -164,7 +165,6 @@ class Database {
 
       this.evtSource.onopen = async () => {
         console.log("SSE: opened channel successfully!");
-        this.eventManager.publish(EVENTS.databaseSyncRequested, true, false);
       };
 
       this.evtSource.onerror = function (error) {
