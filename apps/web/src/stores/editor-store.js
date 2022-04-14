@@ -141,7 +141,7 @@ class EditorStore extends BaseStore {
 
   saveSession = async (sessionId, session) => {
     const currentSession = this.get().session;
-    if (currentSession.readonly) return; // do not allow saving of readonly session
+    if (currentSession.readonly && session.readonly !== false) return; // do not allow saving of readonly session
 
     this.setSaveState(0);
 
@@ -220,7 +220,6 @@ class EditorStore extends BaseStore {
     const session = this.get().session;
     if (session.id) await db.fs.cancel(session.id);
 
-    appStore.setIsEditorOpen(false);
     this.set((state) => {
       state.session = {
         ...getDefaultSession(),
@@ -231,6 +230,7 @@ class EditorStore extends BaseStore {
     this.toggleProperties(false);
     if (shouldNavigate)
       hashNavigate(`/notes/create`, { replace: true, addNonce: true });
+    appStore.setIsEditorOpen(false);
   };
 
   setTitle = (sessionId, title) => {

@@ -122,6 +122,7 @@ class NoteStore extends BaseStore {
   readonly = async (id) => {
     const note = db.notes.note(id);
     await note.readonly();
+    this._syncEditor(note.id, "readonly", !note.data.readonly);
     this.refresh();
   };
 

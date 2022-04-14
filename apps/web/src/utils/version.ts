@@ -1,41 +1,28 @@
+export type Platforms = "web" | "desktop";
+export type AppVersion = typeof appVersion;
 export const appVersion = {
   formatted: format(
     process.env.REACT_APP_VERSION,
     process.env.REACT_APP_GIT_HASH,
-    process.env.REACT_APP_PLATFORM
+    process.env.REACT_APP_PLATFORM as Platforms
   ),
   clean: formatVersion(process.env.REACT_APP_VERSION),
-  numerical: parseInt(process.env.REACT_APP_VERSION),
+  numerical: parseInt(process.env.REACT_APP_VERSION || "0"),
 };
 
-/**
- *
- * @param {number} version
- * @param {string} hash
- * @param {"web"|"desktop"} type
- */
-function format(version, hash, type) {
+function format(version?: string, hash?: string, type?: "web" | "desktop") {
   return `${formatVersion(version)}-${hash}-${type}`;
 }
 
-/**
- *
- * @param {number} version
- * @param {string} hash
- * @param {"web"|"desktop"} type
- */
-function formatVersion(version) {
+function formatVersion(version?: string) {
   if (!version) return "";
   const [major, minor, bugfix0, bugfix1] = version.toString().split("");
   return `${major}.${minor}.${bugfix0}${bugfix1 || ""}`;
 }
 
-/**
- *
- * @param {ServiceWorker} serviceWorker
- * @returns {Promise<{formatted: string, numerical: number}>}
- */
-export function getServiceWorkerVersion(serviceWorker) {
+export function getServiceWorkerVersion(
+  serviceWorker: ServiceWorker
+): Promise<AppVersion> {
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(
       () => reject("Service worker did not respond."),
@@ -50,6 +37,7 @@ export function getServiceWorkerVersion(serviceWorker) {
       resolve({
         formatted: formatVersion(version),
         numerical: parseInt(version),
+        clean: formatVersion(version),
       });
     });
     serviceWorker.postMessage({ type: "GET_VERSION" });

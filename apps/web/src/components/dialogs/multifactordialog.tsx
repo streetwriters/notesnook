@@ -29,7 +29,7 @@ import { useSessionState } from "../../utils/hooks";
 import { exportToPDF } from "../../common/export";
 import { useTimer } from "../../hooks/use-timer";
 import { phone } from "phone";
-import { showMultifactorDialog } from "../../common/dialog-controller";
+import { Perform, showMultifactorDialog } from "../../common/dialog-controller";
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
 export type AuthenticatorType = "app" | "sms" | "email";
@@ -48,7 +48,7 @@ type Authenticator = {
 
 type StepComponentProps = {
   onNext: (...args: any[]) => void;
-  onClose?: () => void;
+  onClose?: Perform;
   onError?: (error: string) => void;
 };
 
@@ -80,12 +80,12 @@ type VerifyAuthenticatorFormProps = PropsWithChildren<{
 type SetupAuthenticatorProps = { onSubmitCode: SubmitCodeFunction };
 
 type MultifactorDialogProps = {
-  onClose: () => void;
+  onClose: Perform;
   primaryMethod?: AuthenticatorType;
 };
 
 type RecoveryCodesDialogProps = {
-  onClose: () => void;
+  onClose: Perform;
   primaryMethod: AuthenticatorType;
 };
 
@@ -245,7 +245,7 @@ export function MultifactorDialog(props: MultifactorDialogProps) {
       {step.component && (
         <step.component
           onNext={(...args) => {
-            if (!step.next) return onClose();
+            if (!step.next) return onClose(true);
 
             const nextStepCreator: Function =
               step.next !== "recoveryCodes" && primaryMethod
@@ -750,7 +750,11 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
       <Text variant={"body"} color="fontTertiary" mt={1} textAlign="center">
         Your account is now 100% secure against unauthorized logins.
       </Text>
-      <Button mt={2} sx={{ borderRadius: 100, px: 6 }} onClick={props.onClose}>
+      <Button
+        mt={2}
+        sx={{ borderRadius: 100, px: 6 }}
+        onClick={() => props.onClose?.(true)}
+      >
         Done
       </Button>
 
@@ -758,7 +762,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
         variant={"anchor"}
         mt={2}
         onClick={() => {
-          props.onClose && props.onClose();
+          props.onClose && props.onClose(true);
           setTimeout(async () => {
             await showMultifactorDialog(props.authenticatorType);
           }, 100);
@@ -792,7 +796,11 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
         {mfaMethodToPhrase(fallbackMethod)} in case you lose access to your{" "}
         {mfaMethodToPhrase(primaryMethod)}.
       </Text>
-      <Button mt={2} sx={{ borderRadius: 100, px: 6 }} onClick={onClose}>
+      <Button
+        mt={2}
+        sx={{ borderRadius: 100, px: 6 }}
+        onClick={() => onClose?.(true)}
+      >
         Done
       </Button>
     </Flex>

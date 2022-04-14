@@ -73,7 +73,7 @@ const reminders = {
 function ReminderDialog(props) {
   const { reminderKey } = props;
   const reminder = reminders[reminderKey];
-  if (!reminder) return;
+  if (!reminder) return null;
 
   return (
     <Dialog

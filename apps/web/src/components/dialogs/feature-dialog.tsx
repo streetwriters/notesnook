@@ -24,7 +24,7 @@ type Feature = {
   subFeatures?: SubFeature[];
 };
 
-type FeatureKeys = "confirmed" | "highlights";
+export type FeatureKeys = "confirmed" | "highlights";
 const features: Record<FeatureKeys, Feature> = {
   confirmed: {
     title: "Email confirmed!",
@@ -40,15 +40,19 @@ const features: Record<FeatureKeys, Feature> = {
     subtitle: `Welcome to v${appVersion.clean}`,
     subFeatures: [
       {
-        title: "Region-based pricing",
+        title: "All panes are now resizable",
         subtitle: (
           <>
-            You can now get Notesnook Pro at a much discounted price depending
-            on where you are located. It works by default — no special codes
-            required.
+            You can now adjust the width of all the panes as you see fit. And
+            they persist across sessions too!
           </>
         ),
-        icon: Icon.Pro,
+        icon: Icon.Resize,
+      },
+      {
+        title: "Sort alphabetically when group by = none",
+        subtitle: <>No idea why this wasn't included earlier.</>,
+        icon: Icon.SortBy,
       },
     ],
     cta: {
@@ -59,11 +63,11 @@ const features: Record<FeatureKeys, Feature> = {
       },
     },
     shouldShow: () => {
-      const hasShown = Config.get(
-        `${appVersion.numerical}:highlights`,
-        false
-      ) as boolean;
-      return !isTesting() && !hasShown;
+      const key = `${appVersion.numerical}:highlights`;
+      const hasShownBefore = Config.get(key, false) as boolean;
+      const hasShownAny = Config.has((k) => k.endsWith(":highlights"));
+      if (!hasShownAny) Config.set(key, true);
+      return hasShownAny && !isTesting() && !hasShownBefore;
     },
   },
 };

@@ -92,18 +92,17 @@ function ListItem(props) {
           ...props.menu?.extraData,
         });
       }}
-      p={2}
+      pr={2}
       py={isCompact ? 1 : 2}
+      pl={1}
       tabIndex={-1}
       sx={{
         height: "inherit",
         cursor: "pointer",
         position: "relative",
-        boxShadow: isFocused
-          ? `5px 2px 0px -2px var(--${primary}) inset`
-          : "none",
+        borderLeft: "5px solid",
+        borderLeftColor: isFocused ? primary : "transparent",
         transition: "box-shadow 200ms ease-in",
-        // isMenuTarget
         borderTop: isMenuTarget ? `1px solid var(--${primary})` : "none",
         borderBottom: isMenuTarget ? `1px solid var(--${primary})` : "none",
         ":hover": {

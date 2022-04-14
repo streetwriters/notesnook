@@ -111,11 +111,36 @@ textarea,
 
 ::-moz-selection {
   /* Code for Firefox */
-  background-color: var(--primary);
-  color: var(--static);
+  background-color: var(--dimPrimary);
+  color: var(--text);
 }
 
 ::selection {
-  background-color: var(--primary);
-  color: var(--static);
+  background-color: var(--dimPrimary);
+  color: var(--text);
+}
+
+.middle-pane {
+  overflow: hidden;
+  display: flex;
+}
+.editor-pane {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.nav-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.pane::before {
+  width: 1px !important;
+}
+
+:root {
+  --focus-border: var(--primary);
+  --separator-border: var(--border);
+  --sash-size: 10px;
+  --sash-hover-size: 4px;
 }

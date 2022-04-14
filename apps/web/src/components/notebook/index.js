@@ -10,6 +10,7 @@ import { hashNavigate, navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import { showToast } from "../../utils/toast";
 import { Multiselect } from "../../common/multi-select";
+import { pluralize } from "../../utils/string";
 
 function Notebook(props) {
   const { item, index, totalNotes, date } = props;
@@ -32,7 +33,7 @@ function Notebook(props) {
         isCompact ? (
           <>
             <Text fontSize="subBody" color="fontTertiary">
-              {totalNotes} {totalNotes > 1 ? "notes" : "note"}
+              {pluralize(totalNotes, "note", "notes")}
             </Text>
           </>
         ) : (
@@ -70,9 +71,7 @@ function Notebook(props) {
               <Text as="span" mx={1}>
                 •
               </Text>
-              <Text>
-                {totalNotes} {totalNotes > 1 ? "notes" : "note"}
-              </Text>
+              <Text>{pluralize(totalNotes, "note", "notes")}</Text>
             </Flex>
           </>
         )

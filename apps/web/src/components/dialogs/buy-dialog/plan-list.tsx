@@ -1,10 +1,10 @@
 import { Text, Flex, Button } from "rebass";
 import * as Icon from "../../icons";
-import getSymbolFromCurrency from "currency-symbol-map";
 import { ReactComponent as Nomad } from "../../../assets/nomad.svg";
 import { Period, Plan } from "./types";
 import { PLAN_METADATA, usePlans } from "./plans";
 import { useEffect } from "react";
+import { getCurrencySymbol } from "./helpers";
 
 type PlansListProps = {
   onPlanSelected: (plan: Plan) => void;
@@ -92,13 +92,13 @@ function RecurringPricing(props: RecurringPricingProps) {
           fontSize={"body"}
           sx={{ textDecorationLine: "line-through" }}
         >
-          {getSymbolFromCurrency(plan.currency)}
+          {getCurrencySymbol(plan.currency)}
           {plan.originalPrice.gross}
         </Text>
       )}
       <Text>
         <Text as="span" fontSize="subtitle">
-          {getSymbolFromCurrency(plan.currency)}
+          {getCurrencySymbol(plan.currency)}
           {plan.price.gross}
         </Text>
         {formatPeriod(plan.period)}

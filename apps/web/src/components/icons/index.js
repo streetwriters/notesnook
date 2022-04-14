@@ -153,6 +153,7 @@ import {
   mdiRestore,
   mdiVectorLink,
   mdiCodeBraces,
+  mdiArrowCollapseHorizontal,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -380,3 +381,4 @@ export const Upload = createIcon(mdiCloudOffOutline);
 export const Uploaded = createIcon(mdiCloudCheckOutline);
 export const References = createIcon(mdiVectorLink);
 export const Codeblock = createIcon(mdiCodeBraces);
+export const Resize = createIcon(mdiArrowCollapseHorizontal);

@@ -754,7 +754,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
       alignSelf="center"
       justifyContent={"center"}
       alignItems="center"
-      width={["95%", 420]}
+      width={["95%", "45%"]}
       flex={1}
       onSubmit={async (e) => {
         e.preventDefault();
