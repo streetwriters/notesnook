@@ -1,7 +1,7 @@
 {
   "name": "notesnook",
   "description": "Your private note taking space",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "private": true,
   "main": "./src/App.js",
   "homepage": "https://notesnook.com/",
@@ -72,6 +72,7 @@
     "@types/hookrouter": "^2.2.5",
     "@types/node-fetch": "^2.5.10",
     "@types/quill": "^2.0.5",
+    "@types/react-dom": "^18.0.0",
     "@types/react-modal": "^3.13.1",
     "@types/rebass": "^4.0.10",
     "@types/rebass__forms": "^4.0.6",

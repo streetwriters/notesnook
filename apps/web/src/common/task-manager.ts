@@ -55,7 +55,7 @@ export class TaskManager {
         removeStatus(statusTask.id);
         return result;
       case "modal":
-        return await showProgressDialog({
+        return await showProgressDialog<T>({
           title: task.title,
           subtitle: task.subtitle,
           action: task.action,
