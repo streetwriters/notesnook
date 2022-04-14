@@ -24,7 +24,7 @@ type Feature = {
   subFeatures?: SubFeature[];
 };
 
-type FeatureKeys = "confirmed" | "highlights";
+export type FeatureKeys = "confirmed" | "highlights";
 const features: Record<FeatureKeys, Feature> = {
   confirmed: {
     title: "Email confirmed!",
@@ -63,11 +63,11 @@ const features: Record<FeatureKeys, Feature> = {
       },
     },
     shouldShow: () => {
-      const hasShown = Config.get(
-        `${appVersion.numerical}:highlights`,
-        false
-      ) as boolean;
-      return !isTesting() && !hasShown;
+      const key = `${appVersion.numerical}:highlights`;
+      const hasShownBefore = Config.get(key, false) as boolean;
+      const hasShownAny = Config.has((k) => k.endsWith(":highlights"));
+      if (!hasShownAny) Config.set(key, true);
+      return hasShownAny && !isTesting() && !hasShownBefore;
     },
   },
 };
