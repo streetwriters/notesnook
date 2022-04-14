@@ -2,7 +2,6 @@ import { Button, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import useMobile from "../../utils/use-mobile";
-import useTablet from "../../utils/use-tablet";
 import * as Icons from "../icons";
 
 function NavigationItem(props) {
@@ -14,11 +13,11 @@ function NavigationItem(props) {
     isShortcut,
     isNew,
     children,
+    isTablet,
   } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const { openMenu } = useMenuTrigger();
   const isMobile = useMobile();
-  const isTablet = useTablet();
 
   return (
     <Button
@@ -27,7 +26,7 @@ function NavigationItem(props) {
       px={2}
       py={"9px"}
       mx={1}
-      mt={[1, 2, "3px"]}
+      mt={isTablet ? 1 : "3px"}
       sx={{
         borderRadius: "default",
         position: "relative",
@@ -50,7 +49,7 @@ function NavigationItem(props) {
         props.onClick();
       }}
       display="flex"
-      justifyContent={["flex-start", "center", "flex-start"]}
+      justifyContent={isTablet ? "center" : "flex-start"}
       alignItems="center"
     >
       <Icon
@@ -74,7 +73,7 @@ function NavigationItem(props) {
       )}
 
       <Text
-        display={["block", "none", "block"]}
+        display={isTablet ? "none" : "block"}
         variant="body"
         fontSize="subtitle"
         sx={{

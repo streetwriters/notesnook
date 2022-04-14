@@ -70,7 +70,7 @@ const NAVIGATION_MENU_WIDTH = "10em";
 const NAVIGATION_MENU_TABLET_WIDTH = "4em";
 
 function NavigationMenu(props) {
-  const { toggleNavigationContainer } = props;
+  const { toggleNavigationContainer, isTablet } = props;
   const [location, previousLocation, state] = useLocation();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const colors = useAppStore((store) => store.colors);
@@ -104,7 +104,6 @@ function NavigationMenu(props) {
       id="navigationmenu"
       flexDirection="column"
       justifyContent="space-between"
-      flex={1}
       initial={{
         opacity: 1,
       }}
@@ -114,21 +113,10 @@ function NavigationMenu(props) {
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       sx={{
-        borderRight: "1px solid",
-        borderRightColor: "border",
-        minWidth: [
-          NAVIGATION_MENU_WIDTH,
-          isFocusMode ? 0 : NAVIGATION_MENU_TABLET_WIDTH,
-          isFocusMode ? 0 : NAVIGATION_MENU_WIDTH,
-        ],
-        maxWidth: [
-          NAVIGATION_MENU_WIDTH,
-          isFocusMode ? 0 : NAVIGATION_MENU_TABLET_WIDTH,
-          isFocusMode ? 0 : NAVIGATION_MENU_WIDTH,
-        ],
         zIndex: 1,
         height: "auto",
         position: "relative",
+        flex: 1,
       }}
       bg={"bgSecondary"}
       px={0}
@@ -137,6 +125,7 @@ function NavigationMenu(props) {
         <Flex flexDirection="column">
           {routes.map((item) => (
             <NavigationItem
+              isTablet={isTablet}
               key={item.path}
               title={item.title}
               icon={item.icon}
@@ -155,6 +144,7 @@ function NavigationMenu(props) {
           ))}
           {colors.map((color) => (
             <NavigationItem
+              isTablet={isTablet}
               key={color.id}
               title={db.colors.alias(color.id)}
               icon={Circle}
@@ -186,6 +176,7 @@ function NavigationMenu(props) {
           />
           {pins.map((pin) => (
             <NavigationItem
+              isTablet={isTablet}
               key={pin.id}
               title={pin.type === "tag" ? db.tags.alias(pin.id) : pin.title}
               menu={{
@@ -224,21 +215,9 @@ function NavigationMenu(props) {
         </Flex>
       </FlexScrollContainer>
       <Flex flexDirection="column">
-        {/* {theme === "light" ? (
-          <NavigationItem
-            title="Dark mode"
-            icon={DarkMode}
-            onClick={toggleNightMode}
-          />
-        ) : (
-          <NavigationItem
-            title="Light mode"
-            icon={LightMode}
-            onClick={toggleNightMode}
-          />
-        )} */}
         {!isLoggedIn && (
           <NavigationItem
+            isTablet={isTablet}
             title="Login"
             icon={Login}
             onClick={() => hardNavigate("/login")}
@@ -246,6 +225,7 @@ function NavigationMenu(props) {
         )}
 
         <NavigationItem
+          isTablet={isTablet}
           key={settings.path}
           title={settings.title}
           icon={settings.icon}
@@ -254,30 +234,32 @@ function NavigationMenu(props) {
           }}
           selected={location.startsWith(settings.path)}
         >
-          <Button
-            variant={"icon"}
-            title="Toggle dark/light mode"
-            sx={{
-              position: "absolute",
-              right: "2px",
-              bg: "transparent",
-              borderRadius: "default",
-              ":hover:not(disabled)": {
-                bg: "background",
-              },
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              setFollowSystemTheme(false);
-              toggleNightMode();
-            }}
-          >
-            {theme === "dark" ? (
-              <DarkMode size={16} />
-            ) : (
-              <LightMode size={16} />
-            )}
-          </Button>
+          {isTablet ? null : (
+            <Button
+              variant={"icon"}
+              title="Toggle dark/light mode"
+              sx={{
+                position: "absolute",
+                right: "2px",
+                bg: "bgSecondary",
+                borderRadius: "default",
+                ":hover:not(disabled)": {
+                  bg: "background",
+                },
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setFollowSystemTheme(false);
+                toggleNightMode();
+              }}
+            >
+              {theme === "dark" ? (
+                <DarkMode size={16} />
+              ) : (
+                <LightMode size={16} />
+              )}
+            </Button>
+          )}
         </NavigationItem>
       </Flex>
     </AnimatedFlex>

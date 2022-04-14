@@ -43,8 +43,11 @@ export default function useSlider(sliderId, { onSliding, onChange }) {
 
   const slideToIndex = useCallback(
     (index) => {
+      console.log(index, slides, ref.current, slides[index].node);
       if (!ref.current || index >= slides.length) return;
-      slides[index].node.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        slides[index].node.scrollIntoView();
+      }, 100);
     },
     [ref, slides]
   );
