@@ -241,10 +241,11 @@ function NavigationMenu(props) {
               sx={{
                 position: "absolute",
                 right: "2px",
-                bg: "bgSecondary",
+                bg: "transparent",
                 borderRadius: "default",
                 ":hover:not(disabled)": {
-                  bg: "background",
+                  bg: "bgSecondaryHover",
+                  filter: "brightness(100%)",
                 },
               }}
               onClick={(e) => {
