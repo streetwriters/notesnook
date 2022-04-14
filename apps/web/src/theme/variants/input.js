@@ -13,19 +13,17 @@ class Default {
   constructor() {
     return {
       borderRadius: "default",
-      border: "none",
-      // borderColor: "border",
-      boxShadow: "0px 0px 0px 1px var(--border) inset",
+      border: "2px solid var(--border)",
       fontFamily: "body",
       fontWeight: "body",
       fontSize: "input",
       color: "text",
       outline: "none",
       ":focus": {
-        boxShadow: "0px 0px 0px 1.5px var(--primary) inset",
+        border: "2px solid var(--primary)",
       },
       ":hover:not(:focus)": {
-        boxShadow: "0px 0px 0px 1px var(--dimPrimary) inset",
+        border: "2px solid var(--dimPrimary)",
       },
     };
   }
@@ -36,12 +34,12 @@ class Clean {
     return {
       variant: "forms.input",
       outline: "none",
-      boxShadow: "none",
+      border: "none",
       ":focus": {
-        boxShadow: "none",
+        border: "none",
       },
       ":hover:not(:focus)": {
-        boxShadow: "none",
+        border: "none",
       },
     };
   }
@@ -51,13 +49,13 @@ class Error {
   constructor() {
     return {
       variant: "forms.input",
-      boxShadow: "0px 0px 0px 1px var(--error) inset",
+      border: "2px solid var(--error)",
       outline: "none",
       ":focus": {
-        boxShadow: "0px 0px 0px 1.5px var(--error) inset",
+        border: "2px solid var(--error)",
       },
       ":hover:not(:focus)": {
-        boxShadow: "0px 0px 0px 1px var(--error) inset",
+        border: "2px solid var(--errorBg)",
       },
     };
   }
