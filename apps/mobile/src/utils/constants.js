@@ -19,8 +19,8 @@ export const GROUP = {
 
 export const SORT = {
   dateEdited: 'Date edited',
-  dateCreated: 'Date created'
-  //title:"Title",
+  dateCreated: 'Date created',
+  title: 'Title'
 };
 
 export const itemSkus = [
