@@ -9,6 +9,7 @@ import { store as notestore } from "../../stores/note-store";
 import { useStore, store } from "../../stores/notebook-store";
 import { getTotalNotes } from "../../common";
 import Accordion from "../accordion";
+import { pluralize } from "../../utils/string";
 
 function MoveDialog({ onClose, noteIds }) {
   const [selected, setSelected] = useState([]);
@@ -139,7 +140,7 @@ function MoveDialog({ onClose, noteIds }) {
                         indent={1}
                         icon={Icon.Topic}
                         title={topic.title}
-                        totalNotes={topic.notes.length}
+                        totalNotes={topic.notes?.length || 0}
                         action={
                           isSelected && hasNotes ? (
                             <Icon.Close
@@ -175,7 +176,7 @@ function MoveDialog({ onClose, noteIds }) {
 }
 
 function topicHasNotes(topic, noteIds) {
-  return noteIds.some((id) => topic.notes.indexOf(id) > -1);
+  return noteIds.some((id) => topic.notes && topic.notes.indexOf(id) > -1);
 }
 
 function FilteredList({
@@ -292,7 +293,7 @@ function Item(props) {
     >
       <Flex flexDirection="column">
         <Text variant="body">{title}</Text>
-        <Text variant="subBody">{totalNotes + " notes"}</Text>
+        <Text variant="subBody">{pluralize(totalNotes, "note", "notes")}</Text>
       </Flex>
       {action}
     </Button>
