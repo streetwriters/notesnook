@@ -51,8 +51,7 @@ export function groupArray(
     fastsort(array).by(getSortSelectors(options));
 
   if (options.groupBy === "none") {
-    array.splice(0, 0, { title: "All", type: "header" });
-    return array;
+    return [{ title: "All", type: "header" }, ...array];
   }
 
   const keySelector = KEY_SELECTORS[options.groupBy || "default"];
