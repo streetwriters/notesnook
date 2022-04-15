@@ -111,12 +111,15 @@ export function setWidthHeight(size) {
 }
 
 export function getTotalNotes(notebook) {
+  if (!notebook || notebook.type === 'header') return 0;
   if (notebook.type === 'topic') {
+    if (!notebook.notes) return 0;
     return notebook.notes.length;
   }
   if (!notebook.topics) return 0;
   return notebook.topics.reduce((sum, topic) => {
-    return sum + topic.notes.length;
+    let length = topic?.notes ? topic.notes.length : 0;
+    return sum + length;
   }, 0);
 }
 
