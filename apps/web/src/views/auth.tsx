@@ -23,6 +23,7 @@ import AuthContainer from "../components/auth-container";
 import { isTesting } from "../utils/platform";
 import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
 import { useTimer } from "../hooks/use-timer";
+import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 
 type LoginFormData = {
   email: string;
@@ -153,7 +154,11 @@ function Auth(props: AuthProps) {
               alignItems: "center",
             }}
             variant={"secondary"}
-            onClick={() => openURL("/notes/")}
+            onClick={() => {
+              if (route === "signup")
+                trackEvent(ANALYTICS_EVENTS.signupSkipped);
+              openURL("/notes/");
+            }}
           >
             Jump to app <ArrowRight size={18} sx={{ ml: 1 }} />
           </Button>
