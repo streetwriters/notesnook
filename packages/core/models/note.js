@@ -127,7 +127,7 @@ export default class Note {
       await this._db.colors.untag(this._note.color, this._note.id);
     await this._db.notes.add({
       id: this.id,
-      color,
+      color: this._db.colors.sanitize(color),
     });
   }
 

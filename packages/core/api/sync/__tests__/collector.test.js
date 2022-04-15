@@ -1,5 +1,14 @@
-import { databaseTest, TEST_NOTE, delay } from "../../../__tests__/utils";
+import {
+  databaseTest,
+  TEST_NOTE,
+  delay,
+  StorageInterface,
+} from "../../../__tests__/utils";
 import Collector from "../collector";
+
+beforeEach(async () => {
+  StorageInterface.clear();
+});
 
 test("newly created note should get included in collector", () =>
   databaseTest().then(async (db) => {
