@@ -23,6 +23,7 @@ import {
   Print,
   Copy,
   Refresh,
+  Checkmark,
 } from "../icons";
 import Field from "../field";
 import { useSessionState } from "../../utils/hooks";
@@ -136,6 +137,7 @@ const steps = {
         authenticator={authenticator.type}
       />
     ),
+    cancellable: true,
   }),
   recoveryCodes: (authenticatorType: AuthenticatorType): Step => ({
     title: "Save your recovery codes",
@@ -407,6 +409,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
     sharedKey: null,
     authenticatorUri: null,
   });
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     (async function () {
@@ -441,20 +444,45 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
         If you can't scan the QR code above, enter this text instead (spaces
         don't matter):
       </Text>
-      <Text
-        mt={2}
+      <Flex
         bg="bgSecondary"
-        p={2}
-        fontFamily="monospace"
-        fontSize="body"
-        sx={{ borderRadius: "default", overflowWrap: "anywhere" }}
+        mt={2}
+        sx={{ borderRadius: "default", alignItems: "center" }}
+        p={1}
       >
-        {authenticatorDetails.sharedKey ? (
-          authenticatorDetails.sharedKey
-        ) : (
-          <Loading />
-        )}
-      </Text>
+        <Text
+          className="selectable"
+          fontFamily="monospace"
+          fontSize="body"
+          ml={1}
+          sx={{
+            flex: 1,
+            overflowWrap: "anywhere",
+            color: "text",
+          }}
+        >
+          {authenticatorDetails.sharedKey ? (
+            authenticatorDetails.sharedKey
+          ) : (
+            <Loading />
+          )}
+        </Text>
+        <Button
+          type="button"
+          variant="secondary"
+          sx={{ display: "flex", alignItems: "center" }}
+          onClick={async () => {
+            if (!authenticatorDetails.sharedKey) return;
+            await navigator.clipboard.writeText(authenticatorDetails.sharedKey);
+            setCopied(true);
+            setTimeout(() => {
+              setCopied(false);
+            }, 2500);
+          }}
+        >
+          {copied ? <Checkmark size={15} /> : <Copy size={15} />}
+        </Button>
+      </Flex>
     </VerifyAuthenticatorForm>
   );
 }
@@ -661,6 +689,16 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
         icon: Copy,
         action: async () => {
           await clipboard.writeText(codes.join("\n"));
+          const button = document.getElementById("btn-copy");
+          if (!button) return;
+
+          const buttonText = button.querySelector(".title");
+          if (!buttonText) return;
+
+          buttonText.innerHTML = "Copied!";
+          setTimeout(() => {
+            buttonText.innerHTML = "Copy";
+          }, 2500);
         },
       },
       {
@@ -716,6 +754,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
       <Flex sx={{ justifyContent: "start", alignItems: "center", mt: 2 }}>
         {actions.map((action) => (
           <Button
+            id={`btn-${action.title.toLowerCase()}`}
             type="button"
             variant="secondary"
             mr={1}
@@ -724,7 +763,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             onClick={action.action}
           >
             <action.icon size={15} sx={{ mr: "2px" }} />
-            {action.title}
+            <span className="title">{action.title}</span>
           </Button>
         ))}
       </Flex>
