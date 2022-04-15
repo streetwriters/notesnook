@@ -1,12 +1,11 @@
 import { Linking } from 'react-native';
-import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import { history } from '.';
-import { useMenuStore, useSelectionStore } from '../stores/stores';
 import { eSendEvent, ToastEvent } from '../services/event-manager';
 import Navigation from '../services/navigation';
+import SearchService from '../services/search';
+import { useMenuStore, useSelectionStore } from '../stores/stores';
 import { db } from './database';
 import { eClearEditor } from './events';
-import SearchService from '../services/search';
 
 export const deleteItems = async item => {
   if (item && db.monographs.isPublished(item.id)) {
@@ -118,27 +117,7 @@ export const deleteItems = async item => {
 export const openLinkInBrowser = async (link, colors) => {
   try {
     const url = link;
-    if (await InAppBrowser.isAvailable()) {
-      await InAppBrowser.open(url, {
-        // iOS Properties
-        dismissButtonStyle: 'cancel',
-        preferredBarTintColor: colors.accent,
-        preferredControlTintColor: 'white',
-        readerMode: false,
-        animated: true,
-        modalPresentationStyle: 'fullScreen',
-        modalTransitionStyle: 'coverVertical',
-        modalEnabled: true,
-        enableBarCollapsing: false,
-        // Android Properties
-        showTitle: true,
-        toolbarColor: colors.accent,
-        secondaryToolbarColor: 'black',
-        enableUrlBarHiding: true,
-        enableDefaultShare: true,
-        forceCloseOnRedirection: false
-      });
-    } else Linking.openURL(url);
+    Linking.openURL(url);
   } catch (error) {
     console.log(error.message);
   }
