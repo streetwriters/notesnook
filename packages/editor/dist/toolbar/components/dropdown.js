@@ -1,0 +1,42 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { useRef, useState } from "react";
+import { Button, Text } from "rebass";
+import { Icon } from "./icon";
+import { Icons } from "../icons";
+import { MenuPresenter } from "../../components/menu/menu";
+export function Dropdown(props) {
+    var items = props.items, selectedItem = props.selectedItem;
+    var buttonRef = useRef(null);
+    var _a = useState(false), isOpen = _a[0], setIsOpen = _a[1];
+    return (_jsxs(_Fragment, { children: [_jsxs(Button, __assign({ ref: buttonRef, sx: {
+                    p: 1,
+                    m: 0,
+                    bg: isOpen ? "hover" : "transparent",
+                    mr: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    ":hover": { bg: "hover" },
+                    ":last-of-type": {
+                        mr: 0,
+                    },
+                }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: [typeof selectedItem === "string" ? (_jsx(Text, __assign({ sx: { fontSize: 12, mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), _jsx(Icon, { path: Icons.chevronDown, size: 16, color: "text" })] })), _jsx(MenuPresenter, { options: {
+                    type: "menu",
+                    position: {
+                        target: buttonRef.current || undefined,
+                        isTargetAbsolute: true,
+                        location: "below",
+                        yOffset: 5,
+                    },
+                }, isOpen: isOpen, items: items, onClose: function () { return setIsOpen(false); } })] }));
+}
