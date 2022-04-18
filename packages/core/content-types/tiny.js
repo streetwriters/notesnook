@@ -1,6 +1,6 @@
 import showdown from "showdown";
 import dataurl from "../utils/dataurl";
-import { getDummyDocument, getInnerText, parseHTML } from "../utils/html-parser";
+import { getDummyDocument, parseHTML } from "../utils/html-parser";
 
 var converter = new showdown.Converter();
 converter.setFlavor("original");
@@ -18,9 +18,7 @@ class Tiny {
   }
 
   toTXT() {
-    return this.document.body
-      ? this.document.body.innerText || this.document.body.textContent
-      : this.document.textContent;
+    return this.document.body.innerText;
   }
 
   toMD() {
@@ -31,7 +29,7 @@ class Tiny {
     const paragraph = this.document.querySelector("p");
     if (!paragraph) return;
 
-    return getInnerText(paragraph);
+    return paragraph.innerText;
   }
 
   isEmpty() {
@@ -66,7 +64,7 @@ class Tiny {
         }
       }
     }
-    return this.document.outerHTML || this.document.body.innerHTML;
+    return this.document.body.innerHTML;
   }
 
   removeAttachments(hashes) {
@@ -78,7 +76,7 @@ class Tiny {
       attachment.remove();
     }
 
-    return this.document.outerHTML || this.document.body.innerHTML;
+    return this.document.body.innerHTML;
   }
 
   async extractAttachments(store) {
@@ -141,7 +139,7 @@ class Tiny {
       }
     }
     return {
-      data: this.document.outerHTML || this.document.body.innerHTML,
+      data: this.document.body.innerHTML,
       attachments,
     };
   }

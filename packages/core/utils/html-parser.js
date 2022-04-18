@@ -1,14 +1,17 @@
-import { parse } from "node-html-parser";
 import { decodeHTML5 } from "entities";
+import { Window } from "happy-dom";
 
-export const parseHTML =
-  typeof DOMParser === "undefined"
-    ? (input) => parse(input)
-    : (input) => new DOMParser().parseFromString(input, "text/html");
+const RealDOMParser =
+  "window" in global && "DOMParser" in window
+    ? new window.DOMParser()
+    : new new Window().DOMParser();
+
+export const parseHTML = (input) =>
+  RealDOMParser.parseFromString(input, "text/html");
 
 export function getDummyDocument() {
   const doc = parseHTML("<div></div>");
-  return typeof DOMParser === "undefined" ? doc : doc;
+  return doc;
 }
 
 export function getInnerText(element) {
