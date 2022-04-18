@@ -1,13 +1,13 @@
 import { decodeHTML5 } from "entities";
-import { Window } from "happy-dom";
+import { DOMParser } from "linkedom";
 
 const RealDOMParser =
   "window" in global && "DOMParser" in window
     ? new window.DOMParser()
-    : new new Window().DOMParser();
+    : new DOMParser();
 
 export const parseHTML = (input) =>
-  RealDOMParser.parseFromString(input, "text/html");
+  RealDOMParser.parseFromString(wrapIntoHTMLDocument(input), "text/html");
 
 export function getDummyDocument() {
   const doc = parseHTML("<div></div>");
@@ -16,4 +16,10 @@ export function getDummyDocument() {
 
 export function getInnerText(element) {
   return decodeHTML5(element.innerText || element.textContent);
+}
+
+function wrapIntoHTMLDocument(input) {
+  if (input.includes("<body>")) return input;
+
+  return `<!doctype html><html lang="en"><head><title>Document Fragment</title></head><body>${input}</body></html>`;
 }
