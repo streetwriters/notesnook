@@ -10,6 +10,7 @@ import PremiumService from '../../../../services/premium';
 import { editing } from '../../../../utils';
 import { db } from '../../../../utils/database';
 import { eCloseProgressDialog } from '../../../../utils/events';
+import filesystem from '../../../../utils/filesystem';
 import { sleep } from '../../../../utils/time';
 import { EditorWebView, getNote } from '../../Functions';
 import tiny, { safeKeyboardDismiss } from '../tiny';
@@ -321,7 +322,9 @@ async function attachFile(uri, hash, type, filename, options) {
       return false;
     }
 
-    if (!exists || options?.reupload) {
+    let fileCheck = exists && (await filesystem.checkAttachment(hash));
+
+    if (!exists || options?.reupload || !fileCheck?.success) {
       let key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,

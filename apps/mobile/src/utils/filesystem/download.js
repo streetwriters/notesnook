@@ -10,6 +10,7 @@ import { db } from '../database';
 import Storage from '../database/storage';
 import { cacheDir, fileCheck } from './utils';
 import hosts from 'notes-core/utils/constants';
+import NetInfo from '@react-native-community/netinfo';
 
 export async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
@@ -163,6 +164,9 @@ export async function getUploadedFileSize(hash) {
 }
 
 export async function checkAttachment(hash) {
+  const internetState = await NetInfo.fetch();
+  const isInternetReachable = internetState.isConnected && internetState.isInternetReachable;
+  if (!isInternetReachable) return { success: true };
   const attachment = db.attachments.attachment(hash);
   if (!attachment) return { failed: 'Attachment not found.' };
 
@@ -170,7 +174,7 @@ export async function checkAttachment(hash) {
     const size = await getUploadedFileSize(hash);
     if (size <= 0) return { failed: 'File length is 0.' };
   } catch (e) {
-    return { failed: e.message };
+    return { failed: e?.message };
   }
   return { success: true };
 }
