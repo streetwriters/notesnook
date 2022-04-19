@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, { EasingNode, timing, useValue } from 'react-native-reanimated';
 import { useThemeStore } from '../../../../stores/theme';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
 import { sleep } from '../../../../utils/time';
@@ -22,7 +22,7 @@ const ToolbarItemPin = ({ format, color }) => {
     timing(scale, {
       toValue: val,
       duration: time,
-      easing: Easing.in(Easing.ease)
+      easing: EasingNode.in(EasingNode.ease)
     }).start();
     await sleep(time);
     animating = false;

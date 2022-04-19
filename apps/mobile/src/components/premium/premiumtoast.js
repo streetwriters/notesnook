@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import Animated, { EasingNode } from 'react-native-reanimated';
 import { useThemeStore } from '../../stores/theme';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
@@ -57,19 +57,19 @@ export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
       Animated.timing(opacityPrem, {
         toValue: 1,
         duration: 300,
-        easing: Easing.inOut(Easing.ease)
+        easing: EasingNode.inOut(EasingNode.ease)
       }).start();
       Animated.timing(translatePrem, {
         toValue: 0,
         duration: 300,
-        easing: Easing.inOut(Easing.ease)
+        easing: EasingNode.inOut(EasingNode.ease)
       }).start();
 
       let timer = setTimeout(async () => {
         Animated.timing(opacityPrem, {
           toValue: -0,
           duration: 150,
-          easing: Easing.inOut(Easing.ease)
+          easing: EasingNode.inOut(EasingNode.ease)
         }).start();
         currentMsg = {
           title: '',

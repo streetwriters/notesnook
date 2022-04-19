@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
-index 5fa44b5..af6d7be 100644
+index f0f6402..d645d81 100644
 --- a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
 +++ b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
-@@ -623,7 +623,18 @@ RCT_SCROLL_EVENT_HANDLER(scrollViewDidScrollToTop, onScrollToTop)
+@@ -685,7 +685,18 @@ RCT_SCROLL_EVENT_HANDLER(scrollViewDidScrollToTop, onScrollToTop)
                                           : MAX(0, _scrollView.contentSize.height - viewportSize.height);
  
      // Calculate the snap offsets adjacent to the initial offset target
@@ -17,15 +17,8 @@ index 5fa44b5..af6d7be 100644
 +      targetOffset = self.disableIntervalMomentum ? scrollView.contentOffset.x : targetContentOffset->x;
 +    } else {
 +      targetOffset = self.disableIntervalMomentum ? scrollView.contentOffset.y : targetContentOffset->y;
-+    }
++   }
 +
      CGFloat smallerOffset = 0.0;
      CGFloat largerOffset = maximumOffset;
  
-diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
-new file mode 100644
-index 0000000..361f5fb
---- /dev/null
-+++ b/node_modules/react-native/scripts/.packager.env
-@@ -0,0 +1 @@
-+export RCT_METRO_PORT=8081

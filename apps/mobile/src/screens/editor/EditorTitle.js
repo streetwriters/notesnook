@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TextInput } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import Animated, { EasingNode } from 'react-native-reanimated';
 import { useThemeStore } from '../../stores/theme';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { SIZE } from '../../utils/size';
@@ -13,7 +13,7 @@ function animation(v) {
   Animated.timing(opacityVal, {
     toValue: v,
     duration: 150,
-    easing: Easing.inOut(Easing.ease)
+    easing: EasingNode.inOut(EasingNode.ease)
   }).start();
 }
 

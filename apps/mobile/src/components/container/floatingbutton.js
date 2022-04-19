@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Keyboard, Platform, View } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import Animated, { EasingNode } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
@@ -23,7 +23,7 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
     Animated.timing(translateY, {
       toValue: translate,
       duration: 250,
-      easing: Easing.elastic(1)
+      easing: EasingNode.elastic(1)
     }).start();
   }
 

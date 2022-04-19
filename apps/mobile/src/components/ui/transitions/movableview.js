@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { PanResponder } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import Animated, { EasingNode } from 'react-native-reanimated';
 
 export default class MovableView extends Component {
   constructor(props) {
@@ -21,7 +21,7 @@ export default class MovableView extends Component {
         Animated.timing(this.state.scale, {
           toValue: 1.03,
           duration: 600,
-          easing: Easing.elastic(1)
+          easing: EasingNode.elastic(1)
         }).start();
         this.props.onDragStart();
       },
@@ -35,18 +35,18 @@ export default class MovableView extends Component {
         Animated.timing(this.state.panX, {
           toValue: 0,
           duration: 600,
-          easing: Easing.elastic(1)
+          easing: EasingNode.elastic(1)
         }).start();
         Animated.timing(this.state.panY, {
           toValue: 0,
           duration: 600,
-          easing: Easing.elastic(1)
+          easing: EasingNode.elastic(1)
         }).start();
 
         Animated.timing(this.state.scale, {
           toValue: 1,
           duration: 600,
-          easing: Easing.elastic(1)
+          easing: EasingNode.elastic(1)
         }).start();
 
         this.xOffset = 0;
@@ -67,7 +67,7 @@ export default class MovableView extends Component {
         Animated.timing(this.state.scale, {
           toValue: value,
           duration: this.props.breathDuration | 1000,
-          easing: Easing.inOut(Easing.ease)
+          easing: EasingNode.inOut(EasingNode.ease)
         }).start();
       }, 1000);
     }

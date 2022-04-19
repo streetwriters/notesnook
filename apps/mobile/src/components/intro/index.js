@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Dimensions, Image, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, { EasingNode, timing, useValue } from 'react-native-reanimated';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useThemeStore } from '../../stores/theme';
@@ -41,12 +41,12 @@ const Intro = () => {
         timing(opacity, {
           toValue: 1,
           duration: 600,
-          easing: Easing.in(Easing.ease)
+          easing: EasingNode.in(EasingNode.ease)
         }).start();
         timing(translateY, {
           toValue: 0,
           duration: 1000,
-          easing: Easing.in(Easing.ease)
+          easing: EasingNode.in(EasingNode.ease)
         }).start();
       }, 15);
     }

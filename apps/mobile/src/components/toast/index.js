@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Keyboard, View } from 'react-native';
-import Animated, { Easing, useValue } from 'react-native-reanimated';
+import Animated, { EasingNode, useValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
@@ -56,7 +56,7 @@ export const Toast = ({ context = 'global' }) => {
     timing(toastOpacity, {
       toValue: 1,
       duration: 150,
-      easing: Easing.ease
+      easing: EasingNode.ease
     }).start();
 
     if (hideTimeout.current) {
@@ -100,14 +100,14 @@ export const Toast = ({ context = 'global' }) => {
       timing(toastOpacity, {
         toValue: 0,
         duration: 100,
-        easing: Easing.in(Easing.ease)
+        easing: EasingNode.in(EasingNode.ease)
       }).start(() => {
         showNext(msg);
         setTimeout(() => {
           timing(toastOpacity, {
             toValue: 1,
             duration: 150,
-            easing: Easing.in(Easing.ease)
+            easing: EasingNode.in(EasingNode.ease)
           }).start();
         }, 300);
       });
@@ -115,7 +115,7 @@ export const Toast = ({ context = 'global' }) => {
       timing(toastOpacity, {
         toValue: 0,
         duration: 150,
-        easing: Easing.inOut(Easing.ease)
+        easing: EasingNode.inOut(EasingNode.ease)
       }).start(async () => {
         toastMessages.shift();
         await sleep(100);

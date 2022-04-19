@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, { EasingNode, timing, useValue } from 'react-native-reanimated';
 import { Button } from '../../components/ui/button';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
@@ -46,7 +46,7 @@ const EditorOverlay = () => {
       timing(opacity, {
         toValue: 0,
         duration: 150,
-        easing: Easing.in(Easing.ease)
+        easing: EasingNode.in(EasingNode.ease)
       }).start();
       timerClosing = setTimeout(() => {
         opacity.setValue(1);

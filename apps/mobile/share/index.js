@@ -1,6 +1,5 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import { getLinkPreview } from 'link-preview-js';
-import { HTMLRootElement } from 'node-html-parser/dist/nodes/html';
 import { parseHTML } from 'notes-core/utils/htmlparser';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
@@ -18,7 +17,7 @@ import {
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, { EasingNode, timing, useValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
@@ -61,10 +60,6 @@ function getBaseUrl(site) {
   return url;
 }
 
-/**
- *
- * @param {HTMLRootElement} document
- */
 function wrapTablesWithDiv(document) {
   const tables = document.getElementsByTagName('table');
   for (let table of tables) {
@@ -95,10 +90,6 @@ let elementBlacklist = [
   'footer'
 ];
 
-/**
- *
- * @param {HTMLRootElement} document
- */
 function removeInvalidElements(document) {
   let elements = document.querySelectorAll(elementBlacklist.join(','));
   for (let element of elements) {
@@ -107,10 +98,6 @@ function removeInvalidElements(document) {
   return document;
 }
 
-/**
- *
- * @param {HTMLRootElement} document
- */
 function replaceSrcWithAbsoluteUrls(document, baseUrl) {
   let images = document.querySelectorAll('img');
   console.log(images.length);
@@ -135,10 +122,6 @@ function replaceSrcWithAbsoluteUrls(document, baseUrl) {
   return document;
 }
 
-/**
- *
- * @param {HTMLRootElement} document
- */
 function fixCodeBlocks(document) {
   let elements = document.querySelectorAll('code,pre');
 
@@ -218,12 +201,12 @@ const NotesnookShare = ({ quicknote = false }) => {
     timing(opacity, {
       toValue: opacityV,
       duration: 300,
-      easing: Easing.in(Easing.ease)
+      easing: EasingNode.in(EasingNode.ease)
     }).start();
     timing(translate, {
       toValue: translateV,
       duration: 300,
-      easing: Easing.in(Easing.ease)
+      easing: EasingNode.in(EasingNode.ease)
     }).start();
   };
 
