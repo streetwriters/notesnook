@@ -56,6 +56,7 @@ import BaseDialog from '../../components/dialog/base-dialog';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { SIZE } from '../../utils/size';
+import { tabBarRef } from '../../utils/global-refs';
 const format = (ver: number) => {
   let parts = ver.toString().split('');
   return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? '' : parts[2]}${
@@ -776,7 +777,14 @@ const groups: SettingSection[] = [
         description: 'Check for new version of Notesnook',
         modifer: async () => {
           const version = await checkVersion();
-          if (!version.needsUpdate) return false;
+          if (!version.needsUpdate) {
+            ToastEvent.show({
+              heading: 'You are on latest version',
+              type: 'success',
+              context: 'global'
+            });
+            return false;
+          }
           presentSheet({
             component: ref => <Update version={version} fwdRef={ref} />
           });

@@ -15,7 +15,7 @@ import { MMKV } from './mmkv';
 
 async function read(key) {
   if (!key) return null;
-  let data = await MMKV.getItem(key);
+  let data = MMKV.getString(key);
 
   if (!data) return null;
   try {
@@ -26,7 +26,8 @@ async function read(key) {
 }
 
 async function write(key, data) {
-  return await MMKV.setItem(key, typeof data === 'string' ? data : JSON.stringify(data));
+  MMKV.setString(key, typeof data === 'string' ? data : JSON.stringify(data));
+  return true;
 }
 
 async function readMulti(keys) {

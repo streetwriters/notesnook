@@ -80,7 +80,7 @@ const ToolbarItem = ({
 
   const onColorChange = async () => {
     if (/^(dhilitecolor|dforecolor)$/.test(format)) {
-      let _color = await MMKV.getItem(format);
+      let _color = MMKV.getString(format);
       let defColor = format === 'dhilitecolor' ? colors.accent + '60' : colors.accent;
       setColor(_color || defColor);
     }

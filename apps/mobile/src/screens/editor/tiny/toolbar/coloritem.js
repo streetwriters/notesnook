@@ -60,7 +60,7 @@ const ColorItem = ({ value, format, onCustomPress, checked }) => {
       await MMKV.removeItem(`d${format}`);
     } else {
       formatSelection(execCommands[format](value));
-      await MMKV.setItem(`d${format}`, value);
+      MMKV.setString(`d${format}`, value);
     }
     eSendEvent('onColorChange');
   };

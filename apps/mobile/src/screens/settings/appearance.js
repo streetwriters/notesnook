@@ -102,14 +102,6 @@ export const AccentColorPicker = ({ settings = true, wrap = false }) => {
     <ScrollView
       horizontal={true}
       showsHorizontalScrollIndicator={false}
-      onMoveShouldSetResponderCapture={() => {
-        if (!settings) return;
-        tabBarRef.current?.setScrollEnabled(false);
-      }}
-      onMomentumScrollEnd={() => {
-        if (!settings) return;
-        tabBarRef.current?.setScrollEnabled(true);
-      }}
       style={{
         borderRadius: 5,
         padding: 5,

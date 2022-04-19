@@ -340,18 +340,6 @@ export const useAppEvents = () => {
       setRecoveryKeyMessage();
     }
     if (!user.isEmailConfirmed) setEmailVerifyMessage();
-
-    if (!login) {
-      if (PremiumService.get() && user) {
-        if (SettingsService.get().reminder === 'off') {
-          await SettingsService.set({ reminder: 'daily' });
-        }
-        if (Backup.checkBackupRequired()) {
-          sleep(2000).then(() => Backup.checkAndRun());
-        }
-      }
-    }
-
     refValues.current.isUserReady = true;
 
     syncedOnLaunch.current = true;
@@ -468,14 +456,14 @@ export const useAppEvents = () => {
         movedAway: editing.movedAway,
         timestamp: Date.now()
       });
-      await MMKV.setItem('appState', state);
+      MMKV.setString('appState', state);
     }
   }
 
   async function checkIntentState() {
     try {
-      let notesAddedFromIntent = await MMKV.getItem('notesAddedFromIntent');
-      let shareExtensionOpened = await MMKV.getItem('shareExtensionOpened');
+      let notesAddedFromIntent = MMKV.getString('notesAddedFromIntent');
+      let shareExtensionOpened = MMKV.getString('shareExtensionOpened');
       if (notesAddedFromIntent) {
         if (Platform.OS === 'ios') {
           await db.init();

@@ -38,7 +38,7 @@ export const NavigationStack = React.memo(
 
     React.useEffect(() => {
       (async () => {
-        let settings = await MMKV.getItem('appSettings');
+        let settings = MMKV.getString('appSettings');
         if (settings) {
           settings = JSON.parse(settings);
           homepage.current = settings.homepage;
