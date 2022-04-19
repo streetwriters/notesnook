@@ -25,6 +25,7 @@ import TableHeader from "@tiptap/extension-table-header";
 import { ImageNode } from "./extensions/image";
 import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
 import { useTheme } from "@notesnook/theme";
+import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -32,10 +33,18 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 
 const useTiptap = (
-  options: Partial<EditorOptions & ThemeConfig> = {},
+  options: Partial<EditorOptions & ThemeConfig & AttachmentOptions> = {},
   deps?: React.DependencyList
 ) => {
-  const { theme, accent, scale, onCreate, ...restOptions } = options;
+  const {
+    theme,
+    accent,
+    scale,
+    onCreate,
+    onDownloadAttachment,
+    ...restOptions
+  } = options;
+
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
       extensions: [
@@ -71,6 +80,9 @@ const useTiptap = (
         Placeholder.configure({
           placeholder: "Start writing your note...",
         }),
+        AttachmentNode.configure({
+          onDownloadAttachment,
+        }),
       ],
       onCreate: ({ editor }) => {
         if (theme && accent && scale) {
@@ -79,7 +91,7 @@ const useTiptap = (
         if (onCreate) onCreate({ editor });
       },
     }),
-    [theme, accent, scale, onCreate]
+    [theme, accent, scale, onCreate, onDownloadAttachment]
   );
 
   const editor = useEditor({ ...defaultOptions, ...restOptions }, deps);

@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ITool, ToolProps } from "../types";
 import { ToolId } from ".";
 import { IconNames } from "../icons";
@@ -36,6 +35,11 @@ export declare class ClearFormatting implements ITool {
     render: (props: ToolProps) => JSX.Element;
 }
 export declare class Link implements ITool {
+    id: ToolId;
+    title: string;
+    render: (props: ToolProps) => JSX.Element;
+}
+export declare class Attachment implements ITool {
     id: ToolId;
     title: string;
     render: (props: ToolProps) => JSX.Element;

@@ -89,14 +89,6 @@ export class Image implements ITool {
   };
 }
 
-export class Attachment extends BlockTool<ToolId> {
-  constructor() {
-    super("attachment", "Attachment", "attachment", (editor) => {
-      return false;
-    });
-  }
-}
-
 type CellLocation = { column: number; row: number };
 type TableSize = { columns: number; rows: number };
 export class Table implements ITool {

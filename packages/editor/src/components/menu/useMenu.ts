@@ -159,6 +159,8 @@ export function getPosition(
 
   if (target !== "mouse" && align === "center" && elementWidth > 0) {
     position.left -= elementWidth / 2 - target.clientWidth / 2;
+  } else if (target !== "mouse" && align === "end" && elementWidth > 0) {
+    position.left -= elementWidth - target.clientWidth;
   }
 
   // Adjust menu height

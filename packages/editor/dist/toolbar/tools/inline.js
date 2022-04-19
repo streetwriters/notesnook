@@ -174,3 +174,16 @@ var Link = /** @class */ (function () {
     return Link;
 }());
 export { Link };
+var Attachment = /** @class */ (function () {
+    function Attachment() {
+        var _this = this;
+        this.id = "attachment";
+        this.title = "Attachment";
+        this.render = function (props) {
+            var editor = props.editor;
+            return (_jsx(ToolButton, { title: _this.title, id: _this.id, icon: "attachment", onClick: function () { }, toggled: false }));
+        };
+    }
+    return Attachment;
+}());
+export { Attachment };

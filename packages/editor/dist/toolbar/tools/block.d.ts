@@ -25,9 +25,6 @@ export declare class Image implements ITool {
     title: string;
     render: (props: ToolProps) => JSX.Element;
 }
-export declare class Attachment extends BlockTool<ToolId> {
-    constructor();
-}
 export declare class Table implements ITool {
     id: ToolId;
     title: string;

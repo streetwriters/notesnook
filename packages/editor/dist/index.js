@@ -46,6 +46,7 @@ import TableCell from "./extensions/table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { ImageNode } from "./extensions/image";
 import { useTheme } from "@notesnook/theme";
+import { AttachmentNode } from "./extensions/attachment";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -53,7 +54,7 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 var useTiptap = function (options, deps) {
     if (options === void 0) { options = {}; }
-    var theme = options.theme, accent = options.accent, scale = options.scale, onCreate = options.onCreate, restOptions = __rest(options, ["theme", "accent", "scale", "onCreate"]);
+    var theme = options.theme, accent = options.accent, scale = options.scale, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, restOptions = __rest(options, ["theme", "accent", "scale", "onCreate", "onDownloadAttachment"]);
     var defaultOptions = useMemo(function () { return ({
         extensions: [
             TextStyle,
@@ -88,6 +89,9 @@ var useTiptap = function (options, deps) {
             Placeholder.configure({
                 placeholder: "Start writing your note...",
             }),
+            AttachmentNode.configure({
+                onDownloadAttachment: onDownloadAttachment,
+            }),
         ],
         onCreate: function (_a) {
             var editor = _a.editor;
@@ -97,7 +101,7 @@ var useTiptap = function (options, deps) {
             if (onCreate)
                 onCreate({ editor: editor });
         },
-    }); }, [theme, accent, scale, onCreate]);
+    }); }, [theme, accent, scale, onCreate, onDownloadAttachment]);
     var editor = useEditor(__assign(__assign({}, defaultOptions), restOptions), deps);
     /**
      * Add editor to global for use in React Native.

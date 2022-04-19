@@ -104,16 +104,6 @@ var Image = /** @class */ (function () {
     return Image;
 }());
 export { Image };
-var Attachment = /** @class */ (function (_super) {
-    __extends(Attachment, _super);
-    function Attachment() {
-        return _super.call(this, "attachment", "Attachment", "attachment", function (editor) {
-            return false;
-        }) || this;
-    }
-    return Attachment;
-}(BlockTool));
-export { Attachment };
 var Table = /** @class */ (function () {
     function Table() {
         var _this = this;

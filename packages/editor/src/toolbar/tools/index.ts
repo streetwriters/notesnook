@@ -9,17 +9,11 @@ import {
   Superscript,
   ClearFormatting,
   Link,
+  Attachment,
 } from "./inline";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
-import {
-  Blockquote,
-  CodeBlock,
-  HorizontalRule,
-  Image,
-  Attachment,
-  Table,
-} from "./block";
+import { Blockquote, CodeBlock, HorizontalRule, Image, Table } from "./block";
 import { Headings } from "./headings";
 import { NumberedList, BulletList } from "./lists";
 import { LeftToRight, RightToLeft } from "./text-direction";

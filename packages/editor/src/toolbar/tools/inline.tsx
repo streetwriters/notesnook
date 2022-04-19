@@ -195,3 +195,22 @@ export class Link implements ITool {
     );
   };
 }
+
+export class Attachment implements ITool {
+  id: ToolId = "attachment";
+  title = "Attachment";
+
+  render = (props: ToolProps) => {
+    const { editor } = props;
+
+    return (
+      <ToolButton
+        title={this.title}
+        id={this.id}
+        icon="attachment"
+        onClick={() => {}}
+        toggled={false}
+      />
+    );
+  };
+}

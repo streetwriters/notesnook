@@ -50,6 +50,8 @@ import {
   mdiTrashCanOutline,
   mdiTableMergeCells,
   mdiTableSplitCell,
+  mdiDeleteOutline,
+  mdiDownloadOutline,
 } from "@mdi/js";
 
 export const Icons = {
@@ -98,12 +100,15 @@ export const Icons = {
   cellProperties: mdiSquareRoundedBadgeOutline,
   backgroundColor: mdiFormatColorFill,
   borderColor: mdiBorderAllVariant,
-  plus: mdiPlus,
-  close: mdiClose,
   sortDesc: mdiSortDescending,
   deleteTable: mdiTrashCanOutline,
   mergeCells: mdiTableMergeCells,
   splitCells: mdiTableSplitCell,
+
+  plus: mdiPlus,
+  close: mdiClose,
+  delete: mdiDeleteOutline,
+  download: mdiDownloadOutline,
 };
 
 export type IconNames = keyof typeof Icons;

@@ -1,4 +1,4 @@
-import { mdiAttachment, mdiBorderHorizontal, mdiCheck, mdiChevronDown, mdiCodeBraces, mdiCodeTags, mdiDotsVertical, mdiFormatAlignCenter, mdiFormatAlignJustify, mdiFormatAlignLeft, mdiFormatAlignRight, mdiFormatBold, mdiFormatClear, mdiFormatColorHighlight, mdiFormatColorText, mdiFormatItalic, mdiFormatListBulleted, mdiFormatListNumbered, mdiFormatQuoteClose, mdiFormatStrikethrough, mdiFormatSubscript, mdiFormatSuperscript, mdiFormatTextdirectionLToR, mdiFormatTextdirectionRToL, mdiFormatUnderline, mdiImage, mdiInvertColorsOff, mdiLinkPlus, mdiLoading, mdiTable, mdiTableBorder, mdiTableRowPlusBefore, mdiTableRowRemove, mdiTableColumnPlusAfter, mdiTableColumnPlusBefore, mdiTableColumnRemove, mdiUploadOutline, mdiPlus, mdiSquareRoundedBadgeOutline, mdiFormatColorFill, mdiBorderAllVariant, mdiClose, mdiSortDescending, mdiArrowExpandRight, mdiArrowExpandLeft, mdiArrowExpandDown, mdiArrowExpandUp, mdiTrashCanOutline, mdiTableMergeCells, mdiTableSplitCell, } from "@mdi/js";
+import { mdiAttachment, mdiBorderHorizontal, mdiCheck, mdiChevronDown, mdiCodeBraces, mdiCodeTags, mdiDotsVertical, mdiFormatAlignCenter, mdiFormatAlignJustify, mdiFormatAlignLeft, mdiFormatAlignRight, mdiFormatBold, mdiFormatClear, mdiFormatColorHighlight, mdiFormatColorText, mdiFormatItalic, mdiFormatListBulleted, mdiFormatListNumbered, mdiFormatQuoteClose, mdiFormatStrikethrough, mdiFormatSubscript, mdiFormatSuperscript, mdiFormatTextdirectionLToR, mdiFormatTextdirectionRToL, mdiFormatUnderline, mdiImage, mdiInvertColorsOff, mdiLinkPlus, mdiLoading, mdiTable, mdiTableBorder, mdiTableRowPlusBefore, mdiTableRowRemove, mdiTableColumnPlusAfter, mdiTableColumnPlusBefore, mdiTableColumnRemove, mdiUploadOutline, mdiPlus, mdiSquareRoundedBadgeOutline, mdiFormatColorFill, mdiBorderAllVariant, mdiClose, mdiSortDescending, mdiArrowExpandRight, mdiArrowExpandLeft, mdiArrowExpandDown, mdiArrowExpandUp, mdiTrashCanOutline, mdiTableMergeCells, mdiTableSplitCell, mdiDeleteOutline, mdiDownloadOutline, } from "@mdi/js";
 export var Icons = {
     bold: mdiFormatBold,
     italic: mdiFormatItalic,
@@ -45,10 +45,12 @@ export var Icons = {
     cellProperties: mdiSquareRoundedBadgeOutline,
     backgroundColor: mdiFormatColorFill,
     borderColor: mdiBorderAllVariant,
-    plus: mdiPlus,
-    close: mdiClose,
     sortDesc: mdiSortDescending,
     deleteTable: mdiTrashCanOutline,
     mergeCells: mdiTableMergeCells,
     splitCells: mdiTableSplitCell,
+    plus: mdiPlus,
+    close: mdiClose,
+    delete: mdiDeleteOutline,
+    download: mdiDownloadOutline,
 };
