@@ -10,10 +10,10 @@ import Notifications from './notifications';
 import Orientation from 'react-native-orientation';
 import { DDS } from './device-detection';
 
-async function migrate(settings: SettingStore['settings']) {
+function migrate(settings: SettingStore['settings']) {
   if (settings.migrated) return true;
 
-  let introCompleted = await MMKV.getItem('introCompleted');
+  let introCompleted = MMKV.getString('introCompleted');
 
   if (!introCompleted) {
     console.log('no need to migrate');
@@ -26,7 +26,7 @@ async function migrate(settings: SettingStore['settings']) {
   MMKV.removeItem('introCompleted');
   console.log('migrated introCompleted', introCompleted);
 
-  let askForRating = await MMKV.getItem('askForRating');
+  let askForRating = MMKV.getString('askForRating');
   if (askForRating) {
     if (askForRating === 'completed' || askForRating === 'never') {
       settings.rateApp = false;
@@ -39,7 +39,7 @@ async function migrate(settings: SettingStore['settings']) {
     MMKV.removeItem('askForRating');
   }
 
-  let askForBackup = await MMKV.getItem('askForBackup');
+  let askForBackup = MMKV.getString('askForBackup');
   if (askForBackup) {
     askForBackup = JSON.parse(askForBackup);
     //@ts-ignore
@@ -48,29 +48,29 @@ async function migrate(settings: SettingStore['settings']) {
     console.log('migrated askForBackup', askForBackup);
   }
 
-  let lastBackupDate = await MMKV.getItem('backupDate');
+  let lastBackupDate = MMKV.getString('backupDate');
   if (lastBackupDate) settings.lastBackupDate = parseInt(lastBackupDate);
   MMKV.removeItem('backupDate');
   console.log('migrated backupDate', lastBackupDate);
 
-  let isUserEmailConfirmed = await MMKV.getItem('isUserEmailConfirmed');
+  let isUserEmailConfirmed = MMKV.getString('isUserEmailConfirmed');
   if (isUserEmailConfirmed === 'yes') settings.userEmailConfirmed = true;
   if (isUserEmailConfirmed === 'no') settings.userEmailConfirmed = false;
   console.log('migrated useEmailConfirmed', isUserEmailConfirmed);
 
   MMKV.removeItem('isUserEmailConfirmed');
 
-  let userHasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
+  let userHasSavedRecoveryKey = MMKV.getString('userHasSavedRecoveryKey');
   if (userHasSavedRecoveryKey) settings.recoveryKeySaved = true;
   MMKV.removeItem('userHasSavedRecoveryKey');
   console.log('migrated userHasSavedRecoveryKey', userHasSavedRecoveryKey);
 
-  let accentColor = await MMKV.getItem('accentColor');
+  let accentColor = MMKV.getString('accentColor');
   if (accentColor) settings.theme.accent = accentColor;
   MMKV.removeItem('accentColor');
   console.log('migrated accentColor', accentColor);
 
-  let theme = await MMKV.getItem('theme');
+  let theme = MMKV.getString('theme');
   if (theme) {
     theme = JSON.parse(theme);
     //@ts-ignore
@@ -80,30 +80,32 @@ async function migrate(settings: SettingStore['settings']) {
 
   console.log('migrated theme', theme);
 
-  let backupStorageDir = await MMKV.getItem('backupStorageDir');
+  let backupStorageDir = MMKV.getString('backupStorageDir');
   if (backupStorageDir) settings.backupDirectoryAndroid = JSON.parse(backupStorageDir);
   MMKV.removeItem('backupStorageDir');
   console.log('migrated backupStorageDir', backupStorageDir);
 
-  let dontShowCompleteSheet = await MMKV.getItem('dontShowCompleteSheet');
+  let dontShowCompleteSheet = MMKV.getString('dontShowCompleteSheet');
   if (dontShowCompleteSheet) settings.showBackupCompleteSheet = false;
   MMKV.removeItem('dontShowCompleteSheet');
   console.log('migrated dontShowCompleteSheet', dontShowCompleteSheet);
 
   settings.migrated = true;
-
-  await set(settings);
+  set(settings);
   console.log('migrated completed');
 
   return true;
 }
 
-async function init() {
+function init() {
   scale.fontScale = 1;
-  let settingsJson = await MMKV.getItem('appSettings');
+  let now = performance.now();
+  let settingsJson = MMKV.getString('appSettings');
+
+  console.log('fetch data done', performance.now() - now);
   let settings = get();
   if (!settingsJson) {
-    await MMKV.setItem('appSettings', JSON.stringify(settings));
+    MMKV.setString('appSettings', JSON.stringify(settings));
   } else {
     settings = {
       ...settings,
@@ -117,15 +119,15 @@ async function init() {
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
   }
-  setPrivacyScreen(settings);
+  setTimeout(() => setPrivacyScreen(settings));
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
-  await migrate(settings);
+  migrate(settings);
   getColorScheme();
   return;
 }
 
-async function setPrivacyScreen(settings: SettingStore['settings']) {
+function setPrivacyScreen(settings: SettingStore['settings']) {
   if (settings.privacyScreen || settings.appLockMode === 'background') {
     if (Platform.OS === 'android') {
       AndroidModule.setSecureMode(true);
@@ -141,7 +143,7 @@ async function setPrivacyScreen(settings: SettingStore['settings']) {
   }
 }
 
-async function set(next: Partial<SettingStore['settings']>) {
+function set(next: Partial<SettingStore['settings']>) {
   let settings = get();
   settings = {
     ...settings,
@@ -149,10 +151,10 @@ async function set(next: Partial<SettingStore['settings']>) {
   };
 
   useSettingStore.getState().setSettings(settings);
-  setTimeout(async () => await MMKV.setItem('appSettings', JSON.stringify(settings)), 1);
+  setTimeout(async () => MMKV.setString('appSettings', JSON.stringify(settings)), 1);
 }
 
-async function toggle(id: keyof SettingStore['settings']) {
+function toggle(id: keyof SettingStore['settings']) {
   let settings = get();
   if (typeof settings[id] !== 'boolean') return;
   settings = {
@@ -161,7 +163,7 @@ async function toggle(id: keyof SettingStore['settings']) {
   //@ts-ignore
   settings[id] = !settings[id];
   useSettingStore.getState().setSettings(settings);
-  await MMKV.setItem('appSettings', JSON.stringify(settings));
+  MMKV.setString('appSettings', JSON.stringify(settings));
 }
 
 function get() {
@@ -171,7 +173,7 @@ function get() {
 async function onFirstLaunch() {
   let introCompleted = get().introCompleted;
   if (!introCompleted) {
-    await set({
+    set({
       rateApp: Date.now() + 86400000 * 2,
       nextBackupRequestTime: Date.now() + 86400000 * 3
     });

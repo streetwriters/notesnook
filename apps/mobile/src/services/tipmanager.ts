@@ -46,8 +46,8 @@ let tipState: { [name: string]: boolean } = {};
 let popState: { [name: string]: boolean } = {};
 
 export class TipManager {
-  static async init() {
-    let tipStateJson = await MMKV.getItem('tipState');
+  static init() {
+    let tipStateJson = MMKV.getString('tipState');
     if (tipStateJson) {
       tipState = JSON.parse(tipStateJson);
     } else {
@@ -55,7 +55,7 @@ export class TipManager {
       tipState = {};
     }
 
-    let popStateJson = await MMKV.getItem('popupState');
+    let popStateJson = MMKV.getString('popupState');
     if (popStateJson) {
       popState = JSON.parse(popStateJson);
     } else {
@@ -71,7 +71,7 @@ export class TipManager {
       if (tipState[context]) return;
       //@ts-ignore
       tipState[context] = true;
-      MMKV.setItem('tipState', JSON.stringify(tipState));
+      MMKV.setString('tipState', JSON.stringify(tipState));
     }
 
     let tipsForCtx = tips.filter(tip => tip.contexts.indexOf(context) > -1);
@@ -91,7 +91,7 @@ export class TipManager {
   static markPopupUsed(id: string) {
     //@ts-ignore
     popState[id] = true;
-    MMKV.setItem('popupState', JSON.stringify(popState));
+    MMKV.setString('popupState', JSON.stringify(popState));
   }
 
   static placeholderTip() {

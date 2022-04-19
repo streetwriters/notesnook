@@ -1,17 +1,14 @@
 import dayjs from 'dayjs';
 import React from 'react';
 import { Linking, Platform, View } from 'react-native';
-import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ChangePassword } from '../../components/auth/change-password';
-import { Progress } from '../../components/sheets/progress';
 import { Button } from '../../components/ui/button';
 import Seperator from '../../components/ui/seperator';
+import { TimeSince } from '../../components/ui/time-since';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
-import Sync from '../../services/sync';
 import { useUserStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
 import {
@@ -19,20 +16,12 @@ import {
   SUBSCRIPTION_STATUS,
   SUBSCRIPTION_STATUS_STRINGS
 } from '../../utils/constants';
-import {
-  eCloseProgressDialog,
-  eOpenAttachmentsDialog,
-  eOpenPremiumDialog,
-  eOpenRecoveryKeyDialog
-} from '../../utils/events';
+import { eOpenPremiumDialog } from '../../utils/events';
 import { usePricing } from '../../utils/hooks/use-pricing';
 import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import TwoFactorAuth from './2fa';
-import { CustomButton } from './button';
-import { verifyUser } from './functions';
+import { SectionItem } from './section-item';
 
-const getTimeLeft = t2 => {
+export const getTimeLeft = t2 => {
   let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
   return {
     time: dayjs(t2).diff(dayjs(), daysRemaining === 0 ? 'hours' : 'days'),
@@ -40,7 +29,7 @@ const getTimeLeft = t2 => {
   };
 };
 
-const SettingsUserSection = () => {
+const SettingsUserSection = ({ item }) => {
   const colors = useThemeStore(state => state.colors);
 
   const user = useUserStore(state => state.user);
@@ -49,6 +38,14 @@ const SettingsUserSection = () => {
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
   const monthlyPlan = usePricing('monthly');
+  const isBasic = user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+  const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+  const isPro = user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM;
+  const isNotPro =
+    user?.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+    user?.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
+
+  const lastSynced = useUserStore(state => state.lastSynced);
 
   const manageSubscription = () => {
     if (!user.isEmailConfirmed) {
@@ -84,8 +81,7 @@ const SettingsUserSection = () => {
           <View
             style={{
               paddingHorizontal: 12,
-              marginTop: 15,
-              marginBottom: 15
+              marginTop: 15
             }}
           >
             <View
@@ -100,56 +96,79 @@ const SettingsUserSection = () => {
               <View
                 style={{
                   justifyContent: 'space-between',
-                  alignItems: 'center',
                   flexDirection: 'row',
-                  paddingBottom: 4,
-                  borderBottomWidth: 1,
-                  borderColor: colors.accent
+                  paddingBottom: 4
                 }}
               >
                 <View
                   style={{
                     flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center'
+                    width: '100%',
+                    justifyContent: 'space-between'
                   }}
                 >
                   <View
                     style={{
-                      borderWidth: 1,
-                      borderRadius: 100,
-                      borderColor: colors.accent,
-                      width: 20,
-                      height: 20,
-                      alignItems: 'center',
-                      justifyContent: 'center'
+                      flexDirection: 'row'
                     }}
                   >
-                    <Icon size={SIZE.md} color={colors.accent} name="account-outline" />
-                  </View>
+                    <View
+                      style={{
+                        alignItems: 'center'
+                      }}
+                    >
+                      <View
+                        style={{
+                          backgroundColor: colors.shade,
+                          borderRadius: 100,
+                          width: 50,
+                          height: 50,
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Icon size={SIZE.xl} color={colors.accent} name="camera-outline" />
+                      </View>
+                    </View>
 
-                  <Paragraph
-                    color={colors.heading}
-                    size={SIZE.sm}
-                    style={{
-                      marginLeft: 5
-                    }}
-                  >
-                    {user?.email}
-                  </Paragraph>
-                </View>
-                <View
-                  style={{
-                    borderRadius: 5,
-                    padding: 5,
-                    paddingVertical: 2.5
-                  }}
-                >
-                  <Heading color={colors.accent} size={SIZE.sm}>
-                    {SUBSCRIPTION_STATUS_STRINGS[user.subscription?.type]}
-                  </Heading>
+                    <View
+                      style={{
+                        marginLeft: 10,
+                        flexGrow: 1
+                      }}
+                    >
+                      <Heading color={colors.accent} size={SIZE.xs + 1}>
+                        {SUBSCRIPTION_STATUS_STRINGS[user.subscription?.type].toUpperCase()}
+                      </Heading>
+
+                      <Paragraph color={colors.heading} size={SIZE.sm}>
+                        {user?.email}
+                      </Paragraph>
+                      <Paragraph color={colors.icon} size={SIZE.xs}>
+                        Last synced{' '}
+                        <TimeSince
+                          style={{ fontSize: SIZE.xs, color: colors.icon }}
+                          time={lastSynced}
+                        />
+                      </Paragraph>
+                    </View>
+                  </View>
                 </View>
               </View>
+
+              {/* {isNotPro ? (
+                <Button
+                  height={30}
+                  style={{
+                    borderRadius: 100,
+                    paddingHorizontal: 12
+                  }}
+                  fontSize={SIZE.xs}
+                  type="accent"
+                  title={`GET PRO (${monthlyPlan?.product?.localizedPrice} / mo)`}
+                />
+              ) : null} */}
+
               <View>
                 {user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC ? (
                   <View>
@@ -194,36 +213,6 @@ const SettingsUserSection = () => {
                     </Paragraph>
                   </View>
                 ) : null}
-
-                {user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
-                  user.subscription?.type !== SUBSCRIPTION_STATUS.BETA && (
-                    <>
-                      <Seperator />
-                      <Button
-                        onPress={manageSubscription}
-                        width="100%"
-                        style={{
-                          paddingHorizontal: 0
-                        }}
-                        fontSize={SIZE.md}
-                        title={
-                          !user.isEmailConfirmed
-                            ? 'Confirm your email'
-                            : user.subscription?.provider === 3 &&
-                              user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
-                            ? 'Manage subscription from desktop app'
-                            : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-                              Platform.OS === 'android'
-                            ? `Resubscribe from Google Playstore`
-                            : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
-                            ? `Resubscribe to Notesnook Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
-                            : `Subscribe to Notesnook Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
-                        }
-                        height={50}
-                        type="accent"
-                      />
-                    </>
-                  )}
               </View>
 
               {user?.subscription?.provider &&
@@ -255,84 +244,9 @@ const SettingsUserSection = () => {
             </View>
           </View>
 
-          {[
-            {
-              name: 'Save data recovery key',
-              func: async () => {
-                verifyUser(null, async () => {
-                  await sleep(300);
-                  eSendEvent(eOpenRecoveryKeyDialog);
-                });
-              },
-              desc: 'Recover your data using the recovery key if your password is lost.'
-            },
-            {
-              name: 'Manage attachments',
-              func: () => {
-                eSendEvent(eOpenAttachmentsDialog);
-              },
-              desc: 'Manage all attachments in one place.'
-            },
-            {
-              name: 'Change password',
-              func: async () => {
-                ChangePassword.present();
-              },
-              desc: 'Setup a new password for your account.'
-            },
-            {
-              name: 'Having problems with syncing?',
-              func: async () => {
-                Progress.present();
-                await Sync.run('global', true);
-                eSendEvent(eCloseProgressDialog);
-              },
-              desc: 'Try force sync to resolve issues with syncing.'
-            },
-            {
-              name: 'Subscription not activated?',
-              func: async () => {
-                if (Platform.OS === 'android') return;
-                presentSheet({
-                  title: 'Loading subscriptions',
-                  paragraph: `Please wait while we fetch your subscriptions.`
-                });
-                let subscriptions = await RNIap.getPurchaseHistory();
-                subscriptions.sort((a, b) => b.transactionDate - a.transactionDate);
-                let currentSubscription = subscriptions[0];
-                presentSheet({
-                  title: 'Notesnook Pro',
-                  paragraph: `You subscribed to Notesnook Pro on ${new Date(
-                    currentSubscription.transactionDate
-                  ).toLocaleString()}. Verify this subscription?`,
-                  action: async () => {
-                    presentSheet({
-                      title: 'Verifying subscription',
-                      paragraph: `Please wait while we verify your subscription.`
-                    });
-                    await PremiumService.subscriptions.verify(currentSubscription);
-                    eSendEvent(eCloseProgressDialog);
-                  },
-                  icon: 'information-outline',
-                  actionText: 'Verify'
-                });
-              },
-              desc: 'Verify your subscription to Notesnook Pro'
-            }
-          ].map(item =>
-            item.name === 'Subscription not activated?' &&
-            (Platform.OS !== 'ios' || PremiumService.get()) ? null : (
-              <CustomButton
-                key={item.name}
-                title={item.name}
-                onPress={item.func}
-                tagline={item.desc}
-                color={item.name === 'Logout' ? colors.errorText : colors.pri}
-              />
-            )
-          )}
-
-          <TwoFactorAuth />
+          {item.sections.map(item => (
+            <SectionItem key={item.name} item={item} />
+          ))}
         </>
       ) : null}
     </>

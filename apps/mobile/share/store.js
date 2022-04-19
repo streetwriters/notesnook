@@ -7,7 +7,7 @@ export const useShareStore = create((set, get) => ({
   colors: Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT,
   accent: ACCENT,
   setAccent: async () => {
-    let appSettings = await MMKV.getItem('appSettings');
+    let appSettings = MMKV.getString('appSettings');
 
     if (appSettings) {
       appSettings = JSON.parse(appSettings);
@@ -31,7 +31,7 @@ export const useShareStore = create((set, get) => ({
     set({ appendNote: note });
   },
   restoreAppendNote: async () => {
-    let note = await MMKV.getItem('shareMenuAppendNote');
+    let note = MMKV.getString('shareMenuAppendNote');
     if (note) {
       note = JSON.parse(note);
       set({ appendNote: note });

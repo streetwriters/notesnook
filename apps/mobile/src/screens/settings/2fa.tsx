@@ -23,92 +23,6 @@ import useTimer from '../../utils/hooks/use-timer';
 import { sanitizeFilename } from '../../utils/sanitizer';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
-import { CustomButton } from './button';
-import { verifyUser } from './functions';
-import SectionHeader from './section-header';
-
-const TwoFactorAuth = ({ isSheet }: { isSheet: boolean }) => {
-  const [collapsed, setCollapsed] = useState(isSheet ? false : true);
-  const user = useUserStore(state => state.user);
-
-  const enable2fa = () => {
-    verifyUser('global', async () => {
-      MFASheet.present();
-    });
-  };
-
-  const disable2fa = () => {
-    verifyUser('global', async () => {
-      await db.mfa?.disable();
-      let user = await db.user?.fetchUser();
-      useUserStore.getState().setUser(user);
-    });
-  };
-
-  const mfaSettingsList = user?.mfa?.isEnabled
-    ? [
-        {
-          name: user.mfa?.secondaryMethod
-            ? 'Reconfigure fallback 2FA method'
-            : 'Add fallback 2FA method',
-          func: () => {
-            verifyUser('global', async () => {
-              MFASheet.present(true);
-            });
-          },
-          desc: 'You can use fallback 2FA method incase you are unable to login via primary method'
-        },
-        {
-          name: 'View recovery codes',
-          func: () => {
-            verifyUser('global', async () => {
-              MFARecoveryCodes.present('sms');
-            });
-          },
-          desc: 'View and save recovery codes for to recover your account'
-        },
-        {
-          name: 'Disable two-factor authentication',
-          func: disable2fa,
-          desc: 'Decreased security for your account'
-        }
-      ]
-    : [
-        {
-          name: 'Enable two-factor authentication',
-          func: enable2fa,
-          desc: 'Increased security for your account'
-        }
-      ];
-
-  return (
-    <>
-      {!isSheet && (
-        <SectionHeader
-          collapsed={collapsed}
-          setCollapsed={setCollapsed}
-          title="Two Factor Authentication"
-        />
-      )}
-
-      {!collapsed && (
-        <>
-          {mfaSettingsList.map(item => (
-            //@ts-ignore
-            <CustomButton
-              key={item.name}
-              title={item.name}
-              tagline={item.desc}
-              onPress={item.func}
-            />
-          ))}
-        </>
-      )}
-    </>
-  );
-};
-
-export default TwoFactorAuth;
 
 const mfaMethods: MFAMethod[] = [
   {
@@ -151,7 +65,7 @@ type MFAStepProps = {
   method?: MFAMethod;
   isSetup?: boolean;
 };
-const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
+export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
 
@@ -209,7 +123,7 @@ const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
   );
 };
 
-const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
+export const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
   const colors = useThemeStore(state => state.colors);
   const user = useUserStore(state => state.user);
   const [authenticatorDetails, setAuthenticatorDetails] = useState({
@@ -437,7 +351,7 @@ const MFASetup = ({ method, onSuccess, setStep, recovery }: MFAStepProps) => {
   );
 };
 
-const MFARecoveryCodes = ({ method, recovery, onSuccess, isSetup = true }: MFAStepProps) => {
+export const MFARecoveryCodes = ({ method, recovery, onSuccess, isSetup = true }: MFAStepProps) => {
   const colors = useThemeStore(state => state.colors);
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -647,7 +561,7 @@ const MFASuccess = ({ recovery }: MFAStepProps) => {
   );
 };
 
-const MFASheet = ({ recovery }: { recovery?: boolean }) => {
+export const MFASheet = ({ recovery }: { recovery?: boolean }) => {
   const [step, setStep] = useState<MFAStep>({
     id: 'mfapick',
     props: {

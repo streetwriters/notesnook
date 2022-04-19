@@ -15,6 +15,7 @@ import { Empty } from './empty';
 import { Footer } from '../list-items/footer';
 import { Header } from '../list-items/headers/header';
 import { SectionHeader } from '../list-items/headers/section-header';
+import { tabBarRef } from '../../utils/global-refs';
 
 const renderItems = {
   note: NoteWrapper,
@@ -135,6 +136,9 @@ const List = ({
         data={_loading ? listData.slice(0, 9) : listData}
         renderItem={renderItem}
         onScroll={_onScroll}
+        onMomentumScrollEnd={() => {
+          tabBarRef.current?.unlock();
+        }}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
         keyboardShouldPersistTaps="always"

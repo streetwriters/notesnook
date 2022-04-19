@@ -38,7 +38,7 @@ export const NavigationStack = React.memo(
 
     React.useEffect(() => {
       (async () => {
-        let settings = await MMKV.getItem('appSettings');
+        let settings = MMKV.getString('appSettings');
         if (settings) {
           settings = JSON.parse(settings);
           homepage.current = settings.homepage;
@@ -83,8 +83,8 @@ export const NavigationStack = React.memo(
               <Stack.Screen name="NotesPage" component={Notes} />
               <Stack.Screen name="Tags" component={Tags} />
               <Stack.Screen name="Notebook" component={Notebook} />
-              <Stack.Screen name="Settings" component={Settings} />
               <Stack.Screen name="Search" component={Search} />
+              <Stack.Screen name="Settings" component={Settings} />
             </Stack.Navigator>
           ) : null}
         </NavigationContainer>

@@ -19,6 +19,7 @@ export const MenuItem = React.memo(
 
     const _onPress = event => {
       if (item.func) {
+        console.log('item.func called');
         item.func();
       } else {
         Navigation.navigate(

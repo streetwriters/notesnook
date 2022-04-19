@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeStore } from '../../stores/theme';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import SearchService from '../../services/search';
+import { useThemeStore } from '../../stores/theme';
 import { eScrollEvent } from '../../utils/events';
-import { IconButton } from '../ui/icon-button';
-import { SearchInput } from '../SearchInput';
 import { LeftMenus } from './left-menus';
 import { RightMenus } from './right-menus';
 import { Title } from './title';
 
 export const Header = React.memo(
-  ({ root, title, screen, isBack, color, action, rightButtons, notebook }) => {
+  ({ root, title, screen, isBack, color, action, rightButtons, notebook, onBackPress }) => {
     const colors = useThemeStore(state => state.colors);
     const insets = useSafeAreaInsets();
     const [hide, setHide] = useState(true);
@@ -48,7 +45,7 @@ export const Header = React.memo(
         ]}
       >
         <View style={styles.leftBtnContainer}>
-          <LeftMenus headerMenuState={!isBack} currentScreen={screen} />
+          <LeftMenus onBackPress={onBackPress} headerMenuState={!isBack} currentScreen={screen} />
 
           <Title
             notebook={notebook}

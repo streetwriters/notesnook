@@ -15,7 +15,7 @@ export const RightMenus = ({ currentScreen, action, rightButtons }) => {
   const menuRef = useRef();
   return (
     <View style={styles.rightBtnContainer}>
-      {currentScreen !== 'Settings' ? (
+      {!currentScreen.startsWith('Settings') ? (
         <IconButton
           onPress={async () => {
             Navigation.navigate('Search', {

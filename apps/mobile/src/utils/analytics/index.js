@@ -19,7 +19,7 @@ Mozilla/5.0 (Linux; Android 8.0.0; SM-G960F Build/R16NW) AppleWebKit/537.36 (KHT
  */
 async function canUpdateAnalytics(route, conditions = []) {
   if (!useSettingStore?.getState()?.settings?.telemetry) return false;
-  let eventsList = await MMKV.getItem('notesnookUserEvents');
+  let eventsList = MMKV.getString('notesnookUserEvents');
 
   if (eventsList) {
     eventsList = JSON.parse(eventsList);
@@ -42,14 +42,14 @@ async function canUpdateAnalytics(route, conditions = []) {
 }
 
 async function saveAnalytics(route, value = true) {
-  let eventsList = await MMKV.getItem('notesnookUserEvents');
+  let eventsList = MMKV.getString('notesnookUserEvents');
   if (eventsList) {
     eventsList = JSON.parse(eventsList);
   } else {
     eventsList = {};
   }
   eventsList[route] = value;
-  await MMKV.setItem('notesnookUserEvents', JSON.stringify(eventsList));
+  MMKV.setString('notesnookUserEvents', JSON.stringify(eventsList));
 }
 
 /**

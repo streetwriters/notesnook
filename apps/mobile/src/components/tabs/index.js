@@ -26,40 +26,36 @@ export default class Tabs extends Component {
   renderItem = ({ item, index }) => this.props.items[index];
 
   onMoveShouldSetResponder = event => {
-    if (this.locked) return;
-    if (this.responderAllowedScroll) return;
+    console.log(this.locked);
+    if (this.locked) return false;
+    if (this.responderAllowedScroll) return false;
     this.lastOffset = this.scrollOffset;
-    // let x = event.nativeEvent.pageX;
-    // let y = event.nativeEvent.pageY;
+    let x = event.nativeEvent.pageX;
     this.hideKeyboardIfVisible();
     let cOffset = this.scrollOffset.toFixed(0);
     let pOffset = this.props.offsets.b.toFixed(0);
-    // let heightCheck = !editing.tooltip
-    //   ? this.props.dimensions.height - 70
-    //   : this.props.dimensions.height - 140;
+    let aOffset = this.props.offsets.a.toFixed(0);
+    let page0Width = pOffset - aOffset;
 
-    if (DDS.isLargeTablet()) {
+    console.log(this.page, this.currentDrawerState);
+    if (
+      (this.page === 0 && !this.currentDrawerState && x > 80 && x < page0Width - 80) ||
+      DDS.isLargeTablet()
+    ) {
+      this.responderAllowedScroll = false;
       this.setScrollEnabled(false);
-      this.responderAllowedScroll = true;
-      return;
+      return false;
     }
 
     if (cOffset > pOffset - 50 || DDS.isSmallTab) {
-      // if (
-      //   (!DDS.isSmallTab && x > 50) ||
-      //   y > heightCheck ||
-      //   (DDS.isSmallTab && x > this.props.widths.b)
-      // ) {
       this.responderAllowedScroll = false;
       this.setScrollEnabled(false);
-      return;
-      // } else {
-      //   this.responderAllowedScroll = true;
-      //   this.setScrollEnabled(true);
-      //   return;
-      // }
+      return false;
     }
+
+    this.setScrollEnabled(true);
     this.responderAllowedScroll = true;
+    return false;
   };
 
   openDrawer = () => {
@@ -129,8 +125,12 @@ export default class Tabs extends Component {
     });
   };
 
+  unlock = () => {
+    this.locked = false;
+  };
+
   onTouchEnd = () => {
-    if (this.locked) return;
+    this.locked = false;
     this.responderAllowedScroll = false;
     this.setScrollEnabled(true);
   };
@@ -183,6 +183,7 @@ export default class Tabs extends Component {
   scrollEndTimeout = null;
 
   onScrollEnd = () => {
+    console.log('scroll end', this.scrollOffset);
     if (this.scrollEndTimeout) {
       clearTimeout(this.scrollEndTimeout);
       this.scrollEndTimeout = null;
@@ -256,10 +257,10 @@ export default class Tabs extends Component {
           alwaysBounceHorizontal={false}
           scrollToOverflowEnabled={false}
           scrollsToTop={false}
-          scrollEventThrottle={10}
-          directionalLockEnabled
+          scrollEventThrottle={5}
           overScrollMode="never"
           maxToRenderPerBatch={100}
+          directionalLockEnabled
           keyboardDismissMode="none"
           removeClippedSubviews={false}
           keyboardShouldPersistTaps="always"
