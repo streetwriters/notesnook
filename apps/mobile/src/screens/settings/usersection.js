@@ -169,7 +169,7 @@ const SettingsUserSection = ({ item }) => {
                 />
               ) : null} */}
 
-              <View>
+              {/* <View>
                 {user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC ? (
                   <View>
                     <Seperator />
@@ -213,9 +213,9 @@ const SettingsUserSection = ({ item }) => {
                     </Paragraph>
                   </View>
                 ) : null}
-              </View>
+              </View> */}
 
-              {user?.subscription?.provider &&
+              {/* {user?.subscription?.provider &&
               user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
               user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC &&
               SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
@@ -240,7 +240,7 @@ const SettingsUserSection = ({ item }) => {
                   height={20}
                   type="accent"
                 />
-              ) : null}
+              ) : null} */}
             </View>
           </View>
 

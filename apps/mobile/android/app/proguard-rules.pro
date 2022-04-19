@@ -48,3 +48,7 @@
 -keepclassmembers class * extends com.sun.jna.* { public *; }
 
 -keep class com.streetwriters.notesnook.BuildConfig { *; }
+
+# Reanimated 
+-keep class com.swmansion.reanimated.** { *; }
+-keep class com.facebook.react.turbomodule.** { *; }

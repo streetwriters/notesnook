@@ -33,6 +33,8 @@ import com.facebook.react.config.ReactFeatureFlags;
 import com.streetwriters.notesnook.newarchitecture.MainApplicationReactNativeHost;
 import cl.json.RNShareModule;
 import px.tooltips.RNTooltipsModule;
+import com.facebook.react.bridge.JSIModulePackage; // <- add  
+import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
@@ -101,6 +103,10 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                 @Override
                 protected String getJSMainModuleName() {
                     return "index";
+                }
+
+                 @Override protected JSIModulePackage getJSIModulePackage() {        
+                     return new ReanimatedJSIModulePackage(); // <- add      
                 }
             };
 
