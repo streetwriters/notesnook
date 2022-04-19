@@ -380,7 +380,7 @@ async function saveToMarkdown(note) {
     path = file.uri;
   }
 
-  let markdown = await db.notes.note(note.id).export('md', markdown);
+  let markdown = await db.notes.note(note.id).export('md');
   let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
 
   let fileUri;

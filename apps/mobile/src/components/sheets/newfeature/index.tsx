@@ -77,6 +77,7 @@ NewFeature.present = () => {
   SettingsService.set({
     version: APP_VERSION
   });
+  if (features.length === 0) return;
   presentSheet({
     component: <NewFeature features={features} />
   });

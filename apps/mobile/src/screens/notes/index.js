@@ -98,10 +98,12 @@ export const Notes = ({ route, navigation }) => {
 
   const setActionAfterFirstSave = () => {
     if (params.current?.get === 'monographs') return;
+    console.log(params.current);
     editing.actionAfterFirstSave = {
       type: params.current?.type,
       id: params.current?.id,
-      notebook: params.current?.notebookId
+      notebook: params.current?.notebookId,
+      color: params.current.title
     };
   };
 

@@ -746,7 +746,8 @@ async function addToCollection(id) {
       break;
     }
     case 'color': {
-      await db.notes.note(id).color(editing.actionAfterFirstSave.id);
+      console.log('after save action:', editing.actionAfterFirstSave.name);
+      await db.notes.note(id).color(editing.actionAfterFirstSave.color);
       editing.actionAfterFirstSave = {
         type: null
       };

@@ -1,6 +1,7 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import { getLinkPreview } from 'link-preview-js';
 import { HTMLRootElement } from 'node-html-parser/dist/nodes/html';
+import { parseHTML } from 'notes-core/utils/htmlparser';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -8,18 +9,16 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Modal,
-  NativeModules,
   Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
-  UIManager,
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, { acc, Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
@@ -32,7 +31,6 @@ import Storage from '../src/utils/database/storage';
 import { sleep } from '../src/utils/time';
 import { Search } from './search';
 import { useShareStore } from './store';
-
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
 async function sanitizeHtml(site) {
@@ -114,8 +112,6 @@ function removeInvalidElements(document) {
  * @param {HTMLRootElement} document
  */
 function replaceSrcWithAbsoluteUrls(document, baseUrl) {
-  console.log('parsing:', document);
-
   let images = document.querySelectorAll('img');
   console.log(images.length);
   for (var i = 0; i < images.length; i++) {
@@ -145,7 +141,7 @@ function replaceSrcWithAbsoluteUrls(document, baseUrl) {
  */
 function fixCodeBlocks(document) {
   let elements = document.querySelectorAll('code,pre');
-  console.log(elements.length);
+
   for (let element of elements) {
     element.classList.add('.hljs');
   }
@@ -153,13 +149,11 @@ function fixCodeBlocks(document) {
 }
 
 function sanitize(html, baseUrl) {
-  let { parse } = require('node-html-parser');
-  let parser = parse(html);
+  let parser = parseHTML(html);
   parser = wrapTablesWithDiv(parser);
   parser = removeInvalidElements(parser);
   parser = replaceSrcWithAbsoluteUrls(parser, baseUrl);
   parser = fixCodeBlocks(parser);
-
   let htmlString = parser.outerHTML;
 
   htmlString = htmlString + `<hr>${makeHtmlFromUrl(baseUrl)}`;

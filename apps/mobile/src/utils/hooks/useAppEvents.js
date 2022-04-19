@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
-import { doInBackground, editing } from '..';
+import { editing } from '..';
 import { Walkthrough } from '../../components/walkthroughs';
 import {
   EditorWebView,
@@ -37,7 +37,7 @@ import {
 } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import Sync, { ignoredMessages } from '../../services/sync';
+import Sync from '../../services/sync';
 import {
   clearAllStores,
   initialize,
