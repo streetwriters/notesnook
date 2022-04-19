@@ -12,6 +12,7 @@ import { ColorPicker, DEFAULT_COLORS } from "../tools/colors";
 import { FloatingMenuProps } from "./types";
 import { selectedRect, TableMap, TableRect } from "prosemirror-tables";
 import { Transaction } from "prosemirror-state";
+import { MenuItem } from "../../components/menu/types";
 
 export function TableRowFloatingMenu(props: FloatingMenuProps) {
   const { editor } = props;
@@ -22,7 +23,14 @@ export function TableRowFloatingMenu(props: FloatingMenuProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!editor.isActive("tableRow")) return;
+    if (
+      !editor.isActive("tableCell") &&
+      !editor.isActive("tableRow") &&
+      !editor.isActive("tableHeader")
+    ) {
+      setPosition(null);
+      return;
+    }
 
     let { $from } = editor.state.selection;
 
@@ -137,6 +145,10 @@ export function TableColumnFloatingMenu(props: FloatingMenuProps) {
   const [position, setPosition] = useState<MenuOptions["position"] | null>(
     null
   );
+  const isInsideCellSelection =
+    !editor.state.selection.empty &&
+    editor.state.selection.$anchor.node().type.name === "tableCell";
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showCellProps, setShowCellProps] = useState(false);
   const [menuPosition, setMenuPosition] = useState<
@@ -144,8 +156,14 @@ export function TableColumnFloatingMenu(props: FloatingMenuProps) {
   >(null);
 
   useEffect(() => {
-    if (!editor.isActive("tableRow")) return;
-
+    if (
+      !editor.isActive("tableCell") &&
+      !editor.isActive("tableRow") &&
+      !editor.isActive("tableHeader")
+    ) {
+      setPosition(null);
+      return;
+    }
     let { $from } = editor.state.selection;
 
     const selectedNode = $from.node();
@@ -173,6 +191,89 @@ export function TableColumnFloatingMenu(props: FloatingMenuProps) {
   }, [editor.state.selection]);
 
   if (!position) return null;
+
+  const columnProperties: MenuItem[] = [
+    {
+      key: "addColumnLeft",
+      type: "menuitem",
+      title: "Add column left",
+      onClick: () => editor.chain().focus().addColumnBefore().run(),
+      icon: "insertColumnLeft",
+    },
+    {
+      key: "addColumnRight",
+      type: "menuitem",
+      title: "Add column right",
+      onClick: () => editor.chain().focus().addColumnAfter().run(),
+      icon: "insertColumnRight",
+    },
+    {
+      key: "moveColumnLeft",
+      type: "menuitem",
+      title: "Move column left",
+      onClick: () => moveColumnLeft(editor),
+      icon: "moveColumnLeft",
+    },
+    {
+      key: "moveColumnRight",
+      type: "menuitem",
+      title: "Move column right",
+      onClick: () => moveColumnRight(editor),
+      icon: "moveColumnRight",
+    },
+    {
+      key: "deleteColumn",
+      type: "menuitem",
+      title: "Delete column",
+      onClick: () => editor.chain().focus().deleteColumn().run(),
+      icon: "deleteColumn",
+    },
+  ];
+
+  const mergeSplitProperties: MenuItem[] = [
+    {
+      key: "splitCells",
+      type: "menuitem",
+      title: "Split cells",
+      onClick: () => editor.chain().focus().splitCell().run(),
+      icon: "splitCells",
+    },
+    {
+      key: "mergeCells",
+      type: "menuitem",
+      title: "Merge cells",
+      onClick: () => editor.chain().focus().mergeCells().run(),
+      icon: "mergeCells",
+    },
+  ];
+
+  const cellProperties: MenuItem[] = [
+    {
+      key: "cellProperties",
+      type: "menuitem",
+      title: "Cell properties",
+      onClick: () => {
+        setShowCellProps(true);
+        setMenuPosition({
+          target: position.target || undefined,
+          isTargetAbsolute: true,
+          yOffset: 10,
+          location: "below",
+        });
+      },
+      icon: "cellProperties",
+    },
+  ];
+
+  const tableProperties: MenuItem[] = [
+    {
+      key: "deleteTable",
+      type: "menuitem",
+      title: "Delete table",
+      icon: "deleteTable",
+      onClick: () => editor.chain().focus().deleteTable().run(),
+    },
+  ];
 
   return (
     <MenuPresenter
@@ -208,7 +309,7 @@ export function TableColumnFloatingMenu(props: FloatingMenuProps) {
           toggled={false}
           title="Insert column right"
           id="insertColumnRight"
-          icon="insertColumnRight"
+          icon="plus"
           onClick={() => editor.chain().focus().addColumnAfter().run()}
           sx={{ mr: 0, p: "3px", borderRadius: "small" }}
           iconSize={16}
@@ -225,58 +326,17 @@ export function TableColumnFloatingMenu(props: FloatingMenuProps) {
           type: "menu",
           position: {},
         }}
-        items={[
-          {
-            key: "addColumnAbove",
-            type: "menuitem",
-            title: "Add column left",
-            onClick: () => editor.chain().focus().addColumnBefore().run(),
-            icon: "insertColumnLeft",
-          },
-          {
-            key: "moveColumnLeft",
-            type: "menuitem",
-            title: "Move column left",
-            onClick: () => moveColumnLeft(editor),
-            icon: "moveColumnLeft",
-          },
-          {
-            key: "moveColumnRight",
-            type: "menuitem",
-            title: "Move column right",
-            onClick: () => moveColumnRight(editor),
-            icon: "moveColumnRight",
-          },
-          {
-            key: "deleteColumn",
-            type: "menuitem",
-            title: "Delete column",
-            onClick: () => editor.chain().focus().deleteColumn().run(),
-            icon: "deleteColumn",
-          },
-          {
-            key: "sortDesc",
-            type: "menuitem",
-            title: "Sort descending",
-            onClick: () => {},
-            icon: "sortDesc",
-          },
-          {
-            key: "cellProperties",
-            type: "menuitem",
-            title: "Cell properties",
-            onClick: () => {
-              setShowCellProps(true);
-              setMenuPosition({
-                target: position.target || undefined,
-                isTargetAbsolute: true,
-                yOffset: 10,
-                location: "below",
-              });
-            },
-            icon: "cellProperties",
-          },
-        ]}
+        items={
+          isInsideCellSelection
+            ? [...mergeSplitProperties, ...cellProperties]
+            : [
+                ...columnProperties,
+                { type: "seperator", key: "cellSeperator" },
+                ...cellProperties,
+                { type: "seperator", key: "tableSeperator" },
+                ...tableProperties,
+              ]
+        }
       />
 
       <MenuPresenter

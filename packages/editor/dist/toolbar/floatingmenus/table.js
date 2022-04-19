@@ -45,6 +45,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Slider } from "@rebass/forms";
 import { useEffect, useRef, useState } from "react";
@@ -61,8 +70,12 @@ export function TableRowFloatingMenu(props) {
     var _b = useState(false), isMenuOpen = _b[0], setIsMenuOpen = _b[1];
     useEffect(function () {
         var _a;
-        if (!editor.isActive("tableRow"))
+        if (!editor.isActive("tableCell") &&
+            !editor.isActive("tableRow") &&
+            !editor.isActive("tableHeader")) {
+            setPosition(null);
             return;
+        }
         var $from = editor.state.selection.$from;
         var selectedNode = $from.node();
         var pos = selectedNode.isTextblock ? $from.before() : $from.pos;
@@ -135,13 +148,19 @@ export function TableColumnFloatingMenu(props) {
     var _this = this;
     var editor = props.editor;
     var _a = useState(null), position = _a[0], setPosition = _a[1];
+    var isInsideCellSelection = !editor.state.selection.empty &&
+        editor.state.selection.$anchor.node().type.name === "tableCell";
     var _b = useState(false), isMenuOpen = _b[0], setIsMenuOpen = _b[1];
     var _c = useState(false), showCellProps = _c[0], setShowCellProps = _c[1];
     var _d = useState(null), menuPosition = _d[0], setMenuPosition = _d[1];
     useEffect(function () {
         var _a;
-        if (!editor.isActive("tableRow"))
+        if (!editor.isActive("tableCell") &&
+            !editor.isActive("tableRow") &&
+            !editor.isActive("tableHeader")) {
+            setPosition(null);
             return;
+        }
         var $from = editor.state.selection.$from;
         var selectedNode = $from.node();
         var pos = selectedNode.isTextblock ? $from.before() : $from.pos;
@@ -164,6 +183,85 @@ export function TableColumnFloatingMenu(props) {
     }, [editor.state.selection]);
     if (!position)
         return null;
+    var columnProperties = [
+        {
+            key: "addColumnLeft",
+            type: "menuitem",
+            title: "Add column left",
+            onClick: function () { return editor.chain().focus().addColumnBefore().run(); },
+            icon: "insertColumnLeft",
+        },
+        {
+            key: "addColumnRight",
+            type: "menuitem",
+            title: "Add column right",
+            onClick: function () { return editor.chain().focus().addColumnAfter().run(); },
+            icon: "insertColumnRight",
+        },
+        {
+            key: "moveColumnLeft",
+            type: "menuitem",
+            title: "Move column left",
+            onClick: function () { return moveColumnLeft(editor); },
+            icon: "moveColumnLeft",
+        },
+        {
+            key: "moveColumnRight",
+            type: "menuitem",
+            title: "Move column right",
+            onClick: function () { return moveColumnRight(editor); },
+            icon: "moveColumnRight",
+        },
+        {
+            key: "deleteColumn",
+            type: "menuitem",
+            title: "Delete column",
+            onClick: function () { return editor.chain().focus().deleteColumn().run(); },
+            icon: "deleteColumn",
+        },
+    ];
+    var mergeSplitProperties = [
+        {
+            key: "splitCells",
+            type: "menuitem",
+            title: "Split cells",
+            onClick: function () { return editor.chain().focus().splitCell().run(); },
+            icon: "splitCells",
+        },
+        {
+            key: "mergeCells",
+            type: "menuitem",
+            title: "Merge cells",
+            onClick: function () { return editor.chain().focus().mergeCells().run(); },
+            icon: "mergeCells",
+        },
+    ];
+    var cellProperties = [
+        {
+            key: "cellProperties",
+            type: "menuitem",
+            title: "Cell properties",
+            onClick: function () {
+                setShowCellProps(true);
+                setMenuPosition({
+                    target: position.target || undefined,
+                    isTargetAbsolute: true,
+                    yOffset: 10,
+                    location: "below",
+                });
+            },
+            icon: "cellProperties",
+        },
+    ];
+    var tableProperties = [
+        {
+            key: "deleteTable",
+            type: "menuitem",
+            title: "Delete table",
+            icon: "deleteTable",
+            onClick: function () { return editor.chain().focus().deleteTable().run(); },
+        },
+    ];
     return (_jsxs(MenuPresenter, __assign({ isOpen: true, items: [], onClose: function () { }, options: {
             type: "autocomplete",
             position: position,
@@ -177,64 +275,18 @@ export function TableColumnFloatingMenu(props) {
                     },
                 } }, { children: [_jsx(ToolButton, { toggled: isMenuOpen, title: "Column properties", id: "properties", icon: "more", onClick: function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
                             return [2 /*return*/, setIsMenuOpen(true)];
-                        }); }); }, iconSize: 16, sx: { mr: 0, p: "3px", borderRadius: "small" } }), _jsx(ToolButton, { toggled: false, title: "Insert column right", id: "insertColumnRight", icon: "insertColumnRight", onClick: function () { return editor.chain().focus().addColumnAfter().run(); }, sx: { mr: 0, p: "3px", borderRadius: "small" }, iconSize: 16 })] })), _jsx(MenuPresenter, { isOpen: isMenuOpen, onClose: function () {
+                        }); }); }, iconSize: 16, sx: { mr: 0, p: "3px", borderRadius: "small" } }), _jsx(ToolButton, { toggled: false, title: "Insert column right", id: "insertColumnRight", icon: "plus", onClick: function () { return editor.chain().focus().addColumnAfter().run(); }, sx: { mr: 0, p: "3px", borderRadius: "small" }, iconSize: 16 })] })), _jsx(MenuPresenter, { isOpen: isMenuOpen, onClose: function () {
                     setIsMenuOpen(false);
                     editor.commands.focus();
                 }, options: {
                     type: "menu",
                     position: {},
-                }, items: [
-                    {
-                        key: "addColumnAbove",
-                        type: "menuitem",
-                        title: "Add column left",
-                        onClick: function () { return editor.chain().focus().addColumnBefore().run(); },
-                        icon: "insertColumnLeft",
-                    },
-                    {
-                        key: "moveColumnLeft",
-                        type: "menuitem",
-                        title: "Move column left",
-                        onClick: function () { return moveColumnLeft(editor); },
-                        icon: "moveColumnLeft",
-                    },
-                    {
-                        key: "moveColumnRight",
-                        type: "menuitem",
-                        title: "Move column right",
-                        onClick: function () { return moveColumnRight(editor); },
-                        icon: "moveColumnRight",
-                    },
-                    {
-                        key: "deleteColumn",
-                        type: "menuitem",
-                        title: "Delete column",
-                        onClick: function () { return editor.chain().focus().deleteColumn().run(); },
-                        icon: "deleteColumn",
-                    },
-                    {
-                        key: "sortDesc",
-                        type: "menuitem",
-                        title: "Sort descending",
-                        onClick: function () { },
-                        icon: "sortDesc",
-                    },
-                    {
-                        key: "cellProperties",
-                        type: "menuitem",
-                        title: "Cell properties",
-                        onClick: function () {
-                            setShowCellProps(true);
-                            setMenuPosition({
-                                target: position.target || undefined,
-                                isTargetAbsolute: true,
-                                yOffset: 10,
-                                location: "below",
-                            });
-                        },
-                        icon: "cellProperties",
-                    },
-                ] }), _jsx(MenuPresenter, __assign({ isOpen: showCellProps, onClose: function () {
+                }, items: isInsideCellSelection
+                    ? __spreadArray(__spreadArray([], mergeSplitProperties, true), cellProperties, true) : __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], columnProperties, true), [
+                    { type: "seperator", key: "cellSeperator" }
+                ], false), cellProperties, true), [
+                    { type: "seperator", key: "tableSeperator" }
+                ], false), tableProperties, true) }), _jsx(MenuPresenter, __assign({ isOpen: showCellProps, onClose: function () {
                     setShowCellProps(false);
                     editor.commands.focus();
                 }, options: {

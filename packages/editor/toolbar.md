@@ -67,6 +67,6 @@ Total Tools:
 - [x] image
 - [x] attachment
 - [] media
-- [] table
+- [x] table
 - [x] ltr rtl
 - [] searchreplace

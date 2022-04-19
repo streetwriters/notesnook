@@ -44,7 +44,11 @@ export declare const Icons: {
     cellProperties: string;
     backgroundColor: string;
     borderColor: string;
+    plus: string;
     close: string;
     sortDesc: string;
+    deleteTable: string;
+    mergeCells: string;
+    splitCells: string;
 };
 export declare type IconNames = keyof typeof Icons;

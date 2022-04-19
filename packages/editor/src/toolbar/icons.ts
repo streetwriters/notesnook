@@ -47,6 +47,9 @@ import {
   mdiArrowExpandLeft,
   mdiArrowExpandDown,
   mdiArrowExpandUp,
+  mdiTrashCanOutline,
+  mdiTableMergeCells,
+  mdiTableSplitCell,
 } from "@mdi/js";
 
 export const Icons = {
@@ -87,7 +90,7 @@ export const Icons = {
   moveRowUp: mdiArrowExpandUp,
   deleteRow: mdiTableRowRemove,
   toggleHeaderRow: mdiTableBorder,
-  insertColumnRight: mdiPlus,
+  insertColumnRight: mdiTableColumnPlusAfter,
   insertColumnLeft: mdiTableColumnPlusBefore,
   moveColumnRight: mdiArrowExpandRight,
   moveColumnLeft: mdiArrowExpandLeft,
@@ -95,8 +98,12 @@ export const Icons = {
   cellProperties: mdiSquareRoundedBadgeOutline,
   backgroundColor: mdiFormatColorFill,
   borderColor: mdiBorderAllVariant,
+  plus: mdiPlus,
   close: mdiClose,
   sortDesc: mdiSortDescending,
+  deleteTable: mdiTrashCanOutline,
+  mergeCells: mdiTableMergeCells,
+  splitCells: mdiTableSplitCell,
 };
 
 export type IconNames = keyof typeof Icons;
