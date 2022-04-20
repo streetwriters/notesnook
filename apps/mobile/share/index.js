@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   Alert,
   Keyboard,
-  KeyboardAvoidingView,
   Modal,
   Platform,
   SafeAreaView,
@@ -17,7 +16,6 @@ import {
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, { EasingNode, timing, useValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
@@ -30,8 +28,6 @@ import Storage from '../src/utils/database/storage';
 import { sleep } from '../src/utils/time';
 import { Search } from './search';
 import { useShareStore } from './store';
-const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
-const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
 async function sanitizeHtml(site) {
   try {
     let html = await fetch(site);
@@ -188,27 +184,9 @@ const NotesnookShare = ({ quicknote = false }) => {
   const keyboardHeight = useRef(0);
   const { width, height } = useWindowDimensions();
   const webviewRef = useRef();
-  const opacity = useValue(0);
-  const translate = useValue(1000);
   const insets = Platform.OS === 'android' ? { top: StatusBar.currentHeight } : useSafeAreaInsets();
-  const prevAnimation = useRef(null);
   const [showSearch, setShowSearch] = useState(false);
   const [kh, setKh] = useState(0);
-
-  const animate = (opacityV, translateV) => {
-    prevAnimation.current = translateV;
-    if (Platform.OS === 'ios') return;
-    timing(opacity, {
-      toValue: opacityV,
-      duration: 300,
-      easing: EasingNode.in(EasingNode.ease)
-    }).start();
-    timing(translate, {
-      toValue: translateV,
-      duration: 300,
-      easing: EasingNode.in(EasingNode.ease)
-    }).start();
-  };
 
   const onKeyboardDidShow = event => {
     let kHeight = event.endCoordinates.height;
@@ -287,7 +265,6 @@ const NotesnookShare = ({ quicknote = false }) => {
     loadData();
     useShareStore.getState().restoreAppendNote();
     sleep(50).then(() => {
-      animate(1, 0);
       sleep(500).then(r => {
         Storage.write('shareExtensionOpened', 'opened');
       });
@@ -295,8 +272,6 @@ const NotesnookShare = ({ quicknote = false }) => {
   }, []);
 
   const close = async () => {
-    animate(0, 1000);
-    await sleep(300);
     setNote({ ...defaultNote });
     setLoadingIntent(true);
     if (quicknote) {
@@ -464,11 +439,10 @@ const NotesnookShare = ({ quicknote = false }) => {
 
   return (
     <Outer {...outerProps}>
-      <AnimatedSAV
+      <SafeAreaView
         style={{
           width: width > 500 ? 500 : width,
           height: height - kh,
-          opacity: Platform.OS !== 'ios' ? opacity : 1,
           alignSelf: 'center',
           justifyContent: 'flex-end'
         }}
@@ -495,7 +469,6 @@ const NotesnookShare = ({ quicknote = false }) => {
                 if (showSearch) {
                   console.log('hide search');
                   setShowSearch(false);
-                  animate(1, 0);
                 } else {
                   close();
                 }
@@ -538,7 +511,6 @@ const NotesnookShare = ({ quicknote = false }) => {
               if (showSearch) {
                 console.log('hide search');
                 setShowSearch(false);
-                animate(1, 0);
               } else {
                 close();
               }
@@ -567,7 +539,6 @@ const NotesnookShare = ({ quicknote = false }) => {
             getKeyboardHeight={() => keyboardHeight.current}
             close={() => {
               setShowSearch(false);
-              animate(1, 0);
             }}
           />
         ) : null}
@@ -625,7 +596,6 @@ const NotesnookShare = ({ quicknote = false }) => {
                 color={colors.nav}
                 onPress={() => {
                   setShowSearch(true);
-                  animate(1, 1000);
                 }}
                 icon="text-short"
                 iconSize={18}
@@ -793,7 +763,7 @@ const NotesnookShare = ({ quicknote = false }) => {
             />
           </View>
         </View>
-      </AnimatedSAV>
+      </SafeAreaView>
     </Outer>
   );
 };

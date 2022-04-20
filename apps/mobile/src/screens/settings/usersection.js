@@ -1,23 +1,13 @@
 import dayjs from 'dayjs';
 import React from 'react';
-import { Linking, Platform, View } from 'react-native';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from '../../components/ui/button';
-import Seperator from '../../components/ui/seperator';
 import { TimeSince } from '../../components/ui/time-since';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
-import PremiumService from '../../services/premium';
 import { useUserStore } from '../../stores/stores';
 import { useThemeStore } from '../../stores/theme';
-import {
-  SUBSCRIPTION_PROVIDER,
-  SUBSCRIPTION_STATUS,
-  SUBSCRIPTION_STATUS_STRINGS
-} from '../../utils/constants';
-import { eOpenPremiumDialog } from '../../utils/events';
-import { usePricing } from '../../utils/hooks/use-pricing';
+import { SUBSCRIPTION_STATUS_STRINGS } from '../../utils/constants';
 import { SIZE } from '../../utils/size';
 import { SectionItem } from './section-item';
 
@@ -34,45 +24,18 @@ const SettingsUserSection = ({ item }) => {
 
   const user = useUserStore(state => state.user);
   const subscriptionDaysLeft = user && getTimeLeft(parseInt(user.subscription?.expiry));
-  const isExpired = user && subscriptionDaysLeft.time < 0;
-  const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
-  const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
-  const monthlyPlan = usePricing('monthly');
-  const isBasic = user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
-  const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-  const isPro = user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM;
-  const isNotPro =
-    user?.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
-    user?.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
+  // const isExpired = user && subscriptionDaysLeft.time < 0;
+  // const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
+  // const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
+  // const monthlyPlan = usePricing('monthly');
+  // const isBasic = user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+  // const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+  // const isPro = user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM;
+  // const isNotPro =
+  //   user?.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+  //   user?.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
 
   const lastSynced = useUserStore(state => state.lastSynced);
-
-  const manageSubscription = () => {
-    if (!user.isEmailConfirmed) {
-      PremiumService.showVerifyEmailDialog();
-      return;
-    }
-    if (
-      user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-      Platform.OS === 'android'
-    ) {
-      if (user.subscription?.provider === 3) {
-        ToastEvent.show({
-          heading: 'Subscribed on web',
-          message: 'Open your web browser to manage your subscription.',
-          type: 'success'
-        });
-        return;
-      }
-      Linking.openURL(
-        Platform.OS === 'ios'
-          ? 'https://apps.apple.com/account/subscriptions'
-          : 'https://play.google.com/store/account/subscriptions'
-      );
-    } else {
-      eSendEvent(eOpenPremiumDialog);
-    }
-  };
 
   return (
     <>

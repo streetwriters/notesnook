@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useThemeStore } from '../../../stores/theme';
-import { useSettingStore } from '../../../stores/stores';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
+import { useSettingStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/theme';
 import { history } from '../../../utils';
 import { PressableButton } from '../../ui/pressable';
 import { ActionStrip } from './action-strip';
@@ -61,8 +61,6 @@ const SelectionWrapper = ({ children, item, background, onLongPress, onPress, te
         paddingVertical: compactMode ? 8 : 12
       }}
     >
-      {actionStrip ? <ActionStrip note={item} setActionStrip={setActionStrip} /> : null}
-
       {item.type === 'note' ? <Filler background={background} item={item} /> : null}
       <SelectionIcon
         compactMode={compactMode}
@@ -71,6 +69,8 @@ const SelectionWrapper = ({ children, item, background, onLongPress, onPress, te
         onLongPress={onLongPress}
       />
       {children}
+
+      {actionStrip ? <ActionStrip note={item} setActionStrip={setActionStrip} /> : null}
     </PressableButton>
   );
 };

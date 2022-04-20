@@ -37,7 +37,7 @@ export default class Tabs extends Component {
     let page0Width = pOffset - aOffset;
 
     if (
-      (this.page === 0 && !this.currentDrawerState && x > 80 && x < page0Width - 80) ||
+      (this.page === 0 && !this.currentDrawerState && x > 100 && x < page0Width - 100) ||
       DDS.isLargeTablet()
     ) {
       this.responderAllowedScroll = false;

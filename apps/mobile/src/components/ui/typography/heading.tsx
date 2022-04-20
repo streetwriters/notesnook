@@ -1,19 +1,24 @@
 import React from 'react';
 import { Platform, TextProps } from 'react-native';
 import { Text } from 'react-native';
+import Animated, { ComplexAnimationBuilder, Layout } from 'react-native-reanimated';
 import { useThemeStore } from '../../../stores/theme';
 import { SIZE } from '../../../utils/size';
 
 interface HeadingProps extends TextProps {
   color?: string;
   size?: number;
+  layout?: ComplexAnimationBuilder;
 }
+
+const AnimatedText = Animated.createAnimatedComponent(Text);
 
 const Heading = ({ color, size = SIZE.xl, style, ...restProps }: HeadingProps) => {
   const colors = useThemeStore(state => state.colors);
 
   return (
-    <Text
+    <AnimatedText
+      layout={restProps.layout || Layout}
       allowFontScaling={true}
       maxFontSizeMultiplier={1}
       {...restProps}
@@ -26,7 +31,7 @@ const Heading = ({ color, size = SIZE.xl, style, ...restProps }: HeadingProps) =
         },
         style
       ]}
-    ></Text>
+    ></AnimatedText>
   );
 };
 

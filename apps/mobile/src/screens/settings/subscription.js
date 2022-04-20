@@ -4,19 +4,19 @@ import { Button } from '../../components/ui/button';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
 import { useUserStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
 import { SUBSCRIPTION_PROVIDER, SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { eOpenPremiumDialog } from '../../utils/events';
 import { usePricing } from '../../utils/hooks/use-pricing';
 import { SIZE } from '../../utils/size';
 
 export const Subscription = () => {
-  const user: any = useUserStore(state => state.user);
+  const user = useUserStore(state => state.user);
   const monthlyPlan = usePricing('monthly');
-  const colors = useThemeStore(state => state.colors);
   const isNotPro =
     user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
     user.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
+
+  const subscriptionProviderInfo = SUBSCRIPTION_PROVIDER[user?.subscription?.provider];
 
   const manageSubscription = () => {
     if (!user.isEmailConfirmed) {
@@ -77,28 +77,24 @@ export const Subscription = () => {
         />
       ) : null}
 
-      {user?.subscription?.provider &&
+      {subscriptionProviderInfo &&
       user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
-      user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC &&
-      SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
+      user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC ? (
         <Button
-          title={SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title}
+          title={subscriptionProviderInfo?.title}
           onPress={() => {
             presentSheet({
-              title: SUBSCRIPTION_PROVIDER[user?.subscription?.provider].title,
-              paragraph: SUBSCRIPTION_PROVIDER[user?.subscription?.provider].desc
+              title: subscriptionProviderInfo.title,
+              paragraph: subscriptionProviderInfo.desc
             });
           }}
           style={{
             alignSelf: 'flex-start',
-            paddingHorizontal: 0
+            borderRadius: 100
           }}
           fontSize={SIZE.sm}
-          textStyle={{
-            fontWeight: 'normal'
-          }}
           height={30}
-          type="transparent"
+          type="grayAccent"
         />
       ) : null}
     </View>

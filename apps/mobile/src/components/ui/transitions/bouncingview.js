@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import Animated, { EasingNode, timing } from 'react-native-reanimated';
+import React, { useEffect } from 'react';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
 
 export const BouncingView = ({
   children,
@@ -8,37 +13,30 @@ export const BouncingView = ({
   animated = true,
   initialScale = 0.9
 }) => {
-  const scale = Animated.useValue(!animated ? 1 : initialScale);
+  const scale = useSharedValue(!animated ? 1 : initialScale);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: !animated ? 1 : scale.value
+        }
+      ]
+    };
+  });
 
   useEffect(() => {
     if (!animated) return;
-    scale.setValue(initialScale);
-    timing(scale, {
-      toValue: 1,
+    scale.value = initialScale;
+    scale.value = withTiming(1, {
       duration: duration,
-      easing: EasingNode.elastic(1)
-    }).start();
-
+      easing: Easing.elastic(1)
+    });
     return () => {
       if (!animated) return;
-      scale.setValue(initialScale);
+      scale.value = initialScale;
     };
   }, []);
 
-  return (
-    <Animated.View
-      style={[
-        {
-          transform: [
-            {
-              scale: !animated ? 1 : scale
-            }
-          ]
-        },
-        style
-      ]}
-    >
-      {children}
-    </Animated.View>
-  );
+  return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
 };

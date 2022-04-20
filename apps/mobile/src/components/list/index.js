@@ -1,21 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
 import { notesnook } from '../../../e2e/test.ids';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
 import { eSendEvent } from '../../services/event-manager';
 import Sync from '../../services/sync';
+import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/theme';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/events';
+import { tabBarRef } from '../../utils/global-refs';
 import JumpToSectionDialog from '../dialogs/jump-to-section';
-import { NotebookWrapper } from '../list-items/notebook/wrapper';
-import { NoteWrapper } from '../list-items/note/wrapper';
-import TagItem from '../list-items/tag';
-import { Empty } from './empty';
 import { Footer } from '../list-items/footer';
 import { Header } from '../list-items/headers/header';
 import { SectionHeader } from '../list-items/headers/section-header';
-import { tabBarRef } from '../../utils/global-refs';
+import { NoteWrapper } from '../list-items/note/wrapper';
+import { NotebookWrapper } from '../list-items/notebook/wrapper';
+import TagItem from '../list-items/tag';
+import { Empty } from './empty';
 
 const renderItems = {
   note: NoteWrapper,

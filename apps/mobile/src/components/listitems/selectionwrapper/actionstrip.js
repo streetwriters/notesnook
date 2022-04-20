@@ -1,22 +1,22 @@
+import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import Clipboard from '@react-native-clipboard/clipboard';
-import Animated, { useValue } from 'react-native-reanimated';
-import { useThemeStore } from '../../../stores/theme';
+import Animated, { SlideInUp, SlideOutDown, useValue } from 'react-native-reanimated';
+import { openVault, ToastEvent } from '../../../services/event-manager';
+import Navigation from '../../../services/navigation';
 import {
   useMenuStore,
   useNotebookStore,
   useSelectionStore,
   useTrashStore
 } from '../../../stores/stores';
-import { openVault, ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
+import { useThemeStore } from '../../../stores/theme';
 import { dWidth, getElevation, toTXT } from '../../../utils';
 import { db } from '../../../utils/database';
 import { deleteItems } from '../../../utils/functions';
-import { IconButton } from '../../ui/icon-button';
-import { Button } from '../../ui/button';
 import { presentDialog } from '../../dialog/functions';
+import { Button } from '../../ui/button';
+import { IconButton } from '../../ui/icon-button';
 
 export const ActionStrip = ({ note, setActionStrip }) => {
   const colors = useThemeStore(state => state.colors);
@@ -41,15 +41,6 @@ export const ActionStrip = ({ note, setActionStrip }) => {
       Navigation.routeNames.Notes
     ]);
   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      opacity.setValue(1);
-    }, 100);
-    return () => {
-      opacity.setValue(0);
-    };
-  }, [width]);
 
   const actions = [
     {
@@ -233,15 +224,16 @@ export const ActionStrip = ({ note, setActionStrip }) => {
       onLayout={event => {
         setWidth(event.nativeEvent.layout.width);
       }}
+      entering={SlideInUp.springify().mass(0.4)}
+      exiting={SlideOutDown}
       style={{
         position: 'absolute',
-        zIndex: 20,
+        zIndex: 999,
         width: '102%',
         height: '100%',
         flexDirection: 'row',
         justifyContent: 'flex-end',
-        alignItems: 'center',
-        opacity: opacity
+        alignItems: 'center'
       }}
     >
       <Button

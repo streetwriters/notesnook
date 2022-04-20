@@ -1,84 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import Animated, { EasingNode } from 'react-native-reanimated';
-import { useThemeStore } from '../../stores/theme';
+import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
+import { EditorWebView } from '../../screens/editor/Functions';
+import tiny from '../../screens/editor/tiny/tiny';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { dWidth, editing, getElevation } from '../../utils';
+import { useThemeStore } from '../../stores/theme';
+import { editing, getElevation } from '../../utils';
 import { eCloseActionSheet, eOpenPremiumDialog, eShowGetPremium } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
-import { EditorWebView } from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
 import { Button } from '../ui/button';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
-export const translatePrem = new Animated.Value(-dWidth);
-export const opacityPrem = new Animated.Value(0);
-let timer = null;
-let currentMsg = {
-  title: '',
-  desc: ''
-};
 export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
   const colors = useThemeStore(state => state.colors);
-  const [msg, setMsg] = useState(currentMsg);
+  const [msg, setMsg] = useState(null);
+  const timer = useRef();
 
   const open = event => {
     if (!event) {
-      if (timer !== null) {
-        clearTimeout(timer);
-        timer = null;
-      }
-      currentMsg = {
-        title: '',
-        desc: ''
-      };
-      setMsg(currentMsg);
-      opacityPrem.setValue(0);
-      translatePrem.setValue(-dWidth);
+      clearTimeout(timer);
+      timer.current = null;
+      setMsg(null);
       return;
     }
 
-    if (event.context === context && currentMsg?.desc !== event.desc) {
-      if (timer !== null) {
-        clearTimeout(timer);
-        timer = null;
+    if (event.context === context && msg?.desc !== event.desc) {
+      if (timer.current !== null) {
+        clearTimeout(timer.current);
+        timer.current = null;
       }
-      opacityPrem.setValue(0);
-      translatePrem.setValue(-dWidth);
-      currentMsg = {
-        title: event.title,
-        desc: event.desc
-      };
-      setMsg(currentMsg);
-      opacityPrem.setValue(1);
-      Animated.timing(opacityPrem, {
-        toValue: 1,
-        duration: 300,
-        easing: EasingNode.inOut(EasingNode.ease)
-      }).start();
-      Animated.timing(translatePrem, {
-        toValue: 0,
-        duration: 300,
-        easing: EasingNode.inOut(EasingNode.ease)
-      }).start();
-
-      let timer = setTimeout(async () => {
-        Animated.timing(opacityPrem, {
-          toValue: -0,
-          duration: 150,
-          easing: EasingNode.inOut(EasingNode.ease)
-        }).start();
-        currentMsg = {
-          title: '',
-          desc: ''
-        };
-        await sleep(150);
-        setMsg(currentMsg);
-        opacityPrem.setValue(0);
-        translatePrem.setValue(-dWidth);
+      setMsg(event);
+      timer.current = setTimeout(async () => {
+        setMsg(null);
       }, 3000);
     }
   };
@@ -86,7 +42,7 @@ export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
   useEffect(() => {
     eSubscribeEvent(eShowGetPremium, open);
     return () => {
-      translatePrem.setValue(-dWidth);
+      clearTimeout(timer.current);
       eUnSubscribeEvent(eShowGetPremium, open);
     };
   }, []);
@@ -102,56 +58,54 @@ export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
   };
 
   return (
-    <Animated.View
-      style={{
-        position: 'absolute',
-        backgroundColor: colors.nav,
-        zIndex: 999,
-        ...getElevation(10),
-        padding: 12,
-        borderRadius: 10,
-        flexDirection: 'row',
-        alignSelf: 'center',
-        justifyContent: 'space-between',
-        top: offset,
-        opacity: opacityPrem,
-        maxWidth: DDS.isLargeTablet() ? 400 : '98%',
-        transform: [
-          {
-            translateY: translatePrem
-          }
-        ]
-      }}
-    >
-      <View
+    !!msg && (
+      <Animated.View
+        entering={FadeInUp}
+        exiting={FadeOutUp}
         style={{
-          flexShrink: 1,
-          flexGrow: 1,
-          paddingRight: 6
+          position: 'absolute',
+          backgroundColor: colors.nav,
+          zIndex: 999,
+          ...getElevation(20),
+          padding: 12,
+          borderRadius: 10,
+          flexDirection: 'row',
+          alignSelf: 'center',
+          justifyContent: 'space-between',
+          top: offset,
+          maxWidth: DDS.isLargeTablet() ? 400 : '98%'
         }}
       >
-        <Heading
+        <View
           style={{
-            flexWrap: 'wrap'
+            flexShrink: 1,
+            flexGrow: 1,
+            paddingRight: 6
           }}
-          color={colors.accent}
-          size={SIZE.md}
         >
-          {msg.title}
-        </Heading>
+          <Heading
+            style={{
+              flexWrap: 'wrap'
+            }}
+            color={colors.accent}
+            size={SIZE.md}
+          >
+            {msg.title}
+          </Heading>
 
-        <Paragraph
-          style={{
-            flexWrap: 'wrap'
-          }}
-          size={SIZE.sm}
-          color={colors.pri}
-        >
-          {msg.desc}
-        </Paragraph>
-      </View>
+          <Paragraph
+            style={{
+              flexWrap: 'wrap'
+            }}
+            size={SIZE.sm}
+            color={colors.pri}
+          >
+            {msg.desc}
+          </Paragraph>
+        </View>
 
-      <Button onPress={onPress} title="Get Now" type="accent" />
-    </Animated.View>
+        <Button onPress={onPress} title="Get Now" type="accent" />
+      </Animated.View>
+    )
   );
 };

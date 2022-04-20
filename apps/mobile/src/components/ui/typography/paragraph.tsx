@@ -1,18 +1,22 @@
 import React from 'react';
 import { Text, TextProps } from 'react-native';
+import Animated, { ComplexAnimationBuilder, Layout } from 'react-native-reanimated';
 import { useThemeStore } from '../../../stores/theme';
 import { SIZE } from '../../../utils/size';
 
 interface ParagraphProps extends TextProps {
   color?: string;
   size?: number;
+  layout?: ComplexAnimationBuilder;
 }
+const AnimatedText = Animated.createAnimatedComponent(Text);
 
 const Paragraph = ({ color, size = SIZE.sm, style, ...restProps }: ParagraphProps) => {
   const colors = useThemeStore(state => state.colors);
 
   return (
-    <Text
+    <AnimatedText
+      layout={restProps.layout || Layout}
       allowFontScaling
       maxFontSizeMultiplier={1}
       {...restProps}
@@ -25,7 +29,7 @@ const Paragraph = ({ color, size = SIZE.sm, style, ...restProps }: ParagraphProp
         },
         style
       ]}
-    ></Text>
+    ></AnimatedText>
   );
 };
 

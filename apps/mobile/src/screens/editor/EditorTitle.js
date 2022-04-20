@@ -1,36 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { TextInput } from 'react-native';
-import Animated, { EasingNode } from 'react-native-reanimated';
-import { useThemeStore } from '../../stores/theme';
+import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { useThemeStore } from '../../stores/theme';
 import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
 import { post, _onMessage } from './Functions';
-
-const opacityVal = new Animated.Value(0);
-const translateY = new Animated.Value(-700);
-function animation(v) {
-  Animated.timing(opacityVal, {
-    toValue: v,
-    duration: 150,
-    easing: EasingNode.inOut(EasingNode.ease)
-  }).start();
-}
 
 export const EditorTitle = () => {
   const colors = useThemeStore(state => state.colors);
-
   const [title, setTitle] = useState(null);
+  const [show, setShow] = useState(false);
   const onScroll = async data => {
     if (data.visible === undefined || data.visible === null) return;
     if (data.visible > 190) {
-      translateY.setValue(0);
-      await sleep(5);
-      animation(1);
+      setShow(true);
     } else {
-      animation(0);
-      await sleep(150);
-      translateY.setValue(-700);
+      setShow(false);
     }
     if (title !== data.title) {
       setTitle(data.title);
@@ -44,16 +29,12 @@ export const EditorTitle = () => {
     };
   }, []);
 
-  return (
+  return show ? (
     <Animated.View
+      entering={FadeInUp}
+      exiting={FadeOutUp}
       style={{
-        opacity: opacityVal,
-        paddingLeft: 0,
-        transform: [
-          {
-            translateY: translateY
-          }
-        ]
+        paddingLeft: 0
       }}
     >
       <TextInput
@@ -82,5 +63,7 @@ export const EditorTitle = () => {
         }}
       />
     </Animated.View>
+  ) : (
+    <View />
   );
 };

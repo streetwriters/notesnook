@@ -11,6 +11,7 @@ import { SIZE } from '../../../utils/size';
 import { Button } from '../../ui/button';
 import Seperator from '../../ui/seperator';
 import Heading from '../../ui/typography/heading';
+import Animated, { Layout } from 'react-native-reanimated';
 
 const Sort = ({ type, screen }) => {
   const colors = useThemeStore(state => state.colors);
@@ -106,7 +107,7 @@ const Sort = ({ type, screen }) => {
           <Button
             type={'grayBg'}
             title="Title"
-            height={45}
+            height={40}
             iconPosition="left"
             icon={'check'}
             buttonType={{ text: colors.accent }}
