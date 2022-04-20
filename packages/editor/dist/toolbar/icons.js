@@ -1,4 +1,4 @@
-import { mdiAttachment, mdiBorderHorizontal, mdiCheck, mdiChevronDown, mdiCodeBraces, mdiCodeTags, mdiDotsVertical, mdiFormatAlignCenter, mdiFormatAlignJustify, mdiFormatAlignLeft, mdiFormatAlignRight, mdiFormatBold, mdiFormatClear, mdiFormatColorHighlight, mdiFormatColorText, mdiFormatItalic, mdiFormatListBulleted, mdiFormatListNumbered, mdiFormatQuoteClose, mdiFormatStrikethrough, mdiFormatSubscript, mdiFormatSuperscript, mdiFormatTextdirectionLToR, mdiFormatTextdirectionRToL, mdiFormatUnderline, mdiImage, mdiInvertColorsOff, mdiLinkPlus, mdiLoading, mdiTable, mdiTableBorder, mdiTableRowPlusBefore, mdiTableRowRemove, mdiTableColumnPlusAfter, mdiTableColumnPlusBefore, mdiTableColumnRemove, mdiUploadOutline, mdiPlus, mdiSquareRoundedBadgeOutline, mdiFormatColorFill, mdiBorderAllVariant, mdiClose, mdiSortDescending, mdiArrowExpandRight, mdiArrowExpandLeft, mdiArrowExpandDown, mdiArrowExpandUp, mdiTrashCanOutline, mdiTableMergeCells, mdiTableSplitCell, mdiDeleteOutline, mdiDownloadOutline, } from "@mdi/js";
+import { mdiAttachment, mdiBorderHorizontal, mdiCheck, mdiChevronDown, mdiCodeBraces, mdiCodeTags, mdiDotsVertical, mdiFormatAlignCenter, mdiFormatAlignJustify, mdiFormatAlignLeft, mdiFormatAlignRight, mdiFormatBold, mdiFormatClear, mdiFormatColorHighlight, mdiFormatColorText, mdiFormatItalic, mdiFormatListBulleted, mdiFormatListNumbered, mdiFormatQuoteClose, mdiFormatStrikethrough, mdiFormatSubscript, mdiFormatSuperscript, mdiFormatTextdirectionLToR, mdiFormatTextdirectionRToL, mdiFormatUnderline, mdiImage, mdiInvertColorsOff, mdiLinkPlus, mdiLoading, mdiTable, mdiTableBorder, mdiTableRowPlusBefore, mdiTableRowRemove, mdiTableColumnPlusAfter, mdiTableColumnPlusBefore, mdiTableColumnRemove, mdiUploadOutline, mdiPlus, mdiSquareRoundedBadgeOutline, mdiFormatColorFill, mdiBorderAllVariant, mdiClose, mdiSortDescending, mdiArrowExpandRight, mdiArrowExpandLeft, mdiArrowExpandDown, mdiArrowExpandUp, mdiTrashCanOutline, mdiTableMergeCells, mdiTableSplitCell, mdiDeleteOutline, mdiDownloadOutline, mdiFormatListCheckbox, mdiDrag, mdiCheckboxMarkedOutline, mdiChevronUp, } from "@mdi/js";
 export var Icons = {
     bold: mdiFormatBold,
     italic: mdiFormatItalic,
@@ -23,9 +23,9 @@ export var Icons = {
     textColor: mdiFormatColorText,
     link: mdiLinkPlus,
     image: mdiImage,
-    chevronDown: mdiChevronDown,
     colorClear: mdiInvertColorsOff,
     check: mdiCheck,
+    checkbox: mdiCheckboxMarkedOutline,
     loading: mdiLoading,
     more: mdiDotsVertical,
     upload: mdiUploadOutline,
@@ -49,8 +49,12 @@ export var Icons = {
     deleteTable: mdiTrashCanOutline,
     mergeCells: mdiTableMergeCells,
     splitCells: mdiTableSplitCell,
+    checklist: mdiFormatListCheckbox,
+    dragHandle: mdiDrag,
     plus: mdiPlus,
     close: mdiClose,
     delete: mdiDeleteOutline,
     download: mdiDownloadOutline,
+    chevronDown: mdiChevronDown,
+    chevronUp: mdiChevronUp,
 };

@@ -29,4 +29,9 @@ declare type BulletListStyleTypes = "circle" | "square" | "disc";
 export declare class BulletList extends ListTool<BulletListStyleTypes> {
     constructor();
 }
+export declare class Checklist implements ITool {
+    id: ToolId;
+    title: string;
+    render: (props: ToolProps) => JSX.Element;
+}
 export {};

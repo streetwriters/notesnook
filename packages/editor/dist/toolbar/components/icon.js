@@ -30,7 +30,7 @@ function MDIIconWrapper(_a) {
     var themedColor = theme.colors
         ? theme.colors[color]
         : color;
-    return (_jsx(MDIIcon, { title: title, path: path, size: size + "px", style: {
+    return (_jsx(MDIIcon, { className: "icon", title: title, path: path, size: size + "px", style: {
             strokeWidth: stroke || "0px",
             stroke: themedColor,
         }, color: themedColor, spin: rotate }));

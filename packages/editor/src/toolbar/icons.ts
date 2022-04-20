@@ -52,6 +52,10 @@ import {
   mdiTableSplitCell,
   mdiDeleteOutline,
   mdiDownloadOutline,
+  mdiFormatListCheckbox,
+  mdiDrag,
+  mdiCheckboxMarkedOutline,
+  mdiChevronUp,
 } from "@mdi/js";
 
 export const Icons = {
@@ -78,9 +82,9 @@ export const Icons = {
   textColor: mdiFormatColorText,
   link: mdiLinkPlus,
   image: mdiImage,
-  chevronDown: mdiChevronDown,
   colorClear: mdiInvertColorsOff,
   check: mdiCheck,
+  checkbox: mdiCheckboxMarkedOutline,
   loading: mdiLoading,
   more: mdiDotsVertical,
   upload: mdiUploadOutline,
@@ -104,11 +108,15 @@ export const Icons = {
   deleteTable: mdiTrashCanOutline,
   mergeCells: mdiTableMergeCells,
   splitCells: mdiTableSplitCell,
+  checklist: mdiFormatListCheckbox,
+  dragHandle: mdiDrag,
 
   plus: mdiPlus,
   close: mdiClose,
   delete: mdiDeleteOutline,
   download: mdiDownloadOutline,
+  chevronDown: mdiChevronDown,
+  chevronUp: mdiChevronUp,
 };
 
 export type IconNames = keyof typeof Icons;

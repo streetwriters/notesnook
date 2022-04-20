@@ -4,7 +4,7 @@ import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
 import { Blockquote, CodeBlock, HorizontalRule, Image, Table } from "./block";
 import { Headings } from "./headings";
-import { NumberedList, BulletList } from "./lists";
+import { NumberedList, BulletList, Checklist } from "./lists";
 import { LeftToRight, RightToLeft } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 declare const tools: {
@@ -30,6 +30,7 @@ declare const tools: {
     rtl: RightToLeft;
     numberedList: NumberedList;
     bulletList: BulletList;
+    checklist: Checklist;
     textColor: TextColor;
     highlight: Highlight;
     link: Link;

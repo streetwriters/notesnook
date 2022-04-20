@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ITool, ToolProps } from "../types";
 import { ToolId } from ".";
 import { IconNames } from "../icons";

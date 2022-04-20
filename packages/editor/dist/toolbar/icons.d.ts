@@ -22,9 +22,9 @@ export declare const Icons: {
     textColor: string;
     link: string;
     image: string;
-    chevronDown: string;
     colorClear: string;
     check: string;
+    checkbox: string;
     loading: string;
     more: string;
     upload: string;
@@ -48,9 +48,13 @@ export declare const Icons: {
     deleteTable: string;
     mergeCells: string;
     splitCells: string;
+    checklist: string;
+    dragHandle: string;
     plus: string;
     close: string;
     delete: string;
     download: string;
+    chevronDown: string;
+    chevronUp: string;
 };
 export declare type IconNames = keyof typeof Icons;

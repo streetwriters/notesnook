@@ -28,6 +28,7 @@ function MDIIconWrapper({
 
   return (
     <MDIIcon
+      className="icon"
       title={title}
       path={path}
       size={size + "px"}

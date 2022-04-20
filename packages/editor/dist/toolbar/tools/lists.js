@@ -127,6 +127,19 @@ var BulletList = /** @class */ (function (_super) {
     return BulletList;
 }(ListTool));
 export { BulletList };
+var Checklist = /** @class */ (function () {
+    function Checklist() {
+        var _this = this;
+        this.id = "checklist";
+        this.title = "Checklist";
+        this.render = function (props) {
+            var editor = props.editor;
+            return (_jsx(ToolButton, { title: _this.title, id: _this.id, icon: "checklist", onClick: function () { return editor.chain().focus().toggleTaskList().run(); }, toggled: false }));
+        };
+    }
+    return Checklist;
+}());
+export { Checklist };
 function ListThumbnail(props) {
     var listStyleType = props.listStyleType;
     return (_jsx(Flex, __assign({ as: "ul", sx: {

@@ -147,6 +147,25 @@ export class BulletList extends ListTool<BulletListStyleTypes> {
   }
 }
 
+export class Checklist implements ITool {
+  id: ToolId = "checklist";
+  title = "Checklist";
+
+  render = (props: ToolProps) => {
+    const { editor } = props;
+
+    return (
+      <ToolButton
+        title={this.title}
+        id={this.id}
+        icon="checklist"
+        onClick={() => editor.chain().focus().toggleTaskList().run()}
+        toggled={false}
+      />
+    );
+  };
+}
+
 type ListThumbnailProps = { listStyleType: string };
 function ListThumbnail(props: ListThumbnailProps) {
   const { listStyleType } = props;

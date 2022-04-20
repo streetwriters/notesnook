@@ -33,7 +33,7 @@ export function Toolbar(props: ToolbarProps) {
     ["subscript", "superscript", "horizontalRule"],
     ["codeblock", "blockquote"],
     ["formatClear", "ltr", "rtl"],
-    ["numberedList", "bulletList"],
+    ["numberedList", "bulletList", "checklist"],
     ["link", "image", "attachment", "table"],
     ["textColor", "highlight"],
   ];

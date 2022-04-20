@@ -47,6 +47,8 @@ import TableHeader from "@tiptap/extension-table-header";
 import { ImageNode } from "./extensions/image";
 import { useTheme } from "@notesnook/theme";
 import { AttachmentNode } from "./extensions/attachment";
+import { TaskListNode } from "./extensions/task-list";
+import { TaskItemNode } from "./extensions/task-item";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -58,7 +60,11 @@ var useTiptap = function (options, deps) {
     var defaultOptions = useMemo(function () { return ({
         extensions: [
             TextStyle,
-            StarterKit,
+            StarterKit.configure({
+                dropcursor: {
+                    class: "drop-cursor",
+                },
+            }),
             CharacterCount,
             Underline,
             Subscript,
@@ -68,8 +74,9 @@ var useTiptap = function (options, deps) {
             FontFamily,
             BulletList,
             OrderedList,
+            TaskItemNode.configure({ nested: true }),
+            TaskListNode,
             Link,
-            ImageNode,
             Table.configure({
                 resizable: true,
                 allowTableNodeSelection: true,
@@ -89,6 +96,7 @@ var useTiptap = function (options, deps) {
             Placeholder.configure({
                 placeholder: "Start writing your note...",
             }),
+            ImageNode,
             AttachmentNode.configure({
                 onDownloadAttachment: onDownloadAttachment,
             }),
