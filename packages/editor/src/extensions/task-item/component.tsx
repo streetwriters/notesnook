@@ -16,21 +16,13 @@ import {
   findChildren,
   NodeWithPos,
 } from "@tiptap/core";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function TaskItemComponent(props: ImageProps & NodeViewProps) {
   const { checked } = props.node.attrs;
-
+  const [stats, setStats] = useState({ checked: 0, total: 0 });
   const { editor, updateAttributes, node, getPos } = props;
-  // const [isOpen, setIsOpen] = useState(true);
-  // const elementRef = useRef<HTMLSpanElement>();
-  // const isActive = editor.isActive("attachment", { hash });
-  // const [isToolbarVisible, setIsToolbarVisible] = useState<boolean>();
   const theme = editor.storage.theme as Theme;
-
-  //   useEffect(() => {
-  //     setIsToolbarVisible(isActive);
-  //   }, [isActive]);
 
   const toggle = useCallback(() => {
     if (!editor.isEditable) return false;
@@ -44,10 +36,26 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
     editor.view.dispatch(tr);
     return true;
   }, [editor, getPos, node]);
+
   const nestedTaskList = getChildren(node, getPos()).find(
     ({ node }) => node.type.name === "taskList"
   );
   const isNested = !!nestedTaskList;
+  const isCollapsed = nestedTaskList
+    ? nestedTaskList.node.attrs.collapsed
+    : false;
+
+  useEffect(() => {
+    if (!nestedTaskList) return;
+    const { pos, node } = nestedTaskList;
+    const children = findChildren(
+      node,
+      (node) => node.type.name === "taskItem"
+    );
+    const checked = children.filter(({ node }) => node.attrs.checked).length;
+    const total = children.length;
+    setStats({ checked, total });
+  }, [isNested, nestedTaskList, node]);
 
   return (
     <NodeViewWrapper>
@@ -60,107 +68,107 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
             },
           }}
         >
-          <Flex sx={{ flex: 1 }}>
-            <Icon
-              className="dragHandle"
-              draggable="true"
-              contentEditable={false}
-              data-drag-handle
-              path={Icons.dragHandle}
-              sx={{
-                opacity: 0,
-                alignSelf: "start",
-                mr: 2,
-                cursor: "grab",
-                ".icon:hover path": {
-                  fill: "var(--disabled) !important",
-                },
-              }}
-              size={20}
-            />
-            <Icon
-              path={checked ? Icons.check : ""}
-              sx={{
-                border: "2px solid",
-                borderColor: checked ? "disabled" : "icon",
-                borderRadius: "default",
-                alignSelf: "start",
-                mr: 2,
-                p: "1px",
-                cursor: "pointer",
-                ":hover": {
-                  borderColor: "disabled",
-                },
-                ":hover .icon path": {
-                  fill: "var(--disabled) !important",
-                },
-              }}
-              onMouseEnter={(e) => {
-                if (e.buttons > 0) {
-                  toggle();
-                }
-              }}
-              onMouseDown={(e) => {
-                if (toggle()) e.preventDefault();
-              }}
-              color={checked ? "disabled" : "icon"}
-              size={13}
-            />
-
-            <NodeViewContent
-              as={"li"}
-              style={{
-                listStyleType: "none",
-                textDecorationLine: checked ? "line-through" : "none",
-                color: checked ? "var(--disabled)" : "var(--text)",
-                flex: 1,
-              }}
-            />
-          </Flex>
-          {isNested && (
-            <Icon
-              className="toggleSublist"
-              path={
-                nestedTaskList.node.attrs.collapsed
-                  ? Icons.chevronDown
-                  : Icons.chevronUp
+          <Icon
+            className="dragHandle"
+            draggable="true"
+            contentEditable={false}
+            data-drag-handle
+            path={Icons.dragHandle}
+            sx={{
+              opacity: 0,
+              alignSelf: "start",
+              mr: 2,
+              cursor: "grab",
+              ".icon:hover path": {
+                fill: "var(--checked) !important",
+              },
+            }}
+            size={20}
+          />
+          <Icon
+            path={checked ? Icons.check : ""}
+            stroke="1px"
+            sx={{
+              border: "2px solid",
+              borderColor: checked ? "checked" : "icon",
+              borderRadius: "default",
+              alignSelf: "start",
+              mr: 2,
+              p: "1px",
+              cursor: "pointer",
+              ":hover": {
+                borderColor: "checked",
+              },
+              ":hover .icon path": {
+                fill: "var(--checked) !important",
+              },
+            }}
+            onMouseEnter={(e) => {
+              if (e.buttons > 0) {
+                toggle();
               }
-              sx={{
-                opacity: 0,
-                position: "absolute",
-                right: 0,
-                alignSelf: "start",
-                mr: 2,
-                cursor: "pointer",
-                ".icon:hover path": {
-                  fill: "var(--disabled) !important",
-                },
-              }}
-              size={20}
-              onClick={() => {
-                editor
-                  .chain()
-                  .setNodeSelection(getPos())
-                  .command(({ tr }) => {
-                    const { pos, node } = nestedTaskList;
-                    tr.setNodeMarkup(pos, undefined, {
-                      collapsed: !node.attrs.collapsed,
-                    });
-                    return true;
-                  })
-                  .run();
-              }}
-            />
+            }}
+            onMouseDown={(e) => {
+              if (toggle()) e.preventDefault();
+            }}
+            color={checked ? "checked" : "icon"}
+            size={13}
+          />
+
+          <NodeViewContent
+            as={"li"}
+            style={{
+              listStyleType: "none",
+              textDecorationLine: checked ? "line-through" : "none",
+              color: checked ? "var(--checked)" : "var(--text)",
+              flex: 1,
+            }}
+          />
+
+          {isNested && (
+            <>
+              {isCollapsed && (
+                <Text variant={"body"} sx={{ color: "fontTertiary", mr: 35 }}>
+                  {stats.checked}/{stats.total}
+                </Text>
+              )}
+              <Icon
+                className="toggleSublist"
+                path={
+                  nestedTaskList.node.attrs.collapsed
+                    ? Icons.chevronDown
+                    : Icons.chevronUp
+                }
+                sx={{
+                  opacity: isCollapsed ? 1 : 0,
+                  position: "absolute",
+                  right: 0,
+                  alignSelf: "start",
+                  mr: 2,
+                  cursor: "pointer",
+                  ".icon:hover path": {
+                    fill: "var(--checked) !important",
+                  },
+                }}
+                size={20}
+                onClick={() => {
+                  editor
+                    .chain()
+                    .setNodeSelection(getPos())
+                    .command(({ tr }) => {
+                      const { pos, node } = nestedTaskList;
+                      tr.setNodeMarkup(pos, undefined, {
+                        collapsed: !node.attrs.collapsed,
+                      });
+                      return true;
+                    })
+                    .run();
+                }}
+              />
+            </>
           )}
         </Flex>
       </ThemeProvider>
-      {/*
-        <Flex>
-          <Box></Box>
-          
-          <Box contentEditable="true" />
-        </Flex>
-      </ThemeProvider> */}
     </NodeViewWrapper>
   );
 }

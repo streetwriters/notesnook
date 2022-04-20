@@ -28,6 +28,7 @@ import { useTheme } from "@notesnook/theme";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import { TaskListNode } from "./extensions/task-list";
 import { TaskItemNode } from "./extensions/task-item";
+import { Dropcursor } from "./extensions/drop-cursor";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -52,9 +53,10 @@ const useTiptap = (
       extensions: [
         TextStyle,
         StarterKit.configure({
-          dropcursor: {
-            class: "drop-cursor",
-          },
+          dropcursor: false,
+        }),
+        Dropcursor.configure({
+          class: "drop-cursor",
         }),
         CharacterCount,
         Underline,

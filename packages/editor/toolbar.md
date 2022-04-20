@@ -59,7 +59,7 @@ Total Tools:
 - [x] subscript superscript
 - [x] numlist
 - [x] bullist
-- [] checklist
+- [x] checklist
 - [x] forecolor backcolor
 - [x] removeformat
 - [x] hr

@@ -12,6 +12,19 @@ export var TaskListNode = TaskList.extend({
                     "data-collapsed": attributes.collapsed === true,
                 }); },
             },
+            title: {
+                default: null,
+                keepOnSplit: false,
+                parseHTML: function (element) { return element.dataset.title; },
+                renderHTML: function (attributes) {
+                    if (!attributes.title || attributes.nested) {
+                        return {};
+                    }
+                    return {
+                        "data-title": attributes.title,
+                    };
+                },
+            },
         };
     },
     // renderHTML({ node, HTMLAttributes }) {

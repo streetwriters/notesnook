@@ -13,10 +13,11 @@ import { Theme } from "@notesnook/theme";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useEffect, useState } from "react";
+import { Input } from "@rebass/forms";
 
 export function TaskListComponent(props: NodeViewProps) {
-  const { editor, getPos, node } = props;
-  const { collapsed } = node.attrs;
+  const { editor, getPos, node, updateAttributes } = props;
+  const { collapsed, title } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const theme = editor.storage.theme as Theme;
@@ -47,7 +48,7 @@ export function TaskListComponent(props: NodeViewProps) {
     const percentage = Math.round((checked / total) * 100);
     setStats({ checked, total, percentage });
   }, [nested, node]);
-  console.log(collapsed);
+
   return (
     <NodeViewWrapper style={{ display: collapsed ? "none" : "block" }}>
       <ThemeProvider theme={theme}>
@@ -63,7 +64,6 @@ export function TaskListComponent(props: NodeViewProps) {
                 alignItems: "center",
                 justifyContent: "end",
                 overflow: "hidden",
-                px: 2,
               }}
             >
               <Box
@@ -78,27 +78,33 @@ export function TaskListComponent(props: NodeViewProps) {
                   transition: "width 250ms ease-out",
                 }}
               />
-              <Flex sx={{ zIndex: 1 }}>
-                <Icon path={Icons.checkbox} size={15} />
-                <Text variant={"body"} sx={{ ml: 1 }}>
+              <Input
+                value={title}
+                variant={"clean"}
+                sx={{ p: 0, px: 2, zIndex: 1, color: "fontTertiary" }}
+                placeholder="Untitled"
+                onChange={(e) => {
+                  updateAttributes({ title: e.target.value });
+                }}
+              />
+              <Flex sx={{ flexShrink: 0, pr: 2 }}>
+                <Icon path={Icons.checkbox} size={15} color="fontTertiary" />
+                <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
                   {stats.checked}/{stats.total}
                 </Text>
               </Flex>
-              {/* <Text variant={"body"} sx={{ zIndex: 1 }}>
-                {stats.percentage}% done
-              </Text> */}
             </Flex>
           )}
-          <NodeViewContent
-            as={"ul"}
-            style={{
-              paddingInlineStart: 0,
-              marginBlockStart: nested ? 15 : 0,
-              marginBlockEnd: 0,
-            }}
-          />
         </Flex>
       </ThemeProvider>
+      <NodeViewContent
+        as={"ul"}
+        style={{
+          paddingInlineStart: 0,
+          marginBlockStart: nested ? 15 : 0,
+          marginBlockEnd: 0,
+        }}
+      />
     </NodeViewWrapper>
   );
 }

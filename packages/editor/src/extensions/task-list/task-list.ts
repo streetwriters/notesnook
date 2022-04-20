@@ -15,6 +15,20 @@ export const TaskListNode = TaskList.extend({
           "data-collapsed": attributes.collapsed === true,
         }),
       },
+      title: {
+        default: null,
+        keepOnSplit: false,
+        parseHTML: (element) => element.dataset.title,
+        renderHTML: (attributes) => {
+          if (!attributes.title || attributes.nested) {
+            return {};
+          }
+
+          return {
+            "data-title": attributes.title,
+          };
+        },
+      },
     };
   },
 
