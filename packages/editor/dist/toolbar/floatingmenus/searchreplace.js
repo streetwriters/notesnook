@@ -40,7 +40,7 @@ export function SearchReplaceFloatingMenu(props) {
     var _c = __read(useState(false), 2), matchWholeWord = _c[0], setMatchWholeWord = _c[1];
     var _d = __read(useState(false), 2), enableRegex = _d[0], setEnableRegex = _d[1];
     var replaceText = useRef("");
-    var searchText = useRef("");
+    var searchInputRef = useRef();
     var search = useCallback(function (term) {
         editor.commands.search(term, {
             matchCase: matchCase,
@@ -49,11 +49,21 @@ export function SearchReplaceFloatingMenu(props) {
         });
     }, [matchCase, enableRegex, matchWholeWord]);
     useEffect(function () {
-        search(searchText.current);
+        if (!searchInputRef.current)
+            return;
+        search(searchInputRef.current.value);
     }, [search, matchCase, matchWholeWord, enableRegex]);
     useEffect(function () {
-        if (isSearching && selectedText)
+        if (isSearching && selectedText) {
+            if (searchInputRef.current) {
+                var input_1 = searchInputRef.current;
+                setTimeout(function () {
+                    input_1.value = selectedText;
+                    input_1.focus();
+                }, 0);
+            }
             search(selectedText);
+        }
     }, [isSearching, selectedText, search]);
     if (!isSearching)
         return null;
@@ -70,9 +80,8 @@ export function SearchReplaceFloatingMenu(props) {
                                     mr: 1,
                                     width: 200,
                                     alignItems: "center",
-                                } }, { children: [_jsx(Input, { defaultValue: selectedText, autoFocus: true, sx: { p: 1 }, placeholder: "Find", onChange: function (e) {
-                                            searchText.current = e.target.value;
-                                            search(searchText.current);
+                                } }, { children: [_jsx(Input, { defaultValue: selectedText, ref: searchInputRef, autoFocus: true, sx: { p: 1 }, placeholder: "Find", onChange: function (e) {
+                                            search(e.target.value);
                                         } }), _jsxs(Flex, __assign({ sx: {
                                             position: "absolute",
                                             right: 0,

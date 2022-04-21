@@ -174,10 +174,14 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           }
           return true;
         },
-      endSearch: () => () => {
-        this.storage.isSearching = false;
-        return true;
-      },
+      endSearch:
+        () =>
+        ({ state, dispatch }) => {
+          this.storage.isSearching = false;
+          this.storage.searchTerm = "";
+          updateView(state, dispatch);
+          return true;
+        },
       search:
         (term, options?: SearchSettings) =>
         ({ state, dispatch }) => {

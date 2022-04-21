@@ -140,10 +140,15 @@ export var SearchReplace = Extension.create({
                     return true;
                 };
             },
-            endSearch: function () { return function () {
-                _this.storage.isSearching = false;
-                return true;
-            }; },
+            endSearch: function () {
+                return function (_a) {
+                    var state = _a.state, dispatch = _a.dispatch;
+                    _this.storage.isSearching = false;
+                    _this.storage.searchTerm = "";
+                    updateView(state, dispatch);
+                    return true;
+                };
+            },
             search: function (term, options) {
                 return function (_a) {
                     var state = _a.state, dispatch = _a.dispatch;

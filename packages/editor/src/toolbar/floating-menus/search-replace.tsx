@@ -16,7 +16,7 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
   const [matchWholeWord, setMatchWholeWord] = useState(false);
   const [enableRegex, setEnableRegex] = useState(false);
   const replaceText = useRef("");
-  const searchText = useRef("");
+  const searchInputRef = useRef<HTMLInputElement>();
 
   const search = useCallback(
     (term: string) => {
@@ -30,11 +30,21 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
   );
 
   useEffect(() => {
-    search(searchText.current);
+    if (!searchInputRef.current) return;
+    search(searchInputRef.current.value);
   }, [search, matchCase, matchWholeWord, enableRegex]);
 
   useEffect(() => {
-    if (isSearching && selectedText) search(selectedText);
+    if (isSearching && selectedText) {
+      if (searchInputRef.current) {
+        const input = searchInputRef.current;
+        setTimeout(() => {
+          input.value = selectedText;
+          input.focus();
+        }, 0);
+      }
+      search(selectedText);
+    }
   }, [isSearching, selectedText, search]);
 
   if (!isSearching) return null;
@@ -67,12 +77,12 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
             >
               <Input
                 defaultValue={selectedText}
+                ref={searchInputRef}
                 autoFocus
                 sx={{ p: 1 }}
                 placeholder="Find"
                 onChange={(e) => {
-                  searchText.current = e.target.value;
-                  search(searchText.current);
+                  search(e.target.value);
                 }}
               />
               <Flex
