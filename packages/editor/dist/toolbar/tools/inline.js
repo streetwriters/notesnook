@@ -24,6 +24,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
 import { MenuPresenter } from "../../components/menu/menu";
@@ -124,9 +140,9 @@ var Link = /** @class */ (function () {
             var editor = props.editor;
             var buttonRef = useRef(null);
             var targetRef = useRef();
-            var _a = useState(false), isOpen = _a[0], setIsOpen = _a[1];
-            var _b = useState(), href = _b[0], setHref = _b[1];
-            var _c = useState(), text = _c[0], setText = _c[1];
+            var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
+            var _b = __read(useState(), 2), href = _b[0], setHref = _b[1];
+            var _c = __read(useState(), 2), text = _c[0], setText = _c[1];
             var currentUrl = editor.getAttributes("link").href;
             var isEditing = !!currentUrl;
             return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { ref: buttonRef, title: _this.title, id: _this.id, icon: "link", onClick: function () {

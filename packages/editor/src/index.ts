@@ -29,6 +29,7 @@ import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import { TaskListNode } from "./extensions/task-list";
 import { TaskItemNode } from "./extensions/task-item";
 import { Dropcursor } from "./extensions/drop-cursor";
+import { SearchReplace } from "./extensions/search-replace";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -51,6 +52,7 @@ const useTiptap = (
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
       extensions: [
+        SearchReplace,
         TextStyle,
         StarterKit.configure({
           dropcursor: false,

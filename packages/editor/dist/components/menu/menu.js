@@ -20,6 +20,22 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { useCallback, useRef, useEffect, useState, } from "react";
 import { Box, Flex, Text } from "rebass";
@@ -30,8 +46,8 @@ import MenuItem from "./menuitem";
 import Modal from "react-modal";
 // import { store as selectionStore } from "../../stores/selectionstore";
 function useMenuFocus(items, onAction, onClose) {
-    var _a = useState(-1), focusIndex = _a[0], setFocusIndex = _a[1];
-    var _b = useState(false), isSubmenuOpen = _b[0], setIsSubmenuOpen = _b[1];
+    var _a = __read(useState(-1), 2), focusIndex = _a[0], setFocusIndex = _a[1];
+    var _b = __read(useState(false), 2), isSubmenuOpen = _b[0], setIsSubmenuOpen = _b[1];
     var moveItemIntoView = useCallback(function (index) {
         var item = items[index];
         if (!item)

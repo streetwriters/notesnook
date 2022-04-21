@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { EditorOptions } from "@tiptap/react";
 import Toolbar from "./toolbar";
 import { ThemeConfig } from "@notesnook/theme/dist/theme/types";

@@ -1,3 +1,19 @@
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx } from "react/jsx-runtime";
 import { Dropdown } from "../components/dropdown";
 var FontSize = /** @class */ (function () {
@@ -40,7 +56,7 @@ var FontFamily = /** @class */ (function () {
             var editor = props.editor;
             var currentFontFamily = ((_b = (_a = Object.entries(_this.fontFamilies)
                 .find(function (_a) {
-                var key = _a[0], value = _a[1];
+                var _b = __read(_a, 2), key = _b[0], value = _b[1];
                 return editor.isActive("textStyle", { fontFamily: value });
             })) === null || _a === void 0 ? void 0 : _a.map(function (a) { return a; })) === null || _b === void 0 ? void 0 : _b.at(0)) || "System";
             return (_jsx(Dropdown, { selectedItem: currentFontFamily, items: _this.toMenuItems(editor, currentFontFamily) }));

@@ -24,6 +24,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
 import { Icons } from "../icons";
@@ -115,16 +131,16 @@ var Table = /** @class */ (function () {
         this.MIN_ROWS = 4;
         this.render = function (props) {
             var editor = props.editor;
-            var _a = useState(false), isOpen = _a[0], setIsOpen = _a[1];
+            var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
             var ref = useRef(null);
-            var _b = useState({
+            var _b = __read(useState({
                 column: 0,
                 row: 0,
-            }), cellLocation = _b[0], setCellLocation = _b[1];
-            var _c = useState({
+            }), 2), cellLocation = _b[0], setCellLocation = _b[1];
+            var _c = __read(useState({
                 columns: _this.MIN_COLUMNS,
                 rows: _this.MIN_ROWS,
-            }), tableSize = _c[0], setTableSize = _c[1];
+            }), 2), tableSize = _c[0], setTableSize = _c[1];
             useEffect(function () {
                 setTableSize(function (old) {
                     var columns = old.columns, rows = old.rows;

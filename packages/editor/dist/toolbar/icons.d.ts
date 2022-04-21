@@ -50,6 +50,13 @@ export declare const Icons: {
     splitCells: string;
     checklist: string;
     dragHandle: string;
+    previousMatch: string;
+    nextMatch: string;
+    replaceOne: string;
+    replaceAll: string;
+    caseSensitive: string;
+    wholeWord: string;
+    regex: string;
     plus: string;
     close: string;
     delete: string;

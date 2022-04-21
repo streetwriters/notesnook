@@ -24,6 +24,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Box, Button, Flex } from "rebass";
 import { Icon } from "../components/icon";
@@ -39,7 +55,7 @@ var ListTool = /** @class */ (function () {
         this.options = options;
         this.render = function (props) {
             var editor = props.editor;
-            var _a = useState(false), isOpen = _a[0], setIsOpen = _a[1];
+            var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
             var ref = useRef(null);
             var isActive = editor.isActive(_this.options.type);
             return (_jsxs(Flex, __assign({ ref: ref }, { children: [_jsx(ToolButton, { title: _this.title, id: _this.id, icon: _this.options.icon, onClick: function () { return _this.options.onClick(editor); }, toggled: isActive, sx: { mr: 0 } }), _jsx(Button, __assign({ sx: {

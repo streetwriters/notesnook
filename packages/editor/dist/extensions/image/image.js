@@ -9,6 +9,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import { ImageComponent } from "./component";
@@ -99,7 +115,7 @@ export var ImageNode = Node.create({
                 find: inputRegex,
                 type: this.type,
                 getAttributes: function (match) {
-                    var alt = match[2], src = match[3], title = match[4];
+                    var _a = __read(match, 5), alt = _a[2], src = _a[3], title = _a[4];
                     return { src: src, alt: alt, title: title };
                 },
             }),

@@ -31,7 +31,7 @@ export function Toolbar(props) {
     ];
     if (!editor)
         return null;
-    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(Flex, __assign({ sx: { flexWrap: "wrap" } }, { children: tools.map(function (tools) {
+    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(Flex, __assign({ className: "editor-toolbar", sx: { flexWrap: "wrap" } }, { children: tools.map(function (tools) {
                     return (_jsx(Flex, __assign({ className: "toolbar-group", sx: {
                             pr: 2,
                             mr: 2,

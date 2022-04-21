@@ -9,6 +9,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Box, Flex, Text } from "rebass";
 import { NodeViewWrapper, NodeViewContent, } from "@tiptap/react";
@@ -21,7 +37,7 @@ import { Input } from "@rebass/forms";
 export function TaskListComponent(props) {
     var editor = props.editor, getPos = props.getPos, node = props.node, updateAttributes = props.updateAttributes;
     var _a = node.attrs, collapsed = _a.collapsed, title = _a.title;
-    var _b = useState({ checked: 0, total: 0, percentage: 0 }), stats = _b[0], setStats = _b[1];
+    var _b = __read(useState({ checked: 0, total: 0, percentage: 0 }), 2), stats = _b[0], setStats = _b[1];
     var theme = editor.storage.theme;
     var resolvedPos = editor.state.doc.resolve(getPos());
     var parentTaskItem = findParentNodeClosestToPos(resolvedPos, function (node) { return node.type.name === "taskItem"; });

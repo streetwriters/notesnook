@@ -41,7 +41,7 @@ export function Toolbar(props: ToolbarProps) {
   if (!editor) return null;
   return (
     <ThemeProvider theme={themeProperties}>
-      <Flex sx={{ flexWrap: "wrap" }}>
+      <Flex className="editor-toolbar" sx={{ flexWrap: "wrap" }}>
         {tools.map((tools) => {
           return (
             <Flex

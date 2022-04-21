@@ -24,6 +24,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Box, Button, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
@@ -58,7 +74,7 @@ var ColorTool = /** @class */ (function () {
         this.onColorChange = onColorChange;
         this.render = function (props) {
             var editor = props.editor;
-            var _a = useState(false), isOpen = _a[0], setIsOpen = _a[1];
+            var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
             var attrs = editor.getAttributes(_this.id === "highlight" ? "highlight" : "textStyle");
             var ref = useRef(null);
             var isActive = editor.isActive(_this.id === "highlight" ? "highlight" : "textStyle", { color: /\W+/gm });
@@ -120,7 +136,7 @@ var TextColor = /** @class */ (function (_super) {
 export { TextColor };
 export function ColorPicker(props) {
     var colors = props.colors, color = props.color, onClear = props.onClear, onChange = props.onChange;
-    var _a = useState(tinycolor(color || colors[0]).toHexString()), currentColor = _a[0], setCurrentColor = _a[1];
+    var _a = __read(useState(tinycolor(color || colors[0]).toHexString()), 2), currentColor = _a[0], setCurrentColor = _a[1];
     return (_jsxs(_Fragment, { children: [_jsx(Flex, __assign({ sx: {
                     width: "100%",
                     height: 50,

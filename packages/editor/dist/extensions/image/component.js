@@ -9,6 +9,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Box, Flex, Image, Text } from "rebass";
 import { NodeViewWrapper } from "@tiptap/react";
@@ -25,7 +41,7 @@ export function ImageComponent(props) {
     var editor = props.editor, updateAttributes = props.updateAttributes;
     var imageRef = useRef();
     var isActive = editor.isActive("image", { src: src });
-    var _b = useState(), isToolbarVisible = _b[0], setIsToolbarVisible = _b[1];
+    var _b = __read(useState(), 2), isToolbarVisible = _b[0], setIsToolbarVisible = _b[1];
     var theme = editor.storage.theme;
     useEffect(function () {
         setIsToolbarVisible(isActive);
@@ -58,7 +74,7 @@ export function ImageComponent(props) {
 }
 function ImageToolbar(props) {
     var editor = props.editor, float = props.float, height = props.height, width = props.width;
-    var _a = useState(false), isOpen = _a[0], setIsOpen = _a[1];
+    var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var onSizeChange = useCallback(function (newWidth, newHeight) {
         var size = newWidth
             ? {

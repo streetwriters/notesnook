@@ -9,6 +9,33 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Flex, Text } from "rebass";
 import { NodeViewWrapper, NodeViewContent, } from "@tiptap/react";
@@ -19,7 +46,7 @@ import { findChildren, } from "@tiptap/core";
 import { useCallback, useEffect, useState } from "react";
 export function TaskItemComponent(props) {
     var checked = props.node.attrs.checked;
-    var _a = useState({ checked: 0, total: 0 }), stats = _a[0], setStats = _a[1];
+    var _a = __read(useState({ checked: 0, total: 0 }), 2), stats = _a[0], setStats = _a[1];
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, getPos = props.getPos;
     var theme = editor.storage.theme;
     var toggle = useCallback(function () {
@@ -119,14 +146,24 @@ export function TaskItemComponent(props) {
                                 } })] }))] })) })) }));
 }
 function toggleChildren(node, tr, toggleState, parentPos) {
+    var e_1, _a;
     var children = findChildren(node, function (node) { return node.type.name === "taskItem"; });
-    for (var _i = 0, children_1 = children; _i < children_1.length; _i++) {
-        var pos = children_1[_i].pos;
-        // need to add 1 to get inside the node
-        var actualPos = pos + parentPos + 1;
-        tr.setNodeMarkup(actualPos, undefined, {
-            checked: toggleState,
-        });
+    try {
+        for (var children_1 = __values(children), children_1_1 = children_1.next(); !children_1_1.done; children_1_1 = children_1.next()) {
+            var pos = children_1_1.value.pos;
+            // need to add 1 to get inside the node
+            var actualPos = pos + parentPos + 1;
+            tr.setNodeMarkup(actualPos, undefined, {
+                checked: toggleState,
+            });
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (children_1_1 && !children_1_1.done && (_a = children_1.return)) _a.call(children_1);
+        }
+        finally { if (e_1) throw e_1.error; }
     }
     return tr;
 }

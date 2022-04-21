@@ -9,6 +9,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useRef, useState } from "react";
 import { Button, Text } from "rebass";
@@ -18,7 +34,7 @@ import { MenuPresenter } from "../../components/menu/menu";
 export function Dropdown(props) {
     var items = props.items, selectedItem = props.selectedItem;
     var buttonRef = useRef(null);
-    var _a = useState(false), isOpen = _a[0], setIsOpen = _a[1];
+    var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     return (_jsxs(_Fragment, { children: [_jsxs(Button, __assign({ ref: buttonRef, sx: {
                     p: 1,
                     m: 0,

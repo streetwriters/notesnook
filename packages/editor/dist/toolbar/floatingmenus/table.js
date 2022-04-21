@@ -45,6 +45,22 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
         if (ar || !(i in from)) {
@@ -66,8 +82,8 @@ import { selectedRect } from "prosemirror-tables";
 export function TableRowFloatingMenu(props) {
     var editor = props.editor;
     var theme = editor.storage.theme;
-    var _a = useState(null), position = _a[0], setPosition = _a[1];
-    var _b = useState(false), isMenuOpen = _b[0], setIsMenuOpen = _b[1];
+    var _a = __read(useState(null), 2), position = _a[0], setPosition = _a[1];
+    var _b = __read(useState(false), 2), isMenuOpen = _b[0], setIsMenuOpen = _b[1];
     useEffect(function () {
         var _a;
         if (!editor.isActive("tableCell") &&
@@ -147,12 +163,12 @@ export function TableRowFloatingMenu(props) {
 export function TableColumnFloatingMenu(props) {
     var _this = this;
     var editor = props.editor;
-    var _a = useState(null), position = _a[0], setPosition = _a[1];
+    var _a = __read(useState(null), 2), position = _a[0], setPosition = _a[1];
     var isInsideCellSelection = !editor.state.selection.empty &&
         editor.state.selection.$anchor.node().type.name === "tableCell";
-    var _b = useState(false), isMenuOpen = _b[0], setIsMenuOpen = _b[1];
-    var _c = useState(false), showCellProps = _c[0], setShowCellProps = _c[1];
-    var _d = useState(null), menuPosition = _d[0], setMenuPosition = _d[1];
+    var _b = __read(useState(false), 2), isMenuOpen = _b[0], setIsMenuOpen = _b[1];
+    var _c = __read(useState(false), 2), showCellProps = _c[0], setShowCellProps = _c[1];
+    var _d = __read(useState(null), 2), menuPosition = _d[0], setMenuPosition = _d[1];
     useEffect(function () {
         var _a;
         if (!editor.isActive("tableCell") &&
@@ -282,11 +298,11 @@ export function TableColumnFloatingMenu(props) {
                     type: "menu",
                     position: {},
                 }, items: isInsideCellSelection
-                    ? __spreadArray(__spreadArray([], mergeSplitProperties, true), cellProperties, true) : __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], columnProperties, true), [
+                    ? __spreadArray(__spreadArray([], __read(mergeSplitProperties), false), __read(cellProperties), false) : __spreadArray(__spreadArray(__spreadArray(__spreadArray(__spreadArray([], __read(columnProperties), false), [
                     { type: "seperator", key: "cellSeperator" }
-                ], false), cellProperties, true), [
+                ], false), __read(cellProperties), false), [
                     { type: "seperator", key: "tableSeperator" }
-                ], false), tableProperties, true) }), _jsx(MenuPresenter, __assign({ isOpen: showCellProps, onClose: function () {
+                ], false), __read(tableProperties), false) }), _jsx(MenuPresenter, __assign({ isOpen: showCellProps, onClose: function () {
                     setShowCellProps(false);
                     editor.commands.focus();
                 }, options: {
@@ -318,7 +334,7 @@ function CellProperties(props) {
 }
 function ColorPickerTool(props) {
     var color = props.color, title = props.title, icon = props.icon, onColorChange = props.onColorChange;
-    var _a = useState(false), isOpen = _a[0], setIsOpen = _a[1];
+    var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var buttonRef = useRef(null);
     return (_jsxs(_Fragment, { children: [_jsxs(Flex, __assign({ sx: { justifyContent: "space-between", alignItems: "center", mt: 1 } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: title })), _jsx(ToolButton, { buttonRef: buttonRef, toggled: isOpen, title: title, id: icon, icon: icon, iconSize: 16, sx: {
                             p: "2.5px",

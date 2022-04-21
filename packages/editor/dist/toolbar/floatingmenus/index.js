@@ -11,6 +11,7 @@ var __assign = (this && this.__assign) || function () {
 };
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { TableRowFloatingMenu, TableColumnFloatingMenu } from "./table";
+import { SearchReplaceFloatingMenu } from "./search-replace";
 export function EditorFloatingMenus(props) {
-    return (_jsxs(_Fragment, { children: [_jsx(TableRowFloatingMenu, __assign({}, props)), _jsx(TableColumnFloatingMenu, __assign({}, props))] }));
+    return (_jsxs(_Fragment, { children: [_jsx(TableRowFloatingMenu, __assign({}, props)), _jsx(TableColumnFloatingMenu, __assign({}, props)), _jsx(SearchReplaceFloatingMenu, __assign({}, props))] }));
 }
