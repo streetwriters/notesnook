@@ -153,13 +153,13 @@ const MoveNoteComponent = ({ note }) => {
     if (!note?.id && selectedItemsList?.length === 0) return;
 
     let notes = selectedItemsList.length > 0 ? selectedItemsList.map(n => n.id) : [note?.id];
-    console.log(notes);
     let ids = [];
     let notebooks = db.notebooks.all;
     for (let i = 0; i < notebooks.length; i++) {
       if (notebooks[i].topics) {
         for (let t = 0; t < notebooks[i].topics.length; t++) {
           let topic = notebooks[i].topics[t];
+          if (topic.type !== 'topic') continue;
           for (let id of notes) {
             if (topic.notes.indexOf(id) > -1) {
               console.log('found', ids.indexOf(notebooks[i].id));
@@ -355,7 +355,7 @@ const MoveNoteComponent = ({ note }) => {
               {expanded === item.id ? (
                 <FlatList
                   nestedScrollEnabled
-                  data={item.topics}
+                  data={item.topics?.filter(t => t.type === 'topic')}
                   keyboardShouldPersistTaps="always"
                   keyboardDismissMode="none"
                   onMomentumScrollEnd={() => {
