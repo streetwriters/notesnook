@@ -75,6 +75,8 @@ import {
   mdiFormatFont,
   mdiFormatLetterCase,
   mdiFormatLetterMatches,
+  mdiMoviePlusOutline,
+  mdiLink,
 } from "@mdi/js";
 
 export const Icons = {
@@ -100,6 +102,7 @@ export const Icons = {
   highlight: mdiFormatColorHighlight,
   textColor: mdiFormatColorText,
   link: mdiLinkPlus,
+  url: mdiLink,
   image: mdiImage,
   colorClear: mdiInvertColorsOff,
   check: mdiCheck,
@@ -138,6 +141,7 @@ export const Icons = {
   caseSensitive: mdiFormatLetterCase,
   wholeWord: mdiFormatLetterMatches,
   regex: mdiRegex,
+  embed: mdiMoviePlusOutline,
 
   plus: mdiPlus,
   close: mdiClose,

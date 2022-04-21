@@ -49,6 +49,7 @@ import { Dropdown } from "../components/dropdown";
 import { Icon } from "../components/icon";
 import { Box, Button, Flex, Text } from "rebass";
 import { Popup } from "../components/popup";
+import { EmbedPopup } from "../popups/embed-popup";
 var BlockTool = /** @class */ (function () {
     function BlockTool(id, title, icon, command) {
         var _this = this;
@@ -120,6 +121,31 @@ var Image = /** @class */ (function () {
     return Image;
 }());
 export { Image };
+var Embed = /** @class */ (function () {
+    function Embed() {
+        var _this = this;
+        this.id = "embed";
+        this.title = "Embed";
+        this.render = function (props) {
+            var editor = props.editor;
+            var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
+            var buttonRef = useRef(null);
+            return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { buttonRef: buttonRef, id: _this.id, title: _this.title, icon: "embed", onClick: function () { return setIsOpen(function (s) { return !s; }); }, toggled: isOpen }), _jsx(MenuPresenter, __assign({ isOpen: isOpen, items: [], onClose: function () { return setIsOpen(false); }, options: {
+                            type: "menu",
+                            position: {
+                                target: buttonRef.current || undefined,
+                                isTargetAbsolute: true,
+                                location: "below",
+                                yOffset: 10,
+                            },
+                        } }, { children: _jsx(EmbedPopup, { title: "Insert embed", icon: "check", onClose: function (embed) {
+                                editor.chain().focus().insertEmbed(embed).run();
+                            } }) }))] }));
+        };
+    }
+    return Embed;
+}());
+export { Embed };
 var Table = /** @class */ (function () {
     function Table() {
         var _this = this;

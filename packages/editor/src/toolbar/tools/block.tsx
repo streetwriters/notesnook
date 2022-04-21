@@ -9,6 +9,7 @@ import { Dropdown } from "../components/dropdown";
 import { Icon } from "../components/icon";
 import { Box, Button, Flex, Text } from "rebass";
 import { Popup } from "../components/popup";
+import { EmbedPopup } from "../popups/embed-popup";
 
 class BlockTool<TId extends ToolId> implements ITool {
   constructor(
@@ -84,6 +85,51 @@ export class Image implements ITool {
             },
           ]}
         />
+      </>
+    );
+  };
+}
+
+export class Embed implements ITool {
+  id: ToolId = "embed";
+  title: string = "Embed";
+
+  render = (props: ToolProps) => {
+    const { editor } = props;
+    const [isOpen, setIsOpen] = useState(false);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    return (
+      <>
+        <ToolButton
+          buttonRef={buttonRef}
+          id={this.id}
+          title={this.title}
+          icon={"embed"}
+          onClick={() => setIsOpen((s) => !s)}
+          toggled={isOpen}
+        />
+        <MenuPresenter
+          isOpen={isOpen}
+          items={[]}
+          onClose={() => setIsOpen(false)}
+          options={{
+            type: "menu",
+            position: {
+              target: buttonRef.current || undefined,
+              isTargetAbsolute: true,
+              location: "below",
+              yOffset: 10,
+            },
+          }}
+        >
+          <EmbedPopup
+            title="Insert embed"
+            icon="check"
+            onClose={(embed) => {
+              editor.chain().focus().insertEmbed(embed).run();
+            }}
+          />
+        </MenuPresenter>
       </>
     );
   };

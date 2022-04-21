@@ -34,7 +34,7 @@ export function Toolbar(props: ToolbarProps) {
     ["codeblock", "blockquote"],
     ["formatClear", "ltr", "rtl"],
     ["numberedList", "bulletList", "checklist"],
-    ["link", "image", "attachment", "table"],
+    ["link", "image", "attachment", "table", "embed"],
     ["textColor", "highlight"],
   ];
 

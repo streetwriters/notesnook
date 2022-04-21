@@ -4,7 +4,7 @@ import { IconNames, Icons } from "../icons";
 import { PropsWithChildren } from "react";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 
-type PopupProps = {
+export type PopupProps = {
   title?: string;
   action?: PopupButtonProps;
 };

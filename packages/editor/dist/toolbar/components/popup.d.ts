@@ -2,7 +2,7 @@ import { ButtonProps } from "rebass";
 import { IconNames } from "../icons";
 import { PropsWithChildren } from "react";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
-declare type PopupProps = {
+export declare type PopupProps = {
     title?: string;
     action?: PopupButtonProps;
 };

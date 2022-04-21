@@ -25,6 +25,11 @@ export declare class Image implements ITool {
     title: string;
     render: (props: ToolProps) => JSX.Element;
 }
+export declare class Embed implements ITool {
+    id: ToolId;
+    title: string;
+    render: (props: ToolProps) => JSX.Element;
+}
 export declare class Table implements ITool {
     id: ToolId;
     title: string;

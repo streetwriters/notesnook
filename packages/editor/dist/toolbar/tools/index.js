@@ -1,7 +1,7 @@
 import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link, Attachment, } from "./inline";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
-import { Blockquote, CodeBlock, HorizontalRule, Image, Table } from "./block";
+import { Blockquote, CodeBlock, HorizontalRule, Image, Table, Embed, } from "./block";
 import { Headings } from "./headings";
 import { NumberedList, BulletList, Checklist } from "./lists";
 import { LeftToRight, RightToLeft } from "./text-direction";
@@ -36,6 +36,7 @@ var tools = {
     image: new Image(),
     attachment: new Attachment(),
     table: new Table(),
+    embed: new Embed(),
 };
 export function findToolById(id) {
     return tools[id];

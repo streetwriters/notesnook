@@ -8,6 +8,7 @@
     "@mdi/react": "^1.5.0",
     "@notesnook/theme": "file:../themeprovider",
     "@rebass/forms": "^4.0.6",
+    "@social-embed/lib": "^0.0.1-next.12",
     "@tiptap/extension-character-count": "^2.0.0-beta.24",
     "@tiptap/extension-color": "^2.0.0-beta.9",
     "@tiptap/extension-font-family": "^2.0.0-beta.21",

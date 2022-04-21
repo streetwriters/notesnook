@@ -51,6 +51,7 @@ import { TaskListNode } from "./extensions/task-list";
 import { TaskItemNode } from "./extensions/task-item";
 import { Dropcursor } from "./extensions/drop-cursor";
 import { SearchReplace } from "./extensions/search-replace";
+import { EmbedNode } from "./extensions/embed";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -101,6 +102,7 @@ var useTiptap = function (options, deps) {
                 placeholder: "Start writing your note...",
             }),
             ImageNode,
+            EmbedNode,
             AttachmentNode.configure({
                 onDownloadAttachment: onDownloadAttachment,
             }),

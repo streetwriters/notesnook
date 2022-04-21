@@ -21,6 +21,7 @@ export declare const Icons: {
     highlight: string;
     textColor: string;
     link: string;
+    url: string;
     image: string;
     colorClear: string;
     check: string;
@@ -57,6 +58,7 @@ export declare const Icons: {
     caseSensitive: string;
     wholeWord: string;
     regex: string;
+    embed: string;
     plus: string;
     close: string;
     delete: string;

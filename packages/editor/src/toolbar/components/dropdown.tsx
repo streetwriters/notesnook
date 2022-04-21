@@ -8,16 +8,20 @@ import { MenuItem } from "../../components/menu/types";
 type DropdownProps = {
   selectedItem: string | JSX.Element;
   items: MenuItem[];
+  buttonRef?: React.MutableRefObject<HTMLButtonElement | undefined>;
 };
 export function Dropdown(props: DropdownProps) {
-  const { items, selectedItem } = props;
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const { items, selectedItem, buttonRef } = props;
+  const internalRef = useRef<any>();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <Button
-        ref={buttonRef}
+        ref={(ref) => {
+          internalRef.current = ref;
+          if (buttonRef) buttonRef.current = ref;
+        }}
         sx={{
           p: 1,
           m: 0,
@@ -45,7 +49,7 @@ export function Dropdown(props: DropdownProps) {
         options={{
           type: "menu",
           position: {
-            target: buttonRef.current || undefined,
+            target: internalRef.current || undefined,
             isTargetAbsolute: true,
             location: "below",
             yOffset: 5,
