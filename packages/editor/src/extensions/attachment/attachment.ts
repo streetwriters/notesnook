@@ -1,5 +1,5 @@
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "@tiptap/react";
+import { findChildren, ReactNodeViewRenderer } from "@tiptap/react";
 import { Attribute } from "@tiptap/core";
 import { AttachmentComponent } from "./component";
 
@@ -8,11 +8,17 @@ export interface AttachmentOptions {
   onDownloadAttachment: (attachment: Attachment) => boolean;
 }
 
-export type Attachment = {
+export type Attachment = AttachmentProgress & {
   hash: string;
   filename: string;
   type: string;
   size: number;
+};
+
+export type AttachmentProgress = {
+  progress: number;
+  type: "upload" | "download";
+  hash: string;
 };
 
 declare module "@tiptap/core" {
@@ -20,6 +26,7 @@ declare module "@tiptap/core" {
     attachment: {
       insertAttachment: (attachment: Attachment) => ReturnType;
       downloadAttachment: (attachment: Attachment) => ReturnType;
+      setProgress: (progress: AttachmentProgress) => ReturnType;
     };
   }
 }
@@ -83,6 +90,25 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
         (attachment) =>
         ({}) => {
           return this.options.onDownloadAttachment(attachment);
+        },
+      setProgress:
+        (options) =>
+        ({ state, tr, dispatch }) => {
+          const { hash, progress, type } = options;
+          const attachments = findChildren(
+            state.doc,
+            (node) =>
+              (node.type.name === "attachment" || node.type.name === "image") &&
+              node.attrs.hash === hash
+          );
+          for (const attachment of attachments) {
+            tr.setNodeMarkup(attachment.pos, attachment.node.type, {
+              progress,
+              type,
+            });
+          }
+          if (dispatch) dispatch(tr);
+          return true;
         },
     };
   },

@@ -49,11 +49,11 @@ Interaction Elements:
 Total Tools:
 
 - [x] bold italic underline strikethrough inlinecode
-- [x] fontselect (50% done)
+- [x] fontselect
 - [x] blockquote (styling left)
 - [x] codeblock
-- [x] fontsizeselect (50% done)
-- [x] formatselect (50% done)
+- [x] fontsizeselect
+- [x] formatselect
 - [x] alignleft aligncenter alignright alignjustify
 - [] outdent indent
 - [x] subscript superscript
@@ -69,4 +69,4 @@ Total Tools:
 - [] media
 - [x] table
 - [x] ltr rtl
-- [] searchreplace
+- [x] searchreplace

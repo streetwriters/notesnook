@@ -2,17 +2,23 @@ import { Node } from "@tiptap/core";
 export interface AttachmentOptions {
     onDownloadAttachment: (attachment: Attachment) => boolean;
 }
-export declare type Attachment = {
+export declare type Attachment = AttachmentProgress & {
     hash: string;
     filename: string;
     type: string;
     size: number;
+};
+export declare type AttachmentProgress = {
+    progress: number;
+    type: "upload" | "download";
+    hash: string;
 };
 declare module "@tiptap/core" {
     interface Commands<ReturnType> {
         attachment: {
             insertAttachment: (attachment: Attachment) => ReturnType;
             downloadAttachment: (attachment: Attachment) => ReturnType;
+            setProgress: (progress: AttachmentProgress) => ReturnType;
         };
     }
 }
