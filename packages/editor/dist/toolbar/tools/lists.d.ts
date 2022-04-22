@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ITool, ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
 import { ToolId } from ".";

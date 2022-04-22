@@ -78,9 +78,9 @@ export function TaskItemComponent(props) {
         }).length;
         var total = children.length;
         setStats({ checked: checked, total: total });
-    }, [isNested, nestedTaskList, node]);
+    }, []);
     return (_jsx(NodeViewWrapper, { children: _jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsxs(Flex, __assign({ sx: {
-                    mb: 2,
+                    mb: isNested ? 0 : 2,
                     ":hover > .dragHandle, :hover > .toggleSublist": {
                         opacity: 1,
                     },
@@ -118,6 +118,7 @@ export function TaskItemComponent(props) {
                             textDecorationLine: checked ? "line-through" : "none",
                             color: checked ? "var(--checked)" : "var(--text)",
                             flex: 1,
+                            marginBottom: isNested ? 0 : 5,
                         } }), isNested && (_jsxs(_Fragment, { children: [isCollapsed && (_jsxs(Text, __assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), _jsx(Icon, { className: "toggleSublist", path: nestedTaskList.node.attrs.collapsed
                                     ? Icons.chevronDown
                                     : Icons.chevronUp, sx: {

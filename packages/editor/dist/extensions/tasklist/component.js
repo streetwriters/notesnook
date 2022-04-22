@@ -77,7 +77,7 @@ export function TaskListComponent(props) {
                                     zIndex: 0,
                                     left: 0,
                                     transition: "width 250ms ease-out",
-                                } }), _jsx(Input, { value: title, variant: "clean", sx: { p: 0, px: 2, zIndex: 1, color: "fontTertiary" }, placeholder: "Untitled", onChange: function (e) {
+                                } }), _jsx(Input, { value: title || "", variant: "clean", sx: { p: 0, px: 2, zIndex: 1, color: "fontTertiary" }, placeholder: "Untitled", onChange: function (e) {
                                     updateAttributes({ title: e.target.value });
                                 } }), _jsxs(Flex, __assign({ sx: { flexShrink: 0, pr: 2 } }, { children: [_jsx(Icon, { path: Icons.checkbox, size: 15, color: "fontTertiary" }), _jsxs(Text, __assign({ variant: "body", sx: { ml: 1, color: "fontTertiary" } }, { children: [stats.checked, "/", stats.total] }))] }))] }))) })) })), _jsx(NodeViewContent, { as: "ul", style: {
                     paddingInlineStart: 0,

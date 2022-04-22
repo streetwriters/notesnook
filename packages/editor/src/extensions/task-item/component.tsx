@@ -55,14 +55,14 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
     const checked = children.filter(({ node }) => node.attrs.checked).length;
     const total = children.length;
     setStats({ checked, total });
-  }, [isNested, nestedTaskList, node]);
+  }, []);
 
   return (
     <NodeViewWrapper>
       <ThemeProvider theme={theme}>
         <Flex
           sx={{
-            mb: 2,
+            mb: isNested ? 0 : 2,
             ":hover > .dragHandle, :hover > .toggleSublist": {
               opacity: 1,
             },
@@ -122,6 +122,7 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
               textDecorationLine: checked ? "line-through" : "none",
               color: checked ? "var(--checked)" : "var(--text)",
               flex: 1,
+              marginBottom: isNested ? 0 : 5,
             }}
           />
 

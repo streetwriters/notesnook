@@ -79,7 +79,7 @@ export function TaskListComponent(props: NodeViewProps) {
                 }}
               />
               <Input
-                value={title}
+                value={title || ""}
                 variant={"clean"}
                 sx={{ p: 0, px: 2, zIndex: 1, color: "fontTertiary" }}
                 placeholder="Untitled"
