@@ -2,19 +2,13 @@ import React from 'react';
 import { FloatingButton } from '../../components/container/floating-button';
 import { RightMenus } from '../../components/header/right-menus';
 import List from '../../components/list';
-import { DDS } from '../../services/device-detection';
-import { eSendEvent } from '../../services/event-manager';
 import Navigation, { NavigationProps } from '../../services/navigation';
 import SearchService from '../../services/search';
 import SettingsService from '../../services/settings';
 import useNavigationStore from '../../stores/use-navigation-store';
 import { useNoteStore } from '../../stores/use-notes-store';
-import { editing } from '../../utils';
 import { db } from '../../utils/database';
-import { eOnLoadNote } from '../../utils/events';
-import { tabBarRef } from '../../utils/global-refs';
 import { useNavigationFocus } from '../../utils/hooks/use-navigation-focus';
-import { getNote } from '../editor/Functions';
 import { openEditor } from '../notes/common';
 
 const prepareSearch = () => {

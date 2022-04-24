@@ -2,11 +2,11 @@
 import { groupArray } from 'notes-core/utils/grouping';
 import create, { State } from 'zustand';
 import { db } from '../utils/database';
-import { NotebookType, NoteType } from '../utils/types';
+import { TrashType } from '../utils/types';
 
 export interface TrashStore extends State {
-  trash: Array<NoteType | NotebookType>;
-  setTrash: (items?: Array<NoteType | NotebookType>) => void;
+  trash: Array<TrashType>;
+  setTrash: (items?: Array<TrashType>) => void;
   clearTrash: () => void;
 }
 

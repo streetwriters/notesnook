@@ -125,7 +125,7 @@ type TrashItem<TItem extends Entity<'note' | 'notebook'>> = Entity<'trash'> & {
   deleted: boolean;
 } & Omit<TItem, 'id' | 'type'>;
 
-type TrashType = TrashItem<NoteType> | TrashItem<NotebookType>;
+export type TrashType = TrashItem<NoteType> | TrashItem<NotebookType>;
 
 export interface GroupHeader extends Omit<Entity<'header'>, 'id' | 'dateCreated' | 'dateModified'> {
   title: string;
