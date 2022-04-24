@@ -1,8 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
 import { FlatList, View } from 'react-native';
-import { ContainerHeader } from '../../components/container/containerheader';
-import { Header } from '../../components/header';
+import useNavigationStore from '../../stores/use-navigation-store';
 import { tabBarRef } from '../../utils/global-refs';
 import { useNavigationFocus } from '../../utils/hooks/use-navigation-focus';
 import { SectionItem } from './section-item';
@@ -12,6 +11,15 @@ const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Setti
   useNavigationFocus(navigation, {
     onFocus: () => {
       tabBarRef.current?.lock();
+      console.log('called');
+      useNavigationStore.getState().update(
+        {
+          name: 'SettingsGroup',
+          //@ts-ignore
+          title: route.params.name
+        },
+        true
+      );
       return false;
     }
   });
@@ -26,10 +34,6 @@ const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Setti
 
   return (
     <View>
-      <ContainerHeader>
-        <Header title={route.params.name} isBack={true} screen={route.name} />
-      </ContainerHeader>
-
       {route.params.sections ? (
         <FlatList
           data={route.params.sections}

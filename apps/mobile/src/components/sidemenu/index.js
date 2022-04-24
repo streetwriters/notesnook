@@ -17,6 +17,7 @@ import { ColorSection } from './color-section';
 import { MenuItem } from './menu-item';
 import { TagsSection } from './pinned-section';
 import { UserStatus } from './user-status';
+import Navigation from '../../services/navigation';
 
 export const SideMenu = React.memo(
   () => {
@@ -39,7 +40,13 @@ export const SideMenu = React.memo(
       {
         name: 'Settings',
         icon: 'cog-outline',
-        close: true
+        close: true,
+        func: () => {
+          Navigation.navigate({
+            name: 'Settings',
+            title: 'Settings'
+          });
+        }
       }
     ];
 

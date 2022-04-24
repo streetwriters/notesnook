@@ -7,6 +7,7 @@ import { PressableButton } from '../../components/ui/pressable';
 import Seperator from '../../components/ui/seperator';
 import Paragraph from '../../components/ui/typography/paragraph';
 import SettingsService from '../../services/settings';
+import useNavigationStore from '../../stores/use-navigation-store';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
@@ -63,6 +64,13 @@ export const SectionItem = React.memo(
           switch (item.type) {
             case 'screen':
               navigation.dispatch(StackActions.push('SettingsGroup', item));
+              useNavigationStore.getState().update(
+                {
+                  name: 'SettingsGroup',
+                  title: typeof item.name === 'function' ? item.name(current) : item.name
+                },
+                true
+              );
               break;
             case 'switch':
               onChangeSettings();

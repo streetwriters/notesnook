@@ -24,7 +24,7 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
   const isFocused = useNavigationFocus(navigation, {
     onFocus: () => {
       useNavigationStore.getState().update({
-        name: route.name
+        name: 'Settings'
       });
       return true;
     },
@@ -49,10 +49,6 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
 
   return (
     <View>
-      <ContainerHeader>
-        <Header title="Settings" isBack={false} screen="Settings" />
-      </ContainerHeader>
-
       {loading && (
         <BaseDialog animated={false} bounce={false} visible={true}>
           <View
