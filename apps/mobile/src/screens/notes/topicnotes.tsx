@@ -46,8 +46,10 @@ export const TopicNotes = ({ navigation, route }: NavigationProps<'TopicNotes'>)
   );
 };
 
-TopicNotes.get = (id: string, grouped = true) => {
-  let notes = db.notes?.tagged(id) || [];
+TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
+  //@ts-ignore
+  const { id, notebookId } = params.item;
+  let notes = db.notebooks?.notebook(notebookId)?.topics.topic(id)?.all || [];
   return grouped ? groupArray(notes, db.settings?.getGroupOptions('notes')) : notes;
 };
 

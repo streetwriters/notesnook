@@ -1,7 +1,7 @@
 import { groupArray } from 'notes-core/utils/grouping';
 import React from 'react';
 import NotesPage, { PLACEHOLDER_DATA } from '.';
-import Navigation, { NavigationProps } from '../../services/navigation';
+import Navigation, { NavigationProps, NotesScreenParams } from '../../services/navigation';
 import { db } from '../../utils/database';
 import { MonographType } from '../../utils/types';
 import { openMonographsWebpage } from './common';
@@ -20,7 +20,7 @@ export const Monographs = ({ navigation, route }: NavigationProps<'Monographs'>)
   );
 };
 
-Monographs.get = (id: string, grouped = true) => {
+Monographs.get = (params: NotesScreenParams, grouped = true) => {
   let notes = db.monographs?.all || [];
   return grouped ? groupArray(notes, db.settings?.getGroupOptions('notes')) : notes;
 };

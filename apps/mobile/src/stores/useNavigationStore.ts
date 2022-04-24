@@ -36,6 +36,7 @@ export type HeaderRightButton = {
 
 interface NavigationStore extends State {
   currentScreen: CurrentScreen;
+  currentScreenRaw: CurrentScreen;
   canGoBack: boolean | undefined;
   update: (
     currentScreen: CurrentScreen,
@@ -52,23 +53,13 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
     title: 'Notes',
     type: 'notes'
   },
+  currentScreenRaw: { name: 'notes' },
   canGoBack: false,
   update: (currentScreen, canGoBack, headerRightButtons) => {
     //@ts-ignore
     const color = COLORS_NOTE[currentScreen.title?.toLowerCase()];
-    if (
-      currentScreen.name === get().currentScreen.name &&
-      !currentScreen.id &&
-      get().currentScreen.id?.endsWith('_navigation')
-    )
-      return;
+    if (JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)) return;
 
-    if (
-      currentScreen.name === get().currentScreen.name &&
-      currentScreen.id === get().currentScreen.id
-    )
-      return;
-    console.log('UPDATING STATE', currentScreen.name, canGoBack);
     set({
       currentScreen: {
         name: currentScreen.name,
@@ -78,6 +69,7 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
         color: color,
         notebookId: currentScreen.notebookId
       },
+      currentScreenRaw: currentScreen,
       canGoBack,
       headerRightButtons: headerRightButtons
     });

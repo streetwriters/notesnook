@@ -5,7 +5,7 @@ import List from '../../components/list';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import Navigation, { NavigationProps, NotesScreenParams } from '../../services/navigation';
 import SearchService from '../../services/search';
-import useNavigationStore, { HeaderRightButton } from '../../stores/use-navigation-store';
+import useNavigationStore, { HeaderRightButton, RouteName } from '../../stores/use-navigation-store';
 import { useNoteStore } from '../../stores/use-notes-store';
 import { useNavigationFocus } from '../../utils/hooks/use-navigation-focus';
 import { NoteType } from '../../utils/types';
@@ -40,8 +40,8 @@ export const MONOGRAPH_PLACEHOLDER_DATA = {
   buttonIcon: 'information-outline'
 };
 
-export interface RouteProps<T extends string> extends NavigationProps<T> {
-  get: (id: string, grouped?: boolean) => NoteType[];
+export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
+  get: (params: NotesScreenParams, grouped?: boolean) => NoteType[];
   placeholderData: any;
   onPressFloatingButton: () => void;
   focusControl?: boolean;
@@ -59,12 +59,13 @@ const NotesPage = ({
   canGoBack,
   rightButtons
 }: RouteProps<'NotesPage' | 'TaggedNotes' | 'Monographs' | 'ColoredNotes' | 'TopicNotes'>) => {
-  const [notes, setNotes] = useState<NoteType[]>(get(route.params?.item?.id));
   const params = useRef<NotesScreenParams>(route?.params);
-  const [warning, setWarning] = useState(!isSynced(params.current));
+  const [notes, setNotes] = useState<NoteType[]>(get(route.params, true));
+  const [warning, setWarning] = useState(!isSynced(route.params));
   const loading = useNoteStore(state => state.loading);
   const alias = getAlias(params.current);
   const isMonograph = route.name === 'Monographs';
+  console.log(warning, 'isWarning', isSynced(route.params));
 
   const isFocused = useNavigationFocus(navigation, {
     onFocus: prev => {
@@ -110,11 +111,11 @@ const NotesPage = ({
     params.current.title = params.current.title || params.current.item.title;
     const { item } = params.current;
     try {
-      let notes = get(item.id) as NoteType[];
+      let notes = get(params.current, true) as NoteType[];
       if ((item.type === 'tag' || item.type === 'color') && (!notes || notes.length === 0)) {
         return Navigation.goBack();
       }
-      if (item.type === 'topic') setWarning(isSynced(params.current));
+      if (item.type === 'topic') setWarning(!isSynced(params.current));
       setNotes(notes);
       syncWithNavigation();
     } catch (e) {}
@@ -134,7 +135,7 @@ const NotesPage = ({
       type: 'notes',
       title: item.type === 'tag' ? '#' + alias : toCamelCase(item.title),
       get: () => {
-        return get(item.id, false);
+        return get(params.current, false);
       }
     });
   };

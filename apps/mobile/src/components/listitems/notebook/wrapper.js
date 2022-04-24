@@ -72,7 +72,7 @@ export const NotebookWrapper = React.memo(
       <SelectionWrapper
         pinned={item.pinned}
         index={index}
-        onPress={openNotebookTopic}
+        onPress={() => openNotebookTopic(item)}
         height={item.type === 'topic' ? 80 : 110}
         item={item}
       >

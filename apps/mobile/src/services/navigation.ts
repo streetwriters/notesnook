@@ -122,7 +122,7 @@ function queueRoutesForUpdate(...routes: Route[]) {
 }
 
 function navigate<T extends RouteName>(screen: CurrentScreen, params: RouteParams[T]) {
-  useNavigationStore.getState().update(screen, params.canGoBack);
+  useNavigationStore.getState().update(screen, params?.canGoBack);
   if (screen.name === 'Notebook') routeUpdateFunctions['Notebook'](params);
   if (screen.name.endsWith('Notes')) routeUpdateFunctions[screen.name](params);
   //@ts-ignore

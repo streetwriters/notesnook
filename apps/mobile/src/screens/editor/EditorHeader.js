@@ -100,6 +100,7 @@ const EditorHeader = () => {
         }, 1);
         keyboardListener.current?.remove();
         await clearEditor();
+        BackHandler.removeEventListener('hardwareBackPress', _onHardwareBackPress);
       }
       closing.current = false;
     }, 1);

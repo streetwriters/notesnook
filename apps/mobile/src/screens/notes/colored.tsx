@@ -1,7 +1,7 @@
 import { groupArray } from 'notes-core/utils/grouping';
 import React from 'react';
 import NotesPage, { PLACEHOLDER_DATA } from '.';
-import Navigation, { NavigationProps } from '../../services/navigation';
+import Navigation, { NavigationProps, NotesScreenParams } from '../../services/navigation';
 import { db } from '../../utils/database';
 import { ColorType, TagType } from '../../utils/types';
 import { getAlias, openEditor, toCamelCase } from './common';
@@ -20,8 +20,8 @@ export const ColoredNotes = ({ navigation, route }: NavigationProps<'ColoredNote
   );
 };
 
-ColoredNotes.get = (id: string, grouped = true) => {
-  let notes = db.notes?.colored(id) || [];
+ColoredNotes.get = (params: NotesScreenParams, grouped = true) => {
+  let notes = db.notes?.colored(params.item.id) || [];
   return grouped ? groupArray(notes, db.settings?.getGroupOptions('notes')) : notes;
 };
 
