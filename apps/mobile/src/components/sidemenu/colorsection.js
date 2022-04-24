@@ -12,6 +12,7 @@ import { presentDialog } from '../dialog/functions';
 import { PressableButton } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { ColoredNotes } from '../../screens/notes/colored';
 
 export const ColorSection = React.memo(
   () => {
@@ -61,21 +62,7 @@ const ColorItem = React.memo(
     }, [headerTextState]);
 
     const onPress = item => {
-      let params = {
-        ...item,
-        type: 'color',
-        menu: true,
-        get: 'colored'
-      };
-      Navigation.navigate(
-        {
-          name: 'NotesPage',
-          title: alias.slice(0, 1).toUpperCase() + alias.slice(1),
-          id: item.id,
-          type: 'color'
-        },
-        params
-      );
+      ColoredNotes.navigate(item, false);
 
       setImmediate(() => {
         Navigation.closeDrawer();

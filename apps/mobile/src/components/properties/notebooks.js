@@ -10,6 +10,8 @@ import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import { PressableButton } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
+import { TopicNotes } from '../../screens/notes/topic-notes';
+import Notebook from '../../screens/notebook';
 
 export default function Notebooks({ note, close }) {
   const colors = useThemeStore(state => state.colors);
@@ -44,31 +46,13 @@ export default function Notebooks({ note, close }) {
   const navigateNotebook = id => {
     let item = db.notebooks.notebook(id)?.data;
     if (!item) return;
-    let params = {
-      menu: false,
-      notebook: item,
-      title: item.title
-    };
-    let currentScreen = {
-      name: 'Notebook',
-      title: item.title,
-      id: item.id,
-      type: item.type
-    };
-    Navigation.navigate(currentScreen, params);
+    Notebook.navigate(item, true);
   };
 
   const navigateTopic = (id, notebookId) => {
     let item = db.notebooks.notebook(notebookId)?.topics?.topic(id)?._topic;
     if (!item) return;
-    let params = { ...item, menu: false };
-    let currentScreen = {
-      name: 'NotesPage',
-      title: item.title,
-      id: item.id,
-      type: item.type
-    };
-    Navigation.navigate(currentScreen, params);
+    TopicNotes.navigate(item, true);
   };
 
   return !note.notebooks || note.notebooks.length === 0 ? null : (

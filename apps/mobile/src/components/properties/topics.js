@@ -1,20 +1,13 @@
 import React from 'react';
 import { View } from 'react-native';
-import Navigation from '../../services/navigation';
+import { TopicNotes } from '../../screens/notes/topic-notes';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 
 export const Topics = ({ item, close }) => {
   const open = topic => {
     close();
-    let params = { ...topic, menu: false, get: 'topics' };
-    let currentScreen = {
-      name: 'NotesPage',
-      title: topic.title,
-      id: topic.id,
-      type: topic.type
-    };
-    Navigation.navigate(currentScreen, params);
+    TopicNotes.navigate(topic, true);
   };
 
   const renderItem = topic => (

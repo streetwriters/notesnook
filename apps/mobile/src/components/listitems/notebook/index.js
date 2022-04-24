@@ -2,18 +2,25 @@ import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useThemeStore } from '../../../stores/use-theme-store';
+import { TopicNotes } from '../../../screens/notes/topic-notes';
 import { useSettingStore } from '../../../stores/use-setting-store';
-import { eSendEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { getTotalNotes, history } from '../../../utils';
-import { refreshNotesPage } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
-import { IconButton } from '../../ui/icon-button';
-import { Button } from '../../ui/button';
 import { Properties } from '../../properties';
+import { Button } from '../../ui/button';
+import { IconButton } from '../../ui/icon-button';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
+
+const showActionSheet = item => {
+  Properties.present(item);
+};
+
+const navigateToTopic = topic => {
+  if (history.selectedItemsList.length > 0) return;
+  TopicNotes.navigate(topic, true);
+};
 
 export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateBy }) => {
   const colors = useThemeStore(state => state.colors);
@@ -21,22 +28,6 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
   const compactMode = notebooksListMode === 'compact';
   const topics = item.topics?.slice(0, 3) || [];
   const totalNotes = getTotalNotes(item);
-  const showActionSheet = () => {
-    Properties.present(item);
-  };
-
-  const navigateToTopic = topic => {
-    if (history.selectedItemsList.length > 0) return;
-    Navigation.navigate(
-      {
-        name: 'NotesPage',
-        title: topic.title,
-        id: topic.id,
-        type: topic.type
-      },
-      { ...topic, menu: false, get: 'topics' }
-    );
-  };
 
   return (
     <>
@@ -190,7 +181,7 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
         name="dots-horizontal"
         testID={notesnook.ids.notebook.menu}
         size={SIZE.xl}
-        onPress={showActionSheet}
+        onPress={() => showActionSheet(item)}
         customStyle={{
           justifyContent: 'center',
           height: 35,

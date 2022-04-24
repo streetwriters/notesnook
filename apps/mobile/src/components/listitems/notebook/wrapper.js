@@ -11,67 +11,68 @@ import { db } from '../../../utils/database';
 import { presentDialog } from '../../dialog/functions';
 import SelectionWrapper from '../selection-wrapper';
 
+export const openNotebookTopic = item => {
+  const isTrash = item.type === 'trash';
+  if (history.selectedItemsList.length > 0 && history.selectionMode) {
+    useSelectionStore.getState().setSelectedItem(item);
+    return;
+  } else {
+    history.selectedItemsList = [];
+  }
+
+  if (isTrash) {
+    presentDialog({
+      title: `Restore ${item.itemType}`,
+      paragraph: `Restore or delete ${item.itemType} forever`,
+      positiveText: 'Restore',
+      negativeText: 'Delete',
+      positivePress: async () => {
+        await db.trash.restore(item.id);
+        Navigation.queueRoutesForUpdate(
+          'Tags',
+          'Notes',
+          'Notebooks',
+          'Favorites',
+          'Trash',
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes'
+        );
+        useSelectionStore.getState().setSelectionMode(false);
+        ToastEvent.show({
+          heading: 'Restore successful',
+          type: 'success'
+        });
+      },
+      onClose: async () => {
+        await db.trash.delete(item.id);
+        useTrashStore.getState().setTrash();
+        useSelectionStore.getState().setSelectionMode(false);
+        ToastEvent.show({
+          heading: 'Permanantly deleted items',
+          type: 'success',
+          context: 'local'
+        });
+      }
+    });
+    return;
+  }
+  if (item.type === 'topic') {
+    TopicNotes.navigate(item, true);
+  } else {
+    Notebook.navigate(item, true);
+  }
+};
+
 export const NotebookWrapper = React.memo(
   ({ item, index, dateBy }) => {
     const isTrash = item.type === 'trash';
-    const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
 
-    const onPress = () => {
-      if (history.selectedItemsList.length > 0 && history.selectionMode) {
-        setSelectedItem(item);
-        return;
-      } else {
-        history.selectedItemsList = [];
-      }
-
-      if (isTrash) {
-        presentDialog({
-          title: `Restore ${item.itemType}`,
-          paragraph: `Restore or delete ${item.itemType} forever`,
-          positiveText: 'Restore',
-          negativeText: 'Delete',
-          positivePress: async () => {
-            await db.trash.restore(item.id);
-            Navigation.queueRoutesForUpdate(
-              'Tags',
-              'Notes',
-              'Notebooks',
-              'Favorites',
-              'Trash',
-              'TaggedNotes',
-              'ColoredNotes',
-              'TopicNotes'
-            );
-            useSelectionStore.getState().setSelectionMode(false);
-            ToastEvent.show({
-              heading: 'Restore successful',
-              type: 'success'
-            });
-          },
-          onClose: async () => {
-            await db.trash.delete(item.id);
-            useTrashStore.getState().setTrash();
-            useSelectionStore.getState().setSelectionMode(false);
-            ToastEvent.show({
-              heading: 'Permanantly deleted items',
-              type: 'success',
-              context: 'local'
-            });
-          }
-        });
-        return;
-      }
-      if (item.type === 'topic') {
-        TopicNotes.navigate(item, true);
-      } else {
-        Notebook.navigate(item, true);
-      }
-    };
     return (
       <SelectionWrapper
         pinned={item.pinned}
         index={index}
-        onPress={onPress}
+        onPress={openNotebookTopic}
         height={item.type === 'topic' ? 80 : 110}
         item={item}
       >

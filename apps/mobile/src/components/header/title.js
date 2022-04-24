@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { Layout } from 'react-native-reanimated';
+import Notebook from '../../screens/notebook';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import useNavigationStore from '../../stores/use-navigation-store';
@@ -60,17 +61,7 @@ export const Title = () => {
 
   function navigateToNotebook() {
     if (!isTopic) return;
-    Navigation.navigate(
-      {
-        name: 'Notebook',
-        id: isTopic.id,
-        type: isTopic.type
-      },
-      {
-        notebook: isTopic,
-        title: isTopic.title
-      }
-    );
+    Notebook.navigate(notebook, true);
   }
 
   return (

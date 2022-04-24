@@ -24,7 +24,7 @@ export const MenuItem = React.memo(
       if (item.func) {
         item.func();
       } else {
-        Navigation.navigate({ name: item.name }, { menu: true });
+        Navigation.navigate({ name: item.name }, { canGoBack: false });
       }
       if (item.close) {
         setImmediate(() => {
