@@ -45,7 +45,13 @@ export const deleteItems = async item => {
 
     await db.notes.delete(...ids);
 
-    Navigation.queueRoutesForUpdate([Navigation.routeNames.Notes, Navigation.routeNames.NotesPage]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
     eSendEvent(eClearEditor);
   }
   if (topics?.length > 0) {
@@ -55,10 +61,7 @@ export const deleteItems = async item => {
     }
 
     // layoutmanager.withAnimation(150);
-    Navigation.queueRoutesForUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notebook
-    ]);
+    Navigation.queueRoutesForUpdate('Notebook', 'Notebooks');
     useMenuStore.getState().setMenuPins();
     ToastEvent.show({
       heading: 'Topics deleted',
@@ -71,7 +74,14 @@ export const deleteItems = async item => {
     await db.notebooks.delete(...ids);
 
     //layoutmanager.withAnimation(150);
-    Navigation.queueRoutesForUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notes]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Notebooks'
+    );
     useMenuStore.getState().setMenuPins();
   }
 
@@ -94,14 +104,16 @@ export const deleteItems = async item => {
         await db.trash.restore(...ids);
 
         //layoutmanager.withAnimation(150);
-        Navigation.queueRoutesForUpdate([
-          Navigation.routeNames.Notebooks,
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Trash,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Notebook,
-          Navigation.routeNames.Trash
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes',
+          'Favorites',
+          'Notes',
+          'Notebook',
+          'Notebooks',
+          'Trash'
+        );
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
         ToastEvent.hide();
@@ -110,7 +122,7 @@ export const deleteItems = async item => {
     });
   }
   history.selectedItemsList = [];
-  Navigation.queueRoutesForUpdate([Navigation.routeNames.Trash]);
+  Navigation.queueRoutesForUpdate('Trash');
   useSelectionStore.getState().clearSelection(true);
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();

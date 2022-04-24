@@ -625,12 +625,15 @@ export const _onMessage = async evt => {
         let _tag = JSON.parse(message.value);
         console.log(_tag.title);
         await db.notes.note(note.id).untag(_tag.title);
+
         useTagStore.getState().setTags();
-        Navigation.queueRoutesForUpdate([
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Tags
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes',
+          'Favorites',
+          'Notes'
+        );
       }
       break;
     case 'newtag':
@@ -732,11 +735,14 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null
       };
-      Navigation.queueRoutesForUpdate([
-        Navigation.routeNames.Notebooks,
-        Navigation.routeNames.TopicNotes,
-        Navigation.routeNames.Notebook
-      ]);
+      Navigation.queueRoutesForUpdate(
+        'TaggedNotes',
+        'ColoredNotes',
+        'TopicNotes',
+        'Favorites',
+        'Notes',
+        'Notebook'
+      );
       break;
     }
     case 'tag': {
@@ -744,10 +750,13 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null
       };
-      Navigation.queueRoutesForUpdate([
-        Navigation.routeNames.Tags,
-        Navigation.routeNames.TaggedNotes
-      ]);
+      Navigation.queueRoutesForUpdate(
+        'TaggedNotes',
+        'ColoredNotes',
+        'TopicNotes',
+        'Favorites',
+        'Notes'
+      );
       eSendEvent('updateTags');
       break;
     }
@@ -757,7 +766,13 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null
       };
-      Navigation.queueRoutesForUpdate([Navigation.routeNames.ColoredNotes]);
+      Navigation.queueRoutesForUpdate(
+        'TaggedNotes',
+        'ColoredNotes',
+        'TopicNotes',
+        'Favorites',
+        'Notes'
+      );
       useMenuStore.getState().setColorNotes();
       break;
     }
@@ -821,12 +836,13 @@ export async function saveNote(title, _id, data, type, _sessionId, _historySessi
     if (!locked) {
       let noteId = await db.notes.add(noteData);
       if (!_id || saveCounter < 3) {
-        Navigation.queueRoutesForUpdate([
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Notebook
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes',
+          'Favorites',
+          'Notes'
+        );
       }
       if (!_id) {
         if (sessionId === _sessionId) id = noteId;
@@ -851,11 +867,13 @@ export async function saveNote(title, _id, data, type, _sessionId, _historySessi
       await db.vault.save(noteData);
     }
     if (sessionId === _sessionId) {
-      Navigation.queueRoutesForUpdate([
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes
-      ]);
+      Navigation.queueRoutesForUpdate(
+        'TaggedNotes',
+        'ColoredNotes',
+        'TopicNotes',
+        'Favorites',
+        'Notes'
+      );
 
       lastEditTime = n + 10;
       let n = db.notes.note(_id)?.data?.dateEdited;

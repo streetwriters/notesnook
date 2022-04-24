@@ -123,11 +123,13 @@ export const useActions = ({ close = () => {}, item }) => {
     if (!item.id) return;
     close();
     await db.notes.note(item.id).favorite();
-    Navigation.queueRoutesForUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
   }
 
   async function pinItem() {
@@ -142,7 +144,14 @@ export const useActions = ({ close = () => {}, item }) => {
       return;
     }
     await db[`${type}s`][type](item.id).pin();
-    Navigation.queueRoutesForUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notes]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Notebooks'
+    );
   }
 
   async function pinToNotifications() {
@@ -178,14 +187,14 @@ export const useActions = ({ close = () => {}, item }) => {
     if (!checkNoteSynced()) return;
     close();
     await db.trash.restore(item.id);
-    Navigation.queueRoutesForUpdate([
-      Navigation.routeNames.Tags,
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Trash
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Notebooks'
+    );
     let type = item.type === 'trash' ? item.itemType : item.type;
     ToastEvent.show({
       heading: type === 'note' ? 'Note restored from trash' : 'Notebook restored from trash',
@@ -299,11 +308,13 @@ export const useActions = ({ close = () => {}, item }) => {
       let note = db.notes.note(item.id).data;
       if (note.locked) {
         close();
-        Navigation.queueRoutesForUpdate([
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes',
+          'Favorites',
+          'Notes'
+        );
       }
     } catch (e) {
       close();
@@ -361,11 +372,14 @@ export const useActions = ({ close = () => {}, item }) => {
         await db.tags.rename(item.id, db.tags.sanitize(value));
         useTagStore.getState().setTags();
         useMenuStore.getState().setMenuPins();
-        Navigation.queueRoutesForUpdate([
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Tags
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes',
+          'Favorites',
+          'Notes',
+          'Tags'
+        );
       },
       input: true,
       defaultValue: alias,
@@ -407,11 +421,14 @@ export const useActions = ({ close = () => {}, item }) => {
         positivePress: async value => {
           await db.tags.remove(item.id);
           useTagStore.getState().setTags();
-          Navigation.queueRoutesForUpdate([
-            Navigation.routeNames.Notes,
-            Navigation.routeNames.NotesPage,
-            Navigation.routeNames.Tags
-          ]);
+          Navigation.queueRoutesForUpdate(
+            'TaggedNotes',
+            'ColoredNotes',
+            'TopicNotes',
+            'Favorites',
+            'Notes',
+            'Tags'
+          );
         },
         positiveText: 'Delete',
         positiveType: 'errorShade'
@@ -441,12 +458,15 @@ export const useActions = ({ close = () => {}, item }) => {
       .notebook(editing.actionAfterFirstSave.notebook)
       .topics.topic(editing.actionAfterFirstSave.id)
       .delete(item.id);
-    Navigation.queueRoutesForUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Notebook
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Notebook',
+      'Notebooks'
+    );
     close();
   }
 
@@ -461,7 +481,7 @@ export const useActions = ({ close = () => {}, item }) => {
       negativeText: 'Cancel',
       positivePress: async () => {
         await db.trash.delete(item.id);
-        Navigation.queueRoutesForUpdate([Navigation.routeNames.Trash]);
+        Navigation.queueRoutesForUpdate('Trash');
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
           heading: 'Permanantly deleted items',
@@ -496,11 +516,13 @@ export const useActions = ({ close = () => {}, item }) => {
   async function toggleLocalOnly() {
     if (!checkNoteSynced()) return;
     db.notes.note(item.id).localOnly();
-    Navigation.queueRoutesForUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
     close();
   }
 
@@ -511,22 +533,26 @@ export const useActions = ({ close = () => {}, item }) => {
       useEditorStore.getState().setReadonly(current);
       tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
     }
-    Navigation.queueRoutesForUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
     close();
   };
 
   const duplicateNote = async () => {
     if (!checkNoteSynced()) return;
     await db.notes.note(item.id).duplicate();
-    Navigation.queueRoutesForUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
     close();
   };
 
