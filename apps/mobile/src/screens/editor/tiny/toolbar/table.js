@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { PressableButton } from '../../../../components/ui/pressable';
 import Heading from '../../../../components/ui/typography/heading';
 import Paragraph from '../../../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../../../stores/theme';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { eSendEvent } from '../../../../services/event-manager';
 import { eCloseProgressDialog } from '../../../../utils/events';
 import { SIZE } from '../../../../utils/size';

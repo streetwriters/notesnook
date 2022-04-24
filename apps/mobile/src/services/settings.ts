@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { enabled } from 'react-native-privacy-snapshot';
 import { SettingStore } from '../stores/interfaces';
-import { useSettingStore } from '../stores/stores';
+import { useSettingStore } from '../stores/use-setting-store';
 import { AndroidModule } from '../utils';
 import { getColorScheme } from '../utils/color-scheme/utils';
 import { MMKV } from '../utils/database/mmkv';
@@ -99,10 +99,7 @@ function migrate(settings: SettingStore['settings']) {
 
 function init() {
   scale.fontScale = 1;
-  let now = performance.now();
   let settingsJson = MMKV.getString('appSettings');
-
-  console.log('fetch data done', performance.now() - now);
   let settings = get();
   if (!settingsJson) {
     MMKV.setString('appSettings', JSON.stringify(settings));
@@ -170,7 +167,7 @@ function get() {
   return { ...useSettingStore.getState().settings };
 }
 
-async function onFirstLaunch() {
+function onFirstLaunch() {
   let introCompleted = get().introCompleted;
   if (!introCompleted) {
     set({

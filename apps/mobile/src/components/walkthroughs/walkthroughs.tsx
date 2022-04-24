@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COMMUNITY_SVG, LAUNCH_ROCKET, SUPPORT_SVG, WELCOME_SVG } from '../../assets/images/assets';
-import { ThemeStore, useThemeStore } from '../../stores/theme';
+import { ThemeStore, useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent } from '../../services/event-manager';
 import { getElevation } from '../../utils';
 import { eOpenAddNotebookDialog } from '../../utils/events';

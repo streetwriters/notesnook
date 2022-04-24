@@ -4,8 +4,9 @@ import Paragraph from '../../components/ui/typography/paragraph';
 import Backup from '../../services/backup';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import { useSettingStore, useUserStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/use-user-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 
 export const AutomaticBackupsSelector = () => {

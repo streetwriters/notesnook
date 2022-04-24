@@ -9,15 +9,13 @@ import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manag
 import { setRateAppMessage } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import {
-  initialize,
-  useFavoriteStore,
-  useMessageStore,
-  useNoteStore,
-  useSettingStore,
-  useUserStore
-} from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { initialize } from '../../stores';
+import { useUserStore } from '../../stores/use-user-store';
+import { useMessageStore } from '../../stores/use-message-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useFavoriteStore } from '../../stores/use-favorite-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { editing } from '../../utils';
 import { db } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
@@ -52,9 +50,10 @@ const Launcher = React.memo(
     const deviceMode = useSettingStore(state => state.deviceMode);
     const passwordInputRef = useRef();
     const password = useRef();
+    const introCompleted = SettingsService.get().introCompleted;
     const [requireIntro, setRequireIntro] = useState({
-      updated: false,
-      value: false
+      updated: introCompleted,
+      value: !introCompleted
     });
     const dbInitCompleted = useRef(false);
 
@@ -63,18 +62,20 @@ const Launcher = React.memo(
         return;
       }
       await restoreEditorState();
-      await db.notes.init();
-      setNotes();
-      setFavorites();
-      setLoading(false);
-      Walkthrough.init();
+      setImmediate(() => {
+        db.notes.init().then(() => {
+          setNotes();
+          setFavorites();
+          setLoading(false);
+          Walkthrough.init();
+        });
+      });
     };
 
     const init = async () => {
       if (!dbInitCompleted.current) {
         await db.init();
         initialize();
-        useUserStore.getState().setUser(await db.user.getUser());
         dbInitCompleted.current = true;
       }
 
@@ -84,7 +85,7 @@ const Launcher = React.memo(
     };
 
     const hideSplashScreen = async () => {
-      await sleep(requireIntro.value ? 500 : 0);
+      if (requireIntro.value) await sleep(500);
       await RNBootSplash.hide({ fade: true });
       setTimeout(async () => {
         if (Platform.OS === 'android') {
@@ -100,22 +101,22 @@ const Launcher = React.memo(
         } else {
           StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
         }
-      }, 500);
+      }, 1000);
     };
 
     useEffect(() => {
+      console.log('hide splash', requireIntro.updated);
       if (requireIntro.updated) {
         hideSplashScreen();
+        return;
       }
-    }, [requireIntro, verifyUser]);
-
-    useEffect(() => {
       let introCompleted = SettingsService.get().introCompleted;
+      console.log(requireIntro);
       setRequireIntro({
         updated: true,
         value: !introCompleted
       });
-    }, []);
+    }, [requireIntro, verifyUser]);
 
     useEffect(() => {
       if (!loading) {

@@ -1,16 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, ColorValue, TextStyle } from 'react-native';
-import Animated, {
-  FadeIn,
-  FadeOut,
-  Layout,
-  LightSpeedInLeft,
-  SlideInLeft,
-  SlideInRight,
-  SlideOutLeft
-} from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, Layout, LightSpeedInLeft } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../utils';
 import { BUTTON_TYPES } from '../../../utils/constants';
 import { SIZE } from '../../../utils/size';
@@ -130,6 +122,7 @@ export const Button = ({
         {!title ? null : (
           <Component
             layout={Layout}
+            animated={true}
             color={textColor}
             size={fontSize}
             numberOfLines={1}

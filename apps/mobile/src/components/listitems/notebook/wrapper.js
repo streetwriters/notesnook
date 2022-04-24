@@ -1,13 +1,15 @@
 import React from 'react';
 import { NotebookItem } from '.';
-import { eSendEvent, ToastEvent } from '../../../services/event-manager';
+import Notebook from '../../../screens/notebook';
+import { TopicNotes } from '../../../screens/notes/topic-notes';
+import { ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
-import { useSelectionStore, useTrashStore } from '../../../stores/stores';
+import { useSelectionStore } from '../../../stores/use-selection-store';
+import { useTrashStore } from '../../../stores/use-trash-store';
 import { history } from '../../../utils';
-import { eOnNewTopicAdded, refreshNotesPage } from '../../../utils/events';
+import { db } from '../../../utils/database';
 import { presentDialog } from '../../dialog/functions';
 import SelectionWrapper from '../selection-wrapper';
-import { db } from '../../../utils/database';
 
 export const NotebookWrapper = React.memo(
   ({ item, index, dateBy }) => {
@@ -30,14 +32,16 @@ export const NotebookWrapper = React.memo(
           negativeText: 'Delete',
           positivePress: async () => {
             await db.trash.restore(item.id);
-            Navigation.setRoutesToUpdate([
-              Navigation.routeNames.Tags,
-              Navigation.routeNames.Notes,
-              Navigation.routeNames.Notebooks,
-              Navigation.routeNames.NotesPage,
-              Navigation.routeNames.Favorites,
-              Navigation.routeNames.Trash
-            ]);
+            Navigation.queueRoutesForUpdate(
+              'Tags',
+              'Notes',
+              'Notebooks',
+              'Favorites',
+              'Trash',
+              'TaggedNotes',
+              'ColoredNotes',
+              'TopicNotes'
+            );
             useSelectionStore.getState().setSelectionMode(false);
             ToastEvent.show({
               heading: 'Restore successful',
@@ -57,28 +61,11 @@ export const NotebookWrapper = React.memo(
         });
         return;
       }
-
-      let routeName = item.type === 'topic' ? 'NotesPage' : 'Notebook';
-
-      let params =
-        item.type === 'topic'
-          ? { ...item, menu: false }
-          : {
-              menu: false,
-              notebook: item,
-              title: item.title
-            };
-      let headerState = {
-        heading: item.title,
-        id: item.id,
-        type: item.type
-      };
       if (item.type === 'topic') {
-        eSendEvent(refreshNotesPage, params);
+        TopicNotes.navigate(item, true);
       } else {
-        eSendEvent(eOnNewTopicAdded, params);
+        Notebook.navigate(item, true);
       }
-      Navigation.navigate(routeName, params, headerState);
     };
     return (
       <SelectionWrapper

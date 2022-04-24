@@ -6,7 +6,7 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
-import { useThemeStore } from '../../../../stores/theme';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { sleep } from '../../../../utils/time';
 
 const ToolbarItemPin = ({ format, color }) => {

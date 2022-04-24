@@ -1,7 +1,9 @@
 import React from 'react';
 import NoteItem from '.';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useEditorStore, useSelectionStore, useTrashStore } from '../../../stores/stores';
+import { useSelectionStore } from '../../../stores/use-selection-store';
+import { useTrashStore } from '../../../stores/use-trash-store';
+import { useEditorStore } from '../../../stores/use-editor-store';
 import { DDS } from '../../../services/device-detection';
 import { eSendEvent, openVault, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
@@ -66,14 +68,16 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
       negativeText: 'Delete',
       positivePress: async () => {
         await db.trash.restore(item.id);
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.Tags,
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Notebooks,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Trash
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'Tags',
+          'Notes',
+          'Notebooks',
+          'Favorites',
+          'Trash',
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes'
+        );
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
           heading: 'Restore successful',

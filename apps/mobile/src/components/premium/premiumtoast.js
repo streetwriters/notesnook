@@ -5,7 +5,7 @@ import { EditorWebView } from '../../screens/editor/Functions';
 import tiny from '../../screens/editor/tiny/tiny';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { editing, getElevation } from '../../utils';
 import { eCloseActionSheet, eOpenPremiumDialog, eShowGetPremium } from '../../utils/events';
 import { SIZE } from '../../utils/size';

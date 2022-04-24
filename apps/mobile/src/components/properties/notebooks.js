@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
@@ -42,34 +42,33 @@ export default function Notebooks({ note, close }) {
   }
 
   const navigateNotebook = id => {
-    let routeName = 'Notebook';
-    let item = db.notebooks.notebook(id).data;
+    let item = db.notebooks.notebook(id)?.data;
+    if (!item) return;
     let params = {
       menu: false,
       notebook: item,
       title: item.title
     };
-    let headerState = {
-      heading: item.title,
+    let currentScreen = {
+      name: 'Notebook',
+      title: item.title,
       id: item.id,
       type: item.type
     };
-    eSendEvent(eOnNewTopicAdded, params);
-    Navigation.navigate(routeName, params, headerState);
+    Navigation.navigate(currentScreen, params);
   };
 
   const navigateTopic = (id, notebookId) => {
-    let routeName = 'NotesPage';
-    let item = db.notebooks.notebook(notebookId).topics.topic(id)._topic;
-
+    let item = db.notebooks.notebook(notebookId)?.topics?.topic(id)?._topic;
+    if (!item) return;
     let params = { ...item, menu: false };
-    let headerState = {
-      heading: item.title,
+    let currentScreen = {
+      name: 'NotesPage',
+      title: item.title,
       id: item.id,
       type: item.type
     };
-    eSendEvent(refreshNotesPage, params);
-    Navigation.navigate(routeName, params, headerState);
+    Navigation.navigate(currentScreen, params);
   };
 
   return !note.notebooks || note.notebooks.length === 0 ? null : (

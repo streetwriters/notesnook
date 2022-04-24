@@ -2,23 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eScrollEvent } from '../../utils/events';
 import { LeftMenus } from './left-menus';
 import { RightMenus } from './right-menus';
 import { Title } from './title';
 
 export const Header = React.memo(
-  ({ root, title, screen, isBack, color, action, rightButtons, notebook, onBackPress }) => {
+  () => {
     const colors = useThemeStore(state => state.colors);
     const insets = useSafeAreaInsets();
     const [hide, setHide] = useState(true);
 
     const onScroll = data => {
-      if (data.screen !== screen) return;
       if (data.y > 150) {
+        if (!hide) return;
         setHide(false);
       } else {
+        if (hide) return;
         setHide(true);
       }
     };
@@ -28,7 +29,7 @@ export const Header = React.memo(
       return () => {
         eUnSubscribeEvent(eScrollEvent, onScroll);
       };
-    }, []);
+    }, [hide]);
 
     return (
       <View
@@ -45,22 +46,14 @@ export const Header = React.memo(
         ]}
       >
         <View style={styles.leftBtnContainer}>
-          <LeftMenus onBackPress={onBackPress} headerMenuState={!isBack} currentScreen={screen} />
-
-          <Title
-            notebook={notebook}
-            headerColor={color}
-            heading={title}
-            screen={screen}
-            root={root}
-          />
+          <LeftMenus />
+          <Title />
         </View>
-
-        <RightMenus rightButtons={rightButtons} action={action} currentScreen={screen} />
+        <RightMenus />
       </View>
     );
   },
-  (prev, next) => prev.title === next.title
+  () => true
 );
 
 const styles = StyleSheet.create({

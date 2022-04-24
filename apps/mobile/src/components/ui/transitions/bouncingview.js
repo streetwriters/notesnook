@@ -32,10 +32,6 @@ export const BouncingView = ({
       duration: duration,
       easing: Easing.elastic(1)
     });
-    return () => {
-      if (!animated) return;
-      scale.value = initialScale;
-    };
   }, []);
 
   return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;

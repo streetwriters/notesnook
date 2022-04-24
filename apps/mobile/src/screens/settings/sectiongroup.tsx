@@ -1,14 +1,15 @@
 import React from 'react';
 import { View } from 'react-native';
 import Heading from '../../components/ui/typography/heading';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import { SectionItem } from './section-item';
 import { SettingSection } from './types';
 
 export const SectionGroup = ({ item }: { item: SettingSection }) => {
   const colors = useThemeStore(state => state.colors);
-  const isHidden = item.hidden && item.hidden(null);
+  const current = item.useHook && item.useHook();
+  const isHidden = item.hidden && item.hidden(current);
   return isHidden ? null : (
     <View
       style={{

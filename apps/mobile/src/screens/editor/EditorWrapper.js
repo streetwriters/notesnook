@@ -11,8 +11,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
 import { PremiumToast } from '../../components/premium/premium-toast';
 import { DDS } from '../../services/device-detection';
-import { useNoteStore, useSettingStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { editing } from '../../utils';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
@@ -47,36 +48,38 @@ export const EditorWrapper = ({ width }) => {
       testID="editor-wrapper"
       ref={editorRef}
       style={{
-        width: width[deviceMode].c,
+        width: width[deviceMode]?.c,
         height: '100%',
         backgroundColor: colors.bg,
         borderLeftWidth: DDS.isTab ? 1 : 0,
         borderLeftColor: DDS.isTab ? colors.nav : 'transparent'
       }}
     >
-      <SafeAreaView
-        style={{
-          flex: 1
-        }}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      {loading ? null : (
+        <SafeAreaView
           style={{
             flex: 1
           }}
-          enabled={!floating}
         >
-          <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
-          <TextInput
-            key="input"
-            ref={textInput}
-            style={{ height: 1, padding: 0, width: 1, position: 'absolute' }}
-            blurOnSubmit={false}
-          />
-          {loading ? null : <Editor key="editor" />}
-          <EditorOverlay key="overlay" />
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{
+              flex: 1
+            }}
+            enabled={!floating}
+          >
+            <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
+            <TextInput
+              key="input"
+              ref={textInput}
+              style={{ height: 1, padding: 0, width: 1, position: 'absolute' }}
+              blurOnSubmit={false}
+            />
+            <Editor key="editor" />
+            <EditorOverlay key="overlay" />
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      )}
     </View>
   );
 };

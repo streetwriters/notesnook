@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import * as Progress from 'react-native-progress';
-import { useThemeStore } from '../../stores/theme';
-import { useAttachmentStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useAttachmentStore } from '../../stores/use-attachment-store';
 import { SIZE } from '../../utils/size';
 
 export const ProgressCircle = () => {

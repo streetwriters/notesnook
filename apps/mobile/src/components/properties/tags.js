@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
@@ -64,13 +64,15 @@ const TagItem = ({ tag, close }) => {
       type: 'tag',
       get: 'tagged'
     };
-
-    eSendEvent(refreshNotesPage, params);
-    Navigation.navigate('NotesPage', params, {
-      heading: '#' + _tag.title,
-      id: _tag.id,
-      type: _tag.type
-    });
+    Navigation.navigate(
+      {
+        name: 'NotesPage',
+        title: '#' + _tag.title,
+        id: _tag.id,
+        type: _tag.type
+      },
+      params
+    );
     await sleep(300);
     close();
   };

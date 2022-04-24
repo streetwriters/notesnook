@@ -5,8 +5,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
 import { IconButton } from '../../components/ui/icon-button';
 import { Properties } from '../../components/properties';
-import { useThemeStore } from '../../stores/theme';
-import { useEditorStore, useSettingStore, useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
+import { useEditorStore } from '../../stores/use-editor-store';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
@@ -180,7 +182,7 @@ const EditorHeader = () => {
     //   // console.log('NOTE REMOVED', id);
     //   // await db.notes.remove(id);
     //   // if (id !== getNote().id) return;
-    //   // Navigation.setRoutesToUpdate([
+    //   // Navigation.queueRoutesForUpdate([
     //   //   Navigation.routeNames.Favorites,
     //   //   Navigation.routeNames.Notes,
     //   //   Navigation.routeNames.NotesPage,

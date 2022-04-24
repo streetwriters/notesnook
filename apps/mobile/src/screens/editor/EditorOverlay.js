@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/button';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { editing } from '../../utils';
 import { eOnLoadNote } from '../../utils/events';
 import { SIZE } from '../../utils/size';

@@ -2,24 +2,30 @@ import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Menu from 'react-native-reanimated-material-menu';
 import { notesnook } from '../../../e2e/test.ids';
-import { useThemeStore } from '../../stores/theme';
-import { useSettingStore } from '../../stores/stores';
 import Navigation from '../../services/navigation';
+import SearchService from '../../services/search';
+import useNavigationStore from '../../stores/use-navigation-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import { IconButton } from '../ui/icon-button';
 
-export const RightMenus = ({ currentScreen, action, rightButtons }) => {
+export const RightMenus = () => {
   const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
+  const rightButtons = useNavigationStore(state => state.headerRightButtons);
+  const currentScreen = useNavigationStore(state => state.currentScreen.name);
   const menuRef = useRef();
+
   return (
     <View style={styles.rightBtnContainer}>
       {!currentScreen.startsWith('Settings') ? (
         <IconButton
           onPress={async () => {
-            Navigation.navigate('Search', {
-              menu: false
+            SearchService.prepareSearch();
+            Navigation.navigate({
+              name: 'Search'
             });
           }}
           testID="icon-search"
@@ -31,7 +37,7 @@ export const RightMenus = ({ currentScreen, action, rightButtons }) => {
 
       {deviceMode !== 'mobile' ? (
         <Button
-          onPress={action}
+          onPress={RightMenus.floatingButtonAction}
           testID={notesnook.ids.default.addBtn}
           icon={currentScreen === 'Trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
@@ -54,7 +60,7 @@ export const RightMenus = ({ currentScreen, action, rightButtons }) => {
         />
       ) : null}
 
-      {rightButtons ? (
+      {rightButtons && rightButtons.length > 0 ? (
         <Menu
           ref={menuRef}
           animationDuration={200}
@@ -67,7 +73,6 @@ export const RightMenus = ({ currentScreen, action, rightButtons }) => {
               onPress={() => {
                 menuRef.current?.show();
               }}
-              //testID={notesnook.ids.default.header.buttons.left}
               name="dots-vertical"
               color={colors.pri}
               customStyle={styles.rightBtn}
@@ -87,7 +92,7 @@ export const RightMenus = ({ currentScreen, action, rightButtons }) => {
               }}
               key={item.title}
               title={item.title}
-              onPress={item.func}
+              onPress={item.onPress}
             />
           ))}
         </Menu>
@@ -95,6 +100,8 @@ export const RightMenus = ({ currentScreen, action, rightButtons }) => {
     </View>
   );
 };
+
+RightMenus.floatingButtonAction = () => {};
 
 const styles = StyleSheet.create({
   rightBtnContainer: {

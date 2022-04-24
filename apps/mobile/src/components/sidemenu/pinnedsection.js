@@ -1,21 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
-import { useMenuStore, useNoteStore } from '../../stores/stores';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
+import useNavigationStore from '../../stores/use-navigation-store';
+import { useMenuStore } from '../../stores/use-menu-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
 import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/events';
 import { normalize, SIZE } from '../../utils/size';
+import { Properties } from '../properties';
 import { Button } from '../ui/button';
 import { Notice } from '../ui/notice';
 import { PressableButton } from '../ui/pressable';
-import { Properties } from '../properties';
 import Seperator from '../ui/seperator';
 import SheetWrapper from '../ui/sheet';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { TaggedNotes } from '../../screens/notes/tagged';
+import { TopicNotes } from '../../screens/notes/topic-notes';
+import Notebook from '../../screens/notebook';
 
 export const TagsSection = React.memo(
   () => {
@@ -30,42 +35,16 @@ export const TagsSection = React.memo(
     }, [loading]);
 
     const onPress = item => {
-      let params = {};
       if (item.type === 'notebook') {
-        params = {
-          notebook: item,
-          title: item.title,
-          menu: true
-        };
-        eSendEvent(eOnNewTopicAdded, params);
-        Navigation.navigate('Notebook', params, {
-          heading: item.title,
-          id: item.id,
-          type: item.type
-        });
+        Notebook.navigate(item);
       } else if (item.type === 'tag') {
-        params = {
-          ...item,
-          type: 'tag',
-          menu: true,
-          get: 'tagged'
-        };
-        eSendEvent(refreshNotesPage, params);
-        Navigation.navigate('NotesPage', params, {
-          heading: '#' + db.tags.alias(item.id),
-          id: item.id,
-          type: item.type
-        });
+        TaggedNotes.navigate(item);
       } else {
-        params = { ...item, menu: true, get: 'topics' };
-        eSendEvent(refreshNotesPage, params);
-        Navigation.navigate('NotesPage', params, {
-          heading: item.title,
-          id: item.id,
-          type: item.type
-        });
+        TopicNotes.navigate(item);
       }
-      Navigation.closeDrawer();
+      setImmediate(() => {
+        Navigation.closeDrawer();
+      });
     };
     const renderItem = ({ item, index }) => {
       let alias = item ? (item.type === 'tag' ? db.tags.alias(item.title) : item.title) : null;
@@ -112,10 +91,13 @@ export const PinItem = React.memo(
     const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
     const fwdRef = useRef();
 
-    const onHeaderStateChange = event => {
+    const onHeaderStateChange = state => {
       setTimeout(() => {
-        if (event.id === item.id) {
-          setHeaderTextState(event);
+        let id = state.currentScreen?.id;
+        if (id === item.id) {
+          setHeaderTextState({
+            id: state.currentScreen.id
+          });
         } else {
           if (headerTextState !== null) {
             setHeaderTextState(null);
@@ -125,9 +107,9 @@ export const PinItem = React.memo(
     };
 
     useEffect(() => {
-      eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+      let unsub = useNavigationStore.subscribe(onHeaderStateChange);
       return () => {
-        eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+        unsub();
       };
     }, [headerTextState]);
 

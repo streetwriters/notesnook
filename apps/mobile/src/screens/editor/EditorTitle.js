@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { TextInput } from 'react-native';
+import { TextInput, View } from 'react-native';
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import { post, _onMessage } from './Functions';
 

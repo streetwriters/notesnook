@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking, View } from 'react-native';
 import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eCloseAnnouncementDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';

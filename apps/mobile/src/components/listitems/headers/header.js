@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
-import { useMessageStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useMessageStore } from '../../../stores/use-message-store';
 import { COLORS_NOTE } from '../../../utils/color-scheme';
 import { Announcement } from '../../announcements/announcement';
 import { Card } from '../../list/card';

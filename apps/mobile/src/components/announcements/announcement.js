@@ -1,7 +1,8 @@
 import React from 'react';
 import { FlatList, View } from 'react-native';
-import { useMessageStore, useSelectionStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useSelectionStore } from '../../stores/use-selection-store';
+import { useMessageStore } from '../../stores/use-message-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { allowedOnPlatform, renderItem } from './functions';
 
 export const Announcement = ({ color }) => {

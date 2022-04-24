@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import umami from '../../utils/analytics';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent } from '../../services/event-manager';
 import { getElevation } from '../../utils';
 import { eCloseProgressDialog, eOpenLoginDialog } from '../../utils/events';

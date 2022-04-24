@@ -1,4 +1,4 @@
-import { useMessageStore } from '../stores/stores';
+import { useMessageStore } from '../stores/use-message-store';
 import { eOpenLoginDialog, eOpenRateDialog, eOpenRecoveryKeyDialog } from '../utils/events';
 import { eSendEvent } from './event-manager';
 import PremiumService from './premium';

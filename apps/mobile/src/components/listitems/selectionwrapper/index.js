@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
-import { useSettingStore } from '../../../stores/stores';
-import { useThemeStore } from '../../../stores/theme';
+import { useSettingStore } from '../../../stores/use-setting-store';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { history } from '../../../utils';
 import { PressableButton } from '../../ui/pressable';
 import { ActionStrip } from './action-strip';

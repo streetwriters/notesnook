@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
 import { DDS } from '../../services/device-detection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { getElevation } from '../../utils';
 import { eHideToast, eShowToast } from '../../utils/events';
 import { SIZE } from '../../utils/size';

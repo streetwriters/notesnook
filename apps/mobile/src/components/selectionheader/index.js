@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { BackHandler, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeStore } from '../../stores/theme';
-import { useSelectionStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useSelectionStore } from '../../stores/use-selection-store';
 import { eSendEvent, ToastEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
@@ -15,19 +15,24 @@ import { sleep } from '../../utils/time';
 import { presentDialog } from '../dialog/functions';
 import { IconButton } from '../ui/icon-button';
 import Heading from '../ui/typography/heading';
+import useNavigationStore from '../../stores/use-navigation-store';
 
-export const SelectionHeader = React.memo(({ screen, type, extras }) => {
+export const SelectionHeader = React.memo(() => {
   const colors = useThemeStore(state => state.colors);
-
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
   const setSelectionMode = useSelectionStore(state => state.setSelectionMode);
   const clearSelection = useSelectionStore(state => state.clearSelection);
-
+  const currentScreen = useNavigationStore(state => state.currentScreen);
+  const screen = currentScreen.name;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
-    tabBarRef.current?.setScrollEnabled(!selectionMode);
+    if (selectionMode) {
+      tabBarRef.current?.lock();
+    } else {
+      tabBarRef.current?.unlock();
+    }
   }, [selectionMode]);
 
   const addToFavorite = async () => {
@@ -35,11 +40,13 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
       selectedItemsList.forEach(item => {
         db.notes.note(item.id).favorite();
       });
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.Notes,
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites
-      ]);
+      Navigation.queueRoutesForUpdate(
+        'Notes',
+        'Favorites',
+        'ColoredNotes',
+        'TaggedNotes',
+        'TopicNotes'
+      );
       clearSelection();
     }
   };
@@ -51,14 +58,17 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
         noteIds.push(item.id);
       });
       await db.trash.restore(...noteIds);
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.Tags,
-        Navigation.routeNames.Notes,
-        Navigation.routeNames.Notebooks,
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Trash
-      ]);
+      Navigation.queueRoutesForUpdate(
+        'Notes',
+        'Favorites',
+        'ColoredNotes',
+        'TaggedNotes',
+        'TopicNotes',
+        'Trash',
+        'Notebooks',
+        'Tags'
+      );
+
       clearSelection();
       ToastEvent.show({
         heading: 'Restore successful',
@@ -82,14 +92,16 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
             noteIds.push(item.id);
           });
           await db.trash.delete(...noteIds);
-          Navigation.setRoutesToUpdate([
-            Navigation.routeNames.Tags,
-            Navigation.routeNames.Notes,
-            Navigation.routeNames.Notebooks,
-            Navigation.routeNames.NotesPage,
-            Navigation.routeNames.Favorites,
-            Navigation.routeNames.Trash
-          ]);
+          Navigation.queueRoutesForUpdate(
+            'Notes',
+            'Favorites',
+            'ColoredNotes',
+            'TaggedNotes',
+            'TopicNotes',
+            'Trash',
+            'Notebooks',
+            'Tags'
+          );
           clearSelection();
         }
       },
@@ -111,7 +123,7 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
     }
   }, [selectionMode]);
 
-  return !selectionMode || Navigation.getCurrentScreen() !== screen ? null : (
+  return !selectionMode ? null : (
     <View
       style={{
         width: '100%',
@@ -205,23 +217,27 @@ export const SelectionHeader = React.memo(({ screen, type, extras }) => {
           />
         )}
 
-        {type === 'topic' ? (
+        {screen === 'TopicNotes' ? (
           <IconButton
             onPress={async () => {
               if (selectedItemsList.length > 0) {
+                //TODO
+                let extras = {};
                 await db.notebooks
                   .notebook(extras.notebook)
                   .topics.topic(extras.topic)
                   .delete(...selectedItemsList.map(item => item.id));
 
                 eSendEvent(refreshNotesPage);
-                Navigation.setRoutesToUpdate([
-                  Navigation.routeNames.NotesPage,
-                  Navigation.routeNames.Favorites,
-                  Navigation.routeNames.Notes,
-                  Navigation.routeNames.Notebook,
-                  Navigation.routeNames.Notebooks
-                ]);
+                Navigation.queueRoutesForUpdate(
+                  'Notes',
+                  'Favorites',
+                  'ColoredNotes',
+                  'TaggedNotes',
+                  'TopicNotes',
+                  'Notebooks',
+                  'Notebook'
+                );
                 clearSelection();
               }
             }}

@@ -5,7 +5,7 @@ import isMobilePhone from 'validator/lib/isMobilePhone';
 import isURL from 'validator/lib/isURL';
 import { Button } from '../../../../components/ui/button';
 import Input from '../../../../components/ui/input';
-import { useThemeStore } from '../../../../stores/theme';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { eSendEvent, ToastEvent } from '../../../../services/event-manager';
 import { editing, itemSkus } from '../../../../utils';
 import { SIZE } from '../../../../utils/size';

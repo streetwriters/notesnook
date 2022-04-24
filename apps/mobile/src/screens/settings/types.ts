@@ -20,6 +20,6 @@ export type SettingsGroup = {
 };
 
 export type RouteParams = {
-  SettingsHome: undefined;
+  SettingsHome: { [name: string]: string };
   SettingsGroup: SettingSection;
 };

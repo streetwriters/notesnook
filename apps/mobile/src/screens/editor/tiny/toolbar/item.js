@@ -4,8 +4,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { PressableButton } from '../../../../components/ui/pressable';
 import Heading from '../../../../components/ui/typography/heading';
 import Paragraph from '../../../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../../../stores/theme';
-import { useUserStore } from '../../../../stores/stores';
+import { useThemeStore } from '../../../../stores/use-theme-store';
+import { useUserStore } from '../../../../stores/use-user-store';
 import {
   eSendEvent,
   eSubscribeEvent,

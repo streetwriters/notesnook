@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { editing } from '../../utils';
 import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/events';

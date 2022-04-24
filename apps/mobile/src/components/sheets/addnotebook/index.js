@@ -2,7 +2,7 @@ import React, { createRef } from 'react';
 import { Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useMenuStore } from '../../../stores/stores';
+import { useMenuStore } from '../../../stores/use-menu-store';
 import { DDS } from '../../../services/device-detection';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
@@ -198,11 +198,15 @@ export class AddNotebookSheet extends React.Component {
       });
     }
     useMenuStore.getState().setMenuPins();
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notebook,
-      Navigation.routeNames.NotesPage
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes',
+      'Notebooks',
+      'Notebook'
+    );
+
     this.setState({
       loading: false
     });

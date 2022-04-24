@@ -3,8 +3,7 @@ import { FlatList, RefreshControl, View } from 'react-native';
 import { notesnook } from '../../../e2e/test.ids';
 import { eSendEvent } from '../../services/event-manager';
 import Sync from '../../services/sync';
-import { useUserStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
@@ -56,7 +55,8 @@ const List = ({
   placeholderData,
   loading,
   headerProps = {
-    heading: 'Home'
+    heading: 'Home',
+    color: null
   },
   screen,
   ListHeader,
@@ -65,11 +65,11 @@ const List = ({
   const colors = useThemeStore(state => state.colors);
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
-  const syncing = useUserStore(state => state.syncing);
 
   useEffect(() => {
     let timeout = null;
     if (!loading) {
+      console.log('LOADING ENDED');
       timeout = setTimeout(
         () => {
           _setLoading(false);
@@ -77,6 +77,7 @@ const List = ({
         listData.length === 0 ? 0 : 300
       );
     } else {
+      console.log('STILL LOADING');
       _setLoading(true);
     }
     return () => {
@@ -149,7 +150,7 @@ const List = ({
             colors={[colors.accent]}
             progressBackgroundColor={colors.nav}
             onRefresh={_onRefresh}
-            refreshing={syncing}
+            refreshing={false}
           />
         }
         ListEmptyComponent={
@@ -169,9 +170,6 @@ const List = ({
             ) : (
               <Header
                 title={headerProps.heading}
-                paragraph={headerProps.paragraph}
-                onPress={headerProps.onPress}
-                icon={headerProps.icon}
                 color={headerProps.color}
                 type={type}
                 screen={screen}

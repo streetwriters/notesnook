@@ -5,8 +5,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { TimeSince } from '../../components/ui/time-since';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useUserStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/use-user-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SUBSCRIPTION_STATUS_STRINGS } from '../../utils/constants';
 import { SIZE } from '../../utils/size';
 import { SectionItem } from './section-item';
@@ -90,7 +90,7 @@ const SettingsUserSection = ({ item }) => {
                           justifyContent: 'center'
                         }}
                       >
-                        <Icon size={SIZE.xl} color={colors.accent} name="camera-outline" />
+                        <Icon size={SIZE.xl} color={colors.accent} name="account-outline" />
                       </View>
                     </View>
 

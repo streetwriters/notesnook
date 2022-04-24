@@ -1,7 +1,9 @@
 import { createRef } from 'react';
 import { Platform } from 'react-native';
 import { presentDialog } from '../../components/dialog/functions';
-import { useEditorStore, useMenuStore, useTagStore } from '../../stores/stores';
+import { useMenuStore } from '../../stores/use-menu-store';
+import { useEditorStore } from '../../stores/use-editor-store';
+import { useTagStore } from '../../stores/use-tag-store';
 import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
@@ -624,7 +626,7 @@ export const _onMessage = async evt => {
         console.log(_tag.title);
         await db.notes.note(note.id).untag(_tag.title);
         useTagStore.getState().setTags();
-        Navigation.setRoutesToUpdate([
+        Navigation.queueRoutesForUpdate([
           Navigation.routeNames.Notes,
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Tags
@@ -730,9 +732,9 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null
       };
-      Navigation.setRoutesToUpdate([
+      Navigation.queueRoutesForUpdate([
         Navigation.routeNames.Notebooks,
-        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.TopicNotes,
         Navigation.routeNames.Notebook
       ]);
       break;
@@ -742,7 +744,11 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null
       };
-      Navigation.setRoutesToUpdate([Navigation.routeNames.Tags, Navigation.routeNames.NotesPage]);
+      Navigation.queueRoutesForUpdate([
+        Navigation.routeNames.Tags,
+        Navigation.routeNames.TaggedNotes
+      ]);
+      eSendEvent('updateTags');
       break;
     }
     case 'color': {
@@ -751,7 +757,7 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null
       };
-      Navigation.setRoutesToUpdate([Navigation.routeNames.NotesPage]);
+      Navigation.queueRoutesForUpdate([Navigation.routeNames.ColoredNotes]);
       useMenuStore.getState().setColorNotes();
       break;
     }
@@ -815,7 +821,7 @@ export async function saveNote(title, _id, data, type, _sessionId, _historySessi
     if (!locked) {
       let noteId = await db.notes.add(noteData);
       if (!_id || saveCounter < 3) {
-        Navigation.setRoutesToUpdate([
+        Navigation.queueRoutesForUpdate([
           Navigation.routeNames.Notes,
           Navigation.routeNames.Favorites,
           Navigation.routeNames.NotesPage,
@@ -845,7 +851,7 @@ export async function saveNote(title, _id, data, type, _sessionId, _historySessi
       await db.vault.save(noteData);
     }
     if (sessionId === _sessionId) {
-      Navigation.setRoutesToUpdate([
+      Navigation.queueRoutesForUpdate([
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites,
         Navigation.routeNames.Notes

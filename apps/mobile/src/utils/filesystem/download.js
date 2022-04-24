@@ -4,7 +4,7 @@ import * as ScopedStorage from 'react-native-scoped-storage';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
 import { ShareComponent } from '../../components/sheets/export-notes/share';
-import { useAttachmentStore } from '../../stores/stores';
+import { useAttachmentStore } from '../../stores/use-attachment-store';
 import { presentSheet, ToastEvent } from '../../services/event-manager';
 import { db } from '../database';
 import Storage from '../database/storage';

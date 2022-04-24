@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
-import { useSelectionStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useSelectionStore } from '../../stores/use-selection-store';
 
 export const ContainerHeader = ({ children }) => {
   const colors = useThemeStore(state => state.colors);

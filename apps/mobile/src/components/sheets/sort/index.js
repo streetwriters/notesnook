@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
 import { eSendEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { GROUP, SORT } from '../../../utils/constants';
 import { db } from '../../../utils/database';
 import { refreshNotesPage } from '../../../utils/events';
@@ -11,7 +11,6 @@ import { SIZE } from '../../../utils/size';
 import { Button } from '../../ui/button';
 import Seperator from '../../ui/seperator';
 import Heading from '../../ui/typography/heading';
-import Animated, { Layout } from 'react-native-reanimated';
 
 const Sort = ({ type, screen }) => {
   const colors = useThemeStore(state => state.colors);
@@ -23,7 +22,7 @@ const Sort = ({ type, screen }) => {
     layoutmanager.withSpringAnimation(600);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
-      Navigation.setRoutesToUpdate([screen]);
+      Navigation.queueRoutesForUpdate(screen);
       eSendEvent('groupOptionsUpdate');
       eSendEvent(refreshNotesPage);
     }, 1);

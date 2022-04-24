@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
-import { useThemeStore } from '../../stores/theme';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
+import useNavigationStore from '../../stores/use-navigation-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { normalize, SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import { PressableButton } from '../ui/pressable';
@@ -14,34 +14,30 @@ import Paragraph from '../ui/typography/paragraph';
 export const MenuItem = React.memo(
   ({ item, index, testID, rightBtn }) => {
     const colors = useThemeStore(state => state.colors);
-    const [headerTextState, setHeaderTextState] = useState(null);
-    let isFocused = headerTextState?.id === item.name.toLowerCase() + '_navigation';
+    const [headerTextState, setHeaderTextState] = useState(
+      useNavigationStore.getState().currentScreen
+    );
+    const screenId = item.name.toLowerCase() + '_navigation';
+    let isFocused = headerTextState?.id === screenId;
 
-    const _onPress = event => {
+    const _onPress = () => {
       if (item.func) {
-        console.log('item.func called');
         item.func();
       } else {
-        Navigation.navigate(
-          item.name,
-          {
-            menu: true
-          },
-          {
-            heading: item.name,
-            id: item.name.toLowerCase() + '_navigation'
-          }
-        );
+        Navigation.navigate({ name: item.name }, { menu: true });
       }
       if (item.close) {
-        Navigation.closeDrawer();
+        setImmediate(() => {
+          Navigation.closeDrawer();
+        });
       }
     };
 
-    const onHeaderStateChange = event => {
+    const onHeaderStateChange = state => {
       setTimeout(() => {
-        if (event.id === item.name.toLowerCase() + '_navigation') {
-          setHeaderTextState(event);
+        let id = state.currentScreen?.id;
+        if (id === screenId) {
+          setHeaderTextState({ id: state.currentScreen.id });
         } else {
           if (headerTextState !== null) {
             setHeaderTextState(null);
@@ -51,9 +47,9 @@ export const MenuItem = React.memo(
     };
 
     useEffect(() => {
-      eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+      let unsub = useNavigationStore.subscribe(onHeaderStateChange);
       return () => {
-        eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+        unsub();
       };
     }, [headerTextState]);
 

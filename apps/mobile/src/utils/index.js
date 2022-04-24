@@ -1,8 +1,6 @@
-import { Dimensions, NativeModules, Platform } from 'react-native';
-import BackgroundService from 'react-native-background-actions';
+import { AppState, Dimensions, NativeModules, Platform } from 'react-native';
 import { beginBackgroundTask, endBackgroundTask } from 'react-native-begin-background-task';
 import RNTooltips from 'react-native-tooltips';
-import { bgTaskOptions } from './constants';
 import { db } from './database';
 import { tabBarRef } from './global-refs';
 
@@ -93,11 +91,9 @@ export async function doInBackground(cb) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       try {
-        await BackgroundService.start(async () => {
-          let result = await cb();
-          await BackgroundService.stop();
-          res(result);
-        }, bgTaskOptions);
+        console.log('APP STATE AT SYNC: ', AppState.currentState);
+        let result = await cb();
+        res(result);
       } catch (e) {
         res(e.message);
       }

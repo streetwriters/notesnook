@@ -9,12 +9,12 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useSelectionStore, useSettingStore } from '../../stores/stores';
+import { useSelectionStore } from '../../stores/use-selection-store';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { editing, getElevation, showTooltip, TOOLTIP_POSITIONS } from '../../utils';
 import { normalize, SIZE } from '../../utils/size';
 import { PressableButton } from '../ui/pressable';
 
-const translateY = new Animated.Value(0);
 export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = false }) => {
   const insets = useSafeAreaInsets();
   const deviceMode = useSettingStore(state => state.deviceMode);
@@ -77,7 +77,7 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
               ? Platform.isPad
                 ? insets.bottom - 12
                 : insets.bottom - 24
-              : insets.bottom + 12,
+              : insets.bottom,
           zIndex: 10
         },
         animatedStyle

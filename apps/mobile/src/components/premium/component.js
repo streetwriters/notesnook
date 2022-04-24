@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { LAUNCH_ROCKET } from '../../assets/images/assets';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
 import PremiumService from '../../services/premium';

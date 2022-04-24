@@ -16,10 +16,10 @@ import { MMKV } from './mmkv';
 async function read(key) {
   if (!key) return null;
   let data = MMKV.getString(key);
-
   if (!data) return null;
   try {
-    return JSON.parse(data);
+    let parse = JSON.parse(data);
+    return parse;
   } catch (e) {
     return data;
   }

@@ -1,8 +1,8 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useRef, useState } from 'react';
 import { Linking, Platform, Text, TextInput, View } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
-import { useUserStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useUserStore } from '../../../stores/use-user-store';
 import { eSendEvent, ToastEvent } from '../../../services/event-manager';
 import PremiumService from '../../../services/premium';
 import { APP_VERSION } from '../../../../version';

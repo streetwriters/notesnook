@@ -2,8 +2,8 @@ import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useThemeStore } from '../../../stores/theme';
-import { useSettingStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useSettingStore } from '../../../stores/use-setting-store';
 import { eSendEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import { getTotalNotes, history } from '../../../utils';
@@ -27,15 +27,15 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
 
   const navigateToTopic = topic => {
     if (history.selectedItemsList.length > 0) return;
-    let routeName = 'NotesPage';
-    let params = { ...topic, menu: false, get: 'topics' };
-    let headerState = {
-      heading: topic.title,
-      id: topic.id,
-      type: topic.type
-    };
-    eSendEvent(refreshNotesPage, params);
-    Navigation.navigate(routeName, params, headerState);
+    Navigation.navigate(
+      {
+        name: 'NotesPage',
+        title: topic.title,
+        id: topic.id,
+        type: topic.type
+      },
+      { ...topic, menu: false, get: 'topics' }
+    );
   };
 
   return (

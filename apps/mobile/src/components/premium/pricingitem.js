@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { getElevation } from '../../utils';
 import { SIZE } from '../../utils/size';
 import { PressableButton } from '../ui/pressable';

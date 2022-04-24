@@ -1,7 +1,7 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import React from 'react';
 import { View } from 'react-native';
-import { useSettingStore } from '../../stores/stores';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { ToastEvent } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { SIZE } from '../../utils/size';

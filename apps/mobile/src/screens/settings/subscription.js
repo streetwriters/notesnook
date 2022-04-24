@@ -3,7 +3,7 @@ import { Linking, Platform, View } from 'react-native';
 import { Button } from '../../components/ui/button';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
-import { useUserStore } from '../../stores/stores';
+import { useUserStore } from '../../stores/use-user-store';
 import { SUBSCRIPTION_PROVIDER, SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { eOpenPremiumDialog } from '../../utils/events';
 import { usePricing } from '../../utils/hooks/use-pricing';
@@ -13,8 +13,8 @@ export const Subscription = () => {
   const user = useUserStore(state => state.user);
   const monthlyPlan = usePricing('monthly');
   const isNotPro =
-    user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
-    user.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
+    user?.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+    user?.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
 
   const subscriptionProviderInfo = SUBSCRIPTION_PROVIDER[user?.subscription?.provider];
 
@@ -24,7 +24,7 @@ export const Subscription = () => {
       return;
     }
     if (
-      user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+      user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
       Platform.OS === 'android'
     ) {
       if (user.subscription?.provider === 3) {

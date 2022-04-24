@@ -6,7 +6,7 @@ import DialogHeader from '../components/dialog/dialog-header';
 import { CompactFeatures } from '../components/premium/compact-features';
 import { PricingPlans } from '../components/premium/pricing-plans';
 import Seperator from '../components/ui/seperator';
-import { useUserStore } from '../stores/stores';
+import { useUserStore } from '../stores/use-user-store';
 import { itemSkus, SUBSCRIPTION_STATUS } from '../utils/constants';
 import { db } from '../utils/database';
 import { eOpenPremiumDialog, eOpenTrialEndingDialog, eShowGetPremium } from '../utils/events';
@@ -95,6 +95,7 @@ const onUserStatusCheck = async type => {
   if (userstore?.premium !== get()) {
     userstore.setPremium(get());
   }
+  console.log('status check: ', type, get());
 
   let status = get();
   let message = null;

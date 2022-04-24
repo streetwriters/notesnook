@@ -5,7 +5,7 @@ import { IconButton } from '../../components/ui/icon-button';
 import { Button } from '../../components/ui/button';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import {
   eSendEvent,
   eSubscribeEvent,

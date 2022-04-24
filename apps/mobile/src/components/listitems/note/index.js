@@ -3,8 +3,8 @@ import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useThemeStore } from '../../../stores/theme';
-import { useSettingStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useSettingStore } from '../../../stores/use-setting-store';
 import { eSendEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import { COLORS_NOTE } from '../../../utils/color-scheme';
@@ -19,32 +19,33 @@ import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 
 const navigateToTopic = topic => {
-  let routeName = 'NotesPage';
-  let params = { ...topic, menu: false, get: 'topics' };
-  let headerState = {
-    heading: topic.title,
-    id: topic.id,
-    type: topic.type
-  };
-  eSendEvent(refreshNotesPage, params);
-  Navigation.navigate(routeName, params, headerState);
+  Navigation.navigate(
+    {
+      name: 'NotesPage',
+      title: topic.title,
+      id: topic.id,
+      type: topic.type
+    },
+    { ...topic, menu: false, get: 'topics' }
+  );
 };
 
 function navigateToTag(item) {
-  let _tag = db.tags.tag(item.id);
-  if (!_tag) return;
-  let params = {
-    ..._tag,
-    type: 'tag',
-    get: 'tagged'
-  };
-
-  eSendEvent(refreshNotesPage, params);
-  Navigation.navigate('NotesPage', params, {
-    heading: '#' + _tag.title,
-    id: _tag.id,
-    type: _tag.type
-  });
+  const tag = db.tags.tag(item.id);
+  if (!tag) return;
+  Navigation.navigate(
+    {
+      name: 'NotesPage',
+      title: '#' + tag.title,
+      id: tag.id,
+      type: tag.type
+    },
+    {
+      ...tag,
+      type: 'tag',
+      get: 'tagged'
+    }
+  );
 }
 
 const showActionSheet = item => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { useThemeStore } from '../../../../stores/theme';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
 import { editing } from '../../../../utils';
 import layoutmanager from '../../../../utils/layout-manager';

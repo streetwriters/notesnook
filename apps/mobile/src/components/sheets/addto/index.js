@@ -5,8 +5,9 @@ import { notesnook } from '../../../../e2e/test.ids';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import SearchService from '../../../services/search';
-import { useNotebookStore, useSelectionStore } from '../../../stores/stores';
-import { useThemeStore } from '../../../stores/theme';
+import { useSelectionStore } from '../../../stores/use-selection-store';
+import { useNotebookStore } from '../../../stores/use-notebook-store';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { getTotalNotes } from '../../../utils';
 import { db } from '../../../utils/database';
 import { eOpenMoveNoteDialog } from '../../../utils/events';
@@ -50,13 +51,15 @@ const AddToNotebookSheet = () => {
     setVisible(false);
     newNotebookTitle = null;
     setNote(null);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Notebook,
-      Navigation.routeNames.Notebooks
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes',
+      'Notebooks',
+      'Notebook'
+    );
   };
 
   return !visible ? null : (
@@ -135,11 +138,14 @@ const MoveNoteComponent = ({ note }) => {
       );
     }
 
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes'
+    );
+
     setNotebooks();
     updateNoteExists();
     SearchService.updateAndSearch();

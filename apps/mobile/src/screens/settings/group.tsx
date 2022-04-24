@@ -1,12 +1,25 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, View } from 'react-native';
 import { ContainerHeader } from '../../components/container/containerheader';
 import { Header } from '../../components/header';
+import { tabBarRef } from '../../utils/global-refs';
+import { useNavigationFocus } from '../../utils/hooks/use-navigation-focus';
 import { SectionItem } from './section-item';
 import { RouteParams, SettingSection } from './types';
 
 const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'SettingsGroup'>) => {
+  useNavigationFocus(navigation, {
+    onFocus: () => {
+      tabBarRef.current?.lock();
+      return false;
+    }
+  });
+  useEffect(() => {
+    return () => {
+      tabBarRef.current?.unlock();
+    };
+  }, []);
   const renderItem = ({ item, index }: { item: SettingSection; index: number }) => (
     <SectionItem item={item} />
   );

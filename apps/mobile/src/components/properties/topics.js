@@ -1,24 +1,20 @@
 import React from 'react';
 import { View } from 'react-native';
-import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
-import { refreshNotesPage } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 
 export const Topics = ({ item, close }) => {
   const open = topic => {
     close();
-
-    let routeName = 'NotesPage';
     let params = { ...topic, menu: false, get: 'topics' };
-    let headerState = {
-      heading: topic.title,
+    let currentScreen = {
+      name: 'NotesPage',
+      title: topic.title,
       id: topic.id,
       type: topic.type
     };
-    eSendEvent(refreshNotesPage, params);
-    Navigation.navigate(routeName, params, headerState);
+    Navigation.navigate(currentScreen, params);
   };
 
   const renderItem = topic => (

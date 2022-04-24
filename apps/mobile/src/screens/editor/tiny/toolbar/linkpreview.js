@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { IconButton } from '../../../../components/ui/icon-button';
 import Heading from '../../../../components/ui/typography/heading';
 import Paragraph from '../../../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../../../stores/theme';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { openLinkInBrowser } from '../../../../utils/functions';
 import { SIZE } from '../../../../utils/size';
 import { INPUT_MODE, properties, reFocusEditor } from './constants';

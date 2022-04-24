@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAttachmentStore } from '../../stores/stores';
+import { useAttachmentStore } from '../../stores/use-attachment-store';
 
 export const useAttachmentProgress = (attachment, encryption) => {
   const progress = useAttachmentStore(state => state.progress);

@@ -1,7 +1,7 @@
 import { Platform, StatusBar } from 'react-native';
 import { AndroidModule } from '..';
 import { eSendEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eThemeUpdated } from '../events';
 
 export const ACCENT = {

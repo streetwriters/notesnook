@@ -1,7 +1,7 @@
 import React from 'react';
 import { Linking, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { STORE_LINK } from '../../../utils/constants';
 import { SIZE } from '../../../utils/size';
 import { Button } from '../../ui/button';

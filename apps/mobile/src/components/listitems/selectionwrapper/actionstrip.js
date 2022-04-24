@@ -1,16 +1,14 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import Animated, { SlideInUp, SlideOutDown, useValue } from 'react-native-reanimated';
+import Animated, { SlideInUp, SlideOutDown } from 'react-native-reanimated';
 import { openVault, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
-import {
-  useMenuStore,
-  useNotebookStore,
-  useSelectionStore,
-  useTrashStore
-} from '../../../stores/stores';
-import { useThemeStore } from '../../../stores/theme';
+import { useSelectionStore } from '../../../stores/use-selection-store';
+import { useTrashStore } from '../../../stores/use-trash-store';
+import { useMenuStore } from '../../../stores/use-menu-store';
+import { useNotebookStore } from '../../../stores/use-notebook-store';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { dWidth, getElevation, toTXT } from '../../../utils';
 import { db } from '../../../utils/database';
 import { deleteItems } from '../../../utils/functions';
@@ -28,18 +26,19 @@ export const ActionStrip = ({ note, setActionStrip }) => {
 
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
   const [width, setWidth] = useState(dWidth - 16);
-  const opacity = useValue(0);
   useEffect(() => {
     if (note.type === 'note') return;
     setIsPinnedToMenu(db.settings.isPinned(note.id));
   }, []);
 
   const updateNotes = () => {
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes'
+    );
   };
 
   const actions = [
@@ -155,13 +154,15 @@ export const ActionStrip = ({ note, setActionStrip }) => {
       icon: 'delete-restore',
       onPress: async () => {
         await db.trash.restore(note.id);
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Notebooks,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Trash
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'Notes',
+          'Favorites',
+          'ColoredNotes',
+          'TaggedNotes',
+          'TopicNotes',
+          'Trash',
+          'Notebooks'
+        );
 
         ToastEvent.show({
           heading:

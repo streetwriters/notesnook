@@ -22,7 +22,6 @@ export default class Tabs extends Component {
     this.lastOffset = this.props.offsets.a;
     this.locked = false;
   }
-
   renderItem = ({ item, index }) => this.props.items[index];
 
   onMoveShouldSetResponder = event => {

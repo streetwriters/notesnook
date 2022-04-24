@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { useEditorStore } from '../../../../stores/stores';
+import { useEditorStore } from '../../../../stores/use-editor-store';
 import { EditorWebView, textInput } from '../../Functions';
 import tiny from '../tiny';
 

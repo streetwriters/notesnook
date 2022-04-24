@@ -7,8 +7,8 @@ import { PressableButton } from '../../components/ui/pressable';
 import Seperator from '../../components/ui/seperator';
 import Paragraph from '../../components/ui/typography/paragraph';
 import SettingsService from '../../services/settings';
-import { useSettingStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import { AccentColorPicker, HomagePageSelector } from './appearance';
 import { AutomaticBackupsSelector } from './backup-restore';
@@ -22,125 +22,127 @@ const components: { [name: string]: ReactElement } = {
   subscription: <Subscription />
 };
 
-export const SectionItem = ({ item }: { item: SettingSection }) => {
-  const colors = useThemeStore(state => state.colors);
-  const settings = useSettingStore(state => state.settings);
-  const navigation = useNavigation<NavigationProp<RouteParams>>();
-  const current = item.useHook && item.useHook(item);
-  const isHidden = item.hidden && item.hidden(item.property || current);
+export const SectionItem = React.memo(
+  ({ item }: { item: SettingSection }) => {
+    const colors = useThemeStore(state => state.colors);
+    const settings = useSettingStore(state => state.settings);
+    const navigation = useNavigation<NavigationProp<RouteParams>>();
+    const current = item.useHook && item.useHook(item);
+    const isHidden = item.hidden && item.hidden(item.property || current);
+    const onChangeSettings = () => {
+      if (item.modifer) {
+        item.modifer(item.property || current);
+        return;
+      }
+      if (!item.property) return;
+      SettingsService.set({
+        [item.property]: !settings[item.property]
+      });
+    };
 
-  const onChangeSettings = () => {
-    if (item.modifer) {
-      item.modifer(item.property || current);
-      return;
-    }
-    if (!item.property) return;
-    SettingsService.set({
-      [item.property]: !settings[item.property]
-    });
-  };
+    const styles =
+      item.type === 'danger'
+        ? {
+            backgroundColor: colors.errorBg
+          }
+        : {};
 
-  const styles =
-    item.type === 'danger'
-      ? {
-          backgroundColor: colors.errorBg
-        }
-      : {};
-
-  return isHidden ? null : (
-    <PressableButton
-      disabled={item.type === 'component'}
-      customStyle={{
-        width: '100%',
-        alignItems: 'center',
-        padding: 12,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 20,
-        ...styles
-      }}
-      onPress={() => {
-        switch (item.type) {
-          case 'screen':
-            navigation.dispatch(StackActions.push('SettingsGroup', item));
-            break;
-          case 'switch':
-            onChangeSettings();
-            break;
-          default:
-            item.modifer && item.modifer(current);
-            break;
-        }
-      }}
-    >
-      <View
-        style={{
+    return isHidden ? null : (
+      <PressableButton
+        disabled={item.type === 'component'}
+        customStyle={{
+          width: '100%',
+          alignItems: 'center',
+          padding: 12,
           flexDirection: 'row',
-          flexShrink: 1
+          justifyContent: 'space-between',
+          paddingVertical: 20,
+          ...styles
+        }}
+        onPress={() => {
+          switch (item.type) {
+            case 'screen':
+              navigation.dispatch(StackActions.push('SettingsGroup', item));
+              break;
+            case 'switch':
+              onChangeSettings();
+              break;
+            default:
+              item.modifer && item.modifer(current);
+              break;
+          }
         }}
       >
         <View
           style={{
-            width: 40,
-            height: 40,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginRight: 12,
-            backgroundColor: item.component === 'colorpicker' ? colors.accent : undefined,
-            borderRadius: 100
+            flexDirection: 'row',
+            flexShrink: 1
           }}
         >
-          {!!item.icon && (
-            <Icon
-              color={item.type === 'danger' ? colors.errorText : colors.icon}
-              name={item.icon}
-              size={30}
-            />
-          )}
-        </View>
-
-        <View
-          style={{
-            flexShrink: 1,
-            paddingRight: item.type === 'switch' ? 10 : 0
-          }}
-        >
-          <Paragraph
-            color={item.type === 'danger' ? colors.errorText : colors.heading}
-            size={SIZE.md + 1}
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 12,
+              backgroundColor: item.component === 'colorpicker' ? colors.accent : undefined,
+              borderRadius: 100
+            }}
           >
-            {typeof item.name === 'function' ? item.name(current) : item.name}
-          </Paragraph>
-          {!!item.description && (
+            {!!item.icon && (
+              <Icon
+                color={item.type === 'danger' ? colors.errorText : colors.icon}
+                name={item.icon}
+                size={30}
+              />
+            )}
+          </View>
+
+          <View
+            style={{
+              flexShrink: 1,
+              paddingRight: item.type === 'switch' ? 10 : 0
+            }}
+          >
             <Paragraph
-              color={item.type === 'danger' ? colors.errorText : colors.pri}
-              size={SIZE.sm}
+              color={item.type === 'danger' ? colors.errorText : colors.heading}
+              size={SIZE.md + 1}
             >
-              {typeof item.description === 'function'
-                ? item.description(current)
-                : item.description}
+              {typeof item.name === 'function' ? item.name(current) : item.name}
             </Paragraph>
-          )}
+            {!!item.description && (
+              <Paragraph
+                color={item.type === 'danger' ? colors.errorText : colors.pri}
+                size={SIZE.sm}
+              >
+                {typeof item.description === 'function'
+                  ? item.description(current)
+                  : item.description}
+              </Paragraph>
+            )}
 
-          {!!item.component && (
-            <>
-              <Seperator half />
-              {components[item.component]}
-            </>
-          )}
+            {!!item.component && (
+              <>
+                <Seperator half />
+                {components[item.component]}
+              </>
+            )}
+          </View>
         </View>
-      </View>
 
-      {item.type === 'switch' && item.property && (
-        <ToggleSwitch
-          isOn={item.getter ? item.getter(item.property || current) : settings[item.property]}
-          onColor={colors.accent}
-          offColor={colors.icon}
-          size="small"
-          animationSpeed={150}
-          onToggle={onChangeSettings}
-        />
-      )}
-    </PressableButton>
-  );
-};
+        {item.type === 'switch' && item.property && (
+          <ToggleSwitch
+            isOn={item.getter ? item.getter(item.property || current) : settings[item.property]}
+            onColor={colors.accent}
+            offColor={colors.icon}
+            size="small"
+            animationSpeed={150}
+            onToggle={onChangeSettings}
+          />
+        )}
+      </PressableButton>
+    );
+  },
+  () => true
+);

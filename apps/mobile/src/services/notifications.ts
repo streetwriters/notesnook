@@ -8,7 +8,7 @@ import { db } from '../utils/database';
 import { MMKV } from '../utils/database/mmkv';
 import { eOnLoadNote } from '../utils/events';
 import { tabBarRef } from '../utils/global-refs';
-import { useNoteStore } from '../stores/stores';
+import { useNoteStore } from '../stores/use-notes-store';
 import { DDS } from './device-detection';
 import { eSendEvent } from './event-manager';
 import SettingsService from './settings';

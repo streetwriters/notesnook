@@ -20,7 +20,6 @@ import {
   updateNoteInEditor
 } from '../../screens/editor/Functions';
 import tiny from '../../screens/editor/tiny/tiny';
-import Backup from '../../services/backup';
 import BiometricService from '../../services/biometrics';
 import {
   eSendEvent,
@@ -38,15 +37,12 @@ import {
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
 import Sync from '../../services/sync';
-import {
-  clearAllStores,
-  initialize,
-  useAttachmentStore,
-  useMessageStore,
-  useNoteStore,
-  useSettingStore,
-  useUserStore
-} from '../../stores/stores';
+import { clearAllStores, initialize } from '../../stores';
+import { useUserStore } from '../../stores/use-user-store';
+import { useMessageStore } from '../../stores/use-message-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useAttachmentStore } from '../../stores/use-attachment-store';
+import { useNoteStore } from '../../stores/use-notes-store';
 import { updateStatusBarColor } from '../color-scheme';
 import { db } from '../database';
 import { MMKV } from '../database/mmkv';
@@ -54,7 +50,6 @@ import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage 
 import { sleep } from '../time';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
-
 export const useAppEvents = () => {
   const loading = useNoteStore(state => state.loading);
   const setLastSynced = useUserStore(state => state.setLastSynced);
@@ -104,12 +99,14 @@ export const useAppEvents = () => {
     if (!loading) {
       const eventManager = db?.eventManager;
       eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress);
-      eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
+      let sub = eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
       eventManager?.subscribe(EVENTS.syncCompleted, onSyncComplete);
+      console.log('SUBSCRIBED', sub);
     }
 
     return () => {
       const eventManager = db?.eventManager;
+      console.log('UNSUBSCRIBED');
       eventManager?.unsubscribe(EVENTS.syncCompleted, onSyncComplete);
       eventManager?.unsubscribe(EVENTS.syncProgress, onSyncProgress);
       eventManager?.unsubscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
@@ -254,31 +251,7 @@ export const useAppEvents = () => {
   };
 
   const onLogout = async reason => {
-    setUser(null);
-    clearAllStores();
-
-    SettingsService.init();
-    setSyncing(false);
-    setLoginMessage();
-    await PremiumService.setPremiumStatus();
-    SettingsService.set({
-      introCompleted: true
-    });
-    presentSheet({
-      title: reason ? reason : 'User logged out',
-      paragraph: `You have been logged out of your account.`,
-      action: async () => {
-        eSendEvent(eCloseProgressDialog);
-        await sleep(300);
-        eSendEvent(eOpenLoginDialog);
-      },
-      icon: 'logout',
-      actionText: 'Login'
-    });
-
-    setTimeout(() => {
-      initialize();
-    }, 1000);
+    console.log('LOGOUT', reason);
   };
 
   const unsubIAP = () => {

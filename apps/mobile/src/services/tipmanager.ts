@@ -62,7 +62,6 @@ export class TipManager {
       //@ts-ignore
       popState = {};
     }
-    console.log('tipState:', tipState, 'popupState:', popState);
   }
 
   static tip(context: Context) {

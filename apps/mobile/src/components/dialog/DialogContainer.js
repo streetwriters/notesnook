@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { DDS } from '../../services/device-detection';
 import { getElevation } from '../../utils';
 

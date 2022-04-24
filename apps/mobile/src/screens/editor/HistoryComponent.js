@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { IconButton } from '../../components/ui/icon-button';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { editing } from '../../utils';
 import { SIZE } from '../../utils/size';

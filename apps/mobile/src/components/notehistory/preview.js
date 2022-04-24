@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { Alert, Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
-import { useThemeStore } from '../../stores/theme';
-import { useEditorStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useEditorStore } from '../../stores/use-editor-store';
 import { eSendEvent, ToastEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
@@ -78,11 +78,13 @@ export default function NotePreview({ session, content }) {
     }
     eSendEvent(eCloseProgressDialog, 'note_history');
     eSendEvent(eCloseProgressDialog);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes'
+    );
 
     ToastEvent.show({
       heading: 'Note restored successfully',

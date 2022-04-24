@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
-import { useMessageStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useMessageStore } from '../../../stores/use-message-store';
 import { DDS } from '../../../services/device-detection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
 import { getElevation } from '../../../utils';

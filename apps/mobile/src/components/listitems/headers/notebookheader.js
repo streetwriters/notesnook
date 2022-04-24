@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
-import { useMenuStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useMenuStore } from '../../../stores/use-menu-store';
 import { ToastEvent } from '../../../services/event-manager';
 import { getTotalNotes } from '../../../utils';
 import { db } from '../../../utils/database';

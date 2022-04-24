@@ -5,8 +5,10 @@ import { notesnook } from '../../../e2e/test.ids';
 import Settings from '../../screens/settings';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent } from '../../services/event-manager';
-import { useSettingStore, useUserStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/use-user-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import umami from '../../utils/analytics';
 import { toggleDarkMode } from '../../utils/color-scheme/utils';
 import { MenuItemsList, SUBSCRIPTION_STATUS } from '../../utils/constants';
@@ -22,7 +24,7 @@ export const SideMenu = React.memo(
     const deviceMode = useSettingStore(state => state.deviceMode);
     const insets = useSafeAreaInsets();
     const subscriptionType = useUserStore(state => state.user?.subscription?.type);
-    console.log(subscriptionType);
+    const loading = useNoteStore(state => state.loading);
     const noTextMode = false;
 
     const BottomItemsList = [
@@ -63,7 +65,7 @@ export const SideMenu = React.memo(
       []
     );
 
-    return (
+    return !loading ? (
       <View
         style={{
           height: '100%',
@@ -129,7 +131,7 @@ export const SideMenu = React.memo(
           </View>
         </View>
       </View>
-    );
+    ) : null;
   },
   () => true
 );

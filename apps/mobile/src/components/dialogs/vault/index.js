@@ -187,17 +187,15 @@ export class VaultDialog extends Component {
       });
       return;
     }
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Notebook
-    ]);
+
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'TopicNotes',
+      'TaggedNotes',
+      'ColoredNotes'
+    );
+
     this.password = null;
     this.confirmPassword = null;
     SearchService.updateAndSearch();

@@ -2,7 +2,7 @@ import React, { RefObject, useState } from 'react';
 import { Platform, View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
 import { FlatList } from 'react-native-gesture-handler';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { eSendEvent, presentSheet, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import { db } from '../../../utils/database';
@@ -82,13 +82,16 @@ export const MoveNotes = ({
     }
     await db.notebooks?.notebook(currentNotebook.id).topics.add(value);
     setCurrentNotebook(db.notebooks?.notebook(currentNotebook.id).data);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notebook
-    ]);
+
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes',
+      'Notebook',
+      'Notebooks'
+    );
     return true;
   };
 
@@ -269,13 +272,15 @@ export const MoveNotes = ({
               },
               ...selectedNoteIds
             );
-            Navigation.setRoutesToUpdate([
-              Navigation.routeNames.NotesPage,
-              Navigation.routeNames.Favorites,
-              Navigation.routeNames.Notes,
-              Navigation.routeNames.Notebooks,
-              Navigation.routeNames.Notebook
-            ]);
+            Navigation.queueRoutesForUpdate(
+              'Notes',
+              'Favorites',
+              'ColoredNotes',
+              'TaggedNotes',
+              'TopicNotes',
+              'Notebook',
+              'Notebooks'
+            );
             SearchService.updateAndSearch();
             eSendEvent(eCloseProgressDialog);
           }}
