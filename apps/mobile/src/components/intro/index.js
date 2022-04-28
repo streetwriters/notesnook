@@ -71,7 +71,7 @@ const Intro = () => {
             }}
           >
             <Image
-              source={require('../../assets/images/notesnook-logo-png.png')}
+              source={require('../../assets/images/notesnook.png')}
               style={{
                 width: 40,
                 height: 40,
