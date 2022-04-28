@@ -1,6 +1,5 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
 import { Header } from '../header';
 import SelectionHeader from '../selection-header';

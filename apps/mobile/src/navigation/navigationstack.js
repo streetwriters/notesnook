@@ -72,7 +72,7 @@ export const NavigationStack = React.memo(
     });
 
     return (
-      <Container root={true}>
+      <Container>
         <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
           <Tabs />
         </NavigationContainer>

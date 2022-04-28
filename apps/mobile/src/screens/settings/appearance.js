@@ -13,7 +13,6 @@ import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { hexToRGBA, RGB_Linear_Shade, switchAccentColor } from '../../utils/color-scheme/utils';
 import { MenuItemsList } from '../../utils/constants';
-import { tabBarRef } from '../../utils/global-refs';
 import { pv, SIZE } from '../../utils/size';
 
 export const HomagePageSelector = () => {
