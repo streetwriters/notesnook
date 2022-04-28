@@ -23,7 +23,7 @@ import { clearAllStores } from '../../stores';
 import { useUserStore } from '../../stores/use-user-store';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { AndroidModule } from '../../utils';
-import { toggleDarkMode } from '../../utils/color-scheme/utils';
+import { toggleDarkMode, getColorScheme } from '../../utils/color-scheme/utils';
 import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
@@ -368,6 +368,12 @@ export const settingsGroups: SettingSection[] = [
             name: 'Pitch black',
             description: 'Save battery on device with amoled screen at night.',
             property: 'pitchBlack',
+            modifer: () => {
+              SettingsService.set({
+                pitchBlack: !SettingsService.get().pitchBlack
+              });
+              getColorScheme();
+            },
             icon: 'brightness-1'
           }
         ]
