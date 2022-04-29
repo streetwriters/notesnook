@@ -13,14 +13,14 @@ export const Container = ({ children }) => {
         flex: 1
       }}
     >
-      <SelectionHeader />
-      <Header title="Header" screen="Header" />
       <SafeAreaView
         style={{
           flex: 1,
           overflow: 'hidden'
         }}
       >
+        <SelectionHeader />
+        <Header title="Header" screen="Header" />
         {children}
       </SafeAreaView>
     </KeyboardAvoidingView>
