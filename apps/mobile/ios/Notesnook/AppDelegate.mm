@@ -3,8 +3,9 @@
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
-
+#import <RNBootSplash/RNBootSplash.h>
 #import <React/RCTAppSetupUtils.h>
+#import <React/RCTLinkingManager.h>
 
 #if RCT_NEW_ARCH_ENABLED
 #import <React/CoreModulesPlugins.h>
@@ -36,12 +37,8 @@ RCTBridge *bridge;
 {
   RCTAppSetupPrepareApp(application);
   shareViewController = [UIViewController new];
-
   bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
-
-
-  NSURL *url = (NSURL *) [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey];
-
+  
 #if RCT_NEW_ARCH_ENABLED
   _contextContainer = std::make_shared<facebook::react::ContextContainer const>();
   _reactNativeConfig = std::make_shared<facebook::react::EmptyReactNativeConfig const>();
@@ -49,16 +46,9 @@ RCTBridge *bridge;
   _bridgeAdapter = [[RCTSurfacePresenterBridgeAdapter alloc] initWithBridge:bridge contextContainer:_contextContainer];
   bridge.surfacePresenter = _bridgeAdapter.surfacePresenter;
 #endif
-
-  UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"RnDiffApp", nil);
-
-  // if (@available(iOS 13.0, *)) {
-  //   rootView.backgroundColor = [UIColor systemBackgroundColor];
-  // } else {
-  //   rootView.backgroundColor = [UIColor whiteColor];
-  // }
-
-    if (url != nil) {
+  
+  NSURL *url = (NSURL *) [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey];
+  if (url != nil) {
     navController = [[UINavigationController alloc] initWithRootViewController:shareViewController];
   } else {
     rootViewController = [UIViewController new];
@@ -67,23 +57,30 @@ RCTBridge *bridge;
   
   
   navController.navigationBarHidden = YES;
-
-    if (url != nil) {
+  
+  if (url != nil) {
     RCTRootView *shareView = [[RCTRootView alloc] initWithBridge:bridge
                                                       moduleName:@"QuickNoteIOS"
                                                initialProperties:nil];
-    shareView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
+    if (@available(iOS 13.0, *)) {
+      shareView.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+      shareView.backgroundColor = [UIColor whiteColor];
+    }
     shareViewController.view = shareView;
     [RNBootSplash initWithStoryboard:@"BootSplash" rootView:shareView];
   } else {
     RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                      moduleName:@"Notesnook"                                      initialProperties:nil];
-    
-    rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
+    if (@available(iOS 13.0, *)) {
+      rootView.backgroundColor = [UIColor systemBackgroundColor];
+    } else {
+      rootView.backgroundColor = [UIColor whiteColor];
+    }
     rootViewController.view = rootView;
     [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
   }
-
+  
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
@@ -128,7 +125,7 @@ RCTBridge *bridge;
       [app performSelector:@selector(suspend)];
       [NSThread sleepForTimeInterval:0.5];
       [navController popToRootViewControllerAnimated:false];
-    
+      
     }
     
     
@@ -157,14 +154,14 @@ RCTBridge *bridge;
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const std::string &)name
-                                                      jsInvoker:(std::shared_ptr<facebook::react::CallInvoker>)jsInvoker
+jsInvoker:(std::shared_ptr<facebook::react::CallInvoker>)jsInvoker
 {
   return nullptr;
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const std::string &)name
-                                                     initParams:
-                                                         (const facebook::react::ObjCTurboModule::InitParams &)params
+initParams:
+(const facebook::react::ObjCTurboModule::InitParams &)params
 {
   return nullptr;
 }
