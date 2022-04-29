@@ -82,7 +82,7 @@ RCTBridge *bridge;
   }
   
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-  self.window.rootViewController = rootViewController;
+  self.window.rootViewController = navController;
   [self.window makeKeyAndVisible];
   return YES;
 }
