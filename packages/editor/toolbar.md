@@ -70,3 +70,27 @@ Total Tools:
 - [x] table
 - [x] ltr rtl
 - [x] searchreplace
+
+What's next:
+
+- [ ] Port codeblock extension from tinymce to tiptap
+- [ ] Optimize toolbar & editor UI for mobile
+- [ ] Refactor & finalize UI + styling
+- [ ] Write tests
+
+## Optimize toolbar & editor UI for mobile
+
+1. Refactor tools to be more easily configurable
+2. Implement sub groups in toolbar
+3. Move all popups to /popups directory
+4. Implement mobile positioning logic in menu/popup presenter
+5. Add support for repositioning toolbar (top/bottom)
+6. Move all popups to be shown as bottom sheets on mobile
+
+### Refactor tools
+
+1. A tool defines it's own UI
+   - This gives it maximum flexibility to do whatever it wants.
+2. Some factors of a tool's UI can be defined externally
+   - For example, a tool's icon + title + description?
+3.

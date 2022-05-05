@@ -28,14 +28,14 @@ export function Toolbar(props: ToolbarProps) {
 
   const tools: ToolbarDefinition = [
     ["bold", "italic", "underline", "strikethrough", "code"],
-    ["fontSize", "fontFamily", "headings"],
-    ["alignLeft", "alignCenter", "alignRight", "alignJustify"],
-    ["subscript", "superscript", "horizontalRule"],
-    ["codeblock", "blockquote"],
-    ["formatClear", "ltr", "rtl"],
-    ["numberedList", "bulletList", "checklist"],
-    ["link", "image", "attachment", "table", "embed"],
-    ["textColor", "highlight"],
+    // ["fontSize", "fontFamily", "headings"],
+    // ["alignLeft", "alignCenter", "alignRight", "alignJustify"],
+    // ["subscript", "superscript", "horizontalRule"],
+    // ["codeblock", "blockquote"],
+    // ["formatClear", "ltr", "rtl"],
+    // ["numberedList", "bulletList", "checklist"],
+    // ["link", "image", "attachment", "table", "embed"],
+    // ["textColor", "highlight"],
   ];
 
   if (!editor) return null;
@@ -54,8 +54,8 @@ export function Toolbar(props: ToolbarProps) {
               }}
             >
               {tools.map((toolId) => {
-                const { render: Component } = findToolById(toolId);
-                return <Component editor={editor} />;
+                const Component = findToolById(toolId);
+                return <Component editor={editor} id={toolId} />;
               })}
             </Flex>
           );

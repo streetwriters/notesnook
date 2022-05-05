@@ -20,14 +20,14 @@ export function Toolbar(props) {
     var themeProperties = useTheme({ accent: accent, theme: theme, scale: scale });
     var tools = [
         ["bold", "italic", "underline", "strikethrough", "code"],
-        ["fontSize", "fontFamily", "headings"],
-        ["alignLeft", "alignCenter", "alignRight", "alignJustify"],
-        ["subscript", "superscript", "horizontalRule"],
-        ["codeblock", "blockquote"],
-        ["formatClear", "ltr", "rtl"],
-        ["numberedList", "bulletList", "checklist"],
-        ["link", "image", "attachment", "table", "embed"],
-        ["textColor", "highlight"],
+        // ["fontSize", "fontFamily", "headings"],
+        // ["alignLeft", "alignCenter", "alignRight", "alignJustify"],
+        // ["subscript", "superscript", "horizontalRule"],
+        // ["codeblock", "blockquote"],
+        // ["formatClear", "ltr", "rtl"],
+        // ["numberedList", "bulletList", "checklist"],
+        // ["link", "image", "attachment", "table", "embed"],
+        // ["textColor", "highlight"],
     ];
     if (!editor)
         return null;
@@ -38,8 +38,8 @@ export function Toolbar(props) {
                             borderRight: "1px solid var(--border)",
                             ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
                         } }, { children: tools.map(function (toolId) {
-                            var Component = findToolById(toolId).render;
-                            return _jsx(Component, { editor: editor });
+                            var Component = findToolById(toolId);
+                            return _jsx(Component, { editor: editor, id: toolId });
                         }) })));
                 }) })), _jsx(EditorFloatingMenus, { editor: editor })] })));
 }

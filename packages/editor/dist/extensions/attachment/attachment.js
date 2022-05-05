@@ -22,6 +22,7 @@ export var AttachmentNode = Node.create({
         return {
             //   HTMLAttributes: {},
             onDownloadAttachment: function () { return false; },
+            onOpenAttachmentPicker: function () { return false; },
         };
     },
     group: function () {
@@ -65,6 +66,11 @@ export var AttachmentNode = Node.create({
             downloadAttachment: function (attachment) {
                 return function (_a) {
                     return _this.options.onDownloadAttachment(attachment);
+                };
+            },
+            openAttachmentPicker: function () {
+                return function (_a) {
+                    return _this.options.onOpenAttachmentPicker();
                 };
             },
             setProgress: function (options) {

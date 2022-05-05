@@ -1,12 +1,12 @@
-/// <reference types="react" />
 import { Editor } from "@tiptap/core";
+import { IconNames } from "./icons";
 import { ToolId } from "./tools";
-export declare type ToolProps = {
+export declare type ToolProps = ToolDefinition & {
     editor: Editor;
-};
-export interface ITool {
     id: ToolId;
+};
+export declare type ToolDefinition = {
+    icon: IconNames;
     title: string;
     description?: string;
-    render(props: ToolProps): JSX.Element;
-}
+};

@@ -6,6 +6,7 @@ import { AttachmentComponent } from "./component";
 export interface AttachmentOptions {
   // HTMLAttributes: Record<string, any>;
   onDownloadAttachment: (attachment: Attachment) => boolean;
+  onOpenAttachmentPicker: () => boolean;
 }
 
 export type Attachment = AttachmentProgress & {
@@ -24,6 +25,7 @@ export type AttachmentProgress = {
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     attachment: {
+      openAttachmentPicker: () => ReturnType;
       insertAttachment: (attachment: Attachment) => ReturnType;
       downloadAttachment: (attachment: Attachment) => ReturnType;
       setProgress: (progress: AttachmentProgress) => ReturnType;
@@ -42,6 +44,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       //   HTMLAttributes: {},
       onDownloadAttachment: () => false,
+      onOpenAttachmentPicker: () => false,
     };
   },
 
@@ -90,6 +93,11 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
         (attachment) =>
         ({}) => {
           return this.options.onDownloadAttachment(attachment);
+        },
+      openAttachmentPicker:
+        () =>
+        ({}) => {
+          return this.options.onOpenAttachmentPicker();
         },
       setProgress:
         (options) =>

@@ -1,14 +1,14 @@
 import { Editor } from "@tiptap/core";
+import { IconNames } from "./icons";
 import { ToolId } from "./tools";
 
-export type ToolProps = { editor: Editor };
-export interface ITool {
+export type ToolProps = ToolDefinition & {
+  editor: Editor;
   id: ToolId;
+};
+
+export type ToolDefinition = {
+  icon: IconNames;
   title: string;
   description?: string;
-  render(props: ToolProps): JSX.Element;
-}
-
-// export interface ToolConstructor {
-//   new (editor: Editor): ITool;
-// }
+};
