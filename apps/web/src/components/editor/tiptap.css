@@ -170,3 +170,11 @@ img.ProseMirror-separator {
   cursor: ew-resize;
   cursor: col-resize;
 }
+
+.drop-cursor {
+  background-color: var(--text) !important;
+}
+
+.search-result {
+  background-color: var(--disabled);
+}
