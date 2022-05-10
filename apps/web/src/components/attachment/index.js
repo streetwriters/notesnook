@@ -10,6 +10,7 @@ import { Multiselect } from "../../common/multi-select";
 import {
   closeOpenedDialog,
   showAttachmentsDialog,
+  showPromptDialog,
 } from "../../common/dialog-controller";
 import { hashNavigate } from "../../navigation";
 
@@ -173,7 +174,12 @@ const menuItems = [
     title: () => "Rename",
     icon: Icon.Rename,
     onClick: async ({ attachment }) => {
-      const newName = prompt("Rename file", attachment.metadata.filename);
+      const newName = await showPromptDialog({
+        title: "Rename attachment",
+        description: attachment.metadata.filename,
+        defaultValue: attachment.metadata.filename,
+      });
+      if (!newName) return;
       await store.rename(attachment.metadata.hash, newName);
     },
   },

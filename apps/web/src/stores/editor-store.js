@@ -174,6 +174,8 @@ class EditorStore extends BaseStore {
       }
 
       this.set((state) => {
+        if (state.session.id !== note.id) return;
+
         for (let key in session) {
           if (key === "content") continue;
           state.session[key] = session[key];
@@ -183,6 +185,7 @@ class EditorStore extends BaseStore {
         state.session.context = null;
         state.session.id = note.id;
         state.session.saveState = 1;
+        state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
       });
 

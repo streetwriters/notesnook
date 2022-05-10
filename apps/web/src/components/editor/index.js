@@ -90,12 +90,13 @@ function Editor({ noteId, nonce }) {
     [newSession, openSession, nonce]
   );
 
-  const clearContent = useCallback(() => {
+  const clearContent = useCallback((focus) => {
     const editor = editorRef.current?.editor;
     if (!editor || !editor.initialized) return;
     editor.clearContent();
     updateWordCount(editor);
-    editor.focus(); // TODO
+    if (focus) editor.focus(); // TODO
+    // console.trace("HELLO");
   }, []);
 
   const setContent = useCallback(() => {
@@ -114,7 +115,7 @@ function Editor({ noteId, nonce }) {
 
       let content = await editorstore.get().getSessionContent();
       if (content?.data) editorSetContent(editor, content.data);
-      else clearContent(editor);
+      else clearContent();
 
       editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
       if (id && content) await db.attachments.downloadImages(id);
@@ -181,7 +182,7 @@ function Editor({ noteId, nonce }) {
     function newSession() {
       if (!nonce) return;
 
-      clearContent();
+      clearContent(true);
     },
     [nonce, clearContent]
   );
@@ -278,7 +279,7 @@ function Editor({ noteId, nonce }) {
                 sessionId={sessionId}
                 onChange={(content, editor) => {
                   const { id, sessionId } = editorstore.get().session;
-                  debouncedOnEditorChange(sessionId, id, sessionId, content);
+                  debouncedOnEditorChange(id, id, sessionId, content);
                   debouncedUpdateWordCount(editor);
                 }}
                 changeInterval={100}

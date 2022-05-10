@@ -17,12 +17,14 @@ import IssueDialog from "./issuedialog";
 import { MultifactorDialog, RecoveryCodesDialog } from "./multi-factor-dialog";
 import OnboardingDialog from "./onboarding-dialog";
 import AttachmentsDialog from "./attachmentsdialog";
+import { Prompt } from "./prompt";
 
 const Dialogs = {
   AddNotebookDialog,
   TrackingDetailsDialog,
   BuyDialog,
   Confirm,
+  Prompt,
   EmailVerificationDialog,
   LoadingDialog,
   MoveDialog,

@@ -117,6 +117,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             className="pane nav-pane"
             minSize={50}
             preferredSize={paneSizes[0]}
+            visible={show}
           >
             <Flex flex={1}>
               <SuspenseLoader
