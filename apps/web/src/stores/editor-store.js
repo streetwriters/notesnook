@@ -174,6 +174,8 @@ class EditorStore extends BaseStore {
       }
 
       this.set((state) => {
+        if (state.session.id !== note.id) return;
+
         for (let key in session) {
           if (key === "content") continue;
           state.session[key] = session[key];

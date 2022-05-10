@@ -278,7 +278,7 @@ function Editor({ noteId, nonce }) {
                 sessionId={sessionId}
                 onChange={(content, editor) => {
                   const { id, sessionId } = editorstore.get().session;
-                  debouncedOnEditorChange(sessionId, id, sessionId, content);
+                  debouncedOnEditorChange(id, id, sessionId, content);
                   debouncedUpdateWordCount(editor);
                 }}
                 changeInterval={100}
