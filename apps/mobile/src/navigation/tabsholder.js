@@ -6,7 +6,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
-import { NewTabs } from '../components/tabs/new';
+import { NewTabs } from '../components/tabs';
 import { EditorWrapper } from '../screens/editor/EditorWrapper';
 import { checkStatus, EditorWebView, getNote } from '../screens/editor/Functions';
 import tiny from '../screens/editor/tiny/tiny';

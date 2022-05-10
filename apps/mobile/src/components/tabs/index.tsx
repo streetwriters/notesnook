@@ -83,12 +83,10 @@ export const NewTabs = forwardRef<TabsRef, TabProps>(
         },
         unlock: () => {
           forcedLock.value = false;
-          console.log('forced lock status', forcedLock.value);
           return false;
         },
         lock: () => {
           forcedLock.value = true;
-          console.log('forced lock status', forcedLock.value);
           return true;
         },
         openDrawer: () => {
@@ -171,13 +169,11 @@ export const NewTabs = forwardRef<TabsRef, TabProps>(
 
         const animationConfig = {
           velocity: event.velocityX,
-          overshootClamping: true,
-          stiffness: 200,
-          mass: 0.1
+          mass: 0.01
         };
 
         if (finalValue < homePosition) {
-          if (isSwipeLeft && finalValue < homePosition - 150) {
+          if (isSwipeLeft && finalValue < homePosition - 100) {
             translateX.value = withSpring(0, animationConfig);
             isDrawerOpen.value = true;
             currentTab.value = 1;
@@ -189,7 +185,7 @@ export const NewTabs = forwardRef<TabsRef, TabProps>(
             currentTab.value = 1;
             runOnJS(onDrawerStateChange)(false);
             return;
-          } else if (!isSwipeLeft && finalValue < 150) {
+          } else if (!isSwipeLeft && finalValue < 100) {
             translateX.value = withSpring(0, animationConfig);
             isDrawerOpen.value = true;
             currentTab.value = 1;
