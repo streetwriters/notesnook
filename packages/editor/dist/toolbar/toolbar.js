@@ -44,13 +44,12 @@ import { ThemeProvider } from "emotion-theming";
 import { EditorFloatingMenus } from "./floating-menus";
 import { getToolDefinition } from "./tool-definitions";
 import { ToolButton } from "./components/tool-button";
-import { useContext, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { MenuPresenter } from "../components/menu";
 import { Popup } from "./components/popup";
-import React from "react";
-var ToolbarContext = React.createContext({});
+import { ToolbarContext, useToolbarContext, } from "./hooks/useToolbarContext";
 export function Toolbar(props) {
-    var editor = props.editor, theme = props.theme, accent = props.accent, scale = props.scale;
+    var editor = props.editor, theme = props.theme, accent = props.accent, scale = props.scale, location = props.location;
     var themeProperties = useTheme({ accent: accent, theme: theme, scale: scale });
     var _a = __read(useState(), 2), currentPopup = _a[0], setCurrentPopup = _a[1];
     var tools = [
@@ -68,7 +67,7 @@ export function Toolbar(props) {
                 "textColor",
             ],
         ],
-        ["fontSize", "headings", ["fontFamily"]],
+        ["fontSize", "headings", "fontFamily"],
         ["numberedList", "bulletList"],
         ["link"],
         ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
@@ -76,8 +75,9 @@ export function Toolbar(props) {
     ];
     if (!editor)
         return null;
-    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(ToolbarContext.Provider, __assign({ value: { setCurrentPopup: setCurrentPopup, currentPopup: currentPopup } }, { children: _jsx(Flex, __assign({ className: "editor-toolbar", sx: { flexWrap: "wrap" } }, { children: tools.map(function (tools) {
+    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(ToolbarContext.Provider, __assign({ value: { setCurrentPopup: setCurrentPopup, currentPopup: currentPopup, toolbarLocation: location } }, { children: _jsx(Flex, __assign({ className: "editor-toolbar", sx: { flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] } }, { children: tools.map(function (tools) {
                         return (_jsx(ToolbarGroup, { tools: tools, editor: editor, sx: {
+                                flexShrink: 0,
                                 pr: 2,
                                 mr: 2,
                                 borderRight: "1px solid var(--border)",
@@ -100,19 +100,19 @@ function ToolbarGroup(props) {
 }
 function MoreTools(props) {
     var popupId = props.popupId;
-    var _a = useContext(ToolbarContext), currentPopup = _a.currentPopup, setCurrentPopup = _a.setCurrentPopup;
+    var _a = useToolbarContext(), currentPopup = _a.currentPopup, setCurrentPopup = _a.setCurrentPopup, toolbarLocation = _a.toolbarLocation;
     var buttonRef = useRef();
     var show = popupId === currentPopup;
     var setShow = function (state) {
         return setCurrentPopup === null || setCurrentPopup === void 0 ? void 0 : setCurrentPopup(state ? popupId : undefined);
     };
-    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { icon: "more", title: "More", toggled: show, buttonRef: buttonRef, onClick: function () { return setShow(!show); } }), _jsx(MenuPresenter, __assign({ isOpen: show, onClose: function () { return setShow(false); }, items: [], options: {
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { icon: "more", title: "More", toggled: show, buttonRef: buttonRef, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setShow(!show); } }), _jsx(MenuPresenter, __assign({ isOpen: show, onClose: function () { return setShow(false); }, items: [], options: {
                     type: "autocomplete",
                     position: {
                         isTargetAbsolute: true,
                         target: buttonRef.current || "mouse",
                         align: "center",
-                        location: "below",
+                        location: toolbarLocation === "bottom" ? "top" : "below",
                         yOffset: 5,
                     },
                 } }, { children: _jsx(Popup, { children: _jsx(ToolbarGroup, { tools: props.tools, editor: props.editor, sx: {

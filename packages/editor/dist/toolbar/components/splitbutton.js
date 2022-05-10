@@ -43,10 +43,12 @@ import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton } from "./tool-button";
 import { MenuPresenter } from "../../components/menu/menu";
+import { useToolbarContext } from "../hooks/useToolbarContext";
 export function SplitButton(props) {
     var menuPresenterProps = props.menuPresenterProps, children = props.children, toolButtonProps = __rest(props, ["menuPresenterProps", "children"]);
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var ref = useRef(null);
+    var toolbarLocation = useToolbarContext().toolbarLocation;
     return (_jsxs(_Fragment, { children: [_jsxs(Flex, __assign({ ref: ref, sx: {
                     borderRadius: "default",
                     bg: isOpen ? "hover" : "transparent",
@@ -59,13 +61,14 @@ export function SplitButton(props) {
                             ":last-of-type": {
                                 mr: 0,
                             },
-                        }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.chevronDown, color: "text", size: 14 }) }))] })), _jsx(MenuPresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, options: {
+                        }, onClick: function () { return setIsOpen(function (s) { return !s; }); }, onMouseDown: function (e) { return e.preventDefault(); } }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: 14 }) }))] })), _jsx(MenuPresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, options: {
                     type: "menu",
                     position: {
                         target: ref.current || undefined,
                         isTargetAbsolute: true,
-                        location: "below",
+                        location: toolbarLocation === "bottom" ? "top" : "below",
                         yOffset: 5,
+                        align: "center",
                     },
                 }, items: [] }, menuPresenterProps, { children: children }))] }));
 }

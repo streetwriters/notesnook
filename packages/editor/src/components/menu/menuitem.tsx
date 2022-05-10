@@ -83,14 +83,7 @@ function MenuItem(props: MenuItemProps) {
                 sx={{ mr: 2 }}
               />
             )}
-            <Text
-              as="span"
-              sx={{
-                fontFamily: "body",
-                fontSize: "menu",
-                color: "text",
-              }}
-            >
+            <Text as="span" variant={"body"}>
               {title}
             </Text>
           </Flex>

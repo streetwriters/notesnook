@@ -4,6 +4,7 @@ import { Icon } from "./icon";
 import { Icons } from "../icons";
 import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
 import { MenuItem } from "../../components/menu/types";
+import { useToolbarContext } from "../hooks/useToolbarContext";
 
 type DropdownProps = {
   selectedItem: string | JSX.Element;
@@ -15,6 +16,7 @@ export function Dropdown(props: DropdownProps) {
   const { items, selectedItem, buttonRef, menuWidth } = props;
   const internalRef = useRef<any>();
   const [isOpen, setIsOpen] = useState(false);
+  const { toolbarLocation } = useToolbarContext();
 
   return (
     <>
@@ -36,6 +38,7 @@ export function Dropdown(props: DropdownProps) {
           },
         }}
         onClick={() => setIsOpen((s) => !s)}
+        onMouseDown={(e) => e.preventDefault()}
       >
         {typeof selectedItem === "string" ? (
           <Text sx={{ fontSize: 12, mr: 1, color: "text" }}>
@@ -44,7 +47,13 @@ export function Dropdown(props: DropdownProps) {
         ) : (
           selectedItem
         )}
-        <Icon path={Icons.chevronDown} size={14} color={"text"} />
+        <Icon
+          path={
+            toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown
+          }
+          size={14}
+          color={"text"}
+        />
       </Button>
       <MenuPresenter
         options={{
@@ -52,7 +61,7 @@ export function Dropdown(props: DropdownProps) {
           position: {
             target: internalRef.current || undefined,
             isTargetAbsolute: true,
-            location: "below",
+            location: toolbarLocation === "bottom" ? "top" : "below",
             yOffset: 5,
           },
         }}

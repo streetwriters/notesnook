@@ -11,13 +11,11 @@ import { ToolButton } from "./components/tool-button";
 import { useContext, useRef, useState } from "react";
 import { MenuPresenter } from "../components/menu";
 import { Popup } from "./components/popup";
-import React from "react";
-
-const ToolbarContext = React.createContext<{
-  currentPopup?: string;
-  setCurrentPopup?: React.Dispatch<React.SetStateAction<string | undefined>>;
-}>({});
-
+import {
+  ToolbarContext,
+  ToolbarLocation,
+  useToolbarContext,
+} from "./hooks/useToolbarContext";
 // type Colors = {
 //   text: string;
 //   background: string;
@@ -32,11 +30,10 @@ type ToolbarDefinition = ToolbarGroupDefinition[];
 
 type ToolbarProps = ThemeConfig & {
   editor: Editor | null;
-  // tools: ToolbarDefinition;
-  // colors: Colors;
+  location: ToolbarLocation;
 };
 export function Toolbar(props: ToolbarProps) {
-  const { editor, theme, accent, scale } = props;
+  const { editor, theme, accent, scale, location } = props;
   const themeProperties = useTheme({ accent, theme, scale });
   const [currentPopup, setCurrentPopup] = useState<string | undefined>();
 
@@ -55,7 +52,7 @@ export function Toolbar(props: ToolbarProps) {
         "textColor",
       ],
     ],
-    ["fontSize", "headings", ["fontFamily"]],
+    ["fontSize", "headings", "fontFamily"],
     ["numberedList", "bulletList"],
     ["link"],
     ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
@@ -65,14 +62,20 @@ export function Toolbar(props: ToolbarProps) {
   if (!editor) return null;
   return (
     <ThemeProvider theme={themeProperties}>
-      <ToolbarContext.Provider value={{ setCurrentPopup, currentPopup }}>
-        <Flex className="editor-toolbar" sx={{ flexWrap: "wrap" }}>
+      <ToolbarContext.Provider
+        value={{ setCurrentPopup, currentPopup, toolbarLocation: location }}
+      >
+        <Flex
+          className="editor-toolbar"
+          sx={{ flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] }}
+        >
           {tools.map((tools) => {
             return (
               <ToolbarGroup
                 tools={tools}
                 editor={editor}
                 sx={{
+                  flexShrink: 0,
                   pr: 2,
                   mr: 2,
                   borderRight: "1px solid var(--border)",
@@ -116,10 +119,15 @@ function ToolbarGroup(props: ToolbarGroupProps) {
   );
 }
 
-type MoreToolsProps = { popupId: string; tools: ToolId[]; editor: Editor };
+type MoreToolsProps = {
+  popupId: string;
+  tools: ToolId[];
+  editor: Editor;
+};
 function MoreTools(props: MoreToolsProps) {
   const { popupId } = props;
-  const { currentPopup, setCurrentPopup } = useContext(ToolbarContext);
+  const { currentPopup, setCurrentPopup, toolbarLocation } =
+    useToolbarContext();
   const buttonRef = useRef<HTMLButtonElement | null>();
 
   const show = popupId === currentPopup;
@@ -133,6 +141,7 @@ function MoreTools(props: MoreToolsProps) {
         title="More"
         toggled={show}
         buttonRef={buttonRef}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => setShow(!show)}
       />
       <MenuPresenter
@@ -145,7 +154,7 @@ function MoreTools(props: MoreToolsProps) {
             isTargetAbsolute: true,
             target: buttonRef.current || "mouse",
             align: "center",
-            location: "below",
+            location: toolbarLocation === "bottom" ? "top" : "below",
             yOffset: 5,
           },
         }}

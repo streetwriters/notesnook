@@ -32,9 +32,11 @@ import { useRef, useState } from "react";
 import { Icon } from "../components/icon";
 import { Button } from "rebass";
 import { TablePopup } from "../popups/table-popup";
+import { useToolbarContext } from "../hooks/useToolbarContext";
 export function InsertBlock(props) {
     var buttonRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
+    var toolbarLocation = useToolbarContext().toolbarLocation;
     return (_jsxs(_Fragment, { children: [_jsx(Button, __assign({ ref: buttonRef, sx: {
                     p: 1,
                     m: 0,
@@ -46,12 +48,12 @@ export function InsertBlock(props) {
                     ":last-of-type": {
                         mr: 0,
                     },
-                }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.plus, size: 18, color: "primary" }) })), _jsx(MenuPresenter, { options: {
+                }, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.plus, size: 18, color: "primary" }) })), _jsx(MenuPresenter, { options: {
                     type: "menu",
                     position: {
                         target: buttonRef.current || undefined,
                         isTargetAbsolute: true,
-                        location: "below",
+                        location: toolbarLocation === "bottom" ? "top" : "below",
                         yOffset: 5,
                     },
                 }, isOpen: isOpen, items: [

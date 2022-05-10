@@ -12,10 +12,13 @@ import { Popup } from "../components/popup";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
 import { MenuItem } from "../../components/menu/types";
+import { useToolbarContext } from "../hooks/useToolbarContext";
 
 export function InsertBlock(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement | null>();
   const [isOpen, setIsOpen] = useState(false);
+  const { toolbarLocation } = useToolbarContext();
+
   return (
     <>
       <Button
@@ -32,6 +35,7 @@ export function InsertBlock(props: ToolProps) {
             mr: 0,
           },
         }}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => setIsOpen((s) => !s)}
       >
         <Icon path={Icons.plus} size={18} color={"primary"} />
@@ -42,7 +46,7 @@ export function InsertBlock(props: ToolProps) {
           position: {
             target: buttonRef.current || undefined,
             isTargetAbsolute: true,
-            location: "below",
+            location: toolbarLocation === "bottom" ? "top" : "below",
             yOffset: 5,
           },
         }}

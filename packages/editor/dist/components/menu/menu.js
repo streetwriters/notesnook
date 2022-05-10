@@ -204,26 +204,33 @@ function MenuContainer(props) {
 }
 export function MenuPresenter(props) {
     var className = props.className, options = props.options, items = props.items, isOpen = props.isOpen, onClose = props.onClose, children = props.children, containerProps = __rest(props, ["className", "options", "items", "isOpen", "onClose", "children"]);
-    // const { isOpen, closeMenu } = useMenuTrigger();
-    //  const { items, } = useMenu();
     var position = options.position, type = options.type;
     var isAutocomplete = type === "autocomplete";
     var contentRef = useRef();
-    useEffect(function () {
+    var repositionMenu = useCallback(function (position) {
         if (!contentRef.current || !position)
             return;
         var menu = contentRef.current;
         var menuPosition = getPosition(menu, position);
         menu.style.top = menuPosition.top + "px";
         menu.style.left = menuPosition.left + "px";
+    }, []);
+    useEffect(function () {
+        repositionMenu(position);
+    }, [position]);
+    useEffect(function () {
+        function onWindowResize() {
+            repositionMenu(position);
+        }
+        window.addEventListener("resize", onWindowResize);
+        return function () {
+            window.removeEventListener("resize", onWindowResize);
+        };
     }, [position]);
     return (_jsx(Modal, __assign({ contentRef: function (ref) { return (contentRef.current = ref); }, className: className || "menuContainer", role: "menu", isOpen: isOpen, appElement: document.body, shouldCloseOnEsc: true, shouldReturnFocusAfterClose: true, shouldCloseOnOverlayClick: true, shouldFocusAfterRender: !isAutocomplete, ariaHideApp: !isAutocomplete, preventScroll: !isAutocomplete, onRequestClose: onClose, portalClassName: className || "menuPresenter", onAfterOpen: function (obj) {
             if (!obj || !position)
                 return;
-            var menu = obj.contentEl;
-            var menuPosition = getPosition(menu, position);
-            menu.style.top = menuPosition.top + "px";
-            menu.style.left = menuPosition.left + "px";
+            repositionMenu(position);
         }, overlayElement: function (props, contentEl) {
             return (_jsx(Box, __assign({}, props, { style: __assign(__assign({}, props.style), { position: isAutocomplete ? "initial" : "fixed", zIndex: 1000, backgroundColor: isAutocomplete ? "transparent" : "unset" }) }, { children: contentEl })));
         }, contentElement: function (props, children) { return (_jsx(Box, __assign({}, props, { style: {}, sx: {

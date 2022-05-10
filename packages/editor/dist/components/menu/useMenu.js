@@ -14,7 +14,7 @@ export function getPosition(element, options) {
     var elementWidth = element.offsetWidth;
     var elementHeight = element.offsetHeight;
     var windowWidth = parent.clientWidth;
-    var windowHeight = parent.clientHeight - 20;
+    var windowHeight = parent.clientHeight;
     var position = { top: 0, left: 0 };
     if (windowWidth - actualX < elementWidth) {
         var xDiff = actualX - x;
@@ -30,10 +30,8 @@ export function getPosition(element, options) {
         else if (location === "left")
             position.left -= elementWidth;
     }
-    if (windowHeight - actualY < elementHeight) {
-        var yDiff = actualY - y;
+    if (actualY + elementHeight > windowHeight) {
         position.top = windowHeight - elementHeight;
-        position.top -= yDiff;
     }
     else {
         position.top = y;
@@ -42,7 +40,7 @@ export function getPosition(element, options) {
         if (location === "below")
             position.top += height;
         else if (location === "top")
-            position.top -= height;
+            position.top = y - elementHeight;
     }
     if (target !== "mouse" && align === "center" && elementWidth > 0) {
         position.left -= elementWidth / 2 - target.clientWidth / 2;
@@ -60,7 +58,7 @@ export function getPosition(element, options) {
     }
     position.top = position.top < 0 ? 0 : position.top;
     position.left = position.left < 0 ? 0 : position.left;
-    position.top += yOffset;
+    position.top += location === "below" ? yOffset : -yOffset;
     position.left += xOffset;
     return position;
 }

@@ -275,18 +275,30 @@ export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
     children,
     ...containerProps
   } = props;
-  // const { isOpen, closeMenu } = useMenuTrigger();
-  //  const { items, } = useMenu();
   const { position, type } = options;
   const isAutocomplete = type === "autocomplete";
   const contentRef = useRef<HTMLDivElement>();
 
-  useEffect(() => {
+  const repositionMenu = useCallback((position: MenuOptions["position"]) => {
     if (!contentRef.current || !position) return;
     const menu = contentRef.current;
     const menuPosition = getPosition(menu, position);
     menu.style.top = menuPosition.top + "px";
     menu.style.left = menuPosition.left + "px";
+  }, []);
+
+  useEffect(() => {
+    repositionMenu(position);
+  }, [position]);
+
+  useEffect(() => {
+    function onWindowResize() {
+      repositionMenu(position);
+    }
+    window.addEventListener("resize", onWindowResize);
+    return () => {
+      window.removeEventListener("resize", onWindowResize);
+    };
   }, [position]);
 
   return (
@@ -306,10 +318,7 @@ export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
       portalClassName={className || "menuPresenter"}
       onAfterOpen={(obj) => {
         if (!obj || !position) return;
-        const { contentEl: menu } = obj;
-        const menuPosition = getPosition(menu, position);
-        menu.style.top = menuPosition.top + "px";
-        menu.style.left = menuPosition.left + "px";
+        repositionMenu(position);
       }}
       overlayElement={(props, contentEl) => {
         return (

@@ -5,6 +5,7 @@ import { IconNames, Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton, ToolButtonProps } from "./tool-button";
 import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
+import { useToolbarContext } from "../hooks/useToolbarContext";
 
 type SplitButtonProps = ToolButtonProps & {
   menuPresenterProps?: Partial<MenuPresenterProps>;
@@ -14,6 +15,7 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
 
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { toolbarLocation } = useToolbarContext();
 
   return (
     <>
@@ -37,8 +39,15 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
             },
           }}
           onClick={() => setIsOpen((s) => !s)}
+          onMouseDown={(e) => e.preventDefault()}
         >
-          <Icon path={Icons.chevronDown} color="text" size={14} />
+          <Icon
+            path={
+              toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown
+            }
+            color="text"
+            size={14}
+          />
         </Button>
       </Flex>
       <MenuPresenter
@@ -49,8 +58,9 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
           position: {
             target: ref.current || undefined,
             isTargetAbsolute: true,
-            location: "below",
+            location: toolbarLocation === "bottom" ? "top" : "below",
             yOffset: 5,
+            align: "center",
           },
         }}
         items={[]}
