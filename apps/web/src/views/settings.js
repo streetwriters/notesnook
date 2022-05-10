@@ -439,64 +439,65 @@ function Settings(props) {
                 tip="Create a backup file of all your data"
               />
             </Button>
-
-            <Button
-              variant="list"
-              onClick={async () => {
-                if (!isLoggedIn)
-                  throw new Error("You must be logged in to restore backups.");
-                await importBackup();
-                await refreshApp();
-              }}
-            >
-              <Tip
-                text="Restore backup"
-                tip="Restore data from a backup file"
-              />
-            </Button>
-            <Toggle
-              title="Encrypt backups"
-              onTip="All backup files will be encrypted"
-              offTip="Backup files will not be encrypted"
-              onToggled={toggleEncryptBackups}
-              premium={CHECK_IDS.backupEncrypt}
-              isToggled={encryptBackups}
-            />
-
-            <OptionsItem
-              title={isDesktop() ? "Automatic backups" : "Backup reminders"}
-              tip={
-                isDesktop()
-                  ? "Automatically backup my data"
-                  : "Remind me to backup my data"
-              }
-              options={["Never", "Daily", "Weekly", "Monthly"]}
-              premium="backups"
-              selectedOption={backupReminderOffset}
-              onSelectionChanged={(_option, index) =>
-                setBackupReminderOffset(index)
-              }
-            />
-            {isDesktop() && !!backupReminderOffset ? (
-              <Button
-                key={"backupLocation"}
-                variant="list"
-                onClick={async () => {
-                  const location = await window.native.selectDirectory({
-                    title: "Select where Notesnook should save backups",
-                    defaultPath:
-                      backupStorageLocation || PATHS.backupsDirectory,
-                  });
-                  if (!location) return;
-                  setBackupStorageLocation(location);
-                }}
-              >
-                <Tip
-                  text={"Change backups storage location"}
-                  tip={backupStorageLocation}
+            {isLoggedIn && (
+              <>
+                <Button
+                  variant="list"
+                  onClick={async () => {
+                    await importBackup();
+                    await refreshApp();
+                  }}
+                >
+                  <Tip
+                    text="Restore backup"
+                    tip="Restore data from a backup file"
+                  />
+                </Button>
+                <Toggle
+                  title="Encrypt backups"
+                  onTip="All backup files will be encrypted"
+                  offTip="Backup files will not be encrypted"
+                  onToggled={toggleEncryptBackups}
+                  premium={CHECK_IDS.backupEncrypt}
+                  isToggled={encryptBackups}
                 />
-              </Button>
-            ) : null}
+
+                <OptionsItem
+                  title={isDesktop() ? "Automatic backups" : "Backup reminders"}
+                  tip={
+                    isDesktop()
+                      ? "Automatically backup my data"
+                      : "Remind me to backup my data"
+                  }
+                  options={["Never", "Daily", "Weekly", "Monthly"]}
+                  premium="backups"
+                  selectedOption={backupReminderOffset}
+                  onSelectionChanged={(_option, index) =>
+                    setBackupReminderOffset(index)
+                  }
+                />
+                {isDesktop() && !!backupReminderOffset ? (
+                  <Button
+                    key={"backupLocation"}
+                    variant="list"
+                    onClick={async () => {
+                      const location = await window.native.selectDirectory({
+                        title: "Select where Notesnook should save backups",
+                        defaultPath:
+                          backupStorageLocation || PATHS.backupsDirectory,
+                      });
+                      if (!location) return;
+                      setBackupStorageLocation(location);
+                    }}
+                  >
+                    <Tip
+                      text={"Change backups storage location"}
+                      tip={backupStorageLocation}
+                    />
+                  </Button>
+                ) : null}
+              </>
+            )}
           </>
         )}
 
