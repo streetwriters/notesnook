@@ -151,6 +151,22 @@ export function confirm(props: ConfirmDialogProps) {
   ));
 }
 
+export function showPromptDialog(props: {
+  title: string;
+  description?: string;
+  defaultValue?: string;
+}) {
+  return showDialog<"Prompt", string | null>("Prompt", (Dialog, perform) => (
+    <Dialog
+      {...props}
+      onClose={() => perform(null)}
+      onSave={(text) => {
+        perform(text);
+      }}
+    />
+  ));
+}
+
 export function showError(title: string, message: string) {
   return confirm({ title, message, yesText: "Okay" });
 }
