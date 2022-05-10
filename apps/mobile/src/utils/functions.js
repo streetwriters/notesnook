@@ -50,7 +50,8 @@ export const deleteItems = async item => {
       'ColoredNotes',
       'TopicNotes',
       'Favorites',
-      'Notes'
+      'Notes',
+      'Trash'
     );
     eSendEvent(eClearEditor);
   }
@@ -80,7 +81,8 @@ export const deleteItems = async item => {
       'TopicNotes',
       'Favorites',
       'Notes',
-      'Notebooks'
+      'Notebooks',
+      'Trash'
     );
     useMenuStore.getState().setMenuPins();
   }

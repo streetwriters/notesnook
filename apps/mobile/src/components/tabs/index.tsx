@@ -126,7 +126,7 @@ export const NewTabs = forwardRef<TabsRef, TabProps>(
     const gesture = Gesture.Pan()
       .maxPointers(1)
       .enabled(enabled)
-      .activeOffsetX([-20, 20])
+      .activeOffsetX([-10, 10])
       .failOffsetY([-10, 10])
       .onBegin(event => {
         locked.value = false;

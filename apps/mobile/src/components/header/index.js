@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { useSelectionStore } from '../../stores/use-selection-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { eScrollEvent } from '../../utils/events';
 import { LeftMenus } from './left-menus';
@@ -13,6 +14,7 @@ export const Header = React.memo(
     const colors = useThemeStore(state => state.colors);
     const insets = useSafeAreaInsets();
     const [hide, setHide] = useState(true);
+    const selectionMode = useSelectionStore(state => state.selectionMode);
 
     const onScroll = data => {
       if (data.y > 150) {
@@ -31,7 +33,7 @@ export const Header = React.memo(
       };
     }, [hide]);
 
-    return (
+    return selectionMode ? null : (
       <View
         style={[
           styles.container,

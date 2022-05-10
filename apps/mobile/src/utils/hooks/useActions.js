@@ -193,7 +193,8 @@ export const useActions = ({ close = () => {}, item }) => {
       'TopicNotes',
       'Favorites',
       'Notes',
-      'Notebooks'
+      'Notebooks',
+      'Trash'
     );
     let type = item.type === 'trash' ? item.itemType : item.type;
     ToastEvent.show({

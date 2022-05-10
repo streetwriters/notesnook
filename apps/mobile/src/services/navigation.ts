@@ -69,13 +69,13 @@ export type NavigationProps<T extends RouteName> = BottomTabScreenProps<RoutePar
  * Functions to update each route when required.
  */
 const routeUpdateFunctions: { [name: string]: (...args: any[]) => void } = {
-  Notes: useNoteStore.getState().setNotes,
-  Notebooks: useNotebookStore.getState().setNotebooks,
-  Tags: useTagStore.getState().setTags,
-  Favorites: useFavoriteStore.getState().setFavorites,
-  Trash: useTrashStore.getState().setTrash,
+  Notes: () => useNoteStore.getState().setNotes(),
+  Notebooks: () => useNotebookStore.getState().setNotebooks(),
+  Tags: () => useTagStore.getState().setTags(),
+  Favorites: () => useFavoriteStore.getState().setFavorites(),
+  Trash: () => useTrashStore.getState().setTrash(),
   Notebook: (params: NotebookScreenParams) => eSendEvent(eOnNewTopicAdded, params),
-  NotesPage: (params: NotesScreenParams) => eSendEvent(refreshNotesPage, params),
+  NotesPage: (params: NotesScreenParams) => eSendEvent('NotesPage', params),
   TaggedNotes: (params: NotesScreenParams) => eSendEvent('TaggedNotes', params),
   ColoredNotes: (params: NotesScreenParams) => eSendEvent('ColoredNotes', params),
   TopicNotes: (params: NotesScreenParams) => eSendEvent('TopicNotes', params),
@@ -93,6 +93,7 @@ function clearRouteFromQueue(routeName: Route) {
  * Check if a route needs update
  */
 function routeNeedsUpdate(routeName: Route, callback: () => void) {
+  console.log('routeName', routesUpdateQueue);
   if (routesUpdateQueue.indexOf(routeName) > -1) {
     clearRouteFromQueue(routeName);
     callback();
@@ -100,16 +101,17 @@ function routeNeedsUpdate(routeName: Route, callback: () => void) {
 }
 
 function queueRoutesForUpdate(...routes: Route[]) {
+  console.log('updating routes', routes);
   const currentScreen = useNavigationStore.getState().currentScreen;
-  const routeHistory = rootNavigatorRef.getState().routes;
-
+  const routeHistory = rootNavigatorRef.getState()?.history || [{ key: currentScreen.name }];
   // filter out routes that are not rendered to prevent unnecessary updates
   routes = routes.filter(
     //@ts-ignore
-    routeName => routeHistory?.findIndex(route => route.name === routeName) > -1
+    routeName => routeHistory?.findIndex(route => route.key?.startsWith(routeName)) > -1
   );
-
+  console.log('routes to update: ', routes, routeHistory, currentScreen.name);
   if (routes.indexOf(currentScreen.name) > -1) {
+    console.log('updating current route');
     routeUpdateFunctions[currentScreen.name]();
     clearRouteFromQueue(currentScreen.name);
     // Remove focused screen from queue

@@ -57,6 +57,9 @@ export const Trash = ({ navigation, route }: NavigationProps<'Trash'>) => {
       useNavigationStore.getState().update({
         name: route.name
       });
+      if (useTrashStore.getState().trash.length === 0) {
+        useTrashStore.getState().setTrash();
+      }
       SearchService.prepareSearch = prepareSearch;
       return !prev?.current;
     },

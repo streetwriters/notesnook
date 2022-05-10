@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { RefreshControl, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { notesnook } from '../../../e2e/test.ids';
 import { eSendEvent } from '../../services/event-manager';
 import Sync from '../../services/sync';
@@ -69,7 +70,6 @@ const List = ({
   useEffect(() => {
     let timeout = null;
     if (!loading) {
-      console.log('LOADING ENDED');
       timeout = setTimeout(
         () => {
           _setLoading(false);
@@ -77,7 +77,6 @@ const List = ({
         listData.length === 0 ? 0 : 300
       );
     } else {
-      console.log('STILL LOADING');
       _setLoading(true);
     }
     return () => {
@@ -129,7 +128,7 @@ const List = ({
 
   return (
     <>
-      <FlatList
+      <Animated.FlatList
         style={styles}
         keyExtractor={_keyExtractor}
         ref={scrollRef}

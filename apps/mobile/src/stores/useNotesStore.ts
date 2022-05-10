@@ -16,7 +16,9 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
   loading: true,
   setLoading: loading => set({ loading: loading }),
+
   setNotes: items => {
+    console.log('UPDATING NOTES');
     if (!items) {
       set({
         notes: groupArray((db.notes?.all as NoteType[]) || [], db.settings?.getGroupOptions('home'))

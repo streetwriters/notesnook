@@ -1,8 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useSelectionStore } from '../../stores/use-selection-store';
 import { useMessageStore } from '../../stores/use-message-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { hexToRGBA } from '../../utils/color-scheme/utils';
@@ -13,18 +11,14 @@ import Paragraph from '../ui/typography/paragraph';
 export const Card = ({ color, warning }) => {
   const colors = useThemeStore(state => state.colors);
   color = color ? color : colors.accent;
-
-  const selectionMode = useSelectionStore(state => state.selectionMode);
   const messageBoardState = useMessageStore(state => state.message);
   const announcement = useMessageStore(state => state.announcement);
 
-  return !messageBoardState.visible || selectionMode || announcement || warning ? null : (
-    <Animated.View
+  return !messageBoardState.visible || announcement || warning ? null : (
+    <View
       style={{
         width: '95%'
       }}
-      entering={FadeInUp}
-      exiting={FadeOutUp}
     >
       <PressableButton
         onPress={messageBoardState.onPress}
@@ -95,6 +89,6 @@ export const Card = ({ color, warning }) => {
           />
         </View>
       </PressableButton>
-    </Animated.View>
+    </View>
   );
 };
