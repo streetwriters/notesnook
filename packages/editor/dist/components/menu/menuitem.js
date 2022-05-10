@@ -9,7 +9,7 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 // import { Check, ChevronRight, Pro } from "../icons";
 import { useRef } from "react";
 import { Flex, Box, Text, Button } from "rebass";
@@ -21,7 +21,7 @@ function MenuItem(props) {
     // color,
     icon = item.icon, 
     // iconColor,
-    type = item.type, tooltip = item.tooltip, isDisabled = item.isDisabled, isChecked = item.isChecked, hasSubmenu = item.hasSubmenu, Component = item.component, modifier = item.modifier;
+    type = item.type, tooltip = item.tooltip, isDisabled = item.isDisabled, isChecked = item.isChecked, items = item.items, Component = item.component, modifier = item.modifier;
     var itemRef = useRef(null);
     if (type === "seperator")
         return (_jsx(Box, { as: "li", sx: {
@@ -31,19 +31,19 @@ function MenuItem(props) {
                 my: 2,
                 alignSelf: "center",
             } }, key));
-    return (_jsx(Flex, __assign({ as: "li", sx: { flex: 1, flexDirection: "column" }, onMouseEnter: onMouseEnter, onMouseLeave: onMouseLeave }, { children: _jsx(Button, __assign({ id: key, "data-test-id": "menuitem-".concat(key), ref: itemRef, tabIndex: -1, variant: "menuitem", title: tooltip, disabled: isDisabled, onClick: onClick, sx: {
+    return (_jsx(Flex, __assign({ as: "li", sx: { flex: 1, flexDirection: "column" }, onMouseEnter: onMouseEnter, onMouseLeave: onMouseLeave }, { children: Component ? (_jsx(Component, { onClick: onClick })) : (_jsxs(Button, __assign({ id: key, "data-test-id": "menuitem-".concat(key), ref: itemRef, tabIndex: -1, variant: "menuitem", title: tooltip, disabled: isDisabled, onClick: onClick, sx: {
                 bg: isFocused ? "hover" : "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-            } }, { children: Component ? (_jsx(Component, {})) : (_jsxs(_Fragment, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: 15, sx: { mr: 2 } })), _jsx(Text, __assign({ as: "span", sx: {
-                                    fontFamily: "body",
-                                    fontSize: "menu",
-                                    color: "text",
-                                } }, { children: title }))] }), _jsxs(Flex, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: 14 }), modifier && (_jsx(Text, __assign({ as: "span", sx: {
-                                    fontFamily: "body",
-                                    fontSize: "menu",
-                                    color: "fontTertiary",
-                                } }, { children: modifier })))] })] })) }), key) })));
+            } }, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: 15, sx: { mr: 2 } })), _jsx(Text, __assign({ as: "span", sx: {
+                                fontFamily: "body",
+                                fontSize: "menu",
+                                color: "text",
+                            } }, { children: title }))] }), _jsxs(Flex, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: 14 }), (items === null || items === void 0 ? void 0 : items.length) && _jsx(Icon, { path: Icons.chevronRight, size: 14 }), modifier && (_jsx(Text, __assign({ as: "span", sx: {
+                                fontFamily: "body",
+                                fontSize: "menu",
+                                color: "fontTertiary",
+                            } }, { children: modifier })))] })] }), key)) })));
 }
 export default MenuItem;

@@ -77,7 +77,6 @@ import { Flex, Text } from "rebass";
 import { MenuPresenter } from "../../components/menu/menu";
 import { Popup } from "../components/popup";
 import { ToolButton } from "../components/tool-button";
-import { ColorPicker, DEFAULT_COLORS } from "../tools/colors";
 import { selectedRect } from "prosemirror-tables";
 export function TableRowFloatingMenu(props) {
     var editor = props.editor;
@@ -350,7 +349,7 @@ function ColorPickerTool(props) {
                         isTargetAbsolute: true,
                         yOffset: 5,
                     },
-                } }, { children: _jsx(Flex, __assign({ sx: {
+                } }, { children: _jsx(Flex, { sx: {
                         flexDirection: "column",
                         bg: "background",
                         boxShadow: "menu",
@@ -358,7 +357,7 @@ function ColorPickerTool(props) {
                         borderRadius: "default",
                         p: 1,
                         width: 160,
-                    } }, { children: _jsx(ColorPicker, { colors: DEFAULT_COLORS, color: color, onClear: function () { return onColorChange(); }, onChange: function (color) { return onColorChange(color); } }) })) }))] }));
+                    } }) }))] }));
 }
 /**
  * Done:

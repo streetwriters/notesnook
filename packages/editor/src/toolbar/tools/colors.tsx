@@ -1,13 +1,11 @@
-import { ITool, ToolProps } from "../types";
+import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
-import { ToolId } from ".";
-import { Dropdown } from "../components/dropdown";
-import { MenuItem } from "../../components/menu/types";
 import { Box, Button, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
-import { IconNames, Icons } from "../icons";
+import { Icons } from "../icons";
 import { ToolButton } from "../components/tool-button";
+import { SplitButton } from "../components/split-button";
 import { MenuPresenter } from "../../components/menu/menu";
 import { useRef, useState } from "react";
 import tinycolor from "tinycolor2";
@@ -28,109 +26,76 @@ export const DEFAULT_COLORS = [
   "#ffeb3b",
   "#ffc107",
 ];
+type ColorToolProps = ToolProps & {
+  onColorChange: (editor: Editor, color?: string) => void;
+  isActive: (editor: Editor) => boolean;
+  getActiveColor: (editor: Editor) => string;
+};
+function ColorTool(props: ColorToolProps) {
+  const { editor, onColorChange, isActive, getActiveColor, ...toolProps } =
+    props;
+  const activeColor = getActiveColor(editor);
+  const _isActive = isActive(editor);
 
-class ColorTool implements ITool {
-  constructor(
-    readonly id: ToolId,
-    readonly title: string,
-    private readonly icon: IconNames,
-    private readonly onColorChange: (editor: Editor, color?: string) => void
-  ) {}
-
-  render = (props: ToolProps) => {
-    const { editor } = props;
-    const [isOpen, setIsOpen] = useState(false);
-    const attrs = editor.getAttributes(
-      this.id === "highlight" ? "highlight" : "textStyle"
-    );
-    const ref = useRef<HTMLDivElement>(null);
-    const isActive = editor.isActive(
-      this.id === "highlight" ? "highlight" : "textStyle",
-      { color: /\W+/gm }
-    );
-
-    return (
-      <Flex ref={ref}>
-        <ToolButton
-          title={this.title}
-          id={this.id}
-          icon={this.icon}
-          onClick={() => {}}
-          toggled={false}
-          sx={{ mr: 0, bg: isActive ? attrs.color : "transparent" }}
+  return (
+    <SplitButton
+      {...toolProps}
+      toggled={false}
+      sx={{
+        mr: 0,
+        bg: _isActive ? activeColor : "transparent",
+      }}
+    >
+      <Flex
+        sx={{
+          flexDirection: "column",
+          bg: "background",
+          boxShadow: "menu",
+          border: "1px solid var(--border)",
+          borderRadius: "default",
+          p: 1,
+          width: 160,
+        }}
+      >
+        <ColorPicker
+          colors={DEFAULT_COLORS}
+          color={activeColor}
+          onClear={() => onColorChange(editor)}
+          onChange={(color) => onColorChange(editor, color)}
         />
-        <Button
-          sx={{
-            p: 0,
-            m: 0,
-            bg: "transparent",
-            ":hover": { bg: "hover" },
-            ":last-of-type": {
-              mr: 0,
-            },
-          }}
-          onClick={() => setIsOpen((s) => !s)}
-        >
-          <Icon path={Icons.chevronDown} color="text" size={18} />
-        </Button>
-        <MenuPresenter
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          items={[]}
-          // sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 }}
-          options={{
-            type: "menu",
-            position: {
-              target: ref.current || undefined,
-              isTargetAbsolute: true,
-              location: "below",
-              align: "center",
-              yOffset: 5,
-            },
-          }}
-        >
-          <Flex
-            sx={{
-              flexDirection: "column",
-              bg: "background",
-              boxShadow: "menu",
-              border: "1px solid var(--border)",
-              borderRadius: "default",
-              p: 1,
-              width: 160,
-            }}
-          >
-            <ColorPicker
-              colors={DEFAULT_COLORS}
-              color={attrs.color}
-              onClear={() => this.onColorChange(editor)}
-              onChange={(color) => this.onColorChange(editor, color)}
-            />
-          </Flex>
-        </MenuPresenter>
       </Flex>
-    );
-  };
+    </SplitButton>
+  );
 }
 
-export class Highlight extends ColorTool {
-  constructor() {
-    super("highlight", "Highlight", "highlight", (editor, color) =>
-      color
-        ? editor.chain().focus().toggleHighlight({ color }).run()
-        : editor.chain().focus().unsetHighlight().run()
-    );
-  }
+export function Highlight(props: ToolProps) {
+  return (
+    <ColorTool
+      {...props}
+      isActive={(editor) => editor.isActive("highlight", { color: /\W+/gm })}
+      getActiveColor={(editor) => editor.getAttributes("highlight").color}
+      onColorChange={(editor, color) =>
+        color
+          ? editor.chain().focus().toggleHighlight({ color }).run()
+          : editor.chain().focus().unsetHighlight().run()
+      }
+    />
+  );
 }
 
-export class TextColor extends ColorTool {
-  constructor() {
-    super("textColor", "Text color", "textColor", (editor, color) =>
-      color
-        ? editor.chain().focus().setColor(color).run()
-        : editor.chain().focus().unsetColor().run()
-    );
-  }
+export function TextColor(props: ToolProps) {
+  return (
+    <ColorTool
+      {...props}
+      isActive={(editor) => editor.isActive("textStyle", { color: /\W+/gm })}
+      getActiveColor={(editor) => editor.getAttributes("textStyle").color}
+      onColorChange={(editor, color) =>
+        color
+          ? editor.chain().focus().setColor(color).run()
+          : editor.chain().focus().unsetColor().run()
+      }
+    />
+  );
 }
 
 type ColorPickerProps = {

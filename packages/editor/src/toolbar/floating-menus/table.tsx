@@ -8,7 +8,7 @@ import { getElementPosition, MenuOptions } from "../../components/menu/useMenu";
 import { Popup } from "../components/popup";
 import { ToolButton } from "../components/tool-button";
 import { IconNames } from "../icons";
-import { ColorPicker, DEFAULT_COLORS } from "../tools/colors";
+// import { ColorPicker, DEFAULT_COLORS } from "../tools/colors";
 import { FloatingMenuProps } from "./types";
 import { selectedRect, TableMap, TableRect } from "prosemirror-tables";
 import { Transaction } from "prosemirror-state";
@@ -486,12 +486,12 @@ function ColorPickerTool(props: ColorPickerToolProps) {
             width: 160,
           }}
         >
-          <ColorPicker
+          {/* <ColorPicker
             colors={DEFAULT_COLORS}
             color={color}
             onClear={() => onColorChange()}
             onChange={(color) => onColorChange(color)}
-          />
+          /> */}
         </Flex>
       </MenuPresenter>
     </>

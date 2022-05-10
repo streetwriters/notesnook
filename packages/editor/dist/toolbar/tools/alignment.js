@@ -1,65 +1,40 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
     };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+    return __assign.apply(this, arguments);
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 import { jsx as _jsx } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
-var AlignmentTool = /** @class */ (function () {
-    function AlignmentTool(id, title, alignment, icon) {
-        var _this = this;
-        this.id = id;
-        this.title = title;
-        this.alignment = alignment;
-        this.icon = icon;
-        this.render = function (props) {
-            var editor = props.editor;
-            return (_jsx(ToolButton, { title: _this.title, id: _this.id, icon: _this.icon, onClick: function () {
-                    return editor.chain().focus().setTextAlign(_this.alignment).run();
-                }, toggled: editor.isActive({ textAlign: _this.alignment }) }));
-        };
-    }
-    return AlignmentTool;
-}());
-var AlignCenter = /** @class */ (function (_super) {
-    __extends(AlignCenter, _super);
-    function AlignCenter() {
-        return _super.call(this, "alignCenter", "Align center", "center", "alignCenter") || this;
-    }
-    return AlignCenter;
-}(AlignmentTool));
-export { AlignCenter };
-var AlignRight = /** @class */ (function (_super) {
-    __extends(AlignRight, _super);
-    function AlignRight() {
-        return _super.call(this, "alignRight", "Align right", "right", "alignRight") || this;
-    }
-    return AlignRight;
-}(AlignmentTool));
-export { AlignRight };
-var AlignLeft = /** @class */ (function (_super) {
-    __extends(AlignLeft, _super);
-    function AlignLeft() {
-        return _super.call(this, "alignLeft", "Align left", "left", "alignLeft") || this;
-    }
-    return AlignLeft;
-}(AlignmentTool));
-export { AlignLeft };
-var AlignJustify = /** @class */ (function (_super) {
-    __extends(AlignJustify, _super);
-    function AlignJustify() {
-        return _super.call(this, "alignJustify", "Justify", "justify", "alignJustify") || this;
-    }
-    return AlignJustify;
-}(AlignmentTool));
-export { AlignJustify };
+function AlignmentTool(props) {
+    var editor = props.editor, alignment = props.alignment, toolProps = __rest(props, ["editor", "alignment"]);
+    return (_jsx(ToolButton, __assign({}, toolProps, { onClick: function () { return editor.chain().focus().setTextAlign(alignment).run(); }, toggled: editor.isActive({ textAlign: alignment }) })));
+}
+export function AlignCenter(props) {
+    return _jsx(AlignmentTool, __assign({ alignment: "center" }, props));
+}
+export function AlignLeft(props) {
+    return _jsx(AlignmentTool, __assign({ alignment: "left" }, props));
+}
+export function AlignRight(props) {
+    return _jsx(AlignmentTool, __assign({ alignment: "right" }, props));
+}
+export function AlignJustify(props) {
+    return _jsx(AlignmentTool, __assign({ alignment: "justify" }, props));
+}

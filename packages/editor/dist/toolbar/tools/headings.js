@@ -25,43 +25,34 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 import { jsx as _jsx } from "react/jsx-runtime";
 import { Dropdown } from "../components/dropdown";
-var Headings = /** @class */ (function () {
-    function Headings() {
-        var _this = this;
-        this.title = "Headings";
-        this.id = "headings";
-        this.defaultLevels = [1, 2, 3, 4, 5, 6];
-        this.render = function (props) {
-            var editor = props.editor;
-            var currentHeadingLevel = _this.defaultLevels.find(function (level) {
-                return editor.isActive("heading", { level: level });
-            });
-            return (_jsx(Dropdown, { selectedItem: currentHeadingLevel ? "Heading ".concat(currentHeadingLevel) : "Paragraph", items: _this.toMenuItems(editor, currentHeadingLevel) }));
-        };
-    }
-    Headings.prototype.toMenuItems = function (editor, currentHeadingLevel) {
-        var menuItems = this.defaultLevels.map(function (level) { return ({
-            type: "menuitem",
-            key: "heading-".concat(level),
-            title: "Heading ".concat(level),
-            isChecked: level === currentHeadingLevel,
-            onClick: function () {
-                return editor
-                    .chain()
-                    .focus()
-                    .setHeading({ level: level })
-                    .run();
-            },
-        }); });
-        var paragraph = {
-            key: "paragraph",
-            type: "menuitem",
-            title: "Paragraph",
-            isChecked: !currentHeadingLevel,
-            onClick: function () { return editor.chain().focus().setParagraph().run(); },
-        };
-        return __spreadArray([paragraph], __read(menuItems), false);
+var defaultLevels = [1, 2, 3, 4, 5, 6];
+export function Headings(props) {
+    var editor = props.editor;
+    var currentHeadingLevel = defaultLevels.find(function (level) {
+        return editor.isActive("heading", { level: level });
+    });
+    return (_jsx(Dropdown, { selectedItem: currentHeadingLevel ? "Heading ".concat(currentHeadingLevel) : "Paragraph", items: toMenuItems(editor, currentHeadingLevel), menuWidth: 130 }));
+}
+function toMenuItems(editor, currentHeadingLevel) {
+    var menuItems = defaultLevels.map(function (level) { return ({
+        type: "menuitem",
+        key: "heading-".concat(level),
+        title: "Heading ".concat(level),
+        isChecked: level === currentHeadingLevel,
+        onClick: function () {
+            return editor
+                .chain()
+                .focus()
+                .setHeading({ level: level })
+                .run();
+        },
+    }); });
+    var paragraph = {
+        key: "paragraph",
+        type: "menuitem",
+        title: "Paragraph",
+        isChecked: !currentHeadingLevel,
+        onClick: function () { return editor.chain().focus().setParagraph().run(); },
     };
-    return Headings;
-}());
-export { Headings };
+    return __spreadArray([paragraph], __read(menuItems), false);
+}

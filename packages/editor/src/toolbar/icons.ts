@@ -77,6 +77,7 @@ import {
   mdiFormatLetterMatches,
   mdiMoviePlusOutline,
   mdiLink,
+  mdiChevronRight,
 } from "@mdi/js";
 
 export const Icons = {
@@ -149,6 +150,9 @@ export const Icons = {
   download: mdiDownloadOutline,
   chevronDown: mdiChevronDown,
   chevronUp: mdiChevronUp,
+  chevronRight: mdiChevronRight,
+
+  none: "",
 };
 
 export type IconNames = keyof typeof Icons;

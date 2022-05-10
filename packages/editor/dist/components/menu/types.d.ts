@@ -1,9 +1,12 @@
 /// <reference types="react" />
 import { IconNames } from "../../toolbar/icons";
+declare type MenuItemComponentProps = {
+    onClick?: (e?: any) => void;
+};
 export declare type MenuItem = {
     type: "menuitem" | "seperator";
     key: string;
-    component?: (props: any) => JSX.Element;
+    component?: (props: MenuItemComponentProps) => JSX.Element;
     onClick?: () => void;
     title?: string;
     icon?: IconNames;
@@ -15,3 +18,4 @@ export declare type MenuItem = {
     modifier?: string;
     items?: MenuItem[];
 };
+export {};

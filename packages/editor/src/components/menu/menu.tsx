@@ -115,7 +115,7 @@ export function Menu(props: MenuProps) {
   const hoverTimeout = useRef<NodeJS.Timeout>();
   const onAction = useCallback(
     (e, item) => {
-      e.stopPropagation();
+      e?.stopPropagation();
       if (closeMenu) closeMenu();
       if (item.onClick) {
         item.onClick();
@@ -148,7 +148,7 @@ export function Menu(props: MenuProps) {
     }
 
     const { top, left } = getPosition(subMenuRef.current, {
-      yOffset: menuItemElement.offsetHeight,
+      // yOffset: menuItemElement.offsetHeight,
       target: menuItemElement,
       location: "right",
     });
@@ -231,7 +231,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
         borderRadius: "default",
         boxShadow: "menu",
         border: "1px solid var(--border)",
-        width: 220,
+        minWidth: 220,
         ...sx,
       }}
       {...flexProps}
@@ -258,7 +258,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
   );
 }
 
-type MenuPresenterProps = MenuContainerProps & {
+export type MenuPresenterProps = MenuContainerProps & {
   items: MenuItemType[];
   options: MenuOptions;
   isOpen: boolean;

@@ -1,56 +1,33 @@
-import { ITool, ToolProps } from "../types";
+import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
 import { ToolButton } from "../components/tool-button";
 import { ToolId } from ".";
 import { IconNames, Icons } from "../icons";
 
-class AlignmentTool<TId extends ToolId, TTitle extends string>
-  implements ITool
-{
-  constructor(
-    readonly id: TId,
-    readonly title: TTitle,
-    private readonly alignment: "left" | "right" | "center" | "justify",
-    private readonly icon: IconNames
-  ) {}
+type AlignmentToolProps = ToolProps & {
+  alignment: "left" | "right" | "center" | "justify";
+};
+function AlignmentTool(props: AlignmentToolProps) {
+  const { editor, alignment, ...toolProps } = props;
 
-  render = (props: ToolProps) => {
-    const { editor } = props;
-
-    return (
-      <ToolButton
-        title={this.title}
-        id={this.id}
-        icon={this.icon}
-        onClick={() =>
-          editor.chain().focus().setTextAlign(this.alignment).run()
-        }
-        toggled={editor.isActive({ textAlign: this.alignment })}
-      />
-    );
-  };
+  return (
+    <ToolButton
+      {...toolProps}
+      onClick={() => editor.chain().focus().setTextAlign(alignment).run()}
+      toggled={editor.isActive({ textAlign: alignment })}
+    />
+  );
 }
 
-export class AlignCenter extends AlignmentTool<ToolId, string> {
-  constructor() {
-    super("alignCenter", "Align center", "center", "alignCenter");
-  }
+export function AlignCenter(props: ToolProps) {
+  return <AlignmentTool alignment="center" {...props} />;
 }
-
-export class AlignRight extends AlignmentTool<ToolId, string> {
-  constructor() {
-    super("alignRight", "Align right", "right", "alignRight");
-  }
+export function AlignLeft(props: ToolProps) {
+  return <AlignmentTool alignment="left" {...props} />;
 }
-
-export class AlignLeft extends AlignmentTool<ToolId, string> {
-  constructor() {
-    super("alignLeft", "Align left", "left", "alignLeft");
-  }
+export function AlignRight(props: ToolProps) {
+  return <AlignmentTool alignment="right" {...props} />;
 }
-
-export class AlignJustify extends AlignmentTool<ToolId, string> {
-  constructor() {
-    super("alignJustify", "Justify", "justify", "alignJustify");
-  }
+export function AlignJustify(props: ToolProps) {
+  return <AlignmentTool alignment="justify" {...props} />;
 }

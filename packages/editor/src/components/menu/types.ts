@@ -20,10 +20,13 @@
 
 import { IconNames } from "../../toolbar/icons";
 
+type MenuItemComponentProps = {
+  onClick?: (e?: any) => void;
+};
 export type MenuItem = {
   type: "menuitem" | "seperator";
   key: string;
-  component?: (props: any) => JSX.Element;
+  component?: (props: MenuItemComponentProps) => JSX.Element;
   onClick?: () => void;
   title?: string;
   icon?: IconNames;

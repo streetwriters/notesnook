@@ -126,7 +126,7 @@ export function Menu(props) {
     var items = props.items, title = props.title, closeMenu = props.closeMenu, containerProps = __rest(props, ["items", "title", "closeMenu"]);
     var hoverTimeout = useRef();
     var onAction = useCallback(function (e, item) {
-        e.stopPropagation();
+        e === null || e === void 0 ? void 0 : e.stopPropagation();
         if (closeMenu)
             closeMenu();
         if (item.onClick) {
@@ -151,7 +151,7 @@ export function Menu(props) {
             return;
         }
         var _a = getPosition(subMenuRef.current, {
-            yOffset: menuItemElement.offsetHeight,
+            // yOffset: menuItemElement.offsetHeight,
             target: menuItemElement,
             location: "right",
         }), top = _a.top, left = _a.left;
@@ -191,7 +191,7 @@ export function Menu(props) {
 }
 function MenuContainer(props) {
     var children = props.children, title = props.title, sx = props.sx, flexProps = __rest(props, ["children", "title", "sx"]);
-    return (_jsxs(Box, __assign({ className: "menuContainer", as: "ul", tabIndex: -1, sx: __assign({ bg: "background", py: 1, display: "flex", flexDirection: "column", position: "relative", listStyle: "none", padding: 0, margin: 0, borderRadius: "default", boxShadow: "menu", border: "1px solid var(--border)", width: 220 }, sx) }, flexProps, { children: [title && (_jsx(Text, __assign({ sx: {
+    return (_jsxs(Box, __assign({ className: "menuContainer", as: "ul", tabIndex: -1, sx: __assign({ bg: "background", py: 1, display: "flex", flexDirection: "column", position: "relative", listStyle: "none", padding: 0, margin: 0, borderRadius: "default", boxShadow: "menu", border: "1px solid var(--border)", minWidth: 220 }, sx) }, flexProps, { children: [title && (_jsx(Text, __assign({ sx: {
                     fontFamily: "body",
                     fontSize: "subtitle",
                     color: "primary",

@@ -112,7 +112,3 @@ export function Link(props) {
                         },
                     } }, { children: _jsxs(Flex, __assign({ sx: { p: 1, width: 300, flexDirection: "column" } }, { children: [_jsx(Input, { type: "text", placeholder: "Link text", value: text, onChange: function (e) { return setText(e.target.value); } }), _jsx(Input, { type: "url", sx: { mt: 1 }, autoFocus: true, placeholder: "https://example.com/", value: href, onChange: function (e) { return setHref(e.target.value); } })] })) })) }))] }));
 }
-export function Attachment(props) {
-    var editor = props.editor;
-    return (_jsx(InlineTool, __assign({}, props, { isToggled: function () { return false; }, onClick: function () { return editor.chain().focus().openAttachmentPicker().run(); } })));
-}

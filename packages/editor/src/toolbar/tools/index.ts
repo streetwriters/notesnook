@@ -10,10 +10,10 @@ import {
   Superscript,
   ClearFormatting,
   Link,
-  Attachment,
 } from "./inline";
-// import { FontSize, FontFamily } from "./font";
-// import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
+import { InsertBlock } from "./block";
+import { FontSize, FontFamily } from "./font";
+import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
 // import {
 //   Blockquote,
 //   CodeBlock,
@@ -22,10 +22,10 @@ import {
 //   Table,
 //   Embed,
 // } from "./block";
-// import { Headings } from "./headings";
-// import { NumberedList, BulletList, Checklist } from "./lists";
-// import { LeftToRight, RightToLeft } from "./text-direction";
-// import { Highlight, TextColor } from "./colors";
+import { Headings } from "./headings";
+import { NumberedList, BulletList } from "./lists";
+import { LeftToRight, RightToLeft } from "./text-direction";
+import { Highlight, TextColor } from "./colors";
 
 // const tools = {
 //   bold: new Bold(),
@@ -34,31 +34,24 @@ import {
 //   strikethrough: new Strikethrough(),
 //   code: new Code(),
 //   formatClear: new ClearFormatting(),
-//   alignCenter: new AlignCenter(),
-//   alignRight: new AlignRight(),
-//   alignLeft: new AlignLeft(),
-//   alignJustify: new AlignJustify(),
+
 //   subscript: new Subscript(),
 //   superscript: new Superscript(),
-//   fontSize: new FontSize(),
-//   fontFamily: new FontFamily(),
+
 //   horizontalRule: new HorizontalRule(),
 //   codeblock: new CodeBlock(),
 //   blockquote: new Blockquote(),
 //   headings: new Headings(),
-//   ltr: new LeftToRight(),
-//   rtl: new RightToLeft(),
-//   numberedList: new NumberedList(),
-//   bulletList: new BulletList(),
+
 //   checklist: new Checklist(),
-//   textColor: new TextColor(),
-//   highlight: new Highlight(),
+
 //   link: new Link(),
 //   image: new Image(),
 //   attachment: new Attachment(),
 //   table: new Table(),
 //   embed: new Embed(),
 // };
+
 const tools = {
   bold: Bold,
   italic: Italic,
@@ -69,8 +62,22 @@ const tools = {
   superscript: Superscript,
   clearformatting: ClearFormatting,
   link: Link,
-  attachment: Attachment,
+  insertBlock: InsertBlock,
+  numberedList: NumberedList,
+  bulletList: BulletList,
+  fontSize: FontSize,
+  fontFamily: FontFamily,
+  headings: Headings,
+  alignCenter: AlignCenter,
+  alignRight: AlignRight,
+  alignLeft: AlignLeft,
+  alignJustify: AlignJustify,
+  ltr: LeftToRight,
+  rtl: RightToLeft,
+  textColor: TextColor,
+  highlight: Highlight,
 };
+
 export type ToolId = keyof typeof tools;
 export function findToolById(id: ToolId): React.FunctionComponent<ToolProps> {
   return tools[id];

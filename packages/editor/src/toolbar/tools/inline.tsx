@@ -201,15 +201,3 @@ export function Link(props: ToolProps) {
     </>
   );
 }
-
-export function Attachment(props: ToolProps) {
-  const { editor } = props;
-
-  return (
-    <InlineTool
-      {...props}
-      isToggled={() => false}
-      onClick={() => editor.chain().focus().openAttachmentPicker().run()}
-    />
-  );
-}

@@ -11,7 +11,7 @@ type MenuItemProps = {
   isFocused: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  onClick: (e?: any) => void;
 };
 
 function MenuItem(props: MenuItemProps) {
@@ -26,7 +26,7 @@ function MenuItem(props: MenuItemProps) {
     tooltip,
     isDisabled,
     isChecked,
-    hasSubmenu,
+    items,
     component: Component,
     modifier,
   } = item;
@@ -54,67 +54,64 @@ function MenuItem(props: MenuItemProps) {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <Button
-        id={key}
-        data-test-id={`menuitem-${key}`}
-        key={key}
-        ref={itemRef}
-        tabIndex={-1}
-        variant="menuitem"
-        title={tooltip}
-        disabled={isDisabled}
-        onClick={onClick}
-        sx={{
-          bg: isFocused ? "hover" : "transparent",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        {Component ? (
-          <Component />
-        ) : (
-          <>
-            <Flex>
-              {icon && (
-                <Icon
-                  path={Icons[icon]}
-                  color={"text"}
-                  size={15}
-                  sx={{ mr: 2 }}
-                />
-              )}
+      {Component ? (
+        <Component onClick={onClick} />
+      ) : (
+        <Button
+          id={key}
+          data-test-id={`menuitem-${key}`}
+          key={key}
+          ref={itemRef}
+          tabIndex={-1}
+          variant="menuitem"
+          title={tooltip}
+          disabled={isDisabled}
+          onClick={onClick}
+          sx={{
+            bg: isFocused ? "hover" : "transparent",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Flex>
+            {icon && (
+              <Icon
+                path={Icons[icon]}
+                color={"text"}
+                size={15}
+                sx={{ mr: 2 }}
+              />
+            )}
+            <Text
+              as="span"
+              sx={{
+                fontFamily: "body",
+                fontSize: "menu",
+                color: "text",
+              }}
+            >
+              {title}
+            </Text>
+          </Flex>
+          <Flex>
+            {isChecked && <Icon path={Icons.check} size={14} />}
+            {items?.length && <Icon path={Icons.chevronRight} size={14} />}
+            {modifier && (
               <Text
                 as="span"
                 sx={{
                   fontFamily: "body",
                   fontSize: "menu",
-                  color: "text",
+                  color: "fontTertiary",
                 }}
               >
-                {title}
+                {modifier}
               </Text>
-            </Flex>
-            <Flex>
-              {isChecked && <Icon path={Icons.check} size={14} />}
-              {/* 
-          {hasSubmenu && <ChevronRight size={14} />} */}
-              {modifier && (
-                <Text
-                  as="span"
-                  sx={{
-                    fontFamily: "body",
-                    fontSize: "menu",
-                    color: "fontTertiary",
-                  }}
-                >
-                  {modifier}
-                </Text>
-              )}
-            </Flex>
-          </>
-        )}
-      </Button>
+            )}
+          </Flex>
+        </Button>
+      )}
     </Flex>
   );
 }

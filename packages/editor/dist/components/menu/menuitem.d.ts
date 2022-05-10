@@ -5,7 +5,7 @@ declare type MenuItemProps = {
     isFocused: boolean;
     onMouseEnter: () => void;
     onMouseLeave: () => void;
-    onClick: React.MouseEventHandler<HTMLButtonElement>;
+    onClick: (e?: any) => void;
 };
 declare function MenuItem(props: MenuItemProps): JSX.Element;
 export default MenuItem;

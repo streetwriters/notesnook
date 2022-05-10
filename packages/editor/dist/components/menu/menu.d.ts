@@ -10,7 +10,7 @@ export declare function Menu(props: MenuProps): JSX.Element;
 declare type MenuContainerProps = FlexProps & {
     title?: string;
 };
-declare type MenuPresenterProps = MenuContainerProps & {
+export declare type MenuPresenterProps = MenuContainerProps & {
     items: MenuItemType[];
     options: MenuOptions;
     isOpen: boolean;

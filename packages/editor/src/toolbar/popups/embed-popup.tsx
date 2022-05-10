@@ -16,8 +16,8 @@ type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;
 type EmbedSource = "url" | "code";
 export type EmbedPopupProps = {
   onClose: (embed: Embed) => void;
-  title: string;
-  icon: IconNames;
+  title?: string;
+  icon?: IconNames;
 
   embed?: Embed;
   onSizeChanged?: (size: EmbedSizeOptions) => void;

@@ -1,44 +1,25 @@
-import { ITool, ToolProps } from "../types";
-import { Editor } from "@tiptap/core";
+import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
-import { ToolId } from ".";
-import { IconNames } from "../icons";
 
-class TextDirectionTool<TId extends ToolId, TTitle extends string>
-  implements ITool
-{
-  constructor(
-    readonly id: TId,
-    readonly title: TTitle,
-    private readonly icon: IconNames,
-    private readonly direction: "ltr" | "rtl"
-  ) {}
+type TextDirectionToolProps = ToolProps & {
+  direction: "ltr" | "rtl";
+};
+function TextDirectionTool(props: TextDirectionToolProps) {
+  const { editor, direction, ...toolProps } = props;
 
-  render = (props: ToolProps) => {
-    const { editor } = props;
-
-    return (
-      <ToolButton
-        title={this.title}
-        id={this.id}
-        icon={this.icon}
-        onClick={() =>
-          editor.chain().focus().setTextDirection(this.direction).run()
-        }
-        toggled={editor.isActive({ textDirection: this.direction })}
-      />
-    );
-  };
+  return (
+    <ToolButton
+      {...toolProps}
+      onClick={() => editor.chain().focus().setTextDirection(direction).run()}
+      toggled={editor.isActive({ textDirection: direction })}
+    />
+  );
 }
 
-export class LeftToRight extends TextDirectionTool<ToolId, string> {
-  constructor() {
-    super("ltr", "Left-to-right", "ltr", "ltr");
-  }
+export function RightToLeft(props: ToolProps) {
+  return <TextDirectionTool direction="rtl" {...props} />;
 }
 
-export class RightToLeft extends TextDirectionTool<ToolId, string> {
-  constructor() {
-    super("rtl", "Right-to-left", "rtl", "rtl");
-  }
+export function LeftToRight(props: ToolProps) {
+  return <TextDirectionTool direction="ltr" {...props} />;
 }

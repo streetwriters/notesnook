@@ -1,4 +1,4 @@
-import { ITool, ToolProps } from "../types";
+import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
 import { ToolId } from ".";
 import { Dropdown } from "../components/dropdown";
@@ -9,6 +9,7 @@ import { IconNames, Icons } from "../icons";
 import { ToolButton } from "../components/tool-button";
 import { MenuPresenter } from "../../components/menu/menu";
 import { useRef, useState } from "react";
+import { SplitButton } from "../components/split-button";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];
@@ -21,79 +22,50 @@ type ListOptions<TListStyleTypes> = {
   onClick: (editor: Editor) => void;
   subTypes: ListSubType<TListStyleTypes>[];
 };
-class ListTool<TListStyleTypes extends string> implements ITool {
-  constructor(
-    readonly id: ToolId,
-    readonly title: string,
-    private readonly options: ListOptions<TListStyleTypes>
-  ) {}
 
-  render = (props: ToolProps) => {
-    const { editor } = props;
-    const [isOpen, setIsOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-    const isActive = editor.isActive(this.options.type);
+type ListToolProps<TListStyleTypes> = ToolProps & {
+  options: ListOptions<TListStyleTypes>;
+};
+function ListTool<TListStyleTypes extends string>(
+  props: ListToolProps<TListStyleTypes>
+) {
+  const { editor, options, ...toolProps } = props;
+  const isActive = editor.isActive(options.type);
 
-    return (
-      <Flex ref={ref}>
-        <ToolButton
-          title={this.title}
-          id={this.id}
-          icon={this.options.icon}
-          onClick={() => this.options.onClick(editor)}
-          toggled={isActive}
-          sx={{ mr: 0 }}
-        />
-        <Button
-          sx={{
-            p: 0,
-            m: 0,
-            bg: "transparent",
-            ":hover": { bg: "hover" },
-            ":last-of-type": {
-              mr: 0,
-            },
-          }}
-          onClick={() => setIsOpen((s) => !s)}
-        >
-          <Icon path={Icons.chevronDown} color="text" size={18} />
-        </Button>
-        <MenuPresenter
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          items={this.options.subTypes.map((item) => ({
-            key: item.type,
-            tooltip: item.title,
-            type: "menuitem",
-            component: () => <ListThumbnail listStyleType={item.type} />,
-            onClick: () => {
-              let chain = editor.chain().focus();
+  return (
+    <SplitButton
+      {...toolProps}
+      onClick={() => options.onClick(editor)}
+      toggled={isActive}
+      sx={{ mr: 0 }}
+      menuPresenterProps={{
+        items: options.subTypes.map((item) => ({
+          key: item.type,
+          tooltip: item.title,
+          type: "menuitem",
+          component: ({ onClick }) => (
+            <Button variant={"menuitem"} onClick={onClick}>
+              <ListThumbnail listStyleType={item.type} />
+            </Button>
+          ),
+          onClick: () => {
+            let chain = editor.chain().focus();
 
-              if (!isActive) {
-                if (this.options.type === "bulletList")
-                  chain = chain.toggleBulletList();
-                else chain = chain.toggleOrderedList();
-              }
+            if (!isActive) {
+              if (options.type === "bulletList")
+                chain = chain.toggleBulletList();
+              else chain = chain.toggleOrderedList();
+            }
 
-              return chain
-                .updateAttributes(this.options.type, { listType: item.type })
-                .run();
-            },
-          }))}
-          sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 }}
-          options={{
-            type: "menu",
-            position: {
-              target: ref.current || undefined,
-              isTargetAbsolute: true,
-              location: "below",
-              yOffset: 5,
-            },
-          }}
-        />
-      </Flex>
-    );
-  };
+            return chain
+              .updateAttributes(options.type, { listType: item.type })
+              .run();
+          },
+        })),
+        sx: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 },
+      }}
+    />
+  );
 }
 
 type NumberedListStyleTypes =
@@ -103,67 +75,45 @@ type NumberedListStyleTypes =
   | "lower-alpha"
   | "upper-alpha"
   | "decimal";
-export class NumberedList extends ListTool<NumberedListStyleTypes> {
-  constructor() {
-    const options: ListOptions<NumberedListStyleTypes> = {
-      type: "orderedList",
-      icon: "numberedList",
-      onClick: (editor) => editor.chain().focus().toggleOrderedList().run(),
-      subTypes: [
-        { type: "decimal", title: "Decimal", items: ["1", "2", "3"] },
-        { type: "upper-alpha", title: "Upper alpha", items: ["A", "B", "C"] },
-        { type: "lower-alpha", title: "Lower alpha", items: ["a", "b", "c"] },
-        {
-          type: "upper-roman",
-          title: "Upper Roman",
-          items: ["I", "II", "III"],
-        },
-        {
-          type: "lower-roman",
-          title: "Lower Roman",
-          items: ["i", "ii", "iii"],
-        },
-        { type: "lower-greek", title: "Lower Greek", items: ["α", "β", "γ"] },
-      ],
-    };
-    super("numberedList", "Numbered list", options);
-  }
+
+export function NumberedList(props: ToolProps) {
+  const options: ListOptions<NumberedListStyleTypes> = {
+    type: "orderedList",
+    icon: "numberedList",
+    onClick: (editor) => editor.chain().focus().toggleOrderedList().run(),
+    subTypes: [
+      { type: "decimal", title: "Decimal", items: ["1", "2", "3"] },
+      { type: "upper-alpha", title: "Upper alpha", items: ["A", "B", "C"] },
+      { type: "lower-alpha", title: "Lower alpha", items: ["a", "b", "c"] },
+      {
+        type: "upper-roman",
+        title: "Upper Roman",
+        items: ["I", "II", "III"],
+      },
+      {
+        type: "lower-roman",
+        title: "Lower Roman",
+        items: ["i", "ii", "iii"],
+      },
+      { type: "lower-greek", title: "Lower Greek", items: ["α", "β", "γ"] },
+    ],
+  };
+  return <ListTool {...props} options={options} />;
 }
 
 type BulletListStyleTypes = "circle" | "square" | "disc";
-export class BulletList extends ListTool<BulletListStyleTypes> {
-  constructor() {
-    const options: ListOptions<BulletListStyleTypes> = {
-      type: "bulletList",
-      icon: "bulletList",
-      onClick: (editor) => editor.chain().focus().toggleOrderedList().run(),
-      subTypes: [
-        { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
-        { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
-        { type: "square", title: "Lower alpha", items: ["a", "b", "c"] },
-      ],
-    };
-    super("bulletList", "Bullet list", options);
-  }
-}
-
-export class Checklist implements ITool {
-  id: ToolId = "checklist";
-  title = "Checklist";
-
-  render = (props: ToolProps) => {
-    const { editor } = props;
-
-    return (
-      <ToolButton
-        title={this.title}
-        id={this.id}
-        icon="checklist"
-        onClick={() => editor.chain().focus().toggleTaskList().run()}
-        toggled={false}
-      />
-    );
+export function BulletList(props: ToolProps) {
+  const options: ListOptions<BulletListStyleTypes> = {
+    type: "bulletList",
+    icon: "bulletList",
+    onClick: (editor) => editor.chain().focus().toggleOrderedList().run(),
+    subTypes: [
+      { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
+      { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
+      { type: "square", title: "Lower alpha", items: ["a", "b", "c"] },
+    ],
   };
+  return <ListTool {...props} options={options} />;
 }
 
 type ListThumbnailProps = { listStyleType: string };

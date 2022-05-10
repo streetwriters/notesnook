@@ -2,16 +2,17 @@ import { useRef, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
-import { MenuPresenter } from "../../components/menu/menu";
+import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
 import { MenuItem } from "../../components/menu/types";
 
 type DropdownProps = {
   selectedItem: string | JSX.Element;
   items: MenuItem[];
   buttonRef?: React.MutableRefObject<HTMLButtonElement | undefined>;
+  menuWidth?: number;
 };
 export function Dropdown(props: DropdownProps) {
-  const { items, selectedItem, buttonRef } = props;
+  const { items, selectedItem, buttonRef, menuWidth } = props;
   const internalRef = useRef<any>();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -43,7 +44,7 @@ export function Dropdown(props: DropdownProps) {
         ) : (
           selectedItem
         )}
-        <Icon path={Icons.chevronDown} size={16} color={"text"} />
+        <Icon path={Icons.chevronDown} size={14} color={"text"} />
       </Button>
       <MenuPresenter
         options={{
@@ -58,6 +59,7 @@ export function Dropdown(props: DropdownProps) {
         isOpen={isOpen}
         items={items}
         onClose={() => setIsOpen(false)}
+        sx={{ minWidth: menuWidth }}
       />
     </>
   );

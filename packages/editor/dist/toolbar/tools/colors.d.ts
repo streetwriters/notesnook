@@ -1,23 +1,8 @@
 /// <reference types="react" />
-import { ITool, ToolProps } from "../types";
-import { Editor } from "@tiptap/core";
-import { ToolId } from ".";
-import { IconNames } from "../icons";
+import { ToolProps } from "../types";
 export declare const DEFAULT_COLORS: string[];
-declare class ColorTool implements ITool {
-    readonly id: ToolId;
-    readonly title: string;
-    private readonly icon;
-    private readonly onColorChange;
-    constructor(id: ToolId, title: string, icon: IconNames, onColorChange: (editor: Editor, color?: string) => void);
-    render: (props: ToolProps) => JSX.Element;
-}
-export declare class Highlight extends ColorTool {
-    constructor();
-}
-export declare class TextColor extends ColorTool {
-    constructor();
-}
+export declare function Highlight(props: ToolProps): JSX.Element;
+export declare function TextColor(props: ToolProps): JSX.Element;
 declare type ColorPickerProps = {
     colors: string[];
     color: string;

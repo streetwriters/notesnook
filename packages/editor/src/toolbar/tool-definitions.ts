@@ -1,45 +1,101 @@
 import { ToolDefinition } from "./types";
 import { ToolId } from "./tools";
 
-const InlineTools: Record<ToolId, ToolDefinition> = {
-  attachment: {
-    icon: "attachment",
-    title: "Attachment",
-  },
+const tools: Record<ToolId, ToolDefinition> = {
   bold: {
     icon: "bold",
     title: "Bold",
   },
   italic: {
-    icon: "attachment",
-    title: "Attachment",
+    icon: "italic",
+    title: "Italic",
   },
   underline: {
-    icon: "attachment",
-    title: "Attachment",
+    icon: "underline",
+    title: "Underline",
   },
   strikethrough: {
-    icon: "attachment",
-    title: "Attachment",
+    icon: "strikethrough",
+    title: "Strikethrough",
   },
   link: {
-    icon: "attachment",
-    title: "Attachment",
+    icon: "link",
+    title: "Link",
   },
   code: {
-    icon: "attachment",
-    title: "Attachment",
+    icon: "code",
+    title: "Code",
   },
   clearformatting: {
-    icon: "attachment",
-    title: "Attachment",
+    icon: "formatClear",
+    title: "Clear all formatting",
   },
   subscript: {
-    icon: "attachment",
-    title: "Attachment",
+    icon: "subscript",
+    title: "Subscript",
   },
   superscript: {
-    icon: "attachment",
-    title: "Attachment",
+    icon: "superscript",
+    title: "Superscript",
+  },
+  insertBlock: {
+    icon: "plus",
+    title: "Insert",
+  },
+  bulletList: {
+    icon: "bulletList",
+    title: "Bullet list",
+  },
+  numberedList: {
+    icon: "numberedList",
+    title: "Numbered list",
+  },
+  fontFamily: {
+    icon: "none",
+    title: "Font family",
+  },
+  fontSize: {
+    icon: "none",
+    title: "Font size",
+  },
+  headings: {
+    icon: "none",
+    title: "Headings",
+  },
+  alignCenter: {
+    icon: "alignCenter",
+    title: "Align center",
+  },
+  alignLeft: {
+    icon: "alignLeft",
+    title: "Align left",
+  },
+  alignRight: {
+    icon: "alignRight",
+    title: "Align right",
+  },
+  alignJustify: {
+    icon: "alignJustify",
+    title: "Justify",
+  },
+  ltr: {
+    icon: "ltr",
+    title: "Left to right",
+  },
+  rtl: {
+    icon: "rtl",
+    title: "Right to left",
+  },
+  highlight: {
+    icon: "highlight",
+    title: "Highlight",
+  },
+  textColor: {
+    icon: "textColor",
+    title: "Text color",
   },
 };
+
+export function getToolDefinition(id: ToolId) {
+  return tools[id];
+}

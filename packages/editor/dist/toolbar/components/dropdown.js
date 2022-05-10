@@ -32,7 +32,7 @@ import { Icon } from "./icon";
 import { Icons } from "../icons";
 import { MenuPresenter } from "../../components/menu/menu";
 export function Dropdown(props) {
-    var items = props.items, selectedItem = props.selectedItem, buttonRef = props.buttonRef;
+    var items = props.items, selectedItem = props.selectedItem, buttonRef = props.buttonRef, menuWidth = props.menuWidth;
     var internalRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     return (_jsxs(_Fragment, { children: [_jsxs(Button, __assign({ ref: function (ref) {
@@ -50,7 +50,7 @@ export function Dropdown(props) {
                     ":last-of-type": {
                         mr: 0,
                     },
-                }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: [typeof selectedItem === "string" ? (_jsx(Text, __assign({ sx: { fontSize: 12, mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), _jsx(Icon, { path: Icons.chevronDown, size: 16, color: "text" })] })), _jsx(MenuPresenter, { options: {
+                }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: [typeof selectedItem === "string" ? (_jsx(Text, __assign({ sx: { fontSize: 12, mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), _jsx(Icon, { path: Icons.chevronDown, size: 14, color: "text" })] })), _jsx(MenuPresenter, { options: {
                     type: "menu",
                     position: {
                         target: internalRef.current || undefined,
@@ -58,5 +58,5 @@ export function Dropdown(props) {
                         location: "below",
                         yOffset: 5,
                     },
-                }, isOpen: isOpen, items: items, onClose: function () { return setIsOpen(false); } })] }));
+                }, isOpen: isOpen, items: items, onClose: function () { return setIsOpen(false); }, sx: { minWidth: menuWidth } })] }));
 }

@@ -65,5 +65,7 @@ export declare const Icons: {
     download: string;
     chevronDown: string;
     chevronUp: string;
+    chevronRight: string;
+    none: string;
 };
 export declare type IconNames = keyof typeof Icons;

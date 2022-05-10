@@ -1,6 +1,13 @@
 import React from "react";
 import { ToolProps } from "../types";
-import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link, Attachment } from "./inline";
+import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link } from "./inline";
+import { InsertBlock } from "./block";
+import { FontSize, FontFamily } from "./font";
+import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
+import { Headings } from "./headings";
+import { NumberedList, BulletList } from "./lists";
+import { LeftToRight, RightToLeft } from "./text-direction";
+import { Highlight, TextColor } from "./colors";
 declare const tools: {
     bold: typeof Bold;
     italic: typeof Italic;
@@ -11,7 +18,20 @@ declare const tools: {
     superscript: typeof Superscript;
     clearformatting: typeof ClearFormatting;
     link: typeof Link;
-    attachment: typeof Attachment;
+    insertBlock: typeof InsertBlock;
+    numberedList: typeof NumberedList;
+    bulletList: typeof BulletList;
+    fontSize: typeof FontSize;
+    fontFamily: typeof FontFamily;
+    headings: typeof Headings;
+    alignCenter: typeof AlignCenter;
+    alignRight: typeof AlignRight;
+    alignLeft: typeof AlignLeft;
+    alignJustify: typeof AlignJustify;
+    ltr: typeof LeftToRight;
+    rtl: typeof RightToLeft;
+    textColor: typeof TextColor;
+    highlight: typeof Highlight;
 };
 export declare type ToolId = keyof typeof tools;
 export declare function findToolById(id: ToolId): React.FunctionComponent<ToolProps>;

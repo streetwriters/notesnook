@@ -1,4 +1,4 @@
-import { ITool, ToolProps } from "../types";
+import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
 import { ToolButton } from "../components/tool-button";
 import { ToolId } from ".";
@@ -10,286 +10,158 @@ import { Icon } from "../components/icon";
 import { Box, Button, Flex, Text } from "rebass";
 import { Popup } from "../components/popup";
 import { EmbedPopup } from "../popups/embed-popup";
+import { TablePopup } from "../popups/table-popup";
+import { MenuItem } from "../../components/menu/types";
 
-class BlockTool<TId extends ToolId> implements ITool {
-  constructor(
-    readonly id: TId,
-    readonly title: string,
-    private readonly icon: IconNames,
-    private readonly command: (editor: Editor) => boolean
-  ) {}
-
-  render = (props: ToolProps) => {
-    const { editor } = props;
-
-    return (
-      <ToolButton
-        id={this.id}
-        title={this.title}
-        icon={this.icon}
-        onClick={() => this.command(editor)}
-        toggled={editor.isActive(this.id)}
+export function InsertBlock(props: ToolProps) {
+  const buttonRef = useRef<HTMLButtonElement | null>();
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <>
+      <Button
+        ref={buttonRef}
+        sx={{
+          p: 1,
+          m: 0,
+          bg: isOpen ? "hover" : "transparent",
+          mr: 1,
+          display: "flex",
+          alignItems: "center",
+          ":hover": { bg: "hover" },
+          ":last-of-type": {
+            mr: 0,
+          },
+        }}
+        onClick={() => setIsOpen((s) => !s)}
+      >
+        <Icon path={Icons.plus} size={18} color={"primary"} />
+      </Button>
+      <MenuPresenter
+        options={{
+          type: "menu",
+          position: {
+            target: buttonRef.current || undefined,
+            isTargetAbsolute: true,
+            location: "below",
+            yOffset: 5,
+          },
+        }}
+        isOpen={isOpen}
+        items={[
+          tasklist(editor),
+          horizontalRule(editor),
+          codeblock(editor),
+          blockquote(editor),
+          image(editor),
+          attachment(editor),
+          embed(editor),
+          table(editor),
+        ]}
+        onClose={() => setIsOpen(false)}
       />
-    );
-  };
+    </>
+  );
 }
 
-export class HorizontalRule extends BlockTool<ToolId> {
-  constructor() {
-    super("horizontalRule", "Horizontal rule", "horizontalRule", (editor) =>
-      editor.chain().focus().setHorizontalRule().run()
-    );
-  }
-}
+const horizontalRule = (editor: Editor | null): MenuItem => ({
+  key: "hr",
+  type: "menuitem",
+  title: "Horizontal rule",
+  icon: "horizontalRule",
+  isChecked: editor?.isActive("horizontalRule"),
+  onClick: () => editor?.chain().focus().setHorizontalRule().run(),
+});
 
-export class CodeBlock extends BlockTool<ToolId> {
-  constructor() {
-    super("codeblock", "Codeblock", "codeblock", (editor) =>
-      editor.chain().focus().toggleCodeBlock().run()
-    );
-  }
-}
+const codeblock = (editor: Editor | null): MenuItem => ({
+  key: "codeblock",
+  type: "menuitem",
+  title: "Code block",
+  icon: "codeblock",
+  isChecked: editor?.isActive("codeBlock"),
+  onClick: () => editor?.chain().focus().toggleCodeBlock().run(),
+});
 
-export class Blockquote extends BlockTool<ToolId> {
-  constructor() {
-    super("blockquote", "Blockquote", "blockquote", (editor) =>
-      editor.chain().focus().toggleBlockquote().run()
-    );
-  }
-}
+const blockquote = (editor: Editor | null): MenuItem => ({
+  key: "blockquote",
+  type: "menuitem",
+  title: "Quote",
+  icon: "blockquote",
+  isChecked: editor?.isActive("blockQuote"),
+  onClick: () => editor?.chain().focus().toggleBlockquote().run(),
+});
 
-export class Image implements ITool {
-  id: ToolId = "image";
-  title: string = "Image";
+const image = (editor: Editor | null): MenuItem => ({
+  key: "image",
+  type: "menuitem",
+  title: "Image",
+  icon: "image",
+  items: [
+    {
+      key: "upload-from-disk",
+      type: "menuitem",
+      title: "Upload from disk",
+      icon: "upload",
+      onClick: () => {},
+    },
+    {
+      key: "upload-from-url",
+      type: "menuitem",
+      title: "Attach from URL",
+      icon: "link",
+      onClick: () => {},
+    },
+  ],
+});
 
-  render = (props: ToolProps) => {
-    const { editor } = props;
-    return (
-      <>
-        <Dropdown
-          selectedItem={<Icon path={Icons.image} size={16} />}
-          items={[
-            {
-              key: "upload-from-disk",
-              type: "menuitem",
-              title: "Upload from disk",
-              icon: "upload",
-              onClick: () => {},
-            },
-            {
-              key: "upload-from-url",
-              type: "menuitem",
-              title: "Attach from URL",
-              icon: "link",
-              onClick: () => {},
-            },
-          ]}
+const embed = (editor: Editor | null): MenuItem => ({
+  key: "embed",
+  type: "menuitem",
+  title: "Embed",
+  icon: "embed",
+});
+
+const table = (editor: Editor | null): MenuItem => ({
+  key: "table",
+  type: "menuitem",
+  title: "Table",
+  icon: "table",
+  items: [
+    {
+      key: "table-size-selector",
+      type: "menuitem",
+      component: (props) => (
+        <TablePopup
+          onClose={(size) => {
+            editor
+              ?.chain()
+              .focus()
+              .insertTable({
+                rows: size.rows,
+                cols: size.columns,
+              })
+              .run();
+            props.onClick?.();
+          }}
         />
-      </>
-    );
-  };
-}
+      ),
+    },
+  ],
+});
 
-export class Embed implements ITool {
-  id: ToolId = "embed";
-  title: string = "Embed";
+const attachment = (editor: Editor | null): MenuItem => ({
+  key: "attachment",
+  type: "menuitem",
+  title: "Attachment",
+  icon: "attachment",
+  isChecked: editor?.isActive("attachment"),
+  onClick: () => editor?.chain().focus().openAttachmentPicker().run(),
+});
 
-  render = (props: ToolProps) => {
-    const { editor } = props;
-    const [isOpen, setIsOpen] = useState(false);
-    const buttonRef = useRef<HTMLButtonElement>(null);
-    return (
-      <>
-        <ToolButton
-          buttonRef={buttonRef}
-          id={this.id}
-          title={this.title}
-          icon={"embed"}
-          onClick={() => setIsOpen((s) => !s)}
-          toggled={isOpen}
-        />
-        <MenuPresenter
-          isOpen={isOpen}
-          items={[]}
-          onClose={() => setIsOpen(false)}
-          options={{
-            type: "menu",
-            position: {
-              target: buttonRef.current || undefined,
-              isTargetAbsolute: true,
-              location: "below",
-              yOffset: 10,
-            },
-          }}
-        >
-          <EmbedPopup
-            title="Insert embed"
-            icon="check"
-            onClose={(embed) => {
-              editor.chain().focus().insertEmbed(embed).run();
-            }}
-          />
-        </MenuPresenter>
-      </>
-    );
-  };
-}
-
-type CellLocation = { column: number; row: number };
-type TableSize = { columns: number; rows: number };
-export class Table implements ITool {
-  id: ToolId = "table";
-  title: string = "Table";
-  private MAX_COLUMNS = 20;
-  private MAX_ROWS = 20;
-
-  private MIN_COLUMNS = 4;
-  private MIN_ROWS = 4;
-
-  render = (props: ToolProps) => {
-    const { editor } = props;
-    const [isOpen, setIsOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-    const [cellLocation, setCellLocation] = useState<CellLocation>({
-      column: 0,
-      row: 0,
-    });
-    const [tableSize, setTableSize] = useState<TableSize>({
-      columns: this.MIN_COLUMNS,
-      rows: this.MIN_ROWS,
-    });
-
-    useEffect(() => {
-      setTableSize((old) => {
-        const { columns, rows } = old;
-        const { column, row } = cellLocation;
-
-        let isDecrease = row === rows - 2 || column === columns - 2;
-
-        let rowFactor = Number(row === rows || row === rows - 2);
-        let columnFactor = Number(column === columns || column === columns - 2);
-
-        return {
-          columns: isDecrease
-            ? Math.max(column + columnFactor, this.MIN_COLUMNS)
-            : Math.min(old.columns + columnFactor, this.MAX_COLUMNS),
-          rows: isDecrease
-            ? Math.max(row + rowFactor, this.MIN_ROWS)
-            : Math.min(old.rows + rowFactor, this.MAX_ROWS),
-        };
-      });
-    }, [cellLocation]);
-
-    return (
-      <Flex ref={ref}>
-        <Button
-          sx={{
-            p: 1,
-            m: 0,
-            bg: isOpen ? "hover" : "transparent",
-            mr: 1,
-            display: "flex",
-            alignItems: "center",
-            ":hover": { bg: "hover" },
-            ":last-of-type": {
-              mr: 0,
-            },
-          }}
-          onClick={() => setIsOpen((s) => !s)}
-        >
-          <Icon path={Icons.table} color="text" size={18} />
-          <Icon path={Icons.chevronDown} color="text" size={18} />
-        </Button>
-        <MenuPresenter
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          items={[]}
-          options={{
-            type: "menu",
-            position: {
-              target: ref.current || undefined,
-              isTargetAbsolute: true,
-              location: "below",
-              yOffset: 5,
-            },
-          }}
-        >
-          <Popup>
-            <Flex sx={{ p: 1, flexDirection: "column", alignItems: "center" }}>
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr ".repeat(tableSize.columns),
-                  gap: "3px",
-                  bg: "background",
-                }}
-              >
-                {Array(tableSize.columns * tableSize.rows)
-                  .fill(0)
-                  .map((_, index) => (
-                    <Box
-                      width={15}
-                      height={15}
-                      sx={{
-                        border: "1px solid var(--disabled)",
-                        borderRadius: "2px",
-                        bg: this.isCellHighlighted(
-                          index,
-                          cellLocation,
-                          tableSize
-                        )
-                          ? "disabled"
-                          : "transparent",
-                        ":hover": {
-                          bg: "disabled",
-                        },
-                      }}
-                      onMouseEnter={() => {
-                        setCellLocation(this.getCellLocation(index, tableSize));
-                      }}
-                      onClick={() => {
-                        editor
-                          .chain()
-                          .focus()
-                          .insertTable({
-                            cols: cellLocation.column,
-                            rows: cellLocation.row,
-                          })
-                          .run();
-                        setIsOpen(false);
-                      }}
-                    />
-                  ))}
-              </Box>
-              <Text variant={"body"} sx={{ mt: 1 }}>
-                {cellLocation.column}x{cellLocation.row}
-              </Text>
-            </Flex>
-          </Popup>
-        </MenuPresenter>
-      </Flex>
-    );
-  };
-
-  private getCellLocation(index: number, tableSize: TableSize): CellLocation {
-    const cellIndex = index + 1;
-    const column = cellIndex % tableSize.columns;
-    let row = cellIndex / tableSize.columns;
-    const flooredRow = Math.floor(row);
-    row = row === flooredRow ? row : flooredRow + 1;
-
-    return { column: column ? column : tableSize.columns, row };
-  }
-
-  private isCellHighlighted(
-    index: number,
-    currentCellLocation: CellLocation,
-    tableSize: TableSize
-  ) {
-    const cellLocation = this.getCellLocation(index, tableSize);
-    return (
-      cellLocation.row <= currentCellLocation.row &&
-      cellLocation.column <= currentCellLocation.column
-    );
-  }
-}
+const tasklist = (editor: Editor | null): MenuItem => ({
+  key: "tasklist",
+  type: "menuitem",
+  title: "Task list",
+  icon: "checkbox",
+  isChecked: editor?.isActive("taskList"),
+  onClick: () => editor?.chain().focus().toggleTaskList().run(),
+});

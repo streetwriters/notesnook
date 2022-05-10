@@ -1,18 +1,3 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -23,6 +8,17 @@ var __assign = (this && this.__assign) || function () {
         return t;
     };
     return __assign.apply(this, arguments);
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
 };
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
@@ -45,9 +41,8 @@ import { Box, Button, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
-import { ToolButton } from "../components/tool-button";
-import { MenuPresenter } from "../../components/menu/menu";
-import { useRef, useState } from "react";
+import { SplitButton } from "../components/split-button";
+import { useState } from "react";
 import tinycolor from "tinycolor2";
 export var DEFAULT_COLORS = [
     "#f44336",
@@ -65,75 +60,37 @@ export var DEFAULT_COLORS = [
     "#ffeb3b",
     "#ffc107",
 ];
-var ColorTool = /** @class */ (function () {
-    function ColorTool(id, title, icon, onColorChange) {
-        var _this = this;
-        this.id = id;
-        this.title = title;
-        this.icon = icon;
-        this.onColorChange = onColorChange;
-        this.render = function (props) {
-            var editor = props.editor;
-            var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-            var attrs = editor.getAttributes(_this.id === "highlight" ? "highlight" : "textStyle");
-            var ref = useRef(null);
-            var isActive = editor.isActive(_this.id === "highlight" ? "highlight" : "textStyle", { color: /\W+/gm });
-            return (_jsxs(Flex, __assign({ ref: ref }, { children: [_jsx(ToolButton, { title: _this.title, id: _this.id, icon: _this.icon, onClick: function () { }, toggled: false, sx: { mr: 0, bg: isActive ? attrs.color : "transparent" } }), _jsx(Button, __assign({ sx: {
-                            p: 0,
-                            m: 0,
-                            bg: "transparent",
-                            ":hover": { bg: "hover" },
-                            ":last-of-type": {
-                                mr: 0,
-                            },
-                        }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.chevronDown, color: "text", size: 18 }) })), _jsx(MenuPresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, items: [], 
-                        // sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 }}
-                        options: {
-                            type: "menu",
-                            position: {
-                                target: ref.current || undefined,
-                                isTargetAbsolute: true,
-                                location: "below",
-                                align: "center",
-                                yOffset: 5,
-                            },
-                        } }, { children: _jsx(Flex, __assign({ sx: {
-                                flexDirection: "column",
-                                bg: "background",
-                                boxShadow: "menu",
-                                border: "1px solid var(--border)",
-                                borderRadius: "default",
-                                p: 1,
-                                width: 160,
-                            } }, { children: _jsx(ColorPicker, { colors: DEFAULT_COLORS, color: attrs.color, onClear: function () { return _this.onColorChange(editor); }, onChange: function (color) { return _this.onColorChange(editor, color); } }) })) }))] })));
-        };
-    }
-    return ColorTool;
-}());
-var Highlight = /** @class */ (function (_super) {
-    __extends(Highlight, _super);
-    function Highlight() {
-        return _super.call(this, "highlight", "Highlight", "highlight", function (editor, color) {
+function ColorTool(props) {
+    var editor = props.editor, onColorChange = props.onColorChange, isActive = props.isActive, getActiveColor = props.getActiveColor, toolProps = __rest(props, ["editor", "onColorChange", "isActive", "getActiveColor"]);
+    var activeColor = getActiveColor(editor);
+    var _isActive = isActive(editor);
+    return (_jsx(SplitButton, __assign({}, toolProps, { toggled: false, sx: {
+            mr: 0,
+            bg: _isActive ? activeColor : "transparent",
+        } }, { children: _jsx(Flex, __assign({ sx: {
+                flexDirection: "column",
+                bg: "background",
+                boxShadow: "menu",
+                border: "1px solid var(--border)",
+                borderRadius: "default",
+                p: 1,
+                width: 160,
+            } }, { children: _jsx(ColorPicker, { colors: DEFAULT_COLORS, color: activeColor, onClear: function () { return onColorChange(editor); }, onChange: function (color) { return onColorChange(editor, color); } }) })) })));
+}
+export function Highlight(props) {
+    return (_jsx(ColorTool, __assign({}, props, { isActive: function (editor) { return editor.isActive("highlight", { color: /\W+/gm }); }, getActiveColor: function (editor) { return editor.getAttributes("highlight").color; }, onColorChange: function (editor, color) {
             return color
                 ? editor.chain().focus().toggleHighlight({ color: color }).run()
                 : editor.chain().focus().unsetHighlight().run();
-        }) || this;
-    }
-    return Highlight;
-}(ColorTool));
-export { Highlight };
-var TextColor = /** @class */ (function (_super) {
-    __extends(TextColor, _super);
-    function TextColor() {
-        return _super.call(this, "textColor", "Text color", "textColor", function (editor, color) {
+        } })));
+}
+export function TextColor(props) {
+    return (_jsx(ColorTool, __assign({}, props, { isActive: function (editor) { return editor.isActive("textStyle", { color: /\W+/gm }); }, getActiveColor: function (editor) { return editor.getAttributes("textStyle").color; }, onColorChange: function (editor, color) {
             return color
                 ? editor.chain().focus().setColor(color).run()
                 : editor.chain().focus().unsetColor().run();
-        }) || this;
-    }
-    return TextColor;
-}(ColorTool));
-export { TextColor };
+        } })));
+}
 export function ColorPicker(props) {
     var colors = props.colors, color = props.color, onClear = props.onClear, onChange = props.onChange;
     var _a = __read(useState(tinycolor(color || colors[0]).toHexString()), 2), currentColor = _a[0], setCurrentColor = _a[1];

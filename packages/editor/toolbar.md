@@ -91,6 +91,13 @@ What's next:
 
 1. A tool defines it's own UI
    - This gives it maximum flexibility to do whatever it wants.
+   - However, this also restricts the tool to be shown in specific places
+     - For example: if all block tools are defined as menu buttons, they can only be shown in a menu
+   - But since this toolbar is application specific, this is alright. We already know where a certain
+     tool is going to be rendered. Locking things down, while reduces flexibility, also allows us to
+     easily customize a specific tool's behavior. A generic toolbar would be great in cases where multiple
+     apps are going to be using it.
 2. Some factors of a tool's UI can be defined externally
    - For example, a tool's icon + title + description?
-3.
+3. It wouldn't be a bad idea to separate out action & toggle state of a tool as well. This can be useful in
+   cases where we want to invoke a specific tool or get a specific tool's toggle state.

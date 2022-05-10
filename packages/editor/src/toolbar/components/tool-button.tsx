@@ -4,12 +4,12 @@ import { Button, ButtonProps } from "rebass";
 import { IconNames, Icons } from "../icons";
 import { Icon } from "./icon";
 
-type ToolButtonProps = ButtonProps & {
+export type ToolButtonProps = ButtonProps & {
   icon: IconNames;
   iconColor?: keyof SchemeColors;
   iconSize?: number;
   toggled: boolean;
-  buttonRef?: React.Ref<HTMLButtonElement>;
+  buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined>;
 };
 export function ToolButton(props: ToolButtonProps) {
   const {

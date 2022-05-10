@@ -9,37 +9,113 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useTheme } from "@notesnook/theme";
 import { Flex } from "rebass";
 import { findToolById } from "./tools";
 import { ThemeProvider } from "emotion-theming";
 import { EditorFloatingMenus } from "./floating-menus";
+import { getToolDefinition } from "./tool-definitions";
+import { ToolButton } from "./components/tool-button";
+import { useContext, useRef, useState } from "react";
+import { MenuPresenter } from "../components/menu";
+import { Popup } from "./components/popup";
+import React from "react";
+var ToolbarContext = React.createContext({});
 export function Toolbar(props) {
     var editor = props.editor, theme = props.theme, accent = props.accent, scale = props.scale;
     var themeProperties = useTheme({ accent: accent, theme: theme, scale: scale });
+    var _a = __read(useState(), 2), currentPopup = _a[0], setCurrentPopup = _a[1];
     var tools = [
-        ["bold", "italic", "underline", "strikethrough", "code"],
-        // ["fontSize", "fontFamily", "headings"],
-        // ["alignLeft", "alignCenter", "alignRight", "alignJustify"],
-        // ["subscript", "superscript", "horizontalRule"],
-        // ["codeblock", "blockquote"],
-        // ["formatClear", "ltr", "rtl"],
-        // ["numberedList", "bulletList", "checklist"],
-        // ["link", "image", "attachment", "table", "embed"],
-        // ["textColor", "highlight"],
+        ["insertBlock"],
+        [
+            "bold",
+            "italic",
+            "underline",
+            [
+                "strikethrough",
+                "code",
+                "subscript",
+                "superscript",
+                "highlight",
+                "textColor",
+            ],
+        ],
+        ["fontSize", "headings", ["fontFamily"]],
+        ["numberedList", "bulletList"],
+        ["link"],
+        ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
+        ["clearformatting"],
     ];
     if (!editor)
         return null;
-    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(Flex, __assign({ className: "editor-toolbar", sx: { flexWrap: "wrap" } }, { children: tools.map(function (tools) {
-                    return (_jsx(Flex, __assign({ className: "toolbar-group", sx: {
-                            pr: 2,
-                            mr: 2,
-                            borderRight: "1px solid var(--border)",
-                            ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
-                        } }, { children: tools.map(function (toolId) {
-                            var Component = findToolById(toolId);
-                            return _jsx(Component, { editor: editor, id: toolId });
-                        }) })));
-                }) })), _jsx(EditorFloatingMenus, { editor: editor })] })));
+    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(ToolbarContext.Provider, __assign({ value: { setCurrentPopup: setCurrentPopup, currentPopup: currentPopup } }, { children: _jsx(Flex, __assign({ className: "editor-toolbar", sx: { flexWrap: "wrap" } }, { children: tools.map(function (tools) {
+                        return (_jsx(ToolbarGroup, { tools: tools, editor: editor, sx: {
+                                pr: 2,
+                                mr: 2,
+                                borderRight: "1px solid var(--border)",
+                                ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
+                            } }));
+                    }) })) })), _jsx(EditorFloatingMenus, { editor: editor })] })));
+}
+function ToolbarGroup(props) {
+    var tools = props.tools, editor = props.editor, flexProps = __rest(props, ["tools", "editor"]);
+    return (_jsx(Flex, __assign({ className: "toolbar-group" }, flexProps, { children: tools.map(function (toolId) {
+            if (Array.isArray(toolId)) {
+                return (_jsx(MoreTools, { popupId: toolId.join(""), tools: toolId, editor: editor }));
+            }
+            else {
+                var Component = findToolById(toolId);
+                var toolDefinition = getToolDefinition(toolId);
+                return _jsx(Component, __assign({ editor: editor, id: toolId }, toolDefinition));
+            }
+        }) })));
+}
+function MoreTools(props) {
+    var popupId = props.popupId;
+    var _a = useContext(ToolbarContext), currentPopup = _a.currentPopup, setCurrentPopup = _a.setCurrentPopup;
+    var buttonRef = useRef();
+    var show = popupId === currentPopup;
+    var setShow = function (state) {
+        return setCurrentPopup === null || setCurrentPopup === void 0 ? void 0 : setCurrentPopup(state ? popupId : undefined);
+    };
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { icon: "more", title: "More", toggled: show, buttonRef: buttonRef, onClick: function () { return setShow(!show); } }), _jsx(MenuPresenter, __assign({ isOpen: show, onClose: function () { return setShow(false); }, items: [], options: {
+                    type: "autocomplete",
+                    position: {
+                        isTargetAbsolute: true,
+                        target: buttonRef.current || "mouse",
+                        align: "center",
+                        location: "below",
+                        yOffset: 5,
+                    },
+                } }, { children: _jsx(Popup, { children: _jsx(ToolbarGroup, { tools: props.tools, editor: props.editor, sx: {
+                            p: 1,
+                        } }) }) }))] }));
 }
