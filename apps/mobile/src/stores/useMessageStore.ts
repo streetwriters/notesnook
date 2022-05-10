@@ -73,7 +73,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     visible: false,
     message: null,
     actionText: null,
-    onPress: () => {},
+    onPress: () => null,
     data: {},
     icon: 'account-outline'
   },
