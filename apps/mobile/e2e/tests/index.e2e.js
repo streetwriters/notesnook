@@ -3,11 +3,11 @@ const { navigate, tapByText, prepare } = require('./utils');
 const { sleep } = require('./utils');
 
 describe('APP LAUNCH AND NAVIGATION', () => {
-  it('App should launch successfully & hide welcome screen', async done => {
+  it('App should launch successfully & hide welcome screen', async () => {
     await prepare();
   });
 
-  it('Basic navigation should work', async done => {
+  it('Basic navigation should work', async () => {
     await prepare();
     await navigate('Notebooks');
     await tapByText('Skip introduction');

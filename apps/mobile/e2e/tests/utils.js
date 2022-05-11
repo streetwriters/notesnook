@@ -12,6 +12,7 @@ export const sleep = duration =>
 export async function LaunchApp() {
   await expect(element(by.id(notesnook.ids.default.root))).toBeVisible();
   await expect(element(by.id('notesnook.splashscreen'))).toBeVisible();
+  await sleep(500);
   await element(by.text('Get started')).tap();
   await sleep(500);
   await element(by.text('Next')).tap();
@@ -82,7 +83,7 @@ export async function navigate(screen) {
   await sleep(500);
   let menu = elementById(notesnook.ids.default.header.buttons.left);
   await menu.tap();
-  await sleep(100);
+  await sleep(500);
   await elementByText(screen).tap();
 }
 
