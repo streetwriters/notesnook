@@ -5,6 +5,7 @@ import { Icons } from "../icons";
 import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
 import { MenuItem } from "../../components/menu/types";
 import { useToolbarContext } from "../hooks/useToolbarContext";
+import { useToolbarLocation } from "../stores/toolbar-store";
 
 type DropdownProps = {
   selectedItem: string | JSX.Element;
@@ -16,7 +17,7 @@ export function Dropdown(props: DropdownProps) {
   const { items, selectedItem, buttonRef, menuWidth } = props;
   const internalRef = useRef<any>();
   const [isOpen, setIsOpen] = useState(false);
-  const { toolbarLocation } = useToolbarContext();
+  const toolbarLocation = useToolbarLocation();
 
   return (
     <>

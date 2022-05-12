@@ -31,12 +31,14 @@ export declare const Icons: {
     upload: string;
     attachment: string;
     table: string;
+    rowProperties: string;
     insertRowBelow: string;
     insertRowAbove: string;
     moveRowDown: string;
     moveRowUp: string;
     deleteRow: string;
     toggleHeaderRow: string;
+    columnProperties: string;
     insertColumnRight: string;
     insertColumnLeft: string;
     moveColumnRight: string;

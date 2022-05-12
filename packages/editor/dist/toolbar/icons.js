@@ -1,4 +1,4 @@
-import { mdiAttachment, mdiBorderHorizontal, mdiCheck, mdiChevronDown, mdiCodeBraces, mdiCodeTags, mdiDotsVertical, mdiFormatAlignCenter, mdiFormatAlignJustify, mdiFormatAlignLeft, mdiFormatAlignRight, mdiFormatBold, mdiFormatClear, mdiFormatColorHighlight, mdiFormatColorText, mdiFormatItalic, mdiFormatListBulleted, mdiFormatListNumbered, mdiFormatQuoteClose, mdiFormatStrikethrough, mdiFormatSubscript, mdiFormatSuperscript, mdiFormatTextdirectionLToR, mdiFormatTextdirectionRToL, mdiFormatUnderline, mdiImage, mdiInvertColorsOff, mdiLinkPlus, mdiLoading, mdiTable, mdiTableBorder, mdiTableRowPlusBefore, mdiTableRowRemove, mdiTableColumnPlusAfter, mdiTableColumnPlusBefore, mdiTableColumnRemove, mdiUploadOutline, mdiPlus, mdiSquareRoundedBadgeOutline, mdiFormatColorFill, mdiBorderAllVariant, mdiClose, mdiSortDescending, mdiArrowExpandRight, mdiArrowExpandLeft, mdiArrowExpandDown, mdiArrowExpandUp, mdiTrashCanOutline, mdiTableMergeCells, mdiTableSplitCell, mdiDeleteOutline, mdiDownloadOutline, mdiFormatListCheckbox, mdiDrag, mdiCheckboxMarkedOutline, mdiChevronUp, mdiArrowUp, mdiArrowDown, mdiRegex, mdiFormatLetterCase, mdiFormatLetterMatches, mdiMoviePlusOutline, mdiLink, mdiChevronRight, } from "@mdi/js";
+import { mdiAttachment, mdiBorderHorizontal, mdiCheck, mdiChevronDown, mdiCodeBraces, mdiCodeTags, mdiDotsVertical, mdiFormatAlignCenter, mdiFormatAlignJustify, mdiFormatAlignLeft, mdiFormatAlignRight, mdiFormatBold, mdiFormatClear, mdiFormatColorHighlight, mdiFormatColorText, mdiFormatItalic, mdiFormatListBulleted, mdiFormatListNumbered, mdiFormatQuoteClose, mdiFormatStrikethrough, mdiFormatSubscript, mdiFormatSuperscript, mdiFormatTextdirectionLToR, mdiFormatTextdirectionRToL, mdiFormatUnderline, mdiImage, mdiInvertColorsOff, mdiLinkPlus, mdiLoading, mdiTable, mdiTableBorder, mdiTableRowPlusAfter, mdiTableRowPlusBefore, mdiTableRowRemove, mdiTableColumnPlusAfter, mdiTableColumnPlusBefore, mdiTableColumnRemove, mdiUploadOutline, mdiPlus, mdiSquareRoundedBadgeOutline, mdiFormatColorFill, mdiBorderAllVariant, mdiClose, mdiSortDescending, mdiArrowExpandRight, mdiArrowExpandLeft, mdiArrowExpandDown, mdiArrowExpandUp, mdiTrashCanOutline, mdiTableMergeCells, mdiTableSplitCell, mdiDeleteOutline, mdiDownloadOutline, mdiFormatListCheckbox, mdiDrag, mdiCheckboxMarkedOutline, mdiChevronUp, mdiArrowUp, mdiArrowDown, mdiRegex, mdiFormatLetterCase, mdiFormatLetterMatches, mdiMoviePlusOutline, mdiLink, mdiChevronRight, mdiTableColumnWidth, mdiTableRowHeight, } from "@mdi/js";
 export var Icons = {
     bold: mdiFormatBold,
     italic: mdiFormatItalic,
@@ -32,12 +32,14 @@ export var Icons = {
     upload: mdiUploadOutline,
     attachment: mdiAttachment,
     table: mdiTable,
-    insertRowBelow: mdiPlus,
+    rowProperties: mdiTableRowHeight,
+    insertRowBelow: mdiTableRowPlusAfter,
     insertRowAbove: mdiTableRowPlusBefore,
     moveRowDown: mdiArrowExpandDown,
     moveRowUp: mdiArrowExpandUp,
     deleteRow: mdiTableRowRemove,
     toggleHeaderRow: mdiTableBorder,
+    columnProperties: mdiTableColumnWidth,
     insertColumnRight: mdiTableColumnPlusAfter,
     insertColumnLeft: mdiTableColumnPlusBefore,
     moveColumnRight: mdiArrowExpandRight,

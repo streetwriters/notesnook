@@ -33,8 +33,8 @@ import { Flex } from "rebass";
 import { Input } from "@rebass/forms";
 import { Popup } from "../components/popup";
 function InlineTool(props) {
-    var editor = props.editor, title = props.title, id = props.id, icon = props.icon, isToggled = props.isToggled, onClick = props.onClick;
-    return (_jsx(ToolButton, { title: title, id: id, icon: icon, onClick: function () { return onClick(editor); }, toggled: isToggled(editor) }));
+    var editor = props.editor, title = props.title, icon = props.icon, isToggled = props.isToggled, onClick = props.onClick;
+    return (_jsx(ToolButton, { title: title, id: icon, icon: icon, onClick: function () { return onClick(editor); }, toggled: isToggled(editor) }));
 }
 export function Italic(props) {
     return (_jsx(InlineTool, __assign({}, props, { isToggled: function (editor) { return editor.isActive("italic"); }, onClick: function (editor) { return editor.chain().focus().toggleItalic().run(); } })));
@@ -63,7 +63,7 @@ export function ClearFormatting(props) {
         } })));
 }
 export function Link(props) {
-    var editor = props.editor, id = props.id, title = props.title, icon = props.icon;
+    var editor = props.editor, title = props.title, icon = props.icon;
     var buttonRef = useRef(null);
     var targetRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
@@ -71,7 +71,7 @@ export function Link(props) {
     var _c = __read(useState(), 2), text = _c[0], setText = _c[1];
     var currentUrl = editor.getAttributes("link").href;
     var isEditing = !!currentUrl;
-    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { ref: buttonRef, title: title, id: id, icon: icon, onClick: function () {
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { id: icon, ref: buttonRef, title: title, icon: icon, onClick: function () {
                     if (isEditing)
                         setHref(currentUrl);
                     var _a = editor.state.selection, from = _a.from, to = _a.to, $from = _a.$from;

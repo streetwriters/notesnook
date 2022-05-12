@@ -10,6 +10,7 @@ export type ToolButtonProps = ButtonProps & {
   iconSize?: number;
   toggled: boolean;
   buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined>;
+  variant?: "small" | "normal";
 };
 export function ToolButton(props: ToolButtonProps) {
   const {
@@ -20,6 +21,7 @@ export function ToolButton(props: ToolButtonProps) {
     toggled,
     sx,
     buttonRef,
+    variant = "normal",
     ...buttonProps
   } = props;
 
@@ -29,10 +31,11 @@ export function ToolButton(props: ToolButtonProps) {
       tabIndex={-1}
       id={`tool-${id}`}
       sx={{
-        p: 1,
+        p: variant === "small" ? "3px" : 1,
+        borderRadius: variant === "small" ? "small" : "default",
         m: 0,
         bg: toggled ? "hover" : "transparent",
-        mr: 1,
+        mr: variant === "small" ? 0 : 1,
         ":hover": { bg: "hover" },
         ":last-of-type": {
           mr: 0,
@@ -44,7 +47,7 @@ export function ToolButton(props: ToolButtonProps) {
       <Icon
         path={Icons[icon]}
         color={iconColor || "text"}
-        size={iconSize || 18}
+        size={iconSize || variant === "small" ? 16 : 18}
       />
     </Button>
   );

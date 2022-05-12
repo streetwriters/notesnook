@@ -3,9 +3,11 @@ import { Dropdown } from "../components/dropdown";
 import { ToolId } from ".";
 import { MenuItem } from "../../components/menu/types";
 import { Editor } from "@tiptap/core";
+import { Box, Button, Flex } from "rebass";
+import { Slider } from "@rebass/forms";
 
 const defaultFontSizes = [
-  12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 60, 72, 100,
+  8, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 60, 72, 100,
 ];
 export function FontSize(props: ToolProps) {
   const { editor } = props;
@@ -17,13 +19,28 @@ export function FontSize(props: ToolProps) {
   return (
     <Dropdown
       selectedItem={`${currentFontSize}px`}
-      items={defaultFontSizes.map((size) => ({
-        key: `${size}px`,
-        type: "menuitem",
-        title: `${size}px`,
-        isChecked: size === currentFontSize,
-        onClick: () => editor.chain().focus().setFontSize(`${size}px`).run(),
-      }))}
+      items={[
+        {
+          key: "font-sizes",
+          type: "menuitem",
+          component: () => (
+            <Box
+              sx={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)" }}
+            >
+              {defaultFontSizes.map((size) => (
+                <Button variant={"menuitem"}>{size}px</Button>
+              ))}
+            </Box>
+          ),
+        },
+      ]}
+      // items={defaultFontSizes.map((size) => ({
+      //   key: `${size}px`,
+      //   type: "menuitem",
+      //   title: `${size}px`,
+      //   isChecked: size === currentFontSize,
+      //   onClick: () => editor.chain().focus().setFontSize(`${size}px`).run(),
+      // }))}
       menuWidth={100}
     />
   );

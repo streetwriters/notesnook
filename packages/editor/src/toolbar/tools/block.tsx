@@ -3,7 +3,10 @@ import { Editor } from "@tiptap/core";
 import { ToolButton } from "../components/tool-button";
 import { ToolId } from ".";
 import { IconNames, Icons } from "../icons";
-import { MenuPresenter } from "../../components/menu/menu";
+import {
+  ActionSheetPresenter,
+  MenuPresenter,
+} from "../../components/menu/menu";
 import { useEffect, useRef, useState } from "react";
 import { Dropdown } from "../components/dropdown";
 import { Icon } from "../components/icon";
@@ -12,12 +15,12 @@ import { Popup } from "../components/popup";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
 import { MenuItem } from "../../components/menu/types";
-import { useToolbarContext } from "../hooks/useToolbarContext";
+import { useToolbarLocation } from "../stores/toolbar-store";
 
 export function InsertBlock(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement | null>();
   const [isOpen, setIsOpen] = useState(false);
-  const { toolbarLocation } = useToolbarContext();
+  const toolbarLocation = useToolbarLocation();
 
   return (
     <>
@@ -40,7 +43,7 @@ export function InsertBlock(props: ToolProps) {
       >
         <Icon path={Icons.plus} size={18} color={"primary"} />
       </Button>
-      <MenuPresenter
+      {/* <MenuPresenter
         options={{
           type: "menu",
           position: {
@@ -60,6 +63,21 @@ export function InsertBlock(props: ToolProps) {
           attachment(editor),
           embed(editor),
           table(editor),
+        ]}
+        onClose={() => setIsOpen(false)}
+      /> */}
+      <ActionSheetPresenter
+        title="Choose a block to insert"
+        isOpen={isOpen}
+        items={[
+          tasklist(editor),
+          horizontalRule(editor),
+          codeblock(editor),
+          blockquote(editor),
+          imageActionSheet(editor),
+          attachment(editor),
+          embedActionSheet(editor),
+          tableActionSheet(editor),
         ]}
         onClose={() => setIsOpen(false)}
       />
@@ -117,6 +135,44 @@ const image = (editor: Editor | null): MenuItem => ({
   ],
 });
 
+const imageActionSheet = (editor: Editor | null): MenuItem => ({
+  key: "image",
+  type: "menuitem",
+  title: "Image",
+  icon: "image",
+  items: [
+    {
+      key: "imageOptions",
+      type: "menuitem",
+      component: function ({ onClick }) {
+        const [isOpen, setIsOpen] = useState(true);
+        return (
+          <ActionSheetPresenter
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            items={[
+              {
+                key: "upload-from-disk",
+                type: "menuitem",
+                title: "Upload from disk",
+                icon: "upload",
+                onClick: () => {},
+              },
+              {
+                key: "upload-from-url",
+                type: "menuitem",
+                title: "Attach from URL",
+                icon: "link",
+                onClick: () => {},
+              },
+            ]}
+          />
+        );
+      },
+    },
+  ],
+});
+
 const embed = (editor: Editor | null): MenuItem => ({
   key: "embed",
   type: "menuitem",
@@ -135,7 +191,7 @@ const table = (editor: Editor | null): MenuItem => ({
       type: "menuitem",
       component: (props) => (
         <TablePopup
-          onClose={(size) => {
+          onInsertTable={(size) => {
             editor
               ?.chain()
               .focus()
@@ -148,6 +204,82 @@ const table = (editor: Editor | null): MenuItem => ({
           }}
         />
       ),
+    },
+  ],
+});
+
+const embedActionSheet = (editor: Editor | null): MenuItem => ({
+  key: "embed",
+  type: "menuitem",
+  title: "Embed",
+  icon: "embed",
+  items: [
+    {
+      key: "table-size-selector",
+      type: "menuitem",
+      component: function ({ onClick }) {
+        const [isOpen, setIsOpen] = useState(true);
+        return (
+          <ActionSheetPresenter
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            items={[]}
+          >
+            <EmbedPopup
+              title="Insert embed"
+              icon="check"
+              onClose={(embed) => {
+                editor?.chain().insertEmbed(embed).run();
+                setIsOpen(false);
+                onClick?.();
+              }}
+              // embed={props}
+              // onSourceChanged={(src) => {}}
+              // onSizeChanged={(size) => editor.commands.setEmbedSize(size)}
+            />
+          </ActionSheetPresenter>
+        );
+      },
+    },
+  ],
+});
+
+const tableActionSheet = (editor: Editor | null): MenuItem => ({
+  key: "table",
+  type: "menuitem",
+  title: "Table",
+  icon: "table",
+  items: [
+    {
+      key: "table-size-selector",
+      type: "menuitem",
+      component: function ({ onClick }) {
+        const [isOpen, setIsOpen] = useState(true);
+        return (
+          <ActionSheetPresenter
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            items={[]}
+          >
+            <TablePopup
+              cellSize={30}
+              autoExpand={false}
+              onInsertTable={(size) => {
+                editor
+                  ?.chain()
+                  .focus()
+                  .insertTable({
+                    rows: size.rows,
+                    cols: size.columns,
+                  })
+                  .run();
+                setIsOpen(false);
+                onClick?.();
+              }}
+            />
+          </ActionSheetPresenter>
+        );
+      },
     },
   ],
 });

@@ -29,9 +29,9 @@ export function Popup(props) {
     return (_jsxs(Flex, __assign({ sx: {
             bg: "background",
             flexDirection: "column",
-            borderRadius: "default",
-            border: "1px solid var(--border)",
-            boxShadow: "menu",
+            //  borderRadius: "default",
+            // border: "1px solid var(--border)",
+            // boxShadow: "menu",
         } }, { children: [title && (_jsxs(Flex, __assign({ sx: {
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -41,5 +41,5 @@ export function Popup(props) {
 }
 function PopupButton(props) {
     var text = props.text, loading = props.loading, icon = props.icon, iconColor = props.iconColor, iconSize = props.iconSize, restProps = __rest(props, ["text", "loading", "icon", "iconColor", "iconSize"]);
-    return (_jsx(Button, __assign({ variant: "dialog", sx: { p: 1, px: 2 } }, restProps, { children: loading ? (_jsx(Icon, { path: Icons.loading, size: 16, rotate: true, color: "primary" })) : icon ? (_jsx(Icon, { path: Icons[icon], size: iconSize || 18, color: iconColor || "icon" })) : (text) })));
+    return (_jsx(Button, __assign({ variant: "icon", sx: { p: 1, px: 2 } }, restProps, { children: loading ? (_jsx(Icon, { path: Icons.loading, size: 16, rotate: true, color: "primary" })) : icon ? (_jsx(Icon, { path: Icons[icon], size: iconSize || 18, color: iconColor || "icon" })) : (text) })));
 }

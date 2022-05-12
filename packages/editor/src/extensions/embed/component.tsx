@@ -1,4 +1,4 @@
-import { Box, Flex, Image, ImageProps, Text } from "rebass";
+import { Box, Button, Flex, Image, ImageProps, Text } from "rebass";
 import { NodeViewWrapper, NodeViewProps, FloatingMenu } from "@tiptap/react";
 import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
 import { ThemeProvider } from "emotion-theming";
@@ -8,7 +8,11 @@ import { ToolButton } from "../../toolbar/components/tool-button";
 import { findToolById, ToolId } from "../../toolbar/tools";
 import { Editor } from "@tiptap/core";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MenuPresenter } from "../../components/menu/menu";
+import {
+  ActionSheetPresenter,
+  MenuPresenter,
+  PopupPresenter,
+} from "../../components/menu/menu";
 import { Popup } from "../../toolbar/components/popup";
 import { Toggle } from "../../components/toggle";
 import { Input } from "@rebass/forms";
@@ -18,6 +22,9 @@ import {
   EmbedSizeOptions,
 } from "./embed";
 import { EmbedPopup } from "../../toolbar/popups/embed-popup";
+import { Icon } from "../../toolbar/components/icon";
+import { Icons } from "../../toolbar/icons";
+import { DesktopOnly, MobileOnly } from "../../components/responsive";
 
 export function EmbedComponent(props: NodeViewProps) {
   const { src, width, height, align } = props.node.attrs as EmbedAttributes &
@@ -61,9 +68,27 @@ export function EmbedComponent(props: NodeViewProps) {
             }}
             lockAspectRatio={true}
           >
-            <Flex sx={{ position: "relative", justifyContent: "end" }}>
+            {/* <Flex sx={{ position: "relative", justifyContent: "end" }}>
+              
+            </Flex> */}
+            <Flex
+              width={"100%"}
+              sx={{
+                position: "relative",
+                justifyContent: "end",
+                borderTop: "20px solid var(--bgSecondary)",
+                // borderLeft: "20px solid var(--bgSecondary)",
+                borderTopLeftRadius: "default",
+                borderTopRightRadius: "default",
+                borderColor: isActive ? "border" : "bgSecondary",
+                cursor: "pointer",
+                ":hover": {
+                  borderColor: "border",
+                },
+              }}
+            >
               {isToolbarVisible && (
-                <ImageToolbar
+                <EmbedToolbar
                   editor={editor}
                   align={align}
                   height={height || 0}
@@ -79,10 +104,11 @@ export function EmbedComponent(props: NodeViewProps) {
               width={"100%"}
               height={"100%"}
               sx={{
-                border: isActive
-                  ? "2px solid var(--primary)"
-                  : "2px solid transparent",
-                borderRadius: "default",
+                border: "none",
+                // border: isActive
+                //   ? "2px solid var(--primary)"
+                //   : "2px solid transparent",
+                // borderRadius: "default",
               }}
               {...props}
             />
@@ -98,7 +124,7 @@ type ImageToolbarProps = Required<EmbedAttributes> &
     editor: Editor;
   };
 
-function ImageToolbar(props: ImageToolbarProps) {
+function EmbedToolbar(props: ImageToolbarProps) {
   const { editor, height, width, src } = props;
   const [isOpen, setIsOpen] = useState(false);
 
@@ -184,7 +210,13 @@ function ImageToolbar(props: ImageToolbarProps) {
         </Flex>
       </Flex>
 
-      {isOpen && (
+      <PopupPresenter
+        isOpen={isOpen}
+        desktop="none"
+        mobile="sheet"
+        onClose={() => setIsOpen(false)}
+        blocking={true}
+      >
         <EmbedPopup
           title="Embed properties"
           icon="close"
@@ -193,7 +225,7 @@ function ImageToolbar(props: ImageToolbarProps) {
           onSourceChanged={(src) => {}}
           onSizeChanged={(size) => editor.commands.setEmbedSize(size)}
         />
-      )}
+      </PopupPresenter>
     </Flex>
   );
 }

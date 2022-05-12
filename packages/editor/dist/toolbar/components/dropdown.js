@@ -31,12 +31,12 @@ import { Button, Text } from "rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
 import { MenuPresenter } from "../../components/menu/menu";
-import { useToolbarContext } from "../hooks/useToolbarContext";
+import { useToolbarLocation } from "../stores/toolbar-store";
 export function Dropdown(props) {
     var items = props.items, selectedItem = props.selectedItem, buttonRef = props.buttonRef, menuWidth = props.menuWidth;
     var internalRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    var toolbarLocation = useToolbarContext().toolbarLocation;
+    var toolbarLocation = useToolbarLocation();
     return (_jsxs(_Fragment, { children: [_jsxs(Button, __assign({ ref: function (ref) {
                     internalRef.current = ref;
                     if (buttonRef)

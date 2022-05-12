@@ -17,9 +17,9 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
       sx={{
         bg: "background",
         flexDirection: "column",
-        borderRadius: "default",
-        border: "1px solid var(--border)",
-        boxShadow: "menu",
+        //  borderRadius: "default",
+        // border: "1px solid var(--border)",
+        // boxShadow: "menu",
       }}
     >
       {title && (
@@ -52,7 +52,7 @@ type PopupButtonProps = ButtonProps & {
 function PopupButton(props: PopupButtonProps) {
   const { text, loading, icon, iconColor, iconSize, ...restProps } = props;
   return (
-    <Button variant="dialog" sx={{ p: 1, px: 2 }} {...restProps}>
+    <Button variant="icon" sx={{ p: 1, px: 2 }} {...restProps}>
       {loading ? (
         <Icon path={Icons.loading} size={16} rotate color="primary" />
       ) : icon ? (

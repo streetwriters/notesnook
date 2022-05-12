@@ -8,14 +8,16 @@ import { EditorFloatingMenus } from "./floating-menus";
 import { getToolDefinition } from "./tool-definitions";
 import { Dropdown } from "./components/dropdown";
 import { ToolButton } from "./components/tool-button";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { MenuPresenter } from "../components/menu";
 import { Popup } from "./components/popup";
+import { ToolbarContext, useToolbarContext } from "./hooks/useToolbarContext";
 import {
-  ToolbarContext,
   ToolbarLocation,
-  useToolbarContext,
-} from "./hooks/useToolbarContext";
+  useToolbarLocation,
+  useToolbarStore,
+} from "./stores/toolbar-store";
+
 // type Colors = {
 //   text: string;
 //   background: string;
@@ -31,11 +33,18 @@ type ToolbarDefinition = ToolbarGroupDefinition[];
 type ToolbarProps = ThemeConfig & {
   editor: Editor | null;
   location: ToolbarLocation;
+  isMobile?: boolean;
 };
 export function Toolbar(props: ToolbarProps) {
-  const { editor, theme, accent, scale, location } = props;
+  const { editor, theme, accent, scale, location, isMobile } = props;
   const themeProperties = useTheme({ accent, theme, scale });
   const [currentPopup, setCurrentPopup] = useState<string | undefined>();
+  const { setIsMobile, setToolbarLocation } = useToolbarStore();
+
+  useEffect(() => {
+    setIsMobile(isMobile || false);
+    setToolbarLocation(location);
+  }, [isMobile, location]);
 
   const tools: ToolbarDefinition = [
     ["insertBlock"],
@@ -63,7 +72,10 @@ export function Toolbar(props: ToolbarProps) {
   return (
     <ThemeProvider theme={themeProperties}>
       <ToolbarContext.Provider
-        value={{ setCurrentPopup, currentPopup, toolbarLocation: location }}
+        value={{
+          setCurrentPopup,
+          currentPopup,
+        }}
       >
         <Flex
           className="editor-toolbar"
@@ -112,7 +124,7 @@ function ToolbarGroup(props: ToolbarGroupProps) {
         } else {
           const Component = findToolById(toolId);
           const toolDefinition = getToolDefinition(toolId);
-          return <Component editor={editor} id={toolId} {...toolDefinition} />;
+          return <Component editor={editor} {...toolDefinition} />;
         }
       })}
     </Flex>
@@ -126,8 +138,9 @@ type MoreToolsProps = {
 };
 function MoreTools(props: MoreToolsProps) {
   const { popupId } = props;
-  const { currentPopup, setCurrentPopup, toolbarLocation } =
-    useToolbarContext();
+  const { currentPopup, setCurrentPopup } = useToolbarContext();
+  const toolbarLocation = useToolbarLocation();
+
   const buttonRef = useRef<HTMLButtonElement | null>();
 
   const show = popupId === currentPopup;

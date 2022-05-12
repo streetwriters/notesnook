@@ -78,6 +78,10 @@ import {
   mdiMoviePlusOutline,
   mdiLink,
   mdiChevronRight,
+  mdiTableRow,
+  mdiTableColumn,
+  mdiTableColumnWidth,
+  mdiTableRowHeight,
 } from "@mdi/js";
 
 export const Icons = {
@@ -113,12 +117,14 @@ export const Icons = {
   upload: mdiUploadOutline,
   attachment: mdiAttachment,
   table: mdiTable,
-  insertRowBelow: mdiPlus,
+  rowProperties: mdiTableRowHeight,
+  insertRowBelow: mdiTableRowPlusAfter,
   insertRowAbove: mdiTableRowPlusBefore,
   moveRowDown: mdiArrowExpandDown,
   moveRowUp: mdiArrowExpandUp,
   deleteRow: mdiTableRowRemove,
   toggleHeaderRow: mdiTableBorder,
+  columnProperties: mdiTableColumnWidth,
   insertColumnRight: mdiTableColumnPlusAfter,
   insertColumnLeft: mdiTableColumnPlusBefore,
   moveColumnRight: mdiArrowExpandRight,

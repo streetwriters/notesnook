@@ -80,12 +80,19 @@ What's next:
 
 ## Optimize toolbar & editor UI for mobile
 
-1. Refactor tools to be more easily configurable
-2. Implement sub groups in toolbar
-3. Move all popups to /popups directory
-4. Implement mobile positioning logic in menu/popup presenter
-5. Add support for repositioning toolbar (top/bottom)
-6. Move all popups to be shown as bottom sheets on mobile
+1. Refactor tools to be more easily configurable (partially done)
+2. Implement sub groups in toolbar (done)
+3. Move all popups to /popups directory (partially done)
+4. Implement mobile positioning logic in menu/popup presenter (done)
+5. Add support for repositioning toolbar (top/bottom) (done)
+6. Move all popups to be shown as bottom sheets on mobile (partially done)
+7. Figure out how to make interactive widgets selectable in editor (e.g. iframe & table)
+8. Create popup header for use in action sheet (done)
+   1. Header contains title & action(s)
+9. Implement logic to open inline popups (image/cell properties) as an action sheet (done)
+10. Open search replace popup as action sheet (done)
+11. Improve font size menu (done)
+12. Move table context toolbars to bottom (done)
 
 ### Refactor tools
 

@@ -43,12 +43,12 @@ import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton } from "./tool-button";
 import { MenuPresenter } from "../../components/menu/menu";
-import { useToolbarContext } from "../hooks/useToolbarContext";
+import { useToolbarLocation } from "../stores/toolbar-store";
 export function SplitButton(props) {
     var menuPresenterProps = props.menuPresenterProps, children = props.children, toolButtonProps = __rest(props, ["menuPresenterProps", "children"]);
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var ref = useRef(null);
-    var toolbarLocation = useToolbarContext().toolbarLocation;
+    var toolbarLocation = useToolbarLocation();
     return (_jsxs(_Fragment, { children: [_jsxs(Flex, __assign({ ref: ref, sx: {
                     borderRadius: "default",
                     bg: isOpen ? "hover" : "transparent",

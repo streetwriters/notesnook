@@ -8,5 +8,6 @@ export declare type ToolButtonProps = ButtonProps & {
     iconSize?: number;
     toggled: boolean;
     buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined>;
+    variant?: "small" | "normal";
 };
 export declare function ToolButton(props: ToolButtonProps): JSX.Element;

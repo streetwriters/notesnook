@@ -92,23 +92,28 @@ export function EmbedPopup(props) {
                     src: _src,
                 });
             },
-        } }, { children: _jsxs(Flex, __assign({ sx: { width: 300, flexDirection: "column", p: 1 } }, { children: [error && (_jsxs(Text, __assign({ variant: "error", sx: {
+        } }, { children: _jsxs(Flex, __assign({ sx: { flexDirection: "column", p: 1 } }, { children: [error && (_jsxs(Text, __assign({ variant: "error", sx: {
                         bg: "errorBg",
                         color: "error",
                         p: 1,
                         borderRadius: "default",
-                    } }, { children: ["Error: ", error] }))), _jsxs(Flex, { children: [_jsx(Button, __assign({ variant: "dialog", sx: {
-                                p: 1,
+                    } }, { children: ["Error: ", error] }))), _jsxs(Flex, __assign({ sx: { mb: 1 } }, { children: [_jsx(Button, __assign({ variant: "dialog", sx: {
+                                pb: 1,
                                 mr: 1,
+                                borderRadius: 0,
                                 color: embedSource === "url" ? "primary" : "text",
-                            }, onClick: function () { return setEmbedSource("url"); } }, { children: "From link" })), _jsx(Button, __assign({ variant: "dialog", sx: {
-                                p: 1,
+                                borderBottom: "2px solid",
+                                borderBottomColor: embedSource === "url" ? "primary" : "transparent",
+                            }, onClick: function () { return setEmbedSource("url"); } }, { children: "From URL" })), _jsx(Button, __assign({ variant: "dialog", sx: {
+                                pb: 1,
+                                borderRadius: 0,
                                 color: embedSource === "code" ? "primary" : "text",
-                            }, onClick: function () { return setEmbedSource("code"); } }, { children: "From code" }))] }), embedSource === "url" ? (_jsx(Input, { placeholder: "Embed source URL", value: src, autoFocus: true, onChange: function (e) { return setSrc(e.target.value); }, sx: { p: 1, mt: 1, fontSize: "body" } })) : (_jsx(Textarea, { autoFocus: true, variant: "forms.input", sx: { fontSize: "subBody", fontFamily: "monospace", mt: 1 }, minHeight: 100, onChange: function (e) { return setSrc(e.target.value); }, placeholder: "Paste embed code here. Only iframes are supported." })), embedSource === "url" ? (_jsxs(Flex, __assign({ sx: { alignItems: "center", mt: 2 } }, { children: [_jsx(Input, { type: "number", placeholder: "Width", value: width, sx: {
-                                mr: 2,
-                                p: 1,
+                                borderBottom: "2px solid",
+                                borderBottomColor: embedSource === "code" ? "primary" : "transparent",
+                            }, onClick: function () { return setEmbedSource("code"); } }, { children: "From code" }))] })), embedSource === "url" ? (_jsx(Input, { placeholder: "Enter embed source URL", value: src, autoFocus: true, onChange: function (e) { return setSrc(e.target.value); }, sx: { mt: 1, fontSize: "body" } })) : (_jsx(Textarea, { autoFocus: true, variant: "forms.input", sx: { fontSize: "subBody", fontFamily: "monospace", mt: 1 }, minHeight: [200, 100], onChange: function (e) { return setSrc(e.target.value); }, placeholder: "Paste embed code here. Only iframes are supported." })), embedSource === "url" ? (_jsxs(Flex, __assign({ sx: { alignItems: "center", mt: 1 } }, { children: [_jsx(Input, { type: "number", placeholder: "Width", value: width, sx: {
+                                mr: 1,
                                 fontSize: "body",
-                            }, onChange: function (e) { return onSizeChange(e.target.valueAsNumber); } }), _jsx(Input, { type: "number", placeholder: "Height", value: height, sx: { p: 1, fontSize: "body" }, onChange: function (e) { return onSizeChange(undefined, e.target.valueAsNumber); } })] }))) : null] })) })));
+                            }, onChange: function (e) { return onSizeChange(e.target.valueAsNumber); } }), _jsx(Input, { type: "number", placeholder: "Height", value: height, sx: { fontSize: "body" }, onChange: function (e) { return onSizeChange(undefined, e.target.valueAsNumber); } })] }))) : null] })) })));
 }
 function getAttribute(document, id) {
     var element = document.querySelector("[".concat(id, "]"));

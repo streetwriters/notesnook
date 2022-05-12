@@ -37,6 +37,7 @@
     "re-resizable": "^6.9.5",
     "react-color": "^2.19.3",
     "react-modal": "^3.14.4",
+    "react-spring-bottom-sheet": "^3.4.0",
     "react-toggle": "^4.1.2",
     "reactjs-popup": "^2.0.5",
     "rebass": "^4.0.7",

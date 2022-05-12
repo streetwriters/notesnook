@@ -45,6 +45,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -74,15 +85,15 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { Slider } from "@rebass/forms";
 import { useEffect, useRef, useState } from "react";
 import { Flex, Text } from "rebass";
-import { MenuPresenter } from "../../components/menu/menu";
+import { ActionSheetPresenter, MenuPresenter, } from "../../components/menu/menu";
 import { Popup } from "../components/popup";
 import { ToolButton } from "../components/tool-button";
 import { selectedRect } from "prosemirror-tables";
+import { DesktopOnly, MobileOnly } from "../../components/responsive";
 export function TableRowFloatingMenu(props) {
     var editor = props.editor;
-    var theme = editor.storage.theme;
+    // const theme = editor.storage.theme as Theme;
     var _a = __read(useState(null), 2), position = _a[0], setPosition = _a[1];
-    var _b = __read(useState(false), 2), isMenuOpen = _b[0], setIsMenuOpen = _b[1];
     useEffect(function () {
         var _a;
         if (!editor.isActive("tableCell") &&
@@ -111,18 +122,23 @@ export function TableRowFloatingMenu(props) {
     }, [editor.state.selection]);
     if (!position)
         return null;
-    return (_jsxs(MenuPresenter, __assign({ isOpen: true, items: [], onClose: function () { }, options: {
+    return (_jsx(MenuPresenter, __assign({ isOpen: true, items: [], onClose: function () { }, options: {
             type: "autocomplete",
             position: position,
-        } }, { children: [_jsxs(Flex, __assign({ sx: {
-                    bg: "background",
-                    flexWrap: "nowrap",
-                    borderRadius: "default",
-                    opacity: isMenuOpen ? 1 : 0.3,
-                    ":hover": {
-                        opacity: 1,
-                    },
-                } }, { children: [_jsx(ToolButton, { toggled: isMenuOpen, title: "Row properties", id: "properties", icon: "more", onClick: function () { return setIsMenuOpen(true); }, iconSize: 16, sx: { mr: 0, p: "3px", borderRadius: "small" } }), _jsx(ToolButton, { toggled: false, title: "Insert row below", id: "insertRowBelow", icon: "insertRowBelow", onClick: function () { return editor.chain().focus().addRowAfter().run(); }, sx: { mr: 0, p: "3px", borderRadius: "small" }, iconSize: 16 })] })), _jsx(MenuPresenter, { isOpen: isMenuOpen, onClose: function () {
+        } }, { children: _jsxs(Flex, __assign({ sx: {
+                bg: "background",
+                flexWrap: "nowrap",
+                borderRadius: "default",
+                // opacity: isMenuOpen ? 1 : 0.3,
+                ":hover": {
+                    opacity: 1,
+                },
+            } }, { children: [_jsx(RowProperties, { title: "Row properties", editor: editor, variant: "small", icon: "more" }), _jsx(InsertRowBelow, { title: "Insert row below", icon: "insertRowBelow", editor: editor, variant: "small" })] })) })));
+}
+function RowProperties(props) {
+    var editor = props.editor, toolProps = __rest(props, ["editor"]);
+    var _a = __read(useState(false), 2), isMenuOpen = _a[0], setIsMenuOpen = _a[1];
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({ toggled: isMenuOpen }, toolProps, { onClick: function () { return setIsMenuOpen(true); } })), _jsx(MenuPresenter, { isOpen: isMenuOpen, onClose: function () {
                     setIsMenuOpen(false);
                     editor.commands.focus();
                 }, options: {
@@ -157,47 +173,20 @@ export function TableRowFloatingMenu(props) {
                         onClick: function () { return editor.chain().focus().deleteRow().run(); },
                         icon: "deleteRow",
                     },
-                ] })] })));
+                ] })] }));
 }
-export function TableColumnFloatingMenu(props) {
+function InsertRowBelow(props) {
+    var editor = props.editor, toolProps = __rest(props, ["editor"]);
+    return (_jsx(ToolButton, __assign({ toggled: false }, toolProps, { onClick: function () { return editor.chain().focus().addRowAfter().run(); } })));
+}
+function ColumnProperties(props) {
     var _this = this;
-    var editor = props.editor;
-    var _a = __read(useState(null), 2), position = _a[0], setPosition = _a[1];
+    var editor = props.editor, currentCell = props.currentCell, toolProps = __rest(props, ["editor", "currentCell"]);
+    var _a = __read(useState(false), 2), isMenuOpen = _a[0], setIsMenuOpen = _a[1];
     var isInsideCellSelection = !editor.state.selection.empty &&
         editor.state.selection.$anchor.node().type.name === "tableCell";
-    var _b = __read(useState(false), 2), isMenuOpen = _b[0], setIsMenuOpen = _b[1];
-    var _c = __read(useState(false), 2), showCellProps = _c[0], setShowCellProps = _c[1];
-    var _d = __read(useState(null), 2), menuPosition = _d[0], setMenuPosition = _d[1];
-    useEffect(function () {
-        var _a;
-        if (!editor.isActive("tableCell") &&
-            !editor.isActive("tableRow") &&
-            !editor.isActive("tableHeader")) {
-            setPosition(null);
-            return;
-        }
-        var $from = editor.state.selection.$from;
-        var selectedNode = $from.node();
-        var pos = selectedNode.isTextblock ? $from.before() : $from.pos;
-        var currentCell = (_a = editor.view.nodeDOM(pos)) === null || _a === void 0 ? void 0 : _a.closest("td,th");
-        var currentTable = currentCell === null || currentCell === void 0 ? void 0 : currentCell.closest("table");
-        if (!currentCell || !currentTable)
-            return;
-        setPosition(function (old) {
-            if ((old === null || old === void 0 ? void 0 : old.target) === currentCell)
-                return old;
-            return {
-                isTargetAbsolute: true,
-                location: "top",
-                align: "center",
-                yAnchor: currentTable,
-                yOffset: -2,
-                target: currentCell,
-            };
-        });
-    }, [editor.state.selection]);
-    if (!position)
-        return null;
+    var _b = __read(useState(false), 2), showCellProps = _b[0], setShowCellProps = _b[1];
+    var _c = __read(useState(null), 2), menuPosition = _c[0], setMenuPosition = _c[1];
     var columnProperties = [
         {
             key: "addColumnLeft",
@@ -259,7 +248,7 @@ export function TableColumnFloatingMenu(props) {
             onClick: function () {
                 setShowCellProps(true);
                 setMenuPosition({
-                    target: position.target || undefined,
+                    target: currentCell || undefined,
                     isTargetAbsolute: true,
                     yOffset: 10,
                     location: "below",
@@ -277,20 +266,9 @@ export function TableColumnFloatingMenu(props) {
             onClick: function () { return editor.chain().focus().deleteTable().run(); },
         },
     ];
-    return (_jsxs(MenuPresenter, __assign({ isOpen: true, items: [], onClose: function () { }, options: {
-            type: "autocomplete",
-            position: position,
-        } }, { children: [_jsxs(Flex, __assign({ sx: {
-                    bg: "background",
-                    flexWrap: "nowrap",
-                    borderRadius: "default",
-                    opacity: isMenuOpen || showCellProps ? 1 : 0.3,
-                    ":hover": {
-                        opacity: 1,
-                    },
-                } }, { children: [_jsx(ToolButton, { toggled: isMenuOpen, title: "Column properties", id: "properties", icon: "more", onClick: function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-                            return [2 /*return*/, setIsMenuOpen(true)];
-                        }); }); }, iconSize: 16, sx: { mr: 0, p: "3px", borderRadius: "small" } }), _jsx(ToolButton, { toggled: false, title: "Insert column right", id: "insertColumnRight", icon: "plus", onClick: function () { return editor.chain().focus().addColumnAfter().run(); }, sx: { mr: 0, p: "3px", borderRadius: "small" }, iconSize: 16 })] })), _jsx(MenuPresenter, { isOpen: isMenuOpen, onClose: function () {
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({ toggled: isMenuOpen }, toolProps, { onClick: function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                    return [2 /*return*/, setIsMenuOpen(true)];
+                }); }); } })), _jsx(MenuPresenter, { isOpen: isMenuOpen, onClose: function () {
                     setIsMenuOpen(false);
                     editor.commands.focus();
                 }, options: {
@@ -301,13 +279,67 @@ export function TableColumnFloatingMenu(props) {
                     { type: "seperator", key: "cellSeperator" }
                 ], false), __read(cellProperties), false), [
                     { type: "seperator", key: "tableSeperator" }
-                ], false), __read(tableProperties), false) }), _jsx(MenuPresenter, __assign({ isOpen: showCellProps, onClose: function () {
-                    setShowCellProps(false);
-                    editor.commands.focus();
-                }, options: {
-                    type: "menu",
-                    position: menuPosition || {},
-                }, items: [] }, { children: _jsx(CellProperties, { editor: editor, onClose: function () { return setShowCellProps(false); } }) }))] })));
+                ], false), __read(tableProperties), false) }), _jsx(DesktopOnly, { children: _jsx(MenuPresenter, __assign({ isOpen: showCellProps, onClose: function () {
+                        setShowCellProps(false);
+                        editor.commands.focus();
+                    }, options: {
+                        type: "menu",
+                        position: menuPosition || {},
+                    }, items: [] }, { children: _jsx(CellProperties, { editor: editor, onClose: function () { return setShowCellProps(false); } }) })) }), _jsx(MobileOnly, { children: _jsx(ActionSheetPresenter, __assign({ isOpen: showCellProps, onClose: function () {
+                        setShowCellProps(false);
+                        editor.commands.focus();
+                    }, items: [] }, { children: _jsx(CellProperties, { editor: editor, onClose: function () { return setShowCellProps(false); } }) })) })] }));
+}
+function InsertColumnRight(props) {
+    var editor = props.editor, toolProps = __rest(props, ["editor"]);
+    return (_jsx(ToolButton, __assign({}, toolProps, { toggled: false, onClick: function () { return editor.chain().focus().addColumnAfter().run(); } })));
+}
+export function TableColumnFloatingMenu(props) {
+    var editor = props.editor;
+    var _a = __read(useState(null), 2), position = _a[0], setPosition = _a[1];
+    useEffect(function () {
+        var _a;
+        if (!editor.isActive("tableCell") &&
+            !editor.isActive("tableRow") &&
+            !editor.isActive("tableHeader")) {
+            setPosition(null);
+            return;
+        }
+        var $from = editor.state.selection.$from;
+        var selectedNode = $from.node();
+        var pos = selectedNode.isTextblock ? $from.before() : $from.pos;
+        var currentCell = (_a = editor.view.nodeDOM(pos)) === null || _a === void 0 ? void 0 : _a.closest("td,th");
+        var currentTable = currentCell === null || currentCell === void 0 ? void 0 : currentCell.closest("table");
+        if (!currentCell || !currentTable)
+            return;
+        setPosition(function (old) {
+            if ((old === null || old === void 0 ? void 0 : old.target) === currentCell)
+                return old;
+            return {
+                isTargetAbsolute: true,
+                location: "top",
+                align: "center",
+                yAnchor: currentTable,
+                yOffset: 2,
+                target: currentCell,
+            };
+        });
+    }, [editor.state.selection]);
+    if (!position)
+        return null;
+    return (_jsx(MenuPresenter, __assign({ isOpen: true, items: [], onClose: function () { }, options: {
+            type: "autocomplete",
+            position: position,
+        } }, { children: _jsxs(Flex, __assign({ sx: {
+                bg: "background",
+                flexWrap: "nowrap",
+                borderRadius: "default",
+                // opacity: 0.3,
+                //  opacity: isMenuOpen || showCellProps ? 1 : 0.3,
+                ":hover": {
+                    opacity: 1,
+                },
+            } }, { children: [_jsx(ColumnProperties, { currentCell: position.target, title: "Column properties", editor: editor, icon: "more", variant: "small" }), _jsx(InsertColumnRight, { editor: editor, title: "Insert column right", variant: "small", icon: "plus" })] })) })));
 }
 function CellProperties(props) {
     var editor = props.editor, onClose = props.onClose;
@@ -317,7 +349,7 @@ function CellProperties(props) {
             icon: "close",
             iconColor: "error",
             onClick: onClose,
-        } }, { children: _jsxs(Flex, __assign({ sx: { flexDirection: "column", width: 200, px: 1, mb: 2 } }, { children: [_jsx(ColorPickerTool, { color: attributes.backgroundColor, title: "Background color", icon: "backgroundColor", onColorChange: function (color) {
+        } }, { children: _jsxs(Flex, __assign({ sx: { flexDirection: "column", px: 1, mb: 2 } }, { children: [_jsx(ColorPickerTool, { color: attributes.backgroundColor, title: "Background color", icon: "backgroundColor", onColorChange: function (color) {
                         return editor.commands.setCellAttribute("backgroundColor", color);
                     } }), _jsx(ColorPickerTool, { color: attributes.color, title: "Text color", icon: "textColor", onColorChange: function (color) {
                         return editor.commands.setCellAttribute("color", color);

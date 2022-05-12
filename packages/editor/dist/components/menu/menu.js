@@ -44,6 +44,9 @@ import { getPosition } from "./useMenu";
 import MenuItem from "./menuitem";
 // import { useMenuTrigger, useMenu, getPosition } from "../../hooks/useMenu";
 import Modal from "react-modal";
+import { BottomSheet } from "react-spring-bottom-sheet";
+import "react-spring-bottom-sheet/dist/style.css";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 // import { store as selectionStore } from "../../stores/selectionstore";
 function useMenuFocus(items, onAction, onClose) {
     var _a = __read(useState(-1), 2), focusIndex = _a[0], setFocusIndex = _a[1];
@@ -202,8 +205,18 @@ function MenuContainer(props) {
                     wordWrap: "break-word",
                 } }, { children: title }))), children] })));
 }
+export function PopupPresenter(props) {
+    var _a = props.mobile, mobile = _a === void 0 ? "menu" : _a, _b = props.desktop, desktop = _b === void 0 ? "menu" : _b, restProps = __rest(props, ["mobile", "desktop"]);
+    var isMobile = useIsMobile();
+    if (isMobile && mobile === "sheet")
+        return _jsx(ActionSheetPresenter, __assign({}, restProps));
+    else if (mobile === "menu" || desktop === "menu")
+        return _jsx(MenuPresenter, __assign({}, restProps));
+    else
+        return props.isOpen ? _jsx(_Fragment, { children: props.children }) : null;
+}
 export function MenuPresenter(props) {
-    var className = props.className, options = props.options, items = props.items, isOpen = props.isOpen, onClose = props.onClose, children = props.children, containerProps = __rest(props, ["className", "options", "items", "isOpen", "onClose", "children"]);
+    var className = props.className, _a = props.options, options = _a === void 0 ? { type: "menu", position: {} } : _a, _b = props.items, items = _b === void 0 ? [] : _b, isOpen = props.isOpen, _c = props.onClose, onClose = _c === void 0 ? function () { } : _c, children = props.children, containerProps = __rest(props, ["className", "options", "items", "isOpen", "onClose", "children"]);
     var position = options.position, type = options.type;
     var isAutocomplete = type === "autocomplete";
     var contentRef = useRef();
@@ -254,4 +267,8 @@ export function MenuPresenter(props) {
                 background: "transparent",
             },
         } }, { children: props.children ? (props.children) : (_jsx(Menu, __assign({ items: items, closeMenu: onClose }, containerProps))) })));
+}
+export function ActionSheetPresenter(props) {
+    var _a = props.items, items = _a === void 0 ? [] : _a, isOpen = props.isOpen, _b = props.onClose, onClose = _b === void 0 ? function () { } : _b, children = props.children, sx = props.sx, _c = props.blocking, blocking = _c === void 0 ? true : _c, containerProps = __rest(props, ["items", "isOpen", "onClose", "children", "sx", "blocking"]);
+    return (_jsx(BottomSheet, __assign({ open: isOpen, onDismiss: onClose, blocking: blocking }, { children: props.children ? (props.children) : (_jsx(Menu, __assign({ items: items, closeMenu: onClose, sx: __assign({ flex: 1, boxShadow: "none", border: "none" }, sx) }, containerProps))) })));
 }

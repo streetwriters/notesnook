@@ -14,6 +14,9 @@ import { MenuItem as MenuItemType /*ResolvedMenuItem*/ } from "./types";
 // import { useMenuTrigger, useMenu, getPosition } from "../../hooks/useMenu";
 import Modal from "react-modal";
 import { ThemeProvider } from "emotion-theming";
+import { BottomSheet } from "react-spring-bottom-sheet";
+import "react-spring-bottom-sheet/dist/style.css";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 // import { store as selectionStore } from "../../stores/selectionstore";
 
 function useMenuFocus(
@@ -258,20 +261,35 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
   );
 }
 
+export type PopupType = "sheet" | "menu" | "none";
+export type PopupPresenterProps = MenuPresenterProps &
+  ActionSheetPresenterProps & {
+    mobile?: PopupType;
+    desktop?: PopupType;
+  };
+export function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
+  const { mobile = "menu", desktop = "menu", ...restProps } = props;
+  const isMobile = useIsMobile();
+  if (isMobile && mobile === "sheet")
+    return <ActionSheetPresenter {...restProps} />;
+  else if (mobile === "menu" || desktop === "menu")
+    return <MenuPresenter {...restProps} />;
+  else return props.isOpen ? <>{props.children}</> : null;
+}
+
 export type MenuPresenterProps = MenuContainerProps & {
-  items: MenuItemType[];
-  options: MenuOptions;
+  items?: MenuItemType[];
+  onClose?: () => void;
   isOpen: boolean;
-  onClose: () => void;
-  className?: string;
+  options?: MenuOptions;
 };
 export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
   const {
     className,
-    options,
-    items,
+    options = { type: "menu", position: {} },
+    items = [],
     isOpen,
-    onClose,
+    onClose = () => {},
     children,
     ...containerProps
   } = props;
@@ -382,5 +400,45 @@ export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
         <Menu items={items} closeMenu={onClose} {...containerProps} />
       )}
     </Modal>
+  );
+}
+
+export type ActionSheetPresenterProps = MenuContainerProps & {
+  items?: MenuItemType[];
+  isOpen: boolean;
+  onClose?: () => void;
+  blocking?: boolean;
+};
+export function ActionSheetPresenter(
+  props: PropsWithChildren<ActionSheetPresenterProps>
+) {
+  const {
+    items = [],
+    isOpen,
+    onClose = () => {},
+    children,
+    sx,
+    blocking = true,
+    ...containerProps
+  } = props;
+
+  return (
+    <BottomSheet open={isOpen} onDismiss={onClose} blocking={blocking}>
+      {props.children ? (
+        props.children
+      ) : (
+        <Menu
+          items={items}
+          closeMenu={onClose}
+          sx={{
+            flex: 1,
+            boxShadow: "none",
+            border: "none",
+            ...sx,
+          }}
+          {...containerProps}
+        />
+      )}
+    </BottomSheet>
   );
 }

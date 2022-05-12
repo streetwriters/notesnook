@@ -12,11 +12,11 @@ type InlineToolProps = ToolProps & {
   onClick: (editor: Editor) => boolean;
 };
 function InlineTool(props: InlineToolProps) {
-  const { editor, title, id, icon, isToggled, onClick } = props;
+  const { editor, title, icon, isToggled, onClick } = props;
   return (
     <ToolButton
       title={title}
-      id={id}
+      id={icon}
       icon={icon}
       onClick={() => onClick(editor)}
       toggled={isToggled(editor)}
@@ -107,7 +107,7 @@ export function ClearFormatting(props: ToolProps) {
 }
 
 export function Link(props: ToolProps) {
-  const { editor, id, title, icon } = props;
+  const { editor, title, icon } = props;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const targetRef = useRef<HTMLElement>();
   const [isOpen, setIsOpen] = useState(false);
@@ -119,9 +119,9 @@ export function Link(props: ToolProps) {
   return (
     <>
       <ToolButton
+        id={icon}
         ref={buttonRef}
         title={title}
-        id={id}
         icon={icon}
         onClick={() => {
           if (isEditing) setHref(currentUrl);

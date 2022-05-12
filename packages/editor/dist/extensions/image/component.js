@@ -26,15 +26,15 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Box, Flex, Image, Text } from "rebass";
+import { Box, Flex, Image } from "rebass";
 import { NodeViewWrapper } from "@tiptap/react";
 import { ThemeProvider } from "emotion-theming";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { PopupPresenter, } from "../../components/menu/menu";
 import { Popup } from "../../toolbar/components/popup";
-import { Toggle } from "../../components/toggle";
-import { Input } from "@rebass/forms";
+import { ImageProperties } from "../../toolbar/popups/image-properties";
 export function ImageComponent(props) {
     var _a = props.node
         .attrs, src = _a.src, alt = _a.alt, title = _a.title, width = _a.width, height = _a.height, align = _a.align, float = _a.float;
@@ -75,23 +75,6 @@ export function ImageComponent(props) {
 function ImageToolbar(props) {
     var editor = props.editor, float = props.float, height = props.height, width = props.width;
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    var onSizeChange = useCallback(function (newWidth, newHeight) {
-        var size = newWidth
-            ? {
-                width: newWidth,
-                height: newWidth * (height / width),
-            }
-            : newHeight
-                ? {
-                    width: newHeight * (width / height),
-                    height: newHeight,
-                }
-                : {
-                    width: 0,
-                    height: 0,
-                };
-        editor.chain().setImageSize(size).run();
-    }, [width, height]);
     return (_jsxs(Flex, __assign({ sx: {
             flexDirection: "column",
             position: "absolute",
@@ -125,21 +108,10 @@ function ImageToolbar(props) {
                             mr: 1,
                             borderRight: "1px solid var(--border)",
                             ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
-                        } }, { children: _jsx(ToolButton, { toggled: isOpen, title: "Image properties", id: "imageProperties", icon: "more", onClick: function () { return setIsOpen(function (s) { return !s; }); } }) }))] })), isOpen && (_jsx(Popup, __assign({ title: "Image properties", action: {
-                    icon: "close",
-                    onClick: function () {
-                        setIsOpen(false);
-                    },
-                } }, { children: _jsxs(Flex, __assign({ sx: { width: 200, flexDirection: "column", p: 1 } }, { children: [_jsxs(Flex, __assign({ sx: { justifyContent: "space-between", alignItems: "center" } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: "Floating?" })), _jsx(Toggle, { checked: float, onClick: function () {
-                                        return editor
-                                            .chain()
-                                            .setImageAlignment({ float: !float, align: "left" })
-                                            .run();
-                                    } })] })), _jsxs(Flex, __assign({ sx: { alignItems: "center", mt: 2 } }, { children: [_jsx(Input, { type: "number", placeholder: "Width", value: width, sx: {
-                                        mr: 2,
-                                        p: 1,
-                                        fontSize: "body",
-                                    }, onChange: function (e) { return onSizeChange(e.target.valueAsNumber); } }), _jsx(Input, { type: "number", placeholder: "Height", value: height, sx: { p: 1, fontSize: "body" }, onChange: function (e) {
-                                        return onSizeChange(undefined, e.target.valueAsNumber);
-                                    } })] }))] })) })))] })));
+                        } }, { children: _jsx(ToolButton, { toggled: isOpen, title: "Image properties", id: "imageProperties", icon: "more", onClick: function () { return setIsOpen(function (s) { return !s; }); } }) }))] })), _jsx(PopupPresenter, __assign({ mobile: "sheet", desktop: "none", isOpen: isOpen, onClose: function () { return setIsOpen(false); }, blocking: false }, { children: _jsx(Popup, __assign({ title: "Image properties", action: {
+                        icon: "close",
+                        onClick: function () {
+                            setIsOpen(false);
+                        },
+                    } }, { children: _jsx(ImageProperties, __assign({}, props)) })) }))] })));
 }

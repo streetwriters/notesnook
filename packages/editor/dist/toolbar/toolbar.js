@@ -44,14 +44,20 @@ import { ThemeProvider } from "emotion-theming";
 import { EditorFloatingMenus } from "./floating-menus";
 import { getToolDefinition } from "./tool-definitions";
 import { ToolButton } from "./components/tool-button";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MenuPresenter } from "../components/menu";
 import { Popup } from "./components/popup";
-import { ToolbarContext, useToolbarContext, } from "./hooks/useToolbarContext";
+import { ToolbarContext, useToolbarContext } from "./hooks/useToolbarContext";
+import { useToolbarLocation, useToolbarStore, } from "./stores/toolbar-store";
 export function Toolbar(props) {
-    var editor = props.editor, theme = props.theme, accent = props.accent, scale = props.scale, location = props.location;
+    var editor = props.editor, theme = props.theme, accent = props.accent, scale = props.scale, location = props.location, isMobile = props.isMobile;
     var themeProperties = useTheme({ accent: accent, theme: theme, scale: scale });
     var _a = __read(useState(), 2), currentPopup = _a[0], setCurrentPopup = _a[1];
+    var _b = useToolbarStore(), setIsMobile = _b.setIsMobile, setToolbarLocation = _b.setToolbarLocation;
+    useEffect(function () {
+        setIsMobile(isMobile || false);
+        setToolbarLocation(location);
+    }, [isMobile, location]);
     var tools = [
         ["insertBlock"],
         [
@@ -75,7 +81,10 @@ export function Toolbar(props) {
     ];
     if (!editor)
         return null;
-    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(ToolbarContext.Provider, __assign({ value: { setCurrentPopup: setCurrentPopup, currentPopup: currentPopup, toolbarLocation: location } }, { children: _jsx(Flex, __assign({ className: "editor-toolbar", sx: { flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] } }, { children: tools.map(function (tools) {
+    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(ToolbarContext.Provider, __assign({ value: {
+                    setCurrentPopup: setCurrentPopup,
+                    currentPopup: currentPopup,
+                } }, { children: _jsx(Flex, __assign({ className: "editor-toolbar", sx: { flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] } }, { children: tools.map(function (tools) {
                         return (_jsx(ToolbarGroup, { tools: tools, editor: editor, sx: {
                                 flexShrink: 0,
                                 pr: 2,
@@ -94,13 +103,14 @@ function ToolbarGroup(props) {
             else {
                 var Component = findToolById(toolId);
                 var toolDefinition = getToolDefinition(toolId);
-                return _jsx(Component, __assign({ editor: editor, id: toolId }, toolDefinition));
+                return _jsx(Component, __assign({ editor: editor }, toolDefinition));
             }
         }) })));
 }
 function MoreTools(props) {
     var popupId = props.popupId;
-    var _a = useToolbarContext(), currentPopup = _a.currentPopup, setCurrentPopup = _a.setCurrentPopup, toolbarLocation = _a.toolbarLocation;
+    var _a = useToolbarContext(), currentPopup = _a.currentPopup, setCurrentPopup = _a.setCurrentPopup;
+    var toolbarLocation = useToolbarLocation();
     var buttonRef = useRef();
     var show = popupId === currentPopup;
     var setShow = function (state) {

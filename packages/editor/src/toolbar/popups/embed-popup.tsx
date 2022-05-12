@@ -100,7 +100,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
         },
       }}
     >
-      <Flex sx={{ width: 300, flexDirection: "column", p: 1 }}>
+      <Flex sx={{ flexDirection: "column", p: 1 }}>
         {error && (
           <Text
             variant={"error"}
@@ -115,23 +115,31 @@ export function EmbedPopup(props: EmbedPopupProps) {
           </Text>
         )}
         {/* <Flex sx={{ position: "relative", alignItems: "center" }}> */}
-        <Flex>
+        <Flex sx={{ mb: 1 }}>
           <Button
             variant={"dialog"}
             sx={{
-              p: 1,
+              pb: 1,
               mr: 1,
+              borderRadius: 0,
               color: embedSource === "url" ? "primary" : "text",
+              borderBottom: "2px solid",
+              borderBottomColor:
+                embedSource === "url" ? "primary" : "transparent",
             }}
             onClick={() => setEmbedSource("url")}
           >
-            From link
+            From URL
           </Button>
           <Button
             variant={"dialog"}
             sx={{
-              p: 1,
+              pb: 1,
+              borderRadius: 0,
               color: embedSource === "code" ? "primary" : "text",
+              borderBottom: "2px solid",
+              borderBottomColor:
+                embedSource === "code" ? "primary" : "transparent",
             }}
             onClick={() => setEmbedSource("code")}
           >
@@ -140,31 +148,30 @@ export function EmbedPopup(props: EmbedPopupProps) {
         </Flex>
         {embedSource === "url" ? (
           <Input
-            placeholder="Embed source URL"
+            placeholder="Enter embed source URL"
             value={src}
             autoFocus
             onChange={(e) => setSrc(e.target.value)}
-            sx={{ p: 1, mt: 1, fontSize: "body" }}
+            sx={{ mt: 1, fontSize: "body" }}
           />
         ) : (
           <Textarea
             autoFocus
             variant={"forms.input"}
             sx={{ fontSize: "subBody", fontFamily: "monospace", mt: 1 }}
-            minHeight={100}
+            minHeight={[200, 100]}
             onChange={(e) => setSrc(e.target.value)}
             placeholder="Paste embed code here. Only iframes are supported."
           />
         )}
         {embedSource === "url" ? (
-          <Flex sx={{ alignItems: "center", mt: 2 }}>
+          <Flex sx={{ alignItems: "center", mt: 1 }}>
             <Input
               type="number"
               placeholder="Width"
               value={width}
               sx={{
-                mr: 2,
-                p: 1,
+                mr: 1,
                 fontSize: "body",
               }}
               onChange={(e) => onSizeChange(e.target.valueAsNumber)}
@@ -173,7 +180,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               type="number"
               placeholder="Height"
               value={height}
-              sx={{ p: 1, fontSize: "body" }}
+              sx={{ fontSize: "body" }}
               onChange={(e) => onSizeChange(undefined, e.target.valueAsNumber)}
             />
           </Flex>
