@@ -10,3 +10,4 @@ Supported providers:
 6. Standard Notes
 7. OneNote
 8. Zoho Notebook
+9. Joplin

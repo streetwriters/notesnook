@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/importer",
   "private": false,
-  "version": "1.2.3",
+  "version": "1.3.0",
   "main": "dist/index.js",
   "description": "Convert notes from various note taking apps into a simple & standard format.",
   "scripts": {
