@@ -1,2 +1,1 @@
-1. 🥳 Added OneNote support! 🥳
-2. 🥳 Added Zoho Notebook support! 🥳
+1. 🥳 Added Joplin support! 🥳
