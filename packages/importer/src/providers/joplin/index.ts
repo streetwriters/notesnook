@@ -7,20 +7,19 @@ import {
   ProviderSettings,
 } from "../provider";
 import { parse } from "node-html-parser";
-import BaseItem from "@joplin/lib/models/BaseItem";
 import {
   NoteEntity,
   FolderEntity,
-  NoteResourceEntity,
   TagEntity,
   NoteTagEntity,
   ResourceEntity,
-} from "@joplin/lib/services/database/types";
+} from "./types";
 import showdown from "showdown";
 import { Attachment, attachmentToHTML } from "../../models/attachment";
 import { HTMLRootElement } from "node-html-parser/dist/nodes/html";
 import { IHasher } from "../../utils/hasher";
 import { unserialize } from "./helpers";
+import { ModelType } from "./types";
 
 const converter = new showdown.Converter();
 
@@ -30,12 +29,11 @@ type JoplinData = {
   folders: FolderEntity[];
   tags: TagEntity[];
   resources: ResourceEntity[];
-  noteResources: NoteResourceEntity[];
 };
 
 export class Joplin implements IFileProvider {
   type: "file" = "file";
-  public supportedExtensions = [".jex"];
+  public supportedExtensions = [".jex", ".md"];
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";
   public name = "Joplin";
@@ -46,33 +44,28 @@ export class Joplin implements IFileProvider {
   ): Promise<ProviderResult> {
     const data: JoplinData = {
       folders: [],
-      noteResources: [],
       noteTags: [],
       notes: [],
       resources: [],
       tags: [],
     };
     const notes: Note[] = [];
-
     await iterate(this, files, async (file) => {
       const item = await unserialize(file.text);
       switch (item.type_) {
-        case BaseItem.TYPE_NOTE:
+        case ModelType.Note:
           data.notes.push(item);
           break;
-        case BaseItem.TYPE_NOTE_TAG:
+        case ModelType.NoteTag:
           data.noteTags.push(item);
           break;
-        case BaseItem.TYPE_NOTE_RESOURCE:
-          data.noteResources.push(item);
-          break;
-        case BaseItem.TYPE_RESOURCE:
+        case ModelType.Resource:
           data.resources.push(item);
           break;
-        case BaseItem.TYPE_TAG:
+        case ModelType.Tag:
           data.tags.push(item);
           break;
-        case BaseItem.TYPE_FOLDER:
+        case ModelType.Folder:
           data.folders.push(item);
           break;
       }

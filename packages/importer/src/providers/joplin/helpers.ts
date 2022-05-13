@@ -1,4 +1,4 @@
-import BaseModel, { ModelType } from "@joplin/lib/BaseModel";
+import { ModelType } from "./types";
 
 // Taken from https://github.com/laurent22/joplin/blob/6f1a806e5c7159a544de5d997b189e0e83a9d8ea/packages/lib/models/BaseItem.ts#L477-L523
 export async function unserialize(content: string) {
@@ -38,7 +38,7 @@ export async function unserialize(content: string) {
     output.title = title[0];
   }
 
-  if (output.type_ === BaseModel.TYPE_NOTE) output.body = body.join("\n");
+  if (output.type_ === ModelType.Note) output.body = body.join("\n");
 
   for (const n in output) {
     if (!output.hasOwnProperty(n)) continue;
