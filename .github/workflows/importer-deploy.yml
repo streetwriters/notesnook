@@ -27,8 +27,8 @@ jobs:
         with:
           node-version: 16.x
       - run: |
-          cd apps/importer
           npm i
+          cd apps/importer
           npm run build
           mv ./build/ ./public_html/
 

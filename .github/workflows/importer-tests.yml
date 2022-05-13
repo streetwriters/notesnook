@@ -27,6 +27,6 @@ jobs:
         with:
           node-version: 16.x
       - run: |
-          cd packages/importer
           npm i
+          cd packages/importer
           npm run test
