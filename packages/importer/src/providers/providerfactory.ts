@@ -6,6 +6,7 @@ import { GoogleKeep } from "./keep";
 import { Simplenote } from "./simplenote";
 import { ZohoNotebook } from "./zohonotebook";
 import { OneNote } from "./onenote";
+import { Joplin } from "./joplin";
 
 const providerMap = {
   evernote: Evernote,
@@ -16,18 +17,10 @@ const providerMap = {
   onenote: OneNote,
   standardnotes: StandardNotes,
   zohonotebook: ZohoNotebook,
+  joplin: Joplin,
 };
 
-type ProvidersMap = {
-  evernote: Evernote;
-  md: Markdown;
-  html: HTML;
-  keep: GoogleKeep;
-  simplenote: Simplenote;
-  onenote: OneNote;
-  standardnotes: StandardNotes;
-  zohonotebook: ZohoNotebook;
-};
+type ProvidersMap = typeof providerMap;
 
 export type Providers = keyof ProvidersMap;
 
@@ -38,8 +31,8 @@ export class ProviderFactory {
 
   static getProvider<TProvider extends Providers>(
     provider: TProvider
-  ): ProvidersMap[TProvider] {
-    const Provider = <unknown>new providerMap[provider]();
-    return <ProvidersMap[TProvider]>Provider;
+  ): InstanceType<ProvidersMap[TProvider]> {
+    const Provider = new providerMap[provider]();
+    return Provider as InstanceType<ProvidersMap[TProvider]>;
   }
 }
