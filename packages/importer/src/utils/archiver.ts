@@ -25,17 +25,24 @@ type Unpacker = (file: IFile) => IFile[];
 
 const unpackers: Record<string, Unpacker> = {
   ".zip": unzip,
+  ".jex": untar,
   ".znote": untar,
 };
 
 function isArchive(file: IFile) {
-  return file.name.endsWith(".zip") || file.name.endsWith(".znote");
+  for (let unpacker in unpackers) {
+    if (file.name.endsWith(unpacker)) return true;
+  }
+  return false;
 }
 
 export function unpack(files: IFile[], root?: string): File[] {
   const extracted: File[] = [];
 
   for (let file of files) {
+    if (file.path && root) file.path = path.join(root, file.path);
+    extracted.push(new File(file));
+
     if (isArchive(file)) {
       try {
         const root = path.basename(file.name, "");
@@ -45,9 +52,6 @@ export function unpack(files: IFile[], root?: string): File[] {
         console.error(e);
         continue;
       }
-    } else {
-      if (file.path && root) file.path = path.join(root, file.path);
-      extracted.push(new File(file));
     }
   }
 
