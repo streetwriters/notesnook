@@ -5,7 +5,8 @@
   "description": "All the custom made or modified plugins for TinyMCE used in Notesnook & other apps maintained by Streetwriters team.",
   "main": "index.js",
   "scripts": {
-    "test": "node scripts/testHarness.js"
+    "test": "node scripts/testHarness.js",
+    "build": "echo \"Noop.\""
   },
   "keywords": [
     "tinymce",

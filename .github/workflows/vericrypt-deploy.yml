@@ -27,9 +27,9 @@ jobs:
         with:
           node-version: 16.x
       - run: |
-          cd apps/vericrypt
           npm i
-          npm run build
+          npx turbo run build
+          cd apps/vericrypt
           mv ./build/ ./public_html/
 
       - uses: blbecker/rsync-deploy@v1.0

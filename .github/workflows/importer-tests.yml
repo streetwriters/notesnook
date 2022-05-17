@@ -28,5 +28,6 @@ jobs:
           node-version: 16.x
       - run: |
           npm i
+          npx turbo run build
           cd packages/importer
           npm run test

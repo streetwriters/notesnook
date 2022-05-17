@@ -18,14 +18,14 @@
   },
   "author": "Abdullah Atta <abdullahatta@streetwriters.co>",
   "license": "MIT",
-  "dependencies": {
-    "base64-arraybuffer": "^1.0.2",
-    "node-html-parser": "github:thecodrr/node-html-parser",
-    "spark-md5": "^3.0.2"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/streetwriters/notesnook.git",
     "directory": "packages/znel"
+  },
+  "dependencies": {
+    "base64-arraybuffer": "^1.0.2",
+    "node-html-parser": "github:thecodrr/node-html-parser",
+    "spark-md5": "^3.0.2"
   }
 }

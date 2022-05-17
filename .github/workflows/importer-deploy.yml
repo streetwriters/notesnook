@@ -28,6 +28,7 @@ jobs:
           node-version: 16.x
       - run: |
           npm i
+          npx turbo run build
           cd apps/importer
           npm run build
           mv ./build/ ./public_html/
