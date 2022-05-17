@@ -1,1 +1,2 @@
 1. 🥳 Added Joplin support! 🥳
+2. Optimize for mobile screens

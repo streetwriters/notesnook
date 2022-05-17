@@ -6,8 +6,8 @@ export function Hero() {
     <Flex
       sx={{
         flexDirection: "column",
-        mt: 150,
-        mb: 100,
+        mt: [50, 150],
+        mb: [50, 100],
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -20,6 +20,7 @@ export function Hero() {
           fontSize: "title",
           textAlign: "center",
           color: "fontTertiary",
+          mt: [2, 0],
         }}
       >
         Import your notes from any notes app into Notesnook.
@@ -47,7 +48,7 @@ export function Hero() {
         sx={{
           bg: "bgSecondary",
           flexDirection: "column",
-          width: 400,
+          width: ["90%", 400],
           mt: 4,
           p: 2,
           borderRadius: "default",

@@ -8,7 +8,7 @@ export function StepContainer({
   return (
     <Flex
       sx={{
-        width: "40%",
+        width: ["90%", "40%"],
         boxShadow: "0px 0px 20px 0px #00000011",
         p: 4,
         borderRadius: "default",
