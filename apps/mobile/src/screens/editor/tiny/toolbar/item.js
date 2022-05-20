@@ -32,6 +32,7 @@ import {
 import ToolbarItemPin from './itempin';
 import ToolbarListFormat from './listformat';
 import { Table } from './table';
+import { editorState } from '../../tiptap/utils';
 
 const ToolbarItem = ({
   format,
@@ -90,7 +91,7 @@ const ToolbarItem = ({
     properties.selection = data;
     let formats = Object.keys(data);
     if (!data['link'] && type === 'tooltip') {
-      if (editing.tooltip) {
+      if (editorState().tooltip) {
         eSendEvent('showTooltip');
       }
     }
@@ -203,9 +204,9 @@ const ToolbarItem = ({
   const onPress = async event => {
     if (premium && !isPro) {
       let user = await db.user.getUser();
-      if (editing.isFocused) {
+      if (editorState().isFocused) {
         safeKeyboardDismiss();
-        editing.isFocused = true;
+        editorState().isFocused = true;
       }
       if (user && !isPro && !user.isEmailConfirmed) {
         PremiumService.showVerifyEmailDialog();
@@ -223,15 +224,15 @@ const ToolbarItem = ({
     }
 
     if (type === 'settings') {
-      if (editing.isFocused) {
+      if (editorState().isFocused) {
         safeKeyboardDismiss();
-        editing.isFocused = true;
+        editorState().isFocused = true;
       }
       eSendEvent('openEditorSettings');
       return;
     }
 
-    if (editing.tooltip === format && !formatValue) {
+    if (editorState().tooltip === format && !formatValue) {
       focusEditor(format);
       eSendEvent('showTooltip');
 
@@ -316,7 +317,7 @@ const ToolbarItem = ({
     }
 
     focusEditor(format);
-    editing.tooltip = null;
+    editorState().tooltip = null;
   };
 
   const isdefaultColorFormat = /^(dhilitecolor|dforecolor)$/.test(format);

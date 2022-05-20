@@ -11,14 +11,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
 import { PremiumToast } from '../../components/premium/premium-toast';
 import { DDS } from '../../services/device-detection';
-import { useSettingStore } from '../../stores/use-setting-store';
 import { useNoteStore } from '../../stores/use-notes-store';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
-import { editing } from '../../utils';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
 import EditorOverlay from './EditorOverlay';
-import { checkStatus, textInput } from './Functions';
+import { editorController, editorState, textInput } from './tiptap/utils';
 
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore(state => state.colors);
@@ -29,8 +28,8 @@ export const EditorWrapper = ({ width }) => {
 
   const onAppStateChanged = async state => {
     if (state === 'active') {
-      if (!editing.movedAway) {
-        await checkStatus(false);
+      if (!editorState().movedAway) {
+        editorController.current.onReady();
       }
     }
   };

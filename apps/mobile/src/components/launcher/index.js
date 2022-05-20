@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { NativeModules, Platform, StatusBar, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
+import { editorState } from '../../screens/editor/tiptap/utils';
 import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
+import BackupService from '../../services/backup';
 import BiometricService from '../../services/biometrics';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
@@ -10,13 +12,12 @@ import { setRateAppMessage } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
 import { initialize } from '../../stores';
-import { useUserStore } from '../../stores/use-user-store';
-import { useMessageStore } from '../../stores/use-message-store';
-import { useSettingStore } from '../../stores/use-setting-store';
 import { useFavoriteStore } from '../../stores/use-favorite-store';
+import { useMessageStore } from '../../stores/use-message-store';
 import { useNoteStore } from '../../stores/use-notes-store';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
-import { editing } from '../../utils';
+import { useUserStore } from '../../stores/use-user-store';
 import { db } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
 import { eOpenAnnouncementDialog } from '../../utils/events';
@@ -25,6 +26,7 @@ import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { SVG } from '../auth/background';
 import Intro from '../intro';
+import NewFeature from '../sheets/new-feature/index';
 import { Update } from '../sheets/update';
 import { Button } from '../ui/button';
 import { IconButton } from '../ui/icon-button';
@@ -34,8 +36,6 @@ import { SvgView } from '../ui/svg';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { Walkthrough } from '../walkthroughs';
-import NewFeature from '../sheets/new-feature/index';
-import BackupService from '../../services/backup';
 
 const Launcher = React.memo(
   () => {
@@ -184,9 +184,9 @@ const Launcher = React.memo(
           !appState.movedAway &&
           Date.now() < appState.timestamp + 3600000
         ) {
-          editing.isRestoringState = true;
-          editing.currentlyEditing = true;
-          editing.movedAway = false;
+          editorState().currentlyEditing = true;
+          editorState().isRestoringState = true;
+          editorState().movedAway = false;
           if (!DDS.isTab) {
             tabBarRef.current?.goToPage(1);
           }

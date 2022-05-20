@@ -14,6 +14,7 @@ import tiny from '../tiny';
 import { execCommands } from './commands';
 import { focusEditor, formatSelection, INPUT_MODE, properties } from './constants';
 import LinkPreview from './linkpreview';
+import { editorState } from '../../tiptap/utils';
 
 let inputValue = null;
 
@@ -30,11 +31,11 @@ const ToolbarLinkInput = ({ format, value, setVisible }) => {
     }
     inputValue = value;
     properties.inputMode = value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING;
-    editing.tooltip = format;
+    editorState().tooltip = format;
     properties.userBlur = false;
     return () => {
       properties.inputMode = null;
-      editing.tooltip = null;
+      editorState().tooltip = null;
       inputValue = null;
     };
   }, [format]);
@@ -87,7 +88,7 @@ const ToolbarLinkInput = ({ format, value, setVisible }) => {
       tiny.call(EditorWebView, tiny.clearRange);
     }
 
-    editing.tooltip = null;
+    editorState().tooltip = null;
 
     if (inputValue) {
       properties.pauseSelectionChange = true;

@@ -11,23 +11,9 @@ import {
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
-import { editing } from '..';
 import { Walkthrough } from '../../components/walkthroughs';
-import {
-  EditorWebView,
-  getNote,
-  getWebviewInit,
-  updateNoteInEditor
-} from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
+import { editorState } from '../../screens/editor/tiptap/utils';
 import BiometricService from '../../services/biometrics';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  presentSheet,
-  ToastEvent
-} from '../../services/event-manager';
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -36,6 +22,10 @@ import {
 } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
+import { updateStatusBarColor } from '../color-scheme';
+import { db } from '../database';
+import { MMKV } from '../database/mmkv';
+import { eClearEditor, eCloseProgressDialog, refreshNotesPage } from '../events';
 import Sync from '../../services/sync';
 import { clearAllStores, initialize } from '../../stores';
 import { useUserStore } from '../../stores/use-user-store';
@@ -43,11 +33,13 @@ import { useMessageStore } from '../../stores/use-message-store';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useAttachmentStore } from '../../stores/use-attachment-store';
 import { useNoteStore } from '../../stores/use-notes-store';
-import { updateStatusBarColor } from '../color-scheme';
-import { db } from '../database';
-import { MMKV } from '../database/mmkv';
-import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage } from '../events';
-import { sleep } from '../time';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from '../../services/event-manager';
+import { useEditorStore } from '../../stores/use-editor-store';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -68,15 +60,15 @@ export const useAppEvents = () => {
 
   const onMediaDownloaded = ({ hash, groupId, src }) => {
     if (groupId?.startsWith('monograph')) return;
-    tiny.call(
-      EditorWebView,
-      `
-        (function(){
-          let image = ${JSON.stringify({ hash, src })};
-          tinymce.activeEditor._replaceImage(image);
-        })();
-        `
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `
+    //     (function(){
+    //       let image = ${JSON.stringify({ hash, src })};
+    //       tinymce.activeEditor._replaceImage(image);
+    //     })();
+    //     `
+    // );
   };
 
   const onLoadingAttachmentProgress = data => {
@@ -188,8 +180,10 @@ export const useAppEvents = () => {
     setLastSynced(await db.lastSynced());
     setSyncing(false);
     eSendEvent(eCloseProgressDialog, 'sync_progress');
-    if (getNote()) {
-      await updateNoteInEditor();
+    let id = useEditorStore.getState().currentEditingNote;
+    let note = id && db.notes.note(id).data;
+    if (note) {
+      //await updateNoteInEditor();
     }
   };
 
@@ -366,9 +360,7 @@ export const useAppEvents = () => {
       await reconnectSSE();
 
       await checkIntentState();
-      if (getWebviewInit()) {
-        await MMKV.removeItem('appState');
-      }
+      await MMKV.removeItem('appState');
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
         try {
@@ -380,7 +372,9 @@ export const useAppEvents = () => {
       }
     } else {
       refValues.current.prevState = 'background';
-      if (getNote()?.locked && SettingsService.get().appLockMode === 'background') {
+      let id = useEditorStore.getState().currentEditingNote;
+      let note = id && db.notes.note(id).data;
+      if (note?.locked && SettingsService.get().appLockMode === 'background') {
         eSendEvent(eClearEditor);
       }
       await storeAppState();
@@ -421,12 +415,14 @@ export const useAppEvents = () => {
   }
 
   async function storeAppState() {
-    if (editing.currentlyEditing) {
-      if (getNote()?.locked) return;
+    if (editorState().currentlyEditing) {
+      let id = useEditorStore.getState().currentEditingNote;
+      let note = id && db.notes.note(id).data;
+      if (note?.locked) return;
       let state = JSON.stringify({
-        editing: editing.currentlyEditing,
-        note: getNote(),
-        movedAway: editing.movedAway,
+        editing: editorState().currentlyEditing,
+        note: note,
+        movedAway: editorState().movedAway,
         timestamp: Date.now()
       });
       MMKV.setString('appState', state);
@@ -449,7 +445,9 @@ export const useAppEvents = () => {
         eSendEvent(refreshNotesPage);
       }
       if (notesAddedFromIntent || shareExtensionOpened) {
-        eSendEvent('loadingNote', getNote());
+        let id = useEditorStore.getState().currentEditingNote;
+        let note = id && db.notes.note(id).data;
+        eSendEvent('loadingNote', note);
         eSendEvent('webviewreset', true);
         MMKV.removeItem('shareExtensionOpened');
       }

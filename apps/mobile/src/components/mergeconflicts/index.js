@@ -30,6 +30,7 @@ import DialogContainer from '../dialog/dialog-container';
 import DialogHeader from '../dialog/dialog-header';
 import Seperator from '../ui/seperator';
 import Paragraph from '../ui/typography/paragraph';
+import { editorController } from '../../screens/editor/tiptap/utils';
 
 const primaryWebView = createRef();
 const secondaryWebView = createRef();
@@ -155,7 +156,6 @@ const MergeConflicts = () => {
         id: null
       });
     }
-    eSendEvent(refreshNotesPage);
     Navigation.queueRoutesForUpdate(
       'Notes',
       'Favorites',
@@ -163,8 +163,8 @@ const MergeConflicts = () => {
       'TaggedNotes',
       'TopicNotes'
     );
-    if (getNote()?.id === note.id) {
-      updateNoteInEditor();
+    if (editorController.current?.note?.id === note.id) {
+      //TODO
     }
     close();
     await Sync.run();

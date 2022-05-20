@@ -13,6 +13,7 @@ import { EditorWebView, getNote } from '../../Functions';
 import tiny from '../tiny';
 import { endSearch } from './commands';
 import { properties } from './constants';
+import { editorController } from '../../tiptap/utils';
 
 const SearcReplace = () => {
   const colors = useThemeStore(state => state.colors);
@@ -196,7 +197,7 @@ const SearcReplace = () => {
         fwdRef={switchModeRef}
         iconColor={enableReplace ? colors.accent : colors.icon}
         onPress={() => {
-          if (getNote()?.readonly) return;
+          if (editorController.current?.note?.readonly) return;
           hideAllTooltips();
           if (enableReplace) {
             if (focusType === 2) {

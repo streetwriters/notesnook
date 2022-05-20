@@ -30,6 +30,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'off',
     'prefer-const': 'off',
     'no-empty': 'off',
+    'react/no-unescaped-entities': 'off',
     'react/prop-types': 0,
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx', 'ts', 'tsx'] }],
     'prettier/prettier': [

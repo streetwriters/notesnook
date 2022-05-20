@@ -13,6 +13,7 @@ import { sleep } from '../../utils/time';
 import { Button } from '../ui/button';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { editorState } from '../../screens/editor/tiptap/utils';
 
 export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
   const colors = useThemeStore(state => state.colors);
@@ -50,7 +51,7 @@ export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
   const onPress = async () => {
     open(null);
     eSendEvent(eCloseActionSheet);
-    if (editing.isFocused) {
+    if (editorState().isFocused) {
       tiny.call(EditorWebView, tiny.blur);
     }
     await sleep(300);

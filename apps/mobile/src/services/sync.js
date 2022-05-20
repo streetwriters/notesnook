@@ -6,6 +6,7 @@ import { useUserStore } from '../stores/use-user-store';
 import { doInBackground } from '../utils';
 import { db } from '../utils/database';
 import { ToastEvent } from './event-manager';
+import { editorController } from '../screens/editor/tiptap/utils';
 
 export const ignoredMessages = ['Sync already running', 'Not allowed to start service intent'];
 
@@ -52,7 +53,7 @@ const run = async (context = 'global', forced = false, full = true) => {
   } finally {
     userstore.setLastSynced(await db.lastSynced());
     initialize();
-    if (getNote()?.id) {
+    if (editorController.current?.note?.id) {
       await updateNoteInEditor();
     }
     db.eventManager.publish(EVENTS.syncCompleted);

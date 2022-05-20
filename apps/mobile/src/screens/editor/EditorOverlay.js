@@ -6,10 +6,10 @@ import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
-import { editing } from '../../utils';
 import { eOnLoadNote } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { timeConverter } from '../../utils/time';
+import { editorState } from './tiptap/utils';
 
 let timer = null;
 let timerError = null;
@@ -27,7 +27,7 @@ const EditorOverlay = () => {
   });
 
   const load = async _loading => {
-    editing.overlay = true;
+    editorState().overlay = true;
     clearTimeout(timer);
     clearTimeout(timerError);
     clearTimeout(timerClosing);
@@ -47,7 +47,7 @@ const EditorOverlay = () => {
       clearTimeout(timerError);
       clearTimeout(timerClosing);
       setError(false);
-      editing.overlay = false;
+      editorState().overlay = false;
       opacity.value = withTiming(0, { duration: 150 });
       timerClosing = setTimeout(() => {
         setLoading(null);

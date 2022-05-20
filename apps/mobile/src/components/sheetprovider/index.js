@@ -14,6 +14,7 @@ import { Button } from '../ui/button';
 import SheetWrapper from '../ui/sheet';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { editorState } from '../../screens/editor/tiptap/utils';
 
 const SheetProvider = ({ context = 'global' }) => {
   const colors = useThemeStore(state => state.colors);
@@ -45,7 +46,7 @@ const SheetProvider = ({ context = 'global' }) => {
     setVisible(true);
     if (data.editor) {
       editor.current.refocus = false;
-      if (editing.keyboardState) {
+      if (editorState().keyboardState) {
         tiny.call(EditorWebView, tiny.cacheRange + tiny.blur);
         editor.current.refocus = true;
       }
@@ -59,8 +60,8 @@ const SheetProvider = ({ context = 'global' }) => {
         actionSheetRef.current?.setModalVisible(true);
         return;
       } else {
-        if (editor.current.refocus) {
-          editing.isFocused = true;
+        if (editor.current?.refocus) {
+          editorState().isFocused = true;
           await reFocusEditor();
           tiny.call(EditorWebView, tiny.restoreRange + tiny.clearRange);
           editor.current.refocus = false;

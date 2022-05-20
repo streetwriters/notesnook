@@ -1,9 +1,8 @@
 import { EV, EVENTS } from 'notes-core/common';
 import React, { useEffect, useRef } from 'react';
-import { BackHandler, InteractionManager, Keyboard, Platform, Vibration, View } from 'react-native';
+import { BackHandler, InteractionManager, Platform, Vibration, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
-import { IconButton } from '../../components/ui/icon-button';
 import { Properties } from '../../components/properties';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { useUserStore } from '../../stores/use-user-store';
@@ -17,7 +16,7 @@ import {
   ToastEvent
 } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
-import { editing } from '../../utils';
+import umami from '../../utils/analytics';
 import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
 import {
@@ -29,18 +28,16 @@ import {
   eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/events';
-import useEditorTags from '../../utils/hooks/useEditorTags';
 import { tabBarRef } from '../../utils/global-refs';
-import umami from '../../utils/analytics';
 import { EditorTitle } from './EditorTitle';
-import { clearEditor, getNote, loadNote, setColors, startClosingSession } from './Functions';
 import { ProgressCircle } from './ProgressCircle';
-import tiny, { safeKeyboardDismiss } from './tiny/tiny';
+import { safeKeyboardDismiss } from './tiny/tiny';
 import { endSearch } from './tiny/toolbar/commands';
-import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
+import { editorController, editorState } from './tiptap/utils';
+import { IconButton } from '../../components/ui/icon-button';
 
-const EditorHeader = () => {
+const EditorHeader = ({ editor }) => {
   const colors = useThemeStore(state => state.colors);
   const deviceMode = useSettingStore(state => state.deviceMode);
   const currentlyEditingNote = useEditorStore(state => state.currentEditingNote);
@@ -50,59 +47,36 @@ const EditorHeader = () => {
   const handleBack = useRef();
   const keyboardListener = useRef();
   const closing = useRef(false);
-  const editorTags = useEditorTags();
   const searchReplace = useEditorStore(state => state.searchReplace);
   const readonly = useEditorStore(state => state.readonly);
 
-  useEffect(() => {
-    setColors(colors);
-  }, [colors]);
-
   const _onBackPress = async () => {
-    editing.lastClosedTime = Date.now();
-    if (deviceMode === 'mobile') {
-      startClosingSession();
-    }
     setTimeout(async () => {
-      closing.current = true;
       if (deviceMode !== 'mobile' && fullscreen) {
-        eSendEvent(eCloseFullscreenEditor);
-        return;
-      }
-      if (deviceMode === 'mobile') {
-        editing.movedAway = true;
-      }
-      eSendEvent('showTooltip');
-      toolbarRef.current?.scrollTo({
-        x: 0,
-        y: 0,
-        animated: false
-      });
-      editing.isFocused = false;
-      editing.currentlyEditing = false;
-      editing.focusType = null;
-      safeKeyboardDismiss();
-      if (deviceMode !== 'mobile') {
         if (fullscreen) {
           eSendEvent(eCloseFullscreenEditor);
         }
-      } else {
-        startClosingSession();
-        if (deviceMode === 'mobile') {
-          tabBarRef.current?.goToPage(0);
-        }
-        eSendEvent('historyEvent', {
-          undo: 0,
-          redo: 0
-        });
-        setTimeout(() => {
-          useEditorStore.getState().setCurrentlyEditingNote(null);
-        }, 1);
-        keyboardListener.current?.remove();
-        await clearEditor();
-        BackHandler.removeEventListener('hardwareBackPress', _onHardwareBackPress);
+        return;
       }
-      closing.current = false;
+
+      if (deviceMode === 'mobile') {
+        editorState().movedAway = true;
+        tabBarRef.current?.goToPage(0);
+      }
+      eSendEvent('historyEvent', {
+        undo: 0,
+        redo: 0
+      });
+      setImmediate(() => useEditorStore.getState().setCurrentlyEditingNote(null));
+      editorState().currentlyEditing = false;
+      keyboardListener.current?.remove();
+      editor?.reset();
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+        Navigation.routeNames.Notebook
+      ]);
     }, 1);
   };
 
@@ -129,7 +103,7 @@ const EditorHeader = () => {
       return;
     }
 
-    let note = getNote() && db.notes.note(getNote().id).data;
+    let note = db.notes.note(editorController.current?.note.current?.id)?.data;
     if (note.locked) {
       ToastEvent.show({
         heading: 'Locked notes cannot be published',
@@ -138,15 +112,15 @@ const EditorHeader = () => {
       });
       return;
     }
-    if (editing.isFocused) {
+    if (editorState().isFocused) {
       safeKeyboardDismiss();
-      editing.isFocused = true;
+      editorState().isFocused = true;
     }
     eSendEvent(eOpenPublishNoteDialog, note);
   };
 
   const showActionsheet = async () => {
-    let note = getNote() && db.notes.note(getNote().id).data;
+    let note = db.notes.note(editorController.current?.note?.current)?.data;
 
     if (!note) {
       ToastEvent.show({
@@ -158,9 +132,9 @@ const EditorHeader = () => {
       return;
     }
 
-    if (editing.isFocused || editing.keyboardState) {
+    if (editorState().isFocused || editorState().keyboardState) {
       safeKeyboardDismiss();
-      editing.isFocused = true;
+      editorState().isFocused = true;
     }
 
     Properties.present(note, ['Dark Mode']);
@@ -177,21 +151,7 @@ const EditorHeader = () => {
     };
   }, []);
 
-  const onNoteRemoved = async id => {
-    // try {
-    //   return;
-    //   // console.log('NOTE REMOVED', id);
-    //   // await db.notes.remove(id);
-    //   // if (id !== getNote().id) return;
-    //   // Navigation.queueRoutesForUpdate([
-    //   //   Navigation.routeNames.Favorites,
-    //   //   Navigation.routeNames.Notes,
-    //   //   Navigation.routeNames.NotesPage,
-    //   //   Navigation.routeNames.Trash,
-    //   //   Navigation.routeNames.Notebook
-    //   // ]);
-    // } catch (e) {}
-  };
+  const onNoteRemoved = async id => {};
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
@@ -207,10 +167,11 @@ const EditorHeader = () => {
   }, [fullscreen]);
 
   const load = async item => {
-    console.log(item.id);
-    await loadNote(item);
+    //console.log(item.id);
+    // await loadNote(item);
+    console.log('load called');
     InteractionManager.runAfterInteractions(() => {
-      keyboardListener.current = Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
+      //keyboardListener.current = Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
           'hardwareBackPress',
@@ -237,13 +198,13 @@ const EditorHeader = () => {
       handleBack.current = BackHandler.addEventListener('hardwareBackPress', _onHardwareBackPress);
       return;
     }
-    if (editing.currentlyEditing) {
+    if (editorState().currentlyEditing) {
       await _onBackPress();
     }
   };
 
   const _onHardwareBackPress = async () => {
-    if (editing.currentlyEditing) {
+    if (editorState().currentlyEditing) {
       await _onBackPress();
       return true;
     }
@@ -309,9 +270,9 @@ const EditorHeader = () => {
                 }}
                 top={50}
                 onPress={async () => {
-                  if (editing.isFocused) {
+                  if (editorState().isFocused) {
                     safeKeyboardDismiss();
-                    editing.isFocused = true;
+                    editorState().isFocused = true;
                   }
                   umami.pageView('/pro-screen', '/editor');
                   eSendEvent(eOpenPremiumDialog);
@@ -372,7 +333,7 @@ const EditorHeader = () => {
                 top={50}
                 onPress={() => {
                   eSendEvent(eOpenFullscreenEditor);
-                  editing.isFullscreen = true;
+                  editorState().isFullscreen = true;
                 }}
               />
             ) : null}
