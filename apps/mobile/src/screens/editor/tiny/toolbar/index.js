@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 import { IconButton } from '../../../../components/ui/icon-button';
-import { useEditorStore } from '../../../../stores/stores';
-import { useThemeStore } from '../../../../stores/theme';
+import { useEditorStore } from '../../../../stores/use-editor-store';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { getElevation } from '../../../../utils';
 import { db } from '../../../../utils/database';
 import { normalize } from '../../../../utils/size';

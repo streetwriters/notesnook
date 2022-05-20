@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { eCloseProgressDialog } from '../../utils/events';

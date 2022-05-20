@@ -1,32 +1,67 @@
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Container from '../components/container';
-import { useThemeStore } from '../stores/theme';
-import { useSelectionStore } from '../stores/stores';
-import { eSendEvent } from '../services/event-manager';
-import Navigation from '../services/navigation';
-import { history } from '../utils';
-import { hideAllTooltips } from '../utils/hooks/use-tooltip';
-import { MMKV } from '../utils/database/mmkv';
-import { rootNavigatorRef } from '../utils/global-refs';
 import Favorites from '../screens/favorites';
-import Notebooks from '../screens/notebooks';
 import Home from '../screens/home';
 import Notebook from '../screens/notebook';
-import Notes from '../screens/notes';
+import Notebooks from '../screens/notebooks';
+import { ColoredNotes } from '../screens/notes/colored';
+import { Monographs } from '../screens/notes/monographs';
+import { TaggedNotes } from '../screens/notes/tagged';
+import { TopicNotes } from '../screens/notes/topic-notes';
 import { Search } from '../screens/search';
 import Settings from '../screens/settings';
 import Tags from '../screens/tags';
 import Trash from '../screens/trash';
+import { eSendEvent } from '../services/event-manager';
+import SettingsService from '../services/settings';
+import useNavigationStore from '../stores/use-navigation-store';
+import { useSelectionStore } from '../stores/use-selection-store';
+import { history } from '../utils';
+import { rootNavigatorRef } from '../utils/global-refs';
+import { hideAllTooltips } from '../utils/hooks/use-tooltip';
+const Tab = createBottomTabNavigator();
+const Tabs = React.memo(
+  () => {
+    const homepage = SettingsService.get().homepage;
+    React.useEffect(() => {
+      setTimeout(() => {
+        useNavigationStore.getState().update({ name: homepage });
+      }, 1000);
+    }, []);
 
-const Stack = createNativeStackNavigator();
+    return (
+      <Tab.Navigator
+        tabBar={() => null}
+        initialRouteName={homepage}
+        backBehavior="history"
+        screenOptions={{
+          headerShown: false,
+          lazy: false
+        }}
+      >
+        <Tab.Screen name="Notes" component={Home} />
+        <Tab.Screen name="Notebooks" component={Notebooks} />
+        <Tab.Screen name="Favorites" component={Favorites} />
+        <Tab.Screen name="Trash" component={Trash} />
+        <Tab.Screen name="Tags" component={Tags} />
+        <Tab.Screen name="Settings" component={Settings} />
+        <Tab.Screen options={{ lazy: true }} name="TaggedNotes" component={TaggedNotes} />
+        <Tab.Screen options={{ lazy: true }} name="TopicNotes" component={TopicNotes} />
+        <Tab.Screen options={{ lazy: true }} name="ColoredNotes" component={ColoredNotes} />
+        <Tab.Screen options={{ lazy: true }} name="Monographs" component={Monographs} />
+        <Tab.Screen options={{ lazy: true }} name="Notebook" component={Notebook} />
+        <Tab.Screen options={{ lazy: true }} name="Search" component={Search} />
+      </Tab.Navigator>
+    );
+  },
+  () => true
+);
+
 export const NavigationStack = React.memo(
   () => {
-    const colors = useThemeStore(state => state.colors);
-    const [render, setRender] = React.useState(false);
     const clearSelection = useSelectionStore(state => state.clearSelection);
-    const homepage = React.useRef('Notes');
 
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
@@ -36,57 +71,10 @@ export const NavigationStack = React.memo(
       eSendEvent('navigate');
     });
 
-    React.useEffect(() => {
-      (async () => {
-        let settings = await MMKV.getItem('appSettings');
-        if (settings) {
-          settings = JSON.parse(settings);
-          homepage.current = settings.homepage;
-        }
-        setRender(true);
-        Navigation.setHeaderState(
-          settings.homepage,
-          {
-            menu: true
-          },
-          {
-            heading: settings.homepage,
-            id: settings.homepage.toLowerCase() + '_navigation'
-          }
-        );
-      })();
-    }, []);
-
     return (
-      <Container root={true}>
-        <NavigationContainer
-          onStateChange={onStateChange}
-          independent={true}
-          ref={rootNavigatorRef}
-        >
-          {render ? (
-            <Stack.Navigator
-              initialRouteName={homepage.current}
-              screenOptions={{
-                headerShown: false,
-                gestureEnabled: false,
-                animation: 'none',
-                contentStyle: {
-                  backgroundColor: colors.bg
-                }
-              }}
-            >
-              <Stack.Screen name="Notes" component={Home} />
-              <Stack.Screen name="Notebooks" component={Notebooks} />
-              <Stack.Screen name="Favorites" component={Favorites} />
-              <Stack.Screen name="Trash" component={Trash} />
-              <Stack.Screen name="NotesPage" component={Notes} />
-              <Stack.Screen name="Tags" component={Tags} />
-              <Stack.Screen name="Notebook" component={Notebook} />
-              <Stack.Screen name="Settings" component={Settings} />
-              <Stack.Screen name="Search" component={Search} />
-            </Stack.Navigator>
-          ) : null}
+      <Container>
+        <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
+          <Tabs />
         </NavigationContainer>
       </Container>
     );

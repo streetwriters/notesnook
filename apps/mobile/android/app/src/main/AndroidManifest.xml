@@ -24,6 +24,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/BootTheme"
         android:largeHeap="true"
+        android:supportsRtl="false"
+        tools:replace="android:supportsRtl"
         android:usesCleartextTraffic="true">
         <receiver android:exported="false" android:name=".NoteWidget">
             <intent-filter>

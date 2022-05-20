@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import Heading from '../../../../components/ui/typography/heading';
-import { useThemeStore } from '../../../../stores/theme';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Paragraph from '../../../../components/ui/typography/paragraph';

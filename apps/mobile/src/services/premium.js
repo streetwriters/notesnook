@@ -6,7 +6,7 @@ import DialogHeader from '../components/dialog/dialog-header';
 import { CompactFeatures } from '../components/premium/compact-features';
 import { PricingPlans } from '../components/premium/pricing-plans';
 import Seperator from '../components/ui/seperator';
-import { useUserStore } from '../stores/stores';
+import { useUserStore } from '../stores/use-user-store';
 import { itemSkus, SUBSCRIPTION_STATUS } from '../utils/constants';
 import { db } from '../utils/database';
 import { eOpenPremiumDialog, eOpenTrialEndingDialog, eShowGetPremium } from '../utils/events';
@@ -68,7 +68,7 @@ async function getProducts() {
 }
 
 function get() {
-  // if (__DEV__) return true;
+  if (__DEV__) return true;
 
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
@@ -95,6 +95,7 @@ const onUserStatusCheck = async type => {
   if (userstore?.premium !== get()) {
     userstore.setPremium(get());
   }
+  console.log('status check: ', type, get());
 
   let status = get();
   let message = null;
@@ -188,12 +189,12 @@ const showVerifyEmailDialog = () => {
 
 const subscriptions = {
   get: async () => {
-    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (!_subscriptions) return [];
     return JSON.parse(_subscriptions);
   },
   set: async subscription => {
-    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (_subscriptions) {
       _subscriptions = JSON.parse(_subscriptions);
     } else {
@@ -205,10 +206,10 @@ const subscriptions = {
     } else {
       _subscriptions[index] = subscription;
     }
-    await MMKV.setItem('subscriptionsIOS', JSON.stringify(_subscriptions));
+    MMKV.setString('subscriptionsIOS', JSON.stringify(_subscriptions));
   },
   remove: async transactionId => {
-    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (_subscriptions) {
       _subscriptions = JSON.parse(_subscriptions);
     } else {
@@ -217,7 +218,7 @@ const subscriptions = {
     let index = _subscriptions.findIndex(s => s.transactionId === transactionId);
     if (index !== -1) {
       _subscriptions.splice(index);
-      await MMKV.setItem('subscriptionsIOS', JSON.stringify(_subscriptions));
+      MMKV.setString('subscriptionsIOS', JSON.stringify(_subscriptions));
     }
   },
   verify: async subscription => {
@@ -282,7 +283,7 @@ async function getRemainingTrialDaysStatus() {
   let current = Date.now() - user.subscription.start;
   current = (current / total) * 100;
   console.log(current);
-  let lastTrialDialogShownAt = await MMKV.getItem('lastTrialDialogShownAt');
+  let lastTrialDialogShownAt = MMKV.getString('lastTrialDialogShownAt');
 
   if (current > 75 && isTrial && lastTrialDialogShownAt !== 'ending') {
     eSendEvent(eOpenTrialEndingDialog, {

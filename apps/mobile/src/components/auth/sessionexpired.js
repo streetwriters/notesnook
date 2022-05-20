@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import BiometricService from '../../services/biometrics';
 import {
   eSendEvent,

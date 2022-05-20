@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../../stores/theme';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
 import { normalize, SIZE } from '../../../../utils/size';
 import { formatSelection, properties, rgbToHex } from './constants';
@@ -60,7 +60,7 @@ const ColorItem = ({ value, format, onCustomPress, checked }) => {
       await MMKV.removeItem(`d${format}`);
     } else {
       formatSelection(execCommands[format](value));
-      await MMKV.setItem(`d${format}`, value);
+      MMKV.setString(`d${format}`, value);
     }
     eSendEvent('onColorChange');
   };

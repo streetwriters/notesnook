@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import Paragraph from '../ui/typography/paragraph';
 
 export const ProTag = ({ width, size, background }) => {

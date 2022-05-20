@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
-import { useSettingStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useSettingStore } from '../../../stores/use-setting-store';
 import {
   eSendEvent,
   eSubscribeEvent,

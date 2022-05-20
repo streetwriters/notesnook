@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import * as ProgressBar from 'react-native-progress';
 import { presentSheet } from '../../../services/event-manager';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import useSyncProgress from '../../../utils/hooks/use-sync-progress';
 import { SIZE } from '../../../utils/size';
 import Seperator from '../../ui/seperator';

@@ -5,7 +5,7 @@ import { Modal, Platform, SafeAreaView, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
@@ -156,14 +156,15 @@ const MergeConflicts = () => {
         id: null
       });
     }
-    eSendEvent(refreshNotesPage);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes'
+    );
     if (editorController.current?.note?.id === note.id) {
-      updateNoteInEditor();
+      //TODO
     }
     close();
     await Sync.run();

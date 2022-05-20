@@ -1,20 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { RefreshControl, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { notesnook } from '../../../e2e/test.ids';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
 import { eSendEvent } from '../../services/event-manager';
 import Sync from '../../services/sync';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/events';
+import { tabBarRef } from '../../utils/global-refs';
 import JumpToSectionDialog from '../dialogs/jump-to-section';
-import { NotebookWrapper } from '../list-items/notebook/wrapper';
-import { NoteWrapper } from '../list-items/note/wrapper';
-import TagItem from '../list-items/tag';
-import { Empty } from './empty';
 import { Footer } from '../list-items/footer';
 import { Header } from '../list-items/headers/header';
 import { SectionHeader } from '../list-items/headers/section-header';
+import { NoteWrapper } from '../list-items/note/wrapper';
+import { NotebookWrapper } from '../list-items/notebook/wrapper';
+import TagItem from '../list-items/tag';
+import { Empty } from './empty';
 
 const renderItems = {
   note: NoteWrapper,
@@ -55,7 +56,8 @@ const List = ({
   placeholderData,
   loading,
   headerProps = {
-    heading: 'Home'
+    heading: 'Home',
+    color: null
   },
   screen,
   ListHeader,
@@ -64,7 +66,6 @@ const List = ({
   const colors = useThemeStore(state => state.colors);
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
-  const syncing = useUserStore(state => state.syncing);
 
   useEffect(() => {
     let timeout = null;
@@ -127,7 +128,7 @@ const List = ({
 
   return (
     <>
-      <FlatList
+      <Animated.FlatList
         style={styles}
         keyExtractor={_keyExtractor}
         ref={scrollRef}
@@ -135,6 +136,9 @@ const List = ({
         data={_loading ? listData.slice(0, 9) : listData}
         renderItem={renderItem}
         onScroll={_onScroll}
+        onMomentumScrollEnd={() => {
+          tabBarRef.current?.unlock();
+        }}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
         keyboardShouldPersistTaps="always"
@@ -145,7 +149,7 @@ const List = ({
             colors={[colors.accent]}
             progressBackgroundColor={colors.nav}
             onRefresh={_onRefresh}
-            refreshing={syncing}
+            refreshing={false}
           />
         }
         ListEmptyComponent={
@@ -165,9 +169,6 @@ const List = ({
             ) : (
               <Header
                 title={headerProps.heading}
-                paragraph={headerProps.paragraph}
-                onPress={headerProps.onPress}
-                icon={headerProps.icon}
                 color={headerProps.color}
                 type={type}
                 screen={screen}

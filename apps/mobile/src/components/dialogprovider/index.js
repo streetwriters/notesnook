@@ -1,5 +1,5 @@
 import React from 'react';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { EditorSettings } from '../../screens/editor/EditorSettings';
 import { AddNotebookSheet } from '../sheets/add-notebook';
 import { AddTopicDialog } from '../dialogs/add-topic';

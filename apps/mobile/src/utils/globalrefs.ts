@@ -1,9 +1,9 @@
 import { createNavigationContainerRef } from '@react-navigation/native';
 import { createRef } from 'react';
 import { TextInput, View } from 'react-native';
-import Tabs from '../components/tabs';
+import { TabsRef } from '../components/tabs';
 
 export const inputRef = createRef<TextInput>();
 export const rootNavigatorRef = createNavigationContainerRef();
-export const tabBarRef = createRef<Tabs>();
+export const tabBarRef = createRef<TabsRef>();
 export const editorRef = createRef<View>();

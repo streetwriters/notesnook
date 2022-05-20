@@ -1,8 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeStore } from '../../stores/theme';
-import { useSettingStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { useTip } from '../../services/tip-manager';
 import { COLORS_NOTE } from '../../utils/color-scheme';
 import { SIZE } from '../../utils/size';

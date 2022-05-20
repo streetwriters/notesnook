@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useMessageStore } from '../../stores/stores';
+import { useMessageStore } from '../../stores/use-message-store';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import Heading from '../ui/typography/heading';

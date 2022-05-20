@@ -4,7 +4,10 @@ import { BackHandler, InteractionManager, Platform, Vibration, View } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
 import { Properties } from '../../components/properties';
-import { IconButton } from '../../components/ui/icon-button';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
+import { useEditorStore } from '../../stores/use-editor-store';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
@@ -13,8 +16,6 @@ import {
   ToastEvent
 } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
-import { useEditorStore, useSettingStore, useUserStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
 import umami from '../../utils/analytics';
 import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
@@ -34,6 +35,7 @@ import { safeKeyboardDismiss } from './tiny/tiny';
 import { endSearch } from './tiny/toolbar/commands';
 import picker from './tiny/toolbar/picker';
 import { editorController, editorState } from './tiptap/utils';
+import { IconButton } from '../../components/ui/icon-button';
 
 const EditorHeader = ({ editor }) => {
   const colors = useThemeStore(state => state.colors);

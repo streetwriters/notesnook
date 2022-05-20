@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, TextStyle, View, ViewStyle } from 'react-native';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
 import { TTip } from '../../services/tip-manager';
-import { ThemeStore, useThemeStore } from '../../stores/theme';
+import { ThemeStore, useThemeStore } from '../../stores/use-theme-store';
 import { MMKV } from '../../utils/database/mmkv';
 import { eCloseProgressDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -140,7 +140,7 @@ export const Tip = ({
 
 Tip.present = async (tip: TTip) => {
   if (!tip) return;
-  let dontShow = await MMKV.getItem('neverShowSheetTips');
+  let dontShow = MMKV.getString('neverShowSheetTips');
   if (dontShow) return;
   presentSheet({
     component: (

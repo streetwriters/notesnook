@@ -5,8 +5,9 @@ import { notesnook } from '../../../../e2e/test.ids';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import SearchService from '../../../services/search';
-import { useNotebookStore, useSelectionStore } from '../../../stores/stores';
-import { useThemeStore } from '../../../stores/theme';
+import { useSelectionStore } from '../../../stores/use-selection-store';
+import { useNotebookStore } from '../../../stores/use-notebook-store';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { getTotalNotes } from '../../../utils';
 import { db } from '../../../utils/database';
 import { eOpenMoveNoteDialog } from '../../../utils/events';
@@ -50,13 +51,15 @@ const AddToNotebookSheet = () => {
     setVisible(false);
     newNotebookTitle = null;
     setNote(null);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Notebook,
-      Navigation.routeNames.Notebooks
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes',
+      'Notebooks',
+      'Notebook'
+    );
   };
 
   return !visible ? null : (
@@ -135,11 +138,14 @@ const MoveNoteComponent = ({ note }) => {
       );
     }
 
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes'
+    );
+
     setNotebooks();
     updateNoteExists();
     SearchService.updateAndSearch();
@@ -153,13 +159,13 @@ const MoveNoteComponent = ({ note }) => {
     if (!note?.id && selectedItemsList?.length === 0) return;
 
     let notes = selectedItemsList.length > 0 ? selectedItemsList.map(n => n.id) : [note?.id];
-    console.log(notes);
     let ids = [];
     let notebooks = db.notebooks.all;
     for (let i = 0; i < notebooks.length; i++) {
       if (notebooks[i].topics) {
         for (let t = 0; t < notebooks[i].topics.length; t++) {
           let topic = notebooks[i].topics[t];
+          if (topic.type !== 'topic') continue;
           for (let id of notes) {
             if (topic.notes.indexOf(id) > -1) {
               console.log('found', ids.indexOf(notebooks[i].id));
@@ -355,7 +361,7 @@ const MoveNoteComponent = ({ note }) => {
               {expanded === item.id ? (
                 <FlatList
                   nestedScrollEnabled
-                  data={item.topics}
+                  data={item.topics?.filter(t => t.type === 'topic')}
                   keyboardShouldPersistTaps="always"
                   keyboardDismissMode="none"
                   onMomentumScrollEnd={() => {

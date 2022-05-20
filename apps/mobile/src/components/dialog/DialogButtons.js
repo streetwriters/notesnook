@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import Paragraph from '../ui/typography/paragraph';

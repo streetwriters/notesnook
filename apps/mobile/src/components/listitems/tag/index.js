@@ -1,35 +1,21 @@
 import React from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { View } from 'react-native';
 import { notesnook } from '../../../../e2e/test.ids';
-import { PressableButton } from '../../ui/pressable';
-import { useThemeStore } from '../../../stores/theme';
-import { eSendEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
+import { TaggedNotes } from '../../../screens/notes/tagged';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { db } from '../../../utils/database';
-import { refreshNotesPage } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
-import { IconButton } from '../../ui/icon-button';
 import { Properties } from '../../properties';
+import { IconButton } from '../../ui/icon-button';
+import { PressableButton } from '../../ui/pressable';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 
 const TagItem = React.memo(
   ({ item, index }) => {
     const colors = useThemeStore(state => state.colors);
-    const { fontScale } = useWindowDimensions();
     const onPress = () => {
-      let params = {
-        ...item,
-        type: 'tag',
-        get: 'tagged'
-      };
-
-      eSendEvent(refreshNotesPage, params);
-      Navigation.navigate('NotesPage', params, {
-        heading: '#' + item.title,
-        id: item.id,
-        type: item.type
-      });
+      TaggedNotes.navigate(item, true);
     };
 
     return (

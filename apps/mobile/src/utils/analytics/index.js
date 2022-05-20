@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { MMKV } from '../database/mmkv';
-import { useSettingStore } from '../../stores/stores';
+import { useSettingStore } from '../../stores/use-setting-store';
 
 const WEBSITE_ID = `3c6890ce-8410-49d5-8831-15fb2eb28a21`;
 const baseUrl = `https://analytics.streetwriters.co/api/collect`;
@@ -19,7 +19,7 @@ Mozilla/5.0 (Linux; Android 8.0.0; SM-G960F Build/R16NW) AppleWebKit/537.36 (KHT
  */
 async function canUpdateAnalytics(route, conditions = []) {
   if (!useSettingStore?.getState()?.settings?.telemetry) return false;
-  let eventsList = await MMKV.getItem('notesnookUserEvents');
+  let eventsList = MMKV.getString('notesnookUserEvents');
 
   if (eventsList) {
     eventsList = JSON.parse(eventsList);
@@ -42,14 +42,14 @@ async function canUpdateAnalytics(route, conditions = []) {
 }
 
 async function saveAnalytics(route, value = true) {
-  let eventsList = await MMKV.getItem('notesnookUserEvents');
+  let eventsList = MMKV.getString('notesnookUserEvents');
   if (eventsList) {
     eventsList = JSON.parse(eventsList);
   } else {
     eventsList = {};
   }
   eventsList[route] = value;
-  await MMKV.setItem('notesnookUserEvents', JSON.stringify(eventsList));
+  MMKV.setString('notesnookUserEvents', JSON.stringify(eventsList));
 }
 
 /**

@@ -1,0 +1,806 @@
+import dayjs from 'dayjs';
+import React from 'react';
+import { Linking, Platform } from 'react-native';
+import { checkVersion } from 'react-native-check-version';
+import * as RNIap from 'react-native-iap';
+import { enabled } from 'react-native-privacy-snapshot';
+import { APP_VERSION } from '../../../version';
+import { ChangePassword } from '../../components/auth/change-password';
+import { presentDialog } from '../../components/dialog/functions';
+import { Issue } from '../../components/sheets/github/issue';
+import { Progress } from '../../components/sheets/progress';
+import { Update } from '../../components/sheets/update';
+import BackupService from '../../services/backup';
+import BiometicService from '../../services/biometrics';
+import { eSendEvent, openVault, presentSheet, ToastEvent } from '../../services/event-manager';
+import { setLoginMessage } from '../../services/message';
+import Navigation from '../../services/navigation';
+import Notifications from '../../services/notifications';
+import PremiumService from '../../services/premium';
+import SettingsService from '../../services/settings';
+import Sync from '../../services/sync';
+import { clearAllStores } from '../../stores';
+import { useUserStore } from '../../stores/use-user-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { AndroidModule } from '../../utils';
+import { toggleDarkMode, getColorScheme } from '../../utils/color-scheme/utils';
+import { SUBSCRIPTION_STATUS } from '../../utils/constants';
+import { db } from '../../utils/database';
+import { MMKV } from '../../utils/database/mmkv';
+import {
+  eCloseProgressDialog,
+  eCloseSimpleDialog,
+  eOpenAttachmentsDialog,
+  eOpenLoginDialog,
+  eOpenRecoveryKeyDialog,
+  eOpenRestoreDialog
+} from '../../utils/events';
+import { useVaultStatus } from '../../utils/hooks/use-vault-status';
+import { sleep } from '../../utils/time';
+import { MFARecoveryCodes, MFASheet } from './2fa';
+import AppLock from './app-lock';
+import { verifyUser } from './functions';
+import { SettingSection } from './types';
+import { getTimeLeft } from './user-section';
+const format = (ver: number) => {
+  let parts = ver.toString().split('');
+  return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? '' : parts[2]}${
+    !parts[3] ? '' : parts[3]
+  } `;
+};
+
+export const settingsGroups: SettingSection[] = [
+  {
+    name: 'account',
+    useHook: () => useUserStore(state => state.user),
+    hidden: current => !current,
+    sections: [
+      {
+        useHook: () => useUserStore(state => state.user),
+        hidden: current => !current,
+        name: current => {
+          const user = current;
+          const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+          const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+          return isBasic
+            ? 'Subscribe to Pro'
+            : isTrial
+            ? 'Your free trial has started'
+            : 'Subscription details';
+        },
+        type: 'component',
+        component: 'subscription',
+        icon: 'crown',
+        description: current => {
+          const user = current;
+          const subscriptionDaysLeft = user && getTimeLeft(parseInt(user.subscription?.expiry));
+          const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
+          const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
+
+          return user.subscription?.type === 2
+            ? 'You signed up on ' + startDate
+            : user.subscription?.type === 1
+            ? 'Your free trial will end on ' + expiryDate
+            : user.subscription?.type === 6
+            ? subscriptionDaysLeft.time < -3
+              ? 'Your subscription has ended'
+              : 'Your account will be downgraded to Basic in 3 days'
+            : user.subscription?.type === 7
+            ? `Your subscription will end on ${expiryDate}.`
+            : user.subscription?.type === 5
+            ? `Your subscription will renew on ${expiryDate}.`
+            : 'Never hesitate to choose privacy';
+        }
+      },
+      {
+        type: 'screen',
+        name: 'Account Settings',
+        icon: 'account-cog',
+        description: 'Manage account',
+        sections: [
+          {
+            name: 'Save data recovery key',
+            modifer: async () => {
+              verifyUser(null, async () => {
+                await sleep(300);
+                eSendEvent(eOpenRecoveryKeyDialog);
+              });
+            },
+            description: 'Recover your data using the recovery key if your password is lost.'
+          },
+          {
+            name: 'Manage attachments',
+            icon: 'attachment',
+            modifer: () => {
+              eSendEvent(eOpenAttachmentsDialog);
+            },
+            description: 'Manage all attachments in one place.'
+          },
+          {
+            name: 'Change password',
+            modifer: async () => {
+              ChangePassword.present();
+            },
+            description: 'Setup a new password for your account.'
+          },
+          {
+            type: 'screen',
+            name: 'Two factor authentication',
+            description: 'Manage 2FA settings',
+            icon: 'two-factor-authentication',
+            sections: [
+              {
+                name: 'Enable two-factor authentication',
+                modifer: () => {
+                  verifyUser('global', async () => {
+                    MFASheet.present();
+                  });
+                },
+                useHook: () => useUserStore(state => state.user),
+                hidden: user => {
+                  return !!user?.mfa?.isEnabled;
+                },
+                description: 'Increased security for your account'
+              },
+              {
+                name: 'Add fallback 2FA method',
+                useHook: () => useUserStore(state => state.user),
+                hidden: user => {
+                  return !!user?.mfa?.secondaryMethod || !user?.mfa?.isEnabled;
+                },
+                modifer: () => {
+                  verifyUser('global', async () => {
+                    MFASheet.present(true);
+                  });
+                },
+                description:
+                  'You can use fallback 2FA method incase you are unable to login via primary method'
+              },
+              {
+                name: 'Reconfigure fallback 2FA method',
+                useHook: () => useUserStore(state => state.user),
+                hidden: user => {
+                  return !user?.mfa?.secondaryMethod || !user?.mfa?.isEnabled;
+                },
+                modifer: () => {
+                  verifyUser('global', async () => {
+                    MFASheet.present(true);
+                  });
+                },
+                description:
+                  'You can use fallback 2FA method incase you are unable to login via primary method'
+              },
+              {
+                name: 'View recovery codes',
+                modifer: () => {
+                  verifyUser('global', async () => {
+                    MFARecoveryCodes.present('sms');
+                  });
+                },
+                useHook: () => useUserStore(state => state.user),
+                hidden: user => {
+                  return !user?.mfa?.isEnabled;
+                },
+                description: 'View and save recovery codes for to recover your account'
+              },
+              {
+                name: 'Disable two-factor authentication',
+                modifer: () => {
+                  verifyUser('global', async () => {
+                    await db.mfa?.disable();
+                    let user = await db.user?.fetchUser();
+                    useUserStore.getState().setUser(user);
+                  });
+                },
+
+                useHook: () => useUserStore(state => state.user),
+                hidden: user => {
+                  return !user?.mfa?.isEnabled;
+                },
+                description: 'Decreased security for your account'
+              }
+            ]
+          },
+          {
+            name: 'Subscription not activated?',
+            hidden: () => Platform.OS !== 'ios',
+            modifer: async () => {
+              if (Platform.OS === 'android') return;
+              presentSheet({
+                title: 'Loading subscriptions',
+                paragraph: `Please wait while we fetch your subscriptions.`
+              });
+              let subscriptions = await RNIap.getPurchaseHistory();
+              subscriptions.sort((a, b) => b.transactionDate - a.transactionDate);
+              let currentSubscription = subscriptions[0];
+              presentSheet({
+                title: 'Notesnook Pro',
+                paragraph: `You subscribed to Notesnook Pro on ${new Date(
+                  currentSubscription.transactionDate
+                ).toLocaleString()}. Verify this subscription?`,
+                action: async () => {
+                  presentSheet({
+                    title: 'Verifying subscription',
+                    paragraph: `Please wait while we verify your subscription.`
+                  });
+                  await PremiumService.subscriptions.verify(currentSubscription);
+                  eSendEvent(eCloseProgressDialog);
+                },
+                icon: 'information-outline',
+                actionText: 'Verify'
+              });
+            },
+            description: 'Verify your subscription to Notesnook Pro'
+          },
+          {
+            name: 'Log out',
+            description: 'Clear all your data and reset the app.',
+            icon: 'logout',
+            modifer: () => {
+              presentDialog({
+                title: 'Logout',
+                paragraph: 'Clear all your data and reset the app.',
+                positiveText: 'Logout',
+                positivePress: async () => {
+                  try {
+                    eSendEvent('settings-loading', true);
+                    setImmediate(async () => {
+                      eSendEvent(eCloseSimpleDialog);
+                      db.user?.logout();
+                      setLoginMessage();
+                      await PremiumService.setPremiumStatus();
+                      await BiometicService.resetCredentials();
+                      MMKV.clearStore();
+                      await db.init();
+                      await clearAllStores();
+                      SettingsService.init();
+                      SettingsService.set({
+                        introCompleted: true
+                      });
+                      useUserStore.getState().setUser(null);
+                      useUserStore.getState().setSyncing(false);
+                      console.log('HIDING');
+                      Navigation.goBack();
+                      Navigation.goBack();
+                      eSendEvent('settings-loading', false);
+                    });
+                  } catch (e) {
+                    ToastEvent.error(e as Error, 'Error logging out');
+                    eSendEvent('settings-loading', false);
+                  }
+                }
+              });
+            }
+          },
+          {
+            type: 'danger',
+            name: 'Delete account',
+            icon: 'alert',
+            description: `All your data will be removed permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.`,
+            modifer: () => {
+              presentDialog({
+                title: 'Delete account',
+                paragraphColor: 'red',
+                paragraph:
+                  'All your data will be removed permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.',
+                positiveType: 'errorShade',
+                input: true,
+                inputPlaceholder: 'Enter account password',
+                positiveText: 'Delete',
+                positivePress: async value => {
+                  try {
+                    let verified = await db.user?.verifyPassword(value);
+                    if (verified) {
+                      eSendEvent('settings-loading', true);
+                      await db.user?.deleteUser(value);
+                      await BiometicService.resetCredentials();
+                      SettingsService.set({
+                        introCompleted: true
+                      });
+                    } else {
+                      ToastEvent.show({
+                        heading: 'Incorrect password',
+                        message: 'The account password you entered is incorrect',
+                        type: 'error',
+                        context: 'global'
+                      });
+                    }
+
+                    eSendEvent('settings-loading', false);
+                  } catch (e) {
+                    eSendEvent('settings-loading', false);
+                    console.log(e);
+                    ToastEvent.error(e as Error, 'Failed to delete account', 'global');
+                  }
+                }
+              });
+            }
+          }
+        ]
+      },
+      {
+        name: 'Having problems with sync',
+        description: 'Try force sync to resolve issues with syncing',
+        icon: 'sync-alert',
+        modifer: async () => {
+          Progress.present();
+          await Sync.run('global', true);
+          eSendEvent(eCloseProgressDialog);
+        }
+      }
+    ]
+  },
+  {
+    name: 'Customize',
+    sections: [
+      {
+        type: 'screen',
+        name: 'Theme',
+        description: 'Change app look and feel',
+        icon: 'shape',
+        sections: [
+          {
+            type: 'component',
+            name: 'Accent color',
+            description: 'Pick the color that matches your mood',
+            component: 'colorpicker'
+          },
+          {
+            type: 'switch',
+            name: 'Use system theme',
+            description: 'Automatically switch to dark mode when system theme changes',
+            property: 'useSystemTheme',
+            icon: 'circle-half'
+          },
+          {
+            type: 'switch',
+            name: 'Dark mode',
+            description: 'Strain your eyes no more at night',
+            property: 'theme',
+            icon: 'brightness-6',
+            modifer: () => {
+              toggleDarkMode();
+            },
+            getter: () => useSettingStore.getState().settings.theme.dark
+          },
+          {
+            type: 'switch',
+            name: 'Pitch black',
+            description: 'Save battery on device with amoled screen at night.',
+            property: 'pitchBlack',
+            modifer: () => {
+              SettingsService.set({
+                pitchBlack: !SettingsService.get().pitchBlack
+              });
+              getColorScheme();
+            },
+            icon: 'brightness-1'
+          }
+        ]
+      },
+      {
+        type: 'screen',
+        name: 'Behaviour',
+        description: 'Change app homepage',
+        sections: [
+          {
+            type: 'component',
+            name: 'Homepage',
+            description: 'Default screen to open on app startup',
+            component: 'homeselector'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    name: 'Privacy and security',
+    sections: [
+      {
+        type: 'switch',
+        name: 'Telemetry',
+        icon: 'radar',
+        description:
+          'Contribute towards a better Notesnook. All tracking information is anonymous.',
+        property: 'telemetry'
+      },
+      {
+        type: 'screen',
+        name: 'Vault',
+        description: 'Multi-layer encryption to most important notes',
+        icon: 'key',
+        sections: [
+          {
+            name: 'Create vault',
+            description: 'Set a password to create vault and lock notes.',
+            icon: 'key',
+            useHook: useVaultStatus,
+            hidden: current => current?.exists,
+            modifer: () => {
+              PremiumService.verify(() => {
+                openVault({
+                  item: {},
+                  novault: false,
+                  title: 'Create vault',
+                  description: 'Set a password to create vault and lock notes.'
+                });
+              });
+            }
+          },
+          {
+            useHook: useVaultStatus,
+            name: 'Change vault password',
+            description: 'Setup a new password for your vault.',
+            hidden: current => !current?.exists,
+            modifer: () =>
+              openVault({
+                item: {},
+                changePassword: true,
+                novault: true,
+                title: 'Change vault password',
+                description: 'Set a new password for your vault.'
+              })
+          },
+          {
+            useHook: useVaultStatus,
+            name: 'Clear vault',
+            description: 'Unlock all locked notes',
+            hidden: current => !current?.exists,
+            modifer: () => {
+              openVault({
+                item: {},
+                clearVault: true,
+                novault: true,
+                title: 'Clear vault',
+                description: 'Enter vault password to unlock and remove all notes from the vault.'
+              });
+            }
+          },
+          {
+            name: 'Delete vault',
+            description: 'Delete vault (and optionally remove all notes).',
+            useHook: useVaultStatus,
+            hidden: current => !current?.exists,
+            modifer: () => {
+              openVault({
+                item: {},
+                deleteVault: true,
+                novault: true,
+                title: 'Delete vault',
+                description: 'Enter your account password to delete your vault.'
+              });
+            }
+          },
+          {
+            type: 'switch',
+            name: 'Biometric unlocking',
+            icon: 'fingerprint',
+            useHook: useVaultStatus,
+            description: 'Access notes in vault using biometrics',
+            hidden: current => !current?.exists || !current?.isBiometryAvailable,
+            getter: current => current?.biometryEnrolled,
+            modifer: current => {
+              openVault({
+                item: {},
+                fingerprintAccess: !current.biometryEnrolled,
+                revokeFingerprintAccess: current.biometryEnrolled,
+                novault: true,
+                title: current.biometryEnrolled
+                  ? 'Revoke biometric unlocking'
+                  : 'Enable biometery unlock',
+                description: current.biometryEnrolled
+                  ? 'Disable biometric unlocking for notes in vault'
+                  : 'Enable biometric unlocking for notes in vault'
+              });
+            }
+          }
+        ]
+      },
+      {
+        type: 'switch',
+        icon: 'eye-off-outline',
+        name: 'Privacy mode',
+        description: `Hide app contents when you switch to other apps. This will also disable screenshot taking in the app.`,
+        modifer: () => {
+          const settings = SettingsService.get();
+          Platform.OS === 'android'
+            ? AndroidModule.setSecureMode(!settings.privacyScreen)
+            : enabled(true);
+
+          SettingsService.set({ privacyScreen: !settings.privacyScreen });
+        },
+        property: 'privacyScreen'
+      },
+      {
+        name: 'App lock',
+        description: 'Change app lock mode to suit your needs',
+        icon: 'fingerprint',
+        modifer: () => {
+          AppLock.present();
+        }
+      }
+    ]
+  },
+  {
+    name: 'Backup and restore',
+    sections: [
+      {
+        type: 'screen',
+        name: 'Backups',
+        icon: 'backup-restore',
+        description: 'Create a backup or change backup settings',
+        sections: [
+          {
+            name: 'Backup now',
+            description: 'Create a backup of your data',
+            modifer: async () => {
+              const user = useUserStore.getState().user;
+              if (!user) {
+                await BackupService.run(true);
+                return;
+              }
+              verifyUser(null, () => BackupService.run(true));
+            }
+          },
+          {
+            type: 'component',
+            name: 'Automatic backups',
+            description: 'Backup your data once every week or daily automatically.',
+            component: 'autobackups'
+          },
+          {
+            name: 'Select backup directory',
+            description: 'Select directory to store backups',
+            icon: 'folder',
+            hidden: () =>
+              !!SettingsService.get().backupDirectoryAndroid || Platform.OS !== 'android',
+            property: 'backupDirectoryAndroid',
+            modifer: async () => {
+              let dir;
+              try {
+                dir = await BackupService.checkBackupDirExists(true);
+              } catch (e) {
+              } finally {
+                if (!dir) {
+                  ToastEvent.show({
+                    heading: 'No directory selected',
+                    type: 'error'
+                  });
+                }
+              }
+            }
+          },
+          {
+            name: 'Change backup directory',
+            description: () => SettingsService.get().backupDirectoryAndroid?.name || '',
+            icon: 'folder',
+            hidden: () =>
+              !SettingsService.get().backupDirectoryAndroid || Platform.OS !== 'android',
+            property: 'backupDirectoryAndroid',
+            modifer: async () => {
+              let dir;
+              try {
+                dir = await BackupService.checkBackupDirExists(true);
+              } catch (e) {
+              } finally {
+                if (!dir) {
+                  ToastEvent.show({
+                    heading: 'No directory selected',
+                    type: 'error'
+                  });
+                }
+              }
+            }
+          },
+          {
+            type: 'switch',
+            name: 'Backup encryption',
+            description: 'Encrypt all your backups.',
+            icon: 'lock',
+            property: 'encryptedBackup',
+            modifer: async () => {
+              const user = useUserStore.getState().user;
+              const settings = SettingsService.get();
+              if (!user) {
+                ToastEvent.show({
+                  heading: 'Login required to enable encryption',
+                  type: 'error',
+                  func: () => {
+                    eSendEvent(eOpenLoginDialog);
+                  },
+                  actionText: 'Login'
+                });
+                return;
+              }
+              SettingsService.set({ encryptedBackup: !settings.encryptedBackup });
+            }
+          }
+        ]
+      },
+      {
+        name: 'Restore backup',
+        description: `Restore backup from phone storage.`,
+        modifer: () => {
+          const user = useUserStore.getState().user;
+          if (!user || !user?.email) {
+            ToastEvent.show({
+              heading: 'Login required',
+              message: 'Please log in to your account to restore backup',
+              type: 'error',
+              context: 'global'
+            });
+            return;
+          }
+          eSendEvent(eOpenRestoreDialog);
+        }
+      }
+    ]
+  },
+  {
+    name: 'Productivity',
+    hidden: () => Platform.OS !== 'android',
+    sections: [
+      {
+        type: 'switch',
+        name: 'Notes in notifications',
+        description: `Add quick notes from notifications without opening the app.`,
+        property: 'notifNotes',
+        icon: 'form-textbox',
+        modifer: () => {
+          const settings = SettingsService.get();
+          if (settings.notifNotes) {
+            Notifications.unpinQuickNote();
+          } else {
+            Notifications.pinQuickNote(false);
+          }
+          SettingsService.toggle('notifNotes');
+        }
+      }
+    ]
+  },
+  {
+    name: 'Help and support',
+    sections: [
+      {
+        name: 'Report an issue',
+        icon: 'bug',
+        modifer: () => {
+          presentSheet({
+            component: <Issue />
+          });
+        },
+        description: 'Faced an issue or have a suggestion? Click here to create a bug report'
+      },
+      {
+        name: 'Documentation',
+        modifer: async () => {
+          Linking.openURL('https://docs.notesnook.com');
+        },
+        description: 'Learn about every feature and how it works.',
+        icon: 'file-document'
+      },
+      {
+        type: 'switch',
+        name: 'Debug mode',
+        description: 'Show debug options on items',
+        property: 'devMode'
+      }
+    ]
+  },
+  {
+    name: 'community',
+    sections: [
+      {
+        name: 'Join our Telegram group',
+        description: "We are on telegram, let's talk",
+        icon: 'telegram',
+        modifer: () => {
+          Linking.openURL('https://t.me/notesnook').catch(console.log);
+        }
+      },
+      {
+        name: 'Join our Discord community',
+        icon: 'discord',
+        modifer: async () => {
+          presentSheet({
+            title: 'Join our Discord Community',
+            iconColor: 'discord',
+            paragraph: 'We are not ghosts, chat with us and share your experience.',
+            valueArray: [
+              'Talk with us anytime.',
+              'Follow the development process',
+              'Give suggestions and report issues.',
+              'Get early access to new features',
+              'Meet other people using Notesnook'
+            ],
+            icon: 'discord',
+            action: async () => {
+              try {
+                Linking.openURL('https://discord.gg/zQBK97EE22').catch(console.log);
+              } catch (e) {}
+            },
+            actionText: 'Join Now'
+          });
+        },
+        description: 'We are not ghosts, chat with us and share your experience.'
+      }
+    ]
+  },
+  {
+    name: 'legal',
+    sections: [
+      {
+        name: 'Terms of service',
+        modifer: async () => {
+          try {
+            await Linking.openURL('https://notesnook.com/tos');
+          } catch (e) {}
+        },
+        description: 'Read our terms of service'
+      },
+      {
+        name: 'Privacy policy',
+        modifer: async () => {
+          try {
+            await Linking.openURL('https://notesnook.com/privacy');
+          } catch (e) {}
+        },
+        description: 'Read our privacy policy'
+      }
+    ]
+  },
+  {
+    name: 'about',
+    sections: [
+      {
+        name: 'Download on desktop',
+        icon: 'monitor',
+        modifer: async () => {
+          try {
+            await Linking.openURL('https://notesnook.com');
+          } catch (e) {}
+        },
+        description: 'Get Notesnook app on your desktop and access all notes'
+      },
+      {
+        name: 'Roadmap',
+        icon: 'chart-timeline',
+        modifer: async () => {
+          try {
+            await Linking.openURL('https://notesnook.com/roadmap/');
+          } catch (e) {}
+        },
+        description: 'See what the future of Notesnook is going to be like.'
+      },
+      {
+        name: 'Check for updates',
+        icon: 'cellphone-arrow-down',
+        description: 'Check for new version of Notesnook',
+        modifer: async () => {
+          const version = await checkVersion();
+          if (!version.needsUpdate) {
+            ToastEvent.show({
+              heading: 'You are on latest version',
+              type: 'success',
+              context: 'global'
+            });
+            return false;
+          }
+          presentSheet({
+            component: ref => <Update version={version} fwdRef={ref} />
+          });
+        }
+      },
+      {
+        name: 'App version',
+        icon: 'alpha-v',
+        modifer: async () => {
+          try {
+            await Linking.openURL('https://notesnook.com');
+          } catch (e) {}
+        },
+        description: format(APP_VERSION)
+      }
+    ]
+  }
+];

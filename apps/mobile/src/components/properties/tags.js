@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
@@ -8,6 +8,7 @@ import { eOpenTagsDialog, refreshNotesPage } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { Button } from '../ui/button';
+import { TaggedNotes } from '../../screens/notes/tagged';
 
 export const Tags = ({ item, close }) => {
   const colors = useThemeStore(state => state.colors);
@@ -59,18 +60,7 @@ const TagItem = ({ tag, close }) => {
   const onPress = async () => {
     let tags = db.tags.all;
     let _tag = tags.find(t => t.title === tag);
-    let params = {
-      ..._tag,
-      type: 'tag',
-      get: 'tagged'
-    };
-
-    eSendEvent(refreshNotesPage, params);
-    Navigation.navigate('NotesPage', params, {
-      heading: '#' + _tag.title,
-      id: _tag.id,
-      type: _tag.type
-    });
+    TaggedNotes.navigate(_tag, true);
     await sleep(300);
     close();
   };

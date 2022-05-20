@@ -2,17 +2,18 @@ import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-k
 import React, { useEffect, useRef } from 'react';
 import { Platform, View } from 'react-native';
 import { NavigationBar, StatusBar } from 'react-native-bars';
-import Animated, { useValue } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
-import Tabs from '../components/tabs';
+import { NewTabs } from '../components/tabs';
 import { EditorWrapper } from '../screens/editor/EditorWrapper';
 import { editorState } from '../screens/editor/tiptap/utils';
 import { DDS } from '../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
-import { useEditorStore, useSettingStore } from '../stores/stores';
-import { useThemeStore } from '../stores/theme';
+import { useEditorStore } from '../stores/use-editor-store';
+import { useSettingStore } from '../stores/use-setting-store';
+import { useThemeStore } from '../stores/use-theme-store';
 import { editing, setWidthHeight } from '../utils';
 import { db } from '../utils/database';
 import {
@@ -36,10 +37,9 @@ export const TabsHolder = React.memo(
     const dimensions = useSettingStore(state => state.dimensions);
     const setDimensions = useSettingStore(state => state.setDimensions);
     const insets = useSafeAreaInsets();
-    const animatedOpacity = useValue(0);
-    const animatedTranslateY = useValue(-9999);
+    const animatedOpacity = useSharedValue(0);
+    const animatedTranslateY = useSharedValue(-9999);
     const overlayRef = useRef();
-    const initialLayoutCalled = useRef(false);
 
     const showFullScreenEditor = () => {
       setFullscreen(true);
@@ -84,6 +84,7 @@ export const TabsHolder = React.memo(
     }, [deviceMode, dimensions, colors]);
 
     const _onLayout = async event => {
+      console.log('layout called here');
       if (layoutTimer) {
         clearTimeout(layoutTimer);
         layoutTimer = null;
@@ -165,7 +166,7 @@ export const TabsHolder = React.memo(
     const onScroll = scrollOffset => {
       hideAllTooltips();
       if (scrollOffset > offsets[deviceMode].a - 10) {
-        animatedOpacity.setValue(0);
+        animatedOpacity.value = 0;
         toggleView(false);
       } else {
         let o = scrollOffset / 300;
@@ -175,13 +176,13 @@ export const TabsHolder = React.memo(
         } else {
           op = 1 - o;
         }
-        animatedOpacity.setValue(op);
+        animatedOpacity.value = op;
         toggleView(op < 0.1 ? false : true);
       }
     };
 
     const toggleView = show => {
-      animatedTranslateY.setValue(show ? 0 : -9999);
+      animatedTranslateY.value = show ? 0 : -9999;
     };
 
     const valueLimiter = (value, min, max) => {
@@ -232,52 +233,16 @@ export const TabsHolder = React.memo(
       }
     };
 
-    const listItems = [
-      <View
-        key="1"
-        onLayout={() => {
-          if (!initialLayoutCalled.current) {
-            tabBarRef.current?.goToIndex(1, false);
-            initialLayoutCalled.current = true;
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        opacity: animatedOpacity.value,
+        transform: [
+          {
+            translateY: animatedTranslateY.value
           }
-        }}
-        style={{
-          height: '100%',
-          width: fullscreen ? 0 : widths[deviceMode].a
-        }}
-      >
-        <SideMenu />
-      </View>,
-      <View
-        key="2"
-        style={{
-          height: '100%',
-          width: fullscreen ? 0 : widths[deviceMode].b
-        }}
-      >
-        {deviceMode === 'mobile' ? (
-          <Animated.View
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              zIndex: 999,
-              backgroundColor: 'rgba(0,0,0,0.2)',
-              opacity: animatedOpacity,
-              transform: [
-                {
-                  translateY: animatedTranslateY
-                }
-              ]
-            }}
-            ref={overlayRef}
-          />
-        ) : null}
-
-        <NavigationStack />
-      </View>,
-      <EditorWrapper key="3" width={widths} dimensions={dimensions} />
-    ];
+        ]
+      };
+    });
 
     return (
       <View
@@ -292,21 +257,59 @@ export const TabsHolder = React.memo(
       >
         <StatusBar animated={true} barStyle={colors.night ? 'light-content' : 'dark-content'} />
         <NavigationBar barStyle={colors.night ? 'light-content' : 'dark-content'} />
-        {deviceMode ? (
-          <Tabs
+
+        {deviceMode && widths[deviceMode] ? (
+          <NewTabs
             ref={tabBarRef}
             dimensions={dimensions}
             widths={widths[deviceMode]}
-            style={{
-              zIndex: 1
-            }}
-            initialIndex={deviceMode === 'smallTablet' || deviceMode === 'tablet' ? 0 : 1}
-            toggleOverlay={toggleView}
-            offsets={offsets[deviceMode]}
-            items={listItems}
+            enabled={deviceMode !== 'tablet'}
             onScroll={onScroll}
             onChangeTab={onChangeTab}
-          />
+            onDrawerStateChange={state => {}}
+          >
+            <View
+              key="1"
+              style={{
+                height: '100%',
+                width: fullscreen ? 0 : widths[deviceMode]?.a
+              }}
+            >
+              <SideMenu />
+            </View>
+
+            <View
+              key="2"
+              style={{
+                height: '100%',
+                width: fullscreen ? 0 : widths[deviceMode]?.b
+              }}
+            >
+              {deviceMode === 'mobile' ? (
+                <Animated.View
+                  onTouchEnd={() => {
+                    tabBarRef.current?.closeDrawer();
+                    animatedOpacity.value = withTiming(0);
+                    animatedTranslateY.value = withTiming(-9999);
+                  }}
+                  style={[
+                    {
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      zIndex: 999,
+                      backgroundColor: 'rgba(0,0,0,0.2)'
+                    },
+                    animatedStyle
+                  ]}
+                  ref={overlayRef}
+                />
+              ) : null}
+
+              <NavigationStack />
+            </View>
+            <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+          </NewTabs>
         ) : null}
       </View>
     );

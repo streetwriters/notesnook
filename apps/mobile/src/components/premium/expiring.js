@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
 import { eOpenPremiumDialog, eOpenResultDialog, eOpenTrialEndingDialog } from '../../utils/events';

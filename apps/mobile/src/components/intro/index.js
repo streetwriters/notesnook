@@ -1,17 +1,16 @@
 import React, { useEffect } from 'react';
 import { Dimensions, Image, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
-import { useSettingStore } from '../../stores/stores';
+import AppLock from '../../screens/settings/app-lock';
 import SettingsService from '../../services/settings';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { getElevation } from '../../utils';
 import umami from '../../utils/analytics';
-import { MMKV } from '../../utils/database/mmkv';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
-import AppLock from '../../screens/settings/app-lock';
 import { Button } from '../ui/button';
 import { SvgView } from '../ui/svg';
 import { BouncingView } from '../ui/transitions/bouncing-view';
@@ -29,26 +28,9 @@ const Intro = () => {
   const isTelemetryEnabled = useSettingStore(state => state.settings.telemetry);
   const { height } = useWindowDimensions();
 
-  const opacity = useValue(0);
-  const translateY = useValue(5);
-  const translateY2 = useValue(0);
-  const insets = useSafeAreaInsets();
-
   useEffect(() => {
     if (!introCompleted) {
       umami.pageView('/welcome', '', []);
-      setTimeout(() => {
-        timing(opacity, {
-          toValue: 1,
-          duration: 600,
-          easing: Easing.in(Easing.ease)
-        }).start();
-        timing(translateY, {
-          toValue: 0,
-          duration: 1000,
-          easing: Easing.in(Easing.ease)
-        }).start();
-      }, 15);
     }
   }, [introCompleted]);
 
@@ -60,19 +42,14 @@ const Intro = () => {
 
   return (
     !introCompleted && (
-      <Animated.View
+      <View
         testID="notesnook.splashscreen"
         style={{
           zIndex: 999,
           width: '100%',
           height: '100%',
           position: 'absolute',
-          backgroundColor: colors.bg,
-          transform: [
-            {
-              translateY: translateY2
-            }
-          ]
+          backgroundColor: colors.bg
         }}
       >
         <SafeAreaView
@@ -85,21 +62,16 @@ const Intro = () => {
           }}
         >
           <Animated.View
+            layout={FadeIn.duration(500)}
             style={{
               width: '100%',
               height: '100%',
               justifyContent: 'center',
-              alignItems: 'center',
-              opacity: opacity,
-              transform: [
-                {
-                  translateY: translateY
-                }
-              ]
+              alignItems: 'center'
             }}
           >
             <Image
-              source={require('../../assets/images/notesnook-logo-png.png')}
+              source={require('../../assets/images/notesnook.png')}
               style={{
                 width: 40,
                 height: 40,
@@ -218,7 +190,7 @@ const Intro = () => {
             </BouncingView>
           </Animated.View>
         </SafeAreaView>
-      </Animated.View>
+      </View>
     )
   );
 };

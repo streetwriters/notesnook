@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Button } from '../../components/ui/button';
 import Heading from '../../components/ui/typography/heading';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import {
   eSendEvent,
   eSubscribeEvent,

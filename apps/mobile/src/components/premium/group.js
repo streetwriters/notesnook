@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';

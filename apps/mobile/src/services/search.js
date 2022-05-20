@@ -1,11 +1,13 @@
-import { useSearchStore } from '../stores/stores';
+import { useSearchStore } from '../stores/use-search-store';
 import { db } from '../utils/database';
+
+let prepareSearch = () => {};
 
 let searchInformation = {
   placeholder: 'Search in all notes',
   data: [],
   type: 'notes',
-  get: null
+  get: () => null
 };
 
 let keyword = null;
@@ -32,8 +34,8 @@ async function search(silent) {
 
   let results;
   if (!searchInformation.type) return;
-
-  results = await db.lookup[searchInformation.type](searchInformation.data, term);
+  let searchableData = searchInformation.get ? searchInformation.get() : [];
+  results = await db.lookup[searchInformation.type](searchableData, term);
 
   if (!results || results.length === 0) {
     searchstore.setSearchStatus(
@@ -53,7 +55,6 @@ function getSearchInformation() {
 
 function updateAndSearch() {
   if (!keyword || keyword === '') return;
-  searchInformation.data = searchInformation.get() || [];
   search(true);
 }
 
@@ -62,7 +63,8 @@ const SearchService = {
   getSearchInformation,
   search,
   setTerm,
-  updateAndSearch
+  updateAndSearch,
+  prepareSearch
 };
 
 export default SearchService;

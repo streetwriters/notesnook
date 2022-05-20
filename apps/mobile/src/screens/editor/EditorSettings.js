@@ -12,7 +12,7 @@ import Input from '../../components/ui/input';
 import { PressableButton } from '../../components/ui/pressable';
 import Seperator from '../../components/ui/seperator';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';

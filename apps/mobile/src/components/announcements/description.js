@@ -1,5 +1,5 @@
 import React from 'react';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import Paragraph from '../ui/typography/paragraph';
 import { getStyle } from './functions';

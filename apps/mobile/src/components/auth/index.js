@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useThemeStore } from '../../stores/theme';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eCloseLoginDialog, eOpenLoginDialog } from '../../utils/events';
 import { sleep } from '../../utils/time';
 import BaseDialog from '../dialog/base-dialog';
 import { Toast } from '../toast';
+import { IconButton } from '../ui/icon-button';
 import { Login } from './login';
 import { Signup } from './signup';
 
@@ -20,6 +23,7 @@ const Auth = () => {
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     eSubscribeEvent(eOpenLoginDialog, open);
@@ -55,8 +59,6 @@ const Auth = () => {
       background={colors.bg}
       transparent={false}
     >
-      <Toast context="local" />
-
       {currentAuthMode !== AuthMode.login ? (
         <Signup
           changeMode={mode => setCurrentAuthMode(mode)}
@@ -66,6 +68,24 @@ const Auth = () => {
       ) : (
         <Login changeMode={mode => setCurrentAuthMode(mode)} />
       )}
+
+      {currentAuthMode === AuthMode.welcomeSignup ? null : (
+        <IconButton
+          name="arrow-left"
+          onPress={() => {
+            eSendEvent(eCloseLoginDialog);
+          }}
+          color={colors.pri}
+          customStyle={{
+            position: 'absolute',
+            zIndex: 999,
+            left: 12,
+            top: Platform.OS === 'ios' ? 12 + insets.top : 12
+          }}
+        />
+      )}
+
+      <Toast context="local" />
     </BaseDialog>
   );
 };

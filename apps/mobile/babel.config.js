@@ -3,15 +3,25 @@ const configs = {
   env: {
     development: {
       presets: ['module:metro-react-native-babel-preset'],
-      plugins: ['@babel/plugin-transform-named-capturing-groups-regex']
+      plugins: [
+        '@babel/plugin-transform-named-capturing-groups-regex',
+        'react-native-reanimated/plugin'
+      ]
     },
     test: {
       presets: ['module:metro-react-native-babel-preset'],
-      plugins: ['@babel/plugin-transform-named-capturing-groups-regex']
+      plugins: [
+        '@babel/plugin-transform-named-capturing-groups-regex',
+        'react-native-reanimated/plugin'
+      ]
     },
     production: {
       presets: ['module:metro-react-native-babel-preset'],
-      plugins: ['transform-remove-console', '@babel/plugin-transform-named-capturing-groups-regex']
+      plugins: [
+        'transform-remove-console',
+        '@babel/plugin-transform-named-capturing-groups-regex',
+        'react-native-reanimated/plugin'
+      ]
     }
   }
 };

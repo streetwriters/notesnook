@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.webkit.WebView;
 import com.facebook.react.ReactActivityDelegate;
 import com.zoontek.rnbootsplash.RNBootSplash; 
-import com.zoontek.rnbars.RNBars; // <- add this necessary import
+import com.zoontek.rnbars.RNBars;
+import com.facebook.react.ReactActivityDelegate;
+import com.facebook.react.ReactRootView;
 
 public class MainActivity extends ReactActivity {
 
@@ -28,20 +30,37 @@ public class MainActivity extends ReactActivity {
     }
 
   }
-  
+
+    /**
+   * Returns the instance of the {@link ReactActivityDelegate}. There the RootView is created and
+   * you can specify the rendered you wish to use (Fabric or the older renderer).
+   */
+  @Override
+  protected ReactActivityDelegate createReactActivityDelegate() {
+    return new MainActivityDelegate(this, getMainComponentName());
+  }
+
+  public static class MainActivityDelegate extends ReactActivityDelegate {
+    public MainActivityDelegate(ReactActivity activity, String mainComponentName) {
+      super(activity, mainComponentName);
+    }
+    @Override
+    protected ReactRootView createRootView() {
+      ReactRootView reactRootView = new ReactRootView(getContext());
+      // If you opted-in for the New Architecture, we enable the Fabric Renderer.
+      reactRootView.setIsFabric(BuildConfig.IS_NEW_ARCHITECTURE_ENABLED);
+	
+      return reactRootView;
+    }
 
     @Override
-  protected ReactActivityDelegate createReactActivityDelegate() {
-    return new ReactActivityDelegate(this, getMainComponentName()) {
-
-      @Override
       protected void loadApp(String appKey) {
-        RNBootSplash.init(MainActivity.this);
-        RNBars.init(MainActivity.this, "dark-content");
+        RNBootSplash.init(getPlainActivity());
+        RNBars.init(getPlainActivity(), "dark-content");
         super.loadApp(appKey);
       }
-    };
   }
+  
 
 @Override
 public void onNewIntent(Intent intent) {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
-import { useThemeStore } from '../../../../stores/theme';
 import layoutmanager from '../../../../utils/layout-manager';
 import { normalize } from '../../../../utils/size';
 import { EditorWebView } from '../../Functions';

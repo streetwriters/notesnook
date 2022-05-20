@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { IconButton } from '../../components/ui/icon-button';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
 import useKeyboard from '../../utils/hooks/use-keyboard';
 import { SIZE } from '../../utils/size';
 import { EditorWebView } from './Functions';

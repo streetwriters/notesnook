@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Button } from '../../components/ui/button';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../stores/theme';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { editing } from '../../utils';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eOnLoadNote } from '../../utils/events';
 import { SIZE } from '../../utils/size';
-import { sleep, timeConverter } from '../../utils/time';
+import { timeConverter } from '../../utils/time';
 import { editorState } from './tiptap/utils';
 
 let timer = null;
@@ -19,7 +18,13 @@ const EditorOverlay = () => {
   const colors = useThemeStore(state => state.colors);
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
-  const opacity = useValue(1);
+  const opacity = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value
+    };
+  });
 
   const load = async _loading => {
     editorState().overlay = true;
@@ -27,11 +32,10 @@ const EditorOverlay = () => {
     clearTimeout(timerError);
     clearTimeout(timerClosing);
     if (_loading) {
-      opacity.setValue(1);
+      opacity.value = 1;
       setLoading(_loading);
       timerError = setTimeout(() => {
         if (_loading) {
-          console.log('could not load');
           let _n = _loading;
           _n.forced = true;
           eSendEvent(eOnLoadNote, _n);
@@ -44,17 +48,18 @@ const EditorOverlay = () => {
       clearTimeout(timerClosing);
       setError(false);
       editorState().overlay = false;
-      timing(opacity, {
-        toValue: 0,
-        duration: 150,
-        easing: Easing.in(Easing.ease)
-      }).start();
+      opacity.value = withTiming(0, { duration: 150 });
       timerClosing = setTimeout(() => {
-        opacity.setValue(1);
         setLoading(null);
       }, 150);
     }
   };
+
+  useEffect(() => {
+    if (!loading) {
+      opacity.value = 1;
+    }
+  }, [loading]);
 
   useEffect(() => {
     eSubscribeEvent('loadingNote', load);
@@ -65,21 +70,23 @@ const EditorOverlay = () => {
 
   return (
     <Animated.View
-      style={{
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        backgroundColor: colors.bg,
-        justifyContent: 'center',
-        alignItems: 'center',
-        opacity: opacity,
-        transform: [
-          {
-            translateY: loading ? 0 : 6000
-          }
-        ],
-        zIndex: 100
-      }}
+      style={[
+        {
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          backgroundColor: colors.bg,
+          justifyContent: 'center',
+          alignItems: 'center',
+          transform: [
+            {
+              translateY: loading ? 0 : 6000
+            }
+          ],
+          zIndex: 100
+        },
+        animatedStyle
+      ]}
     >
       <Animated.View
         style={{

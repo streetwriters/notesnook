@@ -5,7 +5,7 @@ export type useEditorType = ReturnType<typeof useEditor>;
 export type EditorState = {
   currentlyEditing: boolean;
   isFullscreen: boolean;
-  onNoteCreated: (id: string) => void;
+  onNoteCreated?: ((id: string) => void) | null;
   isFocused: boolean;
   focusType: 'title' | 'editor' | null;
   movedAway: boolean;

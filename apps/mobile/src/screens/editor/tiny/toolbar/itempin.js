@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
-import { useThemeStore } from '../../../../stores/theme';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/event-manager';
+import { useThemeStore } from '../../../../stores/use-theme-store';
 import { sleep } from '../../../../utils/time';
 
 const ToolbarItemPin = ({ format, color }) => {
   const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
-  let scale = useValue(0);
+  let scale = useSharedValue(0);
+
   useEffect(() => {
     eSubscribeEvent('showTooltip', show);
     return () => {
@@ -19,11 +25,10 @@ const ToolbarItemPin = ({ format, color }) => {
   async function animate(val, time = 200) {
     if (animating) return;
     animating = true;
-    timing(scale, {
-      toValue: val,
+    scale.value = withTiming(val, {
       duration: time,
       easing: Easing.in(Easing.ease)
-    }).start();
+    });
     await sleep(time);
     animating = false;
   }
@@ -40,21 +45,29 @@ const ToolbarItemPin = ({ format, color }) => {
     }
   };
 
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: scale.value
+        }
+      ]
+    };
+  }, []);
+
   return (
     visible && (
       <Animated.View
-        style={{
-          width: '100%',
-          height: 3,
-          backgroundColor: color || colors.accent,
-          position: 'absolute',
-          top: 0,
-          transform: [
-            {
-              scale: scale
-            }
-          ]
-        }}
+        style={[
+          {
+            width: '100%',
+            height: 3,
+            backgroundColor: color || colors.accent,
+            position: 'absolute',
+            top: 0
+          },
+          animatedStyle
+        ]}
       />
     )
   );

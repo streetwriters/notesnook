@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/theme';
-import { useTagStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useTagStore } from '../../../stores/use-tag-store';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import { db } from '../../../utils/database';
@@ -113,11 +113,15 @@ const ManageTagsSheet = () => {
       });
     }
 
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes',
+      'Notebooks',
+      'Notebook'
+    );
   };
 
   return !visible ? null : (
@@ -230,11 +234,13 @@ const TagItem = ({ tag, note, setNote }) => {
       setNote(db.notes.note(note.id).data);
     } catch (e) {}
     setTimeout(() => {
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes
-      ]);
+      Navigation.queueRoutesForUpdate(
+        'Notes',
+        'Favorites',
+        'ColoredNotes',
+        'TaggedNotes',
+        'TopicNotes'
+      );
     }, 1);
   };
 

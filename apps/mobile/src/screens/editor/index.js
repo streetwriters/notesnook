@@ -2,7 +2,7 @@ import React from 'react';
 import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
-import { useUserStore } from '../../stores/stores';
+import { useUserStore } from '../../stores/use-user-store';
 import EditorHeader from './EditorHeader';
 import { sourceUri, _onShouldStartLoadWithRequest } from './Functions';
 import { useEditor } from './tiptap/use-editor';

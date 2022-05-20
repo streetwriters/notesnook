@@ -29,11 +29,17 @@ import com.oblador.keychain.KeychainPackage;
 import com.onibenjo.htmltopdf.RNHTMLtoPDFModule;
 import com.reactnativedocumentpicker.DocumentPickerModule;
 import com.vinzscam.reactnativefileviewer.RNFileViewerModule;
-
+import com.facebook.react.config.ReactFeatureFlags;
+import com.streetwriters.notesnook.newarchitecture.MainApplicationReactNativeHost;
 import cl.json.RNShareModule;
 import px.tooltips.RNTooltipsModule;
+import com.facebook.react.bridge.JSIModulePackage; // <- add  
+import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
+
+      private final ReactNativeHost mNewArchitectureNativeHost =
+      new MainApplicationReactNativeHost(this);
 
     private final ReactNativeHost mReactNativeHost =
             new ReactNativeHost(this) {
@@ -44,11 +50,8 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
 
                 @Override
                 protected List<ReactPackage> getPackages() {
-
                     List<ReactPackage> packages = new PackageList(this).getPackages();
-                    //packages.add(new KeychainPackage(new KeychainModuleBuilder().withoutWarmUp()));
-
-                    packages.add(new TurboReactPackage() {
+                      packages.add(new TurboReactPackage() {
                         @Override
                         public NativeModule getModule(String name, ReactApplicationContext reactContext) {
 
@@ -94,13 +97,16 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
 
                         }
                     });
-
                     return packages;
                 }
 
                 @Override
                 protected String getJSMainModuleName() {
                     return "index";
+                }
+
+                 @Override protected JSIModulePackage getJSIModulePackage() {        
+                     return new ReanimatedJSIModulePackage(); // <- add      
                 }
             };
 
@@ -112,12 +118,18 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
 
     @Override
     public ReactNativeHost getReactNativeHost() {
-        return mReactNativeHost;
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      return mNewArchitectureNativeHost;
+    } else {
+      return mReactNativeHost;
+    }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+         // If you opted-in for the New Architecture, we enable the TurboModule system
+        ReactFeatureFlags.useTurboModules = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
         SoLoader.init(this, /* native exopackage */ false);
         initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
     }

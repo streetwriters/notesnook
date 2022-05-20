@@ -2,8 +2,8 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/theme';
-import { useAttachmentStore } from '../../../stores/stores';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useAttachmentStore } from '../../../stores/use-attachment-store';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import { db } from '../../../utils/database';
@@ -76,11 +76,13 @@ const PublishNoteSheet = () => {
           password: isLocked && passwordValue
         });
         setNote(db.notes.note(note.id)?.data);
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'Notes',
+          'Favorites',
+          'ColoredNotes',
+          'TaggedNotes',
+          'TopicNotes'
+        );
       }
     } catch (e) {
       ToastEvent.show({
@@ -101,11 +103,13 @@ const PublishNoteSheet = () => {
       if (note?.id) {
         await db.monographs.unpublish(note.id);
         setNote(db.notes.note(note.id)?.data);
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'Notes',
+          'Favorites',
+          'ColoredNotes',
+          'TaggedNotes',
+          'TopicNotes'
+        );
       }
     } catch (e) {
       ToastEvent.show({

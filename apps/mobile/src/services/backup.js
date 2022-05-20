@@ -61,8 +61,7 @@ async function checkBackupDirExists(reset = false) {
       }
       presentDialog({
         title: 'Select backup folder',
-        paragraph:
-          'Please select a folder where you would like to store backup files. You can change or disable automatic backups in settings however we highly recommend that you keep them on.',
+        paragraph: 'Please select a folder where you would like to store backup files.',
         positivePress: async () => {
           resolve(await getDirectoryAndroid());
         },

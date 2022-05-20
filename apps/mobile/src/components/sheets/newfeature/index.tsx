@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { APP_VERSION } from '../../../../version';
 import { eSendEvent, presentSheet } from '../../../services/event-manager';
 import SettingsService from '../../../services/settings';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { eCloseProgressDialog } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
 import { Button } from '../../ui/button';
@@ -77,6 +77,7 @@ NewFeature.present = () => {
   SettingsService.set({
     version: APP_VERSION
   });
+  if (features.length === 0) return;
   presentSheet({
     component: <NewFeature features={features} />
   });

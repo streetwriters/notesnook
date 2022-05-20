@@ -4,7 +4,7 @@ import ActionSheet from 'react-native-actions-sheet';
 import { DDS } from '../../services/device-detection';
 import { ToastEvent } from '../../services/event-manager';
 import SettingsService from '../../services/settings';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
 import DialogHeader from '../dialog/dialog-header';
 import { Button } from '../ui/button';

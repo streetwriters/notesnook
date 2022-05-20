@@ -1,51 +1,67 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import Animated, { Layout } from 'react-native-reanimated';
+import Notebook from '../../screens/notebook';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
-import { eOnNewTopicAdded, eScrollEvent } from '../../utils/events';
+import useNavigationStore from '../../stores/use-navigation-store';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { db } from '../../utils/database';
+import { eScrollEvent } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 
-export const Title = ({ heading, headerColor, screen, notebook }) => {
+const titleState = {};
+
+export const Title = () => {
   const colors = useThemeStore(state => state.colors);
-  const [hide, setHide] = useState(screen === 'Notebook' ? true : false);
+  const currentScreen = useNavigationStore(state => state.currentScreen);
+  const isTopic = currentScreen.type === 'topic';
+  const [hide, setHide] = useState(isTopic ? true : false);
+  const isHidden = titleState[currentScreen.id];
+  const notebook = isTopic ? db.notebooks?.notebook(currentScreen.notebookId)?.data : null;
+  const title = currentScreen.title;
+  const isTag = title.slice(0, 1) === '#';
 
   const onScroll = data => {
-    if (screen !== 'Notebook') {
+    if (currentScreen.name !== 'Notebook') {
       setHide(false);
       return;
     }
     if (data.y > 150) {
+      if (!hide) return;
       setHide(false);
     } else {
+      if (hide) return;
       setHide(true);
     }
   };
+
+  useEffect(() => {
+    if (currentScreen.name === 'Notebook') {
+      let value =
+        typeof titleState[currentScreen.id] === 'boolean' ? titleState[currentScreen.id] : true;
+      setHide(value);
+    } else {
+      setHide(titleState[currentScreen.id]);
+    }
+  }, [currentScreen.id]);
+
+  useEffect(() => {
+    titleState[currentScreen.id] = hide;
+  }, [hide]);
 
   useEffect(() => {
     eSubscribeEvent(eScrollEvent, onScroll);
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, []);
+  }, [hide]);
 
   function navigateToNotebook() {
-    if (!notebook) return;
-    let routeName = 'Notebook';
-    let params = {
-      menu: false,
-      notebook: notebook,
-      title: notebook.title
-    };
-    let headerState = {
-      heading: notebook.title,
-      id: notebook.id,
-      type: notebook.type
-    };
-    eSendEvent(eOnNewTopicAdded, params);
-    Navigation.navigate(routeName, params, headerState);
+    if (!isTopic) return;
+    Notebook.navigate(notebook, true);
   }
 
   return (
@@ -56,24 +72,28 @@ export const Title = ({ heading, headerColor, screen, notebook }) => {
         flexDirection: 'row'
       }}
     >
-      {!hide ? (
+      {!hide && !isHidden ? (
         <Heading
           onPress={navigateToNotebook}
-          numberOfLines={notebook ? 2 : 1}
-          size={notebook ? SIZE.md + 2 : SIZE.xl}
+          numberOfLines={isTopic ? 2 : 1}
+          size={isTopic ? SIZE.md + 2 : SIZE.xl}
           style={{
             flexWrap: 'wrap'
           }}
-          color={headerColor}
+          color={currentScreen.color}
         >
-          {notebook ? (
+          {isTopic ? (
             <Paragraph numberOfLines={1} size={SIZE.xs + 1}>
               {notebook?.title}
               {'\n'}
             </Paragraph>
           ) : null}
-          <Heading color={colors.accent}>{heading.slice(0, 1) === '#' ? '#' : null}</Heading>
-          {heading.slice(0, 1) === '#' ? heading.slice(1) : heading}
+          {isTag ? (
+            <Heading size={isTopic ? SIZE.md + 2 : SIZE.xl} color={colors.accent}>
+              #
+            </Heading>
+          ) : null}
+          {isTag ? title.slice(1) : title}
         </Heading>
       ) : null}
     </View>

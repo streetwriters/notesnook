@@ -1,0 +1,24 @@
+diff --git a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
+index f0f6402..d645d81 100644
+--- a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
++++ b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
+@@ -685,7 +685,18 @@ RCT_SCROLL_EVENT_HANDLER(scrollViewDidScrollToTop, onScrollToTop)
+                                          : MAX(0, _scrollView.contentSize.height - viewportSize.height);
+ 
+     // Calculate the snap offsets adjacent to the initial offset target
+-    CGFloat targetOffset = isHorizontal ? targetContentOffset->x : targetContentOffset->y;
++    //CGFloat targetOffset = isHorizontal ? targetContentOffset->x : targetContentOffset->y;
++    /**
++     * https://github.com/facebook/react-native/pull/30033/files/af9c24639073e57f4e309851893e96da2e54271d..52a3d8d87778614b84a113f9198b88fc152a5a26
++     */
++    CGFloat targetOffset = targetContentOffset->y;
++    if (isHorizontal) {
++      // Use current scroll offset to determine the next index to snap to when momentum disabled
++      targetOffset = self.disableIntervalMomentum ? scrollView.contentOffset.x : targetContentOffset->x;
++    } else {
++      targetOffset = self.disableIntervalMomentum ? scrollView.contentOffset.y : targetContentOffset->y;
++   }
++
+     CGFloat smallerOffset = 0.0;
+     CGFloat largerOffset = maximumOffset;
+ 

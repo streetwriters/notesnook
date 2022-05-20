@@ -1,7 +1,8 @@
 import NetInfo from '@react-native-community/netinfo';
 import { EVENTS } from 'notes-core/common';
 import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
-import { initialize, useUserStore } from '../stores/stores';
+import { initialize } from '../stores';
+import { useUserStore } from '../stores/use-user-store';
 import { doInBackground } from '../utils';
 import { db } from '../utils/database';
 import { ToastEvent } from './event-manager';
@@ -12,7 +13,8 @@ export const ignoredMessages = ['Sync already running', 'Not allowed to start se
 const run = async (context = 'global', forced = false, full = true) => {
   let result = false;
   const userstore = useUserStore.getState();
-  if (!userstore.user) {
+  const user = db.user.getUser();
+  if (!user) {
     initialize();
     return true;
   }
@@ -20,8 +22,10 @@ const run = async (context = 'global', forced = false, full = true) => {
   let error = null;
   console.log('Sync.run started');
   try {
+    console.log('DO IN BACKGROUND START');
     let res = await doInBackground(async () => {
       try {
+        console.log('DO IN BACKGROUND');
         await db.sync(full, forced);
         return true;
       } catch (e) {

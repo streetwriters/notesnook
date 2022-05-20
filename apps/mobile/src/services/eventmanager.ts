@@ -1,5 +1,7 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import EventManager from 'notes-core/utils/event-manager';
+import { RefObject } from 'react';
+import ActionSheet from 'react-native-actions-sheet';
 import {
   eHideToast,
   eOnNoteEdited,
@@ -56,7 +58,33 @@ export function sendNoteEditedEvent(data: any) {
   eSendEvent(eOnNoteEdited, data);
 }
 
-export function presentSheet(data: any) {
+type SheetAction = {
+  action: () => void;
+  actionText: string;
+  iconColor?: string;
+  icon?: string;
+  type?: string;
+};
+
+export type PresentSheetOptions = {
+  context: string;
+  component: JSX.Element | ((ref: RefObject<ActionSheet>, close?: () => void) => JSX.Element);
+  disableClosing: boolean;
+  onClose: () => void;
+  progress: boolean;
+  icon: string;
+  title: string;
+  paragraph: string;
+  valueArray?: string[];
+  action: () => void;
+  actionText: string;
+  iconColor?: string;
+  actionsArray: SheetAction[];
+  learnMore: string;
+  learnMorePress: () => void;
+};
+
+export function presentSheet(data: Partial<PresentSheetOptions>) {
   eSendEvent(eOpenProgressDialog, data);
 }
 

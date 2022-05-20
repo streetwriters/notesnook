@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, Text, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
 import { db } from '../../utils/database';

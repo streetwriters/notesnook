@@ -11,18 +11,9 @@ import {
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
-import { doInBackground, editing } from '..';
 import { Walkthrough } from '../../components/walkthroughs';
 import { editorState } from '../../screens/editor/tiptap/utils';
-import Backup from '../../services/backup';
 import BiometricService from '../../services/biometrics';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  presentSheet,
-  ToastEvent
-} from '../../services/event-manager';
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -31,25 +22,26 @@ import {
 } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import Sync, { ignoredMessages } from '../../services/sync';
-import {
-  clearAllStores,
-  initialize,
-  useAttachmentStore,
-  useEditorStore,
-  useMessageStore,
-  useNoteStore,
-  useSettingStore,
-  useUserStore
-} from '../../stores/stores';
 import { updateStatusBarColor } from '../color-scheme';
 import { db } from '../database';
 import { MMKV } from '../database/mmkv';
-import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage } from '../events';
-import { sleep } from '../time';
+import { eClearEditor, eCloseProgressDialog, refreshNotesPage } from '../events';
+import Sync from '../../services/sync';
+import { clearAllStores, initialize } from '../../stores';
+import { useUserStore } from '../../stores/use-user-store';
+import { useMessageStore } from '../../stores/use-message-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useAttachmentStore } from '../../stores/use-attachment-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from '../../services/event-manager';
+import { useEditorStore } from '../../stores/use-editor-store';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
-
 export const useAppEvents = () => {
   const loading = useNoteStore(state => state.loading);
   const setLastSynced = useUserStore(state => state.setLastSynced);
@@ -99,12 +91,14 @@ export const useAppEvents = () => {
     if (!loading) {
       const eventManager = db?.eventManager;
       eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress);
-      eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
+      let sub = eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
       eventManager?.subscribe(EVENTS.syncCompleted, onSyncComplete);
+      console.log('SUBSCRIBED', sub);
     }
 
     return () => {
       const eventManager = db?.eventManager;
+      console.log('UNSUBSCRIBED');
       eventManager?.unsubscribe(EVENTS.syncCompleted, onSyncComplete);
       eventManager?.unsubscribe(EVENTS.syncProgress, onSyncProgress);
       eventManager?.unsubscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
@@ -251,31 +245,7 @@ export const useAppEvents = () => {
   };
 
   const onLogout = async reason => {
-    setUser(null);
-    clearAllStores();
-
-    SettingsService.init();
-    setSyncing(false);
-    setLoginMessage();
-    await PremiumService.setPremiumStatus();
-    SettingsService.set({
-      introCompleted: true
-    });
-    presentSheet({
-      title: reason ? reason : 'User logged out',
-      paragraph: `You have been logged out of your account.`,
-      action: async () => {
-        eSendEvent(eCloseProgressDialog);
-        await sleep(300);
-        eSendEvent(eOpenLoginDialog);
-      },
-      icon: 'logout',
-      actionText: 'Login'
-    });
-
-    setTimeout(() => {
-      initialize();
-    }, 1000);
+    console.log('LOGOUT', reason);
   };
 
   const unsubIAP = () => {
@@ -324,7 +294,9 @@ export const useAppEvents = () => {
           userEmailConfirmed: true
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      ToastEvent.error(e, 'An error occured', 'global');
+    }
 
     user = await db.user.getUser();
     if (
@@ -335,18 +307,6 @@ export const useAppEvents = () => {
       setRecoveryKeyMessage();
     }
     if (!user.isEmailConfirmed) setEmailVerifyMessage();
-
-    if (!login) {
-      if (PremiumService.get() && user) {
-        if (SettingsService.get().reminder === 'off') {
-          await SettingsService.set({ reminder: 'daily' });
-        }
-        if (Backup.checkBackupRequired()) {
-          sleep(2000).then(() => Backup.checkAndRun());
-        }
-      }
-    }
-
     refValues.current.isUserReady = true;
 
     syncedOnLaunch.current = true;
@@ -465,14 +425,14 @@ export const useAppEvents = () => {
         movedAway: editorState().movedAway,
         timestamp: Date.now()
       });
-      await MMKV.setItem('appState', state);
+      MMKV.setString('appState', state);
     }
   }
 
   async function checkIntentState() {
     try {
-      let notesAddedFromIntent = await MMKV.getItem('notesAddedFromIntent');
-      let shareExtensionOpened = await MMKV.getItem('shareExtensionOpened');
+      let notesAddedFromIntent = MMKV.getString('notesAddedFromIntent');
+      let shareExtensionOpened = MMKV.getString('shareExtensionOpened');
       if (notesAddedFromIntent) {
         if (Platform.OS === 'ios') {
           await db.init();

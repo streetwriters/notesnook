@@ -4,7 +4,7 @@ import FileViewer from 'react-native-file-viewer';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { ToastEvent } from '../../../services/event-manager';
 import Exporter from '../../../services/exporter';
 import { getElevation } from '../../../utils';
