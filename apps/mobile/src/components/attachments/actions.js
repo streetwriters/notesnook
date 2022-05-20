@@ -2,7 +2,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import picker from '../../screens/editor/tiny/toolbar/picker';
+import picker from '../../screens/editor/tiptap/picker';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
 import { useAttachmentStore } from '../../stores/use-attachment-store';

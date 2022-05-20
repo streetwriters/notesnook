@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
 import { IconButton } from '../../components/ui/icon-button';
-import { useThemeStore } from '../../stores/use-theme-store';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { useThemeStore } from '../../stores/use-theme-store';
 import useKeyboard from '../../utils/hooks/use-keyboard';
 import { SIZE } from '../../utils/size';
-import { EditorWebView } from './Functions';
-import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 import { editorState } from './tiptap/utils';
 
 const HistoryComponent = () => {
@@ -48,7 +46,6 @@ const HistoryComponent = () => {
           }}
           onPress={() => {
             editorState().keyboardState = true;
-            safeKeyboardDismiss();
           }}
         />
       ) : null}
@@ -64,7 +61,7 @@ const HistoryComponent = () => {
         }}
         onPress={() => {
           if (!historyState.undo) return;
-          tiny.call(EditorWebView, tiny.undo);
+          //  tiny.call(EditorWebView, tiny.undo);
         }}
       />
       <IconButton
@@ -78,7 +75,7 @@ const HistoryComponent = () => {
         }}
         onPress={() => {
           if (!historyState.redo) return;
-          tiny.call(EditorWebView, tiny.redo);
+          //  tiny.call(EditorWebView, tiny.redo);
         }}
       />
     </View>

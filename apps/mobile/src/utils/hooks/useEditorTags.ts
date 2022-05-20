@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useEditorStore } from '../../stores/use-editor-store';
 import { useTagStore } from '../../stores/use-tag-store';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { db } from '../database';
-import { EditorWebView } from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
 
 /**
  * A hook that injects/removes tags from tags bar in editor
@@ -33,7 +31,7 @@ const useEditorTags = () => {
 
   function load() {
     if (!note) return;
-    tiny.call(EditorWebView, renderTags(noteTags));
+    //  tiny.call(EditorWebView, renderTags(noteTags));
   }
 
   useEffect(() => {
@@ -54,20 +52,6 @@ const useEditorTags = () => {
   useEffect(() => {
     load();
   }, [noteTags]);
-
-  // const hideTagBar = `
-  //   toggleNode(".tag-bar-parent","hide");
-  //   clearNode(".tag-bar")`;
-  // const showTagBar = `
-  //   toggleNode(".tag-bar-parent","show");
-  //   clearNode(".tag-bar")`;
-  // const clearNode = `clearNode(".tag-bar")`;
-  const renderTags = (tags: any) => `(function() {
-      clearNode(".tag-bar");
-      toggleNode(".tag-bar-parent","show")
-      let items = ${JSON.stringify(tags)};
-      renderChildernInNode(items, ".tag-bar", "div", ["tag","noselect"]);
-    })();`;
 
   return [];
 };

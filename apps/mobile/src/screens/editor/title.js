@@ -4,7 +4,6 @@ import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
-import { post, _onMessage } from './Functions';
 
 export const EditorTitle = () => {
   const colors = useThemeStore(state => state.colors);
@@ -51,15 +50,15 @@ export const EditorTitle = () => {
         placeholderTextColor={colors.placeholder}
         onChangeText={text => {
           setTitle(text);
-          post('title', text);
-          _onMessage({
-            nativeEvent: {
-              data: JSON.stringify({
-                type: 'title',
-                value: text
-              })
-            }
-          });
+          // post('title', text);
+          // _onMessage({
+          //   nativeEvent: {
+          //     data: JSON.stringify({
+          //       type: 'title',
+          //       value: text
+          //     })
+          //   }
+          // });
         }}
       />
     </Animated.View>

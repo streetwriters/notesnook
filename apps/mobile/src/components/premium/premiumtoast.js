@@ -1,19 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
-import { EditorWebView } from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
+import { editorState } from '../../screens/editor/tiptap/utils';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
-import { editing, getElevation } from '../../utils';
+import { getElevation } from '../../utils';
 import { eCloseActionSheet, eOpenPremiumDialog, eShowGetPremium } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { Button } from '../ui/button';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
-import { editorState } from '../../screens/editor/tiptap/utils';
 
 export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
   const colors = useThemeStore(state => state.colors);
@@ -52,7 +50,7 @@ export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
     open(null);
     eSendEvent(eCloseActionSheet);
     if (editorState().isFocused) {
-      tiny.call(EditorWebView, tiny.blur);
+      //tiny.call(EditorWebView, tiny.blur);
     }
     await sleep(300);
     eSendEvent(eOpenPremiumDialog);

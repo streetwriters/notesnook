@@ -1,7 +1,5 @@
 //@ts-ignore
 import create from 'zustand';
-import { EditorWebView } from '../screens/editor/Functions';
-import tiny from '../screens/editor/tiny/tiny';
 
 interface AttachmentStore {
   progress?: {
@@ -33,18 +31,18 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     let _p = get().progress;
     if (!_p) return;
     _p[hash] = null;
-    tiny.call(
-      EditorWebView,
-      `
-    (function() {
-      let progress = ${JSON.stringify({
-        loaded: 1,
-        total: 1,
-        hash
-      })}
-    tinymce.activeEditor._updateAttachmentProgress(progress);
-    })()`
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `
+    // (function() {
+    //   let progress = ${JSON.stringify({
+    //     loaded: 1,
+    //     total: 1,
+    //     hash
+    //   })}
+    // tinymce.activeEditor._updateAttachmentProgress(progress);
+    // })()`
+    // );
     set({ progress: { ..._p } });
   },
   setProgress: (sent, total, hash, recieved, type) => {
@@ -52,14 +50,14 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     if (!_p) return;
     _p[hash] = { sent, total, hash, recieved, type };
     let progress = { total, hash, loaded: type === 'download' ? recieved : sent };
-    tiny.call(
-      EditorWebView,
-      `
-    (function() {
-      let progress = ${JSON.stringify(progress)}
-      tinymce.activeEditor._updateAttachmentProgress(progress);
-    })()`
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `
+    // (function() {
+    //   let progress = ${JSON.stringify(progress)}
+    //   tinymce.activeEditor._updateAttachmentProgress(progress);
+    // })()`
+    // );
     set({ progress: { ..._p } });
   },
   encryptionProgress: 0,

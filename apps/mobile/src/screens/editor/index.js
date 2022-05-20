@@ -4,9 +4,10 @@ import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
 import { useUserStore } from '../../stores/use-user-store';
 import EditorHeader from './header';
-import { sourceUri, _onShouldStartLoadWithRequest } from './Functions';
 import { useEditor } from './tiptap/use-editor';
 import { editorController } from './tiptap/utils';
+
+const sourceUri = '';
 
 const source = { uri: sourceUri + 'index.html' };
 
@@ -48,7 +49,7 @@ const Editor = React.memo(
             javaScriptEnabled={true}
             focusable={true}
             keyboardDisplayRequiresUserAction={false}
-            onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+            // onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
             cacheMode="LOAD_DEFAULT"
             cacheEnabled={true}
             domStorageEnabled={true}
@@ -63,7 +64,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: 'http://192.168.10.6:3000'
+              uri: 'http://192.168.10.5:3000'
             }}
             style={style}
             autoManageStatusBarEnabled={false}

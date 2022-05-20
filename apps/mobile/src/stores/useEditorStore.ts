@@ -1,8 +1,5 @@
 //@ts-ignore
 import create, { State } from 'zustand';
-import { EditorWebView } from '../screens/editor/Functions';
-import tiny from '../screens/editor/tiny/tiny';
-import { endSearch } from '../screens/editor/tiny/toolbar/commands';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
 
 export interface EditorStore extends State {
@@ -23,7 +20,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   sessionId: null,
   setSessionId: sessionId => {
     console.log(sessionId, 'session id');
-    tiny.call(EditorWebView, `sessionId="${sessionId}";`);
+    // tiny.call(EditorWebView, `sessionId="${sessionId}";`);
     set({ sessionId });
   },
   searchReplace: false,
@@ -41,19 +38,19 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       eUnSubscribeEvent('selectionvalue', func);
       console.log('setSearchReplace:', value, value.length);
       if (!value && get().searchReplace) {
-        endSearch();
+        //  endSearch();
         return;
       }
       set({ searchSelection: value, searchReplace: true });
     };
     eSubscribeEvent('selectionvalue', func);
-    tiny.call(
-      EditorWebView,
-      `(function() {
-      if (editor) {
-        reactNativeEventHandler('selectionvalue',editor.selection.getContent());
-      }
-    })();`
-    );
+    // tiny.call(
+    //   EditorWebView,
+    //   `(function() {
+    //   if (editor) {
+    //     reactNativeEventHandler('selectionvalue',editor.selection.getContent());
+    //   }
+    // })();`
+    // );
   }
 }));

@@ -4,8 +4,9 @@ import { DDS } from '../../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
 import { TipManager } from '../../../services/tip-manager';
-import { useEditorStore, useTagStore } from '../../../stores/stores';
-import { useThemeStore } from '../../../stores/theme';
+import { useEditorStore } from '../../../stores/use-editor-store';
+import { useTagStore } from '../../../stores/use-tag-store';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { db } from '../../../utils/database';
 import { MMKV } from '../../../utils/database/mmkv';
 import { eOnLoadNote, eOpenTagsDialog } from '../../../utils/events';
@@ -159,12 +160,7 @@ export const useEditor = () => {
             currentNote.current?.title !== note.title ||
             currentNote.current?.headline !== note.headline
           ) {
-            Navigation.setRoutesToUpdate([
-              Navigation.routeNames.NotesPage,
-              Navigation.routeNames.Favorites,
-              Navigation.routeNames.Notes,
-              Navigation.routeNames.Notebook
-            ]);
+            Navigation.queueRoutesForUpdate('ColoredNotes', 'Notes', 'TaggedNotes', 'TopicNotes');
           }
         }
 
@@ -284,11 +280,13 @@ export const useEditor = () => {
               .then(async () => {
                 useTagStore.getState().setTags();
                 await commands.setTags(currentNote.current);
-                Navigation.setRoutesToUpdate([
-                  Navigation.routeNames.Notes,
-                  Navigation.routeNames.NotesPage,
-                  Navigation.routeNames.Tags
-                ]);
+                Navigation.queueRoutesForUpdate(
+                  'ColoredNotes',
+                  'Notes',
+                  'TaggedNotes',
+                  'TopicNotes',
+                  'Tags'
+                );
               });
           }
           break;

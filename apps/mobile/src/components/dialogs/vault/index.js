@@ -3,6 +3,7 @@ import React, { Component, createRef } from 'react';
 import { InteractionManager, View } from 'react-native';
 import Share from 'react-native-share';
 import { notesnook } from '../../../../e2e/test.ids';
+import { editorController } from '../../../screens/editor/tiptap/utils';
 import BiometricService from '../../../services/biometrics';
 import { DDS } from '../../../services/device-detection';
 import {
@@ -12,6 +13,7 @@ import {
   ToastEvent
 } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
+import SearchService from '../../../services/search';
 import { getElevation, toTXT } from '../../../utils';
 import { db } from '../../../utils/database';
 import {
@@ -24,17 +26,14 @@ import {
 import { deleteItems } from '../../../utils/functions';
 import { tabBarRef } from '../../../utils/global-refs';
 import { sleep } from '../../../utils/time';
-import { getNote } from '../../../screens/editor/Functions';
-import { Button } from '../../ui/button';
 import BaseDialog from '../../dialog/base-dialog';
 import DialogButtons from '../../dialog/dialog-buttons';
 import DialogHeader from '../../dialog/dialog-header';
+import { Toast } from '../../toast';
+import { Button } from '../../ui/button';
 import Input from '../../ui/input';
 import Seperator from '../../ui/seperator';
-import { Toast } from '../../toast';
 import Paragraph from '../../ui/typography/paragraph';
-import SearchService from '../../../services/search';
-import { editorController } from '../../../screens/editor/tiptap/utils';
 
 let Keychain;
 const passInputRef = createRef();

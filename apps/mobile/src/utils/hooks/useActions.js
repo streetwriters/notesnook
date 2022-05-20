@@ -7,8 +7,6 @@ import { notesnook } from '../../../e2e/test.ids';
 import { presentDialog } from '../../components/dialog/functions';
 import NoteHistory from '../../components/note-history';
 import { MoveNotes } from '../../components/sheets/move-notes/movenote';
-import { EditorWebView } from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny.js';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -19,12 +17,12 @@ import {
 } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import Notifications from '../../services/notifications';
-import { useSelectionStore } from '../../stores/use-selection-store';
-import { useUserStore } from '../../stores/use-user-store';
-import { useMenuStore } from '../../stores/use-menu-store';
 import { useEditorStore } from '../../stores/use-editor-store';
+import { useMenuStore } from '../../stores/use-menu-store';
+import { useSelectionStore } from '../../stores/use-selection-store';
 import { useTagStore } from '../../stores/use-tag-store';
 import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { toggleDarkMode } from '../color-scheme/utils';
 import { db } from '../database';
 import {
@@ -532,7 +530,7 @@ export const useActions = ({ close = () => {}, item }) => {
     let current = db.notes.note(item.id).data.readonly;
     if (useEditorStore.getState().currentEditingNote === item.id) {
       useEditorStore.getState().setReadonly(current);
-      tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
+      //  tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
     }
     Navigation.queueRoutesForUpdate(
       'TaggedNotes',

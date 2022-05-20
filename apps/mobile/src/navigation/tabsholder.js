@@ -320,7 +320,7 @@ export const TabsHolder = React.memo(
 let layoutTimer = null;
 
 const onChangeTab = async obj => {
-  if (obj.i === 1) {
+  if (obj.i === 2) {
     editorState().movedAway = false;
     editorState().isFocused = true;
     activateKeepAwake();
@@ -328,7 +328,7 @@ const onChangeTab = async obj => {
       eSendEvent(eOnLoadNote, { type: 'new' });
     }
   } else {
-    if (obj.from === 1) {
+    if (obj.from === 2) {
       deactivateKeepAwake();
       editorState().movedAway = true;
       editorState().isFocused = false;

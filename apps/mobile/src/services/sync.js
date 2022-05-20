@@ -1,12 +1,11 @@
 import NetInfo from '@react-native-community/netinfo';
 import { EVENTS } from 'notes-core/common';
-import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
+import { editorController } from '../screens/editor/tiptap/utils';
 import { initialize } from '../stores';
 import { useUserStore } from '../stores/use-user-store';
 import { doInBackground } from '../utils';
 import { db } from '../utils/database';
 import { ToastEvent } from './event-manager';
-import { editorController } from '../screens/editor/tiptap/utils';
 
 export const ignoredMessages = ['Sync already running', 'Not allowed to start service intent'];
 
@@ -54,7 +53,7 @@ const run = async (context = 'global', forced = false, full = true) => {
     userstore.setLastSynced(await db.lastSynced());
     initialize();
     if (editorController.current?.note?.id) {
-      await updateNoteInEditor();
+      //await updateNoteInEditor();
     }
     db.eventManager.publish(EVENTS.syncCompleted);
     console.log('sync done');

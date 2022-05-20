@@ -5,32 +5,28 @@ import { Modal, Platform, SafeAreaView, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
-import { useThemeStore } from '../../stores/use-theme-store';
+import { editorController } from '../../screens/editor/tiptap/utils';
 import { DDS } from '../../services/device-detection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from '../../services/event-manager';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import Sync from '../../services/sync';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { dHeight } from '../../utils';
 import { db } from '../../utils/database';
-import { eApplyChanges, eShowMergeDialog, refreshNotesPage } from '../../utils/events';
+import { eApplyChanges, eShowMergeDialog } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
 import { normalize, SIZE } from '../../utils/size';
 import { timeConverter } from '../../utils/time';
-import { getNote, sourceUri, updateNoteInEditor } from '../../screens/editor/Functions';
-import { IconButton } from '../ui/icon-button';
-import { Button } from '../ui/button';
 import BaseDialog from '../dialog/base-dialog';
 import DialogButtons from '../dialog/dialog-buttons';
 import DialogContainer from '../dialog/dialog-container';
 import DialogHeader from '../dialog/dialog-header';
+import { Button } from '../ui/button';
+import { IconButton } from '../ui/icon-button';
 import Seperator from '../ui/seperator';
 import Paragraph from '../ui/typography/paragraph';
-import { editorController } from '../../screens/editor/tiptap/utils';
+
+const sourceUri = '';
 
 const primaryWebView = createRef();
 const secondaryWebView = createRef();

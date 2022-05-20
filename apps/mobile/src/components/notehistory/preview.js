@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
-import { sourceUri } from '../../screens/editor/Functions';
 import { editorController } from '../../screens/editor/tiptap/utils';
 import { eSendEvent, ToastEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
@@ -14,6 +13,8 @@ import { normalize } from '../../utils/size';
 import DialogHeader from '../dialog/dialog-header';
 import { Button } from '../ui/button';
 import Paragraph from '../ui/typography/paragraph';
+
+const sourceUri = '';
 
 export default function NotePreview({ session, content }) {
   const colors = useThemeStore(state => state.colors);

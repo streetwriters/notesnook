@@ -4,10 +4,7 @@ import { BackHandler, InteractionManager, Platform, Vibration, View } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
 import { Properties } from '../../components/properties';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useUserStore } from '../../stores/use-user-store';
-import { useEditorStore } from '../../stores/use-editor-store';
-import { useSettingStore } from '../../stores/use-setting-store';
+import { IconButton } from '../../components/ui/icon-button';
 import { DDS } from '../../services/device-detection';
 import {
   eSendEvent,
@@ -16,6 +13,10 @@ import {
   ToastEvent
 } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
+import { useEditorStore } from '../../stores/use-editor-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import umami from '../../utils/analytics';
 import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
@@ -29,13 +30,10 @@ import {
   eOpenPublishNoteDialog
 } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
-import { EditorTitle } from './title';
 import { ProgressCircle } from './progress';
-import { safeKeyboardDismiss } from './tiny/tiny';
-import { endSearch } from './tiny/toolbar/commands';
-import picker from './tiny/toolbar/picker';
+import picker from './tiptap/picker';
 import { editorController, editorState } from './tiptap/utils';
-import { IconButton } from '../../components/ui/icon-button';
+import { EditorTitle } from './title';
 
 const EditorHeader = ({ editor }) => {
   const colors = useThemeStore(state => state.colors);
@@ -113,7 +111,6 @@ const EditorHeader = ({ editor }) => {
       return;
     }
     if (editorState().isFocused) {
-      safeKeyboardDismiss();
       editorState().isFocused = true;
     }
     eSendEvent(eOpenPublishNoteDialog, note);
@@ -133,7 +130,6 @@ const EditorHeader = ({ editor }) => {
     }
 
     if (editorState().isFocused || editorState().keyboardState) {
-      safeKeyboardDismiss();
       editorState().isFocused = true;
     }
 
@@ -271,7 +267,6 @@ const EditorHeader = ({ editor }) => {
                 top={50}
                 onPress={async () => {
                   if (editorState().isFocused) {
-                    safeKeyboardDismiss();
                     editorState().isFocused = true;
                   }
                   umami.pageView('/pro-screen', '/editor');
@@ -290,7 +285,7 @@ const EditorHeader = ({ editor }) => {
               buttom={10}
               onLongPress={() => {
                 if (searchReplace) {
-                  endSearch();
+                  //endSearch();
                   Vibration.vibrate(5, false);
                 }
               }}
