@@ -29,8 +29,8 @@ import {
   eOpenPublishNoteDialog
 } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
-import { EditorTitle } from './EditorTitle';
-import { ProgressCircle } from './ProgressCircle';
+import { EditorTitle } from './title';
+import { ProgressCircle } from './progress';
 import { safeKeyboardDismiss } from './tiny/tiny';
 import { endSearch } from './tiny/toolbar/commands';
 import picker from './tiny/toolbar/picker';

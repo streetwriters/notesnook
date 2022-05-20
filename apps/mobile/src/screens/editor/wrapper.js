@@ -16,7 +16,7 @@ import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
-import EditorOverlay from './EditorOverlay';
+import EditorOverlay from './loading';
 import { editorController, editorState, textInput } from './tiptap/utils';
 
 export const EditorWrapper = ({ width }) => {

@@ -7,14 +7,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
 import { NewTabs } from '../components/tabs';
-import { EditorWrapper } from '../screens/editor/EditorWrapper';
 import { editorState } from '../screens/editor/tiptap/utils';
+import { EditorWrapper } from '../screens/editor/wrapper';
 import { DDS } from '../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
 import { useEditorStore } from '../stores/use-editor-store';
 import { useSettingStore } from '../stores/use-setting-store';
 import { useThemeStore } from '../stores/use-theme-store';
-import { editing, setWidthHeight } from '../utils';
+import { setWidthHeight } from '../utils';
 import { db } from '../utils/database';
 import {
   eClearEditor,
