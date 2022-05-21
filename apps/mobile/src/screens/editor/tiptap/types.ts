@@ -16,6 +16,12 @@ export type EditorState = {
   saveCount: 0;
 };
 
+export type EditorMessage = {
+  sessionId: string;
+  value: any;
+  type: string;
+};
+
 export type Note = {
   [name: string]: any;
   id: string | null;

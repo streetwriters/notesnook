@@ -10,10 +10,13 @@ import { useThemeStore } from '../../../stores/use-theme-store';
 import { db } from '../../../utils/database';
 import { MMKV } from '../../../utils/database/mmkv';
 import { eOnLoadNote, eOpenTagsDialog } from '../../../utils/events';
+import filesystem from '../../../utils/filesystem';
 import { tabBarRef } from '../../../utils/global-refs';
 import { timeConverter } from '../../../utils/time';
+import { AttachmentType } from '../../../utils/types';
 import Commands from './commands';
-import { EditorState, Note, Content, AppState, SavePayload } from './types';
+import picker from './picker';
+import { EditorState, Note, Content, AppState, SavePayload, EditorMessage } from './types';
 import { defaultState, EditorEvents, isEditorLoaded, makeSessionId, post } from './utils';
 
 export const useEditor = () => {
@@ -234,36 +237,37 @@ export const useEditor = () => {
 
   const onMessage = useCallback(
     event => {
-      let message = event.nativeEvent.data;
-      message = JSON.parse(message);
+      const data = event.nativeEvent.data;
+      let editorMessage = JSON.parse(data) as EditorMessage;
 
-      console.log(message.type);
-
-      if (message.sessionId !== sessionId && message.type !== EditorEvents.status) {
-        console.log(
-          'useEditor: message recieved from invalid session',
-          message.type,
+      logger.info('editor', editorMessage.type);
+      if (editorMessage.sessionId !== sessionId && editorMessage.type !== EditorEvents.status) {
+        logger.error(
+          'editor',
+          'invalid session',
+          editorMessage.type,
           sessionId,
-          message.sessionId
+          editorMessage.sessionId
         );
+
         return;
       }
-      switch (message.type) {
+      switch (editorMessage.type) {
         case EditorEvents.logger:
-          console.log(message.type, message.value);
+          logger.info('editor-webview', editorMessage.value);
           break;
         case 'editor-event:content':
           saveContent({
-            type: message.type,
-            content: message.value
+            type: editorMessage.type,
+            content: editorMessage.value
           });
           break;
         case 'editor-event:selection':
           break;
         case 'editor-event:title':
           saveContent({
-            type: message.type,
-            title: message.value
+            type: editorMessage.type,
+            title: editorMessage.value
           });
           break;
         case 'editor-event:newtag':
@@ -271,12 +275,12 @@ export const useEditor = () => {
           eSendEvent(eOpenTagsDialog, currentNote.current);
           break;
         case 'editor-event:tag':
-          if (message.value) {
+          if (editorMessage.value) {
             if (!currentNote.current) return;
             db.notes
               //@ts-ignore
               ?.note(currentNote.current?.id)
-              .untag(message.value)
+              .untag(editorMessage.value)
               .then(async () => {
                 useTagStore.getState().setTags();
                 await commands.setTags(currentNote.current);
@@ -290,8 +294,21 @@ export const useEditor = () => {
               });
           }
           break;
+        case 'editor-event:picker':
+          picker.pick();
+          break;
+        case 'editor-event:download-attachment':
+          filesystem.downloadAttachment(editorMessage.value?.hash, true);
+          break;
+        default:
+          console.log(
+            'unhandled event recieved from editor: ',
+            editorMessage.type,
+            editorMessage.value
+          );
+          break;
       }
-      eSendEvent(message.type, message);
+      eSendEvent(editorMessage.type, editorMessage);
     },
     [sessionId]
   );

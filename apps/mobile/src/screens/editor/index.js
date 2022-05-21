@@ -25,6 +25,11 @@ const Editor = React.memo(
     const editor = useEditor();
     editorController.current = editor;
 
+    const onError = () => {
+      editorController.current?.setLoading(true);
+      setTimeout(() => editorController.current?.setLoading(false), 10);
+    };
+
     return editor.loading ? null : (
       <>
         <View
@@ -39,15 +44,12 @@ const Editor = React.memo(
             testID={notesnook.editor.id}
             ref={editor.ref}
             onLoad={editor.onLoad}
-            // onRenderProcessGone={() => {
-            //   onResetRequested();
-            // }}
-            // onError={() => {
-            //   onResetRequested();
-            // }}
+            onRenderProcessGone={onError}
+            onError={onError}
             injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
             javaScriptEnabled={true}
             focusable={true}
+            overScrollMode="never"
             keyboardDisplayRequiresUserAction={false}
             // onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
             cacheMode="LOAD_DEFAULT"
@@ -64,7 +66,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: 'http://192.168.10.5:3000'
+              uri: 'http://192.168.10.8:3000'
             }}
             style={style}
             autoManageStatusBarEnabled={false}

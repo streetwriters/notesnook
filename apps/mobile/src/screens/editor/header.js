@@ -44,7 +44,6 @@ const EditorHeader = ({ editor }) => {
   const insets = useSafeAreaInsets();
   const handleBack = useRef();
   const keyboardListener = useRef();
-  const closing = useRef(false);
   const searchReplace = useEditorStore(state => state.searchReplace);
   const readonly = useEditorStore(state => state.readonly);
 
@@ -69,12 +68,6 @@ const EditorHeader = ({ editor }) => {
       editorState().currentlyEditing = false;
       keyboardListener.current?.remove();
       editor?.reset();
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes,
-        Navigation.routeNames.Notebook
-      ]);
     }, 1);
   };
 
