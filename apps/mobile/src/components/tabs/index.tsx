@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle } from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { ViewProps } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -46,6 +46,7 @@ export const NewTabs = forwardRef<TabsRef, TabProps>(
     });
     const locked = useSharedValue(false);
     const forcedLock = useSharedValue(false);
+    const [disabled, setDisabled] = useState(false);
     const containerWidth = widths ? widths.a + widths.b + widths.c : dimensions.width;
     const drawerPosition = 0;
     const homePosition = widths.a;
@@ -108,6 +109,14 @@ export const NewTabs = forwardRef<TabsRef, TabProps>(
     useAnimatedReaction(
       () => currentTab.value,
       result => {
+        if (setDisabled) {
+          if (result === 2) {
+            runOnJS(setDisabled)(true);
+          } else {
+            runOnJS(setDisabled)(false);
+          }
+        }
+
         if (onChangeTab) {
           runOnJS(onChangeTab)({ i: result, from: previousTab.value });
         }
@@ -125,7 +134,7 @@ export const NewTabs = forwardRef<TabsRef, TabProps>(
 
     const gesture = Gesture.Pan()
       .maxPointers(1)
-      .enabled(enabled)
+      .enabled(enabled && !disabled)
       .activeOffsetX([-10, 10])
       .failOffsetY([-10, 10])
       .onBegin(event => {
