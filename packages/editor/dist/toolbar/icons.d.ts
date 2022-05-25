@@ -62,6 +62,7 @@ export declare const Icons: {
     regex: string;
     embed: string;
     plus: string;
+    minus: string;
     close: string;
     delete: string;
     download: string;

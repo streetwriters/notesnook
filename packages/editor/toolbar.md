@@ -108,3 +108,7 @@ What's next:
    - For example, a tool's icon + title + description?
 3. It wouldn't be a bad idea to separate out action & toggle state of a tool as well. This can be useful in
    cases where we want to invoke a specific tool or get a specific tool's toggle state.
+
+---
+
+1. Keyboard shouldn't close on tool click

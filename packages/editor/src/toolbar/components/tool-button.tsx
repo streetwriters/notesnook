@@ -42,6 +42,7 @@ export function ToolButton(props: ToolButtonProps) {
         },
         ...sx,
       }}
+      onMouseDown={(e) => e.preventDefault()}
       {...buttonProps}
     >
       <Icon

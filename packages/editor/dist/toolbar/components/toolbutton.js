@@ -28,5 +28,5 @@ export function ToolButton(props) {
     var id = props.id, icon = props.icon, iconSize = props.iconSize, iconColor = props.iconColor, toggled = props.toggled, sx = props.sx, buttonRef = props.buttonRef, _a = props.variant, variant = _a === void 0 ? "normal" : _a, buttonProps = __rest(props, ["id", "icon", "iconSize", "iconColor", "toggled", "sx", "buttonRef", "variant"]);
     return (_jsx(Button, __assign({ ref: buttonRef, tabIndex: -1, id: "tool-".concat(id), sx: __assign({ p: variant === "small" ? "3px" : 1, borderRadius: variant === "small" ? "small" : "default", m: 0, bg: toggled ? "hover" : "transparent", mr: variant === "small" ? 0 : 1, ":hover": { bg: "hover" }, ":last-of-type": {
                 mr: 0,
-            } }, sx) }, buttonProps, { children: _jsx(Icon, { path: Icons[icon], color: iconColor || "text", size: iconSize || variant === "small" ? 16 : 18 }) })));
+            } }, sx), onMouseDown: function (e) { return e.preventDefault(); } }, buttonProps, { children: _jsx(Icon, { path: Icons[icon], color: iconColor || "text", size: iconSize || variant === "small" ? 16 : 18 }) })));
 }

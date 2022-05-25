@@ -82,6 +82,7 @@ import {
   mdiTableColumn,
   mdiTableColumnWidth,
   mdiTableRowHeight,
+  mdiMinus,
 } from "@mdi/js";
 
 export const Icons = {
@@ -151,6 +152,7 @@ export const Icons = {
   embed: mdiMoviePlusOutline,
 
   plus: mdiPlus,
+  minus: mdiMinus,
   close: mdiClose,
   delete: mdiDeleteOutline,
   download: mdiDownloadOutline,
