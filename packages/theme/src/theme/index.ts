@@ -7,10 +7,15 @@ import { ThemeConfig } from "./types";
 export type Theme = {
   breakpoints: string[];
   space: number[];
-  sizes: Record<string, string>;
+  sizes: Record<string, string | number>;
   radii: Record<string, number>;
   shadows: Record<string, string>;
   colors: SchemeColors;
+  iconSizes: {
+    small: number;
+    medium: number;
+    big: number;
+  };
 } & FontConfig;
 
 class ThemeFactory {
@@ -20,7 +25,7 @@ class ThemeFactory {
   }
 
   construct(config: ThemeConfig): Theme {
-    return {
+    const theme: Theme = {
       breakpoints: ["480px", "1000px", "1000px"],
       space: [0, 5, 10, 15, 20, 25, 30, 35],
       sizes: { full: "100%", half: "50%" },
@@ -33,10 +38,13 @@ class ThemeFactory {
           : {
               menu: "0px 0px 10px 0px #00000022",
             },
+      iconSizes: { big: 18, medium: 16, small: 14 },
       colors: getColors(config.theme, config.accent),
       ...getFontConfig(config.scale),
       ...getVariants(),
     };
+    (theme.space as any).small = 3;
+    return theme;
   }
 }
 
