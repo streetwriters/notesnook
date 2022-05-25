@@ -45,7 +45,6 @@ import TableRow from "@tiptap/extension-table-row";
 import TableCell from "./extensions/table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { ImageNode } from "./extensions/image";
-import { useTheme } from "@notesnook/theme";
 import { AttachmentNode } from "./extensions/attachment";
 import { TaskListNode } from "./extensions/task-list";
 import { TaskItemNode } from "./extensions/task-item";
@@ -59,7 +58,7 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 var useTiptap = function (options, deps) {
     if (options === void 0) { options = {}; }
-    var theme = options.theme, accent = options.accent, scale = options.scale, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, restOptions = __rest(options, ["theme", "accent", "scale", "onCreate", "onDownloadAttachment"]);
+    var theme = options.theme, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, restOptions = __rest(options, ["theme", "onCreate", "onDownloadAttachment"]);
     var defaultOptions = useMemo(function () { return ({
         extensions: [
             SearchReplace,
@@ -109,13 +108,13 @@ var useTiptap = function (options, deps) {
         ],
         onCreate: function (_a) {
             var editor = _a.editor;
-            if (theme && accent && scale) {
-                editor.storage.theme = useTheme({ theme: theme, accent: accent, scale: scale });
+            if (theme) {
+                editor.storage.theme = theme;
             }
             if (onCreate)
                 onCreate({ editor: editor });
         },
-    }); }, [theme, accent, scale, onCreate, onDownloadAttachment]);
+    }); }, [theme, onCreate, onDownloadAttachment]);
     var editor = useEditor(__assign(__assign({}, defaultOptions), restOptions), deps);
     /**
      * Add editor to global for use in React Native.

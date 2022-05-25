@@ -1,8 +1,9 @@
 /// <reference types="react" />
-import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
+import { Theme } from "@notesnook/theme";
 import { Editor } from "@tiptap/core";
 import { ToolbarLocation } from "./stores/toolbar-store";
-declare type ToolbarProps = ThemeConfig & {
+declare type ToolbarProps = {
+    theme: Theme;
     editor: Editor | null;
     location: ToolbarLocation;
     isMobile?: boolean;

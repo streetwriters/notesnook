@@ -1,4 +1,4 @@
-import { useTheme } from "@notesnook/theme";
+import { Theme, useTheme } from "@notesnook/theme";
 import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
 import { Editor } from "@tiptap/core";
 import { Flex, FlexProps } from "rebass";
@@ -30,14 +30,14 @@ import {
 type ToolbarGroupDefinition = (ToolId | ToolId[])[];
 type ToolbarDefinition = ToolbarGroupDefinition[];
 
-type ToolbarProps = ThemeConfig & {
+type ToolbarProps = {
+  theme: Theme;
   editor: Editor | null;
   location: ToolbarLocation;
   isMobile?: boolean;
 };
 export function Toolbar(props: ToolbarProps) {
-  const { editor, theme, accent, scale, location, isMobile } = props;
-  const themeProperties = useTheme({ accent, theme, scale });
+  const { editor, theme, location, isMobile } = props;
   const [currentPopup, setCurrentPopup] = useState<string | undefined>();
   const { setIsMobile, setToolbarLocation } = useToolbarStore();
 
@@ -71,7 +71,7 @@ export function Toolbar(props: ToolbarProps) {
 
   if (!editor) return null;
   return (
-    <ThemeProvider theme={themeProperties}>
+    <ThemeProvider theme={theme}>
       <ToolbarContext.Provider
         value={{
           setCurrentPopup,

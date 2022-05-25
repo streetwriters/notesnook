@@ -37,7 +37,6 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { useTheme } from "@notesnook/theme";
 import { Flex } from "rebass";
 import { findToolById } from "./tools";
 import { ThemeProvider } from "emotion-theming";
@@ -50,8 +49,7 @@ import { Popup } from "./components/popup";
 import { ToolbarContext, useToolbarContext } from "./hooks/useToolbarContext";
 import { useToolbarLocation, useToolbarStore, } from "./stores/toolbar-store";
 export function Toolbar(props) {
-    var editor = props.editor, theme = props.theme, accent = props.accent, scale = props.scale, location = props.location, isMobile = props.isMobile;
-    var themeProperties = useTheme({ accent: accent, theme: theme, scale: scale });
+    var editor = props.editor, theme = props.theme, location = props.location, isMobile = props.isMobile;
     var _a = __read(useState(), 2), currentPopup = _a[0], setCurrentPopup = _a[1];
     var _b = useToolbarStore(), setIsMobile = _b.setIsMobile, setToolbarLocation = _b.setToolbarLocation;
     useEffect(function () {
@@ -82,7 +80,7 @@ export function Toolbar(props) {
     ];
     if (!editor)
         return null;
-    return (_jsxs(ThemeProvider, __assign({ theme: themeProperties }, { children: [_jsx(ToolbarContext.Provider, __assign({ value: {
+    return (_jsxs(ThemeProvider, __assign({ theme: theme }, { children: [_jsx(ToolbarContext.Provider, __assign({ value: {
                     setCurrentPopup: setCurrentPopup,
                     currentPopup: currentPopup,
                 } }, { children: _jsx(Flex, __assign({ className: "editor-toolbar", sx: { flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] } }, { children: tools.map(function (tools) {

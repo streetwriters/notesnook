@@ -24,7 +24,7 @@ import TableCell from "./extensions/table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { ImageNode } from "./extensions/image";
 import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
-import { useTheme } from "@notesnook/theme";
+import { Theme, useTheme } from "@notesnook/theme";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import { TaskListNode } from "./extensions/task-list";
 import { TaskItemNode } from "./extensions/task-item";
@@ -38,17 +38,10 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 
 const useTiptap = (
-  options: Partial<EditorOptions & ThemeConfig & AttachmentOptions> = {},
+  options: Partial<EditorOptions & AttachmentOptions & { theme: Theme }> = {},
   deps?: React.DependencyList
 ) => {
-  const {
-    theme,
-    accent,
-    scale,
-    onCreate,
-    onDownloadAttachment,
-    ...restOptions
-  } = options;
+  const { theme, onCreate, onDownloadAttachment, ...restOptions } = options;
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
@@ -100,13 +93,13 @@ const useTiptap = (
         }),
       ],
       onCreate: ({ editor }) => {
-        if (theme && accent && scale) {
-          editor.storage.theme = useTheme({ theme, accent, scale });
+        if (theme) {
+          editor.storage.theme = theme;
         }
         if (onCreate) onCreate({ editor });
       },
     }),
-    [theme, accent, scale, onCreate, onDownloadAttachment]
+    [theme, onCreate, onDownloadAttachment]
   );
 
   const editor = useEditor({ ...defaultOptions, ...restOptions }, deps);
