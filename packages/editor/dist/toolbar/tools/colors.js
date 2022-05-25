@@ -112,7 +112,7 @@ export function ColorPicker(props) {
                             bg: color,
                             width: 25,
                             height: 25,
-                            m: "2px",
+                            m: "small",
                             borderRadius: "default",
                             cursor: "pointer",
                             ":hover": {
@@ -124,8 +124,8 @@ export function ColorPicker(props) {
                         } })); }), _jsx(Flex, __assign({ sx: {
                             width: 25,
                             height: 25,
-                            m: "2px",
-                            borderRadius: "default",
+                            m: "small",
+                            borderRadius: "small",
                             cursor: "pointer",
                             alignItems: "center",
                             justifyContent: "center",

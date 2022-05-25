@@ -1,10 +1,11 @@
 /// <reference types="react" />
+import { Theme } from "@notesnook/theme";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { FlexProps } from "rebass";
 declare type IconProps = {
     title?: string;
     path: string;
-    size?: number;
+    size?: keyof Theme["iconSizes"] | number;
     color?: keyof SchemeColors;
     stroke?: string;
     rotate?: boolean;

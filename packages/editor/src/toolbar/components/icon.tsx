@@ -7,7 +7,7 @@ import { Flex, FlexProps } from "rebass";
 type IconProps = {
   title?: string;
   path: string;
-  size?: number;
+  size?: keyof Theme["iconSizes"] | number;
   color?: keyof SchemeColors;
   stroke?: string;
   rotate?: boolean;
@@ -31,7 +31,9 @@ function MDIIconWrapper({
       className="icon"
       title={title}
       path={path}
-      size={size + "px"}
+      size={
+        typeof size === "string" ? `${theme.iconSizes[size]}px` : `${size}px`
+      }
       style={{
         strokeWidth: stroke || "0px",
         stroke: themedColor,

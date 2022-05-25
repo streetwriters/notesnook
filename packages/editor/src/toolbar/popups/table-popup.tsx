@@ -71,7 +71,7 @@ export function TablePopup(props: TablePopupProps) {
             gridTemplateColumns: `repeat(${tableSize.columns}, minmax(${
               cellSize || 15
             }px, 1fr))`, // "1fr ".repeat(tableSize.columns),
-            gap: "3px",
+            gap: "small",
             bg: "background",
             width: "100%",
           }}
@@ -95,7 +95,7 @@ export function TablePopup(props: TablePopupProps) {
                 height={cellSize || 15}
                 sx={{
                   border: "1px solid var(--disabled)",
-                  borderRadius: "2px",
+                  borderRadius: "small",
                   bg: isCellHighlighted(index, cellLocation, tableSize)
                     ? "disabled"
                     : "transparent",

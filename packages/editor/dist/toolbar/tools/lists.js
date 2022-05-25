@@ -107,6 +107,6 @@ function ListThumbnail(props) {
                         flexShrink: 0,
                         height: 4,
                         bg: "#cbcbcb",
-                        borderRadius: "2px",
+                        borderRadius: "small",
                     } }) })) }))); }) })));
 }

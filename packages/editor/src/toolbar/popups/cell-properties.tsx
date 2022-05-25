@@ -95,9 +95,8 @@ function ColorPickerTool(props: ColorPickerToolProps) {
           title={title}
           id={icon}
           icon={icon}
-          iconSize={16}
+          variant="small"
           sx={{
-            p: "2.5px",
             borderRadius: "small",
             backgroundColor: color || "transparent",
             ":hover": { bg: color, filter: "brightness(90%)" },

@@ -42,7 +42,7 @@ export function Dropdown(props: DropdownProps) {
         onMouseDown={(e) => e.preventDefault()}
       >
         {typeof selectedItem === "string" ? (
-          <Text sx={{ fontSize: 12, mr: 1, color: "text" }}>
+          <Text sx={{ fontSize: "subBody", mr: 1, color: "text" }}>
             {selectedItem}
           </Text>
         ) : (
@@ -52,7 +52,7 @@ export function Dropdown(props: DropdownProps) {
           path={
             toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown
           }
-          size={14}
+          size={"small"}
           color={"text"}
         />
       </Button>

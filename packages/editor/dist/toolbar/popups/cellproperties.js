@@ -57,8 +57,7 @@ function ColorPickerTool(props) {
     var color = props.color, title = props.title, icon = props.icon, onColorChange = props.onColorChange;
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var buttonRef = useRef(null);
-    return (_jsxs(_Fragment, { children: [_jsxs(Flex, __assign({ sx: { justifyContent: "space-between", alignItems: "center", mt: 1 } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: title })), _jsx(ToolButton, { buttonRef: buttonRef, toggled: isOpen, title: title, id: icon, icon: icon, iconSize: 16, sx: {
-                            p: "2.5px",
+    return (_jsxs(_Fragment, { children: [_jsxs(Flex, __assign({ sx: { justifyContent: "space-between", alignItems: "center", mt: 1 } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: title })), _jsx(ToolButton, { buttonRef: buttonRef, toggled: isOpen, title: title, id: icon, icon: icon, variant: "small", sx: {
                             borderRadius: "small",
                             backgroundColor: color || "transparent",
                             ":hover": { bg: color, filter: "brightness(90%)" },

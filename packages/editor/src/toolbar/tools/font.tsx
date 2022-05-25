@@ -41,7 +41,7 @@ export function FontSize(props: ToolProps) {
       />
       <Text
         variant={"body"}
-        sx={{ fontSize: 12, mx: "3px", textAlign: "center" }}
+        sx={{ fontSize: "subBody", mx: 1, textAlign: "center" }}
         title="Reset font size"
         onClick={() => {
           editor.chain().focus().setFontSize(`16px`).run();

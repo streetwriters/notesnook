@@ -1,4 +1,6 @@
+import { Theme } from "@notesnook/theme";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { useTheme } from "emotion-theming";
 import React from "react";
 import { Button, ButtonProps } from "rebass";
 import { IconNames, Icons } from "../icons";
@@ -31,7 +33,7 @@ export function ToolButton(props: ToolButtonProps) {
       tabIndex={-1}
       id={`tool-${id}`}
       sx={{
-        p: variant === "small" ? "3px" : 1,
+        p: variant === "small" ? "small" : 1,
         borderRadius: variant === "small" ? "small" : "default",
         m: 0,
         bg: toggled ? "hover" : "transparent",
@@ -47,8 +49,8 @@ export function ToolButton(props: ToolButtonProps) {
     >
       <Icon
         path={Icons[icon]}
-        color={iconColor || "text"}
-        size={iconSize || variant === "small" ? 16 : 18}
+        color={iconColor || "icon"}
+        size={iconSize || variant === "small" ? "medium" : "big"}
       />
     </Button>
   );

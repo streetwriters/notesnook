@@ -36,7 +36,7 @@ export function AttachmentComponent(props) {
                         userSelect: "none",
                         alignItems: "center",
                         backgroundColor: "bgSecondary",
-                        padding: "0px 5px 0px 5px",
+                        px: 1,
                         borderRadius: "default",
                         border: "1px solid var(--border)",
                         cursor: "pointer",
@@ -46,14 +46,14 @@ export function AttachmentComponent(props) {
                             bg: "hover",
                         },
                     }, title: filename }, { children: [_jsx(Icon, { path: Icons.attachment, size: 14 }), _jsx(Text, __assign({ as: "span", sx: {
-                                ml: "3px",
+                                ml: "small",
                                 fontSize: "0.85rem",
                                 whiteSpace: "nowrap",
                                 textOverflow: "ellipsis",
                                 overflow: "hidden",
                             }, className: "filename" }, { children: filename })), _jsx(Text, __assign({ as: "span", className: "size", sx: {
-                                ml: "7px",
-                                fontSize: "0.7rem",
+                                ml: 1,
+                                fontSize: "subBody",
                                 color: "fontTertiary",
                                 flexShrink: 0,
                             } }, { children: formatBytes(size) }))] })), _jsx(MenuPresenter, __assign({ isOpen: isActive, onClose: function () { }, items: [], options: {
@@ -92,5 +92,5 @@ function AttachmentToolbar(props) {
                 flexWrap: "nowrap",
                 borderRadius: "default",
                 mb: 2,
-            } }, { children: [_jsx(ToolButton, { toggled: false, title: "Download", id: "download", icon: "download", onClick: function () { }, iconSize: 16, sx: { mr: 1, p: "3px", borderRadius: "small" } }), _jsx(ToolButton, { toggled: false, title: "delete", id: "delete", icon: "delete", onClick: function () { }, iconSize: 16, sx: { mr: 0, p: "3px", borderRadius: "small" } })] })) })));
+            } }, { children: [_jsx(ToolButton, { toggled: false, title: "Download", id: "download", icon: "download", onClick: function () { }, variant: "small", sx: { mr: 1 } }), _jsx(ToolButton, { toggled: false, title: "delete", id: "delete", icon: "delete", onClick: function () { }, variant: "small", sx: { mr: 0 } })] })) })));
 }

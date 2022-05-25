@@ -52,7 +52,7 @@ export function Dropdown(props) {
                     ":last-of-type": {
                         mr: 0,
                     },
-                }, onClick: function () { return setIsOpen(function (s) { return !s; }); }, onMouseDown: function (e) { return e.preventDefault(); } }, { children: [typeof selectedItem === "string" ? (_jsx(Text, __assign({ sx: { fontSize: 12, mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, size: 14, color: "text" })] })), _jsx(MenuPresenter, { options: {
+                }, onClick: function () { return setIsOpen(function (s) { return !s; }); }, onMouseDown: function (e) { return e.preventDefault(); } }, { children: [typeof selectedItem === "string" ? (_jsx(Text, __assign({ sx: { fontSize: "subBody", mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, size: "small", color: "text" })] })), _jsx(MenuPresenter, { options: {
                     type: "menu",
                     position: {
                         target: internalRef.current || undefined,

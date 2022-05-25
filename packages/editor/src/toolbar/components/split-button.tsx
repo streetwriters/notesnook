@@ -47,7 +47,7 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
               toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown
             }
             color="text"
-            size={14}
+            size={"small"}
           />
         </Button>
       </Flex>

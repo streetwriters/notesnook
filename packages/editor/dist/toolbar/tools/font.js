@@ -48,7 +48,7 @@ export function FontSize(props) {
             },
         } }, { children: [_jsx(ToolButton, { toggled: false, title: "Decrease font size", icon: "minus", variant: "small", onClick: function () {
                     editor.chain().focus().setFontSize("".concat(decreaseFontSize(), "px")).run();
-                } }), _jsx(Text, __assign({ variant: "body", sx: { fontSize: 12, mx: "3px", textAlign: "center" }, title: "Reset font size", onClick: function () {
+                } }), _jsx(Text, __assign({ variant: "body", sx: { fontSize: "subBody", mx: 1, textAlign: "center" }, title: "Reset font size", onClick: function () {
                     editor.chain().focus().setFontSize("16px").run();
                 } }, { children: fontSize })), _jsx(ToolButton, { toggled: false, title: "Increase font size", icon: "plus", variant: "small", onClick: function () {
                     editor

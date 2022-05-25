@@ -74,7 +74,7 @@ export function TablePopup(props) {
         } }, { children: _jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column", alignItems: "center" } }, { children: [_jsx(Box, __assign({ sx: {
                         display: "grid",
                         gridTemplateColumns: "repeat(".concat(tableSize.columns, ", minmax(").concat(cellSize || 15, "px, 1fr))"),
-                        gap: "3px",
+                        gap: "small",
                         bg: "background",
                         width: "100%",
                     }, onTouchMove: function (e) {
@@ -90,7 +90,7 @@ export function TablePopup(props) {
                         .fill(0)
                         .map(function (_, index) { return (_jsx(Box, { "data-index": index, height: cellSize || 15, sx: {
                             border: "1px solid var(--disabled)",
-                            borderRadius: "2px",
+                            borderRadius: "small",
                             bg: isCellHighlighted(index, cellLocation, tableSize)
                                 ? "disabled"
                                 : "transparent",

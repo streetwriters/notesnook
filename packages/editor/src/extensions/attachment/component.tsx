@@ -45,7 +45,7 @@ export function AttachmentComponent(props: ImageProps & NodeViewProps) {
             userSelect: "none",
             alignItems: "center",
             backgroundColor: "bgSecondary",
-            padding: "0px 5px 0px 5px",
+            px: 1,
             borderRadius: "default",
             border: "1px solid var(--border)",
             cursor: "pointer",
@@ -61,7 +61,7 @@ export function AttachmentComponent(props: ImageProps & NodeViewProps) {
           <Text
             as="span"
             sx={{
-              ml: "3px",
+              ml: "small",
               fontSize: "0.85rem",
               whiteSpace: "nowrap",
               textOverflow: "ellipsis",
@@ -75,8 +75,8 @@ export function AttachmentComponent(props: ImageProps & NodeViewProps) {
             as="span"
             className="size"
             sx={{
-              ml: "7px",
-              fontSize: "0.7rem",
+              ml: 1,
+              fontSize: "subBody",
               color: "fontTertiary",
               flexShrink: 0,
             }}
@@ -151,8 +151,8 @@ function AttachmentToolbar(props: AttachmentToolbarProps) {
           id="download"
           icon="download"
           onClick={() => {}}
-          iconSize={16}
-          sx={{ mr: 1, p: "3px", borderRadius: "small" }}
+          variant="small"
+          sx={{ mr: 1 }}
         />
         <ToolButton
           toggled={false}
@@ -160,8 +160,8 @@ function AttachmentToolbar(props: AttachmentToolbarProps) {
           id="delete"
           icon="delete"
           onClick={() => {}}
-          iconSize={16}
-          sx={{ mr: 0, p: "3px", borderRadius: "small" }}
+          variant="small"
+          sx={{ mr: 0 }}
         />
       </Flex>
     </Flex>
