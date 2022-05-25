@@ -89,6 +89,7 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "file-loader": "^6.2.0",
     "find-process": "^1.4.4",
+    "ip": "^1.1.8",
     "lorem-ipsum": "^2.0.4",
     "patch-package": "^6.4.7",
     "source-map-explorer": "^2.5.2",

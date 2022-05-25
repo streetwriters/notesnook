@@ -22,12 +22,13 @@ async function initializeDatabase(persistence) {
   //   AUTH_HOST: "http://localhost:8264",
   //   SSE_HOST: "http://localhost:7264",
   // });
+  const ip = `http://${process.env.REACT_APP_LOCALHOST}`;
   db.host({
-    API_HOST: "http://192.168.10.29:5264",
-    AUTH_HOST: "http://192.168.10.29:8264",
-    SSE_HOST: "http://192.168.10.29:7264",
-    ISSUES_HOST: "http://192.168.10.29:2624",
-    SUBSCRIPTIONS_HOST: "http://192.168.10.29:9264",
+    API_HOST: `${ip}:5264`,
+    AUTH_HOST: `${ip}:8264`,
+    SSE_HOST: `${ip}:7264`,
+    ISSUES_HOST: `${ip}:2624`,
+    SUBSCRIPTIONS_HOST: `${ip}:9264`,
   });
   // }
 
