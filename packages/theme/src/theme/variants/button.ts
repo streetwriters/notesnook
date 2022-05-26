@@ -1,21 +1,4 @@
 import { SxStyleProp } from "rebass";
-import { Variants } from ".";
-
-export function getButtonVariants(): Variants {
-  return {
-    default: defaultVariant,
-    primary,
-    secondary,
-    tertiary,
-    list,
-    anchor,
-    tool,
-    icon,
-    dialog,
-    statusitem: statusItem,
-    menuitem: menuItem,
-  };
-}
 
 const defaultVariant: SxStyleProp = {
   bg: "transparent",
@@ -154,4 +137,18 @@ const menuItem: SxStyleProp = {
   ":active:not(:disabled)": {
     backgroundColor: "border",
   },
+};
+
+export const buttonVariants = {
+  default: defaultVariant,
+  primary,
+  secondary,
+  tertiary,
+  list,
+  anchor,
+  tool,
+  icon,
+  dialog,
+  statusitem: statusItem,
+  menuitem: menuItem,
 };

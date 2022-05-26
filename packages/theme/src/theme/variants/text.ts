@@ -1,17 +1,4 @@
 import { SxStyleProp } from "rebass";
-import { Variants } from ".";
-
-export function getTextVariants(): Variants {
-  return {
-    default: defaultVariant,
-    heading,
-    title,
-    subtitle,
-    body,
-    subBody,
-    error,
-  };
-}
 
 const defaultVariant: SxStyleProp = {
   color: "text",
@@ -49,4 +36,14 @@ const error: SxStyleProp = {
   variant: "text.default",
   fontSize: "subBody",
   color: "error",
+};
+
+export const textVariants = {
+  default: defaultVariant,
+  heading,
+  title,
+  subtitle,
+  body,
+  subBody,
+  error,
 };

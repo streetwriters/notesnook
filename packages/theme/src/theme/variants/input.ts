@@ -1,14 +1,4 @@
-import { InputProps } from "@rebass/forms";
-import { SxProps, SxStyleProp } from "rebass";
-import { Variants } from ".";
-
-export function getInputVariants(): Variants {
-  return {
-    input: defaultVariant,
-    error,
-    clean,
-  };
-}
+import { SxStyleProp } from "rebass";
 
 const defaultVariant: SxStyleProp = {
   borderRadius: "default",
@@ -50,4 +40,10 @@ const error: SxStyleProp = {
   ":hover:not(:focus)": {
     boxShadow: "0px 0px 0px 1px var(--error) inset",
   },
+};
+
+export const inputVariants = {
+  input: defaultVariant,
+  error,
+  clean,
 };

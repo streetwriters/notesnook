@@ -1,22 +1,28 @@
 import { getColors, SchemeColors } from "./colorscheme";
-import { getVariants } from "./variants";
+import { variants } from "./variants";
 import { FontConfig, getFontConfig } from "./font";
 import { TransformerFactory, Transformers } from "./transformer";
 import { ThemeConfig } from "./types";
 
 export type Theme = {
   breakpoints: string[];
-  space: number[];
-  sizes: Record<string, string | number>;
-  radii: Record<string, number>;
-  shadows: Record<string, string>;
+  space: number[] & { small?: number };
+  sizes: { full: "100%"; half: "50%" };
+  radii: {
+    none: number;
+    default: number;
+    dialog: number;
+    small: number;
+  };
+  shadows: { menu: string };
   colors: SchemeColors;
   iconSizes: {
     small: number;
     medium: number;
     big: number;
   };
-} & FontConfig;
+} & FontConfig &
+  typeof variants;
 
 class ThemeFactory {
   transform(type: Transformers, theme: any) {
@@ -30,6 +36,8 @@ class ThemeFactory {
       space: [0, 5, 10, 15, 20, 25, 30, 35],
       sizes: { full: "100%", half: "50%" },
       radii: { none: 0, default: 5, dialog: 10, small: 2.5 },
+      iconSizes: { big: 18, medium: 16, small: 14 },
+      colors: getColors(config.theme, config.accent),
       shadows:
         config.theme === "dark"
           ? {
@@ -38,12 +46,10 @@ class ThemeFactory {
           : {
               menu: "0px 0px 10px 0px #00000022",
             },
-      iconSizes: { big: 18, medium: 16, small: 14 },
-      colors: getColors(config.theme, config.accent),
       ...getFontConfig(config.scale),
-      ...getVariants(),
+      ...variants,
     };
-    (theme.space as any).small = 3;
+    theme.space.small = 3;
     return theme;
   }
 }

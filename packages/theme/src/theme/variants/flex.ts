@@ -1,9 +1,22 @@
 import { SxStyleProp } from "rebass";
-import { Variants } from ".";
 
 type FlexDirection = "row" | "column";
-export function createFlexVariants(direction: FlexDirection): Variants {
-  const variants: Variants = {
+export type FlexVariants<T extends FlexDirection> = T extends "row"
+  ? {
+      rowCenter: SxStyleProp;
+      rowFill: SxStyleProp;
+      rowCenterFill: SxStyleProp;
+    }
+  : {
+      columnCenter: SxStyleProp;
+      columnFill: SxStyleProp;
+      columnCenterFill: SxStyleProp;
+    };
+
+export function createFlexVariants<T extends FlexDirection>(
+  direction: T
+): FlexVariants<T> {
+  const variants = {
     Center: createCenterVariant(direction),
     Fill: createFillVariant(direction),
     CenterFill: createCenterFillVariant(direction),
@@ -12,7 +25,7 @@ export function createFlexVariants(direction: FlexDirection): Variants {
     Object.entries(variants).map(([key, value]) => {
       return [`${direction}${key}`, value];
     })
-  );
+  ) as FlexVariants<T>;
 }
 
 function createCenterVariant(direction: FlexDirection): SxStyleProp {
