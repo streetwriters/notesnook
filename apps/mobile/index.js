@@ -8,6 +8,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { enableScreens } from 'react-native-screens';
 import { name as appName } from './app.json';
 import Notifications from './src/services/notifications';
+import './src/utils/logger/index';
 
 global.Buffer = require('buffer').Buffer;
 enableLayoutAnimations(true);
