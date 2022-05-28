@@ -19,7 +19,7 @@
 <img alt="Get it on Google Play" src="https://github.com/streetwriters/notesnook/raw/main/badges/google.png" height="50px">
 </a>
 <a href="https://apps.apple.com/pk/app/notesnook-take-private-notes/id1544027013">
-<img alt="Download on the App Store" src="https://notesnook.com/static//apple.09f3b62d.png" height="50px">
+  <img alt="Download on the App Store" src="https://raw.githubusercontent.com/irshad/notesnook/main/badges/app-store-badge.png" height="50px">
 </a>
 <a href="https://app.notesnook.com/">
 <img alt="Try Notesnook on the Web" src="https://github.com/streetwriters/notesnook/raw/main/badges/web.png" height="50px" style="margin-left: 15px">
