@@ -29,31 +29,57 @@ export const TaskItemNode = TaskItem.extend({
     return [
       "li",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        "data-type": this.name,
+        class: "checklist--item",
       }),
       0,
     ];
   },
 
-  // addAttributes() {
-  //   return {
-  //     hash: getDataAttribute("hash"),
-  //     filename: getDataAttribute("filename"),
-  //     type: getDataAttribute("type"),
-  //     size: getDataAttribute("size"),
-  //   };
-  // },
+  parseHTML() {
+    return [
+      {
+        tag: `li`,
+        getAttrs: (node) => {
+          if (node instanceof Node && node instanceof HTMLElement) {
+            return (
+              (node.classList.contains("checklist--item") ||
+                node.parentElement?.classList.contains("checklist")) &&
+              null
+            );
+          }
+          return false;
+        },
+        priority: 51,
+      },
+    ];
+  },
 
-  // parseHTML() {
+  // renderHTML({ node, HTMLAttributes }) {
   //   return [
-  //     {
-  //       tag: "span[data-hash]",
-  //     },
-  //   ];
-  // },
-
-  // renderHTML({ HTMLAttributes }) {
-  //   return ["span", mergeAttributes(HTMLAttributes)];
+  //     'li',
+  //     mergeAttributes(
+  //       this.options.HTMLAttributes,
+  //       HTMLAttributes,
+  //       { 'data-type': this.name },
+  //     ),
+  //     [
+  //       'label',
+  //       [
+  //         'input',
+  //         {
+  //           type: 'checkbox',
+  //           checked: node.attrs.checked
+  //             ? 'checked'
+  //             : null,
+  //         },
+  //       ],
+  //       ['span'],
+  //     ],
+  //     [
+  //       'div',
+  //       0,
+  //     ],
+  //   ]
   // },
 
   addNodeView() {

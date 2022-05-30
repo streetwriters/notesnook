@@ -51,6 +51,7 @@ import { TaskItemNode } from "./extensions/task-item";
 import { Dropcursor } from "./extensions/drop-cursor";
 import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
+import { CodeBlock } from "./extensions/code-block";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -65,6 +66,7 @@ var useTiptap = function (options, deps) {
             TextStyle,
             StarterKit.configure({
                 dropcursor: false,
+                codeBlock: false,
             }),
             Dropcursor.configure({
                 class: "drop-cursor",
@@ -91,6 +93,7 @@ var useTiptap = function (options, deps) {
             Highlight.configure({
                 multicolor: true,
             }),
+            CodeBlock,
             Color,
             TextAlign.configure({
                 types: ["heading", "paragraph"],

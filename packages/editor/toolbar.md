@@ -112,3 +112,4 @@ What's next:
 ---
 
 1. Keyboard shouldn't close on tool click
+2. Handle context toolbar menus on scroll

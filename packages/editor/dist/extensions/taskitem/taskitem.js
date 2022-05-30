@@ -21,28 +21,54 @@ export var TaskItemNode = TaskItem.extend({
         return [
             "li",
             mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-                "data-type": this.name,
+                class: "checklist--item",
             }),
             0,
         ];
     },
-    // addAttributes() {
-    //   return {
-    //     hash: getDataAttribute("hash"),
-    //     filename: getDataAttribute("filename"),
-    //     type: getDataAttribute("type"),
-    //     size: getDataAttribute("size"),
-    //   };
-    // },
-    // parseHTML() {
+    parseHTML: function () {
+        return [
+            {
+                tag: "li",
+                getAttrs: function (node) {
+                    var _a;
+                    if (node instanceof Node && node instanceof HTMLElement) {
+                        return ((node.classList.contains("checklist--item") ||
+                            ((_a = node.parentElement) === null || _a === void 0 ? void 0 : _a.classList.contains("checklist"))) &&
+                            null);
+                    }
+                    return false;
+                },
+                priority: 51,
+            },
+        ];
+    },
+    // renderHTML({ node, HTMLAttributes }) {
     //   return [
-    //     {
-    //       tag: "span[data-hash]",
-    //     },
-    //   ];
-    // },
-    // renderHTML({ HTMLAttributes }) {
-    //   return ["span", mergeAttributes(HTMLAttributes)];
+    //     'li',
+    //     mergeAttributes(
+    //       this.options.HTMLAttributes,
+    //       HTMLAttributes,
+    //       { 'data-type': this.name },
+    //     ),
+    //     [
+    //       'label',
+    //       [
+    //         'input',
+    //         {
+    //           type: 'checkbox',
+    //           checked: node.attrs.checked
+    //             ? 'checked'
+    //             : null,
+    //         },
+    //       ],
+    //       ['span'],
+    //     ],
+    //     [
+    //       'div',
+    //       0,
+    //     ],
+    //   ]
     // },
     addNodeView: function () {
         return ReactNodeViewRenderer(TaskItemComponent);

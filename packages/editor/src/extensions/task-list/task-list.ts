@@ -32,36 +32,30 @@ export const TaskListNode = TaskList.extend({
     };
   },
 
-  // renderHTML({ node, HTMLAttributes }) {
-  //   return [
-  //     "li",
-  //     mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-  //       "data-type": this.name,
-  //     }),
-  //     0,
-  //   ];
-  // },
+  parseHTML() {
+    return [
+      {
+        tag: `ul`,
+        getAttrs: (node) => {
+          if (node instanceof Node && node instanceof HTMLElement) {
+            return node.classList.contains("checklist") && null;
+          }
+          return false;
+        },
+        priority: 51,
+      },
+    ];
+  },
 
-  // addAttributes() {
-  //   return {
-  //     hash: getDataAttribute("hash"),
-  //     filename: getDataAttribute("filename"),
-  //     type: getDataAttribute("type"),
-  //     size: getDataAttribute("size"),
-  //   };
-  // },
-
-  // parseHTML() {
-  //   return [
-  //     {
-  //       tag: "span[data-hash]",
-  //     },
-  //   ];
-  // },
-
-  // renderHTML({ HTMLAttributes }) {
-  //   return ["span", mergeAttributes(HTMLAttributes)];
-  // },
+  renderHTML({ HTMLAttributes }) {
+    return [
+      "ul",
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+        class: "checklist",
+      }),
+      0,
+    ];
+  },
 
   addNodeView() {
     return ReactNodeViewRenderer(TaskListComponent);
