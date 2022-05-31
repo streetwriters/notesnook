@@ -1,7 +1,7 @@
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
-import { EditorOptions, useEditor } from "@tiptap/react";
+import { EditorOptions, useEditor } from "./extensions/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useMemo } from "react";
 import { EditorView } from "prosemirror-view";
@@ -23,8 +23,7 @@ import TableRow from "@tiptap/extension-table-row";
 import TableCell from "./extensions/table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { ImageNode } from "./extensions/image";
-import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
-import { Theme, useTheme } from "@notesnook/theme";
+import { Theme } from "@notesnook/theme";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import { TaskListNode } from "./extensions/task-list";
 import { TaskItemNode } from "./extensions/task-item";
@@ -32,6 +31,7 @@ import { Dropcursor } from "./extensions/drop-cursor";
 import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
+import { ListItem } from "./extensions/list-item";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -52,6 +52,9 @@ const useTiptap = (
         StarterKit.configure({
           dropcursor: false,
           codeBlock: false,
+          listItem: false,
+          orderedList: false,
+          bulletList: false,
         }),
         Dropcursor.configure({
           class: "drop-cursor",
@@ -94,6 +97,7 @@ const useTiptap = (
         AttachmentNode.configure({
           onDownloadAttachment,
         }),
+        ListItem,
       ],
       onCreate: ({ editor }) => {
         if (theme) {
@@ -101,6 +105,7 @@ const useTiptap = (
         }
         if (onCreate) onCreate({ editor });
       },
+      injectCSS: false,
     }),
     [theme, onCreate, onDownloadAttachment]
   );
@@ -115,3 +120,4 @@ const useTiptap = (
 };
 
 export { useTiptap, Toolbar };
+export * from "./extensions/react";

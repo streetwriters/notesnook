@@ -36,7 +36,7 @@ var __values = (this && this.__values) || function(o) {
 };
 import { Node, textblockTypeInputRule, mergeAttributes } from "@tiptap/core";
 import { Plugin, PluginKey, TextSelection, } from "prosemirror-state";
-import { findParentNodeClosestToPos, ReactNodeViewRenderer, } from "@tiptap/react";
+import { findParentNodeClosestToPos, ReactNodeViewRenderer } from "../react";
 import { CodeblockComponent } from "./component";
 import { HighlighterPlugin } from "./highlighter";
 import detectIndent from "detect-indent";

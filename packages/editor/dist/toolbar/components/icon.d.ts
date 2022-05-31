@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Theme } from "@notesnook/theme";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { FlexProps } from "rebass";

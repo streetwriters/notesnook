@@ -61,7 +61,7 @@ function getLineDecoration(
     class: `line-number ${isActive ? "active" : ""}`,
     "data-line": String(line).padEnd(String(total).length, " "),
   };
-  const spec = {
+  const spec: any = {
     line: line,
     active: isActive,
     total,
@@ -151,8 +151,9 @@ export function HighlighterPlugin({
   name: string;
   defaultLanguage: string | null | undefined;
 }) {
+  const key = new PluginKey("highlighter");
   return new Plugin({
-    key: new PluginKey("highlighter"),
+    key,
 
     state: {
       init: () => {
@@ -224,7 +225,7 @@ export function HighlighterPlugin({
 
     props: {
       decorations(state) {
-        return this.getState(state);
+        return key.getState(state);
       },
     },
 
@@ -256,7 +257,7 @@ export function HighlighterPlugin({
  * are reset (e.g. when you focus out of the code block).
  */
 function getActiveLineDecorations(
-  doc: ProsemirrorNode<any>,
+  doc: ProsemirrorNode,
   decorations: DecorationSet,
   position?: CaretPosition
 ) {

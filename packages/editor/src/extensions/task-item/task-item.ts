@@ -1,13 +1,8 @@
-import { nodeInputRule, mergeAttributes } from "@tiptap/core";
+import { mergeAttributes } from "@tiptap/core";
+import { onBackspacePressed } from "../list-item/commands";
 import { TaskItem } from "@tiptap/extension-task-item";
-import { ReactNodeViewRenderer } from "@tiptap/react";
-import { Attribute } from "@tiptap/core";
 import { TaskItemComponent } from "./component";
-
-export interface AttachmentOptions {
-  // HTMLAttributes: Record<string, any>;
-  // onDownloadAttachment: (attachment: Attachment) => boolean;
-}
+import { ReactNodeViewRenderer } from "../react";
 
 export const TaskItemNode = TaskItem.extend({
   draggable: true,
@@ -41,11 +36,10 @@ export const TaskItemNode = TaskItem.extend({
         tag: `li`,
         getAttrs: (node) => {
           if (node instanceof Node && node instanceof HTMLElement) {
-            return (
-              (node.classList.contains("checklist--item") ||
-                node.parentElement?.classList.contains("checklist")) &&
-              null
-            );
+            return node.classList.contains("checklist--item") ||
+              node.parentElement?.classList.contains("checklist")
+              ? null
+              : false;
           }
           return false;
         },
@@ -54,35 +48,17 @@ export const TaskItemNode = TaskItem.extend({
     ];
   },
 
-  // renderHTML({ node, HTMLAttributes }) {
-  //   return [
-  //     'li',
-  //     mergeAttributes(
-  //       this.options.HTMLAttributes,
-  //       HTMLAttributes,
-  //       { 'data-type': this.name },
-  //     ),
-  //     [
-  //       'label',
-  //       [
-  //         'input',
-  //         {
-  //           type: 'checkbox',
-  //           checked: node.attrs.checked
-  //             ? 'checked'
-  //             : null,
-  //         },
-  //       ],
-  //       ['span'],
-  //     ],
-  //     [
-  //       'div',
-  //       0,
-  //     ],
-  //   ]
-  // },
+  addKeyboardShortcuts() {
+    return {
+      ...this.parent?.(),
+      Backspace: ({ editor }) =>
+        onBackspacePressed(editor, this.name, this.type),
+    };
+  },
 
   addNodeView() {
-    return ReactNodeViewRenderer(TaskItemComponent);
+    return ReactNodeViewRenderer(TaskItemComponent, {
+      as: "li",
+    });
   },
 });

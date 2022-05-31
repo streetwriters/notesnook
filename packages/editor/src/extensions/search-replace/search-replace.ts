@@ -8,7 +8,6 @@ import {
   Transaction,
 } from "prosemirror-state";
 import { Node as ProsemirrorNode } from "prosemirror-model";
-import { findChildren } from "@tiptap/react";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -52,8 +51,7 @@ interface TextNodesWithPosition {
   pos: number;
 }
 
-const updateView = (state: EditorState<any>, dispatch: any) =>
-  dispatch(state.tr);
+const updateView = (state: EditorState, dispatch: any) => dispatch(state.tr);
 
 const regex = (s: string, settings: SearchSettings): RegExp => {
   const { enableRegex, matchCase, matchWholeWord } = settings;
@@ -128,7 +126,7 @@ function searchDocument(
 const replaceAll = (
   replaceTerm: string,
   results: Result[],
-  tr: Transaction<any>
+  tr: Transaction
 ) => {
   let offset = 0;
 
@@ -279,9 +277,10 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
   },
 
   addProseMirrorPlugins() {
+    const key = new PluginKey("searchreplace");
     return [
       new Plugin({
-        key: new PluginKey("searchreplace"),
+        key,
         state: {
           init() {
             return DecorationSet.empty;
@@ -309,7 +308,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         },
         props: {
           decorations(state) {
-            return this.getState(state);
+            return key.getState(state);
           },
         },
       }),

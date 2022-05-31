@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ImageProps } from "rebass";
-import { NodeViewProps } from "@tiptap/react";
+import { NodeViewProps } from "../react";
 export declare function TaskItemComponent(props: ImageProps & NodeViewProps): JSX.Element;

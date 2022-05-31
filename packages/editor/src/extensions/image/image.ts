@@ -1,5 +1,5 @@
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "@tiptap/react";
+import { ReactNodeViewRenderer } from "../react";
 import { ImageComponent } from "./component";
 
 export interface ImageOptions {

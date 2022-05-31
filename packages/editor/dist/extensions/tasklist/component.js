@@ -27,20 +27,23 @@ var __read = (this && this.__read) || function (o, n) {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Box, Flex, Text } from "rebass";
-import { NodeViewWrapper, NodeViewContent, } from "@tiptap/react";
+import { NodeViewWrapper, NodeViewContent } from "../react";
 import { findParentNodeClosestToPos, findChildren } from "@tiptap/core";
 import { ThemeProvider } from "emotion-theming";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@rebass/forms";
+import { TaskItemNode } from "../task-item";
 export function TaskListComponent(props) {
     var editor = props.editor, getPos = props.getPos, node = props.node, updateAttributes = props.updateAttributes;
     var _a = node.attrs, collapsed = _a.collapsed, title = _a.title;
     var _b = __read(useState({ checked: 0, total: 0, percentage: 0 }), 2), stats = _b[0], setStats = _b[1];
     var theme = editor.storage.theme;
-    var resolvedPos = editor.state.doc.resolve(getPos());
-    var parentTaskItem = findParentNodeClosestToPos(resolvedPos, function (node) { return node.type.name === "taskItem"; });
+    var parentTaskItem = useMemo(function () {
+        var resolvedPos = editor.state.doc.resolve(getPos());
+        return findParentNodeClosestToPos(resolvedPos, function (node) { return node.type.name === TaskItemNode.name; });
+    }, []);
     var nested = !!parentTaskItem;
     useEffect(function () {
         if (!parentTaskItem)
@@ -54,7 +57,7 @@ export function TaskListComponent(props) {
     useEffect(function () {
         if (nested)
             return;
-        var children = findChildren(node, function (node) { return node.type.name === "taskItem"; });
+        var children = findChildren(node, function (node) { return node.type.name === TaskItemNode.name; });
         var checked = children.filter(function (node) { return node.node.attrs.checked; }).length;
         var total = children.length;
         var percentage = Math.round((checked / total) * 100);
@@ -81,11 +84,11 @@ export function TaskListComponent(props) {
                                     updateAttributes({ title: e.target.value });
                                 } }), _jsxs(Flex, __assign({ sx: { flexShrink: 0, pr: 2 } }, { children: [_jsx(Icon, { path: Icons.checkbox, size: 15, color: "fontTertiary" }), _jsxs(Text, __assign({ variant: "body", sx: { ml: 1, color: "fontTertiary" } }, { children: [stats.checked, "/", stats.total] }))] }))] }))) })) })), _jsx(NodeViewContent, { as: "ul", style: {
                     paddingInlineStart: 0,
-                    marginBlockStart: nested ? 15 : 0,
+                    marginBlockStart: nested ? 10 : 0,
                     marginBlockEnd: 0,
                 } })] })));
 }
 function areAllChecked(node) {
-    var children = findChildren(node, function (node) { return node.type.name === "taskItem"; });
+    var children = findChildren(node, function (node) { return node.type.name === TaskItemNode.name; });
     return children.every(function (node) { return node.node.attrs.checked; });
 }

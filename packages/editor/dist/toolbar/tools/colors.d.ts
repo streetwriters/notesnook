@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ToolProps } from "../types";
 export declare const DEFAULT_COLORS: string[];
 export declare function Highlight(props: ToolProps): JSX.Element;

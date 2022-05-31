@@ -1,18 +1,12 @@
-import { Box, Flex, Image, ImageProps, Text } from "rebass";
-import { NodeViewWrapper, NodeViewProps, FloatingMenu } from "@tiptap/react";
+import { Box, Flex, ImageProps, Text } from "rebass";
+import { NodeViewWrapper, NodeViewProps } from "../react";
 import { Attachment } from "./attachment";
-import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
 import { ThemeProvider } from "emotion-theming";
-import { Theme, useTheme } from "@notesnook/theme";
-import { Resizable } from "re-resizable";
+import { Theme } from "@notesnook/theme";
 import { ToolButton } from "../../toolbar/components/tool-button";
-import { findToolById, ToolId } from "../../toolbar/tools";
 import { Editor } from "@tiptap/core";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { MenuPresenter } from "../../components/menu/menu";
-import { Popup } from "../../toolbar/components/popup";
-import { Toggle } from "../../components/toggle";
-import { Input } from "@rebass/forms";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 

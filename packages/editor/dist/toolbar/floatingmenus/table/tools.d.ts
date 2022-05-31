@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ToolButtonProps } from "../../components/tool-button";
 import { ToolProps } from "../../types";
 declare type TableToolProps = ToolProps & {

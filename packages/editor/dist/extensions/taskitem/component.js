@@ -38,15 +38,17 @@ var __values = (this && this.__values) || function(o) {
 };
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Flex, Text } from "rebass";
-import { NodeViewWrapper, NodeViewContent, } from "@tiptap/react";
+import { NodeViewWrapper, NodeViewContent } from "../react";
 import { ThemeProvider } from "emotion-theming";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { findChildren, } from "@tiptap/core";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { TaskItemNode } from "./task-item";
 export function TaskItemComponent(props) {
+    var _a;
     var checked = props.node.attrs.checked;
-    var _a = __read(useState({ checked: 0, total: 0 }), 2), stats = _a[0], setStats = _a[1];
+    var _b = __read(useState({ checked: 0, total: 0 }), 2), stats = _b[0], setStats = _b[1];
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, getPos = props.getPos;
     var theme = editor.storage.theme;
     var toggle = useCallback(function () {
@@ -59,19 +61,21 @@ export function TaskItemComponent(props) {
         editor.view.dispatch(tr);
         return true;
     }, [editor, getPos, node]);
-    var nestedTaskList = getChildren(node, getPos()).find(function (_a) {
-        var node = _a.node;
-        return node.type.name === "taskList";
-    });
+    var nestedTaskList = useMemo(function () {
+        return getChildren(node, getPos()).find(function (_a) {
+            var node = _a.node;
+            return node.type.name === "taskList";
+        });
+    }, [node.childCount]);
     var isNested = !!nestedTaskList;
     var isCollapsed = nestedTaskList
-        ? nestedTaskList.node.attrs.collapsed
+        ? (_a = editor.state.doc.nodeAt(nestedTaskList.pos)) === null || _a === void 0 ? void 0 : _a.attrs.collapsed
         : false;
     useEffect(function () {
         if (!nestedTaskList)
             return;
         var pos = nestedTaskList.pos, node = nestedTaskList.node;
-        var children = findChildren(node, function (node) { return node.type.name === "taskItem"; });
+        var children = findChildren(node, function (node) { return node.type.name === TaskItemNode.name; });
         var checked = children.filter(function (_a) {
             var node = _a.node;
             return node.attrs.checked;
@@ -80,7 +84,8 @@ export function TaskItemComponent(props) {
         setStats({ checked: checked, total: total });
     }, []);
     return (_jsx(NodeViewWrapper, { children: _jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsxs(Flex, __assign({ sx: {
-                    mb: isNested ? 0 : 2,
+                    //  mb: isNested ? 0 : 2,
+                    alignItems: "center",
                     ":hover > .dragHandle, :hover > .toggleSublist": {
                         opacity: 1,
                     },
@@ -106,22 +111,15 @@ export function TaskItemComponent(props) {
                             ":hover .icon path": {
                                 fill: "var(--checked) !important",
                             },
-                        }, onMouseEnter: function (e) {
-                            if (e.buttons > 0) {
-                                toggle();
-                            }
                         }, onMouseDown: function (e) {
                             if (toggle())
                                 e.preventDefault();
-                        }, color: checked ? "checked" : "icon", size: 13 }), _jsx(NodeViewContent, { as: "li", style: {
-                            listStyleType: "none",
+                        }, color: checked ? "checked" : "icon", size: 13 }), _jsx(NodeViewContent, { style: {
                             textDecorationLine: checked ? "line-through" : "none",
                             color: checked ? "var(--checked)" : "var(--text)",
                             flex: 1,
-                            marginBottom: isNested ? 0 : 5,
-                        } }), isNested && (_jsxs(_Fragment, { children: [isCollapsed && (_jsxs(Text, __assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), _jsx(Icon, { className: "toggleSublist", path: nestedTaskList.node.attrs.collapsed
-                                    ? Icons.chevronDown
-                                    : Icons.chevronUp, sx: {
+                            // marginBottom: isNested ? 0 : 5,
+                        } }), isNested && (_jsxs(_Fragment, { children: [isCollapsed && (_jsxs(Text, __assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), _jsx(Icon, { className: "toggleSublist", path: isCollapsed ? Icons.chevronDown : Icons.chevronUp, sx: {
                                     opacity: isCollapsed ? 1 : 0,
                                     position: "absolute",
                                     right: 0,
@@ -139,7 +137,7 @@ export function TaskItemComponent(props) {
                                         var tr = _a.tr;
                                         var pos = nestedTaskList.pos, node = nestedTaskList.node;
                                         tr.setNodeMarkup(pos, undefined, {
-                                            collapsed: !node.attrs.collapsed,
+                                            collapsed: !isCollapsed,
                                         });
                                         return true;
                                     })
@@ -148,7 +146,7 @@ export function TaskItemComponent(props) {
 }
 function toggleChildren(node, tr, toggleState, parentPos) {
     var e_1, _a;
-    var children = findChildren(node, function (node) { return node.type.name === "taskItem"; });
+    var children = findChildren(node, function (node) { return node.type.name === TaskItemNode.name; });
     try {
         for (var children_1 = __values(children), children_1_1 = children_1.next(); !children_1_1.done; children_1_1 = children_1.next()) {
             var pos = children_1_1.value.pos;

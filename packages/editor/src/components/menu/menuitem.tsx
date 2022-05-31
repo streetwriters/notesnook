@@ -6,7 +6,7 @@ import { Icons } from "../../toolbar/icons";
 import { MenuItem /*ResolvedMenuItem*/ } from "./types";
 
 type MenuItemProps = {
-  // item: ResolvedMenuItem<any>;
+  // item: ResolvedMenuItem;
   item: MenuItem;
   isFocused: boolean;
   onMouseEnter: () => void;
@@ -79,7 +79,7 @@ function MenuItem(props: MenuItemProps) {
               <Icon
                 path={Icons[icon]}
                 color={"text"}
-                size={15}
+                size={"medium"}
                 sx={{ mr: 2 }}
               />
             )}

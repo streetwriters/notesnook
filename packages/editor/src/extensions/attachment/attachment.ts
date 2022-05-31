@@ -1,5 +1,5 @@
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { findChildren, ReactNodeViewRenderer } from "@tiptap/react";
+import { findChildren, ReactNodeViewRenderer } from "../react";
 import { Attribute } from "@tiptap/core";
 import { AttachmentComponent } from "./component";
 

@@ -342,6 +342,7 @@ export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
         return (
           <Box
             {...props}
+            //@ts-ignore
             style={{
               ...props.style,
               position: isAutocomplete ? "initial" : "fixed",

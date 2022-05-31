@@ -1,26 +1,6 @@
-import { Theme } from "@notesnook/theme";
-import { Slider } from "@rebass/forms";
-import { Editor, findParentNodeClosestToPos } from "@tiptap/core";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Flex, Text } from "rebass";
-import {
-  ActionSheetPresenter,
-  MenuPresenter,
-} from "../../../components/menu/menu";
-import {
-  getElementPosition,
-  MenuOptions,
-} from "../../../components/menu/useMenu";
-import { Popup } from "../../components/popup";
-import { ToolButton, ToolButtonProps } from "../../components/tool-button";
-import { IconNames } from "../../icons";
-// import { ColorPicker, DEFAULT_COLORS } from "../tools/colors";
-import { FloatingMenuProps } from "../types";
-import { selectedRect, TableMap, TableRect } from "prosemirror-tables";
+import { Editor } from "@tiptap/core";
+import { selectedRect, TableRect } from "prosemirror-tables";
 import { Transaction } from "prosemirror-state";
-import { MenuItem } from "../../../components/menu/types";
-import { DesktopOnly, MobileOnly } from "../../../components/responsive";
-import { ToolProps } from "../../types";
 
 function moveColumnRight(editor: Editor) {
   const { tr } = editor.state;
@@ -67,7 +47,7 @@ function moveRowUp(editor: Editor) {
 }
 
 function moveColumn(
-  tr: Transaction<any>,
+  tr: Transaction,
   rect: TableRect,
   from: number,
   to: number
@@ -97,12 +77,7 @@ function getColumnCells({ map, table }: TableRect, col: number) {
   return cells;
 }
 
-function moveRow(
-  tr: Transaction<any>,
-  rect: TableRect,
-  from: number,
-  to: number
-) {
+function moveRow(tr: Transaction, rect: TableRect, from: number, to: number) {
   let fromCells = getRowCells(rect, from);
   let toCells = getRowCells(rect, to);
   return moveCells(tr, rect, fromCells, toCells);
@@ -126,7 +101,7 @@ function getRowCells({ map, table }: TableRect, row: number) {
 }
 
 function moveCells(
-  tr: Transaction<any>,
+  tr: Transaction,
   rect: TableRect,
   fromCells: any[],
   toCells: any[]

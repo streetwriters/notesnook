@@ -1,4 +1,4 @@
-import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "@tiptap/react";
+import { NodeViewContent, NodeViewProps, NodeViewWrapper } from "../react";
 import { useEffect, useRef, useState } from "react";
 import { loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";
@@ -51,11 +51,7 @@ export function CodeblockComponent(props: NodeViewProps) {
   }, [language, updateAttributes]);
 
   useEffect(() => {
-    function onSelectionUpdate({
-      transaction,
-    }: {
-      transaction: Transaction<any>;
-    }) {
+    function onSelectionUpdate({ transaction }: { transaction: Transaction }) {
       const position = toCaretPosition(getLines(node), transaction.selection);
       setCaretPosition(position);
     }

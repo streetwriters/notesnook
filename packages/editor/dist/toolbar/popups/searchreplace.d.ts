@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Editor } from "@tiptap/core";
 export declare type SearchReplacePopupProps = {
     editor: Editor;

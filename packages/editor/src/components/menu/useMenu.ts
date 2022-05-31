@@ -31,7 +31,7 @@ export type MenuOptions = {
 };
 // interface IMenuStore {
 //   isOpen?: boolean;
-//   // items?: ResolvedMenuItem<any>[];
+//   // items?: ResolvedMenuItem[];
 //   items?: MenuItem[];
 //   title?: string;
 //   options?: MenuOptions;

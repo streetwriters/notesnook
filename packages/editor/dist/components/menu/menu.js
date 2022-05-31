@@ -245,7 +245,9 @@ export function MenuPresenter(props) {
                 return;
             repositionMenu(position);
         }, overlayElement: function (props, contentEl) {
-            return (_jsx(Box, __assign({}, props, { style: __assign(__assign({}, props.style), { position: isAutocomplete ? "initial" : "fixed", zIndex: 1000, backgroundColor: isAutocomplete ? "transparent" : "unset" }) }, { children: contentEl })));
+            return (_jsx(Box, __assign({}, props, { 
+                //@ts-ignore
+                style: __assign(__assign({}, props.style), { position: isAutocomplete ? "initial" : "fixed", zIndex: 1000, backgroundColor: isAutocomplete ? "transparent" : "unset" }) }, { children: contentEl })));
         }, contentElement: function (props, children) { return (_jsx(Box, __assign({}, props, { style: {}, sx: {
                 top: 0,
                 left: 0,

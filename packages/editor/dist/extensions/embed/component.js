@@ -27,12 +27,12 @@ var __read = (this && this.__read) || function (o, n) {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Box, Flex } from "rebass";
-import { NodeViewWrapper } from "@tiptap/react";
+import { NodeViewWrapper } from "../react";
 import { ThemeProvider } from "emotion-theming";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { useEffect, useRef, useState } from "react";
-import { PopupPresenter, } from "../../components/menu/menu";
+import { PopupPresenter } from "../../components/menu/menu";
 import { EmbedPopup } from "../../toolbar/popups/embed-popup";
 export function EmbedComponent(props) {
     var _a = props.node.attrs, src = _a.src, width = _a.width, height = _a.height, align = _a.align;

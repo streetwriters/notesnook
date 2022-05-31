@@ -1,10 +1,5 @@
 import { Box, Flex, Image, ImageProps, Text } from "rebass";
-import {
-  NodeViewWrapper,
-  NodeViewProps,
-  NodeViewContent,
-  FloatingMenu,
-} from "@tiptap/react";
+import { NodeViewWrapper, NodeViewProps, NodeViewContent } from "../react";
 import { Node } from "prosemirror-model";
 import { Transaction, Selection } from "prosemirror-state";
 import { findParentNodeClosestToPos, findChildren } from "@tiptap/core";
@@ -12,8 +7,9 @@ import { ThemeProvider } from "emotion-theming";
 import { Theme } from "@notesnook/theme";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@rebass/forms";
+import { TaskItemNode } from "../task-item";
 
 export function TaskListComponent(props: NodeViewProps) {
   const { editor, getPos, node, updateAttributes } = props;
@@ -21,11 +17,15 @@ export function TaskListComponent(props: NodeViewProps) {
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
   const theme = editor.storage.theme as Theme;
-  const resolvedPos = editor.state.doc.resolve(getPos());
-  const parentTaskItem = findParentNodeClosestToPos(
-    resolvedPos,
-    (node) => node.type.name === "taskItem"
-  );
+
+  const parentTaskItem = useMemo(() => {
+    const resolvedPos = editor.state.doc.resolve(getPos());
+    return findParentNodeClosestToPos(
+      resolvedPos,
+      (node) => node.type.name === TaskItemNode.name
+    );
+  }, []);
+
   const nested = !!parentTaskItem;
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export function TaskListComponent(props: NodeViewProps) {
     if (nested) return;
     const children = findChildren(
       node,
-      (node) => node.type.name === "taskItem"
+      (node) => node.type.name === TaskItemNode.name
     );
     const checked = children.filter((node) => node.node.attrs.checked).length;
     const total = children.length;
@@ -101,7 +101,7 @@ export function TaskListComponent(props: NodeViewProps) {
         as={"ul"}
         style={{
           paddingInlineStart: 0,
-          marginBlockStart: nested ? 15 : 0,
+          marginBlockStart: nested ? 10 : 0,
           marginBlockEnd: 0,
         }}
       />
@@ -110,6 +110,9 @@ export function TaskListComponent(props: NodeViewProps) {
 }
 
 function areAllChecked(node: Node) {
-  const children = findChildren(node, (node) => node.type.name === "taskItem");
+  const children = findChildren(
+    node,
+    (node) => node.type.name === TaskItemNode.name
+  );
   return children.every((node) => node.node.attrs.checked);
 }

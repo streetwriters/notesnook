@@ -80,7 +80,7 @@ export function NumberedList(props: ToolProps) {
   const options: ListOptions<NumberedListStyleTypes> = {
     type: "orderedList",
     icon: "numberedList",
-    onClick: (editor) => editor.chain().focus().toggleOrderedList().run(),
+    onClick: (editor) => editor.chain().focus().toggleTaskList().run(),
     subTypes: [
       { type: "decimal", title: "Decimal", items: ["1", "2", "3"] },
       { type: "upper-alpha", title: "Upper alpha", items: ["A", "B", "C"] },

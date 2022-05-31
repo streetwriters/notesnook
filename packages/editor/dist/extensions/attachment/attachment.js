@@ -10,7 +10,7 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 import { Node, mergeAttributes } from "@tiptap/core";
-import { findChildren, ReactNodeViewRenderer } from "@tiptap/react";
+import { findChildren, ReactNodeViewRenderer } from "../react";
 import { AttachmentComponent } from "./component";
 export var AttachmentNode = Node.create({
     name: "attachment",

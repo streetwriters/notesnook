@@ -1,3 +1,7 @@
+/**
+ * Quick & dirty script to download & transform all language details from
+ * the PrismJS repo.
+ */
 require("isomorphic-fetch");
 
 async function main() {
@@ -10,14 +14,6 @@ async function main() {
   for (const key in json.languages) {
     if (key === "meta") continue;
     const language = json.languages[key];
-    // if (key === "markup") {
-    //   language.alias.forEach((alias) => {
-    //     output.push({
-    //       filename: key,
-    //       title: language.aliasTitles[alias],
-    //     });
-    //   });
-    // }
     output.push({
       filename: key,
       title: language.title,

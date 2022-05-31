@@ -36,7 +36,7 @@ function MenuItem(props) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-            } }, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: 15, sx: { mr: 2 } })), _jsx(Text, __assign({ as: "span", variant: "body" }, { children: title }))] }), _jsxs(Flex, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: 14 }), (items === null || items === void 0 ? void 0 : items.length) && _jsx(Icon, { path: Icons.chevronRight, size: 14 }), modifier && (_jsx(Text, __assign({ as: "span", sx: {
+            } }, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: "medium", sx: { mr: 2 } })), _jsx(Text, __assign({ as: "span", variant: "body" }, { children: title }))] }), _jsxs(Flex, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: 14 }), (items === null || items === void 0 ? void 0 : items.length) && _jsx(Icon, { path: Icons.chevronRight, size: 14 }), modifier && (_jsx(Text, __assign({ as: "span", sx: {
                                 fontFamily: "body",
                                 fontSize: "menu",
                                 color: "fontTertiary",

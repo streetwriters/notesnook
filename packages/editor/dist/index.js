@@ -23,7 +23,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
-import { useEditor } from "@tiptap/react";
+import { useEditor } from "./extensions/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useMemo } from "react";
 import { EditorView } from "prosemirror-view";
@@ -52,6 +52,7 @@ import { Dropcursor } from "./extensions/drop-cursor";
 import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
+import { ListItem } from "./extensions/list-item";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -67,6 +68,9 @@ var useTiptap = function (options, deps) {
             StarterKit.configure({
                 dropcursor: false,
                 codeBlock: false,
+                listItem: false,
+                orderedList: false,
+                bulletList: false,
             }),
             Dropcursor.configure({
                 class: "drop-cursor",
@@ -108,6 +112,7 @@ var useTiptap = function (options, deps) {
             AttachmentNode.configure({
                 onDownloadAttachment: onDownloadAttachment,
             }),
+            ListItem,
         ],
         onCreate: function (_a) {
             var editor = _a.editor;
@@ -117,6 +122,7 @@ var useTiptap = function (options, deps) {
             if (onCreate)
                 onCreate({ editor: editor });
         },
+        injectCSS: false,
     }); }, [theme, onCreate, onDownloadAttachment]);
     var editor = useEditor(__assign(__assign({}, defaultOptions), restOptions), deps);
     /**
@@ -126,3 +132,4 @@ var useTiptap = function (options, deps) {
     return editor;
 };
 export { useTiptap, Toolbar };
+export * from "./extensions/react";

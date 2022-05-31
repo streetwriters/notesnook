@@ -62,7 +62,7 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
+import { NodeViewContent, NodeViewWrapper } from "../react";
 import { useEffect, useRef, useState } from "react";
 import { loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";

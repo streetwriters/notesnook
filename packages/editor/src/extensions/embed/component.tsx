@@ -1,30 +1,14 @@
-import { Box, Button, Flex, Image, ImageProps, Text } from "rebass";
-import { NodeViewWrapper, NodeViewProps, FloatingMenu } from "@tiptap/react";
-import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
+import { Box, Flex } from "rebass";
+import { NodeViewWrapper, NodeViewProps } from "../react";
 import { ThemeProvider } from "emotion-theming";
-import { Theme, useTheme } from "@notesnook/theme";
+import { Theme } from "@notesnook/theme";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
-import { findToolById, ToolId } from "../../toolbar/tools";
 import { Editor } from "@tiptap/core";
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActionSheetPresenter,
-  MenuPresenter,
-  PopupPresenter,
-} from "../../components/menu/menu";
-import { Popup } from "../../toolbar/components/popup";
-import { Toggle } from "../../components/toggle";
-import { Input } from "@rebass/forms";
-import {
-  EmbedAlignmentOptions,
-  EmbedAttributes,
-  EmbedSizeOptions,
-} from "./embed";
+import { useEffect, useRef, useState } from "react";
+import { PopupPresenter } from "../../components/menu/menu";
+import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { EmbedPopup } from "../../toolbar/popups/embed-popup";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { DesktopOnly, MobileOnly } from "../../components/responsive";
 
 export function EmbedComponent(props: NodeViewProps) {
   const { src, width, height, align } = props.node.attrs as EmbedAttributes &

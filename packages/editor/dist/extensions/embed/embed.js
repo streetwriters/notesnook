@@ -10,7 +10,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 import { Node, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "@tiptap/react";
+import { ReactNodeViewRenderer } from "../react";
 import { EmbedComponent } from "./component";
 export var EmbedNode = Node.create({
     name: "embed",

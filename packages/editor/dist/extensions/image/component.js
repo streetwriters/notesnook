@@ -27,12 +27,12 @@ var __read = (this && this.__read) || function (o, n) {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Box, Flex, Image } from "rebass";
-import { NodeViewWrapper } from "@tiptap/react";
+import { NodeViewWrapper } from "../react";
 import { ThemeProvider } from "emotion-theming";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { useEffect, useRef, useState } from "react";
-import { PopupPresenter, } from "../../components/menu/menu";
+import { PopupPresenter } from "../../components/menu/menu";
 import { Popup } from "../../toolbar/components/popup";
 import { ImageProperties } from "../../toolbar/popups/image-properties";
 export function ImageComponent(props) {

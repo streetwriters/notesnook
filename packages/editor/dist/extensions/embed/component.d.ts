@@ -1,3 +1,2 @@
-/// <reference types="react" />
-import { NodeViewProps } from "@tiptap/react";
+import { NodeViewProps } from "../react";
 export declare function EmbedComponent(props: NodeViewProps): JSX.Element;

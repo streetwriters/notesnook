@@ -1,7 +1,6 @@
-import { nodeInputRule, mergeAttributes } from "@tiptap/core";
+import { mergeAttributes } from "@tiptap/core";
 import { TaskList } from "@tiptap/extension-task-list";
-import { ReactNodeViewRenderer } from "@tiptap/react";
-import { Attribute } from "@tiptap/core";
+import { ReactNodeViewRenderer } from "../react";
 import { TaskListComponent } from "./component";
 
 export const TaskListNode = TaskList.extend({
@@ -55,6 +54,29 @@ export const TaskListNode = TaskList.extend({
       }),
       0,
     ];
+  },
+
+  addCommands() {
+    return {
+      toggleTaskList:
+        () =>
+        ({ editor, commands, state, tr }) => {
+          const { $from, $to } = state.selection;
+          commands.toggleList(this.name, this.options.itemTypeName);
+          const position = {
+            from: tr.mapping.map($from.pos),
+            to: tr.mapping.map($to.pos),
+          };
+          // There is a minor bug in Prosemirror or Tiptap where creating
+          // nested node view causes the editor selection to act weird.
+          // The solution is to manually force the editor back to the correct
+          // position.
+          // NOTE: We have to wrap this in setTimeout & use the editor
+          // directly or else it won't run.
+          setTimeout(() => editor.commands.setTextSelection(position), 0);
+          return true;
+        },
+    };
   },
 
   addNodeView() {

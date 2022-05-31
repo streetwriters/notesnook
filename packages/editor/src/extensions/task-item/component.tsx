@@ -1,10 +1,5 @@
 import { Box, Flex, Image, ImageProps, Text } from "rebass";
-import {
-  NodeViewWrapper,
-  NodeViewProps,
-  NodeViewContent,
-  FloatingMenu,
-} from "@tiptap/react";
+import { NodeViewWrapper, NodeViewProps, NodeViewContent } from "../react";
 import { ThemeProvider } from "emotion-theming";
 import { Theme } from "@notesnook/theme";
 import { Icon } from "../../toolbar/components/icon";
@@ -16,7 +11,8 @@ import {
   findChildren,
   NodeWithPos,
 } from "@tiptap/core";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { TaskItemNode } from "./task-item";
 
 export function TaskItemComponent(props: ImageProps & NodeViewProps) {
   const { checked } = props.node.attrs;
@@ -37,12 +33,15 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
     return true;
   }, [editor, getPos, node]);
 
-  const nestedTaskList = getChildren(node, getPos()).find(
-    ({ node }) => node.type.name === "taskList"
-  );
+  const nestedTaskList = useMemo(() => {
+    return getChildren(node, getPos()).find(
+      ({ node }) => node.type.name === "taskList"
+    );
+  }, [node.childCount]);
+
   const isNested = !!nestedTaskList;
-  const isCollapsed = nestedTaskList
-    ? nestedTaskList.node.attrs.collapsed
+  const isCollapsed: boolean = nestedTaskList
+    ? editor.state.doc.nodeAt(nestedTaskList.pos)?.attrs.collapsed
     : false;
 
   useEffect(() => {
@@ -50,7 +49,7 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
     const { pos, node } = nestedTaskList;
     const children = findChildren(
       node,
-      (node) => node.type.name === "taskItem"
+      (node) => node.type.name === TaskItemNode.name
     );
     const checked = children.filter(({ node }) => node.attrs.checked).length;
     const total = children.length;
@@ -62,7 +61,8 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
       <ThemeProvider theme={theme}>
         <Flex
           sx={{
-            mb: isNested ? 0 : 2,
+            //  mb: isNested ? 0 : 2,
+            alignItems: "center",
             ":hover > .dragHandle, :hover > .toggleSublist": {
               opacity: 1,
             },
@@ -103,11 +103,6 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
                 fill: "var(--checked) !important",
               },
             }}
-            onMouseEnter={(e) => {
-              if (e.buttons > 0) {
-                toggle();
-              }
-            }}
             onMouseDown={(e) => {
               if (toggle()) e.preventDefault();
             }}
@@ -116,13 +111,11 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
           />
 
           <NodeViewContent
-            as={"li"}
             style={{
-              listStyleType: "none",
               textDecorationLine: checked ? "line-through" : "none",
               color: checked ? "var(--checked)" : "var(--text)",
               flex: 1,
-              marginBottom: isNested ? 0 : 5,
+              // marginBottom: isNested ? 0 : 5,
             }}
           />
 
@@ -135,11 +128,7 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
               )}
               <Icon
                 className="toggleSublist"
-                path={
-                  nestedTaskList.node.attrs.collapsed
-                    ? Icons.chevronDown
-                    : Icons.chevronUp
-                }
+                path={isCollapsed ? Icons.chevronDown : Icons.chevronUp}
                 sx={{
                   opacity: isCollapsed ? 1 : 0,
                   position: "absolute",
@@ -159,7 +148,7 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
                     .command(({ tr }) => {
                       const { pos, node } = nestedTaskList;
                       tr.setNodeMarkup(pos, undefined, {
-                        collapsed: !node.attrs.collapsed,
+                        collapsed: !isCollapsed,
                       });
                       return true;
                     })
@@ -176,11 +165,14 @@ export function TaskItemComponent(props: ImageProps & NodeViewProps) {
 
 function toggleChildren(
   node: Node,
-  tr: Transaction<any>,
+  tr: Transaction,
   toggleState: boolean,
   parentPos: number
-): Transaction<any> {
-  const children = findChildren(node, (node) => node.type.name === "taskItem");
+): Transaction {
+  const children = findChildren(
+    node,
+    (node) => node.type.name === TaskItemNode.name
+  );
   for (const { pos } of children) {
     // need to add 1 to get inside the node
     const actualPos = pos + parentPos + 1;

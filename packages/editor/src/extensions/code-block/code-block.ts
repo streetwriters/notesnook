@@ -8,10 +8,7 @@ import {
   Selection,
 } from "prosemirror-state";
 import { ResolvedPos, Node as ProsemirrorNode } from "prosemirror-model";
-import {
-  findParentNodeClosestToPos,
-  ReactNodeViewRenderer,
-} from "@tiptap/react";
+import { findParentNodeClosestToPos, ReactNodeViewRenderer } from "../react";
 import { CodeblockComponent } from "./component";
 import { HighlighterPlugin } from "./highlighter";
 import detectIndent from "detect-indent";
@@ -505,7 +502,7 @@ export type CaretPosition = {
 };
 export function toCaretPosition(
   lines: CodeLine[],
-  selection: Selection<any>
+  selection: Selection
 ): CaretPosition | undefined {
   const { $from, $to, $head } = selection;
   if ($from.parent.type.name !== CodeBlock.name) return;
@@ -524,12 +521,12 @@ export function toCaretPosition(
   return;
 }
 
-export function getLines(node: ProsemirrorNode<any>) {
+export function getLines(node: ProsemirrorNode) {
   const { lines } = node.attrs as CodeBlockAttributes;
   return lines || [];
 }
 
-function exitOnTripleEnter(editor: Editor, $from: ResolvedPos<any>) {
+function exitOnTripleEnter(editor: Editor, $from: ResolvedPos) {
   const isAtEnd = $from.parentOffset === $from.parent.nodeSize - 2;
   const endsWithDoubleNewline = $from.parent.textContent.endsWith("\n\n");
 
@@ -550,7 +547,7 @@ function exitOnTripleEnter(editor: Editor, $from: ResolvedPos<any>) {
 
 function indentOnEnter(
   editor: Editor,
-  $from: ResolvedPos<any>,
+  $from: ResolvedPos,
   options: IndentationOptions
 ) {
   const { lines } = $from.parent.attrs as CodeBlockAttributes;
@@ -606,7 +603,7 @@ export function toCodeLines(code: string, pos: number): CodeLine[] {
   return positions;
 }
 
-function getSelectedLines(lines: CodeLine[], selection: Selection<any>) {
+function getSelectedLines(lines: CodeLine[], selection: Selection) {
   const { $from, $to } = selection;
   return lines.filter(
     (line) =>
@@ -616,7 +613,7 @@ function getSelectedLines(lines: CodeLine[], selection: Selection<any>) {
   );
 }
 
-function parseIndentation(node: ProsemirrorNode<any>): IndentationOptions {
+function parseIndentation(node: ProsemirrorNode): IndentationOptions {
   const { indentType, indentLength } = node.attrs;
   return {
     type: indentType,
@@ -641,8 +638,8 @@ function indent(type: IndentationOptions["type"], length: number) {
  * Persist selection between transaction steps
  */
 function withSelection(
-  tr: Transaction<any>,
-  callback: (tr: Transaction<any>) => void
+  tr: Transaction,
+  callback: (tr: Transaction) => void
 ): boolean {
   const { $anchor, $head } = tr.selection;
 

@@ -12,9 +12,7 @@ var __values = (this && this.__values) || function(o) {
 import { Extension } from "@tiptap/core";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import { Plugin, PluginKey, TextSelection, } from "prosemirror-state";
-var updateView = function (state, dispatch) {
-    return dispatch(state.tr);
-};
+var updateView = function (state, dispatch) { return dispatch(state.tr); };
 var regex = function (s, settings) {
     var enableRegex = settings.enableRegex, matchCase = settings.matchCase, matchWholeWord = settings.matchWholeWord;
     var boundary = matchWholeWord ? "\\b" : "";
@@ -248,9 +246,10 @@ export var SearchReplace = Extension.create({
     },
     addProseMirrorPlugins: function () {
         var _this = this;
+        var key = new PluginKey("searchreplace");
         return [
             new Plugin({
-                key: new PluginKey("searchreplace"),
+                key: key,
                 state: {
                     init: function () {
                         return DecorationSet.empty;
@@ -272,7 +271,7 @@ export var SearchReplace = Extension.create({
                 },
                 props: {
                     decorations: function (state) {
-                        return this.getState(state);
+                        return key.getState(state);
                     },
                 },
             }),

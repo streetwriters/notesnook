@@ -68,8 +68,8 @@ export declare type CaretPosition = {
     selected?: number;
     total: number;
 };
-export declare function toCaretPosition(lines: CodeLine[], selection: Selection<any>): CaretPosition | undefined;
-export declare function getLines(node: ProsemirrorNode<any>): CodeLine[];
+export declare function toCaretPosition(lines: CodeLine[], selection: Selection): CaretPosition | undefined;
+export declare function getLines(node: ProsemirrorNode): CodeLine[];
 declare type CodeLine = {
     index: number;
     from: number;

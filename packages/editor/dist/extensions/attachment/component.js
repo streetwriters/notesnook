@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || function () {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Box, Flex, Text } from "rebass";
-import { NodeViewWrapper } from "@tiptap/react";
+import { NodeViewWrapper } from "../react";
 import { ThemeProvider } from "emotion-theming";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { useRef } from "react";

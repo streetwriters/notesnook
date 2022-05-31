@@ -1,28 +1,19 @@
-import { Box, Flex, Image, ImageProps, Text } from "rebass";
-import { NodeViewWrapper, NodeViewProps, FloatingMenu } from "@tiptap/react";
+import { Box, Flex, Image, ImageProps } from "rebass";
+import { NodeViewWrapper, NodeViewProps } from "../react";
 import {
   ImageAlignmentOptions,
   ImageAttributes,
   ImageSizeOptions,
 } from "./image";
-import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
 import { ThemeProvider } from "emotion-theming";
-import { Theme, useTheme } from "@notesnook/theme";
+import { Theme } from "@notesnook/theme";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
-import { findToolById, ToolId } from "../../toolbar/tools";
 import { Editor } from "@tiptap/core";
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActionSheetPresenter,
-  MenuPresenter,
-  PopupPresenter,
-} from "../../components/menu/menu";
+import { useEffect, useRef, useState } from "react";
+import { PopupPresenter } from "../../components/menu/menu";
 import { Popup } from "../../toolbar/components/popup";
-import { Toggle } from "../../components/toggle";
-import { Input } from "@rebass/forms";
 import { ImageProperties } from "../../toolbar/popups/image-properties";
-import { DesktopOnly, MobileOnly } from "../../components/responsive";
 
 export function ImageComponent(props: ImageProps & NodeViewProps) {
   const { src, alt, title, width, height, align, float } = props.node

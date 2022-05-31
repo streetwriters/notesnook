@@ -143,8 +143,9 @@ function getDecorations(_a) {
 }
 export function HighlighterPlugin(_a) {
     var name = _a.name, defaultLanguage = _a.defaultLanguage;
+    var key = new PluginKey("highlighter");
     return new Plugin({
-        key: new PluginKey("highlighter"),
+        key: key,
         state: {
             init: function () {
                 return DecorationSet.empty;
@@ -185,7 +186,7 @@ export function HighlighterPlugin(_a) {
         },
         props: {
             decorations: function (state) {
-                return this.getState(state);
+                return key.getState(state);
             },
         },
         appendTransaction: function (transactions, _prevState, nextState) {
