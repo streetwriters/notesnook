@@ -1,7 +1,7 @@
 import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
 import { ToolButton } from "../components/tool-button";
-import { MenuPresenter } from "../../components/menu/menu";
+import { MenuPresenter, PopupPresenter } from "../../components/menu/menu";
 import { useRef, useState } from "react";
 import { Flex } from "rebass";
 import { Input } from "@rebass/forms";
@@ -143,7 +143,9 @@ export function Link(props: ToolProps) {
         }}
         toggled={isOpen || !!isEditing}
       />
-      <MenuPresenter
+      <PopupPresenter
+        mobile="sheet"
+        desktop="menu"
         options={{
           type: "menu",
           position: {
@@ -180,7 +182,7 @@ export function Link(props: ToolProps) {
           }}
           //  negativeButton={{ text: "Cancel", onClick: () => setIsOpen(false) }}
         >
-          <Flex sx={{ p: 1, width: 300, flexDirection: "column" }}>
+          <Flex sx={{ p: 1, flexDirection: "column" }}>
             <Input
               type="text"
               placeholder="Link text"
@@ -197,7 +199,7 @@ export function Link(props: ToolProps) {
             />
           </Flex>
         </Popup>
-      </MenuPresenter>
+      </PopupPresenter>
     </>
   );
 }

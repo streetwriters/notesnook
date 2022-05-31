@@ -44,8 +44,7 @@ import { getPosition } from "./useMenu";
 import MenuItem from "./menuitem";
 // import { useMenuTrigger, useMenu, getPosition } from "../../hooks/useMenu";
 import Modal from "react-modal";
-import { BottomSheet } from "react-spring-bottom-sheet";
-import "react-spring-bottom-sheet/dist/style.css";
+import Sheet from "react-modal-sheet";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 // import { store as selectionStore } from "../../stores/selectionstore";
 function useMenuFocus(items, onAction, onClose) {
@@ -272,5 +271,15 @@ export function MenuPresenter(props) {
 }
 export function ActionSheetPresenter(props) {
     var _a = props.items, items = _a === void 0 ? [] : _a, isOpen = props.isOpen, _b = props.onClose, onClose = _b === void 0 ? function () { } : _b, children = props.children, sx = props.sx, _c = props.blocking, blocking = _c === void 0 ? true : _c, containerProps = __rest(props, ["items", "isOpen", "onClose", "children", "sx", "blocking"]);
-    return (_jsx(BottomSheet, __assign({ open: isOpen, onDismiss: onClose, blocking: blocking }, { children: props.children ? (props.children) : (_jsx(Menu, __assign({ items: items, closeMenu: onClose, sx: __assign({ flex: 1, boxShadow: "none", border: "none" }, sx) }, containerProps))) })));
+    return (_jsxs(Sheet, __assign({ isOpen: isOpen, onClose: onClose, springConfig: {
+            stiffness: 300,
+            damping: 30,
+            mass: 0.2,
+            duration: 300,
+        } }, { children: [_jsxs(Sheet.Container, __assign({ style: {
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                    boxShadow: "none",
+                    paddingBottom: 30,
+                } }, { children: [_jsx(Sheet.Header, {}), _jsx(Sheet.Content, { children: props.children ? (props.children) : (_jsx(Menu, __assign({ items: items, closeMenu: onClose, sx: __assign({ flex: 1, boxShadow: "none", border: "none" }, sx) }, containerProps))) })] })), _jsx(Sheet.Backdrop, {})] })));
 }

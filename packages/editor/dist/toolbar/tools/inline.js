@@ -27,7 +27,7 @@ var __read = (this && this.__read) || function (o, n) {
 };
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
-import { MenuPresenter } from "../../components/menu/menu";
+import { PopupPresenter } from "../../components/menu/menu";
 import { useRef, useState } from "react";
 import { Flex } from "rebass";
 import { Input } from "@rebass/forms";
@@ -84,7 +84,7 @@ export function Link(props) {
                         : editor.state.doc.textBetween(from, to);
                     setText(selectedText);
                     setIsOpen(true);
-                }, toggled: isOpen || !!isEditing }), _jsx(MenuPresenter, __assign({ options: {
+                }, toggled: isOpen || !!isEditing }), _jsx(PopupPresenter, __assign({ mobile: "sheet", desktop: "menu", options: {
                     type: "menu",
                     position: {
                         target: targetRef.current || buttonRef.current || undefined,
@@ -110,5 +110,5 @@ export function Link(props) {
                             commandChain.run();
                             setIsOpen(false);
                         },
-                    } }, { children: _jsxs(Flex, __assign({ sx: { p: 1, width: 300, flexDirection: "column" } }, { children: [_jsx(Input, { type: "text", placeholder: "Link text", value: text, onChange: function (e) { return setText(e.target.value); } }), _jsx(Input, { type: "url", sx: { mt: 1 }, autoFocus: true, placeholder: "https://example.com/", value: href, onChange: function (e) { return setHref(e.target.value); } })] })) })) }))] }));
+                    } }, { children: _jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column" } }, { children: [_jsx(Input, { type: "text", placeholder: "Link text", value: text, onChange: function (e) { return setText(e.target.value); } }), _jsx(Input, { type: "url", sx: { mt: 1 }, autoFocus: true, placeholder: "https://example.com/", value: href, onChange: function (e) { return setHref(e.target.value); } })] })) })) }))] }));
 }

@@ -124,7 +124,9 @@ var imageActionSheet = function (editor) { return ({
                             type: "menuitem",
                             title: "Upload from disk",
                             icon: "upload",
-                            onClick: function () { },
+                            onClick: function () {
+                                return editor === null || editor === void 0 ? void 0 : editor.chain().focus().openAttachmentPicker("image").run();
+                            },
                         },
                         {
                             key: "upload-from-url",
@@ -215,7 +217,7 @@ var attachment = function (editor) { return ({
     title: "Attachment",
     icon: "attachment",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("attachment"),
-    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().openAttachmentPicker().run(); },
+    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().openAttachmentPicker("file").run(); },
 }); };
 var tasklist = function (editor) { return ({
     key: "tasklist",

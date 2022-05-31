@@ -156,7 +156,8 @@ const imageActionSheet = (editor: Editor | null): MenuItem => ({
                 type: "menuitem",
                 title: "Upload from disk",
                 icon: "upload",
-                onClick: () => {},
+                onClick: () =>
+                  editor?.chain().focus().openAttachmentPicker("image").run(),
               },
               {
                 key: "upload-from-url",
@@ -290,7 +291,7 @@ const attachment = (editor: Editor | null): MenuItem => ({
   title: "Attachment",
   icon: "attachment",
   isChecked: editor?.isActive("attachment"),
-  onClick: () => editor?.chain().focus().openAttachmentPicker().run(),
+  onClick: () => editor?.chain().focus().openAttachmentPicker("file").run(),
 });
 
 const tasklist = (editor: Editor | null): MenuItem => ({

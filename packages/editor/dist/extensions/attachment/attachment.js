@@ -68,11 +68,9 @@ export var AttachmentNode = Node.create({
                     return _this.options.onDownloadAttachment(attachment);
                 };
             },
-            openAttachmentPicker: function () {
-                return function (_a) {
-                    return _this.options.onOpenAttachmentPicker();
-                };
-            },
+            openAttachmentPicker: function (type) { return function () {
+                return _this.options.onOpenAttachmentPicker(type);
+            }; },
             setProgress: function (options) {
                 return function (_a) {
                     var e_1, _b;

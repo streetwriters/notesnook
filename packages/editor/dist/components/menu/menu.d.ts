@@ -2,7 +2,6 @@ import { PropsWithChildren } from "react";
 import { FlexProps } from "rebass";
 import { MenuOptions } from "./useMenu";
 import { MenuItem as MenuItemType } from "./types";
-import "react-spring-bottom-sheet/dist/style.css";
 declare type MenuProps = MenuContainerProps & {
     items: MenuItemType[];
     closeMenu: () => void;

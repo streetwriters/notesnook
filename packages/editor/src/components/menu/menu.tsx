@@ -14,8 +14,7 @@ import { MenuItem as MenuItemType /*ResolvedMenuItem*/ } from "./types";
 // import { useMenuTrigger, useMenu, getPosition } from "../../hooks/useMenu";
 import Modal from "react-modal";
 import { ThemeProvider } from "emotion-theming";
-import { BottomSheet } from "react-spring-bottom-sheet";
-import "react-spring-bottom-sheet/dist/style.css";
+import Sheet from "react-modal-sheet";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 // import { store as selectionStore } from "../../stores/selectionstore";
 
@@ -424,22 +423,45 @@ export function ActionSheetPresenter(
   } = props;
 
   return (
-    <BottomSheet open={isOpen} onDismiss={onClose} blocking={blocking}>
-      {props.children ? (
-        props.children
-      ) : (
-        <Menu
-          items={items}
-          closeMenu={onClose}
-          sx={{
-            flex: 1,
-            boxShadow: "none",
-            border: "none",
-            ...sx,
-          }}
-          {...containerProps}
-        />
-      )}
-    </BottomSheet>
+    <Sheet
+      isOpen={isOpen}
+      onClose={onClose}
+      springConfig={{
+        stiffness: 300,
+        damping: 30,
+        mass: 0.2,
+        duration: 300,
+      }}
+    >
+      <Sheet.Container
+        style={{
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          boxShadow: "none",
+          paddingBottom: 30,
+        }}
+      >
+        <Sheet.Header />
+        <Sheet.Content>
+          {props.children ? (
+            props.children
+          ) : (
+            <Menu
+              items={items}
+              closeMenu={onClose}
+              sx={{
+                flex: 1,
+                boxShadow: "none",
+                border: "none",
+                ...sx,
+              }}
+              {...containerProps}
+            />
+          )}
+        </Sheet.Content>
+      </Sheet.Container>
+
+      <Sheet.Backdrop />
+    </Sheet>
   );
 }

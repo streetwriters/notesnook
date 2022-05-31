@@ -3,10 +3,11 @@ import { findChildren, ReactNodeViewRenderer } from "../react";
 import { Attribute } from "@tiptap/core";
 import { AttachmentComponent } from "./component";
 
+export type AttachmentType = "image" | "file";
 export interface AttachmentOptions {
   // HTMLAttributes: Record<string, any>;
   onDownloadAttachment: (attachment: Attachment) => boolean;
-  onOpenAttachmentPicker: () => boolean;
+  onOpenAttachmentPicker: (type: AttachmentType) => boolean;
 }
 
 export type Attachment = AttachmentProgress & {
@@ -25,7 +26,7 @@ export type AttachmentProgress = {
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     attachment: {
-      openAttachmentPicker: () => ReturnType;
+      openAttachmentPicker: (type: AttachmentType) => ReturnType;
       insertAttachment: (attachment: Attachment) => ReturnType;
       downloadAttachment: (attachment: Attachment) => ReturnType;
       setProgress: (progress: AttachmentProgress) => ReturnType;
@@ -94,11 +95,9 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
         ({}) => {
           return this.options.onDownloadAttachment(attachment);
         },
-      openAttachmentPicker:
-        () =>
-        ({}) => {
-          return this.options.onOpenAttachmentPicker();
-        },
+      openAttachmentPicker: (type: AttachmentType) => () => {
+        return this.options.onOpenAttachmentPicker(type);
+      },
       setProgress:
         (options) =>
         ({ state, tr, dispatch }) => {
