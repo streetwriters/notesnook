@@ -3,7 +3,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import { EditorOptions, useEditor } from "./extensions/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
@@ -32,6 +32,8 @@ import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
+import { PortalProviderAPI } from "./extensions/react/ReactNodeViewPortals";
+import { EventDispatcher } from "./extensions/react/event-dispatcher";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -39,10 +41,20 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 
 const useTiptap = (
-  options: Partial<EditorOptions & AttachmentOptions & { theme: Theme }> = {},
+  options: Partial<
+    EditorOptions &
+      AttachmentOptions & { theme: Theme; portalProviderAPI: PortalProviderAPI }
+  > = {},
   deps?: React.DependencyList
 ) => {
-  const { theme, onCreate, onDownloadAttachment, ...restOptions } = options;
+  const {
+    theme,
+    onCreate,
+    onDownloadAttachment,
+    portalProviderAPI,
+    ...restOptions
+  } = options;
+  const eventDispatcher = useMemo(() => new EventDispatcher(), []);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
@@ -103,11 +115,15 @@ const useTiptap = (
         if (theme) {
           editor.storage.theme = theme;
         }
+        if (portalProviderAPI)
+          editor.storage.portalProviderAPI = portalProviderAPI;
+        if (eventDispatcher) editor.storage.eventDispatcher = eventDispatcher;
+
         if (onCreate) onCreate({ editor });
       },
       injectCSS: false,
     }),
-    [theme, onCreate, onDownloadAttachment]
+    [theme, onCreate, onDownloadAttachment, portalProviderAPI, eventDispatcher]
   );
 
   const editor = useEditor({ ...defaultOptions, ...restOptions }, deps);

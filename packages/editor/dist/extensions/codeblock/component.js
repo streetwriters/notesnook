@@ -62,9 +62,8 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { NodeViewContent, NodeViewWrapper } from "../react";
 import { useEffect, useRef, useState } from "react";
-import { loadLanguage } from "./loader";
+import { isLanguageLoaded, loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";
 import "prism-themes/themes/prism-dracula.min.css";
 import { ThemeProvider } from "emotion-theming";
@@ -74,13 +73,12 @@ import { PopupPresenter } from "../../components/menu/menu";
 import { Input } from "@rebass/forms";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { toCaretPosition, getLines, } from "./code-block";
 export function CodeblockComponent(props) {
-    var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node;
-    var _a = node.attrs, language = _a.language, indentLength = _a.indentLength, indentType = _a.indentType;
-    var theme = editor.storage.theme;
+    var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, forwardRef = props.forwardRef;
+    var _a = node === null || node === void 0 ? void 0 : node.attrs, language = _a.language, indentLength = _a.indentLength, indentType = _a.indentType, caretPosition = _a.caretPosition;
+    var theme = editor === null || editor === void 0 ? void 0 : editor.storage.theme;
     var _b = __read(useState(false), 2), isOpen = _b[0], setIsOpen = _b[1];
-    var _c = __read(useState(), 2), caretPosition = _c[0], setCaretPosition = _c[1];
+    // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
     var toolbarRef = useRef(null);
     var languageDefinition = Languages.find(function (l) { var _a; return l.filename === language || ((_a = l.alias) === null || _a === void 0 ? void 0 : _a.some(function (a) { return a === language; })); });
     useEffect(function () {
@@ -90,10 +88,8 @@ export function CodeblockComponent(props) {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (!language || !languageDefinition) {
-                                updateAttributes({ language: null });
+                            if (!language || !languageDefinition || isLanguageLoaded(language))
                                 return [2 /*return*/];
-                            }
                             return [4 /*yield*/, loadLanguage(languageDefinition.filename)];
                         case 1:
                             syntax = _a.sent();
@@ -108,68 +104,57 @@ export function CodeblockComponent(props) {
                 });
             });
         })();
-    }, [language, updateAttributes]);
-    useEffect(function () {
-        function onSelectionUpdate(_a) {
-            var transaction = _a.transaction;
-            var position = toCaretPosition(getLines(node), transaction.selection);
-            setCaretPosition(position);
-        }
-        editor.on("selectionUpdate", onSelectionUpdate);
-        return function () {
-            editor.off("selectionUpdate", onSelectionUpdate);
-        };
-    }, [node]);
-    return (_jsx(NodeViewWrapper, { children: _jsxs(ThemeProvider, __assign({ theme: theme }, { children: [_jsxs(Flex, __assign({ sx: {
-                        flexDirection: "column",
-                        borderRadius: "default",
-                        overflow: "hidden",
-                    } }, { children: [_jsx(Text, __assign({ as: "pre", sx: {
-                                "div, span.token, span.line-number-widget": {
-                                    fontFamily: "monospace",
-                                    fontSize: "code",
-                                    whiteSpace: "pre !important",
-                                    tabSize: 1,
-                                },
-                                position: "relative",
-                                lineHeight: "20px",
-                                bg: "codeBg",
-                                color: "static",
-                                overflowX: "auto",
-                                display: "flex",
-                                px: 2,
-                                pt: 2,
-                                pb: 1,
-                            }, spellCheck: false }, { children: _jsx(NodeViewContent, { as: "code" }) })), _jsxs(Flex, __assign({ ref: toolbarRef, sx: {
-                                bg: "codeBg",
-                                alignItems: "center",
-                                justifyContent: "end",
-                                borderTop: "1px solid var(--codeBorder)",
-                            } }, { children: [caretPosition ? (_jsxs(Text, __assign({ variant: "subBody", sx: { mr: 2, color: "codeFg" } }, { children: ["Line ", caretPosition.line, ", Column ", caretPosition.column, " ", caretPosition.selected
-                                            ? "(".concat(caretPosition.selected, " selected)")
-                                            : ""] }))) : null, _jsx(Button, __assign({ variant: "icon", sx: { p: 1, mr: 1, ":hover": { bg: "codeSelection" } }, title: "Toggle indentation mode", onClick: function () {
-                                        editor.commands.changeCodeBlockIndentation({
-                                            type: indentType === "space" ? "tab" : "space",
-                                            length: indentLength,
-                                        });
-                                    } }, { children: _jsxs(Text, __assign({ variant: "subBody", sx: { color: "codeFg" } }, { children: [indentType === "space" ? "Spaces" : "Tabs", ": ", indentLength] })) })), _jsx(Button, __assign({ variant: "icon", sx: {
-                                        p: 1,
-                                        mr: 1,
-                                        bg: isOpen ? "codeSelection" : "transparent",
-                                        ":hover": { bg: "codeSelection" },
-                                    }, onClick: function () { return setIsOpen(true); }, title: "Change language" }, { children: _jsx(Text, __assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), _jsx(PopupPresenter, __assign({ isOpen: isOpen, onClose: function () {
-                        setIsOpen(false);
-                        editor.commands.focus();
-                    }, mobile: "sheet", desktop: "menu", options: {
-                        type: "menu",
-                        position: {
-                            target: toolbarRef.current || undefined,
-                            align: "end",
-                            isTargetAbsolute: true,
-                            location: "top",
-                            yOffset: 5,
-                        },
-                    } }, { children: _jsx(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: function (language) { return updateAttributes({ language: language }); } }) }))] })) }));
+    }, [language]);
+    return (_jsxs(ThemeProvider, __assign({ theme: theme }, { children: [_jsxs(Flex, __assign({ sx: {
+                    flexDirection: "column",
+                    borderRadius: "default",
+                    overflow: "hidden",
+                } }, { children: [_jsx(Text, { ref: forwardRef, as: "pre", sx: {
+                            "div, span.token, span.line-number-widget, span.line-number::before": {
+                                fontFamily: "monospace",
+                                fontSize: "code",
+                                whiteSpace: "pre !important",
+                                tabSize: 1,
+                            },
+                            position: "relative",
+                            lineHeight: "20px",
+                            bg: "codeBg",
+                            color: "static",
+                            overflowX: "auto",
+                            display: "flex",
+                            px: 2,
+                            pt: 2,
+                            pb: 1,
+                        }, spellCheck: false }), _jsxs(Flex, __assign({ ref: toolbarRef, contentEditable: false, sx: {
+                            bg: "codeBg",
+                            alignItems: "center",
+                            justifyContent: "end",
+                            borderTop: "1px solid var(--codeBorder)",
+                        } }, { children: [caretPosition ? (_jsxs(Text, __assign({ variant: "subBody", sx: { mr: 2, color: "codeFg" } }, { children: ["Line ", caretPosition.line, ", Column ", caretPosition.column, " ", caretPosition.selected
+                                        ? "(".concat(caretPosition.selected, " selected)")
+                                        : ""] }))) : null, _jsx(Button, __assign({ variant: "icon", sx: { p: 1, mr: 1, ":hover": { bg: "codeSelection" } }, title: "Toggle indentation mode", onClick: function () {
+                                    editor.commands.changeCodeBlockIndentation({
+                                        type: indentType === "space" ? "tab" : "space",
+                                        amount: indentLength,
+                                    });
+                                } }, { children: _jsxs(Text, __assign({ variant: "subBody", sx: { color: "codeFg" } }, { children: [indentType === "space" ? "Spaces" : "Tabs", ": ", indentLength] })) })), _jsx(Button, __assign({ variant: "icon", sx: {
+                                    p: 1,
+                                    mr: 1,
+                                    bg: isOpen ? "codeSelection" : "transparent",
+                                    ":hover": { bg: "codeSelection" },
+                                }, onClick: function () { return setIsOpen(true); }, title: "Change language" }, { children: _jsx(Text, __assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), _jsx(PopupPresenter, __assign({ isOpen: isOpen, onClose: function () {
+                    setIsOpen(false);
+                    editor.commands.focus();
+                }, mobile: "sheet", desktop: "menu", options: {
+                    type: "menu",
+                    position: {
+                        target: toolbarRef.current || undefined,
+                        align: "end",
+                        isTargetAbsolute: true,
+                        location: "top",
+                        yOffset: 5,
+                    },
+                } }, { children: _jsx(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: function (language) { return updateAttributes({ language: language }); } }) }))] })));
 }
 function LanguageSelector(props) {
     var onLanguageSelected = props.onLanguageSelected, selectedLanguage = props.selectedLanguage;

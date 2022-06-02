@@ -1,15 +1,16 @@
 import { Node } from "@tiptap/core";
 import { Selection } from "prosemirror-state";
 import { Node as ProsemirrorNode } from "prosemirror-model";
-export declare type IndentationOptions = {
-    type: "space" | "tab";
-    length: number;
-};
+interface Indent {
+    type: "tab" | "space";
+    amount: number;
+}
 export declare type CodeBlockAttributes = {
-    indentType: IndentationOptions["type"];
+    indentType: Indent["type"];
     indentLength: number;
     language: string;
     lines: CodeLine[];
+    caretPosition?: CaretPosition;
 };
 export interface CodeBlockOptions {
     /**
@@ -55,7 +56,7 @@ declare module "@tiptap/core" {
             /**
              * Change code block indentation options
              */
-            changeCodeBlockIndentation: (options: IndentationOptions) => ReturnType;
+            changeCodeBlockIndentation: (options: Indent) => ReturnType;
         };
     }
 }
@@ -67,8 +68,9 @@ export declare type CaretPosition = {
     line: number;
     selected?: number;
     total: number;
+    from: number;
 };
-export declare function toCaretPosition(lines: CodeLine[], selection: Selection): CaretPosition | undefined;
+export declare function toCaretPosition(selection: Selection, lines?: CodeLine[]): CaretPosition | undefined;
 export declare function getLines(node: ProsemirrorNode): CodeLine[];
 declare type CodeLine = {
     index: number;

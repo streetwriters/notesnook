@@ -49,7 +49,7 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import { findChildren } from "@tiptap/core";
 import { refractor } from "refractor/lib/core";
-import { getLines, toCaretPosition, toCodeLines, } from "./code-block";
+import { toCaretPosition, toCodeLines, } from "./code-block";
 function parseNodes(nodes, className) {
     if (className === void 0) { className = []; }
     return nodes.reduce(function (result, node) {
@@ -58,6 +58,9 @@ function parseNodes(nodes, className) {
         var classes = __spreadArray([], __read(className), false);
         if (node.type === "element" && node.properties)
             classes.push.apply(classes, __spreadArray([], __read(node.properties.className), false));
+        // this is required so that even plain text is wrapped in a span
+        // during highlighting. Without this, Prosemirror's selection acts
+        // weird for the first highlighted node/span.
         else
             classes.push("token", "text");
         if (node.type === "element") {
@@ -73,19 +76,24 @@ function getHighlightNodes(result) {
     return result.children || [];
 }
 function getLineDecoration(from, line, total, isActive) {
+    var maxLength = String(total).length;
     var attributes = {
         class: "line-number ".concat(isActive ? "active" : ""),
-        "data-line": String(line).padEnd(String(total).length, " "),
+        "data-line": String(line).padEnd(maxLength, " "),
     };
     var spec = {
         line: line,
         active: isActive,
         total: total,
+        from: from,
     };
     // Prosemirror has a selection issue with the widget decoration
     // on the first line. To work around that we use inline decoration
     // for the first line.
-    if (line === 1) {
+    if (line === 1 ||
+        // Android Composition API (aka the virtual keyboard) doesn't behave well
+        // with Decoration widgets so we have to resort to inline line numbers.
+        isAndroid()) {
         return Decoration.inline(from, from + 1, attributes, spec);
     }
     return Decoration.widget(from, function () {
@@ -95,21 +103,26 @@ function getLineDecoration(from, line, total, isActive) {
             element.classList.add("active");
         element.innerHTML = attributes["data-line"];
         return element;
-    }, __assign(__assign({}, spec), { key: "".concat(line, "-").concat(isActive ? "active" : "inactive") }));
+    }, __assign(__assign({}, spec), { 
+        // should rerender when any of these change:
+        // 1. line number
+        // 2. line active state
+        // 3. the max length of all lines
+        key: "".concat(line, "-").concat(isActive ? "active" : "", "-").concat(maxLength) }));
 }
 function getDecorations(_a) {
-    var doc = _a.doc, name = _a.name, defaultLanguage = _a.defaultLanguage, currentLine = _a.currentLine;
+    var doc = _a.doc, name = _a.name, defaultLanguage = _a.defaultLanguage, caretPosition = _a.caretPosition;
     var decorations = [];
     var languages = refractor.listLanguages();
     findChildren(doc, function (node) { return node.type.name === name; }).forEach(function (block) {
         var e_1, _a;
         var code = block.node.textContent;
-        var lines = block.node.attrs.lines;
+        var lines = toCodeLines(code, block.pos);
         try {
             for (var _b = __values(lines || []), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var line = _c.value;
                 var lineNumber = line.index + 1;
-                var isActive = lineNumber === currentLine;
+                var isActive = lineNumber === (caretPosition === null || caretPosition === void 0 ? void 0 : caretPosition.line) && line.from === (caretPosition === null || caretPosition === void 0 ? void 0 : caretPosition.from);
                 var decoration = getLineDecoration(line.from, lineNumber, (lines === null || lines === void 0 ? void 0 : lines.length) || 0, isActive);
                 decorations.push(decoration);
             }
@@ -155,7 +168,12 @@ export function HighlighterPlugin(_a) {
                 var newNodeName = newState.selection.$head.parent.type.name;
                 var oldNodes = findChildren(oldState.doc, function (node) { return node.type.name === name; });
                 var newNodes = findChildren(newState.doc, function (node) { return node.type.name === name; });
-                var position = toCaretPosition(getLines(newState.selection.$head.parent), newState.selection);
+                var position = toCaretPosition(newState.selection);
+                // const isDocChanged =
+                //   transaction.docChanged &&
+                //   // TODO
+                //   !transaction.steps.every((step) => step instanceof ReplaceAroundStep);
+                // console.log("Selection", transaction.docChanged, isDocChanged);
                 if (transaction.docChanged &&
                     // Apply decorations if:
                     // selection includes named node,
@@ -177,7 +195,7 @@ export function HighlighterPlugin(_a) {
                         doc: transaction.doc,
                         name: name,
                         defaultLanguage: defaultLanguage,
-                        currentLine: position === null || position === void 0 ? void 0 : position.line,
+                        caretPosition: position,
                     });
                 }
                 decorationSet = getActiveLineDecorations(transaction.doc, decorationSet, position);
@@ -189,17 +207,29 @@ export function HighlighterPlugin(_a) {
                 return key.getState(state);
             },
         },
-        appendTransaction: function (transactions, _prevState, nextState) {
+        appendTransaction: function (transactions, prevState, nextState) {
             var tr = nextState.tr;
             var modified = false;
-            if (transactions.some(function (transaction) { return transaction.docChanged; })) {
-                findChildren(nextState.doc, function (node) { return node.type.name === name; }).forEach(function (block) {
-                    var node = block.node, pos = block.pos;
+            var docChanged = transactions.some(function (transaction) { return transaction.docChanged; });
+            var selectionChanged = (nextState.selection.$from.parent.type.name === name ||
+                prevState.selection.$from.parent.type.name === name) &&
+                prevState.selection.$from.pos !== nextState.selection.$from.pos;
+            findChildren(nextState.doc, function (node) { return node.type.name === name; }).forEach(function (block) {
+                var node = block.node, pos = block.pos;
+                var attributes = __assign({}, node.attrs);
+                if (docChanged) {
                     var lines = toCodeLines(node.textContent, pos);
-                    tr.setNodeMarkup(pos, undefined, __assign(__assign({}, node.attrs), { lines: lines }));
+                    attributes.lines = lines.slice();
+                }
+                if (selectionChanged) {
+                    var position = toCaretPosition(nextState.selection, docChanged ? toCodeLines(node.textContent, pos) : undefined);
+                    attributes.caretPosition = position;
+                }
+                if (docChanged || selectionChanged) {
+                    tr.setNodeMarkup(pos, node.type, attributes);
                     modified = true;
-                });
-            }
+                }
+            });
             return modified ? tr : null;
         },
     });
@@ -211,8 +241,11 @@ export function HighlighterPlugin(_a) {
 function getActiveLineDecorations(doc, decorations, position) {
     var e_2, _a;
     var lineDecorations = decorations.find(undefined, undefined, function (_a) {
-        var line = _a.line, active = _a.active;
-        return (position && line === position.line) || active;
+        var line = _a.line, active = _a.active, from = _a.from;
+        var isSame = position
+            ? line === position.line && from === position.from
+            : false;
+        return isSame || active;
     });
     if (!lineDecorations.length)
         return decorations;
@@ -240,4 +273,8 @@ function getActiveLineDecorations(doc, decorations, position) {
         finally { if (e_2) throw e_2.error; }
     }
     return decorations.add(doc, newDecorations);
+}
+function isAndroid() {
+    var ua = navigator.userAgent.toLowerCase();
+    return ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
 }

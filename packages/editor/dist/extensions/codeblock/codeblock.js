@@ -36,10 +36,13 @@ var __values = (this && this.__values) || function(o) {
 };
 import { Node, textblockTypeInputRule, mergeAttributes } from "@tiptap/core";
 import { Plugin, PluginKey, TextSelection, } from "prosemirror-state";
-import { findParentNodeClosestToPos, ReactNodeViewRenderer } from "../react";
+import { findParentNodeClosestToPos } from "../react";
 import { CodeblockComponent } from "./component";
 import { HighlighterPlugin } from "./highlighter";
+import ReactNodeView from "../react/ReactNodeView";
 import detectIndent from "detect-indent";
+import redent from "redent";
+import stripIndent from "strip-indent";
 export var backtickInputRegex = /^```([a-z]+)?[\s\n]$/;
 export var tildeInputRegex = /^~~~([a-z]+)?[\s\n]$/;
 var ZERO_WIDTH_SPACE = "\u200b";
@@ -63,6 +66,10 @@ export var CodeBlock = Node.create({
     addAttributes: function () {
         var _this = this;
         return {
+            caretPosition: {
+                default: undefined,
+                rendered: false,
+            },
             lines: {
                 default: [],
                 rendered: false,
@@ -71,9 +78,7 @@ export var CodeBlock = Node.create({
                 default: "space",
                 parseHTML: function (element) {
                     var indentType = element.dataset.indentType;
-                    if (indentType)
-                        return indentType;
-                    return detectIndent(element.innerText).type;
+                    return indentType;
                 },
                 renderHTML: function (attributes) {
                     if (!attributes.indentType) {
@@ -88,9 +93,7 @@ export var CodeBlock = Node.create({
                 default: 2,
                 parseHTML: function (element) {
                     var indentLength = element.dataset.indentLength;
-                    if (indentLength)
-                        return indentLength;
-                    return detectIndent(element.innerText).amount;
+                    return indentLength;
                 },
                 renderHTML: function (attributes) {
                     if (!attributes.indentLength) {
@@ -146,7 +149,7 @@ export var CodeBlock = Node.create({
         return [
             "pre",
             mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-            0,
+            ["code", {}, 0],
         ];
     },
     addCommands: function () {
@@ -183,7 +186,10 @@ export var CodeBlock = Node.create({
                             if (!whitespaceLength)
                                 continue;
                             var indentLength = whitespaceLength;
-                            var indentToken = indent(options.type, indentLength);
+                            var indentToken = indent({
+                                type: options.type,
+                                amount: indentLength,
+                            });
                             tr.insertText(indentToken, tr.mapping.map(line.from), tr.mapping.map(line.from + whitespaceLength));
                         }
                     }
@@ -196,7 +202,7 @@ export var CodeBlock = Node.create({
                     }
                     commands.updateAttributes(_this.type, {
                         indentType: options.type,
-                        indentLength: options.length,
+                        indentLength: options.amount,
                     });
                     return true;
                 };
@@ -229,7 +235,7 @@ export var CodeBlock = Node.create({
                     return false;
                 }
                 if (isAtStart || !$anchor.parent.textContent.length) {
-                    return _this.editor.commands.clearNodes();
+                    return _this.editor.commands.deleteNode(_this.type);
                 }
                 return false;
             },
@@ -301,7 +307,7 @@ export var CodeBlock = Node.create({
                     return false;
                 }
                 var indentation = parseIndentation($from.parent);
-                var indentToken = indent(indentation.type, indentation.length);
+                var indentToken = indent(indentation);
                 var lines = $from.parent.attrs.lines;
                 var selectedLines = getSelectedLines(lines, selection);
                 return editor
@@ -315,7 +321,7 @@ export var CodeBlock = Node.create({
                                 var line = selectedLines_1_1.value;
                                 if (line.text(indentToken.length) !== indentToken)
                                     continue;
-                                tr.delete(tr.mapping.map(line.from), tr.mapping.map(line.from + indentation.length));
+                                tr.delete(tr.mapping.map(line.from), tr.mapping.map(line.from + indentation.amount));
                             }
                         }
                         catch (e_2_1) { e_2 = { error: e_2_1 }; }
@@ -345,8 +351,7 @@ export var CodeBlock = Node.create({
                     var tr = _a.tr;
                     return withSelection(tr, function (tr) {
                         var e_3, _a;
-                        var indentation = parseIndentation($from.parent);
-                        var indentToken = indent(indentation.type, indentation.length);
+                        var indentToken = indent(parseIndentation($from.parent));
                         if (selectedLines.length === 1)
                             return tr.insertText(indentToken, $from.pos);
                         try {
@@ -398,10 +403,6 @@ export var CodeBlock = Node.create({
                         if (!event.clipboardData) {
                             return false;
                         }
-                        // don’t create a new code block within code blocks
-                        if (_this.editor.isActive(_this.type.name)) {
-                            return false;
-                        }
                         var text = event.clipboardData.getData("text/plain");
                         var vscode = event.clipboardData.getData("vscode-editor-data");
                         var vscodeData = vscode ? JSON.parse(vscode) : undefined;
@@ -409,15 +410,26 @@ export var CodeBlock = Node.create({
                         if (!text || !language) {
                             return false;
                         }
+                        var indent = fixIndentation(text, parseIndentation(view.state.selection.$from.parent));
                         var tr = view.state.tr;
-                        // create an empty code block
-                        tr.replaceSelectionWith(_this.type.create({ language: language }));
-                        // put cursor inside the newly created code block
-                        tr.setSelection(TextSelection.near(tr.doc.resolve(Math.max(0, tr.selection.from - 2))));
+                        // create an empty code block if not already within one
+                        if (!_this.editor.isActive(_this.type.name)) {
+                            tr.replaceSelectionWith(_this.type.create({
+                                language: language,
+                                indentType: indent.type,
+                                indentLength: indent.amount,
+                            }));
+                        }
+                        // // put cursor inside the newly created code block
+                        // tr.setSelection(
+                        //   TextSelection.near(
+                        //     tr.doc.resolve(Math.max(0, tr.selection.from - 2))
+                        //   )
+                        // );
                         // add text to code block
                         // strip carriage return chars from text pasted as code
                         // see: https://github.com/ProseMirror/prosemirror-view/commit/a50a6bcceb4ce52ac8fcc6162488d8875613aacd
-                        tr.insertText(text.replace(/\r\n?/g, "\n"));
+                        tr.insertText(indent.code.replace(/\r\n?/g, "\n"));
                         // store meta information
                         // this is useful for other plugins that depends on the paste event
                         // like the paste rule plugin
@@ -431,14 +443,31 @@ export var CodeBlock = Node.create({
         ];
     },
     addNodeView: function () {
-        return ReactNodeViewRenderer(CodeblockComponent);
+        return ReactNodeView.fromComponent(CodeblockComponent, {
+            contentDOMFactory: function () {
+                var content = document.createElement("div");
+                content.classList.add("node-content-wrapper");
+                content.style.whiteSpace = "inherit";
+                // caret is not visible if content element width is 0px
+                content.style.minWidth = "20px";
+                return { dom: content };
+            },
+            shouldUpdate: function (_a, _b) {
+                var prev = _a.attrs;
+                var next = _b.attrs;
+                return (compareCaretPosition(prev.caretPosition, next.caretPosition) ||
+                    prev.language !== next.language ||
+                    prev.indentType !== next.indentType);
+            },
+        });
     },
 });
-export function toCaretPosition(lines, selection) {
+export function toCaretPosition(selection, lines) {
     var e_4, _a;
     var $from = selection.$from, $to = selection.$to, $head = selection.$head;
     if ($from.parent.type.name !== CodeBlock.name)
         return;
+    lines = lines || getLines($from.parent);
     try {
         for (var lines_2 = __values(lines), lines_2_1 = lines_2.next(); !lines_2_1.done; lines_2_1 = lines_2.next()) {
             var line = lines_2_1.value;
@@ -449,6 +478,7 @@ export function toCaretPosition(lines, selection) {
                     column: lineLength - (line.to - $head.pos),
                     selected: $to.pos - $from.pos,
                     total: lines.length,
+                    from: line.from,
                 };
             }
         }
@@ -483,16 +513,28 @@ function exitOnTripleEnter(editor, $from) {
         .run();
 }
 function indentOnEnter(editor, $from, options) {
+    var _a = getNewline($from, options) || {}, indentation = _a.indentation, newline = _a.newline;
+    if (!newline)
+        return false;
+    return editor
+        .chain()
+        .insertContent("".concat(newline).concat(indentation), {
+        parseOptions: { preserveWhitespace: "full" },
+    })
+        .focus()
+        .run();
+}
+function getNewline($from, options) {
     var lines = $from.parent.attrs.lines;
     var currentLine = getLineAt(lines, $from.pos);
     if (!currentLine)
         return false;
-    var text = editor.state.doc.textBetween(currentLine.from, currentLine.to);
+    var text = currentLine.text();
     var indentLength = text.length - text.trimStart().length;
-    var newline = "".concat(NEWLINE).concat(indent(options.type, indentLength));
-    return editor.commands.insertContent(newline, {
-        parseOptions: { preserveWhitespace: "full" },
-    });
+    return {
+        newline: NEWLINE,
+        indentation: indent({ amount: indentLength, type: options.type }),
+    };
 }
 export function toCodeLines(code, pos) {
     var positions = [];
@@ -533,10 +575,12 @@ function getSelectedLines(lines, selection) {
     });
 }
 function parseIndentation(node) {
+    if (node.type.name !== CodeBlock.name)
+        return undefined;
     var _a = node.attrs, indentType = _a.indentType, indentLength = _a.indentLength;
     return {
         type: indentType,
-        length: parseInt(indentLength),
+        amount: parseInt(indentLength),
     };
 }
 function getLineAt(lines, pos) {
@@ -545,9 +589,14 @@ function getLineAt(lines, pos) {
 function inRange(x, a, b) {
     return x >= a && x <= b;
 }
-function indent(type, length) {
-    var char = type === "space" ? " " : "\t";
-    return char.repeat(length);
+function indent(options) {
+    var char = options.type === "space" ? " " : "\t";
+    return char.repeat(options.amount);
+}
+function compareCaretPosition(prev, next) {
+    return (next === undefined ||
+        (prev === null || prev === void 0 ? void 0 : prev.column) !== (next === null || next === void 0 ? void 0 : next.column) ||
+        (prev === null || prev === void 0 ? void 0 : prev.line) !== (next === null || next === void 0 ? void 0 : next.line));
 }
 /**
  * Persist selection between transaction steps
@@ -557,4 +606,12 @@ function withSelection(tr, callback) {
     callback(tr);
     tr.setSelection(new TextSelection(tr.doc.resolve(tr.mapping.map($anchor.pos)), tr.doc.resolve(tr.mapping.map($head.pos))));
     return true;
+}
+function fixIndentation(code, indent) {
+    var _a = indent || detectIndent(code), amount = _a.amount, _b = _a.type, type = _b === void 0 ? "space" : _b;
+    var fixed = redent(code, amount, {
+        includeEmptyLines: false,
+        indent: type === "space" ? " " : "\t",
+    });
+    return { code: stripIndent(fixed), amount: amount, type: type };
 }

@@ -53,6 +53,7 @@ import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
+import { EventDispatcher } from "./extensions/react/event-dispatcher";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -60,7 +61,8 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 var useTiptap = function (options, deps) {
     if (options === void 0) { options = {}; }
-    var theme = options.theme, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, restOptions = __rest(options, ["theme", "onCreate", "onDownloadAttachment"]);
+    var theme = options.theme, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, portalProviderAPI = options.portalProviderAPI, restOptions = __rest(options, ["theme", "onCreate", "onDownloadAttachment", "portalProviderAPI"]);
+    var eventDispatcher = useMemo(function () { return new EventDispatcher(); }, []);
     var defaultOptions = useMemo(function () { return ({
         extensions: [
             SearchReplace,
@@ -119,11 +121,15 @@ var useTiptap = function (options, deps) {
             if (theme) {
                 editor.storage.theme = theme;
             }
+            if (portalProviderAPI)
+                editor.storage.portalProviderAPI = portalProviderAPI;
+            if (eventDispatcher)
+                editor.storage.eventDispatcher = eventDispatcher;
             if (onCreate)
                 onCreate({ editor: editor });
         },
         injectCSS: false,
-    }); }, [theme, onCreate, onDownloadAttachment]);
+    }); }, [theme, onCreate, onDownloadAttachment, portalProviderAPI, eventDispatcher]);
     var editor = useEditor(__assign(__assign({}, defaultOptions), restOptions), deps);
     /**
      * Add editor to global for use in React Native.

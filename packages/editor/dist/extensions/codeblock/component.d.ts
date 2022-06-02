@@ -1,3 +1,4 @@
-import { NodeViewProps } from "../react";
 import "prism-themes/themes/prism-dracula.min.css";
-export declare function CodeblockComponent(props: NodeViewProps): JSX.Element;
+import { CodeBlockAttributes } from "./code-block";
+import { ReactComponentProps } from "../react/types";
+export declare function CodeblockComponent(props: ReactComponentProps<CodeBlockAttributes>): JSX.Element;

@@ -35,6 +35,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var loadedLanguages = {};
+export function isLanguageLoaded(name) {
+    return !!loadedLanguages[name];
+}
 export function loadLanguage(shortName) {
     return __awaiter(this, void 0, void 0, function () {
         var url, result;

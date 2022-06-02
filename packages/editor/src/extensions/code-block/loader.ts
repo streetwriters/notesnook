@@ -1,6 +1,9 @@
 import { Syntax } from "refractor";
 
 const loadedLanguages: Record<string, Syntax | undefined> = {};
+export function isLanguageLoaded(name: string) {
+  return !!loadedLanguages[name];
+}
 export async function loadLanguage(shortName: string) {
   if (loadedLanguages[shortName]) return loadedLanguages[shortName];
 
