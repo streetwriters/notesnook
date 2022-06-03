@@ -36,14 +36,19 @@ function ColorTool(props: ColorToolProps) {
     props;
   const activeColor = getActiveColor(editor);
   const _isActive = isActive(editor);
+  const tColor = tinycolor(activeColor);
 
   return (
     <SplitButton
       {...toolProps}
       toggled={false}
+      iconColor={_isActive && tColor.isDark() ? "static" : "icon"}
       sx={{
         mr: 0,
         bg: _isActive ? activeColor : "transparent",
+        ":hover": {
+          bg: _isActive ? tColor.darken(5).toRgbString() : "transparent",
+        },
       }}
     >
       <Flex

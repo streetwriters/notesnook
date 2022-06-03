@@ -64,9 +64,13 @@ function ColorTool(props) {
     var editor = props.editor, onColorChange = props.onColorChange, isActive = props.isActive, getActiveColor = props.getActiveColor, toolProps = __rest(props, ["editor", "onColorChange", "isActive", "getActiveColor"]);
     var activeColor = getActiveColor(editor);
     var _isActive = isActive(editor);
-    return (_jsx(SplitButton, __assign({}, toolProps, { toggled: false, sx: {
+    var tColor = tinycolor(activeColor);
+    return (_jsx(SplitButton, __assign({}, toolProps, { toggled: false, iconColor: _isActive && tColor.isDark() ? "static" : "icon", sx: {
             mr: 0,
             bg: _isActive ? activeColor : "transparent",
+            ":hover": {
+                bg: _isActive ? tColor.darken(5).toRgbString() : "transparent",
+            },
         } }, { children: _jsx(Flex, __assign({ sx: {
                 flexDirection: "column",
                 bg: "background",
