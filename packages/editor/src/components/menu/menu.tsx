@@ -13,9 +13,10 @@ import MenuItem from "./menuitem";
 import { MenuItem as MenuItemType /*ResolvedMenuItem*/ } from "./types";
 // import { useMenuTrigger, useMenu, getPosition } from "../../hooks/useMenu";
 import Modal from "react-modal";
-import { ThemeProvider } from "emotion-theming";
+import { ThemeProvider, useTheme } from "emotion-theming";
 import Sheet from "react-modal-sheet";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import { Theme } from "@notesnook/theme";
 // import { store as selectionStore } from "../../stores/selectionstore";
 
 function useMenuFocus(
@@ -421,6 +422,7 @@ export function ActionSheetPresenter(
     blocking = true,
     ...containerProps
   } = props;
+  const theme: Theme = useTheme();
 
   return (
     <Sheet
@@ -437,7 +439,7 @@ export function ActionSheetPresenter(
         style={{
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
-          boxShadow: "none",
+          boxShadow: theme.shadows.menu,
           paddingBottom: 30,
         }}
       >
@@ -461,7 +463,10 @@ export function ActionSheetPresenter(
         </Sheet.Content>
       </Sheet.Container>
 
-      <Sheet.Backdrop />
+      <Sheet.Backdrop
+        style={{ backgroundColor: "transparent" }}
+        onTap={onClose}
+      />
     </Sheet>
   );
 }
