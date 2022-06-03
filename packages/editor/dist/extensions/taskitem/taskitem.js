@@ -13,7 +13,7 @@ import { mergeAttributes } from "@tiptap/core";
 import { onBackspacePressed } from "../list-item/commands";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component";
-import { ReactNodeViewRenderer } from "../react";
+import { createNodeView } from "../react";
 export var TaskItemNode = TaskItem.extend({
     draggable: true,
     addAttributes: function () {
@@ -65,8 +65,14 @@ export var TaskItemNode = TaskItem.extend({
             } });
     },
     addNodeView: function () {
-        return ReactNodeViewRenderer(TaskItemComponent, {
-            as: "li",
+        return createNodeView(TaskItemComponent, {
+            contentDOMFactory: true,
+            wrapperFactory: function () { return document.createElement("li"); },
+            shouldUpdate: function (_a, _b) {
+                var prev = _a.attrs;
+                var next = _b.attrs;
+                return (prev.checked !== next.checked || prev.collapsed !== next.collapsed);
+            },
         });
     },
 });

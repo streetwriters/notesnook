@@ -34,12 +34,12 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+import { findParentNodeClosestToPos } from "@tiptap/core";
 import { Node, textblockTypeInputRule, mergeAttributes } from "@tiptap/core";
 import { Plugin, PluginKey, TextSelection, } from "prosemirror-state";
-import { findParentNodeClosestToPos } from "../react";
 import { CodeblockComponent } from "./component";
 import { HighlighterPlugin } from "./highlighter";
-import ReactNodeView from "../react/ReactNodeView";
+import { createNodeView } from "../react";
 import detectIndent from "detect-indent";
 import redent from "redent";
 import stripIndent from "strip-indent";
@@ -443,7 +443,7 @@ export var CodeBlock = Node.create({
         ];
     },
     addNodeView: function () {
-        return ReactNodeView.fromComponent(CodeblockComponent, {
+        return createNodeView(CodeblockComponent, {
             contentDOMFactory: function () {
                 var content = document.createElement("div");
                 content.classList.add("node-content-wrapper");

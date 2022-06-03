@@ -61,12 +61,11 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useEffect, useRef, useState } from "react";
 import { isLanguageLoaded, loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";
 import "prism-themes/themes/prism-dracula.min.css";
-import { ThemeProvider } from "emotion-theming";
 import { Button, Flex, Text } from "rebass";
 import Languages from "./languages.json";
 import { PopupPresenter } from "../../components/menu/menu";
@@ -76,7 +75,6 @@ import { Icons } from "../../toolbar/icons";
 export function CodeblockComponent(props) {
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, forwardRef = props.forwardRef;
     var _a = node === null || node === void 0 ? void 0 : node.attrs, language = _a.language, indentLength = _a.indentLength, indentType = _a.indentType, caretPosition = _a.caretPosition;
-    var theme = editor === null || editor === void 0 ? void 0 : editor.storage.theme;
     var _b = __read(useState(false), 2), isOpen = _b[0], setIsOpen = _b[1];
     // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
     var toolbarRef = useRef(null);
@@ -105,7 +103,7 @@ export function CodeblockComponent(props) {
             });
         })();
     }, [language]);
-    return (_jsxs(ThemeProvider, __assign({ theme: theme }, { children: [_jsxs(Flex, __assign({ sx: {
+    return (_jsxs(_Fragment, { children: [_jsxs(Flex, __assign({ sx: {
                     flexDirection: "column",
                     borderRadius: "default",
                     overflow: "hidden",
@@ -154,7 +152,7 @@ export function CodeblockComponent(props) {
                         location: "top",
                         yOffset: 5,
                     },
-                } }, { children: _jsx(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: function (language) { return updateAttributes({ language: language }); } }) }))] })));
+                } }, { children: _jsx(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: function (language) { return updateAttributes({ language: language }); } }) }))] }));
 }
 function LanguageSelector(props) {
     var onLanguageSelected = props.onLanguageSelected, selectedLanguage = props.selectedLanguage;

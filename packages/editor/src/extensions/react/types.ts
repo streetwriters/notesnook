@@ -4,7 +4,7 @@ import { Node as PMNode, Attrs } from "prosemirror-model";
 export interface ReactNodeProps {
   selected: boolean;
 }
-
+export type NodeWithAttrs<T> = PMNode & { attrs: T };
 export type GetPos = GetPosNode | boolean;
 export type GetPosNode = () => number;
 export type ForwardRef = (node: HTMLElement | null) => void;
@@ -17,18 +17,23 @@ export type ContentDOM =
     }
   | undefined;
 
-export type ReactComponentProps<TAttributes = Attrs> = {
-  getPos: GetPos;
-  node: PMNode & { attrs: TAttributes };
+export type ReactNodeViewProps<TAttributes = Attrs> = {
+  getPos: GetPosNode;
+  node: NodeWithAttrs<TAttributes>;
   editor: Editor;
   updateAttributes: UpdateAttributes<TAttributes>;
   forwardRef?: ForwardRef;
 };
 
+export type SelectionBasedReactNodeViewProps<TAttributes = Attrs> =
+  ReactNodeViewProps<TAttributes> & {
+    selected: boolean;
+  };
+
 export type ReactNodeViewOptions<P> = {
   props?: P;
-  component?: React.ComponentType<P & ReactComponentProps>;
+  component?: React.ComponentType<P>;
   shouldUpdate?: ShouldUpdate;
-  contentDOMFactory?: () => ContentDOM;
+  contentDOMFactory?: (() => ContentDOM) | boolean;
   wrapperFactory?: () => HTMLElement;
 };

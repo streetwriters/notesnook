@@ -25,10 +25,8 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Box, Flex } from "rebass";
-import { NodeViewWrapper } from "../react";
-import { ThemeProvider } from "emotion-theming";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { useEffect, useRef, useState } from "react";
@@ -44,40 +42,36 @@ export function EmbedComponent(props) {
     useEffect(function () {
         setIsToolbarVisible(isActive);
     }, [isActive]);
-    return (_jsx(NodeViewWrapper, { children: _jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsx(Box, __assign({ sx: {
-                    display: "flex",
-                    justifyContent: align === "center"
-                        ? "center"
-                        : align === "left"
-                            ? "start"
-                            : "end",
-                } }, { children: _jsxs(Resizable, __assign({ size: {
-                        height: height || "auto",
-                        width: width || "auto",
-                    }, maxWidth: "100%", onResizeStop: function (e, direction, ref, d) {
-                        updateAttributes({
-                            width: ref.clientWidth,
-                            height: ref.clientHeight,
-                        });
-                    }, lockAspectRatio: true }, { children: [_jsx(Flex, __assign({ width: "100%", sx: {
-                                position: "relative",
-                                justifyContent: "end",
-                                borderTop: "20px solid var(--bgSecondary)",
-                                // borderLeft: "20px solid var(--bgSecondary)",
-                                borderTopLeftRadius: "default",
-                                borderTopRightRadius: "default",
-                                borderColor: isActive ? "border" : "bgSecondary",
-                                cursor: "pointer",
-                                ":hover": {
-                                    borderColor: "border",
-                                },
-                            } }, { children: isToolbarVisible && (_jsx(EmbedToolbar, { editor: editor, align: align, height: height || 0, width: width || 0, src: src })) })), _jsx(Box, __assign({ as: "iframe", ref: embedRef, src: src, width: "100%", height: "100%", sx: {
-                                border: "none",
-                                // border: isActive
-                                //   ? "2px solid var(--primary)"
-                                //   : "2px solid transparent",
-                                // borderRadius: "default",
-                            } }, props))] })) })) })) }));
+    return (_jsx(_Fragment, { children: _jsx(Box, __assign({ sx: {
+                display: "flex",
+                justifyContent: align === "center" ? "center" : align === "left" ? "start" : "end",
+            } }, { children: _jsxs(Resizable, __assign({ size: {
+                    height: height || "auto",
+                    width: width || "auto",
+                }, maxWidth: "100%", onResizeStop: function (e, direction, ref, d) {
+                    updateAttributes({
+                        width: ref.clientWidth,
+                        height: ref.clientHeight,
+                    });
+                }, lockAspectRatio: true }, { children: [_jsx(Flex, __assign({ width: "100%", sx: {
+                            position: "relative",
+                            justifyContent: "end",
+                            borderTop: "20px solid var(--bgSecondary)",
+                            // borderLeft: "20px solid var(--bgSecondary)",
+                            borderTopLeftRadius: "default",
+                            borderTopRightRadius: "default",
+                            borderColor: isActive ? "border" : "bgSecondary",
+                            cursor: "pointer",
+                            ":hover": {
+                                borderColor: "border",
+                            },
+                        } }, { children: isToolbarVisible && (_jsx(EmbedToolbar, { editor: editor, align: align, height: height || 0, width: width || 0, src: src })) })), _jsx(Box, __assign({ as: "iframe", ref: embedRef, src: src, width: "100%", height: "100%", sx: {
+                            border: "none",
+                            // border: isActive
+                            //   ? "2px solid var(--primary)"
+                            //   : "2px solid transparent",
+                            // borderRadius: "default",
+                        } }, props))] })) })) }));
 }
 function EmbedToolbar(props) {
     var editor = props.editor, height = props.height, width = props.width, src = props.src;

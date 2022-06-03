@@ -23,7 +23,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
-import { useEditor } from "./extensions/react";
+import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useMemo } from "react";
 import { EditorView } from "prosemirror-view";
@@ -53,7 +53,7 @@ import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
-import { EventDispatcher } from "./extensions/react/event-dispatcher";
+import { EventDispatcher } from "./extensions/react";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads

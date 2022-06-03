@@ -1,8 +1,6 @@
-export * from "@tiptap/core";
-export { Editor } from "./Editor";
-export * from "./use-editor";
-export * from "./ReactRenderer";
-export * from "./ReactNodeViewRenderer";
-export * from "./EditorContent";
-export * from "./NodeViewWrapper";
-export * from "./NodeViewContent";
+export * from "./react-node-view";
+export * from "./types";
+export * from "./react-portal-provider";
+export * from "./selection-based-react-node-view";
+export * from "./plugin";
+export * from "./event-dispatcher";

@@ -1,102 +1,97 @@
-import { Box, Flex, ImageProps, Text } from "rebass";
-import { NodeViewWrapper, NodeViewProps } from "../react";
+import { Box, Flex, Text } from "rebass";
 import { Attachment } from "./attachment";
-import { ThemeProvider } from "emotion-theming";
-import { Theme } from "@notesnook/theme";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { Editor } from "@tiptap/core";
 import { useRef } from "react";
 import { MenuPresenter } from "../../components/menu/menu";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
+import { ReactNodeViewProps } from "../react";
 
-export function AttachmentComponent(props: ImageProps & NodeViewProps) {
-  const { hash, filename, size } = props.node.attrs as Attachment;
+export function AttachmentComponent(props: ReactNodeViewProps<Attachment>) {
+  const { hash, filename, size } = props.node.attrs;
 
-  const { editor, updateAttributes } = props;
+  const { editor } = props;
   const elementRef = useRef<HTMLSpanElement>();
   const isActive = editor.isActive("attachment", { hash });
   // const [isToolbarVisible, setIsToolbarVisible] = useState<boolean>();
-  const theme = editor.storage.theme as Theme;
 
   //   useEffect(() => {
   //     setIsToolbarVisible(isActive);
   //   }, [isActive]);
 
   return (
-    <NodeViewWrapper as={"span"}>
-      <ThemeProvider theme={theme}>
-        <Box
-          ref={elementRef}
+    <>
+      <Box
+        ref={elementRef}
+        as="span"
+        contentEditable={false}
+        variant={"body"}
+        sx={{
+          display: "inline-flex",
+          overflow: "hidden",
+          position: "relative",
+          zIndex: 1,
+          userSelect: "none",
+          alignItems: "center",
+          backgroundColor: "bgSecondary",
+          px: 1,
+          borderRadius: "default",
+          border: "1px solid var(--border)",
+          cursor: "pointer",
+          maxWidth: 250,
+          borderColor: isActive ? "primary" : "border",
+          ":hover": {
+            bg: "hover",
+          },
+        }}
+        title={filename}
+      >
+        <Icon path={Icons.attachment} size={14} />
+        <Text
           as="span"
-          contentEditable={false}
-          variant={"body"}
           sx={{
-            display: "inline-flex",
+            ml: "small",
+            fontSize: "0.85rem",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
             overflow: "hidden",
-            position: "relative",
-            zIndex: 1,
-            userSelect: "none",
-            alignItems: "center",
-            backgroundColor: "bgSecondary",
-            px: 1,
-            borderRadius: "default",
-            border: "1px solid var(--border)",
-            cursor: "pointer",
-            maxWidth: 250,
-            borderColor: isActive ? "primary" : "border",
-            ":hover": {
-              bg: "hover",
-            },
           }}
-          title={filename}
+          className="filename"
         >
-          <Icon path={Icons.attachment} size={14} />
-          <Text
-            as="span"
-            sx={{
-              ml: "small",
-              fontSize: "0.85rem",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-            className="filename"
-          >
-            {filename}
-          </Text>
-          <Text
-            as="span"
-            className="size"
-            sx={{
-              ml: 1,
-              fontSize: "subBody",
-              color: "fontTertiary",
-              flexShrink: 0,
-            }}
-          >
-            {formatBytes(size)}
-          </Text>
-        </Box>
-        <MenuPresenter
-          isOpen={isActive}
-          onClose={() => {}}
-          items={[]}
-          options={{
-            type: "autocomplete",
-            position: {
-              target: elementRef.current || undefined,
-              location: "top",
-              yOffset: -5,
-              isTargetAbsolute: true,
-              align: "end",
-            },
+          {filename}
+        </Text>
+        <Text
+          as="span"
+          className="size"
+          sx={{
+            ml: 1,
+            fontSize: "subBody",
+            color: "fontTertiary",
+            flexShrink: 0,
           }}
         >
-          <AttachmentToolbar editor={editor} />
-        </MenuPresenter>
-      </ThemeProvider>
-    </NodeViewWrapper>
+          {formatBytes(size)}
+        </Text>
+      </Box>
+      <MenuPresenter
+        isOpen={isActive}
+        onClose={() => {}}
+        items={[]}
+        options={{
+          type: "autocomplete",
+          position: {
+            target: elementRef.current || undefined,
+            location: "top",
+            yOffset: -5,
+            isTargetAbsolute: true,
+            align: "end",
+          },
+        }}
+      >
+        <AttachmentToolbar editor={editor} />
+      </MenuPresenter>
+    </>
   );
 }
 
@@ -116,6 +111,7 @@ type AttachmentToolbarProps = {
   editor: Editor;
 };
 
+// TODO make this functional
 function AttachmentToolbar(props: AttachmentToolbarProps) {
   const { editor } = props;
 

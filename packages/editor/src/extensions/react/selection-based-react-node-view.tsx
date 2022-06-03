@@ -1,16 +1,24 @@
 import React from "react";
-import { DecorationSet, EditorView } from "prosemirror-view";
+import { DecorationSet } from "prosemirror-view";
 import { Node as PMNode } from "prosemirror-model";
 import { Selection, NodeSelection } from "prosemirror-state";
-import { PortalProviderAPI } from "./ReactNodeViewPortals";
+import { PortalProviderAPI } from "./react-portal-provider";
 import {
   stateKey as SelectionChangePluginKey,
   ReactNodeViewState,
 } from "./plugin";
 import { EventDispatcher } from "./event-dispatcher";
-import { ReactComponentProps, GetPos, ReactNodeViewOptions } from "./types";
-import ReactNodeView from "./ReactNodeView";
+import {
+  ReactNodeViewProps,
+  ReactNodeViewOptions,
+  GetPosNode,
+  SelectionBasedReactNodeViewProps,
+  ForwardRef,
+} from "./types";
+import { ReactNodeView } from "./react-node-view";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
+import { Theme } from "@notesnook/theme";
+import { ThemeProvider } from "emotion-theming";
 
 /**
  * A ReactNodeView that handles React components sensitive
@@ -37,18 +45,18 @@ import { Editor, NodeViewRendererProps } from "@tiptap/core";
  */
 
 export class SelectionBasedNodeView<
-  P = ReactComponentProps
+  P extends SelectionBasedReactNodeViewProps
 > extends ReactNodeView<P> {
   private oldSelection: Selection;
   private selectionChangeState: ReactNodeViewState;
 
-  pos: number | undefined;
+  pos: number = -1;
   posEnd: number | undefined;
 
   constructor(
     node: PMNode,
     editor: Editor,
-    getPos: GetPos,
+    getPos: GetPosNode,
     portalProviderAPI: PortalProviderAPI,
     eventDispatcher: EventDispatcher,
     options: ReactNodeViewOptions<P>
@@ -62,6 +70,29 @@ export class SelectionBasedNodeView<
       this.editor.view.state
     );
     this.selectionChangeState.subscribe(this.onSelectionChange);
+  }
+
+  render(
+    props: P = {} as P,
+    forwardRef?: ForwardRef
+  ): React.ReactElement<any> | null {
+    if (!this.options.component) return null;
+    const theme = this.editor.storage.theme as Theme;
+    const isSelected = this.insideSelection() || this.nodeInsideSelection();
+
+    return (
+      <ThemeProvider theme={theme}>
+        <this.options.component
+          {...props}
+          editor={this.editor}
+          getPos={this.getPos}
+          node={this.node}
+          forwardRef={forwardRef}
+          selected={isSelected}
+          updateAttributes={(attr) => this.updateAttributes(attr, this.pos)}
+        />
+      </ThemeProvider>
+    );
   }
 
   /**
@@ -208,23 +239,26 @@ export class SelectionBasedNodeView<
   private onSelectionChange = () => {
     this.update(this.node, [], DecorationSet.empty);
   };
+}
 
-  static fromComponent<TProps>(
-    component: React.ComponentType<TProps & ReactComponentProps>,
-    options?: Omit<ReactNodeViewOptions<TProps>, "component">
-  ) {
-    return ({ node, getPos, editor }: NodeViewRendererProps) => {
-      return new SelectionBasedNodeView<TProps>(
-        node,
-        editor,
-        getPos,
-        editor.storage.portalProviderAPI,
-        editor.storage.eventDispatcher,
-        {
-          ...options,
-          component,
-        }
-      ).init();
-    };
-  }
+export function createSelectionBasedNodeView<
+  TProps extends SelectionBasedReactNodeViewProps
+>(
+  component: React.ComponentType<TProps>,
+  options?: Omit<ReactNodeViewOptions<TProps>, "component">
+) {
+  return ({ node, getPos, editor }: NodeViewRendererProps) => {
+    const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
+    return new SelectionBasedNodeView(
+      node,
+      editor,
+      _getPos,
+      editor.storage.portalProviderAPI,
+      editor.storage.eventDispatcher,
+      {
+        ...options,
+        component,
+      }
+    ).init();
+  };
 }

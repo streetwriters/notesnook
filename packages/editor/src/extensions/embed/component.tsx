@@ -1,5 +1,4 @@
 import { Box, Flex } from "rebass";
-import { NodeViewWrapper, NodeViewProps } from "../react";
 import { ThemeProvider } from "emotion-theming";
 import { Theme } from "@notesnook/theme";
 import { Resizable } from "re-resizable";
@@ -9,10 +8,12 @@ import { useEffect, useRef, useState } from "react";
 import { PopupPresenter } from "../../components/menu/menu";
 import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { EmbedPopup } from "../../toolbar/popups/embed-popup";
+import { ReactNodeViewProps } from "../react";
 
-export function EmbedComponent(props: NodeViewProps) {
-  const { src, width, height, align } = props.node.attrs as EmbedAttributes &
-    EmbedAlignmentOptions;
+export function EmbedComponent(
+  props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
+) {
+  const { src, width, height, align } = props.node.attrs;
 
   const { editor, updateAttributes } = props;
   const embedRef = useRef<HTMLIFrameElement>();
@@ -25,81 +26,75 @@ export function EmbedComponent(props: NodeViewProps) {
   }, [isActive]);
 
   return (
-    <NodeViewWrapper>
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent:
-              align === "center"
-                ? "center"
-                : align === "left"
-                ? "start"
-                : "end",
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent:
+            align === "center" ? "center" : align === "left" ? "start" : "end",
+        }}
+      >
+        <Resizable
+          size={{
+            height: height || "auto",
+            width: width || "auto",
           }}
+          maxWidth="100%"
+          onResizeStop={(e, direction, ref, d) => {
+            updateAttributes({
+              width: ref.clientWidth,
+              height: ref.clientHeight,
+            });
+          }}
+          lockAspectRatio={true}
         >
-          <Resizable
-            size={{
-              height: height || "auto",
-              width: width || "auto",
-            }}
-            maxWidth="100%"
-            onResizeStop={(e, direction, ref, d) => {
-              updateAttributes({
-                width: ref.clientWidth,
-                height: ref.clientHeight,
-              });
-            }}
-            lockAspectRatio={true}
-          >
-            {/* <Flex sx={{ position: "relative", justifyContent: "end" }}>
+          {/* <Flex sx={{ position: "relative", justifyContent: "end" }}>
               
             </Flex> */}
-            <Flex
-              width={"100%"}
-              sx={{
-                position: "relative",
-                justifyContent: "end",
-                borderTop: "20px solid var(--bgSecondary)",
-                // borderLeft: "20px solid var(--bgSecondary)",
-                borderTopLeftRadius: "default",
-                borderTopRightRadius: "default",
-                borderColor: isActive ? "border" : "bgSecondary",
-                cursor: "pointer",
-                ":hover": {
-                  borderColor: "border",
-                },
-              }}
-            >
-              {isToolbarVisible && (
-                <EmbedToolbar
-                  editor={editor}
-                  align={align}
-                  height={height || 0}
-                  width={width || 0}
-                  src={src}
-                />
-              )}
-            </Flex>
-            <Box
-              as="iframe"
-              ref={embedRef}
-              src={src}
-              width={"100%"}
-              height={"100%"}
-              sx={{
-                border: "none",
-                // border: isActive
-                //   ? "2px solid var(--primary)"
-                //   : "2px solid transparent",
-                // borderRadius: "default",
-              }}
-              {...props}
-            />
-          </Resizable>
-        </Box>
-      </ThemeProvider>
-    </NodeViewWrapper>
+          <Flex
+            width={"100%"}
+            sx={{
+              position: "relative",
+              justifyContent: "end",
+              borderTop: "20px solid var(--bgSecondary)",
+              // borderLeft: "20px solid var(--bgSecondary)",
+              borderTopLeftRadius: "default",
+              borderTopRightRadius: "default",
+              borderColor: isActive ? "border" : "bgSecondary",
+              cursor: "pointer",
+              ":hover": {
+                borderColor: "border",
+              },
+            }}
+          >
+            {isToolbarVisible && (
+              <EmbedToolbar
+                editor={editor}
+                align={align}
+                height={height || 0}
+                width={width || 0}
+                src={src}
+              />
+            )}
+          </Flex>
+          <Box
+            as="iframe"
+            ref={embedRef}
+            src={src}
+            width={"100%"}
+            height={"100%"}
+            sx={{
+              border: "none",
+              // border: isActive
+              //   ? "2px solid var(--primary)"
+              //   : "2px solid transparent",
+              // borderRadius: "default",
+            }}
+            {...props}
+          />
+        </Resizable>
+      </Box>
+    </>
   );
 }
 

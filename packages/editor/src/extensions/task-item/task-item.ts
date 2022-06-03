@@ -1,8 +1,12 @@
-import { mergeAttributes } from "@tiptap/core";
+import { mergeAttributes, nodeInputRule } from "@tiptap/core";
 import { onBackspacePressed } from "../list-item/commands";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component";
-import { ReactNodeViewRenderer } from "../react";
+import { createNodeView } from "../react";
+
+export type TaskItemAttributes = {
+  checked: boolean;
+};
 
 export const TaskItemNode = TaskItem.extend({
   draggable: true,
@@ -57,8 +61,14 @@ export const TaskItemNode = TaskItem.extend({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(TaskItemComponent, {
-      as: "li",
+    return createNodeView(TaskItemComponent, {
+      contentDOMFactory: true,
+      wrapperFactory: () => document.createElement("li"),
+      shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
+        return (
+          prev.checked !== next.checked || prev.collapsed !== next.collapsed
+        );
+      },
     });
   },
 });

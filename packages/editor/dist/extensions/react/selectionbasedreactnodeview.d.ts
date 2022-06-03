@@ -1,9 +1,9 @@
 import React from "react";
 import { Node as PMNode } from "prosemirror-model";
-import { PortalProviderAPI } from "./ReactNodeViewPortals";
+import { PortalProviderAPI } from "./react-portal-provider";
 import { EventDispatcher } from "./event-dispatcher";
-import { ReactComponentProps, GetPos, ReactNodeViewOptions } from "./types";
-import ReactNodeView from "./ReactNodeView";
+import { ReactNodeViewOptions, GetPosNode, SelectionBasedReactNodeViewProps, ForwardRef } from "./types";
+import { ReactNodeView } from "./react-node-view";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
 /**
  * A ReactNodeView that handles React components sensitive
@@ -28,12 +28,13 @@ import { Editor, NodeViewRendererProps } from "@tiptap/core";
  *   return super.viewShouldUpdate(nextNode);
  * }```
  */
-export declare class SelectionBasedNodeView<P = ReactComponentProps> extends ReactNodeView<P> {
+export declare class SelectionBasedNodeView<P extends SelectionBasedReactNodeViewProps> extends ReactNodeView<P> {
     private oldSelection;
     private selectionChangeState;
-    pos: number | undefined;
+    pos: number;
     posEnd: number | undefined;
-    constructor(node: PMNode, editor: Editor, getPos: GetPos, portalProviderAPI: PortalProviderAPI, eventDispatcher: EventDispatcher, options: ReactNodeViewOptions<P>);
+    constructor(node: PMNode, editor: Editor, getPos: GetPosNode, portalProviderAPI: PortalProviderAPI, eventDispatcher: EventDispatcher, options: ReactNodeViewOptions<P>);
+    render(props?: P, forwardRef?: ForwardRef): React.ReactElement<any> | null;
     /**
      * Update current node's start and end positions.
      *
@@ -50,5 +51,5 @@ export declare class SelectionBasedNodeView<P = ReactComponentProps> extends Rea
     viewShouldUpdate(_nextNode: PMNode): boolean;
     destroy(): void;
     private onSelectionChange;
-    static fromComponent<TProps>(component: React.ComponentType<TProps & ReactComponentProps>, options?: Omit<ReactNodeViewOptions<TProps>, "component">): ({ node, getPos, editor }: NodeViewRendererProps) => any;
 }
+export declare function createSelectionBasedNodeView<TProps extends SelectionBasedReactNodeViewProps>(component: React.ComponentType<TProps>, options?: Omit<ReactNodeViewOptions<TProps>, "component">): ({ node, getPos, editor }: NodeViewRendererProps) => SelectionBasedNodeView<TProps>;

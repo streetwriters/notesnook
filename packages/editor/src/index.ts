@@ -1,9 +1,9 @@
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
-import { EditorOptions, useEditor } from "./extensions/react";
+import { EditorOptions, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
@@ -32,8 +32,7 @@ import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
-import { PortalProviderAPI } from "./extensions/react/ReactNodeViewPortals";
-import { EventDispatcher } from "./extensions/react/event-dispatcher";
+import { PortalProviderAPI, EventDispatcher } from "./extensions/react";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads

@@ -9,8 +9,8 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { Node, mergeAttributes } from "@tiptap/core";
-import { findChildren, ReactNodeViewRenderer } from "../react";
+import { Node, mergeAttributes, findChildren } from "@tiptap/core";
+import { createNodeView } from "../react";
 import { AttachmentComponent } from "./component";
 export var AttachmentNode = Node.create({
     name: "attachment",
@@ -20,7 +20,7 @@ export var AttachmentNode = Node.create({
     atom: true,
     addOptions: function () {
         return {
-            //   HTMLAttributes: {},
+            HTMLAttributes: {},
             onDownloadAttachment: function () { return false; },
             onOpenAttachmentPicker: function () { return false; },
         };
@@ -46,10 +46,13 @@ export var AttachmentNode = Node.create({
     },
     renderHTML: function (_a) {
         var HTMLAttributes = _a.HTMLAttributes;
-        return ["span", mergeAttributes(HTMLAttributes)];
+        return [
+            "span",
+            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+        ];
     },
     addNodeView: function () {
-        return ReactNodeViewRenderer(AttachmentComponent);
+        return createNodeView(AttachmentComponent);
     },
     addCommands: function () {
         var _this = this;

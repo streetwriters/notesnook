@@ -29,6 +29,7 @@
     "@tiptap/extension-text-align": "^2.0.0-beta.29",
     "@tiptap/extension-text-style": "^2.0.0-beta.23",
     "@tiptap/extension-underline": "^2.0.0-beta.23",
+    "@tiptap/react": "^2.0.0-beta.109",
     "@tiptap/starter-kit": "^2.0.0-beta.185",
     "detect-indent": "^7.0.0",
     "detect-indentation": "^5.20.0",

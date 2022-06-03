@@ -1,3 +1,3 @@
-import { ImageProps } from "rebass";
-import { NodeViewProps } from "../react";
-export declare function TaskItemComponent(props: ImageProps & NodeViewProps): JSX.Element;
+import { ReactNodeViewProps } from "../react";
+import { TaskItemAttributes } from "./task-item";
+export declare function TaskItemComponent(props: ReactNodeViewProps<TaskItemAttributes>): JSX.Element;

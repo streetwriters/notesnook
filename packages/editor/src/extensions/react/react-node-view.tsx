@@ -1,24 +1,21 @@
 import React from "react";
-import {
-  NodeView,
-  EditorView,
-  Decoration,
-  DecorationSource,
-} from "prosemirror-view";
+import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
 import { Node as PMNode } from "prosemirror-model";
 
-import { PortalProviderAPI } from "./ReactNodeViewPortals";
+import { PortalProviderAPI } from "./react-portal-provider";
 import { EventDispatcher } from "./event-dispatcher";
 import {
-  ReactComponentProps,
+  ReactNodeViewProps,
   ReactNodeViewOptions,
-  GetPos,
+  GetPosNode,
   ForwardRef,
   ContentDOM,
 } from "./types";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
+import { Theme } from "@notesnook/theme";
+import { ThemeProvider } from "emotion-theming";
 
-export default class ReactNodeView<P> implements NodeView {
+export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;
   private contentDOMWrapper?: Node;
 
@@ -28,7 +25,7 @@ export default class ReactNodeView<P> implements NodeView {
   constructor(
     node: PMNode,
     protected readonly editor: Editor,
-    protected readonly getPos: GetPos,
+    protected readonly getPos: GetPosNode,
     protected readonly portalProviderAPI: PortalProviderAPI,
     protected readonly eventDispatcher: EventDispatcher,
     protected readonly options: ReactNodeViewOptions<P>
@@ -95,6 +92,17 @@ export default class ReactNodeView<P> implements NodeView {
   }
 
   getContentDOM(): ContentDOM {
+    if (!this.options.contentDOMFactory) return;
+    if (this.options.contentDOMFactory === true) {
+      const content = document.createElement("div");
+      content.classList.add(
+        `${this.node.type.name.toLowerCase()}-content-wrapper`
+      );
+      content.style.whiteSpace = "inherit";
+      // caret is not visible if content element width is 0px
+      content.style.minWidth = `20px`;
+      return { dom: content };
+    }
     return this.options.contentDOMFactory?.();
   }
 
@@ -114,30 +122,29 @@ export default class ReactNodeView<P> implements NodeView {
     forwardRef?: ForwardRef
   ): React.ReactElement<any> | null {
     if (!this.options.component) return null;
+    const theme = this.editor.storage.theme as Theme;
+    const pos = this.getPos();
 
     return (
-      <this.options.component
-        {...props}
-        editor={this.editor}
-        getPos={this.getPos}
-        node={this.node}
-        forwardRef={forwardRef}
-        updateAttributes={(attr) => this.updateAttributes(attr)}
-      />
+      <ThemeProvider theme={theme}>
+        <this.options.component
+          {...props}
+          editor={this.editor}
+          getPos={this.getPos}
+          node={this.node}
+          forwardRef={forwardRef}
+          updateAttributes={(attr) => this.updateAttributes(attr, pos)}
+        />
+      </ThemeProvider>
     );
   }
 
-  private updateAttributes(attributes: any) {
+  updateAttributes(attributes: any, pos: number) {
     this.editor.commands.command(({ tr }) => {
-      if (typeof this.getPos === "boolean") return false;
-
-      const pos = this.getPos();
-
       tr.setNodeMarkup(pos, undefined, {
         ...this.node.attrs,
         ...attributes,
       });
-
       return true;
     });
   }
@@ -262,38 +269,40 @@ export default class ReactNodeView<P> implements NodeView {
     this.domRef = undefined;
     this.contentDOM = undefined;
   }
-
-  static fromComponent<TProps>(
-    component: React.ComponentType<TProps & ReactComponentProps>,
-    options?: Omit<ReactNodeViewOptions<TProps>, "component">
-  ) {
-    return ({ node, getPos, editor }: NodeViewRendererProps) => {
-      return new ReactNodeView<TProps>(
-        node,
-        editor,
-        getPos,
-        editor.storage.portalProviderAPI,
-        editor.storage.eventDispatcher,
-        {
-          ...options,
-          component,
-        }
-      ).init();
-    };
-  }
 }
 
-function isiOS(): boolean {
-  return (
-    [
-      "iPad Simulator",
-      "iPhone Simulator",
-      "iPod Simulator",
-      "iPad",
-      "iPhone",
-      "iPod",
-    ].includes(navigator.platform) ||
-    // iPad on iOS 13 detection
-    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
-  );
+export function createNodeView<TProps extends ReactNodeViewProps>(
+  component: React.ComponentType<TProps>,
+  options?: Omit<ReactNodeViewOptions<TProps>, "component">
+) {
+  return ({ node, getPos, editor }: NodeViewRendererProps) => {
+    const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
+
+    return new ReactNodeView<TProps>(
+      node,
+      editor,
+      _getPos,
+      editor.storage.portalProviderAPI,
+      editor.storage.eventDispatcher,
+      {
+        ...options,
+        component,
+      }
+    ).init();
+  };
 }
+
+// function isiOS(): boolean {
+//   return (
+//     [
+//       "iPad Simulator",
+//       "iPhone Simulator",
+//       "iPod Simulator",
+//       "iPad",
+//       "iPhone",
+//       "iPod",
+//     ].includes(navigator.platform) ||
+//     // iPad on iOS 13 detection
+//     (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+//   );
+// }

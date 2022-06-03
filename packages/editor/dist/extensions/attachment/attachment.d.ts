@@ -1,6 +1,7 @@
 import { Node } from "@tiptap/core";
 export declare type AttachmentType = "image" | "file";
 export interface AttachmentOptions {
+    HTMLAttributes: Record<string, any>;
     onDownloadAttachment: (attachment: Attachment) => boolean;
     onOpenAttachmentPicker: (type: AttachmentType) => boolean;
 }

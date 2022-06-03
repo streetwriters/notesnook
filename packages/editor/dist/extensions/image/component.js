@@ -25,10 +25,8 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Box, Flex, Image } from "rebass";
-import { NodeViewWrapper } from "../react";
-import { ThemeProvider } from "emotion-theming";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { useEffect, useRef, useState } from "react";
@@ -36,8 +34,7 @@ import { PopupPresenter } from "../../components/menu/menu";
 import { Popup } from "../../toolbar/components/popup";
 import { ImageProperties } from "../../toolbar/popups/image-properties";
 export function ImageComponent(props) {
-    var _a = props.node
-        .attrs, src = _a.src, alt = _a.alt, title = _a.title, width = _a.width, height = _a.height, align = _a.align, float = _a.float;
+    var _a = props.node.attrs, src = _a.src, alt = _a.alt, title = _a.title, width = _a.width, height = _a.height, align = _a.align, float = _a.float;
     var editor = props.editor, updateAttributes = props.updateAttributes;
     var imageRef = useRef();
     var isActive = editor.isActive("image", { src: src });
@@ -46,31 +43,31 @@ export function ImageComponent(props) {
     useEffect(function () {
         setIsToolbarVisible(isActive);
     }, [isActive]);
-    return (_jsx(NodeViewWrapper, { children: _jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsx(Box, __assign({ sx: {
-                    display: float ? "block" : "flex",
-                    justifyContent: float
-                        ? "stretch"
-                        : align === "center"
-                            ? "center"
-                            : align === "left"
-                                ? "start"
-                                : "end",
-                } }, { children: _jsxs(Resizable, __assign({ style: {
-                        float: float ? (align === "left" ? "left" : "right") : "none",
-                    }, size: {
-                        height: height || "auto",
-                        width: width || "auto",
-                    }, maxWidth: "100%", onResizeStop: function (e, direction, ref, d) {
-                        updateAttributes({
-                            width: ref.clientWidth,
-                            height: ref.clientHeight,
-                        });
-                    }, lockAspectRatio: true }, { children: [_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: isToolbarVisible && (_jsx(ImageToolbar, { editor: editor, float: float, align: align, height: height || 0, width: width || 0 })) })), _jsx(Image, __assign({ ref: imageRef, src: src, alt: alt, title: title, width: "100%", height: "100%", sx: {
-                                border: isActive
-                                    ? "2px solid var(--primary)"
-                                    : "2px solid transparent",
-                                borderRadius: "default",
-                            } }, props))] })) })) })) }));
+    return (_jsx(_Fragment, { children: _jsx(Box, __assign({ sx: {
+                display: float ? "block" : "flex",
+                justifyContent: float
+                    ? "stretch"
+                    : align === "center"
+                        ? "center"
+                        : align === "left"
+                            ? "start"
+                            : "end",
+            } }, { children: _jsxs(Resizable, __assign({ style: {
+                    float: float ? (align === "left" ? "left" : "right") : "none",
+                }, size: {
+                    height: height || "auto",
+                    width: width || "auto",
+                }, maxWidth: "100%", onResizeStop: function (e, direction, ref, d) {
+                    updateAttributes({
+                        width: ref.clientWidth,
+                        height: ref.clientHeight,
+                    });
+                }, lockAspectRatio: true }, { children: [_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: isToolbarVisible && (_jsx(ImageToolbar, { editor: editor, float: float, align: align, height: height || 0, width: width || 0 })) })), _jsx(Image, __assign({ ref: imageRef, src: src, alt: alt, title: title, width: "100%", height: "100%", sx: {
+                            border: isActive
+                                ? "2px solid var(--primary)"
+                                : "2px solid transparent",
+                            borderRadius: "default",
+                        } }, props))] })) })) }));
 }
 function ImageToolbar(props) {
     var editor = props.editor, float = props.float, height = props.height, width = props.width;

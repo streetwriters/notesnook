@@ -1,11 +1,11 @@
-import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { findChildren, ReactNodeViewRenderer } from "../react";
+import { Node, mergeAttributes, findChildren } from "@tiptap/core";
 import { Attribute } from "@tiptap/core";
+import { createNodeView } from "../react";
 import { AttachmentComponent } from "./component";
 
 export type AttachmentType = "image" | "file";
 export interface AttachmentOptions {
-  // HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, any>;
   onDownloadAttachment: (attachment: Attachment) => boolean;
   onOpenAttachmentPicker: (type: AttachmentType) => boolean;
 }
@@ -43,7 +43,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
 
   addOptions() {
     return {
-      //   HTMLAttributes: {},
+      HTMLAttributes: {},
       onDownloadAttachment: () => false,
       onOpenAttachmentPicker: () => false,
     };
@@ -73,11 +73,14 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ["span", mergeAttributes(HTMLAttributes)];
+    return [
+      "span",
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+    ];
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(AttachmentComponent);
+    return createNodeView(AttachmentComponent);
   },
 
   addCommands() {

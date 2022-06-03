@@ -1,5 +1,4 @@
 import { Box, Flex, Image, ImageProps } from "rebass";
-import { NodeViewWrapper, NodeViewProps } from "../react";
 import {
   ImageAlignmentOptions,
   ImageAttributes,
@@ -14,10 +13,12 @@ import { useEffect, useRef, useState } from "react";
 import { PopupPresenter } from "../../components/menu/menu";
 import { Popup } from "../../toolbar/components/popup";
 import { ImageProperties } from "../../toolbar/popups/image-properties";
+import { ReactNodeViewProps } from "../react";
 
-export function ImageComponent(props: ImageProps & NodeViewProps) {
-  const { src, alt, title, width, height, align, float } = props.node
-    .attrs as ImageAttributes & ImageAlignmentOptions;
+export function ImageComponent(
+  props: ReactNodeViewProps<ImageAttributes & ImageAlignmentOptions>
+) {
+  const { src, alt, title, width, height, align, float } = props.node.attrs;
 
   const { editor, updateAttributes } = props;
   const imageRef = useRef<HTMLImageElement>();
@@ -30,67 +31,65 @@ export function ImageComponent(props: ImageProps & NodeViewProps) {
   }, [isActive]);
 
   return (
-    <NodeViewWrapper>
-      <ThemeProvider theme={theme}>
-        <Box
-          sx={{
-            display: float ? "block" : "flex",
-            justifyContent: float
-              ? "stretch"
-              : align === "center"
-              ? "center"
-              : align === "left"
-              ? "start"
-              : "end",
+    <>
+      <Box
+        sx={{
+          display: float ? "block" : "flex",
+          justifyContent: float
+            ? "stretch"
+            : align === "center"
+            ? "center"
+            : align === "left"
+            ? "start"
+            : "end",
+        }}
+      >
+        <Resizable
+          style={{
+            float: float ? (align === "left" ? "left" : "right") : "none",
           }}
+          size={{
+            height: height || "auto",
+            width: width || "auto",
+          }}
+          maxWidth="100%"
+          onResizeStop={(e, direction, ref, d) => {
+            updateAttributes({
+              width: ref.clientWidth,
+              height: ref.clientHeight,
+            });
+          }}
+          lockAspectRatio={true}
         >
-          <Resizable
-            style={{
-              float: float ? (align === "left" ? "left" : "right") : "none",
+          <Flex sx={{ position: "relative", justifyContent: "end" }}>
+            {isToolbarVisible && (
+              <ImageToolbar
+                editor={editor}
+                float={float}
+                align={align}
+                height={height || 0}
+                width={width || 0}
+              />
+            )}
+          </Flex>
+          <Image
+            ref={imageRef}
+            src={src}
+            alt={alt}
+            title={title}
+            width={"100%"}
+            height={"100%"}
+            sx={{
+              border: isActive
+                ? "2px solid var(--primary)"
+                : "2px solid transparent",
+              borderRadius: "default",
             }}
-            size={{
-              height: height || "auto",
-              width: width || "auto",
-            }}
-            maxWidth="100%"
-            onResizeStop={(e, direction, ref, d) => {
-              updateAttributes({
-                width: ref.clientWidth,
-                height: ref.clientHeight,
-              });
-            }}
-            lockAspectRatio={true}
-          >
-            <Flex sx={{ position: "relative", justifyContent: "end" }}>
-              {isToolbarVisible && (
-                <ImageToolbar
-                  editor={editor}
-                  float={float}
-                  align={align}
-                  height={height || 0}
-                  width={width || 0}
-                />
-              )}
-            </Flex>
-            <Image
-              ref={imageRef}
-              src={src}
-              alt={alt}
-              title={title}
-              width={"100%"}
-              height={"100%"}
-              sx={{
-                border: isActive
-                  ? "2px solid var(--primary)"
-                  : "2px solid transparent",
-                borderRadius: "default",
-              }}
-              {...props}
-            />
-          </Resizable>
-        </Box>
-      </ThemeProvider>
-    </NodeViewWrapper>
+            {...props}
+          />
+        </Resizable>
+      </Box>
+    </>
   );
 }
 

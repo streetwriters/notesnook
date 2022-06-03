@@ -1,5 +1,5 @@
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { ReactNodeViewRenderer } from "../react";
+import { createNodeView } from "../react";
 import { ImageComponent } from "./component";
 
 export interface ImageOptions {
@@ -98,7 +98,7 @@ export const ImageNode = Node.create<ImageOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(ImageComponent);
+    return createNodeView(ImageComponent);
   },
 
   addCommands() {

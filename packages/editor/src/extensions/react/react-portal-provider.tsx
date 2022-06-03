@@ -67,7 +67,7 @@ export class PortalProviderAPI extends EventDispatcher {
     try {
       unmountComponentAtNode(container);
     } catch (error) {
-      console.error(error);
+      // IGNORE console.error(error);
     }
   }
 }

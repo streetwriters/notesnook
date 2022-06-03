@@ -1,13 +1,13 @@
 import React from "react";
 import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
 import { Node as PMNode } from "prosemirror-model";
-import { PortalProviderAPI } from "./ReactNodeViewPortals";
+import { PortalProviderAPI } from "./react-portal-provider";
 import { EventDispatcher } from "./event-dispatcher";
-import { ReactComponentProps, ReactNodeViewOptions, GetPos, ForwardRef, ContentDOM } from "./types";
+import { ReactNodeViewProps, ReactNodeViewOptions, GetPosNode, ForwardRef, ContentDOM } from "./types";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
-export declare class ReactNodeView<P> implements NodeView {
+export declare class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     protected readonly editor: Editor;
-    protected readonly getPos: GetPos;
+    protected readonly getPos: GetPosNode;
     protected readonly portalProviderAPI: PortalProviderAPI;
     protected readonly eventDispatcher: EventDispatcher;
     protected readonly options: ReactNodeViewOptions<P>;
@@ -15,7 +15,7 @@ export declare class ReactNodeView<P> implements NodeView {
     private contentDOMWrapper?;
     contentDOM: HTMLElement | undefined;
     node: PMNode;
-    constructor(node: PMNode, editor: Editor, getPos: GetPos, portalProviderAPI: PortalProviderAPI, eventDispatcher: EventDispatcher, options: ReactNodeViewOptions<P>);
+    constructor(node: PMNode, editor: Editor, getPos: GetPosNode, portalProviderAPI: PortalProviderAPI, eventDispatcher: EventDispatcher, options: ReactNodeViewOptions<P>);
     /**
      * This method exists to move initialization logic out of the constructor,
      * so object can be initialized properly before calling render first time.
@@ -32,7 +32,7 @@ export declare class ReactNodeView<P> implements NodeView {
     handleRef: (node: HTMLElement | null) => void;
     private _handleRef;
     render(props?: P, forwardRef?: ForwardRef): React.ReactElement<any> | null;
-    private updateAttributes;
+    updateAttributes(attributes: any, pos: number): void;
     update(node: PMNode, _decorations: readonly Decoration[], _innerDecorations: DecorationSource): boolean;
     ignoreMutation(mutation: MutationRecord | {
         type: "selection";
@@ -46,5 +46,5 @@ export declare class ReactNodeView<P> implements NodeView {
     setDomAttrs(node: PMNode, element: HTMLElement): void;
     get dom(): HTMLElement;
     destroy(): void;
-    static fromComponent<TProps>(component: React.ComponentType<TProps & ReactComponentProps>, options?: Omit<ReactNodeViewOptions<TProps>, "component">): ({ node, getPos, editor }: NodeViewRendererProps) => ReactNodeView<TProps>;
 }
+export declare function createNodeView<TProps extends ReactNodeViewProps>(component: React.ComponentType<TProps>, options?: Omit<ReactNodeViewOptions<TProps>, "component">): ({ node, getPos, editor }: NodeViewRendererProps) => ReactNodeView<TProps>;

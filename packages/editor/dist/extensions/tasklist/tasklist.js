@@ -1,6 +1,6 @@
 import { mergeAttributes } from "@tiptap/core";
 import { TaskList } from "@tiptap/extension-task-list";
-import { ReactNodeViewRenderer } from "../react";
+import { createNodeView } from "../react";
 import { TaskListComponent } from "./component";
 export var TaskListNode = TaskList.extend({
     addAttributes: function () {
@@ -77,6 +77,14 @@ export var TaskListNode = TaskList.extend({
         };
     },
     addNodeView: function () {
-        return ReactNodeViewRenderer(TaskListComponent);
+        var _this = this;
+        return createNodeView(TaskListComponent, {
+            contentDOMFactory: function () {
+                var content = document.createElement("ul");
+                content.classList.add("".concat(_this.name.toLowerCase(), "-content-wrapper"));
+                content.style.whiteSpace = "inherit";
+                return { dom: content };
+            },
+        });
     },
 });

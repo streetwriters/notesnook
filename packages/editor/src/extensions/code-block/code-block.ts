@@ -1,4 +1,4 @@
-import { Editor, NodeViewRendererProps } from "@tiptap/core";
+import { Editor, findParentNodeClosestToPos } from "@tiptap/core";
 import { Node, textblockTypeInputRule, mergeAttributes } from "@tiptap/core";
 import {
   Plugin,
@@ -8,10 +8,9 @@ import {
   Selection,
 } from "prosemirror-state";
 import { ResolvedPos, Node as ProsemirrorNode } from "prosemirror-model";
-import { findParentNodeClosestToPos, ReactNodeViewRenderer } from "../react";
 import { CodeblockComponent } from "./component";
 import { HighlighterPlugin } from "./highlighter";
-import ReactNodeView from "../react/ReactNodeView";
+import { createNodeView } from "../react";
 import detectIndent from "detect-indent";
 import redent from "redent";
 import stripIndent from "strip-indent";
@@ -505,7 +504,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
   },
 
   addNodeView() {
-    return ReactNodeView.fromComponent(CodeblockComponent, {
+    return createNodeView(CodeblockComponent, {
       contentDOMFactory: () => {
         const content = document.createElement("div");
         content.classList.add("node-content-wrapper");

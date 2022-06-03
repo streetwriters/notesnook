@@ -1,6 +1,5 @@
-import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { findChildren, ReactNodeViewRenderer } from "../react";
-import { Attribute } from "@tiptap/core";
+import { Node, mergeAttributes } from "@tiptap/core";
+import { createNodeView } from "../react";
 import { EmbedComponent } from "./component";
 
 export interface EmbedOptions {
@@ -76,7 +75,7 @@ export const EmbedNode = Node.create<EmbedOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(EmbedComponent);
+    return createNodeView(EmbedComponent);
   },
 
   addCommands() {

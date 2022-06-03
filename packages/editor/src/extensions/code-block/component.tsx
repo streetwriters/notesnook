@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { isLanguageLoaded, loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";
 import "prism-themes/themes/prism-dracula.min.css";
-import { Theme } from "@notesnook/theme";
-import { ThemeProvider } from "emotion-theming";
 import { Button, Flex, Text } from "rebass";
 import Languages from "./languages.json";
 import { PopupPresenter } from "../../components/menu/menu";
@@ -11,14 +9,13 @@ import { Input } from "@rebass/forms";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { CodeBlockAttributes } from "./code-block";
-import { ReactComponentProps } from "../react/types";
+import { ReactNodeViewProps } from "../react/types";
 
 export function CodeblockComponent(
-  props: ReactComponentProps<CodeBlockAttributes>
+  props: ReactNodeViewProps<CodeBlockAttributes>
 ) {
   const { editor, updateAttributes, node, forwardRef } = props;
   const { language, indentLength, indentType, caretPosition } = node?.attrs;
-  const theme = editor?.storage.theme as Theme;
 
   const [isOpen, setIsOpen] = useState(false);
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
@@ -45,7 +42,7 @@ export function CodeblockComponent(
   }, [language]);
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Flex
         sx={{
           flexDirection: "column",
@@ -154,7 +151,7 @@ export function CodeblockComponent(
           onLanguageSelected={(language) => updateAttributes({ language })}
         />
       </PopupPresenter>
-    </ThemeProvider>
+    </>
   );
 }
 

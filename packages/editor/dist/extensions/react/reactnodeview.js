@@ -35,6 +35,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 import { jsx as _jsx } from "react/jsx-runtime";
+import { ThemeProvider } from "emotion-theming";
 var ReactNodeView = /** @class */ (function () {
     function ReactNodeView(node, editor, getPos, portalProviderAPI, eventDispatcher, options) {
         var _this = this;
@@ -95,6 +96,16 @@ var ReactNodeView = /** @class */ (function () {
     };
     ReactNodeView.prototype.getContentDOM = function () {
         var _a, _b;
+        if (!this.options.contentDOMFactory)
+            return;
+        if (this.options.contentDOMFactory === true) {
+            var content = document.createElement("div");
+            content.classList.add("".concat(this.node.type.name.toLowerCase(), "-content-wrapper"));
+            content.style.whiteSpace = "inherit";
+            // caret is not visible if content element width is 0px
+            content.style.minWidth = "20px";
+            return { dom: content };
+        }
         return (_b = (_a = this.options).contentDOMFactory) === null || _b === void 0 ? void 0 : _b.call(_a);
     };
     ReactNodeView.prototype._handleRef = function (node) {
@@ -109,15 +120,14 @@ var ReactNodeView = /** @class */ (function () {
         if (props === void 0) { props = {}; }
         if (!this.options.component)
             return null;
-        return (_jsx(this.options.component, __assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: function (attr) { return _this.updateAttributes(attr); } })));
+        var theme = this.editor.storage.theme;
+        var pos = this.getPos();
+        return (_jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsx(this.options.component, __assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: function (attr) { return _this.updateAttributes(attr, pos); } })) })));
     };
-    ReactNodeView.prototype.updateAttributes = function (attributes) {
+    ReactNodeView.prototype.updateAttributes = function (attributes, pos) {
         var _this = this;
         this.editor.commands.command(function (_a) {
             var tr = _a.tr;
-            if (typeof _this.getPos === "boolean")
-                return false;
-            var pos = _this.getPos();
             tr.setNodeMarkup(pos, undefined, __assign(__assign({}, _this.node.attrs), attributes));
             return true;
         });
@@ -218,24 +228,13 @@ var ReactNodeView = /** @class */ (function () {
         this.domRef = undefined;
         this.contentDOM = undefined;
     };
-    ReactNodeView.fromComponent = function (component, options) {
-        return function (_a) {
-            var node = _a.node, getPos = _a.getPos, editor = _a.editor;
-            return new ReactNodeView(node, editor, getPos, editor.storage.portalProviderAPI, editor.storage.eventDispatcher, __assign(__assign({}, options), { component: component })).init();
-        };
-    };
     return ReactNodeView;
 }());
 export { ReactNodeView };
-function isiOS() {
-    return ([
-        "iPad Simulator",
-        "iPhone Simulator",
-        "iPod Simulator",
-        "iPad",
-        "iPhone",
-        "iPod",
-    ].includes(navigator.platform) ||
-        // iPad on iOS 13 detection
-        (navigator.userAgent.includes("Mac") && "ontouchend" in document));
+export function createNodeView(component, options) {
+    return function (_a) {
+        var node = _a.node, getPos = _a.getPos, editor = _a.editor;
+        var _getPos = function () { return (typeof getPos === "boolean" ? -1 : getPos()); };
+        return new ReactNodeView(node, editor, _getPos, editor.storage.portalProviderAPI, editor.storage.eventDispatcher, __assign(__assign({}, options), { component: component })).init();
+    };
 }
