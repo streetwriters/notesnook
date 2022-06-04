@@ -243,5 +243,5 @@ var tasklist = function (editor) { return ({
     title: "Task list",
     icon: "checkbox",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("taskList"),
-    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().toggleTaskList().run(); },
+    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().toggleTaskList().run(); },
 }); };

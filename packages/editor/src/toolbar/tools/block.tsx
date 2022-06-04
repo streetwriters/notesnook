@@ -305,5 +305,5 @@ const tasklist = (editor: Editor | null): MenuItem => ({
   title: "Task list",
   icon: "checkbox",
   isChecked: editor?.isActive("taskList"),
-  onClick: () => editor?.chain().toggleTaskList().run(),
+  onClick: () => editor?.chain().focus().toggleTaskList().run(),
 });
