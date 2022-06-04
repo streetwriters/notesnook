@@ -61,7 +61,7 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 var useTiptap = function (options, deps) {
     if (options === void 0) { options = {}; }
-    var theme = options.theme, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, portalProviderAPI = options.portalProviderAPI, restOptions = __rest(options, ["theme", "onCreate", "onDownloadAttachment", "portalProviderAPI"]);
+    var theme = options.theme, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, onOpenAttachmentPicker = options.onOpenAttachmentPicker, portalProviderAPI = options.portalProviderAPI, restOptions = __rest(options, ["theme", "onCreate", "onDownloadAttachment", "onOpenAttachmentPicker", "portalProviderAPI"]);
     var eventDispatcher = useMemo(function () { return new EventDispatcher(); }, []);
     var defaultOptions = useMemo(function () { return ({
         extensions: [
@@ -113,6 +113,7 @@ var useTiptap = function (options, deps) {
             EmbedNode,
             AttachmentNode.configure({
                 onDownloadAttachment: onDownloadAttachment,
+                onOpenAttachmentPicker: onOpenAttachmentPicker,
             }),
             ListItem,
         ],
@@ -129,7 +130,14 @@ var useTiptap = function (options, deps) {
                 onCreate({ editor: editor });
         },
         injectCSS: false,
-    }); }, [theme, onCreate, onDownloadAttachment, portalProviderAPI, eventDispatcher]);
+    }); }, [
+        theme,
+        onCreate,
+        onDownloadAttachment,
+        onOpenAttachmentPicker,
+        portalProviderAPI,
+        eventDispatcher,
+    ]);
     var editor = useEditor(__assign(__assign({}, defaultOptions), restOptions), deps);
     /**
      * Add editor to global for use in React Native.

@@ -50,6 +50,7 @@ const useTiptap = (
     theme,
     onCreate,
     onDownloadAttachment,
+    onOpenAttachmentPicker,
     portalProviderAPI,
     ...restOptions
   } = options;
@@ -107,6 +108,7 @@ const useTiptap = (
         EmbedNode,
         AttachmentNode.configure({
           onDownloadAttachment,
+          onOpenAttachmentPicker,
         }),
         ListItem,
       ],
@@ -122,7 +124,14 @@ const useTiptap = (
       },
       injectCSS: false,
     }),
-    [theme, onCreate, onDownloadAttachment, portalProviderAPI, eventDispatcher]
+    [
+      theme,
+      onCreate,
+      onDownloadAttachment,
+      onOpenAttachmentPicker,
+      portalProviderAPI,
+      eventDispatcher,
+    ]
   );
 
   const editor = useEditor({ ...defaultOptions, ...restOptions }, deps);
