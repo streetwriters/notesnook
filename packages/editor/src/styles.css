@@ -6,10 +6,6 @@
   pointer-events: none;
 }
 
-.ProseMirror {
-  color: var(--text);
-}
-
 .ProseMirror code:not(pre code) {
   background-color: var(--bgSecondary);
 }
