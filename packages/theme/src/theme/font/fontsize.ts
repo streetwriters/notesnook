@@ -8,6 +8,7 @@ export function getFontSizes(scale?: number): FontSizes {
     body: "0.8rem",
     menu: "0.8rem",
     subBody: "0.750rem",
+    code: "0.9rem",
   };
 }
 
@@ -20,4 +21,5 @@ export type FontSizes = {
   body: string;
   menu: string;
   subBody: string;
+  code: string;
 };

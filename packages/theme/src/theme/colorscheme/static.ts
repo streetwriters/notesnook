@@ -12,6 +12,14 @@ export type StaticColors = {
   warn: string;
   warnBg: string;
   favorite: string;
+
+  codeBg: string;
+  codeFg: string;
+  codeHighlight: string;
+  codeSelectionBg: string;
+  codeSelectionFg: string;
+  codeBorder: string;
+  codeSelection: string;
 };
 export function getStaticColors(accent: string): StaticColors {
   return {
@@ -26,5 +34,14 @@ export function getStaticColors(accent: string): StaticColors {
     warn: "#FF5722",
     warnBg: "#FF572220",
     favorite: "#ffd700",
+
+    // dracula colors
+    codeBg: "#282a36",
+    codeFg: "#6c7393",
+    codeHighlight: "#50fa7b",
+    codeSelectionFg: "#f8f8f2",
+    codeSelectionBg: "#44475a",
+    codeBorder: "#6c7393",
+    codeSelection: "#9580ff1a",
   };
 }
