@@ -463,7 +463,7 @@ export function ActionSheetPresenter(
       </Sheet.Container>
 
       <Sheet.Backdrop
-        style={{ backgroundColor: "transparent" }}
+        style={{ backgroundColor: "transparent", border: "none" }}
         onTap={onClose}
       />
     </Sheet>
