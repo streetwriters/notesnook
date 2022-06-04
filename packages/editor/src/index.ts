@@ -17,7 +17,6 @@ import BulletList from "./extensions/bullet-list";
 import OrderedList from "./extensions/ordered-list";
 import Highlight from "@tiptap/extension-highlight";
 import Color from "@tiptap/extension-color";
-import Link from "@tiptap/extension-link";
 import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "./extensions/table-cell";
@@ -32,6 +31,7 @@ import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
+import { Link } from "./extensions/link";
 import { PortalProviderAPI, EventDispatcher } from "./extensions/react";
 
 EditorView.prototype.updateState = function updateState(state) {

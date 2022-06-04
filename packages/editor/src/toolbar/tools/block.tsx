@@ -16,6 +16,7 @@ import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
 import { MenuItem } from "../../components/menu/types";
 import { useToolbarLocation } from "../stores/toolbar-store";
+import { DesktopOnly, MobileOnly } from "../../components/responsive";
 
 export function InsertBlock(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement | null>();
@@ -43,44 +44,48 @@ export function InsertBlock(props: ToolProps) {
       >
         <Icon path={Icons.plus} size={18} color={"primary"} />
       </Button>
-      {/* <MenuPresenter
-        options={{
-          type: "menu",
-          position: {
-            target: buttonRef.current || undefined,
-            isTargetAbsolute: true,
-            location: toolbarLocation === "bottom" ? "top" : "below",
-            yOffset: 5,
-          },
-        }}
-        isOpen={isOpen}
-        items={[
-          tasklist(editor),
-          horizontalRule(editor),
-          codeblock(editor),
-          blockquote(editor),
-          image(editor),
-          attachment(editor),
-          embed(editor),
-          table(editor),
-        ]}
-        onClose={() => setIsOpen(false)}
-      /> */}
-      <ActionSheetPresenter
-        title="Choose a block to insert"
-        isOpen={isOpen}
-        items={[
-          tasklist(editor),
-          horizontalRule(editor),
-          codeblock(editor),
-          blockquote(editor),
-          imageActionSheet(editor),
-          attachment(editor),
-          embedActionSheet(editor),
-          tableActionSheet(editor),
-        ]}
-        onClose={() => setIsOpen(false)}
-      />
+
+      <DesktopOnly>
+        <MenuPresenter
+          options={{
+            type: "menu",
+            position: {
+              target: buttonRef.current || undefined,
+              isTargetAbsolute: true,
+              location: toolbarLocation === "bottom" ? "top" : "below",
+              yOffset: 5,
+            },
+          }}
+          isOpen={isOpen}
+          items={[
+            tasklist(editor),
+            horizontalRule(editor),
+            codeblock(editor),
+            blockquote(editor),
+            image(editor),
+            attachment(editor),
+            embed(editor),
+            table(editor),
+          ]}
+          onClose={() => setIsOpen(false)}
+        />
+      </DesktopOnly>
+      <MobileOnly>
+        <ActionSheetPresenter
+          isOpen={isOpen}
+          items={[
+            tasklist(editor),
+            horizontalRule(editor),
+            codeblock(editor),
+            blockquote(editor),
+            imageActionSheet(editor),
+            attachment(editor),
+            embedActionSheet(editor),
+            tableActionSheet(editor),
+          ]}
+          onClose={() => setIsOpen(false)}
+        />
+      </MobileOnly>
     </>
   );
 }

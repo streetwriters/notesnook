@@ -6,7 +6,7 @@
   "dependencies": {
     "@mdi/js": "^6.7.96",
     "@mdi/react": "^1.6.0",
-    "@notesnook/theme": "file:../themeprovider",
+    "@notesnook/theme": "github:streetwriters/themeprovider",
     "@rebass/forms": "^4.0.6",
     "@social-embed/lib": "^0.0.1-next.12",
     "@tiptap/core": "^2.0.0-beta.176",
@@ -46,7 +46,7 @@
     "react-color": "^2.19.3",
     "react-colorful": "^5.5.1",
     "react-modal": "^3.14.4",
-    "react-modal-sheet": "file:../react-modal-sheet",
+    "react-modal-sheet": "github:thecodrr/react-action-sheet",
     "react-spring-bottom-sheet": "^3.4.0",
     "react-toggle": "^4.1.2",
     "reactjs-popup": "^2.0.5",

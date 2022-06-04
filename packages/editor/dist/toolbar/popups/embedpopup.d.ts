@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { EmbedAlignmentOptions, EmbedAttributes, EmbedSizeOptions } from "../../extensions/embed";
 import { IconNames } from "../icons";
 declare type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;

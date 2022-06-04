@@ -27,13 +27,14 @@ var __read = (this && this.__read) || function (o, n) {
 };
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { Icons } from "../icons";
-import { ActionSheetPresenter, } from "../../components/menu/menu";
+import { ActionSheetPresenter, MenuPresenter, } from "../../components/menu/menu";
 import { useRef, useState } from "react";
 import { Icon } from "../components/icon";
 import { Button } from "rebass";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
 import { useToolbarLocation } from "../stores/toolbar-store";
+import { DesktopOnly, MobileOnly } from "../../components/responsive";
 export function InsertBlock(props) {
     var buttonRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
@@ -49,16 +50,33 @@ export function InsertBlock(props) {
                     ":last-of-type": {
                         mr: 0,
                     },
-                }, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.plus, size: 18, color: "primary" }) })), _jsx(ActionSheetPresenter, { title: "Choose a block to insert", isOpen: isOpen, items: [
-                    tasklist(editor),
-                    horizontalRule(editor),
-                    codeblock(editor),
-                    blockquote(editor),
-                    imageActionSheet(editor),
-                    attachment(editor),
-                    embedActionSheet(editor),
-                    tableActionSheet(editor),
-                ], onClose: function () { return setIsOpen(false); } })] }));
+                }, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.plus, size: 18, color: "primary" }) })), _jsx(DesktopOnly, { children: _jsx(MenuPresenter, { options: {
+                        type: "menu",
+                        position: {
+                            target: buttonRef.current || undefined,
+                            isTargetAbsolute: true,
+                            location: toolbarLocation === "bottom" ? "top" : "below",
+                            yOffset: 5,
+                        },
+                    }, isOpen: isOpen, items: [
+                        tasklist(editor),
+                        horizontalRule(editor),
+                        codeblock(editor),
+                        blockquote(editor),
+                        image(editor),
+                        attachment(editor),
+                        embed(editor),
+                        table(editor),
+                    ], onClose: function () { return setIsOpen(false); } }) }), _jsx(MobileOnly, { children: _jsx(ActionSheetPresenter, { isOpen: isOpen, items: [
+                        tasklist(editor),
+                        horizontalRule(editor),
+                        codeblock(editor),
+                        blockquote(editor),
+                        imageActionSheet(editor),
+                        attachment(editor),
+                        embedActionSheet(editor),
+                        tableActionSheet(editor),
+                    ], onClose: function () { return setIsOpen(false); } }) })] }));
 }
 var horizontalRule = function (editor) { return ({
     key: "hr",

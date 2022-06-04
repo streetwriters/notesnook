@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { MenuItem } from "./types";
 declare type MenuItemProps = {
     item: MenuItem;
