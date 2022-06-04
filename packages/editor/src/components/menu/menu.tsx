@@ -440,7 +440,6 @@ export function ActionSheetPresenter(
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           boxShadow: theme.shadows.menu,
-          paddingBottom: 30,
         }}
       >
         <Sheet.Header />

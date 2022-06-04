@@ -9,9 +9,9 @@ import { SplitButton } from "../components/split-button";
 import { MenuPresenter } from "../../components/menu/menu";
 import { useRef, useState } from "react";
 import tinycolor from "tinycolor2";
+import { HexColorPicker, HexColorInput } from "react-colorful";
 
 export const DEFAULT_COLORS = [
-  "#f44336",
   "#e91e63",
   "#9c27b0",
   "#673ab7",
@@ -25,6 +25,7 @@ export const DEFAULT_COLORS = [
   "#cddc39",
   "#ffeb3b",
   "#ffc107",
+  "#f44336",
 ];
 type ColorToolProps = ToolProps & {
   onColorChange: (editor: Editor, color?: string) => void;
@@ -50,16 +51,23 @@ function ColorTool(props: ColorToolProps) {
           bg: _isActive ? tColor.darken(5).toRgbString() : "transparent",
         },
       }}
+      popupPresenterProps={{
+        mobile: "sheet",
+        desktop: "menu",
+      }}
     >
       <Flex
         sx={{
-          flexDirection: "column",
           bg: "background",
-          boxShadow: "menu",
-          border: "1px solid var(--border)",
-          borderRadius: "default",
-          p: 1,
-          width: 160,
+          width: ["auto", "auto", 250],
+          flexDirection: "column",
+          p: [3, 3, 2],
+          boxShadow: ["none", "none", "menu"],
+          borderRadius: ["none", "none", "dialog"],
+          ".react-colorful": {
+            width: "auto",
+            height: 150,
+          },
         }}
       >
         <ColorPicker
@@ -109,93 +117,60 @@ type ColorPickerProps = {
   onClear: () => void;
   onChange: (color: string) => void;
 };
+const PALETTE_SIZE = [35, 35, 25];
 export function ColorPicker(props: ColorPickerProps) {
   const { colors, color, onClear, onChange } = props;
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const tColor = tinycolor(color || colors[0]);
   const [currentColor, setCurrentColor] = useState<string>(
-    tinycolor(color || colors[0]).toHexString()
+    tColor.toHexString()
   );
 
   return (
     <>
+      {isPickerOpen && (
+        <HexColorPicker color={currentColor} onChange={onChange} />
+      )}
       <Flex
         sx={{
-          width: "100%",
-          height: 50,
-          bg: currentColor,
-          mb: 1,
-          borderRadius: "default",
           alignItems: "center",
           justifyContent: "center",
+          mt: isPickerOpen ? 2 : 0,
         }}
       >
-        <Text
+        <Button
+          variant={"secondary"}
           sx={{
-            fontSize: "subheading",
-            color: tinycolor(currentColor).isDark() ? "white" : "black",
+            flexShrink: 0,
+            bg: currentColor,
+            width: PALETTE_SIZE,
+            height: PALETTE_SIZE,
+            mr: 2,
+            borderRadius: 50,
+            boxShadow: "menu",
+            p: 0,
           }}
+          onClick={() => setIsPickerOpen((s) => !s)}
         >
-          {currentColor}
-        </Text>
-      </Flex>
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
-        }}
-      >
-        {colors.map((color) => (
-          <Box
-            sx={{
-              bg: color,
-              width: 25,
-              height: 25,
-              m: "small",
-              borderRadius: "default",
-              cursor: "pointer",
-              ":hover": {
-                filter: "brightness(85%)",
-              },
-            }}
-            onClick={() => {
-              setCurrentColor(color);
-              onChange(color);
-            }}
+          <Icon
+            path={Icons.palette}
+            color={tColor.isDark() ? "static" : "icon"}
+            size={18}
           />
-        ))}
-        <Flex
-          sx={{
-            width: 25,
-            height: 25,
-            m: "small",
-            borderRadius: "small",
-            cursor: "pointer",
-            alignItems: "center",
-            justifyContent: "center",
-            ":hover": {
-              filter: "brightness(85%)",
-            },
-          }}
-          onClick={onClear}
-        >
-          <Icon path={Icons.colorClear} size={18} />
-        </Flex>
-      </Box>
-      <Flex
-        sx={{
-          mt: 1,
-          borderRadius: "default",
-        }}
-      >
+        </Button>
         <Input
+          variant={"clean"}
           placeholder="#000000"
+          spellCheck={false}
           sx={{
-            p: 1,
-            m: 0,
-            fontSize: "body",
-            border: "none",
-            borderWidth: 0,
+            p: 0,
+            borderRadius: 0,
+            fontSize: ["title", "title", "body"],
+            color: "fontTertiary",
+            textAlign: "left",
+            letterSpacing: 1.5,
           }}
-          value={currentColor}
+          value={currentColor.toUpperCase()}
           maxLength={7}
           onChange={(e) => {
             const { value } = e.target;
@@ -204,16 +179,47 @@ export function ColorPicker(props: ColorPickerProps) {
           }}
         />
         <Button
+          variant={"icon"}
           sx={{
+            flexShrink: 0,
             bg: "transparent",
-            p: 1,
-            ":hover": { bg: "hover" },
-            cursor: "pointer",
+            width: PALETTE_SIZE,
+            height: PALETTE_SIZE,
+            mr: 2,
+            borderRadius: 50,
+            p: 0,
           }}
-          onClick={() => onChange(currentColor)}
+          onClick={onClear}
         >
-          <Icon path={Icons.check} color="text" size={18} />
+          <Icon path={Icons.colorClear} color="text" size={15} />
         </Button>
+      </Flex>
+      <Flex
+        sx={{
+          borderTop: "1px solid var(--border)",
+          mt: 2,
+          pt: 4,
+          flexWrap: "wrap",
+        }}
+      >
+        {colors.map((color) => (
+          <Button
+            variant={"secondary"}
+            sx={{
+              bg: color,
+              width: PALETTE_SIZE,
+              height: PALETTE_SIZE,
+              ml: [2, 2, 1],
+              mb: [2, 2, 1],
+              borderRadius: 50,
+              boxShadow: "menu",
+            }}
+            onClick={() => {
+              setCurrentColor(color);
+              onChange(color);
+            }}
+          />
+        ))}
       </Flex>
     </>
   );

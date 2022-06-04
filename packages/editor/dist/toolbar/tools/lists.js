@@ -26,7 +26,7 @@ import { SplitButton } from "../components/split-button";
 function ListTool(props) {
     var editor = props.editor, options = props.options, toolProps = __rest(props, ["editor", "options"]);
     var isActive = editor.isActive(options.type);
-    return (_jsx(SplitButton, __assign({}, toolProps, { onClick: function () { return options.onClick(editor); }, toggled: isActive, sx: { mr: 0 }, menuPresenterProps: {
+    return (_jsx(SplitButton, __assign({}, toolProps, { onClick: function () { return options.onClick(editor); }, toggled: isActive, sx: { mr: 0 }, popupPresenterProps: {
             items: options.subTypes.map(function (item) { return ({
                 key: item.type,
                 tooltip: item.title,

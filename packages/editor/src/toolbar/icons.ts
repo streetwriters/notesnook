@@ -83,6 +83,7 @@ import {
   mdiTableColumnWidth,
   mdiTableRowHeight,
   mdiMinus,
+  mdiPaletteOutline,
 } from "@mdi/js";
 
 export const Icons = {
@@ -150,6 +151,7 @@ export const Icons = {
   wholeWord: mdiFormatLetterMatches,
   regex: mdiRegex,
   embed: mdiMoviePlusOutline,
+  palette: mdiPaletteOutline,
 
   plus: mdiPlus,
   minus: mdiMinus,

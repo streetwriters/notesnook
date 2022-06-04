@@ -37,15 +37,15 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { Box, Button, Flex, Text } from "rebass";
+import { Button, Flex } from "rebass";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
 import { SplitButton } from "../components/split-button";
 import { useState } from "react";
 import tinycolor from "tinycolor2";
+import { HexColorPicker } from "react-colorful";
 export var DEFAULT_COLORS = [
-    "#f44336",
     "#e91e63",
     "#9c27b0",
     "#673ab7",
@@ -59,6 +59,7 @@ export var DEFAULT_COLORS = [
     "#cddc39",
     "#ffeb3b",
     "#ffc107",
+    "#f44336",
 ];
 function ColorTool(props) {
     var editor = props.editor, onColorChange = props.onColorChange, isActive = props.isActive, getActiveColor = props.getActiveColor, toolProps = __rest(props, ["editor", "onColorChange", "isActive", "getActiveColor"]);
@@ -71,14 +72,20 @@ function ColorTool(props) {
             ":hover": {
                 bg: _isActive ? tColor.darken(5).toRgbString() : "transparent",
             },
+        }, popupPresenterProps: {
+            mobile: "sheet",
+            desktop: "menu",
         } }, { children: _jsx(Flex, __assign({ sx: {
-                flexDirection: "column",
                 bg: "background",
-                boxShadow: "menu",
-                border: "1px solid var(--border)",
-                borderRadius: "default",
-                p: 1,
-                width: 160,
+                width: ["auto", "auto", 250],
+                flexDirection: "column",
+                p: [3, 3, 2],
+                boxShadow: ["none", "none", "menu"],
+                borderRadius: ["none", "none", "dialog"],
+                ".react-colorful": {
+                    width: "auto",
+                    height: 150,
+                },
             } }, { children: _jsx(ColorPicker, { colors: DEFAULT_COLORS, color: activeColor, onClear: function () { return onColorChange(editor); }, onChange: function (color) { return onColorChange(editor, color); } }) })) })));
 }
 export function Highlight(props) {
@@ -95,65 +102,60 @@ export function TextColor(props) {
                 : editor.chain().focus().unsetColor().run();
         } })));
 }
+var PALETTE_SIZE = [35, 35, 25];
 export function ColorPicker(props) {
     var colors = props.colors, color = props.color, onClear = props.onClear, onChange = props.onChange;
-    var _a = __read(useState(tinycolor(color || colors[0]).toHexString()), 2), currentColor = _a[0], setCurrentColor = _a[1];
-    return (_jsxs(_Fragment, { children: [_jsx(Flex, __assign({ sx: {
-                    width: "100%",
-                    height: 50,
-                    bg: currentColor,
-                    mb: 1,
-                    borderRadius: "default",
+    var _a = __read(useState(false), 2), isPickerOpen = _a[0], setIsPickerOpen = _a[1];
+    var tColor = tinycolor(color || colors[0]);
+    var _b = __read(useState(tColor.toHexString()), 2), currentColor = _b[0], setCurrentColor = _b[1];
+    return (_jsxs(_Fragment, { children: [isPickerOpen && (_jsx(HexColorPicker, { color: currentColor, onChange: onChange })), _jsxs(Flex, __assign({ sx: {
                     alignItems: "center",
                     justifyContent: "center",
-                } }, { children: _jsx(Text, __assign({ sx: {
-                        fontSize: "subheading",
-                        color: tinycolor(currentColor).isDark() ? "white" : "black",
-                    } }, { children: currentColor })) })), _jsxs(Box, __assign({ sx: {
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
-                } }, { children: [colors.map(function (color) { return (_jsx(Box, { sx: {
-                            bg: color,
-                            width: 25,
-                            height: 25,
-                            m: "small",
-                            borderRadius: "default",
-                            cursor: "pointer",
-                            ":hover": {
-                                filter: "brightness(85%)",
-                            },
-                        }, onClick: function () {
-                            setCurrentColor(color);
-                            onChange(color);
-                        } })); }), _jsx(Flex, __assign({ sx: {
-                            width: 25,
-                            height: 25,
-                            m: "small",
-                            borderRadius: "small",
-                            cursor: "pointer",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            ":hover": {
-                                filter: "brightness(85%)",
-                            },
-                        }, onClick: onClear }, { children: _jsx(Icon, { path: Icons.colorClear, size: 18 }) }))] })), _jsxs(Flex, __assign({ sx: {
-                    mt: 1,
-                    borderRadius: "default",
-                } }, { children: [_jsx(Input, { placeholder: "#000000", sx: {
-                            p: 1,
-                            m: 0,
-                            fontSize: "body",
-                            border: "none",
-                            borderWidth: 0,
-                        }, value: currentColor, maxLength: 7, onChange: function (e) {
+                    mt: isPickerOpen ? 2 : 0,
+                } }, { children: [_jsx(Button, __assign({ variant: "secondary", sx: {
+                            flexShrink: 0,
+                            bg: currentColor,
+                            width: PALETTE_SIZE,
+                            height: PALETTE_SIZE,
+                            mr: 2,
+                            borderRadius: 50,
+                            boxShadow: "menu",
+                            p: 0,
+                        }, onClick: function () { return setIsPickerOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.palette, color: tColor.isDark() ? "static" : "icon", size: 18 }) })), _jsx(Input, { variant: "clean", placeholder: "#000000", spellCheck: false, sx: {
+                            p: 0,
+                            borderRadius: 0,
+                            fontSize: ["title", "title", "body"],
+                            color: "fontTertiary",
+                            textAlign: "left",
+                            letterSpacing: 1.5,
+                        }, value: currentColor.toUpperCase(), maxLength: 7, onChange: function (e) {
                             var value = e.target.value;
                             if (!value)
                                 return;
                             setCurrentColor(value);
-                        } }), _jsx(Button, __assign({ sx: {
+                        } }), _jsx(Button, __assign({ variant: "icon", sx: {
+                            flexShrink: 0,
                             bg: "transparent",
-                            p: 1,
-                            ":hover": { bg: "hover" },
-                            cursor: "pointer",
-                        }, onClick: function () { return onChange(currentColor); } }, { children: _jsx(Icon, { path: Icons.check, color: "text", size: 18 }) }))] }))] }));
+                            width: PALETTE_SIZE,
+                            height: PALETTE_SIZE,
+                            mr: 2,
+                            borderRadius: 50,
+                            p: 0,
+                        }, onClick: onClear }, { children: _jsx(Icon, { path: Icons.colorClear, color: "text", size: 15 }) }))] })), _jsx(Flex, __assign({ sx: {
+                    borderTop: "1px solid var(--border)",
+                    mt: 2,
+                    pt: 4,
+                    flexWrap: "wrap",
+                } }, { children: colors.map(function (color) { return (_jsx(Button, { variant: "secondary", sx: {
+                        bg: color,
+                        width: PALETTE_SIZE,
+                        height: PALETTE_SIZE,
+                        ml: [2, 2, 1],
+                        mb: [2, 2, 1],
+                        borderRadius: 50,
+                        boxShadow: "menu",
+                    }, onClick: function () {
+                        setCurrentColor(color);
+                        onChange(color);
+                    } })); }) }))] }));
 }

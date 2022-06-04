@@ -282,6 +282,5 @@ export function ActionSheetPresenter(props) {
                     borderTopLeftRadius: 20,
                     borderTopRightRadius: 20,
                     boxShadow: theme.shadows.menu,
-                    paddingBottom: 30,
                 } }, { children: [_jsx(Sheet.Header, {}), _jsx(Sheet.Content, { children: props.children ? (props.children) : (_jsx(Menu, __assign({ items: items, closeMenu: onClose, sx: __assign({ flex: 1, boxShadow: "none", border: "none" }, sx) }, containerProps))) })] })), _jsx(Sheet.Backdrop, { style: { backgroundColor: "transparent" }, onTap: onClose })] })));
 }

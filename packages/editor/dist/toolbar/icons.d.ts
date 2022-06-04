@@ -61,6 +61,7 @@ export declare const Icons: {
     wholeWord: string;
     regex: string;
     embed: string;
+    palette: string;
     plus: string;
     minus: string;
     close: string;

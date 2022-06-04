@@ -42,10 +42,10 @@ import { Button, Flex } from "rebass";
 import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton } from "./tool-button";
-import { MenuPresenter } from "../../components/menu/menu";
+import { PopupPresenter, } from "../../components/menu/menu";
 import { useToolbarLocation } from "../stores/toolbar-store";
 export function SplitButton(props) {
-    var menuPresenterProps = props.menuPresenterProps, children = props.children, toolButtonProps = __rest(props, ["menuPresenterProps", "children"]);
+    var popupPresenterProps = props.popupPresenterProps, children = props.children, toolButtonProps = __rest(props, ["popupPresenterProps", "children"]);
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var ref = useRef(null);
     var toolbarLocation = useToolbarLocation();
@@ -61,7 +61,7 @@ export function SplitButton(props) {
                             ":last-of-type": {
                                 mr: 0,
                             },
-                        }, onClick: function () { return setIsOpen(function (s) { return !s; }); }, onMouseDown: function (e) { return e.preventDefault(); } }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small" }) }))] })), _jsx(MenuPresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, options: {
+                        }, onClick: function () { return setIsOpen(function (s) { return !s; }); }, onMouseDown: function (e) { return e.preventDefault(); } }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small" }) }))] })), _jsx(PopupPresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, options: {
                     type: "menu",
                     position: {
                         target: ref.current || undefined,
@@ -70,5 +70,5 @@ export function SplitButton(props) {
                         yOffset: 5,
                         align: "center",
                     },
-                }, items: [] }, menuPresenterProps, { children: children }))] }));
+                }, items: [] }, popupPresenterProps, { children: children }))] }));
 }

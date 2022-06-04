@@ -167,11 +167,11 @@ function LanguageSelector(props) {
             bg: "background",
             marginRight: 2,
         } }, { children: [_jsx(Input, { autoFocus: true, placeholder: "Search languages", sx: {
-                    mx: 2,
                     width: "auto",
                     position: "sticky",
                     top: 2,
                     bg: "background",
+                    mx: 2,
                     p: "7px",
                 }, onChange: function (e) {
                     if (!e.target.value)

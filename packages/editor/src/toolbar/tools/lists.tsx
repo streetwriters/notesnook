@@ -38,7 +38,7 @@ function ListTool<TListStyleTypes extends string>(
       onClick={() => options.onClick(editor)}
       toggled={isActive}
       sx={{ mr: 0 }}
-      menuPresenterProps={{
+      popupPresenterProps={{
         items: options.subTypes.map((item) => ({
           key: item.type,
           tooltip: item.title,

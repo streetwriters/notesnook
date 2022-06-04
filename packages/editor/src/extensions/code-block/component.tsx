@@ -180,11 +180,11 @@ function LanguageSelector(props: LanguageSelectorProps) {
         autoFocus
         placeholder="Search languages"
         sx={{
-          mx: 2,
           width: "auto",
           position: "sticky",
           top: 2,
           bg: "background",
+          mx: 2,
           p: "7px",
         }}
         onChange={(e) => {

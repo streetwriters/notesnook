@@ -44,6 +44,7 @@
     "prosemirror-view": "^1.24.1",
     "re-resizable": "^6.9.9",
     "react-color": "^2.19.3",
+    "react-colorful": "^5.5.1",
     "react-modal": "^3.14.4",
     "react-modal-sheet": "file:../react-modal-sheet",
     "react-spring-bottom-sheet": "^3.4.0",

@@ -4,15 +4,18 @@ import { Button, ButtonProps, Flex } from "rebass";
 import { IconNames, Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton, ToolButtonProps } from "./tool-button";
-import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
+import {
+  PopupPresenter,
+  PopupPresenterProps,
+} from "../../components/menu/menu";
 import { useToolbarContext } from "../hooks/useToolbarContext";
 import { useToolbarLocation } from "../stores/toolbar-store";
 
 type SplitButtonProps = ToolButtonProps & {
-  menuPresenterProps?: Partial<MenuPresenterProps>;
+  popupPresenterProps?: Partial<PopupPresenterProps>;
 };
 export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
-  const { menuPresenterProps, children, ...toolButtonProps } = props;
+  const { popupPresenterProps, children, ...toolButtonProps } = props;
 
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -51,7 +54,7 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
           />
         </Button>
       </Flex>
-      <MenuPresenter
+      <PopupPresenter
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         options={{
@@ -65,10 +68,10 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
           },
         }}
         items={[]}
-        {...menuPresenterProps}
+        {...popupPresenterProps}
       >
         {children}
-      </MenuPresenter>
+      </PopupPresenter>
     </>
   );
 }
