@@ -12,6 +12,7 @@ import "allotment/dist/style.css";
 import Config from "./utils/config";
 import EditorLoading from "./components/editor/loading";
 import NavigationMenuPlaceholder from "./components/navigationmenu/index.lite";
+import { useStore } from "./stores/app-store";
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")
@@ -81,6 +82,7 @@ function SuspenseLoader({ condition, props, component: Component, fallback }) {
 }
 
 function DesktopAppContents({ isAppLoaded, show, setShow }) {
+  const isFocusMode = useStore((store) => store.isFocusMode);
   const isTablet = useTablet();
   const defaultSizes = useMemo(
     () => [isTablet ? 60 : 180, isTablet ? 240 : 380],
@@ -117,7 +119,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             className="pane nav-pane"
             minSize={50}
             preferredSize={paneSizes[0]}
-            visible={show}
+            visible={!isFocusMode}
           >
             <Flex flex={1}>
               <SuspenseLoader
@@ -135,7 +137,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
           </Allotment.Pane>
           <Allotment.Pane
             className="pane middle-pane"
-            minSize={5}
+            minSize={2}
             preferredSize={paneSizes[1]}
             visible={show}
           >
