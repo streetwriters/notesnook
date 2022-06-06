@@ -18,6 +18,11 @@ try {
   require("electron-reloader")(module);
 } catch (_) {}
 
+// only run a single instance
+if (app.requestSingleInstanceLock()) {
+  app.exit();
+}
+
 /**
  * @type {BrowserWindow}
  */
