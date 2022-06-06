@@ -143,7 +143,12 @@ function showIssueReportedDialog({ url }) {
       <>
         <p>
           You can track your bug report at{" "}
-          <Text as="a" href={url} sx={{ lineBreak: "anywhere" }}>
+          <Text
+            as="a"
+            target="_blank"
+            href={url}
+            sx={{ lineBreak: "anywhere" }}
+          >
             {url}
           </Text>
           .
