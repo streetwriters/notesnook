@@ -74,7 +74,7 @@ describe.each([
       let note = db.notes.note(id);
       await note[action](value);
       let tag = db[collection].tag(value);
-      await db[collection].rename(tag.id, value + " ././..././new");
+      await db[collection].rename(tag.id, value + "    new");
       tag = db[collection].tag(tag.id);
       expect(db[collection].alias(tag.id)).toBe(value + "new");
     }));
@@ -100,7 +100,7 @@ describe.each([
   test(`invalid characters from ${action} title are removed`, () =>
     noteTest().then(async ({ db, id }) => {
       let note = db.notes.note(id);
-      await note[action](`${value.toUpperCase()}/.,#=)(&*&^%$$$@$)`);
+      await note[action](`${value.toUpperCase()}      \t\t\t\t\t\r\n\r\n`);
       note = db.notes.note(id);
       check(note, value);
     }));
