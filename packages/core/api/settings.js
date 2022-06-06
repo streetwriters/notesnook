@@ -146,7 +146,10 @@ class Settings {
   }
 
   async _saveSettings(updateDateModified = true) {
-    if (updateDateModified) this._settings.dateModified = Date.now();
+    if (updateDateModified) {
+      this._settings.dateModified = Date.now();
+      this._settings.synced = false;
+    }
 
     await this._db.storage.write("settings", this._settings);
     EV.publish(EVENTS.databaseUpdated, this._settings);
