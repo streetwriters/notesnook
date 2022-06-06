@@ -77,13 +77,21 @@ function MoveDialog({ onClose, noteIds }) {
           itemName="notebook"
           renderItem={(notebook, index) => {
             const selectedTopics = selected.filter((s) => s.id === notebook.id);
+            const hasNotes = notebook.topics.some((topic) =>
+              topicHasNotes(topic, noteIds)
+            );
             return (
               <Accordion
                 key={notebook.id}
                 testId={`notebook-${index}`}
                 title={
                   <Flex flexDirection={"column"} sx={{ px: 1 }}>
-                    <Text variant={"body"}>{notebook.title}</Text>
+                    <Text
+                      variant={"body"}
+                      sx={{ color: hasNotes ? "primary" : "text" }}
+                    >
+                      {notebook.title}
+                    </Text>
                     <Text variant={"subBody"} fontWeight="normal">
                       {getTotalNotes(notebook)} notes &amp;{" "}
                       {notebook.topics.length} topics{" "}
@@ -139,7 +147,15 @@ function MoveDialog({ onClose, noteIds }) {
                         }}
                         indent={1}
                         icon={Icon.Topic}
-                        title={topic.title}
+                        title={
+                          hasNotes ? (
+                            <Text as="span" sx={{ color: "primary" }}>
+                              {topic.title}
+                            </Text>
+                          ) : (
+                            topic.title
+                          )
+                        }
                         totalNotes={topic.notes?.length || 0}
                         action={
                           isSelected && hasNotes ? (
