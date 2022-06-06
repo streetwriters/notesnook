@@ -34,7 +34,7 @@ function editorSetContent(editor, content) {
 
   updateWordCount(editor);
 
-  editor.focus();
+  if (!editor.hasFocus()) editor.focus();
 }
 
 function updateWordCount(editor) {

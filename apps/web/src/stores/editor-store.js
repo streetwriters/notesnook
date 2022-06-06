@@ -174,7 +174,7 @@ class EditorStore extends BaseStore {
       }
 
       this.set((state) => {
-        if (state.session.id !== note.id) return;
+        if (!!state.session.id && state.session.id !== note.id) return;
 
         for (let key in session) {
           if (key === "content") continue;
@@ -184,6 +184,7 @@ class EditorStore extends BaseStore {
         state.session.notebooks = note.notebooks;
         state.session.context = null;
         state.session.id = note.id;
+        state.session.title = note.title;
         state.session.saveState = 1;
         state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
@@ -191,7 +192,7 @@ class EditorStore extends BaseStore {
 
       if (!sessionId) {
         noteStore.setSelectedNote(id);
-        hashNavigate(`/notes/${id}/edit`, { replace: true });
+        hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
       }
     } catch (err) {
       this.setSaveState(-1);
