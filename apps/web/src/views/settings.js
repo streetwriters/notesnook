@@ -94,7 +94,7 @@ const otherItems = [
   {
     title: "Roadmap",
     description: "See what the future of Notesnook is going to be like!",
-    link: "https://docs.notesnook.com/roadmap",
+    link: "https://notesnook.com/roadmap",
   },
 ];
 
