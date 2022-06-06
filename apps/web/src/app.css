@@ -74,7 +74,7 @@
 input,
 textarea,
 [contenteditable="true"],
-[contenteditable="true"] > * {
+[contenteditable="true"] * {
   -webkit-touch-callout: initial;
   -webkit-user-select: text;
   -khtml-user-select: text;
