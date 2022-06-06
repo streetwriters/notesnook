@@ -169,6 +169,7 @@ class AppStore extends BaseStore {
   };
 
   sync = async (full = true, force = false) => {
+    return;
     clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
 

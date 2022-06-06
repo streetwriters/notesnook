@@ -15,7 +15,7 @@
     "@rebass/forms": "^4.0.6",
     "@streetwriters/tinymce-plugins": "^1.5.18",
     "@tinymce/tinymce-react": "^3.13.0",
-    "@tiptap/react": "^2.0.0-beta.108",
+    "@tiptap/react": "^2.0.0-beta.109",
     "@types/rebass": "^4.0.10",
     "async-mutex": "^0.3.2",
     "axios": "^0.21.4",

@@ -23,7 +23,6 @@ import { FlexScrollContainer } from "../scroll-container";
 import { formatDate } from "notes-core/utils/date";
 import { debounce, debounceWithId } from "../../utils/debounce";
 import { showError } from "../../common/dialog-controller";
-import "./tiptap.css";
 import { CharacterCounter, IEditor } from "./tiptap";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
