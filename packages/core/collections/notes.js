@@ -270,7 +270,8 @@ export default class Notes extends Collection {
     const { color, tags, id } = note;
 
     if (color) {
-      await this._db.colors.add(color, id);
+      const { title } = await this._db.colors.add(color, id);
+      note.color = title;
     }
 
     if (tags && tags.length) {
