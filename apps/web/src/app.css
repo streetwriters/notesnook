@@ -71,6 +71,7 @@
 }
 
 .selectable,
+.selectable *,
 input,
 textarea,
 [contenteditable="true"],

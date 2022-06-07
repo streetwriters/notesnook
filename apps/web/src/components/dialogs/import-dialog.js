@@ -47,7 +47,7 @@ function ImportDialog(props) {
     <Dialog
       isOpen={true}
       title={"Import notes"}
-      description="Notesnook Importer allows you to import your notes from any notes app into Notesnook"
+      description="Use the Importer to import your notes from other notes apps."
       onClose={props.onClose}
       negativeButton={
         progress.done
@@ -172,7 +172,26 @@ function ImportDialog(props) {
                 ))}
               </Flex>
             </Accordion>
-
+            <Accordion title={`How do I get the .zip file?`} isClosed={true}>
+              <Text className="selectable" as="ol" variant={"body"} my={1}>
+                <Text as="li" variant={"body"}>
+                  Go to{" "}
+                  <a href="https://importer.notesnook.com/">
+                    https://importer.notesnook.com/
+                  </a>
+                </Text>
+                <Text as="li" variant={"body"}>
+                  Select the notes app you want to import from
+                </Text>
+                <Text as="li" variant={"body"}>
+                  Follow the next steps in the Importer to download the .zip
+                  file
+                </Text>
+                <Text as="li" variant={"body"}>
+                  Drag &amp; drop the downloaded .zip file above
+                </Text>
+              </Text>
+            </Accordion>
             {files.length > 0 && (
               <Accordion
                 title={`${notes.length} notes found`}
