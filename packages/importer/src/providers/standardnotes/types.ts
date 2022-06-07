@@ -32,6 +32,8 @@ type SNBackupItem<
       [ComponentDataDomain]?: Record<string, any | null | undefined>;
     };
   };
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type SNNote = SNBackupItem<ContentType.Note, NoteContent>;

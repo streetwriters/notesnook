@@ -81,13 +81,11 @@ export class StandardNotes implements IFileProvider {
       });
 
       for (let item of snnotes) {
+        const { createdAt, updatedAt } = this.getTimestamps(item);
         let note: Note = {
           title: item.content.title,
-          dateCreated: item.created_at_timestamp / 1000,
-          dateEdited:
-            item.updated_at_timestamp || item.created_at_timestamp
-              ? (item.updated_at_timestamp || item.created_at_timestamp) / 1000
-              : undefined,
+          dateCreated: createdAt,
+          dateEdited: updatedAt,
           pinned: <boolean>item.content.appData[DefaultAppDomain]?.pinned,
           tags: this.getTags(item, tags),
           content: this.parseContent(item, components),
@@ -226,5 +224,24 @@ export class StandardNotes implements IFileProvider {
           type: ContentType.HTML,
         };
     }
+  }
+
+  private getTimestamps(note: SNNote) {
+    let createdAt =
+      typeof note.created_at === "string"
+        ? new Date(note.created_at).getTime()
+        : note.created_at_timestamp
+        ? note.created_at_timestamp / 1000
+        : undefined;
+    let updatedAt =
+      typeof note.updated_at === "string"
+        ? new Date(note.updated_at).getTime()
+        : note.updated_at_timestamp
+        ? note.updated_at_timestamp / 1000
+        : undefined;
+
+    if (updatedAt === 0) updatedAt = undefined;
+    if (createdAt === 0) createdAt = undefined;
+    return { createdAt, updatedAt };
   }
 }
