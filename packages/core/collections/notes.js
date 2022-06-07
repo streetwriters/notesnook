@@ -98,8 +98,10 @@ export default class Notes extends Collection {
       dateModified: note.dateModified,
     };
 
-    await this._resolveColorAndTags(note);
     await this._collection.addItem(note);
+
+    await this._resolveColorAndTags(note);
+    await this._resolveNotebooks(note);
     return note.id;
   }
 
@@ -234,11 +236,12 @@ export default class Notes extends Collection {
       );
     let topic = this._db.notebooks.notebook(to.id).topics.topic(to.topic);
     if (!topic) throw new Error("No such topic exists.");
+    console.log(topic, noteIds);
     await topic.add(...noteIds);
   }
 
-  async repairReferences() {
-    const notes = this.all;
+  async repairReferences(notes) {
+    notes = notes || this.all;
     for (let note of notes) {
       const { notebooks } = note;
       if (!notebooks) continue;
@@ -283,6 +286,19 @@ export default class Notes extends Collection {
           continue;
         }
         if (addedTag.title !== tag) tags[i] = addedTag.title;
+      }
+    }
+  }
+
+  async _resolveNotebooks(note) {
+    const { notebooks, id } = note;
+    if (!notebooks) return;
+
+    for (const notebook of notebooks) {
+      const nb = this._db.notebooks.notebook(notebook.id);
+      if (!nb) continue;
+      for (const topic of notebook.topics) {
+        await this.move({ id: notebook.id, topic }, id);
       }
     }
   }

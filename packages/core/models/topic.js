@@ -31,23 +31,23 @@ export default class Topic {
 
       const noteNotebook = notebooks.find((nb) => nb.id === this._notebookId);
       const noteHasNotebook = !!noteNotebook;
-      if (noteHasNotebook) {
+      const noteHasTopic = noteNotebook.topics.indexOf(topic.id) > -1;
+      if (noteHasNotebook && !noteHasTopic) {
         // 1 note can be inside multiple topics
-        const noteHasTopic = noteNotebook.topics.indexOf(topic.id) > -1;
-        if (noteHasTopic) continue;
-
         noteNotebook.topics.push(topic.id);
-      } else {
+      } else if (!noteHasNotebook) {
         notebooks.push({
           id: this._notebookId,
           topics: [topic.id],
         });
       }
 
-      await this._db.notes.add({
-        id: noteId,
-        notebooks,
-      });
+      if (!noteHasNotebook || !noteHasTopic) {
+        await this._db.notes.add({
+          id: noteId,
+          notebooks,
+        });
+      }
 
       if (!this.has(noteId)) {
         topic.notes.push(noteId);
