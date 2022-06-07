@@ -38,7 +38,7 @@ const defaultEditorDescription = (item: SNNote): EditorDescription => {
 
 export class StandardNotes implements IFileProvider {
   public type: "file" = "file";
-  public supportedExtensions = [".txt"];
+  public supportedExtensions = [".txt", ".zip"];
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";
   public name = "Standard Notes";
