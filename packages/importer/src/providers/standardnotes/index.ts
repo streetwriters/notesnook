@@ -83,8 +83,11 @@ export class StandardNotes implements IFileProvider {
       for (let item of snnotes) {
         let note: Note = {
           title: item.content.title,
-          dateCreated: item.created_at_timestamp,
-          dateEdited: item.updated_at_timestamp || item.created_at_timestamp,
+          dateCreated: item.created_at_timestamp / 1000,
+          dateEdited:
+            item.updated_at_timestamp || item.created_at_timestamp
+              ? (item.updated_at_timestamp || item.created_at_timestamp) / 1000
+              : undefined,
           pinned: <boolean>item.content.appData[DefaultAppDomain]?.pinned,
           tags: this.getTags(item, tags),
           content: this.parseContent(item, components),
