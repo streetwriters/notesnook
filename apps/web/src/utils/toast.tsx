@@ -8,7 +8,7 @@ type ToastType = "success" | "error" | "warn" | "info";
 type ToastAction = {
   text: string;
   onClick: () => void;
-  type: "primary" | "text";
+  type?: "primary" | "text";
 };
 
 function showToast(
@@ -73,7 +73,7 @@ function ToastContainer(props: ToastContainerProps) {
           <Button
             flexShrink={0}
             variant="primary"
-            color={action.type}
+            color={action.type || "primary"}
             fontWeight="bold"
             bg={"transparent"}
             fontSize="body"
