@@ -10,12 +10,7 @@ export class ThemeFactory {
       space: [0, 5, 10, 15, 20, 25, 30, 35],
       sizes: { full: "100%", half: "50%" },
       radii: { none: 0, default: 10 },
-      colors: {
-        modes: {
-          dark: ColorSchemeFactory.construct("dark"),
-          light: ColorSchemeFactory.construct("light"),
-        },
-      },
+      colors: ColorSchemeFactory.construct("light"),
       rawColors: ColorSchemeFactory.construct("light"),
       ...FontFactory.construct(),
       ...new VariantsFactory(),
