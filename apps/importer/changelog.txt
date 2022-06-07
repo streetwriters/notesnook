@@ -1,2 +1,5 @@
 1. 🥳 Added Joplin support! 🥳
 2. Optimize for mobile screens
+3. Add very basic telemetry (only sends the provider used)
+4. Fixed timestamp issues with Standard Notes provider
+5. Fixed issue where importer would always open in dark mode
