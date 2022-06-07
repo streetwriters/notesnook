@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@rebass/forms";
 import { useStore, store, SESSION_STATES } from "../../stores/editor-store";
 
@@ -18,16 +18,19 @@ function TitleBox(props: TitleBoxProps) {
   const [placeholder, setPlaceholder] = useState<string>();
 
   useEffect(() => {
-    if (state === SESSION_STATES.new) {
+    const noteTitle = store.get().session.title;
+    if (state === SESSION_STATES.new && noteTitle !== currentTitle) {
       setCurrentTitle("");
       setPlaceholder("");
     } else if (state === SESSION_STATES.stale) {
-      setCurrentTitle(store.get().session.title);
+      setCurrentTitle(noteTitle);
     }
-  }, [state]);
+    // We do not want to update when currentTitle changes.
+  }, [state, sessionId]);
 
   useEffect(() => {
-    setPlaceholder(title);
+    if (currentTitle !== title) setPlaceholder(title);
+    // We do not want to update when currentTitle changes.
   }, [title]);
 
   return (
