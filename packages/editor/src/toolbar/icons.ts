@@ -84,6 +84,7 @@ import {
   mdiTableRowHeight,
   mdiMinus,
   mdiPaletteOutline,
+  mdiCircle,
 } from "@mdi/js";
 
 export const Icons = {
@@ -161,6 +162,7 @@ export const Icons = {
   chevronDown: mdiChevronDown,
   chevronUp: mdiChevronUp,
   chevronRight: mdiChevronRight,
+  circle: mdiCircle,
 
   none: "",
 };

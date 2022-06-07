@@ -54,6 +54,8 @@ import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
 import { Link } from "./extensions/link";
 import { EventDispatcher } from "./extensions/react";
+import { OutlineList } from "./extensions/outline-list";
+import { OutlineListItem } from "./extensions/outline-list-item";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -115,6 +117,8 @@ var useTiptap = function (options, deps) {
                 onDownloadAttachment: onDownloadAttachment,
                 onOpenAttachmentPicker: onOpenAttachmentPicker,
             }),
+            OutlineListItem,
+            OutlineList,
             ListItem,
         ],
         onCreate: function (_a) {
