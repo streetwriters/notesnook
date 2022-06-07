@@ -49,7 +49,7 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
 
   useEffect(() => {
     (async () => {
-      if (!provider || !files.length) return;
+      if (!files.length) return;
 
       setProgress({ total: 0, done: 0 });
       let result: ProviderResult = { notes: [], errors: [] };
@@ -71,7 +71,11 @@ export function FileProviderHandler(props: FileProviderHandlerProps) {
       setProgress({ total: 0, done: 0 });
       onTransformFinished(result);
     })();
-  }, [provider, files, onTransformFinished]);
+
+    // Disabled because we do not want to cause an update when provider changes
+    // which only happens when the user selects a different provider.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files, onTransformFinished]);
 
   return (
     <StepContainer sx={{ flexDirection: "column", alignItems: "stretch" }}>

@@ -1,9 +1,8 @@
 import { Button, Flex, Text } from "@theme-ui/components";
 import { Accordion } from "./Accordion";
-import { TransformError } from "@notesnook/importer/dist/src/utils/transformerror";
 
 type ImportErrorsProps = {
-  errors: TransformError[];
+  errors: Error[];
 };
 
 export function ImportErrors(props: ImportErrorsProps) {
@@ -13,14 +12,13 @@ export function ImportErrors(props: ImportErrorsProps) {
       sx={{ bg: "errorBg", borderRadius: "default", mt: 2 }}
       color="#E53935"
     >
-      <Flex sx={{ flexDirection: "column", px: 2, pb: 2 }}>
+      <Flex sx={{ flexDirection: "column", px: 2, pb: 2, overflowX: "auto" }}>
         {props.errors.map((error, index) => (
           <Text
             variant="body"
             sx={{ color: "error", my: 1, fontFamily: "monospace" }}
           >
-            {index + 1}. {error.message}{" "}
-            {error.file ? `(${error.file.name})` : ""}
+            {index + 1}. {error.message}
             <br />
           </Text>
         ))}

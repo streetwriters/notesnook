@@ -2,7 +2,7 @@ import { Flex } from "@theme-ui/components";
 import { ThemeProvider } from "@theme-ui/theme-provider";
 import "./App.css";
 import { ThemeFactory } from "./theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StepSeperator } from "./components/StepSeperator";
 import { ProviderSelector } from "./components/ProviderSelector";
 import { FileProviderHandler } from "./components/FileProviderHandler";
@@ -12,10 +12,22 @@ import { Footer } from "./components/Footer";
 import { IProvider } from "@notesnook/importer";
 import { NetworkProviderHandler } from "./components/NetworkProviderHandler";
 import { ProviderResult } from "@notesnook/importer/dist/src/providers/provider";
+import { trackEvent } from "./utils/analytics";
 
 function App() {
   const [selectedProvider, setSelectedProvider] = useState<IProvider>();
   const [providerResult, setProviderResult] = useState<ProviderResult>();
+
+  useEffect(() => {
+    if (selectedProvider && providerResult) {
+      (async () => {
+        await trackEvent(
+          { name: selectedProvider.name, type: "event" },
+          selectedProvider.name
+        );
+      })();
+    }
+  }, [providerResult, selectedProvider]);
 
   return (
     <ThemeProvider theme={ThemeFactory.construct()}>
@@ -27,7 +39,12 @@ function App() {
             alignItems: "center",
           }}
         >
-          <ProviderSelector onProviderChanged={setSelectedProvider} />
+          <ProviderSelector
+            onProviderChanged={(provider) => {
+              setSelectedProvider(provider);
+              setProviderResult(undefined);
+            }}
+          />
 
           {selectedProvider ? (
             <>

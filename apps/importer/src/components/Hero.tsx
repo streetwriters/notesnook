@@ -1,7 +1,10 @@
-import { Flex, Link, Text } from "@theme-ui/components";
+import { Checkbox, Flex, Label, Link, Text } from "@theme-ui/components";
+import { useTelemetry } from "../utils/analytics";
 import { appVersion } from "../utils/version";
 
 export function Hero() {
+  const { isEnabled, setIsEnabled } = useTelemetry();
+
   return (
     <Flex
       sx={{
@@ -25,24 +28,41 @@ export function Hero() {
       >
         Import your notes from any notes app into Notesnook.
       </Text>
-      <Flex sx={{ mt: 2 }}>
-        <Text variant="body" sx={{ px: 1 }}>
+      <Flex sx={{ mt: 2, alignItems: "center" }}>
+        <Text variant="body" sx={{ px: 2 }}>
           v{appVersion}
         </Text>
         <Link
           href="https://github.com/streetwriters/notesnook"
           variant="text.body"
-          sx={{ px: 1, borderLeft: "1px solid var(--theme-ui-colors-border)" }}
+          sx={{ px: 2, borderLeft: "1px solid var(--theme-ui-colors-border)" }}
         >
           Github
         </Link>
         <Link
           href="https://app.notesnook.com/"
           variant="text.body"
-          sx={{ px: 1, borderLeft: "1px solid var(--theme-ui-colors-border)" }}
+          sx={{ px: 2, borderLeft: "1px solid var(--theme-ui-colors-border)" }}
         >
           Notesnook Web
         </Link>
+        <Label
+          variant="text.body"
+          sx={{
+            width: "auto",
+            alignItems: "center",
+            px: 2,
+            borderLeft: "1px solid var(--theme-ui-colors-border)",
+          }}
+          title={`Currently the only thing sent is which provider you used after a successful import. This data is completely anonymous, of course.`}
+        >
+          <Checkbox
+            sx={{ mr: 1 }}
+            checked={isEnabled}
+            onChange={() => setIsEnabled((s) => !s)}
+          />
+          Telemetry {isEnabled ? "enabled" : "disabled"}
+        </Label>
       </Flex>
       <Flex
         sx={{
