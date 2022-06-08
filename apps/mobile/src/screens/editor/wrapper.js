@@ -27,10 +27,13 @@ export const EditorWrapper = ({ width }) => {
   const floating = useIsFloatingKeyboard();
 
   const onAppStateChanged = async state => {
+    if (editorState().movedAway) return;
     if (state === 'active') {
-      if (!editorState().movedAway) {
-        editorController.current.onReady();
-      }
+      editorController.current.onReady();
+      // workaround: refocus editor when return from background
+      await editorController.current?.commands.focus();
+    } else {
+      await editorController.current?.commands?.blur();
     }
   };
 
