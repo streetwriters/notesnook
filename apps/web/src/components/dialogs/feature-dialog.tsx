@@ -38,23 +38,7 @@ const features: Record<FeatureKeys, Feature> = {
   highlights: {
     title: "✨ Highlights ✨",
     subtitle: `Welcome to v${appVersion.clean}`,
-    subFeatures: [
-      {
-        title: "All panes are now resizable",
-        subtitle: (
-          <>
-            You can now adjust the width of all the panes as you see fit. And
-            they persist across sessions too!
-          </>
-        ),
-        icon: Icon.Resize,
-      },
-      {
-        title: "Sort alphabetically when group by = none",
-        subtitle: <>No idea why this wasn't included earlier.</>,
-        icon: Icon.SortBy,
-      },
-    ],
+    subFeatures: [],
     cta: {
       title: "Got it",
       icon: Icon.Checkmark,
@@ -63,10 +47,13 @@ const features: Record<FeatureKeys, Feature> = {
       },
     },
     shouldShow: () => {
+      if (!features.highlights.subFeatures?.length) return false;
+
       const key = `${appVersion.numerical}:highlights`;
       const hasShownBefore = Config.get(key, false) as boolean;
       const hasShownAny = Config.has((k) => k.endsWith(":highlights"));
       if (!hasShownAny) Config.set(key, true);
+
       return hasShownAny && !isTesting() && !hasShownBefore;
     },
   },
