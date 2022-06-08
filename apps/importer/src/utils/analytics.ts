@@ -17,20 +17,27 @@ declare global {
 
 export function loadTrackerScript() {
   if (Config.get("telemetry") === "false") return Promise.resolve(false);
-  return new Promise<boolean>((resolve, reject) => {
-    var script = document.createElement("script");
-    script.src = "https://analytics.streetwriters.co/umami.js";
-    script.async = true;
-    script.dataset.websiteId = "b84b000d-9fcb-48e3-bbc0-0adad1a960c0";
+  if (!!document.getElementById("analytics")) {
+    return Promise.resolve(true);
+  }
 
-    if (process.env.REACT_APP_PLATFORM !== "desktop")
-      script.dataset.domains = "importer.notesnook.com";
-    script.dataset.autoTrack = "false";
-    script.dataset.doNotTrack = "true";
-    script.dataset.hostUrl = "https://analytics.streetwriters.co";
+  var script = document.createElement("script");
+  script.id = "analytics";
+  script.src = "https://analytics.streetwriters.co/umami.js";
+  script.async = true;
+  script.dataset.websiteId = "b84b000d-9fcb-48e3-bbc0-0adad1a960c0";
+
+  if (process.env.REACT_APP_PLATFORM !== "desktop")
+    script.dataset.domains = "importer.notesnook.com";
+  script.dataset.autoTrack = "false";
+  script.dataset.doNotTrack = "true";
+  script.dataset.hostUrl = "https://analytics.streetwriters.co";
+
+  return new Promise<boolean>((resolve, reject) => {
+    script.onload = () => resolve(true);
+    script.onerror = (e) => reject(e);
+
     var firstScriptElement = document.getElementsByTagName("script")[0];
-    firstScriptElement.onload = () => resolve(true);
-    firstScriptElement.onerror = (e) => reject(e);
     firstScriptElement.parentNode?.insertBefore(script, firstScriptElement);
   });
 }
