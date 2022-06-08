@@ -1,5 +1,5 @@
 import { decodeHTML5 } from "entities";
-import { DOMParser } from "linkedom";
+import { DOMParser } from "linkedom/worker";
 
 const RealDOMParser =
   "window" in global && "DOMParser" in window
