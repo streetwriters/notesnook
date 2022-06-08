@@ -31,7 +31,8 @@ export default class Topic {
 
       const noteNotebook = notebooks.find((nb) => nb.id === this._notebookId);
       const noteHasNotebook = !!noteNotebook;
-      const noteHasTopic = noteNotebook.topics.indexOf(topic.id) > -1;
+      const noteHasTopic =
+        noteHasNotebook && noteNotebook.topics.indexOf(topic.id) > -1;
       if (noteHasNotebook && !noteHasTopic) {
         // 1 note can be inside multiple topics
         noteNotebook.topics.push(topic.id);

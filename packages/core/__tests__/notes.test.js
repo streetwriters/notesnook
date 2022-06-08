@@ -325,20 +325,6 @@ test("note content should not contain image base64 data after save", () =>
     expect(content).not.toContain(`src=`);
   }));
 
-test("repairing notebook references should reinclude the missing noteIds", () =>
-  notebookTest().then(async ({ db, id }) => {
-    const notebook = db.notebooks.notebook(id);
-    let note = {
-      ...TEST_NOTE,
-      notebooks: [{ id, topics: [notebook.topics.all[0].id] }],
-    };
-    const noteId = await db.notes.add(note);
-    await db.notes.repairReferences();
-    note = db.notes.note(noteId);
-    expect(notebook.topics.all[0].notes).toHaveLength(0);
-    expect(note.notebooks).toHaveLength(0);
-  }));
-
 test("repairing notebook references should delete non-existent notebooks", () =>
   noteTest({
     ...TEST_NOTE,
@@ -355,7 +341,7 @@ test("adding a note with an invalid tag should clean the tag array", () =>
       db.notes.add({
         ...TEST_NOTE,
         id: "helloworld",
-        tags: ["/.,"],
+        tags: ["    "],
       })
     ).resolves.toBe("helloworld");
 
