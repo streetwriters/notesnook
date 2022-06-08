@@ -19,7 +19,7 @@ try {
 } catch (_) {}
 
 // only run a single instance
-if (app.requestSingleInstanceLock()) {
+if (!app.requestSingleInstanceLock()) {
   app.exit();
 }
 
