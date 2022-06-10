@@ -1,5 +1,6 @@
 import { createRef, MutableRefObject, RefObject } from 'react';
 import { Platform } from 'react-native';
+import { EdgeInsets } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import { db } from '../../../utils/database';
 import { sleep } from '../../../utils/time';
@@ -7,6 +8,13 @@ import { Note } from './types';
 import { getResponse, randId, textInput } from './utils';
 
 type Action = { job: string; id: string };
+
+export type Settings = {
+  readonly: boolean;
+  fullscreen: boolean;
+  deviceMode: string;
+  premium: boolean;
+};
 
 async function call(webview: RefObject<WebView | undefined>, action?: Action) {
   if (!webview || !action) return;
@@ -88,6 +96,29 @@ statusBar.current.set({date:"",saved:""});
     if (element) {
       element.setAttribute("data-placeholder","${placeholder}");
     }
+    `)
+    );
+  };
+
+  setInsets = async (insets: EdgeInsets) => {
+    logger.info('setInsets', insets);
+    await call(
+      this.ref,
+      fn(`
+      if (typeof safeAreaController !== "undefined") {
+        safeAreaController.update(${JSON.stringify(insets)}) 
+      }
+    `)
+    );
+  };
+
+  setSettings = async (settings: Partial<Settings>) => {
+    await call(
+      this.ref,
+      fn(`
+      if (typeof globalThis.settingsController !== "undefined") {
+        globalThis.settingsController.update(${JSON.stringify(settings)}) 
+      }
     `)
     );
   };

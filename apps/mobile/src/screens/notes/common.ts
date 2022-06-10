@@ -58,6 +58,10 @@ export const setOnFirstSave = (
     color?: string;
   } | null
 ) => {
+  if (!data) {
+    editorState().onNoteCreated = null;
+    return;
+  }
   //@ts-ignore
   editorState().onNoteCreated = onNoteCreated(id, data);
 };

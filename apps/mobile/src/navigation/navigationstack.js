@@ -43,9 +43,9 @@ const Tabs = React.memo(
       >
         <Tab.Screen name="Notes" component={Home} />
         <Tab.Screen name="Notebooks" component={Notebooks} />
-        <Tab.Screen name="Favorites" component={Favorites} />
-        <Tab.Screen name="Trash" component={Trash} />
-        <Tab.Screen name="Tags" component={Tags} />
+        <Tab.Screen options={{ lazy: true }} name="Favorites" component={Favorites} />
+        <Tab.Screen options={{ lazy: true }} name="Trash" component={Trash} />
+        <Tab.Screen options={{ lazy: true }} name="Tags" component={Tags} />
         <Tab.Screen name="Settings" component={Settings} />
         <Tab.Screen options={{ lazy: true }} name="TaggedNotes" component={TaggedNotes} />
         <Tab.Screen options={{ lazy: true }} name="TopicNotes" component={TopicNotes} />

@@ -209,7 +209,8 @@ const EditorHeader = ({ editor }) => {
           flexDirection: 'row',
           paddingHorizontal: 12,
           height: 50,
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          display: 'none'
         }}
       >
         <View

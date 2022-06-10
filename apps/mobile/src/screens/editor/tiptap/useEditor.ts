@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import { DDS } from '../../../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
@@ -9,14 +10,11 @@ import { useTagStore } from '../../../stores/use-tag-store';
 import { useThemeStore } from '../../../stores/use-theme-store';
 import { db } from '../../../utils/database';
 import { MMKV } from '../../../utils/database/mmkv';
-import { eOnLoadNote, eOpenTagsDialog } from '../../../utils/events';
-import filesystem from '../../../utils/filesystem';
+import { eOnLoadNote } from '../../../utils/events';
 import { tabBarRef } from '../../../utils/global-refs';
 import { timeConverter } from '../../../utils/time';
-import { AttachmentType } from '../../../utils/types';
 import Commands from './commands';
-import picker from './picker';
-import { EditorState, Note, Content, AppState, SavePayload, EditorMessage } from './types';
+import { AppState, Content, EditorState, Note, SavePayload } from './types';
 import { defaultState, EditorEvents, isEditorLoaded, makeSessionId, post } from './utils';
 
 export const useEditor = () => {
@@ -31,11 +29,16 @@ export const useEditor = () => {
   const state = useRef<Partial<EditorState>>(defaultState);
   const placeholderTip = useRef(TipManager.placeholderTip());
   const tags = useTagStore(state => state.tags);
+  const insets = useSafeAreaInsets();
 
   const postMessage = useCallback(
     async (type: string, data: any) => await post(editorRef, type, data),
     []
   );
+
+  useEffect(() => {
+    commands.setInsets(insets);
+  }, [insets]);
 
   useEffect(() => {
     commands.setTags(currentNote.current);
@@ -235,84 +238,6 @@ export const useEditor = () => {
     };
   }, []);
 
-  const onMessage = useCallback(
-    event => {
-      const data = event.nativeEvent.data;
-      let editorMessage = JSON.parse(data) as EditorMessage;
-
-      logger.info('editor', editorMessage.type);
-      if (editorMessage.sessionId !== sessionId && editorMessage.type !== EditorEvents.status) {
-        logger.error(
-          'editor',
-          'invalid session',
-          editorMessage.type,
-          sessionId,
-          editorMessage.sessionId
-        );
-
-        return;
-      }
-      switch (editorMessage.type) {
-        case EditorEvents.logger:
-          logger.info('editor-webview', editorMessage.value);
-          break;
-        case 'editor-event:content':
-          saveContent({
-            type: editorMessage.type,
-            content: editorMessage.value
-          });
-          break;
-        case 'editor-event:selection':
-          break;
-        case 'editor-event:title':
-          saveContent({
-            type: editorMessage.type,
-            title: editorMessage.value
-          });
-          break;
-        case 'editor-event:newtag':
-          if (!currentNote.current) return;
-          eSendEvent(eOpenTagsDialog, currentNote.current);
-          break;
-        case 'editor-event:tag':
-          if (editorMessage.value) {
-            if (!currentNote.current) return;
-            db.notes
-              //@ts-ignore
-              ?.note(currentNote.current?.id)
-              .untag(editorMessage.value)
-              .then(async () => {
-                useTagStore.getState().setTags();
-                await commands.setTags(currentNote.current);
-                Navigation.queueRoutesForUpdate(
-                  'ColoredNotes',
-                  'Notes',
-                  'TaggedNotes',
-                  'TopicNotes',
-                  'Tags'
-                );
-              });
-          }
-          break;
-        case 'editor-event:picker':
-          picker.pick();
-          break;
-        case 'editor-event:download-attachment':
-          filesystem.downloadAttachment(editorMessage.value?.hash, true);
-          break;
-        default:
-          console.log(
-            'unhandled event recieved from editor: ',
-            editorMessage.type,
-            editorMessage.value
-          );
-          break;
-      }
-      eSendEvent(editorMessage.type, editorMessage);
-    },
-    [sessionId]
-  );
-
   const saveContent = useCallback(
     ({ title, content, type }: { title?: string; content?: string; type: string }) => {
       if (type === EditorEvents.content) {
@@ -354,6 +279,7 @@ export const useEditor = () => {
       loadNote({ ...currentNote.current, forced: true });
     } else {
       await commands.setPlaceholder(placeholderTip.current);
+      commands.setInsets(insets);
       restoreEditorState();
     }
   }, [state, currentNote, loadNote]);
@@ -392,7 +318,6 @@ export const useEditor = () => {
   }
 
   return {
-    onMessage,
     ref: editorRef,
     onLoad,
     commands,
@@ -403,6 +328,7 @@ export const useEditor = () => {
     sessionId,
     setSessionId,
     note: currentNote,
-    onReady
+    onReady,
+    saveContent
   };
 };

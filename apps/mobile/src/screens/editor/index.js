@@ -1,11 +1,12 @@
 import React from 'react';
-import { Platform, View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
 import { useUserStore } from '../../stores/use-user-store';
 import EditorHeader from './header';
 import { useEditor } from './tiptap/use-editor';
 import { editorController } from './tiptap/utils';
+import { useEditorEvents } from './tiptap/use-editor-events';
 
 const sourceUri = '';
 
@@ -23,11 +24,18 @@ const Editor = React.memo(
   () => {
     const premiumUser = useUserStore(state => state.premium);
     const editor = useEditor();
+    const onMessage = useEditorEvents(editor);
     editorController.current = editor;
 
     const onError = () => {
+      console.log('onError');
       editorController.current?.setLoading(true);
       setTimeout(() => editorController.current?.setLoading(false), 10);
+    };
+
+    const onShouldStartLoadWithRequest = request => {
+      Linking.openURL(request.url);
+      return false;
     };
 
     return editor.loading ? null : (
@@ -39,7 +47,6 @@ const Editor = React.memo(
             flex: 1
           }}
         >
-          <EditorHeader editor={editor} />
           <WebView
             testID={notesnook.editor.id}
             ref={editor.ref}
@@ -49,13 +56,16 @@ const Editor = React.memo(
             injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
             javaScriptEnabled={true}
             focusable={true}
+            setSupportMultipleWindows={false}
             overScrollMode="never"
             keyboardDisplayRequiresUserAction={false}
-            // onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+            onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
             cacheMode="LOAD_DEFAULT"
             cacheEnabled={true}
             domStorageEnabled={true}
             bounces={false}
+            setBuiltInZoomControls={false}
+            setDisplayZoomControls={false}
             allowFileAccess={true}
             scalesPageToFit={true}
             renderLoading={() => <View />}
@@ -66,11 +76,11 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: 'http://192.168.10.8:3000'
+              uri: 'http://192.168.10.3:3000'
             }}
             style={style}
             autoManageStatusBarEnabled={false}
-            onMessage={editor.onMessage}
+            onMessage={onMessage}
           />
         </View>
       </>
