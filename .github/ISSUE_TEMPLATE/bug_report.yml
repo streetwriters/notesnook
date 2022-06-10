@@ -1,0 +1,57 @@
+name: Bug Report
+description: Are you facing a bug or a crash in Notesnook?
+title: ""
+labels: ["Type: Bug", "Status: Pending"]
+assignees:
+  - thecodrr
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Tell us what you were trying to do & what happened
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to reproduce the problem
+      description: If we can reproduce it, we can fix it
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of Notesnook are you using?
+      placeholder: v1.8.10 etc
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform/OS
+      description: What platform are you seeing the problem on?
+      multiple: true
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - iOS
+        - Android
+        - Chrome/Chromium
+        - Firefox
+        - Safari
+        - Other browser
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell

@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest a feature you are missing in Notesnook
+title: ""
+labels: ["Type: Feature Request", "Status: Pending"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest this idea!
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you facing?
+      description: Also tell us how this idea will fix the problem & what's the use case.
+      placeholder: e.g. I'm always frustrated when...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: What's the solution you'd like to see in Notesnook?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What alternatives have you considered?
+  - type: textarea
+    id: general
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
