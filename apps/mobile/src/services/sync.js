@@ -12,7 +12,7 @@ export const ignoredMessages = ['Sync already running', 'Not allowed to start se
 const run = async (context = 'global', forced = false, full = true) => {
   let result = false;
   const userstore = useUserStore.getState();
-  const user = db.user.getUser();
+  const user = await db.user.getUser();
   if (!user) {
     initialize();
     return true;
