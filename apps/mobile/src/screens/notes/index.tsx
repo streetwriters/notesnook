@@ -71,7 +71,7 @@ const NotesPage = ({
     onFocus: prev => {
       Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
       syncWithNavigation();
-      if (focusControl) return !prev;
+      if (focusControl) return !prev.current;
       return false;
     },
     onBlur: () => {
