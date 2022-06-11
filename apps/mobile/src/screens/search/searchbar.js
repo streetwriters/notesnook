@@ -77,16 +77,11 @@ export const SearchBar = () => {
   return (
     <View
       style={{
-        height: normalize(50),
+        height: 50,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
         flexShrink: 1,
-        width: '100%',
-        paddingLeft: 6,
-        marginTop: Platform.OS === 'android' ? insets.top + 5 : 5,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.nav
+        width: '100%'
       }}
     >
       <IconButton

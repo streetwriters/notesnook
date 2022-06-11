@@ -36,9 +36,6 @@ export const Search = ({ navigation, route }) => {
 
   return (
     <>
-      <ContainerHeader>
-        <SearchBar />
-      </ContainerHeader>
       <List
         listData={searchResults}
         type="search"

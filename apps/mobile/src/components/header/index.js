@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SearchBar } from '../../screens/search/search-bar';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import useNavigationStore from '../../stores/use-navigation-store';
 import { useSelectionStore } from '../../stores/use-selection-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { eScrollEvent } from '../../utils/events';
@@ -15,6 +17,7 @@ export const Header = React.memo(
     const insets = useSafeAreaInsets();
     const [hide, setHide] = useState(true);
     const selectionMode = useSelectionStore(state => state.selectionMode);
+    const currentScreen = useNavigationStore(state => state.currentScreen);
 
     const onScroll = data => {
       if (data.y > 150) {
@@ -34,25 +37,33 @@ export const Header = React.memo(
     }, [hide]);
 
     return selectionMode ? null : (
-      <View
-        style={[
-          styles.container,
-          {
-            marginTop: Platform.OS === 'android' ? insets.top : null,
-            backgroundColor: colors.bg,
-            overflow: 'hidden',
-            borderBottomWidth: 1,
-            borderBottomColor: hide ? 'transparent' : colors.nav,
-            justifyContent: 'space-between'
-          }
-        ]}
-      >
-        <View style={styles.leftBtnContainer}>
-          <LeftMenus />
-          <Title />
+      <>
+        <View
+          style={[
+            styles.container,
+            {
+              marginTop: Platform.OS === 'android' ? insets.top : null,
+              backgroundColor: colors.bg,
+              overflow: 'hidden',
+              borderBottomWidth: 1,
+              borderBottomColor: hide ? 'transparent' : colors.nav,
+              justifyContent: 'space-between'
+            }
+          ]}
+        >
+          {currentScreen.name === 'Search' ? (
+            <SearchBar />
+          ) : (
+            <>
+              <View style={styles.leftBtnContainer}>
+                <LeftMenus />
+                <Title />
+              </View>
+              <RightMenus />
+            </>
+          )}
         </View>
-        <RightMenus />
-      </View>
+      </>
     );
   },
   () => true
@@ -62,7 +73,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     zIndex: 11,
-    minHeight: 50,
+    height: 50,
+    maxHeight: 50,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 12,
