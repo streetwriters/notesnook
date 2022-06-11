@@ -7,7 +7,11 @@ import { doInBackground } from '../utils';
 import { db } from '../utils/database';
 import { ToastEvent } from './event-manager';
 
-export const ignoredMessages = ['Sync already running', 'Not allowed to start service intent'];
+export const ignoredMessages = [
+  'Sync already running',
+  'Not allowed to start service intent',
+  'WebSocket failed to connect'
+];
 
 const run = async (context = 'global', forced = false, full = true) => {
   let result = false;
