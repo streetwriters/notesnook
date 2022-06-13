@@ -593,6 +593,7 @@ export function showAnnouncementDialog(
   return showDialog("AnnouncementDialog", (Dialog, perform) => (
     <Dialog
       announcement={announcement}
+      removeAnnouncement={() => remove(announcement.id)}
       onClose={(res: boolean) => {
         remove(announcement.id);
         perform(res);

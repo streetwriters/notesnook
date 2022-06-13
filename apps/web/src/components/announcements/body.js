@@ -27,7 +27,11 @@ const features = [
   { icon: Icon.Edit, title: "Rich text editor" },
 ];
 
-export default function AnnouncementBody({ id, components, type }) {
+export default function AnnouncementBody({
+  removeAnnouncement,
+  components,
+  type,
+}) {
   return components
     .filter((item) =>
       item.platforms.some((platform) => allowedPlatforms.indexOf(platform) > -1)
@@ -87,13 +91,18 @@ export default function AnnouncementBody({ id, components, type }) {
           case "description":
             return <Description item={item} fontSize="subtitle" />;
           case "callToActions":
-            return <CalltoActions item={item} />;
+            return (
+              <CalltoActions
+                item={item}
+                removeAnnouncement={removeAnnouncement}
+              />
+            );
           case "features":
             return <Features item={item} />;
           case "text":
             return (
               <Text
-                value={item.text}
+                value={item.value}
                 sx={mapStyle(item.style)}
                 mx={HORIZONTAL_MARGIN}
               />
@@ -177,7 +186,7 @@ function Text({ value, ...restProps }) {
   );
 }
 
-function CalltoActions({ item }) {
+function CalltoActions({ item, removeAnnouncement }) {
   const { actions, style } = item;
   return (
     <Flex
@@ -212,6 +221,7 @@ function CalltoActions({ item }) {
                 mr: 1,
               },
             }}
+            removeAnnouncement={removeAnnouncement}
           />
         ))}
     </Flex>
@@ -250,14 +260,16 @@ function InlineCalltoActions({ item }) {
   );
 }
 
-function CalltoAction({ action, variant, sx }) {
+function CalltoAction({ action, variant, sx, removeAnnouncement }) {
   return (
     <Button
       as={action.type === "link" ? "a" : "button"}
       href={action.type === "link" ? action.data : ""}
+      target="_blank"
       variant={variant}
       sx={sx}
       onClick={async () => {
+        removeAnnouncement();
         closeOpenedDialog();
         trackEvent(ANALYTICS_EVENTS.announcementCta, action.data);
         switch (action.type) {
@@ -265,7 +277,6 @@ function CalltoAction({ action, variant, sx }) {
             const url = new URL(action.data);
             if (url.origin === window.location.origin)
               window.open(action.data, "_self");
-            else window.open(action.data, "_blank");
             break;
           case "promo":
             const [coupon, plan] = action.data.split(":");
