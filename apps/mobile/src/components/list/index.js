@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RefreshControl, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { FastList } from 'superlist';
 import { notesnook } from '../../../e2e/test.ids';
 import { eSendEvent } from '../../services/event-manager';
 import Sync from '../../services/sync';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/events';
@@ -24,6 +25,15 @@ const renderItems = {
   tag: TagItem,
   section: SectionHeader,
   header: SectionHeader
+};
+
+const itemHeights = {
+  notes: 70,
+  notebooks: 100,
+  topics: 80,
+  tags: 80,
+  sections: 40,
+  headers: 40
 };
 
 const RenderItem = ({ item, index, type, ...restArgs }) => {
@@ -65,37 +75,51 @@ const List = ({
 }) => {
   const colors = useThemeStore(state => state.colors);
   const scrollRef = useRef();
-  const [_loading, _setLoading] = useState(true);
+  const [_loading, _setLoading] = useState(false);
 
-  useEffect(() => {
-    let timeout = null;
-    if (!loading) {
-      timeout = setTimeout(
-        () => {
-          _setLoading(false);
-        },
-        listData.length === 0 ? 0 : 300
+  const compactMode =
+    type !== 'notes' && type !== 'notebooks'
+      ? null
+      : useSettingStore(
+          state => state.settings[type === 'notes' ? 'notesListMode' : 'notebooksListMode']
+        );
+
+  const heights = listData.map(item => {
+    let height = itemHeights[item.type + 's'];
+    return item.type !== 'header' ? (compactMode === 'compact' ? 50 : height) : height;
+  });
+
+  // useEffect(() => {
+  //   let timeout = null;
+  //   if (!loading) {
+  //     timeout = setTimeout(
+  //       () => {
+  //         _setLoading(false);
+  //       },
+  //       listData.length === 0 ? 0 : 300
+  //     );
+  //   } else {
+  //     _setLoading(true);
+  //   }
+  //   return () => {
+  //    // clearTimeout(timeout);
+  //   };
+  // }, [loading]);
+
+  const renderRow = React.useCallback(
+    (section, row) => {
+      return (
+        <RenderItem
+          item={listData[row]}
+          index={row}
+          color={headerProps.color}
+          title={headerProps.heading}
+          type={screen === 'Notes' ? 'home' : type}
+          screen={screen}
+        />
       );
-    } else {
-      _setLoading(true);
-    }
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [loading]);
-
-  const renderItem = React.useCallback(
-    ({ item, index }) => (
-      <RenderItem
-        item={item}
-        index={index}
-        color={headerProps.color}
-        title={headerProps.heading}
-        type={screen === 'Notes' ? 'home' : type}
-        screen={screen}
-      />
-    ),
-    []
+    },
+    [headerProps.color, headerProps.heading, listData]
   );
 
   const _onRefresh = async () => {
@@ -124,23 +148,60 @@ const List = ({
     backgroundColor: colors.bg
   };
 
-  const _keyExtractor = item => item.id || item.title;
+  //const _keyExtractor = item => item.id || item.title;
+
+  const renderEmpty = React.useCallback(() => {
+    return (
+      <Empty
+        loading={loading || _loading}
+        placeholderData={placeholderData}
+        headerProps={headerProps}
+        type={type}
+        screen={screen}
+      />
+    );
+  }, [loading, _loading]);
+
+  const renderFooter = React.useCallback(() => {
+    return <Footer />;
+  }, []);
+
+  const renderHeader = React.useCallback(() => {
+    return (
+      <>
+        {ListHeader ? (
+          ListHeader
+        ) : (
+          <Header
+            title={headerProps.heading}
+            color={headerProps.color}
+            type={type}
+            screen={screen}
+            warning={warning}
+          />
+        )}
+      </>
+    );
+  }, [headerProps.heading, headerProps.color]);
+
+  const rowHeight = React.useCallback((section, row) => heights[row], [listData.length]);
 
   return (
     <>
-      <Animated.FlatList
+      <FastList
         style={styles}
-        keyExtractor={_keyExtractor}
         ref={scrollRef}
         testID={notesnook.list.id}
-        data={_loading ? listData.slice(0, 9) : listData}
-        renderItem={renderItem}
+        sections={[listData.length]}
+        batchSize={height => height / 2.2}
+        renderAheadMultiplier={2}
+        renderBehindMultiplier={1}
+        rowHeight={rowHeight}
+        renderRow={renderRow}
         onScroll={_onScroll}
         onMomentumScrollEnd={() => {
           tabBarRef.current?.unlock();
         }}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="interactive"
         refreshControl={
@@ -152,31 +213,9 @@ const List = ({
             refreshing={false}
           />
         }
-        ListEmptyComponent={
-          <Empty
-            loading={loading || _loading}
-            placeholderData={placeholderData}
-            headerProps={headerProps}
-            type={type}
-            screen={screen}
-          />
-        }
-        ListFooterComponent={<Footer />}
-        ListHeaderComponent={
-          <>
-            {ListHeader ? (
-              ListHeader
-            ) : (
-              <Header
-                title={headerProps.heading}
-                color={headerProps.color}
-                type={type}
-                screen={screen}
-                warning={warning}
-              />
-            )}
-          </>
-        }
+        renderEmpty={renderEmpty}
+        renderFooter={renderFooter}
+        renderHeader={renderHeader}
       />
       <JumpToSectionDialog
         screen={screen}
