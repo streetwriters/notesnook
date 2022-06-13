@@ -1,4 +1,5 @@
 import React from 'react';
+import DelayLayout from '../../components/delay-layout';
 import List from '../../components/list';
 import Navigation, { NavigationProps } from '../../services/navigation';
 import SearchService from '../../services/search';
@@ -43,7 +44,7 @@ export const Favorites = ({ navigation, route }: NavigationProps<'Favorites'>) =
   });
 
   return (
-    <>
+    <DelayLayout wait={loading}>
       <List
         listData={favorites}
         type="notes"
@@ -57,7 +58,7 @@ export const Favorites = ({ navigation, route }: NavigationProps<'Favorites'>) =
           heading: 'Favorites'
         }}
       />
-    </>
+    </DelayLayout>
   );
 };
 

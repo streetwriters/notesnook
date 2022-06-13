@@ -51,11 +51,13 @@ const format = (ver: number) => {
 
 export const settingsGroups: SettingSection[] = [
   {
+    id: 'account',
     name: 'account',
     useHook: () => useUserStore(state => state.user),
     hidden: current => !current,
     sections: [
       {
+        id: 'subscription-status',
         useHook: () => useUserStore(state => state.user),
         hidden: current => !current,
         name: current => {
@@ -93,12 +95,14 @@ export const settingsGroups: SettingSection[] = [
         }
       },
       {
+        id: 'account-settings',
         type: 'screen',
         name: 'Account Settings',
         icon: 'account-cog',
         description: 'Manage account',
         sections: [
           {
+            id: 'recovery-key',
             name: 'Save data recovery key',
             modifer: async () => {
               verifyUser(null, async () => {
@@ -109,6 +113,7 @@ export const settingsGroups: SettingSection[] = [
             description: 'Recover your data using the recovery key if your password is lost.'
           },
           {
+            id: 'manage-attachments',
             name: 'Manage attachments',
             icon: 'attachment',
             modifer: () => {
@@ -117,6 +122,7 @@ export const settingsGroups: SettingSection[] = [
             description: 'Manage all attachments in one place.'
           },
           {
+            id: 'change-password',
             name: 'Change password',
             modifer: async () => {
               ChangePassword.present();
@@ -124,12 +130,14 @@ export const settingsGroups: SettingSection[] = [
             description: 'Setup a new password for your account.'
           },
           {
+            id: '2fa-settings',
             type: 'screen',
             name: 'Two factor authentication',
             description: 'Manage 2FA settings',
             icon: 'two-factor-authentication',
             sections: [
               {
+                id: 'enable-2fa',
                 name: 'Enable two-factor authentication',
                 modifer: () => {
                   verifyUser('global', async () => {
@@ -143,6 +151,7 @@ export const settingsGroups: SettingSection[] = [
                 description: 'Increased security for your account'
               },
               {
+                id: '2fa-fallback',
                 name: 'Add fallback 2FA method',
                 useHook: () => useUserStore(state => state.user),
                 hidden: user => {
@@ -157,6 +166,7 @@ export const settingsGroups: SettingSection[] = [
                   'You can use fallback 2FA method incase you are unable to login via primary method'
               },
               {
+                id: 'change-2fa-method',
                 name: 'Reconfigure fallback 2FA method',
                 useHook: () => useUserStore(state => state.user),
                 hidden: user => {
@@ -171,6 +181,7 @@ export const settingsGroups: SettingSection[] = [
                   'You can use fallback 2FA method incase you are unable to login via primary method'
               },
               {
+                id: 'view-2fa-codes',
                 name: 'View recovery codes',
                 modifer: () => {
                   verifyUser('global', async () => {
@@ -184,6 +195,7 @@ export const settingsGroups: SettingSection[] = [
                 description: 'View and save recovery codes for to recover your account'
               },
               {
+                id: 'disabled-2fa',
                 name: 'Disable two-factor authentication',
                 modifer: () => {
                   verifyUser('global', async () => {
@@ -202,6 +214,7 @@ export const settingsGroups: SettingSection[] = [
             ]
           },
           {
+            id: 'subscription-not-active',
             name: 'Subscription not activated?',
             hidden: () => Platform.OS !== 'ios',
             modifer: async () => {
@@ -233,6 +246,7 @@ export const settingsGroups: SettingSection[] = [
             description: 'Verify your subscription to Notesnook Pro'
           },
           {
+            id: 'logout',
             name: 'Log out',
             description: 'Clear all your data and reset the app.',
             icon: 'logout',
@@ -273,6 +287,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: 'delete-account',
             type: 'danger',
             name: 'Delete account',
             icon: 'alert',
@@ -319,6 +334,7 @@ export const settingsGroups: SettingSection[] = [
         ]
       },
       {
+        id: 'sync-issues-fix',
         name: 'Having problems with sync',
         description: 'Try force sync to resolve issues with syncing',
         icon: 'sync-alert',
@@ -331,21 +347,25 @@ export const settingsGroups: SettingSection[] = [
     ]
   },
   {
+    id: 'customize',
     name: 'Customize',
     sections: [
       {
+        id: 'personalization',
         type: 'screen',
         name: 'Theme',
         description: 'Change app look and feel',
         icon: 'shape',
         sections: [
           {
+            id: 'accent-color-picker',
             type: 'component',
             name: 'Accent color',
             description: 'Pick the color that matches your mood',
             component: 'colorpicker'
           },
           {
+            id: 'use-system-theme',
             type: 'switch',
             name: 'Use system theme',
             description: 'Automatically switch to dark mode when system theme changes',
@@ -353,6 +373,7 @@ export const settingsGroups: SettingSection[] = [
             icon: 'circle-half'
           },
           {
+            id: 'enable-dark-mode',
             type: 'switch',
             name: 'Dark mode',
             description: 'Strain your eyes no more at night',
@@ -364,6 +385,7 @@ export const settingsGroups: SettingSection[] = [
             getter: () => useSettingStore.getState().settings.theme.dark
           },
           {
+            id: 'pitch-black',
             type: 'switch',
             name: 'Pitch black',
             description: 'Save battery on device with amoled screen at night.',
@@ -379,11 +401,13 @@ export const settingsGroups: SettingSection[] = [
         ]
       },
       {
+        id: 'behaviour',
         type: 'screen',
         name: 'Behaviour',
         description: 'Change app homepage',
         sections: [
           {
+            id: 'default-home',
             type: 'component',
             name: 'Homepage',
             description: 'Default screen to open on app startup',
@@ -394,9 +418,11 @@ export const settingsGroups: SettingSection[] = [
     ]
   },
   {
+    id: 'privacy-security',
     name: 'Privacy and security',
     sections: [
       {
+        id: 'temeltery',
         type: 'switch',
         name: 'Telemetry',
         icon: 'radar',
@@ -405,12 +431,14 @@ export const settingsGroups: SettingSection[] = [
         property: 'telemetry'
       },
       {
+        id: 'vault',
         type: 'screen',
         name: 'Vault',
         description: 'Multi-layer encryption to most important notes',
         icon: 'key',
         sections: [
           {
+            id: 'create-vault',
             name: 'Create vault',
             description: 'Set a password to create vault and lock notes.',
             icon: 'key',
@@ -428,6 +456,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: 'change-vault-password',
             useHook: useVaultStatus,
             name: 'Change vault password',
             description: 'Setup a new password for your vault.',
@@ -442,6 +471,7 @@ export const settingsGroups: SettingSection[] = [
               })
           },
           {
+            id: 'clear-vault',
             useHook: useVaultStatus,
             name: 'Clear vault',
             description: 'Unlock all locked notes',
@@ -457,6 +487,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: 'delete-vault',
             name: 'Delete vault',
             description: 'Delete vault (and optionally remove all notes).',
             useHook: useVaultStatus,
@@ -472,6 +503,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: 'biometic-unlock',
             type: 'switch',
             name: 'Biometric unlocking',
             icon: 'fingerprint',
@@ -497,6 +529,7 @@ export const settingsGroups: SettingSection[] = [
         ]
       },
       {
+        id: 'privacy-mode',
         type: 'switch',
         icon: 'eye-off-outline',
         name: 'Privacy mode',
@@ -512,6 +545,7 @@ export const settingsGroups: SettingSection[] = [
         property: 'privacyScreen'
       },
       {
+        id: 'app-lock',
         name: 'App lock',
         description: 'Change app lock mode to suit your needs',
         icon: 'fingerprint',
@@ -522,15 +556,18 @@ export const settingsGroups: SettingSection[] = [
     ]
   },
   {
+    id: 'back-restore',
     name: 'Backup and restore',
     sections: [
       {
+        id: 'backups',
         type: 'screen',
         name: 'Backups',
         icon: 'backup-restore',
         description: 'Create a backup or change backup settings',
         sections: [
           {
+            id: 'backup-now',
             name: 'Backup now',
             description: 'Create a backup of your data',
             modifer: async () => {
@@ -543,12 +580,14 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: 'auto-backups',
             type: 'component',
             name: 'Automatic backups',
             description: 'Backup your data once every week or daily automatically.',
             component: 'autobackups'
           },
           {
+            id: 'select-backup-dir',
             name: 'Select backup directory',
             description: 'Select directory to store backups',
             icon: 'folder',
@@ -571,6 +610,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: 'change-backup-dir',
             name: 'Change backup directory',
             description: () => SettingsService.get().backupDirectoryAndroid?.name || '',
             icon: 'folder',
@@ -593,6 +633,7 @@ export const settingsGroups: SettingSection[] = [
             }
           },
           {
+            id: 'enable-backup-encryption',
             type: 'switch',
             name: 'Backup encryption',
             description: 'Encrypt all your backups.',
@@ -618,6 +659,7 @@ export const settingsGroups: SettingSection[] = [
         ]
       },
       {
+        id: 'restore-backup',
         name: 'Restore backup',
         description: `Restore backup from phone storage.`,
         modifer: () => {
@@ -637,10 +679,12 @@ export const settingsGroups: SettingSection[] = [
     ]
   },
   {
+    id: 'productivity',
     name: 'Productivity',
     hidden: () => Platform.OS !== 'android',
     sections: [
       {
+        id: 'notification-notes',
         type: 'switch',
         name: 'Notes in notifications',
         description: `Add quick notes from notifications without opening the app.`,
@@ -659,9 +703,11 @@ export const settingsGroups: SettingSection[] = [
     ]
   },
   {
+    id: 'help-support',
     name: 'Help and support',
     sections: [
       {
+        id: 'report-issue',
         name: 'Report an issue',
         icon: 'bug',
         modifer: () => {
@@ -672,6 +718,7 @@ export const settingsGroups: SettingSection[] = [
         description: 'Faced an issue or have a suggestion? Click here to create a bug report'
       },
       {
+        id: 'docs-link',
         name: 'Documentation',
         modifer: async () => {
           Linking.openURL('https://docs.notesnook.com');
@@ -680,6 +727,7 @@ export const settingsGroups: SettingSection[] = [
         icon: 'file-document'
       },
       {
+        id: 'debug-mode',
         type: 'switch',
         name: 'Debug mode',
         description: 'Show debug options on items',
@@ -688,9 +736,11 @@ export const settingsGroups: SettingSection[] = [
     ]
   },
   {
+    id: 'community',
     name: 'community',
     sections: [
       {
+        id: 'join-telegram',
         name: 'Join our Telegram group',
         description: "We are on telegram, let's talk",
         icon: 'telegram',
@@ -699,6 +749,7 @@ export const settingsGroups: SettingSection[] = [
         }
       },
       {
+        id: 'join-discord',
         name: 'Join our Discord community',
         icon: 'discord',
         modifer: async () => {
@@ -727,9 +778,11 @@ export const settingsGroups: SettingSection[] = [
     ]
   },
   {
+    id: 'legal',
     name: 'legal',
     sections: [
       {
+        id: 'tos',
         name: 'Terms of service',
         modifer: async () => {
           try {
@@ -739,6 +792,7 @@ export const settingsGroups: SettingSection[] = [
         description: 'Read our terms of service'
       },
       {
+        id: 'privacy-policy',
         name: 'Privacy policy',
         modifer: async () => {
           try {
@@ -750,9 +804,11 @@ export const settingsGroups: SettingSection[] = [
     ]
   },
   {
+    id: 'about',
     name: 'about',
     sections: [
       {
+        id: 'download',
         name: 'Download on desktop',
         icon: 'monitor',
         modifer: async () => {
@@ -763,6 +819,7 @@ export const settingsGroups: SettingSection[] = [
         description: 'Get Notesnook app on your desktop and access all notes'
       },
       {
+        id: 'roadmap',
         name: 'Roadmap',
         icon: 'chart-timeline',
         modifer: async () => {
@@ -773,6 +830,7 @@ export const settingsGroups: SettingSection[] = [
         description: 'See what the future of Notesnook is going to be like.'
       },
       {
+        id: 'check-for-updates',
         name: 'Check for updates',
         icon: 'cellphone-arrow-down',
         description: 'Check for new version of Notesnook',
@@ -792,6 +850,7 @@ export const settingsGroups: SettingSection[] = [
         }
       },
       {
+        id: 'app-version',
         name: 'App version',
         icon: 'alpha-v',
         modifer: async () => {

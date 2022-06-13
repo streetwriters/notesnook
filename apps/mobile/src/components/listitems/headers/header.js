@@ -38,9 +38,7 @@ export const Header = React.memo(
         ) : announcements.length !== 0 && !noAnnouncement ? (
           <Announcement color={color || colors.accent} />
         ) : type === 'search' ? null : !shouldShow ? (
-          <Animated.View
-            entering={FadeInUp.delay(500)}
-            exiting={FadeOutUp}
+          <View
             style={{
               marginBottom: 5,
               padding: 0,
@@ -52,7 +50,7 @@ export const Header = React.memo(
             {messageCard ? (
               <Card color={COLORS_NOTE[color?.toLowerCase()] || colors.accent} />
             ) : null}
-          </Animated.View>
+          </View>
         ) : null}
       </>
     );

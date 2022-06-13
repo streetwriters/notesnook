@@ -1,5 +1,6 @@
 import React from 'react';
 import { FloatingButton } from '../../components/container/floating-button';
+import DelayLayout from '../../components/delay-layout';
 import { presentDialog } from '../../components/dialog/functions';
 import List from '../../components/list';
 import { ToastEvent } from '../../services/event-manager';
@@ -61,14 +62,13 @@ export const Trash = ({ navigation, route }: NavigationProps<'Trash'>) => {
         useTrashStore.getState().setTrash();
       }
       SearchService.prepareSearch = prepareSearch;
-      return !prev?.current;
+      return false;
     },
-    onBlur: () => false,
-    delay: SettingsService.get().homepage === route.name ? 1 : -1
+    onBlur: () => false
   });
 
   return (
-    <>
+    <DelayLayout>
       <List
         listData={trash}
         type="trash"
@@ -83,7 +83,7 @@ export const Trash = ({ navigation, route }: NavigationProps<'Trash'>) => {
       {trash && trash.length !== 0 ? (
         <FloatingButton title="Clear all trash" onPress={onPressFloatingButton} shouldShow={true} />
       ) : null}
-    </>
+    </DelayLayout>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { ContainerHeader } from '../../components/container/containerheader';
 import { FloatingButton } from '../../components/container/floating-button';
+import DelayLayout from '../../components/delay-layout';
 import { AddNotebookEvent } from '../../components/dialog-provider/recievers';
 import { Header } from '../../components/header';
 import { RightMenus } from '../../components/header/right-menus';
@@ -63,7 +64,7 @@ export const Notebooks = ({ navigation, route }: NavigationProps<'Notebooks'>) =
   }, [notebooks]);
 
   return (
-    <>
+    <DelayLayout>
       <List
         listData={notebooks}
         type="notebooks"
@@ -78,7 +79,7 @@ export const Notebooks = ({ navigation, route }: NavigationProps<'Notebooks'>) =
       {!notebooks || notebooks.length === 0 || !isFocused ? null : (
         <FloatingButton title="Create a new notebook" onPress={onPressFloatingButton} />
       )}
-    </>
+    </DelayLayout>
   );
 };
 

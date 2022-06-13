@@ -1,5 +1,6 @@
 import React from 'react';
 import { FloatingButton } from '../../components/container/floating-button';
+import DelayLayout from '../../components/delay-layout';
 import { RightMenus } from '../../components/header/right-menus';
 import List from '../../components/list';
 import Navigation, { NavigationProps } from '../../services/navigation';
@@ -46,7 +47,7 @@ export const Home = ({ navigation, route }: NavigationProps<'Notes'>) => {
   });
 
   return (
-    <>
+    <DelayLayout wait={loading} delay={500}>
       <List
         listData={notes}
         type="notes"
@@ -57,10 +58,9 @@ export const Home = ({ navigation, route }: NavigationProps<'Notes'>) => {
         }}
         placeholderData={PLACEHOLDER_DATA}
       />
-      {!notes || notes.length === 0 || !isFocused ? null : (
-        <FloatingButton title="Create a new note" onPress={openEditor} />
-      )}
-    </>
+
+      <FloatingButton title="Create a new note" onPress={openEditor} />
+    </DelayLayout>
   );
 };
 

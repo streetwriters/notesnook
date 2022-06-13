@@ -1,7 +1,5 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import SettingsService from '../../services/settings';
-import useNavigationStore from '../../stores/use-navigation-store';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
 type NavigationFocus = {
   onFocus?: (prev: RefObject<boolean>) => boolean;
@@ -12,7 +10,7 @@ type NavigationFocus = {
 
 export const useNavigationFocus = (
   navigation: NativeStackNavigationProp<any>,
-  { onFocus, onBlur, delay, focusOnInit }: NavigationFocus
+  { onFocus, onBlur, delay, focusOnInit = true }: NavigationFocus
 ) => {
   const [isFocused, setFocused] = useState(focusOnInit);
   const prev = useRef(false);

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ContainerHeader } from '../../components/container/containerheader';
+import DelayLayout from '../../components/delay-layout';
 import List from '../../components/list';
 import SearchService from '../../services/search';
 import useNavigationStore from '../../stores/use-navigation-store';
@@ -7,7 +7,6 @@ import { useSearchStore } from '../../stores/use-search-store';
 import { inputRef } from '../../utils/global-refs';
 import { useNavigationFocus } from '../../utils/hooks/use-navigation-focus';
 import { sleep } from '../../utils/time';
-import { SearchBar } from './search-bar';
 
 export const Search = ({ navigation, route }) => {
   const searchResults = useSearchStore(state => state.searchResults);
@@ -35,7 +34,7 @@ export const Search = ({ navigation, route }) => {
   }, []);
 
   return (
-    <>
+    <DelayLayout wait={searching}>
       <List
         listData={searchResults}
         type="search"
@@ -54,6 +53,6 @@ export const Search = ({ navigation, route }) => {
           loading: 'Searching...'
         }}
       />
-    </>
+    </DelayLayout>
   );
 };

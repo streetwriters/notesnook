@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FloatingButton } from '../../components/container/floating-button';
+import DelayLayout from '../../components/delay-layout';
 import { RightMenus } from '../../components/header/right-menus';
 import List from '../../components/list';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
@@ -55,7 +56,7 @@ const NotesPage = ({
   get,
   placeholderData,
   onPressFloatingButton,
-  focusControl,
+  focusControl = true,
   canGoBack,
   rightButtons
 }: RouteProps<'NotesPage' | 'TaggedNotes' | 'Monographs' | 'ColoredNotes' | 'TopicNotes'>) => {
@@ -63,6 +64,7 @@ const NotesPage = ({
   const [notes, setNotes] = useState<NoteType[]>(get(route.params, true));
   const [warning, setWarning] = useState(!isSynced(route.params));
   const loading = useNoteStore(state => state.loading);
+  const [loadingNotes, setLoadingNotes] = useState(false);
   const alias = getAlias(params.current);
   const isMonograph = route.name === 'Monographs';
   console.log(warning, 'isWarning', isSynced(route.params));
@@ -108,9 +110,11 @@ const NotesPage = ({
 
   const onRequestUpdate = (data?: NotesScreenParams) => {
     if (data) params.current = data;
+    const isNew = data?.item?.id !== params.current?.item?.id;
     params.current.title = params.current.title || params.current.item.title;
     const { item } = params.current;
     try {
+      if (isNew) setLoadingNotes(true);
       let notes = get(params.current, true) as NoteType[];
       if ((item.type === 'tag' || item.type === 'color') && (!notes || notes.length === 0)) {
         return Navigation.goBack();
@@ -120,6 +124,10 @@ const NotesPage = ({
       syncWithNavigation();
     } catch (e) {}
   };
+
+  useEffect(() => {
+    if (loadingNotes) setLoadingNotes(false);
+  }, [notes]);
 
   useEffect(() => {
     eSubscribeEvent(route.name, onRequestUpdate);
@@ -141,7 +149,7 @@ const NotesPage = ({
   };
 
   return (
-    <>
+    <DelayLayout wait={loading || loadingNotes}>
       <List
         listData={notes}
         warning={warning ? WARNING_DATA : null}
@@ -160,7 +168,7 @@ const NotesPage = ({
       {notes?.length > 0 || isFocused ? (
         <FloatingButton title="Create a note" onPress={onPressFloatingButton} />
       ) : null}
-    </>
+    </DelayLayout>
   );
 };
 

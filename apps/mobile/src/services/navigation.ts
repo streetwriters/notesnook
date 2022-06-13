@@ -1,5 +1,6 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { StackActions } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFavoriteStore } from '../stores/use-favorite-store';
 import useNavigationStore, { CurrentScreen, Route, RouteName } from '../stores/use-navigation-store';
 import { useNotebookStore } from '../stores/use-notebook-store';
@@ -63,7 +64,7 @@ export type RouteParams = {
   Monographs: NotesScreenParams;
 };
 
-export type NavigationProps<T extends RouteName> = BottomTabScreenProps<RouteParams, T>;
+export type NavigationProps<T extends RouteName> = NativeStackScreenProps<RouteParams, T>;
 
 /**
  * Functions to update each route when required.
@@ -96,6 +97,7 @@ function routeNeedsUpdate(routeName: Route, callback: () => void) {
   console.log('routeName', routesUpdateQueue);
   if (routesUpdateQueue.indexOf(routeName) > -1) {
     clearRouteFromQueue(routeName);
+    console.log('CALL ROUTE UPDATE');
     callback();
   }
 }
@@ -126,7 +128,8 @@ function queueRoutesForUpdate(...routes: Route[]) {
 function navigate<T extends RouteName>(screen: CurrentScreen, params: RouteParams[T]) {
   useNavigationStore.getState().update(screen, params?.canGoBack);
   if (screen.name === 'Notebook') routeUpdateFunctions['Notebook'](params);
-  if (screen.name.endsWith('Notes')) routeUpdateFunctions[screen.name](params);
+  if (screen.name.endsWith('Notes') && screen.name !== 'Notes')
+    routeUpdateFunctions[screen.name](params);
   //@ts-ignore
   rootNavigatorRef.current?.navigate(screen.name, params);
 }

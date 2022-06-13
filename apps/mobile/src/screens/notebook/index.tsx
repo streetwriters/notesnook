@@ -2,6 +2,7 @@ import { groupArray } from 'notes-core/utils/grouping';
 import { qclone } from 'qclone';
 import React, { useEffect, useRef, useState } from 'react';
 import { FloatingButton } from '../../components/container/floating-button';
+import DelayLayout from '../../components/delay-layout';
 import List from '../../components/list';
 import { NotebookHeader } from '../../components/list-items/headers/notebook-header';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
@@ -87,7 +88,7 @@ const Notebook = ({ route, navigation }: NavigationProps<'Notebook'>) => {
   };
 
   return (
-    <>
+    <DelayLayout>
       <List
         listData={topics}
         type="topics"
@@ -110,7 +111,7 @@ const Notebook = ({ route, navigation }: NavigationProps<'Notebook'>) => {
       />
 
       <FloatingButton title="Add new topic" onPress={onPressFloatingButton} />
-    </>
+    </DelayLayout>
   );
 };
 

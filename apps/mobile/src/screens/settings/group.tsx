@@ -1,49 +1,16 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
-import Animated, { FadeIn, FadeInDown, Layout, ZoomIn } from 'react-native-reanimated';
-import { Empty } from '../../components/list/empty';
+import React, { useEffect } from 'react';
+import { FlatList, View } from 'react-native';
+import DelayLayout from '../../components/delay-layout';
 import useNavigationStore from '../../stores/use-navigation-store';
-import { useThemeStore } from '../../stores/use-theme-store';
 import { tabBarRef } from '../../utils/global-refs';
 import { useNavigationFocus } from '../../utils/hooks/use-navigation-focus';
 import { SectionItem } from './section-item';
 import { RouteParams, SettingSection } from './types';
 
-const useDelayLayout = (delay: number) => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let timeout = setTimeout(() => {
-      setLoading(false);
-    }, delay);
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, []);
-
-  return loading;
-};
-
-const Loading = () => {
-  const colors = useThemeStore(state => state.colors.accent);
-
-  return (
-    <Empty
-      placeholderData={{
-        paragraph: 'Personalize Notesnook the way you wish to.',
-        heading: 'Minimal & meaningful',
-        loading: 'Personalize Notesnook the way you wish to.'
-      }}
-      headerProps={{
-        color: 'accent'
-      }}
-    />
-  );
-};
+const keyExtractor = (item: SettingSection, index: number) => item.id;
 
 const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'SettingsGroup'>) => {
-  const loading = useDelayLayout(300);
   useNavigationFocus(navigation, {
     onFocus: () => {
       tabBarRef.current?.lock();
@@ -68,20 +35,18 @@ const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Setti
     <SectionItem item={item} />
   );
 
-  return loading ? (
-    <Loading />
-  ) : (
-    <View>
-      {route.params.sections ? (
-        <Animated.View entering={FadeInDown}>
+  return (
+    <DelayLayout>
+      <View>
+        {route.params.sections ? (
           <FlatList
             data={route.params.sections}
-            keyExtractor={(item, index) => item.name || index.toString()}
+            keyExtractor={keyExtractor}
             renderItem={renderItem}
           />
-        </Animated.View>
-      ) : null}
-    </View>
+        ) : null}
+      </View>
+    </DelayLayout>
   );
 };
 

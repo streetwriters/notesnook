@@ -2,9 +2,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { Bar } from 'react-native-progress';
-import { ContainerHeader } from '../../components/container/containerheader';
+import DelayLayout from '../../components/delay-layout';
 import BaseDialog from '../../components/dialog/base-dialog';
-import { Header } from '../../components/header';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
@@ -17,6 +16,8 @@ import { settingsGroups } from './settings-data';
 import { RouteParams, SettingSection } from './types';
 import SettingsUserSection from './user-section';
 
+const keyExtractor = (item: SettingSection, index: number) => item.id;
+
 const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'SettingsHome'>) => {
   const colors = useThemeStore(state => state.colors);
   const [loading, setLoading] = useState(false);
@@ -26,15 +27,16 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
       useNavigationStore.getState().update({
         name: 'Settings'
       });
-      return true;
+      return false;
     },
     onBlur: () => {
       flatlistRef.current?.scrollToOffset({
         offset: 0,
         animated: false
       });
-      return navigation.getState().index === 0;
-    }
+      return false;
+    },
+    focusOnInit: true
   });
 
   const renderItem = ({ item, index }: { item: SettingSection; index: number }) =>
@@ -48,59 +50,58 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
   }, []);
 
   return (
-    <View>
-      {loading && (
-        <BaseDialog animated={false} bounce={false} visible={true}>
-          <View
-            style={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: colors.bg,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-            <Heading color={colors.pri} size={SIZE.lg}>
-              Logging out
-            </Heading>
-            <Paragraph color={colors.icon}>
-              Please wait while we log out and clear app data.
-            </Paragraph>
+    <DelayLayout type="settings">
+      <View>
+        {loading && (
+          //@ts-ignore
+          <BaseDialog animated={false} bounce={false} visible={true}>
             <View
               style={{
-                flexDirection: 'row',
-                width: 100,
-                marginTop: 15
+                width: '100%',
+                height: '100%',
+                backgroundColor: colors.bg,
+                justifyContent: 'center',
+                alignItems: 'center'
               }}
             >
-              <Bar
-                height={5}
-                width={100}
-                animated={true}
-                useNativeDriver
-                indeterminate
-                indeterminateAnimationDuration={2000}
-                unfilledColor={colors.nav}
-                color={colors.accent}
-                borderWidth={0}
-              />
+              <Heading color={colors.pri} size={SIZE.lg}>
+                Logging out
+              </Heading>
+              <Paragraph color={colors.icon}>
+                Please wait while we log out and clear app data.
+              </Paragraph>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  width: 100,
+                  marginTop: 15
+                }}
+              >
+                <Bar
+                  height={5}
+                  width={100}
+                  animated={true}
+                  useNativeDriver
+                  indeterminate
+                  indeterminateAnimationDuration={2000}
+                  unfilledColor={colors.nav}
+                  color={colors.accent}
+                  borderWidth={0}
+                />
+              </View>
             </View>
-          </View>
-        </BaseDialog>
-      )}
+          </BaseDialog>
+        )}
 
-      <FlatList
-        data={isFocused ? settingsGroups : settingsGroups.slice(0, 3)}
-        ref={flatlistRef}
-        keyExtractor={(item, index) =>
-          typeof item.name === 'function'
-            ? item.name({}) || index.toString()
-            : item.name || index.toString()
-        }
-        ListFooterComponent={<View style={{ height: 200 }} />}
-        renderItem={renderItem}
-      />
-    </View>
+        <FlatList
+          data={settingsGroups}
+          ref={flatlistRef}
+          keyExtractor={keyExtractor}
+          ListFooterComponent={<View style={{ height: 200 }} />}
+          renderItem={renderItem}
+        />
+      </View>
+    </DelayLayout>
   );
 };
 

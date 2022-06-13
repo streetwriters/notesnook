@@ -1,4 +1,5 @@
 import React from 'react';
+import DelayLayout from '../../components/delay-layout';
 import List from '../../components/list';
 import Navigation, { NavigationProps } from '../../services/navigation';
 import SearchService from '../../services/search';
@@ -41,7 +42,7 @@ export const Tags = ({ navigation, route }: NavigationProps<'Tags'>) => {
   });
 
   return (
-    <>
+    <DelayLayout>
       <List
         listData={tags}
         type="tags"
@@ -52,7 +53,7 @@ export const Tags = ({ navigation, route }: NavigationProps<'Tags'>) => {
         screen="Tags"
         placeholderData={PLACEHOLDER_DATA}
       />
-    </>
+    </DelayLayout>
   );
 };
 
