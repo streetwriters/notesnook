@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Container from '../components/container';
 import Favorites from '../screens/favorites';
@@ -18,12 +19,14 @@ import { eSendEvent } from '../services/event-manager';
 import SettingsService from '../services/settings';
 import useNavigationStore from '../stores/use-navigation-store';
 import { useSelectionStore } from '../stores/use-selection-store';
+import { useThemeStore } from '../stores/use-theme-store';
 import { history } from '../utils';
 import { rootNavigatorRef } from '../utils/global-refs';
 import { hideAllTooltips } from '../utils/hooks/use-tooltip';
-const Tab = createBottomTabNavigator();
+const NativeStack = createNativeStackNavigator();
 const Tabs = React.memo(
   () => {
+    const colors = useThemeStore(state => state.colors);
     const homepage = SettingsService.get().homepage;
     React.useEffect(() => {
       setTimeout(() => {
@@ -32,28 +35,32 @@ const Tabs = React.memo(
     }, []);
 
     return (
-      <Tab.Navigator
+      <NativeStack.Navigator
         tabBar={() => null}
         initialRouteName={homepage}
         backBehavior="history"
         screenOptions={{
           headerShown: false,
-          lazy: false
+          lazy: false,
+          animation: 'none',
+          contentStyle: {
+            backgroundColor: colors.bg
+          }
         }}
       >
-        <Tab.Screen name="Notes" component={Home} />
-        <Tab.Screen name="Notebooks" component={Notebooks} />
-        <Tab.Screen options={{ lazy: true }} name="Favorites" component={Favorites} />
-        <Tab.Screen options={{ lazy: true }} name="Trash" component={Trash} />
-        <Tab.Screen options={{ lazy: true }} name="Tags" component={Tags} />
-        <Tab.Screen name="Settings" component={Settings} />
-        <Tab.Screen options={{ lazy: true }} name="TaggedNotes" component={TaggedNotes} />
-        <Tab.Screen options={{ lazy: true }} name="TopicNotes" component={TopicNotes} />
-        <Tab.Screen options={{ lazy: true }} name="ColoredNotes" component={ColoredNotes} />
-        <Tab.Screen options={{ lazy: true }} name="Monographs" component={Monographs} />
-        <Tab.Screen options={{ lazy: true }} name="Notebook" component={Notebook} />
-        <Tab.Screen options={{ lazy: true }} name="Search" component={Search} />
-      </Tab.Navigator>
+        <NativeStack.Screen name="Notes" component={Home} />
+        <NativeStack.Screen name="Notebooks" component={Notebooks} />
+        <NativeStack.Screen options={{ lazy: true }} name="Favorites" component={Favorites} />
+        <NativeStack.Screen options={{ lazy: true }} name="Trash" component={Trash} />
+        <NativeStack.Screen options={{ lazy: true }} name="Tags" component={Tags} />
+        <NativeStack.Screen name="Settings" component={Settings} />
+        <NativeStack.Screen options={{ lazy: true }} name="TaggedNotes" component={TaggedNotes} />
+        <NativeStack.Screen options={{ lazy: true }} name="TopicNotes" component={TopicNotes} />
+        <NativeStack.Screen options={{ lazy: true }} name="ColoredNotes" component={ColoredNotes} />
+        <NativeStack.Screen options={{ lazy: true }} name="Monographs" component={Monographs} />
+        <NativeStack.Screen options={{ lazy: true }} name="Notebook" component={Notebook} />
+        <NativeStack.Screen options={{ lazy: true }} name="Search" component={Search} />
+      </NativeStack.Navigator>
     );
   },
   () => true
