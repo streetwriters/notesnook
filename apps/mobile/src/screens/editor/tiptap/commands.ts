@@ -17,7 +17,7 @@ export type Settings = {
 };
 
 async function call(webview: RefObject<WebView | undefined>, action?: Action) {
-  if (!webview || !action) return;
+  if (!webview.current || !action) return;
   setImmediate(() => webview.current?.injectJavaScript(action.job));
   let response = await getResponse(action.id);
   console.log('webview job: ', action.id, response ? response.value : response);
