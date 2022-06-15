@@ -13,6 +13,7 @@ import Config from "./utils/config";
 import EditorLoading from "./components/editor/loading";
 import NavigationMenuPlaceholder from "./components/navigationmenu/index.lite";
 import { useStore } from "./stores/app-store";
+import { Toaster } from "react-hot-toast";
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")
@@ -63,6 +64,7 @@ function App() {
               show={show}
             />
           )}
+          <Toaster />
         </Flex>
       </ThemeProvider>
     </LazyMotion>
