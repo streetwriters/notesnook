@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect } from 'react';
 import { FlatList, View } from 'react-native';
+import Animated, { FadeInDown, FadeOut, FadeOutDown } from 'react-native-reanimated';
 import DelayLayout from '../../components/delay-layout';
 import useNavigationStore from '../../stores/use-navigation-store';
 import { tabBarRef } from '../../utils/global-refs';
@@ -37,14 +38,16 @@ const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Setti
   );
 
   return (
-    <DelayLayout>
+    <DelayLayout type="settings" delay={100}>
       <View
         style={{
           flex: 1
         }}
       >
         {route.params.sections ? (
-          <FlatList
+          <Animated.FlatList
+            entering={FadeInDown}
+            exiting={FadeOutDown}
             data={route.params.sections}
             keyExtractor={keyExtractor}
             renderItem={renderItem}

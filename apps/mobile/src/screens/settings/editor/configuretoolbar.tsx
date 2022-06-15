@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { DraxProvider, DraxScrollView } from 'react-native-drax';
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { Button } from '../../../components/ui/button';
 import { Notice } from '../../../components/ui/notice';
 import Paragraph from '../../../components/ui/typography/paragraph';
@@ -20,7 +21,7 @@ export const ConfigureToolbar = () => {
 
   return (
     <DraxProvider>
-      <View style={styles.container}>
+      <Animated.View entering={FadeInDown} exiting={FadeOutDown} style={styles.container}>
         <View
           style={{
             paddingVertical: 12
@@ -103,7 +104,7 @@ export const ConfigureToolbar = () => {
             />
           </View>
         </DraxScrollView>
-      </View>
+      </Animated.View>
     </DraxProvider>
   );
 };

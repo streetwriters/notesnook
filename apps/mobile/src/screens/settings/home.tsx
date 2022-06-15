@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { Bar } from 'react-native-progress';
+import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import DelayLayout from '../../components/delay-layout';
 import BaseDialog from '../../components/dialog/base-dialog';
 import Heading from '../../components/ui/typography/heading';
@@ -21,7 +22,6 @@ const keyExtractor = (item: SettingSection, index: number) => item.id;
 const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'SettingsHome'>) => {
   const colors = useThemeStore(state => state.colors);
   const [loading, setLoading] = useState(false);
-  const flatlistRef = useRef<FlatList<SettingSection>>(null);
 
   useNavigationFocus(navigation, {
     onFocus: () => {
@@ -44,7 +44,7 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
   }, []);
 
   return (
-    <DelayLayout type="settings">
+    <DelayLayout delay={100} type="settings">
       <View>
         {loading && (
           //@ts-ignore
@@ -87,9 +87,10 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
           </BaseDialog>
         )}
 
-        <FlatList
+        <Animated.FlatList
+          entering={FadeInDown}
+          exiting={FadeOutDown}
           data={settingsGroups}
-          ref={flatlistRef}
           keyExtractor={keyExtractor}
           ListFooterComponent={<View style={{ height: 200 }} />}
           renderItem={renderItem}
