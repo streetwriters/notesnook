@@ -17,7 +17,7 @@ export const Header = React.memo(
     const insets = useSafeAreaInsets();
     const [hide, setHide] = useState(true);
     const selectionMode = useSelectionStore(state => state.selectionMode);
-    const currentScreen = useNavigationStore(state => state.currentScreen);
+    const currentScreen = useNavigationStore(state => state.currentScreen?.name);
 
     const onScroll = data => {
       if (data.y > 150) {
@@ -51,7 +51,7 @@ export const Header = React.memo(
             }
           ]}
         >
-          {currentScreen.name === 'Search' ? (
+          {currentScreen === 'Search' ? (
             <SearchBar />
           ) : (
             <>
