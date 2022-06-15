@@ -205,19 +205,20 @@ const Launcher = React.memo(
     };
 
     const checkNeedsBackup = async () => {
-      let { nextBackupRequestTime, reminder } = SettingsService.get();
-      if (reminder === 'off' || !reminder) {
-        if (nextBackupRequestTime < Date.now()) {
-          presentSheet({
-            title: 'Backup & restore',
-            paragraph: 'Please enable automatic backups to keep your data safe',
-            component: <SettingsBackupAndRestore isSheet={true} />
-          });
-
-          return true;
-        }
-      }
       return false;
+      // let { nextBackupRequestTime, reminder } = SettingsService.get();
+      // if (reminder === 'off' || !reminder) {
+      //   if (nextBackupRequestTime < Date.now()) {
+      //     presentSheet({
+      //       title: 'Backup & restore',
+      //       paragraph: 'Please enable automatic backups to keep your data safe',
+      //       component: <SettingsBackupAndRestore isSheet={true} />
+      //     });
+
+      //     return true;
+      //   }
+      // }
+      // return false;
     };
 
     const onUnlockBiometrics = async () => {
