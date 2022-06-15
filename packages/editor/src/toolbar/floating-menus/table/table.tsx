@@ -1,25 +1,24 @@
 import { useEffect, useState } from "react";
 import { Flex } from "rebass";
-import { MenuPresenter } from "../../../components/menu/menu";
-import { MenuOptions } from "../../../components/menu/useMenu";
 // import { ColorPicker, DEFAULT_COLORS } from "../tools/colors";
 import { FloatingMenuProps } from "../types";
+import { useToolbarLocation } from "../../stores/toolbar-store";
+import { PositionOptions } from "../../../utils/position";
+import { PopupPresenter } from "../../../components/popup-presenter";
+import { getToolbarElement } from "../../utils/dom";
 import {
   ColumnProperties,
   InsertColumnRight,
   InsertRowBelow,
   RowProperties,
-} from "./tools";
-import { getToolbarElement } from "../../utils/dom";
-import { useToolbarContext } from "../../hooks/useToolbarContext";
-import { useToolbarLocation } from "../../stores/toolbar-store";
+  TableProperties,
+} from "../../tools/table";
+import { getToolDefinition } from "../../tool-definitions";
 
 export function TableRowFloatingMenu(props: FloatingMenuProps) {
   const { editor } = props;
   // const theme = editor.storage.theme as Theme;
-  const [position, setPosition] = useState<MenuOptions["position"] | null>(
-    null
-  );
+  const [position, setPosition] = useState<PositionOptions | null>(null);
 
   useEffect(() => {
     if (
@@ -54,14 +53,12 @@ export function TableRowFloatingMenu(props: FloatingMenuProps) {
   if (!position) return null;
 
   return (
-    <MenuPresenter
+    <PopupPresenter
       isOpen
-      items={[]}
+      blocking={false}
+      focusOnRender={false}
       onClose={() => {}}
-      options={{
-        type: "autocomplete",
-        position,
-      }}
+      position={position}
     >
       <Flex
         sx={{
@@ -75,27 +72,24 @@ export function TableRowFloatingMenu(props: FloatingMenuProps) {
         }}
       >
         <RowProperties
-          title="Row properties"
-          editor={editor}
-          variant="small"
+          {...getToolDefinition("rowProperties")}
           icon="more"
+          variant="small"
+          editor={editor}
         />
         <InsertRowBelow
-          title="Insert row below"
-          icon="insertRowBelow"
+          {...getToolDefinition("insertRowBelow")}
           editor={editor}
           variant="small"
         />
       </Flex>
-    </MenuPresenter>
+    </PopupPresenter>
   );
 }
 
 export function TableColumnFloatingMenu(props: FloatingMenuProps) {
   const { editor } = props;
-  const [position, setPosition] = useState<MenuOptions["position"] | null>(
-    null
-  );
+  const [position, setPosition] = useState<PositionOptions | null>(null);
 
   useEffect(() => {
     if (
@@ -135,14 +129,12 @@ export function TableColumnFloatingMenu(props: FloatingMenuProps) {
   if (!position) return null;
 
   return (
-    <MenuPresenter
+    <PopupPresenter
       isOpen
-      items={[]}
       onClose={() => {}}
-      options={{
-        type: "autocomplete",
-        position,
-      }}
+      blocking={false}
+      position={position}
+      focusOnRender={false}
     >
       <Flex
         sx={{
@@ -156,21 +148,20 @@ export function TableColumnFloatingMenu(props: FloatingMenuProps) {
           },
         }}
       >
-        <ColumnProperties
-          currentCell={position.target as HTMLElement}
-          title="Column properties"
+        <TableProperties
           editor={editor}
+          title="tableProperties"
           icon="more"
           variant={"small"}
         />
         <InsertColumnRight
+          {...getToolDefinition("insertColumnRight")}
           editor={editor}
-          title="Insert column right"
           variant={"small"}
           icon="plus"
         />
       </Flex>
-    </MenuPresenter>
+    </PopupPresenter>
   );
 }
 
@@ -179,18 +170,16 @@ export function TableFloatingMenu(props: FloatingMenuProps) {
   const toolbarLocation = useToolbarLocation();
   if (!editor.isActive("table")) return null;
   return (
-    <MenuPresenter
+    <PopupPresenter
       isOpen
-      items={[]}
       onClose={() => {}}
-      options={{
-        type: "autocomplete",
-        position: {
-          isTargetAbsolute: true,
-          target: getToolbarElement(),
-          location: toolbarLocation === "bottom" ? "top" : "below",
-        },
+      blocking={false}
+      position={{
+        isTargetAbsolute: true,
+        target: getToolbarElement(),
+        location: toolbarLocation === "bottom" ? "top" : "below",
       }}
+      focusOnRender={false}
     >
       <Flex
         sx={{
@@ -204,7 +193,7 @@ export function TableFloatingMenu(props: FloatingMenuProps) {
           },
         }}
       >
-        <RowProperties
+        {/* <RowProperties
           title="Row properties"
           editor={editor}
           variant="normal"
@@ -227,8 +216,8 @@ export function TableFloatingMenu(props: FloatingMenuProps) {
           title="Insert column right"
           variant={"normal"}
           icon="insertColumnRight"
-        />
+        /> */}
       </Flex>
-    </MenuPresenter>
+    </PopupPresenter>
   );
 }

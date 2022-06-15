@@ -29,20 +29,14 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { Box, Flex, Image } from "rebass";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
-import { useEffect, useRef, useState } from "react";
-import { PopupPresenter } from "../../components/menu/menu";
-import { Popup } from "../../toolbar/components/popup";
+import { useRef, useState } from "react";
+import { ResponsivePresenter } from "../../components/responsive";
 import { ImageProperties } from "../../toolbar/popups/image-properties";
+import { Popup } from "../../toolbar/components/popup";
 export function ImageComponent(props) {
-    var _a = props.node.attrs, src = _a.src, alt = _a.alt, title = _a.title, width = _a.width, height = _a.height, align = _a.align, float = _a.float;
-    var editor = props.editor, updateAttributes = props.updateAttributes;
+    var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, selected = props.selected;
+    var _a = node.attrs, src = _a.src, alt = _a.alt, title = _a.title, width = _a.width, height = _a.height, align = _a.align, float = _a.float;
     var imageRef = useRef();
-    var isActive = editor.isActive("image", { src: src });
-    var _b = __read(useState(), 2), isToolbarVisible = _b[0], setIsToolbarVisible = _b[1];
-    var theme = editor.storage.theme;
-    useEffect(function () {
-        setIsToolbarVisible(isActive);
-    }, [isActive]);
     return (_jsx(_Fragment, { children: _jsx(Box, __assign({ sx: {
                 display: float ? "block" : "flex",
                 justifyContent: float
@@ -62,8 +56,8 @@ export function ImageComponent(props) {
                         width: ref.clientWidth,
                         height: ref.clientHeight,
                     });
-                }, lockAspectRatio: true }, { children: [_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: isToolbarVisible && (_jsx(ImageToolbar, { editor: editor, float: float, align: align, height: height || 0, width: width || 0 })) })), _jsx(Image, __assign({ ref: imageRef, src: src, alt: alt, title: title, width: "100%", height: "100%", sx: {
-                            border: isActive
+                }, lockAspectRatio: true }, { children: [selected && (_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(ImageToolbar, { editor: editor, float: float, align: align, height: height || 0, width: width || 0 }) }))), _jsx(Image, __assign({ ref: imageRef, src: src, alt: alt, title: title, width: "100%", height: "100%", sx: {
+                            border: selected
                                 ? "2px solid var(--primary)"
                                 : "2px solid transparent",
                             borderRadius: "default",
@@ -72,7 +66,8 @@ export function ImageComponent(props) {
 function ImageToolbar(props) {
     var editor = props.editor, float = props.float, height = props.height, width = props.width;
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    return (_jsxs(Flex, __assign({ sx: {
+    var ref = useRef();
+    return (_jsxs(Flex, __assign({ ref: ref, sx: {
             flexDirection: "column",
             position: "absolute",
             top: -40,
@@ -105,10 +100,13 @@ function ImageToolbar(props) {
                             mr: 1,
                             borderRight: "1px solid var(--border)",
                             ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
-                        } }, { children: _jsx(ToolButton, { toggled: isOpen, title: "Image properties", id: "imageProperties", icon: "more", onClick: function () { return setIsOpen(function (s) { return !s; }); } }) }))] })), _jsx(PopupPresenter, __assign({ mobile: "sheet", desktop: "none", isOpen: isOpen, onClose: function () { return setIsOpen(false); }, blocking: false }, { children: _jsx(Popup, __assign({ title: "Image properties", action: {
-                        icon: "close",
-                        onClick: function () {
-                            setIsOpen(false);
-                        },
+                        } }, { children: _jsx(ToolButton, { toggled: isOpen, title: "Image properties", id: "imageProperties", icon: "more", onClick: function () { return setIsOpen(function (s) { return !s; }); } }) }))] })), _jsx(ResponsivePresenter, __assign({ isOpen: isOpen, desktop: "menu", mobile: "sheet", onClose: function () { return setIsOpen(false); }, blocking: true, focusOnRender: false, position: {
+                    target: ref.current || "mouse",
+                    align: "start",
+                    location: "below",
+                    yOffset: 10,
+                    isTargetAbsolute: true,
+                } }, { children: _jsx(Popup, __assign({ title: "Image properties", onClose: function () {
+                        setIsOpen(false);
                     } }, { children: _jsx(ImageProperties, __assign({}, props)) })) }))] })));
 }

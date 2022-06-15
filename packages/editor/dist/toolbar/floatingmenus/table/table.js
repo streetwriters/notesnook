@@ -28,10 +28,11 @@ var __read = (this && this.__read) || function (o, n) {
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from "react";
 import { Flex } from "rebass";
-import { MenuPresenter } from "../../../components/menu/menu";
-import { ColumnProperties, InsertColumnRight, InsertRowBelow, RowProperties, } from "./tools";
-import { getToolbarElement } from "../../utils/dom";
 import { useToolbarLocation } from "../../stores/toolbar-store";
+import { PopupPresenter } from "../../../components/popup-presenter";
+import { getToolbarElement } from "../../utils/dom";
+import { InsertColumnRight, InsertRowBelow, RowProperties, TableProperties, } from "../../tools/table";
+import { getToolDefinition } from "../../tool-definitions";
 export function TableRowFloatingMenu(props) {
     var editor = props.editor;
     // const theme = editor.storage.theme as Theme;
@@ -64,10 +65,7 @@ export function TableRowFloatingMenu(props) {
     }, [editor.state.selection]);
     if (!position)
         return null;
-    return (_jsx(MenuPresenter, __assign({ isOpen: true, items: [], onClose: function () { }, options: {
-            type: "autocomplete",
-            position: position,
-        } }, { children: _jsxs(Flex, __assign({ sx: {
+    return (_jsx(PopupPresenter, __assign({ isOpen: true, blocking: false, focusOnRender: false, onClose: function () { }, position: position }, { children: _jsxs(Flex, __assign({ sx: {
                 bg: "background",
                 flexWrap: "nowrap",
                 borderRadius: "default",
@@ -75,7 +73,7 @@ export function TableRowFloatingMenu(props) {
                 ":hover": {
                     opacity: 1,
                 },
-            } }, { children: [_jsx(RowProperties, { title: "Row properties", editor: editor, variant: "small", icon: "more" }), _jsx(InsertRowBelow, { title: "Insert row below", icon: "insertRowBelow", editor: editor, variant: "small" })] })) })));
+            } }, { children: [_jsx(RowProperties, __assign({}, getToolDefinition("rowProperties"), { icon: "more", variant: "small", editor: editor })), _jsx(InsertRowBelow, __assign({}, getToolDefinition("insertRowBelow"), { editor: editor, variant: "small" }))] })) })));
 }
 export function TableColumnFloatingMenu(props) {
     var editor = props.editor;
@@ -110,10 +108,7 @@ export function TableColumnFloatingMenu(props) {
     }, [editor.state.selection]);
     if (!position)
         return null;
-    return (_jsx(MenuPresenter, __assign({ isOpen: true, items: [], onClose: function () { }, options: {
-            type: "autocomplete",
-            position: position,
-        } }, { children: _jsxs(Flex, __assign({ sx: {
+    return (_jsx(PopupPresenter, __assign({ isOpen: true, onClose: function () { }, blocking: false, position: position, focusOnRender: false }, { children: _jsxs(Flex, __assign({ sx: {
                 bg: "background",
                 flexWrap: "nowrap",
                 borderRadius: "default",
@@ -122,21 +117,18 @@ export function TableColumnFloatingMenu(props) {
                 ":hover": {
                     opacity: 1,
                 },
-            } }, { children: [_jsx(ColumnProperties, { currentCell: position.target, title: "Column properties", editor: editor, icon: "more", variant: "small" }), _jsx(InsertColumnRight, { editor: editor, title: "Insert column right", variant: "small", icon: "plus" })] })) })));
+            } }, { children: [_jsx(TableProperties, { editor: editor, title: "tableProperties", icon: "more", variant: "small" }), _jsx(InsertColumnRight, __assign({}, getToolDefinition("insertColumnRight"), { editor: editor, variant: "small", icon: "plus" }))] })) })));
 }
 export function TableFloatingMenu(props) {
     var editor = props.editor;
     var toolbarLocation = useToolbarLocation();
     if (!editor.isActive("table"))
         return null;
-    return (_jsx(MenuPresenter, __assign({ isOpen: true, items: [], onClose: function () { }, options: {
-            type: "autocomplete",
-            position: {
-                isTargetAbsolute: true,
-                target: getToolbarElement(),
-                location: toolbarLocation === "bottom" ? "top" : "below",
-            },
-        } }, { children: _jsxs(Flex, __assign({ sx: {
+    return (_jsx(PopupPresenter, __assign({ isOpen: true, onClose: function () { }, blocking: false, position: {
+            isTargetAbsolute: true,
+            target: getToolbarElement(),
+            location: toolbarLocation === "bottom" ? "top" : "below",
+        }, focusOnRender: false }, { children: _jsx(Flex, { sx: {
                 bg: "background",
                 flexWrap: "nowrap",
                 borderRadius: "default",
@@ -145,5 +137,5 @@ export function TableFloatingMenu(props) {
                 ":hover": {
                     opacity: 1,
                 },
-            } }, { children: [_jsx(RowProperties, { title: "Row properties", editor: editor, variant: "normal", icon: "rowProperties" }), _jsx(InsertRowBelow, { title: "Insert row below", icon: "insertRowBelow", editor: editor, variant: "normal" }), _jsx(ColumnProperties, { title: "Column properties", editor: editor, icon: "columnProperties", variant: "normal" }), _jsx(InsertColumnRight, { editor: editor, title: "Insert column right", variant: "normal", icon: "insertColumnRight" })] })) })));
+            } }) })));
 }

@@ -1,14 +1,3 @@
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -25,11 +14,10 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx } from "react/jsx-runtime";
 import { Dropdown } from "../components/dropdown";
-import { Flex, Text } from "rebass";
-import { ToolButton } from "../components/tool-button";
 import { useCallback } from "react";
+import { Counter } from "../components/counter";
 var defaultFontSizes = [
     8, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 60, 72, 100,
 ];
@@ -40,23 +28,15 @@ export function FontSize(props) {
     var decreaseFontSize = useCallback(function () {
         return Math.max(8, fontSizeAsNumber - 1);
     }, [fontSizeAsNumber]);
-    return (_jsxs(Flex, __assign({ sx: {
-            alignItems: "center",
-            mr: 1,
-            ":last-of-type": {
-                mr: 0,
-            },
-        } }, { children: [_jsx(ToolButton, { toggled: false, title: "Decrease font size", icon: "minus", variant: "small", onClick: function () {
-                    editor.chain().focus().setFontSize("".concat(decreaseFontSize(), "px")).run();
-                } }), _jsx(Text, __assign({ variant: "body", sx: { fontSize: "subBody", mx: 1, textAlign: "center" }, title: "Reset font size", onClick: function () {
-                    editor.chain().focus().setFontSize("16px").run();
-                } }, { children: fontSize })), _jsx(ToolButton, { toggled: false, title: "Increase font size", icon: "plus", variant: "small", onClick: function () {
-                    editor
-                        .chain()
-                        .focus()
-                        .setFontSize("".concat(fontSizeAsNumber + 1, "px"))
-                        .run();
-                } })] })));
+    return (_jsx(Counter, { title: "font size", onDecrease: function () {
+            return editor.chain().focus().setFontSize("".concat(decreaseFontSize(), "px")).run();
+        }, onIncrease: function () {
+            return editor
+                .chain()
+                .focus()
+                .setFontSize("".concat(fontSizeAsNumber + 1, "px"))
+                .run();
+        }, onReset: function () { return editor.chain().focus().setFontSize("16px").run(); }, value: fontSize }));
 }
 var fontFamilies = {
     System: "Open Sans",
@@ -79,7 +59,7 @@ function toMenuItems(editor, currentFontFamily) {
         var value = fontFamilies[key];
         menuItems.push({
             key: key,
-            type: "menuitem",
+            type: "button",
             title: key,
             isChecked: key === currentFontFamily,
             onClick: function () { return editor.chain().focus().setFontFamily(value).run(); },

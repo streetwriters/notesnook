@@ -3,7 +3,7 @@ import { Attachment } from "./attachment";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { Editor } from "@tiptap/core";
 import { useRef } from "react";
-import { MenuPresenter } from "../../components/menu/menu";
+// import { MenuPresenter } from "../../components/menu/menu";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { ReactNodeViewProps } from "../react";
@@ -74,7 +74,7 @@ export function AttachmentComponent(props: ReactNodeViewProps<Attachment>) {
           {formatBytes(size)}
         </Text>
       </Box>
-      <MenuPresenter
+      {/* <MenuPresenter
         isOpen={isActive}
         onClose={() => {}}
         items={[]}
@@ -90,7 +90,7 @@ export function AttachmentComponent(props: ReactNodeViewProps<Attachment>) {
         }}
       >
         <AttachmentToolbar editor={editor} />
-      </MenuPresenter>
+      </MenuPresenter> */}
     </>
   );
 }

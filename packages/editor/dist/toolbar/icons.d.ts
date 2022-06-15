@@ -45,6 +45,7 @@ export declare const Icons: {
     moveColumnLeft: string;
     deleteColumn: string;
     cellProperties: string;
+    cellBorderColor: string;
     backgroundColor: string;
     borderColor: string;
     sortDesc: string;
@@ -62,6 +63,7 @@ export declare const Icons: {
     regex: string;
     embed: string;
     palette: string;
+    tableSettings: string;
     plus: string;
     minus: string;
     close: string;
@@ -70,6 +72,7 @@ export declare const Icons: {
     chevronDown: string;
     chevronUp: string;
     chevronRight: string;
+    chevronLeft: string;
     circle: string;
     none: string;
 };

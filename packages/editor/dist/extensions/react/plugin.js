@@ -17,7 +17,7 @@ var ReactNodeViewState = /** @class */ (function () {
 }());
 export { ReactNodeViewState };
 export var stateKey = new PluginKey("reactNodeView");
-export var plugin = new Plugin({
+export var NodeViewSelectionNotifierPlugin = new Plugin({
     state: {
         init: function () {
             return new ReactNodeViewState();
@@ -37,5 +37,3 @@ export var plugin = new Plugin({
         };
     },
 });
-var plugins = function () { return [plugin]; };
-export default plugins;

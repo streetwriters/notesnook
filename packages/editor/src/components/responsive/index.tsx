@@ -1,5 +1,13 @@
 import React, { PropsWithChildren } from "react";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store";
+import {
+  useIsMobile,
+  useToolbarStore,
+} from "../../toolbar/stores/toolbar-store";
+import {
+  ActionSheetPresenter,
+  ActionSheetPresenterProps,
+} from "../action-sheet";
+import { MenuPresenter, MenuPresenterProps } from "../menu";
 
 type ResponsiveContainerProps = {
   mobile?: JSX.Element;
@@ -7,7 +15,7 @@ type ResponsiveContainerProps = {
 };
 
 export function ResponsiveContainer(props: ResponsiveContainerProps) {
-  const isMobile = useToolbarStore((store) => store.isMobile);
+  const isMobile = useIsMobile();
   if (isMobile) return props.mobile || null;
   else return props.desktop || null;
 }
@@ -18,4 +26,23 @@ export function DesktopOnly(props: PropsWithChildren<{}>) {
 
 export function MobileOnly(props: PropsWithChildren<{}>) {
   return <ResponsiveContainer mobile={<>{props.children}</>} />;
+}
+
+export type PopupType = "sheet" | "menu" | "none";
+export type ResponsivePresenterProps = MenuPresenterProps &
+  ActionSheetPresenterProps & {
+    mobile?: PopupType;
+    desktop?: PopupType;
+  };
+
+export function ResponsivePresenter(
+  props: PropsWithChildren<ResponsivePresenterProps>
+) {
+  const { mobile = "menu", desktop = "menu", ...restProps } = props;
+  const isMobile = useIsMobile();
+  if (isMobile && mobile === "sheet")
+    return <ActionSheetPresenter {...restProps} />;
+  else if (mobile === "menu" || desktop === "menu")
+    return <MenuPresenter {...restProps} />;
+  else return props.isOpen ? <>{props.children}</> : null;
 }

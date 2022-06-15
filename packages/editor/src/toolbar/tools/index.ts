@@ -14,44 +14,35 @@ import {
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
-// import {
-//   Blockquote,
-//   CodeBlock,
-//   HorizontalRule,
-//   Image,
-//   Table,
-//   Embed,
-// } from "./block";
 import { Headings } from "./headings";
 import { NumberedList, BulletList } from "./lists";
 import { LeftToRight, RightToLeft } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
+import {
+  TableSettings,
+  ColumnProperties,
+  RowProperties,
+  CellProperties,
+  InsertColumnLeft,
+  InsertColumnRight,
+  MoveColumnLeft,
+  MoveColumnRight,
+  DeleteColumn,
+  SplitCells,
+  MergeCells,
+  InsertRowAbove,
+  InsertRowBelow,
+  MoveRowUp,
+  MoveRowDown,
+  DeleteRow,
+  DeleteTable,
+  CellBackgroundColor,
+  CellBorderColor,
+  CellTextColor,
+  CellBorderWidth,
+} from "./table";
 
-// const tools = {
-//   bold: new Bold(),
-//   italic: new Italic(),
-//   underline: new Underline(),
-//   strikethrough: new Strikethrough(),
-//   code: new Code(),
-//   formatClear: new ClearFormatting(),
-
-//   subscript: new Subscript(),
-//   superscript: new Superscript(),
-
-//   horizontalRule: new HorizontalRule(),
-//   codeblock: new CodeBlock(),
-//   blockquote: new Blockquote(),
-//   headings: new Headings(),
-
-//   checklist: new Checklist(),
-
-//   link: new Link(),
-//   image: new Image(),
-//   attachment: new Attachment(),
-//   table: new Table(),
-//   embed: new Embed(),
-// };
-
+export type ToolId = keyof typeof tools;
 const tools = {
   bold: Bold,
   italic: Italic,
@@ -76,9 +67,30 @@ const tools = {
   rtl: RightToLeft,
   textColor: TextColor,
   highlight: Highlight,
+
+  tableSettings: TableSettings,
+  columnProperties: ColumnProperties,
+  rowProperties: RowProperties,
+  cellProperties: CellProperties,
+  insertColumnLeft: InsertColumnLeft,
+  insertColumnRight: InsertColumnRight,
+  moveColumnLeft: MoveColumnLeft,
+  moveColumnRight: MoveColumnRight,
+  deleteColumn: DeleteColumn,
+  splitCells: SplitCells,
+  mergeCells: MergeCells,
+  cellBackgroundColor: CellBackgroundColor,
+  cellBorderColor: CellBorderColor,
+  cellTextColor: CellTextColor,
+  cellBorderWidth: CellBorderWidth,
+  insertRowAbove: InsertRowAbove,
+  insertRowBelow: InsertRowBelow,
+  moveRowUp: MoveRowUp,
+  moveRowDown: MoveRowDown,
+  deleteRow: DeleteRow,
+  deleteTable: DeleteTable,
 };
 
-export type ToolId = keyof typeof tools;
-export function findToolById(id: ToolId): React.FunctionComponent<ToolProps> {
+export function findTool(id: ToolId): React.FunctionComponent<ToolProps> {
   return tools[id];
 }

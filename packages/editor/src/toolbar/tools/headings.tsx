@@ -25,7 +25,7 @@ export function Headings(props: ToolProps) {
 
 function toMenuItems(editor: Editor, currentHeadingLevel?: number): MenuItem[] {
   const menuItems: MenuItem[] = defaultLevels.map((level) => ({
-    type: "menuitem",
+    type: "button",
     key: `heading-${level}`,
     title: `Heading ${level}`,
     isChecked: level === currentHeadingLevel,
@@ -38,7 +38,7 @@ function toMenuItems(editor: Editor, currentHeadingLevel?: number): MenuItem[] {
   }));
   const paragraph: MenuItem = {
     key: "paragraph",
-    type: "menuitem",
+    type: "button",
     title: "Paragraph",
     isChecked: !currentHeadingLevel,
     onClick: () => editor.chain().focus().setParagraph().run(),

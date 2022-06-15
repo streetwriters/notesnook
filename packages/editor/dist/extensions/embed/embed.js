@@ -10,7 +10,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 import { Node, mergeAttributes } from "@tiptap/core";
-import { createNodeView } from "../react";
+import { createSelectionBasedNodeView, NodeViewSelectionNotifierPlugin, } from "../react";
 import { EmbedComponent } from "./component";
 export var EmbedNode = Node.create({
     name: "embed",
@@ -49,8 +49,11 @@ export var EmbedNode = Node.create({
             mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
         ];
     },
+    addProseMirrorPlugins: function () {
+        return [NodeViewSelectionNotifierPlugin];
+    },
     addNodeView: function () {
-        return createNodeView(EmbedComponent);
+        return createSelectionBasedNodeView(EmbedComponent);
     },
     addCommands: function () {
         var _this = this;

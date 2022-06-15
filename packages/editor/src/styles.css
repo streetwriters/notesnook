@@ -212,3 +212,7 @@ pre *::selection {
   background-color: var(--codeSelection) !important;
   color: currentColor;
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

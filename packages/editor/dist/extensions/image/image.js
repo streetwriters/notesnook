@@ -26,7 +26,7 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { createNodeView } from "../react";
+import { createSelectionBasedNodeView, NodeViewSelectionNotifierPlugin, } from "../react";
 import { ImageComponent } from "./component";
 export var inputRegex = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
 export var ImageNode = Node.create({
@@ -81,7 +81,10 @@ export var ImageNode = Node.create({
         ];
     },
     addNodeView: function () {
-        return createNodeView(ImageComponent);
+        return createSelectionBasedNodeView(ImageComponent);
+    },
+    addProseMirrorPlugins: function () {
+        return [NodeViewSelectionNotifierPlugin];
     },
     addCommands: function () {
         var _this = this;

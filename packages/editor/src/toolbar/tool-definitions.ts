@@ -94,6 +94,112 @@ const tools: Record<ToolId, ToolDefinition> = {
     icon: "textColor",
     title: "Text color",
   },
+
+  tableSettings: {
+    icon: "tableSettings",
+    title: "Table settings",
+    conditional: true,
+  },
+  columnProperties: {
+    icon: "columnProperties",
+    title: "Column properties",
+    conditional: true,
+  },
+  rowProperties: {
+    icon: "rowProperties",
+    title: "Row properties",
+    conditional: true,
+  },
+  cellProperties: {
+    icon: "cellProperties",
+    title: "Cell properties",
+    conditional: true,
+  },
+  insertColumnLeft: {
+    icon: "insertColumnLeft",
+    title: "Insert column left",
+    conditional: true,
+  },
+  insertColumnRight: {
+    icon: "insertColumnRight",
+    title: "Insert column right",
+    conditional: true,
+  },
+  moveColumnLeft: {
+    icon: "moveColumnLeft",
+    title: "Move column left",
+    conditional: true,
+  },
+  moveColumnRight: {
+    icon: "moveColumnLeft",
+    title: "Move column right",
+    conditional: true,
+  },
+  deleteColumn: {
+    icon: "deleteColumn",
+    title: "Delete column",
+    conditional: true,
+  },
+  splitCells: {
+    icon: "splitCells",
+    title: "Split cells",
+    conditional: true,
+  },
+  mergeCells: {
+    icon: "mergeCells",
+    title: "Merge cells",
+    conditional: true,
+  },
+  insertRowAbove: {
+    icon: "insertRowAbove",
+    title: "Insert row above",
+    conditional: true,
+  },
+  insertRowBelow: {
+    icon: "insertRowBelow",
+    title: "Insert row below",
+    conditional: true,
+  },
+  moveRowUp: {
+    icon: "moveRowUp",
+    title: "Move row up",
+    conditional: true,
+  },
+  moveRowDown: {
+    icon: "moveRowDown",
+    title: "Move row down",
+    conditional: true,
+  },
+  deleteRow: {
+    icon: "deleteRow",
+    title: "Delete row",
+    conditional: true,
+  },
+  deleteTable: {
+    icon: "deleteTable",
+    title: "Delete table",
+    conditional: true,
+  },
+  cellBackgroundColor: {
+    icon: "backgroundColor",
+    title: "Cell background color",
+    conditional: true,
+  },
+  cellBorderColor: {
+    icon: "cellBorderColor",
+    title: "Cell border color",
+    conditional: true,
+  },
+  cellTextColor: {
+    icon: "textColor",
+    title: "Cell text color",
+    conditional: true,
+  },
+  cellBorderWidth: {
+    icon: "none",
+    title: "Cell border width",
+    conditional: true,
+  },
 };
 
 export function getToolDefinition(id: ToolId) {

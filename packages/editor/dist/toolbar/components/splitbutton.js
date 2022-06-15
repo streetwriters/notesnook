@@ -20,55 +20,28 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Button, Flex } from "rebass";
 import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton } from "./tool-button";
-import { PopupPresenter, } from "../../components/menu/menu";
 import { useToolbarLocation } from "../stores/toolbar-store";
 export function SplitButton(props) {
-    var popupPresenterProps = props.popupPresenterProps, children = props.children, toolButtonProps = __rest(props, ["popupPresenterProps", "children"]);
-    var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
+    var children = props.children, toggled = props.toggled, onOpen = props.onOpen, toolButtonProps = __rest(props, ["children", "toggled", "onOpen"]);
     var ref = useRef(null);
     var toolbarLocation = useToolbarLocation();
     return (_jsxs(_Fragment, { children: [_jsxs(Flex, __assign({ ref: ref, sx: {
                     borderRadius: "default",
-                    bg: isOpen ? "hover" : "transparent",
+                    bg: toggled ? "hover" : "transparent",
                     ":hover": { bg: "hover" },
-                } }, { children: [_jsx(ToolButton, __assign({}, toolButtonProps)), _jsx(Button, __assign({ sx: {
+                } }, { children: [_jsx(ToolButton, __assign({}, toolButtonProps, { toggled: toggled })), _jsx(Button, __assign({ sx: {
                             p: 0,
                             m: 0,
-                            bg: "transparent",
+                            bg: toggled ? "hover" : "transparent",
                             ":hover": { bg: "hover" },
                             ":last-of-type": {
                                 mr: 0,
                             },
-                        }, onClick: function () { return setIsOpen(function (s) { return !s; }); }, onMouseDown: function (e) { return e.preventDefault(); } }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small" }) }))] })), _jsx(PopupPresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, options: {
-                    type: "menu",
-                    position: {
-                        target: ref.current || undefined,
-                        isTargetAbsolute: true,
-                        location: toolbarLocation === "bottom" ? "top" : "below",
-                        yOffset: 5,
-                        align: "center",
-                    },
-                }, items: [] }, popupPresenterProps, { children: children }))] }));
+                        }, onClick: onOpen, onMouseDown: function (e) { return e.preventDefault(); } }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small" }) }))] })), children] }));
 }

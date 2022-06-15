@@ -3,11 +3,7 @@ import { Editor } from "@tiptap/core";
 import { ToolButton } from "../components/tool-button";
 import { ToolId } from ".";
 import { IconNames, Icons } from "../icons";
-import {
-  ActionSheetPresenter,
-  MenuPresenter,
-} from "../../components/menu/menu";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Dropdown } from "../components/dropdown";
 import { Icon } from "../components/icon";
 import { Box, Button, Flex, Text } from "rebass";
@@ -15,13 +11,34 @@ import { Popup } from "../components/popup";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
 import { MenuItem } from "../../components/menu/types";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { DesktopOnly, MobileOnly } from "../../components/responsive";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import {
+  DesktopOnly,
+  MobileOnly,
+  ResponsivePresenter,
+} from "../../components/responsive";
+import { ActionSheetPresenter } from "../../components/action-sheet";
+import { getToolbarElement } from "../utils/dom";
+import { showPopup } from "../../components/popup-presenter";
 
 export function InsertBlock(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement | null>();
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
+  const isMobile = useIsMobile();
+
+  const menuItems = useMemo(() => {
+    return [
+      tasklist(editor),
+      horizontalRule(editor),
+      codeblock(editor),
+      blockquote(editor),
+      image(editor),
+      attachment(editor),
+      isMobile ? embedMobile(editor) : embedDesktop(editor),
+      table(editor),
+    ];
+  }, [isMobile]);
 
   return (
     <>
@@ -45,54 +62,27 @@ export function InsertBlock(props: ToolProps) {
         <Icon path={Icons.plus} size={18} color={"primary"} />
       </Button>
 
-      <DesktopOnly>
-        <MenuPresenter
-          options={{
-            type: "menu",
-            position: {
-              target: buttonRef.current || undefined,
-              isTargetAbsolute: true,
-              location: toolbarLocation === "bottom" ? "top" : "below",
-              yOffset: 5,
-            },
-          }}
-          isOpen={isOpen}
-          items={[
-            tasklist(editor),
-            horizontalRule(editor),
-            codeblock(editor),
-            blockquote(editor),
-            image(editor),
-            attachment(editor),
-            embed(editor),
-            table(editor),
-          ]}
-          onClose={() => setIsOpen(false)}
-        />
-      </DesktopOnly>
-      <MobileOnly>
-        <ActionSheetPresenter
-          isOpen={isOpen}
-          items={[
-            tasklist(editor),
-            horizontalRule(editor),
-            codeblock(editor),
-            blockquote(editor),
-            imageActionSheet(editor),
-            attachment(editor),
-            embedActionSheet(editor),
-            tableActionSheet(editor),
-          ]}
-          onClose={() => setIsOpen(false)}
-        />
-      </MobileOnly>
+      <ResponsivePresenter
+        desktop="menu"
+        mobile="sheet"
+        title="Choose a block to insert"
+        isOpen={isOpen}
+        items={menuItems}
+        onClose={() => setIsOpen(false)}
+        position={{
+          target: buttonRef.current || undefined,
+          isTargetAbsolute: true,
+          location: toolbarLocation === "bottom" ? "top" : "below",
+          yOffset: 5,
+        }}
+      />
     </>
   );
 }
 
 const horizontalRule = (editor: Editor | null): MenuItem => ({
   key: "hr",
-  type: "menuitem",
+  type: "button",
   title: "Horizontal rule",
   icon: "horizontalRule",
   isChecked: editor?.isActive("horizontalRule"),
@@ -101,7 +91,7 @@ const horizontalRule = (editor: Editor | null): MenuItem => ({
 
 const codeblock = (editor: Editor | null): MenuItem => ({
   key: "codeblock",
-  type: "menuitem",
+  type: "button",
   title: "Code block",
   icon: "codeblock",
   isChecked: editor?.isActive("codeBlock"),
@@ -110,7 +100,7 @@ const codeblock = (editor: Editor | null): MenuItem => ({
 
 const blockquote = (editor: Editor | null): MenuItem => ({
   key: "blockquote",
-  type: "menuitem",
+  type: "button",
   title: "Quote",
   icon: "blockquote",
   isChecked: editor?.isActive("blockQuote"),
@@ -119,180 +109,115 @@ const blockquote = (editor: Editor | null): MenuItem => ({
 
 const image = (editor: Editor | null): MenuItem => ({
   key: "image",
-  type: "menuitem",
+  type: "button",
   title: "Image",
   icon: "image",
-  items: [
-    {
-      key: "upload-from-disk",
-      type: "menuitem",
-      title: "Upload from disk",
-      icon: "upload",
-      onClick: () => {},
-    },
-    {
-      key: "upload-from-url",
-      type: "menuitem",
-      title: "Attach from URL",
-      icon: "link",
-      onClick: () => {},
-    },
-  ],
-});
-
-const imageActionSheet = (editor: Editor | null): MenuItem => ({
-  key: "image",
-  type: "menuitem",
-  title: "Image",
-  icon: "image",
-  items: [
-    {
-      key: "imageOptions",
-      type: "menuitem",
-      component: function ({ onClick }) {
-        const [isOpen, setIsOpen] = useState(true);
-        return (
-          <ActionSheetPresenter
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            items={[
-              {
-                key: "upload-from-disk",
-                type: "menuitem",
-                title: "Upload from disk",
-                icon: "upload",
-                onClick: () =>
-                  editor?.chain().focus().openAttachmentPicker("image").run(),
-              },
-              {
-                key: "upload-from-url",
-                type: "menuitem",
-                title: "Attach from URL",
-                icon: "link",
-                onClick: () => {},
-              },
-            ]}
-          />
-        );
+  menu: {
+    title: "Insert an image",
+    items: [
+      {
+        key: "upload-from-disk",
+        type: "button",
+        title: "Upload from disk",
+        icon: "upload",
+        onClick: () => {},
       },
-    },
-  ],
-});
-
-const embed = (editor: Editor | null): MenuItem => ({
-  key: "embed",
-  type: "menuitem",
-  title: "Embed",
-  icon: "embed",
+      {
+        key: "upload-from-url",
+        type: "button",
+        title: "Attach from URL",
+        icon: "link",
+        onClick: () => {},
+      },
+    ],
+  },
 });
 
 const table = (editor: Editor | null): MenuItem => ({
   key: "table",
-  type: "menuitem",
+  type: "button",
   title: "Table",
   icon: "table",
-  items: [
-    {
-      key: "table-size-selector",
-      type: "menuitem",
-      component: (props) => (
-        <TablePopup
-          onInsertTable={(size) => {
-            editor
-              ?.chain()
-              .focus()
-              .insertTable({
-                rows: size.rows,
-                cols: size.columns,
-              })
-              .run();
-            props.onClick?.();
+  menu: {
+    title: "Insert a table",
+    items: [
+      {
+        key: "table-size-selector",
+        type: "popup",
+        component: (props) => (
+          <TablePopup
+            onInsertTable={(size) => {
+              editor
+                ?.chain()
+                .focus()
+                .insertTable({
+                  rows: size.rows,
+                  cols: size.columns,
+                })
+                .run();
+              props.onClick?.();
+            }}
+          />
+        ),
+      },
+    ],
+  },
+});
+
+const embedMobile = (editor: Editor | null): MenuItem => ({
+  key: "embed",
+  type: "button",
+  title: "Embed",
+  icon: "embed",
+  menu: {
+    title: "Insert an embed",
+    items: [
+      {
+        key: "embed-popup",
+        type: "popup",
+        component: function ({ onClick }) {
+          return (
+            <EmbedPopup
+              title="Insert embed"
+              onClose={(embed) => {
+                if (!embed) return onClick?.();
+                editor?.chain().insertEmbed(embed).run();
+                onClick?.();
+              }}
+            />
+          );
+        },
+      },
+    ],
+  },
+});
+
+const embedDesktop = (editor: Editor | null): MenuItem => ({
+  key: "embed",
+  type: "button",
+  title: "Embed",
+  icon: "embed",
+  onClick: () => {
+    if (!editor) return;
+    showPopup({
+      theme: editor.storage.theme,
+      popup: (hide) => (
+        <EmbedPopup
+          title="Insert embed"
+          onClose={(embed) => {
+            if (!embed) return hide();
+            editor?.chain().insertEmbed(embed).run();
+            hide();
           }}
         />
       ),
-    },
-  ],
-});
-
-const embedActionSheet = (editor: Editor | null): MenuItem => ({
-  key: "embed",
-  type: "menuitem",
-  title: "Embed",
-  icon: "embed",
-  items: [
-    {
-      key: "table-size-selector",
-      type: "menuitem",
-      component: function ({ onClick }) {
-        const [isOpen, setIsOpen] = useState(true);
-        return (
-          <ActionSheetPresenter
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            items={[]}
-          >
-            <EmbedPopup
-              title="Insert embed"
-              icon="check"
-              onClose={(embed) => {
-                editor?.chain().insertEmbed(embed).run();
-                setIsOpen(false);
-                onClick?.();
-              }}
-              // embed={props}
-              // onSourceChanged={(src) => {}}
-              // onSizeChanged={(size) => editor.commands.setEmbedSize(size)}
-            />
-          </ActionSheetPresenter>
-        );
-      },
-    },
-  ],
-});
-
-const tableActionSheet = (editor: Editor | null): MenuItem => ({
-  key: "table",
-  type: "menuitem",
-  title: "Table",
-  icon: "table",
-  items: [
-    {
-      key: "table-size-selector",
-      type: "menuitem",
-      component: function ({ onClick }) {
-        const [isOpen, setIsOpen] = useState(true);
-        return (
-          <ActionSheetPresenter
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            items={[]}
-          >
-            <TablePopup
-              cellSize={30}
-              autoExpand={false}
-              onInsertTable={(size) => {
-                editor
-                  ?.chain()
-                  .focus()
-                  .insertTable({
-                    rows: size.rows,
-                    cols: size.columns,
-                  })
-                  .run();
-                setIsOpen(false);
-                onClick?.();
-              }}
-            />
-          </ActionSheetPresenter>
-        );
-      },
-    },
-  ],
+    });
+  },
 });
 
 const attachment = (editor: Editor | null): MenuItem => ({
   key: "attachment",
-  type: "menuitem",
+  type: "button",
   title: "Attachment",
   icon: "attachment",
   isChecked: editor?.isActive("attachment"),
@@ -301,7 +226,7 @@ const attachment = (editor: Editor | null): MenuItem => ({
 
 const tasklist = (editor: Editor | null): MenuItem => ({
   key: "tasklist",
-  type: "menuitem",
+  type: "button",
   title: "Task list",
   icon: "checkbox",
   isChecked: editor?.isActive("taskList"),

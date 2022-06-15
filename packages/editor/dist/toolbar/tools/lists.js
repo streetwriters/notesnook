@@ -20,36 +20,54 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 import { jsx as _jsx } from "react/jsx-runtime";
 import { Box, Button, Flex } from "rebass";
+import { useRef, useState } from "react";
 import { SplitButton } from "../components/split-button";
+import { useToolbarLocation } from "../stores/toolbar-store";
+import { getToolbarElement } from "../utils/dom";
+import { PopupWrapper } from "../../components/popup-presenter";
 function ListTool(props) {
     var editor = props.editor, options = props.options, toolProps = __rest(props, ["editor", "options"]);
     var isActive = editor.isActive(options.type);
-    return (_jsx(SplitButton, __assign({}, toolProps, { onClick: function () { return options.onClick(editor); }, toggled: isActive, sx: { mr: 0 }, popupPresenterProps: {
-            items: options.subTypes.map(function (item) { return ({
-                key: item.type,
-                tooltip: item.title,
-                type: "menuitem",
-                component: function (_a) {
-                    var onClick = _a.onClick;
-                    return (_jsx(Button, __assign({ variant: "menuitem", onClick: onClick }, { children: _jsx(ListThumbnail, { listStyleType: item.type }) })));
-                },
-                onClick: function () {
-                    var chain = editor.chain().focus();
-                    if (!isActive) {
-                        if (options.type === "bulletList")
-                            chain = chain.toggleBulletList();
-                        else
-                            chain = chain.toggleOrderedList();
-                    }
-                    return chain
-                        .updateAttributes(options.type, { listType: item.type })
-                        .run();
-                },
-            }); }),
-            sx: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 },
-        } })));
+    var toolbarLocation = useToolbarLocation();
+    var isBottom = toolbarLocation === "bottom";
+    var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
+    var buttonRef = useRef();
+    return (_jsx(SplitButton, __assign({}, toolProps, { buttonRef: buttonRef, onClick: function () { return options.onClick(editor); }, toggled: isActive || isOpen, sx: { mr: 0 }, onOpen: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(PopupWrapper, { isOpen: isOpen, group: "lists", id: toolProps.title, blocking: false, focusOnRender: false, position: {
+                isTargetAbsolute: true,
+                target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
+                align: "center",
+                location: isBottom ? "top" : "below",
+                yOffset: isBottom ? 10 : 5,
+            }, renderPopup: function () { return (_jsx(Box, __assign({ sx: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 } }, { children: options.subTypes.map(function (item) { return (_jsx(Button, __assign({ variant: "menuitem", sx: { width: 80 }, onClick: function () {
+                        var chain = editor.chain().focus();
+                        if (!isActive) {
+                            if (options.type === "bulletList")
+                                chain = chain.toggleBulletList();
+                            else
+                                chain = chain.toggleOrderedList();
+                        }
+                        return chain
+                            .updateAttributes(options.type, { listType: item.type })
+                            .run();
+                    } }, { children: _jsx(ListThumbnail, { listStyleType: item.type }) }), item.title)); }) }))); } }) })));
 }
 export function NumberedList(props) {
     var options = {
@@ -95,7 +113,7 @@ function ListThumbnail(props) {
             flex: 1,
             p: 0,
             listStyleType: listStyleType,
-        } }, { children: [0, 0, 0].map(function () { return (_jsx(Box, __assign({ as: "li", sx: {
+        } }, { children: [0, 1, 2].map(function (i) { return (_jsx(Box, __assign({ as: "li", sx: {
                 display: "list-item",
                 color: "text",
                 fontSize: 8,
@@ -108,5 +126,5 @@ function ListThumbnail(props) {
                         height: 4,
                         bg: "#cbcbcb",
                         borderRadius: "small",
-                    } }) })) }))); }) })));
+                    } }) })) }), i.toString())); }) })));
 }

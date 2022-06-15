@@ -1,5 +1,9 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import { createNodeView } from "../react";
+import {
+  createNodeView,
+  createSelectionBasedNodeView,
+  NodeViewSelectionNotifierPlugin,
+} from "../react";
 import { EmbedComponent } from "./component";
 
 export interface EmbedOptions {
@@ -74,8 +78,12 @@ export const EmbedNode = Node.create<EmbedOptions>({
     ];
   },
 
+  addProseMirrorPlugins() {
+    return [NodeViewSelectionNotifierPlugin];
+  },
+
   addNodeView() {
-    return createNodeView(EmbedComponent);
+    return createSelectionBasedNodeView(EmbedComponent);
   },
 
   addCommands() {

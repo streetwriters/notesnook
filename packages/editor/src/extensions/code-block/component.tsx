@@ -4,12 +4,13 @@ import { refractor } from "refractor/lib/core";
 import "prism-themes/themes/prism-dracula.min.css";
 import { Button, Flex, Text } from "rebass";
 import Languages from "./languages.json";
-import { PopupPresenter } from "../../components/menu/menu";
 import { Input } from "@rebass/forms";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { CodeBlockAttributes } from "./code-block";
 import { ReactNodeViewProps } from "../react/types";
+import { ResponsivePresenter } from "../../components/responsive";
+import { Popup } from "../../toolbar/components/popup";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -127,30 +128,29 @@ export function CodeblockComponent(
           </Button>
         </Flex>
       </Flex>
-      <PopupPresenter
+      <ResponsivePresenter
         isOpen={isOpen}
-        onClose={() => {
-          setIsOpen(false);
-          editor.commands.focus();
-        }}
+        onClose={() => setIsOpen(false)}
         mobile="sheet"
         desktop="menu"
-        options={{
-          type: "menu",
-          position: {
-            target: toolbarRef.current || undefined,
-            align: "end",
-            isTargetAbsolute: true,
-            location: "top",
-            yOffset: 5,
-          },
+        position={{
+          target: toolbarRef.current || undefined,
+          align: "end",
+          isTargetAbsolute: true,
+          location: "top",
+          yOffset: 5,
         }}
+        title="Change code block language"
       >
         <LanguageSelector
           selectedLanguage={languageDefinition?.filename || "Plaintext"}
-          onLanguageSelected={(language) => updateAttributes({ language })}
+          onLanguageSelected={(language) => {
+            updateAttributes({ language });
+            setIsOpen(false);
+          }}
+          onClose={() => setIsOpen(false)}
         />
-      </PopupPresenter>
+      </ResponsivePresenter>
     </>
   );
 }
@@ -158,80 +158,82 @@ export function CodeblockComponent(
 type LanguageSelectorProps = {
   onLanguageSelected: (language: string) => void;
   selectedLanguage: string;
+  onClose: () => void;
 };
 function LanguageSelector(props: LanguageSelectorProps) {
-  const { onLanguageSelected, selectedLanguage } = props;
+  const { onLanguageSelected, selectedLanguage, onClose } = props;
   const [languages, setLanguages] = useState(Languages);
 
   return (
-    <Flex
-      sx={{
-        flexDirection: "column",
-        height: 200,
-        width: 300,
-        boxShadow: "menu",
-        borderRadius: "default",
-        overflowY: "auto",
-        bg: "background",
-        marginRight: 2,
-      }}
-    >
-      <Input
-        autoFocus
-        placeholder="Search languages"
-        sx={{
-          width: "auto",
-          position: "sticky",
-          top: 2,
-          bg: "background",
-          mx: 2,
-          p: "7px",
-        }}
-        onChange={(e) => {
-          if (!e.target.value) return setLanguages(Languages);
-          const query = e.target.value.toLowerCase();
-          setLanguages(
-            Languages.filter((lang) => {
-              return (
-                lang.title.toLowerCase().indexOf(query) > -1 ||
-                lang.alias?.some(
-                  (alias) => alias.toLowerCase().indexOf(query) > -1
-                )
-              );
-            })
-          );
-        }}
-      />
+    <Popup title="Select language" onClose={onClose}>
       <Flex
         sx={{
           flexDirection: "column",
-          pt: 2,
-          mt: 1,
+          height: 200,
+          width: ["auto", 300],
+          overflowY: "auto",
+          bg: "background",
         }}
       >
-        {languages.map((lang) => (
-          <Button
-            variant={"menuitem"}
-            sx={{
-              textAlign: "left",
-              py: 1,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-            onClick={() => onLanguageSelected(lang.filename)}
-          >
-            <Text variant={"body"}>{lang.title}</Text>
-            {selectedLanguage === lang.filename ? (
-              <Icon path={Icons.check} size="small" />
-            ) : lang.alias ? (
-              <Text variant={"subBody"} sx={{ fontSize: "10px" }}>
-                {lang.alias.slice(0, 3).join(", ")}
-              </Text>
-            ) : null}
-          </Button>
-        ))}
+        <Input
+          autoFocus
+          placeholder="Search languages"
+          sx={{
+            width: "auto",
+            position: "sticky",
+            top: 0,
+            bg: "background",
+            mx: 2,
+            p: "7px",
+            zIndex: 999,
+          }}
+          onChange={(e) => {
+            if (!e.target.value) return setLanguages(Languages);
+            const query = e.target.value.toLowerCase();
+            setLanguages(
+              Languages.filter((lang) => {
+                return (
+                  lang.title.toLowerCase().indexOf(query) > -1 ||
+                  lang.alias?.some(
+                    (alias) => alias.toLowerCase().indexOf(query) > -1
+                  )
+                );
+              })
+            );
+          }}
+        />
+        <Flex
+          sx={{
+            flexDirection: "column",
+            pt: 1,
+            mt: 1,
+          }}
+        >
+          {languages.map((lang) => (
+            <Button
+              key={lang.title}
+              variant={"menuitem"}
+              sx={{
+                textAlign: "left",
+                py: 1,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+              onClick={() => onLanguageSelected(lang.filename)}
+            >
+              <Text variant={"body"}>{lang.title}</Text>
+              {selectedLanguage === lang.filename ? (
+                <Icon path={Icons.check} size="small" />
+              ) : lang.alias ? (
+                <Text variant={"subBody"} sx={{ fontSize: "10px" }}>
+                  {lang.alias.slice(0, 3).join(", ")}
+                </Text>
+              ) : null}
+            </Button>
+          ))}
+        </Flex>
       </Flex>
-    </Flex>
+    </Popup>
   );
 }

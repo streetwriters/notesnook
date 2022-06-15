@@ -1,4 +1,4 @@
 /// <reference types="react" />
 import { ImageAlignmentOptions, ImageAttributes } from "./image";
-import { ReactNodeViewProps } from "../react";
-export declare function ImageComponent(props: ReactNodeViewProps<ImageAttributes & ImageAlignmentOptions>): JSX.Element;
+import { SelectionBasedReactNodeViewProps } from "../react";
+export declare function ImageComponent(props: SelectionBasedReactNodeViewProps<ImageAttributes & ImageAlignmentOptions>): JSX.Element;

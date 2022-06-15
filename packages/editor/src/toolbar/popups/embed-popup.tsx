@@ -11,13 +11,14 @@ import {
 import { IconNames } from "../icons";
 import { ToolButton } from "../components/tool-button";
 import { convertUrlToEmbedUrl } from "@social-embed/lib";
+import { InlineInput } from "../../components/inline-input";
+import { Tabs, Tab } from "../../components/tabs";
 
 type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;
 type EmbedSource = "url" | "code";
 export type EmbedPopupProps = {
-  onClose: (embed: Embed) => void;
+  onClose: (embed?: Embed) => void;
   title?: string;
-  icon?: IconNames;
 
   embed?: Embed;
   onSizeChanged?: (size: EmbedSizeOptions) => void;
@@ -25,7 +26,7 @@ export type EmbedPopupProps = {
 };
 
 export function EmbedPopup(props: EmbedPopupProps) {
-  const { onClose, onSizeChanged, onSourceChanged, title, icon, embed } = props;
+  const { onClose, onSizeChanged, onSourceChanged, title, embed } = props;
   const [width, setWidth] = useState(embed?.width || 300);
   const [height, setHeight] = useState(embed?.height || 150);
   const [src, setSrc] = useState(embed?.src || "");
@@ -60,47 +61,8 @@ export function EmbedPopup(props: EmbedPopupProps) {
   }, [onSourceChanged, src]);
 
   return (
-    <Popup
-      title={title}
-      action={{
-        icon,
-        onClick: () => {
-          setError(null);
-          let _src = src;
-          let _width = width;
-          let _height = height;
-          if (embedSource === "code") {
-            const document = new DOMParser().parseFromString(src, "text/html");
-            if (document.getElementsByTagName("iframe").length <= 0)
-              return setError("Embed code must include an iframe.");
-
-            const srcValue = getAttribute(document, "src");
-            if (!srcValue)
-              return setError(
-                "Embed code must include an iframe with an src attribute."
-              );
-
-            _src = srcValue;
-
-            const widthValue = getAttribute(document, "width");
-            if (widthValue && !isNaN(parseInt(widthValue)))
-              _width = parseInt(widthValue);
-
-            const heightValue = getAttribute(document, "height");
-            if (heightValue && !isNaN(parseInt(heightValue)))
-              _height = parseInt(heightValue);
-          }
-          const convertedUrl = convertUrlToEmbedUrl(_src);
-          if (!!convertedUrl) _src = convertedUrl;
-          onClose({
-            height: _height,
-            width: _width,
-            src: _src,
-          });
-        },
-      }}
-    >
-      <Flex sx={{ flexDirection: "column", p: 1 }}>
+    <Popup title={title} onClose={() => onClose()}>
+      <Flex sx={{ flexDirection: "column", width: ["auto", 300] }}>
         {error && (
           <Text
             variant={"error"}
@@ -114,77 +76,104 @@ export function EmbedPopup(props: EmbedPopupProps) {
             Error: {error}
           </Text>
         )}
-        {/* <Flex sx={{ position: "relative", alignItems: "center" }}> */}
-        <Flex sx={{ mb: 1 }}>
-          <Button
-            variant={"dialog"}
-            sx={{
-              pb: 1,
-              mr: 1,
-              borderRadius: 0,
-              color: embedSource === "url" ? "primary" : "text",
-              borderBottom: "2px solid",
-              borderBottomColor:
-                embedSource === "url" ? "primary" : "transparent",
-            }}
-            onClick={() => setEmbedSource("url")}
-          >
-            From URL
-          </Button>
-          <Button
-            variant={"dialog"}
-            sx={{
-              pb: 1,
-              borderRadius: 0,
-              color: embedSource === "code" ? "primary" : "text",
-              borderBottom: "2px solid",
-              borderBottomColor:
-                embedSource === "code" ? "primary" : "transparent",
-            }}
-            onClick={() => setEmbedSource("code")}
-          >
-            From code
-          </Button>
-        </Flex>
-        {embedSource === "url" ? (
-          <Input
-            placeholder="Enter embed source URL"
-            value={src}
-            autoFocus
-            onChange={(e) => setSrc(e.target.value)}
-            sx={{ mt: 1, fontSize: "body" }}
-          />
-        ) : (
-          <Textarea
-            autoFocus
-            variant={"forms.input"}
-            sx={{ fontSize: "subBody", fontFamily: "monospace", mt: 1 }}
-            minHeight={[200, 100]}
-            onChange={(e) => setSrc(e.target.value)}
-            placeholder="Paste embed code here. Only iframes are supported."
-          />
-        )}
-        {embedSource === "url" ? (
-          <Flex sx={{ alignItems: "center", mt: 1 }}>
+
+        <Tabs
+          activeIndex={0}
+          containerProps={{ sx: { mx: 1, mb: 1, flexDirection: "column" } }}
+          onTabChanged={(index) => setEmbedSource(index === 0 ? "url" : "code")}
+        >
+          <Tab title="From URL">
             <Input
-              type="number"
-              placeholder="Width"
-              value={width}
-              sx={{
-                mr: 1,
-                fontSize: "body",
-              }}
-              onChange={(e) => onSizeChange(e.target.valueAsNumber)}
-            />
-            <Input
-              type="number"
-              placeholder="Height"
-              value={height}
+              placeholder="Enter embed source URL"
+              value={src}
+              autoFocus
+              onChange={(e) => setSrc(e.target.value)}
               sx={{ fontSize: "body" }}
-              onChange={(e) => onSizeChange(undefined, e.target.valueAsNumber)}
             />
-          </Flex>
-        ) : null}
+            <Flex sx={{ alignItems: "center", mt: 1 }}>
+              <InlineInput
+                containerProps={{ sx: { mr: 1 } }}
+                label="width"
+                type="number"
+                placeholder="Width"
+                value={width}
+                sx={{
+                  mr: 1,
+                  fontSize: "body",
+                }}
+                onChange={(e) => onSizeChange(e.target.valueAsNumber)}
+              />
+              <InlineInput
+                label="height"
+                type="number"
+                placeholder="Height"
+                value={height}
+                sx={{ fontSize: "body" }}
+                onChange={(e) =>
+                  onSizeChange(undefined, e.target.valueAsNumber)
+                }
+              />
+            </Flex>
+          </Tab>
+          <Tab title="From code">
+            <Textarea
+              autoFocus
+              variant={"forms.input"}
+              sx={{ fontSize: "subBody", fontFamily: "monospace" }}
+              minHeight={[200, 100]}
+              onChange={(e) => setSrc(e.target.value)}
+              placeholder="Paste embed code here. Only iframes are supported."
+            />
+          </Tab>
+        </Tabs>
+
+        <Button
+          variant={"primary"}
+          sx={{
+            alignSelf: ["stretch", "end", "end"],
+            my: 1,
+            mr: 1,
+          }}
+          onClick={() => {
+            setError(null);
+            let _src = src;
+            let _width = width;
+            let _height = height;
+            if (embedSource === "code") {
+              const document = new DOMParser().parseFromString(
+                src,
+                "text/html"
+              );
+              if (document.getElementsByTagName("iframe").length <= 0)
+                return setError("Embed code must include an iframe.");
+
+              const srcValue = getAttribute(document, "src");
+              if (!srcValue)
+                return setError(
+                  "Embed code must include an iframe with an src attribute."
+                );
+
+              _src = srcValue;
+
+              const widthValue = getAttribute(document, "width");
+              if (widthValue && !isNaN(parseInt(widthValue)))
+                _width = parseInt(widthValue);
+
+              const heightValue = getAttribute(document, "height");
+              if (heightValue && !isNaN(parseInt(heightValue)))
+                _height = parseInt(heightValue);
+            }
+            const convertedUrl = convertUrlToEmbedUrl(_src);
+            if (!!convertedUrl) _src = convertedUrl;
+            onClose({
+              height: _height,
+              width: _width,
+              src: _src,
+            });
+          }}
+        >
+          {title}
+        </Button>
       </Flex>
     </Popup>
   );

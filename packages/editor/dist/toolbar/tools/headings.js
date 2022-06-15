@@ -35,7 +35,7 @@ export function Headings(props) {
 }
 function toMenuItems(editor, currentHeadingLevel) {
     var menuItems = defaultLevels.map(function (level) { return ({
-        type: "menuitem",
+        type: "button",
         key: "heading-".concat(level),
         title: "Heading ".concat(level),
         isChecked: level === currentHeadingLevel,
@@ -49,7 +49,7 @@ function toMenuItems(editor, currentHeadingLevel) {
     }); });
     var paragraph = {
         key: "paragraph",
-        type: "menuitem",
+        type: "button",
         title: "Paragraph",
         isChecked: !currentHeadingLevel,
         onClick: function () { return editor.chain().focus().setParagraph().run(); },

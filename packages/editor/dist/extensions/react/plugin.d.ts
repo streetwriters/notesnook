@@ -8,6 +8,4 @@ export declare class ReactNodeViewState {
     notifyNewSelection(fromPos: number, toPos: number): void;
 }
 export declare const stateKey: PluginKey<any>;
-export declare const plugin: Plugin<ReactNodeViewState>;
-declare const plugins: () => Plugin<ReactNodeViewState>[];
-export default plugins;
+export declare const NodeViewSelectionNotifierPlugin: Plugin<ReactNodeViewState>;

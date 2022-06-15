@@ -13,7 +13,7 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { Box, Flex, Text } from "rebass";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { useRef } from "react";
-import { MenuPresenter } from "../../components/menu/menu";
+// import { MenuPresenter } from "../../components/menu/menu";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 export function AttachmentComponent(props) {
@@ -25,44 +25,35 @@ export function AttachmentComponent(props) {
     //   useEffect(() => {
     //     setIsToolbarVisible(isActive);
     //   }, [isActive]);
-    return (_jsxs(_Fragment, { children: [_jsxs(Box, __assign({ ref: elementRef, as: "span", contentEditable: false, variant: "body", sx: {
-                    display: "inline-flex",
-                    overflow: "hidden",
-                    position: "relative",
-                    zIndex: 1,
-                    userSelect: "none",
-                    alignItems: "center",
-                    backgroundColor: "bgSecondary",
-                    px: 1,
-                    borderRadius: "default",
-                    border: "1px solid var(--border)",
-                    cursor: "pointer",
-                    maxWidth: 250,
-                    borderColor: isActive ? "primary" : "border",
-                    ":hover": {
-                        bg: "hover",
-                    },
-                }, title: filename }, { children: [_jsx(Icon, { path: Icons.attachment, size: 14 }), _jsx(Text, __assign({ as: "span", sx: {
-                            ml: "small",
-                            fontSize: "0.85rem",
-                            whiteSpace: "nowrap",
-                            textOverflow: "ellipsis",
-                            overflow: "hidden",
-                        }, className: "filename" }, { children: filename })), _jsx(Text, __assign({ as: "span", className: "size", sx: {
-                            ml: 1,
-                            fontSize: "subBody",
-                            color: "fontTertiary",
-                            flexShrink: 0,
-                        } }, { children: formatBytes(size) }))] })), _jsx(MenuPresenter, __assign({ isOpen: isActive, onClose: function () { }, items: [], options: {
-                    type: "autocomplete",
-                    position: {
-                        target: elementRef.current || undefined,
-                        location: "top",
-                        yOffset: -5,
-                        isTargetAbsolute: true,
-                        align: "end",
-                    },
-                } }, { children: _jsx(AttachmentToolbar, { editor: editor }) }))] }));
+    return (_jsx(_Fragment, { children: _jsxs(Box, __assign({ ref: elementRef, as: "span", contentEditable: false, variant: "body", sx: {
+                display: "inline-flex",
+                overflow: "hidden",
+                position: "relative",
+                zIndex: 1,
+                userSelect: "none",
+                alignItems: "center",
+                backgroundColor: "bgSecondary",
+                px: 1,
+                borderRadius: "default",
+                border: "1px solid var(--border)",
+                cursor: "pointer",
+                maxWidth: 250,
+                borderColor: isActive ? "primary" : "border",
+                ":hover": {
+                    bg: "hover",
+                },
+            }, title: filename }, { children: [_jsx(Icon, { path: Icons.attachment, size: 14 }), _jsx(Text, __assign({ as: "span", sx: {
+                        ml: "small",
+                        fontSize: "0.85rem",
+                        whiteSpace: "nowrap",
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                    }, className: "filename" }, { children: filename })), _jsx(Text, __assign({ as: "span", className: "size", sx: {
+                        ml: 1,
+                        fontSize: "subBody",
+                        color: "fontTertiary",
+                        flexShrink: 0,
+                    } }, { children: formatBytes(size) }))] })) }));
 }
 function formatBytes(bytes, decimals) {
     if (decimals === void 0) { decimals = 1; }

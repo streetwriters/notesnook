@@ -33,6 +33,7 @@ export function ToolButton(props: ToolButtonProps) {
       tabIndex={-1}
       id={`tool-${id}`}
       sx={{
+        flexShrink: 0,
         p: variant === "small" ? "small" : 1,
         borderRadius: variant === "small" ? "small" : "default",
         m: 0,

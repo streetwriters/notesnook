@@ -29,19 +29,13 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { Box, Flex } from "rebass";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
-import { useEffect, useRef, useState } from "react";
-import { PopupPresenter } from "../../components/menu/menu";
+import { useRef, useState } from "react";
 import { EmbedPopup } from "../../toolbar/popups/embed-popup";
+import { ResponsivePresenter } from "../../components/responsive";
 export function EmbedComponent(props) {
-    var _a = props.node.attrs, src = _a.src, width = _a.width, height = _a.height, align = _a.align;
-    var editor = props.editor, updateAttributes = props.updateAttributes;
+    var editor = props.editor, updateAttributes = props.updateAttributes, selected = props.selected, node = props.node;
     var embedRef = useRef();
-    var isActive = editor.isActive("embed", { src: src });
-    var _b = __read(useState(), 2), isToolbarVisible = _b[0], setIsToolbarVisible = _b[1];
-    var theme = editor.storage.theme;
-    useEffect(function () {
-        setIsToolbarVisible(isActive);
-    }, [isActive]);
+    var _a = node.attrs, src = _a.src, width = _a.width, height = _a.height, align = _a.align;
     return (_jsx(_Fragment, { children: _jsx(Box, __assign({ sx: {
                 display: "flex",
                 justifyContent: align === "center" ? "center" : align === "left" ? "start" : "end",
@@ -60,12 +54,12 @@ export function EmbedComponent(props) {
                             // borderLeft: "20px solid var(--bgSecondary)",
                             borderTopLeftRadius: "default",
                             borderTopRightRadius: "default",
-                            borderColor: isActive ? "border" : "bgSecondary",
+                            borderColor: selected ? "border" : "bgSecondary",
                             cursor: "pointer",
                             ":hover": {
                                 borderColor: "border",
                             },
-                        } }, { children: isToolbarVisible && (_jsx(EmbedToolbar, { editor: editor, align: align, height: height || 0, width: width || 0, src: src })) })), _jsx(Box, __assign({ as: "iframe", ref: embedRef, src: src, width: "100%", height: "100%", sx: {
+                        } }, { children: selected && (_jsx(EmbedToolbar, { editor: editor, align: align, height: height || 0, width: width || 0, src: src })) })), _jsx(Box, __assign({ as: "iframe", ref: embedRef, src: src, width: "100%", height: "100%", sx: {
                             border: "none",
                             // border: isActive
                             //   ? "2px solid var(--primary)"
@@ -76,7 +70,8 @@ export function EmbedComponent(props) {
 function EmbedToolbar(props) {
     var editor = props.editor, height = props.height, width = props.width, src = props.src;
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    return (_jsxs(Flex, __assign({ sx: {
+    var ref = useRef();
+    return (_jsxs(Flex, __assign({ ref: ref, sx: {
             flexDirection: "column",
             position: "absolute",
             top: -40,
@@ -109,5 +104,11 @@ function EmbedToolbar(props) {
                             mr: 1,
                             borderRight: "1px solid var(--border)",
                             ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
-                        } }, { children: _jsx(ToolButton, { toggled: isOpen, title: "Embed properties", id: "embedProperties", icon: "more", onClick: function () { return setIsOpen(function (s) { return !s; }); } }) }))] })), _jsx(PopupPresenter, __assign({ isOpen: isOpen, desktop: "none", mobile: "sheet", onClose: function () { return setIsOpen(false); }, blocking: true }, { children: _jsx(EmbedPopup, { title: "Embed properties", icon: "close", onClose: function () { return setIsOpen(false); }, embed: props, onSourceChanged: function (src) { }, onSizeChanged: function (size) { return editor.commands.setEmbedSize(size); } }) }))] })));
+                        } }, { children: _jsx(ToolButton, { toggled: isOpen, title: "Embed properties", id: "embedProperties", icon: "more", onClick: function () { return setIsOpen(function (s) { return !s; }); } }) }))] })), _jsx(ResponsivePresenter, __assign({ isOpen: isOpen, desktop: "menu", mobile: "sheet", onClose: function () { return setIsOpen(false); }, blocking: true, focusOnRender: false, position: {
+                    target: ref.current || "mouse",
+                    align: "start",
+                    location: "below",
+                    yOffset: 10,
+                    isTargetAbsolute: true,
+                } }, { children: _jsx(EmbedPopup, { title: "Embed properties", onClose: function () { return setIsOpen(false); }, embed: props, onSourceChanged: function (src) { }, onSizeChanged: function (size) { return editor.commands.setEmbedSize(size); } }) }))] })));
 }

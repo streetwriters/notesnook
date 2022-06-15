@@ -4,6 +4,8 @@ import { Popup } from "../components/popup";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
+import { useIsMobile } from "../stores/toolbar-store";
+import { InlineInput } from "../../components/inline-input";
 
 const MAX_COLUMNS = 20;
 const MAX_ROWS = 20;
@@ -15,11 +17,13 @@ type TableSize = { columns: number; rows: number };
 
 export type TablePopupProps = {
   onInsertTable: (size: TableSize) => void;
-  cellSize?: number;
-  autoExpand?: boolean;
 };
 export function TablePopup(props: TablePopupProps) {
-  const { onInsertTable, cellSize, autoExpand } = props;
+  const isMobile = useIsMobile();
+  const autoExpand = !isMobile;
+  const cellSize = isMobile ? 30 : 15;
+
+  const { onInsertTable } = props;
   const [cellLocation, setCellLocation] = useState<CellLocation>({
     column: 0,
     row: 0,
@@ -52,106 +56,115 @@ export function TablePopup(props: TablePopupProps) {
   }, [cellLocation, autoExpand]);
 
   return (
-    <Popup
-      title="Insert table"
-      action={{
-        icon: "check",
-        onClick: () => {
+    <Flex sx={{ p: 1, flexDirection: "column", alignItems: "center" }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${tableSize.columns}, minmax(${cellSize}px, 1fr))`, // "1fr ".repeat(tableSize.columns),
+          gap: "small",
+          bg: "background",
+          width: "100%",
+        }}
+        onTouchMove={(e) => {
+          const touch = e.touches.item(0);
+          const element = document.elementFromPoint(
+            touch.pageX,
+            touch.pageY
+          ) as HTMLElement;
+          if (!element) return;
+          const index = element.dataset.index;
+          if (!index) return;
+          setCellLocation(getCellLocation(parseInt(index), tableSize));
+        }}
+      >
+        {Array(tableSize.columns * tableSize.rows)
+          .fill(0)
+          .map((_, index) => (
+            <Box
+              data-index={index}
+              height={cellSize || 15}
+              sx={{
+                border: "1px solid var(--disabled)",
+                borderRadius: "small",
+                bg: isCellHighlighted(index, cellLocation, tableSize)
+                  ? "disabled"
+                  : "transparent",
+              }}
+              onTouchStart={() => {
+                setCellLocation(getCellLocation(index, tableSize));
+              }}
+              onMouseEnter={() => {
+                setCellLocation(getCellLocation(index, tableSize));
+              }}
+              onClick={() => {
+                onInsertTable({
+                  columns: cellLocation.column,
+                  rows: cellLocation.row,
+                });
+              }}
+            />
+          ))}
+      </Box>
+      <Flex
+        sx={{
+          display: ["flex", "none", "none"],
+          my: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <InlineInput
+          containerProps={{ sx: { mr: 1 } }}
+          label="columns"
+          placeholder={`${cellLocation.column} columns`}
+          type="number"
+          value={cellLocation.column}
+          onChange={(e) => {
+            setCellLocation((l) => ({
+              ...l,
+              column: e.target.valueAsNumber || 0,
+            }));
+          }}
+        />
+        <InlineInput
+          label="rows"
+          placeholder={`${cellLocation.row} rows`}
+          type="number"
+          value={cellLocation.row}
+          onChange={(e) => {
+            setCellLocation((l) => ({
+              ...l,
+              row: e.target.valueAsNumber || 0,
+            }));
+          }}
+        />
+      </Flex>
+      <Text
+        variant={"body"}
+        sx={{ mt: 1, display: ["none", "block", "block"] }}
+      >
+        {cellLocation.column} x {cellLocation.row}
+      </Text>
+      <Button
+        variant={"primary"}
+        sx={{
+          display: ["block", "none", "none"],
+          alignSelf: ["stretch", "end", "end"],
+          py: 2,
+        }}
+        onClick={() =>
           onInsertTable({
             columns: cellLocation.column,
             rows: cellLocation.row,
-          });
-        },
-      }}
-    >
-      <Flex sx={{ p: 1, flexDirection: "column", alignItems: "center" }}>
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${tableSize.columns}, minmax(${
-              cellSize || 15
-            }px, 1fr))`, // "1fr ".repeat(tableSize.columns),
-            gap: "small",
-            bg: "background",
-            width: "100%",
-          }}
-          onTouchMove={(e) => {
-            const touch = e.touches.item(0);
-            const element = document.elementFromPoint(
-              touch.pageX,
-              touch.pageY
-            ) as HTMLElement;
-            if (!element) return;
-            const index = element.dataset.index;
-            if (!index) return;
-            setCellLocation(getCellLocation(parseInt(index), tableSize));
-          }}
-        >
-          {Array(tableSize.columns * tableSize.rows)
-            .fill(0)
-            .map((_, index) => (
-              <Box
-                data-index={index}
-                height={cellSize || 15}
-                sx={{
-                  border: "1px solid var(--disabled)",
-                  borderRadius: "small",
-                  bg: isCellHighlighted(index, cellLocation, tableSize)
-                    ? "disabled"
-                    : "transparent",
-                }}
-                onTouchStart={() => {
-                  setCellLocation(getCellLocation(index, tableSize));
-                }}
-                onMouseEnter={() => {
-                  setCellLocation(getCellLocation(index, tableSize));
-                }}
-                onClick={() => {
-                  onInsertTable({
-                    columns: cellLocation.column,
-                    rows: cellLocation.row,
-                  });
-                }}
-              />
-            ))}
-        </Box>
-        <Flex
-          sx={{
-            display: ["flex", "none"],
-            my: 1,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Input
-            placeholder={`${cellLocation.column} columns`}
-            sx={{ mr: 1 }}
-            type="number"
-            value={cellLocation.column}
-            onChange={(e) => {
-              setCellLocation((l) => ({
-                ...l,
-                column: e.target.valueAsNumber || 0,
-              }));
-            }}
-          />
-          <Input
-            placeholder={`${cellLocation.row} rows`}
-            type="number"
-            value={cellLocation.row}
-            onChange={(e) => {
-              setCellLocation((l) => ({
-                ...l,
-                row: e.target.valueAsNumber || 0,
-              }));
-            }}
-          />
-        </Flex>
-        <Text variant={"body"} sx={{ mt: 1, display: ["none", "block"] }}>
-          {cellLocation.column}x{cellLocation.row}
-        </Text>
-      </Flex>
-    </Popup>
+          })
+        }
+        disabled={!cellLocation.column || !cellLocation.row}
+      >
+        {!cellLocation.column || !cellLocation.row
+          ? "Please set a table size"
+          : `Insert a ${cellLocation.column} x ${cellLocation.row} table`}
+      </Button>
+    </Flex>
   );
 }
 

@@ -27,18 +27,31 @@ var __read = (this && this.__read) || function (o, n) {
 };
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { Icons } from "../icons";
-import { ActionSheetPresenter, MenuPresenter, } from "../../components/menu/menu";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Icon } from "../components/icon";
 import { Button } from "rebass";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { DesktopOnly, MobileOnly } from "../../components/responsive";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import { ResponsivePresenter, } from "../../components/responsive";
+import { showPopup } from "../../components/popup-presenter";
 export function InsertBlock(props) {
     var buttonRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var toolbarLocation = useToolbarLocation();
+    var isMobile = useIsMobile();
+    var menuItems = useMemo(function () {
+        return [
+            tasklist(editor),
+            horizontalRule(editor),
+            codeblock(editor),
+            blockquote(editor),
+            image(editor),
+            attachment(editor),
+            isMobile ? embedMobile(editor) : embedDesktop(editor),
+            table(editor),
+        ];
+    }, [isMobile]);
     return (_jsxs(_Fragment, { children: [_jsx(Button, __assign({ ref: buttonRef, sx: {
                     p: 1,
                     m: 0,
@@ -50,37 +63,16 @@ export function InsertBlock(props) {
                     ":last-of-type": {
                         mr: 0,
                     },
-                }, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.plus, size: 18, color: "primary" }) })), _jsx(DesktopOnly, { children: _jsx(MenuPresenter, { options: {
-                        type: "menu",
-                        position: {
-                            target: buttonRef.current || undefined,
-                            isTargetAbsolute: true,
-                            location: toolbarLocation === "bottom" ? "top" : "below",
-                            yOffset: 5,
-                        },
-                    }, isOpen: isOpen, items: [
-                        tasklist(editor),
-                        horizontalRule(editor),
-                        codeblock(editor),
-                        blockquote(editor),
-                        image(editor),
-                        attachment(editor),
-                        embed(editor),
-                        table(editor),
-                    ], onClose: function () { return setIsOpen(false); } }) }), _jsx(MobileOnly, { children: _jsx(ActionSheetPresenter, { isOpen: isOpen, items: [
-                        tasklist(editor),
-                        horizontalRule(editor),
-                        codeblock(editor),
-                        blockquote(editor),
-                        imageActionSheet(editor),
-                        attachment(editor),
-                        embedActionSheet(editor),
-                        tableActionSheet(editor),
-                    ], onClose: function () { return setIsOpen(false); } }) })] }));
+                }, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.plus, size: 18, color: "primary" }) })), _jsx(ResponsivePresenter, { desktop: "menu", mobile: "sheet", title: "Choose a block to insert", isOpen: isOpen, items: menuItems, onClose: function () { return setIsOpen(false); }, position: {
+                    target: buttonRef.current || undefined,
+                    isTargetAbsolute: true,
+                    location: toolbarLocation === "bottom" ? "top" : "below",
+                    yOffset: 5,
+                } })] }));
 }
 var horizontalRule = function (editor) { return ({
     key: "hr",
-    type: "menuitem",
+    type: "button",
     title: "Horizontal rule",
     icon: "horizontalRule",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("horizontalRule"),
@@ -88,7 +80,7 @@ var horizontalRule = function (editor) { return ({
 }); };
 var codeblock = function (editor) { return ({
     key: "codeblock",
-    type: "menuitem",
+    type: "button",
     title: "Code block",
     icon: "codeblock",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("codeBlock"),
@@ -96,7 +88,7 @@ var codeblock = function (editor) { return ({
 }); };
 var blockquote = function (editor) { return ({
     key: "blockquote",
-    type: "menuitem",
+    type: "button",
     title: "Quote",
     icon: "blockquote",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("blockQuote"),
@@ -104,134 +96,98 @@ var blockquote = function (editor) { return ({
 }); };
 var image = function (editor) { return ({
     key: "image",
-    type: "menuitem",
+    type: "button",
     title: "Image",
     icon: "image",
-    items: [
-        {
-            key: "upload-from-disk",
-            type: "menuitem",
-            title: "Upload from disk",
-            icon: "upload",
-            onClick: function () { },
-        },
-        {
-            key: "upload-from-url",
-            type: "menuitem",
-            title: "Attach from URL",
-            icon: "link",
-            onClick: function () { },
-        },
-    ],
-}); };
-var imageActionSheet = function (editor) { return ({
-    key: "image",
-    type: "menuitem",
-    title: "Image",
-    icon: "image",
-    items: [
-        {
-            key: "imageOptions",
-            type: "menuitem",
-            component: function (_a) {
-                var onClick = _a.onClick;
-                var _b = __read(useState(true), 2), isOpen = _b[0], setIsOpen = _b[1];
-                return (_jsx(ActionSheetPresenter, { isOpen: isOpen, onClose: function () { return setIsOpen(false); }, items: [
-                        {
-                            key: "upload-from-disk",
-                            type: "menuitem",
-                            title: "Upload from disk",
-                            icon: "upload",
-                            onClick: function () {
-                                return editor === null || editor === void 0 ? void 0 : editor.chain().focus().openAttachmentPicker("image").run();
-                            },
-                        },
-                        {
-                            key: "upload-from-url",
-                            type: "menuitem",
-                            title: "Attach from URL",
-                            icon: "link",
-                            onClick: function () { },
-                        },
-                    ] }));
+    menu: {
+        title: "Insert an image",
+        items: [
+            {
+                key: "upload-from-disk",
+                type: "button",
+                title: "Upload from disk",
+                icon: "upload",
+                onClick: function () { },
             },
-        },
-    ],
-}); };
-var embed = function (editor) { return ({
-    key: "embed",
-    type: "menuitem",
-    title: "Embed",
-    icon: "embed",
+            {
+                key: "upload-from-url",
+                type: "button",
+                title: "Attach from URL",
+                icon: "link",
+                onClick: function () { },
+            },
+        ],
+    },
 }); };
 var table = function (editor) { return ({
     key: "table",
-    type: "menuitem",
+    type: "button",
     title: "Table",
     icon: "table",
-    items: [
-        {
-            key: "table-size-selector",
-            type: "menuitem",
-            component: function (props) { return (_jsx(TablePopup, { onInsertTable: function (size) {
-                    var _a;
-                    editor === null || editor === void 0 ? void 0 : editor.chain().focus().insertTable({
-                        rows: size.rows,
-                        cols: size.columns,
-                    }).run();
-                    (_a = props.onClick) === null || _a === void 0 ? void 0 : _a.call(props);
-                } })); },
-        },
-    ],
+    menu: {
+        title: "Insert a table",
+        items: [
+            {
+                key: "table-size-selector",
+                type: "popup",
+                component: function (props) { return (_jsx(TablePopup, { onInsertTable: function (size) {
+                        var _a;
+                        editor === null || editor === void 0 ? void 0 : editor.chain().focus().insertTable({
+                            rows: size.rows,
+                            cols: size.columns,
+                        }).run();
+                        (_a = props.onClick) === null || _a === void 0 ? void 0 : _a.call(props);
+                    } })); },
+            },
+        ],
+    },
 }); };
-var embedActionSheet = function (editor) { return ({
+var embedMobile = function (editor) { return ({
     key: "embed",
-    type: "menuitem",
+    type: "button",
     title: "Embed",
     icon: "embed",
-    items: [
-        {
-            key: "table-size-selector",
-            type: "menuitem",
-            component: function (_a) {
-                var onClick = _a.onClick;
-                var _b = __read(useState(true), 2), isOpen = _b[0], setIsOpen = _b[1];
-                return (_jsx(ActionSheetPresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, items: [] }, { children: _jsx(EmbedPopup, { title: "Insert embed", icon: "check", onClose: function (embed) {
+    menu: {
+        title: "Insert an embed",
+        items: [
+            {
+                key: "embed-popup",
+                type: "popup",
+                component: function (_a) {
+                    var onClick = _a.onClick;
+                    return (_jsx(EmbedPopup, { title: "Insert embed", onClose: function (embed) {
+                            if (!embed)
+                                return onClick === null || onClick === void 0 ? void 0 : onClick();
                             editor === null || editor === void 0 ? void 0 : editor.chain().insertEmbed(embed).run();
-                            setIsOpen(false);
                             onClick === null || onClick === void 0 ? void 0 : onClick();
-                        } }) })));
+                        } }));
+                },
             },
-        },
-    ],
+        ],
+    },
 }); };
-var tableActionSheet = function (editor) { return ({
-    key: "table",
-    type: "menuitem",
-    title: "Table",
-    icon: "table",
-    items: [
-        {
-            key: "table-size-selector",
-            type: "menuitem",
-            component: function (_a) {
-                var onClick = _a.onClick;
-                var _b = __read(useState(true), 2), isOpen = _b[0], setIsOpen = _b[1];
-                return (_jsx(ActionSheetPresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, items: [] }, { children: _jsx(TablePopup, { cellSize: 30, autoExpand: false, onInsertTable: function (size) {
-                            editor === null || editor === void 0 ? void 0 : editor.chain().focus().insertTable({
-                                rows: size.rows,
-                                cols: size.columns,
-                            }).run();
-                            setIsOpen(false);
-                            onClick === null || onClick === void 0 ? void 0 : onClick();
-                        } }) })));
-            },
-        },
-    ],
+var embedDesktop = function (editor) { return ({
+    key: "embed",
+    type: "button",
+    title: "Embed",
+    icon: "embed",
+    onClick: function () {
+        if (!editor)
+            return;
+        showPopup({
+            theme: editor.storage.theme,
+            popup: function (hide) { return (_jsx(EmbedPopup, { title: "Insert embed", onClose: function (embed) {
+                    if (!embed)
+                        return hide();
+                    editor === null || editor === void 0 ? void 0 : editor.chain().insertEmbed(embed).run();
+                    hide();
+                } })); },
+        });
+    },
 }); };
 var attachment = function (editor) { return ({
     key: "attachment",
-    type: "menuitem",
+    type: "button",
     title: "Attachment",
     icon: "attachment",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("attachment"),
@@ -239,7 +195,7 @@ var attachment = function (editor) { return ({
 }); };
 var tasklist = function (editor) { return ({
     key: "tasklist",
-    type: "menuitem",
+    type: "button",
     title: "Task list",
     icon: "checkbox",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("taskList"),

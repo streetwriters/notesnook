@@ -68,10 +68,11 @@ import { refractor } from "refractor/lib/core";
 import "prism-themes/themes/prism-dracula.min.css";
 import { Button, Flex, Text } from "rebass";
 import Languages from "./languages.json";
-import { PopupPresenter } from "../../components/menu/menu";
 import { Input } from "@rebass/forms";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
+import { ResponsivePresenter } from "../../components/responsive";
+import { Popup } from "../../toolbar/components/popup";
 export function CodeblockComponent(props) {
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, forwardRef = props.forwardRef;
     var _a = node === null || node === void 0 ? void 0 : node.attrs, language = _a.language, indentLength = _a.indentLength, indentType = _a.indentType, caretPosition = _a.caretPosition;
@@ -140,57 +141,52 @@ export function CodeblockComponent(props) {
                                     mr: 1,
                                     bg: isOpen ? "codeSelection" : "transparent",
                                     ":hover": { bg: "codeSelection" },
-                                }, onClick: function () { return setIsOpen(true); }, title: "Change language" }, { children: _jsx(Text, __assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), _jsx(PopupPresenter, __assign({ isOpen: isOpen, onClose: function () {
-                    setIsOpen(false);
-                    editor.commands.focus();
-                }, mobile: "sheet", desktop: "menu", options: {
-                    type: "menu",
-                    position: {
-                        target: toolbarRef.current || undefined,
-                        align: "end",
-                        isTargetAbsolute: true,
-                        location: "top",
-                        yOffset: 5,
-                    },
-                } }, { children: _jsx(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: function (language) { return updateAttributes({ language: language }); } }) }))] }));
+                                }, onClick: function () { return setIsOpen(true); }, title: "Change language" }, { children: _jsx(Text, __assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), _jsx(ResponsivePresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, mobile: "sheet", desktop: "menu", position: {
+                    target: toolbarRef.current || undefined,
+                    align: "end",
+                    isTargetAbsolute: true,
+                    location: "top",
+                    yOffset: 5,
+                }, title: "Change code block language" }, { children: _jsx(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: function (language) {
+                        updateAttributes({ language: language });
+                        setIsOpen(false);
+                    }, onClose: function () { return setIsOpen(false); } }) }))] }));
 }
 function LanguageSelector(props) {
-    var onLanguageSelected = props.onLanguageSelected, selectedLanguage = props.selectedLanguage;
+    var onLanguageSelected = props.onLanguageSelected, selectedLanguage = props.selectedLanguage, onClose = props.onClose;
     var _a = __read(useState(Languages), 2), languages = _a[0], setLanguages = _a[1];
-    return (_jsxs(Flex, __assign({ sx: {
-            flexDirection: "column",
-            height: 200,
-            width: 300,
-            boxShadow: "menu",
-            borderRadius: "default",
-            overflowY: "auto",
-            bg: "background",
-            marginRight: 2,
-        } }, { children: [_jsx(Input, { autoFocus: true, placeholder: "Search languages", sx: {
-                    width: "auto",
-                    position: "sticky",
-                    top: 2,
-                    bg: "background",
-                    mx: 2,
-                    p: "7px",
-                }, onChange: function (e) {
-                    if (!e.target.value)
-                        return setLanguages(Languages);
-                    var query = e.target.value.toLowerCase();
-                    setLanguages(Languages.filter(function (lang) {
-                        var _a;
-                        return (lang.title.toLowerCase().indexOf(query) > -1 ||
-                            ((_a = lang.alias) === null || _a === void 0 ? void 0 : _a.some(function (alias) { return alias.toLowerCase().indexOf(query) > -1; })));
-                    }));
-                } }), _jsx(Flex, __assign({ sx: {
-                    flexDirection: "column",
-                    pt: 2,
-                    mt: 1,
-                } }, { children: languages.map(function (lang) { return (_jsxs(Button, __assign({ variant: "menuitem", sx: {
-                        textAlign: "left",
-                        py: 1,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                    }, onClick: function () { return onLanguageSelected(lang.filename); } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: lang.title })), selectedLanguage === lang.filename ? (_jsx(Icon, { path: Icons.check, size: "small" })) : lang.alias ? (_jsx(Text, __assign({ variant: "subBody", sx: { fontSize: "10px" } }, { children: lang.alias.slice(0, 3).join(", ") }))) : null] }))); }) }))] })));
+    return (_jsx(Popup, __assign({ title: "Select language", onClose: onClose }, { children: _jsxs(Flex, __assign({ sx: {
+                flexDirection: "column",
+                height: 200,
+                width: ["auto", 300],
+                overflowY: "auto",
+                bg: "background",
+            } }, { children: [_jsx(Input, { autoFocus: true, placeholder: "Search languages", sx: {
+                        width: "auto",
+                        position: "sticky",
+                        top: 0,
+                        bg: "background",
+                        mx: 2,
+                        p: "7px",
+                        zIndex: 999,
+                    }, onChange: function (e) {
+                        if (!e.target.value)
+                            return setLanguages(Languages);
+                        var query = e.target.value.toLowerCase();
+                        setLanguages(Languages.filter(function (lang) {
+                            var _a;
+                            return (lang.title.toLowerCase().indexOf(query) > -1 ||
+                                ((_a = lang.alias) === null || _a === void 0 ? void 0 : _a.some(function (alias) { return alias.toLowerCase().indexOf(query) > -1; })));
+                        }));
+                    } }), _jsx(Flex, __assign({ sx: {
+                        flexDirection: "column",
+                        pt: 1,
+                        mt: 1,
+                    } }, { children: languages.map(function (lang) { return (_jsxs(Button, __assign({ variant: "menuitem", sx: {
+                            textAlign: "left",
+                            py: 1,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }, onClick: function () { return onLanguageSelected(lang.filename); } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: lang.title })), selectedLanguage === lang.filename ? (_jsx(Icon, { path: Icons.check, size: "small" })) : lang.alias ? (_jsx(Text, __assign({ variant: "subBody", sx: { fontSize: "10px" } }, { children: lang.alias.slice(0, 3).join(", ") }))) : null] }), lang.title)); }) }))] })) })));
 }

@@ -1,5 +1,9 @@
 import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { createNodeView } from "../react";
+import {
+  createNodeView,
+  createSelectionBasedNodeView,
+  NodeViewSelectionNotifierPlugin,
+} from "../react";
 import { ImageComponent } from "./component";
 
 export interface ImageOptions {
@@ -98,7 +102,11 @@ export const ImageNode = Node.create<ImageOptions>({
   },
 
   addNodeView() {
-    return createNodeView(ImageComponent);
+    return createSelectionBasedNodeView(ImageComponent);
+  },
+
+  addProseMirrorPlugins() {
+    return [NodeViewSelectionNotifierPlugin];
   },
 
   addCommands() {

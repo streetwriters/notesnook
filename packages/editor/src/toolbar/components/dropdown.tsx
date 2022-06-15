@@ -2,10 +2,11 @@ import { useRef, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
-import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
+// import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
 import { MenuItem } from "../../components/menu/types";
-import { useToolbarContext } from "../hooks/useToolbarContext";
-import { useToolbarLocation } from "../stores/toolbar-store";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import { MenuPresenter } from "../../components/menu";
+import { getToolbarElement } from "../utils/dom";
 
 type DropdownProps = {
   selectedItem: string | JSX.Element;
@@ -18,6 +19,8 @@ export function Dropdown(props: DropdownProps) {
   const internalRef = useRef<any>();
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
+  const isMobile = useIsMobile();
+  const isBottom = toolbarLocation === "bottom";
 
   return (
     <>
@@ -49,27 +52,34 @@ export function Dropdown(props: DropdownProps) {
           selectedItem
         )}
         <Icon
-          path={
-            toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown
-          }
+          path={isBottom ? Icons.chevronUp : Icons.chevronDown}
           size={"small"}
           color={"text"}
         />
       </Button>
+
       <MenuPresenter
-        options={{
-          type: "menu",
-          position: {
-            target: internalRef.current || undefined,
-            isTargetAbsolute: true,
-            location: toolbarLocation === "bottom" ? "top" : "below",
-            yOffset: 5,
-          },
-        }}
         isOpen={isOpen}
         items={items}
         onClose={() => setIsOpen(false)}
-        sx={{ minWidth: menuWidth }}
+        position={{
+          target: isBottom
+            ? getToolbarElement()
+            : internalRef.current || "mouse",
+          isTargetAbsolute: true,
+          location: isBottom ? "top" : "below",
+          align: "center",
+          yOffset: 5,
+        }}
+        blocking={!isMobile}
+        focusOnRender={!isMobile}
+        sx={{
+          minWidth: menuWidth,
+          maxWidth: isBottom ? "95vw" : "auto",
+          p: isBottom ? 1 : 0,
+          flexDirection: isBottom ? "row" : "column",
+          overflowX: isBottom ? "auto" : "hidden",
+        }}
       />
     </>
   );

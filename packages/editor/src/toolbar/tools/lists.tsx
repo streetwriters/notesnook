@@ -1,15 +1,12 @@
 import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
-import { ToolId } from ".";
-import { Dropdown } from "../components/dropdown";
-import { MenuItem } from "../../components/menu/types";
-import { Box, Button, Flex, Text } from "rebass";
-import { Icon } from "../components/icon";
-import { IconNames, Icons } from "../icons";
-import { ToolButton } from "../components/tool-button";
-import { MenuPresenter } from "../../components/menu/menu";
+import { Box, Button, Flex } from "rebass";
+import { IconNames } from "../icons";
 import { useRef, useState } from "react";
 import { SplitButton } from "../components/split-button";
+import { useToolbarLocation } from "../stores/toolbar-store";
+import { getToolbarElement } from "../utils/dom";
+import { PopupWrapper } from "../../components/popup-presenter";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];
@@ -31,40 +28,63 @@ function ListTool<TListStyleTypes extends string>(
 ) {
   const { editor, options, ...toolProps } = props;
   const isActive = editor.isActive(options.type);
+  const toolbarLocation = useToolbarLocation();
+  const isBottom = toolbarLocation === "bottom";
+  const [isOpen, setIsOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>();
 
   return (
     <SplitButton
       {...toolProps}
+      buttonRef={buttonRef}
       onClick={() => options.onClick(editor)}
-      toggled={isActive}
+      toggled={isActive || isOpen}
       sx={{ mr: 0 }}
-      popupPresenterProps={{
-        items: options.subTypes.map((item) => ({
-          key: item.type,
-          tooltip: item.title,
-          type: "menuitem",
-          component: ({ onClick }) => (
-            <Button variant={"menuitem"} onClick={onClick}>
-              <ListThumbnail listStyleType={item.type} />
-            </Button>
-          ),
-          onClick: () => {
-            let chain = editor.chain().focus();
+      onOpen={() => setIsOpen((s) => !s)}
+    >
+      <PopupWrapper
+        isOpen={isOpen}
+        group="lists"
+        id={toolProps.title}
+        blocking={false}
+        focusOnRender={false}
+        position={{
+          isTargetAbsolute: true,
+          target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
+          align: "center",
+          location: isBottom ? "top" : "below",
+          yOffset: isBottom ? 10 : 5,
+        }}
+        renderPopup={() => (
+          <Box
+            sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 }}
+          >
+            {options.subTypes.map((item) => (
+              <Button
+                key={item.title}
+                variant={"menuitem"}
+                sx={{ width: 80 }}
+                onClick={() => {
+                  let chain = editor.chain().focus();
 
-            if (!isActive) {
-              if (options.type === "bulletList")
-                chain = chain.toggleBulletList();
-              else chain = chain.toggleOrderedList();
-            }
+                  if (!isActive) {
+                    if (options.type === "bulletList")
+                      chain = chain.toggleBulletList();
+                    else chain = chain.toggleOrderedList();
+                  }
 
-            return chain
-              .updateAttributes(options.type, { listType: item.type })
-              .run();
-          },
-        })),
-        sx: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 },
-      }}
-    />
+                  return chain
+                    .updateAttributes(options.type, { listType: item.type })
+                    .run();
+                }}
+              >
+                <ListThumbnail listStyleType={item.type} />
+              </Button>
+            ))}
+          </Box>
+        )}
+      />
+    </SplitButton>
   );
 }
 
@@ -129,8 +149,9 @@ function ListThumbnail(props: ListThumbnailProps) {
         listStyleType,
       }}
     >
-      {[0, 0, 0].map(() => (
+      {[0, 1, 2].map((i) => (
         <Box
+          key={i.toString()}
           as="li"
           sx={{
             display: "list-item",

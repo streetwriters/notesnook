@@ -1,12 +1,9 @@
 import { ToolProps } from "../types";
 import { Dropdown } from "../components/dropdown";
-import { ToolId } from ".";
 import { MenuItem } from "../../components/menu/types";
 import { Editor } from "@tiptap/core";
-import { Box, Button, Flex, Text } from "rebass";
-import { Slider } from "@rebass/forms";
-import { ToolButton } from "../components/tool-button";
 import { useCallback } from "react";
+import { Counter } from "../components/counter";
 
 const defaultFontSizes = [
   8, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 60, 72, 100,
@@ -21,48 +18,21 @@ export function FontSize(props: ToolProps) {
   }, [fontSizeAsNumber]);
 
   return (
-    <Flex
-      sx={{
-        alignItems: "center",
-        mr: 1,
-        ":last-of-type": {
-          mr: 0,
-        },
-      }}
-    >
-      <ToolButton
-        toggled={false}
-        title="Decrease font size"
-        icon="minus"
-        variant={"small"}
-        onClick={() => {
-          editor.chain().focus().setFontSize(`${decreaseFontSize()}px`).run();
-        }}
-      />
-      <Text
-        variant={"body"}
-        sx={{ fontSize: "subBody", mx: 1, textAlign: "center" }}
-        title="Reset font size"
-        onClick={() => {
-          editor.chain().focus().setFontSize(`16px`).run();
-        }}
-      >
-        {fontSize}
-      </Text>
-      <ToolButton
-        toggled={false}
-        title="Increase font size"
-        icon="plus"
-        variant={"small"}
-        onClick={() => {
-          editor
-            .chain()
-            .focus()
-            .setFontSize(`${fontSizeAsNumber + 1}px`)
-            .run();
-        }}
-      />
-    </Flex>
+    <Counter
+      title="font size"
+      onDecrease={() =>
+        editor.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()
+      }
+      onIncrease={() =>
+        editor
+          .chain()
+          .focus()
+          .setFontSize(`${fontSizeAsNumber + 1}px`)
+          .run()
+      }
+      onReset={() => editor.chain().focus().setFontSize(`16px`).run()}
+      value={fontSize}
+    />
   );
 }
 
@@ -97,7 +67,7 @@ function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
     const value = fontFamilies[key as keyof typeof fontFamilies];
     menuItems.push({
       key,
-      type: "menuitem",
+      type: "button",
       title: key,
       isChecked: key === currentFontFamily,
       onClick: () => editor.chain().focus().setFontFamily(value).run(),

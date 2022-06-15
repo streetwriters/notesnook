@@ -1,9 +1,9 @@
 import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
 import { ToolButton } from "../components/tool-button";
-import { MenuPresenter, PopupPresenter } from "../../components/menu/menu";
-import { useRef, useState } from "react";
-import { Flex } from "rebass";
+import { useCallback, useRef, useState } from "react";
+import { ResponsivePresenter } from "../../components/responsive";
+import { Button, Flex } from "rebass";
 import { Input } from "@rebass/forms";
 import { Popup } from "../components/popup";
 
@@ -111,16 +111,31 @@ export function Link(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const targetRef = useRef<HTMLElement>();
   const [isOpen, setIsOpen] = useState(false);
+
   const [href, setHref] = useState<string>();
   const [text, setText] = useState<string>();
   const currentUrl = editor.getAttributes("link").href;
   const isEditing = !!currentUrl;
 
+  const onDone = useCallback((href: string, text: string) => {
+    if (!href) return;
+
+    let commandChain = editor
+      .chain()
+      .focus()
+      .extendMarkRange("link")
+      .setLink({ href, target: "_blank" });
+    if (text) commandChain = commandChain.insertContent(text).focus();
+
+    commandChain.run();
+    setIsOpen(false);
+  }, []);
+
   return (
     <>
       <ToolButton
         id={icon}
-        ref={buttonRef}
+        buttonRef={buttonRef}
         title={title}
         icon={icon}
         onClick={() => {
@@ -143,63 +158,81 @@ export function Link(props: ToolProps) {
         }}
         toggled={isOpen || !!isEditing}
       />
-      <PopupPresenter
+      <ResponsivePresenter
         mobile="sheet"
         desktop="menu"
-        options={{
-          type: "menu",
-          position: {
-            target: targetRef.current || buttonRef.current || undefined,
-            isTargetAbsolute: true,
-            location: "below",
-            yOffset: 5,
-          },
+        position={{
+          target: targetRef.current || buttonRef.current || undefined,
+          isTargetAbsolute: true,
+          location: "below",
+          align: "center",
+          yOffset: 5,
         }}
+        title={isEditing ? "Edit link" : "Insert link"}
         isOpen={isOpen}
         items={[]}
         onClose={() => {
           editor.commands.focus();
           setIsOpen(false);
         }}
+        focusOnRender={false}
       >
         <Popup
           title={isEditing ? "Edit link" : "Insert link"}
-          action={{
-            text: isEditing ? "Edit" : "Insert",
-            onClick: () => {
-              if (!href) return;
-
-              let commandChain = editor
-                .chain()
-                .focus()
-                .extendMarkRange("link")
-                .setLink({ href, target: "_blank" });
-              if (text) commandChain = commandChain.insertContent(text).focus();
-
-              commandChain.run();
-              setIsOpen(false);
-            },
-          }}
-          //  negativeButton={{ text: "Cancel", onClick: () => setIsOpen(false) }}
+          onClose={() => setIsOpen(false)}
         >
-          <Flex sx={{ p: 1, flexDirection: "column" }}>
-            <Input
-              type="text"
-              placeholder="Link text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-            <Input
-              type="url"
-              sx={{ mt: 1 }}
-              autoFocus
-              placeholder="https://example.com/"
-              value={href}
-              onChange={(e) => setHref(e.target.value)}
-            />
-          </Flex>
+          <LinkPopup
+            href={href}
+            text={text}
+            isEditing={isEditing}
+            onDone={({ href, text }) => {
+              onDone(href, text);
+            }}
+          />
         </Popup>
-      </PopupPresenter>
+      </ResponsivePresenter>
     </>
+  );
+}
+
+type LinkPopupProps = {
+  text?: string;
+  href?: string;
+  isEditing?: boolean;
+  onDone: (link: { text: string; href: string }) => void;
+};
+function LinkPopup(props: LinkPopupProps) {
+  const { text: _text, href: _href, isEditing = false, onDone } = props;
+  const [href, setHref] = useState<string>(_href || "");
+  const [text, setText] = useState<string>(_text || "");
+
+  return (
+    <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>
+      <Input
+        type="text"
+        placeholder="Link text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <Input
+        type="url"
+        sx={{ mt: 1 }}
+        autoFocus
+        placeholder="https://example.com/"
+        value={href}
+        onChange={(e) => setHref(e.target.value)}
+      />
+      <Button
+        variant={"primary"}
+        sx={{
+          alignSelf: ["stretch", "end", "end"],
+          my: 1,
+          mr: 1,
+        }}
+        onClick={() => onDone({ text, href })}
+      >
+        {isEditing ? "Save edits" : "Insert link"}
+      </Button>
+    </Flex>
   );
 }

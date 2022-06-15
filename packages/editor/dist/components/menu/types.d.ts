@@ -3,19 +3,28 @@ import { IconNames } from "../../toolbar/icons";
 declare type MenuItemComponentProps = {
     onClick?: (e?: any) => void;
 };
-export declare type MenuItem = {
-    type: "menuitem" | "seperator";
+export declare type MenuItemTypes = "button" | "separator" | "popup";
+export declare type BaseMenuItem<TType extends MenuItemTypes> = {
+    type: TType;
     key: string;
-    component?: (props: MenuItemComponentProps) => JSX.Element;
+    isHidden?: boolean;
+};
+export declare type MenuSeperator = BaseMenuItem<"separator">;
+export declare type MenuPopup = BaseMenuItem<"popup"> & {
+    component: (props: MenuItemComponentProps) => JSX.Element;
+};
+export declare type MenuButton = BaseMenuItem<"button"> & {
     onClick?: () => void;
-    title?: string;
+    title: string;
     icon?: IconNames;
     tooltip?: string;
     isDisabled?: boolean;
-    isHidden?: boolean;
     isChecked?: boolean;
-    hasSubmenu?: boolean;
     modifier?: string;
-    items?: MenuItem[];
+    menu?: {
+        title: string;
+        items: MenuItem[];
+    };
 };
+export declare type MenuItem = MenuButton | MenuSeperator | MenuPopup;
 export {};

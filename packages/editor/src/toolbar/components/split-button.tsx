@@ -1,23 +1,19 @@
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
-import React, { PropsWithChildren, useRef, useState } from "react";
-import { Button, ButtonProps, Flex } from "rebass";
-import { IconNames, Icons } from "../icons";
+import { PropsWithChildren, useRef, useState } from "react";
+import { Button, Flex } from "rebass";
+import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton, ToolButtonProps } from "./tool-button";
-import {
-  PopupPresenter,
-  PopupPresenterProps,
-} from "../../components/menu/menu";
-import { useToolbarContext } from "../hooks/useToolbarContext";
 import { useToolbarLocation } from "../stores/toolbar-store";
+import {
+  PopupWrapper,
+  PopupWrapperProps,
+} from "../../components/popup-presenter";
+import { PositionOptions } from "../../utils/position";
 
-type SplitButtonProps = ToolButtonProps & {
-  popupPresenterProps?: Partial<PopupPresenterProps>;
-};
+export type SplitButtonProps = ToolButtonProps & { onOpen: () => void };
 export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
-  const { popupPresenterProps, children, ...toolButtonProps } = props;
+  const { children, toggled, onOpen, ...toolButtonProps } = props;
 
-  const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const toolbarLocation = useToolbarLocation();
 
@@ -27,22 +23,22 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
         ref={ref}
         sx={{
           borderRadius: "default",
-          bg: isOpen ? "hover" : "transparent",
+          bg: toggled ? "hover" : "transparent",
           ":hover": { bg: "hover" },
         }}
       >
-        <ToolButton {...toolButtonProps} />
+        <ToolButton {...toolButtonProps} toggled={toggled} />
         <Button
           sx={{
             p: 0,
             m: 0,
-            bg: "transparent",
+            bg: toggled ? "hover" : "transparent",
             ":hover": { bg: "hover" },
             ":last-of-type": {
               mr: 0,
             },
           }}
-          onClick={() => setIsOpen((s) => !s)}
+          onClick={onOpen}
           onMouseDown={(e) => e.preventDefault()}
         >
           <Icon
@@ -54,24 +50,7 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
           />
         </Button>
       </Flex>
-      <PopupPresenter
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        options={{
-          type: "menu",
-          position: {
-            target: ref.current || undefined,
-            isTargetAbsolute: true,
-            location: toolbarLocation === "bottom" ? "top" : "below",
-            yOffset: 5,
-            align: "center",
-          },
-        }}
-        items={[]}
-        {...popupPresenterProps}
-      >
-        {children}
-      </PopupPresenter>
+      {children}
     </>
   );
 }

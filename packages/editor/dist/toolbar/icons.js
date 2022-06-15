@@ -1,4 +1,4 @@
-import { mdiAttachment, mdiBorderHorizontal, mdiCheck, mdiChevronDown, mdiCodeBraces, mdiCodeTags, mdiDotsVertical, mdiFormatAlignCenter, mdiFormatAlignJustify, mdiFormatAlignLeft, mdiFormatAlignRight, mdiFormatBold, mdiFormatClear, mdiFormatColorHighlight, mdiFormatColorText, mdiFormatItalic, mdiFormatListBulleted, mdiFormatListNumbered, mdiFormatQuoteClose, mdiFormatStrikethrough, mdiFormatSubscript, mdiFormatSuperscript, mdiFormatTextdirectionLToR, mdiFormatTextdirectionRToL, mdiFormatUnderline, mdiImage, mdiInvertColorsOff, mdiLinkPlus, mdiLoading, mdiTable, mdiTableBorder, mdiTableRowPlusAfter, mdiTableRowPlusBefore, mdiTableRowRemove, mdiTableColumnPlusAfter, mdiTableColumnPlusBefore, mdiTableColumnRemove, mdiUploadOutline, mdiPlus, mdiSquareRoundedBadgeOutline, mdiFormatColorFill, mdiBorderAllVariant, mdiClose, mdiSortDescending, mdiArrowExpandRight, mdiArrowExpandLeft, mdiArrowExpandDown, mdiArrowExpandUp, mdiTrashCanOutline, mdiTableMergeCells, mdiTableSplitCell, mdiDeleteOutline, mdiDownloadOutline, mdiFormatListCheckbox, mdiDrag, mdiCheckboxMarkedOutline, mdiChevronUp, mdiArrowUp, mdiArrowDown, mdiRegex, mdiFormatLetterCase, mdiFormatLetterMatches, mdiMoviePlusOutline, mdiLink, mdiChevronRight, mdiTableColumnWidth, mdiTableRowHeight, mdiMinus, mdiPaletteOutline, mdiCircle, } from "@mdi/js";
+import { mdiAttachment, mdiBorderHorizontal, mdiCheck, mdiChevronDown, mdiCodeBraces, mdiCodeTags, mdiDotsVertical, mdiFormatAlignCenter, mdiFormatAlignJustify, mdiFormatAlignLeft, mdiFormatAlignRight, mdiFormatBold, mdiFormatClear, mdiFormatColorHighlight, mdiFormatColorText, mdiFormatItalic, mdiFormatListBulleted, mdiFormatListNumbered, mdiFormatQuoteClose, mdiFormatStrikethrough, mdiFormatSubscript, mdiFormatSuperscript, mdiFormatTextdirectionLToR, mdiFormatTextdirectionRToL, mdiFormatUnderline, mdiImage, mdiInvertColorsOff, mdiLinkPlus, mdiLoading, mdiTable, mdiTableBorder, mdiTableRowPlusAfter, mdiTableRowPlusBefore, mdiTableRowRemove, mdiTableColumnPlusAfter, mdiTableColumnPlusBefore, mdiTableColumnRemove, mdiUploadOutline, mdiPlus, mdiFormatColorFill, mdiClose, mdiSortDescending, mdiArrowExpandRight, mdiArrowExpandLeft, mdiArrowExpandDown, mdiArrowExpandUp, mdiTableMergeCells, mdiTableSplitCell, mdiDeleteOutline, mdiDownloadOutline, mdiFormatListCheckbox, mdiDrag, mdiCheckboxMarkedOutline, mdiChevronUp, mdiArrowUp, mdiArrowDown, mdiRegex, mdiFormatLetterCase, mdiFormatLetterMatches, mdiMoviePlusOutline, mdiLink, mdiChevronRight, mdiTableColumnWidth, mdiTableRowHeight, mdiMinus, mdiPaletteOutline, mdiCircle, mdiChevronLeft, mdiTableCog, mdiTableOff, mdiRectangle, } from "@mdi/js";
 export var Icons = {
     bold: mdiFormatBold,
     italic: mdiFormatItalic,
@@ -45,11 +45,12 @@ export var Icons = {
     moveColumnRight: mdiArrowExpandRight,
     moveColumnLeft: mdiArrowExpandLeft,
     deleteColumn: mdiTableColumnRemove,
-    cellProperties: mdiSquareRoundedBadgeOutline,
+    cellProperties: mdiRectangle,
+    cellBorderColor: "M4 24q-.825 0-1.412-.587Q2 22.825 2 22q0-.825.588-1.413Q3.175 20 4 20h16q.825 0 1.413.587Q22 21.175 22 22q0 .825-.587 1.413Q20.825 24 20 24Zm1-6q-.425 0-.713-.288Q4 17.425 4 17v-2.325q0-.2.075-.388q.075-.187.225-.337l8.75-8.75l3.75 3.75l-8.75 8.75q-.15.15-.337.225q-.188.075-.388.075Zm1-2h.9L14 8.95L13.05 8L6 15.1Zm11.925-8.15l-3.75-3.75l1.8-1.8q.275-.3.7-.288q.425.013.7.288l2.35 2.35q.275.275.275.688q0 .412-.275.712ZM6 16Z",
     backgroundColor: mdiFormatColorFill,
-    borderColor: mdiBorderAllVariant,
+    borderColor: "M4 24q-.825 0-1.412-.587Q2 22.825 2 22q0-.825.588-1.413Q3.175 20 4 20h16q.825 0 1.413.587Q22 21.175 22 22q0 .825-.587 1.413Q20.825 24 20 24Zm1-6q-.425 0-.713-.288Q4 17.425 4 17v-2.325q0-.2.075-.388q.075-.187.225-.337l8.75-8.75l3.75 3.75l-8.75 8.75q-.15.15-.337.225q-.188.075-.388.075Zm1-2h.9L14 8.95L13.05 8L6 15.1Zm11.925-8.15l-3.75-3.75l1.8-1.8q.275-.3.7-.288q.425.013.7.288l2.35 2.35q.275.275.275.688q0 .412-.275.712ZM6 16Z",
     sortDesc: mdiSortDescending,
-    deleteTable: mdiTrashCanOutline,
+    deleteTable: mdiTableOff,
     mergeCells: mdiTableMergeCells,
     splitCells: mdiTableSplitCell,
     checklist: mdiFormatListCheckbox,
@@ -63,6 +64,7 @@ export var Icons = {
     regex: mdiRegex,
     embed: mdiMoviePlusOutline,
     palette: mdiPaletteOutline,
+    tableSettings: mdiTableCog,
     plus: mdiPlus,
     minus: mdiMinus,
     close: mdiClose,
@@ -71,6 +73,7 @@ export var Icons = {
     chevronDown: mdiChevronDown,
     chevronUp: mdiChevronUp,
     chevronRight: mdiChevronRight,
+    chevronLeft: mdiChevronLeft,
     circle: mdiCircle,
     none: "",
 };

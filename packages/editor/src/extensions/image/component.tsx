@@ -4,31 +4,24 @@ import {
   ImageAttributes,
   ImageSizeOptions,
 } from "./image";
-import { ThemeProvider } from "emotion-theming";
 import { Theme } from "@notesnook/theme";
 import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { Editor } from "@tiptap/core";
 import { useEffect, useRef, useState } from "react";
-import { PopupPresenter } from "../../components/menu/menu";
-import { Popup } from "../../toolbar/components/popup";
+import { ReactNodeViewProps, SelectionBasedReactNodeViewProps } from "../react";
+import { ResponsivePresenter } from "../../components/responsive";
 import { ImageProperties } from "../../toolbar/popups/image-properties";
-import { ReactNodeViewProps } from "../react";
+import { Popup } from "../../toolbar/components/popup";
 
 export function ImageComponent(
-  props: ReactNodeViewProps<ImageAttributes & ImageAlignmentOptions>
+  props: SelectionBasedReactNodeViewProps<
+    ImageAttributes & ImageAlignmentOptions
+  >
 ) {
-  const { src, alt, title, width, height, align, float } = props.node.attrs;
-
-  const { editor, updateAttributes } = props;
+  const { editor, updateAttributes, node, selected } = props;
+  const { src, alt, title, width, height, align, float } = node.attrs;
   const imageRef = useRef<HTMLImageElement>();
-  const isActive = editor.isActive("image", { src });
-  const [isToolbarVisible, setIsToolbarVisible] = useState<boolean>();
-  const theme = editor.storage.theme as Theme;
-
-  useEffect(() => {
-    setIsToolbarVisible(isActive);
-  }, [isActive]);
 
   return (
     <>
@@ -61,8 +54,8 @@ export function ImageComponent(
           }}
           lockAspectRatio={true}
         >
-          <Flex sx={{ position: "relative", justifyContent: "end" }}>
-            {isToolbarVisible && (
+          {selected && (
+            <Flex sx={{ position: "relative", justifyContent: "end" }}>
               <ImageToolbar
                 editor={editor}
                 float={float}
@@ -70,8 +63,8 @@ export function ImageComponent(
                 height={height || 0}
                 width={width || 0}
               />
-            )}
-          </Flex>
+            </Flex>
+          )}
           <Image
             ref={imageRef}
             src={src}
@@ -80,7 +73,7 @@ export function ImageComponent(
             width={"100%"}
             height={"100%"}
             sx={{
-              border: isActive
+              border: selected
                 ? "2px solid var(--primary)"
                 : "2px solid transparent",
               borderRadius: "default",
@@ -101,9 +94,11 @@ type ImageToolbarProps = ImageAlignmentOptions &
 function ImageToolbar(props: ImageToolbarProps) {
   const { editor, float, height, width } = props;
   const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>();
 
   return (
     <Flex
+      ref={ref}
       sx={{
         flexDirection: "column",
         position: "absolute",
@@ -184,25 +179,30 @@ function ImageToolbar(props: ImageToolbarProps) {
         </Flex>
       </Flex>
 
-      <PopupPresenter
-        mobile="sheet"
-        desktop="none"
+      <ResponsivePresenter
         isOpen={isOpen}
+        desktop="menu"
+        mobile="sheet"
         onClose={() => setIsOpen(false)}
-        blocking={false}
+        blocking
+        focusOnRender={false}
+        position={{
+          target: ref.current || "mouse",
+          align: "start",
+          location: "below",
+          yOffset: 10,
+          isTargetAbsolute: true,
+        }}
       >
         <Popup
           title="Image properties"
-          action={{
-            icon: "close",
-            onClick: () => {
-              setIsOpen(false);
-            },
+          onClose={() => {
+            setIsOpen(false);
           }}
         >
           <ImageProperties {...props} />
         </Popup>
-      </PopupPresenter>
+      </ResponsivePresenter>
     </Flex>
   );
 }

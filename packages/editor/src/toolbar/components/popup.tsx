@@ -3,67 +3,53 @@ import { Icon } from "./icon";
 import { IconNames, Icons } from "../icons";
 import { PropsWithChildren } from "react";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { DesktopOnly, MobileOnly } from "../../components/responsive";
 
 export type PopupProps = {
   title?: string;
-  action?: PopupButtonProps;
+  onClose: () => void;
 };
 
 export function Popup(props: PropsWithChildren<PopupProps>) {
-  const { title, action, children } = props;
+  const { title, onClose, children } = props;
 
   return (
-    <Flex
-      sx={{
-        bg: "background",
-        flexDirection: "column",
-        //  borderRadius: "default",
-        // border: "1px solid var(--border)",
-        // boxShadow: "menu",
-      }}
-    >
-      {title && (
+    <>
+      <DesktopOnly>
         <Flex
           sx={{
-            justifyContent: "space-between",
-            alignItems: "center",
-            mx: 1,
-            mt: 1,
+            overflow: "hidden",
+            bg: "background",
+            flexDirection: "column",
+            borderRadius: "default",
+            // border: "1px solid var(--border)",
+            boxShadow: "menu",
+            minWidth: 200,
           }}
         >
-          <Text variant={"subtitle"}>{title}</Text>
-          {action && (
-            <PopupButton data-test-id="popup-no" color="text" {...action} />
-          )}
+          <Flex
+            className="movable"
+            sx={{
+              bg: "bgSecondary",
+              justifyContent: "space-between",
+              alignItems: "center",
+              p: 1,
+              mb: 1,
+            }}
+          >
+            <Text variant={"body"}>{title}</Text>
+            <Button
+              variant={"tool"}
+              sx={{ p: 0, bg: "transparent" }}
+              onClick={onClose}
+            >
+              <Icon path={Icons.close} size={16} />
+            </Button>
+          </Flex>
+          {children}
         </Flex>
-      )}
-      {children}
-    </Flex>
-  );
-}
-
-type PopupButtonProps = ButtonProps & {
-  text?: string;
-  loading?: boolean;
-  icon?: IconNames;
-  iconSize?: number;
-  iconColor?: keyof SchemeColors;
-};
-function PopupButton(props: PopupButtonProps) {
-  const { text, loading, icon, iconColor, iconSize, ...restProps } = props;
-  return (
-    <Button variant="icon" sx={{ p: 1, px: 2 }} {...restProps}>
-      {loading ? (
-        <Icon path={Icons.loading} size={16} rotate color="primary" />
-      ) : icon ? (
-        <Icon
-          path={Icons[icon]}
-          size={iconSize || 18}
-          color={iconColor || "icon"}
-        />
-      ) : (
-        text
-      )}
-    </Button>
+      </DesktopOnly>
+      <MobileOnly>{children}</MobileOnly>
+    </>
   );
 }

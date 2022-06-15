@@ -23,7 +23,7 @@ export declare class PortalProvider extends React.Component<BasePortalProviderPr
     static displayName: string;
     portalProviderAPI: PortalProviderAPI;
     constructor(props: BasePortalProviderProps);
-    render(): React.ReactChild | JSX.Element | null;
+    render(): JSX.Element | React.ReactChild | null;
     componentDidUpdate(): void;
 }
 export declare class PortalRenderer extends React.Component<{

@@ -25,11 +25,11 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
-import { PopupPresenter } from "../../components/menu/menu";
-import { useRef, useState } from "react";
-import { Flex } from "rebass";
+import { useCallback, useRef, useState } from "react";
+import { ResponsivePresenter } from "../../components/responsive";
+import { Button, Flex } from "rebass";
 import { Input } from "@rebass/forms";
 import { Popup } from "../components/popup";
 function InlineTool(props) {
@@ -71,7 +71,20 @@ export function Link(props) {
     var _c = __read(useState(), 2), text = _c[0], setText = _c[1];
     var currentUrl = editor.getAttributes("link").href;
     var isEditing = !!currentUrl;
-    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { id: icon, ref: buttonRef, title: title, icon: icon, onClick: function () {
+    var onDone = useCallback(function (href, text) {
+        if (!href)
+            return;
+        var commandChain = editor
+            .chain()
+            .focus()
+            .extendMarkRange("link")
+            .setLink({ href: href, target: "_blank" });
+        if (text)
+            commandChain = commandChain.insertContent(text).focus();
+        commandChain.run();
+        setIsOpen(false);
+    }, []);
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, { id: icon, buttonRef: buttonRef, title: title, icon: icon, onClick: function () {
                     if (isEditing)
                         setHref(currentUrl);
                     var _a = editor.state.selection, from = _a.from, to = _a.to, $from = _a.$from;
@@ -84,31 +97,27 @@ export function Link(props) {
                         : editor.state.doc.textBetween(from, to);
                     setText(selectedText);
                     setIsOpen(true);
-                }, toggled: isOpen || !!isEditing }), _jsx(PopupPresenter, __assign({ mobile: "sheet", desktop: "menu", options: {
-                    type: "menu",
-                    position: {
-                        target: targetRef.current || buttonRef.current || undefined,
-                        isTargetAbsolute: true,
-                        location: "below",
-                        yOffset: 5,
-                    },
-                }, isOpen: isOpen, items: [], onClose: function () {
+                }, toggled: isOpen || !!isEditing }), _jsx(ResponsivePresenter, __assign({ mobile: "sheet", desktop: "menu", position: {
+                    target: targetRef.current || buttonRef.current || undefined,
+                    isTargetAbsolute: true,
+                    location: "below",
+                    align: "center",
+                    yOffset: 5,
+                }, title: isEditing ? "Edit link" : "Insert link", isOpen: isOpen, items: [], onClose: function () {
                     editor.commands.focus();
                     setIsOpen(false);
-                } }, { children: _jsx(Popup, __assign({ title: isEditing ? "Edit link" : "Insert link", action: {
-                        text: isEditing ? "Edit" : "Insert",
-                        onClick: function () {
-                            if (!href)
-                                return;
-                            var commandChain = editor
-                                .chain()
-                                .focus()
-                                .extendMarkRange("link")
-                                .setLink({ href: href, target: "_blank" });
-                            if (text)
-                                commandChain = commandChain.insertContent(text).focus();
-                            commandChain.run();
-                            setIsOpen(false);
-                        },
-                    } }, { children: _jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column" } }, { children: [_jsx(Input, { type: "text", placeholder: "Link text", value: text, onChange: function (e) { return setText(e.target.value); } }), _jsx(Input, { type: "url", sx: { mt: 1 }, autoFocus: true, placeholder: "https://example.com/", value: href, onChange: function (e) { return setHref(e.target.value); } })] })) })) }))] }));
+                }, focusOnRender: false }, { children: _jsx(Popup, __assign({ title: isEditing ? "Edit link" : "Insert link", onClose: function () { return setIsOpen(false); } }, { children: _jsx(LinkPopup, { href: href, text: text, isEditing: isEditing, onDone: function (_a) {
+                            var href = _a.href, text = _a.text;
+                            onDone(href, text);
+                        } }) })) }))] }));
+}
+function LinkPopup(props) {
+    var _text = props.text, _href = props.href, _a = props.isEditing, isEditing = _a === void 0 ? false : _a, onDone = props.onDone;
+    var _b = __read(useState(_href || ""), 2), href = _b[0], setHref = _b[1];
+    var _c = __read(useState(_text || ""), 2), text = _c[0], setText = _c[1];
+    return (_jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column", width: ["auto", 250] } }, { children: [_jsx(Input, { type: "text", placeholder: "Link text", value: text, onChange: function (e) { return setText(e.target.value); } }), _jsx(Input, { type: "url", sx: { mt: 1 }, autoFocus: true, placeholder: "https://example.com/", value: href, onChange: function (e) { return setHref(e.target.value); } }), _jsx(Button, __assign({ variant: "primary", sx: {
+                    alignSelf: ["stretch", "end", "end"],
+                    my: 1,
+                    mr: 1,
+                }, onClick: function () { return onDone({ text: text, href: href }); } }, { children: isEditing ? "Save edits" : "Insert link" }))] })));
 }

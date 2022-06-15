@@ -5,25 +5,19 @@ import { Resizable } from "re-resizable";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { Editor } from "@tiptap/core";
 import { useEffect, useRef, useState } from "react";
-import { PopupPresenter } from "../../components/menu/menu";
 import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { EmbedPopup } from "../../toolbar/popups/embed-popup";
-import { ReactNodeViewProps } from "../react";
+import { SelectionBasedReactNodeViewProps } from "../react";
+import { ResponsivePresenter } from "../../components/responsive";
 
 export function EmbedComponent(
-  props: ReactNodeViewProps<EmbedAttributes & EmbedAlignmentOptions>
+  props: SelectionBasedReactNodeViewProps<
+    EmbedAttributes & EmbedAlignmentOptions
+  >
 ) {
-  const { src, width, height, align } = props.node.attrs;
-
-  const { editor, updateAttributes } = props;
+  const { editor, updateAttributes, selected, node } = props;
   const embedRef = useRef<HTMLIFrameElement>();
-  const isActive = editor.isActive("embed", { src });
-  const [isToolbarVisible, setIsToolbarVisible] = useState<boolean>();
-  const theme = editor.storage.theme as Theme;
-
-  useEffect(() => {
-    setIsToolbarVisible(isActive);
-  }, [isActive]);
+  const { src, width, height, align } = node.attrs;
 
   return (
     <>
@@ -60,14 +54,14 @@ export function EmbedComponent(
               // borderLeft: "20px solid var(--bgSecondary)",
               borderTopLeftRadius: "default",
               borderTopRightRadius: "default",
-              borderColor: isActive ? "border" : "bgSecondary",
+              borderColor: selected ? "border" : "bgSecondary",
               cursor: "pointer",
               ":hover": {
                 borderColor: "border",
               },
             }}
           >
-            {isToolbarVisible && (
+            {selected && (
               <EmbedToolbar
                 editor={editor}
                 align={align}
@@ -106,9 +100,11 @@ type ImageToolbarProps = Required<EmbedAttributes> &
 function EmbedToolbar(props: ImageToolbarProps) {
   const { editor, height, width, src } = props;
   const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>();
 
   return (
     <Flex
+      ref={ref}
       sx={{
         flexDirection: "column",
         position: "absolute",
@@ -188,23 +184,29 @@ function EmbedToolbar(props: ImageToolbarProps) {
           />
         </Flex>
       </Flex>
-
-      <PopupPresenter
+      <ResponsivePresenter
         isOpen={isOpen}
-        desktop="none"
+        desktop="menu"
         mobile="sheet"
         onClose={() => setIsOpen(false)}
-        blocking={true}
+        blocking
+        focusOnRender={false}
+        position={{
+          target: ref.current || "mouse",
+          align: "start",
+          location: "below",
+          yOffset: 10,
+          isTargetAbsolute: true,
+        }}
       >
         <EmbedPopup
           title="Embed properties"
-          icon="close"
           onClose={() => setIsOpen(false)}
           embed={props}
           onSourceChanged={(src) => {}}
           onSizeChanged={(size) => editor.commands.setEmbedSize(size)}
         />
-      </PopupPresenter>
+      </ResponsivePresenter>
     </Flex>
   );
 }
