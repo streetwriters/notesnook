@@ -5,6 +5,7 @@ import DelayLayout from '../../components/delay-layout';
 import useNavigationStore from '../../stores/use-navigation-store';
 import { tabBarRef } from '../../utils/global-refs';
 import { useNavigationFocus } from '../../utils/hooks/use-navigation-focus';
+import { components } from './components';
 import { SectionItem } from './section-item';
 import { RouteParams, SettingSection } from './types';
 
@@ -37,7 +38,11 @@ const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Setti
 
   return (
     <DelayLayout>
-      <View>
+      <View
+        style={{
+          flex: 1
+        }}
+      >
         {route.params.sections ? (
           <FlatList
             data={route.params.sections}
@@ -45,6 +50,7 @@ const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Setti
             renderItem={renderItem}
           />
         ) : null}
+        {route.params.component ? components[route.params.component] : null}
       </View>
     </DelayLayout>
   );

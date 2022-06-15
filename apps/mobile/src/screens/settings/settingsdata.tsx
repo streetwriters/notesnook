@@ -42,6 +42,7 @@ import AppLock from './app-lock';
 import { verifyUser } from './functions';
 import { SettingSection } from './types';
 import { getTimeLeft } from './user-section';
+import { ConfigureToolbar } from './editor/configure-toolbar';
 const format = (ver: number) => {
   let parts = ver.toString().split('');
   return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? '' : parts[2]}${
@@ -699,6 +700,20 @@ export const settingsGroups: SettingSection[] = [
           }
           SettingsService.toggle('notifNotes');
         }
+      }
+    ]
+  },
+  {
+    id: 'editor',
+    name: 'Editor',
+    sections: [
+      {
+        id: 'configure-toolbar',
+        type: 'screen',
+        name: 'Configure toolbar',
+        description: `Make the toolbar adaptable to your needs.`,
+        icon: 'form-textbox',
+        component: 'configuretoolbar'
       }
     ]
   },

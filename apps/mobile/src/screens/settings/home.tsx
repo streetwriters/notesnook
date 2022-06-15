@@ -22,17 +22,11 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
   const colors = useThemeStore(state => state.colors);
   const [loading, setLoading] = useState(false);
   const flatlistRef = useRef<FlatList<SettingSection>>(null);
-  const isFocused = useNavigationFocus(navigation, {
+
+  useNavigationFocus(navigation, {
     onFocus: () => {
       useNavigationStore.getState().update({
         name: 'Settings'
-      });
-      return false;
-    },
-    onBlur: () => {
-      flatlistRef.current?.scrollToOffset({
-        offset: 0,
-        animated: false
       });
       return false;
     },

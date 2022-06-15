@@ -59,7 +59,7 @@ const DialogHeader = ({
               alignItems: 'center'
             }}
           >
-            <Heading style={{ textAlign: centered ? 'center' : 'left' }} size={SIZE.xl}>
+            <Heading style={{ textAlign: centered ? 'center' : 'left' }} size={SIZE.lg}>
               {title} {titlePart ? <Text style={{ color: colors.accent }}>{titlePart}</Text> : null}
             </Heading>
 

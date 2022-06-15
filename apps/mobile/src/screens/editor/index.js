@@ -3,10 +3,9 @@ import { Linking, Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
 import { useUserStore } from '../../stores/use-user-store';
-import EditorHeader from './header';
 import { useEditor } from './tiptap/use-editor';
-import { editorController } from './tiptap/utils';
 import { useEditorEvents } from './tiptap/use-editor-events';
+import { editorController } from './tiptap/utils';
 
 const sourceUri = '';
 
@@ -19,7 +18,7 @@ const style = {
   alignSelf: 'center',
   backgroundColor: 'transparent'
 };
-
+const off = true;
 const Editor = React.memo(
   () => {
     const premiumUser = useUserStore(state => state.premium);
@@ -38,7 +37,7 @@ const Editor = React.memo(
       return false;
     };
 
-    return editor.loading ? null : (
+    return editor.loading || off ? null : (
       <>
         <View
           style={{
@@ -76,7 +75,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: 'http://192.168.10.3:3000'
+              uri: 'http://192.168.10.7:3000'
             }}
             style={style}
             autoManageStatusBarEnabled={false}

@@ -1,5 +1,5 @@
 import { NavigationProp, StackActions, useNavigation } from '@react-navigation/native';
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
@@ -11,17 +11,8 @@ import useNavigationStore from '../../stores/use-navigation-store';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
-import { AccentColorPicker, HomagePageSelector } from './appearance';
-import { AutomaticBackupsSelector } from './backup-restore';
-import { Subscription } from './subscription';
+import { components } from './components';
 import { RouteParams, SettingSection } from './types';
-
-const components: { [name: string]: ReactElement } = {
-  colorpicker: <AccentColorPicker wrap={true} />,
-  homeselector: <HomagePageSelector />,
-  autobackups: <AutomaticBackupsSelector />,
-  subscription: <Subscription />
-};
 
 export const SectionItem = React.memo(
   ({ item }: { item: SettingSection }) => {
@@ -37,6 +28,7 @@ export const SectionItem = React.memo(
       }
       if (!item.property) return;
       SettingsService.set({
+        //@ts-ignore
         [item.property]: !settings[item.property]
       });
     };
@@ -130,7 +122,7 @@ export const SectionItem = React.memo(
               </Paragraph>
             )}
 
-            {!!item.component && (
+            {!!item.component && item.type !== 'screen' && (
               <>
                 <Seperator half />
                 {components[item.component]}
