@@ -7,6 +7,7 @@ import { hashNavigate } from "../navigation";
 import useNavigate from "../utils/use-navigate";
 
 function Home() {
+  useStore((store) => store.nonce);
   const notes = useStore((store) => store.notes);
   const refresh = useStore((store) => store.refresh);
   const clearContext = useStore((store) => store.clearContext);
