@@ -1,7 +1,6 @@
 import Topic from "../models/topic";
 import { qclone } from "qclone";
 import id from "../utils/id";
-import sort from "fast-sort";
 
 export default class Topics {
   /**
@@ -75,9 +74,7 @@ export default class Topics {
    * @returns {Array} an array containing all the topics
    */
   get all() {
-    return sort(this._db.notebooks.notebook(this._notebookId).data.topics).desc(
-      (topic) => topic.dateCreated
-    );
+    return this._db.notebooks.notebook(this._notebookId).data.topics;
   }
 
   /**

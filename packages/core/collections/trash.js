@@ -1,4 +1,3 @@
-import sort from "fast-sort";
 import dayjs from "dayjs";
 
 export default class Trash {
@@ -32,7 +31,7 @@ export default class Trash {
       const collection = this.collections[key];
       trashItems.push(...collection.deleted);
     }
-    return sort(trashItems).desc((item) => item.dateDeleted);
+    return trashItems;
   }
 
   _getItem(id) {

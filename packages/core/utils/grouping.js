@@ -1,34 +1,56 @@
 import "../types";
-import fastsort from "fast-sort";
-import dayjs from "dayjs";
-import { getWeekGroupFromTimestamp } from "./date";
+import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
 
-/**
- *
- * @param {GroupOptions} options
- * @returns sort selectors
- */
-const getSortSelectors = (options) => [
-  { desc: (t) => t.conflicted },
-  { desc: (t) => t.pinned },
-  {
-    [options.sortDirection]: (item) => {
-      if (options.sortBy === "title") return item.alias || item.title;
-      return item[options.sortBy];
-    },
+const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
+const MILLISECONDS_IN_WEEK = MILLISECONDS_IN_DAY * 7;
+
+const SORT_COLLATOR = new Intl.Collator("en", {
+  numeric: false,
+  sensitivity: "base",
+  ignorePunctuation: true,
+  caseFirst: false,
+  usage: "sort",
+});
+
+const comparators = {
+  dateEdited: {
+    asc: (a, b) => a.dateEdited - b.dateEdited,
+    desc: (a, b) => b.dateEdited - a.dateEdited,
   },
-];
+  dateCreated: {
+    asc: (a, b) => a.dateCreated - b.dateCreated,
+    desc: (a, b) => b.dateCreated - a.dateCreated,
+  },
+  dateDeleted: {
+    asc: (a, b) => a.dateDeleted - b.dateDeleted,
+    desc: (a, b) => b.dateDeleted - a.dateDeleted,
+  },
+  title: {
+    asc: (a, b) => SORT_COLLATOR.compare(getTitle(a), getTitle(b)),
+    desc: (a, b) => SORT_COLLATOR.compare(getTitle(b), getTitle(a)),
+  },
+};
+
+function getTitle(item) {
+  return item.alias || item.title;
+}
 
 const KEY_SELECTORS = {
   abc: (item) => getFirstCharacter(item.alias || item.title),
-  month: (item, groupBy) => dayjs(item[groupBy]).format("MMMM"),
+  month: (item, groupBy, dateNow) => {
+    dateNow.setTime(item[groupBy]);
+    return MONTHS_FULL[dateNow.getMonth()];
+  },
   week: (item, groupBy) => getWeekGroupFromTimestamp(item[groupBy]),
-  year: (item, groupBy) => dayjs(item[groupBy]).year(),
-  default: (item, groupBy) => {
-    const date = dayjs(item[groupBy]);
-    return date.isAfter(dayjs().subtract(1, "week"))
+  year: (item, groupBy, dateNow) => {
+    dateNow.setTime(item[groupBy]);
+    return dateNow.getFullYear();
+  },
+  default: (item, groupBy, dateNow) => {
+    const date = item[groupBy];
+    return date > dateNow.getTime() - MILLISECONDS_IN_WEEK
       ? "Recent"
-      : date.isAfter(dayjs().subtract(2, "weeks"))
+      : date > dateNow.getTime() - MILLISECONDS_IN_WEEK * 2
       ? "Last week"
       : "Older";
   },
@@ -47,39 +69,52 @@ export function groupArray(
     sortDirection: "desc",
   }
 ) {
-  if (options.sortBy && options.sortDirection)
-    fastsort(array).by(getSortSelectors(options));
+  const cachedDate = new Date();
+
+  if (options.sortBy && options.sortDirection) {
+    const selector = comparators[options.sortBy][options.sortDirection];
+    array.sort(selector);
+  }
 
   if (options.groupBy === "none") {
     return [{ title: "All", type: "header" }, ...array];
   }
 
-  const keySelector = KEY_SELECTORS[options.groupBy || "default"];
-  let groups = new Map();
-  array.forEach((item) => {
-    let groupTitle = item.pinned
-      ? "Pinned"
-      : item.conflicted
-      ? "Conflicted"
-      : keySelector(item, options.sortBy);
+  const groups = new Map([
+    ["Conflicted", []],
+    ["Pinned", []],
+  ]);
 
-    let group = groups.get(groupTitle) || [];
-    group.push(item);
-    groups.set(groupTitle, group);
+  const keySelector = KEY_SELECTORS[options.groupBy || "default"];
+  array.forEach((item) => {
+    if (item.pinned) {
+      return addToGroup(groups, "Pinned", item);
+    } else if (item.conflicted) return addToGroup(groups, "Conflicted", item);
+
+    const groupTitle = keySelector(item, options.sortBy, cachedDate);
+    addToGroup(groups, groupTitle, item);
   });
 
   let items = [];
-  groups.forEach((groupItems, groupTitle) => {
+  for (let [groupTitle, groupItems] of groups.entries()) {
+    if (!groupItems.length) continue;
+
     let group = { title: groupTitle, type: "header" };
     items.push(group);
     groupItems.forEach((item) => items.push(item));
-  });
+  }
+
   return items;
 }
 
+function addToGroup(groups, groupTitle, item) {
+  const group = groups.get(groupTitle) || [];
+  group.push(item);
+  groups.set(groupTitle, group);
+}
+
+const REGEX = /\S/;
 function getFirstCharacter(str) {
   if (!str) return "-";
-  str = str.trim();
-  if (str.length <= 0) return "-";
-  return str[0].toUpperCase();
+  return REGEX.exec(str)[0].toUpperCase();
 }

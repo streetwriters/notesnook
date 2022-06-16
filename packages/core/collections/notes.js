@@ -3,7 +3,6 @@ import Note from "../models/note";
 import getId from "../utils/id";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone/src/qclone";
-import sort from "fast-sort";
 import { deleteItem } from "../utils/array";
 
 export default class Notes extends Collection {
@@ -169,7 +168,7 @@ export default class Notes extends Collection {
       if (item) arr.push(item.data);
       return arr;
     }, []);
-    return sort(array).desc((note) => note.dateCreated);
+    return array.sort((a, b) => b.dateCreated - a.dateCreated);
   }
 
   delete(...ids) {

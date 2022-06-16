@@ -30,18 +30,13 @@
   "dependencies": {
     "@microsoft/signalr": "^6.0.3",
     "@microsoft/signalr-protocol-msgpack": "^6.0.3",
-    "@stablelib/blake2s": "^1.0.1",
     "async-mutex": "^0.3.2",
     "base64-arraybuffer": "^1.0.1",
-    "cheerio": "^1.0.0-rc.10",
     "dayjs": "^1.10.6",
     "entities": "^3.0.1",
-    "fast-sort": "^2.0.1",
     "fflate": "^0.7.1",
-    "happy-dom": "^2.55.0",
     "linkedom": "^0.14.7",
     "liqe": "^1.13.0",
-    "node-html-parser": "github:thecodrr/node-html-parser",
     "qclone": "^1.0.4",
     "showdown": "github:thecodrr/showdown",
     "spark-md5": "^3.0.1"

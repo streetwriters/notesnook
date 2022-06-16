@@ -1,4 +1,3 @@
-import sort from "fast-sort";
 import IndexedCollection from "./indexed-collection";
 import MapStub from "../utils/map";
 
@@ -7,6 +6,7 @@ export default class CachedCollection extends IndexedCollection {
     super(context, type, eventManager);
     this.type = type;
     this.map = new Map();
+    this.items = undefined;
     // this.eventManager = eventManager;
     // this.encryptionKeyFactory = encryptionKeyFactory;
   }
@@ -34,11 +34,13 @@ export default class CachedCollection extends IndexedCollection {
   async clear() {
     await super.clear();
     this.map.clear();
+    this.invalidateCache();
   }
 
   async updateItem(item) {
     await super.updateItem(item);
     this.map.set(item.id, item);
+    this.invalidateCache();
   }
 
   exists(id) {
@@ -56,19 +58,27 @@ export default class CachedCollection extends IndexedCollection {
   async deleteItem(id) {
     this.map.delete(id);
     await super.deleteItem(id);
+    this.invalidateCache();
   }
 
   getRaw() {
     return Array.from(this.map.values());
   }
 
-  getItems(sortFn = (u) => u.dateCreated, manipulate = (item) => item) {
-    let items = [];
+  getItems(map = undefined) {
+    if (this.items) return this.items;
+
+    this.items = [];
     this.map.forEach((value) => {
       if (!value || value.deleted || !value.id) return;
-      value = manipulate ? manipulate(value) : value;
-      items.push(value);
+      value = map ? map(value) : value;
+      this.items.push(value);
     });
-    return sort(items).desc(sortFn);
+    this.items.sort((a, b) => b.dateCreated - a.dateCreated);
+    return this.items;
+  }
+
+  invalidateCache() {
+    this.items = undefined;
   }
 }

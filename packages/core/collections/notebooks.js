@@ -103,7 +103,7 @@ export default class Notebooks extends Collection {
   }
 
   get all() {
-    return this._collection.getItems([(t) => t.dateCreated, (t) => t.pinned]);
+    return this._collection.getItems();
   }
 
   get pinned() {
