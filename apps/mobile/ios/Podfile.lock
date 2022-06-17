@@ -12,8 +12,6 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.68.1)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - hermes-engine (0.11.0)
-  - libevent (2.1.12)
   - MMKV (1.2.10):
     - MMKVCore (~> 1.2.10)
   - MMKVCore (1.2.13)
@@ -29,12 +27,6 @@ PODS:
     - DoubleConversion
     - fmt (~> 6.2.1)
     - glog
-  - RCT-Folly/Futures (2021.06.28.00-v2):
-    - boost
-    - DoubleConversion
-    - fmt (~> 6.2.1)
-    - glog
-    - libevent
   - RCTRequired (0.68.1)
   - RCTTypeSafety (0.68.1):
     - FBLazyVector (= 0.68.1)
@@ -210,17 +202,6 @@ PODS:
     - React-logger (= 0.68.1)
     - React-perflogger (= 0.68.1)
     - React-runtimeexecutor (= 0.68.1)
-  - React-hermes (0.68.1):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2021.06.28.00-v2)
-    - RCT-Folly/Futures (= 2021.06.28.00-v2)
-    - React-cxxreact (= 0.68.1)
-    - React-jsi (= 0.68.1)
-    - React-jsiexecutor (= 0.68.1)
-    - React-jsinspector (= 0.68.1)
-    - React-perflogger (= 0.68.1)
   - React-jsi (0.68.1):
     - boost (= 1.76.0)
     - DoubleConversion
@@ -262,15 +243,23 @@ PODS:
     - React-Core
   - react-native-keep-awake (1.0.4):
     - React
-  - react-native-mmkv-storage (0.7.0):
+  - react-native-mmkv-storage (0.7.4):
     - MMKV (= 1.2.10)
+    - React-Core
+  - react-native-multithreading (1.1.1):
+    - React
+    - React-callinvoker
     - React-Core
   - react-native-netinfo (6.2.1):
     - React-Core
   - react-native-orientation (3.1.3):
     - React
-  - react-native-safe-area-context (3.3.2):
-    - React-Core
+  - react-native-safe-area-context (4.3.1):
+    - RCT-Folly
+    - RCTRequired
+    - RCTTypeSafety
+    - React
+    - ReactCommon/turbomodule/core
   - react-native-sodium (1.0.0):
     - React
   - react-native-webview (11.17.0):
@@ -360,7 +349,7 @@ PODS:
     - React
   - RNFileViewer (2.1.5):
     - React-Core
-  - RNGestureHandler (2.4.1):
+  - RNGestureHandler (2.4.2):
     - React-Core
   - RNIap (5.2.14):
     - React-Core
@@ -395,7 +384,7 @@ PODS:
     - React-RCTText
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.10.2):
+  - RNScreens (3.13.1):
     - React-Core
     - React-RCTImage
   - RNSecureRandom (1.0.0):
@@ -423,8 +412,6 @@ DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/React/FBReactNativeSpec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - hermes-engine (~> 0.11.0)
-  - libevent (~> 2.1.12)
   - MMKV
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
@@ -437,7 +424,6 @@ DEPENDENCIES:
   - React-Core/RCTWebSocket (from `../node_modules/react-native/`)
   - React-CoreModules (from `../node_modules/react-native/React/CoreModules`)
   - React-cxxreact (from `../node_modules/react-native/ReactCommon/cxxreact`)
-  - React-hermes (from `../node_modules/react-native/ReactCommon/hermes`)
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
@@ -452,6 +438,7 @@ DEPENDENCIES:
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
+  - react-native-multithreading (from `../node_modules/react-native-multithreading`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-orientation (from `../node_modules/react-native-orientation`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -498,8 +485,6 @@ SPEC REPOS:
   trunk:
     - Base64
     - fmt
-    - hermes-engine
-    - libevent
     - MMKV
     - MMKVCore
     - pop
@@ -533,8 +518,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/React/CoreModules"
   React-cxxreact:
     :path: "../node_modules/react-native/ReactCommon/cxxreact"
-  React-hermes:
-    :path: "../node_modules/react-native/ReactCommon/hermes"
   React-jsi:
     :path: "../node_modules/react-native/ReactCommon/jsi"
   React-jsiexecutor:
@@ -563,6 +546,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
     :path: "../node_modules/react-native-mmkv-storage"
+  react-native-multithreading:
+    :path: "../node_modules/react-native-multithreading"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-orientation:
@@ -659,8 +644,6 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 371350f24afa87b6aba606972ec959dcd4a95c9a
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 476ee3e89abb49e07f822b48323c51c57124b572
-  hermes-engine: 84e3af1ea01dd7351ac5d8689cbbea1f9903ffc3
-  libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   MMKV: 76033b9ace2006623308910a3afcc0e25eba3140
   MMKVCore: 3388952ded307e41b3ed8a05892736a236ed1b8e
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
@@ -673,7 +656,6 @@ SPEC CHECKSUMS:
   React-Core: a4a3a8e10d004b08e013c3d0438259dd89a3894c
   React-CoreModules: bb9f8bc36f1ae6d780b856927fa9d4aa01ccccc0
   React-cxxreact: 7dd472aefb8629d6080cbb859240bafccd902704
-  React-hermes: a245deb80c8d0bc35ed599109562c1c75ca803bc
   React-jsi: b25808afe821b607d51c779bdd1717be8393b7ec
   React-jsiexecutor: 4a4bae5671b064a2248a690cf75957669489d08c
   React-jsinspector: 218a2503198ff28a085f8e16622a8d8f507c8019
@@ -687,10 +669,11 @@ SPEC CHECKSUMS:
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-image-picker: 9c8a2687b69300ad9e95cec5d38f35ab9d32467d
   react-native-keep-awake: e63964d58c890de02bfb6519dedb7d90b5c782de
-  react-native-mmkv-storage: ef6741978932d017b252c379cff42ff990a7646c
+  react-native-mmkv-storage: 664aa3f5cdb1480181460bc8e7a3169c486a07de
+  react-native-multithreading: b6a8e2ad13ec657cc11f3ad32786863e80af3183
   react-native-netinfo: 3d3769f0d65de15c83a9bf1346f8be71de5a24bf
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
-  react-native-safe-area-context: 584dc04881deb49474363f3be89e4ca0e854c057
+  react-native-safe-area-context: 6c12e3859b6f27b25de4fee8201cfb858432d8de
   react-native-sodium: 5d17851375e399a532d3c571d0703de4312da31c
   react-native-webview: 10996be8bcc5e37a30dbc139fc544bb651dc8612
   React-perflogger: 30ab8d6db10e175626069e742eead3ebe8f24fd5
@@ -715,12 +698,12 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 0400a6d0c94186d1120c3cbd97b23abc022187a9
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
-  RNGestureHandler: 4f4986408310a43f1606c391f38f76e0d6e790d5
+  RNGestureHandler: 61628a2c859172551aa2100d3e73d1e57878392f
   RNIap: f00befe6581a5953191108cb97d9b3872473337b
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: 64573e25e078ae6bec03b891586d50b9ec284393
-  RNScreens: d6da2b9e29cf523832c2542f47bf1287318b1868
+  RNScreens: 40a2cb40a02a609938137a1e0acfbf8fc9eebf19
   RNSecureRandom: 0dcee021fdb3d50cd5cee5db0ebf583c42f5af0e
   RNShare: 3185c074441b7e8897014d95ba982434a0a024a1
   RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
@@ -730,6 +713,6 @@ SPEC CHECKSUMS:
   toolbar-android: 2a73856e98b750d7e71ce4644d3f41cc98211719
   Yoga: 17cd9a50243093b547c1e539c749928dd68152da
 
-PODFILE CHECKSUM: ad9e77b8317096e4eea6f82fddeeef648450a16b
+PODFILE CHECKSUM: 98de1f7cad864550329e7e4d89dd4cb0c631a4c1
 
 COCOAPODS: 1.11.3
