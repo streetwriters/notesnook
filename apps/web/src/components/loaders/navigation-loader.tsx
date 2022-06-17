@@ -10,6 +10,7 @@ export const NavigationLoader = memo(function NavigationLoader() {
       flexDirection="column"
       flex={1}
       sx={{
+        height: "100%",
         zIndex: 1,
         position: "relative",
       }}

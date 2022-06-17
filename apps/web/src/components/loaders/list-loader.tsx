@@ -8,12 +8,25 @@ const Lines = [1, 2, 3, 4].map(() => getRandomArbitrary(40, 90));
 export const ListLoader = memo(function ListLoader() {
   return (
     <>
-      <Flex alignItems="center" justifyContent={"center"} p={1}>
-        <Skeleton width={40} height={40} circle />
-        <Box sx={{ flex: 1, ml: 1, mt: 2 }}>
-          <Skeleton height={12} />
-          <Skeleton height={8} />
+      <Flex alignItems="center" justifyContent={"center"} sx={{ py: 1, mx: 1 }}>
+        <Box height={38}>
+          <Skeleton width={38} height={38} circle />
         </Box>
+        <Flex
+          sx={{
+            flex: 1,
+            ml: 1,
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Box height={14}>
+            <Skeleton inline height={14} />
+          </Box>
+          <Box height={10} sx={{ mt: 1 }}>
+            <Skeleton inline height={10} />
+          </Box>
+        </Flex>
       </Flex>
       {Lines.map((width) => (
         <Box sx={{ py: 2, px: 1 }}>
