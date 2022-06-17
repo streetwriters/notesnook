@@ -10,7 +10,7 @@ export const ListLoader = memo(function ListLoader() {
     <>
       <Flex alignItems="center" justifyContent={"center"} sx={{ py: 1, mx: 1 }}>
         <Box height={38}>
-          <Skeleton width={38} height={38} circle />
+          <Skeleton width={38} height={38} circle baseColor="var(--border)" />
         </Box>
         <Flex
           sx={{
@@ -21,10 +21,10 @@ export const ListLoader = memo(function ListLoader() {
           }}
         >
           <Box height={14}>
-            <Skeleton inline height={14} />
+            <Skeleton inline height={14} baseColor="var(--border)" />
           </Box>
           <Box height={10} sx={{ mt: 1 }}>
-            <Skeleton inline height={10} />
+            <Skeleton inline height={10} baseColor="var(--border)" />
           </Box>
         </Flex>
       </Flex>
