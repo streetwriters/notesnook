@@ -255,7 +255,7 @@ function Editor({ noteId, nonce }) {
         )}
         <Flex
           variant="columnFill"
-          className="editor"
+          className="selectable editor"
           sx={{
             alignSelf: [
               "stretch",
@@ -307,6 +307,7 @@ export default Editor;
 function Notice({ title, subtitle, onCancel, action }) {
   return (
     <Flex
+      className="selectable"
       bg="bgSecondary"
       p={2}
       justifyContent={"space-between"}
