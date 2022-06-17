@@ -4,14 +4,6 @@ import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
 const MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 const MILLISECONDS_IN_WEEK = MILLISECONDS_IN_DAY * 7;
 
-const SORT_COLLATOR = new Intl.Collator("en", {
-  numeric: false,
-  sensitivity: "base",
-  ignorePunctuation: true,
-  caseFirst: false,
-  usage: "sort",
-});
-
 const comparators = {
   dateEdited: {
     asc: (a, b) => a.dateEdited - b.dateEdited,
@@ -26,8 +18,8 @@ const comparators = {
     desc: (a, b) => b.dateDeleted - a.dateDeleted,
   },
   title: {
-    asc: (a, b) => SORT_COLLATOR.compare(getTitle(a), getTitle(b)),
-    desc: (a, b) => SORT_COLLATOR.compare(getTitle(b), getTitle(a)),
+    asc: (a, b) => getTitle(a).localeCompare(getTitle(b)),
+    desc: (a, b) => getTitle(b).localeCompare(getTitle(a)),
   },
 };
 
