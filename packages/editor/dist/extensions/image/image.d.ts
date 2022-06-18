@@ -1,10 +1,11 @@
 import { Node } from "@tiptap/core";
+import { Attachment } from "../attachment";
 export interface ImageOptions {
     inline: boolean;
     allowBase64: boolean;
     HTMLAttributes: Record<string, any>;
 }
-export declare type ImageAttributes = Partial<ImageSizeOptions> & {
+export declare type ImageAttributes = Partial<ImageSizeOptions> & Partial<Attachment> & {
     src: string;
     alt?: string;
     title?: string;
@@ -23,7 +24,8 @@ declare module "@tiptap/core" {
             /**
              * Add an image
              */
-            setImage: (options: ImageAttributes) => ReturnType;
+            insertImage: (options: ImageAttributes) => ReturnType;
+            updateImage: (options: ImageAttributes) => ReturnType;
             setImageAlignment: (options: ImageAlignmentOptions) => ReturnType;
             setImageSize: (options: ImageSizeOptions) => ReturnType;
         };

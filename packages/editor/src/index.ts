@@ -32,7 +32,11 @@ import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
 import { Link } from "./extensions/link";
-import { PortalProviderAPI, EventDispatcher } from "./extensions/react";
+import {
+  PortalProviderAPI,
+  EventDispatcher,
+  NodeViewSelectionNotifier,
+} from "./extensions/react";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 
@@ -51,6 +55,7 @@ const useTiptap = (
   const {
     theme,
     onCreate,
+    onUpdate,
     onDownloadAttachment,
     onOpenAttachmentPicker,
     portalProviderAPI,
@@ -61,6 +66,7 @@ const useTiptap = (
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
       extensions: [
+        NodeViewSelectionNotifier,
         SearchReplace,
         TextStyle,
         StarterKit.configure({
@@ -126,11 +132,19 @@ const useTiptap = (
 
         if (onCreate) onCreate({ editor });
       },
+      onUpdate: ({ editor, transaction }) => {
+        // a custom extension to transaction that indicates whether
+        // this is an actual update or not.
+        if ((transaction as any).skipUpdate) return;
+
+        onUpdate?.({ editor, transaction });
+      },
       injectCSS: false,
     }),
     [
       theme,
       onCreate,
+      onUpdate,
       onDownloadAttachment,
       onOpenAttachmentPicker,
       portalProviderAPI,

@@ -16,44 +16,53 @@ import { useRef } from "react";
 // import { MenuPresenter } from "../../components/menu/menu";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
+import { PopupPresenter } from "../../components/popup-presenter";
 export function AttachmentComponent(props) {
-    var _a = props.node.attrs, hash = _a.hash, filename = _a.filename, size = _a.size;
-    var editor = props.editor;
+    var editor = props.editor, node = props.node, selected = props.selected;
+    var _a = node.attrs, hash = _a.hash, filename = _a.filename, size = _a.size, progress = _a.progress;
     var elementRef = useRef();
-    var isActive = editor.isActive("attachment", { hash: hash });
+    // const isActive = editor.isActive("attachment", { hash });
     // const [isToolbarVisible, setIsToolbarVisible] = useState<boolean>();
     //   useEffect(() => {
     //     setIsToolbarVisible(isActive);
     //   }, [isActive]);
-    return (_jsx(_Fragment, { children: _jsxs(Box, __assign({ ref: elementRef, as: "span", contentEditable: false, variant: "body", sx: {
-                display: "inline-flex",
-                overflow: "hidden",
-                position: "relative",
-                zIndex: 1,
-                userSelect: "none",
-                alignItems: "center",
-                backgroundColor: "bgSecondary",
-                px: 1,
-                borderRadius: "default",
-                border: "1px solid var(--border)",
-                cursor: "pointer",
-                maxWidth: 250,
-                borderColor: isActive ? "primary" : "border",
-                ":hover": {
-                    bg: "hover",
-                },
-            }, title: filename }, { children: [_jsx(Icon, { path: Icons.attachment, size: 14 }), _jsx(Text, __assign({ as: "span", sx: {
-                        ml: "small",
-                        fontSize: "0.85rem",
-                        whiteSpace: "nowrap",
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                    }, className: "filename" }, { children: filename })), _jsx(Text, __assign({ as: "span", className: "size", sx: {
-                        ml: 1,
-                        fontSize: "subBody",
-                        color: "fontTertiary",
-                        flexShrink: 0,
-                    } }, { children: formatBytes(size) }))] })) }));
+    console.log(progress);
+    return (_jsxs(_Fragment, { children: [_jsxs(Box, __assign({ ref: elementRef, as: "span", contentEditable: false, variant: "body", sx: {
+                    display: "inline-flex",
+                    overflow: "hidden",
+                    position: "relative",
+                    justifyContent: "center",
+                    zIndex: 1,
+                    userSelect: "none",
+                    alignItems: "center",
+                    backgroundColor: "bgSecondary",
+                    px: 1,
+                    borderRadius: "default",
+                    border: "1px solid var(--border)",
+                    cursor: "pointer",
+                    maxWidth: 250,
+                    borderColor: selected ? "primary" : "border",
+                    ":hover": {
+                        bg: "hover",
+                    },
+                }, title: filename }, { children: [_jsx(Icon, { path: Icons.attachment, size: 14 }), _jsx(Text, __assign({ as: "span", sx: {
+                            ml: "small",
+                            fontSize: "body",
+                            whiteSpace: "nowrap",
+                            textOverflow: "ellipsis",
+                            overflow: "hidden",
+                        } }, { children: filename })), _jsx(Text, __assign({ as: "span", sx: {
+                            ml: 1,
+                            fontSize: "0.65rem",
+                            color: "fontTertiary",
+                            flexShrink: 0,
+                        } }, { children: progress ? "".concat(progress, "%") : formatBytes(size) }))] })), _jsx(PopupPresenter, __assign({ isOpen: selected, onClose: function () { }, blocking: false, focusOnRender: false, position: {
+                    target: elementRef.current || undefined,
+                    align: "center",
+                    location: "top",
+                    yOffset: 5,
+                    isTargetAbsolute: true,
+                } }, { children: _jsx(AttachmentToolbar, { editor: editor }) }))] }));
 }
 function formatBytes(bytes, decimals) {
     if (decimals === void 0) { decimals = 1; }
@@ -68,18 +77,10 @@ function formatBytes(bytes, decimals) {
 // TODO make this functional
 function AttachmentToolbar(props) {
     var editor = props.editor;
-    return (_jsx(Flex, __assign({ sx: {
-            flexDirection: "column",
-            // position: "absolute",
-            // top: 0,
-            mb: 2,
-            zIndex: 9999,
-            alignItems: "end",
-        } }, { children: _jsxs(Flex, __assign({ sx: {
-                bg: "background",
-                boxShadow: "menu",
-                flexWrap: "nowrap",
-                borderRadius: "default",
-                mb: 2,
-            } }, { children: [_jsx(ToolButton, { toggled: false, title: "Download", id: "download", icon: "download", onClick: function () { }, variant: "small", sx: { mr: 1 } }), _jsx(ToolButton, { toggled: false, title: "delete", id: "delete", icon: "delete", onClick: function () { }, variant: "small", sx: { mr: 0 } })] })) })));
+    return (_jsxs(Flex, __assign({ sx: {
+            bg: "background",
+            boxShadow: "menu",
+            flexWrap: "nowrap",
+            borderRadius: "default",
+        } }, { children: [_jsx(ToolButton, { toggled: false, title: "Download", id: "download", icon: "download", onClick: function () { }, sx: { mr: 1 } }), _jsx(ToolButton, { toggled: false, title: "delete", id: "delete", icon: "delete", onClick: function () { }, sx: { mr: 0 } })] })));
 }

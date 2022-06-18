@@ -1,4 +1,5 @@
 import { Plugin, PluginKey } from "prosemirror-state";
+import { Extension } from "@tiptap/core";
 export declare type StateChangeHandler = (fromPos: number, toPos: number) => any;
 export declare class ReactNodeViewState {
     private changeHandlers;
@@ -9,3 +10,4 @@ export declare class ReactNodeViewState {
 }
 export declare const stateKey: PluginKey<any>;
 export declare const NodeViewSelectionNotifierPlugin: Plugin<ReactNodeViewState>;
+export declare const NodeViewSelectionNotifier: Extension<any, any>;

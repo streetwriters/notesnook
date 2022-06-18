@@ -15,6 +15,7 @@ export declare class ReactNodeView<P extends ReactNodeViewProps> implements Node
     private contentDOMWrapper?;
     contentDOM: HTMLElement | undefined;
     node: PMNode;
+    isDragging: boolean;
     constructor(node: PMNode, editor: Editor, getPos: GetPosNode, portalProviderAPI: PortalProviderAPI, eventDispatcher: EventDispatcher, options: ReactNodeViewOptions<P>);
     /**
      * This method exists to move initialization logic out of the constructor,
@@ -34,6 +35,8 @@ export declare class ReactNodeView<P extends ReactNodeViewProps> implements Node
     render(props?: P, forwardRef?: ForwardRef): React.ReactElement<any> | null;
     updateAttributes(attributes: any, pos: number): void;
     update(node: PMNode, _decorations: readonly Decoration[], _innerDecorations: DecorationSource): boolean;
+    onDragStart(event: DragEvent): void;
+    stopEvent(event: Event): boolean;
     ignoreMutation(mutation: MutationRecord | {
         type: "selection";
         target: Element;

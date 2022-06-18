@@ -1,4 +1,5 @@
 import { Plugin, PluginKey } from "prosemirror-state";
+import { Extension } from "@tiptap/core";
 var ReactNodeViewState = /** @class */ (function () {
     function ReactNodeViewState() {
         this.changeHandlers = [];
@@ -35,5 +36,10 @@ export var NodeViewSelectionNotifierPlugin = new Plugin({
                 pluginState.notifyNewSelection(from, to);
             },
         };
+    },
+});
+export var NodeViewSelectionNotifier = Extension.create({
+    addProseMirrorPlugins: function () {
+        return [NodeViewSelectionNotifierPlugin];
     },
 });

@@ -53,7 +53,7 @@ import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
 import { Link } from "./extensions/link";
-import { EventDispatcher } from "./extensions/react";
+import { EventDispatcher, NodeViewSelectionNotifier, } from "./extensions/react";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 EditorView.prototype.updateState = function updateState(state) {
@@ -63,10 +63,11 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 var useTiptap = function (options, deps) {
     if (options === void 0) { options = {}; }
-    var theme = options.theme, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, onOpenAttachmentPicker = options.onOpenAttachmentPicker, portalProviderAPI = options.portalProviderAPI, restOptions = __rest(options, ["theme", "onCreate", "onDownloadAttachment", "onOpenAttachmentPicker", "portalProviderAPI"]);
+    var theme = options.theme, onCreate = options.onCreate, onUpdate = options.onUpdate, onDownloadAttachment = options.onDownloadAttachment, onOpenAttachmentPicker = options.onOpenAttachmentPicker, portalProviderAPI = options.portalProviderAPI, restOptions = __rest(options, ["theme", "onCreate", "onUpdate", "onDownloadAttachment", "onOpenAttachmentPicker", "portalProviderAPI"]);
     var eventDispatcher = useMemo(function () { return new EventDispatcher(); }, []);
     var defaultOptions = useMemo(function () { return ({
         extensions: [
+            NodeViewSelectionNotifier,
             SearchReplace,
             TextStyle,
             StarterKit.configure({
@@ -133,10 +134,19 @@ var useTiptap = function (options, deps) {
             if (onCreate)
                 onCreate({ editor: editor });
         },
+        onUpdate: function (_a) {
+            var editor = _a.editor, transaction = _a.transaction;
+            // a custom extension to transaction that indicates whether
+            // this is an actual update or not.
+            if (transaction.skipUpdate)
+                return;
+            onUpdate === null || onUpdate === void 0 ? void 0 : onUpdate({ editor: editor, transaction: transaction });
+        },
         injectCSS: false,
     }); }, [
         theme,
         onCreate,
+        onUpdate,
         onDownloadAttachment,
         onOpenAttachmentPicker,
         portalProviderAPI,

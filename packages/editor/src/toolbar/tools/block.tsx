@@ -120,7 +120,8 @@ const image = (editor: Editor | null): MenuItem => ({
         type: "button",
         title: "Upload from disk",
         icon: "upload",
-        onClick: () => {},
+        onClick: () =>
+          editor?.chain().focus().openAttachmentPicker("image").run(),
       },
       {
         key: "upload-from-url",

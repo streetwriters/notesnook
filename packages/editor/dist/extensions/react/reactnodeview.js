@@ -35,6 +35,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 import { jsx as _jsx } from "react/jsx-runtime";
+import { NodeSelection } from "prosemirror-state";
 import { ThemeProvider } from "emotion-theming";
 var ReactNodeView = /** @class */ (function () {
     function ReactNodeView(node, editor, getPos, portalProviderAPI, eventDispatcher, options) {
@@ -44,6 +45,7 @@ var ReactNodeView = /** @class */ (function () {
         this.portalProviderAPI = portalProviderAPI;
         this.eventDispatcher = eventDispatcher;
         this.options = options;
+        this.isDragging = false;
         this.handleRef = function (node) { return _this._handleRef(node); };
         this.node = node;
     }
@@ -59,6 +61,7 @@ var ReactNodeView = /** @class */ (function () {
     ReactNodeView.prototype.init = function () {
         var _this = this;
         this.domRef = this.createDomRef();
+        this.domRef.ondragstart = function (ev) { return _this.onDragStart(ev); };
         // this.setDomAttrs(this.node, this.domRef);
         var _a = this.getContentDOM() || {
             dom: undefined,
@@ -155,6 +158,105 @@ var ReactNodeView = /** @class */ (function () {
         this.renderReactComponent(function () {
             return _this.render(_this.options.props, _this.handleRef);
         });
+        return true;
+    };
+    ReactNodeView.prototype.onDragStart = function (event) {
+        var _a, _b, _c, _d, _e, _f, _g;
+        var view = this.editor.view;
+        var target = event.target;
+        // get the drag handle element
+        // `closest` is not available for text nodes so we may have to use its parent
+        var dragHandle = target.nodeType === 3
+            ? (_a = target.parentElement) === null || _a === void 0 ? void 0 : _a.closest("[data-drag-handle]")
+            : target.closest("[data-drag-handle]");
+        if (!this.dom || ((_b = this.contentDOM) === null || _b === void 0 ? void 0 : _b.contains(target)) || !dragHandle) {
+            return;
+        }
+        var dragImage = this.dom.querySelector("[data-drag-image]") || this.dom;
+        var x = 0;
+        var y = 0;
+        // calculate offset for drag element if we use a different drag handle element
+        if (dragImage !== dragHandle) {
+            var domBox = dragImage.getBoundingClientRect();
+            var handleBox = dragHandle.getBoundingClientRect();
+            // In React, we have to go through nativeEvent to reach offsetX/offsetY.
+            var offsetX = (_c = event.offsetX) !== null && _c !== void 0 ? _c : (_d = event.nativeEvent) === null || _d === void 0 ? void 0 : _d.offsetX;
+            var offsetY = (_e = event.offsetY) !== null && _e !== void 0 ? _e : (_f = event.nativeEvent) === null || _f === void 0 ? void 0 : _f.offsetY;
+            x = handleBox.x - domBox.x + offsetX;
+            y = handleBox.y - domBox.y + offsetY;
+        }
+        (_g = event.dataTransfer) === null || _g === void 0 ? void 0 : _g.setDragImage(dragImage, x, y);
+        // we need to tell ProseMirror that we want to move the whole node
+        // so we create a NodeSelection
+        var selection = NodeSelection.create(view.state.doc, this.getPos());
+        var transaction = view.state.tr.setSelection(selection);
+        view.dispatch(transaction);
+    };
+    ReactNodeView.prototype.stopEvent = function (event) {
+        var _this = this;
+        var _a;
+        if (!this.dom) {
+            return false;
+        }
+        // if (typeof this.options.stopEvent === 'function') {
+        //   return this.options.stopEvent({ event })
+        // }
+        var target = event.target;
+        var isInElement = this.dom.contains(target) && !((_a = this.contentDOM) === null || _a === void 0 ? void 0 : _a.contains(target));
+        // any event from child nodes should be handled by ProseMirror
+        if (!isInElement) {
+            return false;
+        }
+        var isDropEvent = event.type === "drop";
+        var isInput = ["INPUT", "BUTTON", "SELECT", "TEXTAREA"].includes(target.tagName) ||
+            target.isContentEditable;
+        // any input event within node views should be ignored by ProseMirror
+        if (isInput && !isDropEvent) {
+            return true;
+        }
+        var isEditable = this.editor.isEditable;
+        var isDragging = this.isDragging;
+        var isDraggable = !!this.node.type.spec.draggable;
+        var isSelectable = NodeSelection.isSelectable(this.node);
+        var isCopyEvent = event.type === "copy";
+        var isPasteEvent = event.type === "paste";
+        var isCutEvent = event.type === "cut";
+        var isClickEvent = event.type === "mousedown";
+        var isDragEvent = event.type.startsWith("drag");
+        // ProseMirror tries to drag selectable nodes
+        // even if `draggable` is set to `false`
+        // this fix prevents that
+        if (!isDraggable && isSelectable && isDragEvent) {
+            event.preventDefault();
+        }
+        if (isDraggable && isDragEvent && !isDragging) {
+            event.preventDefault();
+            return false;
+        }
+        // we have to store that dragging started
+        if (isDraggable && isEditable && !isDragging && isClickEvent) {
+            var dragHandle = target.closest("[data-drag-handle]");
+            var isValidDragHandle = dragHandle &&
+                (this.dom === dragHandle || this.dom.contains(dragHandle));
+            if (isValidDragHandle) {
+                this.isDragging = true;
+                document.addEventListener("dragend", function () {
+                    _this.isDragging = false;
+                }, { once: true });
+                document.addEventListener("mouseup", function () {
+                    _this.isDragging = false;
+                }, { once: true });
+            }
+        }
+        // these events are handled by prosemirror
+        if (isDragging ||
+            isDropEvent ||
+            isCopyEvent ||
+            isPasteEvent ||
+            isCutEvent ||
+            (isClickEvent && isSelectable)) {
+            return false;
+        }
         return true;
     };
     ReactNodeView.prototype.ignoreMutation = function (mutation) {

@@ -1,4 +1,10 @@
-import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
+import {
+  Node,
+  nodeInputRule,
+  mergeAttributes,
+  findChildren,
+} from "@tiptap/core";
+import { Attachment, getDataAttribute } from "../attachment";
 import {
   createNodeView,
   createSelectionBasedNodeView,
@@ -12,11 +18,12 @@ export interface ImageOptions {
   HTMLAttributes: Record<string, any>;
 }
 
-export type ImageAttributes = Partial<ImageSizeOptions> & {
-  src: string;
-  alt?: string;
-  title?: string;
-};
+export type ImageAttributes = Partial<ImageSizeOptions> &
+  Partial<Attachment> & {
+    src: string;
+    alt?: string;
+    title?: string;
+  };
 
 export type ImageAlignmentOptions = {
   float?: boolean;
@@ -34,7 +41,8 @@ declare module "@tiptap/core" {
       /**
        * Add an image
        */
-      setImage: (options: ImageAttributes) => ReturnType;
+      insertImage: (options: ImageAttributes) => ReturnType;
+      updateImage: (options: ImageAttributes) => ReturnType;
       setImageAlignment: (options: ImageAlignmentOptions) => ReturnType;
       setImageSize: (options: ImageSizeOptions) => ReturnType;
     };
@@ -77,10 +85,13 @@ export const ImageNode = Node.create<ImageOptions>({
       },
       width: { default: null },
       height: { default: null },
-      float: {
-        default: false,
-      },
-      align: { default: "left" },
+
+      float: getDataAttribute("float", false),
+      align: getDataAttribute("align", "left"),
+      hash: getDataAttribute("hash"),
+      filename: getDataAttribute("filename"),
+      type: getDataAttribute("type"),
+      size: getDataAttribute("size"),
     };
   },
 
@@ -105,13 +116,9 @@ export const ImageNode = Node.create<ImageOptions>({
     return createSelectionBasedNodeView(ImageComponent);
   },
 
-  addProseMirrorPlugins() {
-    return [NodeViewSelectionNotifierPlugin];
-  },
-
   addCommands() {
     return {
-      setImage:
+      insertImage:
         (options) =>
         ({ commands }) => {
           return commands.insertContent({
@@ -128,6 +135,31 @@ export const ImageNode = Node.create<ImageOptions>({
         (options) =>
         ({ commands }) => {
           return commands.updateAttributes(this.name, { ...options });
+        },
+      updateImage:
+        (options) =>
+        ({ state, tr, dispatch }) => {
+          const query = options.hash
+            ? { key: "hash", value: options.hash }
+            : options.src
+            ? { key: "src", value: options.src }
+            : null;
+          if (!query) return false;
+
+          const images = findChildren(
+            state.doc,
+            (node) =>
+              node.type.name === this.name &&
+              node.attrs[query.key] === query.value
+          );
+          for (const image of images) {
+            tr.setNodeMarkup(image.pos, image.node.type, {
+              ...image.node.attrs,
+              ...options,
+            });
+          }
+          if (dispatch) dispatch(tr);
+          return true;
         },
     };
   },

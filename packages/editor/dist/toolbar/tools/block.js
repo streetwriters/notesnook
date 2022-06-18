@@ -107,7 +107,9 @@ var image = function (editor) { return ({
                 type: "button",
                 title: "Upload from disk",
                 icon: "upload",
-                onClick: function () { },
+                onClick: function () {
+                    return editor === null || editor === void 0 ? void 0 : editor.chain().focus().openAttachmentPicker("image").run();
+                },
             },
             {
                 key: "upload-from-url",

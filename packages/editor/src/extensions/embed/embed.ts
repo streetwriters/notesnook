@@ -78,10 +78,6 @@ export const EmbedNode = Node.create<EmbedOptions>({
     ];
   },
 
-  addProseMirrorPlugins() {
-    return [NodeViewSelectionNotifierPlugin];
-  },
-
   addNodeView() {
     return createSelectionBasedNodeView(EmbedComponent);
   },

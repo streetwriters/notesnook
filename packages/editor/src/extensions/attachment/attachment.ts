@@ -1,16 +1,18 @@
-import { Node, mergeAttributes, findChildren } from "@tiptap/core";
+import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
 import { Attribute } from "@tiptap/core";
-import { createNodeView } from "../react";
+import { createNodeView, createSelectionBasedNodeView } from "../react";
 import { AttachmentComponent } from "./component";
 
 export type AttachmentType = "image" | "file";
 export interface AttachmentOptions {
   HTMLAttributes: Record<string, any>;
-  onDownloadAttachment: (attachment: Attachment) => boolean;
-  onOpenAttachmentPicker: (type: AttachmentType) => boolean;
+  onDownloadAttachment: (editor: Editor, attachment: Attachment) => boolean;
+  onOpenAttachmentPicker: (editor: Editor, type: AttachmentType) => boolean;
 }
 
-export type Attachment = AttachmentProgress & {
+export type AttachmentWithProgress = AttachmentProgress & Attachment;
+
+export type Attachment = {
   hash: string;
   filename: string;
   type: string;
@@ -19,7 +21,7 @@ export type Attachment = AttachmentProgress & {
 
 export type AttachmentProgress = {
   progress: number;
-  type: "upload" | "download";
+  type: "upload" | "download" | "encrypt";
   hash: string;
 };
 
@@ -29,7 +31,7 @@ declare module "@tiptap/core" {
       openAttachmentPicker: (type: AttachmentType) => ReturnType;
       insertAttachment: (attachment: Attachment) => ReturnType;
       downloadAttachment: (attachment: Attachment) => ReturnType;
-      setProgress: (progress: AttachmentProgress) => ReturnType;
+      setAttachmentProgress: (progress: AttachmentProgress) => ReturnType;
     };
   }
 }
@@ -57,6 +59,10 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
 
   addAttributes() {
     return {
+      progress: {
+        default: 0,
+        rendered: false,
+      },
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
       type: getDataAttribute("type"),
@@ -80,7 +86,11 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
   },
 
   addNodeView() {
-    return createNodeView(AttachmentComponent);
+    return createSelectionBasedNodeView(AttachmentComponent, {
+      shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
+        return prev.progress !== next.progress;
+      },
+    });
   },
 
   addCommands() {
@@ -88,6 +98,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       insertAttachment:
         (attachment) =>
         ({ commands }) => {
+          console.log("HI!", attachment);
           return commands.insertContent({
             type: this.name,
             attrs: attachment,
@@ -95,28 +106,32 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
         },
       downloadAttachment:
         (attachment) =>
-        ({}) => {
-          return this.options.onDownloadAttachment(attachment);
+        ({ editor }) => {
+          return this.options.onDownloadAttachment(editor, attachment);
         },
-      openAttachmentPicker: (type: AttachmentType) => () => {
-        return this.options.onOpenAttachmentPicker(type);
-      },
-      setProgress:
+      openAttachmentPicker:
+        (type: AttachmentType) =>
+        ({ editor }) => {
+          return this.options.onOpenAttachmentPicker(editor, type);
+        },
+      setAttachmentProgress:
         (options) =>
         ({ state, tr, dispatch }) => {
           const { hash, progress, type } = options;
           const attachments = findChildren(
             state.doc,
             (node) =>
-              (node.type.name === "attachment" || node.type.name === "image") &&
+              (node.type.name === this.name || node.type.name === "image") &&
               node.attrs.hash === hash
           );
           for (const attachment of attachments) {
+            console.log(attachment.node.attrs);
             tr.setNodeMarkup(attachment.pos, attachment.node.type, {
+              ...attachment.node.attrs,
               progress,
-              type,
             });
           }
+          (tr as any).skipUpdate = true;
           if (dispatch) dispatch(tr);
           return true;
         },
@@ -138,9 +153,12 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
   //   },
 });
 
-function getDataAttribute(name: keyof Attachment): Partial<Attribute> {
+export function getDataAttribute(
+  name: string,
+  def?: any | null
+): Partial<Attribute> {
   return {
-    default: null,
+    default: def,
     parseHTML: (element) => element.dataset[name],
     renderHTML: (attributes) => {
       if (!attributes[name]) {

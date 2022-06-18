@@ -132,7 +132,9 @@ var SelectionBasedNodeView = /** @class */ (function (_super) {
             posEnd: typeof posEnd !== "number" ? this.posEnd : posEnd,
         };
     };
-    SelectionBasedNodeView.prototype.viewShouldUpdate = function (_nextNode) {
+    SelectionBasedNodeView.prototype.viewShouldUpdate = function (nextNode) {
+        if (_super.prototype.viewShouldUpdate.call(this, nextNode))
+            return true;
         var selection = this.editor.view.state.selection;
         // update selection
         var oldSelection = this.oldSelection;

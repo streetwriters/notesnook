@@ -48,7 +48,7 @@ export declare class SelectionBasedNodeView<P extends SelectionBasedReactNodeVie
     private isSelectedNode;
     insideSelection: () => boolean;
     nodeInsideSelection: () => boolean;
-    viewShouldUpdate(_nextNode: PMNode): boolean;
+    viewShouldUpdate(nextNode: PMNode): boolean;
     destroy(): void;
     private onSelectionChange;
 }

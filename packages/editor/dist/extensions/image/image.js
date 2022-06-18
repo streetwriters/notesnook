@@ -9,6 +9,17 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -25,8 +36,9 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { Node, nodeInputRule, mergeAttributes } from "@tiptap/core";
-import { createSelectionBasedNodeView, NodeViewSelectionNotifierPlugin, } from "../react";
+import { Node, nodeInputRule, mergeAttributes, findChildren, } from "@tiptap/core";
+import { getDataAttribute } from "../attachment";
+import { createSelectionBasedNodeView, } from "../react";
 import { ImageComponent } from "./component";
 export var inputRegex = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
 export var ImageNode = Node.create({
@@ -58,10 +70,12 @@ export var ImageNode = Node.create({
             },
             width: { default: null },
             height: { default: null },
-            float: {
-                default: false,
-            },
-            align: { default: "left" },
+            float: getDataAttribute("float", false),
+            align: getDataAttribute("align", "left"),
+            hash: getDataAttribute("hash"),
+            filename: getDataAttribute("filename"),
+            type: getDataAttribute("type"),
+            size: getDataAttribute("size"),
         };
     },
     parseHTML: function () {
@@ -83,13 +97,10 @@ export var ImageNode = Node.create({
     addNodeView: function () {
         return createSelectionBasedNodeView(ImageComponent);
     },
-    addProseMirrorPlugins: function () {
-        return [NodeViewSelectionNotifierPlugin];
-    },
     addCommands: function () {
         var _this = this;
         return {
-            setImage: function (options) {
+            insertImage: function (options) {
                 return function (_a) {
                     var commands = _a.commands;
                     return commands.insertContent({
@@ -108,6 +119,39 @@ export var ImageNode = Node.create({
                 return function (_a) {
                     var commands = _a.commands;
                     return commands.updateAttributes(_this.name, __assign({}, options));
+                };
+            },
+            updateImage: function (options) {
+                return function (_a) {
+                    var e_1, _b;
+                    var state = _a.state, tr = _a.tr, dispatch = _a.dispatch;
+                    var query = options.hash
+                        ? { key: "hash", value: options.hash }
+                        : options.src
+                            ? { key: "src", value: options.src }
+                            : null;
+                    if (!query)
+                        return false;
+                    var images = findChildren(state.doc, function (node) {
+                        return node.type.name === _this.name &&
+                            node.attrs[query.key] === query.value;
+                    });
+                    try {
+                        for (var images_1 = __values(images), images_1_1 = images_1.next(); !images_1_1.done; images_1_1 = images_1.next()) {
+                            var image = images_1_1.value;
+                            tr.setNodeMarkup(image.pos, image.node.type, __assign(__assign({}, image.node.attrs), options));
+                        }
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (images_1_1 && !images_1_1.done && (_b = images_1.return)) _b.call(images_1);
+                        }
+                        finally { if (e_1) throw e_1.error; }
+                    }
+                    if (dispatch)
+                        dispatch(tr);
+                    return true;
                 };
             },
         };

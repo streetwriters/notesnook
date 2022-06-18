@@ -18,7 +18,7 @@ import {
   toCodeLines,
 } from "./code-block";
 
-type MergedStep =
+export type MergedStep =
   | AddMarkStep
   | RemoveMarkStep
   | ReplaceAroundStep

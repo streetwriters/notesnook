@@ -1,4 +1,4 @@
 /// <reference types="react" />
-import { Attachment } from "./attachment";
-import { ReactNodeViewProps } from "../react";
-export declare function AttachmentComponent(props: ReactNodeViewProps<Attachment>): JSX.Element;
+import { AttachmentWithProgress } from "./attachment";
+import { SelectionBasedReactNodeViewProps } from "../react";
+export declare function AttachmentComponent(props: SelectionBasedReactNodeViewProps<AttachmentWithProgress>): JSX.Element;

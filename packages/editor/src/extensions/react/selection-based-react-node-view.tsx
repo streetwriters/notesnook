@@ -182,7 +182,9 @@ export class SelectionBasedNodeView<
     );
   };
 
-  viewShouldUpdate(_nextNode: PMNode) {
+  viewShouldUpdate(nextNode: PMNode) {
+    if (super.viewShouldUpdate(nextNode)) return true;
+
     const {
       state: { selection },
     } = this.editor.view;

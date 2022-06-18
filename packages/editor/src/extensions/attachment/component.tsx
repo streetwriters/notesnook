@@ -1,25 +1,27 @@
 import { Box, Flex, Text } from "rebass";
-import { Attachment } from "./attachment";
+import { AttachmentWithProgress } from "./attachment";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { Editor } from "@tiptap/core";
 import { useRef } from "react";
 // import { MenuPresenter } from "../../components/menu/menu";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { ReactNodeViewProps } from "../react";
+import { SelectionBasedReactNodeViewProps } from "../react";
+import { PopupPresenter } from "../../components/popup-presenter";
 
-export function AttachmentComponent(props: ReactNodeViewProps<Attachment>) {
-  const { hash, filename, size } = props.node.attrs;
-
-  const { editor } = props;
+export function AttachmentComponent(
+  props: SelectionBasedReactNodeViewProps<AttachmentWithProgress>
+) {
+  const { editor, node, selected } = props;
+  const { hash, filename, size, progress } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
-  const isActive = editor.isActive("attachment", { hash });
+  // const isActive = editor.isActive("attachment", { hash });
   // const [isToolbarVisible, setIsToolbarVisible] = useState<boolean>();
 
   //   useEffect(() => {
   //     setIsToolbarVisible(isActive);
   //   }, [isActive]);
-
+  console.log(progress);
   return (
     <>
       <Box
@@ -31,6 +33,7 @@ export function AttachmentComponent(props: ReactNodeViewProps<Attachment>) {
           display: "inline-flex",
           overflow: "hidden",
           position: "relative",
+          justifyContent: "center",
           zIndex: 1,
           userSelect: "none",
           alignItems: "center",
@@ -40,7 +43,7 @@ export function AttachmentComponent(props: ReactNodeViewProps<Attachment>) {
           border: "1px solid var(--border)",
           cursor: "pointer",
           maxWidth: 250,
-          borderColor: isActive ? "primary" : "border",
+          borderColor: selected ? "primary" : "border",
           ":hover": {
             bg: "hover",
           },
@@ -52,45 +55,41 @@ export function AttachmentComponent(props: ReactNodeViewProps<Attachment>) {
           as="span"
           sx={{
             ml: "small",
-            fontSize: "0.85rem",
+            fontSize: "body",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
             overflow: "hidden",
           }}
-          className="filename"
         >
           {filename}
         </Text>
         <Text
           as="span"
-          className="size"
           sx={{
             ml: 1,
-            fontSize: "subBody",
+            fontSize: "0.65rem",
             color: "fontTertiary",
             flexShrink: 0,
           }}
         >
-          {formatBytes(size)}
+          {progress ? `${progress}%` : formatBytes(size)}
         </Text>
       </Box>
-      {/* <MenuPresenter
-        isOpen={isActive}
+      <PopupPresenter
+        isOpen={selected}
         onClose={() => {}}
-        items={[]}
-        options={{
-          type: "autocomplete",
-          position: {
-            target: elementRef.current || undefined,
-            location: "top",
-            yOffset: -5,
-            isTargetAbsolute: true,
-            align: "end",
-          },
+        blocking={false}
+        focusOnRender={false}
+        position={{
+          target: elementRef.current || undefined,
+          align: "center",
+          location: "top",
+          yOffset: 5,
+          isTargetAbsolute: true,
         }}
       >
         <AttachmentToolbar editor={editor} />
-      </MenuPresenter> */}
+      </PopupPresenter>
     </>
   );
 }
@@ -118,42 +117,28 @@ function AttachmentToolbar(props: AttachmentToolbarProps) {
   return (
     <Flex
       sx={{
-        flexDirection: "column",
-        // position: "absolute",
-        // top: 0,
-        mb: 2,
-        zIndex: 9999,
-        alignItems: "end",
+        bg: "background",
+        boxShadow: "menu",
+        flexWrap: "nowrap",
+        borderRadius: "default",
       }}
     >
-      <Flex
-        sx={{
-          bg: "background",
-          boxShadow: "menu",
-          flexWrap: "nowrap",
-          borderRadius: "default",
-          mb: 2,
-        }}
-      >
-        <ToolButton
-          toggled={false}
-          title="Download"
-          id="download"
-          icon="download"
-          onClick={() => {}}
-          variant="small"
-          sx={{ mr: 1 }}
-        />
-        <ToolButton
-          toggled={false}
-          title="delete"
-          id="delete"
-          icon="delete"
-          onClick={() => {}}
-          variant="small"
-          sx={{ mr: 0 }}
-        />
-      </Flex>
+      <ToolButton
+        toggled={false}
+        title="Download"
+        id="download"
+        icon="download"
+        onClick={() => {}}
+        sx={{ mr: 1 }}
+      />
+      <ToolButton
+        toggled={false}
+        title="delete"
+        id="delete"
+        icon="delete"
+        onClick={() => {}}
+        sx={{ mr: 0 }}
+      />
     </Flex>
   );
 }

@@ -1,11 +1,13 @@
-import { Node } from "@tiptap/core";
+import { Node, Editor } from "@tiptap/core";
+import { Attribute } from "@tiptap/core";
 export declare type AttachmentType = "image" | "file";
 export interface AttachmentOptions {
     HTMLAttributes: Record<string, any>;
-    onDownloadAttachment: (attachment: Attachment) => boolean;
-    onOpenAttachmentPicker: (type: AttachmentType) => boolean;
+    onDownloadAttachment: (editor: Editor, attachment: Attachment) => boolean;
+    onOpenAttachmentPicker: (editor: Editor, type: AttachmentType) => boolean;
 }
-export declare type Attachment = AttachmentProgress & {
+export declare type AttachmentWithProgress = AttachmentProgress & Attachment;
+export declare type Attachment = {
     hash: string;
     filename: string;
     type: string;
@@ -13,7 +15,7 @@ export declare type Attachment = AttachmentProgress & {
 };
 export declare type AttachmentProgress = {
     progress: number;
-    type: "upload" | "download";
+    type: "upload" | "download" | "encrypt";
     hash: string;
 };
 declare module "@tiptap/core" {
@@ -22,8 +24,9 @@ declare module "@tiptap/core" {
             openAttachmentPicker: (type: AttachmentType) => ReturnType;
             insertAttachment: (attachment: Attachment) => ReturnType;
             downloadAttachment: (attachment: Attachment) => ReturnType;
-            setProgress: (progress: AttachmentProgress) => ReturnType;
+            setAttachmentProgress: (progress: AttachmentProgress) => ReturnType;
         };
     }
 }
 export declare const AttachmentNode: Node<AttachmentOptions, any>;
+export declare function getDataAttribute(name: string, def?: any | null): Partial<Attribute>;

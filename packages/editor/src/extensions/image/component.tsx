@@ -13,6 +13,8 @@ import { ReactNodeViewProps, SelectionBasedReactNodeViewProps } from "../react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { ImageProperties } from "../../toolbar/popups/image-properties";
 import { Popup } from "../../toolbar/components/popup";
+import { Icon } from "../../toolbar/components/icon";
+import { Icons } from "../../toolbar/icons";
 
 export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -23,10 +25,18 @@ export function ImageComponent(
   const { src, alt, title, width, height, align, float } = node.attrs;
   const imageRef = useRef<HTMLImageElement>();
 
+  useEffect(() => {
+    (async () => {
+      if (!imageRef.current) return;
+      imageRef.current.src = await dataUriToBlobURL(src);
+    })();
+  }, [src, imageRef]);
+
   return (
     <>
       <Box
         sx={{
+          position: "relative",
           display: float ? "block" : "flex",
           justifyContent: float
             ? "stretch"
@@ -35,8 +45,27 @@ export function ImageComponent(
             : align === "left"
             ? "start"
             : "end",
+          ":hover .drag-handle, :active .drag-handle": {
+            opacity: 1,
+          },
         }}
+        draggable={false}
       >
+        <Icon
+          className="drag-handle"
+          data-drag-handle
+          draggable
+          path={Icons.dragHandle}
+          sx={{
+            cursor: "grab",
+            position: "absolute",
+            top: 2,
+            left: 2,
+            zIndex: 999,
+            opacity: 0,
+          }}
+        />
+
         <Resizable
           style={{
             float: float ? (align === "left" ? "left" : "right") : "none",
@@ -66,8 +95,8 @@ export function ImageComponent(
             </Flex>
           )}
           <Image
+            data-drag-image
             ref={imageRef}
-            src={src}
             alt={alt}
             title={title}
             width={"100%"}
@@ -205,4 +234,12 @@ function ImageToolbar(props: ImageToolbarProps) {
       </ResponsivePresenter>
     </Flex>
   );
+}
+
+async function dataUriToBlobURL(dataurl: string) {
+  if (!dataurl.startsWith("data:image")) return dataurl;
+
+  const response = await fetch(dataurl);
+  const blob = await response.blob();
+  return URL.createObjectURL(blob);
 }
