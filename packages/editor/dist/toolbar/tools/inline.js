@@ -29,9 +29,8 @@ import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-run
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
-import { Button, Flex } from "rebass";
-import { Input } from "@rebass/forms";
 import { Popup } from "../components/popup";
+import { LinkPopup } from "../popups/link-popup";
 function InlineTool(props) {
     var editor = props.editor, title = props.title, icon = props.icon, isToggled = props.isToggled, onClick = props.onClick;
     return (_jsx(ToolButton, { title: title, id: icon, icon: icon, onClick: function () { return onClick(editor); }, toggled: isToggled(editor) }));
@@ -110,14 +109,4 @@ export function Link(props) {
                             var href = _a.href, text = _a.text;
                             onDone(href, text);
                         } }) })) }))] }));
-}
-function LinkPopup(props) {
-    var _text = props.text, _href = props.href, _a = props.isEditing, isEditing = _a === void 0 ? false : _a, onDone = props.onDone;
-    var _b = __read(useState(_href || ""), 2), href = _b[0], setHref = _b[1];
-    var _c = __read(useState(_text || ""), 2), text = _c[0], setText = _c[1];
-    return (_jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column", width: ["auto", 250] } }, { children: [_jsx(Input, { type: "text", placeholder: "Link text", value: text, onChange: function (e) { return setText(e.target.value); } }), _jsx(Input, { type: "url", sx: { mt: 1 }, autoFocus: true, placeholder: "https://example.com/", value: href, onChange: function (e) { return setHref(e.target.value); } }), _jsx(Button, __assign({ variant: "primary", sx: {
-                    alignSelf: ["stretch", "end", "end"],
-                    my: 1,
-                    mr: 1,
-                }, onClick: function () { return onDone({ text: text, href: href }); } }, { children: isEditing ? "Save edits" : "Insert link" }))] })));
 }

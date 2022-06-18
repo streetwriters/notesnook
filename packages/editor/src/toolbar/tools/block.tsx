@@ -20,6 +20,7 @@ import {
 import { ActionSheetPresenter } from "../../components/action-sheet";
 import { getToolbarElement } from "../utils/dom";
 import { showPopup } from "../../components/popup-presenter";
+import { ImageUploadPopup } from "../popups/image-upload";
 
 export function InsertBlock(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement | null>();
@@ -33,7 +34,7 @@ export function InsertBlock(props: ToolProps) {
       horizontalRule(editor),
       codeblock(editor),
       blockquote(editor),
-      image(editor),
+      image(editor, isMobile),
       attachment(editor),
       isMobile ? embedMobile(editor) : embedDesktop(editor),
       table(editor),
@@ -107,7 +108,7 @@ const blockquote = (editor: Editor | null): MenuItem => ({
   onClick: () => editor?.chain().focus().toggleBlockquote().run(),
 });
 
-const image = (editor: Editor | null): MenuItem => ({
+const image = (editor: Editor | null, isMobile: boolean): MenuItem => ({
   key: "image",
   type: "button",
   title: "Image",
@@ -123,13 +124,7 @@ const image = (editor: Editor | null): MenuItem => ({
         onClick: () =>
           editor?.chain().focus().openAttachmentPicker("image").run(),
       },
-      {
-        key: "upload-from-url",
-        type: "button",
-        title: "Attach from URL",
-        icon: "link",
-        onClick: () => {},
-      },
+      isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor),
     ],
   },
 });
@@ -232,4 +227,53 @@ const tasklist = (editor: Editor | null): MenuItem => ({
   icon: "checkbox",
   isChecked: editor?.isActive("taskList"),
   onClick: () => editor?.chain().focus().toggleTaskList().run(),
+});
+
+const uploadImageFromURLMobile = (editor: Editor | null): MenuItem => ({
+  key: "upload-from-url",
+  type: "button",
+  title: "Attach from URL",
+  icon: "link",
+  menu: {
+    title: "Attach image from URL",
+    items: [
+      {
+        key: "attach-image",
+        type: "popup",
+        component: ({ onClick }) => (
+          <ImageUploadPopup
+            onInsert={(image) => {
+              editor?.commands.insertImage(image);
+              onClick?.();
+            }}
+            onClose={() => {
+              onClick?.();
+            }}
+          />
+        ),
+      },
+    ],
+  },
+});
+
+const uploadImageFromURL = (editor: Editor | null): MenuItem => ({
+  key: "upload-from-url",
+  type: "button",
+  title: "Attach from URL",
+  icon: "link",
+  onClick: () => {
+    if (!editor) return;
+    showPopup({
+      theme: editor.storage.theme,
+      popup: (hide) => (
+        <ImageUploadPopup
+          onInsert={(image) => {
+            editor?.commands.insertImage(image);
+            hide();
+          }}
+          onClose={hide}
+        />
+      ),
+    });
+  },
 });

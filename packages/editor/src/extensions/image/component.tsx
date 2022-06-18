@@ -36,7 +36,6 @@ export function ImageComponent(
     <>
       <Box
         sx={{
-          position: "relative",
           display: float ? "block" : "flex",
           justifyContent: float
             ? "stretch"
@@ -51,23 +50,9 @@ export function ImageComponent(
         }}
         draggable={false}
       >
-        <Icon
-          className="drag-handle"
-          data-drag-handle
-          draggable
-          path={Icons.dragHandle}
-          sx={{
-            cursor: "grab",
-            position: "absolute",
-            top: 2,
-            left: 2,
-            zIndex: 999,
-            opacity: 0,
-          }}
-        />
-
         <Resizable
           style={{
+            position: "relative",
             float: float ? (align === "left" ? "left" : "right") : "none",
           }}
           size={{
@@ -94,6 +79,20 @@ export function ImageComponent(
               />
             </Flex>
           )}
+          <Icon
+            className="drag-handle"
+            data-drag-handle
+            draggable
+            path={Icons.dragHandle}
+            sx={{
+              cursor: "grab",
+              position: "absolute",
+              top: 2,
+              left: 2,
+              zIndex: 999,
+              opacity: 0,
+            }}
+          />
           <Image
             data-drag-image
             ref={imageRef}

@@ -35,6 +35,7 @@ import { TablePopup } from "../popups/table-popup";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { ResponsivePresenter, } from "../../components/responsive";
 import { showPopup } from "../../components/popup-presenter";
+import { ImageUploadPopup } from "../popups/image-upload";
 export function InsertBlock(props) {
     var buttonRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
@@ -46,7 +47,7 @@ export function InsertBlock(props) {
             horizontalRule(editor),
             codeblock(editor),
             blockquote(editor),
-            image(editor),
+            image(editor, isMobile),
             attachment(editor),
             isMobile ? embedMobile(editor) : embedDesktop(editor),
             table(editor),
@@ -94,7 +95,7 @@ var blockquote = function (editor) { return ({
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("blockQuote"),
     onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().toggleBlockquote().run(); },
 }); };
-var image = function (editor) { return ({
+var image = function (editor, isMobile) { return ({
     key: "image",
     type: "button",
     title: "Image",
@@ -111,13 +112,7 @@ var image = function (editor) { return ({
                     return editor === null || editor === void 0 ? void 0 : editor.chain().focus().openAttachmentPicker("image").run();
                 },
             },
-            {
-                key: "upload-from-url",
-                type: "button",
-                title: "Attach from URL",
-                icon: "link",
-                onClick: function () { },
-            },
+            isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor),
         ],
     },
 }); };
@@ -202,4 +197,45 @@ var tasklist = function (editor) { return ({
     icon: "checkbox",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("taskList"),
     onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().toggleTaskList().run(); },
+}); };
+var uploadImageFromURLMobile = function (editor) { return ({
+    key: "upload-from-url",
+    type: "button",
+    title: "Attach from URL",
+    icon: "link",
+    menu: {
+        title: "Attach image from URL",
+        items: [
+            {
+                key: "attach-image",
+                type: "popup",
+                component: function (_a) {
+                    var onClick = _a.onClick;
+                    return (_jsx(ImageUploadPopup, { onInsert: function (image) {
+                            editor === null || editor === void 0 ? void 0 : editor.commands.insertImage(image);
+                            onClick === null || onClick === void 0 ? void 0 : onClick();
+                        }, onClose: function () {
+                            onClick === null || onClick === void 0 ? void 0 : onClick();
+                        } }));
+                },
+            },
+        ],
+    },
+}); };
+var uploadImageFromURL = function (editor) { return ({
+    key: "upload-from-url",
+    type: "button",
+    title: "Attach from URL",
+    icon: "link",
+    onClick: function () {
+        if (!editor)
+            return;
+        showPopup({
+            theme: editor.storage.theme,
+            popup: function (hide) { return (_jsx(ImageUploadPopup, { onInsert: function (image) {
+                    editor === null || editor === void 0 ? void 0 : editor.commands.insertImage(image);
+                    hide();
+                }, onClose: hide })); },
+        });
+    },
 }); };

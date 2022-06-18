@@ -93,8 +93,7 @@ export function ImageComponent(props) {
             });
         }); })();
     }, [src, imageRef]);
-    return (_jsx(_Fragment, { children: _jsxs(Box, __assign({ sx: {
-                position: "relative",
+    return (_jsx(_Fragment, { children: _jsx(Box, __assign({ sx: {
                 display: float ? "block" : "flex",
                 justifyContent: float
                     ? "stretch"
@@ -106,29 +105,30 @@ export function ImageComponent(props) {
                 ":hover .drag-handle, :active .drag-handle": {
                     opacity: 1,
                 },
-            }, draggable: false }, { children: [_jsx(Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: Icons.dragHandle, sx: {
-                        cursor: "grab",
-                        position: "absolute",
-                        top: 2,
-                        left: 2,
-                        zIndex: 999,
-                        opacity: 0,
-                    } }), _jsxs(Resizable, __assign({ style: {
-                        float: float ? (align === "left" ? "left" : "right") : "none",
-                    }, size: {
-                        height: height || "auto",
-                        width: width || "auto",
-                    }, maxWidth: "100%", onResizeStop: function (e, direction, ref, d) {
-                        updateAttributes({
-                            width: ref.clientWidth,
-                            height: ref.clientHeight,
-                        });
-                    }, lockAspectRatio: true }, { children: [selected && (_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(ImageToolbar, { editor: editor, float: float, align: align, height: height || 0, width: width || 0 }) }))), _jsx(Image, __assign({ "data-drag-image": true, ref: imageRef, alt: alt, title: title, width: "100%", height: "100%", sx: {
-                                border: selected
-                                    ? "2px solid var(--primary)"
-                                    : "2px solid transparent",
-                                borderRadius: "default",
-                            } }, props))] }))] })) }));
+            }, draggable: false }, { children: _jsxs(Resizable, __assign({ style: {
+                    position: "relative",
+                    float: float ? (align === "left" ? "left" : "right") : "none",
+                }, size: {
+                    height: height || "auto",
+                    width: width || "auto",
+                }, maxWidth: "100%", onResizeStop: function (e, direction, ref, d) {
+                    updateAttributes({
+                        width: ref.clientWidth,
+                        height: ref.clientHeight,
+                    });
+                }, lockAspectRatio: true }, { children: [selected && (_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(ImageToolbar, { editor: editor, float: float, align: align, height: height || 0, width: width || 0 }) }))), _jsx(Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: Icons.dragHandle, sx: {
+                            cursor: "grab",
+                            position: "absolute",
+                            top: 2,
+                            left: 2,
+                            zIndex: 999,
+                            opacity: 0,
+                        } }), _jsx(Image, __assign({ "data-drag-image": true, ref: imageRef, alt: alt, title: title, width: "100%", height: "100%", sx: {
+                            border: selected
+                                ? "2px solid var(--primary)"
+                                : "2px solid transparent",
+                            borderRadius: "default",
+                        } }, props))] })) })) }));
 }
 function ImageToolbar(props) {
     var editor = props.editor, float = props.float, height = props.height, width = props.width;
