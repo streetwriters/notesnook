@@ -35,7 +35,6 @@ export class PopupRenderer extends React.Component<
     this.setState((prev) => {
       const index = prev.popups.findIndex((p) => p.id === id);
       if (index <= -1) return prev;
-      console.log(index, id, prev.popups[index]);
       const clone = prev.popups.slice();
       clone.splice(index, 1);
       return {
@@ -50,7 +49,6 @@ export class PopupRenderer extends React.Component<
         {this.props.children}
         <EditorContext.Provider value={this.props.editor}>
           {this.state.popups.map(({ id, popup: Popup }) => {
-            console.log(id, Popup);
             return <Popup key={id} />;
           })}
           <div id="popup-container" />

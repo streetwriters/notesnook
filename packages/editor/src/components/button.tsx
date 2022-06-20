@@ -14,15 +14,40 @@ export function Button(props: ButtonProps) {
       capture: true,
     });
 
+    // buttonRef.current.addEventListener("touchmove", onTouchMove, {
+    //   passive: false,
+    //   capture: true,
+    // });
+
+    // buttonRef.current.addEventListener("touchend", onTouchEnd, {
+    //   passive: false,
+    //   capture: true,
+    // });
+
+    // buttonRef.current.addEventListener("touchstart", onTouchStart, {
+    //   passive: false,
+    //   capture: true,
+    // });
+
     return () => {
       buttonRef.current?.removeEventListener("mousedown", onMouseDown, {
         capture: true,
       });
+      // buttonRef.current?.removeEventListener("touchmove", onTouchMove, {
+      //   capture: true,
+      // });
+
+      // buttonRef.current?.removeEventListener("touchend", onTouchEnd, {
+      //   capture: true,
+      // });
+
+      // buttonRef.current?.removeEventListener("touchstart", onTouchStart, {
+      //   capture: true,
+      // });
     };
-  }, [buttonRef.current]);
+  }, []);
 
   const onMouseDown = useCallback((e: MouseEvent) => {
-    console.log("Preventing");
     e.preventDefault();
   }, []);
 
@@ -30,6 +55,7 @@ export function Button(props: ButtonProps) {
   //   e.preventDefault();
   //   const now = Date.now();
   //   setTimeout(() => {
+  //     console.log(now, touchStartTime.current);
   //     if (touchStartTime.current === 0) return;
   //     if (now - touchStartTime.current > 300) return;
   //     //@ts-ignore
@@ -39,7 +65,13 @@ export function Button(props: ButtonProps) {
 
   // const onTouchStart = useCallback((e) => {
   //   touchStartTime.current = Date.now();
+  //   console.log("HELLO!");
   //   e.preventDefault();
+  // }, []);
+
+  // const onTouchMove = useCallback((e) => {
+  //   console.log("HELLO!");
+  //   touchStartTime.current = 0;
   // }, []);
 
   return (

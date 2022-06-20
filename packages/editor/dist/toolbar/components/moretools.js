@@ -38,7 +38,7 @@ export function MoreTools(props) {
     var isBottom = toolbarLocation === "bottom";
     var buttonRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({}, props, { toggled: isOpen, buttonRef: buttonRef, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setIsOpen(function (s) { return !s; }); } })), _jsx(PopupWrapper, { isOpen: isOpen, group: "toolbarGroup", id: popupId, onClosed: function () { return setIsOpen(false); }, position: {
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({}, props, { toggled: isOpen, buttonRef: buttonRef, onClick: function () { return setIsOpen(function (s) { return !s; }); } })), _jsx(PopupWrapper, { isOpen: isOpen, group: "toolbarGroup", id: popupId, onClosed: function () { return setIsOpen(false); }, position: {
                     isTargetAbsolute: true,
                     target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
                     align: "center",
@@ -47,12 +47,6 @@ export function MoreTools(props) {
                 }, autoCloseOnUnmount: autoCloseOnUnmount, focusOnRender: false, blocking: false, renderPopup: function () { return (_jsx(ToolbarGroup, { tools: tools, editor: editor, sx: {
                         flex: 1,
                         p: 1,
-                        // TODO: we cannot put a fix height here
-                        // since it differs from platform to platform.
-                        // perhaps we can use a expose a custom css class
-                        // or extend the theme.
-                        // px: isBottom ? 0 : 1,
-                        // height: "50px",
                         boxShadow: "menu",
                         bg: "background",
                         borderRadius: "default",
