@@ -1,5 +1,5 @@
 import { Flex, Text } from "rebass";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 import { ToolButton } from "./tool-button";
 
 export type CounterProps = {

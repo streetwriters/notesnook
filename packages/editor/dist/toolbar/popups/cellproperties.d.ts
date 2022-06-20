@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { Editor } from "@tiptap/core";
 declare type CellPropertiesProps = {
     editor: Editor;

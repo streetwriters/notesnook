@@ -11,26 +11,45 @@ var __assign = (this && this.__assign) || function () {
 };
 import { jsx as _jsx } from "react/jsx-runtime";
 import { useCallback, useRef } from "react";
+import { useEffect } from "react";
 import { Button as RebassButton } from "rebass";
-export default function Button(props) {
+export function Button(props) {
+    var buttonRef = useRef();
     var touchStartTime = useRef(0);
-    var onTouchEnd = useCallback(function (e) {
+    useEffect(function () {
+        if (!buttonRef.current)
+            return;
+        buttonRef.current.addEventListener("mousedown", onMouseDown, {
+            passive: false,
+            capture: true,
+        });
+        return function () {
+            var _a;
+            (_a = buttonRef.current) === null || _a === void 0 ? void 0 : _a.removeEventListener("mousedown", onMouseDown, {
+                capture: true,
+            });
+        };
+    }, [buttonRef.current]);
+    var onMouseDown = useCallback(function (e) {
+        console.log("Preventing");
         e.preventDefault();
-        var now = Date.now();
-        setTimeout(function () {
-            if (touchStartTime.current === 0)
-                return;
-            if (now - touchStartTime.current > 300)
-                return;
-            //@ts-ignore
-            props.onClick(e);
-        }, 1);
     }, []);
-    var onTouchStart = useCallback(function (e) {
-        touchStartTime.current = Date.now();
-        e.preventDefault();
-    }, []);
-    return (_jsx(RebassButton, __assign({}, props, { onClick: props.onClick, onMouseDown: function (e) { return e.preventDefault(); }, onTouchEnd: onTouchEnd, onTouchMove: function () {
-            touchStartTime.current = 0;
-        }, onTouchStart: onTouchStart })));
+    // const onTouchEnd = useCallback((e) => {
+    //   e.preventDefault();
+    //   const now = Date.now();
+    //   setTimeout(() => {
+    //     if (touchStartTime.current === 0) return;
+    //     if (now - touchStartTime.current > 300) return;
+    //     //@ts-ignore
+    //     props.onClick(e);
+    //   }, 1);
+    // }, []);
+    // const onTouchStart = useCallback((e) => {
+    //   touchStartTime.current = Date.now();
+    //   e.preventDefault();
+    // }, []);
+    return (_jsx(RebassButton, __assign({}, props, { ref: function (ref) {
+            buttonRef.current = ref;
+            // props.ref = ref;
+        }, onClick: props.onClick, onMouseDown: function () { } })));
 }

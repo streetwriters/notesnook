@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || function () {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Flex, Text } from "rebass";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 import { ToolButton } from "./tool-button";
 export function Counter(props) {
     var title = props.title, onDecrease = props.onDecrease, onIncrease = props.onIncrease, onReset = props.onReset, value = props.value;

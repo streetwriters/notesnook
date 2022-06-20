@@ -33,7 +33,7 @@ import { Icons } from "../icons";
 import { useState } from "react";
 import tinycolor from "tinycolor2";
 import { HexColorPicker } from "react-colorful";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 export var DEFAULT_COLORS = [
     "#e91e63",
     "#9c27b0",

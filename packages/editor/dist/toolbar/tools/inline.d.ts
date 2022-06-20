@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ToolProps } from "../types";
 export declare function Italic(props: ToolProps): JSX.Element;
 export declare function Strikethrough(props: ToolProps): JSX.Element;

@@ -35,7 +35,7 @@ import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { ResponsivePresenter, } from "../../components/responsive";
 import { showPopup } from "../../components/popup-presenter";
 import { ImageUploadPopup } from "../popups/image-upload";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 export function InsertBlock(props) {
     var buttonRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];

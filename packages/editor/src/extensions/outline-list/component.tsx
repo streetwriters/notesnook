@@ -1,18 +1,7 @@
-import { Box, Flex, Text } from "rebass";
+import { Text } from "rebass";
 import { ReactNodeViewProps } from "../react";
-import { Node } from "prosemirror-model";
-import {
-  findParentNodeClosestToPos,
-  findChildren,
-  getNodeType,
-} from "@tiptap/core";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { useEffect, useMemo, useState } from "react";
-import { Input } from "@rebass/forms";
-import { TaskItemNode } from "../task-item";
+import { useMemo } from "react";
 import { OutlineListAttributes } from "./outline-list";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
 import { OutlineListItem } from "../outline-list-item";
 
 export function OutlineListComponent(

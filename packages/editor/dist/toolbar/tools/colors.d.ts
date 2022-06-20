@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { Editor } from "@tiptap/core";
 import { ToolProps } from "../types";
 declare type ColorToolProps = ToolProps & {

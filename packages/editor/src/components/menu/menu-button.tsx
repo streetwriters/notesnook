@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Flex, Text } from "rebass";
-import Button from "../button";
+import { Button } from "../button";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useToolbarLocation } from "../../toolbar/stores/toolbar-store";

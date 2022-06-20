@@ -5,7 +5,7 @@ import React from "react";
 import { ButtonProps } from "rebass";
 import { IconNames, Icons } from "../icons";
 import { ToolButtonVariant } from "../types";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 import { Icon } from "./icon";
 
 export type ToolButtonProps = ButtonProps & {
@@ -33,7 +33,7 @@ export function ToolButton(props: ToolButtonProps) {
     <Button
       ref={buttonRef}
       tabIndex={-1}
-      id={`tool-${id}`}
+      id={`tool-${id || icon}`}
       sx={{
         flexShrink: 0,
         p: variant === "small" ? "small" : 1,
@@ -42,6 +42,7 @@ export function ToolButton(props: ToolButtonProps) {
         bg: toggled ? "hover" : "transparent",
         mr: variant === "small" ? 0 : 1,
         ":hover": { bg: ["transparent", "hover"] },
+        ":active": { bg: "hover" },
         ":last-of-type": {
           mr: 0,
         },

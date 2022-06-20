@@ -66,13 +66,14 @@ import { useEffect, useRef, useState } from "react";
 import { isLanguageLoaded, loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";
 import "prism-themes/themes/prism-dracula.min.css";
-import { Button, Flex, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import Languages from "./languages.json";
 import { Input } from "@rebass/forms";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { ResponsivePresenter } from "../../components/responsive";
 import { Popup } from "../../toolbar/components/popup";
+import { Button } from "../../components/button";
 export function CodeblockComponent(props) {
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, forwardRef = props.forwardRef;
     var _a = node === null || node === void 0 ? void 0 : node.attrs, language = _a.language, indentLength = _a.indentLength, indentType = _a.indentType, caretPosition = _a.caretPosition;
@@ -141,7 +142,18 @@ export function CodeblockComponent(props) {
                                     mr: 1,
                                     bg: isOpen ? "codeSelection" : "transparent",
                                     ":hover": { bg: "codeSelection" },
-                                }, onClick: function () { return setIsOpen(true); }, title: "Change language" }, { children: _jsx(Text, __assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), _jsx(ResponsivePresenter, __assign({ isOpen: isOpen, onClose: function () { return setIsOpen(false); }, mobile: "sheet", desktop: "menu", position: {
+                                }, onClick: function () {
+                                    setIsOpen(true);
+                                }, title: "Change language" }, { children: _jsx(Text, __assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), _jsx(ResponsivePresenter, __assign({ isOpen: isOpen, onClose: function () {
+                    setIsOpen(false);
+                    // NOTE: for some reason the language selection action sheet
+                    // does not return focus to the last focused position after
+                    // closing. We have to set focusOnRender=false & manually
+                    // restore focus. I think this has something to do with custom
+                    // node views.
+                    // TRY: perhaps use SelectionBasedReactNodeView?
+                    editor.commands.focus();
+                }, focusOnRender: false, mobile: "sheet", desktop: "menu", position: {
                     target: toolbarRef.current || undefined,
                     align: "end",
                     isTargetAbsolute: true,
@@ -161,7 +173,9 @@ function LanguageSelector(props) {
                 width: ["auto", 300],
                 overflowY: "auto",
                 bg: "background",
-            } }, { children: [_jsx(Input, { autoFocus: true, placeholder: "Search languages", sx: {
+            } }, { children: [_jsx(Input, { onFocus: function () {
+                        console.log("EHLLO!");
+                    }, autoFocus: true, placeholder: "Search languages", sx: {
                         width: "auto",
                         position: "sticky",
                         top: 0,

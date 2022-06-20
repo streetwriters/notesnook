@@ -21,7 +21,7 @@ import { ActionSheetPresenter } from "../../components/action-sheet";
 import { getToolbarElement } from "../utils/dom";
 import { showPopup } from "../../components/popup-presenter";
 import { ImageUploadPopup } from "../popups/image-upload";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 
 export function InsertBlock(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement | null>();

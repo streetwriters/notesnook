@@ -30,7 +30,8 @@ import { ThemeProvider } from "emotion-theming";
 import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
 import { useToolbarStore } from "../../toolbar/stores/toolbar-store";
 import { EditorContext, usePopupRenderer, } from "./popuprenderer";
-export function PopupPresenter(props) {
+import { ResponsivePresenter } from "../responsive";
+function _PopupPresenter(props) {
     var isOpen = props.isOpen, position = props.position, onClose = props.onClose, _a = props.blocking, blocking = _a === void 0 ? true : _a, _b = props.focusOnRender, focusOnRender = _b === void 0 ? true : _b, children = props.children;
     var contentRef = useRef();
     var observerRef = useRef();
@@ -136,6 +137,14 @@ export function PopupPresenter(props) {
             },
         } }, { children: children })));
 }
+export function PopupPresenter(props) {
+    // HACK: we don't want to render the popup presenter for no reason
+    // including it's effects etc. so we just wrap it and return null
+    // if the popup is closed.
+    if (!props.isOpen)
+        return null;
+    return _jsx(_PopupPresenter, __assign({}, props));
+}
 export function PopupWrapper(props) {
     var id = props.id, group = props.group, position = props.position, renderPopup = props.renderPopup, isOpen = props.isOpen, onClosed = props.onClosed, presenterProps = __rest(props, ["id", "group", "position", "renderPopup", "isOpen", "onClosed"]);
     var closePopup = useToolbarStore(function (store) { return store.closePopup; });
@@ -189,7 +198,7 @@ export function showPopup(options) {
     function hide() {
         ReactDOM.unmountComponentAtNode(getPopupContainer());
     }
-    ReactDOM.render(_jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsx(PopupPresenter, __assign({ isOpen: true, onClose: hide, position: {
+    ReactDOM.render(_jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsx(ResponsivePresenter, __assign({ isOpen: true, onClose: hide, position: {
                 target: getToolbarElement(),
                 isTargetAbsolute: true,
                 location: "below",

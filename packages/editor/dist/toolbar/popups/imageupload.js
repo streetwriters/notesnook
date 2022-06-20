@@ -65,7 +65,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Input } from "@rebass/forms";
 import { useState } from "react";
 import { Flex } from "rebass";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 import { Popup } from "../components/popup";
 export function ImageUploadPopup(props) {
     var _this = this;

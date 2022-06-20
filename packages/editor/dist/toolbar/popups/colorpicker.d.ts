@@ -1,3 +1,4 @@
+/// <reference types="react" />
 export declare const DEFAULT_COLORS: string[];
 declare type ColorPickerProps = {
     colors?: string[];

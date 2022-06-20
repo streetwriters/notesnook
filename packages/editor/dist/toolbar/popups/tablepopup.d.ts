@@ -1,3 +1,4 @@
+/// <reference types="react" />
 declare type TableSize = {
     columns: number;
     rows: number;

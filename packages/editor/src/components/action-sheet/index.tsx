@@ -1,17 +1,33 @@
 import React, { PropsWithChildren, useCallback, useRef, useState } from "react";
 import { MenuItem } from "../menu/types";
 import { useTheme } from "emotion-theming";
-import Sheet from "react-modal-sheet";
 import { Theme } from "@notesnook/theme";
-import { Button, Flex, Text } from "rebass";
+import { Box, Button, Flex, Text } from "rebass";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { MenuButton } from "../menu/menu-button";
 import { MenuSeparator } from "../menu/menu-separator";
+import Modal from "react-modal";
+import {
+  motion,
+  PanInfo,
+  useMotionValue,
+  animate,
+  useTransform,
+  useAnimation,
+} from "framer-motion";
 
+const AnimatedFlex = motion(Flex);
 type ActionSheetHistoryItem = {
   title?: string;
   items?: MenuItem[];
+};
+const TRANSITION = {
+  type: "spring",
+  stiffness: 300,
+  damping: 30,
+  mass: 0.2,
+  duration: 300,
 };
 
 function useHistory<T>(initial: T) {
@@ -64,73 +80,159 @@ export function ActionSheetPresenter(
   const contentRef = useRef<HTMLDivElement>();
   const focusedElement = useRef<HTMLElement>();
 
-  // hijack the back button temporarily for a more native experience
-  // on mobile phones.
-  const onPopState = useCallback(
-    (e: PopStateEvent | BeforeUnloadEvent) => {
-      if (onClose) {
-        onClose();
-        e.preventDefault();
-        return true;
-      }
-    },
-    [isOpen, onClose]
+  const y = useMotionValue(0);
+  const opacity = useTransform(
+    y,
+    [0, contentRef.current?.offsetHeight || window.innerHeight],
+    [1, 0]
   );
+  const animation = useAnimation();
 
+  const onBeforeClose = useCallback(() => {
+    const height = contentRef.current?.offsetHeight || window.innerHeight;
+    setTimeout(() => {
+      onClose?.();
+    }, TRANSITION.duration - 50);
+    animation.start({
+      transition: TRANSITION,
+      y: height + 100,
+    });
+  }, [animation, onClose, contentRef.current]);
+
+  if (!isOpen) return null;
   return (
-    <Sheet
+    <Modal
+      contentRef={(ref) => (contentRef.current = ref)}
+      className={"bottom-sheet-presenter"}
+      role="menu"
       isOpen={isOpen}
-      onClose={onClose || (() => {})}
-      springConfig={{
-        stiffness: 300,
-        damping: 30,
-        mass: 0.2,
-        duration: 300,
+      appElement={document.body}
+      shouldCloseOnEsc={blocking}
+      shouldReturnFocusAfterClose={focusOnRender}
+      shouldCloseOnOverlayClick={blocking}
+      shouldFocusAfterRender={focusOnRender}
+      ariaHideApp={blocking}
+      preventScroll={blocking}
+      onRequestClose={() => onBeforeClose()}
+      portalClassName={"bottom-sheet-presenter-portal"}
+      onAfterOpen={() => {
+        animation.start({ transition: TRANSITION, y: 0 });
       }}
-      onOpenStart={() => {
-        window.addEventListener("popstate", onPopState);
-        window.addEventListener("beforeunload", onPopState);
-
-        if (focusOnRender) {
-          focusedElement.current =
-            (document.activeElement as HTMLElement) || undefined;
-          contentRef.current?.focus({ preventScroll: true });
-        }
+      overlayElement={(props, contentEl) => {
+        return (
+          <Box
+            {...props}
+            //@ts-ignore
+            style={{
+              ...props.style,
+              // position: blocking ? "initial" : "fixed",
+              zIndex: 1000,
+              backgroundColor: "unset",
+            }}
+            tabIndex={-1}
+          >
+            <motion.div
+              style={{
+                height: "100%",
+                width: "100%",
+                opacity,
+                position: "absolute",
+                backgroundColor: blocking ? "var(--overlay)" : "transparent",
+              }}
+              tabIndex={-1}
+            />
+            {contentEl}
+          </Box>
+        );
       }}
-      onCloseEnd={() => {
-        window.removeEventListener("popstate", onPopState);
-        window.removeEventListener("beforeunload", onPopState);
-        if (focusOnRender) {
-          focusedElement.current?.focus({ preventScroll: true });
-        }
-      }}
+      contentElement={(props, children) => (
+        <Box
+          {...props}
+          style={{}}
+          sx={{
+            // top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            width: "auto",
+            height: "fit-content",
+            position: "fixed",
+            backgroundColor: "transparent",
+            padding: 0,
+            zIndex: 0,
+            outline: 0,
+            isolation: "isolate",
+          }}
+        >
+          {children}
+        </Box>
+      )}
     >
-      <Sheet.Container
-        style={{
+      <AnimatedFlex
+        animate={animation}
+        style={{ y }}
+        initial={{ y: 1000 }}
+        sx={{
+          bg: "background",
           borderTopLeftRadius: 15,
           borderTopRightRadius: 15,
           boxShadow: theme.shadows.menu,
+          flex: 1,
+          flexDirection: "column",
         }}
       >
-        <Sheet.Header disableDrag={!onClose} />
-        <Sheet.Content>
-          <div
-            id="action-sheet-focus"
-            ref={(ref) => (contentRef.current = ref || undefined)}
-            tabIndex={-1}
-          />
-          <ContentContainer items={items} title={title} onClose={onClose}>
-            {children}
-          </ContentContainer>
-        </Sheet.Content>
-      </Sheet.Container>
+        <AnimatedFlex
+          drag="y"
+          // @ts-ignore
+          onDrag={(_, { delta }: PanInfo) => {
+            y.set(Math.max(y.get() + delta.y, 0));
+          }}
+          // @ts-ignore
+          onDragEnd={(_, { velocity }: PanInfo) => {
+            if (velocity.y >= 500) {
+              onClose?.();
+              return;
+            }
+            const sheetEl = contentRef.current as HTMLDivElement;
+            const contentHeight = sheetEl.offsetHeight;
+            const threshold = 30;
+            const closingHeight = (contentHeight * threshold) / 100;
 
-      {blocking ? (
-        <Sheet.Backdrop style={{ border: "none" }} onTap={onClose} />
-      ) : (
-        <></>
-      )}
-    </Sheet>
+            if (y.get() >= closingHeight) {
+              onBeforeClose();
+            } else {
+              animation.start({ transition: TRANSITION, y: 0 });
+            }
+          }}
+          onAnimationComplete={() => {
+            console.log("ED!");
+          }}
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragMomentum={false}
+          dragElastic={false}
+          sx={{
+            bg: "transparent",
+            alignItems: "center",
+            justifyContent: "center",
+            p: 2,
+          }}
+        >
+          <Box
+            id="pill"
+            sx={{
+              backgroundColor: "hover",
+              width: 60,
+              height: 8,
+              borderRadius: 100,
+            }}
+          />
+        </AnimatedFlex>
+        <ContentContainer items={items} title={title} onClose={onClose}>
+          {children}
+        </ContentContainer>
+      </AnimatedFlex>
+    </Modal>
   );
 }
 

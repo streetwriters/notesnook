@@ -9,7 +9,7 @@ import {
   PopupWrapperProps,
 } from "../../components/popup-presenter";
 import { PositionOptions } from "../../utils/position";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 
 export type SplitButtonProps = ToolButtonProps & { onOpen: () => void };
 export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {

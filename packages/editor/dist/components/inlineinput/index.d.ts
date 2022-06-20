@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { InputProps } from "@rebass/forms";
 import { FlexProps } from "rebass";
 declare type LabelInputProps = InputProps & {

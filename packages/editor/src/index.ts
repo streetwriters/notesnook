@@ -153,7 +153,13 @@ const useTiptap = (
     ]
   );
 
-  const editor = useEditor({ ...defaultOptions, ...restOptions }, deps);
+  const editor = useEditor(
+    {
+      ...defaultOptions,
+      ...restOptions,
+    },
+    deps
+  );
 
   /**
    * Add editor to global for use in React Native.

@@ -12,7 +12,7 @@ var __assign = (this && this.__assign) || function () {
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useRef } from "react";
 import { Flex, Text } from "rebass";
-import Button from "../button";
+import { Button } from "../button";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useToolbarLocation } from "../../toolbar/stores/toolbar-store";

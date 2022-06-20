@@ -8,4 +8,4 @@ export declare type ActionSheetPresenterProps = {
     focusOnRender?: boolean;
     title?: string;
 };
-export declare function ActionSheetPresenter(props: PropsWithChildren<ActionSheetPresenterProps>): JSX.Element;
+export declare function ActionSheetPresenter(props: PropsWithChildren<ActionSheetPresenterProps>): JSX.Element | null;

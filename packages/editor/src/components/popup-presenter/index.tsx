@@ -20,6 +20,7 @@ import {
   PopupRenderer,
   usePopupRenderer,
 } from "./popuprenderer";
+import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
 
 export type PopupPresenterProps = {
   isOpen: boolean;
@@ -30,7 +31,7 @@ export type PopupPresenterProps = {
   movable?: boolean;
 };
 
-export function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
+function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
   const {
     isOpen,
     position,
@@ -207,6 +208,15 @@ export function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
   );
 }
 
+export function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
+  // HACK: we don't want to render the popup presenter for no reason
+  // including it's effects etc. so we just wrap it and return null
+  // if the popup is closed.
+  if (!props.isOpen) return null;
+
+  return <_PopupPresenter {...props} />;
+}
+
 export type PopupWrapperProps = {
   id: string;
   group: string;
@@ -296,7 +306,7 @@ export function PopupWrapper(props: PopupWrapperProps) {
 type ShowPopupOptions = {
   theme: Theme;
   popup: (closePopup: () => void) => React.ReactNode;
-} & Partial<PopupPresenterProps>;
+} & Partial<ResponsivePresenterProps>;
 export function showPopup(options: ShowPopupOptions) {
   const { theme, popup, ...props } = options;
 
@@ -306,7 +316,7 @@ export function showPopup(options: ShowPopupOptions) {
 
   ReactDOM.render(
     <ThemeProvider theme={theme}>
-      <PopupPresenter
+      <ResponsivePresenter
         isOpen
         onClose={hide}
         position={{
@@ -321,7 +331,7 @@ export function showPopup(options: ShowPopupOptions) {
         {...props}
       >
         {popup(hide)}
-      </PopupPresenter>
+      </ResponsivePresenter>
     </ThemeProvider>,
     getPopupContainer()
   );

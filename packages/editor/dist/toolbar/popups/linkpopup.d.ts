@@ -1,3 +1,4 @@
+/// <reference types="react" />
 export declare type LinkPopupProps = {
     text?: string;
     href?: string;

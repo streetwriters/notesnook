@@ -47,8 +47,13 @@ export function MoreTools(props: MoreToolsProps) {
             editor={editor}
             sx={{
               flex: 1,
-              px: isBottom ? 0 : 1,
-              height: "50px",
+              p: 1,
+              // TODO: we cannot put a fix height here
+              // since it differs from platform to platform.
+              // perhaps we can use a expose a custom css class
+              // or extend the theme.
+              // px: isBottom ? 0 : 1,
+              // height: "50px",
               boxShadow: "menu",
               bg: "background",
               borderRadius: "default",

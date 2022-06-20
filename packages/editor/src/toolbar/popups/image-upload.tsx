@@ -2,7 +2,7 @@ import { Input } from "@rebass/forms";
 import { useState } from "react";
 import { Flex } from "rebass";
 import { ImageAttributes } from "../../extensions/image";
-import Button from "../../components/button";
+import { Button } from "../../components/button";
 import { Popup } from "../components/popup";
 
 export type ImageUploadPopupProps = {

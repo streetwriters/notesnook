@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { isLanguageLoaded, loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";
 import "prism-themes/themes/prism-dracula.min.css";
-import { Button, Flex, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import Languages from "./languages.json";
 import { Input } from "@rebass/forms";
 import { Icon } from "../../toolbar/components/icon";
@@ -11,6 +11,7 @@ import { CodeBlockAttributes } from "./code-block";
 import { ReactNodeViewProps } from "../react/types";
 import { ResponsivePresenter } from "../../components/responsive";
 import { Popup } from "../../toolbar/components/popup";
+import { Button } from "../../components/button";
 
 export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
@@ -115,7 +116,9 @@ export function CodeblockComponent(
               bg: isOpen ? "codeSelection" : "transparent",
               ":hover": { bg: "codeSelection" },
             }}
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              setIsOpen(true);
+            }}
             title="Change language"
           >
             <Text
@@ -130,7 +133,17 @@ export function CodeblockComponent(
       </Flex>
       <ResponsivePresenter
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          // NOTE: for some reason the language selection action sheet
+          // does not return focus to the last focused position after
+          // closing. We have to set focusOnRender=false & manually
+          // restore focus. I think this has something to do with custom
+          // node views.
+          // TRY: perhaps use SelectionBasedReactNodeView?
+          editor.commands.focus();
+        }}
+        focusOnRender={false}
         mobile="sheet"
         desktop="menu"
         position={{
@@ -176,6 +189,9 @@ function LanguageSelector(props: LanguageSelectorProps) {
         }}
       >
         <Input
+          onFocus={() => {
+            console.log("EHLLO!");
+          }}
           autoFocus
           placeholder="Search languages"
           sx={{

@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ToolProps } from "../types";
 import { ToolId } from "../tools";
 declare type MoreToolsProps = ToolProps & {

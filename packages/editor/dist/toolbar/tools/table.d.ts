@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ToolProps } from "../types";
 export declare function TableSettings(props: ToolProps): JSX.Element | null;
 export declare function RowProperties(props: ToolProps): JSX.Element;
