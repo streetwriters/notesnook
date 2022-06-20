@@ -200,6 +200,32 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Cell border width",
     conditional: true,
   },
+
+  imageSettings: {
+    icon: "imageSettings",
+    title: "Image settings",
+    conditional: true,
+  },
+  imageAlignCenter: {
+    icon: "alignCenter",
+    title: "Align center",
+    conditional: true,
+  },
+  imageAlignLeft: {
+    icon: "alignLeft",
+    title: "Align left",
+    conditional: true,
+  },
+  imageAlignRight: {
+    icon: "alignRight",
+    title: "Align right",
+    conditional: true,
+  },
+  imageProperties: {
+    icon: "more",
+    title: "Image properties",
+    conditional: true,
+  },
 };
 
 export function getToolDefinition(id: ToolId) {

@@ -92,6 +92,8 @@ import {
   mdiTableOff,
   mdiRectangleOutline,
   mdiRectangle,
+  mdiImageEdit,
+  mdiImageEditOutline,
 } from "@mdi/js";
 
 export const Icons = {
@@ -119,6 +121,7 @@ export const Icons = {
   link: mdiLinkPlus,
   url: mdiLink,
   image: mdiImage,
+  imageSettings: mdiImageEditOutline,
   colorClear: mdiInvertColorsOff,
   check: mdiCheck,
   checkbox: mdiCheckboxMarkedOutline,

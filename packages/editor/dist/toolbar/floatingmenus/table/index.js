@@ -1,1 +1,1 @@
-export { TableColumnFloatingMenu, TableFloatingMenu, TableRowFloatingMenu, } from "./table";
+export { TableColumnFloatingMenu, TableRowFloatingMenu } from "./table";

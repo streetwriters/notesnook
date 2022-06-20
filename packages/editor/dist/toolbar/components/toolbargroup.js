@@ -34,8 +34,6 @@ export function ToolbarGroup(props) {
             else {
                 var Component = findTool(toolId);
                 var toolDefinition = getToolDefinition(toolId);
-                if (toolId === "textColor")
-                    console.log("Rendering", toolId);
                 return (_jsx(Component, __assign({ editor: editor }, toolDefinition), toolDefinition.title));
             }
         }) })));

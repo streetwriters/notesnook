@@ -15,6 +15,7 @@ import { ImageProperties } from "../../toolbar/popups/image-properties";
 import { Popup } from "../../toolbar/components/popup";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
+import { ImageToolbar } from "../../toolbar/floatingmenus/image";
 
 export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -70,13 +71,16 @@ export function ImageComponent(
         >
           {selected && (
             <Flex sx={{ position: "relative", justifyContent: "end" }}>
-              <ImageToolbar
-                editor={editor}
-                float={float}
-                align={align}
-                height={height || 0}
-                width={width || 0}
-              />
+              <Flex
+                sx={{
+                  position: "absolute",
+                  top: -40,
+                  mb: 2,
+                  alignItems: "end",
+                }}
+              >
+                <ImageToolbar editor={editor} />
+              </Flex>
             </Flex>
           )}
           <Icon
@@ -90,7 +94,7 @@ export function ImageComponent(
               top: 2,
               left: 2,
               zIndex: 999,
-              opacity: 0,
+              opacity: selected ? 1 : 0,
             }}
           />
           <Image
@@ -111,127 +115,6 @@ export function ImageComponent(
         </Resizable>
       </Box>
     </>
-  );
-}
-
-type ImageToolbarProps = ImageAlignmentOptions &
-  Required<ImageSizeOptions> & {
-    editor: Editor;
-  };
-
-function ImageToolbar(props: ImageToolbarProps) {
-  const { editor, float, height, width } = props;
-  const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>();
-
-  return (
-    <Flex
-      ref={ref}
-      sx={{
-        flexDirection: "column",
-        position: "absolute",
-        top: -40,
-        mb: 2,
-        zIndex: 9999,
-        alignItems: "end",
-      }}
-    >
-      <Flex
-        sx={{
-          bg: "background",
-          boxShadow: "menu",
-          flexWrap: "nowrap",
-          borderRadius: "default",
-          mb: 2,
-        }}
-      >
-        <Flex
-          className="toolbar-group"
-          sx={{
-            pr: 1,
-            mr: 1,
-            borderRight: "1px solid var(--border)",
-            ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
-          }}
-        >
-          <ToolButton
-            toggled={false}
-            title="Align left"
-            id="alignLeft"
-            icon="alignLeft"
-            onClick={() =>
-              editor.chain().focus().setImageAlignment({ align: "left" }).run()
-            }
-          />
-          {float ? null : (
-            <ToolButton
-              toggled={false}
-              title="Align center"
-              id="alignCenter"
-              icon="alignCenter"
-              onClick={() =>
-                editor
-                  .chain()
-                  .focus()
-                  .setImageAlignment({ align: "center" })
-                  .run()
-              }
-            />
-          )}
-          <ToolButton
-            toggled={false}
-            title="Align right"
-            id="alignRight"
-            icon="alignRight"
-            onClick={() =>
-              editor.chain().focus().setImageAlignment({ align: "right" }).run()
-            }
-          />
-        </Flex>
-        <Flex
-          className="toolbar-group"
-          sx={{
-            pr: 1,
-            mr: 1,
-            borderRight: "1px solid var(--border)",
-            ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
-          }}
-        >
-          <ToolButton
-            toggled={isOpen}
-            title="Image properties"
-            id="imageProperties"
-            icon="more"
-            onClick={() => setIsOpen((s) => !s)}
-          />
-        </Flex>
-      </Flex>
-
-      <ResponsivePresenter
-        isOpen={isOpen}
-        desktop="menu"
-        mobile="sheet"
-        onClose={() => setIsOpen(false)}
-        blocking
-        focusOnRender={false}
-        position={{
-          target: ref.current || "mouse",
-          align: "start",
-          location: "below",
-          yOffset: 10,
-          isTargetAbsolute: true,
-        }}
-      >
-        <Popup
-          title="Image properties"
-          onClose={() => {
-            setIsOpen(false);
-          }}
-        >
-          <ImageProperties {...props} />
-        </Popup>
-      </ResponsivePresenter>
-    </Flex>
   );
 }
 

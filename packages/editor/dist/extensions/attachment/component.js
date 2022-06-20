@@ -21,18 +21,11 @@ export function AttachmentComponent(props) {
     var editor = props.editor, node = props.node, selected = props.selected;
     var _a = node.attrs, hash = _a.hash, filename = _a.filename, size = _a.size, progress = _a.progress;
     var elementRef = useRef();
-    // const isActive = editor.isActive("attachment", { hash });
-    // const [isToolbarVisible, setIsToolbarVisible] = useState<boolean>();
-    //   useEffect(() => {
-    //     setIsToolbarVisible(isActive);
-    //   }, [isActive]);
-    console.log(progress);
     return (_jsxs(_Fragment, { children: [_jsxs(Box, __assign({ ref: elementRef, as: "span", contentEditable: false, variant: "body", sx: {
                     display: "inline-flex",
                     overflow: "hidden",
                     position: "relative",
                     justifyContent: "center",
-                    zIndex: 1,
                     userSelect: "none",
                     alignItems: "center",
                     backgroundColor: "bgSecondary",

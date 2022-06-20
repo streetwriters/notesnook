@@ -9,3 +9,13 @@ export function getPopupContainer() {
     (document.getElementById("popup-container") as HTMLElement) || undefined
   );
 }
+
+export function getEditorContainer() {
+  return (document.querySelector(".editor") ||
+    getPopupContainer()) as HTMLElement;
+}
+
+export function getEditorDOM() {
+  return (document.querySelector(".ProseMirror") ||
+    getEditorContainer()) as HTMLElement; // ProseMirror
+}

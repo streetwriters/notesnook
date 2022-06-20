@@ -23,6 +23,7 @@ export declare const Icons: {
     link: string;
     url: string;
     image: string;
+    imageSettings: string;
     colorClear: string;
     check: string;
     checkbox: string;

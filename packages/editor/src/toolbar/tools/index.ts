@@ -41,6 +41,13 @@ import {
   CellTextColor,
   CellBorderWidth,
 } from "./table";
+import {
+  ImageSettings,
+  ImageAlignCenter,
+  ImageAlignLeft,
+  ImageAlignRight,
+  ImageProperties,
+} from "./image";
 
 export type ToolId = keyof typeof tools;
 const tools = {
@@ -67,6 +74,12 @@ const tools = {
   rtl: RightToLeft,
   textColor: TextColor,
   highlight: Highlight,
+
+  imageSettings: ImageSettings,
+  imageAlignCenter: ImageAlignCenter,
+  imageAlignLeft: ImageAlignLeft,
+  imageAlignRight: ImageAlignRight,
+  imageProperties: ImageProperties,
 
   tableSettings: TableSettings,
   columnProperties: ColumnProperties,

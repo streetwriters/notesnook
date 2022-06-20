@@ -9,6 +9,7 @@ import { NumberedList, BulletList } from "./lists";
 import { LeftToRight, RightToLeft } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import { TableSettings, ColumnProperties, RowProperties, CellProperties, CellBackgroundColor, CellBorderColor, CellTextColor, CellBorderWidth } from "./table";
+import { ImageSettings, ImageAlignCenter, ImageAlignLeft, ImageAlignRight, ImageProperties } from "./image";
 export declare type ToolId = keyof typeof tools;
 declare const tools: {
     bold: typeof Bold;
@@ -34,6 +35,11 @@ declare const tools: {
     rtl: typeof RightToLeft;
     textColor: typeof TextColor;
     highlight: typeof Highlight;
+    imageSettings: typeof ImageSettings;
+    imageAlignCenter: typeof ImageAlignCenter;
+    imageAlignLeft: typeof ImageAlignLeft;
+    imageAlignRight: typeof ImageAlignRight;
+    imageProperties: typeof ImageProperties;
     tableSettings: typeof TableSettings;
     columnProperties: typeof ColumnProperties;
     rowProperties: typeof RowProperties;

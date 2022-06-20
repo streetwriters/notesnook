@@ -7,6 +7,7 @@ import { NumberedList, BulletList } from "./lists";
 import { LeftToRight, RightToLeft } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import { TableSettings, ColumnProperties, RowProperties, CellProperties, InsertColumnLeft, InsertColumnRight, MoveColumnLeft, MoveColumnRight, DeleteColumn, SplitCells, MergeCells, InsertRowAbove, InsertRowBelow, MoveRowUp, MoveRowDown, DeleteRow, DeleteTable, CellBackgroundColor, CellBorderColor, CellTextColor, CellBorderWidth, } from "./table";
+import { ImageSettings, ImageAlignCenter, ImageAlignLeft, ImageAlignRight, ImageProperties, } from "./image";
 var tools = {
     bold: Bold,
     italic: Italic,
@@ -31,6 +32,11 @@ var tools = {
     rtl: RightToLeft,
     textColor: TextColor,
     highlight: Highlight,
+    imageSettings: ImageSettings,
+    imageAlignCenter: ImageAlignCenter,
+    imageAlignLeft: ImageAlignLeft,
+    imageAlignRight: ImageAlignRight,
+    imageProperties: ImageProperties,
     tableSettings: TableSettings,
     columnProperties: ColumnProperties,
     rowProperties: RowProperties,

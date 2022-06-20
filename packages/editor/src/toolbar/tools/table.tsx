@@ -3,8 +3,6 @@ import { Editor } from "@tiptap/core";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Flex, Text } from "rebass";
-import { Input } from "@rebass/forms";
-import { Popup } from "../components/popup";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MenuButton, MenuItem } from "../../components/menu/types";
 import {
@@ -12,7 +10,7 @@ import {
   moveColumnRight as moveColumnRightAction,
   moveRowDown as moveRowDownAction,
   moveRowUp as moveRowUpAction,
-} from "../floatingmenus/table/actions";
+} from "../../extensions/table/actions";
 import { MoreTools } from "../components/more-tools";
 import { menuButtonToTool } from "./utils";
 import { getToolDefinition } from "../tool-definitions";
@@ -48,6 +46,7 @@ export function TableSettings(props: ToolProps) {
 
 export function RowProperties(props: ToolProps) {
   const { editor } = props;
+  const buttonRef = useRef<HTMLButtonElement>();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const items = useMemo(
     () => [
@@ -64,6 +63,7 @@ export function RowProperties(props: ToolProps) {
     <>
       <ToolButton
         {...props}
+        buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
       />
@@ -73,7 +73,12 @@ export function RowProperties(props: ToolProps) {
         desktop="menu"
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        position={{}}
+        position={{
+          target: buttonRef.current,
+          isTargetAbsolute: true,
+          location: "below",
+          yOffset: 5,
+        }}
         items={items}
       />
     </>
@@ -82,6 +87,7 @@ export function RowProperties(props: ToolProps) {
 
 export function ColumnProperties(props: ToolProps) {
   const { editor } = props;
+  const buttonRef = useRef<HTMLButtonElement>();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const items = useMemo(
@@ -99,6 +105,7 @@ export function ColumnProperties(props: ToolProps) {
     <>
       <ToolButton
         {...props}
+        buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
       />
@@ -108,7 +115,12 @@ export function ColumnProperties(props: ToolProps) {
         desktop="menu"
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        position={{}}
+        position={{
+          target: buttonRef.current,
+          isTargetAbsolute: true,
+          location: "below",
+          yOffset: 5,
+        }}
         items={items}
       />
     </>
@@ -117,6 +129,7 @@ export function ColumnProperties(props: ToolProps) {
 
 export function TableProperties(props: ToolProps) {
   const { editor } = props;
+  const buttonRef = useRef<HTMLButtonElement>();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const items = useMemo<MenuItem[]>(
@@ -140,6 +153,7 @@ export function TableProperties(props: ToolProps) {
     <>
       <ToolButton
         {...props}
+        buttonRef={buttonRef}
         toggled={isMenuOpen}
         onClick={() => setIsMenuOpen(true)}
       />
@@ -149,7 +163,12 @@ export function TableProperties(props: ToolProps) {
         desktop="menu"
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
-        position={{}}
+        position={{
+          target: buttonRef.current,
+          isTargetAbsolute: true,
+          location: "below",
+          yOffset: 5,
+        }}
         items={items}
       />
     </>
@@ -276,14 +295,14 @@ const moveColumnLeft = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveColumnLeft"),
   key: "moveColumnLeft",
   type: "button",
-  onClick: () => moveColumnLeft(editor),
+  onClick: () => moveColumnLeftAction(editor),
 });
 
 const moveColumnRight = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveColumnRight"),
   key: "moveColumnRight",
   type: "button",
-  onClick: () => moveColumnRight(editor),
+  onClick: () => moveColumnRightAction(editor),
 });
 
 const deleteColumn = (editor: Editor): MenuButton => ({
@@ -325,13 +344,13 @@ const moveRowUp = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveRowUp"),
   key: "moveRowUp",
   type: "button",
-  onClick: () => {},
+  onClick: () => moveRowUpAction(editor),
 });
 const moveRowDown = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveRowDown"),
   key: "moveRowDown",
   type: "button",
-  onClick: () => {},
+  onClick: () => moveRowDownAction(editor),
 });
 
 const deleteRow = (editor: Editor): MenuButton => ({

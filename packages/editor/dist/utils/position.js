@@ -24,12 +24,11 @@ export function getPosition(element, options) {
     else {
         position.left = x;
     }
-    if (width) {
-        if (location === "right")
-            position.left += width;
-        else if (location === "left")
-            position.left -= elementWidth;
+    if (width && location === "right") {
+        position.left += width;
     }
+    else if (location === "left")
+        position.left -= elementWidth;
     if (actualY + elementHeight > windowHeight) {
         position.top = windowHeight - elementHeight;
     }
@@ -54,10 +53,10 @@ export function getPosition(element, options) {
     }
     if (yAnchor) {
         var anchorY = getElementPosition(yAnchor, isTargetAbsolute);
-        position.top = anchorY.actualY - elementHeight;
+        position.top = anchorY.y - elementHeight;
     }
-    position.top = position.top < 0 ? 0 : position.top;
-    position.left = position.left < 0 ? 0 : position.left;
+    position.top = isTargetAbsolute && position.top < 0 ? 0 : position.top;
+    position.left = isTargetAbsolute && position.left < 0 ? 0 : position.left;
     position.top += location === "below" ? yOffset : -yOffset;
     position.left += xOffset;
     return position;

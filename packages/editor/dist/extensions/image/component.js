@@ -45,32 +45,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Box, Flex, Image } from "rebass";
 import { Resizable } from "re-resizable";
-import { ToolButton } from "../../toolbar/components/tool-button";
-import { useEffect, useRef, useState } from "react";
-import { ResponsivePresenter } from "../../components/responsive";
-import { ImageProperties } from "../../toolbar/popups/image-properties";
-import { Popup } from "../../toolbar/components/popup";
+import { useEffect, useRef } from "react";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
+import { ImageToolbar } from "../../toolbar/floatingmenus/image";
 export function ImageComponent(props) {
     var _this = this;
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, selected = props.selected;
@@ -116,66 +97,24 @@ export function ImageComponent(props) {
                         width: ref.clientWidth,
                         height: ref.clientHeight,
                     });
-                }, lockAspectRatio: true }, { children: [selected && (_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(ImageToolbar, { editor: editor, float: float, align: align, height: height || 0, width: width || 0 }) }))), _jsx(Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: Icons.dragHandle, sx: {
+                }, lockAspectRatio: true }, { children: [selected && (_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(Flex, __assign({ sx: {
+                                position: "absolute",
+                                top: -40,
+                                mb: 2,
+                                alignItems: "end",
+                            } }, { children: _jsx(ImageToolbar, { editor: editor }) })) }))), _jsx(Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: Icons.dragHandle, sx: {
                             cursor: "grab",
                             position: "absolute",
                             top: 2,
                             left: 2,
                             zIndex: 999,
-                            opacity: 0,
+                            opacity: selected ? 1 : 0,
                         } }), _jsx(Image, __assign({ "data-drag-image": true, ref: imageRef, alt: alt, title: title, width: "100%", height: "100%", sx: {
                             border: selected
                                 ? "2px solid var(--primary)"
                                 : "2px solid transparent",
                             borderRadius: "default",
                         } }, props))] })) })) }));
-}
-function ImageToolbar(props) {
-    var editor = props.editor, float = props.float, height = props.height, width = props.width;
-    var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    var ref = useRef();
-    return (_jsxs(Flex, __assign({ ref: ref, sx: {
-            flexDirection: "column",
-            position: "absolute",
-            top: -40,
-            mb: 2,
-            zIndex: 9999,
-            alignItems: "end",
-        } }, { children: [_jsxs(Flex, __assign({ sx: {
-                    bg: "background",
-                    boxShadow: "menu",
-                    flexWrap: "nowrap",
-                    borderRadius: "default",
-                    mb: 2,
-                } }, { children: [_jsxs(Flex, __assign({ className: "toolbar-group", sx: {
-                            pr: 1,
-                            mr: 1,
-                            borderRight: "1px solid var(--border)",
-                            ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
-                        } }, { children: [_jsx(ToolButton, { toggled: false, title: "Align left", id: "alignLeft", icon: "alignLeft", onClick: function () {
-                                    return editor.chain().focus().setImageAlignment({ align: "left" }).run();
-                                } }), float ? null : (_jsx(ToolButton, { toggled: false, title: "Align center", id: "alignCenter", icon: "alignCenter", onClick: function () {
-                                    return editor
-                                        .chain()
-                                        .focus()
-                                        .setImageAlignment({ align: "center" })
-                                        .run();
-                                } })), _jsx(ToolButton, { toggled: false, title: "Align right", id: "alignRight", icon: "alignRight", onClick: function () {
-                                    return editor.chain().focus().setImageAlignment({ align: "right" }).run();
-                                } })] })), _jsx(Flex, __assign({ className: "toolbar-group", sx: {
-                            pr: 1,
-                            mr: 1,
-                            borderRight: "1px solid var(--border)",
-                            ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
-                        } }, { children: _jsx(ToolButton, { toggled: isOpen, title: "Image properties", id: "imageProperties", icon: "more", onClick: function () { return setIsOpen(function (s) { return !s; }); } }) }))] })), _jsx(ResponsivePresenter, __assign({ isOpen: isOpen, desktop: "menu", mobile: "sheet", onClose: function () { return setIsOpen(false); }, blocking: true, focusOnRender: false, position: {
-                    target: ref.current || "mouse",
-                    align: "start",
-                    location: "below",
-                    yOffset: 10,
-                    isTargetAbsolute: true,
-                } }, { children: _jsx(Popup, __assign({ title: "Image properties", onClose: function () {
-                        setIsOpen(false);
-                    } }, { children: _jsx(ImageProperties, __assign({}, props)) })) }))] })));
 }
 function dataUriToBlobURL(dataurl) {
     return __awaiter(this, void 0, void 0, function () {

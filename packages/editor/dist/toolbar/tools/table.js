@@ -27,9 +27,10 @@ var __read = (this && this.__read) || function (o, n) {
 };
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Flex, Text } from "rebass";
 import { ResponsivePresenter } from "../../components/responsive";
+import { moveColumnLeft as moveColumnLeftAction, moveColumnRight as moveColumnRightAction, moveRowDown as moveRowDownAction, moveRowUp as moveRowUpAction, } from "../../extensions/table/actions";
 import { MoreTools } from "../components/more-tools";
 import { menuButtonToTool } from "./utils";
 import { getToolDefinition } from "../tool-definitions";
@@ -58,6 +59,7 @@ export function TableSettings(props) {
 }
 export function RowProperties(props) {
     var editor = props.editor;
+    var buttonRef = useRef();
     var _a = __read(useState(false), 2), isMenuOpen = _a[0], setIsMenuOpen = _a[1];
     var items = useMemo(function () { return [
         insertRowAbove(editor),
@@ -66,10 +68,16 @@ export function RowProperties(props) {
         moveRowDown(editor),
         deleteRow(editor),
     ]; }, []);
-    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({}, props, { toggled: isMenuOpen, onClick: function () { return setIsMenuOpen(true); } })), _jsx(ResponsivePresenter, { title: "Row properties", mobile: "sheet", desktop: "menu", isOpen: isMenuOpen, onClose: function () { return setIsMenuOpen(false); }, position: {}, items: items })] }));
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({}, props, { buttonRef: buttonRef, toggled: isMenuOpen, onClick: function () { return setIsMenuOpen(true); } })), _jsx(ResponsivePresenter, { title: "Row properties", mobile: "sheet", desktop: "menu", isOpen: isMenuOpen, onClose: function () { return setIsMenuOpen(false); }, position: {
+                    target: buttonRef.current,
+                    isTargetAbsolute: true,
+                    location: "below",
+                    yOffset: 5,
+                }, items: items })] }));
 }
 export function ColumnProperties(props) {
     var editor = props.editor;
+    var buttonRef = useRef();
     var _a = __read(useState(false), 2), isMenuOpen = _a[0], setIsMenuOpen = _a[1];
     var items = useMemo(function () { return [
         insertColumnLeft(editor),
@@ -78,10 +86,16 @@ export function ColumnProperties(props) {
         moveColumnRight(editor),
         deleteColumn(editor),
     ]; }, []);
-    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({}, props, { toggled: isMenuOpen, onClick: function () { return setIsMenuOpen(true); } })), _jsx(ResponsivePresenter, { title: "Column properties", mobile: "sheet", desktop: "menu", isOpen: isMenuOpen, onClose: function () { return setIsMenuOpen(false); }, position: {}, items: items })] }));
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({}, props, { buttonRef: buttonRef, toggled: isMenuOpen, onClick: function () { return setIsMenuOpen(true); } })), _jsx(ResponsivePresenter, { title: "Column properties", mobile: "sheet", desktop: "menu", isOpen: isMenuOpen, onClose: function () { return setIsMenuOpen(false); }, position: {
+                    target: buttonRef.current,
+                    isTargetAbsolute: true,
+                    location: "below",
+                    yOffset: 5,
+                }, items: items })] }));
 }
 export function TableProperties(props) {
     var editor = props.editor;
+    var buttonRef = useRef();
     var _a = __read(useState(false), 2), isMenuOpen = _a[0], setIsMenuOpen = _a[1];
     var items = useMemo(function () { return [
         insertColumnLeft(editor),
@@ -96,7 +110,12 @@ export function TableProperties(props) {
         { type: "separator", key: "tableSeperator" },
         deleteTable(editor),
     ]; }, []);
-    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({}, props, { toggled: isMenuOpen, onClick: function () { return setIsMenuOpen(true); } })), _jsx(ResponsivePresenter, { title: "Table properties", mobile: "sheet", desktop: "menu", isOpen: isMenuOpen, onClose: function () { return setIsMenuOpen(false); }, position: {}, items: items })] }));
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({}, props, { buttonRef: buttonRef, toggled: isMenuOpen, onClick: function () { return setIsMenuOpen(true); } })), _jsx(ResponsivePresenter, { title: "Table properties", mobile: "sheet", desktop: "menu", isOpen: isMenuOpen, onClose: function () { return setIsMenuOpen(false); }, position: {
+                    target: buttonRef.current,
+                    isTargetAbsolute: true,
+                    location: "below",
+                    yOffset: 5,
+                }, items: items })] }));
 }
 export function CellProperties(props) {
     return (_jsx(_Fragment, { children: _jsx(MoreTools, __assign({}, props, { popupId: "cellProperties", tools: [
@@ -147,15 +166,15 @@ export function CellBorderWidth(props) {
 }
 var insertColumnLeft = function (editor) { return (__assign(__assign({}, getToolDefinition("insertColumnLeft")), { key: "addColumnLeft", type: "button", onClick: function () { return editor.chain().focus().addColumnBefore().run(); } })); };
 var insertColumnRight = function (editor) { return (__assign(__assign({}, getToolDefinition("insertColumnRight")), { key: "addColumnRight", type: "button", title: "Add column right", onClick: function () { return editor.chain().focus().addColumnAfter().run(); }, icon: "insertColumnRight" })); };
-var moveColumnLeft = function (editor) { return (__assign(__assign({}, getToolDefinition("moveColumnLeft")), { key: "moveColumnLeft", type: "button", onClick: function () { return moveColumnLeft(editor); } })); };
-var moveColumnRight = function (editor) { return (__assign(__assign({}, getToolDefinition("moveColumnRight")), { key: "moveColumnRight", type: "button", onClick: function () { return moveColumnRight(editor); } })); };
+var moveColumnLeft = function (editor) { return (__assign(__assign({}, getToolDefinition("moveColumnLeft")), { key: "moveColumnLeft", type: "button", onClick: function () { return moveColumnLeftAction(editor); } })); };
+var moveColumnRight = function (editor) { return (__assign(__assign({}, getToolDefinition("moveColumnRight")), { key: "moveColumnRight", type: "button", onClick: function () { return moveColumnRightAction(editor); } })); };
 var deleteColumn = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteColumn")), { key: "deleteColumn", type: "button", onClick: function () { return editor.chain().focus().deleteColumn().run(); } })); };
 var splitCells = function (editor) { return (__assign(__assign({}, getToolDefinition("splitCells")), { key: "splitCells", type: "button", onClick: function () { return editor.chain().focus().splitCell().run(); } })); };
 var mergeCells = function (editor) { return (__assign(__assign({}, getToolDefinition("mergeCells")), { key: "mergeCells", type: "button", onClick: function () { return editor.chain().focus().mergeCells().run(); } })); };
 var insertRowAbove = function (editor) { return (__assign(__assign({}, getToolDefinition("insertRowAbove")), { key: "insertRowAbove", type: "button", onClick: function () { return editor.chain().focus().addRowBefore().run(); } })); };
 var insertRowBelow = function (editor) { return (__assign(__assign({}, getToolDefinition("insertRowBelow")), { key: "insertRowBelow", type: "button", onClick: function () { return editor.chain().focus().addRowAfter().run(); } })); };
-var moveRowUp = function (editor) { return (__assign(__assign({}, getToolDefinition("moveRowUp")), { key: "moveRowUp", type: "button", onClick: function () { } })); };
-var moveRowDown = function (editor) { return (__assign(__assign({}, getToolDefinition("moveRowDown")), { key: "moveRowDown", type: "button", onClick: function () { } })); };
+var moveRowUp = function (editor) { return (__assign(__assign({}, getToolDefinition("moveRowUp")), { key: "moveRowUp", type: "button", onClick: function () { return moveRowUpAction(editor); } })); };
+var moveRowDown = function (editor) { return (__assign(__assign({}, getToolDefinition("moveRowDown")), { key: "moveRowDown", type: "button", onClick: function () { return moveRowDownAction(editor); } })); };
 var deleteRow = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteRow")), { key: "deleteRow", type: "button", onClick: function () { return editor.chain().focus().deleteRow().run(); } })); };
 var deleteTable = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteTable")), { key: "deleteTable", type: "button", onClick: function () { return editor.chain().focus().deleteTable().run(); } })); };
 var cellProperties = function (editor) { return (__assign(__assign({}, getToolDefinition("cellProperties")), { key: "cellProperties", type: "button", onClick: function () {

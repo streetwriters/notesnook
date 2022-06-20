@@ -8,6 +8,7 @@ import {
   ImageSizeOptions,
 } from "../../extensions/image";
 import { Editor } from "@tiptap/core";
+import { InlineInput } from "../../components/inline-input";
 
 export type ImagePropertiesProps = ImageSizeOptions &
   ImageAlignmentOptions & { editor: Editor };
@@ -37,7 +38,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
   );
 
   return (
-    <Flex sx={{ width: 200, flexDirection: "column", p: 1 }}>
+    <Flex sx={{ width: ["auto", 300], flexDirection: "column", p: 1 }}>
       <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
         <Text variant={"body"}>Floating?</Text>
         <Toggle
@@ -51,22 +52,19 @@ export function ImageProperties(props: ImagePropertiesProps) {
         />
       </Flex>
       <Flex sx={{ alignItems: "center", mt: 2 }}>
-        <Input
+        <InlineInput
+          label="width"
           type="number"
-          placeholder="Width"
           value={width}
-          sx={{
-            mr: 2,
-            p: 1,
-            fontSize: "body",
+          containerProps={{
+            sx: { mr: 1 },
           }}
           onChange={(e) => onSizeChange(e.target.valueAsNumber)}
         />
-        <Input
+        <InlineInput
+          label="height"
           type="number"
-          placeholder="Height"
           value={height}
-          sx={{ p: 1, fontSize: "body" }}
           onChange={(e) => onSizeChange(undefined, e.target.valueAsNumber)}
         />
       </Flex>

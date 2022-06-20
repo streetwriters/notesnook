@@ -4,6 +4,7 @@ import { useTheme } from "emotion-theming";
 import React from "react";
 import { Button, ButtonProps } from "rebass";
 import { IconNames, Icons } from "../icons";
+import { ToolButtonVariant } from "../types";
 import { Icon } from "./icon";
 
 export type ToolButtonProps = ButtonProps & {
@@ -12,7 +13,7 @@ export type ToolButtonProps = ButtonProps & {
   iconSize?: number;
   toggled: boolean;
   buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined>;
-  variant?: "small" | "normal";
+  variant?: ToolButtonVariant;
 };
 export function ToolButton(props: ToolButtonProps) {
   const {

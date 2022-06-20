@@ -17,7 +17,6 @@ import BulletList from "./extensions/bullet-list";
 import OrderedList from "./extensions/ordered-list";
 import Highlight from "@tiptap/extension-highlight";
 import Color from "@tiptap/extension-color";
-import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "./extensions/table-cell";
 import TableHeader from "@tiptap/extension-table-header";
@@ -39,6 +38,7 @@ import {
 } from "./extensions/react";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
+import { Table } from "./extensions/table";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -94,6 +94,7 @@ const useTiptap = (
         Table.configure({
           resizable: true,
           allowTableNodeSelection: true,
+          cellMinWidth: 50,
         }),
         TableRow,
         TableCell,

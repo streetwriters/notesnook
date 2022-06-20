@@ -28,27 +28,19 @@ var __read = (this && this.__read) || function (o, n) {
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useState } from "react";
 import { Flex } from "rebass";
-import { useToolbarLocation } from "../../stores/toolbar-store";
 import { PopupPresenter } from "../../../components/popup-presenter";
-import { getToolbarElement } from "../../utils/dom";
 import { InsertColumnRight, InsertRowBelow, RowProperties, TableProperties, } from "../../tools/table";
+import { findSelectedDOMNode } from "../../utils/prosemirror";
 import { getToolDefinition } from "../../tool-definitions";
 export function TableRowFloatingMenu(props) {
     var editor = props.editor;
-    // const theme = editor.storage.theme as Theme;
     var _a = __read(useState(null), 2), position = _a[0], setPosition = _a[1];
     useEffect(function () {
-        var _a;
-        if (!editor.isActive("tableCell") &&
-            !editor.isActive("tableRow") &&
-            !editor.isActive("tableHeader")) {
+        if (!editor.isActive("table")) {
             setPosition(null);
             return;
         }
-        var $from = editor.state.selection.$from;
-        var selectedNode = $from.node();
-        var pos = selectedNode.isTextblock ? $from.before() : $from.pos;
-        var currentRow = (_a = editor.view.nodeDOM(pos)) === null || _a === void 0 ? void 0 : _a.closest("tr");
+        var currentRow = findSelectedDOMNode(editor, ["tableRow"]);
         if (!currentRow)
             return;
         setPosition(function (old) {
@@ -118,24 +110,4 @@ export function TableColumnFloatingMenu(props) {
                     opacity: 1,
                 },
             } }, { children: [_jsx(TableProperties, { editor: editor, title: "tableProperties", icon: "more", variant: "small" }), _jsx(InsertColumnRight, __assign({}, getToolDefinition("insertColumnRight"), { editor: editor, variant: "small", icon: "plus" }))] })) })));
-}
-export function TableFloatingMenu(props) {
-    var editor = props.editor;
-    var toolbarLocation = useToolbarLocation();
-    if (!editor.isActive("table"))
-        return null;
-    return (_jsx(PopupPresenter, __assign({ isOpen: true, onClose: function () { }, blocking: false, position: {
-            isTargetAbsolute: true,
-            target: getToolbarElement(),
-            location: toolbarLocation === "bottom" ? "top" : "below",
-        }, focusOnRender: false }, { children: _jsx(Flex, { sx: {
-                bg: "background",
-                flexWrap: "nowrap",
-                borderRadius: "default",
-                // opacity: 0.3,
-                //  opacity: isMenuOpen || showCellProps ? 1 : 0.3,
-                ":hover": {
-                    opacity: 1,
-                },
-            } }) })));
 }

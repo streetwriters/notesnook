@@ -15,13 +15,7 @@ export function AttachmentComponent(
   const { editor, node, selected } = props;
   const { hash, filename, size, progress } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
-  // const isActive = editor.isActive("attachment", { hash });
-  // const [isToolbarVisible, setIsToolbarVisible] = useState<boolean>();
 
-  //   useEffect(() => {
-  //     setIsToolbarVisible(isActive);
-  //   }, [isActive]);
-  console.log(progress);
   return (
     <>
       <Box
@@ -34,7 +28,6 @@ export function AttachmentComponent(
           overflow: "hidden",
           position: "relative",
           justifyContent: "center",
-          zIndex: 1,
           userSelect: "none",
           alignItems: "center",
           backgroundColor: "bgSecondary",

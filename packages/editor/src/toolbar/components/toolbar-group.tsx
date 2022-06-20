@@ -1,4 +1,4 @@
-import { ToolbarGroupDefinition } from "../types";
+import { ToolbarGroupDefinition, ToolButtonVariant } from "../types";
 import { findTool } from "../tools";
 import { Flex, FlexProps } from "rebass";
 import { Editor } from "@tiptap/core";
@@ -8,6 +8,7 @@ import { getToolDefinition } from "../tool-definitions";
 export type ToolbarGroupProps = FlexProps & {
   tools: ToolbarGroupDefinition;
   editor: Editor;
+  variant?: ToolButtonVariant;
 };
 export function ToolbarGroup(props: ToolbarGroupProps) {
   const { tools, editor, ...flexProps } = props;
@@ -28,7 +29,6 @@ export function ToolbarGroup(props: ToolbarGroupProps) {
         } else {
           const Component = findTool(toolId);
           const toolDefinition = getToolDefinition(toolId);
-          if (toolId === "textColor") console.log("Rendering", toolId);
           return (
             <Component
               key={toolDefinition.title}

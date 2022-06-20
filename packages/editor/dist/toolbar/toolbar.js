@@ -26,7 +26,7 @@ export function Toolbar(props) {
         setToolbarLocation(location);
     }, [isMobile, location]);
     var tools = [
-        ["insertBlock", "tableSettings"],
+        ["insertBlock", "tableSettings", "imageSettings"],
         [
             "bold",
             "italic",

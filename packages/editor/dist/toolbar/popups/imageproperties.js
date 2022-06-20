@@ -13,7 +13,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Flex, Text } from "rebass";
 import { useCallback } from "react";
 import { Toggle } from "../../components/toggle";
-import { Input } from "@rebass/forms";
+import { InlineInput } from "../../components/inline-input";
 export function ImageProperties(props) {
     var height = props.height, width = props.width, float = props.float, editor = props.editor;
     var onSizeChange = useCallback(function (newWidth, newHeight) {
@@ -33,14 +33,12 @@ export function ImageProperties(props) {
                 };
         editor.chain().setImageSize(size).run();
     }, [width, height]);
-    return (_jsxs(Flex, __assign({ sx: { width: 200, flexDirection: "column", p: 1 } }, { children: [_jsxs(Flex, __assign({ sx: { justifyContent: "space-between", alignItems: "center" } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: "Floating?" })), _jsx(Toggle, { checked: float, onClick: function () {
+    return (_jsxs(Flex, __assign({ sx: { width: ["auto", 300], flexDirection: "column", p: 1 } }, { children: [_jsxs(Flex, __assign({ sx: { justifyContent: "space-between", alignItems: "center" } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: "Floating?" })), _jsx(Toggle, { checked: float, onClick: function () {
                             return editor
                                 .chain()
                                 .setImageAlignment({ float: !float, align: "left" })
                                 .run();
-                        } })] })), _jsxs(Flex, __assign({ sx: { alignItems: "center", mt: 2 } }, { children: [_jsx(Input, { type: "number", placeholder: "Width", value: width, sx: {
-                            mr: 2,
-                            p: 1,
-                            fontSize: "body",
-                        }, onChange: function (e) { return onSizeChange(e.target.valueAsNumber); } }), _jsx(Input, { type: "number", placeholder: "Height", value: height, sx: { p: 1, fontSize: "body" }, onChange: function (e) { return onSizeChange(undefined, e.target.valueAsNumber); } })] }))] })));
+                        } })] })), _jsxs(Flex, __assign({ sx: { alignItems: "center", mt: 2 } }, { children: [_jsx(InlineInput, { label: "width", type: "number", value: width, containerProps: {
+                            sx: { mr: 1 },
+                        }, onChange: function (e) { return onSizeChange(e.target.valueAsNumber); } }), _jsx(InlineInput, { label: "height", type: "number", value: height, onChange: function (e) { return onSizeChange(undefined, e.target.valueAsNumber); } })] }))] })));
 }

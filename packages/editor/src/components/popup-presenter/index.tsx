@@ -183,7 +183,7 @@ export function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
             display: "flex",
             width: "fit-content",
             height: "fit-content",
-            position: "absolute",
+            position: "fixed",
             backgroundColor: undefined,
             padding: 0,
             zIndex: 0,

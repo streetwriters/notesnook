@@ -51,7 +51,7 @@ export function Toolbar(props: ToolbarProps) {
   }, [isMobile, location]);
 
   const tools: ToolbarDefinition = [
-    ["insertBlock", "tableSettings"],
+    ["insertBlock", "tableSettings", "imageSettings"],
     [
       "bold",
       "italic",
