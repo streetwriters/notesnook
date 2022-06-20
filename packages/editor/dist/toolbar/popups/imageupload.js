@@ -64,16 +64,20 @@ var __read = (this && this.__read) || function (o, n) {
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Input } from "@rebass/forms";
 import { useState } from "react";
-import { Flex, Button } from "rebass";
+import { Flex } from "rebass";
+import Button from "../../components/button";
 import { Popup } from "../components/popup";
 export function ImageUploadPopup(props) {
     var _this = this;
     var onInsert = props.onInsert, onClose = props.onClose;
     var _a = __read(useState(""), 2), url = _a[0], setUrl = _a[1];
-    return (_jsx(Popup, __assign({ title: "Upload image from URL", onClose: onClose }, { children: _jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column", width: ["auto", 250] } }, { children: [_jsx(Input, { type: "url", autoFocus: true, placeholder: "Paste Image URL here", value: url, onChange: function (e) { return setUrl(e.target.value); } }), _jsx(Button, __assign({ variant: "primary", sx: {
+    return (_jsx(Popup, __assign({ title: "Upload image from URL", onClose: onClose }, { children: _jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column", width: ["auto", 250] } }, { children: [_jsx(Input, { type: "url", sx: {
+                        height: "45px",
+                    }, autoFocus: true, placeholder: "Paste Image URL here", value: url, onChange: function (e) { return setUrl(e.target.value); } }), _jsx(Button, __assign({ variant: "primary", sx: {
                         alignSelf: ["stretch", "end", "end"],
                         my: 1,
-                        mr: 1,
+                        mr: [0, 1],
+                        py: 2,
                     }, onClick: function () { return __awaiter(_this, void 0, void 0, function () {
                         var response, dataurl, _a;
                         return __generator(this, function (_b) {

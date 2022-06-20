@@ -68,7 +68,7 @@ export function EmbedPopup(props) {
                         color: "error",
                         p: 1,
                         borderRadius: "default",
-                    } }, { children: ["Error: ", error] }))), _jsxs(Tabs, __assign({ activeIndex: 0, containerProps: { sx: { mx: 1, mb: 1, flexDirection: "column" } }, onTabChanged: function (index) { return setEmbedSource(index === 0 ? "url" : "code"); } }, { children: [_jsxs(Tab, __assign({ title: "From URL" }, { children: [_jsx(Input, { placeholder: "Enter embed source URL", value: src, autoFocus: true, onChange: function (e) { return setSrc(e.target.value); }, sx: { fontSize: "body" } }), _jsxs(Flex, __assign({ sx: { alignItems: "center", mt: 1 } }, { children: [_jsx(InlineInput, { containerProps: { sx: { mr: 1 } }, label: "width", type: "number", placeholder: "Width", value: width, sx: {
+                    } }, { children: ["Error: ", error] }))), _jsxs(Tabs, __assign({ activeIndex: 0, containerProps: { sx: { mx: 1, mb: 1, flexDirection: "column" } }, onTabChanged: function (index) { return setEmbedSource(index === 0 ? "url" : "code"); } }, { children: [_jsxs(Tab, __assign({ title: "From URL" }, { children: [_jsx(Input, { placeholder: "Enter embed source URL", value: src, autoFocus: true, onChange: function (e) { return setSrc(e.target.value); }, autoCapitalize: "none", sx: { fontSize: "body" } }), _jsxs(Flex, __assign({ sx: { alignItems: "center", mt: 1 } }, { children: [_jsx(InlineInput, { containerProps: { sx: { mr: 1 } }, label: "width", type: "number", placeholder: "Width", value: width, sx: {
                                                 mr: 1,
                                                 fontSize: "body",
                                             }, onChange: function (e) { return onSizeChange(e.target.valueAsNumber); } }), _jsx(InlineInput, { label: "height", type: "number", placeholder: "Height", value: height, sx: { fontSize: "body" }, onChange: function (e) {
@@ -77,6 +77,8 @@ export function EmbedPopup(props) {
                         alignSelf: ["stretch", "end", "end"],
                         my: 1,
                         mr: 1,
+                        ml: [1, 0],
+                        py: 2,
                     }, onClick: function () {
                         setError(null);
                         var _src = src;

@@ -93,8 +93,8 @@ export function ActionSheetPresenter(props) {
                 (_a = focusedElement.current) === null || _a === void 0 ? void 0 : _a.focus({ preventScroll: true });
             }
         } }, { children: [_jsxs(Sheet.Container, __assign({ style: {
-                    borderTopLeftRadius: 20,
-                    borderTopRightRadius: 20,
+                    borderTopLeftRadius: 15,
+                    borderTopRightRadius: 15,
                     boxShadow: theme.shadows.menu,
                 } }, { children: [_jsx(Sheet.Header, { disableDrag: !onClose }), _jsxs(Sheet.Content, { children: [_jsx("div", { id: "action-sheet-focus", ref: function (ref) { return (contentRef.current = ref || undefined); }, tabIndex: -1 }), _jsx(ContentContainer, __assign({ items: items, title: title, onClose: onClose }, { children: children }))] })] })), blocking ? (_jsx(Sheet.Backdrop, { style: { border: "none" }, onTap: onClose })) : (_jsx(_Fragment, {}))] })));
 }
@@ -105,7 +105,7 @@ function ContentContainer(props) {
         title: title,
         items: items,
     }), current = _b.current, goBack = _b.goBack, canGoBack = _b.canGoBack, navigate = _b.navigate;
-    return (_jsxs(Flex, __assign({ sx: { flexDirection: "column" } }, { children: [_jsxs(Flex, __assign({ id: "header", sx: { alignItems: "center", mx: 2, mb: 2 } }, { children: [canGoBack && (_jsx(Button, __assign({ variant: "icon", sx: { p: 1, mr: 2 }, onClick: goBack }, { children: _jsx(Icon, { path: Icons.chevronLeft, size: "big" }) }))), (current === null || current === void 0 ? void 0 : current.title) && (_jsx(Text, __assign({ variant: "title", sx: { ml: 1, fontSize: "title" } }, { children: current === null || current === void 0 ? void 0 : current.title })))] })), children
+    return (_jsxs(Flex, __assign({ sx: { flexDirection: "column" } }, { children: [_jsxs(Flex, __assign({ id: "header", sx: { alignItems: "center", mx: 0, mb: 1 } }, { children: [canGoBack && (_jsx(Button, __assign({ variant: "icon", sx: { p: 1, ml: 1 }, onClick: goBack }, { children: _jsx(Icon, { path: Icons.arrowLeft, size: "big" }) }))), (current === null || current === void 0 ? void 0 : current.title) && (_jsx(Text, __assign({ variant: "title", sx: { ml: 1, fontSize: "title" } }, { children: current === null || current === void 0 ? void 0 : current.title })))] })), children
                 ? children
                 : (_a = current === null || current === void 0 ? void 0 : current.items) === null || _a === void 0 ? void 0 : _a.map(function (item) {
                     switch (item.type) {
@@ -117,8 +117,11 @@ function ContentContainer(props) {
                                         navigate(item.menu);
                                     }
                                     else if (item.onClick) {
-                                        item.onClick();
                                         onClose === null || onClose === void 0 ? void 0 : onClose();
+                                        setTimeout(function () {
+                                            var _a;
+                                            (_a = item.onClick) === null || _a === void 0 ? void 0 : _a.call(item);
+                                        }, 300);
                                     }
                                 } }, item.key));
                         case "popup":

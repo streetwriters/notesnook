@@ -96,7 +96,7 @@ export function TaskListComponent(props) {
                             } })] }))) : (_jsxs(Flex, __assign({ sx: {
                         position: "relative",
                         bg: "bgSecondary",
-                        py: 1,
+                        py: 2,
                         borderRadius: "default",
                         mb: 2,
                         alignItems: "center",

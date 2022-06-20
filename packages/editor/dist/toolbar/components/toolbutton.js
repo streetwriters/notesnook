@@ -21,12 +21,12 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import { jsx as _jsx } from "react/jsx-runtime";
-import { Button } from "rebass";
 import { Icons } from "../icons";
+import Button from "../../components/button";
 import { Icon } from "./icon";
 export function ToolButton(props) {
     var id = props.id, icon = props.icon, iconSize = props.iconSize, iconColor = props.iconColor, toggled = props.toggled, sx = props.sx, buttonRef = props.buttonRef, _a = props.variant, variant = _a === void 0 ? "normal" : _a, buttonProps = __rest(props, ["id", "icon", "iconSize", "iconColor", "toggled", "sx", "buttonRef", "variant"]);
-    return (_jsx(Button, __assign({ ref: buttonRef, tabIndex: -1, id: "tool-".concat(id), sx: __assign({ flexShrink: 0, p: variant === "small" ? "small" : 1, borderRadius: variant === "small" ? "small" : "default", m: 0, bg: toggled ? "hover" : "transparent", mr: variant === "small" ? 0 : 1, ":hover": { bg: "hover" }, ":last-of-type": {
+    return (_jsx(Button, __assign({ ref: buttonRef, tabIndex: -1, id: "tool-".concat(id), sx: __assign({ flexShrink: 0, p: variant === "small" ? "small" : 1, borderRadius: variant === "small" ? "small" : "default", m: 0, bg: toggled ? "hover" : "transparent", mr: variant === "small" ? 0 : 1, ":hover": { bg: ["transparent", "hover"] }, ":last-of-type": {
                 mr: 0,
             } }, sx), onMouseDown: function (e) { return e.preventDefault(); } }, buttonProps, { children: _jsx(Icon, { path: Icons[icon], color: iconColor || "icon", size: iconSize || variant === "small" ? "medium" : "big" }) })));
 }

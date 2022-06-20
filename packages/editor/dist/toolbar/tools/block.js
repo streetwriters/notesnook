@@ -29,13 +29,13 @@ import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-run
 import { Icons } from "../icons";
 import { useMemo, useRef, useState } from "react";
 import { Icon } from "../components/icon";
-import { Button } from "rebass";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { ResponsivePresenter, } from "../../components/responsive";
 import { showPopup } from "../../components/popup-presenter";
 import { ImageUploadPopup } from "../popups/image-upload";
+import Button from "../../components/button";
 export function InsertBlock(props) {
     var buttonRef = useRef();
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];

@@ -1,4 +1,3 @@
-/// <reference types="react" />
 export declare type CounterProps = {
     title: string;
     onIncrease: () => void;

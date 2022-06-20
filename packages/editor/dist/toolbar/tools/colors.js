@@ -37,14 +37,14 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx } from "react/jsx-runtime";
-import { SplitButton } from "../components/split-button";
 import { useState } from "react";
 import tinycolor from "tinycolor2";
-import { getToolbarElement } from "../utils/dom";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { ColorPicker } from "../popups/color-picker";
-import { useEditorContext } from "../../components/popup-presenter/popuprenderer";
 import { PopupWrapper } from "../../components/popup-presenter";
+import { useEditorContext } from "../../components/popup-presenter/popuprenderer";
+import { SplitButton } from "../components/split-button";
+import { ColorPicker } from "../popups/color-picker";
+import { useToolbarLocation } from "../stores/toolbar-store";
+import { getToolbarElement } from "../utils/dom";
 export function ColorTool(props) {
     var onColorChange = props.onColorChange, isActive = props.isActive, getActiveColor = props.getActiveColor, title = props.title, toolProps = __rest(props, ["onColorChange", "isActive", "getActiveColor", "title"]);
     var editor = useEditorContext();
@@ -66,9 +66,13 @@ export function ColorTool(props) {
             mr: 0,
             bg: _isActive ? activeColor : "transparent",
             ":hover": {
-                bg: _isActive ? tColor.darken(5).toRgbString() : "transparent",
+                bg: _isActive && !isBottom
+                    ? tColor.darken(5).toRgbString()
+                    : "transparent",
             },
-        }, onOpen: function () { return setIsOpen(function (s) { return !s; }); }, toggled: isOpen }, { children: _jsx(PopupWrapper, { isOpen: isOpen, id: title, group: "color", position: {
+        }, onOpen: function () {
+            setIsOpen(function (s) { return !s; });
+        }, toggled: isOpen }, { children: _jsx(PopupWrapper, { isOpen: isOpen, id: title, group: "color", position: {
                 isTargetAbsolute: true,
                 target: getToolbarElement(),
                 align: isBottom ? "center" : "end",

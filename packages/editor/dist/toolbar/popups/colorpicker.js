@@ -26,13 +26,14 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
 import { useState } from "react";
 import tinycolor from "tinycolor2";
 import { HexColorPicker } from "react-colorful";
+import Button from "../../components/button";
 export var DEFAULT_COLORS = [
     "#e91e63",
     "#9c27b0",
@@ -121,5 +122,8 @@ export function ColorPicker(props) {
                                 }, onClick: function () {
                                     setCurrentColor(color);
                                     onChange(color);
-                                } }, color)); })] })), onClose && (_jsx(Button, __assign({ variant: "icon", sx: { display: ["block", "none"], px: 2 }, onClick: onClose }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) })))] })] })));
+                                } }, color)); })] })), onClose && (_jsx(Button, __assign({ variant: "icon", sx: { display: ["block", "none"], px: 2 }, onClick: onClose, onTouchStart: function (e) { return e.preventDefault(); }, onTouchEnd: function (e) {
+                            e.preventDefault();
+                            onClose();
+                        } }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) })))] })] })));
 }

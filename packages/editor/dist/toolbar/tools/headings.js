@@ -25,19 +25,21 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 import { jsx as _jsx } from "react/jsx-runtime";
 import { Dropdown } from "../components/dropdown";
+import { useToolbarLocation } from "../stores/toolbar-store";
 var defaultLevels = [1, 2, 3, 4, 5, 6];
 export function Headings(props) {
     var editor = props.editor;
+    var toolbarLocation = useToolbarLocation();
     var currentHeadingLevel = defaultLevels.find(function (level) {
         return editor.isActive("heading", { level: level });
     });
-    return (_jsx(Dropdown, { selectedItem: currentHeadingLevel ? "Heading ".concat(currentHeadingLevel) : "Paragraph", items: toMenuItems(editor, currentHeadingLevel), menuWidth: 130 }));
+    return (_jsx(Dropdown, { selectedItem: currentHeadingLevel ? "Heading ".concat(currentHeadingLevel) : "Paragraph", items: toMenuItems(editor, toolbarLocation, currentHeadingLevel), menuWidth: 130 }));
 }
-function toMenuItems(editor, currentHeadingLevel) {
+function toMenuItems(editor, toolbarLocation, currentHeadingLevel) {
     var menuItems = defaultLevels.map(function (level) { return ({
         type: "button",
         key: "heading-".concat(level),
-        title: "Heading ".concat(level),
+        title: toolbarLocation === "bottom" ? "H".concat(level) : "Heading ".concat(level),
         isChecked: level === currentHeadingLevel,
         onClick: function () {
             return editor

@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { IconNames } from "../../toolbar/icons";
 declare type MenuItemComponentProps = {
     onClick?: (e?: any) => void;

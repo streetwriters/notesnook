@@ -46,7 +46,8 @@ export function MoreTools(props) {
                     yOffset: isBottom ? 10 : 5,
                 }, focusOnRender: false, blocking: false, renderPopup: function () { return (_jsx(ToolbarGroup, { tools: tools, editor: editor, sx: {
                         flex: 1,
-                        p: 1,
+                        px: isBottom ? 0 : 1,
+                        height: "50px",
                         boxShadow: "menu",
                         bg: "background",
                         borderRadius: "default",

@@ -73,7 +73,7 @@ export function NumberedList(props) {
     var options = {
         type: "orderedList",
         icon: "numberedList",
-        onClick: function (editor) { return editor.chain().focus().toggleTaskList().run(); },
+        onClick: function (editor) { return editor.chain().focus().toggleOrderedList().run(); },
         subTypes: [
             { type: "decimal", title: "Decimal", items: ["1", "2", "3"] },
             { type: "upper-alpha", title: "Upper alpha", items: ["A", "B", "C"] },

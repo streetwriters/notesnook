@@ -11,20 +11,24 @@ var __assign = (this && this.__assign) || function () {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useRef } from "react";
-import { Flex, Text, Button } from "rebass";
+import { Flex, Text } from "rebass";
+import Button from "../button";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
+import { useToolbarLocation } from "../../toolbar/stores/toolbar-store";
 export function MenuButton(props) {
     var item = props.item, isFocused = props.isFocused, onMouseEnter = props.onMouseEnter, onMouseLeave = props.onMouseLeave, onClick = props.onClick;
     var title = item.title, key = item.key, icon = item.icon, tooltip = item.tooltip, isDisabled = item.isDisabled, isChecked = item.isChecked, menu = item.menu, modifier = item.modifier;
     var itemRef = useRef(null);
+    var toolbarLocation = useToolbarLocation();
+    var isBottom = toolbarLocation === "bottom";
     return (_jsx(Flex, __assign({ as: "li", sx: { flexShrink: 0, flexDirection: "column" }, onMouseEnter: onMouseEnter, onMouseLeave: onMouseLeave }, { children: _jsxs(Button, __assign({ id: key, "data-test-id": "MenuButton-".concat(key), ref: itemRef, tabIndex: -1, variant: "menuitem", title: tooltip, disabled: isDisabled, onClick: onClick, sx: {
-                bg: isFocused ? "hover" : "transparent",
+                bg: isFocused && !isBottom ? "hover" : "transparent",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 ":hover": {
-                    bg: "hover",
+                    bg: isBottom ? "transparent" : "hover",
                 },
             } }, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: "medium", sx: { mr: 2 } })), _jsx(Text, __assign({ as: "span", variant: "body" }, { children: title }))] }), isChecked || menu || modifier ? (_jsxs(Flex, __assign({ sx: { ml: 4 } }, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: 14 }), menu && _jsx(Icon, { path: Icons.chevronRight, size: 14 }), modifier && (_jsx(Text, __assign({ as: "span", sx: {
                                 fontFamily: "body",

@@ -11,6 +11,7 @@ var __assign = (this && this.__assign) || function () {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Flex, Text } from "rebass";
+import Button from "../../components/button";
 import { ToolButton } from "./tool-button";
 export function Counter(props) {
     var title = props.title, onDecrease = props.onDecrease, onIncrease = props.onIncrease, onReset = props.onReset, value = props.value;
@@ -20,5 +21,7 @@ export function Counter(props) {
             ":last-of-type": {
                 mr: 0,
             },
-        } }, { children: [_jsx(ToolButton, { toggled: false, title: "Decrease ".concat(title), icon: "minus", variant: "small", onClick: onDecrease }), _jsx(Text, __assign({ variant: "body", sx: { fontSize: "subBody", mx: 1, textAlign: "center" }, title: "Reset ".concat(title), onClick: onReset }, { children: value })), _jsx(ToolButton, { toggled: false, title: "Increase ".concat(title), icon: "plus", variant: "small", onClick: onIncrease })] })));
+        } }, { children: [_jsx(ToolButton, { toggled: false, title: "Decrease ".concat(title), icon: "minus", variant: "small", onClick: onDecrease }), _jsx(Button, __assign({ sx: {
+                    bg: "transparent",
+                }, onClick: onReset }, { children: _jsx(Text, __assign({ variant: "body", sx: { fontSize: "subBody", mx: 1, textAlign: "center" }, title: "Reset ".concat(title) }, { children: value })) })), _jsx(ToolButton, { toggled: false, title: "Increase ".concat(title), icon: "plus", variant: "small", onClick: onIncrease })] })));
 }

@@ -75,6 +75,7 @@ export declare const Icons: {
     chevronRight: string;
     chevronLeft: string;
     circle: string;
+    arrowLeft: string;
     none: string;
 };
 export declare type IconNames = keyof typeof Icons;

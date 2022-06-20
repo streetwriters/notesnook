@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { EmbedAlignmentOptions, EmbedAttributes, EmbedSizeOptions } from "../../extensions/embed";
 declare type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;
 export declare type EmbedPopupProps = {

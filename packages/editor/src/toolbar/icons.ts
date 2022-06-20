@@ -92,12 +92,9 @@ import {
   mdiTableOff,
   mdiRectangleOutline,
   mdiRectangle,
-<<<<<<< HEAD
   mdiImageEdit,
   mdiImageEditOutline,
-=======
   mdiArrowLeft,
->>>>>>> 565b7be (ui fixes)
 } from "@mdi/js";
 
 export const Icons = {

@@ -32,7 +32,7 @@ import { useIsMobile } from "../stores/toolbar-store";
 import { InlineInput } from "../../components/inline-input";
 var MAX_COLUMNS = 20;
 var MAX_ROWS = 20;
-var MIN_COLUMNS = 12;
+var MIN_COLUMNS = 10;
 var MIN_ROWS = 6;
 export function TablePopup(props) {
     var isMobile = useIsMobile();

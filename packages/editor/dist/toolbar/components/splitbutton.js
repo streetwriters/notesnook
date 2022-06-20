@@ -22,11 +22,12 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useRef } from "react";
-import { Button, Flex } from "rebass";
+import { Flex } from "rebass";
 import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton } from "./tool-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
+import Button from "../../components/button";
 export function SplitButton(props) {
     var children = props.children, toggled = props.toggled, onOpen = props.onOpen, toolButtonProps = __rest(props, ["children", "toggled", "onOpen"]);
     var ref = useRef(null);
@@ -43,5 +44,5 @@ export function SplitButton(props) {
                             ":last-of-type": {
                                 mr: 0,
                             },
-                        }, onClick: onOpen, onMouseDown: function (e) { return e.preventDefault(); } }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small" }) }))] })), children] }));
+                        }, onClick: onOpen }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small" }) }))] })), children] }));
 }

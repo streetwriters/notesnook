@@ -1,6 +1,5 @@
-/// <reference types="react" />
-import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
+import { ToolProps } from "../types";
 declare type ColorToolProps = ToolProps & {
     onColorChange: (editor: Editor, color?: string) => void;
     isActive: (editor: Editor) => boolean;
