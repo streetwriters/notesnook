@@ -25,7 +25,6 @@ export function AttachmentComponent(
         variant={"body"}
         sx={{
           display: "inline-flex",
-          overflow: "hidden",
           position: "relative",
           justifyContent: "center",
           userSelect: "none",
@@ -67,22 +66,12 @@ export function AttachmentComponent(
         >
           {progress ? `${progress}%` : formatBytes(size)}
         </Text>
+        {selected && (
+          <Flex sx={{ position: "absolute", top: -35 }}>
+            <AttachmentToolbar editor={editor} />
+          </Flex>
+        )}
       </Box>
-      <PopupPresenter
-        isOpen={selected}
-        onClose={() => {}}
-        blocking={false}
-        focusOnRender={false}
-        position={{
-          target: elementRef.current || undefined,
-          align: "center",
-          location: "top",
-          yOffset: 5,
-          isTargetAbsolute: true,
-        }}
-      >
-        <AttachmentToolbar editor={editor} />
-      </PopupPresenter>
     </>
   );
 }
