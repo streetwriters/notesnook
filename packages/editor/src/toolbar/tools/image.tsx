@@ -24,6 +24,7 @@ export function ImageSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
+      autoCloseOnUnmount
       popupId="imageSettings"
       tools={
         float

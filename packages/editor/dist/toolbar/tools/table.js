@@ -44,7 +44,7 @@ export function TableSettings(props) {
     var isBottom = useToolbarLocation() === "bottom";
     if (!editor.isActive("table") || !isBottom)
         return null;
-    return (_jsx(MoreTools, __assign({}, props, { popupId: "tableSettings", tools: [
+    return (_jsx(MoreTools, __assign({}, props, { autoCloseOnUnmount: true, popupId: "tableSettings", tools: [
             "insertColumnLeft",
             "insertColumnRight",
             "insertRowAbove",

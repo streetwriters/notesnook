@@ -146,7 +146,7 @@ export function PopupPresenter(props) {
     return _jsx(_PopupPresenter, __assign({}, props));
 }
 export function PopupWrapper(props) {
-    var id = props.id, group = props.group, position = props.position, renderPopup = props.renderPopup, isOpen = props.isOpen, onClosed = props.onClosed, presenterProps = __rest(props, ["id", "group", "position", "renderPopup", "isOpen", "onClosed"]);
+    var id = props.id, group = props.group, position = props.position, renderPopup = props.renderPopup, isOpen = props.isOpen, onClosed = props.onClosed, autoCloseOnUnmount = props.autoCloseOnUnmount, presenterProps = __rest(props, ["id", "group", "position", "renderPopup", "isOpen", "onClosed", "autoCloseOnUnmount"]);
     var closePopup = useToolbarStore(function (store) { return store.closePopup; });
     var openPopup = useToolbarStore(function (store) { return store.openPopup; });
     var closePopupGroup = useToolbarStore(function (store) { return store.closePopupGroup; });
@@ -165,17 +165,18 @@ export function PopupWrapper(props) {
             onClosed === null || onClosed === void 0 ? void 0 : onClosed();
     }, [isPopupOpen]);
     useEffect(function () {
-        console.log("Opening popup", id, isOpen);
         if (isOpen)
             openPopup({ id: id, group: group });
         else
             closePopup(id);
     }, [isOpen, id, group, openPopup]);
     useEffect(function () {
+        if (!autoCloseOnUnmount)
+            return;
         return function () {
             PopupRenderer === null || PopupRenderer === void 0 ? void 0 : PopupRenderer.closePopup(id);
         };
-    }, [id]);
+    }, [autoCloseOnUnmount, id]);
     useEffect(function () {
         if (PopupRenderer && isPopupOpen) {
             PopupRenderer.openPopup(id, function () { return (_jsx(PopupPresenter, __assign({ isOpen: isPopupOpen, onClose: function () { return closePopup(id); }, position: position, blocking: true, focusOnRender: true }, presenterProps, { children: _jsx(Box, __assign({ sx: {

@@ -40,6 +40,15 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import React, { useContext } from "react";
 export var PopupRendererContext = React.createContext(null);
@@ -50,23 +59,36 @@ var PopupRenderer = /** @class */ (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.popupContainer = null;
         _this.state = {
-            popups: {},
+            popups: [],
+        };
+        _this.openPopup = function (id, popup) {
+            if (!popup)
+                return;
+            _this.setState(function (prev) {
+                return {
+                    popups: __spreadArray(__spreadArray([], __read(prev.popups), false), [{ id: id, popup: popup }], false),
+                };
+            });
+        };
+        _this.closePopup = function (id) {
+            _this.setState(function (prev) {
+                var index = prev.popups.findIndex(function (p) { return p.id === id; });
+                if (index <= -1)
+                    return prev;
+                console.log(index, id, prev.popups[index]);
+                var clone = prev.popups.slice();
+                clone.splice(index, 1);
+                return {
+                    popups: clone,
+                };
+            });
         };
         return _this;
     }
-    PopupRenderer.prototype.openPopup = function (id, popup) {
-        var _a;
-        this.setState({ popups: __assign(__assign({}, this.state.popups), (_a = {}, _a[id] = popup, _a)) });
-    };
-    PopupRenderer.prototype.closePopup = function (id) {
-        var _a;
-        this.setState({ popups: __assign(__assign({}, this.state.popups), (_a = {}, _a[id] = null, _a)) });
-    };
     PopupRenderer.prototype.render = function () {
-        return (_jsxs(PopupRendererContext.Provider, __assign({ value: this }, { children: [this.props.children, _jsxs(EditorContext.Provider, __assign({ value: this.props.editor }, { children: [Object.entries(this.state.popups).map(function (_a) {
-                            var _b = __read(_a, 2), id = _b[0], Popup = _b[1];
-                            if (!Popup)
-                                return null;
+        return (_jsxs(PopupRendererContext.Provider, __assign({ value: this }, { children: [this.props.children, _jsxs(EditorContext.Provider, __assign({ value: this.props.editor }, { children: [this.state.popups.map(function (_a) {
+                            var id = _a.id, Popup = _a.popup;
+                            console.log(id, Popup);
                             return _jsx(Popup, {}, id);
                         }), _jsx("div", { id: "popup-container" })] }))] })));
     };

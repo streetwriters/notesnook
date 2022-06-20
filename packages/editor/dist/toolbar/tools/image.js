@@ -41,7 +41,7 @@ export function ImageSettings(props) {
         return null;
     var image = useMemo(function () { return findSelectedNode(editor, "image"); }, []);
     var float = ((image === null || image === void 0 ? void 0 : image.attrs) || {}).float;
-    return (_jsx(MoreTools, __assign({}, props, { popupId: "imageSettings", tools: float
+    return (_jsx(MoreTools, __assign({}, props, { autoCloseOnUnmount: true, popupId: "imageSettings", tools: float
             ? ["imageAlignLeft", "imageAlignRight", "imageProperties"]
             : [
                 "imageAlignLeft",

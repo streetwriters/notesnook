@@ -19,6 +19,7 @@ export declare type PopupWrapperProps = {
     isOpen: boolean;
     onClosed?: () => void;
     renderPopup: (closePopup: () => void) => React.ReactNode;
+    autoCloseOnUnmount?: boolean;
 } & Partial<Omit<PopupPresenterProps, "onClose">>;
 export declare function PopupWrapper(props: PopupWrapperProps): null;
 declare type ShowPopupOptions = {

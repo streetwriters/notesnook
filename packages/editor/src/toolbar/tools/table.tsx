@@ -27,6 +27,7 @@ export function TableSettings(props: ToolProps) {
   return (
     <MoreTools
       {...props}
+      autoCloseOnUnmount
       popupId="tableSettings"
       tools={[
         "insertColumnLeft",

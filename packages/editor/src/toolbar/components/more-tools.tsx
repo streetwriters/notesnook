@@ -10,9 +10,10 @@ import { ToolbarGroup } from "./toolbar-group";
 type MoreToolsProps = ToolProps & {
   popupId: string;
   tools: ToolId[];
+  autoCloseOnUnmount?: boolean;
 };
 export function MoreTools(props: MoreToolsProps) {
-  const { popupId, editor, tools } = props;
+  const { popupId, editor, tools, autoCloseOnUnmount } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
   const buttonRef = useRef<HTMLButtonElement | null>();
@@ -39,6 +40,7 @@ export function MoreTools(props: MoreToolsProps) {
           location: isBottom ? "top" : "below",
           yOffset: isBottom ? 10 : 5,
         }}
+        autoCloseOnUnmount={autoCloseOnUnmount}
         focusOnRender={false}
         blocking={false}
         renderPopup={() => (

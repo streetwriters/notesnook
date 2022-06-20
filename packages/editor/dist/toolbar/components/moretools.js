@@ -33,7 +33,7 @@ import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
 import { ToolbarGroup } from "./toolbar-group";
 export function MoreTools(props) {
-    var popupId = props.popupId, editor = props.editor, tools = props.tools;
+    var popupId = props.popupId, editor = props.editor, tools = props.tools, autoCloseOnUnmount = props.autoCloseOnUnmount;
     var toolbarLocation = useToolbarLocation();
     var isBottom = toolbarLocation === "bottom";
     var buttonRef = useRef();
@@ -44,7 +44,7 @@ export function MoreTools(props) {
                     align: "center",
                     location: isBottom ? "top" : "below",
                     yOffset: isBottom ? 10 : 5,
-                }, focusOnRender: false, blocking: false, renderPopup: function () { return (_jsx(ToolbarGroup, { tools: tools, editor: editor, sx: {
+                }, autoCloseOnUnmount: autoCloseOnUnmount, focusOnRender: false, blocking: false, renderPopup: function () { return (_jsx(ToolbarGroup, { tools: tools, editor: editor, sx: {
                         flex: 1,
                         p: 1,
                         // TODO: we cannot put a fix height here

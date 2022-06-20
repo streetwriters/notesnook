@@ -6,13 +6,16 @@ export declare type PopupRendererProps = PropsWithChildren<{
     editor: Editor;
 }>;
 declare type PopupRendererState = {
-    popups: Record<string, React.FunctionComponent>;
+    popups: {
+        id: string;
+        popup: React.FunctionComponent;
+    }[];
 };
-export declare class PopupRenderer extends React.Component<PopupRendererProps> {
+export declare class PopupRenderer extends React.Component<PopupRendererProps, PopupRendererState, PopupRendererState> {
     popupContainer: HTMLDivElement | null;
     state: PopupRendererState;
-    openPopup(id: string, popup: React.FunctionComponent): void;
-    closePopup(id: string): void;
+    openPopup: (id: string, popup: React.FunctionComponent) => void;
+    closePopup: (id: string) => void;
     render(): React.ReactNode;
 }
 export declare function usePopupRenderer(): PopupRenderer | null;

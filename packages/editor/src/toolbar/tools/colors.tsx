@@ -55,7 +55,7 @@ export function ColorTool(props: ColorToolProps) {
     >
       <PopupWrapper
         isOpen={isOpen}
-        id={title}
+        id={props.icon}
         group={"color"}
         position={{
           isTargetAbsolute: true,

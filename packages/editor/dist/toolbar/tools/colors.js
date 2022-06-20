@@ -72,7 +72,7 @@ export function ColorTool(props) {
             },
         }, onOpen: function () {
             setIsOpen(function (s) { return !s; });
-        }, toggled: isOpen }, { children: _jsx(PopupWrapper, { isOpen: isOpen, id: title, group: "color", position: {
+        }, toggled: isOpen }, { children: _jsx(PopupWrapper, { isOpen: isOpen, id: props.icon, group: "color", position: {
                 isTargetAbsolute: true,
                 target: getToolbarElement(),
                 align: isBottom ? "center" : "end",

@@ -224,6 +224,7 @@ export type PopupWrapperProps = {
   isOpen: boolean;
   onClosed?: () => void;
   renderPopup: (closePopup: () => void) => React.ReactNode;
+  autoCloseOnUnmount?: boolean;
 } & Partial<Omit<PopupPresenterProps, "onClose">>;
 export function PopupWrapper(props: PopupWrapperProps) {
   let {
@@ -233,6 +234,7 @@ export function PopupWrapper(props: PopupWrapperProps) {
     renderPopup,
     isOpen,
     onClosed,
+    autoCloseOnUnmount,
     ...presenterProps
   } = props;
   const closePopup = useToolbarStore((store) => store.closePopup);
@@ -256,16 +258,16 @@ export function PopupWrapper(props: PopupWrapperProps) {
   }, [isPopupOpen]);
 
   useEffect(() => {
-    console.log("Opening popup", id, isOpen);
     if (isOpen) openPopup({ id, group });
     else closePopup(id);
   }, [isOpen, id, group, openPopup]);
 
   useEffect(() => {
+    if (!autoCloseOnUnmount) return;
     return () => {
       PopupRenderer?.closePopup(id);
     };
-  }, [id]);
+  }, [autoCloseOnUnmount, id]);
 
   useEffect(() => {
     if (PopupRenderer && isPopupOpen) {
