@@ -107,8 +107,8 @@ export function ActionSheetPresenter(
     >
       <Sheet.Container
         style={{
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
+          borderTopLeftRadius: 15,
+          borderTopRightRadius: 15,
           boxShadow: theme.shadows.menu,
         }}
       >
@@ -150,10 +150,10 @@ function ContentContainer(props: PropsWithChildren<ContentContainerProps>) {
 
   return (
     <Flex sx={{ flexDirection: "column" }}>
-      <Flex id="header" sx={{ alignItems: "center", mx: 2, mb: 2 }}>
+      <Flex id="header" sx={{ alignItems: "center", mx: 0, mb: 1 }}>
         {canGoBack && (
-          <Button variant={"icon"} sx={{ p: 1, mr: 2 }} onClick={goBack}>
-            <Icon path={Icons.chevronLeft} size={"big"} />
+          <Button variant={"icon"} sx={{ p: 1, ml: 1 }} onClick={goBack}>
+            <Icon path={Icons.arrowLeft} size={"big"} />
           </Button>
         )}
         {current?.title && (
@@ -177,8 +177,10 @@ function ContentContainer(props: PropsWithChildren<ContentContainerProps>) {
                       if (item.menu) {
                         navigate(item.menu);
                       } else if (item.onClick) {
-                        item.onClick();
                         onClose?.();
+                        setTimeout(() => {
+                          item.onClick?.();
+                        }, 300);
                       }
                     }}
                   />
