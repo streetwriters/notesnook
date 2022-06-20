@@ -2,7 +2,7 @@ import { ToolProps } from "../types";
 import { Dropdown } from "../components/dropdown";
 import { MenuItem } from "../../components/menu/types";
 import { Editor } from "@tiptap/core";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Counter } from "../components/counter";
 
 const defaultFontSizes = [

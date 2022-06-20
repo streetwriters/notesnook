@@ -74,6 +74,7 @@ const tools = {
   rtl: RightToLeft,
   textColor: TextColor,
   highlight: Highlight,
+<<<<<<< HEAD
 
   imageSettings: ImageSettings,
   imageAlignCenter: ImageAlignCenter,
@@ -81,6 +82,8 @@ const tools = {
   imageAlignRight: ImageAlignRight,
   imageProperties: ImageProperties,
 
+=======
+>>>>>>> 565b7be (ui fixes)
   tableSettings: TableSettings,
   columnProperties: ColumnProperties,
   rowProperties: RowProperties,

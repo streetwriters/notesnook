@@ -1,19 +1,13 @@
-import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
-import { Box, Button, Flex, Text } from "rebass";
-import { Input } from "@rebass/forms";
-import { Icon } from "../components/icon";
-import { Icons } from "../icons";
-import { ToolButton } from "../components/tool-button";
-import { SplitButton } from "../components/split-button";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import tinycolor from "tinycolor2";
-import { HexColorPicker, HexColorInput } from "react-colorful";
-import { getToolbarElement } from "../utils/dom";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { ColorPicker } from "../popups/color-picker";
-import { useEditorContext } from "../../components/popup-presenter/popuprenderer";
 import { PopupWrapper } from "../../components/popup-presenter";
+import { useEditorContext } from "../../components/popup-presenter/popuprenderer";
+import { SplitButton } from "../components/split-button";
+import { ColorPicker } from "../popups/color-picker";
+import { useToolbarLocation } from "../stores/toolbar-store";
+import { ToolProps } from "../types";
+import { getToolbarElement } from "../utils/dom";
 
 type ColorToolProps = ToolProps & {
   onColorChange: (editor: Editor, color?: string) => void;
@@ -48,10 +42,15 @@ export function ColorTool(props: ColorToolProps) {
         mr: 0,
         bg: _isActive ? activeColor : "transparent",
         ":hover": {
-          bg: _isActive ? tColor.darken(5).toRgbString() : "transparent",
+          bg:
+            _isActive && !isBottom
+              ? tColor.darken(5).toRgbString()
+              : "transparent",
         },
       }}
-      onOpen={() => setIsOpen((s) => !s)}
+      onOpen={() => {
+        setIsOpen((s) => !s);
+      }}
       toggled={isOpen}
     >
       <PopupWrapper

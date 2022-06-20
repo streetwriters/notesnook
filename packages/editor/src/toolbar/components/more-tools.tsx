@@ -47,7 +47,8 @@ export function MoreTools(props: MoreToolsProps) {
             editor={editor}
             sx={{
               flex: 1,
-              p: 1,
+              px: isBottom ? 0 : 1,
+              height: "50px",
               boxShadow: "menu",
               bg: "background",
               borderRadius: "default",

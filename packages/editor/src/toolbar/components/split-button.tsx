@@ -1,5 +1,5 @@
 import { PropsWithChildren, useRef, useState } from "react";
-import { Button, Flex } from "rebass";
+import { Flex } from "rebass";
 import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton, ToolButtonProps } from "./tool-button";
@@ -9,6 +9,7 @@ import {
   PopupWrapperProps,
 } from "../../components/popup-presenter";
 import { PositionOptions } from "../../utils/position";
+import Button from "../../components/button";
 
 export type SplitButtonProps = ToolButtonProps & { onOpen: () => void };
 export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
@@ -39,7 +40,6 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
             },
           }}
           onClick={onOpen}
-          onMouseDown={(e) => e.preventDefault()}
         >
           <Icon
             path={

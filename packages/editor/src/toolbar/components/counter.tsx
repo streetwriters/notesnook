@@ -1,4 +1,5 @@
 import { Flex, Text } from "rebass";
+import Button from "../../components/button";
 import { ToolButton } from "./tool-button";
 
 export type CounterProps = {
@@ -28,14 +29,22 @@ export function Counter(props: CounterProps) {
         variant={"small"}
         onClick={onDecrease}
       />
-      <Text
-        variant={"body"}
-        sx={{ fontSize: "subBody", mx: 1, textAlign: "center" }}
-        title={`Reset ${title}`}
+
+      <Button
+        sx={{
+          bg: "transparent",
+        }}
         onClick={onReset}
       >
-        {value}
-      </Text>
+        <Text
+          variant={"body"}
+          sx={{ fontSize: "subBody", mx: 1, textAlign: "center" }}
+          title={`Reset ${title}`}
+        >
+          {value}
+        </Text>
+      </Button>
+
       <ToolButton
         toggled={false}
         title={`Increase ${title}`}

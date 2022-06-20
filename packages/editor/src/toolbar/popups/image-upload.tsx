@@ -1,7 +1,8 @@
 import { Input } from "@rebass/forms";
 import { useState } from "react";
-import { Flex, Button } from "rebass";
+import { Flex } from "rebass";
 import { ImageAttributes } from "../../extensions/image";
+import Button from "../../components/button";
 import { Popup } from "../components/popup";
 
 export type ImageUploadPopupProps = {
@@ -17,6 +18,9 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
       <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>
         <Input
           type="url"
+          sx={{
+            height: "45px",
+          }}
           autoFocus
           placeholder="Paste Image URL here"
           value={url}
@@ -27,7 +31,8 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           sx={{
             alignSelf: ["stretch", "end", "end"],
             my: 1,
-            mr: 1,
+            mr: [0, 1],
+            py: 2,
           }}
           onClick={async () => {
             const response = await fetch(url);

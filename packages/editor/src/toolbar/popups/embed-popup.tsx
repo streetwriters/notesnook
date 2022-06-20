@@ -88,6 +88,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               value={src}
               autoFocus
               onChange={(e) => setSrc(e.target.value)}
+              autoCapitalize="none"
               sx={{ fontSize: "body" }}
             />
             <Flex sx={{ alignItems: "center", mt: 1 }}>
@@ -133,6 +134,8 @@ export function EmbedPopup(props: EmbedPopupProps) {
             alignSelf: ["stretch", "end", "end"],
             my: 1,
             mr: 1,
+            ml: [1, 0],
+            py: 2,
           }}
           onClick={() => {
             setError(null);

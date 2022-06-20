@@ -21,7 +21,6 @@ export function Dropdown(props: DropdownProps) {
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
   const isBottom = toolbarLocation === "bottom";
-
   return (
     <>
       <Button
@@ -76,9 +75,11 @@ export function Dropdown(props: DropdownProps) {
         sx={{
           minWidth: menuWidth,
           maxWidth: isBottom ? "95vw" : "auto",
-          p: isBottom ? 1 : 0,
           flexDirection: isBottom ? "row" : "column",
           overflowX: isBottom ? "auto" : "hidden",
+          marginRight: isBottom ? "10px" : 0,
+          display: "flex",
+          alignItems: isBottom ? "center" : "unset",
         }}
       />
     </>

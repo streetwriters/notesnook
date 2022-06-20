@@ -6,7 +6,7 @@ import { IconNames, Icons } from "../icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Dropdown } from "../components/dropdown";
 import { Icon } from "../components/icon";
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import { Popup } from "../components/popup";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
@@ -21,6 +21,7 @@ import { ActionSheetPresenter } from "../../components/action-sheet";
 import { getToolbarElement } from "../utils/dom";
 import { showPopup } from "../../components/popup-presenter";
 import { ImageUploadPopup } from "../popups/image-upload";
+import Button from "../../components/button";
 
 export function InsertBlock(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement | null>();
