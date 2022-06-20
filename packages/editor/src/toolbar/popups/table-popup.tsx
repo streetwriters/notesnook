@@ -9,7 +9,7 @@ import { InlineInput } from "../../components/inline-input";
 
 const MAX_COLUMNS = 20;
 const MAX_ROWS = 20;
-const MIN_COLUMNS = 12;
+const MIN_COLUMNS = 10;
 const MIN_ROWS = 6;
 
 type CellLocation = { column: number; row: number };
