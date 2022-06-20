@@ -3,11 +3,13 @@ import { Editor } from "@tiptap/core";
 import { ToolId } from ".";
 import { Dropdown } from "../components/dropdown";
 import { MenuItem } from "../../components/menu/types";
+import { ToolbarLocation, useToolbarLocation } from "../stores/toolbar-store";
 
 const defaultLevels = [1, 2, 3, 4, 5, 6];
 
 export function Headings(props: ToolProps) {
   const { editor } = props;
+  const toolbarLocation = useToolbarLocation();
 
   const currentHeadingLevel = defaultLevels.find((level) =>
     editor.isActive("heading", { level })
@@ -17,17 +19,21 @@ export function Headings(props: ToolProps) {
       selectedItem={
         currentHeadingLevel ? `Heading ${currentHeadingLevel}` : "Paragraph"
       }
-      items={toMenuItems(editor, currentHeadingLevel)}
+      items={toMenuItems(editor, toolbarLocation, currentHeadingLevel)}
       menuWidth={130}
     />
   );
 }
 
-function toMenuItems(editor: Editor, currentHeadingLevel?: number): MenuItem[] {
+function toMenuItems(
+  editor: Editor,
+  toolbarLocation: ToolbarLocation,
+  currentHeadingLevel?: number
+): MenuItem[] {
   const menuItems: MenuItem[] = defaultLevels.map((level) => ({
     type: "button",
     key: `heading-${level}`,
-    title: `Heading ${level}`,
+    title: toolbarLocation === "bottom" ? `H${level}` : `Heading ${level}`,
     isChecked: level === currentHeadingLevel,
     onClick: () =>
       editor
