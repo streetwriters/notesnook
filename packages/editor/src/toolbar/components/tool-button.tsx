@@ -2,9 +2,10 @@ import { Theme } from "@notesnook/theme";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { useTheme } from "emotion-theming";
 import React from "react";
-import { Button, ButtonProps } from "rebass";
+import { ButtonProps } from "rebass";
 import { IconNames, Icons } from "../icons";
 import { ToolButtonVariant } from "../types";
+import Button from "../../components/button";
 import { Icon } from "./icon";
 
 export type ToolButtonProps = ButtonProps & {
@@ -40,7 +41,7 @@ export function ToolButton(props: ToolButtonProps) {
         m: 0,
         bg: toggled ? "hover" : "transparent",
         mr: variant === "small" ? 0 : 1,
-        ":hover": { bg: "hover" },
+        ":hover": { bg: ["transparent", "hover"] },
         ":last-of-type": {
           mr: 0,
         },
