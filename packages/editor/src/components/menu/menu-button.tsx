@@ -1,7 +1,9 @@
 import { useRef } from "react";
-import { Flex, Text, Button } from "rebass";
+import { Flex, Text } from "rebass";
+import Button from "../button";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
+import { useToolbarLocation } from "../../toolbar/stores/toolbar-store";
 import { MenuButton } from "./types";
 
 type MenuButtonProps = {
@@ -17,6 +19,8 @@ export function MenuButton(props: MenuButtonProps) {
   const { title, key, icon, tooltip, isDisabled, isChecked, menu, modifier } =
     item;
   const itemRef = useRef<HTMLButtonElement>(null);
+  const toolbarLocation = useToolbarLocation();
+  const isBottom = toolbarLocation === "bottom";
 
   return (
     <Flex
@@ -36,12 +40,12 @@ export function MenuButton(props: MenuButtonProps) {
         disabled={isDisabled}
         onClick={onClick}
         sx={{
-          bg: isFocused ? "hover" : "transparent",
+          bg: isFocused && !isBottom ? "hover" : "transparent",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           ":hover": {
-            bg: "hover",
+            bg: isBottom ? "transparent" : "hover",
           },
         }}
       >
