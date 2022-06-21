@@ -20,6 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
+import "./extensions";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
@@ -76,6 +77,10 @@ var useTiptap = function (options, deps) {
                 listItem: false,
                 orderedList: false,
                 bulletList: false,
+                history: {
+                    depth: 200,
+                    newGroupDelay: 1000,
+                },
             }),
             Dropcursor.configure({
                 class: "drop-cursor",

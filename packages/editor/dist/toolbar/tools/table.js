@@ -128,23 +128,19 @@ export function CellProperties(props) {
             ] })) }));
 }
 export function CellBackgroundColor(props) {
-    return (_jsx(ColorTool, __assign({}, props, { isActive: function (editor) {
-            return editor.isActive("tableCell", { backgroundColor: /\W+/gm });
-        }, getActiveColor: function (editor) {
+    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellBackgroundColor", getActiveColor: function (editor) {
             return editor.getAttributes("tableCell").backgroundColor;
         }, title: "Cell background color", onColorChange: function (editor, color) {
             return editor.chain().setCellAttribute("backgroundColor", color).run();
         } })));
 }
 export function CellTextColor(props) {
-    return (_jsx(ColorTool, __assign({}, props, { isActive: function (editor) { return editor.isActive("tableCell", { color: /\W+/gm }); }, getActiveColor: function (editor) { return editor.getAttributes("tableCell").color; }, title: "Cell text color", onColorChange: function (editor, color) {
+    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellTextColor", getActiveColor: function (editor) { return editor.getAttributes("tableCell").color; }, title: "Cell text color", onColorChange: function (editor, color) {
             return editor.chain().focus().setCellAttribute("color", color).run();
         } })));
 }
 export function CellBorderColor(props) {
-    return (_jsx(ColorTool, __assign({}, props, { isActive: function (editor) {
-            return editor.isActive("tableCell", { borderColor: /\W+/gm });
-        }, getActiveColor: function (editor) { return editor.getAttributes("tableCell").borderColor; }, title: "Cell border color", onColorChange: function (editor, color) {
+    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellBorderColor", getActiveColor: function (editor) { return editor.getAttributes("tableCell").borderColor; }, title: "Cell border color", onColorChange: function (editor, color) {
             return editor.chain().focus().setCellAttribute("borderColor", color).run();
         } })));
 }

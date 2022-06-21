@@ -1,3 +1,4 @@
+import "./extensions";
 import { EditorOptions } from "@tiptap/react";
 import Toolbar from "./toolbar";
 import { Theme } from "@notesnook/theme";

@@ -199,9 +199,7 @@ export function CellBackgroundColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      isActive={(editor) =>
-        editor.isActive("tableCell", { backgroundColor: /\W+/gm })
-      }
+      cacheKey="cellBackgroundColor"
       getActiveColor={(editor) =>
         editor.getAttributes("tableCell").backgroundColor
       }
@@ -217,7 +215,7 @@ export function CellTextColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      isActive={(editor) => editor.isActive("tableCell", { color: /\W+/gm })}
+      cacheKey="cellTextColor"
       getActiveColor={(editor) => editor.getAttributes("tableCell").color}
       title={"Cell text color"}
       onColorChange={(editor, color) =>
@@ -231,9 +229,7 @@ export function CellBorderColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      isActive={(editor) =>
-        editor.isActive("tableCell", { borderColor: /\W+/gm })
-      }
+      cacheKey="cellBorderColor"
       getActiveColor={(editor) => editor.getAttributes("tableCell").borderColor}
       title={"Cell border color"}
       onColorChange={(editor, color) =>
