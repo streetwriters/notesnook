@@ -764,6 +764,15 @@ export const settingsGroups: SettingSection[] = [
         }
       },
       {
+        id: 'join-twitter',
+        name: 'Follow us on twitter',
+        description: 'Stay updated with the latest news about Notesnook',
+        icon: 'twitter',
+        modifer: () => {
+          Linking.openURL('https://twitter.com/notesnook').catch(console.log);
+        }
+      },
+      {
         id: 'join-discord',
         name: 'Join our Discord community',
         icon: 'discord',
