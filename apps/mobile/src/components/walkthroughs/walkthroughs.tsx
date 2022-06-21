@@ -289,8 +289,6 @@ const trialstarted: { id: string; steps: TStep[] } = {
     },
 
     {
-      // title: 'Make yourself at home',
-      // text: 'Pick a theme of your choice',
       walkthroughItem: () => <ChooseTheme />,
       button: {
         type: 'next',

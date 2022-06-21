@@ -91,34 +91,20 @@ export const HomagePageSelector = () => {
   );
 };
 
-export const AccentColorPicker = ({ settings = true, wrap = false }) => {
+export const AccentColorPicker = ({ settings = true, wrap = true }) => {
   const colors = useThemeStore(state => state.colors);
   function changeAccentColor(color) {
     switchAccentColor(color);
   }
 
   return (
-    <ScrollView
-      horizontal={true}
-      showsHorizontalScrollIndicator={false}
+    <View
       style={{
-        borderRadius: 5,
-        padding: 5,
-        marginTop: 10,
-        marginBottom: wrap ? 0 : pv + 5,
-        width: '100%',
-        paddingHorizontal: wrap ? 0 : 12,
-        maxWidth: settings ? null : '100%'
-      }}
-      scrollEnabled={true}
-      nestedScrollEnabled={true}
-      contentContainerStyle={{
-        alignSelf: 'center',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        maxWidth: wrap ? '100%' : null,
-        alignContent: wrap && 'flex-start',
-        justifyContent: wrap && 'flex-start'
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignContent: 'flex-start'
       }}
     >
       {[
@@ -173,6 +159,6 @@ export const AccentColorPicker = ({ settings = true, wrap = false }) => {
         </PressableButton>
       ))}
       <View style={{ width: 50 }} />
-    </ScrollView>
+    </View>
   );
 };
