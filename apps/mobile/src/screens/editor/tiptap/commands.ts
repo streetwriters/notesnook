@@ -6,6 +6,8 @@ import { db } from '../../../utils/database';
 import { sleep } from '../../../utils/time';
 import { Note } from './types';
 import { getResponse, randId, textInput } from './utils';
+import { Attachment, AttachmentProgress } from 'notesnook-editor/dist/extensions/attachment/index';
+import { ImageAttributes } from 'notesnook-editor/dist/extensions/image/index';
 
 type Action = { job: string; id: string };
 
@@ -49,6 +51,11 @@ class Commands {
     this.ref = ref;
   }
 
+  async doAsync(job: string) {
+    if (!this.ref) return false;
+    return await call(this.ref, fn(job));
+  }
+
   focus = async () => {
     if (!this.ref) return;
     if (Platform.OS === 'android') {
@@ -57,70 +64,57 @@ class Commands {
         if (!this.ref) return;
         textInput.current?.focus();
         this.ref?.current?.requestFocus();
-        await call(this.ref, fn(`editor.commands.focus()`));
+        await this.doAsync(`editor.commands.focus()`);
       }, 1);
     } else {
       await sleep(200);
-      await call(this.ref, fn(`editor.commands.focus()`));
+      await this.doAsync(`editor.commands.focus()`);
     }
   };
 
-  blur = async () => await call(this.ref, fn(`editor.commands.blur();editorTitle.current?.blur()`));
+  blur = async () => await this.doAsync(`editor.commands.blur();editorTitle.current?.blur()`);
 
   clearContent = async () => {
-    await call(
-      this.ref,
-      fn(
-        `
+    await this.doAsync(
+      `
 editor.commands.blur();
 editorTitle.current?.blur();
 editor?.commands.clearContent(false);
 editorController.setTitle(null);
 statusBar.current.set({date:"",saved:""});
         `
-      )
     );
   };
 
-  setSessionId = async (id: string | null) =>
-    await call(this.ref, fn(`globalThis.sessionId = "${id}"`));
+  setSessionId = async (id: string | null) => await this.doAsync(`globalThis.sessionId = "${id}"`);
 
   setStatus = async (date: string | undefined, saved: string) =>
-    await call(this.ref, fn(`statusBar.current.set({date:"${date}",saved:"${saved}"})`));
+    await this.doAsync(`statusBar.current.set({date:"${date}",saved:"${saved}"})`);
 
   setPlaceholder = async (placeholder: string) => {
-    await call(
-      this.ref,
-      fn(`
+    await this.doAsync(`
     const element = document.querySelector(".is-editor-empty");
     if (element) {
       element.setAttribute("data-placeholder","${placeholder}");
     }
-    `)
-    );
+    `);
   };
 
   setInsets = async (insets: EdgeInsets) => {
     logger.info('setInsets', insets);
-    await call(
-      this.ref,
-      fn(`
+    await this.doAsync(`
       if (typeof safeAreaController !== "undefined") {
         safeAreaController.update(${JSON.stringify(insets)}) 
       }
-    `)
-    );
+    `);
   };
 
   setSettings = async (settings: Partial<Settings>) => {
-    await call(
-      this.ref,
-      fn(`
+    await this.doAsync(`
       if (typeof globalThis.settingsController !== "undefined") {
         globalThis.settingsController.update(${JSON.stringify(settings)}) 
       }
-    `)
-    );
+    `);
   };
 
   setTags = async (note: Note | null | undefined) => {
@@ -130,15 +124,32 @@ statusBar.current.set({date:"",saved:""});
         db.tags?.tag(t) ? { title: db.tags.tag(t).title, alias: db.tags.tag(t).alias } : null
       )
       .filter((t: any) => t !== null);
-    await call(
-      this.ref,
-      fn(`
-      if (typeof editorTags !== "undefined" && editorTags.current) {
-        editorTags.current.setTags(${JSON.stringify(tags)});
-      }
-    `)
+    await this.doAsync(`
+    if (typeof editorTags !== "undefined" && editorTags.current) {
+      editorTags.current.setTags(${JSON.stringify(tags)});
+    }
+  `);
+  };
+
+  insertAttachment = async (attachment: Attachment) => {
+    this.doAsync(`editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`);
+  };
+
+  setAttachmentProgress = async (attachmentProgress: AttachmentProgress) => {
+    this.doAsync(
+      `editor && editor.commands.setAttachmentProgress(${JSON.stringify(attachmentProgress)})`
     );
   };
+
+  insertImage = async (image: ImageAttributes) => {
+    console.log('image data', image);
+    this.doAsync(`editor && editor.commands.insertImage(${JSON.stringify(image)})`);
+  };
+
+  updateImage = async (image: ImageAttributes) => {
+    this.doAsync(`editor && editor.commands.updateImage(${JSON.stringify(image)})`);
+  };
+  //todo add replace image function
 }
 
 export default Commands;

@@ -92,6 +92,7 @@ export const useEditor = () => {
   }, []);
 
   const reset = useCallback(async (resetState = true) => {
+    currentNote.current?.id && db.fs.cancel(currentNote.current.id);
     currentNote.current = null;
     currentContent.current = null;
     sessionHistoryId.current = undefined;
@@ -224,12 +225,21 @@ export const useEditor = () => {
         await commands.setStatus(timeConverter(item.dateEdited), 'Saved');
         await postMessage(EditorEvents.title, item.title);
         await postMessage(EditorEvents.html, currentContent.current?.data);
+        loadImages();
         await commands.setTags(currentNote.current);
         overlay(false);
       }
     },
     [setSessionId]
   );
+
+  const loadImages = () => {
+    if (!currentNote.current?.id) return;
+    const images = db.attachments?.ofNote(currentNote.current?.id, 'images');
+    if (images && images.length > 0) {
+      db.attachments?.downloadImages(currentNote.current.id);
+    }
+  };
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, loadNote);

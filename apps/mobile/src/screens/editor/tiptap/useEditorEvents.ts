@@ -127,7 +127,7 @@ export const useEditorEvents = (editor: useEditorType) => {
       premium: isPremium,
       readonly: readonly
     });
-  }, [currentEditingNote, fullscreen, isPremium, readonly]);
+  }, [currentEditingNote, fullscreen, isPremium, readonly, editor.sessionId, editor.loading]);
 
   const onBackPress = useCallback(async () => {
     setTimeout(async () => {
@@ -272,9 +272,10 @@ export const useEditorEvents = (editor: useEditorType) => {
           }
           break;
         case EventTypes.filepicker:
-          picker.pick();
+          picker.pick({ type: editorMessage.value });
           break;
         case EventTypes.download:
+          console.log('download attachment request', editorMessage.value);
           filesystem.downloadAttachment(editorMessage.value?.hash, true);
           break;
         case EventTypes.pro:

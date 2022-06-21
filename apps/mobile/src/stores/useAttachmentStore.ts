@@ -1,5 +1,6 @@
 //@ts-ignore
 import create from 'zustand';
+import { editorController } from '../screens/editor/tiptap/utils';
 
 interface AttachmentStore {
   progress?: {
@@ -28,37 +29,27 @@ interface AttachmentStore {
 export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   progress: {},
   remove: hash => {
-    let _p = get().progress;
-    if (!_p) return;
-    _p[hash] = null;
-    // tiny.call(
-    //   EditorWebView,
-    //   `
-    // (function() {
-    //   let progress = ${JSON.stringify({
-    //     loaded: 1,
-    //     total: 1,
-    //     hash
-    //   })}
-    // tinymce.activeEditor._updateAttachmentProgress(progress);
-    // })()`
-    // );
-    set({ progress: { ..._p } });
+    let progress = get().progress;
+    if (!progress) return;
+    editorController.current?.commands.setAttachmentProgress({
+      hash: hash,
+      progress: 100,
+      type: progress[hash]?.type || 'download'
+    });
+    progress[hash] = null;
+    set({ progress: { ...progress } });
   },
   setProgress: (sent, total, hash, recieved, type) => {
-    let _p = get().progress;
-    if (!_p) return;
-    _p[hash] = { sent, total, hash, recieved, type };
-    let progress = { total, hash, loaded: type === 'download' ? recieved : sent };
-    // tiny.call(
-    //   EditorWebView,
-    //   `
-    // (function() {
-    //   let progress = ${JSON.stringify(progress)}
-    //   tinymce.activeEditor._updateAttachmentProgress(progress);
-    // })()`
-    // );
-    set({ progress: { ..._p } });
+    let progress = get().progress;
+    if (!progress) return;
+    progress[hash] = { sent, total, hash, recieved, type };
+    const progressPercentage = type === 'upload' ? sent / total : recieved / total;
+    editorController.current?.commands.setAttachmentProgress({
+      hash: hash,
+      progress: Math.round(Math.max(progressPercentage * 100, 0)),
+      type: type
+    });
+    set({ progress: { ...progress } });
   },
   encryptionProgress: 0,
   setEncryptionProgress: encryptionProgress => set({ encryptionProgress: encryptionProgress }),

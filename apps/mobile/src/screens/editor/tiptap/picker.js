@@ -48,7 +48,7 @@ const santizeUri = uri => {
 
 const file = async fileOptions => {
   try {
-    let options = {
+    const options = {
       mode: 'import',
       allowMultiSelection: false
     };
@@ -56,7 +56,7 @@ const file = async fileOptions => {
       options.copyTo = 'cachesDirectory';
     }
     console.log('generate key for attachment');
-    let key = await db.attachments.generateKey();
+    const key = await db.attachments.generateKey();
     console.log('generated key for attachments: ', key);
     let file;
     try {
@@ -97,38 +97,20 @@ const file = async fileOptions => {
     console.log('file uri: ', uri);
     uri = Platform.OS === 'ios' ? santizeUri(uri) : uri;
     showEncryptionSheet(file);
-    let hash = await Sodium.hashFile({
+    const hash = await Sodium.hashFile({
       uri: uri,
       type: 'url'
     });
-    console.log('decoded uri: ', uri);
-    let result = await attachFile(uri, hash, file.type, file.name, fileOptions);
-    console.log('attach file: ', result);
-
+    if (!(await attachFile(uri, hash, file.type, file.name, fileOptions))) return;
+    editorController.current?.commands.insertAttachment({
+      hash: hash,
+      filename: file.name,
+      type: file.type,
+      size: file.size
+    });
     setTimeout(() => {
       eSendEvent(eCloseProgressDialog);
     }, 1000);
-    if (!result) return;
-    // tiny.call(
-    //   EditorWebView,
-    //   `
-    // (function() {
-    //   let file = ${JSON.stringify({
-    //     hash: hash,
-    //     filename: file.name,
-    //     type: file.type,
-    //     size: file.size
-    //   })}
-    //   editor.undoManager.transact(function() {
-    //     tinymce.activeEditor.execCommand('mceAttachFile',file);
-    //     setTimeout(function() {
-    //       tinymce.activeEditor.fire("input",{data:""})
-    //     },100)
-    //    });
-
-    // })();
-    // `
-    // );
   } catch (e) {
     ToastEvent.show({
       heading: e.message,
@@ -207,45 +189,29 @@ const pick = async options => {
     return;
   }
 
-  if (options?.reupload) {
-    if (options?.type.startsWith('image')) {
+  if (options?.type.startsWith('image')) {
+    if (options?.reupload) {
       gallery(options);
     } else {
-      file(options);
+      presentSheet({
+        context: options?.context,
+        actionsArray: [
+          {
+            action: () => camera(options),
+            actionText: 'Open camera',
+            icon: 'camera'
+          },
+          {
+            action: () => gallery(options),
+            actionText: 'Select image from gallery',
+            icon: 'image-multiple'
+          }
+        ]
+      });
     }
-    return;
+  } else {
+    file(options);
   }
-
-  if (editorState().isFocused) {
-    editorState().isFocused = true;
-  }
-
-  presentSheet({
-    context: options?.context,
-    actionsArray: [
-      {
-        action: async () => {
-          eSendEvent(eCloseProgressDialog);
-          await sleep(400);
-          await file(options);
-        },
-        actionText: 'Attach a file',
-        icon: 'file'
-      },
-      {
-        action: () => camera(options),
-        actionText: 'Open camera',
-        icon: 'camera'
-      },
-      {
-        action: () => gallery(options),
-        actionText: 'Select image from gallery',
-        icon: 'image-multiple'
-      }
-    ]
-  });
-
-  return;
 };
 
 const handleImageResponse = async (response, options) => {
@@ -267,38 +233,24 @@ const handleImageResponse = async (response, options) => {
     });
     return;
   }
-  let b64 = `data:${image.type};base64, ` + image.base64;
-  let uri = image.uri;
-  uri = decodeURI(uri);
-  let hash = await Sodium.hashFile({
+  const b64 = `data:${image.type};base64, ` + image.base64;
+  const uri = decodeURI(image.uri);
+  const hash = await Sodium.hashFile({
     uri: uri,
     type: 'url'
   });
 
   let fileName = image.originalFileName || image.fileName;
-  let result = await attachFile(uri, hash, image.type, fileName, options);
-  if (!result) return;
-  //   tiny.call(
-  //     EditorWebView,
-  //     `
-  // 	  (function(){
-  // 		let image = ${JSON.stringify({
-  //       hash: hash,
-  //       type: image.type,
-  //       filename: fileName,
-  //       dataurl: b64,
-  //       size: image.fileSize
-  //     })}
+  if (!(await attachFile(uri, hash, image.type, fileName, options))) return;
 
-  //     editor.undoManager.transact(function() {
-  //       tinymce.activeEditor.execCommand('mceAttachImage',image);
-  //       setTimeout(function() {
-  //         tinymce.activeEditor.fire("input",{data:""})
-  //       },100)
-  //      });
-  // 	  })();
-  // 	  `
-  //   );
+  editorController.current?.commands.insertImage({
+    hash: hash,
+    type: image.type,
+    title: fileName,
+    src: b64,
+    size: image.fileSize,
+    filename: fileName
+  });
 };
 
 async function attachFile(uri, hash, type, filename, options) {
