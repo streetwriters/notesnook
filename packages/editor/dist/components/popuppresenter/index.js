@@ -28,33 +28,34 @@ import Modal from "react-modal";
 import ReactDOM from "react-dom";
 import { ThemeProvider } from "emotion-theming";
 import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store";
+import { useIsMobile, useToolbarStore, } from "../../toolbar/stores/toolbar-store";
 import { EditorContext, usePopupRenderer, } from "./popuprenderer";
 import { ResponsivePresenter } from "../responsive";
 function _PopupPresenter(props) {
     var isOpen = props.isOpen, position = props.position, onClose = props.onClose, _a = props.blocking, blocking = _a === void 0 ? true : _a, _b = props.focusOnRender, focusOnRender = _b === void 0 ? true : _b, children = props.children;
+    var isMobile = useIsMobile();
     var contentRef = useRef();
     var observerRef = useRef();
-    var repositionPopup = useCallback(function (position) {
+    var repositionPopup = useCallback(function () {
         if (!contentRef.current || !position)
             return;
         var popup = contentRef.current;
         var popupPosition = getPosition(popup, position);
         popup.style.top = popupPosition.top + "px";
         popup.style.left = popupPosition.left + "px";
-    }, []);
+    }, [position]);
     useEffect(function () {
-        repositionPopup(position);
+        repositionPopup();
     }, [position]);
     useEffect(function () {
         function onWindowResize() {
-            repositionPopup(position);
+            repositionPopup();
         }
         window.addEventListener("resize", onWindowResize);
         return function () {
             window.removeEventListener("resize", onWindowResize);
         };
-    }, [position]);
+    }, []);
     var attachMoveHandlers = useCallback(function () {
         if (!contentRef.current || !isOpen)
             return;
@@ -90,32 +91,37 @@ function _PopupPresenter(props) {
             return;
         var oldHeight = popup.offsetHeight;
         observerRef.current = new ResizeObserver(function (e) {
-            var _a = popup.getBoundingClientRect(), height = _a.height, y = _a.y;
-            var delta = height - oldHeight;
-            if (delta > 0) {
-                // means the new size is bigger so we need to adjust the position
-                // if required. We only do this in case the newly resized popup
-                // is going out of the window.
-                var windowHeight = document.body.clientHeight - 20;
-                if (y + height > windowHeight) {
-                    popup.style.top = windowHeight - height + "px";
-                }
+            if (isMobile) {
+                repositionPopup();
             }
-            oldHeight = height;
+            else {
+                var _a = popup.getBoundingClientRect(), height = _a.height, y = _a.y;
+                var delta = height - oldHeight;
+                if (delta > 0) {
+                    // means the new size is bigger so we need to adjust the position
+                    // if required. We only do this in case the newly resized popup
+                    // is going out of the window.
+                    var windowHeight = document.body.clientHeight - 20;
+                    if (y + height > windowHeight) {
+                        popup.style.top = windowHeight - height + "px";
+                    }
+                }
+                oldHeight = height;
+            }
         });
         observerRef.current.observe(popup, { box: "border-box" });
-    }, []);
+    }, [isMobile]);
     return (_jsx(Modal, __assign({ contentRef: function (ref) { return (contentRef.current = ref); }, className: "popup-presenter", role: "menu", isOpen: isOpen, appElement: document.body, shouldCloseOnEsc: true, shouldReturnFocusAfterClose: true, shouldCloseOnOverlayClick: true, shouldFocusAfterRender: focusOnRender, ariaHideApp: blocking, preventScroll: blocking, onRequestClose: onClose, portalClassName: "popup-presenter-portal", onAfterOpen: function (obj) {
             if (!obj || !position)
                 return;
-            repositionPopup(position);
+            repositionPopup();
             handleResize();
             attachMoveHandlers();
         }, onAfterClose: function () { var _a; return (_a = observerRef.current) === null || _a === void 0 ? void 0 : _a.disconnect(); }, overlayElement: function (props, contentEl) {
             return (_jsx(Box, __assign({}, props, { 
                 //@ts-ignore
                 style: __assign(__assign({}, props.style), { position: !blocking ? "initial" : "fixed", zIndex: 1000, backgroundColor: !blocking ? "transparent" : "unset" }) }, { children: contentEl })));
-        }, contentElement: function (props, children) { return (_jsx(Box, __assign({}, props, { style: {}, sx: {
+        }, contentElement: function (props, children) { return (_jsx(Box, __assign({}, props, { style: {}, onMouseDown: function (e) { return e.preventDefault(); }, sx: {
                 top: 0,
                 left: 0,
                 right: 0,

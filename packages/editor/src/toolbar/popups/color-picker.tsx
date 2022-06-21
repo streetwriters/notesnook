@@ -2,10 +2,11 @@ import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../../components/button";
+import { debounce } from "../../utils/debounce";
 export const DEFAULT_COLORS = [
   "#e91e63",
   "#9c27b0",
@@ -43,14 +44,22 @@ export function ColorPicker(props: ColorPickerProps) {
     onClose,
     expanded,
   } = props;
+  const ref = useRef<HTMLDivElement>();
   const [isPickerOpen, setIsPickerOpen] = useState(expanded || false);
-  const tColor = tinycolor(color || colors[0]);
   const [currentColor, setCurrentColor] = useState<string>(
-    tColor.toHexString()
+    tinycolor(color).toHexString()
   );
+  const tColor = tinycolor(currentColor);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    if (isPickerOpen) ref.current.focus({ preventScroll: true });
+  }, [isPickerOpen]);
 
   return (
     <Flex
+      ref={ref}
+      tabIndex={-1}
       sx={{
         bg: "background",
         flexDirection: "column",
@@ -86,7 +95,11 @@ export function ColorPicker(props: ColorPickerProps) {
 
       {isPickerOpen ? (
         <>
-          <HexColorPicker color={currentColor} onChange={onChange} />
+          <HexColorPicker
+            onChange={(color) => setCurrentColor(color)}
+            onTouchEnd={() => onChange(currentColor)}
+            onMouseUp={() => onChange(currentColor)}
+          />
           <Input
             variant={"clean"}
             placeholder="#000000"
@@ -105,7 +118,10 @@ export function ColorPicker(props: ColorPickerProps) {
             onChange={(e) => {
               const { value } = e.target;
               if (!value) return;
-              setCurrentColor(value);
+              if (tinycolor(value, { format: "hex" }).isValid()) {
+                setCurrentColor(value);
+                onChange(value);
+              }
             }}
           />
         </>

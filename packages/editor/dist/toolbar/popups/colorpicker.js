@@ -30,7 +30,7 @@ import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../../components/button";
@@ -53,10 +53,17 @@ export var DEFAULT_COLORS = [
 var PALETTE_SIZE = [35, 35, 25];
 export function ColorPicker(props) {
     var _a = props.colors, colors = _a === void 0 ? DEFAULT_COLORS : _a, color = props.color, onClear = props.onClear, onChange = props.onChange, title = props.title, onClose = props.onClose, expanded = props.expanded;
+    var ref = useRef();
     var _b = __read(useState(expanded || false), 2), isPickerOpen = _b[0], setIsPickerOpen = _b[1];
-    var tColor = tinycolor(color || colors[0]);
-    var _c = __read(useState(tColor.toHexString()), 2), currentColor = _c[0], setCurrentColor = _c[1];
-    return (_jsxs(Flex, __assign({ sx: {
+    var _c = __read(useState(tinycolor(color).toHexString()), 2), currentColor = _c[0], setCurrentColor = _c[1];
+    var tColor = tinycolor(currentColor);
+    useEffect(function () {
+        if (!ref.current)
+            return;
+        if (isPickerOpen)
+            ref.current.focus({ preventScroll: true });
+    }, [isPickerOpen]);
+    return (_jsxs(Flex, __assign({ ref: ref, tabIndex: -1, sx: {
             bg: "background",
             flexDirection: "column",
             ".react-colorful": {
@@ -75,7 +82,7 @@ export function ColorPicker(props) {
                     pb: isPickerOpen ? 2 : 0,
                     //pb: 0,
                     alignItems: "center",
-                }, onClick: onClose }, { children: [_jsx(Text, __assign({ variant: "title" }, { children: title })), _jsx(Button, __assign({ variant: "icon", sx: { p: 0 } }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) }))] }))), isPickerOpen ? (_jsxs(_Fragment, { children: [_jsx(HexColorPicker, { color: currentColor, onChange: onChange }), _jsx(Input, { variant: "clean", placeholder: "#000000", spellCheck: false, sx: {
+                }, onClick: onClose }, { children: [_jsx(Text, __assign({ variant: "title" }, { children: title })), _jsx(Button, __assign({ variant: "icon", sx: { p: 0 } }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) }))] }))), isPickerOpen ? (_jsxs(_Fragment, { children: [_jsx(HexColorPicker, { onChange: function (color) { return setCurrentColor(color); }, onTouchEnd: function () { return onChange(currentColor); }, onMouseUp: function () { return onChange(currentColor); } }), _jsx(Input, { variant: "clean", placeholder: "#000000", spellCheck: false, sx: {
                             my: 2,
                             p: 0,
                             borderRadius: 0,
@@ -87,7 +94,10 @@ export function ColorPicker(props) {
                             var value = e.target.value;
                             if (!value)
                                 return;
-                            setCurrentColor(value);
+                            if (tinycolor(value, { format: "hex" }).isValid()) {
+                                setCurrentColor(value);
+                                onChange(value);
+                            }
                         } })] })) : null, _jsxs(Flex, { children: [_jsxs(Flex, __assign({ className: "hide-scrollbar", sx: {
                             flex: 1,
                             p: 1,

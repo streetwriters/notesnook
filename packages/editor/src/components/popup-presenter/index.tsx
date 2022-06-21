@@ -13,7 +13,10 @@ import { Editor } from "@tiptap/core";
 import { ThemeProvider } from "emotion-theming";
 import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
 import { Theme } from "@notesnook/theme";
-import { useToolbarStore } from "../../toolbar/stores/toolbar-store";
+import {
+  useIsMobile,
+  useToolbarStore,
+} from "../../toolbar/stores/toolbar-store";
 import React from "react";
 import {
   EditorContext,
@@ -41,30 +44,31 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     children,
   } = props;
 
+  const isMobile = useIsMobile();
   const contentRef = useRef<HTMLDivElement>();
   const observerRef = useRef<ResizeObserver>();
 
-  const repositionPopup = useCallback((position: PositionOptions) => {
+  const repositionPopup = useCallback(() => {
     if (!contentRef.current || !position) return;
     const popup = contentRef.current;
     const popupPosition = getPosition(popup, position);
     popup.style.top = popupPosition.top + "px";
     popup.style.left = popupPosition.left + "px";
-  }, []);
+  }, [position]);
 
   useEffect(() => {
-    repositionPopup(position);
+    repositionPopup();
   }, [position]);
 
   useEffect(() => {
     function onWindowResize() {
-      repositionPopup(position);
+      repositionPopup();
     }
     window.addEventListener("resize", onWindowResize);
     return () => {
       window.removeEventListener("resize", onWindowResize);
     };
-  }, [position]);
+  }, []);
 
   const attachMoveHandlers = useCallback(() => {
     if (!contentRef.current || !isOpen) return;
@@ -106,22 +110,26 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
 
     let oldHeight: number = popup.offsetHeight;
     observerRef.current = new ResizeObserver((e) => {
-      const { height, y } = popup.getBoundingClientRect();
-      const delta = height - oldHeight;
-      if (delta > 0) {
-        // means the new size is bigger so we need to adjust the position
-        // if required. We only do this in case the newly resized popup
-        // is going out of the window.
+      if (isMobile) {
+        repositionPopup();
+      } else {
+        const { height, y } = popup.getBoundingClientRect();
+        const delta = height - oldHeight;
+        if (delta > 0) {
+          // means the new size is bigger so we need to adjust the position
+          // if required. We only do this in case the newly resized popup
+          // is going out of the window.
 
-        const windowHeight = document.body.clientHeight - 20;
-        if (y + height > windowHeight) {
-          popup.style.top = windowHeight - height + "px";
+          const windowHeight = document.body.clientHeight - 20;
+          if (y + height > windowHeight) {
+            popup.style.top = windowHeight - height + "px";
+          }
         }
+        oldHeight = height;
       }
-      oldHeight = height;
     });
     observerRef.current.observe(popup, { box: "border-box" });
-  }, []);
+  }, [isMobile]);
 
   return (
     <Modal
@@ -140,7 +148,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       portalClassName={"popup-presenter-portal"}
       onAfterOpen={(obj) => {
         if (!obj || !position) return;
-        repositionPopup(position);
+        repositionPopup();
 
         handleResize();
         attachMoveHandlers();
@@ -176,6 +184,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         <Box
           {...props}
           style={{}}
+          onMouseDown={(e) => e.preventDefault()}
           sx={{
             top: 0,
             left: 0,
