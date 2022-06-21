@@ -12,7 +12,7 @@ import {
 import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
 import { Walkthrough } from '../../components/walkthroughs';
-import { editorState } from '../../screens/editor/tiptap/utils';
+import { editorController, editorState } from '../../screens/editor/tiptap/utils';
 import BiometricService from '../../services/biometrics';
 import {
   clearMessage,
@@ -60,15 +60,10 @@ export const useAppEvents = () => {
 
   const onMediaDownloaded = ({ hash, groupId, src }) => {
     if (groupId?.startsWith('monograph')) return;
-    // tiny.call(
-    //   EditorWebView,
-    //   `
-    //     (function(){
-    //       let image = ${JSON.stringify({ hash, src })};
-    //       tinymce.activeEditor._replaceImage(image);
-    //     })();
-    //     `
-    // );
+    editorController.current?.commands.updateImage({
+      hash: hash,
+      src: src
+    });
   };
 
   const onLoadingAttachmentProgress = data => {
