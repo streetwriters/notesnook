@@ -2,7 +2,7 @@ import { Editor } from "@tiptap/core";
 import { useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
-import { useEditorContext } from "../../components/popup-presenter/popuprenderer";
+import { config } from "../../utils/config";
 import { SplitButton } from "../components/split-button";
 import { ColorPicker } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
@@ -11,47 +11,38 @@ import { getToolbarElement } from "../utils/dom";
 
 type ColorToolProps = ToolProps & {
   onColorChange: (editor: Editor, color?: string) => void;
-  isActive: (editor: Editor) => boolean;
   getActiveColor: (editor: Editor) => string;
   title: string;
+  cacheKey: string;
 };
 export function ColorTool(props: ColorToolProps) {
-  const { onColorChange, isActive, getActiveColor, title, ...toolProps } =
-    props;
-  const editor = useEditorContext();
-  const activeColor = getActiveColor(editor);
-  const _isActive = isActive(editor);
+  const {
+    editor,
+    onColorChange,
+    getActiveColor,
+    title,
+    cacheKey,
+    ...toolProps
+  } = props;
+  const activeColor = getActiveColor(editor) || config.get(cacheKey);
   const tColor = tinycolor(activeColor);
-  const toolbarLocation = useToolbarLocation();
-  const isBottom = toolbarLocation === "bottom";
+  const isBottom = useToolbarLocation() === "bottom";
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const { hide, isOpen, show } = usePopup({
-  //   id: title,
-  //   group: "color",
-  //   theme: editor?.storage.theme,
-  //   blocking: false,
-  //   focusOnRender: false,
-  // });
-  // console.log("Updating color", editor);
 
   return (
     <SplitButton
       {...toolProps}
-      iconColor={_isActive && tColor.isDark() ? "static" : "icon"}
+      iconColor={activeColor && tColor.isDark() ? "static" : "icon"}
       sx={{
         mr: 0,
-        bg: _isActive ? activeColor : "transparent",
+        bg: activeColor || "transparent",
         ":hover": {
-          bg:
-            _isActive && !isBottom
-              ? tColor.darken(5).toRgbString()
-              : "transparent",
+          bg: activeColor ? tColor.darken(5).toRgbString() : "transparent",
         },
       }}
-      onOpen={() => {
-        setIsOpen((s) => !s);
-      }}
+      onOpen={() => setIsOpen((s) => !s)}
       toggled={isOpen}
+      onClick={() => onColorChange(editor, activeColor)}
     >
       <PopupWrapper
         isOpen={isOpen}
@@ -69,8 +60,14 @@ export function ColorTool(props: ColorToolProps) {
         renderPopup={(close) => (
           <ColorPicker
             color={activeColor}
-            onClear={() => onColorChange(editor)}
-            onChange={(color) => onColorChange(editor, color)}
+            onClear={() => {
+              onColorChange(editor);
+              config.set(cacheKey, null);
+            }}
+            onChange={(color) => {
+              onColorChange(editor, color);
+              config.set(cacheKey, color);
+            }}
             onClose={close}
             title={title}
           />
@@ -84,7 +81,7 @@ export function Highlight(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      isActive={(editor) => editor.isActive("highlight", { color: /\W+/gm })}
+      cacheKey="highlight"
       getActiveColor={(editor) => editor.getAttributes("highlight").color}
       title={"Background color"}
       onColorChange={(editor, color) =>
@@ -100,7 +97,7 @@ export function TextColor(props: ToolProps) {
   return (
     <ColorTool
       {...props}
-      isActive={(editor) => editor.isActive("textStyle", { color: /\W+/gm })}
+      cacheKey={"textColor"}
       getActiveColor={(editor) => editor.getAttributes("textStyle").color}
       title="Text color"
       onColorChange={(editor, color) =>

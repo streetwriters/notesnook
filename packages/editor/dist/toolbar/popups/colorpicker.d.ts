@@ -2,7 +2,7 @@
 export declare const DEFAULT_COLORS: string[];
 declare type ColorPickerProps = {
     colors?: string[];
-    color: string;
+    color?: string;
     onClear: () => void;
     expanded?: boolean;
     onChange: (color: string) => void;

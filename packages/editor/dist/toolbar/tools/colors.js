@@ -40,55 +40,46 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
-import { useEditorContext } from "../../components/popup-presenter/popuprenderer";
+import { config } from "../../utils/config";
 import { SplitButton } from "../components/split-button";
 import { ColorPicker } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
 export function ColorTool(props) {
-    var onColorChange = props.onColorChange, isActive = props.isActive, getActiveColor = props.getActiveColor, title = props.title, toolProps = __rest(props, ["onColorChange", "isActive", "getActiveColor", "title"]);
-    var editor = useEditorContext();
-    var activeColor = getActiveColor(editor);
-    var _isActive = isActive(editor);
+    var editor = props.editor, onColorChange = props.onColorChange, getActiveColor = props.getActiveColor, title = props.title, cacheKey = props.cacheKey, toolProps = __rest(props, ["editor", "onColorChange", "getActiveColor", "title", "cacheKey"]);
+    var activeColor = getActiveColor(editor) || config.get(cacheKey);
     var tColor = tinycolor(activeColor);
-    var toolbarLocation = useToolbarLocation();
-    var isBottom = toolbarLocation === "bottom";
+    var isBottom = useToolbarLocation() === "bottom";
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    // const { hide, isOpen, show } = usePopup({
-    //   id: title,
-    //   group: "color",
-    //   theme: editor?.storage.theme,
-    //   blocking: false,
-    //   focusOnRender: false,
-    // });
-    // console.log("Updating color", editor);
-    return (_jsx(SplitButton, __assign({}, toolProps, { iconColor: _isActive && tColor.isDark() ? "static" : "icon", sx: {
+    return (_jsx(SplitButton, __assign({}, toolProps, { iconColor: activeColor && tColor.isDark() ? "static" : "icon", sx: {
             mr: 0,
-            bg: _isActive ? activeColor : "transparent",
+            bg: activeColor || "transparent",
             ":hover": {
-                bg: _isActive && !isBottom
-                    ? tColor.darken(5).toRgbString()
-                    : "transparent",
+                bg: activeColor ? tColor.darken(5).toRgbString() : "transparent",
             },
-        }, onOpen: function () {
-            setIsOpen(function (s) { return !s; });
-        }, toggled: isOpen }, { children: _jsx(PopupWrapper, { isOpen: isOpen, id: props.icon, group: "color", position: {
+        }, onOpen: function () { return setIsOpen(function (s) { return !s; }); }, toggled: isOpen, onClick: function () { return onColorChange(editor, activeColor); } }, { children: _jsx(PopupWrapper, { isOpen: isOpen, id: props.icon, group: "color", position: {
                 isTargetAbsolute: true,
                 target: getToolbarElement(),
                 align: isBottom ? "center" : "end",
                 location: isBottom ? "top" : "below",
                 yOffset: 10,
-            }, focusOnRender: false, blocking: false, renderPopup: function (close) { return (_jsx(ColorPicker, { color: activeColor, onClear: function () { return onColorChange(editor); }, onChange: function (color) { return onColorChange(editor, color); }, onClose: close, title: title })); } }) })));
+            }, focusOnRender: false, blocking: false, renderPopup: function (close) { return (_jsx(ColorPicker, { color: activeColor, onClear: function () {
+                    onColorChange(editor);
+                    config.set(cacheKey, null);
+                }, onChange: function (color) {
+                    onColorChange(editor, color);
+                    config.set(cacheKey, color);
+                }, onClose: close, title: title })); } }) })));
 }
 export function Highlight(props) {
-    return (_jsx(ColorTool, __assign({}, props, { isActive: function (editor) { return editor.isActive("highlight", { color: /\W+/gm }); }, getActiveColor: function (editor) { return editor.getAttributes("highlight").color; }, title: "Background color", onColorChange: function (editor, color) {
+    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "highlight", getActiveColor: function (editor) { return editor.getAttributes("highlight").color; }, title: "Background color", onColorChange: function (editor, color) {
             return color
                 ? editor.chain().focus().toggleHighlight({ color: color }).run()
                 : editor.chain().focus().unsetHighlight().run();
         } })));
 }
 export function TextColor(props) {
-    return (_jsx(ColorTool, __assign({}, props, { isActive: function (editor) { return editor.isActive("textStyle", { color: /\W+/gm }); }, getActiveColor: function (editor) { return editor.getAttributes("textStyle").color; }, title: "Text color", onColorChange: function (editor, color) {
+    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "textColor", getActiveColor: function (editor) { return editor.getAttributes("textStyle").color; }, title: "Text color", onColorChange: function (editor, color) {
             return color
                 ? editor.chain().focus().setColor(color).run()
                 : editor.chain().focus().unsetColor().run();

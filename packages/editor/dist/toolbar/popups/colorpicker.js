@@ -55,7 +55,7 @@ export function ColorPicker(props) {
     var _a = props.colors, colors = _a === void 0 ? DEFAULT_COLORS : _a, color = props.color, onClear = props.onClear, onChange = props.onChange, title = props.title, onClose = props.onClose, expanded = props.expanded;
     var ref = useRef();
     var _b = __read(useState(expanded || false), 2), isPickerOpen = _b[0], setIsPickerOpen = _b[1];
-    var _c = __read(useState(tinycolor(color).toHexString()), 2), currentColor = _c[0], setCurrentColor = _c[1];
+    var _c = __read(useState(tinycolor(color || colors[0]).toHexString()), 2), currentColor = _c[0], setCurrentColor = _c[1];
     var tColor = tinycolor(currentColor);
     useEffect(function () {
         if (!ref.current)

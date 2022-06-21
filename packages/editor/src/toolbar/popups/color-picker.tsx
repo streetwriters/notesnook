@@ -26,7 +26,7 @@ export const DEFAULT_COLORS = [
 
 type ColorPickerProps = {
   colors?: string[];
-  color: string;
+  color?: string;
   onClear: () => void;
   expanded?: boolean;
   onChange: (color: string) => void;
@@ -47,7 +47,7 @@ export function ColorPicker(props: ColorPickerProps) {
   const ref = useRef<HTMLDivElement>();
   const [isPickerOpen, setIsPickerOpen] = useState(expanded || false);
   const [currentColor, setCurrentColor] = useState<string>(
-    tinycolor(color).toHexString()
+    tinycolor(color || colors[0]).toHexString()
   );
   const tColor = tinycolor(currentColor);
 
