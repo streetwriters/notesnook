@@ -14,6 +14,7 @@ import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
 import { attachFile, insertAttachment } from "./plugins/picker";
 import { DropEvent } from "react-dropzone";
+import { downloadAttachment } from "../../common/attachments";
 
 function updateWordCount(counter?: CharacterCounter) {
   AppEventManager.publish(
@@ -142,59 +143,6 @@ export default function EditorManager({
   );
 }
 
-function useDragOverlay() {
-  const dropElementRef = useRef<HTMLElement>();
-  const overlayRef = useRef<HTMLElement>();
-
-  useEffect(() => {
-    const dropElement = dropElementRef.current;
-    const overlay = overlayRef.current;
-
-    if (!dropElement || !overlay) return;
-
-    function isFile(e: DragEvent) {
-      return (
-        e.dataTransfer &&
-        (e.dataTransfer.files.length > 0 ||
-          e.dataTransfer.types.some((a) => a === "Files"))
-      );
-    }
-
-    function showOverlay(e: DragEvent) {
-      if (!overlay || !isFile(e)) return;
-
-      overlay.style.display = "flex";
-    }
-
-    function hideOverlay(e: DragEvent | DropEvent) {
-      if (!overlay) return;
-      overlay.style.display = "none";
-    }
-
-    function allowDrag(e: DragEvent) {
-      if (!e.dataTransfer || !isFile(e)) return;
-
-      e.dataTransfer.dropEffect = "copy";
-      e.preventDefault();
-    }
-
-    dropElement.addEventListener("dragenter", showOverlay);
-    overlay.addEventListener("drop", hideOverlay);
-    overlay.addEventListener("dragenter", allowDrag);
-    overlay.addEventListener("dragover", allowDrag);
-    overlay.addEventListener("dragleave", hideOverlay);
-    return () => {
-      dropElement.removeEventListener("dragenter", showOverlay);
-      overlay.removeEventListener("drop", hideOverlay);
-      overlay.removeEventListener("dragenter", allowDrag);
-      overlay.removeEventListener("dragover", allowDrag);
-      overlay.removeEventListener("dragleave", hideOverlay);
-    };
-  }, []);
-
-  return [dropElementRef, overlayRef] as const;
-}
-
 type EditorProps = {
   readonly?: boolean;
   focusMode?: boolean;
@@ -248,6 +196,9 @@ function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
               debouncedOnEditorChange(sessionId, id, sessionId, content);
               if (counter) debouncedUpdateWordCount(counter);
             }}
+            onDownloadAttachment={(attachment) =>
+              downloadAttachment(attachment.hash)
+            }
             onInsertAttachment={(type) => {
               const mime = type === "file" ? "*/*" : "image/*";
               insertAttachment(mime).then((file) => {
@@ -322,4 +273,57 @@ function PreviewModeNotice() {
       </Flex>
     </Flex>
   );
+}
+
+function useDragOverlay() {
+  const dropElementRef = useRef<HTMLElement>();
+  const overlayRef = useRef<HTMLElement>();
+
+  useEffect(() => {
+    const dropElement = dropElementRef.current;
+    const overlay = overlayRef.current;
+
+    if (!dropElement || !overlay) return;
+
+    function isFile(e: DragEvent) {
+      return (
+        e.dataTransfer &&
+        (e.dataTransfer.files.length > 0 ||
+          e.dataTransfer.types.some((a) => a === "Files"))
+      );
+    }
+
+    function showOverlay(e: DragEvent) {
+      if (!overlay || !isFile(e)) return;
+
+      overlay.style.display = "flex";
+    }
+
+    function hideOverlay(e: DragEvent | DropEvent) {
+      if (!overlay) return;
+      overlay.style.display = "none";
+    }
+
+    function allowDrag(e: DragEvent) {
+      if (!e.dataTransfer || !isFile(e)) return;
+
+      e.dataTransfer.dropEffect = "copy";
+      e.preventDefault();
+    }
+
+    dropElement.addEventListener("dragenter", showOverlay);
+    overlay.addEventListener("drop", hideOverlay);
+    overlay.addEventListener("dragenter", allowDrag);
+    overlay.addEventListener("dragover", allowDrag);
+    overlay.addEventListener("dragleave", hideOverlay);
+    return () => {
+      dropElement.removeEventListener("dragenter", showOverlay);
+      overlay.removeEventListener("drop", hideOverlay);
+      overlay.removeEventListener("dragenter", allowDrag);
+      overlay.removeEventListener("dragover", allowDrag);
+      overlay.removeEventListener("dragleave", hideOverlay);
+    };
+  }, []);
+
+  return [dropElementRef, overlayRef] as const;
 }

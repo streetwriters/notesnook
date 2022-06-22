@@ -17,6 +17,7 @@ import { createPortal } from "react-dom";
 type TipTapProps = {
   onChange?: (content: string, counter?: CharacterCounter) => void;
   onInsertAttachment?: (type: string) => void;
+  onDownloadAttachment?: (attachment: Attachment) => void;
   onFocus?: () => void;
   content?: string;
   toolbarContainerId?: string;
@@ -27,6 +28,7 @@ function TipTap(props: TipTapProps) {
   const {
     onChange,
     onInsertAttachment,
+    onDownloadAttachment,
     onFocus = () => {},
     content,
     toolbarContainerId,
@@ -70,8 +72,12 @@ function TipTap(props: TipTapProps) {
         onInsertAttachment?.(type);
         return true;
       },
+      onDownloadAttachment: (_editor, attachment) => {
+        onDownloadAttachment?.(attachment);
+        return true;
+      },
     },
-    [content, readonly, theme]
+    [content, readonly, theme, onInsertAttachment, onDownloadAttachment]
   );
 
   useEffect(() => {
