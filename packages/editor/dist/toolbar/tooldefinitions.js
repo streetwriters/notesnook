@@ -221,6 +221,46 @@ var tools = {
         title: "Image properties",
         conditional: true,
     },
+    attachmentSettings: {
+        icon: "attachmentSettings",
+        title: "Attachment settings",
+        conditional: true,
+    },
+    downloadAttachment: {
+        icon: "download",
+        title: "Download attachment",
+        conditional: true,
+    },
+    removeAttachment: {
+        icon: "delete",
+        title: "Remove attachment",
+        conditional: true,
+    },
+    embedSettings: {
+        icon: "embedSettings",
+        title: "Embed settings",
+        conditional: true,
+    },
+    embedAlignCenter: {
+        icon: "alignCenter",
+        title: "Align center",
+        conditional: true,
+    },
+    embedAlignLeft: {
+        icon: "alignLeft",
+        title: "Align left",
+        conditional: true,
+    },
+    embedAlignRight: {
+        icon: "alignRight",
+        title: "Align right",
+        conditional: true,
+    },
+    embedProperties: {
+        icon: "more",
+        title: "Embed properties",
+        conditional: true,
+    },
 };
 export function getToolDefinition(id) {
     return tools[id];

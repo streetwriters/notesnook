@@ -18,6 +18,8 @@ export type EmbedAlignmentOptions = {
   align?: "center" | "left" | "right";
 };
 
+export type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;
+
 export type EmbedSizeOptions = {
   width: number;
   height: number;
@@ -27,11 +29,12 @@ declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     embed: {
       /**
-       * Add an image
+       * Add an embed
        */
       insertEmbed: (options: EmbedAttributes) => ReturnType;
       setEmbedAlignment: (options: EmbedAlignmentOptions) => ReturnType;
       setEmbedSize: (options: EmbedSizeOptions) => ReturnType;
+      setEmbedSource: (src: string) => ReturnType;
     };
   }
 }
@@ -101,6 +104,11 @@ export const EmbedNode = Node.create<EmbedOptions>({
         (options) =>
         ({ commands }) => {
           return commands.updateAttributes(this.name, { ...options });
+        },
+      setEmbedSource:
+        (src) =>
+        ({ commands }) => {
+          return commands.updateAttributes(this.name, { src });
         },
     };
   },

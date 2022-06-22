@@ -1,6 +1,5 @@
 /// <reference types="react" />
-import { EmbedAlignmentOptions, EmbedAttributes, EmbedSizeOptions } from "../../extensions/embed";
-declare type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;
+import { Embed, EmbedSizeOptions } from "../../extensions/embed";
 export declare type EmbedPopupProps = {
     onClose: (embed?: Embed) => void;
     title?: string;
@@ -9,4 +8,3 @@ export declare type EmbedPopupProps = {
     onSourceChanged?: (src: string) => void;
 };
 export declare function EmbedPopup(props: EmbedPopupProps): JSX.Element;
-export {};

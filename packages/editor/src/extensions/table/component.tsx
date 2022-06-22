@@ -31,6 +31,7 @@ import {
 import { getToolDefinition } from "../../toolbar/tool-definitions";
 import { getPosition, PositionOptions } from "../../utils/position";
 import { findSelectedDOMNode } from "../../toolbar/utils/prosemirror";
+import { DesktopOnly } from "../../components/responsive";
 
 export function TableComponent(props: SelectionBasedReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
@@ -46,12 +47,14 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
 
   return (
     <>
-      {selected && (
-        <>
-          <TableRowToolbar editor={editor} table={tableRef.current} />
-          <TableColumnToolbar editor={editor} table={tableRef.current} />
-        </>
-      )}
+      <DesktopOnly>
+        {selected && (
+          <>
+            <TableRowToolbar editor={editor} table={tableRef.current} />
+            <TableColumnToolbar editor={editor} table={tableRef.current} />
+          </>
+        )}
+      </DesktopOnly>
       <div className="tableWrapper">
         <table
           ref={(ref) => {

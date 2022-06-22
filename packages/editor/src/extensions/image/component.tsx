@@ -1,21 +1,12 @@
-import { Box, Flex, Image, ImageProps } from "rebass";
-import {
-  ImageAlignmentOptions,
-  ImageAttributes,
-  ImageSizeOptions,
-} from "./image";
-import { Theme } from "@notesnook/theme";
+import { Box, Flex, Image } from "rebass";
+import { ImageAlignmentOptions, ImageAttributes } from "./image";
 import { Resizable } from "re-resizable";
-import { ToolButton } from "../../toolbar/components/tool-button";
-import { Editor } from "@tiptap/core";
-import { useEffect, useRef, useState } from "react";
-import { ReactNodeViewProps, SelectionBasedReactNodeViewProps } from "../react";
-import { ResponsivePresenter } from "../../components/responsive";
-import { ImageProperties } from "../../toolbar/popups/image-properties";
-import { Popup } from "../../toolbar/components/popup";
+import { useEffect, useRef } from "react";
+import { SelectionBasedReactNodeViewProps } from "../react";
+import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { ImageToolbar } from "../../toolbar/floatingmenus/image";
+import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 
 export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -69,20 +60,35 @@ export function ImageComponent(
           }}
           lockAspectRatio={true}
         >
-          {selected && (
-            <Flex sx={{ position: "relative", justifyContent: "end" }}>
-              <Flex
-                sx={{
-                  position: "absolute",
-                  top: -40,
-                  mb: 2,
-                  alignItems: "end",
-                }}
-              >
-                <ImageToolbar editor={editor} />
+          <DesktopOnly>
+            {selected && (
+              <Flex sx={{ position: "relative", justifyContent: "end" }}>
+                <Flex
+                  sx={{
+                    position: "absolute",
+                    top: -40,
+                    mb: 2,
+                    alignItems: "end",
+                  }}
+                >
+                  <ToolbarGroup
+                    editor={editor}
+                    tools={[
+                      "imageAlignLeft",
+                      "imageAlignCenter",
+                      "imageAlignRight",
+                      "imageProperties",
+                    ]}
+                    sx={{
+                      boxShadow: "menu",
+                      borderRadius: "default",
+                      bg: "background",
+                    }}
+                  />
+                </Flex>
               </Flex>
-            </Flex>
-          )}
+            )}
+          </DesktopOnly>
           <Icon
             className="drag-handle"
             data-drag-handle

@@ -11,11 +11,12 @@ var __assign = (this && this.__assign) || function () {
 };
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { Box, Flex, Text } from "rebass";
-import { ToolButton } from "../../toolbar/components/tool-button";
 import { useRef } from "react";
 // import { MenuPresenter } from "../../components/menu/menu";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
+import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
+import { DesktopOnly } from "../../components/responsive";
 export function AttachmentComponent(props) {
     var editor = props.editor, node = props.node, selected = props.selected;
     var _a = node.attrs, hash = _a.hash, filename = _a.filename, size = _a.size, progress = _a.progress;
@@ -47,7 +48,7 @@ export function AttachmentComponent(props) {
                         fontSize: "0.65rem",
                         color: "fontTertiary",
                         flexShrink: 0,
-                    } }, { children: progress ? "".concat(progress, "%") : formatBytes(size) })), selected && (_jsx(Flex, __assign({ sx: { position: "absolute", top: -35 } }, { children: _jsx(AttachmentToolbar, { editor: editor }) })))] })) }));
+                    } }, { children: progress ? "".concat(progress, "%") : formatBytes(size) })), _jsx(DesktopOnly, { children: selected && (_jsx(Flex, __assign({ sx: { position: "absolute", top: -35 } }, { children: _jsx(ToolbarGroup, { editor: editor, tools: ["removeAttachment", "downloadAttachment"] }) }))) })] })) }));
 }
 function formatBytes(bytes, decimals) {
     if (decimals === void 0) { decimals = 1; }
@@ -58,14 +59,4 @@ function formatBytes(bytes, decimals) {
     var sizes = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
     var i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
-}
-// TODO make this functional
-function AttachmentToolbar(props) {
-    var editor = props.editor;
-    return (_jsxs(Flex, __assign({ sx: {
-            bg: "background",
-            boxShadow: "menu",
-            flexWrap: "nowrap",
-            borderRadius: "default",
-        } }, { children: [_jsx(ToolButton, { toggled: false, title: "Download", id: "download", icon: "download", onClick: function () { }, sx: { mr: 1 } }), _jsx(ToolButton, { toggled: false, title: "delete", id: "delete", icon: "delete", onClick: function () { }, sx: { mr: 0 } })] })));
 }

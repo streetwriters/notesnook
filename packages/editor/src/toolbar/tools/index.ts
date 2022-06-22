@@ -48,6 +48,18 @@ import {
   ImageAlignRight,
   ImageProperties,
 } from "./image";
+import {
+  AttachmentSettings,
+  DownloadAttachment,
+  RemoveAttachment,
+} from "./attachment";
+import {
+  EmbedAlignCenter,
+  EmbedAlignLeft,
+  EmbedAlignRight,
+  EmbedProperties,
+  EmbedSettings,
+} from "./embed";
 
 export type ToolId = keyof typeof tools;
 const tools = {
@@ -80,6 +92,16 @@ const tools = {
   imageAlignLeft: ImageAlignLeft,
   imageAlignRight: ImageAlignRight,
   imageProperties: ImageProperties,
+
+  embedAlignCenter: EmbedAlignCenter,
+  embedAlignLeft: EmbedAlignLeft,
+  embedAlignRight: EmbedAlignRight,
+  embedProperties: EmbedProperties,
+  embedSettings: EmbedSettings,
+
+  attachmentSettings: AttachmentSettings,
+  downloadAttachment: DownloadAttachment,
+  removeAttachment: RemoveAttachment,
 
   tableSettings: TableSettings,
   columnProperties: ColumnProperties,

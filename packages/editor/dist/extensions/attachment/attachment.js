@@ -81,11 +81,16 @@ export var AttachmentNode = Node.create({
             insertAttachment: function (attachment) {
                 return function (_a) {
                     var commands = _a.commands;
-                    console.log("HI!", attachment);
                     return commands.insertContent({
                         type: _this.name,
                         attrs: attachment,
                     });
+                };
+            },
+            removeAttachment: function () {
+                return function (_a) {
+                    var commands = _a.commands;
+                    return commands.deleteNode(_this.name);
                 };
             },
             downloadAttachment: function (attachment) {

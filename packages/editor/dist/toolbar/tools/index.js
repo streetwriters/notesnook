@@ -8,6 +8,8 @@ import { LeftToRight, RightToLeft } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import { TableSettings, ColumnProperties, RowProperties, CellProperties, InsertColumnLeft, InsertColumnRight, MoveColumnLeft, MoveColumnRight, DeleteColumn, SplitCells, MergeCells, InsertRowAbove, InsertRowBelow, MoveRowUp, MoveRowDown, DeleteRow, DeleteTable, CellBackgroundColor, CellBorderColor, CellTextColor, CellBorderWidth, } from "./table";
 import { ImageSettings, ImageAlignCenter, ImageAlignLeft, ImageAlignRight, ImageProperties, } from "./image";
+import { AttachmentSettings, DownloadAttachment, RemoveAttachment, } from "./attachment";
+import { EmbedAlignCenter, EmbedAlignLeft, EmbedAlignRight, EmbedProperties, EmbedSettings, } from "./embed";
 var tools = {
     bold: Bold,
     italic: Italic,
@@ -37,6 +39,14 @@ var tools = {
     imageAlignLeft: ImageAlignLeft,
     imageAlignRight: ImageAlignRight,
     imageProperties: ImageProperties,
+    embedAlignCenter: EmbedAlignCenter,
+    embedAlignLeft: EmbedAlignLeft,
+    embedAlignRight: EmbedAlignRight,
+    embedProperties: EmbedProperties,
+    embedSettings: EmbedSettings,
+    attachmentSettings: AttachmentSettings,
+    downloadAttachment: DownloadAttachment,
+    removeAttachment: RemoveAttachment,
     tableSettings: TableSettings,
     columnProperties: ColumnProperties,
     rowProperties: RowProperties,

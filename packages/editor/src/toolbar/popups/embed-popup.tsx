@@ -4,6 +4,7 @@ import { Popup } from "../components/popup";
 import { Toggle } from "../../components/toggle";
 import { Input, Textarea } from "@rebass/forms";
 import {
+  Embed,
   EmbedAlignmentOptions,
   EmbedAttributes,
   EmbedSizeOptions,
@@ -14,7 +15,6 @@ import { convertUrlToEmbedUrl } from "@social-embed/lib";
 import { InlineInput } from "../../components/inline-input";
 import { Tabs, Tab } from "../../components/tabs";
 
-type Embed = Required<EmbedAttributes> & EmbedAlignmentOptions;
 type EmbedSource = "url" | "code";
 export type EmbedPopupProps = {
   onClose: (embed?: Embed) => void;

@@ -76,6 +76,12 @@ export var EmbedNode = Node.create({
                     return commands.updateAttributes(_this.name, __assign({}, options));
                 };
             },
+            setEmbedSource: function (src) {
+                return function (_a) {
+                    var commands = _a.commands;
+                    return commands.updateAttributes(_this.name, { src: src });
+                };
+            },
         };
     },
 });

@@ -33,6 +33,7 @@ import { InsertColumnRight, InsertRowBelow, RowProperties, TableProperties, } fr
 import { getToolDefinition } from "../../toolbar/tool-definitions";
 import { getPosition } from "../../utils/position";
 import { findSelectedDOMNode } from "../../toolbar/utils/prosemirror";
+import { DesktopOnly } from "../../components/responsive";
 export function TableComponent(props) {
     var editor = props.editor, node = props.node, forwardRef = props.forwardRef;
     var colgroupRef = useRef(null);
@@ -43,7 +44,7 @@ export function TableComponent(props) {
             return;
         updateColumnsOnResize(node, colgroupRef.current, tableRef.current, 50);
     }, [node]);
-    return (_jsxs(_Fragment, { children: [selected && (_jsxs(_Fragment, { children: [_jsx(TableRowToolbar, { editor: editor, table: tableRef.current }), _jsx(TableColumnToolbar, { editor: editor, table: tableRef.current })] })), _jsx("div", __assign({ className: "tableWrapper" }, { children: _jsx("table", __assign({ ref: function (ref) {
+    return (_jsxs(_Fragment, { children: [_jsx(DesktopOnly, { children: selected && (_jsxs(_Fragment, { children: [_jsx(TableRowToolbar, { editor: editor, table: tableRef.current }), _jsx(TableColumnToolbar, { editor: editor, table: tableRef.current })] })) }), _jsx("div", __assign({ className: "tableWrapper" }, { children: _jsx("table", __assign({ ref: function (ref) {
                         forwardRef === null || forwardRef === void 0 ? void 0 : forwardRef(ref);
                         tableRef.current = ref || undefined;
                     } }, { children: _jsx("colgroup", { ref: colgroupRef }) })) }))] }));

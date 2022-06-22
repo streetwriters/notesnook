@@ -10,6 +10,8 @@ import { LeftToRight, RightToLeft } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import { TableSettings, ColumnProperties, RowProperties, CellProperties, CellBackgroundColor, CellBorderColor, CellTextColor, CellBorderWidth } from "./table";
 import { ImageSettings, ImageAlignCenter, ImageAlignLeft, ImageAlignRight, ImageProperties } from "./image";
+import { AttachmentSettings, DownloadAttachment, RemoveAttachment } from "./attachment";
+import { EmbedAlignCenter, EmbedAlignLeft, EmbedAlignRight, EmbedProperties, EmbedSettings } from "./embed";
 export declare type ToolId = keyof typeof tools;
 declare const tools: {
     bold: typeof Bold;
@@ -40,6 +42,14 @@ declare const tools: {
     imageAlignLeft: typeof ImageAlignLeft;
     imageAlignRight: typeof ImageAlignRight;
     imageProperties: typeof ImageProperties;
+    embedAlignCenter: typeof EmbedAlignCenter;
+    embedAlignLeft: typeof EmbedAlignLeft;
+    embedAlignRight: typeof EmbedAlignRight;
+    embedProperties: typeof EmbedProperties;
+    embedSettings: typeof EmbedSettings;
+    attachmentSettings: typeof AttachmentSettings;
+    downloadAttachment: typeof DownloadAttachment;
+    removeAttachment: typeof RemoveAttachment;
     tableSettings: typeof TableSettings;
     columnProperties: typeof ColumnProperties;
     rowProperties: typeof RowProperties;

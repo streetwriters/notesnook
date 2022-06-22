@@ -1,5 +1,5 @@
 import { Box, Flex, Text } from "rebass";
-import { AttachmentWithProgress } from "./attachment";
+import { Attachment, AttachmentWithProgress } from "./attachment";
 import { ToolButton } from "../../toolbar/components/tool-button";
 import { Editor } from "@tiptap/core";
 import { useRef } from "react";
@@ -8,6 +8,8 @@ import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { PopupPresenter } from "../../components/popup-presenter";
+import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
+import { DesktopOnly } from "../../components/responsive";
 
 export function AttachmentComponent(
   props: SelectionBasedReactNodeViewProps<AttachmentWithProgress>
@@ -66,11 +68,16 @@ export function AttachmentComponent(
         >
           {progress ? `${progress}%` : formatBytes(size)}
         </Text>
-        {selected && (
-          <Flex sx={{ position: "absolute", top: -35 }}>
-            <AttachmentToolbar editor={editor} />
-          </Flex>
-        )}
+        <DesktopOnly>
+          {selected && (
+            <Flex sx={{ position: "absolute", top: -35 }}>
+              <ToolbarGroup
+                editor={editor}
+                tools={["removeAttachment", "downloadAttachment"]}
+              />
+            </Flex>
+          )}
+        </DesktopOnly>
       </Box>
     </>
   );
@@ -86,41 +93,4 @@ function formatBytes(bytes: number, decimals = 1) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
-}
-
-type AttachmentToolbarProps = {
-  editor: Editor;
-};
-
-// TODO make this functional
-function AttachmentToolbar(props: AttachmentToolbarProps) {
-  const { editor } = props;
-
-  return (
-    <Flex
-      sx={{
-        bg: "background",
-        boxShadow: "menu",
-        flexWrap: "nowrap",
-        borderRadius: "default",
-      }}
-    >
-      <ToolButton
-        toggled={false}
-        title="Download"
-        id="download"
-        icon="download"
-        onClick={() => {}}
-        sx={{ mr: 1 }}
-      />
-      <ToolButton
-        toggled={false}
-        title="delete"
-        id="delete"
-        icon="delete"
-        onClick={() => {}}
-        sx={{ mr: 0 }}
-      />
-    </Flex>
-  );
 }

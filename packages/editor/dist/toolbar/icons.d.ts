@@ -60,10 +60,12 @@ export declare const Icons: {
     replaceOne: string;
     replaceAll: string;
     replace: string;
+    attachmentSettings: string;
     caseSensitive: string;
     wholeWord: string;
     regex: string;
     embed: string;
+    embedSettings: string;
     palette: string;
     tableSettings: string;
     plus: string;

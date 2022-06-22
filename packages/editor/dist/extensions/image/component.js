@@ -49,9 +49,10 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { Box, Flex, Image } from "rebass";
 import { Resizable } from "re-resizable";
 import { useEffect, useRef } from "react";
+import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { ImageToolbar } from "../../toolbar/floatingmenus/image";
+import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 export function ImageComponent(props) {
     var _this = this;
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, selected = props.selected;
@@ -97,12 +98,21 @@ export function ImageComponent(props) {
                         width: ref.clientWidth,
                         height: ref.clientHeight,
                     });
-                }, lockAspectRatio: true }, { children: [selected && (_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(Flex, __assign({ sx: {
-                                position: "absolute",
-                                top: -40,
-                                mb: 2,
-                                alignItems: "end",
-                            } }, { children: _jsx(ImageToolbar, { editor: editor }) })) }))), _jsx(Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: Icons.dragHandle, sx: {
+                }, lockAspectRatio: true }, { children: [_jsx(DesktopOnly, { children: selected && (_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(Flex, __assign({ sx: {
+                                    position: "absolute",
+                                    top: -40,
+                                    mb: 2,
+                                    alignItems: "end",
+                                } }, { children: _jsx(ToolbarGroup, { editor: editor, tools: [
+                                        "imageAlignLeft",
+                                        "imageAlignCenter",
+                                        "imageAlignRight",
+                                        "imageProperties",
+                                    ], sx: {
+                                        boxShadow: "menu",
+                                        borderRadius: "default",
+                                        bg: "background",
+                                    } }) })) }))) }), _jsx(Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: Icons.dragHandle, sx: {
                             cursor: "grab",
                             position: "absolute",
                             top: 2,

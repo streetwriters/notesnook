@@ -30,6 +30,7 @@ declare module "@tiptap/core" {
     attachment: {
       openAttachmentPicker: (type: AttachmentType) => ReturnType;
       insertAttachment: (attachment: Attachment) => ReturnType;
+      removeAttachment: () => ReturnType;
       downloadAttachment: (attachment: Attachment) => ReturnType;
       setAttachmentProgress: (progress: AttachmentProgress) => ReturnType;
     };
@@ -98,12 +99,15 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       insertAttachment:
         (attachment) =>
         ({ commands }) => {
-          console.log("HI!", attachment);
           return commands.insertContent({
             type: this.name,
             attrs: attachment,
           });
         },
+      removeAttachment:
+        () =>
+        ({ commands }) =>
+          commands.deleteNode(this.name),
       downloadAttachment:
         (attachment) =>
         ({ editor }) => {

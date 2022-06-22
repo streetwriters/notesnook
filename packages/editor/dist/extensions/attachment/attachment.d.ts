@@ -23,6 +23,7 @@ declare module "@tiptap/core" {
         attachment: {
             openAttachmentPicker: (type: AttachmentType) => ReturnType;
             insertAttachment: (attachment: Attachment) => ReturnType;
+            removeAttachment: () => ReturnType;
             downloadAttachment: (attachment: Attachment) => ReturnType;
             setAttachmentProgress: (progress: AttachmentProgress) => ReturnType;
         };
