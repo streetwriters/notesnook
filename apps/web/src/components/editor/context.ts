@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import { useCallback } from "react";
 import { IEditor } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";

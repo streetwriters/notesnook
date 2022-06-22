@@ -1,6 +1,5 @@
 import { SerializedKey } from "@notesnook/crypto/dist/src/types";
 import Compressor from "compressorjs";
-import type { Editor, TinyMCE } from "tinymce";
 import { AppEventManager, AppEvents } from "../../../common/app-events";
 import { db } from "../../../common/db";
 import { showBuyDialog } from "../../../common/dialog-controller";
@@ -159,6 +158,14 @@ export type AttachmentProgress = {
   loaded: number;
 };
 
+export type Attachment = {
+  hash: string;
+  filename: string;
+  type: string;
+  size: number;
+  dataurl?: string;
+};
+
 type AddAttachmentOptions = {
   expectedFileHash?: string;
   showProgress?: boolean;
@@ -169,7 +176,7 @@ async function addAttachment(
   file: File,
   dataurl: string | undefined,
   options: AddAttachmentOptions = {}
-) {
+): Promise<Attachment> {
   const { expectedFileHash, forceWrite, showProgress = true } = options;
 
   const action = async () => {

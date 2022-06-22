@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from "react";
+import { useEffect, useCallback, useState, useRef } from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
@@ -10,6 +10,10 @@ import { debounce, debounceWithId } from "../../utils/debounce";
 import { CharacterCounter } from "./types";
 import Tiptap from "./tiptap";
 import Header from "./header";
+import { Attachment } from "../icons";
+import { useEditorInstance } from "./context";
+import { attachFile, insertAttachment } from "./plugins/picker";
+import { DropEvent } from "react-dropzone";
 
 function updateWordCount(counter?: CharacterCounter) {
   AppEventManager.publish(
@@ -48,6 +52,8 @@ export default function EditorManager({
   const isReadonly = useStore(
     (store) => store.session.readonly || isPreviewMode
   );
+  const [dropRef, overlayRef] = useDragOverlay();
+  const editor = useEditorInstance();
   // TODO move this somewhere more appropriate
   // const init = useStore((store) => store.init);
 
@@ -77,6 +83,7 @@ export default function EditorManager({
 
   return (
     <Flex
+      ref={dropRef}
       flexDirection="column"
       id="editorContainer"
       flex={1}
@@ -93,8 +100,99 @@ export default function EditorManager({
         onRequestFocus={() => toggleProperties(false)}
       />
       {arePropertiesVisible && <Properties />}
+
+      <Box
+        ref={overlayRef}
+        id="drag-overlay"
+        sx={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          bg: "overlay",
+          zIndex: 3,
+          alignItems: "center",
+          justifyContent: "center",
+          display: "none",
+        }}
+        onDrop={async (e) => {
+          if (!editor) return;
+          for (let file of e.dataTransfer.files) {
+            const result = await attachFile(file);
+            if (!result) continue;
+            editor.attachFile(result);
+          }
+        }}
+      >
+        <Flex
+          sx={{
+            border: "2px dashed var(--fontTertiary)",
+            borderRadius: "default",
+            p: 70,
+            flexDirection: "column",
+            pointerEvents: "none",
+          }}
+        >
+          <Attachment size={72} />
+          <Text variant={"heading"} sx={{ color: "icon", mt: 2 }}>
+            Drop your files here to attach
+          </Text>
+        </Flex>
+      </Box>
     </Flex>
   );
+}
+
+function useDragOverlay() {
+  const dropElementRef = useRef<HTMLElement>();
+  const overlayRef = useRef<HTMLElement>();
+
+  useEffect(() => {
+    const dropElement = dropElementRef.current;
+    const overlay = overlayRef.current;
+
+    if (!dropElement || !overlay) return;
+
+    function isFile(e: DragEvent) {
+      return (
+        e.dataTransfer &&
+        (e.dataTransfer.files.length > 0 ||
+          e.dataTransfer.types.some((a) => a === "Files"))
+      );
+    }
+
+    function showOverlay(e: DragEvent) {
+      if (!overlay || !isFile(e)) return;
+
+      overlay.style.display = "flex";
+    }
+
+    function hideOverlay(e: DragEvent | DropEvent) {
+      if (!overlay) return;
+      overlay.style.display = "none";
+    }
+
+    function allowDrag(e: DragEvent) {
+      if (!e.dataTransfer || !isFile(e)) return;
+
+      e.dataTransfer.dropEffect = "copy";
+      e.preventDefault();
+    }
+
+    dropElement.addEventListener("dragenter", showOverlay);
+    overlay.addEventListener("drop", hideOverlay);
+    overlay.addEventListener("dragenter", allowDrag);
+    overlay.addEventListener("dragover", allowDrag);
+    overlay.addEventListener("dragleave", hideOverlay);
+    return () => {
+      dropElement.removeEventListener("dragenter", showOverlay);
+      overlay.removeEventListener("drop", hideOverlay);
+      overlay.removeEventListener("dragenter", allowDrag);
+      overlay.removeEventListener("dragover", allowDrag);
+      overlay.removeEventListener("dragleave", hideOverlay);
+    };
+  }, []);
+
+  return [dropElementRef, overlayRef] as const;
 }
 
 type EditorProps = {
@@ -104,12 +202,9 @@ type EditorProps = {
   onRequestFocus?: () => void;
 };
 function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
+  const editor = useEditorInstance();
   useEffect(() => {
-    console.log("new contentn");
-  }, [content]);
-
-  useEffect(() => {
-    console.log("rerender");
+    console.log("Rerendering editor.");
   }, []);
 
   return (
@@ -153,9 +248,17 @@ function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
               debouncedOnEditorChange(sessionId, id, sessionId, content);
               if (counter) debouncedUpdateWordCount(counter);
             }}
+            onInsertAttachment={(type) => {
+              const mime = type === "file" ? "*/*" : "image/*";
+              insertAttachment(mime).then((file) => {
+                if (!file) return;
+                editor?.attachFile(file);
+              });
+            }}
           />
         </Flex>
       </FlexScrollContainer>
+
       {/* TODO <Box
         id="editorToolbar"
         sx={{

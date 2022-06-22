@@ -5,9 +5,9 @@ import { EditorContent } from "@tiptap/react";
 import { Flex } from "rebass";
 import { Editor } from "@tiptap/core";
 import "notesnook-editor/dist/styles.css";
-import React, { PropsWithChildren, useEffect, useRef } from "react";
+import { PropsWithChildren, useEffect, useRef } from "react";
 import useMobile from "../../utils/use-mobile";
-import { AttachmentProgress, insertAttachment } from "./plugins/picker";
+import { Attachment, AttachmentProgress } from "./plugins/picker";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { EV, EVENTS } from "notes-core/common";
 import { CharacterCounter, IEditor } from "./types";
@@ -16,6 +16,7 @@ import { createPortal } from "react-dom";
 
 type TipTapProps = {
   onChange?: (content: string, counter?: CharacterCounter) => void;
+  onInsertAttachment?: (type: string) => void;
   onFocus?: () => void;
   content?: string;
   toolbarContainerId?: string;
@@ -25,6 +26,7 @@ type TipTapProps = {
 function TipTap(props: TipTapProps) {
   const {
     onChange,
+    onInsertAttachment,
     onFocus = () => {},
     content,
     toolbarContainerId,
@@ -45,7 +47,6 @@ function TipTap(props: TipTapProps) {
       onFocus,
       onCreate: ({ editor }) => {
         counter.current = editor.storage.characterCount as CharacterCounter;
-        console.log("Init!");
         configure({
           editor: toIEditor(editor),
           canRedo: editor.can().redo(),
@@ -56,7 +57,6 @@ function TipTap(props: TipTapProps) {
         if (onChange) onChange(editor.getHTML(), counter.current);
       },
       onDestroy: () => {
-        console.log("Destory!");
         configure({ editor: undefined });
       },
       onTransaction: ({ editor }) => {
@@ -66,22 +66,8 @@ function TipTap(props: TipTapProps) {
         });
       },
       theme,
-      onOpenAttachmentPicker: (editor, type) => {
-        if (type === "file") {
-          insertAttachment().then((file) => {
-            if (!file) return;
-            setTimeout(() => {
-              editor.commands.insertAttachment(file);
-            });
-          });
-        } else if (type === "image") {
-          insertAttachment("image/*").then((image) => {
-            setTimeout(() => {
-              if (!image || !image.dataurl) return;
-              editor.commands.insertImage({ ...image, src: image.dataurl });
-            });
-          });
-        }
+      onOpenAttachmentPicker: (_editor, type) => {
+        onInsertAttachment?.(type);
         return true;
       },
     },
@@ -147,7 +133,11 @@ function TipTap(props: TipTapProps) {
         />
       </Portal>
       <EditorContent
-        style={{ flex: 1, cursor: "text", color: theme.colors.text }}
+        style={{
+          flex: 1,
+          cursor: "text",
+          color: theme.colors.text,
+        }}
         editor={editor}
       />
     </Flex>
@@ -183,5 +173,10 @@ function toIEditor(editor: Editor): IEditor {
     focus: () => editor.commands.focus("start"),
     undo: () => editor.commands.undo(),
     redo: () => editor.commands.redo(),
+    attachFile: (file: Attachment) => {
+      if (file.dataurl) {
+        editor.commands.insertImage({ ...file, src: file.dataurl });
+      } else editor.commands.insertAttachment(file);
+    },
   };
 }

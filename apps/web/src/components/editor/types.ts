@@ -1,4 +1,4 @@
-import { HTMLContent } from "@tiptap/react";
+import { Attachment } from "./plugins/picker";
 
 export type CharacterCounter = {
   words: () => number;
@@ -9,4 +9,5 @@ export interface IEditor {
   focus: () => void;
   undo: () => void;
   redo: () => void;
+  attachFile: (file: Attachment) => void;
 }
