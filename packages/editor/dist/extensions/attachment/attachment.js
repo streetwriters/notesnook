@@ -48,7 +48,7 @@ export var AttachmentNode = Node.create({
             },
             hash: getDataAttribute("hash"),
             filename: getDataAttribute("filename"),
-            type: getDataAttribute("type"),
+            type: getDataAttribute("mime"),
             size: getDataAttribute("size"),
         };
     },
@@ -117,8 +117,7 @@ export var AttachmentNode = Node.create({
                     try {
                         for (var attachments_1 = __values(attachments), attachments_1_1 = attachments_1.next(); !attachments_1_1.done; attachments_1_1 = attachments_1.next()) {
                             var attachment = attachments_1_1.value;
-                            console.log(attachment.node.attrs);
-                            tr.setNodeMarkup(attachment.pos, attachment.node.type, __assign(__assign({}, attachment.node.attrs), { progress: progress }));
+                            tr.setNodeMarkup(attachment.pos, attachment.node.type, __assign(__assign({}, attachment.node.attrs), { progress: progress === 100 ? null : progress }));
                         }
                     }
                     catch (e_1_1) { e_1 = { error: e_1_1 }; }

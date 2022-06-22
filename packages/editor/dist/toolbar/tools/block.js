@@ -52,7 +52,7 @@ export function InsertBlock(props) {
             isMobile ? embedMobile(editor) : embedDesktop(editor),
             table(editor),
         ];
-    }, [isMobile]);
+    }, [editor, isMobile]);
     return (_jsxs(_Fragment, { children: [_jsx(Button, __assign({ ref: buttonRef, sx: {
                     p: 1,
                     m: 0,
@@ -233,7 +233,7 @@ var uploadImageFromURL = function (editor) { return ({
         showPopup({
             theme: editor.storage.theme,
             popup: function (hide) { return (_jsx(ImageUploadPopup, { onInsert: function (image) {
-                    editor === null || editor === void 0 ? void 0 : editor.commands.insertImage(image);
+                    editor === null || editor === void 0 ? void 0 : editor.chain().focus().insertImage(image).run();
                     hide();
                 }, onClose: hide })); },
         });

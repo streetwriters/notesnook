@@ -70,12 +70,17 @@ export function AttachmentComponent(
         </Text>
         <DesktopOnly>
           {selected && (
-            <Flex sx={{ position: "absolute", top: -35 }}>
-              <ToolbarGroup
-                editor={editor}
-                tools={["removeAttachment", "downloadAttachment"]}
-              />
-            </Flex>
+            <ToolbarGroup
+              editor={editor}
+              tools={["removeAttachment", "downloadAttachment"]}
+              sx={{
+                boxShadow: "menu",
+                borderRadius: "default",
+                bg: "background",
+                position: "absolute",
+                top: -35,
+              }}
+            />
           )}
         </DesktopOnly>
       </Box>

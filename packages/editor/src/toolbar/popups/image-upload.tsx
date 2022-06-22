@@ -32,13 +32,25 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
             alignSelf: ["stretch", "end", "end"],
             my: 1,
             mr: [0, 1],
-            py: 2,
           }}
           onClick={async () => {
             const response = await fetch(url);
             if (!response.ok) return; // TODO show error
+
+            const contentType = response.headers.get("Content-Type");
+            const contentLength = response.headers.get("Content-Length");
+
+            if (
+              !contentType ||
+              !contentLength ||
+              contentLength === "0" ||
+              !contentType.startsWith("image/")
+            )
+              return;
+
+            const size = parseInt(contentLength);
             const dataurl = await toDataURL(await response.blob());
-            onInsert({ src: dataurl });
+            onInsert({ src: dataurl, type: contentType, size });
           }}
           disabled={!url.trim()}
         >

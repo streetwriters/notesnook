@@ -90,7 +90,7 @@ export const ImageNode = Node.create<ImageOptions>({
       align: getDataAttribute("align", "left"),
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
-      type: getDataAttribute("type"),
+      type: getDataAttribute("mime"),
       size: getDataAttribute("size"),
     };
   },

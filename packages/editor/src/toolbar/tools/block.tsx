@@ -40,7 +40,7 @@ export function InsertBlock(props: ToolProps) {
       isMobile ? embedMobile(editor) : embedDesktop(editor),
       table(editor),
     ];
-  }, [isMobile]);
+  }, [editor, isMobile]);
 
   return (
     <>
@@ -269,7 +269,7 @@ const uploadImageFromURL = (editor: Editor | null): MenuItem => ({
       popup: (hide) => (
         <ImageUploadPopup
           onInsert={(image) => {
-            editor?.commands.insertImage(image);
+            editor?.chain().focus().insertImage(image).run();
             hide();
           }}
           onClose={hide}

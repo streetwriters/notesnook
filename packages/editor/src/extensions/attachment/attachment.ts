@@ -66,7 +66,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       },
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
-      type: getDataAttribute("type"),
+      type: getDataAttribute("mime"),
       size: getDataAttribute("size"),
     };
   },
@@ -129,10 +129,9 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
               node.attrs.hash === hash
           );
           for (const attachment of attachments) {
-            console.log(attachment.node.attrs);
             tr.setNodeMarkup(attachment.pos, attachment.node.type, {
               ...attachment.node.attrs,
-              progress,
+              progress: progress === 100 ? null : progress,
             });
           }
           tr.setMeta("preventUpdate", true);

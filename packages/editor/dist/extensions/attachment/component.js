@@ -10,7 +10,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { Box, Flex, Text } from "rebass";
+import { Box, Text } from "rebass";
 import { useRef } from "react";
 // import { MenuPresenter } from "../../components/menu/menu";
 import { Icon } from "../../toolbar/components/icon";
@@ -48,7 +48,13 @@ export function AttachmentComponent(props) {
                         fontSize: "0.65rem",
                         color: "fontTertiary",
                         flexShrink: 0,
-                    } }, { children: progress ? "".concat(progress, "%") : formatBytes(size) })), _jsx(DesktopOnly, { children: selected && (_jsx(Flex, __assign({ sx: { position: "absolute", top: -35 } }, { children: _jsx(ToolbarGroup, { editor: editor, tools: ["removeAttachment", "downloadAttachment"] }) }))) })] })) }));
+                    } }, { children: progress ? "".concat(progress, "%") : formatBytes(size) })), _jsx(DesktopOnly, { children: selected && (_jsx(ToolbarGroup, { editor: editor, tools: ["removeAttachment", "downloadAttachment"], sx: {
+                            boxShadow: "menu",
+                            borderRadius: "default",
+                            bg: "background",
+                            position: "absolute",
+                            top: -35,
+                        } })) })] })) }));
 }
 function formatBytes(bytes, decimals) {
     if (decimals === void 0) { decimals = 1; }

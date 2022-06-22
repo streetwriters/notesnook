@@ -77,9 +77,8 @@ export function ImageUploadPopup(props) {
                         alignSelf: ["stretch", "end", "end"],
                         my: 1,
                         mr: [0, 1],
-                        py: 2,
                     }, onClick: function () { return __awaiter(_this, void 0, void 0, function () {
-                        var response, dataurl, _a;
+                        var response, contentType, contentLength, size, dataurl, _a;
                         return __generator(this, function (_b) {
                             switch (_b.label) {
                                 case 0: return [4 /*yield*/, fetch(url)];
@@ -87,12 +86,20 @@ export function ImageUploadPopup(props) {
                                     response = _b.sent();
                                     if (!response.ok)
                                         return [2 /*return*/]; // TODO show error
+                                    contentType = response.headers.get("Content-Type");
+                                    contentLength = response.headers.get("Content-Length");
+                                    if (!contentType ||
+                                        !contentLength ||
+                                        contentLength === "0" ||
+                                        !contentType.startsWith("image/"))
+                                        return [2 /*return*/];
+                                    size = parseInt(contentLength);
                                     _a = toDataURL;
                                     return [4 /*yield*/, response.blob()];
                                 case 2: return [4 /*yield*/, _a.apply(void 0, [_b.sent()])];
                                 case 3:
                                     dataurl = _b.sent();
-                                    onInsert({ src: dataurl });
+                                    onInsert({ src: dataurl, type: contentType, size: size });
                                     return [2 /*return*/];
                             }
                         });

@@ -74,7 +74,7 @@ export var ImageNode = Node.create({
             align: getDataAttribute("align", "left"),
             hash: getDataAttribute("hash"),
             filename: getDataAttribute("filename"),
-            type: getDataAttribute("type"),
+            type: getDataAttribute("mime"),
             size: getDataAttribute("size"),
         };
     },
