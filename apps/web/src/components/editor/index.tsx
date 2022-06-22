@@ -12,9 +12,15 @@ import Tiptap from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
-import { attachFile, insertAttachment } from "./plugins/picker";
+import {
+  attachFile,
+  AttachmentProgress,
+  insertAttachment,
+} from "./plugins/picker";
 import { DropEvent } from "react-dropzone";
 import { downloadAttachment } from "../../common/attachments";
+import { EV, EVENTS } from "notes-core/common";
+import { db } from "../../common/db";
 
 function updateWordCount(counter?: CharacterCounter) {
   AppEventManager.publish(
@@ -60,16 +66,21 @@ export default function EditorManager({
 
   useEffect(() => {
     if (!isNewSession) return;
-    editorstore.newSession(nonce);
-    setContent("");
+    (async function () {
+      await editorstore.newSession(nonce);
+      setContent("");
+    })();
   }, [isNewSession, nonce]);
 
   useEffect(() => {
+    if (!noteId) return;
+
     (async function () {
       const content = await editorstore.get().getSessionContent();
       setContent(content?.data);
+      if (noteId && content) await db.attachments?.downloadImages(noteId);
     })();
-  }, [isPreviewMode]);
+  }, [noteId, isPreviewMode]);
 
   useEffect(() => {
     if (!isOldSession) return;
@@ -79,6 +90,10 @@ export default function EditorManager({
 
       let content = await editorstore.get().getSessionContent();
       setContent(content?.data);
+      // editorstore.set(
+      //   (state: any) => (state.session.state = SESSION_STATES.stale)
+      // );
+      if (noteId && content) await db.attachments?.downloadImages(noteId);
     })();
   }, [noteId, isOldSession]);
 
@@ -151,9 +166,42 @@ type EditorProps = {
 };
 function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
   const editor = useEditorInstance();
+
   useEffect(() => {
-    console.log("Rerendering editor.");
-  }, []);
+    if (!editor) return;
+
+    const event = AppEventManager.subscribe(
+      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+      ({ hash, loaded, total, type }: AttachmentProgress) => {
+        editor.sendAttachmentProgress(
+          hash,
+          type,
+          Math.round((loaded / total) * 100)
+        );
+      }
+    );
+
+    const mediaAttachmentDownloadedEvent = EV.subscribe(
+      EVENTS.mediaAttachmentDownloaded,
+      ({
+        groupId,
+        hash,
+        src,
+      }: {
+        groupId?: string;
+        hash: string;
+        src: string;
+      }) => {
+        if (groupId?.startsWith("monograph")) return;
+        editor.loadImage(hash, src);
+      }
+    );
+
+    return () => {
+      event.unsubscribe();
+      mediaAttachmentDownloadedEvent.unsubscribe();
+    };
+  }, [editor]);
 
   return (
     <>

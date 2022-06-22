@@ -10,4 +10,10 @@ export interface IEditor {
   undo: () => void;
   redo: () => void;
   attachFile: (file: Attachment) => void;
+  loadImage: (hash: string, src: string) => void;
+  sendAttachmentProgress: (
+    hash: string,
+    type: string,
+    progress: number
+  ) => void;
 }

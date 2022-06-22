@@ -77,7 +77,7 @@ function TipTap(props: TipTapProps) {
         return true;
       },
     },
-    [content, readonly, theme, onInsertAttachment, onDownloadAttachment]
+    [content, readonly, theme]
   );
 
   useEffect(() => {
@@ -89,44 +89,6 @@ function TipTap(props: TipTapProps) {
     const isEditorSearching = editor?.storage.searchreplace?.isSearching;
     if (isSearching && !isEditorSearching) toggleSearch();
   }, [toggleSearch, editor?.storage.searchreplace?.isSearching]);
-
-  useEffect(() => {
-    if (!editor) return;
-
-    const event = AppEventManager.subscribe(
-      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-      (progress: AttachmentProgress) => {
-        setTimeout(() =>
-          editor.commands.setAttachmentProgress({
-            hash: progress.hash,
-            type: progress.type,
-            progress: Math.round((progress.loaded / progress.total) * 100),
-          })
-        );
-      }
-    );
-
-    const mediaAttachmentDownloadedEvent = EV.subscribe(
-      EVENTS.mediaAttachmentDownloaded,
-      ({
-        groupId,
-        hash,
-        src,
-      }: {
-        groupId?: string;
-        hash: string;
-        src: string;
-      }) => {
-        console.log(src, hash);
-        if (groupId?.startsWith("monograph")) return;
-        setTimeout(() => editor?.commands?.updateImage({ hash, src }));
-      }
-    );
-    return () => {
-      event.unsubscribe();
-      mediaAttachmentDownloadedEvent.unsubscribe();
-    };
-  }, [editor]);
 
   return (
     <Flex sx={{ flex: 1, flexDirection: "column" }}>
@@ -184,5 +146,12 @@ function toIEditor(editor: Editor): IEditor {
         editor.commands.insertImage({ ...file, src: file.dataurl });
       } else editor.commands.insertAttachment(file);
     },
+    loadImage: (hash, src) => editor.commands.updateImage({ hash, src }),
+    sendAttachmentProgress: (hash, type, progress) =>
+      editor.commands.setAttachmentProgress({
+        hash,
+        type: type as any,
+        progress,
+      }),
   };
 }

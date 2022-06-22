@@ -32,11 +32,6 @@ function TitleBox(props) {
         fontFamily: "heading",
         fontSize: ["1.625em", "1.625em", "2.625em"],
         fontWeight: "heading",
-        border: "none",
-        resize: "none",
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") e.preventDefault();
       }}
       onChange={(e) => {
         setTitle(e.target.value);
