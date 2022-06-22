@@ -17,7 +17,7 @@ const SESSION_STATES = {
   opening: "opening",
 };
 
-const getDefaultSession = (sessionId = Date.now()) => {
+export const getDefaultSession = (sessionId = Date.now()) => {
   return {
     sessionType: "default",
     readonly: false,

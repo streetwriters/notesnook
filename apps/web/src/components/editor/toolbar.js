@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
-import tinymce from "tinymce/tinymce";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -10,14 +9,11 @@ import { showToast } from "../../utils/toast";
 import { AnimatedInput } from "../animated";
 import { showPublishView } from "../publish-view";
 import { db } from "../../common/db";
+import { useHistory, useSearch } from "./context";
 
-const undoRedoEvents = "Undo BeforeAddUndo AddUndo Redo ClearUndos TypingUndo";
 function Toolbar(props) {
-  const sessionState = useStore((store) => store.session.state);
   const sessionId = useStore((store) => store.session.id);
   const isLocked = useStore((store) => store.session.locked);
-  const [undoable, setUndoable] = useState(false);
-  const [redoable, setRedoable] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
@@ -29,6 +25,8 @@ function Toolbar(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const [isTitleVisible, setIsTitleVisible] = useState(false);
   const monographs = useMonographStore((store) => store.monographs);
+  const { canRedo, canUndo, redo, undo } = useHistory();
+  const { toggleSearch } = useSearch();
 
   const isNotePublished = useMemo(
     () => sessionId && db.monographs.isPublished(sessionId),
@@ -40,32 +38,17 @@ function Toolbar(props) {
     if (!editorScroll) return;
 
     function onScroll(e) {
-      // const headerOffset = document.querySelector(".editorTitle").scrollHeight;
-      // const hideOffset = headerOffset + 60;
-      // if (e.target.scrollTop > hideOffset && !isTitleVisible)
-      //   setIsTitleVisible(true);
-      // else if (e.target.scrollTop <= hideOffset && isTitleVisible)
-      //   setIsTitleVisible(false);
+      const hideOffset = document.querySelector(".editorTitle").scrollHeight;
+      if (e.target.scrollTop > hideOffset && !isTitleVisible)
+        setIsTitleVisible(e.target.scrollTop > hideOffset && !isTitleVisible);
+      else if (e.target.scrollTop <= hideOffset && isTitleVisible)
+        setIsTitleVisible(false);
     }
     editorScroll.addEventListener("scroll", onScroll);
     return () => {
       editorScroll.removeEventListener("scroll", onScroll);
     };
   }, [isTitleVisible]);
-
-  useEffect(() => {
-    function updateState() {
-      if (!tinymce.activeEditor) return;
-      setUndoable(tinymce.activeEditor.undoManager.hasUndo());
-      setRedoable(tinymce.activeEditor.undoManager.hasRedo());
-    }
-    tinymce.EditorManager.once("AddEditor", () => {
-      tinymce.activeEditor.on(undoRedoEvents, updateState);
-      tinymce.activeEditor.on("remove", () => {
-        tinymce.activeEditor.off(undoRedoEvents, updateState);
-      });
-    });
-  }, [sessionState]);
 
   const tools = useMemo(
     () => [
@@ -89,7 +72,6 @@ function Toolbar(props) {
         enabled: true,
         onClick: () => toggleNightMode(),
       },
-
       {
         title: isFocusMode ? "Normal mode" : "Focus mode",
         icon: isFocusMode ? Icon.NormalMode : Icon.FocusMode,
@@ -101,7 +83,7 @@ function Toolbar(props) {
             exitFullscreen(document);
             setIsFullscreen(false);
           }
-          if (tinymce.activeEditor) tinymce.activeEditor.focus();
+          // if (tinymce.activeEditor) tinymce.activeEditor.focus();
         },
       },
       {
@@ -120,18 +102,25 @@ function Toolbar(props) {
         },
       },
       {
+        title: "Search",
+        icon: Icon.Search,
+        enabled: true,
+        hidden: !sessionId,
+        onClick: () => toggleSearch(),
+      },
+      {
         title: "Undo",
         icon: Icon.Undo,
-        enabled: undoable,
+        enabled: canUndo,
         hidden: !sessionId,
-        onClick: () => tinymce.activeEditor.execCommand("Undo"),
+        onClick: () => undo(),
       },
       {
         title: "Redo",
         icon: Icon.Redo,
-        enabled: redoable,
+        enabled: canRedo,
         hidden: !sessionId,
-        onClick: () => tinymce.activeEditor.execCommand("Redo"),
+        onClick: () => redo(),
       },
       {
         title: "Properties",
@@ -142,15 +131,18 @@ function Toolbar(props) {
       },
     ],
     [
+      undo,
+      redo,
       isFullscreen,
-      redoable,
-      undoable,
+      canRedo,
+      canUndo,
       toggleFocusMode,
       toggleProperties,
       isFocusMode,
       theme,
       toggleNightMode,
       sessionId,
+      toggleSearch,
     ]
   );
 

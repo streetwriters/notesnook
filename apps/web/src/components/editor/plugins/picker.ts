@@ -14,21 +14,7 @@ const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
 type MimeType = string; //`${string}/${string}`;
 
-function register(editor: Editor) {
-  editor.ui.registry.addButton("attachment", {
-    icon: "attachment",
-    tooltip: "Attach a file",
-    onAction: () => insertAttachment(editor, "*/*"),
-  });
-
-  editor.ui.registry.addButton("image", {
-    icon: "image",
-    tooltip: "Insert image",
-    onAction: () => insertAttachment(editor, "image/*"),
-  });
-}
-
-async function insertAttachment(editor: Editor, type: MimeType) {
+export async function insertAttachment(type: MimeType = "*/*") {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
@@ -39,24 +25,18 @@ async function insertAttachment(editor: Editor, type: MimeType) {
   });
   if (!selectedFile) return;
 
-  await attachFile(editor, selectedFile);
+  return await attachFile(selectedFile);
 }
 
-export async function attachFile(editor: Editor, selectedFile: File) {
+export async function attachFile(selectedFile: File) {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
   }
   if (selectedFile.type.startsWith("image/")) {
-    const image = await pickImage(selectedFile);
-    if (!image) return;
-    //@ts-ignore
-    editor.execCommand("mceAttachImage", image);
+    return await pickImage(selectedFile);
   } else {
-    const file = await pickFile(selectedFile);
-    if (!file) return;
-    //@ts-ignore
-    editor.execCommand("mceAttachFile", file);
+    return await pickFile(selectedFile);
   }
 }
 
@@ -82,10 +62,6 @@ export async function reuploadAttachment(
     const file = await pickFile(selectedFile, options);
     if (!file) return;
   }
-}
-
-export function addPickerPlugin(tinymce: TinyMCE) {
-  tinymce.PluginManager.add("picker", register);
 }
 
 /**
@@ -176,7 +152,8 @@ function compressImage(file: File): Promise<CompressionResult> {
   });
 }
 
-type AttachmentProgress = {
+export type AttachmentProgress = {
+  hash: string;
   type: "encrypt" | "download" | "upload";
   total: number;
   loaded: number;

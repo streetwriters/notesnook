@@ -32,7 +32,7 @@ import "@streetwriters/tinymce-plugins/keyboardquirks";
 import "@streetwriters/tinymce-plugins/attachmentshandler";
 import "@streetwriters/tinymce-plugins/contenthandler";
 import "@streetwriters/tinymce-plugins/bettertable";
-import { addPickerPlugin, attachFile } from "./plugins/picker";
+import { attachFile } from "./plugins/picker";
 import "./plugins/icons";
 import "./plugins/attachmentshandler.css";
 import "@streetwriters/tinymce-plugins/blockescape";
@@ -249,7 +249,7 @@ function TinyMCE(props) {
           onInit && onInit(editor);
         },
         setup: (editor) => {
-          addPickerPlugin(global.tinymce);
+          //  addPickerPlugin(global.tinymce);
 
           function onTap(e) {
             if (
