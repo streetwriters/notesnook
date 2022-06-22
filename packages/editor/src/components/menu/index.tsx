@@ -26,10 +26,11 @@ export function Menu(props: MenuProps) {
   const onAction = useCallback(
     (e, item) => {
       e?.stopPropagation();
-      if (onClose) onClose();
+
       if (item.onClick) {
         item.onClick();
       }
+      if (onClose) onClose();
     },
     [onClose]
   );

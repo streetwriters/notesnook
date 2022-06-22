@@ -57,11 +57,9 @@ export class SelectionBasedNodeView<
     node: PMNode,
     editor: Editor,
     getPos: GetPosNode,
-    portalProviderAPI: PortalProviderAPI,
-    eventDispatcher: EventDispatcher,
     options: ReactNodeViewOptions<P>
   ) {
-    super(node, editor, getPos, portalProviderAPI, eventDispatcher, options);
+    super(node, editor, getPos, options);
 
     this.updatePos();
 
@@ -251,16 +249,9 @@ export function createSelectionBasedNodeView<
 ) {
   return ({ node, getPos, editor }: NodeViewRendererProps) => {
     const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
-    return new SelectionBasedNodeView(
-      node,
-      editor,
-      _getPos,
-      editor.storage.portalProviderAPI,
-      editor.storage.eventDispatcher,
-      {
-        ...options,
-        component,
-      }
-    ).init();
+    return new SelectionBasedNodeView(node, editor, _getPos, {
+      ...options,
+      component,
+    }).init();
   };
 }

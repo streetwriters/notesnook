@@ -207,6 +207,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       toggleCodeBlock:
         (attributes) =>
         ({ commands }) => {
+          console.log("TOGGLING!");
           return commands.toggleNode(this.name, "paragraph", attributes);
         },
       changeCodeBlockIndentation:

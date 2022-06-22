@@ -164,6 +164,7 @@ export var CodeBlock = Node.create({
             toggleCodeBlock: function (attributes) {
                 return function (_a) {
                     var commands = _a.commands;
+                    console.log("TOGGLING!");
                     return commands.toggleNode(_this.name, "paragraph", attributes);
                 };
             },

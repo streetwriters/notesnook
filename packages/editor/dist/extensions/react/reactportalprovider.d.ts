@@ -1,8 +1,6 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { EventDispatcher } from "./event-dispatcher";
-export declare type BasePortalProviderProps = {
-    render: (portalProviderAPI: PortalProviderAPI) => React.ReactChild | JSX.Element | null;
-};
+export declare type BasePortalProviderProps = PropsWithChildren<{}>;
 export declare type Portals = Map<HTMLElement, React.ReactChild>;
 export declare type PortalRendererState = {
     portals: Portals;
@@ -19,11 +17,12 @@ export declare class PortalProviderAPI extends EventDispatcher {
     forceUpdate(): void;
     remove(container: HTMLElement): void;
 }
+export declare function usePortalProvider(): PortalProviderAPI | undefined;
 export declare class PortalProvider extends React.Component<BasePortalProviderProps> {
     static displayName: string;
     portalProviderAPI: PortalProviderAPI;
     constructor(props: BasePortalProviderProps);
-    render(): JSX.Element | React.ReactChild | null;
+    render(): JSX.Element;
     componentDidUpdate(): void;
 }
 export declare class PortalRenderer extends React.Component<{

@@ -77,8 +77,6 @@ export function TableNodeView(editor: Editor) {
         node,
         editor,
         () => 0, // todo
-        editor.storage.portalProviderAPI,
-        editor.storage.eventDispatcher,
         {
           component: TableComponent,
           shouldUpdate: (prev, next) => {

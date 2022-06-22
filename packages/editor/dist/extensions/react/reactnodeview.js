@@ -38,15 +38,15 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { NodeSelection } from "prosemirror-state";
 import { ThemeProvider } from "emotion-theming";
 var ReactNodeView = /** @class */ (function () {
-    function ReactNodeView(node, editor, getPos, portalProviderAPI, eventDispatcher, options) {
+    function ReactNodeView(node, editor, getPos, options) {
         var _this = this;
         this.editor = editor;
         this.getPos = getPos;
-        this.portalProviderAPI = portalProviderAPI;
-        this.eventDispatcher = eventDispatcher;
         this.options = options;
         this.isDragging = false;
         this.handleRef = function (node) { return _this._handleRef(node); };
+        this.portalProviderAPI = editor.storage
+            .portalProviderAPI;
         this.node = node;
     }
     /**
@@ -84,6 +84,7 @@ var ReactNodeView = /** @class */ (function () {
     };
     ReactNodeView.prototype.renderReactComponent = function (component) {
         if (!this.domRef || !component || !this.portalProviderAPI) {
+            console.warn("Cannot render node view", this.editor.storage);
             return;
         }
         this.portalProviderAPI.render(component, this.domRef);
@@ -337,6 +338,6 @@ export function createNodeView(component, options) {
     return function (_a) {
         var node = _a.node, getPos = _a.getPos, editor = _a.editor;
         var _getPos = function () { return (typeof getPos === "boolean" ? -1 : getPos()); };
-        return new ReactNodeView(node, editor, _getPos, editor.storage.portalProviderAPI, editor.storage.eventDispatcher, __assign(__assign({}, options), { component: component })).init();
+        return new ReactNodeView(node, editor, _getPos, __assign(__assign({}, options), { component: component })).init();
     };
 }

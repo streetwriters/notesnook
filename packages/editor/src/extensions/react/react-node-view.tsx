@@ -22,15 +22,16 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   contentDOM: HTMLElement | undefined;
   node: PMNode;
   isDragging = false;
+  portalProviderAPI: PortalProviderAPI;
 
   constructor(
     node: PMNode,
     protected readonly editor: Editor,
     protected readonly getPos: GetPosNode,
-    protected readonly portalProviderAPI: PortalProviderAPI,
-    protected readonly eventDispatcher: EventDispatcher,
     protected readonly options: ReactNodeViewOptions<P>
   ) {
+    this.portalProviderAPI = editor.storage
+      .portalProviderAPI as PortalProviderAPI;
     this.node = node;
   }
 
@@ -76,6 +77,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     component: () => React.ReactElement<any> | null
   ) {
     if (!this.domRef || !component || !this.portalProviderAPI) {
+      console.warn("Cannot render node view", this.editor.storage);
       return;
     }
 
@@ -416,17 +418,10 @@ export function createNodeView<TProps extends ReactNodeViewProps>(
   return ({ node, getPos, editor }: NodeViewRendererProps) => {
     const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
 
-    return new ReactNodeView<TProps>(
-      node,
-      editor,
-      _getPos,
-      editor.storage.portalProviderAPI,
-      editor.storage.eventDispatcher,
-      {
-        ...options,
-        component,
-      }
-    ).init();
+    return new ReactNodeView<TProps>(node, editor, _getPos, {
+      ...options,
+      component,
+    }).init();
   };
 }
 

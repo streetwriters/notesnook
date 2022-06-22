@@ -81,6 +81,7 @@ export function TablePopup(props: TablePopupProps) {
           .fill(0)
           .map((_, index) => (
             <Box
+              key={index}
               data-index={index}
               height={cellSize || 15}
               sx={{

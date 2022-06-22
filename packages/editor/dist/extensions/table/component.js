@@ -53,7 +53,7 @@ export function TableNodeView(editor) {
         __extends(TableNode, _super);
         function TableNode(node, cellMinWidth) {
             var _this = _super.call(this, node, editor, function () { return 0; }, // todo
-            editor.storage.portalProviderAPI, editor.storage.eventDispatcher, {
+            {
                 component: TableComponent,
                 shouldUpdate: function (prev, next) {
                     return prev.type === next.type;

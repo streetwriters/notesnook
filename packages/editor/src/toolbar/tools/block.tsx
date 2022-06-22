@@ -24,7 +24,7 @@ import { ImageUploadPopup } from "../popups/image-upload";
 import { Button } from "../../components/button";
 
 export function InsertBlock(props: ToolProps) {
-  const buttonRef = useRef<HTMLButtonElement | null>();
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();

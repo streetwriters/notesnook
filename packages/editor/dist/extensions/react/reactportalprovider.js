@@ -13,6 +13,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -29,8 +40,8 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { Fragment as _Fragment, jsx as _jsx } from "react/jsx-runtime";
-import React from "react";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import React, { useContext } from "react";
 import { createPortal, unstable_renderSubtreeIntoContainer, unmountComponentAtNode, } from "react-dom";
 import { EventDispatcher } from "./event-dispatcher";
 var PortalProviderAPI = /** @class */ (function (_super) {
@@ -72,6 +83,10 @@ var PortalProviderAPI = /** @class */ (function (_super) {
     return PortalProviderAPI;
 }(EventDispatcher));
 export { PortalProviderAPI };
+var PortalProviderContext = React.createContext(undefined);
+export function usePortalProvider() {
+    return useContext(PortalProviderContext);
+}
 var PortalProvider = /** @class */ (function (_super) {
     __extends(PortalProvider, _super);
     function PortalProvider(props) {
@@ -80,7 +95,7 @@ var PortalProvider = /** @class */ (function (_super) {
         return _this;
     }
     PortalProvider.prototype.render = function () {
-        return this.props.render(this.portalProviderAPI);
+        return (_jsxs(PortalProviderContext.Provider, __assign({ value: this.portalProviderAPI }, { children: [this.props.children, _jsx(PortalRenderer, { portalProviderAPI: this.portalProviderAPI })] })));
     };
     PortalProvider.prototype.componentDidUpdate = function () {
         this.portalProviderAPI.forceUpdate();

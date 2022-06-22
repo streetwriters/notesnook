@@ -53,7 +53,7 @@ import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
 import { Link } from "./extensions/link";
-import { EventDispatcher, NodeViewSelectionNotifier, } from "./extensions/react";
+import { NodeViewSelectionNotifier, usePortalProvider, } from "./extensions/react";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
@@ -64,8 +64,9 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 var useTiptap = function (options, deps) {
     if (options === void 0) { options = {}; }
-    var theme = options.theme, onCreate = options.onCreate, onDownloadAttachment = options.onDownloadAttachment, onOpenAttachmentPicker = options.onOpenAttachmentPicker, portalProviderAPI = options.portalProviderAPI, restOptions = __rest(options, ["theme", "onCreate", "onDownloadAttachment", "onOpenAttachmentPicker", "portalProviderAPI"]);
-    var eventDispatcher = useMemo(function () { return new EventDispatcher(); }, []);
+    if (deps === void 0) { deps = []; }
+    var theme = options.theme, onDownloadAttachment = options.onDownloadAttachment, onOpenAttachmentPicker = options.onOpenAttachmentPicker, restOptions = __rest(options, ["theme", "onDownloadAttachment", "onOpenAttachmentPicker"]);
+    var PortalProviderAPI = usePortalProvider();
     var defaultOptions = useMemo(function () { return ({
         extensions: [
             NodeViewSelectionNotifier,
@@ -128,27 +129,15 @@ var useTiptap = function (options, deps) {
             OutlineList,
             ListItem,
         ],
-        onCreate: function (_a) {
+        onBeforeCreate: function (_a) {
             var editor = _a.editor;
             if (theme) {
                 editor.storage.theme = theme;
             }
-            if (portalProviderAPI)
-                editor.storage.portalProviderAPI = portalProviderAPI;
-            if (eventDispatcher)
-                editor.storage.eventDispatcher = eventDispatcher;
-            if (onCreate)
-                onCreate({ editor: editor });
+            editor.storage.portalProviderAPI = PortalProviderAPI;
         },
         injectCSS: false,
-    }); }, [
-        theme,
-        onCreate,
-        onDownloadAttachment,
-        onOpenAttachmentPicker,
-        portalProviderAPI,
-        eventDispatcher,
-    ]);
+    }); }, [theme, onDownloadAttachment, onOpenAttachmentPicker, PortalProviderAPI]);
     var editor = useEditor(__assign(__assign({}, defaultOptions), restOptions), deps);
     /**
      * Add editor to global for use in React Native.

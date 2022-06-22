@@ -2,21 +2,19 @@ import React from "react";
 import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
 import { Node as PMNode } from "prosemirror-model";
 import { PortalProviderAPI } from "./react-portal-provider";
-import { EventDispatcher } from "./event-dispatcher";
 import { ReactNodeViewProps, ReactNodeViewOptions, GetPosNode, ForwardRef, ContentDOM } from "./types";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
 export declare class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     protected readonly editor: Editor;
     protected readonly getPos: GetPosNode;
-    protected readonly portalProviderAPI: PortalProviderAPI;
-    protected readonly eventDispatcher: EventDispatcher;
     protected readonly options: ReactNodeViewOptions<P>;
     private domRef;
     private contentDOMWrapper?;
     contentDOM: HTMLElement | undefined;
     node: PMNode;
     isDragging: boolean;
-    constructor(node: PMNode, editor: Editor, getPos: GetPosNode, portalProviderAPI: PortalProviderAPI, eventDispatcher: EventDispatcher, options: ReactNodeViewOptions<P>);
+    portalProviderAPI: PortalProviderAPI;
+    constructor(node: PMNode, editor: Editor, getPos: GetPosNode, options: ReactNodeViewOptions<P>);
     /**
      * This method exists to move initialization logic out of the constructor,
      * so object can be initialized properly before calling render first time.

@@ -55,8 +55,8 @@ import { ThemeProvider } from "emotion-theming";
  */
 var SelectionBasedNodeView = /** @class */ (function (_super) {
     __extends(SelectionBasedNodeView, _super);
-    function SelectionBasedNodeView(node, editor, getPos, portalProviderAPI, eventDispatcher, options) {
-        var _this = _super.call(this, node, editor, getPos, portalProviderAPI, eventDispatcher, options) || this;
+    function SelectionBasedNodeView(node, editor, getPos, options) {
+        var _this = _super.call(this, node, editor, getPos, options) || this;
         _this.pos = -1;
         _this.isNodeInsideSelection = function (from, to, pos, posEnd) {
             var _a;
@@ -174,6 +174,6 @@ export function createSelectionBasedNodeView(component, options) {
     return function (_a) {
         var node = _a.node, getPos = _a.getPos, editor = _a.editor;
         var _getPos = function () { return (typeof getPos === "boolean" ? -1 : getPos()); };
-        return new SelectionBasedNodeView(node, editor, _getPos, editor.storage.portalProviderAPI, editor.storage.eventDispatcher, __assign(__assign({}, options), { component: component })).init();
+        return new SelectionBasedNodeView(node, editor, _getPos, __assign(__assign({}, options), { component: component })).init();
     };
 }

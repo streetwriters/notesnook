@@ -33,11 +33,11 @@ export function Menu(props) {
     var hoverTimeout = useRef();
     var onAction = useCallback(function (e, item) {
         e === null || e === void 0 ? void 0 : e.stopPropagation();
-        if (onClose)
-            onClose();
         if (item.onClick) {
             item.onClick();
         }
+        if (onClose)
+            onClose();
     }, [onClose]);
     var _b = useFocus(items, function (e) {
         var item = items[focusIndex];

@@ -37,7 +37,7 @@ import { showPopup } from "../../components/popup-presenter";
 import { ImageUploadPopup } from "../popups/image-upload";
 import { Button } from "../../components/button";
 export function InsertBlock(props) {
-    var buttonRef = useRef();
+    var buttonRef = useRef(null);
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var toolbarLocation = useToolbarLocation();
     var isMobile = useIsMobile();

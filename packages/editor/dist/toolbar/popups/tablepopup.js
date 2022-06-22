@@ -98,7 +98,7 @@ export function TablePopup(props) {
                             columns: cellLocation.column,
                             rows: cellLocation.row,
                         });
-                    } })); }) })), _jsxs(Flex, __assign({ sx: {
+                    } }, index)); }) })), _jsxs(Flex, __assign({ sx: {
                     display: ["flex", "none", "none"],
                     my: 1,
                     alignItems: "center",

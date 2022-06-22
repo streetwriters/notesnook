@@ -1,4 +1,4 @@
-import React from "react";
+import React, { PropsWithChildren, useContext } from "react";
 import {
   createPortal,
   unstable_renderSubtreeIntoContainer,
@@ -6,11 +6,7 @@ import {
 } from "react-dom";
 import { EventDispatcher } from "./event-dispatcher";
 
-export type BasePortalProviderProps = {
-  render: (
-    portalProviderAPI: PortalProviderAPI
-  ) => React.ReactChild | JSX.Element | null;
-};
+export type BasePortalProviderProps = PropsWithChildren<{}>;
 
 export type Portals = Map<HTMLElement, React.ReactChild>;
 
@@ -71,6 +67,12 @@ export class PortalProviderAPI extends EventDispatcher {
     }
   }
 }
+const PortalProviderContext = React.createContext<
+  PortalProviderAPI | undefined
+>(undefined);
+export function usePortalProvider() {
+  return useContext(PortalProviderContext);
+}
 
 export class PortalProvider extends React.Component<BasePortalProviderProps> {
   static displayName = "PortalProvider";
@@ -83,7 +85,12 @@ export class PortalProvider extends React.Component<BasePortalProviderProps> {
   }
 
   render() {
-    return this.props.render(this.portalProviderAPI);
+    return (
+      <PortalProviderContext.Provider value={this.portalProviderAPI}>
+        {this.props.children}
+        <PortalRenderer portalProviderAPI={this.portalProviderAPI} />
+      </PortalProviderContext.Provider>
+    );
   }
 
   componentDidUpdate() {

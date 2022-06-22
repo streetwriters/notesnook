@@ -4,7 +4,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import { EditorOptions, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
@@ -36,6 +36,7 @@ import {
   PortalProviderAPI,
   EventDispatcher,
   NodeViewSelectionNotifier,
+  usePortalProvider,
 } from "./extensions/react";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
@@ -47,21 +48,16 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 
 const useTiptap = (
-  options: Partial<
-    EditorOptions &
-      AttachmentOptions & { theme: Theme; portalProviderAPI: PortalProviderAPI }
-  > = {},
-  deps?: React.DependencyList
+  options: Partial<EditorOptions & AttachmentOptions & { theme: Theme }> = {},
+  deps: React.DependencyList = []
 ) => {
   const {
     theme,
-    onCreate,
     onDownloadAttachment,
     onOpenAttachmentPicker,
-    portalProviderAPI,
     ...restOptions
   } = options;
-  const eventDispatcher = useMemo(() => new EventDispatcher(), []);
+  const PortalProviderAPI = usePortalProvider();
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
@@ -127,27 +123,15 @@ const useTiptap = (
         OutlineList,
         ListItem,
       ],
-      onCreate: ({ editor }) => {
+      onBeforeCreate: ({ editor }) => {
         if (theme) {
           editor.storage.theme = theme;
         }
-
-        if (portalProviderAPI)
-          editor.storage.portalProviderAPI = portalProviderAPI;
-        if (eventDispatcher) editor.storage.eventDispatcher = eventDispatcher;
-
-        if (onCreate) onCreate({ editor });
+        editor.storage.portalProviderAPI = PortalProviderAPI;
       },
       injectCSS: false,
     }),
-    [
-      theme,
-      onCreate,
-      onDownloadAttachment,
-      onOpenAttachmentPicker,
-      portalProviderAPI,
-      eventDispatcher,
-    ]
+    [theme, onDownloadAttachment, onOpenAttachmentPicker, PortalProviderAPI]
   );
 
   const editor = useEditor(

@@ -1,7 +1,5 @@
 import React from "react";
 import { Node as PMNode } from "prosemirror-model";
-import { PortalProviderAPI } from "./react-portal-provider";
-import { EventDispatcher } from "./event-dispatcher";
 import { ReactNodeViewOptions, GetPosNode, SelectionBasedReactNodeViewProps, ForwardRef } from "./types";
 import { ReactNodeView } from "./react-node-view";
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
@@ -33,7 +31,7 @@ export declare class SelectionBasedNodeView<P extends SelectionBasedReactNodeVie
     private selectionChangeState;
     pos: number;
     posEnd: number | undefined;
-    constructor(node: PMNode, editor: Editor, getPos: GetPosNode, portalProviderAPI: PortalProviderAPI, eventDispatcher: EventDispatcher, options: ReactNodeViewOptions<P>);
+    constructor(node: PMNode, editor: Editor, getPos: GetPosNode, options: ReactNodeViewOptions<P>);
     render(props?: P, forwardRef?: ForwardRef): React.ReactElement<any> | null;
     /**
      * Update current node's start and end positions.
