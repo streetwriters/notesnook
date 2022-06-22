@@ -6,6 +6,7 @@ export declare type ActionSheetPresenterProps = {
     onClose?: () => void;
     blocking?: boolean;
     focusOnRender?: boolean;
+    draggable?: boolean;
     title?: string;
 };
 export declare function ActionSheetPresenter(props: PropsWithChildren<ActionSheetPresenterProps>): JSX.Element | null;

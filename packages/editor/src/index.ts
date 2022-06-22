@@ -56,7 +56,6 @@ const useTiptap = (
   const {
     theme,
     onCreate,
-    onUpdate,
     onDownloadAttachment,
     onOpenAttachmentPicker,
     portalProviderAPI,
@@ -132,25 +131,18 @@ const useTiptap = (
         if (theme) {
           editor.storage.theme = theme;
         }
+
         if (portalProviderAPI)
           editor.storage.portalProviderAPI = portalProviderAPI;
         if (eventDispatcher) editor.storage.eventDispatcher = eventDispatcher;
 
         if (onCreate) onCreate({ editor });
       },
-      onUpdate: ({ editor, transaction }) => {
-        // a custom extension to transaction that indicates whether
-        // this is an actual update or not.
-        if ((transaction as any).skipUpdate) return;
-
-        onUpdate?.({ editor, transaction });
-      },
       injectCSS: false,
     }),
     [
       theme,
       onCreate,
-      onUpdate,
       onDownloadAttachment,
       onOpenAttachmentPicker,
       portalProviderAPI,

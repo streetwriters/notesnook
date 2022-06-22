@@ -61,6 +61,7 @@ export type ActionSheetPresenterProps = {
   onClose?: () => void;
   blocking?: boolean;
   focusOnRender?: boolean;
+  draggable?: boolean;
   title?: string;
 };
 
@@ -74,6 +75,7 @@ export function ActionSheetPresenter(
     onClose,
     blocking = true,
     focusOnRender = true,
+    draggable = true,
     children,
   } = props;
   const theme: Theme = useTheme();
@@ -125,22 +127,24 @@ export function ActionSheetPresenter(
             //@ts-ignore
             style={{
               ...props.style,
-              // position: blocking ? "initial" : "fixed",
+              position: "sticky",
               zIndex: 1000,
-              backgroundColor: "unset",
+              backgroundColor: !blocking ? "transparent" : "unset",
             }}
             tabIndex={-1}
           >
-            <motion.div
-              style={{
-                height: "100%",
-                width: "100%",
-                opacity,
-                position: "absolute",
-                backgroundColor: blocking ? "var(--overlay)" : "transparent",
-              }}
-              tabIndex={-1}
-            />
+            {blocking && (
+              <motion.div
+                style={{
+                  height: "100%",
+                  width: "100%",
+                  opacity,
+                  position: "absolute",
+                  backgroundColor: "var(--overlay)",
+                }}
+                tabIndex={-1}
+              />
+            )}
             {contentEl}
           </Box>
         );
@@ -158,7 +162,7 @@ export function ActionSheetPresenter(
             width: "auto",
             height: "fit-content",
             position: "fixed",
-            backgroundColor: "transparent",
+            backgroundColor: undefined,
             padding: 0,
             zIndex: 0,
             outline: 0,
@@ -182,52 +186,51 @@ export function ActionSheetPresenter(
           flexDirection: "column",
         }}
       >
-        <AnimatedFlex
-          drag="y"
-          // @ts-ignore
-          onDrag={(_, { delta }: PanInfo) => {
-            y.set(Math.max(y.get() + delta.y, 0));
-          }}
-          // @ts-ignore
-          onDragEnd={(_, { velocity }: PanInfo) => {
-            if (velocity.y >= 500) {
-              onClose?.();
-              return;
-            }
-            const sheetEl = contentRef.current as HTMLDivElement;
-            const contentHeight = sheetEl.offsetHeight;
-            const threshold = 30;
-            const closingHeight = (contentHeight * threshold) / 100;
-
-            if (y.get() >= closingHeight) {
-              onBeforeClose();
-            } else {
-              animation.start({ transition: TRANSITION, y: 0 });
-            }
-          }}
-          onAnimationComplete={() => {
-            console.log("ED!");
-          }}
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragMomentum={false}
-          dragElastic={false}
-          sx={{
-            bg: "transparent",
-            alignItems: "center",
-            justifyContent: "center",
-            p: 2,
-          }}
-        >
-          <Box
-            id="pill"
-            sx={{
-              backgroundColor: "hover",
-              width: 60,
-              height: 8,
-              borderRadius: 100,
+        {draggable && (
+          <AnimatedFlex
+            drag="y"
+            // @ts-ignore
+            onDrag={(_, { delta }: PanInfo) => {
+              y.set(Math.max(y.get() + delta.y, 0));
             }}
-          />
-        </AnimatedFlex>
+            // @ts-ignore
+            onDragEnd={(_, { velocity }: PanInfo) => {
+              if (velocity.y >= 500) {
+                onClose?.();
+                return;
+              }
+              const sheetEl = contentRef.current as HTMLDivElement;
+              const contentHeight = sheetEl.offsetHeight;
+              const threshold = 30;
+              const closingHeight = (contentHeight * threshold) / 100;
+
+              if (y.get() >= closingHeight) {
+                onBeforeClose();
+              } else {
+                animation.start({ transition: TRANSITION, y: 0 });
+              }
+            }}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragMomentum={false}
+            dragElastic={false}
+            sx={{
+              bg: "transparent",
+              alignItems: "center",
+              justifyContent: "center",
+              p: 2,
+            }}
+          >
+            <Box
+              id="pill"
+              sx={{
+                backgroundColor: "hover",
+                width: 60,
+                height: 8,
+                borderRadius: 100,
+              }}
+            />
+          </AnimatedFlex>
+        )}
         <ContentContainer items={items} title={title} onClose={onClose}>
           {children}
         </ContentContainer>
@@ -252,18 +255,20 @@ function ContentContainer(props: PropsWithChildren<ContentContainerProps>) {
 
   return (
     <Flex sx={{ flexDirection: "column" }}>
-      <Flex id="header" sx={{ alignItems: "center", mx: 0, mb: 1 }}>
-        {canGoBack && (
-          <Button variant={"icon"} sx={{ p: 1, ml: 1 }} onClick={goBack}>
-            <Icon path={Icons.arrowLeft} size={"big"} />
-          </Button>
-        )}
-        {current?.title && (
-          <Text variant={"title"} sx={{ ml: 1, fontSize: "title" }}>
-            {current?.title}
-          </Text>
-        )}
-      </Flex>
+      {canGoBack || current?.title ? (
+        <Flex id="header" sx={{ alignItems: "center", mx: 0, mb: 1 }}>
+          {canGoBack && (
+            <Button variant={"icon"} sx={{ p: 1, ml: 1 }} onClick={goBack}>
+              <Icon path={Icons.arrowLeft} size={"big"} />
+            </Button>
+          )}
+          {current?.title && (
+            <Text variant={"title"} sx={{ ml: 1, fontSize: "title" }}>
+              {current?.title}
+            </Text>
+          )}
+        </Flex>
+      ) : null}
       {children
         ? children
         : current?.items?.map((item) => {

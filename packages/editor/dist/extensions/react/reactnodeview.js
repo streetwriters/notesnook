@@ -83,7 +83,7 @@ var ReactNodeView = /** @class */ (function () {
         return this;
     };
     ReactNodeView.prototype.renderReactComponent = function (component) {
-        if (!this.domRef || !component) {
+        if (!this.domRef || !component || !this.portalProviderAPI) {
             return;
         }
         this.portalProviderAPI.render(component, this.domRef);
@@ -322,7 +322,7 @@ var ReactNodeView = /** @class */ (function () {
         configurable: true
     });
     ReactNodeView.prototype.destroy = function () {
-        if (!this.domRef) {
+        if (!this.domRef || !this.portalProviderAPI) {
             return;
         }
         this.portalProviderAPI.remove(this.domRef);

@@ -11,7 +11,7 @@ import { Icon } from "./icon";
 export type ToolButtonProps = ButtonProps & {
   icon: IconNames;
   iconColor?: keyof SchemeColors;
-  iconSize?: number;
+  iconSize?: keyof Theme["iconSizes"] | number;
   toggled: boolean;
   buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined>;
   variant?: ToolButtonVariant;
@@ -54,7 +54,7 @@ export function ToolButton(props: ToolButtonProps) {
       <Icon
         path={Icons[icon]}
         color={iconColor || "icon"}
-        size={iconSize || variant === "small" ? "medium" : "big"}
+        size={iconSize || (variant === "small" ? "medium" : "big")}
       />
     </Button>
   );

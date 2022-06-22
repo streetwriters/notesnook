@@ -121,7 +121,11 @@ function _PopupPresenter(props) {
             return (_jsx(Box, __assign({}, props, { 
                 //@ts-ignore
                 style: __assign(__assign({}, props.style), { position: !blocking ? "initial" : "fixed", zIndex: 1000, backgroundColor: !blocking ? "transparent" : "unset" }) }, { children: contentEl })));
-        }, contentElement: function (props, children) { return (_jsx(Box, __assign({}, props, { style: {}, onMouseDown: function (e) { return e.preventDefault(); }, sx: {
+        }, contentElement: function (props, children) { return (_jsx(Box, __assign({}, props, { style: {}, 
+            // TODO onMouseDown={(e) => {
+            //   console.log(e);
+            // }}
+            sx: {
                 top: 0,
                 left: 0,
                 right: 0,

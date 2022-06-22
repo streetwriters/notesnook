@@ -75,7 +75,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private renderReactComponent(
     component: () => React.ReactElement<any> | null
   ) {
-    if (!this.domRef || !component) {
+    if (!this.domRef || !component || !this.portalProviderAPI) {
       return;
     }
 
@@ -398,7 +398,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   }
 
   destroy() {
-    if (!this.domRef) {
+    if (!this.domRef || !this.portalProviderAPI) {
       return;
     }
 

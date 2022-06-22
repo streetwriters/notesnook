@@ -184,7 +184,9 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         <Box
           {...props}
           style={{}}
-          onMouseDown={(e) => e.preventDefault()}
+          // TODO onMouseDown={(e) => {
+          //   console.log(e);
+          // }}
           sx={{
             top: 0,
             left: 0,

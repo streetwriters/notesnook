@@ -123,7 +123,8 @@ export var AttachmentNode = Node.create({
                         }
                         finally { if (e_1) throw e_1.error; }
                     }
-                    tr.skipUpdate = true;
+                    tr.setMeta("preventUpdate", true);
+                    tr.setMeta("addToHistory", false);
                     if (dispatch)
                         dispatch(tr);
                     return true;

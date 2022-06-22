@@ -22,5 +22,5 @@ export function SearchReplaceFloatingMenu(props) {
             location: "below",
             align: "end",
             yOffset: 5,
-        } }, { children: _jsx(SearchReplacePopup, { editor: editor }) })));
+        }, blocking: false, focusOnRender: false, draggable: false }, { children: _jsx(SearchReplacePopup, { editor: editor }) })));
 }

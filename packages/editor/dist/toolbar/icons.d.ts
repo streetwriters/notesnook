@@ -59,6 +59,7 @@ export declare const Icons: {
     nextMatch: string;
     replaceOne: string;
     replaceAll: string;
+    replace: string;
     caseSensitive: string;
     wholeWord: string;
     regex: string;

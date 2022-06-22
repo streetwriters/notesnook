@@ -28,8 +28,8 @@ export declare type SearchStorage = SearchSettings & {
     searchTerm: string;
     selectedIndex: number;
     isSearching: boolean;
-    selectedText: string;
-    results: Result[];
+    selectedText?: string;
+    results?: Result[];
 };
 export declare const SearchReplace: Extension<SearchOptions, SearchStorage>;
 export {};

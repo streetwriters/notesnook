@@ -154,6 +154,7 @@ export var SearchReplace = Extension.create({
                     _this.storage.enableRegex = (options === null || options === void 0 ? void 0 : options.enableRegex) || false;
                     _this.storage.matchCase = (options === null || options === void 0 ? void 0 : options.matchCase) || false;
                     _this.storage.matchWholeWord = (options === null || options === void 0 ? void 0 : options.matchWholeWord) || false;
+                    _this.storage.results = [];
                     updateView(state, dispatch);
                     return true;
                 };
@@ -162,7 +163,7 @@ export var SearchReplace = Extension.create({
                 return function (_a) {
                     var chain = _a.chain;
                     var _b = _this.storage, selectedIndex = _b.selectedIndex, results = _b.results;
-                    if (results.length <= 0)
+                    if (!results || results.length <= 0)
                         return false;
                     var nextIndex = selectedIndex + 1;
                     if (isNaN(nextIndex) || nextIndex >= results.length)
@@ -182,7 +183,7 @@ export var SearchReplace = Extension.create({
                 return function (_a) {
                     var chain = _a.chain;
                     var _b = _this.storage, selectedIndex = _b.selectedIndex, results = _b.results;
-                    if (results.length <= 0)
+                    if (!results || results.length <= 0)
                         return false;
                     var prevIndex = selectedIndex - 1;
                     if (isNaN(prevIndex) || prevIndex < 0)
@@ -201,7 +202,7 @@ export var SearchReplace = Extension.create({
                 return function (_a) {
                     var commands = _a.commands, tr = _a.tr, dispatch = _a.dispatch;
                     var _b = _this.storage, selectedIndex = _b.selectedIndex, results = _b.results;
-                    if (!dispatch || results.length <= 0)
+                    if (!dispatch || !results || results.length <= 0)
                         return false;
                     var index = selectedIndex === undefined ? 0 : selectedIndex;
                     var _c = results[index], from = _c.from, to = _c.to;
@@ -225,7 +226,9 @@ export var SearchReplace = Extension.create({
                     var state = _a.state, tr = _a.tr, dispatch = _a.dispatch;
                     if (!dispatch)
                         return false;
-                    var _b = _this.storage, selectedIndex = _b.selectedIndex, results = _b.results;
+                    var results = _this.storage.results;
+                    if (!dispatch || !results || results.length <= 0)
+                        return false;
                     dispatch(replaceAll(term, results, tr));
                     return true;
                 };

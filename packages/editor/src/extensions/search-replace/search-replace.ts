@@ -42,8 +42,8 @@ export type SearchStorage = SearchSettings & {
   searchTerm: string;
   selectedIndex: number;
   isSearching: boolean;
-  selectedText: string;
-  results: Result[];
+  selectedText?: string;
+  results?: Result[];
 };
 
 interface TextNodesWithPosition {
@@ -187,6 +187,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           this.storage.enableRegex = options?.enableRegex || false;
           this.storage.matchCase = options?.matchCase || false;
           this.storage.matchWholeWord = options?.matchWholeWord || false;
+          this.storage.results = [];
           updateView(state, dispatch);
           return true;
         },
@@ -194,7 +195,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         () =>
         ({ chain }) => {
           const { selectedIndex, results } = this.storage;
-          if (results.length <= 0) return false;
+          if (!results || results.length <= 0) return false;
 
           let nextIndex = selectedIndex + 1;
           if (isNaN(nextIndex) || nextIndex >= results.length) nextIndex = 0;
@@ -213,7 +214,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         () =>
         ({ chain }) => {
           const { selectedIndex, results } = this.storage;
-          if (results.length <= 0) return false;
+          if (!results || results.length <= 0) return false;
 
           let prevIndex = selectedIndex - 1;
           if (isNaN(prevIndex) || prevIndex < 0) prevIndex = results.length - 1;
@@ -232,7 +233,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         ({ commands, tr, dispatch }) => {
           const { selectedIndex, results } = this.storage;
 
-          if (!dispatch || results.length <= 0) return false;
+          if (!dispatch || !results || results.length <= 0) return false;
 
           const index = selectedIndex === undefined ? 0 : selectedIndex;
           const { from, to } = results[index];
@@ -262,7 +263,9 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         (term) =>
         ({ state, tr, dispatch }) => {
           if (!dispatch) return false;
-          const { selectedIndex, results } = this.storage;
+          const { results } = this.storage;
+          if (!dispatch || !results || results.length <= 0) return false;
+
           dispatch(replaceAll(term, results, tr));
           return true;
         },

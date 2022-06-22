@@ -131,7 +131,8 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
               progress,
             });
           }
-          (tr as any).skipUpdate = true;
+          tr.setMeta("preventUpdate", true);
+          tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
         },

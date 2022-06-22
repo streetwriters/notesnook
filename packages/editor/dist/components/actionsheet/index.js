@@ -68,7 +68,7 @@ function useHistory(initial) {
 }
 export function ActionSheetPresenter(props) {
     var _a;
-    var isOpen = props.isOpen, title = props.title, items = props.items, onClose = props.onClose, _b = props.blocking, blocking = _b === void 0 ? true : _b, _c = props.focusOnRender, focusOnRender = _c === void 0 ? true : _c, children = props.children;
+    var isOpen = props.isOpen, title = props.title, items = props.items, onClose = props.onClose, _b = props.blocking, blocking = _b === void 0 ? true : _b, _c = props.focusOnRender, focusOnRender = _c === void 0 ? true : _c, _d = props.draggable, draggable = _d === void 0 ? true : _d, children = props.children;
     var theme = useTheme();
     var contentRef = useRef();
     var focusedElement = useRef();
@@ -93,15 +93,13 @@ export function ActionSheetPresenter(props) {
         }, overlayElement: function (props, contentEl) {
             return (_jsxs(Box, __assign({}, props, { 
                 //@ts-ignore
-                style: __assign(__assign({}, props.style), { 
-                    // position: blocking ? "initial" : "fixed",
-                    zIndex: 1000, backgroundColor: "unset" }), tabIndex: -1 }, { children: [_jsx(motion.div, { style: {
+                style: __assign(__assign({}, props.style), { position: "sticky", zIndex: 1000, backgroundColor: !blocking ? "transparent" : "unset" }), tabIndex: -1 }, { children: [blocking && (_jsx(motion.div, { style: {
                             height: "100%",
                             width: "100%",
                             opacity: opacity,
                             position: "absolute",
-                            backgroundColor: blocking ? "var(--overlay)" : "transparent",
-                        }, tabIndex: -1 }), contentEl] })));
+                            backgroundColor: "var(--overlay)",
+                        }, tabIndex: -1 })), contentEl] })));
         }, contentElement: function (props, children) { return (_jsx(Box, __assign({}, props, { style: {}, sx: {
                 // top: 0,
                 left: 0,
@@ -111,7 +109,7 @@ export function ActionSheetPresenter(props) {
                 width: "auto",
                 height: "fit-content",
                 position: "fixed",
-                backgroundColor: "transparent",
+                backgroundColor: undefined,
                 padding: 0,
                 zIndex: 0,
                 outline: 0,
@@ -123,7 +121,7 @@ export function ActionSheetPresenter(props) {
                 boxShadow: theme.shadows.menu,
                 flex: 1,
                 flexDirection: "column",
-            } }, { children: [_jsx(AnimatedFlex, __assign({ drag: "y", 
+            } }, { children: [draggable && (_jsx(AnimatedFlex, __assign({ drag: "y", 
                     // @ts-ignore
                     onDrag: function (_, _a) {
                         var delta = _a.delta;
@@ -146,8 +144,6 @@ export function ActionSheetPresenter(props) {
                         else {
                             animation.start({ transition: TRANSITION, y: 0 });
                         }
-                    }, onAnimationComplete: function () {
-                        console.log("ED!");
                     }, dragConstraints: { top: 0, bottom: 0 }, dragMomentum: false, dragElastic: false, sx: {
                         bg: "transparent",
                         alignItems: "center",
@@ -158,7 +154,7 @@ export function ActionSheetPresenter(props) {
                             width: 60,
                             height: 8,
                             borderRadius: 100,
-                        } }) })), _jsx(ContentContainer, __assign({ items: items, title: title, onClose: onClose }, { children: children }))] })) })));
+                        } }) }))), _jsx(ContentContainer, __assign({ items: items, title: title, onClose: onClose }, { children: children }))] })) })));
 }
 function ContentContainer(props) {
     var _a;
@@ -167,7 +163,7 @@ function ContentContainer(props) {
         title: title,
         items: items,
     }), current = _b.current, goBack = _b.goBack, canGoBack = _b.canGoBack, navigate = _b.navigate;
-    return (_jsxs(Flex, __assign({ sx: { flexDirection: "column" } }, { children: [_jsxs(Flex, __assign({ id: "header", sx: { alignItems: "center", mx: 0, mb: 1 } }, { children: [canGoBack && (_jsx(Button, __assign({ variant: "icon", sx: { p: 1, ml: 1 }, onClick: goBack }, { children: _jsx(Icon, { path: Icons.arrowLeft, size: "big" }) }))), (current === null || current === void 0 ? void 0 : current.title) && (_jsx(Text, __assign({ variant: "title", sx: { ml: 1, fontSize: "title" } }, { children: current === null || current === void 0 ? void 0 : current.title })))] })), children
+    return (_jsxs(Flex, __assign({ sx: { flexDirection: "column" } }, { children: [canGoBack || (current === null || current === void 0 ? void 0 : current.title) ? (_jsxs(Flex, __assign({ id: "header", sx: { alignItems: "center", mx: 0, mb: 1 } }, { children: [canGoBack && (_jsx(Button, __assign({ variant: "icon", sx: { p: 1, ml: 1 }, onClick: goBack }, { children: _jsx(Icon, { path: Icons.arrowLeft, size: "big" }) }))), (current === null || current === void 0 ? void 0 : current.title) && (_jsx(Text, __assign({ variant: "title", sx: { ml: 1, fontSize: "title" } }, { children: current === null || current === void 0 ? void 0 : current.title })))] }))) : null, children
                 ? children
                 : (_a = current === null || current === void 0 ? void 0 : current.items) === null || _a === void 0 ? void 0 : _a.map(function (item) {
                     switch (item.type) {

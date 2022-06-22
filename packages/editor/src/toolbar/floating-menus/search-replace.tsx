@@ -25,6 +25,9 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
         align: "end",
         yOffset: 5,
       }}
+      blocking={false}
+      focusOnRender={false}
+      draggable={false}
     >
       <SearchReplacePopup editor={editor} />
     </ResponsivePresenter>
