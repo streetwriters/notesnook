@@ -26,6 +26,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 import { jsx as _jsx } from "react/jsx-runtime";
 import { Dropdown } from "../components/dropdown";
 import { useToolbarLocation } from "../stores/toolbar-store";
+import { useMemo } from "react";
 var defaultLevels = [1, 2, 3, 4, 5, 6];
 export function Headings(props) {
     var editor = props.editor;
@@ -33,7 +34,8 @@ export function Headings(props) {
     var currentHeadingLevel = defaultLevels.find(function (level) {
         return editor.isActive("heading", { level: level });
     });
-    return (_jsx(Dropdown, { selectedItem: currentHeadingLevel ? "Heading ".concat(currentHeadingLevel) : "Paragraph", items: toMenuItems(editor, toolbarLocation, currentHeadingLevel), menuWidth: 130 }));
+    var items = useMemo(function () { return toMenuItems(editor, toolbarLocation, currentHeadingLevel); }, [currentHeadingLevel]);
+    return (_jsx(Dropdown, { selectedItem: currentHeadingLevel ? "Heading ".concat(currentHeadingLevel) : "Paragraph", items: items, menuWidth: 130 }));
 }
 function toMenuItems(editor, toolbarLocation, currentHeadingLevel) {
     var menuItems = defaultLevels.map(function (level) { return ({
@@ -42,11 +44,8 @@ function toMenuItems(editor, toolbarLocation, currentHeadingLevel) {
         title: toolbarLocation === "bottom" ? "H".concat(level) : "Heading ".concat(level),
         isChecked: level === currentHeadingLevel,
         onClick: function () {
-            return editor
-                .chain()
-                .focus()
-                .setHeading({ level: level })
-                .run();
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().updateAttributes("textStyle", { fontSize: null, fontStyle: null }).setHeading({ level: level }).run();
         },
     }); });
     var paragraph = {
@@ -54,7 +53,7 @@ function toMenuItems(editor, toolbarLocation, currentHeadingLevel) {
         type: "button",
         title: "Paragraph",
         isChecked: !currentHeadingLevel,
-        onClick: function () { return editor.chain().focus().setParagraph().run(); },
+        onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setParagraph().run(); },
     };
     return __spreadArray([paragraph], __read(menuItems), false);
 }

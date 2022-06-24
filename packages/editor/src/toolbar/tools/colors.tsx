@@ -1,5 +1,5 @@
 import { Editor } from "@tiptap/core";
-import { useState } from "react";
+import React, { useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { config } from "../../utils/config";
@@ -10,12 +10,13 @@ import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
 
 type ColorToolProps = ToolProps & {
-  onColorChange: (editor: Editor, color?: string) => void;
-  getActiveColor: (editor: Editor) => string;
+  onColorChange: (color?: string) => void;
+  getActiveColor: () => string;
   title: string;
   cacheKey: string;
 };
-export function ColorTool(props: ColorToolProps) {
+// TODO test rerendering
+function _ColorTool(props: ColorToolProps) {
   const {
     editor,
     onColorChange,
@@ -24,7 +25,7 @@ export function ColorTool(props: ColorToolProps) {
     cacheKey,
     ...toolProps
   } = props;
-  const activeColor = getActiveColor(editor) || config.get(cacheKey);
+  const activeColor = getActiveColor() || config.get(cacheKey);
   const tColor = tinycolor(activeColor);
   const isBottom = useToolbarLocation() === "bottom";
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -42,7 +43,7 @@ export function ColorTool(props: ColorToolProps) {
       }}
       onOpen={() => setIsOpen((s) => !s)}
       toggled={isOpen}
-      onClick={() => onColorChange(editor, activeColor)}
+      onClick={() => onColorChange(activeColor)}
     >
       <PopupWrapper
         isOpen={isOpen}
@@ -61,11 +62,11 @@ export function ColorTool(props: ColorToolProps) {
           <ColorPicker
             color={activeColor}
             onClear={() => {
-              onColorChange(editor);
+              onColorChange();
               config.set(cacheKey, null);
             }}
             onChange={(color) => {
-              onColorChange(editor, color);
+              onColorChange(color);
               config.set(cacheKey, color);
             }}
             onClose={close}
@@ -77,33 +78,38 @@ export function ColorTool(props: ColorToolProps) {
   );
 }
 
+export const ColorTool = React.memo(_ColorTool, () => true);
+
 export function Highlight(props: ToolProps) {
+  const { editor } = props;
+
   return (
     <ColorTool
       {...props}
       cacheKey="highlight"
-      getActiveColor={(editor) => editor.getAttributes("highlight").color}
+      getActiveColor={() => editor.current?.getAttributes("highlight").color}
       title={"Background color"}
-      onColorChange={(editor, color) =>
+      onColorChange={(color) =>
         color
-          ? editor.chain().focus().toggleHighlight({ color }).run()
-          : editor.chain().focus().unsetHighlight().run()
+          ? editor.current?.chain().focus().toggleHighlight({ color }).run()
+          : editor.current?.chain().focus().unsetHighlight().run()
       }
     />
   );
 }
 
 export function TextColor(props: ToolProps) {
+  const { editor } = props;
   return (
     <ColorTool
       {...props}
       cacheKey={"textColor"}
-      getActiveColor={(editor) => editor.getAttributes("textStyle").color}
+      getActiveColor={() => editor.current?.getAttributes("textStyle").color}
       title="Text color"
-      onColorChange={(editor, color) =>
+      onColorChange={(color) =>
         color
-          ? editor.chain().focus().setColor(color).run()
-          : editor.chain().focus().unsetColor().run()
+          ? editor.current?.chain().focus().setColor(color).run()
+          : editor.current?.chain().focus().unsetColor().run()
       }
     />
   );

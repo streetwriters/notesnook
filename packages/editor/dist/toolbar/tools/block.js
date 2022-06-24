@@ -32,11 +32,12 @@ import { Icon } from "../components/icon";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import { ResponsivePresenter, } from "../../components/responsive";
+import { ResponsivePresenter } from "../../components/responsive";
 import { showPopup } from "../../components/popup-presenter";
 import { ImageUploadPopup } from "../popups/image-upload";
 import { Button } from "../../components/button";
 export function InsertBlock(props) {
+    var editor = props.editor;
     var buttonRef = useRef(null);
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var toolbarLocation = useToolbarLocation();
@@ -52,7 +53,7 @@ export function InsertBlock(props) {
             isMobile ? embedMobile(editor) : embedDesktop(editor),
             table(editor),
         ];
-    }, [editor, isMobile]);
+    }, [isMobile]);
     return (_jsxs(_Fragment, { children: [_jsx(Button, __assign({ ref: buttonRef, sx: {
                     p: 1,
                     m: 0,
@@ -77,7 +78,7 @@ var horizontalRule = function (editor) { return ({
     title: "Horizontal rule",
     icon: "horizontalRule",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("horizontalRule"),
-    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().setHorizontalRule().run(); },
+    onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setHorizontalRule().run(); },
 }); };
 var codeblock = function (editor) { return ({
     key: "codeblock",
@@ -85,7 +86,7 @@ var codeblock = function (editor) { return ({
     title: "Code block",
     icon: "codeblock",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("codeBlock"),
-    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().toggleCodeBlock().run(); },
+    onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleCodeBlock().run(); },
 }); };
 var blockquote = function (editor) { return ({
     key: "blockquote",
@@ -93,7 +94,7 @@ var blockquote = function (editor) { return ({
     title: "Quote",
     icon: "blockquote",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("blockQuote"),
-    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().toggleBlockquote().run(); },
+    onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleBlockquote().run(); },
 }); };
 var image = function (editor, isMobile) { return ({
     key: "image",
@@ -108,9 +109,7 @@ var image = function (editor, isMobile) { return ({
                 type: "button",
                 title: "Upload from disk",
                 icon: "upload",
-                onClick: function () {
-                    return editor === null || editor === void 0 ? void 0 : editor.chain().focus().openAttachmentPicker("image").run();
-                },
+                onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().openAttachmentPicker("image").run(); },
             },
             isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor),
         ],
@@ -153,9 +152,10 @@ var embedMobile = function (editor) { return ({
                 component: function (_a) {
                     var onClick = _a.onClick;
                     return (_jsx(EmbedPopup, { title: "Insert embed", onClose: function (embed) {
+                            var _a;
                             if (!embed)
                                 return onClick === null || onClick === void 0 ? void 0 : onClick();
-                            editor === null || editor === void 0 ? void 0 : editor.chain().insertEmbed(embed).run();
+                            (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().insertEmbed(embed).run();
                             onClick === null || onClick === void 0 ? void 0 : onClick();
                         } }));
                 },
@@ -174,9 +174,10 @@ var embedDesktop = function (editor) { return ({
         showPopup({
             theme: editor.storage.theme,
             popup: function (hide) { return (_jsx(EmbedPopup, { title: "Insert embed", onClose: function (embed) {
+                    var _a;
                     if (!embed)
                         return hide();
-                    editor === null || editor === void 0 ? void 0 : editor.chain().insertEmbed(embed).run();
+                    (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().insertEmbed(embed).run();
                     hide();
                 } })); },
         });
@@ -188,7 +189,7 @@ var attachment = function (editor) { return ({
     title: "Attachment",
     icon: "attachment",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("attachment"),
-    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().openAttachmentPicker("file").run(); },
+    onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().openAttachmentPicker("file").run(); },
 }); };
 var tasklist = function (editor) { return ({
     key: "tasklist",
@@ -196,7 +197,7 @@ var tasklist = function (editor) { return ({
     title: "Task list",
     icon: "checkbox",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("taskList"),
-    onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().toggleTaskList().run(); },
+    onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleTaskList().run(); },
 }); };
 var uploadImageFromURLMobile = function (editor) { return ({
     key: "upload-from-url",
@@ -212,7 +213,8 @@ var uploadImageFromURLMobile = function (editor) { return ({
                 component: function (_a) {
                     var onClick = _a.onClick;
                     return (_jsx(ImageUploadPopup, { onInsert: function (image) {
-                            editor === null || editor === void 0 ? void 0 : editor.commands.insertImage(image);
+                            var _a;
+                            (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertImage(image).run();
                             onClick === null || onClick === void 0 ? void 0 : onClick();
                         }, onClose: function () {
                             onClick === null || onClick === void 0 ? void 0 : onClick();
@@ -233,7 +235,8 @@ var uploadImageFromURL = function (editor) { return ({
         showPopup({
             theme: editor.storage.theme,
             popup: function (hide) { return (_jsx(ImageUploadPopup, { onInsert: function (image) {
-                    editor === null || editor === void 0 ? void 0 : editor.chain().focus().insertImage(image).run();
+                    var _a;
+                    (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertImage(image).run();
                     hide();
                 }, onClose: hide })); },
         });

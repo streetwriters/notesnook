@@ -4,6 +4,7 @@ export declare const Icons: {
     underline: string;
     strikethrough: string;
     code: string;
+    codeRemove: string;
     alignCenter: string;
     alignLeft: string;
     alignRight: string;
@@ -21,6 +22,8 @@ export declare const Icons: {
     highlight: string;
     textColor: string;
     link: string;
+    linkRemove: string;
+    linkEdit: string;
     url: string;
     image: string;
     imageSettings: string;

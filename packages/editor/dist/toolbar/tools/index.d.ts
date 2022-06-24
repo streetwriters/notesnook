@@ -1,6 +1,6 @@
 import React from "react";
 import { ToolProps } from "../types";
-import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link } from "./inline";
+import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link, LinkRemove, CodeRemove } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
@@ -19,10 +19,12 @@ declare const tools: {
     underline: typeof Underline;
     strikethrough: typeof Strikethrough;
     code: typeof Code;
+    codeRemove: typeof CodeRemove;
     subscript: typeof Subscript;
     superscript: typeof Superscript;
     clearformatting: typeof ClearFormatting;
     link: typeof Link;
+    linkRemove: typeof LinkRemove;
     insertBlock: typeof InsertBlock;
     numberedList: typeof NumberedList;
     bulletList: typeof BulletList;

@@ -44,25 +44,30 @@ export function EmbedSettings(props) {
 export function EmbedAlignLeft(props) {
     var editor = props.editor;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () {
-            return editor.chain().focus().setEmbedAlignment({ align: "left" }).run();
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setEmbedAlignment({ align: "left" }).run();
         } })));
 }
 export function EmbedAlignRight(props) {
     var editor = props.editor;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () {
-            return editor.chain().focus().setEmbedAlignment({ align: "right" }).run();
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setEmbedAlignment({ align: "right" }).run();
         } })));
 }
 export function EmbedAlignCenter(props) {
     var editor = props.editor;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () {
-            return editor.chain().focus().setEmbedAlignment({ align: "center" }).run();
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setEmbedAlignment({ align: "center" }).run();
         } })));
 }
+// TODO: stop re-rendering
 export function EmbedProperties(props) {
     var editor = props.editor;
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var buttonRef = useRef();
+    // TODO: improve perf by deferring this until user opens the popup
     var embedNode = useMemo(function () { return findSelectedNode(editor, "embed"); }, []);
     var embed = ((embedNode === null || embedNode === void 0 ? void 0 : embedNode.attrs) || {});
     return (_jsxs(_Fragment, { children: [_jsx(ToolButton, __assign({ buttonRef: buttonRef, toggled: isOpen }, props, { onClick: function () { return setIsOpen(function (s) { return !s; }); } })), _jsx(ResponsivePresenter, __assign({ isOpen: isOpen, desktop: "menu", mobile: "sheet", onClose: function () { return setIsOpen(false); }, blocking: true, focusOnRender: false, position: {

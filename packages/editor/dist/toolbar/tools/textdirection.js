@@ -24,7 +24,7 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
 function TextDirectionTool(props) {
     var editor = props.editor, direction = props.direction, toolProps = __rest(props, ["editor", "direction"]);
-    return (_jsx(ToolButton, __assign({}, toolProps, { onClick: function () { return editor.chain().focus().setTextDirection(direction).run(); }, toggled: editor.isActive({ textDirection: direction }) })));
+    return (_jsx(ToolButton, __assign({}, toolProps, { onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextDirection(direction).run(); }, toggled: editor.isActive({ textDirection: direction }) })));
 }
 export function RightToLeft(props) {
     return _jsx(TextDirectionTool, __assign({ direction: "rtl" }, props));

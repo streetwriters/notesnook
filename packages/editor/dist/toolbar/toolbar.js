@@ -26,7 +26,15 @@ export function Toolbar(props) {
         setToolbarLocation(location);
     }, [isMobile, location]);
     var tools = [
-        ["insertBlock", "tableSettings", "imageSettings"],
+        [
+            "insertBlock",
+            "tableSettings",
+            "imageSettings",
+            "embedSettings",
+            "attachmentSettings",
+            "linkRemove",
+            "codeRemove",
+        ],
         [
             "bold",
             "italic",

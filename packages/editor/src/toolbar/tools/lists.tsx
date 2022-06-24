@@ -2,32 +2,31 @@ import { ToolProps } from "../types";
 import { Editor } from "@tiptap/core";
 import { Box, Button, Flex } from "rebass";
 import { IconNames } from "../icons";
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { SplitButton } from "../components/split-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
 import { PopupWrapper } from "../../components/popup-presenter";
+import React from "react";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];
   title: string;
   type: TListStyleTypes;
 };
-type ListOptions<TListStyleTypes> = {
+
+type ListToolProps<TListStyleTypes> = ToolProps & {
+  isActive: boolean;
   icon: IconNames;
   type: "bulletList" | "orderedList";
-  onClick: (editor: Editor) => void;
+  onClick: () => void;
   subTypes: ListSubType<TListStyleTypes>[];
 };
 
-type ListToolProps<TListStyleTypes> = ToolProps & {
-  options: ListOptions<TListStyleTypes>;
-};
-function ListTool<TListStyleTypes extends string>(
+function _ListTool<TListStyleTypes extends string>(
   props: ListToolProps<TListStyleTypes>
 ) {
-  const { editor, options, ...toolProps } = props;
-  const isActive = editor.isActive(options.type);
+  const { editor, onClick, isActive, subTypes, type, ...toolProps } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
   const [isOpen, setIsOpen] = useState(false);
@@ -37,7 +36,7 @@ function ListTool<TListStyleTypes extends string>(
     <SplitButton
       {...toolProps}
       buttonRef={buttonRef}
-      onClick={() => options.onClick(editor)}
+      onClick={onClick}
       toggled={isActive || isOpen}
       sx={{ mr: 0 }}
       onOpen={() => setIsOpen((s) => !s)}
@@ -55,26 +54,32 @@ function ListTool<TListStyleTypes extends string>(
           location: isBottom ? "top" : "below",
           yOffset: isBottom ? 10 : 5,
         }}
+        onClosed={() => setIsOpen(false)}
         renderPopup={() => (
           <Box
-            sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", p: 1 }}
+            sx={{
+              bg: "background",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              p: 1,
+            }}
           >
-            {options.subTypes.map((item) => (
+            {subTypes.map((item) => (
               <Button
                 key={item.title}
                 variant={"menuitem"}
                 sx={{ width: 80 }}
                 onClick={() => {
-                  let chain = editor.chain().focus();
+                  let chain = editor.current?.chain().focus();
+                  if (!chain) return;
 
                   if (!isActive) {
-                    if (options.type === "bulletList")
-                      chain = chain.toggleBulletList();
+                    if (type === "bulletList") chain = chain.toggleBulletList();
                     else chain = chain.toggleOrderedList();
                   }
 
                   return chain
-                    .updateAttributes(options.type, { listType: item.type })
+                    .updateAttributes(type, { listType: item.type })
                     .run();
                 }}
               >
@@ -88,6 +93,10 @@ function ListTool<TListStyleTypes extends string>(
   );
 }
 
+const ListTool = React.memo(_ListTool, (prev, next) => {
+  return prev.isActive === next.isActive;
+});
+
 type NumberedListStyleTypes =
   | "lower-roman"
   | "upper-roman"
@@ -97,43 +106,60 @@ type NumberedListStyleTypes =
   | "decimal";
 
 export function NumberedList(props: ToolProps) {
-  const options: ListOptions<NumberedListStyleTypes> = {
-    type: "orderedList",
-    icon: "numberedList",
-    onClick: (editor) => editor.chain().focus().toggleOrderedList().run(),
-    subTypes: [
-      { type: "decimal", title: "Decimal", items: ["1", "2", "3"] },
-      { type: "upper-alpha", title: "Upper alpha", items: ["A", "B", "C"] },
-      { type: "lower-alpha", title: "Lower alpha", items: ["a", "b", "c"] },
-      {
-        type: "upper-roman",
-        title: "Upper Roman",
-        items: ["I", "II", "III"],
-      },
-      {
-        type: "lower-roman",
-        title: "Lower Roman",
-        items: ["i", "ii", "iii"],
-      },
-      { type: "lower-greek", title: "Lower Greek", items: ["α", "β", "γ"] },
-    ],
-  };
-  return <ListTool {...props} options={options} />;
+  const { editor } = props;
+
+  const onClick = useCallback(
+    () => editor.current?.chain().focus().toggleOrderedList().run(),
+    []
+  );
+
+  return (
+    <ListTool
+      {...props}
+      type="orderedList"
+      isActive={editor.isActive("orderedList")}
+      onClick={onClick}
+      subTypes={[
+        { type: "decimal", title: "Decimal", items: ["1", "2", "3"] },
+        { type: "upper-alpha", title: "Upper alpha", items: ["A", "B", "C"] },
+        { type: "lower-alpha", title: "Lower alpha", items: ["a", "b", "c"] },
+        {
+          type: "upper-roman",
+          title: "Upper Roman",
+          items: ["I", "II", "III"],
+        },
+        {
+          type: "lower-roman",
+          title: "Lower Roman",
+          items: ["i", "ii", "iii"],
+        },
+        { type: "lower-greek", title: "Lower Greek", items: ["α", "β", "γ"] },
+      ]}
+    />
+  );
 }
 
 type BulletListStyleTypes = "circle" | "square" | "disc";
 export function BulletList(props: ToolProps) {
-  const options: ListOptions<BulletListStyleTypes> = {
-    type: "bulletList",
-    icon: "bulletList",
-    onClick: (editor) => editor.chain().focus().toggleOrderedList().run(),
-    subTypes: [
-      { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
-      { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
-      { type: "square", title: "Lower alpha", items: ["a", "b", "c"] },
-    ],
-  };
-  return <ListTool {...props} options={options} />;
+  const { editor } = props;
+  const onClick = useCallback(
+    () => editor.current?.chain().focus().toggleOrderedList().run(),
+    []
+  );
+
+  return (
+    <ListTool
+      {...props}
+      type="bulletList"
+      onClick={onClick}
+      isActive={editor.isActive("bulletList")}
+      subTypes={[
+        { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
+        { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
+        { type: "square", title: "Lower alpha", items: ["a", "b", "c"] },
+      ]}
+    />
+  );
 }
 
 type ListThumbnailProps = { listStyleType: string };

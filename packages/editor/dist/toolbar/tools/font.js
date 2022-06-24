@@ -16,27 +16,27 @@ var __read = (this && this.__read) || function (o, n) {
 };
 import { jsx as _jsx } from "react/jsx-runtime";
 import { Dropdown } from "../components/dropdown";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter";
-var defaultFontSizes = [
-    8, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 60, 72, 100,
-];
+import { useRefValue } from "../../hooks/use-ref-value";
 export function FontSize(props) {
     var editor = props.editor;
-    var _a = editor.getAttributes("textStyle").fontSize, fontSize = _a === void 0 ? "16px" : _a;
-    var fontSizeAsNumber = parseInt(fontSize.replace("px", ""));
+    var _fontSize = editor.getAttributes("textStyle").fontSize;
+    var fontSize = _fontSize || "16px";
+    var fontSizeAsNumber = useRefValue(parseInt(fontSize.replace("px", "")));
     var decreaseFontSize = useCallback(function () {
-        return Math.max(8, fontSizeAsNumber - 1);
-    }, [fontSizeAsNumber]);
+        return Math.max(8, fontSizeAsNumber.current - 1);
+    }, []);
+    var increaseFontSize = useCallback(function () {
+        return Math.min(120, fontSizeAsNumber.current + 1);
+    }, []);
     return (_jsx(Counter, { title: "font size", onDecrease: function () {
-            return editor.chain().focus().setFontSize("".concat(decreaseFontSize(), "px")).run();
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setFontSize("".concat(decreaseFontSize(), "px")).run();
         }, onIncrease: function () {
-            return editor
-                .chain()
-                .focus()
-                .setFontSize("".concat(fontSizeAsNumber + 1, "px"))
-                .run();
-        }, onReset: function () { return editor.chain().focus().setFontSize("16px").run(); }, value: fontSize }));
+            var _a;
+            (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setFontSize("".concat(increaseFontSize(), "px")).run();
+        }, onReset: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setFontSize("16px").run(); }, value: fontSize }));
 }
 var fontFamilies = {
     System: "Open Sans",
@@ -51,7 +51,8 @@ export function FontFamily(props) {
         var _b = __read(_a, 2), key = _b[0], value = _b[1];
         return editor.isActive("textStyle", { fontFamily: value });
     })) === null || _a === void 0 ? void 0 : _a.map(function (a) { return a; })) === null || _b === void 0 ? void 0 : _b.at(0)) || "System";
-    return (_jsx(Dropdown, { selectedItem: currentFontFamily, items: toMenuItems(editor, currentFontFamily), menuWidth: 130 }));
+    var items = useMemo(function () { return toMenuItems(editor, currentFontFamily); }, [currentFontFamily]);
+    return (_jsx(Dropdown, { selectedItem: currentFontFamily, items: items, menuWidth: 130 }));
 }
 function toMenuItems(editor, currentFontFamily) {
     var menuItems = [];
@@ -62,7 +63,7 @@ function toMenuItems(editor, currentFontFamily) {
             type: "button",
             title: key,
             isChecked: key === currentFontFamily,
-            onClick: function () { return editor.chain().focus().setFontFamily(value).run(); },
+            onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setFontFamily(value).run(); },
         });
     };
     for (var key in fontFamilies) {

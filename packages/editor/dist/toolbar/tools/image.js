@@ -53,25 +53,29 @@ export function ImageSettings(props) {
 export function ImageAlignLeft(props) {
     var editor = props.editor;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () {
-            return editor.chain().focus().setImageAlignment({ align: "left" }).run();
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setImageAlignment({ align: "left" }).run();
         } })));
 }
 export function ImageAlignRight(props) {
     var editor = props.editor;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () {
-            return editor.chain().focus().setImageAlignment({ align: "right" }).run();
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setImageAlignment({ align: "right" }).run();
         } })));
 }
 export function ImageAlignCenter(props) {
     var editor = props.editor;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () {
-            return editor.chain().focus().setImageAlignment({ align: "center" }).run();
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setImageAlignment({ align: "center" }).run();
         } })));
 }
 export function ImageProperties(props) {
     var editor = props.editor;
     var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
     var buttonRef = useRef();
+    // TODO: defer until user opens the popup
     var image = useMemo(function () { return findSelectedNode(editor, "image"); }, []);
     var _b = ((image === null || image === void 0 ? void 0 : image.attrs) ||
         {}), float = _b.float, align = _b.align, width = _b.width, height = _b.height;

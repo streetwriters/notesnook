@@ -16,46 +16,52 @@ export type ToolButtonProps = ButtonProps & {
   buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined>;
   variant?: ToolButtonVariant;
 };
-export function ToolButton(props: ToolButtonProps) {
-  const {
-    id,
-    icon,
-    iconSize,
-    iconColor,
-    toggled,
-    sx,
-    buttonRef,
-    variant = "normal",
-    ...buttonProps
-  } = props;
+export const ToolButton = React.memo(
+  function ToolButton(props: ToolButtonProps) {
+    const {
+      id,
+      icon,
+      iconSize,
+      iconColor,
+      toggled,
+      sx,
+      buttonRef,
+      variant = "normal",
+      ...buttonProps
+    } = props;
+    console.log("rerendering", props.title);
 
-  return (
-    <Button
-      ref={buttonRef}
-      tabIndex={-1}
-      id={`tool-${id || icon}`}
-      sx={{
-        flexShrink: 0,
-        p: variant === "small" ? "small" : 1,
-        borderRadius: variant === "small" ? "small" : "default",
-        m: 0,
-        bg: toggled ? "hover" : "transparent",
-        mr: variant === "small" ? 0 : 1,
-        ":hover": { bg: ["transparent", "hover"] },
-        ":active": { bg: "hover" },
-        ":last-of-type": {
-          mr: 0,
-        },
-        ...sx,
-      }}
-      onMouseDown={(e) => e.preventDefault()}
-      {...buttonProps}
-    >
-      <Icon
-        path={Icons[icon]}
-        color={iconColor || "icon"}
-        size={iconSize || (variant === "small" ? "medium" : "big")}
-      />
-    </Button>
-  );
-}
+    return (
+      <Button
+        ref={buttonRef}
+        tabIndex={-1}
+        id={`tool-${id || icon}`}
+        sx={{
+          flexShrink: 0,
+          p: variant === "small" ? "small" : 1,
+          borderRadius: variant === "small" ? "small" : "default",
+          m: 0,
+          bg: toggled ? "hover" : "transparent",
+          mr: variant === "small" ? 0 : 1,
+          ":hover": { bg: ["transparent", "hover"] },
+          ":active": { bg: "hover" },
+          ":last-of-type": {
+            mr: 0,
+          },
+          ...sx,
+        }}
+        onMouseDown={(e) => e.preventDefault()}
+        {...buttonProps}
+      >
+        <Icon
+          path={Icons[icon]}
+          color={iconColor || "icon"}
+          size={iconSize || (variant === "small" ? "medium" : "big")}
+        />
+      </Button>
+    );
+  },
+  (prev, next) => {
+    return prev.toggled === next.toggled;
+  }
+);

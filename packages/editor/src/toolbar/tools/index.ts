@@ -10,6 +10,8 @@ import {
   Superscript,
   ClearFormatting,
   Link,
+  LinkRemove,
+  CodeRemove,
 } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
@@ -68,10 +70,12 @@ const tools = {
   underline: Underline,
   strikethrough: Strikethrough,
   code: Code,
+  codeRemove: CodeRemove,
   subscript: Subscript,
   superscript: Superscript,
   clearformatting: ClearFormatting,
   link: Link,
+  linkRemove: LinkRemove,
   insertBlock: InsertBlock,
   numberedList: NumberedList,
   bulletList: BulletList,

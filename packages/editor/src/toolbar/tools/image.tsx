@@ -47,7 +47,11 @@ export function ImageAlignLeft(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.chain().focus().setImageAlignment({ align: "left" }).run()
+        editor.current
+          ?.chain()
+          .focus()
+          .setImageAlignment({ align: "left" })
+          .run()
       }
     />
   );
@@ -60,7 +64,11 @@ export function ImageAlignRight(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.chain().focus().setImageAlignment({ align: "right" }).run()
+        editor.current
+          ?.chain()
+          .focus()
+          .setImageAlignment({ align: "right" })
+          .run()
       }
     />
   );
@@ -73,7 +81,11 @@ export function ImageAlignCenter(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.chain().focus().setImageAlignment({ align: "center" }).run()
+        editor.current
+          ?.chain()
+          .focus()
+          .setImageAlignment({ align: "center" })
+          .run()
       }
     />
   );
@@ -84,6 +96,7 @@ export function ImageProperties(props: ToolProps) {
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>();
 
+  // TODO: defer until user opens the popup
   const image = useMemo(() => findSelectedNode(editor, "image"), []);
   const { float, align, width, height } = (image?.attrs ||
     {}) as ImageAlignmentOptions & ImageSizeOptions;

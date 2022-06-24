@@ -12,6 +12,7 @@ export type ToolbarGroupProps = FlexProps & {
 };
 export function ToolbarGroup(props: ToolbarGroupProps) {
   const { tools, editor, ...flexProps } = props;
+
   return (
     <Flex className="toolbar-group" {...flexProps}>
       {tools.map((toolId) => {

@@ -1,29 +1,19 @@
 import { ToolProps } from "../types";
-import { Editor } from "@tiptap/core";
-import { ToolButton } from "../components/tool-button";
-import { ToolId } from ".";
-import { IconNames, Icons } from "../icons";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Dropdown } from "../components/dropdown";
+import { Editor } from "../../types";
+import { Icons } from "../icons";
+import { useMemo, useRef, useState } from "react";
 import { Icon } from "../components/icon";
-import { Box, Flex, Text } from "rebass";
-import { Popup } from "../components/popup";
 import { EmbedPopup } from "../popups/embed-popup";
 import { TablePopup } from "../popups/table-popup";
 import { MenuItem } from "../../components/menu/types";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import {
-  DesktopOnly,
-  MobileOnly,
-  ResponsivePresenter,
-} from "../../components/responsive";
-import { ActionSheetPresenter } from "../../components/action-sheet";
-import { getToolbarElement } from "../utils/dom";
+import { ResponsivePresenter } from "../../components/responsive";
 import { showPopup } from "../../components/popup-presenter";
 import { ImageUploadPopup } from "../popups/image-upload";
 import { Button } from "../../components/button";
 
 export function InsertBlock(props: ToolProps) {
+  const { editor } = props;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
@@ -40,7 +30,7 @@ export function InsertBlock(props: ToolProps) {
       isMobile ? embedMobile(editor) : embedDesktop(editor),
       table(editor),
     ];
-  }, [editor, isMobile]);
+  }, [isMobile]);
 
   return (
     <>
@@ -82,34 +72,34 @@ export function InsertBlock(props: ToolProps) {
   );
 }
 
-const horizontalRule = (editor: Editor | null): MenuItem => ({
+const horizontalRule = (editor: Editor): MenuItem => ({
   key: "hr",
   type: "button",
   title: "Horizontal rule",
   icon: "horizontalRule",
   isChecked: editor?.isActive("horizontalRule"),
-  onClick: () => editor?.chain().focus().setHorizontalRule().run(),
+  onClick: () => editor.current?.chain().focus().setHorizontalRule().run(),
 });
 
-const codeblock = (editor: Editor | null): MenuItem => ({
+const codeblock = (editor: Editor): MenuItem => ({
   key: "codeblock",
   type: "button",
   title: "Code block",
   icon: "codeblock",
   isChecked: editor?.isActive("codeBlock"),
-  onClick: () => editor?.chain().focus().toggleCodeBlock().run(),
+  onClick: () => editor.current?.chain().focus().toggleCodeBlock().run(),
 });
 
-const blockquote = (editor: Editor | null): MenuItem => ({
+const blockquote = (editor: Editor): MenuItem => ({
   key: "blockquote",
   type: "button",
   title: "Quote",
   icon: "blockquote",
   isChecked: editor?.isActive("blockQuote"),
-  onClick: () => editor?.chain().focus().toggleBlockquote().run(),
+  onClick: () => editor.current?.chain().focus().toggleBlockquote().run(),
 });
 
-const image = (editor: Editor | null, isMobile: boolean): MenuItem => ({
+const image = (editor: Editor, isMobile: boolean): MenuItem => ({
   key: "image",
   type: "button",
   title: "Image",
@@ -123,14 +113,14 @@ const image = (editor: Editor | null, isMobile: boolean): MenuItem => ({
         title: "Upload from disk",
         icon: "upload",
         onClick: () =>
-          editor?.chain().focus().openAttachmentPicker("image").run(),
+          editor.current?.chain().focus().openAttachmentPicker("image").run(),
       },
       isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor),
     ],
   },
 });
 
-const table = (editor: Editor | null): MenuItem => ({
+const table = (editor: Editor): MenuItem => ({
   key: "table",
   type: "button",
   title: "Table",
@@ -161,7 +151,7 @@ const table = (editor: Editor | null): MenuItem => ({
   },
 });
 
-const embedMobile = (editor: Editor | null): MenuItem => ({
+const embedMobile = (editor: Editor): MenuItem => ({
   key: "embed",
   type: "button",
   title: "Embed",
@@ -178,7 +168,7 @@ const embedMobile = (editor: Editor | null): MenuItem => ({
               title="Insert embed"
               onClose={(embed) => {
                 if (!embed) return onClick?.();
-                editor?.chain().insertEmbed(embed).run();
+                editor.current?.chain().insertEmbed(embed).run();
                 onClick?.();
               }}
             />
@@ -189,7 +179,7 @@ const embedMobile = (editor: Editor | null): MenuItem => ({
   },
 });
 
-const embedDesktop = (editor: Editor | null): MenuItem => ({
+const embedDesktop = (editor: Editor): MenuItem => ({
   key: "embed",
   type: "button",
   title: "Embed",
@@ -203,7 +193,7 @@ const embedDesktop = (editor: Editor | null): MenuItem => ({
           title="Insert embed"
           onClose={(embed) => {
             if (!embed) return hide();
-            editor?.chain().insertEmbed(embed).run();
+            editor.current?.chain().insertEmbed(embed).run();
             hide();
           }}
         />
@@ -212,25 +202,26 @@ const embedDesktop = (editor: Editor | null): MenuItem => ({
   },
 });
 
-const attachment = (editor: Editor | null): MenuItem => ({
+const attachment = (editor: Editor): MenuItem => ({
   key: "attachment",
   type: "button",
   title: "Attachment",
   icon: "attachment",
   isChecked: editor?.isActive("attachment"),
-  onClick: () => editor?.chain().focus().openAttachmentPicker("file").run(),
+  onClick: () =>
+    editor.current?.chain().focus().openAttachmentPicker("file").run(),
 });
 
-const tasklist = (editor: Editor | null): MenuItem => ({
+const tasklist = (editor: Editor): MenuItem => ({
   key: "tasklist",
   type: "button",
   title: "Task list",
   icon: "checkbox",
   isChecked: editor?.isActive("taskList"),
-  onClick: () => editor?.chain().focus().toggleTaskList().run(),
+  onClick: () => editor.current?.chain().focus().toggleTaskList().run(),
 });
 
-const uploadImageFromURLMobile = (editor: Editor | null): MenuItem => ({
+const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
   key: "upload-from-url",
   type: "button",
   title: "Attach from URL",
@@ -244,7 +235,7 @@ const uploadImageFromURLMobile = (editor: Editor | null): MenuItem => ({
         component: ({ onClick }) => (
           <ImageUploadPopup
             onInsert={(image) => {
-              editor?.commands.insertImage(image);
+              editor.current?.chain().focus().insertImage(image).run();
               onClick?.();
             }}
             onClose={() => {
@@ -257,7 +248,7 @@ const uploadImageFromURLMobile = (editor: Editor | null): MenuItem => ({
   },
 });
 
-const uploadImageFromURL = (editor: Editor | null): MenuItem => ({
+const uploadImageFromURL = (editor: Editor): MenuItem => ({
   key: "upload-from-url",
   type: "button",
   title: "Attach from URL",
@@ -269,7 +260,7 @@ const uploadImageFromURL = (editor: Editor | null): MenuItem => ({
       popup: (hide) => (
         <ImageUploadPopup
           onInsert={(image) => {
-            editor?.chain().focus().insertImage(image).run();
+            editor.current?.chain().focus().insertImage(image).run();
             hide();
           }}
           onClose={hide}

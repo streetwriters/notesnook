@@ -24,12 +24,13 @@ export function AttachmentSettings(props) {
 export function DownloadAttachment(props) {
     var editor = props.editor;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () {
+            var _a;
             var attachmentNode = findSelectedNode(editor, "attachment");
             var attachment = ((attachmentNode === null || attachmentNode === void 0 ? void 0 : attachmentNode.attrs) || {});
-            editor === null || editor === void 0 ? void 0 : editor.chain().focus().downloadAttachment(attachment).run();
+            (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().downloadAttachment(attachment).run();
         } })));
 }
 export function RemoveAttachment(props) {
     var editor = props.editor;
-    return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () { return editor === null || editor === void 0 ? void 0 : editor.chain().focus().removeAttachment().run(); } })));
+    return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().removeAttachment().run(); } })));
 }

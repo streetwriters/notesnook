@@ -4,7 +4,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import { EditorOptions, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
@@ -41,6 +41,11 @@ import {
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
+import { Editor } from "./types";
+
+// export class Editor extends TiptapEditor {
+//   get instance(): TiptapEditor {}
+// }
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -140,12 +145,18 @@ const useTiptap = (
       ...restOptions,
     },
     deps
-  );
+  ) as Editor | null;
 
-  /**
-   * Add editor to global for use in React Native.
-   */
-  global.editor = editor;
+  const editorRef = useRef(editor);
+  useEffect(() => {
+    editorRef.current = editor;
+
+    if (editor && !editor.current)
+      Object.defineProperty(editor, "current", {
+        get: () => editorRef.current,
+      });
+  }, [editor]);
+
   return editor;
 };
 

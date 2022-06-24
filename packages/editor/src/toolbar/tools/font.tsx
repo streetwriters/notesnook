@@ -1,36 +1,43 @@
 import { ToolProps } from "../types";
+import { Editor } from "../../types";
 import { Dropdown } from "../components/dropdown";
 import { MenuItem } from "../../components/menu/types";
-import { Editor } from "@tiptap/core";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Counter } from "../components/counter";
+import { useRefValue } from "../../hooks/use-ref-value";
 
-const defaultFontSizes = [
-  8, 12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 60, 72, 100,
-];
 export function FontSize(props: ToolProps) {
   const { editor } = props;
-  const { fontSize = "16px" } = editor.getAttributes("textStyle");
-  const fontSizeAsNumber = parseInt(fontSize.replace("px", ""));
+  const { fontSize: _fontSize } = editor.getAttributes("textStyle");
+  const fontSize = _fontSize || "16px";
+  const fontSizeAsNumber = useRefValue(parseInt(fontSize.replace("px", "")));
 
   const decreaseFontSize = useCallback(() => {
-    return Math.max(8, fontSizeAsNumber - 1);
-  }, [fontSizeAsNumber]);
+    return Math.max(8, fontSizeAsNumber.current - 1);
+  }, []);
+
+  const increaseFontSize = useCallback(() => {
+    return Math.min(120, fontSizeAsNumber.current + 1);
+  }, []);
 
   return (
     <Counter
       title="font size"
       onDecrease={() =>
-        editor.chain().focus().setFontSize(`${decreaseFontSize()}px`).run()
-      }
-      onIncrease={() =>
-        editor
-          .chain()
+        editor.current
+          ?.chain()
           .focus()
-          .setFontSize(`${fontSizeAsNumber + 1}px`)
+          .setFontSize(`${decreaseFontSize()}px`)
           .run()
       }
-      onReset={() => editor.chain().focus().setFontSize(`16px`).run()}
+      onIncrease={() => {
+        editor.current
+          ?.chain()
+          .focus()
+          .setFontSize(`${increaseFontSize()}px`)
+          .run();
+      }}
+      onReset={() => editor.current?.chain().focus().setFontSize(`16px`).run()}
       value={fontSize}
     />
   );
@@ -51,13 +58,13 @@ export function FontFamily(props: ToolProps) {
       )
       ?.map((a) => a)
       ?.at(0) || "System";
+  const items = useMemo(
+    () => toMenuItems(editor, currentFontFamily),
+    [currentFontFamily]
+  );
 
   return (
-    <Dropdown
-      selectedItem={currentFontFamily}
-      items={toMenuItems(editor, currentFontFamily)}
-      menuWidth={130}
-    />
+    <Dropdown selectedItem={currentFontFamily} items={items} menuWidth={130} />
   );
 }
 
@@ -70,7 +77,7 @@ function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
       type: "button",
       title: key,
       isChecked: key === currentFontFamily,
-      onClick: () => editor.chain().focus().setFontFamily(value).run(),
+      onClick: () => editor.current?.chain().focus().setFontFamily(value).run(),
     });
   }
   return menuItems;

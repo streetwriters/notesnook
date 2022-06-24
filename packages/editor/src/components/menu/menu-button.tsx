@@ -1,8 +1,9 @@
 import { useRef } from "react";
-import { Flex, Text, Button } from "rebass";
+import { Flex, Text } from "rebass";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useToolbarLocation } from "../../toolbar/stores/toolbar-store";
+import { Button } from "../button";
 import { MenuButton } from "./types";
 
 type MenuButtonProps = {
@@ -57,7 +58,7 @@ export function MenuButton(props: MenuButtonProps) {
               sx={{ mr: 2 }}
             />
           )}
-          <Text as="span" variant={"body"}>
+          <Text as="span" variant={"body"} sx={{ fontSize: "inherit" }}>
             {title}
           </Text>
         </Flex>

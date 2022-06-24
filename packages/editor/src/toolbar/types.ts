@@ -1,4 +1,4 @@
-import { Editor } from "@tiptap/core";
+import { Editor } from "../types";
 import { IconNames } from "./icons";
 import { ToolId } from "./tools";
 

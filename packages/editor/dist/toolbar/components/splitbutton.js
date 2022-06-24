@@ -28,7 +28,8 @@ import { Icon } from "./icon";
 import { ToolButton } from "./tool-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { Button } from "../../components/button";
-export function SplitButton(props) {
+import React from "react";
+function _SplitButton(props) {
     var children = props.children, toggled = props.toggled, onOpen = props.onOpen, toolButtonProps = __rest(props, ["children", "toggled", "onOpen"]);
     var ref = useRef(null);
     var toolbarLocation = useToolbarLocation();
@@ -46,3 +47,6 @@ export function SplitButton(props) {
                             },
                         }, onClick: onOpen }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small" }) }))] })), children] }));
 }
+export var SplitButton = React.memo(_SplitButton, function (prev, next) {
+    return prev.toggled === next.toggled;
+});

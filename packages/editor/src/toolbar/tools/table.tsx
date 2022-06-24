@@ -1,5 +1,5 @@
 import { ToolProps } from "../types";
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Flex, Text } from "rebass";
@@ -196,44 +196,56 @@ export function CellProperties(props: ToolProps) {
 }
 
 export function CellBackgroundColor(props: ToolProps) {
+  const { editor } = props;
+
   return (
     <ColorTool
       {...props}
       cacheKey="cellBackgroundColor"
-      getActiveColor={(editor) =>
-        editor.getAttributes("tableCell").backgroundColor
+      getActiveColor={() =>
+        editor.current?.getAttributes("tableCell").backgroundColor
       }
       title={"Cell background color"}
-      onColorChange={(editor, color) =>
-        editor.chain().setCellAttribute("backgroundColor", color).run()
+      onColorChange={(color) =>
+        editor.current?.chain().setCellAttribute("backgroundColor", color).run()
       }
     />
   );
 }
 
 export function CellTextColor(props: ToolProps) {
+  const { editor } = props;
+
   return (
     <ColorTool
       {...props}
       cacheKey="cellTextColor"
-      getActiveColor={(editor) => editor.getAttributes("tableCell").color}
+      getActiveColor={() => editor.current?.getAttributes("tableCell").color}
       title={"Cell text color"}
-      onColorChange={(editor, color) =>
-        editor.chain().focus().setCellAttribute("color", color).run()
+      onColorChange={(color) =>
+        editor.current?.chain().focus().setCellAttribute("color", color).run()
       }
     />
   );
 }
 
 export function CellBorderColor(props: ToolProps) {
+  const { editor } = props;
+
   return (
     <ColorTool
       {...props}
       cacheKey="cellBorderColor"
-      getActiveColor={(editor) => editor.getAttributes("tableCell").borderColor}
+      getActiveColor={() =>
+        editor.current?.getAttributes("tableCell").borderColor
+      }
       title={"Cell border color"}
-      onColorChange={(editor, color) =>
-        editor.chain().focus().setCellAttribute("borderColor", color).run()
+      onColorChange={(color) =>
+        editor.current
+          ?.chain()
+          .focus()
+          .setCellAttribute("borderColor", color)
+          .run()
       }
     />
   );
@@ -276,7 +288,7 @@ const insertColumnLeft = (editor: Editor): MenuButton => ({
   ...getToolDefinition("insertColumnLeft"),
   key: "addColumnLeft",
   type: "button",
-  onClick: () => editor.chain().focus().addColumnBefore().run(),
+  onClick: () => editor.current?.chain().focus().addColumnBefore().run(),
 });
 
 const insertColumnRight = (editor: Editor): MenuButton => ({
@@ -284,7 +296,7 @@ const insertColumnRight = (editor: Editor): MenuButton => ({
   key: "addColumnRight",
   type: "button",
   title: "Add column right",
-  onClick: () => editor.chain().focus().addColumnAfter().run(),
+  onClick: () => editor.current?.chain().focus().addColumnAfter().run(),
   icon: "insertColumnRight",
 });
 
@@ -306,35 +318,35 @@ const deleteColumn = (editor: Editor): MenuButton => ({
   ...getToolDefinition("deleteColumn"),
   key: "deleteColumn",
   type: "button",
-  onClick: () => editor.chain().focus().deleteColumn().run(),
+  onClick: () => editor.current?.chain().focus().deleteColumn().run(),
 });
 
 const splitCells = (editor: Editor): MenuButton => ({
   ...getToolDefinition("splitCells"),
   key: "splitCells",
   type: "button",
-  onClick: () => editor.chain().focus().splitCell().run(),
+  onClick: () => editor.current?.chain().focus().splitCell().run(),
 });
 
 const mergeCells = (editor: Editor): MenuButton => ({
   ...getToolDefinition("mergeCells"),
   key: "mergeCells",
   type: "button",
-  onClick: () => editor.chain().focus().mergeCells().run(),
+  onClick: () => editor.current?.chain().focus().mergeCells().run(),
 });
 
 const insertRowAbove = (editor: Editor): MenuButton => ({
   ...getToolDefinition("insertRowAbove"),
   key: "insertRowAbove",
   type: "button",
-  onClick: () => editor.chain().focus().addRowBefore().run(),
+  onClick: () => editor.current?.chain().focus().addRowBefore().run(),
 });
 
 const insertRowBelow = (editor: Editor): MenuButton => ({
   ...getToolDefinition("insertRowBelow"),
   key: "insertRowBelow",
   type: "button",
-  onClick: () => editor.chain().focus().addRowAfter().run(),
+  onClick: () => editor.current?.chain().focus().addRowAfter().run(),
 });
 
 const moveRowUp = (editor: Editor): MenuButton => ({
@@ -354,14 +366,14 @@ const deleteRow = (editor: Editor): MenuButton => ({
   ...getToolDefinition("deleteRow"),
   key: "deleteRow",
   type: "button",
-  onClick: () => editor.chain().focus().deleteRow().run(),
+  onClick: () => editor.current?.chain().focus().deleteRow().run(),
 });
 
 const deleteTable = (editor: Editor): MenuButton => ({
   ...getToolDefinition("deleteTable"),
   key: "deleteTable",
   type: "button",
-  onClick: () => editor.chain().focus().deleteTable().run(),
+  onClick: () => editor.current?.chain().focus().deleteTable().run(),
 });
 
 const cellProperties = (editor: Editor): MenuButton => ({

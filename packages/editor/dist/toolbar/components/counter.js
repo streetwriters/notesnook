@@ -10,10 +10,11 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import React from "react";
 import { Flex, Text } from "rebass";
 import { Button } from "../../components/button";
 import { ToolButton } from "./tool-button";
-export function Counter(props) {
+function _Counter(props) {
     var title = props.title, onDecrease = props.onDecrease, onIncrease = props.onIncrease, onReset = props.onReset, value = props.value;
     return (_jsxs(Flex, __assign({ sx: {
             alignItems: "center",
@@ -25,3 +26,6 @@ export function Counter(props) {
                     bg: "transparent",
                 }, onClick: onReset }, { children: _jsx(Text, __assign({ variant: "body", sx: { fontSize: "subBody", mx: 1, textAlign: "center" }, title: "Reset ".concat(title) }, { children: value })) })), _jsx(ToolButton, { toggled: false, title: "Increase ".concat(title), icon: "plus", variant: "small", onClick: onIncrease })] })));
 }
+export var Counter = React.memo(_Counter, function (prev, next) {
+    return prev.value === next.value;
+});

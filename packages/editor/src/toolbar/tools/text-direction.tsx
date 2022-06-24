@@ -10,7 +10,9 @@ function TextDirectionTool(props: TextDirectionToolProps) {
   return (
     <ToolButton
       {...toolProps}
-      onClick={() => editor.chain().focus().setTextDirection(direction).run()}
+      onClick={() =>
+        editor.current?.chain().focus().setTextDirection(direction).run()
+      }
       toggled={editor.isActive({ textDirection: direction })}
     />
   );

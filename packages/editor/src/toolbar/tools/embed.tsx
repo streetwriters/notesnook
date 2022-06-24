@@ -31,7 +31,11 @@ export function EmbedAlignLeft(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.chain().focus().setEmbedAlignment({ align: "left" }).run()
+        editor.current
+          ?.chain()
+          .focus()
+          .setEmbedAlignment({ align: "left" })
+          .run()
       }
     />
   );
@@ -44,7 +48,11 @@ export function EmbedAlignRight(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.chain().focus().setEmbedAlignment({ align: "right" }).run()
+        editor.current
+          ?.chain()
+          .focus()
+          .setEmbedAlignment({ align: "right" })
+          .run()
       }
     />
   );
@@ -57,17 +65,23 @@ export function EmbedAlignCenter(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() =>
-        editor.chain().focus().setEmbedAlignment({ align: "center" }).run()
+        editor.current
+          ?.chain()
+          .focus()
+          .setEmbedAlignment({ align: "center" })
+          .run()
       }
     />
   );
 }
 
+// TODO: stop re-rendering
 export function EmbedProperties(props: ToolProps) {
   const { editor } = props;
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>();
 
+  // TODO: improve perf by deferring this until user opens the popup
   const embedNode = useMemo(() => findSelectedNode(editor, "embed"), []);
   const embed = (embedNode?.attrs || {}) as Embed;
 

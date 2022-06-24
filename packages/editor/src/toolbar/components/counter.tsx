@@ -1,3 +1,4 @@
+import React from "react";
 import { Flex, Text } from "rebass";
 import { Button } from "../../components/button";
 import { ToolButton } from "./tool-button";
@@ -9,7 +10,7 @@ export type CounterProps = {
   onReset: () => void;
   value: string;
 };
-export function Counter(props: CounterProps) {
+function _Counter(props: CounterProps) {
   const { title, onDecrease, onIncrease, onReset, value } = props;
 
   return (
@@ -55,3 +56,7 @@ export function Counter(props: CounterProps) {
     </Flex>
   );
 }
+
+export const Counter = React.memo(_Counter, (prev, next) => {
+  return prev.value === next.value;
+});

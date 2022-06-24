@@ -1,106 +1,131 @@
 import { ToolProps } from "../types";
-import { Editor } from "@tiptap/core";
 import { ToolButton } from "../components/tool-button";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { Popup } from "../components/popup";
 import { LinkPopup } from "../popups/link-popup";
-
-type InlineToolProps = ToolProps & {
-  isToggled: (editor: Editor) => boolean;
-  onClick: (editor: Editor) => boolean;
-};
-function InlineTool(props: InlineToolProps) {
-  const { editor, title, icon, isToggled, onClick } = props;
-  return (
-    <ToolButton
-      title={title}
-      id={icon}
-      icon={icon}
-      onClick={() => onClick(editor)}
-      toggled={isToggled(editor)}
-    />
-  );
-}
+import { useToolbarLocation } from "../stores/toolbar-store";
 
 export function Italic(props: ToolProps) {
+  const { editor } = props;
   return (
-    <InlineTool
+    <ToolButton
       {...props}
-      isToggled={(editor) => editor.isActive("italic")}
-      onClick={(editor) => editor.chain().focus().toggleItalic().run()}
+      toggled={editor.isActive("italic")}
+      onClick={() => editor.current?.chain().focus().toggleItalic().run()}
     />
   );
 }
 
 export function Strikethrough(props: ToolProps) {
+  const { editor } = props;
   return (
-    <InlineTool
+    <ToolButton
       {...props}
-      isToggled={(editor) => editor.isActive("strikethrough")}
-      onClick={(editor) => editor.chain().focus().toggleStrike().run()}
+      toggled={editor.isActive("strike")}
+      onClick={() => editor.current?.chain().focus().toggleStrike().run()}
     />
   );
 }
 
 export function Underline(props: ToolProps) {
+  const { editor } = props;
   return (
-    <InlineTool
+    <ToolButton
       {...props}
-      isToggled={(editor) => editor.isActive("underline")}
-      onClick={(editor) => editor.chain().focus().toggleUnderline().run()}
+      toggled={editor.isActive("underline")}
+      onClick={() => editor.current?.chain().focus().toggleUnderline().run()}
     />
   );
 }
 
 export function Code(props: ToolProps) {
+  const { editor } = props;
+
   return (
-    <InlineTool
+    <ToolButton
       {...props}
-      isToggled={(editor) => editor.isActive("code")}
-      onClick={(editor) => editor.chain().focus().toggleCode().run()}
+      toggled={editor.isActive("code")}
+      onClick={() => editor.current?.chain().focus().toggleCode().run()}
     />
   );
 }
 
 export function Bold(props: ToolProps) {
+  const { editor } = props;
+
   return (
-    <InlineTool
+    <ToolButton
       {...props}
-      isToggled={(editor) => editor.isActive("bold")}
-      onClick={(editor) => editor.chain().focus().toggleBold().run()}
+      toggled={editor.isActive("bold")}
+      onClick={() => editor.current?.chain().focus().toggleBold().run()}
     />
   );
 }
 
 export function Subscript(props: ToolProps) {
+  const { editor } = props;
   return (
-    <InlineTool
+    <ToolButton
       {...props}
-      isToggled={(editor) => editor.isActive("subscript")}
-      onClick={(editor) => editor.chain().focus().toggleSubscript().run()}
+      toggled={editor.isActive("subscript")}
+      onClick={() => editor.current?.chain().focus().toggleSubscript().run()}
     />
   );
 }
 
 export function Superscript(props: ToolProps) {
+  const { editor } = props;
   return (
-    <InlineTool
+    <ToolButton
       {...props}
-      isToggled={(editor) => editor.isActive("superscript")}
-      onClick={(editor) => editor.chain().focus().toggleSuperscript().run()}
+      toggled={editor.isActive("superscript")}
+      onClick={() => editor.current?.chain().focus().toggleSuperscript().run()}
     />
   );
 }
 
 export function ClearFormatting(props: ToolProps) {
+  const { editor } = props;
   return (
-    <InlineTool
+    <ToolButton
       {...props}
-      isToggled={() => false}
-      onClick={(editor) =>
-        editor.chain().focus().clearNodes().unsetAllMarks().run()
+      toggled={false}
+      onClick={() =>
+        editor.current
+          ?.chain()
+          .focus()
+          .clearNodes()
+          .unsetAllMarks()
+          .unsetMark("link")
+          .run()
       }
+    />
+  );
+}
+
+export function LinkRemove(props: ToolProps) {
+  const { editor } = props;
+  const isBottom = useToolbarLocation() === "bottom";
+  if (!editor.isActive("link") || !isBottom) return null;
+  return (
+    <ToolButton
+      {...props}
+      toggled={false}
+      onClick={() => editor.current?.chain().focus().unsetMark("link").run()}
+    />
+  );
+}
+
+export function CodeRemove(props: ToolProps) {
+  const { editor } = props;
+  const isBottom = useToolbarLocation() === "bottom";
+  if (!editor.isActive("code") || !isBottom) return null;
+  return (
+    <ToolButton
+      {...props}
+      toggled={false}
+      onClick={() => editor.current?.chain().focus().unsetMark("code").run()}
     />
   );
 }
@@ -108,7 +133,6 @@ export function ClearFormatting(props: ToolProps) {
 export function Link(props: ToolProps) {
   const { editor, title, icon } = props;
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const targetRef = useRef<HTMLElement>();
   const [isOpen, setIsOpen] = useState(false);
 
   const [href, setHref] = useState<string>();
@@ -119,14 +143,18 @@ export function Link(props: ToolProps) {
   const onDone = useCallback((href: string, text: string) => {
     if (!href) return;
 
-    let commandChain = editor
-      .chain()
-      .focus()
-      .extendMarkRange("link")
-      .setLink({ href, target: "_blank" });
-    if (text) commandChain = commandChain.insertContent(text).focus();
+    let commandChain = editor.current?.chain().focus();
+    if (!commandChain) return;
 
-    commandChain.run();
+    commandChain
+      .extendMarkRange("link")
+      .toggleLink({ href, target: "_blank" })
+      .insertContent(text || href)
+      .focus()
+      .unsetMark("link")
+      .insertContent(" ")
+      .run();
+
     setIsOpen(false);
   }, []);
 
@@ -136,17 +164,12 @@ export function Link(props: ToolProps) {
         id={icon}
         buttonRef={buttonRef}
         title={title}
-        icon={icon}
+        icon={isEditing ? "linkEdit" : icon}
         onClick={() => {
           if (isEditing) setHref(currentUrl);
 
           let { from, to, $from } = editor.state.selection;
-
           const selectedNode = $from.node();
-          const pos = selectedNode.isTextblock ? $from.before() : $from.pos;
-
-          const domNode = editor.view.nodeDOM(pos) as HTMLElement;
-          targetRef.current = domNode;
 
           const selectedText = isEditing
             ? selectedNode.textContent
@@ -161,7 +184,7 @@ export function Link(props: ToolProps) {
         mobile="sheet"
         desktop="menu"
         position={{
-          target: targetRef.current || buttonRef.current || undefined,
+          target: buttonRef.current || undefined,
           isTargetAbsolute: true,
           location: "below",
           align: "center",
@@ -170,10 +193,7 @@ export function Link(props: ToolProps) {
         title={isEditing ? "Edit link" : "Insert link"}
         isOpen={isOpen}
         items={[]}
-        onClose={() => {
-          editor.commands.focus();
-          setIsOpen(false);
-        }}
+        onClose={() => setIsOpen(false)}
         focusOnRender={false}
       >
         <Popup
@@ -193,3 +213,57 @@ export function Link(props: ToolProps) {
     </>
   );
 }
+
+// export function Link(props: ToolProps) {
+//   const { editor, title, icon } = props;
+//   const buttonRef = useRef<HTMLButtonElement>(null);
+//   const [isOpen, setIsOpen] = useState(false);
+
+//   const [href, setHref] = useState<string>();
+//   const [text, setText] = useState<string>();
+//   const currentUrl = editor.getAttributes("link").href;
+//   const isEditing = !!currentUrl;
+
+//   const onDone = useCallback((href: string, text: string) => {
+//     if (!href) return;
+
+//     let commandChain = editor.current?.chain().focus();
+//     if (!commandChain) return;
+
+//     commandChain
+//       .extendMarkRange("link")
+//       .toggleLink({ href, target: "_blank" })
+//       .insertContent(text || href)
+//       .focus()
+//       .unsetMark("link")
+//       .insertContent(" ")
+//       .run();
+
+//     setIsOpen(false);
+//   }, []);
+
+//   return (
+//     <>
+//       <ToolButton
+//         id={icon}
+//         buttonRef={buttonRef}
+//         title={title}
+//         icon={icon}
+//         onClick={() => {
+//           if (isEditing) setHref(currentUrl);
+
+//           let { from, to, $from } = editor.state.selection;
+//           const selectedNode = $from.node();
+
+//           const selectedText = isEditing
+//             ? selectedNode.textContent
+//             : editor.state.doc.textBetween(from, to);
+
+//           setText(selectedText);
+//           setIsOpen(true);
+//         }}
+//         toggled={isOpen || !!isEditing}
+//       />
+//     </>
+//   );
+// }

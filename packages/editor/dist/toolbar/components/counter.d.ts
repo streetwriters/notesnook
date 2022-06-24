@@ -1,4 +1,4 @@
-/// <reference types="react" />
+import React from "react";
 export declare type CounterProps = {
     title: string;
     onIncrease: () => void;
@@ -6,4 +6,6 @@ export declare type CounterProps = {
     onReset: () => void;
     value: string;
 };
-export declare function Counter(props: CounterProps): JSX.Element;
+declare function _Counter(props: CounterProps): JSX.Element;
+export declare const Counter: React.MemoExoticComponent<typeof _Counter>;
+export {};

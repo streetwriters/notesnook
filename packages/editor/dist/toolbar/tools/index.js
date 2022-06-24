@@ -1,4 +1,4 @@
-import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link, } from "./inline";
+import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link, LinkRemove, CodeRemove, } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
@@ -16,10 +16,12 @@ var tools = {
     underline: Underline,
     strikethrough: Strikethrough,
     code: Code,
+    codeRemove: CodeRemove,
     subscript: Subscript,
     superscript: Superscript,
     clearformatting: ClearFormatting,
     link: Link,
+    linkRemove: LinkRemove,
     insertBlock: InsertBlock,
     numberedList: NumberedList,
     bulletList: BulletList,

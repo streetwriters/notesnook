@@ -128,20 +128,18 @@ export function CellProperties(props) {
             ] })) }));
 }
 export function CellBackgroundColor(props) {
-    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellBackgroundColor", getActiveColor: function (editor) {
-            return editor.getAttributes("tableCell").backgroundColor;
-        }, title: "Cell background color", onColorChange: function (editor, color) {
-            return editor.chain().setCellAttribute("backgroundColor", color).run();
-        } })));
+    var editor = props.editor;
+    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellBackgroundColor", getActiveColor: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.getAttributes("tableCell").backgroundColor; }, title: "Cell background color", onColorChange: function (color) { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().setCellAttribute("backgroundColor", color).run(); } })));
 }
 export function CellTextColor(props) {
-    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellTextColor", getActiveColor: function (editor) { return editor.getAttributes("tableCell").color; }, title: "Cell text color", onColorChange: function (editor, color) {
-            return editor.chain().focus().setCellAttribute("color", color).run();
-        } })));
+    var editor = props.editor;
+    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellTextColor", getActiveColor: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.getAttributes("tableCell").color; }, title: "Cell text color", onColorChange: function (color) { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setCellAttribute("color", color).run(); } })));
 }
 export function CellBorderColor(props) {
-    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellBorderColor", getActiveColor: function (editor) { return editor.getAttributes("tableCell").borderColor; }, title: "Cell border color", onColorChange: function (editor, color) {
-            return editor.chain().focus().setCellAttribute("borderColor", color).run();
+    var editor = props.editor;
+    return (_jsx(ColorTool, __assign({}, props, { cacheKey: "cellBorderColor", getActiveColor: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.getAttributes("tableCell").borderColor; }, title: "Cell border color", onColorChange: function (color) {
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setCellAttribute("borderColor", color).run();
         } })));
 }
 export function CellBorderWidth(props) {
@@ -160,19 +158,19 @@ export function CellBorderWidth(props) {
                     return editor.commands.setCellAttribute("borderWidth", increaseBorderWidth());
                 }, onReset: function () { return editor.commands.setCellAttribute("borderWidth", 1); }, value: borderWidth + "px" })] })));
 }
-var insertColumnLeft = function (editor) { return (__assign(__assign({}, getToolDefinition("insertColumnLeft")), { key: "addColumnLeft", type: "button", onClick: function () { return editor.chain().focus().addColumnBefore().run(); } })); };
-var insertColumnRight = function (editor) { return (__assign(__assign({}, getToolDefinition("insertColumnRight")), { key: "addColumnRight", type: "button", title: "Add column right", onClick: function () { return editor.chain().focus().addColumnAfter().run(); }, icon: "insertColumnRight" })); };
+var insertColumnLeft = function (editor) { return (__assign(__assign({}, getToolDefinition("insertColumnLeft")), { key: "addColumnLeft", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().addColumnBefore().run(); } })); };
+var insertColumnRight = function (editor) { return (__assign(__assign({}, getToolDefinition("insertColumnRight")), { key: "addColumnRight", type: "button", title: "Add column right", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().addColumnAfter().run(); }, icon: "insertColumnRight" })); };
 var moveColumnLeft = function (editor) { return (__assign(__assign({}, getToolDefinition("moveColumnLeft")), { key: "moveColumnLeft", type: "button", onClick: function () { return moveColumnLeftAction(editor); } })); };
 var moveColumnRight = function (editor) { return (__assign(__assign({}, getToolDefinition("moveColumnRight")), { key: "moveColumnRight", type: "button", onClick: function () { return moveColumnRightAction(editor); } })); };
-var deleteColumn = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteColumn")), { key: "deleteColumn", type: "button", onClick: function () { return editor.chain().focus().deleteColumn().run(); } })); };
-var splitCells = function (editor) { return (__assign(__assign({}, getToolDefinition("splitCells")), { key: "splitCells", type: "button", onClick: function () { return editor.chain().focus().splitCell().run(); } })); };
-var mergeCells = function (editor) { return (__assign(__assign({}, getToolDefinition("mergeCells")), { key: "mergeCells", type: "button", onClick: function () { return editor.chain().focus().mergeCells().run(); } })); };
-var insertRowAbove = function (editor) { return (__assign(__assign({}, getToolDefinition("insertRowAbove")), { key: "insertRowAbove", type: "button", onClick: function () { return editor.chain().focus().addRowBefore().run(); } })); };
-var insertRowBelow = function (editor) { return (__assign(__assign({}, getToolDefinition("insertRowBelow")), { key: "insertRowBelow", type: "button", onClick: function () { return editor.chain().focus().addRowAfter().run(); } })); };
+var deleteColumn = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteColumn")), { key: "deleteColumn", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().deleteColumn().run(); } })); };
+var splitCells = function (editor) { return (__assign(__assign({}, getToolDefinition("splitCells")), { key: "splitCells", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().splitCell().run(); } })); };
+var mergeCells = function (editor) { return (__assign(__assign({}, getToolDefinition("mergeCells")), { key: "mergeCells", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().mergeCells().run(); } })); };
+var insertRowAbove = function (editor) { return (__assign(__assign({}, getToolDefinition("insertRowAbove")), { key: "insertRowAbove", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().addRowBefore().run(); } })); };
+var insertRowBelow = function (editor) { return (__assign(__assign({}, getToolDefinition("insertRowBelow")), { key: "insertRowBelow", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().addRowAfter().run(); } })); };
 var moveRowUp = function (editor) { return (__assign(__assign({}, getToolDefinition("moveRowUp")), { key: "moveRowUp", type: "button", onClick: function () { return moveRowUpAction(editor); } })); };
 var moveRowDown = function (editor) { return (__assign(__assign({}, getToolDefinition("moveRowDown")), { key: "moveRowDown", type: "button", onClick: function () { return moveRowDownAction(editor); } })); };
-var deleteRow = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteRow")), { key: "deleteRow", type: "button", onClick: function () { return editor.chain().focus().deleteRow().run(); } })); };
-var deleteTable = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteTable")), { key: "deleteTable", type: "button", onClick: function () { return editor.chain().focus().deleteTable().run(); } })); };
+var deleteRow = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteRow")), { key: "deleteRow", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().deleteRow().run(); } })); };
+var deleteTable = function (editor) { return (__assign(__assign({}, getToolDefinition("deleteTable")), { key: "deleteTable", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().deleteTable().run(); } })); };
 var cellProperties = function (editor) { return (__assign(__assign({}, getToolDefinition("cellProperties")), { key: "cellProperties", type: "button", onClick: function () {
         showPopup({
             theme: editor.storage.theme,

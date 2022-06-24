@@ -30,7 +30,7 @@ export function DownloadAttachment(props: ToolProps) {
       onClick={() => {
         const attachmentNode = findSelectedNode(editor, "attachment");
         const attachment = (attachmentNode?.attrs || {}) as Attachment;
-        editor?.chain().focus().downloadAttachment(attachment).run();
+        editor.current?.chain().focus().downloadAttachment(attachment).run();
       }}
     />
   );
@@ -42,7 +42,7 @@ export function RemoveAttachment(props: ToolProps) {
     <ToolButton
       {...props}
       toggled={false}
-      onClick={() => editor?.chain().focus().removeAttachment().run()}
+      onClick={() => editor.current?.chain().focus().removeAttachment().run()}
     />
   );
 }

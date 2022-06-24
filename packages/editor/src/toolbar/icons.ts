@@ -96,6 +96,7 @@ import {
   mdiImageEditOutline,
   mdiArrowLeft,
   mdiMovieCogOutline,
+  mdiLinkOff,
 } from "@mdi/js";
 
 export const Icons = {
@@ -104,6 +105,7 @@ export const Icons = {
   underline: mdiFormatUnderline,
   strikethrough: mdiFormatStrikethrough,
   code: mdiCodeTags,
+  codeRemove: `M3.62109375 1.83837892 2.26318358 3.13037107 6.46289063 7.536621 1.9995117 12l6.0000003 6 1.40039025-1.400391L4.80029295 12l3.0292968-3.0292965 7.0283205 7.371093-.2578125.2578125L16.000488 18l.224121-.224121 4.3125 4.52490225 1.35791025-1.29492225-4.34326125-4.55712825L22.000488 12l-6-6-1.40039025 1.40039063L19.19970675 12l-3.016113 3.016113L9.156738 7.6435545l.24316425-.24316387L7.999512 6l-.2109375.2109375Z`,
   alignCenter: mdiFormatAlignCenter,
   alignLeft: mdiFormatAlignLeft,
   alignRight: mdiFormatAlignRight,
@@ -121,6 +123,10 @@ export const Icons = {
   highlight: mdiFormatColorHighlight,
   textColor: mdiFormatColorText,
   link: mdiLinkPlus,
+  linkRemove: mdiLinkOff,
+  linkEdit:
+    "m19 14 1.28 1.28c.22.21.22.56 0 .77l-1 1L17.23 15l1-1c.11-.11.25-.17.39-.17s.27.06.38.17m-.3 3.63-6.06 6.07h-2.06v-2.06l6.07-6.06zM7 7h4v2H7c-1.6568542 0-3 1.343146-3 3s1.3431458 3 3 3h4v2H7c-2.7614237 0-5-2.238576-5-5 0-2.7614237 2.2385763-5 5-5m10 0c2.761424 0 5 2.2385763 5 5h-2c0-1.656854-1.343146-3-3-3h-4V7h4m-9 4h8v2H8v-2",
+
   url: mdiLink,
   image: mdiImage,
   imageSettings: mdiImageEditOutline,

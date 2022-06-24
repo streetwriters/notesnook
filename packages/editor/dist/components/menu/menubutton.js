@@ -11,10 +11,11 @@ var __assign = (this && this.__assign) || function () {
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useRef } from "react";
-import { Flex, Text, Button } from "rebass";
+import { Flex, Text } from "rebass";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useToolbarLocation } from "../../toolbar/stores/toolbar-store";
+import { Button } from "../button";
 export function MenuButton(props) {
     var item = props.item, isFocused = props.isFocused, onMouseEnter = props.onMouseEnter, onMouseLeave = props.onMouseLeave, onClick = props.onClick;
     var title = item.title, key = item.key, icon = item.icon, tooltip = item.tooltip, isDisabled = item.isDisabled, isChecked = item.isChecked, menu = item.menu, modifier = item.modifier;
@@ -29,7 +30,7 @@ export function MenuButton(props) {
                 ":hover": {
                     bg: isBottom ? "transparent" : "hover",
                 },
-            } }, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: "medium", sx: { mr: 2 } })), _jsx(Text, __assign({ as: "span", variant: "body" }, { children: title }))] }), isChecked || menu || modifier ? (_jsxs(Flex, __assign({ sx: { ml: 4 } }, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: 14 }), menu && _jsx(Icon, { path: Icons.chevronRight, size: 14 }), modifier && (_jsx(Text, __assign({ as: "span", sx: {
+            } }, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: "medium", sx: { mr: 2 } })), _jsx(Text, __assign({ as: "span", variant: "body", sx: { fontSize: "inherit" } }, { children: title }))] }), isChecked || menu || modifier ? (_jsxs(Flex, __assign({ sx: { ml: 4 } }, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: 14 }), menu && _jsx(Icon, { path: Icons.chevronRight, size: 14 }), modifier && (_jsx(Text, __assign({ as: "span", sx: {
                                 fontFamily: "body",
                                 fontSize: "menu",
                                 color: "fontTertiary",

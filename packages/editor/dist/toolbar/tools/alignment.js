@@ -24,7 +24,7 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
 function AlignmentTool(props) {
     var editor = props.editor, alignment = props.alignment, toolProps = __rest(props, ["editor", "alignment"]);
-    return (_jsx(ToolButton, __assign({}, toolProps, { onClick: function () { return editor.chain().focus().setTextAlign(alignment).run(); }, toggled: editor.isActive({ textAlign: alignment }) })));
+    return (_jsx(ToolButton, __assign({}, toolProps, { onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextAlign(alignment).run(); }, toggled: editor.isActive({ textAlign: alignment }) })));
 }
 export function AlignCenter(props) {
     return _jsx(AlignmentTool, __assign({ alignment: "center" }, props));

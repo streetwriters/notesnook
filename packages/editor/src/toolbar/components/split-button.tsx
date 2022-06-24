@@ -10,9 +10,10 @@ import {
 } from "../../components/popup-presenter";
 import { PositionOptions } from "../../utils/position";
 import { Button } from "../../components/button";
+import React from "react";
 
 export type SplitButtonProps = ToolButtonProps & { onOpen: () => void };
-export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
+function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
   const { children, toggled, onOpen, ...toolButtonProps } = props;
 
   const ref = useRef<HTMLDivElement>(null);
@@ -54,3 +55,6 @@ export function SplitButton(props: PropsWithChildren<SplitButtonProps>) {
     </>
   );
 }
+export const SplitButton = React.memo(_SplitButton, (prev, next) => {
+  return prev.toggled === next.toggled;
+});

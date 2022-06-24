@@ -19,9 +19,19 @@ var tools = {
         icon: "link",
         title: "Link",
     },
+    linkRemove: {
+        icon: "linkRemove",
+        title: "Link remove",
+        conditional: true,
+    },
     code: {
         icon: "code",
         title: "Code",
+    },
+    codeRemove: {
+        icon: "codeRemove",
+        title: "Code",
+        conditional: true,
     },
     clearformatting: {
         icon: "formatClear",

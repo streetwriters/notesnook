@@ -26,7 +26,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
@@ -57,6 +57,9 @@ import { NodeViewSelectionNotifier, usePortalProvider, } from "./extensions/reac
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
+// export class Editor extends TiptapEditor {
+//   get instance(): TiptapEditor {}
+// }
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -139,10 +142,14 @@ var useTiptap = function (options, deps) {
         injectCSS: false,
     }); }, [theme, onDownloadAttachment, onOpenAttachmentPicker, PortalProviderAPI]);
     var editor = useEditor(__assign(__assign({}, defaultOptions), restOptions), deps);
-    /**
-     * Add editor to global for use in React Native.
-     */
-    global.editor = editor;
+    var editorRef = useRef(editor);
+    useEffect(function () {
+        editorRef.current = editor;
+        if (editor && !editor.current)
+            Object.defineProperty(editor, "current", {
+                get: function () { return editorRef.current; },
+            });
+    }, [editor]);
     return editor;
 };
 export { useTiptap, Toolbar };
