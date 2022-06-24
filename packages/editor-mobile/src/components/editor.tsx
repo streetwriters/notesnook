@@ -1,24 +1,14 @@
 import { useTheme } from "@notesnook/theme";
 import { EditorContent } from "@tiptap/react";
-import {
-  Toolbar,
-  useTiptap,
-  PortalProviderAPI,
-  PortalProvider,
-  PortalRenderer,
-} from "notesnook-editor";
+import { PortalProvider, Toolbar, useTiptap } from "notesnook-editor";
 import { useEditorController } from "../hooks/useEditorController";
 import { useEditorThemeStore } from "../state/theme";
+import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
-import Header from "./header";
 
-const Tiptap = ({
-  portalProviderApi,
-}: {
-  portalProviderApi: PortalProviderAPI;
-}) => {
+const Tiptap = () => {
   const theme = useEditorThemeStore((state) => state.colors);
   const toolbarTheme = useTheme({
     //todo
@@ -84,7 +74,6 @@ const Tiptap = ({
       return true;
     },
     theme: editorTheme,
-    portalProviderAPI: portalProviderApi,
   });
   const controller = useEditorController(editor);
   globalThis.editorController = controller;
@@ -145,15 +134,9 @@ const Tiptap = ({
 
 const TiptapProvider = () => {
   return (
-    //@ts-ignore
-    <PortalProvider
-      render={(portalProviderApi) => (
-        <>
-          <Tiptap portalProviderApi={portalProviderApi} />
-          <PortalRenderer portalProviderAPI={portalProviderApi} />
-        </>
-      )}
-    />
+    <PortalProvider>
+      <Tiptap />
+    </PortalProvider>
   );
 };
 
