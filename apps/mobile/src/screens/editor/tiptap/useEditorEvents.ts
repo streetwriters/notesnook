@@ -130,6 +130,11 @@ export const useEditorEvents = (editor: useEditorType) => {
   }, [currentEditingNote, fullscreen, isPremium, readonly, editor.sessionId, editor.loading]);
 
   const onBackPress = useCallback(async () => {
+    const editorHandledBack = await editor.commands.handleBack();
+    if (editorHandledBack) {
+      logger.info('editor handled back event');
+      return;
+    }
     setTimeout(async () => {
       if (deviceMode !== 'mobile' && fullscreen) {
         if (fullscreen) {

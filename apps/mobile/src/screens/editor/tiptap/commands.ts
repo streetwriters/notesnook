@@ -51,9 +51,9 @@ class Commands {
     this.ref = ref;
   }
 
-  async doAsync(job: string) {
+  async doAsync<T>(job: string) {
     if (!this.ref) return false;
-    return await call(this.ref, fn(job));
+    return call(this.ref, fn(job)) as Promise<T>;
   }
 
   focus = async () => {
@@ -132,22 +132,28 @@ statusBar.current.set({date:"",saved:""});
   };
 
   insertAttachment = async (attachment: Attachment) => {
-    this.doAsync(`editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`);
+    await this.doAsync(`editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`);
   };
 
   setAttachmentProgress = async (attachmentProgress: AttachmentProgress) => {
-    this.doAsync(
+    await this.doAsync(
       `editor && editor.commands.setAttachmentProgress(${JSON.stringify(attachmentProgress)})`
     );
   };
 
   insertImage = async (image: ImageAttributes) => {
     console.log('image data', image);
-    this.doAsync(`editor && editor.commands.insertImage(${JSON.stringify(image)})`);
+    await this.doAsync(`editor && editor.commands.insertImage(${JSON.stringify(image)})`);
   };
 
   updateImage = async (image: ImageAttributes) => {
-    this.doAsync(`editor && editor.commands.updateImage(${JSON.stringify(image)})`);
+    await this.doAsync(`editor && editor.commands.updateImage(${JSON.stringify(image)})`);
+  };
+
+  handleBack = async () => {
+    return this.doAsync<boolean>(
+      `response = window.dispatchEvent(new Event("handleBackPress",{cancelable:true}));`
+    );
   };
   //todo add replace image function
 }
