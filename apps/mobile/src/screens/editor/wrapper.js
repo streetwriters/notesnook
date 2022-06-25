@@ -30,10 +30,6 @@ export const EditorWrapper = ({ width }) => {
     if (editorState().movedAway) return;
     if (state === 'active') {
       editorController.current.onReady();
-      // workaround: refocus editor when return from background
-      await editorController.current?.commands.focus();
-    } else {
-      await editorController.current?.commands?.blur();
     }
   };
 
@@ -69,6 +65,7 @@ export const EditorWrapper = ({ width }) => {
               flex: 1
             }}
             enabled={!floating}
+            keyboardVerticalOffset={0}
           >
             <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
             <TextInput

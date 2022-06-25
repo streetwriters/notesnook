@@ -1,3 +1,34 @@
+diff --git a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
+index 4536402..89125e3 100644
+--- a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
++++ b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
+@@ -82,6 +82,7 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+ 
+     // Calculate the displacement needed for the view such that it
+     // no longer overlaps with the keyboard
++    if (this._initialFrameHeight && frame.height < this._initialFrameHeight) frame.height = this._initialFrameHeight;
+     return Math.max(frame.y + frame.height - keyboardY, 0);
+   }
+ 
+@@ -92,7 +93,9 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+ 
+   _onLayout = (event: ViewLayoutEvent) => {
+     const wasFrameNull = this._frame == null;
++   
+     this._frame = event.nativeEvent.layout;
++
+     if (!this._initialFrameHeight) {
+       // save the initial frame height, before the keyboard is visible
+       this._initialFrameHeight = this._frame.height;
+@@ -115,7 +118,7 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+ 
+     const {duration, easing, endCoordinates} = this._keyboardEvent;
+     const height = this._relativeKeyboardHeight(endCoordinates);
+-
++    console.log('new height',height,this.state.bottom);
+     if (this.state.bottom === height) {
+       return;
+     }
 diff --git a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
 index f0f6402..d645d81 100644
 --- a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
