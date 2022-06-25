@@ -216,3 +216,8 @@ pre *::selection {
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.ProseMirror blockquote {
+  border-left: 5px solid var(--border);
+  padding-left: 15px;
+}
