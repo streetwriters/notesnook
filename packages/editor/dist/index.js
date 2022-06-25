@@ -57,6 +57,7 @@ import { NodeViewSelectionNotifier, usePortalProvider, } from "./extensions/reac
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
+import { useIsMobile } from "./toolbar/stores/toolbar-store";
 // export class Editor extends TiptapEditor {
 //   get instance(): TiptapEditor {}
 // }
@@ -70,6 +71,7 @@ var useTiptap = function (options, deps) {
     if (deps === void 0) { deps = []; }
     var theme = options.theme, onDownloadAttachment = options.onDownloadAttachment, onOpenAttachmentPicker = options.onOpenAttachmentPicker, restOptions = __rest(options, ["theme", "onDownloadAttachment", "onOpenAttachmentPicker"]);
     var PortalProviderAPI = usePortalProvider();
+    var isMobile = useIsMobile();
     var defaultOptions = useMemo(function () { return ({
         extensions: [
             NodeViewSelectionNotifier,
@@ -100,7 +102,7 @@ var useTiptap = function (options, deps) {
             OrderedList,
             TaskItemNode.configure({ nested: true }),
             TaskListNode,
-            Link,
+            Link.configure({ openOnClick: !isMobile }),
             Table.configure({
                 resizable: true,
                 allowTableNodeSelection: true,
@@ -140,7 +142,13 @@ var useTiptap = function (options, deps) {
             editor.storage.portalProviderAPI = PortalProviderAPI;
         },
         injectCSS: false,
-    }); }, [theme, onDownloadAttachment, onOpenAttachmentPicker, PortalProviderAPI]);
+    }); }, [
+        theme,
+        onDownloadAttachment,
+        onOpenAttachmentPicker,
+        PortalProviderAPI,
+        isMobile,
+    ]);
     var editor = useEditor(__assign(__assign({}, defaultOptions), restOptions), deps);
     var editorRef = useRef(editor);
     useEffect(function () {

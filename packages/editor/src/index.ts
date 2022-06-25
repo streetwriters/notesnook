@@ -40,6 +40,7 @@ import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
 import { Editor } from "./types";
+import { useIsMobile } from "./toolbar/stores/toolbar-store";
 
 // export class Editor extends TiptapEditor {
 //   get instance(): TiptapEditor {}
@@ -61,6 +62,7 @@ const useTiptap = (
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
+  const isMobile = useIsMobile();
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
@@ -93,7 +95,7 @@ const useTiptap = (
         OrderedList,
         TaskItemNode.configure({ nested: true }),
         TaskListNode,
-        Link,
+        Link.configure({ openOnClick: !isMobile }),
         Table.configure({
           resizable: true,
           allowTableNodeSelection: true,
@@ -134,7 +136,13 @@ const useTiptap = (
       },
       injectCSS: false,
     }),
-    [theme, onDownloadAttachment, onOpenAttachmentPicker, PortalProviderAPI]
+    [
+      theme,
+      onDownloadAttachment,
+      onOpenAttachmentPicker,
+      PortalProviderAPI,
+      isMobile,
+    ]
   );
 
   const editor = useEditor(
