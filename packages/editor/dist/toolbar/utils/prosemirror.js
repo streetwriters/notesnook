@@ -21,3 +21,11 @@ export function findSelectedNode(editor, type) {
         return null;
     return editor.state.doc.nodeAt(pos);
 }
+export function findMark(node, type) {
+    var mark = node.marks.find(function (m) { return m.type.name === type; });
+    return mark;
+}
+export function selectionToOffset(selection) {
+    var $from = selection.$from, from = selection.from;
+    return { node: $from.node(), from: from, to: from + $from.node().nodeSize };
+}

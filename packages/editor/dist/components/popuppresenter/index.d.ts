@@ -26,5 +26,5 @@ declare type ShowPopupOptions = {
     theme: Theme;
     popup: (closePopup: () => void) => React.ReactNode;
 } & Partial<ResponsivePresenterProps>;
-export declare function showPopup(options: ShowPopupOptions): void;
+export declare function showPopup(options: ShowPopupOptions): () => void;
 export {};

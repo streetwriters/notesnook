@@ -1,4 +1,4 @@
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 export declare type FloatingMenuProps = {
     editor: Editor;
 };

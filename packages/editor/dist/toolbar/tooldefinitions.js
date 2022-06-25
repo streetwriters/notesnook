@@ -15,13 +15,28 @@ var tools = {
         icon: "strikethrough",
         title: "Strikethrough",
     },
-    link: {
+    addLink: {
         icon: "link",
         title: "Link",
     },
-    linkRemove: {
+    editLink: {
+        icon: "linkEdit",
+        title: "Edit link",
+        conditional: true,
+    },
+    removeLink: {
         icon: "linkRemove",
-        title: "Link remove",
+        title: "Remove link",
+        conditional: true,
+    },
+    openLink: {
+        icon: "openLink",
+        title: "Open link",
+        conditional: true,
+    },
+    linkSettings: {
+        icon: "linkSettings",
+        title: "Link settings",
         conditional: true,
     },
     code: {

@@ -48,6 +48,7 @@
     "shortid": "^2.2.16",
     "strip-indent": "^4.0.0",
     "tinycolor2": "^1.4.2",
+    "unfurl.js": "^5.7.0",
     "zustand": "^3.7.2"
   },
   "devDependencies": {

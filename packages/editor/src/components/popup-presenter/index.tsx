@@ -54,6 +54,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     const popupPosition = getPosition(popup, position);
     popup.style.top = popupPosition.top + "px";
     popup.style.left = popupPosition.left + "px";
+    console.log("popup", popupPosition);
   }, [position]);
 
   useEffect(() => {
@@ -348,4 +349,6 @@ export function showPopup(options: ShowPopupOptions) {
     </ThemeProvider>,
     getPopupContainer()
   );
+
+  return hide;
 }

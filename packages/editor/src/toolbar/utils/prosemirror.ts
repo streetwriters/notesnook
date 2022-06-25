@@ -4,7 +4,14 @@ import {
   findParentNodeClosestToPos,
   isNodeSelection,
 } from "@tiptap/core";
-import { Node } from "prosemirror-model";
+import { Node, Mark } from "prosemirror-model";
+import { Selection } from "prosemirror-state";
+
+export type NodeWithOffset = {
+  node: Node;
+  from: number;
+  to: number;
+};
 
 export function findSelectedDOMNode(
   editor: Editor,
@@ -36,4 +43,14 @@ export function findSelectedNode(editor: Editor, type: string): Node | null {
   if (!pos) return null;
 
   return editor.state.doc.nodeAt(pos);
+}
+
+export function findMark(node: Node, type: string): Mark | undefined {
+  const mark = node.marks.find((m) => m.type.name === type);
+  return mark;
+}
+
+export function selectionToOffset(selection: Selection): NodeWithOffset {
+  const { $from, from } = selection;
+  return { node: $from.node(), from, to: from + $from.node().nodeSize };
 }

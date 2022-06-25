@@ -1,4 +1,4 @@
-import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link, LinkRemove, CodeRemove, } from "./inline";
+import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, CodeRemove, } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
@@ -10,6 +10,7 @@ import { TableSettings, ColumnProperties, RowProperties, CellProperties, InsertC
 import { ImageSettings, ImageAlignCenter, ImageAlignLeft, ImageAlignRight, ImageProperties, } from "./image";
 import { AttachmentSettings, DownloadAttachment, RemoveAttachment, } from "./attachment";
 import { EmbedAlignCenter, EmbedAlignLeft, EmbedAlignRight, EmbedProperties, EmbedSettings, } from "./embed";
+import { AddLink, EditLink, RemoveLink, LinkSettings, OpenLink } from "./link";
 var tools = {
     bold: Bold,
     italic: Italic,
@@ -20,8 +21,11 @@ var tools = {
     subscript: Subscript,
     superscript: Superscript,
     clearformatting: ClearFormatting,
-    link: Link,
-    linkRemove: LinkRemove,
+    addLink: AddLink,
+    editLink: EditLink,
+    removeLink: RemoveLink,
+    linkSettings: LinkSettings,
+    openLink: OpenLink,
     insertBlock: InsertBlock,
     numberedList: NumberedList,
     bulletList: BulletList,

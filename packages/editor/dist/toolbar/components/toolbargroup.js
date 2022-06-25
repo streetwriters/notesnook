@@ -26,7 +26,7 @@ import { Flex } from "rebass";
 import { MoreTools } from "./more-tools";
 import { getToolDefinition } from "../tool-definitions";
 export function ToolbarGroup(props) {
-    var tools = props.tools, editor = props.editor, flexProps = __rest(props, ["tools", "editor"]);
+    var tools = props.tools, editor = props.editor, force = props.force, selectedNode = props.selectedNode, flexProps = __rest(props, ["tools", "editor", "force", "selectedNode"]);
     return (_jsx(Flex, __assign({ className: "toolbar-group" }, flexProps, { children: tools.map(function (toolId) {
             if (Array.isArray(toolId)) {
                 return (_jsx(MoreTools, { title: "More", icon: "more", popupId: toolId.join(""), tools: toolId, editor: editor }, "more-tools"));
@@ -34,7 +34,7 @@ export function ToolbarGroup(props) {
             else {
                 var Component = findTool(toolId);
                 var toolDefinition = getToolDefinition(toolId);
-                return (_jsx(Component, __assign({ editor: editor }, toolDefinition), toolDefinition.title));
+                return (_jsx(Component, __assign({ editor: editor, force: force, selectedNode: selectedNode }, toolDefinition), toolDefinition.title));
             }
         }) })));
 }

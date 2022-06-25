@@ -4,14 +4,17 @@ import { Flex, FlexProps } from "rebass";
 import { Editor } from "@tiptap/core";
 import { MoreTools } from "./more-tools";
 import { getToolDefinition } from "../tool-definitions";
+import { NodeWithOffset } from "../utils/prosemirror";
 
 export type ToolbarGroupProps = FlexProps & {
   tools: ToolbarGroupDefinition;
   editor: Editor;
   variant?: ToolButtonVariant;
+  force?: boolean;
+  selectedNode?: NodeWithOffset;
 };
 export function ToolbarGroup(props: ToolbarGroupProps) {
-  const { tools, editor, ...flexProps } = props;
+  const { tools, editor, force, selectedNode, ...flexProps } = props;
 
   return (
     <Flex className="toolbar-group" {...flexProps}>
@@ -34,6 +37,8 @@ export function ToolbarGroup(props: ToolbarGroupProps) {
             <Component
               key={toolDefinition.title}
               editor={editor}
+              force={force}
+              selectedNode={selectedNode}
               {...toolDefinition}
             />
           );

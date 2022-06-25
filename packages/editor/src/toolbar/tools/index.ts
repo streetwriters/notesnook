@@ -9,8 +9,6 @@ import {
   Subscript,
   Superscript,
   ClearFormatting,
-  Link,
-  LinkRemove,
   CodeRemove,
 } from "./inline";
 import { InsertBlock } from "./block";
@@ -62,6 +60,7 @@ import {
   EmbedProperties,
   EmbedSettings,
 } from "./embed";
+import { AddLink, EditLink, RemoveLink, LinkSettings, OpenLink } from "./link";
 
 export type ToolId = keyof typeof tools;
 const tools = {
@@ -74,8 +73,11 @@ const tools = {
   subscript: Subscript,
   superscript: Superscript,
   clearformatting: ClearFormatting,
-  link: Link,
-  linkRemove: LinkRemove,
+  addLink: AddLink,
+  editLink: EditLink,
+  removeLink: RemoveLink,
+  linkSettings: LinkSettings,
+  openLink: OpenLink,
   insertBlock: InsertBlock,
   numberedList: NumberedList,
   bulletList: BulletList,

@@ -1,6 +1,6 @@
 import React from "react";
 import { ToolProps } from "../types";
-import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, Link, LinkRemove, CodeRemove } from "./inline";
+import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, CodeRemove } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
@@ -12,6 +12,7 @@ import { TableSettings, ColumnProperties, RowProperties, CellProperties, CellBac
 import { ImageSettings, ImageAlignCenter, ImageAlignLeft, ImageAlignRight, ImageProperties } from "./image";
 import { AttachmentSettings, DownloadAttachment, RemoveAttachment } from "./attachment";
 import { EmbedAlignCenter, EmbedAlignLeft, EmbedAlignRight, EmbedProperties, EmbedSettings } from "./embed";
+import { AddLink, EditLink, RemoveLink, LinkSettings, OpenLink } from "./link";
 export declare type ToolId = keyof typeof tools;
 declare const tools: {
     bold: typeof Bold;
@@ -23,8 +24,11 @@ declare const tools: {
     subscript: typeof Subscript;
     superscript: typeof Superscript;
     clearformatting: typeof ClearFormatting;
-    link: typeof Link;
-    linkRemove: typeof LinkRemove;
+    addLink: typeof AddLink;
+    editLink: typeof EditLink;
+    removeLink: typeof RemoveLink;
+    linkSettings: typeof LinkSettings;
+    openLink: typeof OpenLink;
     insertBlock: typeof InsertBlock;
     numberedList: typeof NumberedList;
     bulletList: typeof BulletList;

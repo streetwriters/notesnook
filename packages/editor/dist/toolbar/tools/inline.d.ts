@@ -8,6 +8,4 @@ export declare function Bold(props: ToolProps): JSX.Element;
 export declare function Subscript(props: ToolProps): JSX.Element;
 export declare function Superscript(props: ToolProps): JSX.Element;
 export declare function ClearFormatting(props: ToolProps): JSX.Element;
-export declare function LinkRemove(props: ToolProps): JSX.Element | null;
 export declare function CodeRemove(props: ToolProps): JSX.Element | null;
-export declare function Link(props: ToolProps): JSX.Element;

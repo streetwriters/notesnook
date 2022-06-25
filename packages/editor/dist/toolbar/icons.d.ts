@@ -23,7 +23,9 @@ export declare const Icons: {
     textColor: string;
     link: string;
     linkRemove: string;
+    openLink: string;
     linkEdit: string;
+    linkSettings: string;
     url: string;
     image: string;
     imageSettings: string;

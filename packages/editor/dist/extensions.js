@@ -25,7 +25,6 @@ import "./extensions/search-replace";
 import "./extensions/embed";
 import "./extensions/code-block";
 import "./extensions/list-item";
-import "./extensions/link";
 import "./extensions/outline-list";
 import "./extensions/outline-list-item";
 import "./extensions/table";

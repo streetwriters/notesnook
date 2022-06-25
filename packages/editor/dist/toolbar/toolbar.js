@@ -32,7 +32,7 @@ export function Toolbar(props) {
             "imageSettings",
             "embedSettings",
             "attachmentSettings",
-            "linkRemove",
+            "linkSettings",
             "codeRemove",
         ],
         [
@@ -51,7 +51,7 @@ export function Toolbar(props) {
         ["fontSize"],
         ["headings", "fontFamily"],
         ["numberedList", "bulletList"],
-        ["link"],
+        ["addLink"],
         ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
         ["clearformatting"],
     ];

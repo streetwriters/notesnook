@@ -31,10 +31,8 @@ import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
-import { Link } from "./extensions/link";
+import { Link } from "@tiptap/extension-link";
 import {
-  PortalProviderAPI,
-  EventDispatcher,
   NodeViewSelectionNotifier,
   usePortalProvider,
 } from "./extensions/react";

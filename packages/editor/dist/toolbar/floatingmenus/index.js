@@ -9,8 +9,9 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
+import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
+import { HoverPopupHandler } from "./hover-popup";
 import { SearchReplaceFloatingMenu } from "./search-replace";
 export function EditorFloatingMenus(props) {
-    return (_jsx(_Fragment, { children: _jsx(SearchReplaceFloatingMenu, __assign({}, props)) }));
+    return (_jsxs(_Fragment, { children: [_jsx(SearchReplaceFloatingMenu, __assign({}, props)), _jsx(HoverPopupHandler, __assign({}, props))] }));
 }

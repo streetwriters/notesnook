@@ -43,6 +43,7 @@ function _PopupPresenter(props) {
         var popupPosition = getPosition(popup, position);
         popup.style.top = popupPosition.top + "px";
         popup.style.left = popupPosition.left + "px";
+        console.log("popup", popupPosition);
     }, [position]);
     useEffect(function () {
         repositionPopup();
@@ -216,4 +217,5 @@ export function showPopup(options) {
                 align: "end",
                 yOffset: 10,
             }, blocking: true, focusOnRender: true }, props, { children: popup(hide) })) })), getPopupContainer());
+    return hide;
 }
