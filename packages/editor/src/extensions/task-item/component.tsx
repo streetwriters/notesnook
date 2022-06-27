@@ -43,7 +43,9 @@ export function TaskItemComponent(
         <Icon
           className="dragHandle"
           draggable="true"
-          //contentEditable={false}
+          // NOTE: Turning this off somehow makes drag/drop stop working
+          // properly on touch devices.
+          // contentEditable={false}
           data-drag-handle
           path={Icons.dragHandle}
           sx={{
