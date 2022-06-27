@@ -74,6 +74,8 @@ export function Menu(props: MenuProps) {
     <>
       <MenuContainer {...containerProps}>
         {items.map((item, index) => {
+          if (item.isHidden) return null;
+
           switch (item.type) {
             case "separator":
               return <MenuSeparator key={item.key} />;

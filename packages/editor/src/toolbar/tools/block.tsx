@@ -115,6 +115,15 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         onClick: () =>
           editor.current?.chain().focus().openAttachmentPicker("image").run(),
       },
+      {
+        key: "camera",
+        type: "button",
+        title: "Take a photo using camera",
+        icon: "camera",
+        isHidden: !isMobile,
+        onClick: () =>
+          editor.current?.chain().focus().openAttachmentPicker("camera").run(),
+      },
       isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor),
     ],
   },

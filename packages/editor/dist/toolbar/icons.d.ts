@@ -35,6 +35,7 @@ export declare const Icons: {
     loading: string;
     more: string;
     upload: string;
+    camera: string;
     attachment: string;
     table: string;
     rowProperties: string;

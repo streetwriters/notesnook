@@ -295,6 +295,8 @@ function ContentContainer(props: PropsWithChildren<ContentContainerProps>) {
       {children
         ? children
         : current?.items?.map((item) => {
+            if (item.isHidden) return null;
+
             switch (item.type) {
               case "separator":
                 return <MenuSeparator key={item.key} />;

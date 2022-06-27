@@ -1,6 +1,6 @@
 import { Node, Editor } from "@tiptap/core";
 import { Attribute } from "@tiptap/core";
-export declare type AttachmentType = "image" | "file";
+export declare type AttachmentType = "image" | "file" | "camera";
 export interface AttachmentOptions {
     HTMLAttributes: Record<string, any>;
     onDownloadAttachment: (editor: Editor, attachment: Attachment) => boolean;

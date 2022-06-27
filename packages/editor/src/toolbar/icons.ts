@@ -98,6 +98,7 @@ import {
   mdiMovieCogOutline,
   mdiLinkOff,
   mdiOpenInNew,
+  mdiCameraOutline,
 } from "@mdi/js";
 
 export const Icons = {
@@ -140,6 +141,7 @@ export const Icons = {
   loading: mdiLoading,
   more: mdiDotsVertical,
   upload: mdiUploadOutline,
+  camera: mdiCameraOutline,
   attachment: mdiAttachment,
   table: mdiTable,
   rowProperties: mdiTableRowHeight,

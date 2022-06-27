@@ -67,6 +67,8 @@ export function Menu(props) {
         subMenuRef.current.style.left = "".concat(left, "px");
     }, [isSubmenuOpen, focusIndex, items]);
     return (_jsxs(_Fragment, { children: [_jsx(MenuContainer, __assign({}, containerProps, { children: items.map(function (item, index) {
+                    if (item.isHidden)
+                        return null;
                     switch (item.type) {
                         case "separator":
                             return _jsx(MenuSeparator, {}, item.key);

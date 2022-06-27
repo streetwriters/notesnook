@@ -3,7 +3,7 @@ import { Attribute } from "@tiptap/core";
 import { createNodeView, createSelectionBasedNodeView } from "../react";
 import { AttachmentComponent } from "./component";
 
-export type AttachmentType = "image" | "file";
+export type AttachmentType = "image" | "file" | "camera";
 export interface AttachmentOptions {
   HTMLAttributes: Record<string, any>;
   onDownloadAttachment: (editor: Editor, attachment: Attachment) => boolean;

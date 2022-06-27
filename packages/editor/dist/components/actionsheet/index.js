@@ -177,6 +177,8 @@ function ContentContainer(props) {
     return (_jsxs(Flex, __assign({ sx: { flexDirection: "column" } }, { children: [canGoBack || (current === null || current === void 0 ? void 0 : current.title) ? (_jsxs(Flex, __assign({ id: "header", sx: { alignItems: "center", mx: 0, mb: 1 } }, { children: [canGoBack && (_jsx(Button, __assign({ variant: "icon", sx: { p: 1, ml: 1 }, onClick: goBack }, { children: _jsx(Icon, { path: Icons.arrowLeft, size: "big" }) }))), (current === null || current === void 0 ? void 0 : current.title) && (_jsx(Text, __assign({ variant: "title", sx: { ml: 1, fontSize: "title" } }, { children: current === null || current === void 0 ? void 0 : current.title })))] }))) : null, children
                 ? children
                 : (_a = current === null || current === void 0 ? void 0 : current.items) === null || _a === void 0 ? void 0 : _a.map(function (item) {
+                    if (item.isHidden)
+                        return null;
                     switch (item.type) {
                         case "separator":
                             return _jsx(MenuSeparator, {}, item.key);
