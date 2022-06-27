@@ -34,13 +34,12 @@ import { useToolbarLocation } from "../stores/toolbar-store";
 import { ImageProperties as ImagePropertiesPopup } from "../popups/image-properties";
 import { findSelectedNode } from "../utils/prosemirror";
 export function ImageSettings(props) {
+    var _a, _b;
     var editor = props.editor;
     var isBottom = useToolbarLocation() === "bottom";
     if (!editor.isActive("image") || !isBottom)
         return null;
-    var image = useMemo(function () { return findSelectedNode(editor, "image"); }, []);
-    var float = ((image === null || image === void 0 ? void 0 : image.attrs) || {}).float;
-    return (_jsx(MoreTools, __assign({}, props, { autoCloseOnUnmount: true, popupId: "imageSettings", tools: float
+    return (_jsx(MoreTools, __assign({}, props, { autoCloseOnUnmount: true, popupId: "imageSettings", tools: ((_b = (_a = findSelectedNode(editor, "image")) === null || _a === void 0 ? void 0 : _a.attrs) === null || _b === void 0 ? void 0 : _b.float)
             ? ["imageAlignLeft", "imageAlignRight", "imageProperties"]
             : [
                 "imageAlignLeft",

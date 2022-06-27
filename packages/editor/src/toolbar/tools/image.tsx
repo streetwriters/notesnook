@@ -15,11 +15,8 @@ import { findSelectedNode } from "../utils/prosemirror";
 export function ImageSettings(props: ToolProps) {
   const { editor } = props;
   const isBottom = useToolbarLocation() === "bottom";
-  if (!editor.isActive("image") || !isBottom) return null;
 
-  const image = useMemo(() => findSelectedNode(editor, "image"), []);
-  const { float } = (image?.attrs || {}) as ImageAlignmentOptions &
-    ImageSizeOptions;
+  if (!editor.isActive("image") || !isBottom) return null;
 
   return (
     <MoreTools
@@ -27,7 +24,7 @@ export function ImageSettings(props: ToolProps) {
       autoCloseOnUnmount
       popupId="imageSettings"
       tools={
-        float
+        findSelectedNode(editor, "image")?.attrs?.float
           ? ["imageAlignLeft", "imageAlignRight", "imageProperties"]
           : [
               "imageAlignLeft",
