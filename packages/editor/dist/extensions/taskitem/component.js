@@ -46,7 +46,7 @@ export function TaskItemComponent(props) {
                 ":hover > .dragHandle": {
                     opacity: 1,
                 },
-            } }, { children: [_jsx(Icon, { className: "dragHandle", draggable: "true", contentEditable: false, "data-drag-handle": true, path: Icons.dragHandle, sx: {
+            } }, { children: [_jsx(Icon, { className: "dragHandle", draggable: "true", "data-drag-handle": true, path: Icons.dragHandle, sx: {
                         opacity: [1, 1, 0],
                         alignSelf: "start",
                         mr: 2,

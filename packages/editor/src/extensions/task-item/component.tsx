@@ -43,7 +43,7 @@ export function TaskItemComponent(
         <Icon
           className="dragHandle"
           draggable="true"
-          contentEditable={false}
+          //contentEditable={false}
           data-drag-handle
           path={Icons.dragHandle}
           sx={{
