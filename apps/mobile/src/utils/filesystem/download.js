@@ -21,7 +21,6 @@ export async function downloadFile(filename, data, cancelToken) {
   try {
     let exists = await RNFetchBlob.fs.exists(path);
     if (exists) {
-      console.log(await RNFetchBlob.fs.readFile(path, 'utf8'));
       console.log('file is downloaded');
       return true;
     }

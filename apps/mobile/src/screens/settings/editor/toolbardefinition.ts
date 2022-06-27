@@ -1,9 +1,19 @@
 import { Icons } from 'notesnook-editor/dist/toolbar/icons';
 import { useThemeStore } from '../../../stores/use-theme-store';
+import { ToolbarGroupDefinition, ToolDefinition } from 'notesnook-editor/dist/toolbar/types';
+import { ToolId } from 'notesnook-editor/dist/toolbar/tools';
 
-export const presets = {
+export const presets: { [name: string]: ToolbarGroupDefinition[] } = {
   default: [
-    ['insertBlock'],
+    [
+      'insertBlock',
+      'tableSettings',
+      'imageSettings',
+      'embedSettings',
+      'attachmentSettings',
+      'linkSettings',
+      'codeRemove'
+    ],
     [
       'bold',
       'italic',
@@ -13,12 +23,20 @@ export const presets = {
     ['fontSize'],
     ['headings', 'fontFamily'],
     ['numberedList', 'bulletList'],
-    ['link'],
+    ['addLink'],
     ['alignCenter', ['alignLeft', 'alignRight', 'alignJustify', 'ltr', 'rtl']],
     ['clearformatting']
   ],
   minimal: [
-    ['insertBlock'],
+    [
+      'insertBlock',
+      'tableSettings',
+      'imageSettings',
+      'embedSettings',
+      'attachmentSettings',
+      'linkSettings',
+      'codeRemove'
+    ],
     [
       'bold',
       'italic',
@@ -26,7 +44,17 @@ export const presets = {
       ['strikethrough', 'subscript', 'superscript', 'highlight', 'textColor']
     ]
   ],
-  custom: []
+  custom: [
+    [
+      'insertBlock',
+      'tableSettings',
+      'imageSettings',
+      'embedSettings',
+      'attachmentSettings',
+      'linkSettings',
+      'codeRemove'
+    ]
+  ]
 };
 
 export function findToolById(id: keyof typeof tools): { title: string; icon: string } {
@@ -51,13 +79,14 @@ export function getUngroupedTools(toolDefinition: (string | string[])[][]): stri
   const ungrouped = [];
   let toolString = JSON.stringify(toolDefinition);
   for (let key of keys) {
+    if (tools[key as ToolId].conditional) continue;
     if (!toolString.includes(key)) ungrouped.push(key);
   }
   console.log(ungrouped);
   return ungrouped;
 }
 
-export const tools = {
+export const tools: Record<ToolId, ToolDefinition> = {
   bold: {
     icon: 'bold',
     title: 'Bold'
@@ -74,13 +103,38 @@ export const tools = {
     icon: 'strikethrough',
     title: 'Strikethrough'
   },
-  link: {
+  addLink: {
     icon: 'link',
     title: 'Link'
+  },
+  editLink: {
+    icon: 'linkEdit',
+    title: 'Edit link',
+    conditional: true
+  },
+  removeLink: {
+    icon: 'linkRemove',
+    title: 'Remove link',
+    conditional: true
+  },
+  openLink: {
+    icon: 'openLink',
+    title: 'Open link',
+    conditional: true
+  },
+  linkSettings: {
+    icon: 'linkSettings',
+    title: 'Link settings',
+    conditional: true
   },
   code: {
     icon: 'code',
     title: 'Code'
+  },
+  codeRemove: {
+    icon: 'codeRemove',
+    title: 'Code',
+    conditional: true
   },
   clearformatting: {
     icon: 'formatClear',
@@ -149,9 +203,180 @@ export const tools = {
   textColor: {
     icon: 'textColor',
     title: 'Text color'
+  },
+
+  tableSettings: {
+    icon: 'tableSettings',
+    title: 'Table settings',
+    conditional: true
+  },
+  columnProperties: {
+    icon: 'columnProperties',
+    title: 'Column properties',
+    conditional: true
+  },
+  rowProperties: {
+    icon: 'rowProperties',
+    title: 'Row properties',
+    conditional: true
+  },
+  cellProperties: {
+    icon: 'cellProperties',
+    title: 'Cell properties',
+    conditional: true
+  },
+  insertColumnLeft: {
+    icon: 'insertColumnLeft',
+    title: 'Insert column left',
+    conditional: true
+  },
+  insertColumnRight: {
+    icon: 'insertColumnRight',
+    title: 'Insert column right',
+    conditional: true
+  },
+  moveColumnLeft: {
+    icon: 'moveColumnLeft',
+    title: 'Move column left',
+    conditional: true
+  },
+  moveColumnRight: {
+    icon: 'moveColumnRight',
+    title: 'Move column right',
+    conditional: true
+  },
+  deleteColumn: {
+    icon: 'deleteColumn',
+    title: 'Delete column',
+    conditional: true
+  },
+  splitCells: {
+    icon: 'splitCells',
+    title: 'Split cells',
+    conditional: true
+  },
+  mergeCells: {
+    icon: 'mergeCells',
+    title: 'Merge cells',
+    conditional: true
+  },
+  insertRowAbove: {
+    icon: 'insertRowAbove',
+    title: 'Insert row above',
+    conditional: true
+  },
+  insertRowBelow: {
+    icon: 'insertRowBelow',
+    title: 'Insert row below',
+    conditional: true
+  },
+  moveRowUp: {
+    icon: 'moveRowUp',
+    title: 'Move row up',
+    conditional: true
+  },
+  moveRowDown: {
+    icon: 'moveRowDown',
+    title: 'Move row down',
+    conditional: true
+  },
+  deleteRow: {
+    icon: 'deleteRow',
+    title: 'Delete row',
+    conditional: true
+  },
+  deleteTable: {
+    icon: 'deleteTable',
+    title: 'Delete table',
+    conditional: true
+  },
+  cellBackgroundColor: {
+    icon: 'backgroundColor',
+    title: 'Cell background color',
+    conditional: true
+  },
+  cellBorderColor: {
+    icon: 'cellBorderColor',
+    title: 'Cell border color',
+    conditional: true
+  },
+  cellTextColor: {
+    icon: 'textColor',
+    title: 'Cell text color',
+    conditional: true
+  },
+  cellBorderWidth: {
+    icon: 'none',
+    title: 'Cell border width',
+    conditional: true
+  },
+
+  imageSettings: {
+    icon: 'imageSettings',
+    title: 'Image settings',
+    conditional: true
+  },
+  imageAlignCenter: {
+    icon: 'alignCenter',
+    title: 'Align center',
+    conditional: true
+  },
+  imageAlignLeft: {
+    icon: 'alignLeft',
+    title: 'Align left',
+    conditional: true
+  },
+  imageAlignRight: {
+    icon: 'alignRight',
+    title: 'Align right',
+    conditional: true
+  },
+  imageProperties: {
+    icon: 'more',
+    title: 'Image properties',
+    conditional: true
+  },
+  attachmentSettings: {
+    icon: 'attachmentSettings',
+    title: 'Attachment settings',
+    conditional: true
+  },
+  downloadAttachment: {
+    icon: 'download',
+    title: 'Download attachment',
+    conditional: true
+  },
+  removeAttachment: {
+    icon: 'delete',
+    title: 'Remove attachment',
+    conditional: true
+  },
+  embedSettings: {
+    icon: 'embedSettings',
+    title: 'Embed settings',
+    conditional: true
+  },
+  embedAlignCenter: {
+    icon: 'alignCenter',
+    title: 'Align center',
+    conditional: true
+  },
+  embedAlignLeft: {
+    icon: 'alignLeft',
+    title: 'Align left',
+    conditional: true
+  },
+  embedAlignRight: {
+    icon: 'alignRight',
+    title: 'Align right',
+    conditional: true
+  },
+  embedProperties: {
+    icon: 'more',
+    title: 'Embed properties',
+    conditional: true
   }
 };
-
 export const toolbarDefinition = presets['default'];
 
 export type FlattenedToolbarItemType = {

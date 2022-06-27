@@ -8,6 +8,7 @@ import { Note } from './types';
 import { getResponse, randId, textInput } from './utils';
 import { Attachment, AttachmentProgress } from 'notesnook-editor/dist/extensions/attachment/index';
 import { ImageAttributes } from 'notesnook-editor/dist/extensions/image/index';
+import { ToolbarGroupDefinition } from 'notesnook-editor/dist/toolbar/types';
 
 type Action = { job: string; id: string };
 
@@ -16,6 +17,7 @@ export type Settings = {
   fullscreen: boolean;
   deviceMode: string;
   premium: boolean;
+  tools: ToolbarGroupDefinition[];
 };
 
 async function call(webview: RefObject<WebView | undefined>, action?: Action) {

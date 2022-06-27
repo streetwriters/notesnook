@@ -27,6 +27,7 @@ import {
 import filesystem from '../../../utils/filesystem';
 import { tabBarRef } from '../../../utils/global-refs';
 import { NoteType } from '../../../utils/types';
+import { useDragState } from '../../settings/editor/state';
 import picker from './picker';
 import { EditorMessage, useEditorType } from './types';
 import { editorController, EditorEvents, editorState } from './utils';
@@ -118,23 +119,34 @@ export const useEditorEvents = (editor: useEditorType) => {
   const currentEditingNote = useEditorStore(state => state.currentEditingNote);
   const readonly = useEditorStore(state => state.readonly);
   const isPremium = useUserStore(state => state.premium);
+  const tools = useDragState(state => state.data);
   if (!editor) return null;
 
   useEffect(() => {
+    console.log('setting settings');
     editor.commands.setSettings({
       deviceMode: deviceMode || 'mobile',
       fullscreen: fullscreen,
       premium: isPremium,
-      readonly: readonly
+      readonly: readonly,
+      tools: tools
     });
-  }, [currentEditingNote, fullscreen, isPremium, readonly, editor.sessionId, editor.loading]);
+  }, [
+    currentEditingNote,
+    fullscreen,
+    isPremium,
+    readonly,
+    editor.sessionId,
+    editor.loading,
+    tools
+  ]);
 
   const onBackPress = useCallback(async () => {
     const editorHandledBack = await editor.commands.handleBack();
-    if (editorHandledBack) {
-      logger.info('editor handled back event');
-      return;
-    }
+    // if (!editorHandledBack) {
+    //   logger.info('editor handled back event', editorHandledBack);
+    //   return;
+    // }
     setTimeout(async () => {
       if (deviceMode !== 'mobile' && fullscreen) {
         if (fullscreen) {

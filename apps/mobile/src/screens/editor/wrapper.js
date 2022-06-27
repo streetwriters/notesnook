@@ -17,6 +17,7 @@ import { useThemeStore } from '../../stores/use-theme-store';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
 import EditorOverlay from './loading';
+import { ProgressBar } from './progress';
 import { editorController, editorState, textInput } from './tiptap/utils';
 
 export const EditorWrapper = ({ width }) => {
@@ -74,6 +75,7 @@ export const EditorWrapper = ({ width }) => {
               style={{ height: 1, padding: 0, width: 1, position: 'absolute' }}
               blurOnSubmit={false}
             />
+            <ProgressBar />
             <Editor key="editor" />
             <EditorOverlay key="overlay" />
           </KeyboardAvoidingView>

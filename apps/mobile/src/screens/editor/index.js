@@ -2,7 +2,6 @@ import React from 'react';
 import { Linking, Platform } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
-import { useUserStore } from '../../stores/use-user-store';
 import { useEditor } from './tiptap/use-editor';
 import { useEditorEvents } from './tiptap/use-editor-events';
 import { editorController } from './tiptap/utils';
@@ -24,7 +23,6 @@ const onShouldStartLoadWithRequest = request => {
 
 const Editor = React.memo(
   () => {
-    const premiumUser = useUserStore(state => state.premium);
     const editor = useEditor();
     const onMessage = useEditorEvents(editor);
     editorController.current = editor;
@@ -62,7 +60,7 @@ const Editor = React.memo(
         allowUniversalAccessFromFileURLs={true}
         originWhitelist={['*']}
         source={{
-          uri: 'http://192.168.10.5:3000'
+          uri: 'http://localhost:3000'
         }}
         style={style}
         autoManageStatusBarEnabled={false}

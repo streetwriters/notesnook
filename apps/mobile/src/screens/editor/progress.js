@@ -4,22 +4,16 @@ import * as Progress from 'react-native-progress';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { useAttachmentStore } from '../../stores/use-attachment-store';
 import { SIZE } from '../../utils/size';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export const ProgressCircle = () => {
+export const ProgressBar = () => {
   const colors = useThemeStore(state => state.colors);
-
   const loading = useAttachmentStore(state => state.loading);
   const [prog, setProg] = useState(0);
   const [visible, setVisible] = useState(false);
   const timer = useRef();
-
-  const formatText = progress => {
-    progress = (progress * 100).toFixed(0);
-    if (progress === 0) {
-      progress = 10;
-    }
-    return progress + '%';
-  };
+  const insets = useSafeAreaInsets();
+  const [width, setWidth] = useState(false);
 
   useEffect(() => {
     if (loading) {
@@ -49,20 +43,20 @@ export const ProgressCircle = () => {
     <View
       style={{
         justifyContent: 'center',
-        marginLeft: 10
+        position: 'absolute',
+        zIndex: 1,
+        marginTop: insets.top + 45,
+        width: '100%'
       }}
+      onLayout={event => setWidth(event.nativeEvent.layout.width)}
     >
-      <Progress.Circle
+      <Progress.Bar
         size={SIZE.xxl}
         progress={prog}
-        showsText
-        textStyle={{
-          fontSize: 7
-        }}
         color={colors.accent}
-        formatText={formatText}
         borderWidth={0}
-        thickness={2}
+        height={1}
+        width={width || 400}
       />
     </View>
   ) : null;

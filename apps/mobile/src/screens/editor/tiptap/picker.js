@@ -189,25 +189,11 @@ const pick = async options => {
     return;
   }
 
-  if (options?.type.startsWith('image')) {
-    if (options?.reupload) {
+  if (options?.type.startsWith('image') || options?.type === 'camera') {
+    if (options.type === 'image') {
       gallery(options);
     } else {
-      presentSheet({
-        context: options?.context,
-        actionsArray: [
-          {
-            action: () => camera(options),
-            actionText: 'Open camera',
-            icon: 'camera'
-          },
-          {
-            action: () => gallery(options),
-            actionText: 'Select image from gallery',
-            icon: 'image-multiple'
-          }
-        ]
-      });
+      camera(options);
     }
   } else {
     file(options);
