@@ -1,4 +1,10 @@
-import React, { PropsWithChildren, useCallback, useRef, useState } from "react";
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import { MenuItem } from "../menu/types";
 import { useTheme } from "emotion-theming";
 import { Theme } from "@notesnook/theme";
@@ -80,7 +86,6 @@ export function ActionSheetPresenter(
   } = props;
   const theme: Theme = useTheme();
   const contentRef = useRef<HTMLDivElement>();
-  const focusedElement = useRef<HTMLElement>();
 
   const y = useMotionValue(0);
   const opacity = useTransform(
@@ -100,6 +105,23 @@ export function ActionSheetPresenter(
       y: height + 100,
     });
   }, [animation, onClose, contentRef.current]);
+
+  const handleBackPress = useCallback(
+    (event: Event) => {
+      event.preventDefault();
+      onBeforeClose();
+    },
+    [onBeforeClose]
+  );
+
+  useEffect(() => {
+    // Note: this is a custom event implemented on the React Native
+    // side to handle back button when action sheet is opened.
+    window.addEventListener("handleBackPress", handleBackPress);
+    return () => {
+      window.removeEventListener("handleBackPress", handleBackPress);
+    };
+  }, [handleBackPress]);
 
   if (!isOpen) return null;
   return (

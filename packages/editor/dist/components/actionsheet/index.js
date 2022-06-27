@@ -26,7 +26,7 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState, useEffect, } from "react";
 import { useTheme } from "emotion-theming";
 import { Box, Button, Flex, Text } from "rebass";
 import { Icon } from "../../toolbar/components/icon";
@@ -71,7 +71,6 @@ export function ActionSheetPresenter(props) {
     var isOpen = props.isOpen, title = props.title, items = props.items, onClose = props.onClose, _b = props.blocking, blocking = _b === void 0 ? true : _b, _c = props.focusOnRender, focusOnRender = _c === void 0 ? true : _c, _d = props.draggable, draggable = _d === void 0 ? true : _d, children = props.children;
     var theme = useTheme();
     var contentRef = useRef();
-    var focusedElement = useRef();
     var y = useMotionValue(0);
     var opacity = useTransform(y, [0, ((_a = contentRef.current) === null || _a === void 0 ? void 0 : _a.offsetHeight) || window.innerHeight], [1, 0]);
     var animation = useAnimation();
@@ -86,6 +85,18 @@ export function ActionSheetPresenter(props) {
             y: height + 100,
         });
     }, [animation, onClose, contentRef.current]);
+    var handleBackPress = useCallback(function (event) {
+        event.preventDefault();
+        onBeforeClose();
+    }, [onBeforeClose]);
+    useEffect(function () {
+        // Note: this is a custom event implemented on the React Native
+        // side to handle back button when action sheet is opened.
+        window.addEventListener("handleBackPress", handleBackPress);
+        return function () {
+            window.removeEventListener("handleBackPress", handleBackPress);
+        };
+    }, [handleBackPress]);
     if (!isOpen)
         return null;
     return (_jsx(Modal, __assign({ contentRef: function (ref) { return (contentRef.current = ref); }, className: "bottom-sheet-presenter", role: "menu", isOpen: isOpen, appElement: document.body, shouldCloseOnEsc: blocking, shouldReturnFocusAfterClose: focusOnRender, shouldCloseOnOverlayClick: blocking, shouldFocusAfterRender: focusOnRender, ariaHideApp: blocking, preventScroll: blocking, onRequestClose: function () { return onBeforeClose(); }, portalClassName: "bottom-sheet-presenter-portal", onAfterOpen: function () {
