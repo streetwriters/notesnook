@@ -33,6 +33,7 @@ export function TaskItemComponent(
   return (
     <>
       <Flex
+        data-drag-image
         sx={{
           ":hover > .dragHandle": {
             opacity: 1,
@@ -46,9 +47,10 @@ export function TaskItemComponent(
           data-drag-handle
           path={Icons.dragHandle}
           sx={{
-            opacity: 0,
+            opacity: [1, 1, 0],
             alignSelf: "start",
             mr: 2,
+            bg: "transparent",
             cursor: "grab",
             ".icon:hover path": {
               fill: "var(--checked) !important",
@@ -75,7 +77,8 @@ export function TaskItemComponent(
             },
           }}
           onMouseDown={(e) => {
-            if (toggle()) e.preventDefault();
+            e.preventDefault();
+            toggle();
           }}
           color={checked ? "checked" : "icon"}
           size={13}

@@ -37,6 +37,8 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 import { jsx as _jsx } from "react/jsx-runtime";
 import { NodeSelection } from "prosemirror-state";
 import { ThemeProvider } from "emotion-theming";
+// @ts-ignore
+import { __serializeForClipboard } from "prosemirror-view";
 var ReactNodeView = /** @class */ (function () {
     function ReactNodeView(node, editor, getPos, options) {
         var _this = this;
@@ -186,12 +188,13 @@ var ReactNodeView = /** @class */ (function () {
             x = handleBox.x - domBox.x + offsetX;
             y = handleBox.y - domBox.y + offsetY;
         }
-        (_g = event.dataTransfer) === null || _g === void 0 ? void 0 : _g.setDragImage(dragImage, x, y);
         // we need to tell ProseMirror that we want to move the whole node
         // so we create a NodeSelection
         var selection = NodeSelection.create(view.state.doc, this.getPos());
         var transaction = view.state.tr.setSelection(selection);
         view.dispatch(transaction);
+        (_g = event.dataTransfer) === null || _g === void 0 ? void 0 : _g.setDragImage(dragImage, x, y);
+        forceHandleDrag(event, this.editor);
     };
     ReactNodeView.prototype.stopEvent = function (event) {
         var _this = this;
@@ -224,6 +227,15 @@ var ReactNodeView = /** @class */ (function () {
         var isCutEvent = event.type === "cut";
         var isClickEvent = event.type === "mousedown";
         var isDragEvent = event.type.startsWith("drag");
+        // if (event instanceof DragEvent && event.dataTransfer) {
+        //   console.log(
+        //     `[${event.type}]:`,
+        //     this.editor.view.dragging,
+        //     event.dataTransfer.getData("Text"),
+        //     event.dataTransfer.getData("text/plain"),
+        //     event.dataTransfer.getData("text/html")
+        //   );
+        // }
         // ProseMirror tries to drag selectable nodes
         // even if `draggable` is set to `false`
         // this fix prevents that
@@ -340,4 +352,31 @@ export function createNodeView(component, options) {
         var _getPos = function () { return (typeof getPos === "boolean" ? -1 : getPos()); };
         return new ReactNodeView(node, editor, _getPos, __assign(__assign({}, options), { component: component })).init();
     };
+}
+// function isiOS(): boolean {
+//   return (
+//     [
+//       "iPad Simulator",
+//       "iPhone Simulator",
+//       "iPod Simulator",
+//       "iPad",
+//       "iPhone",
+//       "iPod",
+//     ].includes(navigator.platform) ||
+//     // iPad on iOS 13 detection
+//     (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+//   );
+// }
+function forceHandleDrag(event, editor) {
+    if (!event.dataTransfer)
+        return;
+    var view = editor.view;
+    var slice = view.state.selection.content();
+    var _a = __serializeForClipboard(view, slice), dom = _a.dom, text = _a.text;
+    event.dataTransfer.clearData();
+    event.dataTransfer.setData("Text", text);
+    event.dataTransfer.setData("text/plain", text);
+    event.dataTransfer.setData("text/html", dom.innerHTML);
+    event.dataTransfer.effectAllowed = "copyMove";
+    view.dragging = { slice: slice, move: true };
 }

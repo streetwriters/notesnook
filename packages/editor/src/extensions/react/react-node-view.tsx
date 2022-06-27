@@ -14,6 +14,8 @@ import {
 import { Editor, NodeViewRendererProps } from "@tiptap/core";
 import { Theme } from "@notesnook/theme";
 import { ThemeProvider } from "emotion-theming";
+// @ts-ignore
+import { __serializeForClipboard } from "prosemirror-view";
 
 export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;
@@ -219,14 +221,15 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       y = handleBox.y - domBox.y + offsetY;
     }
 
-    event.dataTransfer?.setDragImage(dragImage, x, y);
-
     // we need to tell ProseMirror that we want to move the whole node
     // so we create a NodeSelection
     const selection = NodeSelection.create(view.state.doc, this.getPos());
     const transaction = view.state.tr.setSelection(selection);
 
     view.dispatch(transaction);
+
+    event.dataTransfer?.setDragImage(dragImage, x, y);
+    forceHandleDrag(event, this.editor);
   }
 
   stopEvent(event: Event): boolean {
@@ -266,6 +269,16 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     const isCutEvent = event.type === "cut";
     const isClickEvent = event.type === "mousedown";
     const isDragEvent = event.type.startsWith("drag");
+
+    // if (event instanceof DragEvent && event.dataTransfer) {
+    //   console.log(
+    //     `[${event.type}]:`,
+    //     this.editor.view.dragging,
+    //     event.dataTransfer.getData("Text"),
+    //     event.dataTransfer.getData("text/plain"),
+    //     event.dataTransfer.getData("text/html")
+    //   );
+    // }
 
     // ProseMirror tries to drag selectable nodes
     // even if `draggable` is set to `false`
@@ -439,3 +452,18 @@ export function createNodeView<TProps extends ReactNodeViewProps>(
 //     (navigator.userAgent.includes("Mac") && "ontouchend" in document)
 //   );
 // }
+
+function forceHandleDrag(event: DragEvent, editor: Editor) {
+  if (!event.dataTransfer) return;
+  const { view } = editor;
+  const slice = view.state.selection.content();
+  const { dom, text } = __serializeForClipboard(view, slice);
+
+  event.dataTransfer.clearData();
+  event.dataTransfer.setData("Text", text);
+  event.dataTransfer.setData("text/plain", text);
+  event.dataTransfer.setData("text/html", dom.innerHTML);
+  event.dataTransfer.effectAllowed = "copyMove";
+
+  view.dragging = { slice, move: true };
+}

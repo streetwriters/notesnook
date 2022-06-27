@@ -58,9 +58,6 @@ import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
 import { useIsMobile } from "./toolbar/stores/toolbar-store";
-// export class Editor extends TiptapEditor {
-//   get instance(): TiptapEditor {}
-// }
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -158,6 +155,18 @@ var useTiptap = function (options, deps) {
                 get: function () { return editorRef.current; },
             });
     }, [editor]);
+    useEffect(function () {
+        function onDragEnter(event) {
+            if (!!(editor === null || editor === void 0 ? void 0 : editor.view.dragging)) {
+                event.preventDefault();
+                return true;
+            }
+        }
+        editor === null || editor === void 0 ? void 0 : editor.view.dom.addEventListener("dragenter", onDragEnter);
+        return function () {
+            editor === null || editor === void 0 ? void 0 : editor.view.dom.removeEventListener("dragenter", onDragEnter);
+        };
+    }, [editor === null || editor === void 0 ? void 0 : editor.view.dom]);
     return editor;
 };
 export { useTiptap, Toolbar };

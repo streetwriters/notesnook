@@ -42,10 +42,6 @@ import { Table } from "./extensions/table";
 import { Editor } from "./types";
 import { useIsMobile } from "./toolbar/stores/toolbar-store";
 
-// export class Editor extends TiptapEditor {
-//   get instance(): TiptapEditor {}
-// }
-
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
   (this as any).updateStateInner(state, this.state.plugins != state.plugins);
@@ -162,6 +158,20 @@ const useTiptap = (
         get: () => editorRef.current,
       });
   }, [editor]);
+
+  useEffect(() => {
+    function onDragEnter(event: DragEvent) {
+      if (!!editor?.view.dragging) {
+        event.preventDefault();
+        return true;
+      }
+    }
+
+    editor?.view.dom.addEventListener("dragenter", onDragEnter);
+    return () => {
+      editor?.view.dom.removeEventListener("dragenter", onDragEnter);
+    };
+  }, [editor?.view.dom]);
 
   return editor;
 };

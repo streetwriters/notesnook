@@ -42,14 +42,15 @@ export function TaskItemComponent(props) {
         });
         return true;
     }, [editor, getPos, node, checked]);
-    return (_jsx(_Fragment, { children: _jsxs(Flex, __assign({ sx: {
+    return (_jsx(_Fragment, { children: _jsxs(Flex, __assign({ "data-drag-image": true, sx: {
                 ":hover > .dragHandle": {
                     opacity: 1,
                 },
             } }, { children: [_jsx(Icon, { className: "dragHandle", draggable: "true", contentEditable: false, "data-drag-handle": true, path: Icons.dragHandle, sx: {
-                        opacity: 0,
+                        opacity: [1, 1, 0],
                         alignSelf: "start",
                         mr: 2,
+                        bg: "transparent",
                         cursor: "grab",
                         ".icon:hover path": {
                             fill: "var(--checked) !important",
@@ -69,8 +70,8 @@ export function TaskItemComponent(props) {
                             fill: "var(--checked) !important",
                         },
                     }, onMouseDown: function (e) {
-                        if (toggle())
-                            e.preventDefault();
+                        e.preventDefault();
+                        toggle();
                     }, color: checked ? "checked" : "icon", size: 13 }), _jsx(Text, { as: "div", ref: forwardRef, sx: {
                         textDecorationLine: checked ? "line-through" : "none",
                         color: checked ? "var(--checked)" : "var(--text)",
