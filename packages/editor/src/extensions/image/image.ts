@@ -158,6 +158,8 @@ export const ImageNode = Node.create<ImageOptions>({
               ...options,
             });
           }
+          tr.setMeta("preventUpdate", true);
+          tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
         },

@@ -149,6 +149,8 @@ export var ImageNode = Node.create({
                         }
                         finally { if (e_1) throw e_1.error; }
                     }
+                    tr.setMeta("preventUpdate", true);
+                    tr.setMeta("addToHistory", false);
                     if (dispatch)
                         dispatch(tr);
                     return true;
