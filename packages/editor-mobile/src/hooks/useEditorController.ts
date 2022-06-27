@@ -25,7 +25,7 @@ export type EditorController = {
   scroll: (event: React.UIEvent<HTMLDivElement, UIEvent>) => void;
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
-  openFilePicker: (type: "image" | "file") => void;
+  openFilePicker: (type: "image" | "file" | "camera") => void;
   downloadAttachment: (attachment: Attachment) => void;
 };
 
@@ -93,7 +93,7 @@ export function useEditorController(editor: Editor | null): EditorController {
   const scroll = useCallback(
     (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
       //@ts-ignore
-      post(EventTypes.scroll, event.target.scrollTop);
+      //post(EventTypes.scroll, event.target.scrollTop);
     },
     []
   );

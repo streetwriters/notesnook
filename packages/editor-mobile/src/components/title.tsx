@@ -1,10 +1,13 @@
-import { useEffect, useRef } from "react";
+import React from "react";
+import { RefObject, useEffect, useRef } from "react";
 import { EditorController } from "../hooks/useEditorController";
 import styles from "./styles.module.css";
-export default function Title({
+function Title({
   controller,
+  title,
 }: {
-  controller: EditorController;
+  controller: RefObject<EditorController>;
+  title: string;
 }) {
   const titleRef = useRef<HTMLInputElement>(null);
   const emitUpdate = useRef(true);
@@ -13,10 +16,10 @@ export default function Title({
   useEffect(() => {
     if (titleRef.current) {
       emitUpdate.current = false;
-      titleRef.current.value = controller.title;
+      titleRef.current.value = title;
       emitUpdate.current = true;
     }
-  }, [controller.title]);
+  }, [title]);
 
   return (
     <input
@@ -37,9 +40,14 @@ export default function Title({
       }}
       onChange={(event) => {
         if (!emitUpdate.current) return;
-        controller.titleChange(event.target.value);
+        controller.current?.titleChange(event.target.value);
       }}
       placeholder="Note title"
     />
   );
 }
+
+export default React.memo(Title, (prev, next) => {
+  if (prev.title !== next.title) return false;
+  return true;
+});

@@ -1,7 +1,8 @@
 import { useTheme } from "@notesnook/theme";
-import { EditorContent } from "@tiptap/react";
 import { PortalProvider, Toolbar, useTiptap } from "notesnook-editor";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useEditorController } from "../hooks/useEditorController";
+import { useSettings } from "../hooks/useSettings";
 import { useEditorThemeStore } from "../state/theme";
 import Header from "./header";
 import StatusBar from "./statusbar";
@@ -9,7 +10,11 @@ import Tags from "./tags";
 import Title from "./title";
 
 const Tiptap = () => {
+  const settings = useSettings();
   const theme = useEditorThemeStore((state) => state.colors);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [layout, setLayout] = useState(false);
   const toolbarTheme = useTheme({
     //todo
     accent: "green",
@@ -24,7 +29,7 @@ const Tiptap = () => {
     theme: theme?.night ? "dark" : "light",
   });
 
-  editorTheme.space = [0, 6, 12, 20];
+  editorTheme.space = [0, 10, 12, 20];
   toolbarTheme.space = [0, 10, 12, 18];
   //@ts-ignore
   toolbarTheme.space.small = "10px";
@@ -44,7 +49,7 @@ const Tiptap = () => {
   toolbarTheme.fontSizes = {
     ...toolbarTheme.fontSizes,
     subBody: "0.8rem",
-    body: "0.8rem",
+    body: "0.9rem",
   };
 
   toolbarTheme.radii = {
@@ -58,25 +63,35 @@ const Tiptap = () => {
     height: "45px",
   };
 
-  const editor = useTiptap({
-    onUpdate: ({ editor }) => {
-      global.editorController.contentChange(editor);
+  const editor = useTiptap(
+    {
+      onUpdate: ({ editor }) => {
+        global.editorController.contentChange(editor);
+      },
+      onSelectionUpdate: (props) => {
+        global.editorController.selectionChange(props.editor);
+      },
+      onOpenAttachmentPicker: (editor, type) => {
+        global.editorController.openFilePicker(type);
+        return true;
+      },
+      onDownloadAttachment: (editor, attachment) => {
+        global.editorController.downloadAttachment(attachment);
+        return true;
+      },
+      theme: editorTheme,
+      element: !layout ? undefined : contentRef.current || undefined,
     },
-    onSelectionUpdate: (props) => {
-      global.editorController.selectionChange(props.editor);
-    },
-    onOpenAttachmentPicker: (editor, type) => {
-      global.editorController.openFilePicker(type);
-      return true;
-    },
-    onDownloadAttachment: (editor, attachment) => {
-      global.editorController.downloadAttachment(attachment);
-      return true;
-    },
-    theme: editorTheme,
-  });
+    [layout]
+  );
   const controller = useEditorController(editor);
+  const controllerRef = useRef(controller);
   globalThis.editorController = controller;
+  globalThis.editor = editor;
+
+  useLayoutEffect(() => {
+    setLayout(true);
+  }, []);
 
   return (
     <>
@@ -89,9 +104,10 @@ const Tiptap = () => {
           marginBottom: "5px",
         }}
       >
-        <Header controller={controller} />
+        <Header />
         <div
           onScroll={controller.scroll}
+          ref={containerRef}
           style={{
             overflowY: "scroll",
             flexDirection: "column",
@@ -101,16 +117,17 @@ const Tiptap = () => {
             display: "flex",
           }}
         >
-          <Tags controller={controller} />
-          <Title controller={controller} />
-          <StatusBar editor={editor} />
-          <EditorContent
+          <Tags />
+          <Title controller={controllerRef} title={controller.title} />
+          <StatusBar container={containerRef} editor={editor} />
+          <div
+            ref={contentRef}
             style={{
               padding: 12,
               paddingTop: 0,
               color: theme?.pri,
+              flex: 1,
             }}
-            editor={editor}
           />
         </div>
 
@@ -125,6 +142,7 @@ const Tiptap = () => {
             theme={toolbarTheme}
             editor={editor}
             location="bottom"
+            tools={settings.tools}
           />
         </div>
       </div>

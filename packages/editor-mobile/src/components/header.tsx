@@ -3,8 +3,7 @@ import CloudUploadOutlineIcon from "mdi-react/CloudUploadOutlineIcon";
 import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
-import React from "react";
-import { EditorController } from "../hooks/useEditorController";
+import React, { useEffect } from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
 import { useSettings } from "../hooks/useSettings";
 import { EventTypes } from "../utils";
@@ -42,14 +41,9 @@ const Button = ({
   );
 };
 
-export default function Header({
-  controller,
-}: {
-  controller: EditorController;
-}) {
+export default React.memo(function Header() {
   const insets = useSafeArea();
   const settings = useSettings();
-
   return (
     <div
       style={{
@@ -177,4 +171,4 @@ export default function Header({
       </div>
     </div>
   );
-}
+});

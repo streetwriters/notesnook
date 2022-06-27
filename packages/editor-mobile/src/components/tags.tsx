@@ -1,9 +1,8 @@
 import { useRef, useState } from "react";
-import { EditorController } from "../hooks/useEditorController";
 import { EventTypes } from "../utils";
 import styles from "./styles.module.css";
 
-export default function Tags({ controller }: { controller: EditorController }) {
+export default function Tags() {
   const [tags, setTags] = useState<{ title: string; alias: string }[]>([]);
   const editorTags = useRef({
     setTags: setTags,

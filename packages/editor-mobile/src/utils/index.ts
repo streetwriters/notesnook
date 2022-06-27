@@ -1,4 +1,5 @@
-import { Editor } from "@tiptap/react";
+import { ToolbarGroupDefinition } from "notesnook-editor/dist/toolbar/types";
+import { Editor } from "notesnook-editor/dist/types";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 
@@ -14,6 +15,7 @@ export type Settings = {
   fullscreen: boolean;
   deviceMode: "mobile" | "smallTablet" | "tablet";
   premium: boolean;
+  tools: ToolbarGroupDefinition[];
 };
 
 declare global {
