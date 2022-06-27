@@ -119,7 +119,7 @@ export function ImageComponent(props) {
                             left: 2,
                             zIndex: 999,
                             opacity: selected ? 1 : 0,
-                        } }), _jsx(Image, __assign({ "data-drag-image": true, ref: imageRef, alt: alt, title: title, width: "100%", height: "100%", sx: {
+                        } }), _jsx(Image, __assign({ "data-drag-image": true, ref: imageRef, alt: alt, src: "/placeholder.svg", title: title, width: "100%", height: "100%", sx: {
                             border: selected
                                 ? "2px solid var(--primary)"
                                 : "2px solid transparent",

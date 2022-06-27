@@ -107,6 +107,7 @@ export function ImageComponent(
             data-drag-image
             ref={imageRef}
             alt={alt}
+            src="/placeholder.svg"
             title={title}
             width={"100%"}
             height={"100%"}
