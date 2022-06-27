@@ -272,12 +272,20 @@ export function CellBorderWidth(props: ToolProps) {
       <Counter
         title="cell border width"
         onDecrease={() =>
-          editor.commands.setCellAttribute("borderWidth", decreaseBorderWidth())
+          editor.current?.commands.setCellAttribute(
+            "borderWidth",
+            decreaseBorderWidth()
+          )
         }
         onIncrease={() =>
-          editor.commands.setCellAttribute("borderWidth", increaseBorderWidth())
+          editor.current?.commands.setCellAttribute(
+            "borderWidth",
+            increaseBorderWidth()
+          )
         }
-        onReset={() => editor.commands.setCellAttribute("borderWidth", 1)}
+        onReset={() =>
+          editor.current?.commands.setCellAttribute("borderWidth", 1)
+        }
         value={borderWidth + "px"}
       />
     </Flex>

@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 declare type CellPropertiesProps = {
     editor: Editor;
     onClose: () => void;

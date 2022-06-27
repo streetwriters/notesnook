@@ -153,10 +153,12 @@ export function CellBorderWidth(props) {
         return Math.min(10, borderWidth + 1);
     }, [borderWidth]);
     return (_jsxs(Flex, __assign({ sx: { justifyContent: "center", alignItems: "center" } }, { children: [_jsx(Text, __assign({ variant: "subBody", sx: { mx: 1 } }, { children: "Border width:" })), _jsx(Counter, { title: "cell border width", onDecrease: function () {
-                    return editor.commands.setCellAttribute("borderWidth", decreaseBorderWidth());
+                    var _a;
+                    return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setCellAttribute("borderWidth", decreaseBorderWidth());
                 }, onIncrease: function () {
-                    return editor.commands.setCellAttribute("borderWidth", increaseBorderWidth());
-                }, onReset: function () { return editor.commands.setCellAttribute("borderWidth", 1); }, value: borderWidth + "px" })] })));
+                    var _a;
+                    return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setCellAttribute("borderWidth", increaseBorderWidth());
+                }, onReset: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setCellAttribute("borderWidth", 1); }, value: borderWidth + "px" })] })));
 }
 var insertColumnLeft = function (editor) { return (__assign(__assign({}, getToolDefinition("insertColumnLeft")), { key: "addColumnLeft", type: "button", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().addColumnBefore().run(); } })); };
 var insertColumnRight = function (editor) { return (__assign(__assign({}, getToolDefinition("insertColumnRight")), { key: "addColumnRight", type: "button", title: "Add column right", onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().addColumnAfter().run(); }, icon: "insertColumnRight" })); };

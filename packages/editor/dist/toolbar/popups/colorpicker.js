@@ -30,10 +30,11 @@ import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../../components/button";
+import { debounce } from "../../utils/debounce";
 export var DEFAULT_COLORS = [
     "#e91e63",
     "#9c27b0",
@@ -63,6 +64,9 @@ export function ColorPicker(props) {
         if (isPickerOpen)
             ref.current.focus({ preventScroll: true });
     }, [isPickerOpen]);
+    var onColorChange = useCallback(debounce(function (color) {
+        onChange(color);
+    }, 500), [onChange]);
     return (_jsxs(Flex, __assign({ ref: ref, tabIndex: -1, sx: {
             bg: "background",
             flexDirection: "column",
@@ -82,7 +86,10 @@ export function ColorPicker(props) {
                     pb: isPickerOpen ? 2 : 0,
                     //pb: 0,
                     alignItems: "center",
-                }, onClick: onClose }, { children: [_jsx(Text, __assign({ variant: "title" }, { children: title })), _jsx(Button, __assign({ variant: "icon", sx: { p: 0 } }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) }))] }))), isPickerOpen ? (_jsxs(_Fragment, { children: [_jsx(HexColorPicker, { onChange: function (color) { return setCurrentColor(color); }, onTouchEnd: function () { return onChange(currentColor); }, onMouseUp: function () { return onChange(currentColor); } }), _jsx(Input, { variant: "clean", placeholder: "#000000", spellCheck: false, sx: {
+                }, onClick: onClose }, { children: [_jsx(Text, __assign({ variant: "title" }, { children: title })), _jsx(Button, __assign({ variant: "icon", sx: { p: 0 } }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) }))] }))), isPickerOpen ? (_jsxs(_Fragment, { children: [_jsx(HexColorPicker, { onChange: function (color) {
+                            setCurrentColor(color);
+                            onColorChange(color);
+                        }, onTouchEnd: function () { return onChange(currentColor); }, onMouseUp: function () { return onChange(currentColor); } }), _jsx(Input, { variant: "clean", placeholder: "#000000", spellCheck: false, sx: {
                             my: 2,
                             p: 0,
                             borderRadius: 0,

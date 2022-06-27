@@ -2,7 +2,7 @@ import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import tinycolor from "tinycolor2";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../../components/button";
@@ -56,6 +56,13 @@ export function ColorPicker(props: ColorPickerProps) {
     if (isPickerOpen) ref.current.focus({ preventScroll: true });
   }, [isPickerOpen]);
 
+  const onColorChange = useCallback(
+    debounce((color: string) => {
+      onChange(color);
+    }, 500),
+    [onChange]
+  );
+
   return (
     <Flex
       ref={ref}
@@ -96,7 +103,10 @@ export function ColorPicker(props: ColorPickerProps) {
       {isPickerOpen ? (
         <>
           <HexColorPicker
-            onChange={(color) => setCurrentColor(color)}
+            onChange={(color) => {
+              setCurrentColor(color);
+              onColorChange(color);
+            }}
             onTouchEnd={() => onChange(currentColor)}
             onMouseUp={() => onChange(currentColor)}
           />
