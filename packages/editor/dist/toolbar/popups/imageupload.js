@@ -64,46 +64,74 @@ var __read = (this && this.__read) || function (o, n) {
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Input } from "@rebass/forms";
 import { useState } from "react";
-import { Flex } from "rebass";
-import { Button } from "../../components/button";
+import { Flex, Text } from "rebass";
 import { Popup } from "../components/popup";
 export function ImageUploadPopup(props) {
     var _this = this;
     var onInsert = props.onInsert, onClose = props.onClose;
-    var _a = __read(useState(""), 2), url = _a[0], setUrl = _a[1];
-    return (_jsx(Popup, __assign({ title: "Upload image from URL", onClose: onClose }, { children: _jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column", width: ["auto", 250] } }, { children: [_jsx(Input, { type: "url", sx: {
-                        height: "45px",
-                    }, autoFocus: true, placeholder: "Paste Image URL here", value: url, onChange: function (e) { return setUrl(e.target.value); } }), _jsx(Button, __assign({ variant: "primary", sx: {
-                        alignSelf: ["stretch", "end", "end"],
-                        my: 1,
-                        mr: [0, 1],
-                    }, onClick: function () { return __awaiter(_this, void 0, void 0, function () {
-                        var response, contentType, contentLength, size, dataurl, _a;
-                        return __generator(this, function (_b) {
-                            switch (_b.label) {
-                                case 0: return [4 /*yield*/, fetch(url)];
-                                case 1:
-                                    response = _b.sent();
-                                    if (!response.ok)
-                                        return [2 /*return*/]; // TODO show error
-                                    contentType = response.headers.get("Content-Type");
-                                    contentLength = response.headers.get("Content-Length");
-                                    if (!contentType ||
-                                        !contentLength ||
-                                        contentLength === "0" ||
-                                        !contentType.startsWith("image/"))
-                                        return [2 /*return*/];
-                                    size = parseInt(contentLength);
-                                    _a = toDataURL;
-                                    return [4 /*yield*/, response.blob()];
-                                case 2: return [4 /*yield*/, _a.apply(void 0, [_b.sent()])];
-                                case 3:
-                                    dataurl = _b.sent();
-                                    onInsert({ src: dataurl, type: contentType, size: size });
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); }, disabled: !url.trim() }, { children: "Insert image" }))] })) })));
+    var _a = __read(useState(false), 2), isDownloading = _a[0], setIsDownloading = _a[1];
+    var _b = __read(useState(), 2), error = _b[0], setError = _b[1];
+    var _c = __read(useState(""), 2), url = _c[0], setUrl = _c[1];
+    return (_jsx(Popup, __assign({ title: "Insert image from URL", onClose: onClose, action: {
+            loading: isDownloading,
+            title: "Insert image",
+            onClick: function () { return __awaiter(_this, void 0, void 0, function () {
+                var response, contentType, contentLength, size, dataurl, _a, e_1;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            setIsDownloading(true);
+                            setError(undefined);
+                            _b.label = 1;
+                        case 1:
+                            _b.trys.push([1, 5, 6, 7]);
+                            return [4 /*yield*/, fetch(url)];
+                        case 2:
+                            response = _b.sent();
+                            if (!response.ok)
+                                return [2 /*return*/, setError("invalid status code ".concat(response.status))];
+                            contentType = response.headers.get("Content-Type");
+                            contentLength = response.headers.get("Content-Length");
+                            if (!contentType ||
+                                !contentLength ||
+                                contentLength === "0" ||
+                                !contentType.startsWith("image/"))
+                                return [2 /*return*/, setError("not an image")];
+                            size = parseInt(contentLength);
+                            _a = toDataURL;
+                            return [4 /*yield*/, response.blob()];
+                        case 3: return [4 /*yield*/, _a.apply(void 0, [_b.sent()])];
+                        case 4:
+                            dataurl = _b.sent();
+                            onInsert({ src: dataurl, type: contentType, size: size });
+                            return [3 /*break*/, 7];
+                        case 5:
+                            e_1 = _b.sent();
+                            if (e_1 instanceof Error)
+                                setError(e_1.message);
+                            return [3 /*break*/, 7];
+                        case 6:
+                            setIsDownloading(false);
+                            return [7 /*endfinally*/];
+                        case 7: return [2 /*return*/];
+                    }
+                });
+            }); },
+        } }, { children: _jsxs(Flex, __assign({ sx: { px: 2, flexDirection: "column", width: ["auto", 350] } }, { children: [_jsx(Input, { type: "url", autoFocus: true, placeholder: "Paste Image URL here", value: url, onChange: function (e) {
+                        setUrl(e.target.value);
+                        setError(undefined);
+                    } }), error ? (_jsxs(Text, __assign({ variant: "error", sx: {
+                        bg: "errorBg",
+                        mt: 1,
+                        p: 1,
+                        borderRadius: "default",
+                    } }, { children: ["Failed to download image: ", error.toLowerCase(), "."] }))) : (_jsx(Text, __assign({ variant: "subBody", sx: {
+                        bg: "shade",
+                        color: "primary",
+                        mt: 1,
+                        p: 1,
+                        borderRadius: "default",
+                    } }, { children: "To protect your privacy, we will download the image & add it to your attachments." })))] })) })));
 }
 function toDataURL(blob) {
     return new Promise(function (resolve, reject) {

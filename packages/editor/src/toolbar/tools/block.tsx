@@ -134,7 +134,7 @@ const table = (editor: Editor): MenuItem => ({
         component: (props) => (
           <TablePopup
             onInsertTable={(size) => {
-              editor
+              editor.current
                 ?.chain()
                 .focus()
                 .insertTable({

@@ -1,27 +1,13 @@
-import { Flex, Text } from "rebass";
+import { Flex } from "rebass";
 import {
-  createNodeView,
-  ReactNodeView,
-  ReactNodeViewProps,
   SelectionBasedNodeView,
   SelectionBasedReactNodeViewProps,
 } from "../react";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
 import { Node as ProsemirrorNode } from "prosemirror-model";
-import { Transaction } from "prosemirror-state";
-import {
-  Editor,
-  findChildren,
-  findParentNode,
-  getNodeType,
-  NodeWithPos,
-} from "@tiptap/core";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Editor } from "@tiptap/core";
+import { useEffect, useRef } from "react";
 import { updateColumnsOnResize } from "prosemirror-tables";
-import { Decoration, DecorationSource, NodeView } from "prosemirror-view";
-import { TableOptions } from "./table";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
+import { NodeView } from "prosemirror-view";
 import {
   InsertColumnRight,
   InsertRowBelow,
@@ -29,7 +15,7 @@ import {
   TableProperties,
 } from "../../toolbar/tools/table";
 import { getToolDefinition } from "../../toolbar/tool-definitions";
-import { getPosition, PositionOptions } from "../../utils/position";
+import { getPosition } from "../../utils/position";
 import { findSelectedDOMNode } from "../../toolbar/utils/prosemirror";
 import { DesktopOnly } from "../../components/responsive";
 

@@ -71,7 +71,6 @@ function getColumnCells({ map, table }: TableRect, col: number) {
     cells.push({ cell, pos });
 
     row += cell.attrs.rowspan;
-    console.log(cell.textContent);
   }
 
   return cells;

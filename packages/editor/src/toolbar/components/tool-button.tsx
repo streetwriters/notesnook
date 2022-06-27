@@ -29,7 +29,6 @@ export const ToolButton = React.memo(
       variant = "normal",
       ...buttonProps
     } = props;
-    console.log("rerendering", props.title);
 
     return (
       <Button

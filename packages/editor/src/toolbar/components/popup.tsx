@@ -5,13 +5,19 @@ import { PropsWithChildren } from "react";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { DesktopOnly, MobileOnly } from "../../components/responsive";
 
+type Action = {
+  title: string;
+  onClick: () => void;
+  loading?: boolean;
+};
 export type PopupProps = {
   title?: string;
   onClose: () => void;
+  action?: Action;
 };
 
 export function Popup(props: PropsWithChildren<PopupProps>) {
-  const { title, onClose, children } = props;
+  const { title, onClose, action, children } = props;
 
   return (
     <>
@@ -30,23 +36,42 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
           <Flex
             className="movable"
             sx={{
-              bg: "bgSecondary",
               justifyContent: "space-between",
               alignItems: "center",
-              p: 1,
-              mb: 1,
+              p: 2,
             }}
           >
-            <Text variant={"body"}>{title}</Text>
+            <Text variant={"title"}>{title}</Text>
             <Button
               variant={"tool"}
               sx={{ p: 0, bg: "transparent" }}
               onClick={onClose}
             >
-              <Icon path={Icons.close} size={16} />
+              <Icon path={Icons.close} size={"big"} />
             </Button>
           </Flex>
           {children}
+          {action && (
+            <Flex
+              sx={{ justifyContent: "end" }}
+              bg="bgSecondary"
+              p={1}
+              px={2}
+              mt={2}
+            >
+              <Button
+                variant="dialog"
+                onClick={action.loading ? undefined : action.onClick}
+                disabled={action.loading}
+              >
+                {action.loading ? (
+                  <Icon path={Icons.loading} rotate size="medium" />
+                ) : (
+                  action.title
+                )}
+              </Button>
+            </Flex>
+          )}
         </Flex>
       </DesktopOnly>
       <MobileOnly>{children}</MobileOnly>

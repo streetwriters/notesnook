@@ -43,7 +43,6 @@ function _PopupPresenter(props) {
         var popupPosition = getPosition(popup, position);
         popup.style.top = popupPosition.top + "px";
         popup.style.left = popupPosition.left + "px";
-        console.log("popup", popupPosition);
     }, [position]);
     useEffect(function () {
         repositionPopup();

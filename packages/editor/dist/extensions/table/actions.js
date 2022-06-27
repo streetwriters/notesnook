@@ -57,7 +57,6 @@ function getColumnCells(_a, col) {
             continue;
         cells.push({ cell: cell, pos: pos });
         row += cell.attrs.rowspan;
-        console.log(cell.textContent);
     }
     return cells;
 }

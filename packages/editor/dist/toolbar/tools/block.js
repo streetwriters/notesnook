@@ -127,12 +127,12 @@ var table = function (editor) { return ({
                 key: "table-size-selector",
                 type: "popup",
                 component: function (props) { return (_jsx(TablePopup, { onInsertTable: function (size) {
-                        var _a;
-                        editor === null || editor === void 0 ? void 0 : editor.chain().focus().insertTable({
+                        var _a, _b;
+                        (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertTable({
                             rows: size.rows,
                             cols: size.columns,
                         }).run();
-                        (_a = props.onClick) === null || _a === void 0 ? void 0 : _a.call(props);
+                        (_b = props.onClick) === null || _b === void 0 ? void 0 : _b.call(props);
                     } })); },
             },
         ],

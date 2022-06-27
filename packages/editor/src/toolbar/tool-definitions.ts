@@ -156,7 +156,7 @@ const tools: Record<ToolId, ToolDefinition> = {
     conditional: true,
   },
   moveColumnRight: {
-    icon: "moveColumnLeft",
+    icon: "moveColumnRight",
     title: "Move column right",
     conditional: true,
   },

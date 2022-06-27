@@ -15,7 +15,7 @@ import { Icon } from "./icon";
 import { Icons } from "../icons";
 import { DesktopOnly, MobileOnly } from "../../components/responsive";
 export function Popup(props) {
-    var title = props.title, onClose = props.onClose, children = props.children;
+    var title = props.title, onClose = props.onClose, action = props.action, children = props.children;
     return (_jsxs(_Fragment, { children: [_jsx(DesktopOnly, { children: _jsxs(Flex, __assign({ sx: {
                         overflow: "hidden",
                         bg: "background",
@@ -25,10 +25,8 @@ export function Popup(props) {
                         boxShadow: "menu",
                         minWidth: 200,
                     } }, { children: [_jsxs(Flex, __assign({ className: "movable", sx: {
-                                bg: "bgSecondary",
                                 justifyContent: "space-between",
                                 alignItems: "center",
-                                p: 1,
-                                mb: 1,
-                            } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: title })), _jsx(Button, __assign({ variant: "tool", sx: { p: 0, bg: "transparent" }, onClick: onClose }, { children: _jsx(Icon, { path: Icons.close, size: 16 }) }))] })), children] })) }), _jsx(MobileOnly, { children: children })] }));
+                                p: 2,
+                            } }, { children: [_jsx(Text, __assign({ variant: "title" }, { children: title })), _jsx(Button, __assign({ variant: "tool", sx: { p: 0, bg: "transparent" }, onClick: onClose }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) }))] })), children, action && (_jsx(Flex, __assign({ sx: { justifyContent: "end" }, bg: "bgSecondary", p: 1, px: 2, mt: 2 }, { children: _jsx(Button, __assign({ variant: "dialog", onClick: action.loading ? undefined : action.onClick, disabled: action.loading }, { children: action.loading ? (_jsx(Icon, { path: Icons.loading, rotate: true, size: "medium" })) : (action.title) })) })))] })) }), _jsx(MobileOnly, { children: children })] }));
 }

@@ -18,7 +18,7 @@ import { Tabs, Tab } from "../../components/tabs";
 type EmbedSource = "url" | "code";
 export type EmbedPopupProps = {
   onClose: (embed?: Embed) => void;
-  title?: string;
+  title: string;
 
   embed?: Embed;
   onSizeChanged?: (size: EmbedSizeOptions) => void;
@@ -61,7 +61,11 @@ export function EmbedPopup(props: EmbedPopupProps) {
   }, [onSourceChanged, src]);
 
   return (
-    <Popup title={title} onClose={() => onClose()}>
+    <Popup
+      title={title}
+      onClose={() => onClose()}
+      action={{ title, onClick: () => onClose() }}
+    >
       <Flex sx={{ flexDirection: "column", width: ["auto", 300] }}>
         {error && (
           <Text
@@ -79,7 +83,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
 
         <Tabs
           activeIndex={0}
-          containerProps={{ sx: { mx: 1, mb: 1, flexDirection: "column" } }}
+          containerProps={{ sx: { mx: 2, mb: 1, flexDirection: "column" } }}
           onTabChanged={(index) => setEmbedSource(index === 0 ? "url" : "code")}
         >
           <Tab title="From URL">
@@ -128,7 +132,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
           </Tab>
         </Tabs>
 
-        <Button
+        {/* <Button
           variant={"primary"}
           sx={{
             alignSelf: ["stretch", "end", "end"],
@@ -176,7 +180,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
           }}
         >
           {title}
-        </Button>
+        </Button> */}
       </Flex>
     </Popup>
   );

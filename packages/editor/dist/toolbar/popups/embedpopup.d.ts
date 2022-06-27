@@ -2,7 +2,7 @@
 import { Embed, EmbedSizeOptions } from "../../extensions/embed";
 export declare type EmbedPopupProps = {
     onClose: (embed?: Embed) => void;
-    title?: string;
+    title: string;
     embed?: Embed;
     onSizeChanged?: (size: EmbedSizeOptions) => void;
     onSourceChanged?: (src: string) => void;
