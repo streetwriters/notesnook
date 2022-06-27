@@ -105,10 +105,10 @@ export function EditLink(props) {
 export function RemoveLink(props) {
     var editor = props.editor, selectedNode = props.selectedNode;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () {
-            var _a;
+            var _a, _b;
             if (selectedNode)
-                editor.commands.setTextSelection(selectedNode.from);
-            (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().unsetLink().run();
+                (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setTextSelection(selectedNode.from);
+            (_b = editor.current) === null || _b === void 0 ? void 0 : _b.chain().focus().unsetLink().run();
         } })));
 }
 export function OpenLink(props) {

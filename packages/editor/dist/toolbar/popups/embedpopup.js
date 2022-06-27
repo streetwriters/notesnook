@@ -30,6 +30,7 @@ import { Flex, Text } from "rebass";
 import { useCallback, useEffect, useState } from "react";
 import { Popup } from "../components/popup";
 import { Input, Textarea } from "@rebass/forms";
+import { convertUrlToEmbedUrl } from "@social-embed/lib";
 import { InlineInput } from "../../components/inline-input";
 import { Tabs, Tab } from "../../components/tabs";
 export function EmbedPopup(props) {
@@ -62,7 +63,38 @@ export function EmbedPopup(props) {
     useEffect(function () {
         onSourceChanged && onSourceChanged(src);
     }, [onSourceChanged, src]);
-    return (_jsx(Popup, __assign({ title: title, onClose: function () { return onClose(); }, action: { title: title, onClick: function () { return onClose(); } } }, { children: _jsxs(Flex, __assign({ sx: { flexDirection: "column", width: ["auto", 300] } }, { children: [error && (_jsxs(Text, __assign({ variant: "error", sx: {
+    return (_jsx(Popup, __assign({ title: title, onClose: function () { return onClose(); }, action: {
+            title: title,
+            onClick: function () {
+                setError(null);
+                var _src = src;
+                var _width = width;
+                var _height = height;
+                if (embedSource === "code") {
+                    var document_1 = new DOMParser().parseFromString(src, "text/html");
+                    if (document_1.getElementsByTagName("iframe").length <= 0)
+                        return setError("Embed code must include an iframe.");
+                    var srcValue = getAttribute(document_1, "src");
+                    if (!srcValue)
+                        return setError("Embed code must include an iframe with an src attribute.");
+                    _src = srcValue;
+                    var widthValue = getAttribute(document_1, "width");
+                    if (widthValue && !isNaN(parseInt(widthValue)))
+                        _width = parseInt(widthValue);
+                    var heightValue = getAttribute(document_1, "height");
+                    if (heightValue && !isNaN(parseInt(heightValue)))
+                        _height = parseInt(heightValue);
+                }
+                var convertedUrl = convertUrlToEmbedUrl(_src);
+                if (!!convertedUrl)
+                    _src = convertedUrl;
+                onClose({
+                    height: _height,
+                    width: _width,
+                    src: _src,
+                });
+            },
+        } }, { children: _jsxs(Flex, __assign({ sx: { flexDirection: "column", width: ["auto", 300] } }, { children: [error && (_jsxs(Text, __assign({ variant: "error", sx: {
                         bg: "errorBg",
                         color: "error",
                         p: 1,

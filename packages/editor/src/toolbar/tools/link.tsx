@@ -111,7 +111,8 @@ export function RemoveLink(props: ToolProps) {
       {...props}
       toggled={false}
       onClick={() => {
-        if (selectedNode) editor.commands.setTextSelection(selectedNode.from);
+        if (selectedNode)
+          editor.current?.commands.setTextSelection(selectedNode.from);
         editor.current?.chain().focus().unsetLink().run();
       }}
     />

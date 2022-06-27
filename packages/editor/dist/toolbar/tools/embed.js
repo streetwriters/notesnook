@@ -75,5 +75,5 @@ export function EmbedProperties(props) {
                     location: "below",
                     yOffset: 10,
                     isTargetAbsolute: true,
-                } }, { children: _jsx(EmbedPopup, { title: "Embed properties", onClose: function () { return setIsOpen(false); }, embed: embed, onSourceChanged: function (src) { return editor.commands.setEmbedSource(src); }, onSizeChanged: function (size) { return editor.commands.setEmbedSize(size); } }) }))] }));
+                } }, { children: _jsx(EmbedPopup, { title: "Embed properties", onClose: function () { return setIsOpen(false); }, embed: embed, onSourceChanged: function (src) { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setEmbedSource(src); }, onSizeChanged: function (size) { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setEmbedSize(size); } }) }))] }));
 }

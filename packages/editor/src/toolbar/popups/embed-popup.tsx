@@ -64,7 +64,43 @@ export function EmbedPopup(props: EmbedPopupProps) {
     <Popup
       title={title}
       onClose={() => onClose()}
-      action={{ title, onClick: () => onClose() }}
+      action={{
+        title,
+        onClick: () => {
+          setError(null);
+          let _src = src;
+          let _width = width;
+          let _height = height;
+          if (embedSource === "code") {
+            const document = new DOMParser().parseFromString(src, "text/html");
+            if (document.getElementsByTagName("iframe").length <= 0)
+              return setError("Embed code must include an iframe.");
+
+            const srcValue = getAttribute(document, "src");
+            if (!srcValue)
+              return setError(
+                "Embed code must include an iframe with an src attribute."
+              );
+
+            _src = srcValue;
+
+            const widthValue = getAttribute(document, "width");
+            if (widthValue && !isNaN(parseInt(widthValue)))
+              _width = parseInt(widthValue);
+
+            const heightValue = getAttribute(document, "height");
+            if (heightValue && !isNaN(parseInt(heightValue)))
+              _height = parseInt(heightValue);
+          }
+          const convertedUrl = convertUrlToEmbedUrl(_src);
+          if (!!convertedUrl) _src = convertedUrl;
+          onClose({
+            height: _height,
+            width: _width,
+            src: _src,
+          });
+        },
+      }}
     >
       <Flex sx={{ flexDirection: "column", width: ["auto", 300] }}>
         {error && (
@@ -131,56 +167,6 @@ export function EmbedPopup(props: EmbedPopupProps) {
             />
           </Tab>
         </Tabs>
-
-        {/* <Button
-          variant={"primary"}
-          sx={{
-            alignSelf: ["stretch", "end", "end"],
-            my: 1,
-            mr: 1,
-            ml: [1, 0],
-            py: 2,
-          }}
-          onClick={() => {
-            setError(null);
-            let _src = src;
-            let _width = width;
-            let _height = height;
-            if (embedSource === "code") {
-              const document = new DOMParser().parseFromString(
-                src,
-                "text/html"
-              );
-              if (document.getElementsByTagName("iframe").length <= 0)
-                return setError("Embed code must include an iframe.");
-
-              const srcValue = getAttribute(document, "src");
-              if (!srcValue)
-                return setError(
-                  "Embed code must include an iframe with an src attribute."
-                );
-
-              _src = srcValue;
-
-              const widthValue = getAttribute(document, "width");
-              if (widthValue && !isNaN(parseInt(widthValue)))
-                _width = parseInt(widthValue);
-
-              const heightValue = getAttribute(document, "height");
-              if (heightValue && !isNaN(parseInt(heightValue)))
-                _height = parseInt(heightValue);
-            }
-            const convertedUrl = convertUrlToEmbedUrl(_src);
-            if (!!convertedUrl) _src = convertedUrl;
-            onClose({
-              height: _height,
-              width: _width,
-              src: _src,
-            });
-          }}
-        >
-          {title}
-        </Button> */}
       </Flex>
     </Popup>
   );

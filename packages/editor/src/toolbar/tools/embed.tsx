@@ -113,8 +113,10 @@ export function EmbedProperties(props: ToolProps) {
           title="Embed properties"
           onClose={() => setIsOpen(false)}
           embed={embed}
-          onSourceChanged={(src) => editor.commands.setEmbedSource(src)}
-          onSizeChanged={(size) => editor.commands.setEmbedSize(size)}
+          onSourceChanged={(src) =>
+            editor.current?.commands.setEmbedSource(src)
+          }
+          onSizeChanged={(size) => editor.current?.commands.setEmbedSize(size)}
         />
       </ResponsivePresenter>
     </>
