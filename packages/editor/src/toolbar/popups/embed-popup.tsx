@@ -83,7 +83,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
 
         <Tabs
           activeIndex={0}
-          containerProps={{ sx: { mx: 2, mb: 1, flexDirection: "column" } }}
+          containerProps={{ sx: { mx: 1, flexDirection: "column" } }}
           onTabChanged={(index) => setEmbedSource(index === 0 ? "url" : "code")}
         >
           <Tab title="From URL">

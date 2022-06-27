@@ -183,20 +183,16 @@ function LinkTool(props: LinkToolProps) {
         onClose={() => setIsOpen(false)}
         focusOnRender={false}
       >
-        <Popup
-          title={isEditing ? "Edit link" : "Insert link"}
+        <LinkPopup
+          href={href}
+          text={text}
+          isEditing={isEditing}
           onClose={() => setIsOpen(false)}
-        >
-          <LinkPopup
-            href={href}
-            text={text}
-            isEditing={isEditing}
-            onDone={({ href, text }) => {
-              onDone(href, text);
-              setIsOpen(false);
-            }}
-          />
-        </Popup>
+          onDone={({ href, text }) => {
+            onDone(href, text);
+            setIsOpen(false);
+          }}
+        />
       </ResponsivePresenter>
     </>
   );

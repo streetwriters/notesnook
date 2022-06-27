@@ -28,7 +28,6 @@ var __read = (this && this.__read) || function (o, n) {
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
 import { useMemo, useRef, useState } from "react";
-import { Popup } from "../components/popup";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MoreTools } from "../components/more-tools";
 import { useToolbarLocation } from "../stores/toolbar-store";
@@ -76,7 +75,5 @@ export function EmbedProperties(props) {
                     location: "below",
                     yOffset: 10,
                     isTargetAbsolute: true,
-                } }, { children: _jsx(Popup, __assign({ title: "Embed properties", onClose: function () {
-                        setIsOpen(false);
-                    } }, { children: _jsx(EmbedPopup, { title: "Embed properties", onClose: function () { return setIsOpen(false); }, embed: embed, onSourceChanged: function (src) { return editor.commands.setEmbedSource(src); }, onSizeChanged: function (size) { return editor.commands.setEmbedSize(size); } }) })) }))] }));
+                } }, { children: _jsx(EmbedPopup, { title: "Embed properties", onClose: function () { return setIsOpen(false); }, embed: embed, onSourceChanged: function (src) { return editor.commands.setEmbedSource(src); }, onSizeChanged: function (size) { return editor.commands.setEmbedSize(size); } }) }))] }));
 }

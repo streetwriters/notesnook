@@ -29,7 +29,6 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
-import { Popup } from "../components/popup";
 import { LinkPopup } from "../popups/link-popup";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
@@ -141,9 +140,9 @@ function LinkTool(props) {
                     location: "below",
                     align: "center",
                     yOffset: 5,
-                }, title: isEditing ? "Edit link" : "Insert link", isOpen: isOpen, items: [], onClose: function () { return setIsOpen(false); }, focusOnRender: false }, { children: _jsx(Popup, __assign({ title: isEditing ? "Edit link" : "Insert link", onClose: function () { return setIsOpen(false); } }, { children: _jsx(LinkPopup, { href: href, text: text, isEditing: isEditing, onDone: function (_a) {
-                            var href = _a.href, text = _a.text;
-                            onDone(href, text);
-                            setIsOpen(false);
-                        } }) })) }))] }));
+                }, title: isEditing ? "Edit link" : "Insert link", isOpen: isOpen, items: [], onClose: function () { return setIsOpen(false); }, focusOnRender: false }, { children: _jsx(LinkPopup, { href: href, text: text, isEditing: isEditing, onClose: function () { return setIsOpen(false); }, onDone: function (_a) {
+                        var href = _a.href, text = _a.text;
+                        onDone(href, text);
+                        setIsOpen(false);
+                    } }) }))] }));
 }

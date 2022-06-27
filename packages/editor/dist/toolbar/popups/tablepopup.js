@@ -26,8 +26,9 @@ var __read = (this && this.__read) || function (o, n) {
     return ar;
 };
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import { useEffect, useState } from "react";
+import { Popup } from "../components/popup";
 import { useIsMobile } from "../stores/toolbar-store";
 import { InlineInput } from "../../components/inline-input";
 var MAX_COLUMNS = 20;
@@ -66,59 +67,59 @@ export function TablePopup(props) {
             };
         });
     }, [cellLocation, autoExpand]);
-    return (_jsxs(Flex, __assign({ sx: { p: 1, flexDirection: "column", alignItems: "center" } }, { children: [_jsx(Box, __assign({ sx: {
-                    display: "grid",
-                    gridTemplateColumns: "repeat(".concat(tableSize.columns, ", minmax(").concat(cellSize, "px, 1fr))"),
-                    gap: "small",
-                    bg: "background",
-                    width: "100%",
-                }, onTouchMove: function (e) {
-                    var touch = e.touches.item(0);
-                    var element = document.elementFromPoint(touch.pageX, touch.pageY);
-                    if (!element)
-                        return;
-                    var index = element.dataset.index;
-                    if (!index)
-                        return;
-                    setCellLocation(getCellLocation(parseInt(index), tableSize));
-                } }, { children: Array(tableSize.columns * tableSize.rows)
-                    .fill(0)
-                    .map(function (_, index) { return (_jsx(Box, { "data-index": index, height: cellSize || 15, sx: {
-                        border: "1px solid var(--disabled)",
-                        borderRadius: "small",
-                        bg: isCellHighlighted(index, cellLocation, tableSize)
-                            ? "disabled"
-                            : "transparent",
-                    }, onTouchStart: function () {
-                        setCellLocation(getCellLocation(index, tableSize));
-                    }, onMouseEnter: function () {
-                        setCellLocation(getCellLocation(index, tableSize));
-                    }, onClick: function () {
-                        onInsertTable({
-                            columns: cellLocation.column,
-                            rows: cellLocation.row,
-                        });
-                    } }, index)); }) })), _jsxs(Flex, __assign({ sx: {
-                    display: ["flex", "none", "none"],
-                    my: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                } }, { children: [_jsx(InlineInput, { containerProps: { sx: { mr: 1 } }, label: "columns", placeholder: "".concat(cellLocation.column, " columns"), type: "number", value: cellLocation.column, onChange: function (e) {
-                            setCellLocation(function (l) { return (__assign(__assign({}, l), { column: e.target.valueAsNumber || 0 })); });
-                        } }), _jsx(InlineInput, { label: "rows", placeholder: "".concat(cellLocation.row, " rows"), type: "number", value: cellLocation.row, onChange: function (e) {
-                            setCellLocation(function (l) { return (__assign(__assign({}, l), { row: e.target.valueAsNumber || 0 })); });
-                        } })] })), _jsxs(Text, __assign({ variant: "body", sx: { mt: 1, display: ["none", "block", "block"] } }, { children: [cellLocation.column, " x ", cellLocation.row] })), _jsx(Button, __assign({ variant: "primary", sx: {
-                    display: ["block", "none", "none"],
-                    alignSelf: ["stretch", "end", "end"],
-                    py: 2,
-                }, onClick: function () {
-                    return onInsertTable({
-                        columns: cellLocation.column,
-                        rows: cellLocation.row,
-                    });
-                }, disabled: !cellLocation.column || !cellLocation.row }, { children: !cellLocation.column || !cellLocation.row
-                    ? "Please set a table size"
-                    : "Insert a ".concat(cellLocation.column, " x ").concat(cellLocation.row, " table") }))] })));
+    return (_jsx(Popup, __assign({ action: {
+            title: !cellLocation.column || !cellLocation.row
+                ? "Please set a table size"
+                : "Insert a ".concat(cellLocation.column, " x ").concat(cellLocation.row, " table"),
+            disabled: !cellLocation.column || !cellLocation.row,
+            onClick: function () {
+                return onInsertTable({
+                    columns: cellLocation.column,
+                    rows: cellLocation.row,
+                });
+            },
+        } }, { children: _jsxs(Flex, __assign({ sx: { px: 1, flexDirection: "column", alignItems: "center" } }, { children: [_jsx(Box, __assign({ sx: {
+                        display: "grid",
+                        gridTemplateColumns: "repeat(".concat(tableSize.columns, ", minmax(").concat(cellSize, "px, 1fr))"),
+                        gap: "small",
+                        bg: "background",
+                        width: "100%",
+                    }, onTouchMove: function (e) {
+                        var touch = e.touches.item(0);
+                        var element = document.elementFromPoint(touch.pageX, touch.pageY);
+                        if (!element)
+                            return;
+                        var index = element.dataset.index;
+                        if (!index)
+                            return;
+                        setCellLocation(getCellLocation(parseInt(index), tableSize));
+                    } }, { children: Array(tableSize.columns * tableSize.rows)
+                        .fill(0)
+                        .map(function (_, index) { return (_jsx(Box, { "data-index": index, height: cellSize || 15, sx: {
+                            border: "1px solid var(--disabled)",
+                            borderRadius: "small",
+                            bg: isCellHighlighted(index, cellLocation, tableSize)
+                                ? "disabled"
+                                : "transparent",
+                        }, onTouchStart: function () {
+                            setCellLocation(getCellLocation(index, tableSize));
+                        }, onMouseEnter: function () {
+                            setCellLocation(getCellLocation(index, tableSize));
+                        }, onClick: function () {
+                            onInsertTable({
+                                columns: cellLocation.column,
+                                rows: cellLocation.row,
+                            });
+                        } }, index)); }) })), _jsxs(Flex, __assign({ sx: {
+                        display: ["flex", "none", "none"],
+                        mt: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                    } }, { children: [_jsx(InlineInput, { containerProps: { sx: { mr: 1 } }, label: "columns", placeholder: "".concat(cellLocation.column, " columns"), type: "number", value: cellLocation.column, onChange: function (e) {
+                                setCellLocation(function (l) { return (__assign(__assign({}, l), { column: e.target.valueAsNumber || 0 })); });
+                            } }), _jsx(InlineInput, { label: "rows", placeholder: "".concat(cellLocation.row, " rows"), type: "number", value: cellLocation.row, onChange: function (e) {
+                                setCellLocation(function (l) { return (__assign(__assign({}, l), { row: e.target.valueAsNumber || 0 })); });
+                            } })] })), _jsxs(Text, __assign({ variant: "body", sx: { mt: 1, display: ["none", "block", "block"] } }, { children: [cellLocation.column, " x ", cellLocation.row] }))] })) })));
 }
 function getCellLocation(index, tableSize) {
     var cellIndex = index + 1;

@@ -9,10 +9,11 @@ type Action = {
   title: string;
   onClick: () => void;
   loading?: boolean;
+  disabled?: boolean;
 };
 export type PopupProps = {
   title?: string;
-  onClose: () => void;
+  onClose?: () => void;
   action?: Action;
 };
 
@@ -33,25 +34,27 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
             minWidth: 200,
           }}
         >
-          <Flex
-            className="movable"
-            sx={{
-              justifyContent: "space-between",
-              alignItems: "center",
-              p: 2,
-            }}
-          >
-            <Text variant={"title"}>{title}</Text>
-            <Button
-              variant={"tool"}
-              sx={{ p: 0, bg: "transparent" }}
-              onClick={onClose}
+          {title && (
+            <Flex
+              className="movable"
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                p: 2,
+              }}
             >
-              <Icon path={Icons.close} size={"big"} />
-            </Button>
-          </Flex>
+              <Text variant={"title"}>{title}</Text>
+              <Button
+                variant={"tool"}
+                sx={{ p: 0, bg: "transparent" }}
+                onClick={onClose}
+              >
+                <Icon path={Icons.close} size={"big"} />
+              </Button>
+            </Flex>
+          )}
           {children}
-          {action && (
+          {title && action && (
             <Flex
               sx={{ justifyContent: "end" }}
               bg="bgSecondary"
@@ -61,8 +64,10 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
             >
               <Button
                 variant="dialog"
-                onClick={action.loading ? undefined : action.onClick}
-                disabled={action.loading}
+                onClick={
+                  action.disabled || action.loading ? undefined : action.onClick
+                }
+                disabled={action.disabled || action.loading}
               >
                 {action.loading ? (
                   <Icon path={Icons.loading} rotate size="medium" />
@@ -74,7 +79,30 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
           )}
         </Flex>
       </DesktopOnly>
-      <MobileOnly>{children}</MobileOnly>
+      <MobileOnly>
+        {children}
+
+        {action && (
+          <Button
+            variant={"primary"}
+            sx={{
+              alignSelf: "stretch",
+              mb: 1,
+              mt: 2,
+              mx: 1,
+              py: 2,
+            }}
+            onClick={action.disabled ? undefined : action?.onClick}
+            disabled={action.disabled}
+          >
+            {action.loading ? (
+              <Icon path={Icons.loading} rotate size="medium" />
+            ) : (
+              action.title
+            )}
+          </Button>
+        )}
+      </MobileOnly>
     </>
   );
 }

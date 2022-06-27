@@ -109,20 +109,13 @@ export function EmbedProperties(props: ToolProps) {
           isTargetAbsolute: true,
         }}
       >
-        <Popup
+        <EmbedPopup
           title="Embed properties"
-          onClose={() => {
-            setIsOpen(false);
-          }}
-        >
-          <EmbedPopup
-            title="Embed properties"
-            onClose={() => setIsOpen(false)}
-            embed={embed}
-            onSourceChanged={(src) => editor.commands.setEmbedSource(src)}
-            onSizeChanged={(size) => editor.commands.setEmbedSize(size)}
-          />
-        </Popup>
+          onClose={() => setIsOpen(false)}
+          embed={embed}
+          onSourceChanged={(src) => editor.commands.setEmbedSource(src)}
+          onSizeChanged={(size) => editor.commands.setEmbedSize(size)}
+        />
       </ResponsivePresenter>
     </>
   );

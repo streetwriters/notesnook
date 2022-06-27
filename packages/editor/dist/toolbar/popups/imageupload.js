@@ -75,6 +75,7 @@ export function ImageUploadPopup(props) {
     return (_jsx(Popup, __assign({ title: "Insert image from URL", onClose: onClose, action: {
             loading: isDownloading,
             title: "Insert image",
+            disabled: !url,
             onClick: function () { return __awaiter(_this, void 0, void 0, function () {
                 var response, contentType, contentLength, size, dataurl, _a, e_1;
                 return __generator(this, function (_b) {
@@ -117,7 +118,7 @@ export function ImageUploadPopup(props) {
                     }
                 });
             }); },
-        } }, { children: _jsxs(Flex, __assign({ sx: { px: 2, flexDirection: "column", width: ["auto", 350] } }, { children: [_jsx(Input, { type: "url", autoFocus: true, placeholder: "Paste Image URL here", value: url, onChange: function (e) {
+        } }, { children: _jsxs(Flex, __assign({ sx: { px: 1, flexDirection: "column", width: ["auto", 350] } }, { children: [_jsx(Input, { type: "url", autoFocus: true, placeholder: "Paste Image URL here", value: url, onChange: function (e) {
                         setUrl(e.target.value);
                         setError(undefined);
                     } }), error ? (_jsxs(Text, __assign({ variant: "error", sx: {

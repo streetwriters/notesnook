@@ -125,20 +125,14 @@ export function ImageProperties(props: ToolProps) {
           isTargetAbsolute: true,
         }}
       >
-        <Popup
-          title="Image properties"
-          onClose={() => {
-            setIsOpen(false);
-          }}
-        >
-          <ImagePropertiesPopup
-            editor={editor}
-            height={height}
-            width={width}
-            align={align}
-            float={float}
-          />
-        </Popup>
+        <ImagePropertiesPopup
+          editor={editor}
+          height={height}
+          width={width}
+          align={align}
+          float={float}
+          onClose={() => setIsOpen(false)}
+        />
       </ResponsivePresenter>
     </>
   );

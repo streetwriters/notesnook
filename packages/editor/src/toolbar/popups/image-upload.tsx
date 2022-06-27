@@ -22,6 +22,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
       action={{
         loading: isDownloading,
         title: "Insert image",
+        disabled: !url,
         onClick: async () => {
           setIsDownloading(true);
           setError(undefined);
@@ -53,7 +54,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
         },
       }}
     >
-      <Flex sx={{ px: 2, flexDirection: "column", width: ["auto", 350] }}>
+      <Flex sx={{ px: 1, flexDirection: "column", width: ["auto", 350] }}>
         <Input
           type="url"
           autoFocus
