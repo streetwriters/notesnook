@@ -127,7 +127,7 @@ export function ActionSheetPresenter(
             //@ts-ignore
             style={{
               ...props.style,
-              position: "sticky",
+              position: blocking ? "fixed" : "sticky",
               zIndex: 1000,
               backgroundColor: !blocking ? "transparent" : "unset",
             }}
@@ -135,6 +135,7 @@ export function ActionSheetPresenter(
           >
             {blocking && (
               <motion.div
+                id="action-sheet-overlay"
                 style={{
                   height: "100%",
                   width: "100%",

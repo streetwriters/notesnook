@@ -93,7 +93,7 @@ export function ActionSheetPresenter(props) {
         }, overlayElement: function (props, contentEl) {
             return (_jsxs(Box, __assign({}, props, { 
                 //@ts-ignore
-                style: __assign(__assign({}, props.style), { position: "sticky", zIndex: 1000, backgroundColor: !blocking ? "transparent" : "unset" }), tabIndex: -1 }, { children: [blocking && (_jsx(motion.div, { style: {
+                style: __assign(__assign({}, props.style), { position: blocking ? "fixed" : "sticky", zIndex: 1000, backgroundColor: !blocking ? "transparent" : "unset" }), tabIndex: -1 }, { children: [blocking && (_jsx(motion.div, { id: "action-sheet-overlay", style: {
                             height: "100%",
                             width: "100%",
                             opacity: opacity,
