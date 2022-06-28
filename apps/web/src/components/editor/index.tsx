@@ -21,6 +21,7 @@ import { DropEvent } from "react-dropzone";
 import { downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "notes-core/common";
 import { db } from "../../common/db";
+import useMobile from "../../utils/use-mobile";
 
 function updateWordCount(counter?: CharacterCounter) {
   AppEventManager.publish(
@@ -166,6 +167,7 @@ type EditorProps = {
 };
 function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
   const editor = useEditorInstance();
+  const isMobile = useMobile();
 
   useEffect(() => {
     if (!editor) return;
@@ -223,17 +225,19 @@ function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
           onClick={onRequestFocus}
           // mt={[2, 2, 25]}
         >
-          <Box
-            id="editorToolbar"
-            sx={{
-              display: readonly ? "none" : "flex",
-              bg: "background",
-              position: "sticky",
-              top: 0,
-              mb: 1,
-              zIndex: 2,
-            }}
-          />
+          {!isMobile && (
+            <Box
+              id="editorToolbar"
+              sx={{
+                display: readonly ? "none" : "flex",
+                bg: "background",
+                position: "sticky",
+                top: 0,
+                mb: 1,
+                zIndex: 2,
+              }}
+            />
+          )}
           <Header readonly={readonly} />
           <Tiptap
             readonly={readonly}
@@ -258,18 +262,20 @@ function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
         </Flex>
       </FlexScrollContainer>
 
-      {/* TODO <Box
-        id="editorToolbar"
-        sx={{
-          display: readonly ? "none" : "flex",
-          bg: "background",
-          position: "sticky",
-          top: 0,
-          mb: 1,
-          zIndex: 2,
-          px: [2, 2, 35],
-        }}
-      /> */}
+      {isMobile && (
+        <Box
+          id="editorToolbar"
+          sx={{
+            display: readonly ? "none" : "flex",
+            bg: "background",
+            position: "sticky",
+            top: 0,
+            mb: 1,
+            zIndex: 2,
+            px: [2, 2, 35],
+          }}
+        />
+      )}
     </>
   );
 }
@@ -336,8 +342,8 @@ function useDragOverlay() {
     function isFile(e: DragEvent) {
       return (
         e.dataTransfer &&
-        (e.dataTransfer.files.length > 0 ||
-          e.dataTransfer.types.some((a) => a === "Files"))
+        (e.dataTransfer.files?.length > 0 ||
+          e.dataTransfer.types?.some((a) => a === "Files"))
       );
     }
 
