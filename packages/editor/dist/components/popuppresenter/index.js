@@ -157,29 +157,20 @@ export function PopupPresenter(props) {
 }
 export function PopupWrapper(props) {
     var id = props.id, group = props.group, position = props.position, renderPopup = props.renderPopup, isOpen = props.isOpen, onClosed = props.onClosed, autoCloseOnUnmount = props.autoCloseOnUnmount, presenterProps = __rest(props, ["id", "group", "position", "renderPopup", "isOpen", "onClosed", "autoCloseOnUnmount"]);
-    var closePopup = useToolbarStore(function (store) { return store.closePopup; });
-    var openPopup = useToolbarStore(function (store) { return store.openPopup; });
-    var closePopupGroup = useToolbarStore(function (store) { return store.closePopupGroup; });
-    var isPopupOpen = useToolbarStore(function (store) { return !!store.openedPopups[id]; });
     var PopupRenderer = usePopupRenderer();
+    var isPopupOpen = useToolbarStore(function (store) { return !!store.openedPopups[id]; });
+    var openPopup = useToolbarStore(function (store) { return store.openPopup; });
+    var closePopup = useToolbarStore(function (store) { return store.closePopup; });
+    var closePopupGroup = useToolbarStore(function (store) { return store.closePopupGroup; });
     var isBottom = useToolbarStore(function (store) { return store.toolbarLocation === "bottom"; });
     if (isBottom)
         group = "popup";
-    useEffect(function () {
-        if (isPopupOpen) {
-            closePopupGroup(group, [id]);
-        }
-    }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
-    useEffect(function () {
-        if (!isPopupOpen)
-            onClosed === null || onClosed === void 0 ? void 0 : onClosed();
-    }, [isPopupOpen]);
     useEffect(function () {
         if (isOpen)
             openPopup({ id: id, group: group });
         else
             closePopup(id);
-    }, [isOpen, id, group, openPopup]);
+    }, [isOpen, id, group, openPopup, closePopup]);
     useEffect(function () {
         if (!autoCloseOnUnmount)
             return;
@@ -188,18 +179,37 @@ export function PopupWrapper(props) {
         };
     }, [autoCloseOnUnmount, id]);
     useEffect(function () {
-        if (PopupRenderer && isPopupOpen) {
-            PopupRenderer.openPopup(id, function () { return (_jsx(PopupPresenter, __assign({ isOpen: isPopupOpen, onClose: function () { return closePopup(id); }, position: position, blocking: true, focusOnRender: true }, presenterProps, { children: _jsx(Box, __assign({ sx: {
-                        boxShadow: "menu",
-                        borderRadius: "default",
-                        overflow: "hidden",
-                        //          width,
-                    } }, { children: _jsx(EditorContext.Consumer, { children: function () {
-                            return renderPopup(function () { return PopupRenderer.closePopup(id); });
-                        } }) })) }), id)); });
+        if (!isPopupOpen)
+            onClosed === null || onClosed === void 0 ? void 0 : onClosed();
+    }, [isPopupOpen]);
+    useEffect(function () {
+        if (isPopupOpen) {
+            closePopupGroup(group, [id]);
         }
-        else if (PopupRenderer && !isPopupOpen) {
-            PopupRenderer.closePopup(id);
+    }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
+    useEffect(function () {
+        if (!isOpen)
+            closePopup(id);
+    }, [isOpen, id, group, closePopup]);
+    useEffect(function () {
+        if (PopupRenderer && isPopupOpen) {
+            PopupRenderer.openPopup(id, function Popup(_a) {
+                var id = _a.id;
+                var isPopupOpen = useToolbarStore(function (store) { return !!store.openedPopups[id]; });
+                useEffect(function () {
+                    if (!isPopupOpen) {
+                        PopupRenderer.closePopup(id);
+                    }
+                }, [isPopupOpen]);
+                return (_jsx(PopupPresenter, __assign({ isOpen: isPopupOpen, onClose: function () { return closePopup(id); }, position: position, blocking: true, focusOnRender: true }, presenterProps, { children: _jsx(Box, __assign({ sx: {
+                            boxShadow: "menu",
+                            borderRadius: "default",
+                            overflow: "hidden",
+                            //          width,
+                        } }, { children: _jsx(EditorContext.Consumer, { children: function () {
+                                return renderPopup(function () { return PopupRenderer.closePopup(id); });
+                            } }) })) }), id));
+            });
         }
     }, [PopupRenderer, isPopupOpen]);
     return null;

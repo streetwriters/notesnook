@@ -9,8 +9,9 @@ export const PopupRendererContext = React.createContext<PopupRenderer | null>(
 export const EditorContext = React.createContext<Editor | null>(null);
 
 export type PopupRendererProps = PropsWithChildren<{ editor: Editor }>;
+type PopupComponent = React.FunctionComponent<{ id: string }>;
 type PopupRendererState = {
-  popups: { id: string; popup: React.FunctionComponent }[];
+  popups: { id: string; popup: PopupComponent }[];
 };
 export class PopupRenderer extends React.Component<
   PopupRendererProps,
@@ -22,7 +23,7 @@ export class PopupRenderer extends React.Component<
     popups: [] as PopupRendererState["popups"],
   };
 
-  openPopup = (id: string, popup: React.FunctionComponent) => {
+  openPopup = (id: string, popup: PopupComponent) => {
     if (!popup) return;
     this.setState((prev) => {
       return {
@@ -49,7 +50,7 @@ export class PopupRenderer extends React.Component<
         {this.props.children}
         <EditorContext.Provider value={this.props.editor}>
           {this.state.popups.map(({ id, popup: Popup }) => {
-            return <Popup key={id} />;
+            return <Popup key={id} id={id} />;
           })}
           <div id="popup-container" />
         </EditorContext.Provider>

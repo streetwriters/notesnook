@@ -139,8 +139,5 @@ export function ColorPicker(props) {
                                 }, onClick: function () {
                                     setCurrentColor(color);
                                     onChange(color);
-                                } }, color)); })] })), onClose && (_jsx(Button, __assign({ variant: "icon", sx: { display: ["block", "none"], px: 2 }, onClick: onClose, onTouchStart: function (e) { return e.preventDefault(); }, onTouchEnd: function (e) {
-                            e.preventDefault();
-                            onClose();
-                        } }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) })))] })] })));
+                                } }, color)); })] })), onClose && (_jsx(Button, __assign({ variant: "icon", sx: { display: ["block", "none"], px: 2 }, onClick: onClose }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) })))] })] })));
 }

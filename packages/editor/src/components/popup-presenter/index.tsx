@@ -248,30 +248,22 @@ export function PopupWrapper(props: PopupWrapperProps) {
     autoCloseOnUnmount,
     ...presenterProps
   } = props;
-  const closePopup = useToolbarStore((store) => store.closePopup);
-  const openPopup = useToolbarStore((store) => store.openPopup);
-  const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
-  const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
   const PopupRenderer = usePopupRenderer();
+  const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
+  const openPopup = useToolbarStore((store) => store.openPopup);
+  const closePopup = useToolbarStore((store) => store.closePopup);
+  const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
+
   const isBottom = useToolbarStore(
     (store) => store.toolbarLocation === "bottom"
   );
+
   if (isBottom) group = "popup";
-
-  useEffect(() => {
-    if (isPopupOpen) {
-      closePopupGroup(group, [id]);
-    }
-  }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
-
-  useEffect(() => {
-    if (!isPopupOpen) onClosed?.();
-  }, [isPopupOpen]);
 
   useEffect(() => {
     if (isOpen) openPopup({ id, group });
     else closePopup(id);
-  }, [isOpen, id, group, openPopup]);
+  }, [isOpen, id, group, openPopup, closePopup]);
 
   useEffect(() => {
     if (!autoCloseOnUnmount) return;
@@ -281,35 +273,59 @@ export function PopupWrapper(props: PopupWrapperProps) {
   }, [autoCloseOnUnmount, id]);
 
   useEffect(() => {
+    if (!isPopupOpen) onClosed?.();
+  }, [isPopupOpen]);
+
+  useEffect(() => {
+    if (isPopupOpen) {
+      closePopupGroup(group, [id]);
+    }
+  }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
+
+  useEffect(() => {
+    if (!isOpen) closePopup(id);
+  }, [isOpen, id, group, closePopup]);
+
+  useEffect(() => {
     if (PopupRenderer && isPopupOpen) {
-      PopupRenderer.openPopup(id, () => (
-        <PopupPresenter
-          key={id}
-          isOpen={isPopupOpen}
-          onClose={() => closePopup(id)}
-          position={position}
-          blocking
-          focusOnRender
-          {...presenterProps}
-        >
-          <Box
-            sx={{
-              boxShadow: "menu",
-              borderRadius: "default",
-              overflow: "hidden",
-              //          width,
-            }}
+      PopupRenderer.openPopup(id, function Popup({ id }) {
+        const isPopupOpen = useToolbarStore(
+          (store) => !!store.openedPopups[id]
+        );
+
+        useEffect(() => {
+          if (!isPopupOpen) {
+            PopupRenderer.closePopup(id);
+          }
+        }, [isPopupOpen]);
+
+        return (
+          <PopupPresenter
+            key={id}
+            isOpen={isPopupOpen}
+            onClose={() => closePopup(id)}
+            position={position}
+            blocking
+            focusOnRender
+            {...presenterProps}
           >
-            <EditorContext.Consumer>
-              {() => {
-                return renderPopup(() => PopupRenderer.closePopup(id));
+            <Box
+              sx={{
+                boxShadow: "menu",
+                borderRadius: "default",
+                overflow: "hidden",
+                //          width,
               }}
-            </EditorContext.Consumer>
-          </Box>
-        </PopupPresenter>
-      ));
-    } else if (PopupRenderer && !isPopupOpen) {
-      PopupRenderer.closePopup(id);
+            >
+              <EditorContext.Consumer>
+                {() => {
+                  return renderPopup(() => PopupRenderer.closePopup(id));
+                }}
+              </EditorContext.Consumer>
+            </Box>
+          </PopupPresenter>
+        );
+      });
     }
   }, [PopupRenderer, isPopupOpen]);
 

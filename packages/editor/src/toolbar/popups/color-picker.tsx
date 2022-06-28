@@ -207,11 +207,6 @@ export function ColorPicker(props: ColorPickerProps) {
             variant={"icon"}
             sx={{ display: ["block", "none"], px: 2 }}
             onClick={onClose}
-            onTouchStart={(e) => e.preventDefault()}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              onClose();
-            }}
           >
             <Icon path={Icons.close} size="big" />
           </Button>
