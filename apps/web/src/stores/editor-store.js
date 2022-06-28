@@ -141,7 +141,7 @@ class EditorStore extends BaseStore {
 
   saveSession = async (sessionId, session) => {
     const currentSession = this.get().session;
-    if (currentSession.readonly) return; // do not allow saving of readonly session
+    if (currentSession.readonly && session.readonly !== false) return; // do not allow saving of readonly session
 
     this.setSaveState(0);
 
@@ -174,6 +174,8 @@ class EditorStore extends BaseStore {
       }
 
       this.set((state) => {
+        if (!!state.session.id && state.session.id !== note.id) return;
+
         for (let key in session) {
           if (key === "content") continue;
           state.session[key] = session[key];
@@ -182,13 +184,15 @@ class EditorStore extends BaseStore {
         state.session.notebooks = note.notebooks;
         state.session.context = null;
         state.session.id = note.id;
+        state.session.title = note.title;
         state.session.saveState = 1;
+        state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
       });
 
       if (!sessionId) {
         noteStore.setSelectedNote(id);
-        hashNavigate(`/notes/${id}/edit`, { replace: true });
+        hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
       }
     } catch (err) {
       this.setSaveState(-1);
@@ -220,7 +224,6 @@ class EditorStore extends BaseStore {
     const session = this.get().session;
     if (session.id) await db.fs.cancel(session.id);
 
-    appStore.setIsEditorOpen(false);
     this.set((state) => {
       state.session = {
         ...getDefaultSession(),
@@ -231,6 +234,7 @@ class EditorStore extends BaseStore {
     this.toggleProperties(false);
     if (shouldNavigate)
       hashNavigate(`/notes/create`, { replace: true, addNonce: true });
+    appStore.setIsEditorOpen(false);
   };
 
   setTitle = (sessionId, title) => {

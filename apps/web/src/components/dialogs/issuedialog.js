@@ -46,9 +46,6 @@ function IssueDialog(props) {
     <Dialog
       isOpen={true}
       title={"Report an issue"}
-      description={
-        "Let us know if you are facing an issue. We'll do our best to sort it out for you."
-      }
       onClose={props.onClose}
       positiveButton={{
         text: "Report",
@@ -112,6 +109,17 @@ function IssueDialog(props) {
             },
           }}
         />
+        <Text
+          variant="error"
+          color="warn"
+          bg={"warnBg"}
+          mt={1}
+          p={1}
+          sx={{ borderRadius: "default" }}
+        >
+          Your bug report is public. Do NOT include sensitive information
+          (email, passwords etc) in the issue title or description.
+        </Text>
         <Text variant="subBody" mt={1}>
           {getDeviceInfo()
             .split("\n")
@@ -143,7 +151,12 @@ function showIssueReportedDialog({ url }) {
       <>
         <p>
           You can track your bug report at{" "}
-          <Text as="a" href={url} sx={{ lineBreak: "anywhere" }}>
+          <Text
+            as="a"
+            target="_blank"
+            href={url}
+            sx={{ lineBreak: "anywhere" }}
+          >
             {url}
           </Text>
           .

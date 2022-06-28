@@ -9,6 +9,7 @@ import { Edit, RemoveShortcutLink, ShortcutLink } from "../components/icons";
 import { getTotalNotes } from "../common";
 import { formatDate } from "notes-core/utils/date";
 import { db } from "../common/db";
+import { pluralize } from "../utils/string";
 
 function Topics() {
   const selectedNotebookTopics = useNbStore(
@@ -93,8 +94,8 @@ function NotebookHeader({ notebook }) {
         </Text>
       )}
       <Text as="em" variant="subBody" mt={2}>
-        {topics.length} {topics.length > 1 ? "topics" : "topic"}, {totalNotes}{" "}
-        {totalNotes > 1 ? "notes" : "note"}
+        {pluralize(topics.length, "topic", "topics")},{" "}
+        {pluralize(totalNotes, "note", "notes")}
       </Text>
     </Flex>
   );

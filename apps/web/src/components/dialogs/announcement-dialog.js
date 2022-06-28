@@ -4,7 +4,7 @@ import { Flex } from "rebass";
 import AnnouncementBody from "../announcements/body";
 
 function AnnouncementDialog(props) {
-  const { announcement } = props;
+  const { announcement, removeAnnouncement } = props;
   const theme = useTheme();
 
   return (
@@ -65,7 +65,11 @@ function AnnouncementDialog(props) {
           borderRadius: "dialog",
         }}
       >
-        <AnnouncementBody components={announcement.body} type="dialog" />
+        <AnnouncementBody
+          components={announcement.body}
+          removeAnnouncement={removeAnnouncement}
+          type="dialog"
+        />
       </Flex>
     </Modal>
   );

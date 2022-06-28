@@ -8,7 +8,6 @@ import Vault from "../common/vault";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
 import Config from "../utils/config";
-import { qclone } from "qclone";
 import { hashNavigate } from "../navigation";
 import { groupArray } from "notes-core/utils/grouping";
 
@@ -39,14 +38,21 @@ class NoteStore extends BaseStore {
   };
 
   refresh = () => {
-    this.set((state) => {
-      state.notes = groupArray(
-        db.notes.all,
-        db.settings.getGroupOptions("home")
-      );
-      state.nonce = Math.random();
-    });
+    this.get().notes = groupArray(
+      db.notes.all,
+      db.settings.getGroupOptions("home")
+    );
+    this._forceUpdate();
     this.refreshContext();
+  };
+
+  refreshItem = (id, newNote) => {
+    const notes = this.get().notes;
+    const index = notes.findIndex((n) => n.id === id);
+    if (index <= -1) return;
+    newNote = newNote || db.notes.note(id).data;
+    notes[index] = newNote;
+    this._forceUpdate();
   };
 
   refreshContext = () => {
@@ -63,12 +69,8 @@ class NoteStore extends BaseStore {
 
   setContext = (context) => {
     db.notes.init().then(() => {
-      this.set((state) => {
-        state.context = {
-          ...context,
-          notes: qclone(notesFromContext(context)),
-        };
-      });
+      this.get().context = { ...context, notes: notesFromContext(context) };
+      this._forceUpdate();
     });
   };
 
@@ -100,21 +102,21 @@ class NoteStore extends BaseStore {
     const note = db.notes.note(id);
     await note.favorite();
     this._syncEditor(note.id, "favorite", !note.data.favorite);
-    this.refresh();
+    this.refreshItem(id);
   };
 
   unlock = async (id) => {
     return await Vault.unlockNote(id).then(async (res) => {
       if (editorStore.get().session.id === id)
         await editorStore.openSession(id);
-      this.refresh();
+      this.refreshItem(id);
       return res;
     });
   };
 
   lock = async (id) => {
     await Vault.lockNote(id);
-    this.refresh();
+    this.refreshItem(id);
     if (editorStore.get().session.id === id)
       await editorStore.openSession(id, true);
   };
@@ -122,7 +124,8 @@ class NoteStore extends BaseStore {
   readonly = async (id) => {
     const note = db.notes.note(id);
     await note.readonly();
-    this.refresh();
+    this._syncEditor(note.id, "readonly", !note.data.readonly);
+    this.refreshItem(id);
   };
 
   duplicate = async (note) => {
@@ -135,7 +138,7 @@ class NoteStore extends BaseStore {
     const note = db.notes.note(id);
     await note.localOnly();
     this._syncEditor(note.id, "localOnly", !note.data.localOnly);
-    this.refresh();
+    this.refreshItem(id);
   };
 
   setColor = async (id, color) => {
@@ -146,7 +149,7 @@ class NoteStore extends BaseStore {
       else await db.notes.note(id).color(color);
       appStore.refreshNavItems();
       this._syncEditor(note.id, "color", db.notes.note(id).data.color);
-      this.refresh();
+      this.refreshItem(id);
     } catch (e) {
       console.error(e);
     }
@@ -160,6 +163,15 @@ class NoteStore extends BaseStore {
     if (session.id !== noteId) return false;
     toggle(session.id, action, value);
     return true;
+  };
+
+  /**
+   * @private
+   */
+  _forceUpdate = () => {
+    this.set((state) => {
+      state.nonce++;
+    });
   };
 }
 

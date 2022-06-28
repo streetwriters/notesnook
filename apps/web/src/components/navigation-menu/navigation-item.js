@@ -2,30 +2,40 @@ import { Button, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import useMobile from "../../utils/use-mobile";
-import useTablet from "../../utils/use-tablet";
 import * as Icons from "../icons";
 
 function NavigationItem(props) {
-  const { icon: Icon, color, title, isLoading, isShortcut, isNew } = props;
+  const {
+    icon: Icon,
+    color,
+    title,
+    isLoading,
+    isShortcut,
+    isNew,
+    children,
+    isTablet,
+  } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const { openMenu } = useMenuTrigger();
   const isMobile = useMobile();
-  const isTablet = useTablet();
 
   return (
     <Button
       data-test-id={`navitem-${title.toLowerCase()}`}
-      variant="icon"
-      bg={props.selected ? "border" : "transparent"}
+      bg={props.selected ? "bgSecondaryHover" : "transparent"}
       px={2}
       py={"9px"}
       mx={1}
-      mt={[1, 2, "3px"]}
+      mt={isTablet ? 1 : "3px"}
       sx={{
         borderRadius: "default",
         position: "relative",
         ":first-of-type": { mt: 1 },
         ":last-of-type": { mb: 1 },
+        ":hover:not(:disabled)": {
+          bg: "bgSecondaryHover",
+          filter: "brightness(100%)",
+        },
       }}
       label={title}
       title={title}
@@ -39,7 +49,7 @@ function NavigationItem(props) {
         props.onClick();
       }}
       display="flex"
-      justifyContent={["flex-start", "center", "flex-start"]}
+      justifyContent={isTablet ? "center" : "flex-start"}
       alignItems="center"
     >
       <Icon
@@ -63,7 +73,7 @@ function NavigationItem(props) {
       )}
 
       <Text
-        display={["block", "none", "block"]}
+        display={isTablet ? "none" : "block"}
         variant="body"
         fontSize="subtitle"
         sx={{
@@ -76,6 +86,7 @@ function NavigationItem(props) {
       >
         {title}
       </Text>
+      {children}
     </Button>
   );
 }

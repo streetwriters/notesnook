@@ -17,7 +17,7 @@ export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
     onSliding: (e, { lastSlide, position, lastPosition }) => {
       if (!isMobile) return;
       const offset = 70;
-      const width = 180;
+      const width = 300;
 
       const percent = offset - (position / width) * offset;
       const overlay = document.getElementById("overlay");
@@ -32,6 +32,7 @@ export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
     onChange: (e, { slide, lastSlide }) => {
       if (!lastSlide || !isMobile) return;
       toggleSideMenu(slide?.index === 0 ? true : false);
+      console.log("Setting editor", slide?.index === 2 ? true : false);
       setIsEditorOpen(slide?.index === 2 ? true : false);
     },
   });
@@ -43,6 +44,7 @@ export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
 
   useEffect(() => {
     if (!isMobile) return;
+    console.log(isEditorOpen);
     slideToIndex(isEditorOpen ? 2 : 1);
   }, [isMobile, slideToIndex, isEditorOpen]);
 

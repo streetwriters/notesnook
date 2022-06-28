@@ -59,9 +59,6 @@ function Search({ type }) {
       const results = await db.lookup[lookupType](items, query);
       setResults(results);
       setSearchState({ isSearching: false, totalItems: 0 });
-      if (!results.length) {
-        showToast("error", `Nothing found for "${query}".`);
-      }
     },
     [context, type]
   );
@@ -103,8 +100,12 @@ function Search({ type }) {
   }, [type, context]);
 
   useEffect(() => {
-    onSearch(cachedQuery.current);
-  }, [nonce, onSearch]);
+    (async function () {
+      const [lookupType, items] = await typeToItems(type, context);
+      const results = await db.lookup[lookupType](items, cachedQuery.current);
+      setResults(results);
+    })();
+  }, [nonce, type, context]);
 
   if (!title) return hardNavigate("/");
 
@@ -136,7 +137,15 @@ function Search({ type }) {
           context={context}
           type={type}
           items={results}
-          placeholder={SearchPlaceholder}
+          placeholder={() => (
+            <SearchPlaceholder
+              text={
+                cachedQuery.current
+                  ? `Nothing found for "${cachedQuery.current}"`
+                  : undefined
+              }
+            />
+          )}
         />
       )}
     </>

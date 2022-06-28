@@ -9,6 +9,7 @@ import * as serviceWorker from "./serviceWorkerRegistration";
 import Config from "./utils/config";
 import { isTesting } from "./utils/platform";
 import { getServiceWorkerVersion } from "./utils/version";
+import { initializeDatabase } from "./common/db";
 if (process.env.REACT_APP_PLATFORM === "desktop") require("./commands");
 
 const ROUTES = {
@@ -68,16 +69,24 @@ function getRoute() {
   return ROUTES[path] || ROUTES.default;
 }
 
-const route = getRoute();
-route?.component()?.then(({ default: Component }) => {
-  render(
-    <Component {...route.props} />,
-    document.getElementById("root"),
-    () => {
-      document.getElementById("splash").remove();
-    }
-  );
-});
+if (process.env.NODE_ENV === "development") {
+  initializeDatabase().then(() => renderApp());
+} else {
+  renderApp();
+}
+
+function renderApp() {
+  const route = getRoute();
+  return route?.component()?.then(({ default: Component }) => {
+    render(
+      <Component {...route.props} />,
+      document.getElementById("root"),
+      () => {
+        document.getElementById("splash").remove();
+      }
+    );
+  });
+}
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

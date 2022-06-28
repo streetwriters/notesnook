@@ -1,5 +1,5 @@
-import React from "react";
 import ReactDOM from "react-dom";
+import Dialogs from "../components/dialogs";
 import { hardNavigate, hashNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import { qclone } from "qclone";
@@ -13,57 +13,97 @@ import { showToast } from "../utils/toast";
 import { Box, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
-import Dialogs from "../components/dialogs";
+
 import { formatDate } from "notes-core/utils/date";
 import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
-import { getChangelog } from "../utils/version";
+import { AppVersion, getChangelog } from "../utils/version";
 import { isDesktop } from "../utils/platform";
+import { Period } from "../components/dialogs/buy-dialog/types";
+import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
+import { FeatureKeys } from "../components/dialogs/feature-dialog";
 
-function showDialog(dialog) {
-  const root = document.getElementById("dialogContainer");
+type DialogIds = keyof DialogTypes;
+type DialogTypes = typeof Dialogs;
+export type Perform = (result: boolean) => void;
+type RenderDialog<TId extends DialogIds, TReturnType> = (
+  dialog: DialogTypes[TId],
+  perform: (result: TReturnType) => void
+) => JSX.Element;
 
-  if (root) {
-    return new Promise((resolve, reject) => {
-      const perform = (result) => {
-        ReactDOM.unmountComponentAtNode(root);
-        hashNavigate("/", { replace: true });
-        resolve(result);
-      };
-      const PropDialog = dialog(Dialogs, perform);
+const openDialogs: Partial<Record<DialogIds, boolean>> = {};
+function showDialog<TId extends DialogIds, TReturnType>(
+  id: TId,
+  render: RenderDialog<TId, TReturnType>
+): Promise<TReturnType> {
+  return new Promise((resolve, reject) => {
+    if (openDialogs[id]) return false;
 
-      ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
-    });
-  }
-  return Promise.reject("No element with id 'dialogContainer'");
+    const container = document.createElement("div");
+    container.id = id;
+
+    const perform = (result: TReturnType) => {
+      openDialogs[id] = false;
+      ReactDOM.unmountComponentAtNode(container);
+      container.remove();
+      hashNavigate("/", { replace: true, notify: false });
+      resolve(result);
+    };
+    const PropDialog = render(Dialogs[id], perform);
+    ReactDOM.render(
+      <ThemeProvider>{PropDialog}</ThemeProvider>,
+      container,
+      () => (openDialogs[id] = true)
+    );
+  });
 }
 
 export function closeOpenedDialog() {
-  const root = document.getElementById("ReactModalPortal");
-  if (!root) return;
-  ReactDOM.unmountComponentAtNode(root);
+  const dialogs = document.querySelectorAll(".ReactModalPortal");
+  dialogs.forEach((elem) => elem.remove());
 }
 
-export function showEditNotebookDialog(notebookId) {
-  const notebook = db.notebooks.notebook(notebookId)?.data;
+export function showAddNotebookDialog() {
+  return showDialog("AddNotebookDialog", (Dialog, perform) => (
+    <Dialog
+      isOpen={true}
+      onDone={async (nb: any) => {
+        // add the notebook to db
+        await db.notebooks?.add({ ...nb });
+        notebookStore.refresh();
+
+        showToast("success", "Notebook added successfully!");
+        perform(true);
+      }}
+      onClose={() => {
+        perform(false);
+      }}
+    />
+  ));
+}
+
+export function showEditNotebookDialog(notebookId: string) {
+  const notebook = db.notebooks?.notebook(notebookId)?.data;
   if (!notebook) return false;
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.AddNotebookDialog
+  return showDialog("AddNotebookDialog", (Dialog, perform) => (
+    <Dialog
       isOpen={true}
       notebook={notebook}
       edit={true}
-      onDone={async (nb, deletedTopics) => {
+      onDone={async (nb: any, deletedTopics: string[]) => {
         // we remove the topics from notebook
         // beforehand so we can add them manually, later
         const topics = qclone(nb.topics);
         nb.topics = [];
 
-        let notebookId = await db.notebooks.add(nb);
+        let notebookId = await db.notebooks?.add(nb);
 
         // add or delete topics as required
-        const notebookTopics = db.notebooks.notebook(notebookId).topics;
-        await notebookTopics.add(...topics);
-        await notebookTopics.delete(...deletedTopics);
+        const notebookTopics = db.notebooks?.notebook(notebookId).topics;
+        if (notebookTopics) {
+          await notebookTopics.add(...topics);
+          await notebookTopics.delete(...deletedTopics);
+        }
 
         notebookStore.refresh();
         noteStore.refresh();
@@ -79,28 +119,9 @@ export function showEditNotebookDialog(notebookId) {
   ));
 }
 
-export function showAddNotebookDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.AddNotebookDialog
-      isOpen={true}
-      onDone={async (nb) => {
-        // add the notebook to db
-        await db.notebooks.add({ ...nb });
-        notebookStore.refresh();
-
-        showToast("success", "Notebook added successfully!");
-        perform(true);
-      }}
-      onClose={() => {
-        perform(false);
-      }}
-    />
-  ));
-}
-
-export function showBuyDialog(plan, couponCode) {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.BuyDialog
+export function showBuyDialog(plan?: Period, couponCode?: string) {
+  return showDialog("BuyDialog", (Dialog, perform) => (
+    <Dialog
       plan={plan}
       couponCode={couponCode}
       onClose={() => perform(false)}
@@ -108,43 +129,49 @@ export function showBuyDialog(plan, couponCode) {
   ));
 }
 
-export function showBackupDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.BackupDialog onClose={() => perform(false)} />
-  ));
-}
-
-export function confirm({
-  title,
-  subtitle,
-  message,
-  yesText,
-  noText,
-  yesAction,
-  width,
-}) {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.Confirm
-      title={title}
-      subtitle={subtitle}
-      message={message}
-      yesText={yesText}
-      width={width}
-      noText={noText}
+type ConfirmDialogProps = {
+  title?: string;
+  subtitle?: string;
+  message?: string | JSX.Element;
+  yesText?: string;
+  noText?: string;
+  yesAction?: () => void;
+  width?: string;
+};
+export function confirm(props: ConfirmDialogProps) {
+  return showDialog("Confirm", (Dialog, perform) => (
+    <Dialog
+      {...props}
       onNo={() => perform(false)}
       onYes={() => {
-        if (yesAction) yesAction();
+        if (props.yesAction) props.yesAction();
         perform(true);
       }}
     />
   ));
 }
 
-export function showError(title, message) {
+export function showPromptDialog(props: {
+  title: string;
+  description?: string;
+  defaultValue?: string;
+}) {
+  return showDialog<"Prompt", string | null>("Prompt", (Dialog, perform) => (
+    <Dialog
+      {...props}
+      onClose={() => perform(null)}
+      onSave={(text) => {
+        perform(text);
+      }}
+    />
+  ));
+}
+
+export function showError(title: string, message: string) {
   return confirm({ title, message, yesText: "Okay" });
 }
 
-export function showMultiDeleteConfirmation(length) {
+export function showMultiDeleteConfirmation(length: number) {
   return confirm({
     title: `Delete ${length} items?`,
     message: (
@@ -161,7 +188,7 @@ export function showMultiDeleteConfirmation(length) {
   });
 }
 
-export function showMultiPermanentDeleteConfirmation(length) {
+export function showMultiPermanentDeleteConfirmation(length: number) {
   return confirm({
     title: `Permanently delete ${length} items?`,
     message: (
@@ -199,25 +226,7 @@ export function showClearSessionsConfirmation() {
   });
 }
 
-// export function showAccountDeletedNotice() {
-//   return confirm(Icon.Logout, {
-//     title: `Account deleted`,
-//     message:
-//       "You deleted your account from another device. You have been logged out.",
-//     yesText: `Okay`,
-//   });
-// }
-
-// export function showPasswordChangedNotice() {
-//   return confirm(Icon.Logout, {
-//     title: `Account password changed`,
-//     message:
-//       "Your account password was changed, please login again using the new password.",
-//     yesText: `Okay`,
-//   });
-// }
-
-export function showAccountLoggedOutNotice(reason) {
+export function showAccountLoggedOutNotice(reason?: string) {
   return confirm({
     title: "You were logged out",
     message: reason,
@@ -227,7 +236,9 @@ export function showAccountLoggedOutNotice(reason) {
   });
 }
 
-export function showAppUpdatedNotice(version) {
+export function showAppUpdatedNotice(
+  version: AppVersion & { changelog?: string }
+) {
   return confirm({
     title: `Welcome to v${version.formatted}`,
     message: (
@@ -254,66 +265,57 @@ export function showAppUpdatedNotice(version) {
 }
 
 export function showEmailVerificationDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.EmailVerificationDialog onCancel={() => perform(false)} />
+  return showDialog("EmailVerificationDialog", (Dialog, perform) => (
+    <Dialog onCancel={() => perform(false)} />
   ));
 }
 
-export function showExportDialog(noteIds) {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ExportDialog
-      noteIds={noteIds}
-      title={
-        noteIds.length > 1 ? `Export ${noteIds.length} notes` : "Export note"
-      }
-      icon={Icon.Export}
-      onClose={() => perform(false)}
-      onDone={() => perform(true)}
-    />
-  ));
-}
-
-export function showLoadingDialog(dialogData) {
+type LoadingDialogProps = {
+  title: string;
+  message?: string;
+  subtitle: string;
+  action: () => void;
+};
+export function showLoadingDialog(dialogData: LoadingDialogProps) {
   const { title, message, subtitle, action } = dialogData;
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.LoadingDialog
+  return showDialog("LoadingDialog", (Dialog, perform) => (
+    <Dialog
       title={title}
       subtitle={subtitle}
       message={message}
       action={action}
-      onDone={(e) => perform(e)}
+      onDone={(e: boolean) => perform(e)}
     />
   ));
 }
 
-/**
- *
- * @param {{title: string, subtitle?: string, action: Function}} dialogData
- * @returns
- */
-export function showProgressDialog(dialogData) {
+type ProgressDialogProps = {
+  title: string;
+  subtitle: string;
+  action: any;
+};
+export function showProgressDialog<T>(dialogData: ProgressDialogProps) {
   const { title, subtitle, action } = dialogData;
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ProgressDialog
-      title={title}
-      subtitle={subtitle}
-      action={action}
-      onDone={(e) => perform(e)}
-    />
+  return showDialog<"ProgressDialog", T>(
+    "ProgressDialog",
+    (Dialog, perform) => (
+      <Dialog
+        title={title}
+        subtitle={subtitle}
+        action={action}
+        onDone={(e: T) => perform(e)}
+      />
+    )
+  );
+}
+
+export function showMoveNoteDialog(noteIds: string[]) {
+  return showDialog("MoveDialog", (Dialog, perform) => (
+    <Dialog noteIds={noteIds} onClose={(res: boolean) => perform(res)} />
   ));
 }
 
-export function showMoveNoteDialog(noteIds) {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.MoveDialog
-      noteIds={noteIds}
-      onClose={() => perform(false)}
-      onMove={() => perform(true)}
-    />
-  ));
-}
-
-function getDialogData(type) {
+function getDialogData(type: string) {
   switch (type) {
     case "create_vault":
       return {
@@ -415,14 +417,17 @@ function getDialogData(type) {
         positiveButtonText: "Delete Account",
       };
     default:
-      return;
+      return {};
   }
 }
 
-export function showPasswordDialog(type, validate) {
+export function showPasswordDialog(
+  type: string,
+  validate: (password: string) => boolean
+) {
   const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.PasswordDialog
+  return showDialog("PasswordDialog", (Dialog, perform) => (
+    <Dialog
       type={type}
       title={title}
       subtitle={subtitle}
@@ -436,23 +441,23 @@ export function showPasswordDialog(type, validate) {
 }
 
 export function showRecoveryKeyDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.RecoveryKeyDialog onDone={() => perform(true)} />
+  return showDialog("RecoveryKeyDialog", (Dialog, perform) => (
+    <Dialog onDone={() => perform(true)} />
   ));
 }
 
 export function showCreateTopicDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ItemDialog
+  return showDialog("ItemDialog", (Dialog, perform) => (
+    <Dialog
       title={"Create topic"}
       subtitle={"You can create as many topics as you want."}
       onClose={() => {
         perform(false);
       }}
-      onAction={async (topic) => {
+      onAction={async (topic: any) => {
         if (!topic) return;
         const notebookId = notebookStore.get().selectedNotebookId;
-        await db.notebooks.notebook(notebookId).topics.add(topic);
+        await db.notebooks?.notebook(notebookId).topics.add(topic);
         notebookStore.setSelectedNotebook(notebookId);
         showToast("success", "Topic created!");
         perform(true);
@@ -461,22 +466,22 @@ export function showCreateTopicDialog() {
   ));
 }
 
-export function showEditTopicDialog(notebookId, topicId) {
-  const topic = db.notebooks
-    .notebook(notebookId)
+export function showEditTopicDialog(notebookId: string, topicId: string) {
+  const topic: any = db.notebooks
+    ?.notebook(notebookId)
     ?.topics?.topic(topicId)?._topic;
   if (!topic) return;
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ItemDialog
+  return showDialog("ItemDialog", (Dialog, perform) => (
+    <Dialog
       title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
       defaultValue={topic.title}
       icon={Icon.Topic}
       item={topic}
       onClose={() => perform(false)}
-      onAction={async (t) => {
+      onAction={async (t: string) => {
         await db.notebooks
-          .notebook(topic.notebookId)
+          ?.notebook(topic.notebookId)
           .topics.add({ ...topic, title: t });
         notebookStore.setSelectedNotebook(topic.notebookId);
         appStore.refreshNavItems();
@@ -488,41 +493,41 @@ export function showEditTopicDialog(notebookId, topicId) {
 }
 
 export function showCreateTagDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ItemDialog
+  return showDialog("ItemDialog", (Dialog, perform) => (
+    <Dialog
       title={"Create tag"}
       subtitle={"You can create as many tags as you want."}
       onClose={() => {
         perform(false);
       }}
-      onAction={async (title) => {
+      onAction={async (title: string) => {
         if (!title) return showToast("error", "Tag title cannot be empty.");
         try {
-          await db.tags.add(title);
+          await db.tags?.add(title);
           showToast("success", "Tag created!");
           tagStore.refresh();
           perform(true);
         } catch (e) {
-          showToast("error", e.message);
+          if (e instanceof Error) showToast("error", e.message);
         }
       }}
     />
   ));
 }
 
-export function showEditTagDialog(tagId) {
-  const tag = db.tags.tag(tagId);
+export function showEditTagDialog(tagId: string) {
+  const tag = db.tags?.tag(tagId);
   if (!tag) return;
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ItemDialog
+  return showDialog("ItemDialog", (Dialog, perform) => (
+    <Dialog
       title={"Edit tag"}
-      subtitle={`You are editing #${db.tags.alias(tag.id)}.`}
-      defaultValue={db.tags.alias(tag.id)}
+      subtitle={`You are editing #${db.tags?.alias(tag.id)}.`}
+      defaultValue={db.tags?.alias(tag.id)}
       item={tag}
       onClose={() => perform(false)}
-      onAction={async (title) => {
+      onAction={async (title: string) => {
         if (!title) return;
-        await db.tags.rename(tagId, title);
+        await db.tags?.rename(tagId, title);
         showToast("success", "Tag edited!");
         tagStore.refresh();
         editorStore.refreshTags();
@@ -534,19 +539,19 @@ export function showEditTagDialog(tagId) {
   ));
 }
 
-export function showRenameColorDialog(colorId) {
-  const color = db.colors.tag(colorId);
+export function showRenameColorDialog(colorId: string) {
+  const color = db.colors?.tag(colorId);
   if (!color) return;
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ItemDialog
+  return showDialog("ItemDialog", (Dialog, perform) => (
+    <Dialog
       title={"Rename color"}
-      subtitle={`You are renaming color ${db.colors.alias(color.id)}.`}
+      subtitle={`You are renaming color ${db.colors?.alias(color.id)}.`}
       item={color}
-      defaultValue={db.colors.alias(color.id)}
+      defaultValue={db.colors?.alias(color.id)}
       onClose={() => perform(false)}
-      onAction={async (title) => {
+      onAction={async (title: string) => {
         if (!title) return;
-        await db.colors.rename(colorId, title);
+        await db.colors?.rename(colorId, title);
         showToast("success", "Color renamed!");
         appStore.refreshNavItems();
         perform(true);
@@ -555,22 +560,19 @@ export function showRenameColorDialog(colorId) {
   ));
 }
 
-export function showFeatureDialog(featureName) {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.FeatureDialog
-      featureName={featureName}
-      onClose={(res) => perform(res)}
-    />
+export function showFeatureDialog(featureName: FeatureKeys) {
+  return showDialog("FeatureDialog", (Dialog, perform) => (
+    <Dialog featureName={featureName} onClose={(res) => perform(res)} />
   ));
 }
 
-export function showReminderDialog(reminderKey) {
+export function showReminderDialog(reminderKey: string) {
   if (Config.get(reminderKey, false)) return;
 
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ReminderDialog
+  return showDialog("ReminderDialog", (Dialog, perform) => (
+    <Dialog
       reminderKey={reminderKey}
-      onClose={(res) => {
+      onClose={(res: boolean) => {
         Config.set(reminderKey, true);
         perform(res);
       }}
@@ -579,16 +581,20 @@ export function showReminderDialog(reminderKey) {
 }
 
 export function showTrackingDetailsDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.TrackingDetailsDialog onClose={(res) => perform(res)} />
+  return showDialog("TrackingDetailsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }
 
-export function showAnnouncementDialog(announcement, remove) {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.AnnouncementDialog
+export function showAnnouncementDialog(
+  announcement: any,
+  remove: (id: string) => void
+) {
+  return showDialog("AnnouncementDialog", (Dialog, perform) => (
+    <Dialog
       announcement={announcement}
-      onClose={(res) => {
+      removeAnnouncement={() => remove(announcement.id)}
+      onClose={(res: boolean) => {
         remove(announcement.id);
         perform(res);
       }}
@@ -597,9 +603,9 @@ export function showAnnouncementDialog(announcement, remove) {
 }
 
 export function showIssueDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.IssueDialog
-      onClose={(res) => {
+  return showDialog("IssueDialog", (Dialog, perform) => (
+    <Dialog
+      onClose={(res: boolean) => {
         perform(res);
       }}
     />
@@ -607,69 +613,71 @@ export function showIssueDialog() {
 }
 
 export function showImportDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ImportDialog onClose={(res) => perform(res)} />
+  return showDialog("ImportDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }
 
-export function showMultifactorDialog(primaryMethod = "") {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.MultifactorDialog
-      onClose={(res) => perform(res)}
-      primaryMethod={primaryMethod}
-    />
+export function showMultifactorDialog(primaryMethod?: AuthenticatorType) {
+  return showDialog("MultifactorDialog", (Dialog, perform) => (
+    <Dialog onClose={(res) => perform(res)} primaryMethod={primaryMethod} />
   ));
 }
 
-export function show2FARecoveryCodesDialog(primaryMethod) {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.RecoveryCodesDialog
-      onClose={(res) => perform(res)}
-      primaryMethod={primaryMethod}
-    />
+export function show2FARecoveryCodesDialog(primaryMethod: AuthenticatorType) {
+  return showDialog("RecoveryCodesDialog", (Dialog, perform) => (
+    <Dialog onClose={(res) => perform(res)} primaryMethod={primaryMethod} />
   ));
 }
 
 export function showAttachmentsDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.AttachmentsDialog onClose={(res) => perform(res)} />
+  return showDialog("AttachmentsDialog", (Dialog, perform) => (
+    <Dialog onClose={(res: boolean) => perform(res)} />
   ));
 }
 
-export function showOnboardingDialog(type) {
+export function showOnboardingDialog(type: string) {
   if (!type) return;
-
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.OnboardingDialog type={type} onClose={(res) => perform(res)} />
+  return showDialog("OnboardingDialog", (Dialog, perform) => (
+    <Dialog type={type} onClose={(res: boolean) => perform(res)} />
   ));
 }
 
-export function showInvalidSystemTimeDialog({ serverTime, localTime }) {
-  return showDialog((Dialogs) => (
-    <Dialogs.Confirm
-      title={"Your system clock is out of sync"}
-      subtitle={
-        "Please correct your system date & time and reload the app to avoid syncing issues."
-      }
-      message={
-        <>
-          Server time:{" "}
-          {formatDate(serverTime, { dateStyle: "medium", timeStyle: "medium" })}
-          <br />
-          Local time:{" "}
-          {formatDate(localTime, { dateStyle: "medium", timeStyle: "medium" })}
-          <br />
-          Please sync your system time with{" "}
-          <a href="https://time.is">https://time.is/</a>.
-        </>
-      }
-      yesText="Reload app"
-      onYes={() => window.location.reload()}
-    />
-  ));
+export function showInvalidSystemTimeDialog({
+  serverTime,
+  localTime,
+}: {
+  serverTime: number;
+  localTime: number;
+}) {
+  return confirm({
+    title: "Your system clock is out of sync",
+    subtitle:
+      "Please correct your system date & time and reload the app to avoid syncing issues.",
+    message: (
+      <>
+        Server time:{" "}
+        {formatDate(serverTime, { dateStyle: "medium", timeStyle: "medium" })}
+        <br />
+        Local time:{" "}
+        {formatDate(localTime, { dateStyle: "medium", timeStyle: "medium" })}
+        <br />
+        Please sync your system time with{" "}
+        <a href="https://time.is">https://time.is/</a>.
+      </>
+    ),
+    yesText: "Reload app",
+    yesAction: () => window.location.reload(),
+  });
 }
 
-export function showUpdateAvailableNotice({ changelog, version }) {
+export function showUpdateAvailableNotice({
+  changelog,
+  version,
+}: {
+  changelog: string;
+  version: string;
+}) {
   return showUpdateDialog({
     title: `New version available`,
     subtitle: `v${version} is available for download`,
@@ -678,7 +686,7 @@ export function showUpdateAvailableNotice({ changelog, version }) {
   });
 }
 
-export async function showUpdateReadyNotice({ version }) {
+export async function showUpdateReadyNotice({ version }: { version: string }) {
   const changelog = isDesktop() ? null : await getChangelog(version);
   return await showUpdateDialog({
     title: `Update ready for installation`,
@@ -691,7 +699,21 @@ export async function showUpdateReadyNotice({ version }) {
   });
 }
 
-function showUpdateDialog({ title, subtitle, changelog, action }) {
+type UpdateDialogProps = {
+  title: string;
+  subtitle: string;
+  changelog: string;
+  action: {
+    text: string;
+    onClick: () => void;
+  };
+};
+function showUpdateDialog({
+  title,
+  subtitle,
+  changelog,
+  action,
+}: UpdateDialogProps) {
   return confirm({
     title,
     subtitle,

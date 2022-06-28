@@ -23,13 +23,14 @@ import {
   Print,
   Copy,
   Refresh,
+  Checkmark,
 } from "../icons";
 import Field from "../field";
 import { useSessionState } from "../../utils/hooks";
 import { exportToPDF } from "../../common/export";
 import { useTimer } from "../../hooks/use-timer";
 import { phone } from "phone";
-import { showMultifactorDialog } from "../../common/dialog-controller";
+import { Perform, showMultifactorDialog } from "../../common/dialog-controller";
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
 export type AuthenticatorType = "app" | "sms" | "email";
@@ -48,7 +49,7 @@ type Authenticator = {
 
 type StepComponentProps = {
   onNext: (...args: any[]) => void;
-  onClose?: () => void;
+  onClose?: Perform;
   onError?: (error: string) => void;
 };
 
@@ -80,12 +81,12 @@ type VerifyAuthenticatorFormProps = PropsWithChildren<{
 type SetupAuthenticatorProps = { onSubmitCode: SubmitCodeFunction };
 
 type MultifactorDialogProps = {
-  onClose: () => void;
+  onClose: Perform;
   primaryMethod?: AuthenticatorType;
 };
 
 type RecoveryCodesDialogProps = {
-  onClose: () => void;
+  onClose: Perform;
   primaryMethod: AuthenticatorType;
 };
 
@@ -136,6 +137,7 @@ const steps = {
         authenticator={authenticator.type}
       />
     ),
+    cancellable: true,
   }),
   recoveryCodes: (authenticatorType: AuthenticatorType): Step => ({
     title: "Save your recovery codes",
@@ -245,7 +247,7 @@ export function MultifactorDialog(props: MultifactorDialogProps) {
       {step.component && (
         <step.component
           onNext={(...args) => {
-            if (!step.next) return onClose();
+            if (!step.next) return onClose(true);
 
             const nextStepCreator: Function =
               step.next !== "recoveryCodes" && primaryMethod
@@ -407,6 +409,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
     sharedKey: null,
     authenticatorUri: null,
   });
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     (async function () {
@@ -441,20 +444,45 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
         If you can't scan the QR code above, enter this text instead (spaces
         don't matter):
       </Text>
-      <Text
-        mt={2}
+      <Flex
         bg="bgSecondary"
-        p={2}
-        fontFamily="monospace"
-        fontSize="body"
-        sx={{ borderRadius: "default", overflowWrap: "anywhere" }}
+        mt={2}
+        sx={{ borderRadius: "default", alignItems: "center" }}
+        p={1}
       >
-        {authenticatorDetails.sharedKey ? (
-          authenticatorDetails.sharedKey
-        ) : (
-          <Loading />
-        )}
-      </Text>
+        <Text
+          className="selectable"
+          fontFamily="monospace"
+          fontSize="body"
+          ml={1}
+          sx={{
+            flex: 1,
+            overflowWrap: "anywhere",
+            color: "text",
+          }}
+        >
+          {authenticatorDetails.sharedKey ? (
+            authenticatorDetails.sharedKey
+          ) : (
+            <Loading />
+          )}
+        </Text>
+        <Button
+          type="button"
+          variant="secondary"
+          sx={{ display: "flex", alignItems: "center" }}
+          onClick={async () => {
+            if (!authenticatorDetails.sharedKey) return;
+            await navigator.clipboard.writeText(authenticatorDetails.sharedKey);
+            setCopied(true);
+            setTimeout(() => {
+              setCopied(false);
+            }, 2500);
+          }}
+        >
+          {copied ? <Checkmark size={15} /> : <Copy size={15} />}
+        </Button>
+      </Flex>
     </VerifyAuthenticatorForm>
   );
 }
@@ -661,6 +689,16 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
         icon: Copy,
         action: async () => {
           await clipboard.writeText(codes.join("\n"));
+          const button = document.getElementById("btn-copy");
+          if (!button) return;
+
+          const buttonText = button.querySelector(".title");
+          if (!buttonText) return;
+
+          buttonText.innerHTML = "Copied!";
+          setTimeout(() => {
+            buttonText.innerHTML = "Copy";
+          }, 2500);
         },
       },
       {
@@ -707,6 +745,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             textAlign="center"
             fontWeight="body"
             fontFamily={"monospace"}
+            color="text"
           >
             {code}
           </Text>
@@ -715,6 +754,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
       <Flex sx={{ justifyContent: "start", alignItems: "center", mt: 2 }}>
         {actions.map((action) => (
           <Button
+            id={`btn-${action.title.toLowerCase()}`}
             type="button"
             variant="secondary"
             mr={1}
@@ -723,7 +763,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             onClick={action.action}
           >
             <action.icon size={15} sx={{ mr: "2px" }} />
-            {action.title}
+            <span className="title">{action.title}</span>
           </Button>
         ))}
       </Flex>
@@ -749,7 +789,11 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
       <Text variant={"body"} color="fontTertiary" mt={1} textAlign="center">
         Your account is now 100% secure against unauthorized logins.
       </Text>
-      <Button mt={2} sx={{ borderRadius: 100, px: 6 }} onClick={props.onClose}>
+      <Button
+        mt={2}
+        sx={{ borderRadius: 100, px: 6 }}
+        onClick={() => props.onClose?.(true)}
+      >
         Done
       </Button>
 
@@ -757,7 +801,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
         variant={"anchor"}
         mt={2}
         onClick={() => {
-          props.onClose && props.onClose();
+          props.onClose && props.onClose(true);
           setTimeout(async () => {
             await showMultifactorDialog(props.authenticatorType);
           }, 100);
@@ -791,7 +835,11 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
         {mfaMethodToPhrase(fallbackMethod)} in case you lose access to your{" "}
         {mfaMethodToPhrase(primaryMethod)}.
       </Text>
-      <Button mt={2} sx={{ borderRadius: 100, px: 6 }} onClick={onClose}>
+      <Button
+        mt={2}
+        sx={{ borderRadius: 100, px: 6 }}
+        onClick={() => onClose?.(true)}
+      >
         Done
       </Button>
     </Flex>

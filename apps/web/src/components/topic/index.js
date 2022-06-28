@@ -1,12 +1,12 @@
 import React from "react";
 import ListItem from "../list-item";
 import { db } from "../../common/db";
-import { store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { Multiselect } from "../../common/multi-select";
+import { pluralize } from "../../utils/string";
 
 function Topic({ item, index, onClick }) {
   const topic = item;
@@ -27,7 +27,9 @@ function Topic({ item, index, onClick }) {
           <Text as="span" mx={1}>
             •
           </Text>
-          <Text variant="subBody">{topic.notes.length} Notes</Text>
+          <Text variant="subBody">
+            {pluralize(topic.notes?.length || 0, "note", "notes")}
+          </Text>
         </Flex>
       }
       index={index}

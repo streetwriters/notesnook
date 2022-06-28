@@ -12,6 +12,7 @@ import { CustomScrollbarsVirtualList } from "../scroll-container";
 import ReminderBar from "../reminder-bar";
 import Announcements from "../announcements";
 import useAnnouncements from "../../utils/use-announcements";
+import { ListLoader } from "../loaders/list-loader";
 
 function ListContainer(props) {
   const { type, groupType, items, context, refresh, header } = props;
@@ -39,10 +40,16 @@ function ListContainer(props) {
     <Flex variant="columnFill">
       {!props.items.length && props.placeholder ? (
         <>
-          {header || <ReminderBar />}
-          <Flex variant="columnCenterFill">
-            {props.isLoading ? <Icon.Loading rotate /> : <props.placeholder />}
-          </Flex>
+          {props.isLoading ? (
+            <ListLoader />
+          ) : (
+            <>
+              {header || <ReminderBar />}
+              <Flex variant="columnCenterFill">
+                <props.placeholder />
+              </Flex>
+            </>
+          )}
         </>
       ) : (
         <>
@@ -227,6 +234,8 @@ function ListContainer(props) {
           testId={`${props.type}-action-button`}
           onClick={props.button.onClick}
           sx={{
+            position: "absolute",
+            bottom: 0,
             display: ["block", "block", "none"],
             alignSelf: "end",
             borderRadius: 100,

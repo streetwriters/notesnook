@@ -122,7 +122,11 @@ function OnboardingDialog({ onClose: _onClose, type }) {
     else setStep((s) => ++s);
   }, []);
 
-  if (!steps || !steps[step] || !type) return null;
+  if (!steps || !steps[step] || !type) {
+    onClose();
+    return null;
+  }
+
   const {
     title,
     subtitle,

@@ -49,17 +49,19 @@ function RecoveryKeyDialog(props) {
             to recover your data.
           </Text>
           <Text
+            data-test-id="recoveryKey"
             className="selectable"
             mt={2}
             bg="bgSecondary"
             p={2}
             fontFamily="monospace"
             fontSize="body"
+            color="text"
             sx={{ borderRadius: "default", overflowWrap: "anywhere" }}
           >
             {key}
           </Text>
-          <Flex justifyContent="space-around" alignItems="center">
+          <Flex justifyContent="space-around" alignItems="center" mt={4}>
             <Suspense fallback={<div />}>
               <QRCode
                 value={key}

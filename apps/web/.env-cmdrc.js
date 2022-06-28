@@ -1,12 +1,14 @@
 const { execSync } = require("child_process");
-const { cpus } = require("os");
+const { cpus, networkInterfaces } = require("os");
 const { version } = require("./package.json");
+const ip = require("ip");
 
 const NUM_CPUS = cpus().length;
 const IS_CI = process.env.CI;
 const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
 const APP_VERSION = version.replaceAll(".", "");
 console.log("App version:", APP_VERSION);
+console.log("Ip address:", ip.address());
 module.exports = {
   test: {
     TEST_ALL: true,
@@ -20,6 +22,7 @@ module.exports = {
     REACT_APP_VERSION: APP_VERSION,
   },
   dev: {
+    REACT_APP_LOCALHOST: ip.address(),
     REACT_APP_CI: "true",
   },
   web: {

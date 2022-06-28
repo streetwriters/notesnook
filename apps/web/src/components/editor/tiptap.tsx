@@ -113,14 +113,9 @@ function TipTap(props: TipTapProps) {
 
 function Portal(props: PropsWithChildren<{ containerId?: string }>) {
   const { containerId, children } = props;
-  return containerId && document.getElementById(containerId) ? (
-    <>
-      {createPortal(
-        children,
-        document.getElementById(containerId),
-        containerId
-      )}
-    </>
+  const container = containerId && document.getElementById(containerId);
+  return container ? (
+    <>{createPortal(children, container, containerId)}</>
   ) : (
     <>{children}</>
   );

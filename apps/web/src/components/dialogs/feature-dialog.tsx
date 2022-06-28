@@ -24,7 +24,7 @@ type Feature = {
   subFeatures?: SubFeature[];
 };
 
-type FeatureKeys = "confirmed" | "highlights";
+export type FeatureKeys = "confirmed" | "highlights";
 const features: Record<FeatureKeys, Feature> = {
   confirmed: {
     title: "Email confirmed!",
@@ -38,28 +38,7 @@ const features: Record<FeatureKeys, Feature> = {
   highlights: {
     title: "✨ Highlights ✨",
     subtitle: `Welcome to v${appVersion.clean}`,
-    subFeatures: [
-      {
-        title: "Sync over Websockets",
-        subtitle: (
-          <>
-            HTTP sync has been replaced with Websockets sync which is faster &
-            more reliable &amp; also offers realtime sync progress.
-          </>
-        ),
-        icon: Icon.Sync,
-      },
-      {
-        title: "Group by none",
-        subtitle: (
-          <>
-            We went and added an option to disable grouping in lists. To use
-            click on <Code text="List options > Group by > None" />.
-          </>
-        ),
-        icon: Icon.GroupBy,
-      },
-    ],
+    subFeatures: [],
     cta: {
       title: "Got it",
       icon: Icon.Checkmark,
@@ -68,11 +47,14 @@ const features: Record<FeatureKeys, Feature> = {
       },
     },
     shouldShow: () => {
-      const hasShown = Config.get(
-        `${appVersion.numerical}:highlights`,
-        false
-      ) as boolean;
-      return !isTesting() && !hasShown;
+      if (!features.highlights.subFeatures?.length) return false;
+
+      const key = `${appVersion.numerical}:highlights`;
+      const hasShownBefore = Config.get(key, false) as boolean;
+      const hasShownAny = Config.has((k) => k.endsWith(":highlights"));
+      if (!hasShownAny) Config.set(key, true);
+
+      return hasShownAny && !isTesting() && !hasShownBefore;
     },
   },
 };
@@ -85,7 +67,11 @@ type FeatureDialogProps = {
 function FeatureDialog(props: FeatureDialogProps) {
   const { featureName } = props;
   const feature = features[featureName];
-  if (!feature || (feature.shouldShow && !feature.shouldShow())) return null;
+  if (!feature || (feature.shouldShow && !feature.shouldShow())) {
+    props.onClose(false);
+    return null;
+  }
+
   return (
     <Dialog
       isOpen={true}

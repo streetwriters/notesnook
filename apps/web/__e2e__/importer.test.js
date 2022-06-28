@@ -36,7 +36,7 @@ test("login user & import notes", async () => {
 
   let titles = [];
   for (let i = 0; i < 6; ++i) {
-    const noteId = getTestId(`note-${i}`);
+    const noteId = getTestId(`note-${i}-title`);
     const text = await page.innerText(noteId);
     titles.push(text);
   }

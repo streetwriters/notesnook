@@ -9,6 +9,7 @@ import { store as notestore } from "../../stores/note-store";
 import { useStore, store } from "../../stores/notebook-store";
 import { getTotalNotes } from "../../common";
 import Accordion from "../accordion";
+import { pluralize } from "../../utils/string";
 
 function MoveDialog({ onClose, noteIds }) {
   const [selected, setSelected] = useState([]);
@@ -76,13 +77,21 @@ function MoveDialog({ onClose, noteIds }) {
           itemName="notebook"
           renderItem={(notebook, index) => {
             const selectedTopics = selected.filter((s) => s.id === notebook.id);
+            const hasNotes = notebook.topics.some((topic) =>
+              topicHasNotes(topic, noteIds)
+            );
             return (
               <Accordion
                 key={notebook.id}
                 testId={`notebook-${index}`}
                 title={
                   <Flex flexDirection={"column"} sx={{ px: 1 }}>
-                    <Text variant={"body"}>{notebook.title}</Text>
+                    <Text
+                      variant={"body"}
+                      sx={{ color: hasNotes ? "primary" : "text" }}
+                    >
+                      {notebook.title}
+                    </Text>
                     <Text variant={"subBody"} fontWeight="normal">
                       {getTotalNotes(notebook)} notes &amp;{" "}
                       {notebook.topics.length} topics{" "}
@@ -138,8 +147,16 @@ function MoveDialog({ onClose, noteIds }) {
                         }}
                         indent={1}
                         icon={Icon.Topic}
-                        title={topic.title}
-                        totalNotes={topic.notes.length}
+                        title={
+                          hasNotes ? (
+                            <Text as="span" sx={{ color: "primary" }}>
+                              {topic.title}
+                            </Text>
+                          ) : (
+                            topic.title
+                          )
+                        }
+                        totalNotes={topic.notes?.length || 0}
                         action={
                           isSelected && hasNotes ? (
                             <Icon.Close
@@ -175,7 +192,7 @@ function MoveDialog({ onClose, noteIds }) {
 }
 
 function topicHasNotes(topic, noteIds) {
-  return noteIds.some((id) => topic.notes.indexOf(id) > -1);
+  return noteIds.some((id) => topic.notes && topic.notes.indexOf(id) > -1);
 }
 
 function FilteredList({
@@ -292,7 +309,7 @@ function Item(props) {
     >
       <Flex flexDirection="column">
         <Text variant="body">{title}</Text>
-        <Text variant="subBody">{totalNotes + " notes"}</Text>
+        <Text variant="subBody">{pluralize(totalNotes, "note", "notes")}</Text>
       </Flex>
       {action}
     </Button>

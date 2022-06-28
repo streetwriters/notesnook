@@ -22,8 +22,6 @@ import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { isTesting } from "../utils/platform";
 import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
-// @ts-ignore
-import { RequestError } from "notes-core/utils/http";
 import { useTimer } from "../hooks/use-timer";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 
@@ -156,7 +154,11 @@ function Auth(props: AuthProps) {
               alignItems: "center",
             }}
             variant={"secondary"}
-            onClick={() => openURL("/notes/")}
+            onClick={() => {
+              if (route === "signup")
+                trackEvent(ANALYTICS_EVENTS.signupSkipped);
+              openURL("/notes/");
+            }}
           >
             Jump to app <ArrowRight size={18} sx={{ ml: 1 }} />
           </Button>
@@ -440,7 +442,10 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
 
         const url = await db.user?.recoverAccount(form.email.toLowerCase());
         console.log(url);
-        if (isTesting()) return openURL(url);
+        if (isTesting()) {
+          window.open(url, "_self");
+          return;
+        }
         setSuccess(
           `Recovery email sent. Please check your inbox (and spam folder) for further instructions.`
         );
@@ -754,7 +759,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
       alignSelf="center"
       justifyContent={"center"}
       alignItems="center"
-      width={["95%", 420]}
+      width={["95%", "45%"]}
       flex={1}
       onSubmit={async (e) => {
         e.preventDefault();

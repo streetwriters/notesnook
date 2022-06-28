@@ -22,7 +22,7 @@ export function getPlatform() {
 }
 
 export function getDownloadLink(platform) {
-  const baseurl = `https://notesnook.com/downloads/${platform.toLowerCase()}`;
+  const baseurl = `https://notesnook.com/releases/${platform.toLowerCase()}`;
   switch (platform) {
     case "iOS":
       return [

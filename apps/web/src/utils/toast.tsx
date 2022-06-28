@@ -1,14 +1,14 @@
-import CogoToast, { CTReturn } from "cogo-toast";
 import { Button, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import { Error, Warn, Success } from "../components/icons";
 import { store as appstore } from "../stores/app-store";
+import toast from "react-hot-toast";
 
 type ToastType = "success" | "error" | "warn" | "info";
 type ToastAction = {
   text: string;
   onClick: () => void;
-  type: "primary" | "text";
+  type?: "primary" | "text";
 };
 
 function showToast(
@@ -16,32 +16,24 @@ function showToast(
   message: string,
   actions?: ToastAction[],
   hideAfter?: number
-): CTReturn | null | undefined {
-  if (appstore.get().isFocusMode) return null;
+): { hide: () => void } {
+  if (appstore.get().isFocusMode) return { hide: () => {} }; // TODO
+
   const IconComponent =
     type === "error" ? Error : type === "success" ? Success : Warn;
-  const toast = CogoToast[type];
-  if (!toast) return;
-  const t = toast(<ToastContainer message={message} actions={actions} />, {
+
+  const RenderedIcon = () => <IconComponent size={28} color={type} />;
+
+  const id = toast(<ToastContainer message={message} actions={actions} />, {
+    duration: hideAfter || Infinity,
+    icon: <RenderedIcon />,
+    id: message,
     position: "top-right",
-    hideAfter:
-      hideAfter === undefined
-        ? actions
-          ? 5
-          : type === "error"
-          ? 5
-          : 3
-        : hideAfter,
-    bar: { size: "0px" },
-    renderIcon: () => {
-      return (
-        <ThemeProvider>
-          <IconComponent size={28} color={type} />
-        </ThemeProvider>
-      );
+    style: {
+      maxWidth: "auto",
     },
   });
-  return t;
+  return { hide: () => toast.dismiss(id) };
 }
 
 type ToastContainerProps = {
@@ -57,7 +49,6 @@ function ToastContainer(props: ToastContainerProps) {
         data-test-id="toast"
         justifyContent="center"
         alignItems="center"
-        my={2}
         sx={{ borderRadius: "default" }}
       >
         <Text
@@ -73,7 +64,7 @@ function ToastContainer(props: ToastContainerProps) {
           <Button
             flexShrink={0}
             variant="primary"
-            color={action.type}
+            color={action.type || "primary"}
             fontWeight="bold"
             bg={"transparent"}
             fontSize="body"
