@@ -249,10 +249,7 @@ class EditorStore extends BaseStore {
     const session = this.get().session;
     switch (session.sessionType) {
       case "default":
-        return await db.content.insertPlaceholders(
-          await db.content.raw(session.contentId),
-          "/placeholder.svg"
-        );
+        return await db.content.raw(session.contentId);
       case "preview":
         return session.content;
       case "locked":

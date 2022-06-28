@@ -109,10 +109,7 @@ function DiffViewer(props) {
       notesStore.setSelectedNote(noteId);
       note = note.data;
 
-      const content = await db.content.insertPlaceholders(
-        await db.content.raw(note.contentId),
-        "/placeholder.svg"
-      );
+      const content = await db.content.raw(note.contentId);
       if (!content.conflicted)
         return resolveConflict({
           toKeep: content.data,
