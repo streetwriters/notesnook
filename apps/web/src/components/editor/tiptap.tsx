@@ -1,22 +1,19 @@
 import { Theme } from "@notesnook/theme";
 import { useTheme } from "emotion-theming";
-import { Toolbar, useTiptap, PortalProvider } from "notesnook-editor";
-import { EditorContent } from "@tiptap/react";
-import { Flex } from "rebass";
-import { Editor } from "@tiptap/core";
+import { Toolbar, useTiptap, PortalProvider, Editor } from "notesnook-editor";
+import { Box, Flex } from "rebass";
 import "notesnook-editor/dist/styles.css";
 import { PropsWithChildren, useEffect, useRef } from "react";
 import useMobile from "../../utils/use-mobile";
-import { Attachment, AttachmentProgress } from "./plugins/picker";
-import { AppEventManager, AppEvents } from "../../common/app-events";
-import { EV, EVENTS } from "notes-core/common";
+import { Attachment } from "./plugins/picker";
 import { CharacterCounter, IEditor } from "./types";
 import { useConfigureEditor, useSearch } from "./context";
 import { createPortal } from "react-dom";
+import { AttachmentType } from "notesnook-editor/dist/extensions/attachment";
 
 type TipTapProps = {
   onChange?: (content: string, counter?: CharacterCounter) => void;
-  onInsertAttachment?: (type: string) => void;
+  onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onFocus?: () => void;
   content?: string;
@@ -35,6 +32,7 @@ function TipTap(props: TipTapProps) {
     readonly,
   } = props;
 
+  const editorContentRef = useRef<HTMLDivElement>();
   const theme: Theme = useTheme();
   const isMobile = useMobile();
   const counter = useRef<CharacterCounter>();
@@ -43,6 +41,7 @@ function TipTap(props: TipTapProps) {
 
   const editor = useTiptap(
     {
+      element: editorContentRef.current,
       editable: !readonly,
       content,
       autofocus: "start",
@@ -100,13 +99,13 @@ function TipTap(props: TipTapProps) {
           isMobile={isMobile || false}
         />
       </Portal>
-      <EditorContent
+      <Box
+        ref={editorContentRef}
         style={{
           flex: 1,
           cursor: "text",
           color: theme.colors.text,
         }}
-        editor={editor}
       />
     </Flex>
   );
