@@ -1,4 +1,4 @@
-import { ToolDefinition } from "./types";
+import { ToolbarDefinition, ToolDefinition } from "./types";
 import { ToolId } from "./tools";
 
 const tools: Record<ToolId, ToolDefinition> = {
@@ -296,3 +296,34 @@ const tools: Record<ToolId, ToolDefinition> = {
 export function getToolDefinition(id: ToolId) {
   return tools[id];
 }
+
+export const DEFAULT_TOOLS: ToolbarDefinition = [
+  [
+    "insertBlock",
+    "tableSettings",
+    "imageSettings",
+    "embedSettings",
+    "attachmentSettings",
+    "linkSettings",
+    "codeRemove",
+  ],
+  [
+    "bold",
+    "italic",
+    "underline",
+    [
+      "strikethrough",
+      "code",
+      "subscript",
+      "superscript",
+      "highlight",
+      "textColor",
+    ],
+  ],
+  ["fontSize"],
+  ["headings", "fontFamily"],
+  ["numberedList", "bulletList"],
+  ["addLink"],
+  ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
+  ["clearformatting"],
+];

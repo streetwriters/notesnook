@@ -13,40 +13,11 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Flex } from "rebass";
 import { ThemeProvider } from "emotion-theming";
 import { EditorFloatingMenus } from "./floating-menus";
+import { DEFAULT_TOOLS } from "./tool-definitions";
 import { useEffect } from "react";
 import { useToolbarStore, } from "./stores/toolbar-store";
 import { ToolbarGroup } from "./components/toolbar-group";
 import { EditorContext, PopupRenderer, } from "../components/popup-presenter/popuprenderer";
-var DEFAULT_TOOLS = [
-    [
-        "insertBlock",
-        "tableSettings",
-        "imageSettings",
-        "embedSettings",
-        "attachmentSettings",
-        "linkSettings",
-        "codeRemove",
-    ],
-    [
-        "bold",
-        "italic",
-        "underline",
-        [
-            "strikethrough",
-            "code",
-            "subscript",
-            "superscript",
-            "highlight",
-            "textColor",
-        ],
-    ],
-    ["fontSize"],
-    ["headings", "fontFamily"],
-    ["numberedList", "bulletList"],
-    ["addLink"],
-    ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
-    ["clearformatting"],
-];
 export function Toolbar(props) {
     var editor = props.editor, theme = props.theme, location = props.location, isMobile = props.isMobile, _a = props.tools, tools = _a === void 0 ? DEFAULT_TOOLS : _a;
     var setIsMobile = useToolbarStore(function (store) { return store.setIsMobile; });

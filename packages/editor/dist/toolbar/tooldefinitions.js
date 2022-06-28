@@ -290,3 +290,33 @@ var tools = {
 export function getToolDefinition(id) {
     return tools[id];
 }
+export var DEFAULT_TOOLS = [
+    [
+        "insertBlock",
+        "tableSettings",
+        "imageSettings",
+        "embedSettings",
+        "attachmentSettings",
+        "linkSettings",
+        "codeRemove",
+    ],
+    [
+        "bold",
+        "italic",
+        "underline",
+        [
+            "strikethrough",
+            "code",
+            "subscript",
+            "superscript",
+            "highlight",
+            "textColor",
+        ],
+    ],
+    ["fontSize"],
+    ["headings", "fontFamily"],
+    ["numberedList", "bulletList"],
+    ["addLink"],
+    ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
+    ["clearformatting"],
+];

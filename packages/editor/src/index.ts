@@ -177,4 +177,5 @@ const useTiptap = (
 };
 
 export { useTiptap, Toolbar };
+export type { Editor } from "./types";
 export * from "./extensions/react";

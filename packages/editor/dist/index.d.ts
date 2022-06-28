@@ -9,4 +9,5 @@ declare const useTiptap: (options?: Partial<EditorOptions & AttachmentOptions & 
     theme: Theme;
 }>, deps?: import("react").DependencyList) => Editor | null;
 export { useTiptap, Toolbar };
+export type { Editor } from "./types";
 export * from "./extensions/react";

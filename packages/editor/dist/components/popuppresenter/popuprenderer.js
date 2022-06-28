@@ -73,7 +73,6 @@ var PopupRenderer = /** @class */ (function (_super) {
         _this.closePopup = function (id) {
             _this.setState(function (prev) {
                 var index = prev.popups.findIndex(function (p) { return p.id === id; });
-                console.log("[closePopup] ", index, id);
                 if (index <= -1)
                     return prev;
                 var clone = prev.popups.slice();
@@ -88,7 +87,6 @@ var PopupRenderer = /** @class */ (function (_super) {
     PopupRenderer.prototype.render = function () {
         return (_jsxs(PopupRendererContext.Provider, __assign({ value: this }, { children: [this.props.children, _jsxs(EditorContext.Provider, __assign({ value: this.props.editor }, { children: [this.state.popups.map(function (_a) {
                             var id = _a.id, Popup = _a.popup;
-                            console.log("rendering poopup", id);
                             return _jsx(Popup, { id: id }, id);
                         }), _jsx("div", { id: "popup-container" })] }))] })));
     };
