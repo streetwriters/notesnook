@@ -38,6 +38,10 @@ class Settings {
         ...this._settings.groupOptions,
         ...item.groupOptions,
       };
+      this._settings.toolbarConfig = {
+        ...this._settings.toolbarConfig,
+        ...item.toolbarConfig,
+      };
       this._settings.aliases = {
         ...this._settings.aliases,
         ...item.aliases,
@@ -77,6 +81,25 @@ class Settings {
         sortDirection: "desc",
       }
     );
+  }
+
+  /**
+   *
+   * @param {string} key
+   * @param {{preset: string, config?: any[]}} config
+   */
+  async setToolbarConfig(key, config) {
+    this._settings.toolbarConfig[key] = config;
+    await this._saveSettings();
+  }
+
+  /**
+   *
+   * @param {string} key
+   * @returns {{preset: string, config: any[]}}
+   */
+  getToolbarConfig(key) {
+    return this._settings.toolbarConfig[key];
   }
 
   async setAlias(id, name) {
@@ -138,6 +161,7 @@ class Settings {
       id: id(),
       pins: [],
       groupOptions: {},
+      toolbarConfig: {},
       aliases: {},
       dateModified: 0,
       dateCreated: 0,
