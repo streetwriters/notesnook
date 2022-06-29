@@ -2,20 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Input } from "@rebass/forms";
 
 type TitleBoxProps = {
+  nonce?: number;
   readonly: boolean;
   title: string;
   setTitle: (title: string) => void;
 };
 
 function TitleBox(props: TitleBoxProps) {
-  const { readonly, setTitle, title } = props;
+  const { readonly, setTitle, title, nonce } = props;
   const [currentTitle, setCurrentTitle] = useState<string>();
 
   useEffect(() => {
-    // if (currentTitle !== title) setPlaceholder(title);
-    // We do not want to update when currentTitle changes.
     setCurrentTitle(title);
-  }, [title]);
+  }, [nonce]);
 
   return (
     <Input
@@ -43,7 +42,6 @@ function TitleBox(props: TitleBoxProps) {
 export default React.memo(TitleBox, (prevProps, nextProps) => {
   return (
     prevProps.readonly === nextProps.readonly &&
-    prevProps.title === nextProps.title &&
-    prevProps.setTitle === nextProps.setTitle
+    prevProps.nonce === nextProps.nonce
   );
 });

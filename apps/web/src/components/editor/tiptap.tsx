@@ -21,6 +21,7 @@ type TipTapProps = {
   content?: string;
   toolbarContainerId?: string;
   readonly?: boolean;
+  nonce?: number;
 };
 
 function TipTap(props: TipTapProps) {
@@ -33,6 +34,7 @@ function TipTap(props: TipTapProps) {
     toolbarContainerId,
     editorContainer,
     readonly,
+    nonce,
   } = props;
 
   const theme: Theme = useTheme();
@@ -85,7 +87,7 @@ function TipTap(props: TipTapProps) {
         return true;
       },
     },
-    [content, readonly]
+    [readonly, nonce]
   );
 
   useEffect(() => {

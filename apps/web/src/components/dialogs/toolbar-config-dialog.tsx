@@ -58,7 +58,11 @@ export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
   const { setToolbarConfig } = useToolbarConfig();
 
   useEffect(() => {
-    const items = flatten(currentPreset.tools);
+    const items = flatten(
+      currentPreset.id === "default"
+        ? currentPreset.tools.slice(1)
+        : currentPreset.tools
+    );
     items.push(createTrash());
     setItems(items);
   }, [currentPreset]);

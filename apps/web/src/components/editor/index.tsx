@@ -61,7 +61,9 @@ export default function EditorManager({
   const isOldSession = !nonce && !!noteId;
 
   const [content, setContent] = useState<string>("");
+  const [timestamp, setTimestamp] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
+
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isPreviewMode = useStore(
@@ -76,10 +78,13 @@ export default function EditorManager({
 
   useEffect(() => {
     if (!isNewSession) return;
+
     (async function () {
       await editorstore.newSession(nonce);
+
       setContent("");
       setTitle("");
+      setTimestamp(Date.now());
     })();
   }, [isNewSession, nonce]);
 
@@ -89,6 +94,7 @@ export default function EditorManager({
     (async function () {
       const content = await editorstore.get().getSessionContent();
       setContent(content?.data);
+      setTimestamp(Date.now());
       if (noteId && content) await db.attachments?.downloadImages(noteId);
     })();
   }, [noteId, isPreviewMode]);
@@ -104,6 +110,7 @@ export default function EditorManager({
 
       setTitle(session.title);
       setContent(content?.data);
+      setTimestamp(Date.now());
       if (noteId && content) await db.attachments?.downloadImages(noteId);
     })();
   }, [noteId, isOldSession]);
@@ -122,6 +129,7 @@ export default function EditorManager({
     >
       {isPreviewMode && <PreviewModeNotice />}
       <Editor
+        nonce={timestamp}
         title={title}
         content={content}
         readonly={isReadonly}
@@ -137,11 +145,12 @@ type EditorProps = {
   title: string;
   readonly?: boolean;
   focusMode?: boolean;
+  nonce?: number;
   content: string;
   onRequestFocus?: () => void;
 };
 function Editor(props: EditorProps) {
-  const { content, readonly, focusMode, onRequestFocus, title } = props;
+  const { content, readonly, focusMode, onRequestFocus, title, nonce } = props;
   const editor = useEditorInstance();
   const isMobile = useMobile();
 
@@ -215,6 +224,7 @@ function Editor(props: EditorProps) {
             />
           )}
           <Titlebox
+            nonce={nonce}
             readonly={readonly || false}
             setTitle={(title) => {
               const { sessionId, id } = editorstore.get().session;
@@ -224,6 +234,7 @@ function Editor(props: EditorProps) {
           />
           <Header readonly={readonly} />
           <Tiptap
+            nonce={nonce}
             readonly={readonly}
             toolbarContainerId="editorToolbar"
             content={content}

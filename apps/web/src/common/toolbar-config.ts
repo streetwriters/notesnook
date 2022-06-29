@@ -9,7 +9,7 @@ export type Preset = {
   tools: ToolbarGroupDefinition[];
 };
 const presets: Record<PresetId, Preset> = {
-  default: { id: "default", title: "Default", tools: DEFAULT_TOOLS.slice(1) },
+  default: { id: "default", title: "Default", tools: DEFAULT_TOOLS },
   minimal: {
     id: "minimal",
     title: "Minimal",
