@@ -7,9 +7,10 @@ import { PropsWithChildren, useEffect, useRef } from "react";
 import useMobile from "../../utils/use-mobile";
 import { Attachment } from "./plugins/picker";
 import { CharacterCounter, IEditor } from "./types";
-import { useConfigureEditor, useSearch } from "./context";
+import { useConfigureEditor, useSearch, useToolbarConfig } from "./context";
 import { createPortal } from "react-dom";
 import { AttachmentType } from "notesnook-editor/dist/extensions/attachment";
+import { getCurrentPreset } from "../../common/toolbar-config";
 
 type TipTapProps = {
   onChange?: (content: string, counter?: CharacterCounter) => void;
@@ -37,6 +38,7 @@ function TipTap(props: TipTapProps) {
   const isMobile = useMobile();
   const counter = useRef<CharacterCounter>();
   const configure = useConfigureEditor();
+  const { toolbarConfig } = useToolbarConfig();
   const { isSearching, toggleSearch } = useSearch();
 
   const editor = useTiptap(
@@ -52,13 +54,19 @@ function TipTap(props: TipTapProps) {
           editor: toIEditor(editor),
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
+          toolbarConfig: getCurrentPreset().tools,
         });
       },
       onUpdate: ({ editor }) => {
         if (onChange) onChange(editor.getHTML(), counter.current);
       },
       onDestroy: () => {
-        configure({ editor: undefined });
+        configure({
+          editor: undefined,
+          canRedo: false,
+          canUndo: false,
+          searching: false,
+        });
       },
       onTransaction: ({ editor }) => {
         configure({
@@ -97,9 +105,11 @@ function TipTap(props: TipTapProps) {
           theme={theme}
           location={isMobile ? "bottom" : "top"}
           isMobile={isMobile || false}
+          tools={toolbarConfig}
         />
       </Portal>
       <Box
+        className="selectable"
         ref={editorContentRef}
         style={{
           flex: 1,

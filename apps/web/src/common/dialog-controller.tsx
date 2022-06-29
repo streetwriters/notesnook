@@ -167,6 +167,13 @@ export function showPromptDialog(props: {
   ));
 }
 
+export function showToolbarConfigDialog() {
+  return showDialog<"ToolbarConfigDialog", string | null>(
+    "ToolbarConfigDialog",
+    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
+  );
+}
+
 export function showError(title: string, message: string) {
   return confirm({ title, message, yesText: "Okay" });
 }

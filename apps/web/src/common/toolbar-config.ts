@@ -1,0 +1,52 @@
+import { DEFAULT_TOOLS } from "notesnook-editor";
+import { ToolbarGroupDefinition } from "notesnook-editor/dist/toolbar/types";
+import { db } from "./db";
+
+export type PresetId = "default" | "minimal" | "custom";
+export type Preset = {
+  id: PresetId;
+  title: string;
+  tools: ToolbarGroupDefinition[];
+};
+const presets: Record<PresetId, Preset> = {
+  default: { id: "default", title: "Default", tools: DEFAULT_TOOLS.slice(1) },
+  minimal: {
+    id: "minimal",
+    title: "Minimal",
+    tools: [
+      [
+        "bold",
+        "italic",
+        "underline",
+        "strikethrough",
+        "code",
+        "highlight",
+        "textColor",
+      ],
+    ],
+  },
+  custom: { id: "custom", title: "Custom", tools: [] },
+};
+
+export function getCurrentPreset() {
+  const preset = db.settings?.getToolbarConfig("desktop");
+  if (!preset) return presets.default;
+  switch (preset.preset as PresetId) {
+    case "custom":
+      presets.custom.tools = preset.config;
+      return presets.custom;
+    case "minimal":
+      return presets.minimal;
+    default:
+    case "default":
+      return presets.default;
+  }
+}
+
+export function getAllPresets() {
+  return Object.values(presets);
+}
+
+export function getPreset(id: PresetId) {
+  return presets[id];
+}

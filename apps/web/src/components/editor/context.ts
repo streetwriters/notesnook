@@ -4,12 +4,14 @@ import createStore from "../../common/store";
 import BaseStore from "../../stores";
 import { UseStore } from "zustand";
 import shallow from "zustand/shallow";
+import { ToolbarDefinition } from "notesnook-editor/dist/toolbar/types";
 
 type EditorSubState = {
   editor?: IEditor;
   canUndo?: boolean;
   canRedo?: boolean;
   searching?: boolean;
+  toolbarConfig?: ToolbarDefinition;
 };
 class EditorContext extends BaseStore {
   subState: EditorSubState = {};
@@ -57,12 +59,14 @@ export function useSearch() {
   return { isSearching, toggleSearch };
 }
 
-// const EditorInstanceContext = React.createContext<IEditor | undefined>(
-//   undefined
-// );
-
-// export const EditorInstanceProvider = EditorInstanceContext.Provider;
-
-// export function useEditorInstance() {
-//   return useContext(EditorInstanceContext);
-// }
+export function useToolbarConfig() {
+  const toolbarConfig = useEditorContext(
+    (store) => store.subState.toolbarConfig
+  );
+  const configure = useEditorContext((store) => store.configure);
+  const setToolbarConfig = useCallback(
+    (config: ToolbarDefinition) => configure({ toolbarConfig: config }),
+    [configure]
+  );
+  return { toolbarConfig, setToolbarConfig };
+}

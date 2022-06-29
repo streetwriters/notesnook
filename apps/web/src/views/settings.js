@@ -21,6 +21,7 @@ import {
   showMultifactorDialog,
   showAttachmentsDialog,
   show2FARecoveryCodesDialog,
+  showToolbarConfigDialog,
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
@@ -101,6 +102,7 @@ const otherItems = [
 function Settings(props) {
   const [groups, setGroups] = useState({
     appearance: false,
+    editor: false,
     mfa: false,
     backup: false,
     importer: false,
@@ -418,6 +420,28 @@ function Settings(props) {
           </>
         )}
 
+        <Header
+          title="Editor settings"
+          isOpen={groups.editor}
+          onClick={() => {
+            setGroups((g) => ({ ...g, editor: !g.editor }));
+          }}
+        />
+        {groups.editor && (
+          <>
+            <Button
+              variant="list"
+              onClick={async () => {
+                await showToolbarConfigDialog();
+              }}
+            >
+              <Tip
+                text="Configure toolbar"
+                tip="Customize the editor toolbar to fit your needs."
+              />
+            </Button>
+          </>
+        )}
         <Header
           title="Backup & restore"
           isOpen={groups.backup}
