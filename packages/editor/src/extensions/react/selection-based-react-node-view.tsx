@@ -76,7 +76,9 @@ export class SelectionBasedNodeView<
   ): React.ReactElement<any> | null {
     if (!this.options.component) return null;
     const theme = this.editor.storage.theme as Theme;
-    const isSelected = this.insideSelection() || this.nodeInsideSelection();
+    const isSelected =
+      this.editor.isEditable &&
+      (this.insideSelection() || this.nodeInsideSelection());
 
     return (
       <ThemeProvider theme={theme}>

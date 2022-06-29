@@ -25,6 +25,16 @@ export function EmbedComponent(
         }}
       >
         <Resizable
+          enable={{
+            bottom: editor.isEditable,
+            left: editor.isEditable,
+            right: editor.isEditable,
+            top: editor.isEditable,
+            bottomLeft: editor.isEditable,
+            bottomRight: editor.isEditable,
+            topLeft: editor.isEditable,
+            topRight: editor.isEditable,
+          }}
           size={{
             height: height || "auto",
             width: width || "auto",
@@ -46,8 +56,9 @@ export function EmbedComponent(
             sx={{
               position: "relative",
               justifyContent: "end",
-              borderTop: "20px solid var(--bgSecondary)",
-              // borderLeft: "20px solid var(--bgSecondary)",
+              borderTop: editor.isEditable
+                ? "20px solid var(--bgSecondary)"
+                : "none",
               borderTopLeftRadius: "default",
               borderTopRightRadius: "default",
               borderColor: selected ? "border" : "bgSecondary",
@@ -94,11 +105,10 @@ export function EmbedComponent(
             width={"100%"}
             height={"100%"}
             sx={{
-              border: "none",
-              // border: isActive
-              //   ? "2px solid var(--primary)"
-              //   : "2px solid transparent",
-              // borderRadius: "default",
+              border: selected
+                ? "2px solid var(--primary)"
+                : "2px solid transparent",
+              borderRadius: "default",
             }}
             {...props}
           />

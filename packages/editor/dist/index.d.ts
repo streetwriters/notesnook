@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import "./extensions";
 import { EditorOptions } from "@tiptap/react";
 import Toolbar from "./toolbar";
@@ -9,5 +8,6 @@ declare const useTiptap: (options?: Partial<EditorOptions & AttachmentOptions & 
     theme: Theme;
 }>, deps?: import("react").DependencyList) => Editor | null;
 export { useTiptap, Toolbar };
-export type { Editor } from "./types";
+export * from "./types";
 export * from "./extensions/react";
+export * from "./toolbar/tool-definitions";

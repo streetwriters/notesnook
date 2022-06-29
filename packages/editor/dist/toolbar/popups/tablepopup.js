@@ -78,7 +78,7 @@ export function TablePopup(props) {
                     rows: cellLocation.row,
                 });
             },
-        } }, { children: _jsxs(Flex, __assign({ sx: { px: 1, flexDirection: "column", alignItems: "center" } }, { children: [_jsx(Box, __assign({ sx: {
+        } }, { children: _jsxs(Flex, __assign({ sx: { px: 1, pt: 1, flexDirection: "column", alignItems: "center" } }, { children: [_jsx(Box, __assign({ sx: {
                         display: "grid",
                         gridTemplateColumns: "repeat(".concat(tableSize.columns, ", minmax(").concat(cellSize, "px, 1fr))"),
                         gap: "small",

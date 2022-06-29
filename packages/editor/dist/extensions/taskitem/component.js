@@ -44,7 +44,7 @@ export function TaskItemComponent(props) {
     }, [editor, getPos, node, checked]);
     return (_jsx(_Fragment, { children: _jsxs(Flex, __assign({ "data-drag-image": true, sx: {
                 ":hover > .dragHandle": {
-                    opacity: 1,
+                    opacity: editor.isEditable ? 1 : 0,
                 },
             } }, { children: [_jsx(Icon, { className: "dragHandle", draggable: "true", "data-drag-handle": true, path: Icons.dragHandle, sx: {
                         opacity: [1, 1, 0],
@@ -62,7 +62,7 @@ export function TaskItemComponent(props) {
                         alignSelf: "start",
                         mr: 2,
                         p: "1px",
-                        cursor: "pointer",
+                        cursor: editor.isEditable ? "pointer" : "unset",
                         ":hover": {
                             borderColor: "checked",
                         },

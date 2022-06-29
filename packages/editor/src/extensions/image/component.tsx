@@ -19,7 +19,7 @@ export function ImageComponent(
 
   useEffect(() => {
     (async () => {
-      if (!imageRef.current) return;
+      if (!imageRef.current || !src) return;
       imageRef.current.src = await dataUriToBlobURL(src);
     })();
   }, [src, imageRef]);
@@ -40,9 +40,18 @@ export function ImageComponent(
             opacity: 1,
           },
         }}
-        draggable={false}
       >
         <Resizable
+          enable={{
+            bottom: editor.isEditable,
+            left: editor.isEditable,
+            right: editor.isEditable,
+            top: editor.isEditable,
+            bottomLeft: editor.isEditable,
+            bottomRight: editor.isEditable,
+            topLeft: editor.isEditable,
+            topRight: editor.isEditable,
+          }}
           style={{
             position: "relative",
             float: float ? (align === "left" ? "left" : "right") : "none",
@@ -60,49 +69,56 @@ export function ImageComponent(
           }}
           lockAspectRatio={true}
         >
-          <DesktopOnly>
-            {selected && (
-              <Flex sx={{ position: "relative", justifyContent: "end" }}>
-                <Flex
-                  sx={{
-                    position: "absolute",
-                    top: -40,
-                    mb: 2,
-                    alignItems: "end",
-                  }}
-                >
-                  <ToolbarGroup
-                    editor={editor}
-                    tools={[
-                      "imageAlignLeft",
-                      "imageAlignCenter",
-                      "imageAlignRight",
-                      "imageProperties",
-                    ]}
-                    sx={{
-                      boxShadow: "menu",
-                      borderRadius: "default",
-                      bg: "background",
-                    }}
-                  />
-                </Flex>
-              </Flex>
-            )}
-          </DesktopOnly>
-          <Icon
-            className="drag-handle"
+          <Flex
+            width={"100%"}
             data-drag-handle
             draggable
-            path={Icons.dragHandle}
             sx={{
-              cursor: "grab",
-              position: "absolute",
-              top: 2,
-              left: 2,
-              zIndex: 999,
-              opacity: selected ? 1 : 0,
+              position: "relative",
+              justifyContent: "end",
+              borderTop: editor.isEditable
+                ? "20px solid var(--bgSecondary)"
+                : "none",
+              borderTopLeftRadius: "default",
+              borderTopRightRadius: "default",
+              borderColor: selected ? "border" : "bgSecondary",
+              cursor: "pointer",
+              ":hover": {
+                borderColor: "border",
+              },
             }}
-          />
+          >
+            <DesktopOnly>
+              {selected && (
+                <Flex sx={{ position: "relative", justifyContent: "end" }}>
+                  <Flex
+                    sx={{
+                      position: "absolute",
+                      top: -40,
+                      mb: 2,
+                      alignItems: "end",
+                    }}
+                  >
+                    <ToolbarGroup
+                      editor={editor}
+                      tools={[
+                        "imageAlignLeft",
+                        "imageAlignCenter",
+                        "imageAlignRight",
+                        "imageProperties",
+                      ]}
+                      sx={{
+                        boxShadow: "menu",
+                        borderRadius: "default",
+                        bg: "background",
+                      }}
+                    />
+                  </Flex>
+                </Flex>
+              )}
+            </DesktopOnly>
+          </Flex>
+
           <Image
             data-drag-image
             ref={imageRef}
@@ -112,6 +128,7 @@ export function ImageComponent(
             width={"100%"}
             height={"100%"}
             sx={{
+              bg: "bgSecondary",
               border: selected
                 ? "2px solid var(--primary)"
                 : "2px solid transparent",

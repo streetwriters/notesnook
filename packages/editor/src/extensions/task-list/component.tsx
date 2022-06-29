@@ -121,6 +121,7 @@ export function TaskListComponent(
               }}
             />
             <Input
+              readOnly={!editor.isEditable}
               value={title || ""}
               variant={"clean"}
               sx={{ p: 0, px: 2, zIndex: 1, color: "fontTertiary" }}

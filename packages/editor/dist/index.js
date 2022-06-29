@@ -170,4 +170,6 @@ var useTiptap = function (options, deps) {
     return editor;
 };
 export { useTiptap, Toolbar };
+export * from "./types";
 export * from "./extensions/react";
+export * from "./toolbar/tool-definitions";

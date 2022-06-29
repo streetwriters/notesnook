@@ -70,7 +70,9 @@ export function TablePopup(props: TablePopupProps) {
           }),
       }}
     >
-      <Flex sx={{ px: 1, flexDirection: "column", alignItems: "center" }}>
+      <Flex
+        sx={{ px: 1, pt: 1, flexDirection: "column", alignItems: "center" }}
+      >
         <Box
           sx={{
             display: "grid",

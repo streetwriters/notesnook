@@ -110,7 +110,8 @@ var SelectionBasedNodeView = /** @class */ (function (_super) {
         if (!this.options.component)
             return null;
         var theme = this.editor.storage.theme;
-        var isSelected = this.insideSelection() || this.nodeInsideSelection();
+        var isSelected = this.editor.isEditable &&
+            (this.insideSelection() || this.nodeInsideSelection());
         return (_jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsx(this.options.component, __assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: function (attr) { return _this.updateAttributes(attr, _this.pos); } })) })));
     };
     /**

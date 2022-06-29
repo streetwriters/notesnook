@@ -22,7 +22,16 @@ export function EmbedComponent(props) {
     return (_jsx(_Fragment, { children: _jsx(Box, __assign({ sx: {
                 display: "flex",
                 justifyContent: align === "center" ? "center" : align === "left" ? "start" : "end",
-            } }, { children: _jsxs(Resizable, __assign({ size: {
+            } }, { children: _jsxs(Resizable, __assign({ enable: {
+                    bottom: editor.isEditable,
+                    left: editor.isEditable,
+                    right: editor.isEditable,
+                    top: editor.isEditable,
+                    bottomLeft: editor.isEditable,
+                    bottomRight: editor.isEditable,
+                    topLeft: editor.isEditable,
+                    topRight: editor.isEditable,
+                }, size: {
                     height: height || "auto",
                     width: width || "auto",
                 }, maxWidth: "100%", onResizeStop: function (e, direction, ref, d) {
@@ -33,8 +42,9 @@ export function EmbedComponent(props) {
                 }, lockAspectRatio: true }, { children: [_jsx(Flex, __assign({ width: "100%", sx: {
                             position: "relative",
                             justifyContent: "end",
-                            borderTop: "20px solid var(--bgSecondary)",
-                            // borderLeft: "20px solid var(--bgSecondary)",
+                            borderTop: editor.isEditable
+                                ? "20px solid var(--bgSecondary)"
+                                : "none",
                             borderTopLeftRadius: "default",
                             borderTopRightRadius: "default",
                             borderColor: selected ? "border" : "bgSecondary",
@@ -57,10 +67,9 @@ export function EmbedComponent(props) {
                                             borderRadius: "default",
                                             bg: "background",
                                         } }) })) }))) }) })), _jsx(Box, __assign({ as: "iframe", ref: embedRef, src: src, width: "100%", height: "100%", sx: {
-                            border: "none",
-                            // border: isActive
-                            //   ? "2px solid var(--primary)"
-                            //   : "2px solid transparent",
-                            // borderRadius: "default",
+                            border: selected
+                                ? "2px solid var(--primary)"
+                                : "2px solid transparent",
+                            borderRadius: "default",
                         } }, props))] })) })) }));
 }

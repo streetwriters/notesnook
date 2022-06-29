@@ -36,7 +36,7 @@ export function TaskItemComponent(
         data-drag-image
         sx={{
           ":hover > .dragHandle": {
-            opacity: 1,
+            opacity: editor.isEditable ? 1 : 0,
           },
         }}
       >
@@ -70,7 +70,7 @@ export function TaskItemComponent(
             alignSelf: "start",
             mr: 2,
             p: "1px",
-            cursor: "pointer",
+            cursor: editor.isEditable ? "pointer" : "unset",
             ":hover": {
               borderColor: "checked",
             },
