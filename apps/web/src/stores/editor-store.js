@@ -237,12 +237,12 @@ class EditorStore extends BaseStore {
     appStore.setIsEditorOpen(false);
   };
 
-  setTitle = (sessionId, title) => {
-    return this.saveSession(sessionId, { title });
+  setTitle = (noteId, title) => {
+    return this.saveSession(noteId, { title });
   };
 
-  toggle = (sessionId, name, value) => {
-    return this.saveSession(sessionId, { [name]: value });
+  toggle = (noteId, name, value) => {
+    return this.saveSession(noteId, { [name]: value });
   };
 
   saveSessionContent = (noteId, sessionId, content) => {

@@ -1,36 +1,20 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@rebass/forms";
-import { useStore, store, SESSION_STATES } from "../../stores/editor-store";
 
 type TitleBoxProps = {
   readonly: boolean;
+  title: string;
+  setTitle: (title: string) => void;
 };
 
 function TitleBox(props: TitleBoxProps) {
-  const { readonly } = props;
-
-  const state = useStore((store) => store.session.state);
-  const sessionId = useStore((store) => store.session.id);
-  const title = useStore((store) => store.session.title);
-  const setTitle = useStore((store) => store.setTitle);
-
+  const { readonly, setTitle, title } = props;
   const [currentTitle, setCurrentTitle] = useState<string>();
-  const [placeholder, setPlaceholder] = useState<string>();
 
   useEffect(() => {
-    const noteTitle = store.get().session.title;
-    if (state === SESSION_STATES.new && noteTitle !== currentTitle) {
-      setCurrentTitle("");
-      setPlaceholder("");
-    } else if (state === SESSION_STATES.stale) {
-      setCurrentTitle(noteTitle);
-    }
+    // if (currentTitle !== title) setPlaceholder(title);
     // We do not want to update when currentTitle changes.
-  }, [state, sessionId]);
-
-  useEffect(() => {
-    if (currentTitle !== title) setPlaceholder(title);
-    // We do not want to update when currentTitle changes.
+    setCurrentTitle(title);
   }, [title]);
 
   return (
@@ -39,7 +23,7 @@ function TitleBox(props: TitleBoxProps) {
       variant="clean"
       data-test-id="editor-title"
       className="editorTitle"
-      placeholder={placeholder || "Note title"}
+      placeholder={"Note title"}
       width="100%"
       readOnly={readonly}
       sx={{
@@ -50,12 +34,16 @@ function TitleBox(props: TitleBoxProps) {
       }}
       onChange={(e) => {
         setCurrentTitle(e.target.value);
-        setTitle(sessionId, e.target.value);
+        setTitle(e.target.value);
       }}
     />
   );
 }
 
 export default React.memo(TitleBox, (prevProps, nextProps) => {
-  return prevProps.readonly === nextProps.readonly;
+  return (
+    prevProps.readonly === nextProps.readonly &&
+    prevProps.title === nextProps.title &&
+    prevProps.setTitle === nextProps.setTitle
+  );
 });

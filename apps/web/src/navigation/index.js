@@ -35,26 +35,10 @@ export function hashNavigate(
   if (addNonce) url += `/${++last}`;
 
   window.history[`${replace ? "replace" : "push"}State`](null, null, `#${url}`);
-  if (notify) dispatchEvent(new HashChangeEvent("hashchange"));
-  // if (typeof url !== "string") {
-  //   throw new Error(`"url" must be a string, was provided a(n) ${typeof url}`);
-  // }
-  // if (Array.isArray(replaceOrQuery)) {
-  //   throw new Error(
-  //     '"replaceOrQuery" must be boolean, object, or URLSearchParams'
-  //   );
-  // }
 
-  // if (replaceOrQuery !== null && typeof replaceOrQuery === "object") {
-  //   url += "?" + new URLSearchParams(replaceOrQuery).toString();
-  // } else if (replace === undefined && replaceOrQuery !== undefined) {
-  //   replace = replaceOrQuery;
-  // } else if (replace === undefined && replaceOrQuery === undefined) {
-  //   replace = false;
-  // }
-
-  // window.history[`${replace ? "replace" : "push"}State`](null, null, url);
-  // dispatchEvent(new PopStateEvent("popstate", null));
+  const event = new HashChangeEvent("hashchange");
+  event.notify = notify;
+  dispatchEvent(event);
 }
 
 export function useQueryParams(parseFn = parseQuery) {

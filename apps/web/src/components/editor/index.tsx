@@ -22,6 +22,7 @@ import { downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "notes-core/common";
 import { db } from "../../common/db";
 import useMobile from "../../utils/use-mobile";
+import Titlebox from "./title-box";
 
 function updateWordCount(counter?: CharacterCounter) {
   AppEventManager.publish(
@@ -38,8 +39,16 @@ function onEditorChange(noteId: string, sessionId: string, content: string) {
     data: content,
   });
 }
+
+function onTitleChange(noteId: string, title: string) {
+  if (!title) return;
+
+  editorstore.get().setTitle(noteId, title);
+}
+
 const debouncedUpdateWordCount = debounce(updateWordCount, 1000);
 const debouncedOnEditorChange = debounceWithId(onEditorChange, 100);
+const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);
 
 export default function EditorManager({
   noteId,
@@ -52,6 +61,7 @@ export default function EditorManager({
   const isOldSession = !nonce && !!noteId;
 
   const [content, setContent] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isPreviewMode = useStore(
@@ -61,7 +71,6 @@ export default function EditorManager({
     (store) => store.session.readonly || isPreviewMode
   );
   const [dropRef, overlayRef] = useDragOverlay();
-  const editor = useEditorInstance();
   // TODO move this somewhere more appropriate
   // const init = useStore((store) => store.init);
 
@@ -70,6 +79,7 @@ export default function EditorManager({
     (async function () {
       await editorstore.newSession(nonce);
       setContent("");
+      setTitle("");
     })();
   }, [isNewSession, nonce]);
 
@@ -87,13 +97,13 @@ export default function EditorManager({
     if (!isOldSession) return;
 
     (async function () {
-      await editorstore.openSession(noteId);
+      await editorstore.get().openSession(noteId);
 
-      let content = await editorstore.get().getSessionContent();
+      const { getSessionContent, session } = editorstore.get();
+      const content = await getSessionContent();
+
+      setTitle(session.title);
       setContent(content?.data);
-      // editorstore.set(
-      //   (state: any) => (state.session.state = SESSION_STATES.stale)
-      // );
       if (noteId && content) await db.attachments?.downloadImages(noteId);
     })();
   }, [noteId, isOldSession]);
@@ -112,60 +122,26 @@ export default function EditorManager({
     >
       {isPreviewMode && <PreviewModeNotice />}
       <Editor
+        title={title}
         content={content}
         readonly={isReadonly}
         onRequestFocus={() => toggleProperties(false)}
       />
       {arePropertiesVisible && <Properties />}
-
-      <Box
-        ref={overlayRef}
-        id="drag-overlay"
-        sx={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          bg: "overlay",
-          zIndex: 3,
-          alignItems: "center",
-          justifyContent: "center",
-          display: "none",
-        }}
-        onDrop={async (e) => {
-          if (!editor) return;
-          for (let file of e.dataTransfer.files) {
-            const result = await attachFile(file);
-            if (!result) continue;
-            editor.attachFile(result);
-          }
-        }}
-      >
-        <Flex
-          sx={{
-            border: "2px dashed var(--fontTertiary)",
-            borderRadius: "default",
-            p: 70,
-            flexDirection: "column",
-            pointerEvents: "none",
-          }}
-        >
-          <Attachment size={72} />
-          <Text variant={"heading"} sx={{ color: "icon", mt: 2 }}>
-            Drop your files here to attach
-          </Text>
-        </Flex>
-      </Box>
+      <DropZone overlayRef={overlayRef} />
     </Flex>
   );
 }
 
 type EditorProps = {
+  title: string;
   readonly?: boolean;
   focusMode?: boolean;
   content: string;
   onRequestFocus?: () => void;
 };
-function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
+function Editor(props: EditorProps) {
+  const { content, readonly, focusMode, onRequestFocus, title } = props;
   const editor = useEditorInstance();
   const isMobile = useMobile();
 
@@ -238,6 +214,14 @@ function Editor({ content, readonly, focusMode, onRequestFocus }: EditorProps) {
               }}
             />
           )}
+          <Titlebox
+            readonly={readonly || false}
+            setTitle={(title) => {
+              const { sessionId, id } = editorstore.get().session;
+              debouncedOnTitleChange(sessionId, id, title);
+            }}
+            title={title}
+          />
           <Header readonly={readonly} />
           <Tiptap
             readonly={readonly}
@@ -326,6 +310,54 @@ function PreviewModeNotice() {
         </Button>
       </Flex>
     </Flex>
+  );
+}
+
+type DropZoneProps = {
+  overlayRef: React.MutableRefObject<HTMLElement | undefined>;
+};
+function DropZone(props: DropZoneProps) {
+  const { overlayRef } = props;
+  const editor = useEditorInstance();
+
+  return (
+    <Box
+      ref={overlayRef}
+      id="drag-overlay"
+      sx={{
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        bg: "overlay",
+        zIndex: 3,
+        alignItems: "center",
+        justifyContent: "center",
+        display: "none",
+      }}
+      onDrop={async (e) => {
+        if (!editor) return;
+        for (let file of e.dataTransfer.files) {
+          const result = await attachFile(file);
+          if (!result) continue;
+          editor.attachFile(result);
+        }
+      }}
+    >
+      <Flex
+        sx={{
+          border: "2px dashed var(--fontTertiary)",
+          borderRadius: "default",
+          p: 70,
+          flexDirection: "column",
+          pointerEvents: "none",
+        }}
+      >
+        <Attachment size={72} />
+        <Text variant={"heading"} sx={{ color: "icon", mt: 2 }}>
+          Drop your files here to attach
+        </Text>
+      </Flex>
+    </Box>
   );
 }
 

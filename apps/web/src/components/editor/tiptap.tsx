@@ -3,7 +3,7 @@ import { useTheme } from "emotion-theming";
 import { Toolbar, useTiptap, PortalProvider, Editor } from "notesnook-editor";
 import { Box, Flex } from "rebass";
 import "notesnook-editor/dist/styles.css";
-import { PropsWithChildren, useEffect, useRef } from "react";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import useMobile from "../../utils/use-mobile";
 import { Attachment } from "./plugins/picker";
 import { CharacterCounter, IEditor } from "./types";
@@ -13,6 +13,7 @@ import { AttachmentType } from "notesnook-editor/dist/extensions/attachment";
 import { getCurrentPreset } from "../../common/toolbar-config";
 
 type TipTapProps = {
+  editorContainer: HTMLElement;
   onChange?: (content: string, counter?: CharacterCounter) => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
@@ -30,10 +31,10 @@ function TipTap(props: TipTapProps) {
     onFocus = () => {},
     content,
     toolbarContainerId,
+    editorContainer,
     readonly,
   } = props;
 
-  const editorContentRef = useRef<HTMLDivElement>();
   const theme: Theme = useTheme();
   const isMobile = useMobile();
   const counter = useRef<CharacterCounter>();
@@ -43,7 +44,7 @@ function TipTap(props: TipTapProps) {
 
   const editor = useTiptap(
     {
-      element: editorContentRef.current,
+      element: editorContainer,
       editable: !readonly,
       content,
       autofocus: "start",
@@ -84,7 +85,7 @@ function TipTap(props: TipTapProps) {
         return true;
       },
     },
-    [content, readonly, theme]
+    [content, readonly]
   );
 
   useEffect(() => {
@@ -98,7 +99,7 @@ function TipTap(props: TipTapProps) {
   }, [toggleSearch, editor?.storage.searchreplace?.isSearching]);
 
   return (
-    <Flex sx={{ flex: 1, flexDirection: "column" }}>
+    <>
       <Portal containerId={toolbarContainerId}>
         <Toolbar
           editor={editor}
@@ -108,18 +109,37 @@ function TipTap(props: TipTapProps) {
           tools={toolbarConfig}
         />
       </Portal>
-      <Box
-        className="selectable"
-        ref={editorContentRef}
-        style={{
-          flex: 1,
-          cursor: "text",
-          color: theme.colors.text,
-        }}
-      />
-    </Flex>
+    </>
   );
 }
+
+function TiptapWrapper(props: Omit<TipTapProps, "editorContainer">) {
+  const [isReady, setIsReady] = useState(false);
+  const editorContainerRef = useRef<HTMLDivElement>();
+  useEffect(() => {
+    setIsReady(true);
+  }, []);
+
+  return (
+    <PortalProvider>
+      <Flex sx={{ flex: 1, flexDirection: "column" }}>
+        {isReady && editorContainerRef.current ? (
+          <TipTap {...props} editorContainer={editorContainerRef.current} />
+        ) : null}
+        <Box
+          ref={editorContainerRef}
+          className="selectable"
+          style={{
+            flex: 1,
+            cursor: "text",
+            color: "var(--text)", // TODO!
+          }}
+        />
+      </Flex>
+    </PortalProvider>
+  );
+}
+export default TiptapWrapper;
 
 function Portal(props: PropsWithChildren<{ containerId?: string }>) {
   const { containerId, children } = props;
@@ -130,15 +150,6 @@ function Portal(props: PropsWithChildren<{ containerId?: string }>) {
     <>{children}</>
   );
 }
-
-function TiptapProvider(props: TipTapProps) {
-  return (
-    <PortalProvider>
-      <TipTap {...props} />
-    </PortalProvider>
-  );
-}
-export default TiptapProvider;
 
 function toIEditor(editor: Editor): IEditor {
   return {
