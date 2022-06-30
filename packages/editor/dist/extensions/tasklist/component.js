@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -36,26 +37,28 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { jsxs as _jsxs, jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
-import { Box, Flex, Text } from "rebass";
-import { findChildren, getNodeType, } from "@tiptap/core";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { useEffect, useMemo, useState } from "react";
-import { Input } from "@rebass/forms";
-import { TaskItemNode } from "../task-item";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
-export function TaskListComponent(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TaskListComponent = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var rebass_1 = require("rebass");
+var core_1 = require("@tiptap/core");
+var icon_1 = require("../../toolbar/components/icon");
+var icons_1 = require("../../toolbar/icons");
+var react_1 = require("react");
+var forms_1 = require("@rebass/forms");
+var taskitem_1 = require("../taskitem");
+var prosemirror_utils_1 = require("prosemirror-utils");
+function TaskListComponent(props) {
     var editor = props.editor, getPos = props.getPos, node = props.node, updateAttributes = props.updateAttributes, forwardRef = props.forwardRef;
-    var taskItemType = getNodeType(TaskItemNode.name, editor.schema);
+    var taskItemType = (0, core_1.getNodeType)(taskitem_1.TaskItemNode.name, editor.schema);
     var _a = node.attrs, title = _a.title, collapsed = _a.collapsed;
-    var _b = __read(useState({ checked: 0, total: 0, percentage: 0 }), 2), stats = _b[0], setStats = _b[1];
-    var parentTaskItem = useMemo(function () {
+    var _b = __read((0, react_1.useState)({ checked: 0, total: 0, percentage: 0 }), 2), stats = _b[0], setStats = _b[1];
+    var parentTaskItem = (0, react_1.useMemo)(function () {
         var pos = editor.state.doc.resolve(getPos());
-        return findParentNodeOfTypeClosestToPos(pos, taskItemType);
+        return (0, prosemirror_utils_1.findParentNodeOfTypeClosestToPos)(pos, taskItemType);
     }, []);
     var nested = !!parentTaskItem;
-    useEffect(function () {
+    (0, react_1.useEffect)(function () {
         if (!parentTaskItem)
             return;
         var node = parentTaskItem.node, pos = parentTaskItem.pos;
@@ -67,21 +70,21 @@ export function TaskListComponent(props) {
             return true;
         });
     }, [node, parentTaskItem]);
-    useEffect(function () {
-        var children = findChildren(node, function (node) { return node.type.name === TaskItemNode.name; });
+    (0, react_1.useEffect)(function () {
+        var children = (0, core_1.findChildren)(node, function (node) { return node.type.name === taskitem_1.TaskItemNode.name; });
         var checked = children.filter(function (node) { return node.node.attrs.checked; }).length;
         var total = children.length;
         var percentage = Math.round((checked / total) * 100);
         setStats({ checked: checked, total: total, percentage: percentage });
     }, [nested, node]);
-    return (_jsxs(_Fragment, { children: [_jsx(Flex, __assign({ sx: {
+    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Flex, __assign({ sx: {
                     flexDirection: "column",
                     ":hover > div > .toggleSublist": { opacity: 1 },
-                } }, { children: nested ? (_jsxs(Flex, __assign({ sx: {
+                } }, { children: nested ? ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ sx: {
                         position: "absolute",
                         top: 0,
                         right: 0,
-                    }, contentEditable: false }, { children: [collapsed && (_jsxs(Text, __assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), _jsx(Icon, { className: "toggleSublist", path: collapsed ? Icons.chevronDown : Icons.chevronUp, sx: {
+                    }, contentEditable: false }, { children: [collapsed && ((0, jsx_runtime_1.jsxs)(rebass_1.Text, __assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), (0, jsx_runtime_1.jsx)(icon_1.Icon, { className: "toggleSublist", path: collapsed ? icons_1.Icons.chevronDown : icons_1.Icons.chevronUp, sx: {
                                 opacity: collapsed ? 1 : 0,
                                 position: "absolute",
                                 right: 0,
@@ -93,7 +96,7 @@ export function TaskListComponent(props) {
                                 },
                             }, size: 20, onClick: function () {
                                 updateAttributes({ collapsed: !collapsed });
-                            } })] }))) : (_jsxs(Flex, __assign({ sx: {
+                            } })] }))) : ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ sx: {
                         position: "relative",
                         bg: "bgSecondary",
                         py: 1,
@@ -102,7 +105,7 @@ export function TaskListComponent(props) {
                         alignItems: "center",
                         justifyContent: "end",
                         overflow: "hidden",
-                    }, contentEditable: false }, { children: [_jsx(Box, { sx: {
+                    }, contentEditable: false }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Box, { sx: {
                                 height: "100%",
                                 width: "".concat(stats.percentage, "%"),
                                 position: "absolute",
@@ -110,9 +113,9 @@ export function TaskListComponent(props) {
                                 zIndex: 0,
                                 left: 0,
                                 transition: "width 250ms ease-out",
-                            } }), _jsx(Input, { readOnly: !editor.isEditable, value: title || "", variant: "clean", sx: { p: 0, px: 2, zIndex: 1, color: "fontTertiary" }, placeholder: "Untitled", onChange: function (e) {
+                            } }), (0, jsx_runtime_1.jsx)(forms_1.Input, { readOnly: !editor.isEditable, value: title || "", variant: "clean", sx: { p: 0, px: 2, zIndex: 1, color: "fontTertiary" }, placeholder: "Untitled", onChange: function (e) {
                                 updateAttributes({ title: e.target.value });
-                            } }), _jsxs(Flex, __assign({ sx: { flexShrink: 0, pr: 2 } }, { children: [_jsx(Icon, { path: Icons.checkbox, size: 15, color: "fontTertiary" }), _jsxs(Text, __assign({ variant: "body", sx: { ml: 1, color: "fontTertiary" } }, { children: [stats.checked, "/", stats.total] }))] }))] }))) })), _jsx(Text, { as: "div", ref: forwardRef, sx: {
+                            } }), (0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ sx: { flexShrink: 0, pr: 2 } }, { children: [(0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.checkbox, size: 15, color: "fontTertiary" }), (0, jsx_runtime_1.jsxs)(rebass_1.Text, __assign({ variant: "body", sx: { ml: 1, color: "fontTertiary" } }, { children: [stats.checked, "/", stats.total] }))] }))] }))) })), (0, jsx_runtime_1.jsx)(rebass_1.Text, { as: "div", ref: forwardRef, sx: {
                     ul: {
                         display: collapsed ? "none" : "block",
                         paddingInlineStart: 0,
@@ -125,9 +128,10 @@ export function TaskListComponent(props) {
                     },
                 } })] }));
 }
+exports.TaskListComponent = TaskListComponent;
 function areAllChecked(node, pos, doc) {
     var e_1, _a;
-    var children = findChildren(node, function (node) { return node.type.name === TaskItemNode.name; });
+    var children = (0, core_1.findChildren)(node, function (node) { return node.type.name === taskitem_1.TaskItemNode.name; });
     try {
         for (var children_1 = __values(children), children_1_1 = children_1.next(); !children_1_1.done; children_1_1 = children_1.next()) {
             var child = children_1_1.value;

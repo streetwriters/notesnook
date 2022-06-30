@@ -1,4 +1,7 @@
-import { NodeSelection } from "prosemirror-state";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.insertMathNode = void 0;
+var prosemirror_state_1 = require("prosemirror-state");
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Returns a new command that can be used to inserts a new math node at the
@@ -9,7 +12,7 @@ import { NodeSelection } from "prosemirror-state";
  *     NodeType.  Must belong to the same schema that your EditorState uses!
  * @param initialText (optional) The initial source content for the math editor.
  */
-export function insertMathNode(mathNodeType, initialText) {
+function insertMathNode(mathNodeType, initialText) {
     if (initialText === void 0) { initialText = ""; }
     return function (state, dispatch) {
         var $from = state.selection.$from, index = $from.index();
@@ -19,9 +22,10 @@ export function insertMathNode(mathNodeType, initialText) {
         if (dispatch) {
             var mathNode = mathNodeType.create({}, initialText ? state.schema.text(initialText) : null);
             var tr = state.tr.replaceSelectionWith(mathNode);
-            tr = tr.setSelection(NodeSelection.create(tr.doc, $from.pos));
+            tr = tr.setSelection(prosemirror_state_1.NodeSelection.create(tr.doc, $from.pos));
             dispatch(tr);
         }
         return true;
     };
 }
+exports.insertMathNode = insertMathNode;

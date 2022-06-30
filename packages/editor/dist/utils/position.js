@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getElementPosition = exports.getPosition = void 0;
 var mousePosition = { x: 0, y: 0, actualX: 0, actualY: 0 };
 window.addEventListener("mousemove", function (e) {
     var _a = getMousePosition(e), x = _a.x, y = _a.y, actualX = _a.actualX, actualY = _a.actualY;
@@ -6,7 +9,7 @@ window.addEventListener("mousemove", function (e) {
     mousePosition.actualX = actualX;
     mousePosition.actualY = actualY;
 });
-export function getPosition(element, options) {
+function getPosition(element, options) {
     var _a = options || {}, _b = _a.target, target = _b === void 0 ? "mouse" : _b, _c = _a.isTargetAbsolute, isTargetAbsolute = _c === void 0 ? false : _c, _d = _a.location, location = _d === void 0 ? undefined : _d, _e = _a.yOffset, yOffset = _e === void 0 ? 0 : _e, _f = _a.xOffset, xOffset = _f === void 0 ? 0 : _f, _g = _a.align, align = _g === void 0 ? "start" : _g, _h = _a.parent, parent = _h === void 0 ? document.body : _h, yAnchor = _a.yAnchor;
     var _j = target === "mouse"
         ? mousePosition
@@ -64,6 +67,7 @@ export function getPosition(element, options) {
     position.left += xOffset;
     return position;
 }
+exports.getPosition = getPosition;
 function getMousePosition(e) {
     var posx = 0;
     var posy = 0;
@@ -88,7 +92,7 @@ function getMousePosition(e) {
         actualX: posx,
     };
 }
-export function getElementPosition(element, absolute) {
+function getElementPosition(element, absolute) {
     var rect = element.getBoundingClientRect();
     var position = {
         x: element.offsetLeft,
@@ -104,3 +108,4 @@ export function getElementPosition(element, absolute) {
     }
     return position;
 }
+exports.getElementPosition = getElementPosition;

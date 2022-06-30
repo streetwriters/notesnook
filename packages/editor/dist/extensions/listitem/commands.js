@@ -1,7 +1,10 @@
-import { findParentNodeOfType, hasParentNodeOfType } from "prosemirror-utils";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.onBackspacePressed = void 0;
+var prosemirror_utils_1 = require("prosemirror-utils");
 // WORKAROUND: if we're at the start of a list item, we need to either
 // backspace directly to an empty list item above, or outdent this node
-export function onBackspacePressed(editor, name, type) {
+function onBackspacePressed(editor, name, type) {
     var selection = editor.state.selection;
     var empty = selection.empty, $from = selection.$from;
     if (!empty ||
@@ -24,11 +27,12 @@ export function onBackspacePressed(editor, name, type) {
         return editor.chain().joinBackward().joinBackward().run();
     }
 }
+exports.onBackspacePressed = onBackspacePressed;
 function isInside(name, type, state) {
     var $from = state.selection.$from;
     var node = type || state.schema.nodes[name];
     var paragraph = state.schema.nodes.paragraph;
-    return (hasParentNodeOfType(node)(state.selection) &&
+    return ((0, prosemirror_utils_1.hasParentNodeOfType)(node)(state.selection) &&
         $from.parent.type === paragraph);
 }
 function isFirstChildOfParent(state) {
@@ -38,7 +42,7 @@ function isFirstChildOfParent(state) {
         : true;
 }
 var isFirstOfType = function (type, state) {
-    var block = findParentNodeOfType(type)(state.selection);
+    var block = (0, prosemirror_utils_1.findParentNodeOfType)(type)(state.selection);
     if (!block)
         return false;
     var pos = block.pos;
@@ -46,7 +50,7 @@ var isFirstOfType = function (type, state) {
     return !resolved.nodeBefore;
 };
 function isListItemEmpty(type, state) {
-    var block = findParentNodeOfType(type)(state.selection);
+    var block = (0, prosemirror_utils_1.findParentNodeOfType)(type)(state.selection);
     if (!block)
         return false;
     var node = block.node;

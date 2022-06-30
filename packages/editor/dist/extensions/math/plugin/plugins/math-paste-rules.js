@@ -1,3 +1,4 @@
+"use strict";
 /**
  * Note that for some of the `ParseRule`s defined below,
  * we define a `getAttrs` function, which, other than
@@ -19,7 +20,9 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { Fragment, } from "prosemirror-model";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.defaultBlockMathParseRules = exports.defaultInlineMathParseRules = exports.wikipediaInlineMathParseRule = exports.wikipediaBlockMathParseRule = void 0;
+var prosemirror_model_1 = require("prosemirror-model");
 ////////////////////////////////////////////////////////////
 function getFirstMatch(root, rules) {
     var e_1, _a;
@@ -42,7 +45,7 @@ function getFirstMatch(root, rules) {
     return false;
 }
 function makeTextFragment(text, schema) {
-    return Fragment.from(schema.text(text));
+    return prosemirror_model_1.Fragment.from(schema.text(text));
 }
 ////////////////////////////////////////////////////////////
 // -- Wikipedia ----------------------------------------- //
@@ -115,7 +118,7 @@ function matchWikipedia(root) {
  * </span></dd></dl>
  * ```
  */
-export var wikipediaBlockMathParseRule = {
+exports.wikipediaBlockMathParseRule = {
     tag: "dl",
     getAttrs: function (p) {
         var dl = p;
@@ -165,7 +168,7 @@ export var wikipediaBlockMathParseRule = {
  * </span>
  * ```
  */
-export var wikipediaInlineMathParseRule = {
+exports.wikipediaInlineMathParseRule = {
     tag: "span",
     getAttrs: function (p) {
         var span = p;
@@ -185,9 +188,9 @@ export var wikipediaInlineMathParseRule = {
 };
 // -- MathJax ------------------------------------------- //
 ////////////////////////////////////////////////////////////
-export var defaultInlineMathParseRules = [
-    wikipediaInlineMathParseRule,
+exports.defaultInlineMathParseRules = [
+    exports.wikipediaInlineMathParseRule,
 ];
-export var defaultBlockMathParseRules = [
-    wikipediaBlockMathParseRule,
+exports.defaultBlockMathParseRules = [
+    exports.wikipediaBlockMathParseRule,
 ];

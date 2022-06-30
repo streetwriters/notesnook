@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createDispatch = exports.EventDispatcher = void 0;
 var EventDispatcher = /** @class */ (function () {
     function EventDispatcher() {
         this.listeners = {};
@@ -27,12 +30,12 @@ var EventDispatcher = /** @class */ (function () {
     };
     return EventDispatcher;
 }());
-export { EventDispatcher };
+exports.EventDispatcher = EventDispatcher;
 /**
  * Creates a dispatch function that can be called inside ProseMirror Plugin
  * to notify listeners about that plugin's state change.
  */
-export function createDispatch(eventDispatcher) {
+function createDispatch(eventDispatcher) {
     return function (eventName, data) {
         if (!eventName) {
             throw new Error("event name is required!");
@@ -43,3 +46,4 @@ export function createDispatch(eventDispatcher) {
         eventDispatcher.emit(event, data);
     };
 }
+exports.createDispatch = createDispatch;

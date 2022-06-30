@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,12 +10,14 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { mergeAttributes } from "@tiptap/core";
-import { onBackspacePressed } from "../list-item/commands";
-import { TaskItem } from "@tiptap/extension-task-item";
-import { TaskItemComponent } from "./component";
-import { createNodeView } from "../react";
-export var TaskItemNode = TaskItem.extend({
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TaskItemNode = void 0;
+var core_1 = require("@tiptap/core");
+var commands_1 = require("../list-item/commands");
+var extension_task_item_1 = require("@tiptap/extension-task-item");
+var component_1 = require("./component");
+var react_1 = require("../react");
+exports.TaskItemNode = extension_task_item_1.TaskItem.extend({
     draggable: true,
     addAttributes: function () {
         return {
@@ -32,7 +35,7 @@ export var TaskItemNode = TaskItem.extend({
         var node = _a.node, HTMLAttributes = _a.HTMLAttributes;
         return [
             "li",
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+            (0, core_1.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes, {
                 class: "checklist--item",
             }),
             0,
@@ -61,11 +64,11 @@ export var TaskItemNode = TaskItem.extend({
         var _a;
         return __assign(__assign({}, (_a = this.parent) === null || _a === void 0 ? void 0 : _a.call(this)), { Backspace: function (_a) {
                 var editor = _a.editor;
-                return onBackspacePressed(editor, _this.name, _this.type);
+                return (0, commands_1.onBackspacePressed)(editor, _this.name, _this.type);
             } });
     },
     addNodeView: function () {
-        return createNodeView(TaskItemComponent, {
+        return (0, react_1.createNodeView)(component_1.TaskItemComponent, {
             contentDOMFactory: true,
             wrapperFactory: function () { return document.createElement("li"); },
             shouldUpdate: function (_a, _b) {

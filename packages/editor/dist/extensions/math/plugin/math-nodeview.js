@@ -1,13 +1,16 @@
+"use strict";
 /*---------------------------------------------------------
  *  Author: Benjamin R. Bray
  *  License: MIT (see LICENSE in project root for details)
  *--------------------------------------------------------*/
-import { EditorState, TextSelection, } from "prosemirror-state";
-import { EditorView, } from "prosemirror-view";
-import { StepMap } from "prosemirror-transform";
-import { keymap } from "prosemirror-keymap";
-import { newlineInCode, chainCommands, deleteSelection, } from "prosemirror-commands";
-import { collapseMathNode } from "./commands/collapse-math-node";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MathView = void 0;
+var prosemirror_state_1 = require("prosemirror-state");
+var prosemirror_view_1 = require("prosemirror-view");
+var prosemirror_transform_1 = require("prosemirror-transform");
+var prosemirror_keymap_1 = require("prosemirror-keymap");
+var prosemirror_commands_1 = require("prosemirror-commands");
+var collapsemathnode_1 = require("./commands/collapsemathnode");
 var MathView = /** @class */ (function () {
     // == Lifecycle ===================================== //
     /**
@@ -178,7 +181,7 @@ var MathView = /** @class */ (function () {
         var _a = this._innerView.state.applyTransaction(tr), state = _a.state, transactions = _a.transactions;
         this._innerView.updateState(state);
         if (!tr.getMeta("fromOutside")) {
-            var outerTr = this._outerView.state.tr, offsetMap = StepMap.offset(this._getPos() + 1);
+            var outerTr = this._outerView.state.tr, offsetMap = prosemirror_transform_1.StepMap.offset(this._getPos() + 1);
             for (var i = 0; i < transactions.length; i++) {
                 var steps = transactions[i].steps;
                 for (var j = 0; j < steps.length; j++) {
@@ -202,18 +205,18 @@ var MathView = /** @class */ (function () {
         if (!this._mathSrcElt)
             throw new Error("_mathSrcElt does not exist!");
         // create a nested ProseMirror view
-        this._innerView = new EditorView(this._mathSrcElt, {
-            state: EditorState.create({
+        this._innerView = new prosemirror_view_1.EditorView(this._mathSrcElt, {
+            state: prosemirror_state_1.EditorState.create({
                 doc: this._node,
                 plugins: [
-                    keymap({
+                    (0, prosemirror_keymap_1.keymap)({
                         Tab: function (state, dispatch) {
                             if (dispatch) {
                                 dispatch(state.tr.insertText("\t"));
                             }
                             return true;
                         },
-                        Backspace: chainCommands(deleteSelection, function (state, dispatch, tr_inner) {
+                        Backspace: (0, prosemirror_commands_1.chainCommands)(prosemirror_commands_1.deleteSelection, function (state, dispatch, tr_inner) {
                             // default backspace behavior for non-empty selections
                             if (!state.selection.empty) {
                                 return false;
@@ -233,12 +236,12 @@ var MathView = /** @class */ (function () {
                         //   this._outerView.focus();
                         //   return true;
                         // },
-                        Enter: chainCommands(newlineInCode, collapseMathNode(this._outerView, +1, false)),
-                        "Ctrl-Enter": collapseMathNode(this._outerView, +1, false),
-                        ArrowLeft: collapseMathNode(this._outerView, -1, true),
-                        ArrowRight: collapseMathNode(this._outerView, +1, true),
-                        ArrowUp: collapseMathNode(this._outerView, -1, true),
-                        ArrowDown: collapseMathNode(this._outerView, +1, true),
+                        Enter: (0, prosemirror_commands_1.chainCommands)(prosemirror_commands_1.newlineInCode, (0, collapsemathnode_1.collapseMathNode)(this._outerView, +1, false)),
+                        "Ctrl-Enter": (0, collapsemathnode_1.collapseMathNode)(this._outerView, +1, false),
+                        ArrowLeft: (0, collapsemathnode_1.collapseMathNode)(this._outerView, -1, true),
+                        ArrowRight: (0, collapsemathnode_1.collapseMathNode)(this._outerView, +1, true),
+                        ArrowUp: (0, collapsemathnode_1.collapseMathNode)(this._outerView, -1, true),
+                        ArrowDown: (0, collapsemathnode_1.collapseMathNode)(this._outerView, +1, true),
                     }),
                 ],
             }),
@@ -255,7 +258,7 @@ var MathView = /** @class */ (function () {
         var prevCursorPos = maybePos !== null && maybePos !== void 0 ? maybePos : 0;
         // compute position that cursor should appear within the expanded math node
         var innerPos = prevCursorPos <= this._getPos() ? 0 : this._node.nodeSize - 2;
-        this._innerView.dispatch(innerState.tr.setSelection(TextSelection.create(innerState.doc, innerPos)));
+        this._innerView.dispatch(innerState.tr.setSelection(prosemirror_state_1.TextSelection.create(innerState.doc, innerPos)));
         this._isEditing = true;
     };
     /**
@@ -277,4 +280,4 @@ var MathView = /** @class */ (function () {
     };
     return MathView;
 }());
-export { MathView };
+exports.MathView = MathView;

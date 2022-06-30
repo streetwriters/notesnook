@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DEFAULT_TOOLS = exports.getAllTools = exports.getToolDefinition = void 0;
 var tools = {
     bold: {
         icon: "bold",
@@ -291,13 +294,15 @@ var tools = {
         conditional: true,
     },
 };
-export function getToolDefinition(id) {
+function getToolDefinition(id) {
     return tools[id];
 }
-export function getAllTools() {
+exports.getToolDefinition = getToolDefinition;
+function getAllTools() {
     return tools;
 }
-export var DEFAULT_TOOLS = [
+exports.getAllTools = getAllTools;
+exports.DEFAULT_TOOLS = [
     [
         "insertBlock",
         "tableSettings",

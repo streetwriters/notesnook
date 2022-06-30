@@ -1,3 +1,4 @@
+"use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -34,20 +35,25 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { findParentNodeClosestToPos } from "@tiptap/core";
-import { Node, textblockTypeInputRule, mergeAttributes } from "@tiptap/core";
-import { Plugin, PluginKey, TextSelection, } from "prosemirror-state";
-import { CodeblockComponent } from "./component";
-import { HighlighterPlugin } from "./highlighter";
-import { createNodeView } from "../react";
-import detectIndent from "detect-indent";
-import redent from "redent";
-import stripIndent from "strip-indent";
-export var backtickInputRegex = /^```([a-z]+)?[\s\n]$/;
-export var tildeInputRegex = /^~~~([a-z]+)?[\s\n]$/;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.toCodeLines = exports.getLines = exports.toCaretPosition = exports.CodeBlock = exports.tildeInputRegex = exports.backtickInputRegex = void 0;
+var core_1 = require("@tiptap/core");
+var core_2 = require("@tiptap/core");
+var prosemirror_state_1 = require("prosemirror-state");
+var component_1 = require("./component");
+var highlighter_1 = require("./highlighter");
+var react_1 = require("../react");
+var detect_indent_1 = __importDefault(require("detect-indent"));
+var redent_1 = __importDefault(require("redent"));
+var strip_indent_1 = __importDefault(require("strip-indent"));
+exports.backtickInputRegex = /^```([a-z]+)?[\s\n]$/;
+exports.tildeInputRegex = /^~~~([a-z]+)?[\s\n]$/;
 var ZERO_WIDTH_SPACE = "\u200b";
 var NEWLINE = "\n";
-export var CodeBlock = Node.create({
+exports.CodeBlock = core_2.Node.create({
     name: "codeblock",
     addOptions: function () {
         return {
@@ -148,7 +154,7 @@ export var CodeBlock = Node.create({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "pre",
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+            (0, core_2.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
             ["code", {}, 0],
         ];
     },
@@ -220,7 +226,7 @@ export var CodeBlock = Node.create({
                 if ($anchor.parent.type.name !== _this.name) {
                     return false;
                 }
-                var codeblock = findParentNodeClosestToPos($anchor, function (node) { return node.type.name === _this.type.name; });
+                var codeblock = (0, core_1.findParentNodeClosestToPos)($anchor, function (node) { return node.type.name === _this.type.name; });
                 if (!codeblock)
                     return false;
                 return editor.commands.setTextSelection({
@@ -376,15 +382,15 @@ export var CodeBlock = Node.create({
     },
     addInputRules: function () {
         return [
-            textblockTypeInputRule({
-                find: backtickInputRegex,
+            (0, core_2.textblockTypeInputRule)({
+                find: exports.backtickInputRegex,
                 type: this.type,
                 getAttributes: function (match) { return ({
                     language: match[1],
                 }); },
             }),
-            textblockTypeInputRule({
-                find: tildeInputRegex,
+            (0, core_2.textblockTypeInputRule)({
+                find: exports.tildeInputRegex,
                 type: this.type,
                 getAttributes: function (match) { return ({
                     language: match[1],
@@ -397,8 +403,8 @@ export var CodeBlock = Node.create({
         return [
             // this plugin creates a code block for pasted content from VS Code
             // we can also detect the copied code language
-            new Plugin({
-                key: new PluginKey("codeBlockVSCodeHandler"),
+            new prosemirror_state_1.Plugin({
+                key: new prosemirror_state_1.PluginKey("codeBlockVSCodeHandler"),
                 props: {
                     handlePaste: function (view, event) {
                         if (!event.clipboardData) {
@@ -440,11 +446,11 @@ export var CodeBlock = Node.create({
                     },
                 },
             }),
-            HighlighterPlugin({ name: this.name, defaultLanguage: "txt" }),
+            (0, highlighter_1.HighlighterPlugin)({ name: this.name, defaultLanguage: "txt" }),
         ];
     },
     addNodeView: function () {
-        return createNodeView(CodeblockComponent, {
+        return (0, react_1.createNodeView)(component_1.CodeblockComponent, {
             contentDOMFactory: function () {
                 var content = document.createElement("div");
                 content.classList.add("node-content-wrapper");
@@ -463,10 +469,10 @@ export var CodeBlock = Node.create({
         });
     },
 });
-export function toCaretPosition(selection, lines) {
+function toCaretPosition(selection, lines) {
     var e_4, _a;
     var $from = selection.$from, $to = selection.$to, $head = selection.$head;
-    if ($from.parent.type.name !== CodeBlock.name)
+    if ($from.parent.type.name !== exports.CodeBlock.name)
         return;
     lines = lines || getLines($from.parent);
     try {
@@ -493,10 +499,12 @@ export function toCaretPosition(selection, lines) {
     }
     return;
 }
-export function getLines(node) {
+exports.toCaretPosition = toCaretPosition;
+function getLines(node) {
     var lines = node.attrs.lines;
     return lines || [];
 }
+exports.getLines = getLines;
 function exitOnTripleEnter(editor, $from) {
     var isAtEnd = $from.parentOffset === $from.parent.nodeSize - 2;
     var endsWithDoubleNewline = $from.parent.textContent.endsWith("\n\n");
@@ -537,7 +545,7 @@ function getNewline($from, options) {
         indentation: indent({ amount: indentLength, type: options.type }),
     };
 }
-export function toCodeLines(code, pos) {
+function toCodeLines(code, pos) {
     var positions = [];
     var start = 0;
     var from = pos + 1;
@@ -567,6 +575,7 @@ export function toCodeLines(code, pos) {
     }
     return positions;
 }
+exports.toCodeLines = toCodeLines;
 function getSelectedLines(lines, selection) {
     var $from = selection.$from, $to = selection.$to;
     return lines.filter(function (line) {
@@ -576,7 +585,7 @@ function getSelectedLines(lines, selection) {
     });
 }
 function parseIndentation(node) {
-    if (node.type.name !== CodeBlock.name)
+    if (node.type.name !== exports.CodeBlock.name)
         return undefined;
     var _a = node.attrs, indentType = _a.indentType, indentLength = _a.indentLength;
     return {
@@ -605,14 +614,14 @@ function compareCaretPosition(prev, next) {
 function withSelection(tr, callback) {
     var _a = tr.selection, $anchor = _a.$anchor, $head = _a.$head;
     callback(tr);
-    tr.setSelection(new TextSelection(tr.doc.resolve(tr.mapping.map($anchor.pos)), tr.doc.resolve(tr.mapping.map($head.pos))));
+    tr.setSelection(new prosemirror_state_1.TextSelection(tr.doc.resolve(tr.mapping.map($anchor.pos)), tr.doc.resolve(tr.mapping.map($head.pos))));
     return true;
 }
 function fixIndentation(code, indent) {
-    var _a = indent || detectIndent(code), amount = _a.amount, _b = _a.type, type = _b === void 0 ? "space" : _b;
-    var fixed = redent(code, amount, {
+    var _a = indent || (0, detect_indent_1.default)(code), amount = _a.amount, _b = _a.type, type = _b === void 0 ? "space" : _b;
+    var fixed = (0, redent_1.default)(code, amount, {
         includeEmptyLines: false,
         indent: type === "space" ? " " : "\t",
     });
-    return { code: stripIndent(fixed), amount: amount, type: type };
+    return { code: (0, strip_indent_1.default)(fixed), amount: amount, type: type };
 }

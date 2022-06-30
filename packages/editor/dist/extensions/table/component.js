@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -24,32 +25,35 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
-import { Flex } from "rebass";
-import { SelectionBasedNodeView, } from "../react";
-import { useEffect, useRef } from "react";
-import { updateColumnsOnResize } from "prosemirror-tables";
-import { InsertColumnRight, InsertRowBelow, RowProperties, TableProperties, } from "../../toolbar/tools/table";
-import { getToolDefinition } from "../../toolbar/tool-definitions";
-import { getPosition } from "../../utils/position";
-import { findSelectedDOMNode } from "../../toolbar/utils/prosemirror";
-import { DesktopOnly } from "../../components/responsive";
-export function TableComponent(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TableNodeView = exports.TableComponent = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var rebass_1 = require("rebass");
+var react_1 = require("../react");
+var react_2 = require("react");
+var prosemirror_tables_1 = require("prosemirror-tables");
+var table_1 = require("../../toolbar/tools/table");
+var tooldefinitions_1 = require("../../toolbar/tooldefinitions");
+var position_1 = require("../../utils/position");
+var prosemirror_1 = require("../../toolbar/utils/prosemirror");
+var responsive_1 = require("../../components/responsive");
+function TableComponent(props) {
     var editor = props.editor, node = props.node, forwardRef = props.forwardRef;
-    var colgroupRef = useRef(null);
-    var tableRef = useRef();
+    var colgroupRef = (0, react_2.useRef)(null);
+    var tableRef = (0, react_2.useRef)();
     var selected = editor.isActive("table");
-    useEffect(function () {
+    (0, react_2.useEffect)(function () {
         if (!colgroupRef.current || !tableRef.current)
             return;
-        updateColumnsOnResize(node, colgroupRef.current, tableRef.current, 50);
+        (0, prosemirror_tables_1.updateColumnsOnResize)(node, colgroupRef.current, tableRef.current, 50);
     }, [node]);
-    return (_jsxs(_Fragment, { children: [_jsx(DesktopOnly, { children: selected && (_jsxs(_Fragment, { children: [_jsx(TableRowToolbar, { editor: editor, table: tableRef.current }), _jsx(TableColumnToolbar, { editor: editor, table: tableRef.current })] })) }), _jsx("div", __assign({ className: "tableWrapper" }, { children: _jsx("table", __assign({ ref: function (ref) {
+    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(TableRowToolbar, { editor: editor, table: tableRef.current }), (0, jsx_runtime_1.jsx)(TableColumnToolbar, { editor: editor, table: tableRef.current })] })) }), (0, jsx_runtime_1.jsx)("div", __assign({ className: "tableWrapper" }, { children: (0, jsx_runtime_1.jsx)("table", __assign({ ref: function (ref) {
                         forwardRef === null || forwardRef === void 0 ? void 0 : forwardRef(ref);
                         tableRef.current = ref || undefined;
-                    } }, { children: _jsx("colgroup", { ref: colgroupRef }) })) }))] }));
+                    } }, { children: (0, jsx_runtime_1.jsx)("colgroup", { ref: colgroupRef }) })) }))] }));
 }
-export function TableNodeView(editor) {
+exports.TableComponent = TableComponent;
+function TableNodeView(editor) {
     var TableNode = /** @class */ (function (_super) {
         __extends(TableNode, _super);
         function TableNode(node, cellMinWidth) {
@@ -73,20 +77,21 @@ export function TableNodeView(editor) {
             return _this;
         }
         return TableNode;
-    }(SelectionBasedNodeView));
+    }(react_1.SelectionBasedNodeView));
     return TableNode;
 }
+exports.TableNodeView = TableNodeView;
 function TableRowToolbar(props) {
     var editor = props.editor;
-    var rowToolsRef = useRef(null);
-    useEffect(function () {
+    var rowToolsRef = (0, react_2.useRef)(null);
+    (0, react_2.useEffect)(function () {
         if (!rowToolsRef.current) {
             return;
         }
-        var currentRow = findSelectedDOMNode(editor, ["tableRow"]);
+        var currentRow = (0, prosemirror_1.findSelectedDOMNode)(editor, ["tableRow"]);
         if (!currentRow)
             return;
-        var pos = getPosition(rowToolsRef.current, {
+        var pos = (0, position_1.getPosition)(rowToolsRef.current, {
             location: "left",
             target: currentRow,
             align: "start",
@@ -96,7 +101,7 @@ function TableRowToolbar(props) {
         rowToolsRef.current.style.top = "".concat(pos.top, "px");
         rowToolsRef.current.style.left = "".concat(pos.left, "px");
     }, [editor.state.selection, rowToolsRef.current]);
-    return (_jsxs(Flex, __assign({ ref: rowToolsRef, sx: {
+    return ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ ref: rowToolsRef, sx: {
             zIndex: 999,
             top: 0,
             left: 0,
@@ -108,23 +113,23 @@ function TableRowToolbar(props) {
             ":hover": {
                 opacity: 1,
             },
-        } }, { children: [_jsx(RowProperties, __assign({}, getToolDefinition("rowProperties"), { icon: "more", variant: "small", editor: editor })), _jsx(InsertRowBelow, __assign({}, getToolDefinition("insertRowBelow"), { editor: editor, variant: "small" }))] })));
+        } }, { children: [(0, jsx_runtime_1.jsx)(table_1.RowProperties, __assign({}, (0, tooldefinitions_1.getToolDefinition)("rowProperties"), { icon: "more", variant: "small", editor: editor })), (0, jsx_runtime_1.jsx)(table_1.InsertRowBelow, __assign({}, (0, tooldefinitions_1.getToolDefinition)("insertRowBelow"), { editor: editor, variant: "small" }))] })));
 }
 function TableColumnToolbar(props) {
     var editor = props.editor, table = props.table;
-    var columnToolsRef = useRef(null);
-    useEffect(function () {
+    var columnToolsRef = (0, react_2.useRef)(null);
+    (0, react_2.useEffect)(function () {
         if (!columnToolsRef.current || !table) {
             return;
         }
-        var currentCell = findSelectedDOMNode(editor, [
+        var currentCell = (0, prosemirror_1.findSelectedDOMNode)(editor, [
             "tableCell",
             "tableHeader",
         ]);
         if (!currentCell)
             return;
         // tableRef.current
-        var pos = getPosition(columnToolsRef.current, {
+        var pos = (0, position_1.getPosition)(columnToolsRef.current, {
             location: "top",
             align: "center",
             target: currentCell,
@@ -134,7 +139,7 @@ function TableColumnToolbar(props) {
         columnToolsRef.current.style.left = "".concat(pos.left, "px");
         columnToolsRef.current.style.top = "".concat(pos.top, "px");
     }, [editor.state.selection, columnToolsRef.current, table]);
-    return (_jsxs(Flex, __assign({ ref: columnToolsRef, sx: {
+    return ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ ref: columnToolsRef, sx: {
             zIndex: 999,
             top: 0,
             left: 0,
@@ -146,5 +151,5 @@ function TableColumnToolbar(props) {
             ":hover": {
                 opacity: 1,
             },
-        } }, { children: [_jsx(TableProperties, { editor: editor, title: "tableProperties", icon: "more", variant: "small" }), _jsx(InsertColumnRight, __assign({}, getToolDefinition("insertColumnRight"), { editor: editor, variant: "small", icon: "plus" }))] })));
+        } }, { children: [(0, jsx_runtime_1.jsx)(table_1.TableProperties, { editor: editor, title: "tableProperties", icon: "more", variant: "small" }), (0, jsx_runtime_1.jsx)(table_1.InsertColumnRight, __assign({}, (0, tooldefinitions_1.getToolDefinition)("insertColumnRight"), { editor: editor, variant: "small", icon: "plus" }))] })));
 }

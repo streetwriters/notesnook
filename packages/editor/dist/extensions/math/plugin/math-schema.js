@@ -1,3 +1,4 @@
+"use strict";
 /*---------------------------------------------------------
  *  Author: Benjamin R. Bray
  *  License: MIT (see LICENSE in project root for details)
@@ -38,16 +39,18 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.extendMathSchemaSpec = exports.createMathSchema = exports.mathSchemaSpec = void 0;
 // prosemirror imports
-import { Schema, } from "prosemirror-model";
-import { defaultBlockMathParseRules, defaultInlineMathParseRules, } from "./plugins/math-paste-rules";
+var prosemirror_model_1 = require("prosemirror-model");
+var math_paste_rules_1 = require("./plugins/math-paste-rules");
 ////////////////////////////////////////////////////////////
 // force typescript to infer generic type arguments for SchemaSpec
 function createSchemaSpec(spec) {
     return spec;
 }
 // bare minimum ProseMirror schema for working with math nodes
-export var mathSchemaSpec = createSchemaSpec({
+exports.mathSchemaSpec = createSchemaSpec({
     nodes: {
         // :: NodeSpec top-level document node
         doc: {
@@ -67,7 +70,7 @@ export var mathSchemaSpec = createSchemaSpec({
             inline: true,
             atom: true,
             toDOM: function () { return ["math-inline", { class: "math-node" }, 0]; },
-            parseDOM: __spreadArray([{ tag: "math-inline" }], __read(defaultInlineMathParseRules), false),
+            parseDOM: __spreadArray([{ tag: "math-inline" }], __read(math_paste_rules_1.defaultInlineMathParseRules), false),
         },
         math_display: {
             group: "block math",
@@ -75,7 +78,7 @@ export var mathSchemaSpec = createSchemaSpec({
             atom: true,
             code: true,
             toDOM: function () { return ["math-display", { class: "math-node" }, 0]; },
-            parseDOM: __spreadArray([{ tag: "math-display" }], __read(defaultBlockMathParseRules), false),
+            parseDOM: __spreadArray([{ tag: "math-display" }], __read(math_paste_rules_1.defaultBlockMathParseRules), false),
         },
         text: {
             group: "inline",
@@ -93,9 +96,10 @@ export var mathSchemaSpec = createSchemaSpec({
 /**
  * Use the prosemirror-math default SchemaSpec to create a new Schema.
  */
-export function createMathSchema() {
-    return new Schema(mathSchemaSpec);
+function createMathSchema() {
+    return new prosemirror_model_1.Schema(exports.mathSchemaSpec);
 }
+exports.createMathSchema = createMathSchema;
 /**
  * Create a new SchemaSpec by adding math nodes to an existing spec.
 
@@ -107,8 +111,9 @@ export function createMathSchema() {
  * @param baseSpec The SchemaSpec to extend.  Must specify a `marks` field, and
  *     must be a raw object (not an OrderedMap).
  */
-export function extendMathSchemaSpec(baseSpec) {
-    var nodes = __assign(__assign({}, baseSpec.nodes), mathSchemaSpec.nodes);
-    var marks = __assign(__assign({}, baseSpec.marks), mathSchemaSpec.marks);
+function extendMathSchemaSpec(baseSpec) {
+    var nodes = __assign(__assign({}, baseSpec.nodes), exports.mathSchemaSpec.nodes);
+    var marks = __assign(__assign({}, baseSpec.marks), exports.mathSchemaSpec.marks);
     return { nodes: nodes, marks: marks, topNode: baseSpec.topNode };
 }
+exports.extendMathSchemaSpec = extendMathSchemaSpec;

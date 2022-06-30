@@ -1,3 +1,4 @@
+"use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -14,13 +15,15 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { Node, mergeAttributes, findChildren } from "@tiptap/core";
-import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
-import { onBackspacePressed } from "../list-item/commands";
-import { OutlineList } from "../outline-list/outline-list";
-import { createNodeView } from "../react";
-import { OutlineListItemComponent } from "./component";
-export var OutlineListItem = Node.create({
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OutlineListItem = void 0;
+var core_1 = require("@tiptap/core");
+var prosemirror_utils_1 = require("prosemirror-utils");
+var commands_1 = require("../list-item/commands");
+var outlinelist_1 = require("../outline-list/outlinelist");
+var react_1 = require("../react");
+var component_1 = require("./component");
+exports.OutlineListItem = core_1.Node.create({
     name: "outlineListItem",
     addOptions: function () {
         return {
@@ -40,7 +43,7 @@ export var OutlineListItem = Node.create({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "li",
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+            (0, core_1.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes, {
                 "data-type": this.name,
             }),
             0,
@@ -72,7 +75,7 @@ export var OutlineListItem = Node.create({
             "Shift-Tab": function () { return _this.editor.commands.liftListItem(_this.name); },
             Backspace: function (_a) {
                 var editor = _a.editor;
-                return onBackspacePressed(editor, _this.name, _this.type);
+                return (0, commands_1.onBackspacePressed)(editor, _this.name, _this.type);
             },
         };
     },
@@ -90,7 +93,7 @@ export var OutlineListItem = Node.create({
         };
     },
     addNodeView: function () {
-        return createNodeView(OutlineListItemComponent, {
+        return (0, react_1.createNodeView)(component_1.OutlineListItemComponent, {
             contentDOMFactory: true,
             //  wrapperFactory: () => document.createElement("li"),
         });
@@ -100,13 +103,13 @@ function findSublist(editor, type) {
     var _a, _b;
     var selection = editor.state.selection;
     var $from = selection.$from;
-    var listItem = findParentNodeOfTypeClosestToPos($from, type);
+    var listItem = (0, prosemirror_utils_1.findParentNodeOfTypeClosestToPos)($from, type);
     if (!listItem)
         return false;
-    var _c = __read(findChildren(listItem.node, function (node) { return node.type.name === OutlineList.name; }), 1), subList = _c[0];
+    var _c = __read((0, core_1.findChildren)(listItem.node, function (node) { return node.type.name === outlinelist_1.OutlineList.name; }), 1), subList = _c[0];
     if (!subList)
         return false;
-    var isNested = ((_a = subList === null || subList === void 0 ? void 0 : subList.node) === null || _a === void 0 ? void 0 : _a.type.name) === OutlineList.name;
+    var isNested = ((_a = subList === null || subList === void 0 ? void 0 : subList.node) === null || _a === void 0 ? void 0 : _a.type.name) === outlinelist_1.OutlineList.name;
     var isCollapsed = (_b = subList === null || subList === void 0 ? void 0 : subList.node) === null || _b === void 0 ? void 0 : _b.attrs.collapsed;
     var subListPos = listItem.pos + subList.pos + 1;
     return { isCollapsed: isCollapsed, isNested: isNested, subListPos: subListPos };

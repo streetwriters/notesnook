@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,19 +10,21 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { Box, Text } from "rebass";
-import { useRef } from "react";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AttachmentComponent = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var rebass_1 = require("rebass");
+var react_1 = require("react");
 // import { MenuPresenter } from "../../components/menu/menu";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
-import { DesktopOnly } from "../../components/responsive";
-export function AttachmentComponent(props) {
+var icon_1 = require("../../toolbar/components/icon");
+var icons_1 = require("../../toolbar/icons");
+var toolbargroup_1 = require("../../toolbar/components/toolbargroup");
+var responsive_1 = require("../../components/responsive");
+function AttachmentComponent(props) {
     var editor = props.editor, node = props.node, selected = props.selected;
     var _a = node.attrs, hash = _a.hash, filename = _a.filename, size = _a.size, progress = _a.progress;
-    var elementRef = useRef();
-    return (_jsx(_Fragment, { children: _jsxs(Box, __assign({ ref: elementRef, as: "span", contentEditable: false, variant: "body", sx: {
+    var elementRef = (0, react_1.useRef)();
+    return ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: (0, jsx_runtime_1.jsxs)(rebass_1.Box, __assign({ ref: elementRef, as: "span", contentEditable: false, variant: "body", sx: {
                 display: "inline-flex",
                 position: "relative",
                 justifyContent: "center",
@@ -37,18 +40,18 @@ export function AttachmentComponent(props) {
                 ":hover": {
                     bg: "hover",
                 },
-            }, title: filename }, { children: [_jsx(Icon, { path: Icons.attachment, size: 14 }), _jsx(Text, __assign({ as: "span", sx: {
+            }, title: filename }, { children: [(0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.attachment, size: 14 }), (0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ as: "span", sx: {
                         ml: "small",
                         fontSize: "body",
                         whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
                         overflow: "hidden",
-                    } }, { children: filename })), _jsx(Text, __assign({ as: "span", sx: {
+                    } }, { children: filename })), (0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ as: "span", sx: {
                         ml: 1,
                         fontSize: "0.65rem",
                         color: "fontTertiary",
                         flexShrink: 0,
-                    } }, { children: progress ? "".concat(progress, "%") : formatBytes(size) })), _jsx(DesktopOnly, { children: selected && (_jsx(ToolbarGroup, { editor: editor, tools: ["removeAttachment", "downloadAttachment"], sx: {
+                    } }, { children: progress ? "".concat(progress, "%") : formatBytes(size) })), (0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { editor: editor, tools: ["removeAttachment", "downloadAttachment"], sx: {
                             boxShadow: "menu",
                             borderRadius: "default",
                             bg: "background",
@@ -56,6 +59,7 @@ export function AttachmentComponent(props) {
                             top: -35,
                         } })) })] })) }));
 }
+exports.AttachmentComponent = AttachmentComponent;
 function formatBytes(bytes, decimals) {
     if (decimals === void 0) { decimals = 1; }
     if (bytes === 0)

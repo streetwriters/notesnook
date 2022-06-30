@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,10 +10,12 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { Node, mergeAttributes } from "@tiptap/core";
-import { createSelectionBasedNodeView, } from "../react";
-import { EmbedComponent } from "./component";
-export var EmbedNode = Node.create({
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmbedNode = void 0;
+var core_1 = require("@tiptap/core");
+var react_1 = require("../react");
+var component_1 = require("./component");
+exports.EmbedNode = core_1.Node.create({
     name: "embed",
     content: "",
     marks: "",
@@ -46,11 +49,11 @@ export var EmbedNode = Node.create({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "iframe",
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+            (0, core_1.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
         ];
     },
     addNodeView: function () {
-        return createSelectionBasedNodeView(EmbedComponent);
+        return (0, react_1.createSelectionBasedNodeView)(component_1.EmbedComponent);
     },
     addCommands: function () {
         var _this = this;

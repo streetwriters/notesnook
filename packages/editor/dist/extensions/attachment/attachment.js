@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -20,10 +21,12 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { Node, mergeAttributes, findChildren } from "@tiptap/core";
-import { createSelectionBasedNodeView } from "../react";
-import { AttachmentComponent } from "./component";
-export var AttachmentNode = Node.create({
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDataAttribute = exports.AttachmentNode = void 0;
+var core_1 = require("@tiptap/core");
+var react_1 = require("../react");
+var component_1 = require("./component");
+exports.AttachmentNode = core_1.Node.create({
     name: "attachment",
     content: "inline*",
     marks: "",
@@ -63,11 +66,11 @@ export var AttachmentNode = Node.create({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "span",
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+            (0, core_1.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
         ];
     },
     addNodeView: function () {
-        return createSelectionBasedNodeView(AttachmentComponent, {
+        return (0, react_1.createSelectionBasedNodeView)(component_1.AttachmentComponent, {
             shouldUpdate: function (_a, _b) {
                 var prev = _a.attrs;
                 var next = _b.attrs;
@@ -110,7 +113,7 @@ export var AttachmentNode = Node.create({
                     var e_1, _b;
                     var state = _a.state, tr = _a.tr, dispatch = _a.dispatch;
                     var hash = options.hash, progress = options.progress, type = options.type;
-                    var attachments = findChildren(state.doc, function (node) {
+                    var attachments = (0, core_1.findChildren)(state.doc, function (node) {
                         return (node.type.name === _this.name || node.type.name === "image") &&
                             node.attrs.hash === hash;
                     });
@@ -149,7 +152,7 @@ export var AttachmentNode = Node.create({
     //     ];
     //   },
 });
-export function getDataAttribute(name, def) {
+function getDataAttribute(name, def) {
     return {
         default: def,
         parseHTML: function (element) { return element.dataset[name]; },
@@ -164,3 +167,4 @@ export function getDataAttribute(name, def) {
         },
     };
 }
+exports.getDataAttribute = getDataAttribute;

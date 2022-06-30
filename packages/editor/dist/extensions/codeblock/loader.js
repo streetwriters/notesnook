@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,11 +35,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.loadLanguage = exports.isLanguageLoaded = void 0;
 var loadedLanguages = {};
-export function isLanguageLoaded(name) {
+function isLanguageLoaded(name) {
     return !!loadedLanguages[name];
 }
-export function loadLanguage(shortName) {
+exports.isLanguageLoaded = isLanguageLoaded;
+function loadLanguage(shortName) {
     return __awaiter(this, void 0, void 0, function () {
         var url, result;
         return __generator(this, function (_a) {
@@ -56,6 +60,7 @@ export function loadLanguage(shortName) {
         });
     });
 }
+exports.loadLanguage = loadLanguage;
 function loadScript(id, url) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {

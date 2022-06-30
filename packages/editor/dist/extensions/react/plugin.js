@@ -1,5 +1,8 @@
-import { Plugin, PluginKey } from "prosemirror-state";
-import { Extension } from "@tiptap/core";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NodeViewSelectionNotifier = exports.NodeViewSelectionNotifierPlugin = exports.stateKey = exports.ReactNodeViewState = void 0;
+var prosemirror_state_1 = require("prosemirror-state");
+var core_1 = require("@tiptap/core");
 var ReactNodeViewState = /** @class */ (function () {
     function ReactNodeViewState() {
         this.changeHandlers = [];
@@ -16,9 +19,9 @@ var ReactNodeViewState = /** @class */ (function () {
     };
     return ReactNodeViewState;
 }());
-export { ReactNodeViewState };
-export var stateKey = new PluginKey("reactNodeView");
-export var NodeViewSelectionNotifierPlugin = new Plugin({
+exports.ReactNodeViewState = ReactNodeViewState;
+exports.stateKey = new prosemirror_state_1.PluginKey("reactNodeView");
+exports.NodeViewSelectionNotifierPlugin = new prosemirror_state_1.Plugin({
     state: {
         init: function () {
             return new ReactNodeViewState();
@@ -27,9 +30,9 @@ export var NodeViewSelectionNotifierPlugin = new Plugin({
             return pluginState;
         },
     },
-    key: stateKey,
+    key: exports.stateKey,
     view: function (view) {
-        var pluginState = stateKey.getState(view.state);
+        var pluginState = exports.stateKey.getState(view.state);
         return {
             update: function (view) {
                 var _a = view.state.selection, from = _a.from, to = _a.to;
@@ -38,8 +41,8 @@ export var NodeViewSelectionNotifierPlugin = new Plugin({
         };
     },
 });
-export var NodeViewSelectionNotifier = Extension.create({
+exports.NodeViewSelectionNotifier = core_1.Extension.create({
     addProseMirrorPlugins: function () {
-        return [NodeViewSelectionNotifierPlugin];
+        return [exports.NodeViewSelectionNotifierPlugin];
     },
 });

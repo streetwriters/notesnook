@@ -1,6 +1,9 @@
-import { Extension } from "@tiptap/core";
-import "@tiptap/extension-text-style";
-export var TextDirection = Extension.create({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TextDirection = void 0;
+var core_1 = require("@tiptap/core");
+require("@tiptap/extension-text-style");
+exports.TextDirection = core_1.Extension.create({
     name: "textDirection",
     defaultOptions: {
         types: ["paragraph", "heading"],

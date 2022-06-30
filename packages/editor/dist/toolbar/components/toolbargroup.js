@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -20,21 +21,24 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { jsx as _jsx } from "react/jsx-runtime";
-import { findTool } from "../tools";
-import { Flex } from "rebass";
-import { MoreTools } from "./more-tools";
-import { getToolDefinition } from "../tool-definitions";
-export function ToolbarGroup(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ToolbarGroup = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var tools_1 = require("../tools");
+var rebass_1 = require("rebass");
+var moretools_1 = require("./moretools");
+var tooldefinitions_1 = require("../tooldefinitions");
+function ToolbarGroup(props) {
     var tools = props.tools, editor = props.editor, force = props.force, selectedNode = props.selectedNode, flexProps = __rest(props, ["tools", "editor", "force", "selectedNode"]);
-    return (_jsx(Flex, __assign({ className: "toolbar-group" }, flexProps, { children: tools.map(function (toolId) {
+    return ((0, jsx_runtime_1.jsx)(rebass_1.Flex, __assign({ className: "toolbar-group" }, flexProps, { children: tools.map(function (toolId) {
             if (Array.isArray(toolId)) {
-                return (_jsx(MoreTools, { title: "More", icon: "more", popupId: toolId.join(""), tools: toolId, editor: editor }, "more-tools"));
+                return ((0, jsx_runtime_1.jsx)(moretools_1.MoreTools, { title: "More", icon: "more", popupId: toolId.join(""), tools: toolId, editor: editor }, "more-tools"));
             }
             else {
-                var Component = findTool(toolId);
-                var toolDefinition = getToolDefinition(toolId);
-                return (_jsx(Component, __assign({ editor: editor, force: force, selectedNode: selectedNode }, toolDefinition), toolDefinition.title));
+                var Component = (0, tools_1.findTool)(toolId);
+                var toolDefinition = (0, tooldefinitions_1.getToolDefinition)(toolId);
+                return ((0, jsx_runtime_1.jsx)(Component, __assign({ editor: editor, force: force, selectedNode: selectedNode }, toolDefinition), toolDefinition.title));
             }
         }) })));
 }
+exports.ToolbarGroup = ToolbarGroup;

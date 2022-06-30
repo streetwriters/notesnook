@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -25,22 +26,24 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { useRef, useState } from "react";
-import { Button, Text } from "rebass";
-import { Icon } from "./icon";
-import { Icons } from "../icons";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import { MenuPresenter } from "../../components/menu";
-import { getToolbarElement } from "../utils/dom";
-export function Dropdown(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Dropdown = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var react_1 = require("react");
+var rebass_1 = require("rebass");
+var icon_1 = require("./icon");
+var icons_1 = require("../icons");
+var toolbarstore_1 = require("../stores/toolbarstore");
+var menu_1 = require("../../components/menu");
+var dom_1 = require("../utils/dom");
+function Dropdown(props) {
     var items = props.items, selectedItem = props.selectedItem, buttonRef = props.buttonRef, menuWidth = props.menuWidth;
-    var internalRef = useRef();
-    var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    var toolbarLocation = useToolbarLocation();
-    var isMobile = useIsMobile();
+    var internalRef = (0, react_1.useRef)();
+    var _a = __read((0, react_1.useState)(false), 2), isOpen = _a[0], setIsOpen = _a[1];
+    var toolbarLocation = (0, toolbarstore_1.useToolbarLocation)();
+    var isMobile = (0, toolbarstore_1.useIsMobile)();
     var isBottom = toolbarLocation === "bottom";
-    return (_jsxs(_Fragment, { children: [_jsxs(Button, __assign({ ref: function (ref) {
+    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Button, __assign({ ref: function (ref) {
                     internalRef.current = ref;
                     if (buttonRef)
                         buttonRef.current = ref;
@@ -55,9 +58,9 @@ export function Dropdown(props) {
                     ":last-of-type": {
                         mr: 0,
                     },
-                }, onClick: function () { return setIsOpen(function (s) { return !s; }); }, onMouseDown: function (e) { return e.preventDefault(); } }, { children: [typeof selectedItem === "string" ? (_jsx(Text, __assign({ sx: { fontSize: "subBody", mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), _jsx(Icon, { path: isBottom ? Icons.chevronUp : Icons.chevronDown, size: "small", color: "text" })] })), _jsx(MenuPresenter, { isOpen: isOpen, items: items, onClose: function () { return setIsOpen(false); }, position: {
+                }, onClick: function () { return setIsOpen(function (s) { return !s; }); }, onMouseDown: function (e) { return e.preventDefault(); } }, { children: [typeof selectedItem === "string" ? ((0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ sx: { fontSize: "subBody", mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: isBottom ? icons_1.Icons.chevronUp : icons_1.Icons.chevronDown, size: "small", color: "text" })] })), (0, jsx_runtime_1.jsx)(menu_1.MenuPresenter, { isOpen: isOpen, items: items, onClose: function () { return setIsOpen(false); }, position: {
                     target: isBottom
-                        ? getToolbarElement()
+                        ? (0, dom_1.getToolbarElement)()
                         : internalRef.current || "mouse",
                     isTargetAbsolute: true,
                     location: isBottom ? "top" : "below",
@@ -73,3 +76,4 @@ export function Dropdown(props) {
                     alignItems: isBottom ? "center" : "unset",
                 } })] }));
 }
+exports.Dropdown = Dropdown;

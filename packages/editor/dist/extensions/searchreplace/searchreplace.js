@@ -1,3 +1,4 @@
+"use strict";
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -9,9 +10,11 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { Extension } from "@tiptap/core";
-import { Decoration, DecorationSet } from "prosemirror-view";
-import { Plugin, PluginKey, TextSelection, } from "prosemirror-state";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SearchReplace = void 0;
+var core_1 = require("@tiptap/core");
+var prosemirror_view_1 = require("prosemirror-view");
+var prosemirror_state_1 = require("prosemirror-state");
 var updateView = function (state, dispatch) { return dispatch(state.tr); };
 var regex = function (s, settings) {
     var enableRegex = settings.enableRegex, matchCase = settings.matchCase, matchWholeWord = settings.matchWholeWord;
@@ -24,7 +27,7 @@ var regex = function (s, settings) {
 function searchDocument(doc, searchResultClass, searchTerm) {
     var e_1, _a, e_2, _b, e_3, _c;
     if (!searchTerm)
-        return { decorationSet: DecorationSet.empty, results: [] };
+        return { decorationSet: prosemirror_view_1.DecorationSet.empty, results: [] };
     var decorations = [];
     var results = [];
     var index = 0;
@@ -85,7 +88,7 @@ function searchDocument(doc, searchResultClass, searchTerm) {
     try {
         for (var results_1 = __values(results), results_1_1 = results_1.next(); !results_1_1.done; results_1_1 = results_1.next()) {
             var _e = results_1_1.value, from = _e.from, to = _e.to;
-            decorations.push(Decoration.inline(from, to, { class: searchResultClass }));
+            decorations.push(prosemirror_view_1.Decoration.inline(from, to, { class: searchResultClass }));
         }
     }
     catch (e_3_1) { e_3 = { error: e_3_1 }; }
@@ -96,7 +99,7 @@ function searchDocument(doc, searchResultClass, searchTerm) {
         finally { if (e_3) throw e_3.error; }
     }
     return {
-        decorationSet: DecorationSet.create(doc, decorations),
+        decorationSet: prosemirror_view_1.DecorationSet.create(doc, decorations),
         results: results,
     };
 }
@@ -118,7 +121,7 @@ var replaceAll = function (replaceTerm, results, tr) {
     }
     return tr;
 };
-export var SearchReplace = Extension.create({
+exports.SearchReplace = core_1.Extension.create({
     name: "searchreplace",
     addOptions: function () {
         return {
@@ -214,7 +217,7 @@ export var SearchReplace = Extension.create({
                             to: tr.mapping.map(to_2),
                         });
                         commands.focus();
-                        tr.setSelection(new TextSelection(tr.doc.resolve(nextResult.from), tr.doc.resolve(nextResult.to)));
+                        tr.setSelection(new prosemirror_state_1.TextSelection(tr.doc.resolve(nextResult.from), tr.doc.resolve(nextResult.to)));
                     }
                     dispatch(tr);
                     results.splice(index, 1);
@@ -249,13 +252,13 @@ export var SearchReplace = Extension.create({
     },
     addProseMirrorPlugins: function () {
         var _this = this;
-        var key = new PluginKey("searchreplace");
+        var key = new prosemirror_state_1.PluginKey("searchreplace");
         return [
-            new Plugin({
+            new prosemirror_state_1.Plugin({
                 key: key,
                 state: {
                     init: function () {
-                        return DecorationSet.empty;
+                        return prosemirror_view_1.DecorationSet.empty;
                     },
                     apply: function (_a) {
                         var doc = _a.doc, docChanged = _a.docChanged, setSelection = _a.setSelection;
@@ -269,7 +272,7 @@ export var SearchReplace = Extension.create({
                             _this.storage.results = results;
                             return decorationSet;
                         }
-                        return DecorationSet.empty;
+                        return prosemirror_view_1.DecorationSet.empty;
                     },
                 },
                 props: {

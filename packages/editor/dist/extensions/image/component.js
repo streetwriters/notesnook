@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -45,18 +46,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { Box, Flex, Image } from "rebass";
-import { Resizable } from "re-resizable";
-import { useEffect, useRef } from "react";
-import { DesktopOnly } from "../../components/responsive";
-import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
-export function ImageComponent(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ImageComponent = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var rebass_1 = require("rebass");
+var re_resizable_1 = require("re-resizable");
+var react_1 = require("react");
+var responsive_1 = require("../../components/responsive");
+var toolbargroup_1 = require("../../toolbar/components/toolbargroup");
+function ImageComponent(props) {
     var _this = this;
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, selected = props.selected;
     var _a = node.attrs, src = _a.src, alt = _a.alt, title = _a.title, width = _a.width, height = _a.height, align = _a.align, float = _a.float;
-    var imageRef = useRef();
-    useEffect(function () {
+    var imageRef = (0, react_1.useRef)();
+    (0, react_1.useEffect)(function () {
         (function () { return __awaiter(_this, void 0, void 0, function () {
             var _a;
             return __generator(this, function (_b) {
@@ -73,7 +76,7 @@ export function ImageComponent(props) {
             });
         }); })();
     }, [src, imageRef]);
-    return (_jsx(_Fragment, { children: _jsx(Box, __assign({ sx: {
+    return ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: (0, jsx_runtime_1.jsx)(rebass_1.Box, __assign({ sx: {
                 display: float ? "block" : "flex",
                 justifyContent: float
                     ? "stretch"
@@ -85,7 +88,7 @@ export function ImageComponent(props) {
                 ":hover .drag-handle, :active .drag-handle": {
                     opacity: 1,
                 },
-            } }, { children: _jsxs(Resizable, __assign({ enable: {
+            } }, { children: (0, jsx_runtime_1.jsxs)(re_resizable_1.Resizable, __assign({ enable: {
                     bottom: editor.isEditable,
                     left: editor.isEditable,
                     right: editor.isEditable,
@@ -105,7 +108,7 @@ export function ImageComponent(props) {
                         width: ref.clientWidth,
                         height: ref.clientHeight,
                     });
-                }, lockAspectRatio: true }, { children: [_jsx(Flex, __assign({ width: "100%", "data-drag-handle": true, draggable: true, sx: {
+                }, lockAspectRatio: true }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Flex, __assign({ width: "100%", "data-drag-handle": true, draggable: true, sx: {
                             position: "relative",
                             justifyContent: "end",
                             borderTop: editor.isEditable
@@ -118,12 +121,12 @@ export function ImageComponent(props) {
                             ":hover": {
                                 borderColor: "border",
                             },
-                        } }, { children: _jsx(DesktopOnly, { children: selected && (_jsx(Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(Flex, __assign({ sx: {
+                        } }, { children: (0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, __assign({ sx: { position: "relative", justifyContent: "end" } }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Flex, __assign({ sx: {
                                         position: "absolute",
                                         top: -40,
                                         mb: 2,
                                         alignItems: "end",
-                                    } }, { children: _jsx(ToolbarGroup, { editor: editor, tools: [
+                                    } }, { children: (0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { editor: editor, tools: [
                                             "imageAlignLeft",
                                             "imageAlignCenter",
                                             "imageAlignRight",
@@ -132,7 +135,7 @@ export function ImageComponent(props) {
                                             boxShadow: "menu",
                                             borderRadius: "default",
                                             bg: "background",
-                                        } }) })) }))) }) })), _jsx(Image, __assign({ "data-drag-image": true, ref: imageRef, alt: alt, src: "/placeholder.svg", title: title, width: "100%", height: "100%", sx: {
+                                        } }) })) }))) }) })), (0, jsx_runtime_1.jsx)(rebass_1.Image, __assign({ "data-drag-image": true, ref: imageRef, alt: alt, src: "/placeholder.svg", title: title, width: "100%", height: "100%", sx: {
                             bg: "bgSecondary",
                             border: selected
                                 ? "2px solid var(--primary)"
@@ -140,6 +143,7 @@ export function ImageComponent(props) {
                             borderRadius: "default",
                         } }, props))] })) })) }));
 }
+exports.ImageComponent = ImageComponent;
 function dataUriToBlobURL(dataurl) {
     return __awaiter(this, void 0, void 0, function () {
         var response, blob;

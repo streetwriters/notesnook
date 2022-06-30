@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -24,6 +25,29 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -49,10 +73,12 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import React, { useContext } from "react";
-export var PopupRendererContext = React.createContext(null);
-export var EditorContext = React.createContext(null);
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useEditorContext = exports.usePopupRenderer = exports.PopupRenderer = exports.EditorContext = exports.PopupRendererContext = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var react_1 = __importStar(require("react"));
+exports.PopupRendererContext = react_1.default.createContext(null);
+exports.EditorContext = react_1.default.createContext(null);
 var PopupRenderer = /** @class */ (function (_super) {
     __extends(PopupRenderer, _super);
     function PopupRenderer() {
@@ -85,17 +111,19 @@ var PopupRenderer = /** @class */ (function (_super) {
         return _this;
     }
     PopupRenderer.prototype.render = function () {
-        return (_jsxs(PopupRendererContext.Provider, __assign({ value: this }, { children: [this.props.children, _jsxs(EditorContext.Provider, __assign({ value: this.props.editor }, { children: [this.state.popups.map(function (_a) {
+        return ((0, jsx_runtime_1.jsxs)(exports.PopupRendererContext.Provider, __assign({ value: this }, { children: [this.props.children, (0, jsx_runtime_1.jsxs)(exports.EditorContext.Provider, __assign({ value: this.props.editor }, { children: [this.state.popups.map(function (_a) {
                             var id = _a.id, Popup = _a.popup;
-                            return _jsx(Popup, { id: id }, id);
-                        }), _jsx("div", { id: "popup-container" })] }))] })));
+                            return (0, jsx_runtime_1.jsx)(Popup, { id: id }, id);
+                        }), (0, jsx_runtime_1.jsx)("div", { id: "popup-container" })] }))] })));
     };
     return PopupRenderer;
-}(React.Component));
-export { PopupRenderer };
-export function usePopupRenderer() {
-    return useContext(PopupRendererContext);
+}(react_1.default.Component));
+exports.PopupRenderer = PopupRenderer;
+function usePopupRenderer() {
+    return (0, react_1.useContext)(exports.PopupRendererContext);
 }
-export function useEditorContext() {
-    return useContext(EditorContext);
+exports.usePopupRenderer = usePopupRenderer;
+function useEditorContext() {
+    return (0, react_1.useContext)(exports.EditorContext);
 }
+exports.useEditorContext = useEditorContext;

@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -34,11 +35,13 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-import { jsx as _jsx } from "react/jsx-runtime";
-import { NodeSelection } from "prosemirror-state";
-import { ThemeProvider } from "emotion-theming";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createNodeView = exports.ReactNodeView = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var prosemirror_state_1 = require("prosemirror-state");
+var emotion_theming_1 = require("emotion-theming");
 // @ts-ignore
-import { __serializeForClipboard } from "prosemirror-view";
+var prosemirror_view_1 = require("prosemirror-view");
 var ReactNodeView = /** @class */ (function () {
     function ReactNodeView(node, editor, getPos, options) {
         var _this = this;
@@ -128,7 +131,7 @@ var ReactNodeView = /** @class */ (function () {
             return null;
         var theme = this.editor.storage.theme;
         var pos = this.getPos();
-        return (_jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsx(this.options.component, __assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: function (attr) { return _this.updateAttributes(attr, pos); } })) })));
+        return ((0, jsx_runtime_1.jsx)(emotion_theming_1.ThemeProvider, __assign({ theme: theme }, { children: (0, jsx_runtime_1.jsx)(this.options.component, __assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: function (attr) { return _this.updateAttributes(attr, pos); } })) })));
     };
     ReactNodeView.prototype.updateAttributes = function (attributes, pos) {
         var _this = this;
@@ -190,7 +193,7 @@ var ReactNodeView = /** @class */ (function () {
         }
         // we need to tell ProseMirror that we want to move the whole node
         // so we create a NodeSelection
-        var selection = NodeSelection.create(view.state.doc, this.getPos());
+        var selection = prosemirror_state_1.NodeSelection.create(view.state.doc, this.getPos());
         var transaction = view.state.tr.setSelection(selection);
         view.dispatch(transaction);
         (_g = event.dataTransfer) === null || _g === void 0 ? void 0 : _g.setDragImage(dragImage, x, y);
@@ -221,7 +224,7 @@ var ReactNodeView = /** @class */ (function () {
         var isEditable = this.editor.isEditable;
         var isDragging = this.isDragging;
         var isDraggable = !!this.node.type.spec.draggable;
-        var isSelectable = NodeSelection.isSelectable(this.node);
+        var isSelectable = prosemirror_state_1.NodeSelection.isSelectable(this.node);
         var isCopyEvent = event.type === "copy";
         var isPasteEvent = event.type === "paste";
         var isCutEvent = event.type === "cut";
@@ -345,14 +348,15 @@ var ReactNodeView = /** @class */ (function () {
     };
     return ReactNodeView;
 }());
-export { ReactNodeView };
-export function createNodeView(component, options) {
+exports.ReactNodeView = ReactNodeView;
+function createNodeView(component, options) {
     return function (_a) {
         var node = _a.node, getPos = _a.getPos, editor = _a.editor;
         var _getPos = function () { return (typeof getPos === "boolean" ? -1 : getPos()); };
         return new ReactNodeView(node, editor, _getPos, __assign(__assign({}, options), { component: component })).init();
     };
 }
+exports.createNodeView = createNodeView;
 // function isiOS(): boolean {
 //   return (
 //     [
@@ -372,7 +376,7 @@ function forceHandleDrag(event, editor) {
         return;
     var view = editor.view;
     var slice = view.state.selection.content();
-    var _a = __serializeForClipboard(view, slice), dom = _a.dom, text = _a.text;
+    var _a = (0, prosemirror_view_1.__serializeForClipboard)(view, slice), dom = _a.dom, text = _a.text;
     event.dataTransfer.clearData();
     event.dataTransfer.setData("Text", text);
     event.dataTransfer.setData("text/plain", text);

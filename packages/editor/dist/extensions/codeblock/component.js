@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -61,40 +62,45 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { useEffect, useRef, useState } from "react";
-import { isLanguageLoaded, loadLanguage } from "./loader";
-import { refractor } from "refractor/lib/core";
-import { Flex, Text } from "rebass";
-import Languages from "./languages.json";
-import { Input } from "@rebass/forms";
-import { Icon } from "../../toolbar/components/icon";
-import { Icons } from "../../toolbar/icons";
-import { ResponsivePresenter } from "../../components/responsive";
-import { Popup } from "../../toolbar/components/popup";
-import { Button } from "../../components/button";
-export function CodeblockComponent(props) {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CodeblockComponent = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var react_1 = require("react");
+var loader_1 = require("./loader");
+var core_1 = require("refractor/lib/core");
+var rebass_1 = require("rebass");
+var languages_json_1 = __importDefault(require("./languages.json"));
+var forms_1 = require("@rebass/forms");
+var icon_1 = require("../../toolbar/components/icon");
+var icons_1 = require("../../toolbar/icons");
+var responsive_1 = require("../../components/responsive");
+var popup_1 = require("../../toolbar/components/popup");
+var button_1 = require("../../components/button");
+function CodeblockComponent(props) {
     var editor = props.editor, updateAttributes = props.updateAttributes, node = props.node, forwardRef = props.forwardRef;
     var _a = node === null || node === void 0 ? void 0 : node.attrs, language = _a.language, indentLength = _a.indentLength, indentType = _a.indentType, caretPosition = _a.caretPosition;
-    var _b = __read(useState(false), 2), isOpen = _b[0], setIsOpen = _b[1];
+    var _b = __read((0, react_1.useState)(false), 2), isOpen = _b[0], setIsOpen = _b[1];
     // const [caretPosition, setCaretPosition] = useState<CaretPosition>();
-    var toolbarRef = useRef(null);
-    var languageDefinition = Languages.find(function (l) { var _a; return l.filename === language || ((_a = l.alias) === null || _a === void 0 ? void 0 : _a.some(function (a) { return a === language; })); });
-    useEffect(function () {
+    var toolbarRef = (0, react_1.useRef)(null);
+    var languageDefinition = languages_json_1.default.find(function (l) { var _a; return l.filename === language || ((_a = l.alias) === null || _a === void 0 ? void 0 : _a.some(function (a) { return a === language; })); });
+    (0, react_1.useEffect)(function () {
         (function () {
             return __awaiter(this, void 0, void 0, function () {
                 var syntax;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (!language || !languageDefinition || isLanguageLoaded(language))
+                            if (!language || !languageDefinition || (0, loader_1.isLanguageLoaded)(language))
                                 return [2 /*return*/];
-                            return [4 /*yield*/, loadLanguage(languageDefinition.filename)];
+                            return [4 /*yield*/, (0, loader_1.loadLanguage)(languageDefinition.filename)];
                         case 1:
                             syntax = _a.sent();
                             if (!syntax)
                                 return [2 /*return*/];
-                            refractor.register(syntax);
+                            core_1.refractor.register(syntax);
                             updateAttributes({
                                 language: languageDefinition.filename,
                             });
@@ -104,11 +110,11 @@ export function CodeblockComponent(props) {
             });
         })();
     }, [language]);
-    return (_jsxs(_Fragment, { children: [_jsxs(Flex, __assign({ sx: {
+    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ sx: {
                     flexDirection: "column",
                     borderRadius: "default",
                     overflow: "hidden",
-                } }, { children: [_jsx(Text, { ref: forwardRef, as: "pre", sx: {
+                } }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Text, { ref: forwardRef, as: "pre", sx: {
                             "div, span.token, span.line-number-widget, span.line-number::before": {
                                 fontFamily: "monospace",
                                 fontSize: "code",
@@ -124,26 +130,26 @@ export function CodeblockComponent(props) {
                             px: 2,
                             pt: 2,
                             pb: 1,
-                        }, spellCheck: false }), _jsxs(Flex, __assign({ ref: toolbarRef, contentEditable: false, sx: {
+                        }, spellCheck: false }), (0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ ref: toolbarRef, contentEditable: false, sx: {
                             bg: "codeBg",
                             alignItems: "center",
                             justifyContent: "end",
                             borderTop: "1px solid var(--codeBorder)",
-                        } }, { children: [caretPosition ? (_jsxs(Text, __assign({ variant: "subBody", sx: { mr: 2, color: "codeFg" } }, { children: ["Line ", caretPosition.line, ", Column ", caretPosition.column, " ", caretPosition.selected
+                        } }, { children: [caretPosition ? ((0, jsx_runtime_1.jsxs)(rebass_1.Text, __assign({ variant: "subBody", sx: { mr: 2, color: "codeFg" } }, { children: ["Line ", caretPosition.line, ", Column ", caretPosition.column, " ", caretPosition.selected
                                         ? "(".concat(caretPosition.selected, " selected)")
-                                        : ""] }))) : null, _jsx(Button, __assign({ variant: "icon", sx: { p: 1, mr: 1, ":hover": { bg: "codeSelection" } }, title: "Toggle indentation mode", onClick: function () {
+                                        : ""] }))) : null, (0, jsx_runtime_1.jsx)(button_1.Button, __assign({ variant: "icon", sx: { p: 1, mr: 1, ":hover": { bg: "codeSelection" } }, title: "Toggle indentation mode", onClick: function () {
                                     editor.commands.changeCodeBlockIndentation({
                                         type: indentType === "space" ? "tab" : "space",
                                         amount: indentLength,
                                     });
-                                } }, { children: _jsxs(Text, __assign({ variant: "subBody", sx: { color: "codeFg" } }, { children: [indentType === "space" ? "Spaces" : "Tabs", ": ", indentLength] })) })), _jsx(Button, __assign({ variant: "icon", sx: {
+                                } }, { children: (0, jsx_runtime_1.jsxs)(rebass_1.Text, __assign({ variant: "subBody", sx: { color: "codeFg" } }, { children: [indentType === "space" ? "Spaces" : "Tabs", ": ", indentLength] })) })), (0, jsx_runtime_1.jsx)(button_1.Button, __assign({ variant: "icon", sx: {
                                     p: 1,
                                     mr: 1,
                                     bg: isOpen ? "codeSelection" : "transparent",
                                     ":hover": { bg: "codeSelection" },
                                 }, onClick: function () {
                                     setIsOpen(true);
-                                }, title: "Change language" }, { children: _jsx(Text, __assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), _jsx(ResponsivePresenter, __assign({ isOpen: isOpen, onClose: function () {
+                                }, title: "Change language" }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), (0, jsx_runtime_1.jsx)(responsive_1.ResponsivePresenter, __assign({ isOpen: isOpen, onClose: function () {
                     setIsOpen(false);
                     // NOTE: for some reason the language selection action sheet
                     // does not return focus to the last focused position after
@@ -158,21 +164,22 @@ export function CodeblockComponent(props) {
                     isTargetAbsolute: true,
                     location: "top",
                     yOffset: 5,
-                }, title: "Change code block language" }, { children: _jsx(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: function (language) {
+                }, title: "Change code block language" }, { children: (0, jsx_runtime_1.jsx)(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: function (language) {
                         updateAttributes({ language: language });
                         setIsOpen(false);
                     }, onClose: function () { return setIsOpen(false); } }) }))] }));
 }
+exports.CodeblockComponent = CodeblockComponent;
 function LanguageSelector(props) {
     var onLanguageSelected = props.onLanguageSelected, selectedLanguage = props.selectedLanguage, onClose = props.onClose;
-    var _a = __read(useState(Languages), 2), languages = _a[0], setLanguages = _a[1];
-    return (_jsx(Popup, __assign({ title: "Select language", onClose: onClose }, { children: _jsxs(Flex, __assign({ sx: {
+    var _a = __read((0, react_1.useState)(languages_json_1.default), 2), languages = _a[0], setLanguages = _a[1];
+    return ((0, jsx_runtime_1.jsx)(popup_1.Popup, __assign({ title: "Select language", onClose: onClose }, { children: (0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ sx: {
                 flexDirection: "column",
                 height: 200,
                 width: ["auto", 300],
                 overflowY: "auto",
                 bg: "background",
-            } }, { children: [_jsx(Input, { onFocus: function () {
+            } }, { children: [(0, jsx_runtime_1.jsx)(forms_1.Input, { onFocus: function () {
                         console.log("EHLLO!");
                     }, autoFocus: true, placeholder: "Search languages", sx: {
                         width: "auto",
@@ -184,22 +191,22 @@ function LanguageSelector(props) {
                         zIndex: 999,
                     }, onChange: function (e) {
                         if (!e.target.value)
-                            return setLanguages(Languages);
+                            return setLanguages(languages_json_1.default);
                         var query = e.target.value.toLowerCase();
-                        setLanguages(Languages.filter(function (lang) {
+                        setLanguages(languages_json_1.default.filter(function (lang) {
                             var _a;
                             return (lang.title.toLowerCase().indexOf(query) > -1 ||
                                 ((_a = lang.alias) === null || _a === void 0 ? void 0 : _a.some(function (alias) { return alias.toLowerCase().indexOf(query) > -1; })));
                         }));
-                    } }), _jsx(Flex, __assign({ sx: {
+                    } }), (0, jsx_runtime_1.jsx)(rebass_1.Flex, __assign({ sx: {
                         flexDirection: "column",
                         pt: 1,
                         mt: 1,
-                    } }, { children: languages.map(function (lang) { return (_jsxs(Button, __assign({ variant: "menuitem", sx: {
+                    } }, { children: languages.map(function (lang) { return ((0, jsx_runtime_1.jsxs)(button_1.Button, __assign({ variant: "menuitem", sx: {
                             textAlign: "left",
                             py: 1,
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
-                        }, onClick: function () { return onLanguageSelected(lang.filename); } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: lang.title })), selectedLanguage === lang.filename ? (_jsx(Icon, { path: Icons.check, size: "small" })) : lang.alias ? (_jsx(Text, __assign({ variant: "subBody", sx: { fontSize: "10px" } }, { children: lang.alias.slice(0, 3).join(", ") }))) : null] }), lang.title)); }) }))] })) })));
+                        }, onClick: function () { return onLanguageSelected(lang.filename); } }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ variant: "body" }, { children: lang.title })), selectedLanguage === lang.filename ? ((0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.check, size: "small" })) : lang.alias ? ((0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ variant: "subBody", sx: { fontSize: "10px" } }, { children: lang.alias.slice(0, 3).join(", ") }))) : null] }), lang.title)); }) }))] })) })));
 }

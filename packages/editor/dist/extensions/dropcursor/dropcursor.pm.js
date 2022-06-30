@@ -1,5 +1,8 @@
-import { Plugin } from "prosemirror-state";
-import { dropPoint } from "prosemirror-transform";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.dropCursor = void 0;
+var prosemirror_state_1 = require("prosemirror-state");
+var prosemirror_transform_1 = require("prosemirror-transform");
 // :: (options: ?Object) → Plugin
 // Create a plugin that, when added to a ProseMirror instance,
 // causes a decoration to show up at the drop position when something
@@ -20,14 +23,15 @@ import { dropPoint } from "prosemirror-transform";
 //
 //     class:: ?string
 //     A CSS class name to add to the cursor element.
-export function dropCursor(options) {
+function dropCursor(options) {
     if (options === void 0) { options = {}; }
-    return new Plugin({
+    return new prosemirror_state_1.Plugin({
         view: function (editorView) {
             return new DropCursorView(editorView, options);
         },
     });
 }
+exports.dropCursor = dropCursor;
 var DropCursorView = /** @class */ (function () {
     function DropCursorView(editorView, options) {
         var _this = this;
@@ -153,7 +157,7 @@ var DropCursorView = /** @class */ (function () {
         if (pos && !disabled) {
             var target = pos.pos;
             if (this.editorView.dragging && this.editorView.dragging.slice) {
-                var point = dropPoint(this.editorView.state.doc, target, this.editorView.dragging.slice);
+                var point = (0, prosemirror_transform_1.dropPoint)(this.editorView.state.doc, target, this.editorView.dragging.slice);
                 if (!point)
                     return this.setCursor(null);
                 target = point;

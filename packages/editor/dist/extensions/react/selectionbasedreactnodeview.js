@@ -1,3 +1,4 @@
+"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -24,12 +25,14 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { jsx as _jsx } from "react/jsx-runtime";
-import { DecorationSet } from "prosemirror-view";
-import { NodeSelection } from "prosemirror-state";
-import { stateKey as SelectionChangePluginKey, } from "./plugin";
-import { ReactNodeView } from "./react-node-view";
-import { ThemeProvider } from "emotion-theming";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createSelectionBasedNodeView = exports.SelectionBasedNodeView = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var prosemirror_view_1 = require("prosemirror-view");
+var prosemirror_state_1 = require("prosemirror-state");
+var plugin_1 = require("./plugin");
+var reactnodeview_1 = require("./reactnodeview");
+var emotion_theming_1 = require("emotion-theming");
 /**
  * A ReactNodeView that handles React components sensitive
  * to selection changes.
@@ -75,7 +78,7 @@ var SelectionBasedNodeView = /** @class */ (function (_super) {
             return pos < from && to < posEnd;
         };
         _this.isSelectedNode = function (selection) {
-            if (selection instanceof NodeSelection) {
+            if (selection instanceof prosemirror_state_1.NodeSelection) {
                 var _a = _this.editor.view.state.selection, from = _a.from, to = _a.to;
                 return (selection.node === _this.node ||
                     // If nodes are not the same object, we check if they are referring to the same document node
@@ -96,11 +99,11 @@ var SelectionBasedNodeView = /** @class */ (function (_super) {
             return (_this.isSelectedNode(selection) || _this.isNodeInsideSelection(from, to));
         };
         _this.onSelectionChange = function () {
-            _this.update(_this.node, [], DecorationSet.empty);
+            _this.update(_this.node, [], prosemirror_view_1.DecorationSet.empty);
         };
         _this.updatePos();
         _this.oldSelection = editor.view.state.selection;
-        _this.selectionChangeState = SelectionChangePluginKey.getState(_this.editor.view.state);
+        _this.selectionChangeState = plugin_1.stateKey.getState(_this.editor.view.state);
         _this.selectionChangeState.subscribe(_this.onSelectionChange);
         return _this;
     }
@@ -112,7 +115,7 @@ var SelectionBasedNodeView = /** @class */ (function (_super) {
         var theme = this.editor.storage.theme;
         var isSelected = this.editor.isEditable &&
             (this.insideSelection() || this.nodeInsideSelection());
-        return (_jsx(ThemeProvider, __assign({ theme: theme }, { children: _jsx(this.options.component, __assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: function (attr) { return _this.updateAttributes(attr, _this.pos); } })) })));
+        return ((0, jsx_runtime_1.jsx)(emotion_theming_1.ThemeProvider, __assign({ theme: theme }, { children: (0, jsx_runtime_1.jsx)(this.options.component, __assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: function (attr) { return _this.updateAttributes(attr, _this.pos); } })) })));
     };
     /**
      * Update current node's start and end positions.
@@ -146,8 +149,8 @@ var SelectionBasedNodeView = /** @class */ (function (_super) {
         var from = selection.from, to = selection.to;
         var oldFrom = oldSelection.from, oldTo = oldSelection.to;
         if (this.node.type.spec.selectable) {
-            var newNodeSelection = selection instanceof NodeSelection && selection.from === this.pos;
-            var oldNodeSelection = oldSelection instanceof NodeSelection && oldSelection.from === this.pos;
+            var newNodeSelection = selection instanceof prosemirror_state_1.NodeSelection && selection.from === this.pos;
+            var oldNodeSelection = oldSelection instanceof prosemirror_state_1.NodeSelection && oldSelection.from === this.pos;
             if ((newNodeSelection && !oldNodeSelection) ||
                 (oldNodeSelection && !newNodeSelection)) {
                 return true;
@@ -169,12 +172,13 @@ var SelectionBasedNodeView = /** @class */ (function (_super) {
         _super.prototype.destroy.call(this);
     };
     return SelectionBasedNodeView;
-}(ReactNodeView));
-export { SelectionBasedNodeView };
-export function createSelectionBasedNodeView(component, options) {
+}(reactnodeview_1.ReactNodeView));
+exports.SelectionBasedNodeView = SelectionBasedNodeView;
+function createSelectionBasedNodeView(component, options) {
     return function (_a) {
         var node = _a.node, getPos = _a.getPos, editor = _a.editor;
         var _getPos = function () { return (typeof getPos === "boolean" ? -1 : getPos()); };
         return new SelectionBasedNodeView(node, editor, _getPos, __assign(__assign({}, options), { component: component })).init();
     };
 }
+exports.createSelectionBasedNodeView = createSelectionBasedNodeView;

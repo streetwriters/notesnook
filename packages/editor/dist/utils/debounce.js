@@ -1,3 +1,4 @@
+"use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -23,7 +24,9 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-export function debounce(func, waitFor) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.debounce = void 0;
+function debounce(func, waitFor) {
     var timeout;
     var debounced = function () {
         var args = [];
@@ -36,3 +39,4 @@ export function debounce(func, waitFor) {
     };
     return debounced;
 }
+exports.debounce = debounce;

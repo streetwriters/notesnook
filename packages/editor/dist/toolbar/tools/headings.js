@@ -1,3 +1,4 @@
+"use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -23,20 +24,23 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-import { jsx as _jsx } from "react/jsx-runtime";
-import { Dropdown } from "../components/dropdown";
-import { useToolbarLocation } from "../stores/toolbar-store";
-import { useMemo } from "react";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Headings = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var dropdown_1 = require("../components/dropdown");
+var toolbarstore_1 = require("../stores/toolbarstore");
+var react_1 = require("react");
 var defaultLevels = [1, 2, 3, 4, 5, 6];
-export function Headings(props) {
+function Headings(props) {
     var editor = props.editor;
-    var toolbarLocation = useToolbarLocation();
+    var toolbarLocation = (0, toolbarstore_1.useToolbarLocation)();
     var currentHeadingLevel = defaultLevels.find(function (level) {
         return editor.isActive("heading", { level: level });
     });
-    var items = useMemo(function () { return toMenuItems(editor, toolbarLocation, currentHeadingLevel); }, [currentHeadingLevel]);
-    return (_jsx(Dropdown, { selectedItem: currentHeadingLevel ? "Heading ".concat(currentHeadingLevel) : "Paragraph", items: items, menuWidth: 130 }));
+    var items = (0, react_1.useMemo)(function () { return toMenuItems(editor, toolbarLocation, currentHeadingLevel); }, [currentHeadingLevel]);
+    return ((0, jsx_runtime_1.jsx)(dropdown_1.Dropdown, { selectedItem: currentHeadingLevel ? "Heading ".concat(currentHeadingLevel) : "Paragraph", items: items, menuWidth: 130 }));
 }
+exports.Headings = Headings;
 function toMenuItems(editor, toolbarLocation, currentHeadingLevel) {
     var menuItems = defaultLevels.map(function (level) { return ({
         type: "button",

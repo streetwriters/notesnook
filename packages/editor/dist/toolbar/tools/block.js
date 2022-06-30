@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -25,24 +26,26 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
-import { Icons } from "../icons";
-import { useMemo, useRef, useState } from "react";
-import { Icon } from "../components/icon";
-import { EmbedPopup } from "../popups/embed-popup";
-import { TablePopup } from "../popups/table-popup";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import { ResponsivePresenter } from "../../components/responsive";
-import { showPopup } from "../../components/popup-presenter";
-import { ImageUploadPopup } from "../popups/image-upload";
-import { Button } from "../../components/button";
-export function InsertBlock(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InsertBlock = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var icons_1 = require("../icons");
+var react_1 = require("react");
+var icon_1 = require("../components/icon");
+var embedpopup_1 = require("../popups/embedpopup");
+var tablepopup_1 = require("../popups/tablepopup");
+var toolbarstore_1 = require("../stores/toolbarstore");
+var responsive_1 = require("../../components/responsive");
+var popuppresenter_1 = require("../../components/popuppresenter");
+var imageupload_1 = require("../popups/imageupload");
+var button_1 = require("../../components/button");
+function InsertBlock(props) {
     var editor = props.editor;
-    var buttonRef = useRef(null);
-    var _a = __read(useState(false), 2), isOpen = _a[0], setIsOpen = _a[1];
-    var toolbarLocation = useToolbarLocation();
-    var isMobile = useIsMobile();
-    var menuItems = useMemo(function () {
+    var buttonRef = (0, react_1.useRef)(null);
+    var _a = __read((0, react_1.useState)(false), 2), isOpen = _a[0], setIsOpen = _a[1];
+    var toolbarLocation = (0, toolbarstore_1.useToolbarLocation)();
+    var isMobile = (0, toolbarstore_1.useIsMobile)();
+    var menuItems = (0, react_1.useMemo)(function () {
         return [
             tasklist(editor),
             outlinelist(editor),
@@ -56,7 +59,7 @@ export function InsertBlock(props) {
             table(editor),
         ];
     }, [isMobile]);
-    return (_jsxs(_Fragment, { children: [_jsx(Button, __assign({ ref: buttonRef, sx: {
+    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(button_1.Button, __assign({ ref: buttonRef, sx: {
                     p: 1,
                     m: 0,
                     bg: isOpen ? "hover" : "transparent",
@@ -67,13 +70,14 @@ export function InsertBlock(props) {
                     ":last-of-type": {
                         mr: 0,
                     },
-                }, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.plus, size: 18, color: "primary" }) })), _jsx(ResponsivePresenter, { desktop: "menu", mobile: "sheet", title: "Choose a block to insert", isOpen: isOpen, items: menuItems, onClose: function () { return setIsOpen(false); }, position: {
+                }, onMouseDown: function (e) { return e.preventDefault(); }, onClick: function () { return setIsOpen(function (s) { return !s; }); } }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.plus, size: 18, color: "primary" }) })), (0, jsx_runtime_1.jsx)(responsive_1.ResponsivePresenter, { desktop: "menu", mobile: "sheet", title: "Choose a block to insert", isOpen: isOpen, items: menuItems, onClose: function () { return setIsOpen(false); }, position: {
                     target: buttonRef.current || undefined,
                     isTargetAbsolute: true,
                     location: toolbarLocation === "bottom" ? "top" : "below",
                     yOffset: 5,
                 } })] }));
 }
+exports.InsertBlock = InsertBlock;
 var horizontalRule = function (editor) { return ({
     key: "hr",
     type: "button",
@@ -144,7 +148,7 @@ var table = function (editor) { return ({
             {
                 key: "table-size-selector",
                 type: "popup",
-                component: function (props) { return (_jsx(TablePopup, { onInsertTable: function (size) {
+                component: function (props) { return ((0, jsx_runtime_1.jsx)(tablepopup_1.TablePopup, { onInsertTable: function (size) {
                         var _a, _b;
                         (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertTable({
                             rows: size.rows,
@@ -169,7 +173,7 @@ var embedMobile = function (editor) { return ({
                 type: "popup",
                 component: function (_a) {
                     var onClick = _a.onClick;
-                    return (_jsx(EmbedPopup, { title: "Insert embed", onClose: function (embed) {
+                    return ((0, jsx_runtime_1.jsx)(embedpopup_1.EmbedPopup, { title: "Insert embed", onClose: function (embed) {
                             var _a;
                             if (!embed)
                                 return onClick === null || onClick === void 0 ? void 0 : onClick();
@@ -189,9 +193,9 @@ var embedDesktop = function (editor) { return ({
     onClick: function () {
         if (!editor)
             return;
-        showPopup({
+        (0, popuppresenter_1.showPopup)({
             theme: editor.storage.theme,
-            popup: function (hide) { return (_jsx(EmbedPopup, { title: "Insert embed", onClose: function (embed) {
+            popup: function (hide) { return ((0, jsx_runtime_1.jsx)(embedpopup_1.EmbedPopup, { title: "Insert embed", onClose: function (embed) {
                     var _a;
                     if (!embed)
                         return hide();
@@ -238,7 +242,7 @@ var uploadImageFromURLMobile = function (editor) { return ({
                 type: "popup",
                 component: function (_a) {
                     var onClick = _a.onClick;
-                    return (_jsx(ImageUploadPopup, { onInsert: function (image) {
+                    return ((0, jsx_runtime_1.jsx)(imageupload_1.ImageUploadPopup, { onInsert: function (image) {
                             var _a;
                             (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertImage(image).run();
                             onClick === null || onClick === void 0 ? void 0 : onClick();
@@ -258,9 +262,9 @@ var uploadImageFromURL = function (editor) { return ({
     onClick: function () {
         if (!editor)
             return;
-        showPopup({
+        (0, popuppresenter_1.showPopup)({
             theme: editor.storage.theme,
-            popup: function (hide) { return (_jsx(ImageUploadPopup, { onInsert: function (image) {
+            popup: function (hide) { return ((0, jsx_runtime_1.jsx)(imageupload_1.ImageUploadPopup, { onInsert: function (image) {
                     var _a;
                     (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertImage(image).run();
                     hide();

@@ -1,7 +1,10 @@
-import { selectedRect } from "prosemirror-tables";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.moveRowUp = exports.moveRowDown = exports.moveColumnRight = exports.moveColumnLeft = void 0;
+var prosemirror_tables_1 = require("prosemirror-tables");
 function moveColumnRight(editor) {
     var tr = editor.state.tr;
-    var rect = selectedRect(editor.state);
+    var rect = (0, prosemirror_tables_1.selectedRect)(editor.state);
     if (rect.right === rect.map.width)
         return;
     var transaction = moveColumn(tr, rect, rect.left, rect.left + 1);
@@ -9,9 +12,10 @@ function moveColumnRight(editor) {
         return;
     editor.view.dispatch(transaction);
 }
+exports.moveColumnRight = moveColumnRight;
 function moveColumnLeft(editor) {
     var tr = editor.state.tr;
-    var rect = selectedRect(editor.state);
+    var rect = (0, prosemirror_tables_1.selectedRect)(editor.state);
     if (rect.left === 0)
         return;
     var transaction = moveColumn(tr, rect, rect.left, rect.left - 1);
@@ -19,9 +23,10 @@ function moveColumnLeft(editor) {
         return;
     editor.view.dispatch(transaction);
 }
+exports.moveColumnLeft = moveColumnLeft;
 function moveRowDown(editor) {
     var tr = editor.state.tr;
-    var rect = selectedRect(editor.state);
+    var rect = (0, prosemirror_tables_1.selectedRect)(editor.state);
     if (rect.top + 1 === rect.map.height)
         return;
     var transaction = moveRow(tr, rect, rect.top, rect.top + 1);
@@ -29,9 +34,10 @@ function moveRowDown(editor) {
         return;
     editor.view.dispatch(transaction);
 }
+exports.moveRowDown = moveRowDown;
 function moveRowUp(editor) {
     var tr = editor.state.tr;
-    var rect = selectedRect(editor.state);
+    var rect = (0, prosemirror_tables_1.selectedRect)(editor.state);
     if (rect.top === 0)
         return;
     var transaction = moveRow(tr, rect, rect.top, rect.top - 1);
@@ -39,6 +45,7 @@ function moveRowUp(editor) {
         return;
     editor.view.dispatch(transaction);
 }
+exports.moveRowUp = moveRowUp;
 function moveColumn(tr, rect, from, to) {
     var fromCells = getColumnCells(rect, from);
     var toCells = getColumnCells(rect, to);
@@ -104,4 +111,3 @@ function moveCells(tr, rect, fromCells, toCells) {
     }
     return tr;
 }
-export { moveColumnLeft, moveColumnRight, moveRowDown, moveRowUp };

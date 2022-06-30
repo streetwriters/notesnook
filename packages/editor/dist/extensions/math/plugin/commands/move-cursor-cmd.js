@@ -1,4 +1,7 @@
-import { TextSelection } from "prosemirror-state";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.nudgeCursorBackCmd = exports.nudgeCursorForwardCmd = exports.nudgeCursorCmd = void 0;
+var prosemirror_state_1 = require("prosemirror-state");
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Some browsers (cough firefox cough) don't properly handle cursor movement on
@@ -6,7 +9,7 @@ import { TextSelection } from "prosemirror-state";
  *
  * @see https://bugzilla.mozilla.org/show_bug.cgi?id=1252108
  */
-export function nudgeCursorCmd(dir) {
+function nudgeCursorCmd(dir) {
     return function (innerState, dispatch) {
         var _a = innerState.selection, to = _a.to, from = _a.from;
         // compute target position
@@ -16,10 +19,11 @@ export function nudgeCursorCmd(dir) {
         var nodeSize = innerState.doc.nodeSize;
         var targetPos = Math.max(0, Math.min(nodeSize, currentPos + increment));
         if (dispatch) {
-            dispatch(innerState.tr.setSelection(TextSelection.create(innerState.doc, targetPos)));
+            dispatch(innerState.tr.setSelection(prosemirror_state_1.TextSelection.create(innerState.doc, targetPos)));
         }
         return true;
     };
 }
-export var nudgeCursorForwardCmd = nudgeCursorCmd(+1);
-export var nudgeCursorBackCmd = nudgeCursorCmd(-1);
+exports.nudgeCursorCmd = nudgeCursorCmd;
+exports.nudgeCursorForwardCmd = nudgeCursorCmd(+1);
+exports.nudgeCursorBackCmd = nudgeCursorCmd(-1);

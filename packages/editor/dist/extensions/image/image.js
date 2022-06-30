@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -36,12 +37,14 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { Node, nodeInputRule, mergeAttributes, findChildren, } from "@tiptap/core";
-import { getDataAttribute } from "../attachment";
-import { createSelectionBasedNodeView, } from "../react";
-import { ImageComponent } from "./component";
-export var inputRegex = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
-export var ImageNode = Node.create({
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ImageNode = exports.inputRegex = void 0;
+var core_1 = require("@tiptap/core");
+var attachment_1 = require("../attachment");
+var react_1 = require("../react");
+var component_1 = require("./component");
+exports.inputRegex = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
+exports.ImageNode = core_1.Node.create({
     name: "image",
     addOptions: function () {
         return {
@@ -70,12 +73,12 @@ export var ImageNode = Node.create({
             },
             width: { default: null },
             height: { default: null },
-            float: getDataAttribute("float", false),
-            align: getDataAttribute("align", "left"),
-            hash: getDataAttribute("hash"),
-            filename: getDataAttribute("filename"),
-            type: getDataAttribute("mime"),
-            size: getDataAttribute("size"),
+            float: (0, attachment_1.getDataAttribute)("float", false),
+            align: (0, attachment_1.getDataAttribute)("align", "left"),
+            hash: (0, attachment_1.getDataAttribute)("hash"),
+            filename: (0, attachment_1.getDataAttribute)("filename"),
+            type: (0, attachment_1.getDataAttribute)("mime"),
+            size: (0, attachment_1.getDataAttribute)("size"),
         };
     },
     parseHTML: function () {
@@ -89,11 +92,11 @@ export var ImageNode = Node.create({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "img",
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+            (0, core_1.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes),
         ];
     },
     addNodeView: function () {
-        return createSelectionBasedNodeView(ImageComponent);
+        return (0, react_1.createSelectionBasedNodeView)(component_1.ImageComponent);
     },
     addCommands: function () {
         var _this = this;
@@ -130,7 +133,7 @@ export var ImageNode = Node.create({
                             : null;
                     if (!query)
                         return false;
-                    var images = findChildren(state.doc, function (node) {
+                    var images = (0, core_1.findChildren)(state.doc, function (node) {
                         return node.type.name === _this.name &&
                             node.attrs[query.key] === query.value;
                     });
@@ -158,8 +161,8 @@ export var ImageNode = Node.create({
     },
     addInputRules: function () {
         return [
-            nodeInputRule({
-                find: inputRegex,
+            (0, core_1.nodeInputRule)({
+                find: exports.inputRegex,
                 type: this.type,
                 getAttributes: function (match) {
                     var _a = __read(match, 5), alt = _a[2], src = _a[3], title = _a[4];

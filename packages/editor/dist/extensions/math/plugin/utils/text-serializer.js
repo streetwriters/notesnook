@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,6 +10,8 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.mathSerializer = void 0;
 var ProseMirrorTextSerializer = /** @class */ (function () {
     function ProseMirrorTextSerializer(fns, base) {
         // use base serializer as a fallback
@@ -63,7 +66,7 @@ var ProseMirrorTextSerializer = /** @class */ (function () {
     };
     return ProseMirrorTextSerializer;
 }());
-export var mathSerializer = new ProseMirrorTextSerializer({
+exports.mathSerializer = new ProseMirrorTextSerializer({
     nodes: {
         math_inline: function (node) { return "$".concat(node.textContent, "$"); },
         math_display: function (node) { return "\n\n$$\n".concat(node.textContent, "\n$$"); },

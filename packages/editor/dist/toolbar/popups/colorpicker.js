@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -25,17 +26,22 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { Box, Flex, Text } from "rebass";
-import { Input } from "@rebass/forms";
-import { Icon } from "../components/icon";
-import { Icons } from "../icons";
-import { useCallback, useEffect, useRef, useState } from "react";
-import tinycolor from "tinycolor2";
-import { HexColorPicker } from "react-colorful";
-import { Button } from "../../components/button";
-import { debounce } from "../../utils/debounce";
-export var DEFAULT_COLORS = [
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ColorPicker = exports.DEFAULT_COLORS = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var rebass_1 = require("rebass");
+var forms_1 = require("@rebass/forms");
+var icon_1 = require("../components/icon");
+var icons_1 = require("../icons");
+var react_1 = require("react");
+var tinycolor2_1 = __importDefault(require("tinycolor2"));
+var react_colorful_1 = require("react-colorful");
+var button_1 = require("../../components/button");
+var debounce_1 = require("../../utils/debounce");
+exports.DEFAULT_COLORS = [
     "#e91e63",
     "#9c27b0",
     "#673ab7",
@@ -52,22 +58,22 @@ export var DEFAULT_COLORS = [
     "#f44336",
 ];
 var PALETTE_SIZE = [35, 35, 25];
-export function ColorPicker(props) {
-    var _a = props.colors, colors = _a === void 0 ? DEFAULT_COLORS : _a, color = props.color, onClear = props.onClear, onChange = props.onChange, title = props.title, onClose = props.onClose, expanded = props.expanded;
-    var ref = useRef();
-    var _b = __read(useState(expanded || false), 2), isPickerOpen = _b[0], setIsPickerOpen = _b[1];
-    var _c = __read(useState(tinycolor(color || colors[0]).toHexString()), 2), currentColor = _c[0], setCurrentColor = _c[1];
-    var tColor = tinycolor(currentColor);
-    useEffect(function () {
+function ColorPicker(props) {
+    var _a = props.colors, colors = _a === void 0 ? exports.DEFAULT_COLORS : _a, color = props.color, onClear = props.onClear, onChange = props.onChange, title = props.title, onClose = props.onClose, expanded = props.expanded;
+    var ref = (0, react_1.useRef)();
+    var _b = __read((0, react_1.useState)(expanded || false), 2), isPickerOpen = _b[0], setIsPickerOpen = _b[1];
+    var _c = __read((0, react_1.useState)((0, tinycolor2_1.default)(color || colors[0]).toHexString()), 2), currentColor = _c[0], setCurrentColor = _c[1];
+    var tColor = (0, tinycolor2_1.default)(currentColor);
+    (0, react_1.useEffect)(function () {
         if (!ref.current)
             return;
         if (isPickerOpen)
             ref.current.focus({ preventScroll: true });
     }, [isPickerOpen]);
-    var onColorChange = useCallback(debounce(function (color) {
+    var onColorChange = (0, react_1.useCallback)((0, debounce_1.debounce)(function (color) {
         onChange(color);
     }, 500), [onChange]);
-    return (_jsxs(Flex, __assign({ ref: ref, tabIndex: -1, sx: {
+    return ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ ref: ref, tabIndex: -1, sx: {
             bg: "background",
             flexDirection: "column",
             ".react-colorful": {
@@ -79,17 +85,17 @@ export function ColorPicker(props) {
             },
             width: ["calc(100vw - 20px)", 250],
             //  width: ["auto", 250],
-        } }, { children: [onClose && (_jsxs(Box, __assign({ sx: {
+        } }, { children: [onClose && ((0, jsx_runtime_1.jsxs)(rebass_1.Box, __assign({ sx: {
                     display: ["none", "flex"],
                     justifyContent: "space-between",
                     p: 2,
                     pb: isPickerOpen ? 2 : 0,
                     //pb: 0,
                     alignItems: "center",
-                }, onClick: onClose }, { children: [_jsx(Text, __assign({ variant: "title" }, { children: title })), _jsx(Button, __assign({ variant: "icon", sx: { p: 0 } }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) }))] }))), isPickerOpen ? (_jsxs(_Fragment, { children: [_jsx(HexColorPicker, { onChange: function (color) {
+                }, onClick: onClose }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ variant: "title" }, { children: title })), (0, jsx_runtime_1.jsx)(button_1.Button, __assign({ variant: "icon", sx: { p: 0 } }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.close, size: "big" }) }))] }))), isPickerOpen ? ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(react_colorful_1.HexColorPicker, { onChange: function (color) {
                             setCurrentColor(color);
                             onColorChange(color);
-                        }, onTouchEnd: function () { return onChange(currentColor); }, onMouseUp: function () { return onChange(currentColor); } }), _jsx(Input, { variant: "clean", placeholder: "#000000", spellCheck: false, sx: {
+                        }, onTouchEnd: function () { return onChange(currentColor); }, onMouseUp: function () { return onChange(currentColor); } }), (0, jsx_runtime_1.jsx)(forms_1.Input, { variant: "clean", placeholder: "#000000", spellCheck: false, sx: {
                             my: 2,
                             p: 0,
                             borderRadius: 0,
@@ -101,16 +107,16 @@ export function ColorPicker(props) {
                             var value = e.target.value;
                             if (!value)
                                 return;
-                            if (tinycolor(value, { format: "hex" }).isValid()) {
+                            if ((0, tinycolor2_1.default)(value, { format: "hex" }).isValid()) {
                                 setCurrentColor(value);
                                 onChange(value);
                             }
-                        } })] })) : null, _jsxs(Flex, { children: [_jsxs(Flex, __assign({ className: "hide-scrollbar", sx: {
+                        } })] })) : null, (0, jsx_runtime_1.jsxs)(rebass_1.Flex, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ className: "hide-scrollbar", sx: {
                             flex: 1,
                             p: 1,
                             overflowX: ["auto", "hidden"],
                             flexWrap: ["nowrap", "wrap"],
-                        } }, { children: [_jsx(Button, __assign({ variant: "icon", sx: {
+                        } }, { children: [(0, jsx_runtime_1.jsx)(button_1.Button, __assign({ variant: "icon", sx: {
                                     flexShrink: 0,
                                     width: PALETTE_SIZE,
                                     height: PALETTE_SIZE,
@@ -118,7 +124,7 @@ export function ColorPicker(props) {
                                     boxShadow: "menu",
                                     p: 0,
                                     ml: [2, 2, 1],
-                                }, onClick: onClear }, { children: _jsx(Icon, { path: Icons.colorClear, color: "text", size: 15 }) })), _jsx(Button, __assign({ variant: "secondary", sx: {
+                                }, onClick: onClear }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.colorClear, color: "text", size: 15 }) })), (0, jsx_runtime_1.jsx)(button_1.Button, __assign({ variant: "secondary", sx: {
                                     flexShrink: 0,
                                     bg: currentColor,
                                     width: PALETTE_SIZE,
@@ -127,7 +133,7 @@ export function ColorPicker(props) {
                                     // boxShadow: "menu",
                                     p: 0,
                                     ml: [2, 2, 1],
-                                }, onClick: function () { return setIsPickerOpen(function (s) { return !s; }); } }, { children: _jsx(Icon, { path: Icons.palette, color: tColor.isDark() ? "static" : "icon", size: 18 }) })), colors.map(function (color) { return (_jsx(Button, { variant: "secondary", sx: {
+                                }, onClick: function () { return setIsPickerOpen(function (s) { return !s; }); } }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.palette, color: tColor.isDark() ? "static" : "icon", size: 18 }) })), colors.map(function (color) { return ((0, jsx_runtime_1.jsx)(button_1.Button, { variant: "secondary", sx: {
                                     flex: "0 0 auto",
                                     bg: color,
                                     width: PALETTE_SIZE,
@@ -139,5 +145,6 @@ export function ColorPicker(props) {
                                 }, onClick: function () {
                                     setCurrentColor(color);
                                     onChange(color);
-                                } }, color)); })] })), onClose && (_jsx(Button, __assign({ variant: "icon", sx: { display: ["block", "none"], px: 2 }, onClick: onClose }, { children: _jsx(Icon, { path: Icons.close, size: "big" }) })))] })] })));
+                                } }, color)); })] })), onClose && ((0, jsx_runtime_1.jsx)(button_1.Button, __assign({ variant: "icon", sx: { display: ["block", "none"], px: 2 }, onClick: onClose }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.close, size: "big" }) })))] })] })));
 }
+exports.ColorPicker = ColorPicker;

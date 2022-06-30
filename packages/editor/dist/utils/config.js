@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.config = void 0;
 function set(key, value) {
     if (!value)
         return window.localStorage.removeItem(key);
@@ -9,7 +12,7 @@ function get(key, def) {
         return def;
     return tryParse(value);
 }
-export var config = { set: set, get: get };
+exports.config = { set: set, get: get };
 function tryParse(val) {
     if (val === "undefined" || val === "null")
         return;

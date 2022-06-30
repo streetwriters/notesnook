@@ -1,16 +1,19 @@
-import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
-import { Text } from "rebass";
-import { useMemo } from "react";
-import { OutlineListItem } from "../outline-list-item";
-export function OutlineListComponent(props) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OutlineListComponent = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var rebass_1 = require("rebass");
+var react_1 = require("react");
+var outlinelistitem_1 = require("../outlinelistitem");
+function OutlineListComponent(props) {
     var editor = props.editor, getPos = props.getPos, node = props.node, updateAttributes = props.updateAttributes, forwardRef = props.forwardRef;
     var collapsed = node.attrs.collapsed;
-    var isNested = useMemo(function () {
+    var isNested = (0, react_1.useMemo)(function () {
         var _a;
         var pos = editor.state.doc.resolve(getPos());
-        return ((_a = pos.parent) === null || _a === void 0 ? void 0 : _a.type.name) === OutlineListItem.name;
+        return ((_a = pos.parent) === null || _a === void 0 ? void 0 : _a.type.name) === outlinelistitem_1.OutlineListItem.name;
     }, []);
-    return (_jsx(_Fragment, { children: _jsx(Text, { className: "outline-list", as: "div", ref: forwardRef, sx: {
+    return ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: (0, jsx_runtime_1.jsx)(rebass_1.Text, { className: "outline-list", as: "div", ref: forwardRef, sx: {
                 ul: {
                     display: collapsed ? "none" : "block",
                     paddingInlineStart: 0,
@@ -20,3 +23,4 @@ export function OutlineListComponent(props) {
                 },
             } }) }));
 }
+exports.OutlineListComponent = OutlineListComponent;

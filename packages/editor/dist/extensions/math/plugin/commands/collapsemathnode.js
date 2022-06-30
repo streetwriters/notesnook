@@ -1,4 +1,7 @@
-import { TextSelection } from "prosemirror-state";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.collapseMathNode = void 0;
+var prosemirror_state_1 = require("prosemirror-state");
 /**
  * A ProseMirror command for determining whether to exit a math block, based on
  * specific conditions.  Normally called when the user has
@@ -12,7 +15,7 @@ import { TextSelection } from "prosemirror-state";
  *    (inner) selection is empty.
  * @returns A new ProseMirror command based on the input configuration.
  */
-export function collapseMathNode(outerView, dir, requireOnBorder, requireEmptySelection) {
+function collapseMathNode(outerView, dir, requireOnBorder, requireEmptySelection) {
     if (requireEmptySelection === void 0) { requireEmptySelection = true; }
     // create a new ProseMirror command based on the input conditions
     return function (innerState, dispatch) {
@@ -42,10 +45,11 @@ export function collapseMathNode(outerView, dir, requireOnBorder, requireEmptySe
         if (dispatch) {
             // set outer selection to be outside of the nodeview
             var targetPos = dir > 0 ? outerTo : outerFrom;
-            outerView.dispatch(outerState.tr.setSelection(TextSelection.create(outerState.doc, targetPos)));
+            outerView.dispatch(outerState.tr.setSelection(prosemirror_state_1.TextSelection.create(outerState.doc, targetPos)));
             // must return focus to the outer view, otherwise no cursor will appear
             outerView.focus();
         }
         return true;
     };
 }
+exports.collapseMathNode = collapseMathNode;

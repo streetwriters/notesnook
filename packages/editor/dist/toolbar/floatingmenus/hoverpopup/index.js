@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,17 +10,19 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { jsx as _jsx } from "react/jsx-runtime";
-import { useEffect, useRef } from "react";
-import { showPopup } from "../../../components/popup-presenter";
-import { LinkHoverPopupHandler } from "./link";
-var handlers = __assign({}, LinkHoverPopupHandler);
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HoverPopupHandler = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var react_1 = require("react");
+var popuppresenter_1 = require("../../../components/popuppresenter");
+var link_1 = require("./link");
+var handlers = __assign({}, link_1.LinkHoverPopupHandler);
 var HOVER_TIMEOUT = 500;
-export function HoverPopupHandler(props) {
+function HoverPopupHandler(props) {
     var editor = props.editor;
-    var hoverTimeoutId = useRef();
-    var activePopup = useRef();
-    useEffect(function () {
+    var hoverTimeoutId = (0, react_1.useRef)();
+    var activePopup = (0, react_1.useRef)();
+    (0, react_1.useEffect)(function () {
         function onMouseOver(e) {
             if (!e.target ||
                 !(e.target instanceof HTMLElement) ||
@@ -49,8 +52,8 @@ export function HoverPopupHandler(props) {
                 var node = editor.current.view.state.doc.nodeAt(pos);
                 if (!node)
                     return;
-                var hidePopup = showPopup({
-                    popup: function () { return (_jsx(PopupHandler, { editor: editor, selectedNode: {
+                var hidePopup = (0, popuppresenter_1.showPopup)({
+                    popup: function () { return ((0, jsx_runtime_1.jsx)(PopupHandler, { editor: editor, selectedNode: {
                             node: node,
                             from: pos,
                             to: pos + node.nodeSize,
@@ -75,3 +78,4 @@ export function HoverPopupHandler(props) {
     }, []);
     return null;
 }
+exports.HoverPopupHandler = HoverPopupHandler;

@@ -1,6 +1,9 @@
-import { Extension } from "@tiptap/core";
-import "@tiptap/extension-text-style";
-export var FontSize = Extension.create({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FontSize = void 0;
+var core_1 = require("@tiptap/core");
+require("@tiptap/extension-text-style");
+exports.FontSize = core_1.Extension.create({
     name: "fontSize",
     defaultOptions: {
         types: ["textStyle"],

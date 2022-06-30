@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -20,21 +21,27 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { jsx as _jsx } from "react/jsx-runtime";
-import { ToolButton } from "../components/tool-button";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AlignJustify = exports.AlignRight = exports.AlignLeft = exports.AlignCenter = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var toolbutton_1 = require("../components/toolbutton");
 function AlignmentTool(props) {
     var editor = props.editor, alignment = props.alignment, toolProps = __rest(props, ["editor", "alignment"]);
-    return (_jsx(ToolButton, __assign({}, toolProps, { onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextAlign(alignment).run(); }, toggled: editor.isActive({ textAlign: alignment }) })));
+    return ((0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, __assign({}, toolProps, { onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextAlign(alignment).run(); }, toggled: editor.isActive({ textAlign: alignment }) })));
 }
-export function AlignCenter(props) {
-    return _jsx(AlignmentTool, __assign({ alignment: "center" }, props));
+function AlignCenter(props) {
+    return (0, jsx_runtime_1.jsx)(AlignmentTool, __assign({ alignment: "center" }, props));
 }
-export function AlignLeft(props) {
-    return _jsx(AlignmentTool, __assign({ alignment: "left" }, props));
+exports.AlignCenter = AlignCenter;
+function AlignLeft(props) {
+    return (0, jsx_runtime_1.jsx)(AlignmentTool, __assign({ alignment: "left" }, props));
 }
-export function AlignRight(props) {
-    return _jsx(AlignmentTool, __assign({ alignment: "right" }, props));
+exports.AlignLeft = AlignLeft;
+function AlignRight(props) {
+    return (0, jsx_runtime_1.jsx)(AlignmentTool, __assign({ alignment: "right" }, props));
 }
-export function AlignJustify(props) {
-    return _jsx(AlignmentTool, __assign({ alignment: "justify" }, props));
+exports.AlignRight = AlignRight;
+function AlignJustify(props) {
+    return (0, jsx_runtime_1.jsx)(AlignmentTool, __assign({ alignment: "justify" }, props));
 }
+exports.AlignJustify = AlignJustify;

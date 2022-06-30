@@ -1,3 +1,4 @@
+"use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -14,11 +15,13 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { useCallback, useEffect, useState } from "react";
-export function useFocus(items, onAction, onClose) {
-    var _a = __read(useState(-1), 2), focusIndex = _a[0], setFocusIndex = _a[1];
-    var _b = __read(useState(false), 2), isSubmenuOpen = _b[0], setIsSubmenuOpen = _b[1];
-    var moveItemIntoView = useCallback(function (index) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useFocus = void 0;
+var react_1 = require("react");
+function useFocus(items, onAction, onClose) {
+    var _a = __read((0, react_1.useState)(-1), 2), focusIndex = _a[0], setFocusIndex = _a[1];
+    var _b = __read((0, react_1.useState)(false), 2), isSubmenuOpen = _b[0], setIsSubmenuOpen = _b[1];
+    var moveItemIntoView = (0, react_1.useCallback)(function (index) {
         var item = items[index];
         if (!item)
             return;
@@ -29,7 +32,7 @@ export function useFocus(items, onAction, onClose) {
             behavior: "auto",
         });
     }, [items]);
-    var onKeyDown = useCallback(function (e) {
+    var onKeyDown = (0, react_1.useCallback)(function (e) {
         var as = function (i) { return items[i]; };
         var isSeperator = function (i) {
             var _a, _b;
@@ -88,7 +91,7 @@ export function useFocus(items, onAction, onClose) {
             return nextIndex;
         });
     }, [items, isSubmenuOpen, moveItemIntoView, onAction]);
-    useEffect(function () {
+    (0, react_1.useEffect)(function () {
         window.addEventListener("keydown", onKeyDown);
         return function () {
             window.removeEventListener("keydown", onKeyDown);
@@ -96,3 +99,4 @@ export function useFocus(items, onAction, onClose) {
     }, [onKeyDown]);
     return { focusIndex: focusIndex, setFocusIndex: setFocusIndex, isSubmenuOpen: isSubmenuOpen, setIsSubmenuOpen: setIsSubmenuOpen };
 }
+exports.useFocus = useFocus;

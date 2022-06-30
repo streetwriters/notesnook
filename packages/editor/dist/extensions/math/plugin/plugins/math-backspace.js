@@ -1,5 +1,8 @@
-import { NodeSelection } from "prosemirror-state";
-export var mathBackspaceCmd = function (state, dispatch) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.mathBackspaceCmd = void 0;
+var prosemirror_state_1 = require("prosemirror-state");
+var mathBackspaceCmd = function (state, dispatch) {
     // check node before
     var $from = state.selection.$from;
     var nodeBefore = $from.nodeBefore;
@@ -11,7 +14,7 @@ export var mathBackspaceCmd = function (state, dispatch) {
         var index = $from.index($from.depth);
         var $beforePos = state.doc.resolve($from.posAtIndex(index - 1));
         if (dispatch) {
-            dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
+            dispatch(state.tr.setSelection(new prosemirror_state_1.NodeSelection($beforePos)));
         }
         return true;
     }
@@ -23,3 +26,4 @@ export var mathBackspaceCmd = function (state, dispatch) {
     }
     return false;
 };
+exports.mathBackspaceCmd = mathBackspaceCmd;

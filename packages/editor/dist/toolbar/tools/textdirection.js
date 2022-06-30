@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -20,15 +21,19 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { jsx as _jsx } from "react/jsx-runtime";
-import { ToolButton } from "../components/tool-button";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LeftToRight = exports.RightToLeft = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var toolbutton_1 = require("../components/toolbutton");
 function TextDirectionTool(props) {
     var editor = props.editor, direction = props.direction, toolProps = __rest(props, ["editor", "direction"]);
-    return (_jsx(ToolButton, __assign({}, toolProps, { onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextDirection(direction).run(); }, toggled: editor.isActive({ textDirection: direction }) })));
+    return ((0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, __assign({}, toolProps, { onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextDirection(direction).run(); }, toggled: editor.isActive({ textDirection: direction }) })));
 }
-export function RightToLeft(props) {
-    return _jsx(TextDirectionTool, __assign({ direction: "rtl" }, props));
+function RightToLeft(props) {
+    return (0, jsx_runtime_1.jsx)(TextDirectionTool, __assign({ direction: "rtl" }, props));
 }
-export function LeftToRight(props) {
-    return _jsx(TextDirectionTool, __assign({ direction: "ltr" }, props));
+exports.RightToLeft = RightToLeft;
+function LeftToRight(props) {
+    return (0, jsx_runtime_1.jsx)(TextDirectionTool, __assign({ direction: "ltr" }, props));
 }
+exports.LeftToRight = LeftToRight;

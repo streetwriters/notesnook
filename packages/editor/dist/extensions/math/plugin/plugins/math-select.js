@@ -1,10 +1,13 @@
+"use strict";
 /*---------------------------------------------------------
  *  Author: Benjamin R. Bray
  *  License: MIT (see LICENSE in project root for details)
  *--------------------------------------------------------*/
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.mathSelectPlugin = void 0;
 // prosemirror imports
-import { Plugin as ProsePlugin, } from "prosemirror-state";
-import { DecorationSet, Decoration } from "prosemirror-view";
+var prosemirror_state_1 = require("prosemirror-state");
+var prosemirror_view_1 = require("prosemirror-view");
 ////////////////////////////////////////////////////////////
 /**
  * Uses the selection to determine which math_select decorations
@@ -29,9 +32,9 @@ var checkSelection = function (arg) {
         }
         return true;
     });
-    return DecorationSet.create(arg.doc, result.map(function (_a) {
+    return prosemirror_view_1.DecorationSet.create(arg.doc, result.map(function (_a) {
         var start = _a.start, end = _a.end;
-        return Decoration.node(start, end, { class: "math-select" });
+        return prosemirror_view_1.Decoration.node(start, end, { class: "math-select" });
     }));
 };
 /**
@@ -44,7 +47,7 @@ var checkSelection = function (arg) {
  *
  * @todo (6/13/20) math selection rectangles are not quite even with text
  */
-export var mathSelectPlugin = new ProsePlugin({
+exports.mathSelectPlugin = new prosemirror_state_1.Plugin({
     state: {
         init: function (config, partialState) {
             return checkSelection(partialState);
@@ -59,7 +62,7 @@ export var mathSelectPlugin = new ProsePlugin({
     },
     props: {
         decorations: function (state) {
-            return mathSelectPlugin.getState(state);
+            return exports.mathSelectPlugin.getState(state);
         },
     },
 });

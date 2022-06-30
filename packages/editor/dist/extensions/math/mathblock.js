@@ -1,7 +1,10 @@
-import { Node, mergeAttributes } from "@tiptap/core";
-import { inputRules } from "prosemirror-inputrules";
-import { insertMathNode, makeBlockMathInputRule, REGEX_BLOCK_MATH_DOLLARS, } from "./plugin";
-export var MathBlock = Node.create({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MathBlock = void 0;
+var core_1 = require("@tiptap/core");
+var prosemirror_inputrules_1 = require("prosemirror-inputrules");
+var plugin_1 = require("./plugin");
+exports.MathBlock = core_1.Node.create({
     name: "mathBlock",
     group: "block math",
     content: "text*",
@@ -18,7 +21,7 @@ export var MathBlock = Node.create({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "div",
-            mergeAttributes({ class: "math-display math-node" }, HTMLAttributes),
+            (0, core_1.mergeAttributes)({ class: "math-display math-node" }, HTMLAttributes),
             0,
         ];
     },
@@ -28,14 +31,14 @@ export var MathBlock = Node.create({
             insertMathBlock: function () {
                 return function (_a) {
                     var state = _a.state, dispatch = _a.dispatch, view = _a.view;
-                    return insertMathNode(_this.type)(state, dispatch, view);
+                    return (0, plugin_1.insertMathNode)(_this.type)(state, dispatch, view);
                 };
             },
         };
     },
     addProseMirrorPlugins: function () {
-        var inputRulePlugin = inputRules({
-            rules: [makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, this.type)],
+        var inputRulePlugin = (0, prosemirror_inputrules_1.inputRules)({
+            rules: [(0, plugin_1.makeBlockMathInputRule)(plugin_1.REGEX_BLOCK_MATH_DOLLARS, this.type)],
         });
         return [inputRulePlugin];
     },

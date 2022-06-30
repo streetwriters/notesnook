@@ -1,3 +1,4 @@
+"use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -23,25 +24,27 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-import { Table as TiptapTable } from "@tiptap/extension-table";
-import { columnResizing, tableEditing } from "prosemirror-tables";
-import { TableNodeView } from "./component";
-export var Table = TiptapTable.extend({
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Table = void 0;
+var extension_table_1 = require("@tiptap/extension-table");
+var prosemirror_tables_1 = require("prosemirror-tables");
+var component_1 = require("./component");
+exports.Table = extension_table_1.Table.extend({
     addProseMirrorPlugins: function () {
         var isResizable = this.options.resizable && this.editor.isEditable;
         return __spreadArray(__spreadArray([], __read((isResizable
             ? [
-                columnResizing({
+                (0, prosemirror_tables_1.columnResizing)({
                     handleWidth: this.options.handleWidth,
                     cellMinWidth: this.options.cellMinWidth,
-                    View: TableNodeView(this.editor),
+                    View: (0, component_1.TableNodeView)(this.editor),
                     // TODO: PR for @types/prosemirror-tables
                     // @ts-ignore (incorrect type)
                     lastColumnResizable: this.options.lastColumnResizable,
                 }),
             ]
             : [])), false), [
-            tableEditing({
+            (0, prosemirror_tables_1.tableEditing)({
                 allowTableNodeSelection: this.options.allowTableNodeSelection,
             }),
         ], false);

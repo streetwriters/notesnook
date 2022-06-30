@@ -1,14 +1,21 @@
-export function getToolbarElement() {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getEditorDOM = exports.getEditorContainer = exports.getPopupContainer = exports.getToolbarElement = void 0;
+function getToolbarElement() {
     return (document.querySelector(".editor-toolbar") || undefined);
 }
-export function getPopupContainer() {
+exports.getToolbarElement = getToolbarElement;
+function getPopupContainer() {
     return (document.getElementById("popup-container") || undefined);
 }
-export function getEditorContainer() {
+exports.getPopupContainer = getPopupContainer;
+function getEditorContainer() {
     return (document.querySelector(".editor") ||
         getPopupContainer());
 }
-export function getEditorDOM() {
+exports.getEditorContainer = getEditorContainer;
+function getEditorDOM() {
     return (document.querySelector(".ProseMirror") ||
         getEditorContainer()); // ProseMirror
 }
+exports.getEditorDOM = getEditorDOM;

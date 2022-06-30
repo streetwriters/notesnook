@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -45,11 +46,13 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { Plugin, PluginKey } from "prosemirror-state";
-import { Decoration, DecorationSet } from "prosemirror-view";
-import { findChildren } from "@tiptap/core";
-import { refractor } from "refractor/lib/core";
-import { toCaretPosition, toCodeLines, } from "./code-block";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HighlighterPlugin = void 0;
+var prosemirror_state_1 = require("prosemirror-state");
+var prosemirror_view_1 = require("prosemirror-view");
+var core_1 = require("@tiptap/core");
+var core_2 = require("refractor/lib/core");
+var codeblock_1 = require("./codeblock");
 function parseNodes(nodes, className) {
     if (className === void 0) { className = []; }
     return nodes.reduce(function (result, node) {
@@ -94,9 +97,9 @@ function getLineDecoration(from, line, total, isActive) {
         // Android Composition API (aka the virtual keyboard) doesn't behave well
         // with Decoration widgets so we have to resort to inline line numbers.
         isAndroid()) {
-        return Decoration.inline(from, from + 1, attributes, spec);
+        return prosemirror_view_1.Decoration.inline(from, from + 1, attributes, spec);
     }
-    return Decoration.widget(from, function () {
+    return prosemirror_view_1.Decoration.widget(from, function () {
         var element = document.createElement("span");
         element.classList.add("line-number-widget");
         if (isActive)
@@ -113,11 +116,11 @@ function getLineDecoration(from, line, total, isActive) {
 function getDecorations(_a) {
     var doc = _a.doc, name = _a.name, defaultLanguage = _a.defaultLanguage, caretPosition = _a.caretPosition;
     var decorations = [];
-    var languages = refractor.listLanguages();
-    findChildren(doc, function (node) { return node.type.name === name; }).forEach(function (block) {
+    var languages = core_2.refractor.listLanguages();
+    (0, core_1.findChildren)(doc, function (node) { return node.type.name === name; }).forEach(function (block) {
         var e_1, _a;
         var code = block.node.textContent;
-        var lines = toCodeLines(code, block.pos);
+        var lines = (0, codeblock_1.toCodeLines)(code, block.pos);
         try {
             for (var _b = __values(lines || []), _c = _b.next(); !_c.done; _c = _b.next()) {
                 var line = _c.value;
@@ -136,7 +139,7 @@ function getDecorations(_a) {
         }
         var language = block.node.attrs.language || defaultLanguage;
         var nodes = languages.includes(language)
-            ? getHighlightNodes(refractor.highlight(code, language))
+            ? getHighlightNodes(core_2.refractor.highlight(code, language))
             : null;
         if (!nodes)
             return;
@@ -144,7 +147,7 @@ function getDecorations(_a) {
         parseNodes(nodes).forEach(function (node) {
             var to = from + node.text.length;
             if (node.classes.length) {
-                var decoration = Decoration.inline(from, to, {
+                var decoration = prosemirror_view_1.Decoration.inline(from, to, {
                     class: node.classes.join(" "),
                 });
                 decorations.push(decoration);
@@ -152,23 +155,23 @@ function getDecorations(_a) {
             from = to;
         });
     });
-    return DecorationSet.create(doc, decorations);
+    return prosemirror_view_1.DecorationSet.create(doc, decorations);
 }
-export function HighlighterPlugin(_a) {
+function HighlighterPlugin(_a) {
     var name = _a.name, defaultLanguage = _a.defaultLanguage;
-    var key = new PluginKey("highlighter");
-    return new Plugin({
+    var key = new prosemirror_state_1.PluginKey("highlighter");
+    return new prosemirror_state_1.Plugin({
         key: key,
         state: {
             init: function () {
-                return DecorationSet.empty;
+                return prosemirror_view_1.DecorationSet.empty;
             },
             apply: function (transaction, decorationSet, oldState, newState) {
                 var oldNodeName = oldState.selection.$head.parent.type.name;
                 var newNodeName = newState.selection.$head.parent.type.name;
-                var oldNodes = findChildren(oldState.doc, function (node) { return node.type.name === name; });
-                var newNodes = findChildren(newState.doc, function (node) { return node.type.name === name; });
-                var position = toCaretPosition(newState.selection);
+                var oldNodes = (0, core_1.findChildren)(oldState.doc, function (node) { return node.type.name === name; });
+                var newNodes = (0, core_1.findChildren)(newState.doc, function (node) { return node.type.name === name; });
+                var position = (0, codeblock_1.toCaretPosition)(newState.selection);
                 // const isDocChanged =
                 //   transaction.docChanged &&
                 //   // TODO
@@ -214,15 +217,15 @@ export function HighlighterPlugin(_a) {
             var selectionChanged = (nextState.selection.$from.parent.type.name === name ||
                 prevState.selection.$from.parent.type.name === name) &&
                 prevState.selection.$from.pos !== nextState.selection.$from.pos;
-            findChildren(nextState.doc, function (node) { return node.type.name === name; }).forEach(function (block) {
+            (0, core_1.findChildren)(nextState.doc, function (node) { return node.type.name === name; }).forEach(function (block) {
                 var node = block.node, pos = block.pos;
                 var attributes = __assign({}, node.attrs);
                 if (docChanged) {
-                    var lines = toCodeLines(node.textContent, pos);
+                    var lines = (0, codeblock_1.toCodeLines)(node.textContent, pos);
                     attributes.lines = lines.slice();
                 }
                 if (selectionChanged) {
-                    var position = toCaretPosition(nextState.selection, docChanged ? toCodeLines(node.textContent, pos) : undefined);
+                    var position = (0, codeblock_1.toCaretPosition)(nextState.selection, docChanged ? (0, codeblock_1.toCodeLines)(node.textContent, pos) : undefined);
                     attributes.caretPosition = position;
                 }
                 if (docChanged || selectionChanged) {
@@ -234,6 +237,7 @@ export function HighlighterPlugin(_a) {
         },
     });
 }
+exports.HighlighterPlugin = HighlighterPlugin;
 /**
  * When `position` is undefined, all active line decorations
  * are reset (e.g. when you focus out of the code block).

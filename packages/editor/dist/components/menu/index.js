@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -20,18 +21,20 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
-import { useCallback, useRef, useEffect, } from "react";
-import { Box, Flex, Text } from "rebass";
-import { getPosition } from "../../utils/position";
-import { useFocus } from "./use-focus";
-import { MenuSeparator } from "./menu-separator";
-import { MenuButton } from "./menu-button";
-import { PopupPresenter as _PopupPresenter, } from "../popup-presenter";
-export function Menu(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MenuPresenter = exports.Menu = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var react_1 = require("react");
+var rebass_1 = require("rebass");
+var position_1 = require("../../utils/position");
+var usefocus_1 = require("./usefocus");
+var menuseparator_1 = require("./menuseparator");
+var menubutton_1 = require("./menubutton");
+var popuppresenter_1 = require("../popuppresenter");
+function Menu(props) {
     var _a = props.items, items = _a === void 0 ? [] : _a, title = props.title, onClose = props.onClose, containerProps = __rest(props, ["items", "title", "onClose"]);
-    var hoverTimeout = useRef();
-    var onAction = useCallback(function (e, item) {
+    var hoverTimeout = (0, react_1.useRef)();
+    var onAction = (0, react_1.useCallback)(function (e, item) {
         e === null || e === void 0 ? void 0 : e.stopPropagation();
         if (item.onClick) {
             item.onClick();
@@ -39,14 +42,14 @@ export function Menu(props) {
         if (onClose)
             onClose();
     }, [onClose]);
-    var _b = useFocus(items, function (e) {
+    var _b = (0, usefocus_1.useFocus)(items, function (e) {
         var item = items[focusIndex];
         if (item)
             onAction(e, item);
     }, function () { return onClose(); }), focusIndex = _b.focusIndex, setFocusIndex = _b.setFocusIndex, isSubmenuOpen = _b.isSubmenuOpen, setIsSubmenuOpen = _b.setIsSubmenuOpen;
     var focusedItem = items[focusIndex];
-    var subMenuRef = useRef(null);
-    useEffect(function () {
+    var subMenuRef = (0, react_1.useRef)(null);
+    (0, react_1.useEffect)(function () {
         var item = items[focusIndex];
         if (!item || !subMenuRef.current)
             return;
@@ -57,7 +60,7 @@ export function Menu(props) {
             subMenuRef.current.style.visibility = "hidden";
             return;
         }
-        var _a = getPosition(subMenuRef.current, {
+        var _a = (0, position_1.getPosition)(subMenuRef.current, {
             // yOffset: menuItemElement.offsetHeight,
             target: menuItemElement,
             location: "right",
@@ -66,14 +69,14 @@ export function Menu(props) {
         subMenuRef.current.style.top = "".concat(top, "px");
         subMenuRef.current.style.left = "".concat(left, "px");
     }, [isSubmenuOpen, focusIndex, items]);
-    return (_jsxs(_Fragment, { children: [_jsx(MenuContainer, __assign({}, containerProps, { children: items.map(function (item, index) {
+    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(MenuContainer, __assign({}, containerProps, { children: items.map(function (item, index) {
                     if (item.isHidden)
                         return null;
                     switch (item.type) {
                         case "separator":
-                            return _jsx(MenuSeparator, {}, item.key);
+                            return (0, jsx_runtime_1.jsx)(menuseparator_1.MenuSeparator, {}, item.key);
                         case "button":
-                            return (_jsx(MenuButton, { item: item, onClick: function (e) {
+                            return ((0, jsx_runtime_1.jsx)(menubutton_1.MenuButton, { item: item, onClick: function (e) {
                                     if (item.menu) {
                                         setFocusIndex(index);
                                         setIsSubmenuOpen(true);
@@ -99,15 +102,16 @@ export function Menu(props) {
                                         clearTimeout(hoverTimeout.current);
                                 } }, item.key));
                         case "popup":
-                            return _jsx(item.component, { onClick: function (e) { return onAction(e, item); } });
+                            return (0, jsx_runtime_1.jsx)(item.component, { onClick: function (e) { return onAction(e, item); } });
                     }
-                }) })), (focusedItem === null || focusedItem === void 0 ? void 0 : focusedItem.type) === "button" && (focusedItem === null || focusedItem === void 0 ? void 0 : focusedItem.menu) && isSubmenuOpen && (_jsx(Flex, __assign({ ref: subMenuRef, style: { visibility: "hidden" }, sx: {
+                }) })), (focusedItem === null || focusedItem === void 0 ? void 0 : focusedItem.type) === "button" && (focusedItem === null || focusedItem === void 0 ? void 0 : focusedItem.menu) && isSubmenuOpen && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, __assign({ ref: subMenuRef, style: { visibility: "hidden" }, sx: {
                     position: "absolute",
-                } }, { children: _jsx(Menu, { items: focusedItem.menu.items, onClose: onClose }) })))] }));
+                } }, { children: (0, jsx_runtime_1.jsx)(Menu, { items: focusedItem.menu.items, onClose: onClose }) })))] }));
 }
+exports.Menu = Menu;
 function MenuContainer(props) {
     var children = props.children, title = props.title, sx = props.sx, flexProps = __rest(props, ["children", "title", "sx"]);
-    return (_jsxs(Box, __assign({ className: "menuContainer", as: "ul", tabIndex: -1, sx: __assign({ bg: "background", py: 1, display: "flex", flexDirection: "column", position: "relative", listStyle: "none", padding: 0, margin: 0, borderRadius: "default", boxShadow: "menu", border: "1px solid var(--border)", minWidth: 220 }, sx) }, flexProps, { children: [title && (_jsx(Text, __assign({ sx: {
+    return ((0, jsx_runtime_1.jsxs)(rebass_1.Box, __assign({ className: "menuContainer", as: "ul", tabIndex: -1, sx: __assign({ bg: "background", py: 1, display: "flex", flexDirection: "column", position: "relative", listStyle: "none", padding: 0, margin: 0, borderRadius: "default", boxShadow: "menu", border: "1px solid var(--border)", minWidth: 220 }, sx) }, flexProps, { children: [title && ((0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ sx: {
                     fontFamily: "body",
                     fontSize: "subtitle",
                     color: "primary",
@@ -118,7 +122,8 @@ function MenuContainer(props) {
                     wordWrap: "break-word",
                 } }, { children: title }))), children] })));
 }
-export function MenuPresenter(props) {
+function MenuPresenter(props) {
     var _a = props.items, items = _a === void 0 ? [] : _a, restProps = __rest(props, ["items"]);
-    return (_jsx(_PopupPresenter, __assign({}, restProps, { children: props.children ? props.children : _jsx(Menu, __assign({ items: items }, restProps)) })));
+    return ((0, jsx_runtime_1.jsx)(popuppresenter_1.PopupPresenter, __assign({}, restProps, { children: props.children ? props.children : (0, jsx_runtime_1.jsx)(Menu, __assign({ items: items }, restProps)) })));
 }
+exports.MenuPresenter = MenuPresenter;

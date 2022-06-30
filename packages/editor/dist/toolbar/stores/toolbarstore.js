@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,8 +10,13 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import create from "zustand";
-export var useToolbarStore = create(function (set, get) { return ({
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.useIsMobile = exports.useToolbarLocation = exports.useToolbarStore = void 0;
+var zustand_1 = __importDefault(require("zustand"));
+exports.useToolbarStore = (0, zustand_1.default)(function (set, get) { return ({
     isMobile: false,
     openedPopups: {},
     setIsMobile: function (isMobile) {
@@ -48,9 +54,11 @@ export var useToolbarStore = create(function (set, get) { return ({
         });
     },
 }); });
-export function useToolbarLocation() {
-    return useToolbarStore(function (store) { return store.toolbarLocation; });
+function useToolbarLocation() {
+    return (0, exports.useToolbarStore)(function (store) { return store.toolbarLocation; });
 }
-export function useIsMobile() {
-    return useToolbarStore(function (store) { return store.isMobile; });
+exports.useToolbarLocation = useToolbarLocation;
+function useIsMobile() {
+    return (0, exports.useToolbarStore)(function (store) { return store.isMobile; });
 }
+exports.useIsMobile = useIsMobile;

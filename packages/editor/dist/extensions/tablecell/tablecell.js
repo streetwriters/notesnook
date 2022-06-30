@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -9,8 +10,13 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import TiptapTableCell from "@tiptap/extension-table-cell";
-export var TableCell = TiptapTableCell.extend({
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TableCell = void 0;
+var extension_table_cell_1 = __importDefault(require("@tiptap/extension-table-cell"));
+exports.TableCell = extension_table_cell_1.default.extend({
     addAttributes: function () {
         var _a;
         return __assign(__assign({}, (_a = this.parent) === null || _a === void 0 ? void 0 : _a.call(this)), { backgroundColor: addStyleAttribute("backgroundColor", "background-color"), color: addStyleAttribute("color", "color"), borderWidth: addStyleAttribute("borderWidth", "border-width", "px"), borderStyle: addStyleAttribute("borderStyle", "border-style"), borderColor: addStyleAttribute("borderColor", "border-color") });

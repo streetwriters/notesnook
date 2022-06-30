@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -61,18 +62,20 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { Input } from "@rebass/forms";
-import { useState } from "react";
-import { Flex, Text } from "rebass";
-import { Popup } from "../components/popup";
-export function ImageUploadPopup(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ImageUploadPopup = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var forms_1 = require("@rebass/forms");
+var react_1 = require("react");
+var rebass_1 = require("rebass");
+var popup_1 = require("../components/popup");
+function ImageUploadPopup(props) {
     var _this = this;
     var onInsert = props.onInsert, onClose = props.onClose;
-    var _a = __read(useState(false), 2), isDownloading = _a[0], setIsDownloading = _a[1];
-    var _b = __read(useState(), 2), error = _b[0], setError = _b[1];
-    var _c = __read(useState(""), 2), url = _c[0], setUrl = _c[1];
-    return (_jsx(Popup, __assign({ title: "Insert image from URL", onClose: onClose, action: {
+    var _a = __read((0, react_1.useState)(false), 2), isDownloading = _a[0], setIsDownloading = _a[1];
+    var _b = __read((0, react_1.useState)(), 2), error = _b[0], setError = _b[1];
+    var _c = __read((0, react_1.useState)(""), 2), url = _c[0], setUrl = _c[1];
+    return ((0, jsx_runtime_1.jsx)(popup_1.Popup, __assign({ title: "Insert image from URL", onClose: onClose, action: {
             loading: isDownloading,
             title: "Insert image",
             disabled: !url,
@@ -118,15 +121,15 @@ export function ImageUploadPopup(props) {
                     }
                 });
             }); },
-        } }, { children: _jsxs(Flex, __assign({ sx: { px: 1, flexDirection: "column", width: ["auto", 350] } }, { children: [_jsx(Input, { type: "url", autoFocus: true, placeholder: "Paste Image URL here", value: url, onChange: function (e) {
+        } }, { children: (0, jsx_runtime_1.jsxs)(rebass_1.Flex, __assign({ sx: { px: 1, flexDirection: "column", width: ["auto", 350] } }, { children: [(0, jsx_runtime_1.jsx)(forms_1.Input, { type: "url", autoFocus: true, placeholder: "Paste Image URL here", value: url, onChange: function (e) {
                         setUrl(e.target.value);
                         setError(undefined);
-                    } }), error ? (_jsxs(Text, __assign({ variant: "error", sx: {
+                    } }), error ? ((0, jsx_runtime_1.jsxs)(rebass_1.Text, __assign({ variant: "error", sx: {
                         bg: "errorBg",
                         mt: 1,
                         p: 1,
                         borderRadius: "default",
-                    } }, { children: ["Failed to download image: ", error.toLowerCase(), "."] }))) : (_jsx(Text, __assign({ variant: "subBody", sx: {
+                    } }, { children: ["Failed to download image: ", error.toLowerCase(), "."] }))) : ((0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ variant: "subBody", sx: {
                         bg: "shade",
                         color: "primary",
                         mt: 1,
@@ -134,6 +137,7 @@ export function ImageUploadPopup(props) {
                         borderRadius: "default",
                     } }, { children: "To protect your privacy, we will download the image & add it to your attachments." })))] })) })));
 }
+exports.ImageUploadPopup = ImageUploadPopup;
 function toDataURL(blob) {
     return new Promise(function (resolve, reject) {
         var reader = new FileReader();

@@ -1,3 +1,4 @@
+"use strict";
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -14,23 +15,25 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
-import { jsx as _jsx } from "react/jsx-runtime";
-import { Dropdown } from "../components/dropdown";
-import { useCallback, useMemo } from "react";
-import { Counter } from "../components/counter";
-import { useRefValue } from "../../hooks/use-ref-value";
-export function FontSize(props) {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FontFamily = exports.FontSize = void 0;
+var jsx_runtime_1 = require("react/jsx-runtime");
+var dropdown_1 = require("../components/dropdown");
+var react_1 = require("react");
+var counter_1 = require("../components/counter");
+var useRefValue_1 = require("../../hooks/useRefValue");
+function FontSize(props) {
     var editor = props.editor;
     var _fontSize = editor.getAttributes("textStyle").fontSize;
     var fontSize = _fontSize || "16px";
-    var fontSizeAsNumber = useRefValue(parseInt(fontSize.replace("px", "")));
-    var decreaseFontSize = useCallback(function () {
+    var fontSizeAsNumber = (0, useRefValue_1.useRefValue)(parseInt(fontSize.replace("px", "")));
+    var decreaseFontSize = (0, react_1.useCallback)(function () {
         return Math.max(8, fontSizeAsNumber.current - 1);
     }, []);
-    var increaseFontSize = useCallback(function () {
+    var increaseFontSize = (0, react_1.useCallback)(function () {
         return Math.min(120, fontSizeAsNumber.current + 1);
     }, []);
-    return (_jsx(Counter, { title: "font size", onDecrease: function () {
+    return ((0, jsx_runtime_1.jsx)(counter_1.Counter, { title: "font size", onDecrease: function () {
             var _a;
             return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setFontSize("".concat(decreaseFontSize(), "px")).run();
         }, onIncrease: function () {
@@ -38,12 +41,13 @@ export function FontSize(props) {
             (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setFontSize("".concat(increaseFontSize(), "px")).run();
         }, onReset: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setFontSize("16px").run(); }, value: fontSize }));
 }
+exports.FontSize = FontSize;
 var fontFamilies = {
     System: "Open Sans",
     Serif: "serif",
     Monospace: "monospace",
 };
-export function FontFamily(props) {
+function FontFamily(props) {
     var _a, _b;
     var editor = props.editor;
     var currentFontFamily = ((_b = (_a = Object.entries(fontFamilies)
@@ -51,9 +55,10 @@ export function FontFamily(props) {
         var _b = __read(_a, 2), key = _b[0], value = _b[1];
         return editor.isActive("textStyle", { fontFamily: value });
     })) === null || _a === void 0 ? void 0 : _a.map(function (a) { return a; })) === null || _b === void 0 ? void 0 : _b.at(0)) || "System";
-    var items = useMemo(function () { return toMenuItems(editor, currentFontFamily); }, [currentFontFamily]);
-    return (_jsx(Dropdown, { selectedItem: currentFontFamily, items: items, menuWidth: 130 }));
+    var items = (0, react_1.useMemo)(function () { return toMenuItems(editor, currentFontFamily); }, [currentFontFamily]);
+    return ((0, jsx_runtime_1.jsx)(dropdown_1.Dropdown, { selectedItem: currentFontFamily, items: items, menuWidth: 130 }));
 }
+exports.FontFamily = FontFamily;
 function toMenuItems(editor, currentFontFamily) {
     var menuItems = [];
     var _loop_1 = function (key) {

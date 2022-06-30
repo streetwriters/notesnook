@@ -1,9 +1,12 @@
-import { Node, mergeAttributes, wrappingInputRule } from "@tiptap/core";
-import { createNodeView } from "../react";
-import { OutlineListComponent } from "./component";
-export var inputRegex = /^\s*(-o)\s$/;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OutlineList = exports.inputRegex = void 0;
+var core_1 = require("@tiptap/core");
+var react_1 = require("../react");
+var component_1 = require("./component");
+exports.inputRegex = /^\s*(-o)\s$/;
 var outlineListItemName = "outlineListItem";
-export var OutlineList = Node.create({
+exports.OutlineList = core_1.Node.create({
     name: "outlineList",
     addOptions: function () {
         return {
@@ -36,7 +39,7 @@ export var OutlineList = Node.create({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "ul",
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+            (0, core_1.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes, {
                 "data-type": this.name,
             }),
             0,
@@ -61,15 +64,15 @@ export var OutlineList = Node.create({
     },
     addInputRules: function () {
         return [
-            wrappingInputRule({
-                find: inputRegex,
+            (0, core_1.wrappingInputRule)({
+                find: exports.inputRegex,
                 type: this.type,
             }),
         ];
     },
     addNodeView: function () {
         var _this = this;
-        return createNodeView(OutlineListComponent, {
+        return (0, react_1.createNodeView)(component_1.OutlineListComponent, {
             contentDOMFactory: function () {
                 var content = document.createElement("ul");
                 content.classList.add("".concat(_this.name.toLowerCase(), "-content-wrapper"));

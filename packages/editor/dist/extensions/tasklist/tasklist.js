@@ -1,8 +1,11 @@
-import { mergeAttributes } from "@tiptap/core";
-import { TaskList } from "@tiptap/extension-task-list";
-import { createNodeView } from "../react";
-import { TaskListComponent } from "./component";
-export var TaskListNode = TaskList.extend({
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TaskListNode = void 0;
+var core_1 = require("@tiptap/core");
+var extension_task_list_1 = require("@tiptap/extension-task-list");
+var react_1 = require("../react");
+var component_1 = require("./component");
+exports.TaskListNode = extension_task_list_1.TaskList.extend({
     addAttributes: function () {
         return {
             collapsed: {
@@ -46,7 +49,7 @@ export var TaskListNode = TaskList.extend({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "ul",
-            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+            (0, core_1.mergeAttributes)(this.options.HTMLAttributes, HTMLAttributes, {
                 class: "checklist",
             }),
             0,
@@ -78,7 +81,7 @@ export var TaskListNode = TaskList.extend({
     },
     addNodeView: function () {
         var _this = this;
-        return createNodeView(TaskListComponent, {
+        return (0, react_1.createNodeView)(component_1.TaskListComponent, {
             contentDOMFactory: function () {
                 var content = document.createElement("ul");
                 content.classList.add("".concat(_this.name.toLowerCase(), "-content-wrapper"));
