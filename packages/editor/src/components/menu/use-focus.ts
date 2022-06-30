@@ -10,7 +10,7 @@ export function useFocus(
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
 
   const moveItemIntoView = useCallback(
-    (index) => {
+    (index: number) => {
       const item = items[index];
       if (!item) return;
       const element = document.getElementById(item.key);

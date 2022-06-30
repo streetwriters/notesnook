@@ -1,5 +1,5 @@
 import { Table as TiptapTable, TableOptions } from "@tiptap/extension-table";
-import { columnResizing, tableEditing } from "prosemirror-tables";
+import { columnResizing, tableEditing } from "@_ueberdosis/prosemirror-tables";
 import { TableNodeView } from "./component";
 
 export const Table = TiptapTable.extend<TableOptions>({

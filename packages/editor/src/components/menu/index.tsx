@@ -6,7 +6,11 @@ import React, {
 } from "react";
 import { Box, Flex, FlexProps, Text } from "rebass";
 import { getPosition } from "../../utils/position";
-import { MenuItem, MenuItem as MenuItemType } from "./types";
+import {
+  MenuButton as MenuButtonType,
+  MenuItem,
+  MenuItem as MenuItemType,
+} from "./types";
 import { useFocus } from "./use-focus";
 import { MenuSeparator } from "./menu-separator";
 import { MenuButton } from "./menu-button";
@@ -24,10 +28,10 @@ export function Menu(props: MenuProps) {
   const { items = [], title, onClose, ...containerProps } = props;
   const hoverTimeout = useRef<NodeJS.Timeout>();
   const onAction = useCallback(
-    (e, item) => {
+    (e: Event, item?: MenuButtonType) => {
       e?.stopPropagation();
 
-      if (item.onClick) {
+      if (item?.onClick) {
         item.onClick();
       }
       if (onClose) onClose();
@@ -40,7 +44,7 @@ export function Menu(props: MenuProps) {
       items,
       (e) => {
         const item = items[focusIndex];
-        if (item) onAction(e, item);
+        if (item && item.type === "button") onAction(e, item);
       },
       () => onClose()
     );
@@ -114,7 +118,7 @@ export function Menu(props: MenuProps) {
                 />
               );
             case "popup":
-              return <item.component onClick={(e) => onAction(e, item)} />;
+              return <item.component onClick={(e) => onAction(e)} />;
           }
         })}
       </MenuContainer>

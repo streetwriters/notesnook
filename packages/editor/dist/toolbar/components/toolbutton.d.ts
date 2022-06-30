@@ -12,11 +12,4 @@ export declare type ToolButtonProps = ButtonProps & {
     buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined>;
     variant?: ToolButtonVariant;
 };
-export declare const ToolButton: React.NamedExoticComponent<ButtonProps & {
-    icon: IconNames;
-    iconColor?: "background" | "border" | "text" | "blue" | "gray" | "green" | "orange" | "purple" | "red" | "yellow" | "checked" | "disabled" | "placeholder" | "icon" | keyof import("@notesnook/theme/dist/theme/colorscheme/static").StaticColors | "primary" | "bgTransparent" | "accent" | "bgSecondary" | "bgSecondaryText" | "hover" | "fontSecondary" | "fontTertiary" | "overlay" | "secondary" | undefined;
-    iconSize?: number | "big" | "small" | "medium" | undefined;
-    toggled: boolean;
-    buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined> | undefined;
-    variant?: ToolButtonVariant | undefined;
-}>;
+export declare const ToolButton: React.NamedExoticComponent<ToolButtonProps>;

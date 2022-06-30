@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.moveRowUp = exports.moveRowDown = exports.moveColumnRight = exports.moveColumnLeft = void 0;
-var prosemirror_tables_1 = require("prosemirror-tables");
+var prosemirror_tables_1 = require("@_ueberdosis/prosemirror-tables");
 function moveColumnRight(editor) {
     var tr = editor.state.tr;
     var rect = (0, prosemirror_tables_1.selectedRect)(editor.state);

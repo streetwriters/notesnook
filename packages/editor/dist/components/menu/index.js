@@ -36,7 +36,7 @@ function Menu(props) {
     var hoverTimeout = (0, react_1.useRef)();
     var onAction = (0, react_1.useCallback)(function (e, item) {
         e === null || e === void 0 ? void 0 : e.stopPropagation();
-        if (item.onClick) {
+        if (item === null || item === void 0 ? void 0 : item.onClick) {
             item.onClick();
         }
         if (onClose)
@@ -44,7 +44,7 @@ function Menu(props) {
     }, [onClose]);
     var _b = (0, usefocus_1.useFocus)(items, function (e) {
         var item = items[focusIndex];
-        if (item)
+        if (item && item.type === "button")
             onAction(e, item);
     }, function () { return onClose(); }), focusIndex = _b.focusIndex, setFocusIndex = _b.setFocusIndex, isSubmenuOpen = _b.isSubmenuOpen, setIsSubmenuOpen = _b.setIsSubmenuOpen;
     var focusedItem = items[focusIndex];
@@ -102,7 +102,7 @@ function Menu(props) {
                                         clearTimeout(hoverTimeout.current);
                                 } }, item.key));
                         case "popup":
-                            return (0, jsx_runtime_1.jsx)(item.component, { onClick: function (e) { return onAction(e, item); } });
+                            return (0, jsx_runtime_1.jsx)(item.component, { onClick: function (e) { return onAction(e); } });
                     }
                 }) })), (focusedItem === null || focusedItem === void 0 ? void 0 : focusedItem.type) === "button" && (focusedItem === null || focusedItem === void 0 ? void 0 : focusedItem.menu) && isSubmenuOpen && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, __assign({ ref: subMenuRef, style: { visibility: "hidden" }, sx: {
                     position: "absolute",

@@ -27,7 +27,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Table = void 0;
 var extension_table_1 = require("@tiptap/extension-table");
-var prosemirror_tables_1 = require("prosemirror-tables");
+var prosemirror_tables_1 = require("@_ueberdosis/prosemirror-tables");
 var component_1 = require("./component");
 exports.Table = extension_table_1.Table.extend({
     addProseMirrorPlugins: function () {

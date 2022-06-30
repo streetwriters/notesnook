@@ -6,7 +6,7 @@ import {
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "@tiptap/core";
 import { useEffect, useRef } from "react";
-import { updateColumnsOnResize } from "prosemirror-tables";
+import { updateColumnsOnResize } from "@_ueberdosis/prosemirror-tables";
 import { NodeView } from "prosemirror-view";
 import {
   InsertColumnRight,

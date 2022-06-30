@@ -1,5 +1,5 @@
 import { Editor } from "@tiptap/core";
-import { selectedRect, TableRect } from "prosemirror-tables";
+import { selectedRect, TableRect } from "@_ueberdosis/prosemirror-tables";
 import { Transaction } from "prosemirror-state";
 
 function moveColumnRight(editor: Editor) {
