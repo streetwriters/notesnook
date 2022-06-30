@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Editor } from "@tiptap/core";
 import { MenuButton } from "../../components/menu/types";
 import { ToolProps } from "../types";

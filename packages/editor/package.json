@@ -33,8 +33,10 @@
     "@tiptap/starter-kit": "^2.0.0-beta.185",
     "detect-indent": "^7.0.0",
     "emotion-theming": "^10.0.19",
+    "katex": "^0.13.24",
     "lowlight": "^2.6.1",
     "prism-themes": "^1.9.0",
+    "prosemirror-codemark": "^0.4.0",
     "prosemirror-tables": "^1.1.1",
     "prosemirror-utils": "github:atlassian/prosemirror-utils",
     "prosemirror-view": "^1.24.1",
@@ -53,6 +55,7 @@
   },
   "devDependencies": {
     "@types/esm": "^3.2.0",
+    "@types/katex": "^0.14.0",
     "@types/node": "^16.11.11",
     "@types/prismjs": "^1.26.0",
     "@types/react": "^17.0.37",

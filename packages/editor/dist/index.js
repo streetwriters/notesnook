@@ -53,6 +53,8 @@ import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
 import { ListItem } from "./extensions/list-item";
 import { Link } from "@tiptap/extension-link";
+import { Codemark } from "./extensions/code-mark";
+import { MathInline, MathBlock } from "./extensions/math";
 import { NodeViewSelectionNotifier, usePortalProvider, } from "./extensions/react";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
@@ -130,6 +132,9 @@ var useTiptap = function (options, deps) {
             OutlineListItem,
             OutlineList,
             ListItem,
+            Codemark,
+            MathInline,
+            MathBlock,
         ],
         onBeforeCreate: function (_a) {
             var editor = _a.editor;
