@@ -24,7 +24,7 @@ export const MathBlock = Node.create({
   parseHTML() {
     return [
       {
-        tag: `div[class*='math-display']`, // important!
+        tag: `div[class*='math-block']`, // important!
       },
     ];
   },
@@ -32,7 +32,7 @@ export const MathBlock = Node.create({
   renderHTML({ HTMLAttributes }) {
     return [
       "div",
-      mergeAttributes({ class: "math-display math-node" }, HTMLAttributes),
+      mergeAttributes({ class: "math-block math-node" }, HTMLAttributes),
       0,
     ];
   },
