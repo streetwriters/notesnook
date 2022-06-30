@@ -74,6 +74,8 @@ export declare const Icons: {
     embedSettings: string;
     palette: string;
     tableSettings: string;
+    math: string;
+    mathBlock: string;
     plus: string;
     minus: string;
     close: string;

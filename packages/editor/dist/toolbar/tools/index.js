@@ -1,4 +1,4 @@
-import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, CodeRemove, } from "./inline";
+import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, CodeRemove, Math, } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
@@ -40,6 +40,7 @@ var tools = {
     rtl: RightToLeft,
     textColor: TextColor,
     highlight: Highlight,
+    math: Math,
     imageSettings: ImageSettings,
     imageAlignCenter: ImageAlignCenter,
     imageAlignLeft: ImageAlignLeft,

@@ -112,3 +112,14 @@ export function CodeRemove(props: ToolProps) {
     />
   );
 }
+
+export function Math(props: ToolProps) {
+  const { editor } = props;
+  return (
+    <ToolButton
+      {...props}
+      toggled={false}
+      onClick={() => editor.current?.chain().focus().insertMathInline().run()}
+    />
+  );
+}

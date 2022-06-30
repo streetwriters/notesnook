@@ -26,7 +26,7 @@ export {
 export { mathSelectPlugin } from "./plugins/math-select";
 
 // commands
-export { insertMathCmd } from "./commands/insert-math-cmd";
+export { insertMathNode } from "./commands/insert-math-node";
 
 // utilities
 export { mathSerializer } from "./utils/text-serializer";

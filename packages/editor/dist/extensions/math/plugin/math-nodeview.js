@@ -7,7 +7,7 @@ import { EditorView, } from "prosemirror-view";
 import { StepMap } from "prosemirror-transform";
 import { keymap } from "prosemirror-keymap";
 import { newlineInCode, chainCommands, deleteSelection, } from "prosemirror-commands";
-import { collapseMathCmd } from "./commands/collapse-math-cmd";
+import { collapseMathNode } from "./commands/collapse-math-node";
 var MathView = /** @class */ (function () {
     // == Lifecycle ===================================== //
     /**
@@ -34,10 +34,8 @@ var MathView = /** @class */ (function () {
         this._tagName = options.tagName || this._node.type.name.replace("_", "-");
         // create dom representation of nodeview
         this.dom = document.createElement(this._tagName);
-        if (options.inline)
-            this.dom.classList.add("math-inline");
-        else
-            this.dom.classList.add("math-display");
+        if (options.className)
+            this.dom.classList.add(options.className);
         this.dom.classList.add("math-node");
         this._mathRenderElt = document.createElement("span");
         this._mathRenderElt.textContent = "";
@@ -235,12 +233,12 @@ var MathView = /** @class */ (function () {
                         //   this._outerView.focus();
                         //   return true;
                         // },
-                        Enter: chainCommands(newlineInCode, collapseMathCmd(this._outerView, +1, false)),
-                        "Ctrl-Enter": collapseMathCmd(this._outerView, +1, false),
-                        ArrowLeft: collapseMathCmd(this._outerView, -1, true),
-                        ArrowRight: collapseMathCmd(this._outerView, +1, true),
-                        ArrowUp: collapseMathCmd(this._outerView, -1, true),
-                        ArrowDown: collapseMathCmd(this._outerView, +1, true),
+                        Enter: chainCommands(newlineInCode, collapseMathNode(this._outerView, +1, false)),
+                        "Ctrl-Enter": collapseMathNode(this._outerView, +1, false),
+                        ArrowLeft: collapseMathNode(this._outerView, -1, true),
+                        ArrowRight: collapseMathNode(this._outerView, +1, true),
+                        ArrowUp: collapseMathNode(this._outerView, -1, true),
+                        ArrowDown: collapseMathNode(this._outerView, +1, true),
                     }),
                 ],
             }),

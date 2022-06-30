@@ -15,7 +15,7 @@ import { EditorView } from "prosemirror-view";
  *    (inner) selection is empty.
  * @returns A new ProseMirror command based on the input configuration.
  */
-export function collapseMathCmd(
+export function collapseMathNode(
   outerView: EditorView,
   dir: 1 | -1,
   requireOnBorder: boolean,

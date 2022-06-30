@@ -9,3 +9,4 @@ export declare function Subscript(props: ToolProps): JSX.Element;
 export declare function Superscript(props: ToolProps): JSX.Element;
 export declare function ClearFormatting(props: ToolProps): JSX.Element;
 export declare function CodeRemove(props: ToolProps): JSX.Element | null;
+export declare function Math(props: ToolProps): JSX.Element;

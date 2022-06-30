@@ -25,7 +25,7 @@ import {
   deleteSelection,
 } from "prosemirror-commands";
 
-import { collapseMathCmd } from "./commands/collapse-math-cmd";
+import { collapseMathNode } from "./commands/collapse-math-node";
 import { IMathPluginState } from "./math-plugin";
 import { MathRenderer, MathRenderFn } from "./renderers/types";
 
@@ -45,7 +45,7 @@ interface IMathViewOptions {
   renderer: MathRenderFn;
 
   /** Should be true if node is inline */
-  inline?: boolean;
+  className?: string;
 }
 
 export class MathView implements NodeView, ICursorPosObserver {
@@ -102,8 +102,7 @@ export class MathView implements NodeView, ICursorPosObserver {
 
     // create dom representation of nodeview
     this.dom = document.createElement(this._tagName);
-    if (options.inline) this.dom.classList.add("math-inline");
-    else this.dom.classList.add("math-display");
+    if (options.className) this.dom.classList.add(options.className);
     this.dom.classList.add("math-node");
 
     this._mathRenderElt = document.createElement("span");
@@ -342,13 +341,13 @@ export class MathView implements NodeView, ICursorPosObserver {
             // },
             Enter: chainCommands(
               newlineInCode,
-              collapseMathCmd(this._outerView, +1, false)
+              collapseMathNode(this._outerView, +1, false)
             ),
-            "Ctrl-Enter": collapseMathCmd(this._outerView, +1, false),
-            ArrowLeft: collapseMathCmd(this._outerView, -1, true),
-            ArrowRight: collapseMathCmd(this._outerView, +1, true),
-            ArrowUp: collapseMathCmd(this._outerView, -1, true),
-            ArrowDown: collapseMathCmd(this._outerView, +1, true),
+            "Ctrl-Enter": collapseMathNode(this._outerView, +1, false),
+            ArrowLeft: collapseMathNode(this._outerView, -1, true),
+            ArrowRight: collapseMathNode(this._outerView, +1, true),
+            ArrowUp: collapseMathNode(this._outerView, -1, true),
+            ArrowDown: collapseMathNode(this._outerView, +1, true),
           }),
         ],
       }),

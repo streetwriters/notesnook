@@ -335,22 +335,22 @@ span:focus .fake-cursor {
 
 /* -- Block Math ---------------------------------------- */
 
-.math-display {
+.math-block {
   display: block;
 }
 
-.math-display .math-render {
+.math-block .math-render {
   display: block;
 }
 
-.math-display.ProseMirror-selectednode {
+.math-block.ProseMirror-selectednode {
   background-color: var(--bgSecondary);
   padding: 10px;
   border-radius: 5px;
   border: 1px solid var(--border);
 }
 
-.math-display .math-src .ProseMirror {
+.math-block .math-src .ProseMirror {
   width: 100%;
   display: block;
   margin-top: 10px;
@@ -358,15 +358,15 @@ span:focus .fake-cursor {
     Liberation Mono, monospace !important;
 }
 
-/* .math-display .math-src::after, */
-.math-display .math-src::before {
+/* .math-block .math-src::after, */
+.math-block .math-src::before {
   content: "Math";
   text-align: left;
   color: var(--disabled);
   margin-bottom: 10px;
 }
 
-.math-display .katex-display {
+.math-block .katex-display {
   margin: 0;
 }
 

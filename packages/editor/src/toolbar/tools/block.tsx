@@ -24,6 +24,7 @@ export function InsertBlock(props: ToolProps) {
       tasklist(editor),
       horizontalRule(editor),
       codeblock(editor),
+      mathblock(editor),
       blockquote(editor),
       image(editor, isMobile),
       attachment(editor),
@@ -97,6 +98,15 @@ const blockquote = (editor: Editor): MenuItem => ({
   icon: "blockquote",
   isChecked: editor?.isActive("blockQuote"),
   onClick: () => editor.current?.chain().focus().toggleBlockquote().run(),
+});
+
+const mathblock = (editor: Editor): MenuItem => ({
+  key: "math",
+  type: "button",
+  title: "Math & formulas",
+  icon: "mathBlock",
+  isChecked: editor?.isActive("mathBlock"),
+  onClick: () => editor.current?.chain().focus().insertMathBlock().run(),
 });
 
 const image = (editor: Editor, isMobile: boolean): MenuItem => ({

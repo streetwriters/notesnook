@@ -1,13 +1,21 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { inputRules } from "prosemirror-inputrules";
 import {
-  mathPlugin,
+  insertMathNode,
   makeBlockMathInputRule,
   REGEX_BLOCK_MATH_DOLLARS,
 } from "./plugin";
 
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    mathBlock: {
+      insertMathBlock: () => ReturnType;
+    };
+  }
+}
+
 export const MathBlock = Node.create({
-  name: "math_display",
+  name: "mathBlock",
   group: "block math",
   content: "text*", // important!
   atom: true, // important!
@@ -27,6 +35,16 @@ export const MathBlock = Node.create({
       mergeAttributes({ class: "math-display math-node" }, HTMLAttributes),
       0,
     ];
+  },
+
+  addCommands() {
+    return {
+      insertMathBlock:
+        () =>
+        ({ state, dispatch, view }) => {
+          return insertMathNode(this.type)(state, dispatch, view);
+        },
+    };
   },
 
   addProseMirrorPlugins() {

@@ -119,6 +119,10 @@ const tools: Record<ToolId, ToolDefinition> = {
     icon: "textColor",
     title: "Text color",
   },
+  math: {
+    icon: "math",
+    title: "Math (inline)",
+  },
 
   tableSettings: {
     icon: "tableSettings",
@@ -297,6 +301,10 @@ export function getToolDefinition(id: ToolId) {
   return tools[id];
 }
 
+export function getAllTools() {
+  return tools;
+}
+
 export const DEFAULT_TOOLS: ToolbarDefinition = [
   [
     "insertBlock",
@@ -318,6 +326,7 @@ export const DEFAULT_TOOLS: ToolbarDefinition = [
       "superscript",
       "highlight",
       "textColor",
+      "math",
     ],
   ],
   ["fontSize"],

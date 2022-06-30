@@ -15,7 +15,7 @@ interface IMathViewOptions {
     /** Used to render the Tex input */
     renderer: MathRenderFn;
     /** Should be true if node is inline */
-    inline?: boolean;
+    className?: string;
 }
 export declare class MathView implements NodeView, ICursorPosObserver {
     private _node;

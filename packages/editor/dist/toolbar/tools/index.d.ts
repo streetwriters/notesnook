@@ -1,6 +1,6 @@
 import React from "react";
 import { ToolProps } from "../types";
-import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, CodeRemove } from "./inline";
+import { Bold, Italic, Underline, Strikethrough, Code, Subscript, Superscript, ClearFormatting, CodeRemove, Math } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
@@ -43,6 +43,7 @@ declare const tools: {
     rtl: typeof RightToLeft;
     textColor: typeof TextColor;
     highlight: typeof Highlight;
+    math: typeof Math;
     imageSettings: typeof ImageSettings;
     imageAlignCenter: typeof ImageAlignCenter;
     imageAlignLeft: typeof ImageAlignLeft;

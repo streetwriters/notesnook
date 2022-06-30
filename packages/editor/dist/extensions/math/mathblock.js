@@ -1,8 +1,8 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { inputRules } from "prosemirror-inputrules";
-import { makeBlockMathInputRule, REGEX_BLOCK_MATH_DOLLARS, } from "./plugin";
+import { insertMathNode, makeBlockMathInputRule, REGEX_BLOCK_MATH_DOLLARS, } from "./plugin";
 export var MathBlock = Node.create({
-    name: "math_display",
+    name: "mathBlock",
     group: "block math",
     content: "text*",
     atom: true,
@@ -21,6 +21,17 @@ export var MathBlock = Node.create({
             mergeAttributes({ class: "math-display math-node" }, HTMLAttributes),
             0,
         ];
+    },
+    addCommands: function () {
+        var _this = this;
+        return {
+            insertMathBlock: function () {
+                return function (_a) {
+                    var state = _a.state, dispatch = _a.dispatch, view = _a.view;
+                    return insertMathNode(_this.type)(state, dispatch, view);
+                };
+            },
+        };
     },
     addProseMirrorPlugins: function () {
         var inputRulePlugin = inputRules({

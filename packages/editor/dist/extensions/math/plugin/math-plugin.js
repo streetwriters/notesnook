@@ -25,7 +25,7 @@ export function createMathView(inline) {
         var nodeViews = pluginState.activeNodeViews;
         // set up NodeView
         var nodeView = new MathView(node, view, getPos, {
-            inline: inline,
+            className: inline ? "math-inline" : "math-block",
             renderer: inline ? KatexRenderer.inline : KatexRenderer.block,
             tagName: inline ? "span" : "div",
         }, MATH_PLUGIN_KEY, function () {
@@ -63,8 +63,8 @@ var mathPluginSpec = {
     },
     props: {
         nodeViews: {
-            math_inline: createMathView(true),
-            math_display: createMathView(false),
+            mathInline: createMathView(true),
+            mathBlock: createMathView(false),
         },
     },
 };

@@ -116,6 +116,10 @@ var tools = {
         icon: "textColor",
         title: "Text color",
     },
+    math: {
+        icon: "math",
+        title: "Math (inline)",
+    },
     tableSettings: {
         icon: "tableSettings",
         title: "Table settings",
@@ -290,6 +294,9 @@ var tools = {
 export function getToolDefinition(id) {
     return tools[id];
 }
+export function getAllTools() {
+    return tools;
+}
 export var DEFAULT_TOOLS = [
     [
         "insertBlock",
@@ -311,6 +318,7 @@ export var DEFAULT_TOOLS = [
             "superscript",
             "highlight",
             "textColor",
+            "math",
         ],
     ],
     ["fontSize"],

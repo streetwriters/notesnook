@@ -54,3 +54,7 @@ export function CodeRemove(props) {
         return null;
     return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().unsetMark("code").run(); } })));
 }
+export function Math(props) {
+    var editor = props.editor;
+    return (_jsx(ToolButton, __assign({}, props, { toggled: false, onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertMathInline().run(); } })));
+}

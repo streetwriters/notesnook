@@ -58,7 +58,7 @@ export function createMathView(inline: boolean) {
       view,
       getPos as () => number,
       {
-        inline,
+        className: inline ? "math-inline" : "math-block",
         renderer: inline ? KatexRenderer.inline : KatexRenderer.block,
         tagName: inline ? "span" : "div",
       },
@@ -102,8 +102,8 @@ let mathPluginSpec: PluginSpec<IMathPluginState> = {
   },
   props: {
     nodeViews: {
-      math_inline: createMathView(true),
-      math_display: createMathView(false),
+      mathInline: createMathView(true),
+      mathBlock: createMathView(false),
     },
   },
 };

@@ -13,7 +13,7 @@ import { EditorState, NodeSelection, Transaction } from "prosemirror-state";
  *     NodeType.  Must belong to the same schema that your EditorState uses!
  * @param initialText (optional) The initial source content for the math editor.
  */
-export function insertMathCmd(
+export function insertMathNode(
   mathNodeType: NodeType,
   initialText = ""
 ): Command {

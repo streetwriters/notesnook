@@ -10,6 +10,7 @@ import {
   Superscript,
   ClearFormatting,
   CodeRemove,
+  Math,
 } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
@@ -92,6 +93,7 @@ const tools = {
   rtl: RightToLeft,
   textColor: TextColor,
   highlight: Highlight,
+  math: Math,
 
   imageSettings: ImageSettings,
   imageAlignCenter: ImageAlignCenter,

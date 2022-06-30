@@ -47,6 +47,7 @@ export function InsertBlock(props) {
             tasklist(editor),
             horizontalRule(editor),
             codeblock(editor),
+            mathblock(editor),
             blockquote(editor),
             image(editor, isMobile),
             attachment(editor),
@@ -95,6 +96,14 @@ var blockquote = function (editor) { return ({
     icon: "blockquote",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("blockQuote"),
     onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleBlockquote().run(); },
+}); };
+var mathblock = function (editor) { return ({
+    key: "math",
+    type: "button",
+    title: "Math & formulas",
+    icon: "mathBlock",
+    isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("mathBlock"),
+    onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertMathBlock().run(); },
 }); };
 var image = function (editor, isMobile) { return ({
     key: "image",
