@@ -18,11 +18,7 @@ import Tiptap from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
-import {
-  attachFile,
-  AttachmentProgress,
-  insertAttachment,
-} from "./plugins/picker";
+import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
 import { DropEvent } from "react-dropzone";
 import { downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "notes-core/common";

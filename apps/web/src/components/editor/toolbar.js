@@ -9,8 +9,9 @@ import { showToast } from "../../utils/toast";
 import { AnimatedInput } from "../animated";
 import { showPublishView } from "../publish-view";
 import { db } from "../../common/db";
-import { useHistory, useSearch } from "./context";
+import { useEditorInstance, useHistory, useSearch } from "./context";
 
+// TODO: this needs to be cleaned up!
 function Toolbar(props) {
   const sessionId = useStore((store) => store.session.id);
   const isLocked = useStore((store) => store.session.locked);
@@ -27,6 +28,7 @@ function Toolbar(props) {
   const monographs = useMonographStore((store) => store.monographs);
   const { canRedo, canUndo, redo, undo } = useHistory();
   const { toggleSearch } = useSearch();
+  const editor = useEditorInstance();
 
   const isNotePublished = useMemo(
     () => sessionId && db.monographs.isPublished(sessionId),
@@ -83,7 +85,7 @@ function Toolbar(props) {
             exitFullscreen(document);
             setIsFullscreen(false);
           }
-          // if (tinymce.activeEditor) tinymce.activeEditor.focus();
+          if (editor) editor.focus();
         },
       },
       {
@@ -131,6 +133,7 @@ function Toolbar(props) {
       },
     ],
     [
+      editor,
       undo,
       redo,
       isFullscreen,

@@ -3,7 +3,7 @@ import { formatBytes } from "../../utils/filename";
 import ListItem from "../list-item";
 import * as Icon from "../icons";
 import { downloadAttachment } from "../../common/attachments";
-import { reuploadAttachment } from "../editor/plugins/picker";
+import { reuploadAttachment } from "../editor/picker";
 import { store } from "../../stores/attachment-store";
 import { db } from "../../common/db";
 import { Multiselect } from "../../common/multi-select";

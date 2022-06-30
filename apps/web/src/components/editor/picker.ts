@@ -1,12 +1,12 @@
 import { SerializedKey } from "@notesnook/crypto/dist/src/types";
 import Compressor from "compressorjs";
-import { AppEventManager, AppEvents } from "../../../common/app-events";
-import { db } from "../../../common/db";
-import { showBuyDialog } from "../../../common/dialog-controller";
-import { TaskManager } from "../../../common/task-manager";
-import { isUserPremium } from "../../../hooks/use-is-user-premium";
-import fs from "../../../interfaces/fs";
-import { showToast } from "../../../utils/toast";
+import { AppEventManager, AppEvents } from "../../common/app-events";
+import { db } from "../../common/db";
+import { showBuyDialog } from "../../common/dialog-controller";
+import { TaskManager } from "../../common/task-manager";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
+import fs from "../../interfaces/fs";
+import { showToast } from "../../utils/toast";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;

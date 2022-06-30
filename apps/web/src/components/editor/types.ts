@@ -1,4 +1,4 @@
-import { Attachment } from "./plugins/picker";
+import { Attachment } from "./picker";
 
 export type CharacterCounter = {
   words: () => number;

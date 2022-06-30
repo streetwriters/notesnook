@@ -5,7 +5,7 @@ import { Box, Flex } from "rebass";
 import "notesnook-editor/dist/styles.css";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import useMobile from "../../utils/use-mobile";
-import { Attachment } from "./plugins/picker";
+import { Attachment } from "./picker";
 import { CharacterCounter, IEditor } from "./types";
 import { useConfigureEditor, useSearch, useToolbarConfig } from "./context";
 import { createPortal } from "react-dom";
