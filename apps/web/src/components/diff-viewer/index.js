@@ -1,48 +1,20 @@
-import "./diff.css";
-import "../editor/plugins/attachmentshandler.css";
 import { useState, useEffect, useCallback } from "react";
-import { Flex, Box, Text, Button } from "rebass";
+import { Flex, Text, Button } from "rebass";
 import * as Icon from "../icons";
 import ContentToggle from "./content-toggle";
 import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { hashNavigate } from "../../navigation";
-import HTMLDiffer from "./differ";
 import { showToast } from "../../utils/toast";
 import { ScrollSync, ScrollSyncPane } from "react-scroll-sync";
-import { injectCssSrc, removeCss } from "../../utils/css";
-import { EV, EVENTS } from "notes-core/common";
-
-const differ = new HTMLDiffer();
-var conflicts = undefined;
-var currentConflict = undefined;
-
-function navigateConflicts(prev) {
-  if (!conflicts)
-    conflicts = [
-      ...document.querySelectorAll("span.diff-ins"),
-      ...document.querySelectorAll("span.diff-del"),
-    ];
-  let nextConflict;
-  if (currentConflict) {
-    const scrollTop = document.getElementById("diffViewAfter").scrollTop;
-    nextConflict = conflicts.find((conflict) =>
-      prev ? conflict.offsetTop < scrollTop : conflict.offsetTop > scrollTop
-    );
-  } else nextConflict = conflicts[0];
-  if (!nextConflict) return false;
-  currentConflict = nextConflict;
-  currentConflict.scrollIntoView({ block: "center" });
-}
+import { Editor } from "../editor";
 
 function DiffViewer(props) {
   const { noteId } = props;
 
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
-  const theme = useThemeStore((store) => store.theme);
   const sync = useAppStore((store) => store.sync);
   const clearSession = useEditorStore((store) => store.clearSession);
   const [conflictedNote, setConflictedNote] = useState();
@@ -50,6 +22,7 @@ function DiffViewer(props) {
   const [localContent, setLocalContent] = useState();
   const [isDownloadingImages, setIsDownloadingImages] = useState(false);
   const [htmlDiff, setHtmlDiff] = useState({});
+  const [selectedContent, setSelectedContent] = useState(-1);
 
   const resolveConflict = useCallback(
     async ({ toKeep, toCopy, toKeepDateEdited, dateResolved }) => {
@@ -125,38 +98,14 @@ function DiffViewer(props) {
       setLocalContent({ ...content, conflicted: false });
       setRemoteContent(content.conflicted);
 
-      differ
-        .generate(content.data, content.conflicted.data)
-        .then(async ({ before, after }) => {
-          setHtmlDiff({ before, after });
-          conflicts = undefined;
-          currentConflict = undefined;
-        });
-
       setHtmlDiff({ before: content.data, after: content.conflicted.data });
-
-      conflicts = undefined;
-      currentConflict = undefined;
     })();
   }, [noteId, resolveConflict]);
-
-  useEffect(() => {
-    let cssPath = "";
-    if (theme === "dark")
-      cssPath = "/skins/notesnook-dark/content.inline.min.css";
-    else cssPath = "/skins/notesnook/content.inline.min.css";
-    injectCssSrc("tmce", cssPath);
-    return () => {
-      removeCss("tmce");
-    };
-  }, [theme]);
 
   useEffect(() => {
     clearSession(false);
     setIsEditorOpen(true);
   }, [setIsEditorOpen, clearSession]);
-
-  const [selectedContent, setSelectedContent] = useState(-1);
 
   if (!conflictedNote || !localContent || !remoteContent) return null;
   return (
@@ -186,45 +135,21 @@ function DiffViewer(props) {
           justifyContent="center"
           alignItems="center"
           variant="tool"
-          mr={2}
-          onClick={() => {
-            navigateConflicts(true);
-          }}
-        >
-          <Icon.ArrowLeft size={18} />
-          <Text display={["none", "block", "block"]} fontSize="body" ml={1}>
-            Prev conflict
-          </Text>
-        </Button>
-        <Button
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          variant="tool"
           onClick={async () => {
             setIsDownloadingImages(true);
-            const event = EV.subscribe(
-              EVENTS.mediaAttachmentDownloaded,
-              ({ hash, src }) => {
-                const elements = document.querySelectorAll(
-                  `.diffviewer img[data-hash="${hash}"]`
-                );
-                if (!elements || !elements.length) return;
-                for (let element of elements) element.setAttribute("src", src);
-              }
-            );
             try {
-              await db.content.downloadMedia(noteId, {
-                data: htmlDiff.before,
-                type: localContent.type,
-              });
-              await db.content.downloadMedia(noteId, {
-                data: htmlDiff.after,
-                type: remoteContent.type,
-              });
+              await Promise.all([
+                db.content.downloadMedia(noteId, {
+                  data: htmlDiff.before,
+                  type: localContent.type,
+                }),
+                db.content.downloadMedia(noteId, {
+                  data: htmlDiff.after,
+                  type: remoteContent.type,
+                }),
+              ]);
             } finally {
               setIsDownloadingImages(false);
-              event.unsubscribe();
             }
           }}
           disabled={isDownloadingImages}
@@ -238,20 +163,6 @@ function DiffViewer(props) {
           <Text display={["none", "block", "block"]} fontSize="body" ml={1}>
             {isDownloadingImages ? "Downloading..." : "Load images"}
           </Text>
-        </Button>
-        <Button
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          variant="tool"
-          onClick={() => {
-            navigateConflicts();
-          }}
-        >
-          <Text display={["none", "block", "block"]} fontSize="body" mr={1}>
-            Next conflict
-          </Text>
-          <Icon.ArrowRight size={18} />
         </Button>
       </Flex>
       <ScrollSync>
@@ -291,20 +202,24 @@ function DiffViewer(props) {
               }}
             />
             <ScrollSyncPane>
-              <Box
-                id="diffViewBefore"
-                px={2}
-                flex={1}
-                overflowY="auto"
+              <Flex
                 sx={{
+                  px: 2,
+                  overflowY: "auto",
+                  flex: 1,
                   borderStyle: "solid",
                   borderWidth: 0,
                   borderRightWidth: [0, 0, 1],
                   borderBottomWidth: [1, 1, 0],
                   borderColor: "border",
                 }}
-                dangerouslySetInnerHTML={{ __html: htmlDiff.before }}
-              />
+              >
+                <Editor
+                  content={htmlDiff.before}
+                  nonce={0}
+                  options={{ readonly: true, headless: true }}
+                />
+              </Flex>
             </ScrollSyncPane>
           </Flex>
           <Flex
@@ -340,12 +255,13 @@ function DiffViewer(props) {
               }}
             />
             <ScrollSyncPane>
-              <Box
-                id="diffViewAfter"
-                px={2}
-                overflowY="auto"
-                dangerouslySetInnerHTML={{ __html: htmlDiff.after }}
-              />
+              <Flex sx={{ px: 2 }}>
+                <Editor
+                  content={htmlDiff.after}
+                  nonce={0}
+                  options={{ readonly: true, headless: true }}
+                />
+              </Flex>
             </ScrollSyncPane>
           </Flex>
         </Flex>

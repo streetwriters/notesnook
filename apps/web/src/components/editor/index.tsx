@@ -1,4 +1,10 @@
-import { useEffect, useCallback, useState, useRef } from "react";
+import {
+  useEffect,
+  useCallback,
+  useState,
+  useRef,
+  PropsWithChildren,
+} from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
@@ -132,8 +138,10 @@ export default function EditorManager({
         nonce={timestamp}
         title={title}
         content={content}
-        readonly={isReadonly}
-        onRequestFocus={() => toggleProperties(false)}
+        options={{
+          readonly: isReadonly,
+          onRequestFocus: () => toggleProperties(false),
+        }}
       />
       {arePropertiesVisible && <Properties />}
       <DropZone overlayRef={overlayRef} />
@@ -141,18 +149,27 @@ export default function EditorManager({
   );
 }
 
-type EditorProps = {
-  title: string;
+type EditorOptions = {
+  headless?: boolean;
   readonly?: boolean;
   focusMode?: boolean;
-  nonce?: number;
-  content: string;
   onRequestFocus?: () => void;
 };
-function Editor(props: EditorProps) {
-  const { content, readonly, focusMode, onRequestFocus, title, nonce } = props;
+type EditorProps = {
+  title?: string;
+  nonce?: number;
+  content: string;
+  options?: EditorOptions;
+};
+export function Editor(props: EditorProps) {
+  const { content, nonce, options } = props;
+  const { readonly, headless } = options || {
+    headless: false,
+    readonly: false,
+    focusMode: false,
+  };
+
   const editor = useEditorInstance();
-  const isMobile = useMobile();
 
   useEffect(() => {
     if (!editor) return;
@@ -191,6 +208,44 @@ function Editor(props: EditorProps) {
   }, [editor]);
 
   return (
+    <EditorChrome {...props}>
+      <Tiptap
+        nonce={nonce}
+        readonly={readonly}
+        toolbarContainerId={headless ? undefined : "editorToolbar"}
+        content={content}
+        onChange={(content, counter) => {
+          const { id, sessionId } = editorstore.get().session;
+          debouncedOnEditorChange(sessionId, id, sessionId, content);
+          if (counter) debouncedUpdateWordCount(counter);
+        }}
+        onDownloadAttachment={(attachment) =>
+          downloadAttachment(attachment.hash)
+        }
+        onInsertAttachment={(type) => {
+          const mime = type === "file" ? "*/*" : "image/*";
+          insertAttachment(mime).then((file) => {
+            if (!file) return;
+            editor?.attachFile(file);
+          });
+        }}
+      />
+    </EditorChrome>
+  );
+}
+
+function EditorChrome(props: PropsWithChildren<EditorProps>) {
+  const { title, nonce, options, children } = props;
+  const { readonly, focusMode, headless, onRequestFocus } = options || {
+    headless: false,
+    readonly: false,
+    focusMode: false,
+  };
+  const isMobile: boolean | null = useMobile();
+
+  if (headless) return <>{children}</>;
+
+  return (
     <>
       <Toolbar />
       <FlexScrollContainer
@@ -223,37 +278,19 @@ function Editor(props: EditorProps) {
               }}
             />
           )}
-          <Titlebox
-            nonce={nonce}
-            readonly={readonly || false}
-            setTitle={(title) => {
-              const { sessionId, id } = editorstore.get().session;
-              debouncedOnTitleChange(sessionId, id, title);
-            }}
-            title={title}
-          />
+          {title !== undefined ? (
+            <Titlebox
+              nonce={nonce}
+              readonly={readonly || false}
+              setTitle={(title) => {
+                const { sessionId, id } = editorstore.get().session;
+                debouncedOnTitleChange(sessionId, id, title);
+              }}
+              title={title}
+            />
+          ) : null}
           <Header readonly={readonly} />
-          <Tiptap
-            nonce={nonce}
-            readonly={readonly}
-            toolbarContainerId="editorToolbar"
-            content={content}
-            onChange={(content, counter) => {
-              const { id, sessionId } = editorstore.get().session;
-              debouncedOnEditorChange(sessionId, id, sessionId, content);
-              if (counter) debouncedUpdateWordCount(counter);
-            }}
-            onDownloadAttachment={(attachment) =>
-              downloadAttachment(attachment.hash)
-            }
-            onInsertAttachment={(type) => {
-              const mime = type === "file" ? "*/*" : "image/*";
-              insertAttachment(mime).then((file) => {
-                if (!file) return;
-                editor?.attachFile(file);
-              });
-            }}
-          />
+          {children}
         </Flex>
       </FlexScrollContainer>
 

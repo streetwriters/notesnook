@@ -100,6 +100,8 @@ function TipTap(props: TipTapProps) {
     if (isSearching && !isEditorSearching) toggleSearch();
   }, [toggleSearch, editor?.storage.searchreplace?.isSearching]);
 
+  if (!toolbarContainerId) return null;
+
   return (
     <>
       <Portal containerId={toolbarContainerId}>
