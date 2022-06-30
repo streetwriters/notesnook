@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { MenuItem } from "./types";
 export declare function useFocus(items: MenuItem[], onAction: (event: KeyboardEvent) => void, onClose: (event: KeyboardEvent) => void): {
     focusIndex: number;

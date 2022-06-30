@@ -1,8 +1,7 @@
-import { Button, Flex, Text } from "rebass";
-import { useCallback, useEffect, useState } from "react";
+import { Flex, Text } from "rebass";
+import { useCallback } from "react";
 import { Popup } from "../components/popup";
-import { Toggle } from "../../components/toggle";
-import { Input, Textarea } from "@rebass/forms";
+import { Checkbox } from "@rebass/forms";
 import {
   ImageAlignmentOptions,
   ImageSizeOptions,
@@ -42,7 +41,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
       <Flex sx={{ width: ["auto", 300], flexDirection: "column", p: 1 }}>
         <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
           <Text variant={"body"}>Floating?</Text>
-          <Toggle
+          <Checkbox
             checked={float}
             onClick={() =>
               editor

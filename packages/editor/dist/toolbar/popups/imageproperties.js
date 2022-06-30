@@ -13,7 +13,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Flex, Text } from "rebass";
 import { useCallback } from "react";
 import { Popup } from "../components/popup";
-import { Toggle } from "../../components/toggle";
+import { Checkbox } from "@rebass/forms";
 import { InlineInput } from "../../components/inline-input";
 export function ImageProperties(props) {
     var height = props.height, width = props.width, float = props.float, editor = props.editor, onClose = props.onClose;
@@ -34,7 +34,7 @@ export function ImageProperties(props) {
                 };
         editor.chain().setImageSize(size).run();
     }, [width, height]);
-    return (_jsx(Popup, __assign({ title: "Image properties", onClose: onClose }, { children: _jsxs(Flex, __assign({ sx: { width: ["auto", 300], flexDirection: "column", p: 1 } }, { children: [_jsxs(Flex, __assign({ sx: { justifyContent: "space-between", alignItems: "center" } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: "Floating?" })), _jsx(Toggle, { checked: float, onClick: function () {
+    return (_jsx(Popup, __assign({ title: "Image properties", onClose: onClose }, { children: _jsxs(Flex, __assign({ sx: { width: ["auto", 300], flexDirection: "column", p: 1 } }, { children: [_jsxs(Flex, __assign({ sx: { justifyContent: "space-between", alignItems: "center" } }, { children: [_jsx(Text, __assign({ variant: "body" }, { children: "Floating?" })), _jsx(Checkbox, { checked: float, onClick: function () {
                                 return editor
                                     .chain()
                                     .setImageAlignment({ float: !float, align: "left" })

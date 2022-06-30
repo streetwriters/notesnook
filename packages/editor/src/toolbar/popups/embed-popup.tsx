@@ -1,7 +1,6 @@
 import { Button, Flex, Text } from "rebass";
 import { useCallback, useEffect, useState } from "react";
 import { Popup } from "../components/popup";
-import { Toggle } from "../../components/toggle";
 import { Input, Textarea } from "@rebass/forms";
 import {
   Embed,

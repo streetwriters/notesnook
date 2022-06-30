@@ -25,11 +25,11 @@ interface SchemaSpecJson<N extends string = any, M extends string = any> extends
 }
 declare type MathSpecNodeT = SchemaSpecNodeT<typeof mathSchemaSpec>;
 declare type MathSpecMarkT = SchemaSpecMarkT<typeof mathSchemaSpec>;
-export declare const mathSchemaSpec: SchemaSpecJson<"math_inline" | "paragraph" | "text" | "doc" | "math_display", "math_select">;
+export declare const mathSchemaSpec: SchemaSpecJson<"paragraph" | "text" | "doc" | "math_inline" | "math_display", "math_select">;
 /**
  * Use the prosemirror-math default SchemaSpec to create a new Schema.
  */
-export declare function createMathSchema(): Schema<"math_inline" | "paragraph" | "text" | "doc" | "math_display", "math_select">;
+export declare function createMathSchema(): Schema<"paragraph" | "text" | "doc" | "math_inline" | "math_display", "math_select">;
 /**
  * Create a new SchemaSpec by adding math nodes to an existing spec.
 

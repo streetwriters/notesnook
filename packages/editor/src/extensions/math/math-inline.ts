@@ -6,8 +6,6 @@ import {
   mathPlugin,
 } from "./plugin";
 
-import "katex/dist/katex.min.css";
-
 export const MathInline = Node.create({
   name: "math_inline",
   group: "inline math",

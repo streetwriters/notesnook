@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import "./extensions";
 import { EditorOptions } from "@tiptap/react";
 import Toolbar from "./toolbar";

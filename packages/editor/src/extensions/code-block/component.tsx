@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { isLanguageLoaded, loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";
-import "prism-themes/themes/prism-dracula.min.css";
 import { Flex, Text } from "rebass";
 import Languages from "./languages.json";
 import { Input } from "@rebass/forms";
