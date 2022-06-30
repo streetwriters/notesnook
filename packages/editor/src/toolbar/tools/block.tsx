@@ -22,6 +22,7 @@ export function InsertBlock(props: ToolProps) {
   const menuItems = useMemo(() => {
     return [
       tasklist(editor),
+      outlinelist(editor),
       horizontalRule(editor),
       codeblock(editor),
       mathblock(editor),
@@ -238,6 +239,15 @@ const tasklist = (editor: Editor): MenuItem => ({
   icon: "checkbox",
   isChecked: editor?.isActive("taskList"),
   onClick: () => editor.current?.chain().focus().toggleTaskList().run(),
+});
+
+const outlinelist = (editor: Editor): MenuItem => ({
+  key: "outlinelist",
+  type: "button",
+  title: "Outline list",
+  icon: "outlineList",
+  isChecked: editor?.isActive("outlineList"),
+  onClick: () => editor.current?.chain().focus().toggleOutlineList().run(),
 });
 
 const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({

@@ -78,6 +78,7 @@ import {
   mdiCameraOutline,
   mdiMathIntegral,
   mdiFunctionVariant,
+  mdiFileTreeOutline,
 } from "@mdi/js";
 
 export const Icons = {
@@ -167,6 +168,7 @@ export const Icons = {
   tableSettings: mdiTableCog,
   math: mdiFunctionVariant,
   mathBlock: mdiMathIntegral,
+  outlineList: mdiFileTreeOutline,
 
   plus: mdiPlus,
   minus: mdiMinus,

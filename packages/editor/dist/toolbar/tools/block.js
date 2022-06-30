@@ -45,6 +45,7 @@ export function InsertBlock(props) {
     var menuItems = useMemo(function () {
         return [
             tasklist(editor),
+            outlinelist(editor),
             horizontalRule(editor),
             codeblock(editor),
             mathblock(editor),
@@ -215,6 +216,14 @@ var tasklist = function (editor) { return ({
     icon: "checkbox",
     isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("taskList"),
     onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleTaskList().run(); },
+}); };
+var outlinelist = function (editor) { return ({
+    key: "outlinelist",
+    type: "button",
+    title: "Outline list",
+    icon: "outlineList",
+    isChecked: editor === null || editor === void 0 ? void 0 : editor.isActive("outlineList"),
+    onClick: function () { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleOutlineList().run(); },
 }); };
 var uploadImageFromURLMobile = function (editor) { return ({
     key: "upload-from-url",

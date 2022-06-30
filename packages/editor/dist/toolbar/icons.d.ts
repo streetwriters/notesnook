@@ -76,6 +76,7 @@ export declare const Icons: {
     tableSettings: string;
     math: string;
     mathBlock: string;
+    outlineList: string;
     plus: string;
     minus: string;
     close: string;
