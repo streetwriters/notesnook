@@ -1,9 +1,10 @@
 import { useTheme } from "@notesnook/theme";
 import { PortalProvider, Toolbar, useTiptap } from "notesnook-editor";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import { useEditorThemeStore } from "../state/theme";
+import { Settings } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
@@ -12,6 +13,15 @@ import Title from "./title";
 const Tiptap = () => {
   const settings = useSettings();
   const theme = useEditorThemeStore((state) => state.colors);
+  const [initialProps, setInitialProps] = useState<Partial<Settings>>({
+    readonly: global.readonly || global.readonly || settings.readonly,
+    noHeader: global.noHeader || settings.noHeader,
+    noToolbar:
+      global.noToolbar ||
+      settings.noToolbar ||
+      global.readonly ||
+      settings.readonly,
+  });
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState(false);
@@ -81,13 +91,21 @@ const Tiptap = () => {
       },
       theme: editorTheme,
       element: !layout ? undefined : contentRef.current || undefined,
+      editable: !initialProps.readonly,
+      editorProps: {
+        editable: () => !initialProps.readonly,
+      },
     },
-    [layout]
+    [layout, initialProps.readonly]
   );
   const controller = useEditorController(editor);
   const controllerRef = useRef(controller);
   globalThis.editorController = controller;
   globalThis.editor = editor;
+
+  useEffect(() => {
+    setInitialProps({ ...settings });
+  }, [settings]);
 
   useLayoutEffect(() => {
     setLayout(true);
@@ -104,7 +122,7 @@ const Tiptap = () => {
           marginBottom: "5px",
         }}
       >
-        <Header />
+        <Header noHeader={initialProps.noHeader || false} />
         <div
           onScroll={controller.scroll}
           ref={containerRef}
@@ -117,9 +135,13 @@ const Tiptap = () => {
             display: "flex",
           }}
         >
-          <Tags />
-          <Title controller={controllerRef} title={controller.title} />
-          <StatusBar container={containerRef} editor={editor} />
+          {initialProps.noHeader ? null : (
+            <>
+              <Tags />
+              <Title controller={controllerRef} title={controller.title} />
+              <StatusBar container={containerRef} editor={editor} />
+            </>
+          )}
           <div
             ref={contentRef}
             style={{
@@ -131,20 +153,22 @@ const Tiptap = () => {
           />
         </div>
 
-        <div
-          style={{
-            paddingLeft: 10,
-            paddingTop: 5,
-          }}
-        >
-          <Toolbar
-            isMobile={true}
-            theme={toolbarTheme}
-            editor={editor}
-            location="bottom"
-            tools={settings.tools}
-          />
-        </div>
+        {initialProps.noToolbar ? null : (
+          <div
+            style={{
+              paddingLeft: 10,
+              paddingTop: 5,
+            }}
+          >
+            <Toolbar
+              isMobile={true}
+              theme={toolbarTheme}
+              editor={editor}
+              location="bottom"
+              tools={settings.tools}
+            />
+          </div>
+        )}
       </div>
     </>
   );

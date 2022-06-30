@@ -25,6 +25,8 @@ function Title({
     <input
       ref={titleRef}
       className={styles.titleBar}
+      contentEditable={!global.readonly}
+      disabled={global.readonly}
       style={{
         height: 50,
         fontSize: 27,

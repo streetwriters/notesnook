@@ -16,9 +16,14 @@ export type Settings = {
   deviceMode: "mobile" | "smallTablet" | "tablet";
   premium: boolean;
   tools: ToolbarGroupDefinition[];
+  noToolbar?: boolean;
+  noHeader?: boolean;
 };
 
 declare global {
+  var readonly: boolean;
+  var noToolbar: boolean;
+  var noHeader: boolean;
   /**
    * Id of current session
    */
