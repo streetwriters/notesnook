@@ -11,6 +11,7 @@ export function getDarkScheme(accent: string): SchemeColors {
     accent: "#000",
     bgSecondary: "#2b2b2b",
     bgSecondaryText: "#A1A1A1",
+    bgSecondaryHover: "#3d3d3d",
     border: "#353535",
     hover: "#2f2f2f",
     fontSecondary: "#000",

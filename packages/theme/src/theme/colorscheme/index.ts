@@ -20,6 +20,7 @@ export type SchemeColors = StaticColors & {
   accent: string;
   bgSecondary: string;
   bgSecondaryText: string;
+  bgSecondaryHover: string;
   border: string;
   hover: string;
   fontSecondary: string;
