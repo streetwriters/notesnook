@@ -1,5 +1,5 @@
 import { useEditor } from './use-editor';
-
+import { ToolbarGroupDefinition } from 'notesnook-editor/dist/toolbar/types';
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -14,6 +14,25 @@ export type EditorState = {
   keyboardState: boolean;
   ready: boolean;
   saveCount: 0;
+};
+
+export type Settings = {
+  readonly: boolean;
+  fullscreen: boolean;
+  deviceMode: string;
+  premium: boolean;
+  tools: ToolbarGroupDefinition[];
+  noToolbar?: boolean;
+  noHeader?: boolean;
+};
+
+export type EditorProps = {
+  readonly: boolean;
+  noToolbar: boolean;
+  noHeader: boolean;
+  withController: boolean;
+  editorId?: string;
+  onLoad?: () => void;
 };
 
 export type EditorMessage = {

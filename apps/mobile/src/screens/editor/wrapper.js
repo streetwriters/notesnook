@@ -76,8 +76,7 @@ export const EditorWrapper = ({ width }) => {
               blurOnSubmit={false}
             />
             <ProgressBar />
-            <Editor key="editor" />
-            <EditorOverlay key="overlay" />
+            <Editor key="editor" withController={true} />
           </KeyboardAvoidingView>
         </SafeAreaView>
       )}

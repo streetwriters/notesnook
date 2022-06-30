@@ -2,8 +2,6 @@ package com.streetwriters.notesnook;
 
 import android.app.Application;
 import android.content.Context;
-
-import com.RNFetchBlob.RNFetchBlob;
 import com.dooboolab.RNIap.RNIapModule;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -11,21 +9,18 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import androidx.multidex.MultiDexApplication;
-
+//import com.facebook.react.bridge.JavaScriptExecutorFactory;
+//import com.facebook.react.modules.systeminfo.AndroidInfoHelpers;
 import com.facebook.react.TurboReactPackage;
 import com.facebook.react.module.model.ReactModuleInfo;
 import com.facebook.react.module.model.ReactModuleInfoProvider;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.learnium.RNDeviceInfo.RNDeviceModule;
-import com.oblador.keychain.KeychainPackage;
 import com.onibenjo.htmltopdf.RNHTMLtoPDFModule;
 import com.reactnativedocumentpicker.DocumentPickerModule;
 import com.vinzscam.reactnativefileviewer.RNFileViewerModule;
@@ -33,8 +28,7 @@ import com.facebook.react.config.ReactFeatureFlags;
 import com.streetwriters.notesnook.newarchitecture.MainApplicationReactNativeHost;
 import cl.json.RNShareModule;
 import px.tooltips.RNTooltipsModule;
-import com.facebook.react.bridge.JSIModulePackage; // <- add  
-import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
+//import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
@@ -47,6 +41,15 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                 public boolean getUseDeveloperSupport() {
                     return BuildConfig.DEBUG;
                 }
+
+                // @Override
+                // protected JavaScriptExecutorFactory getJavaScriptExecutorFactory() {
+                // return new V8ExecutorFactory(
+                //     getApplicationContext(),
+                //     getPackageName(),
+                //     AndroidInfoHelpers.getFriendlyDeviceName(),
+                //     getUseDeveloperSupport());
+                // }
 
                 @Override
                 protected List<ReactPackage> getPackages() {
@@ -103,10 +106,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                 @Override
                 protected String getJSMainModuleName() {
                     return "index";
-                }
-
-                 @Override protected JSIModulePackage getJSIModulePackage() {        
-                     return new ReanimatedJSIModulePackage(); // <- add      
                 }
             };
 

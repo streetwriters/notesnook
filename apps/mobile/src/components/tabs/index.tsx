@@ -30,7 +30,7 @@ export interface TabsRef {
   setScrollEnabled: () => true;
 }
 
-export const NewTabs = forwardRef<TabsRef, TabProps>(
+export const FluidTabs = forwardRef<TabsRef, TabProps>(
   (
     { children, dimensions, widths, onChangeTab, onScroll, enabled, onDrawerStateChange }: TabProps,
     ref

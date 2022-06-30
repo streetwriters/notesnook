@@ -44,7 +44,7 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
     history.selectedItemsList = [];
   }
 
-  if (_note.conflicted) {
+  if (!_note.conflicted) {
     eSendEvent(eShowMergeDialog, _note);
     return;
   }

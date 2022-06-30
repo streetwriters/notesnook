@@ -496,7 +496,7 @@ export const useActions = ({ close = () => {}, item }) => {
     close();
     await sleep(300);
     presentSheet({
-      component: ref => <NoteHistory ref={ref} note={item} />
+      component: ref => <NoteHistory fwdRef={ref} note={item} />
     });
   }
 

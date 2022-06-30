@@ -1,7 +1,8 @@
-import { createRef, MutableRefObject } from 'react';
+import { createRef, RefObject } from 'react';
 import { TextInput } from 'react-native';
 import WebView from 'react-native-webview';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
+import { NoteType } from '../../../utils/types';
 import { EditorState, useEditorType } from './types';
 export const textInput = createRef<TextInput>();
 export const editorController = createRef<useEditorType>();
@@ -32,16 +33,15 @@ export function randId(prefix: string) {
     .replace('0.', prefix || '');
 }
 
-export function makeSessionId(item?: any) {
+export function makeSessionId(item?: NoteType) {
   return item?.id ? item.id + randId('_session_') : randId('session_');
 }
 
-export async function isEditorLoaded(ref: MutableRefObject<WebView | undefined>) {
-  return await post(ref, EditorEvents.status);
+export async function isEditorLoaded(ref: RefObject<WebView>, sessionId: string) {
+  return await post(ref, sessionId, EditorEvents.status);
 }
 
-export async function post(ref: MutableRefObject<WebView | undefined>, type: string, value = null) {
-  let sessionId = editorController.current?.sessionId;
+export async function post(ref: RefObject<WebView>, sessionId: string, type: string, value = null) {
   if (!sessionId) {
     console.warn('post called without sessionId of type:', type);
     return;

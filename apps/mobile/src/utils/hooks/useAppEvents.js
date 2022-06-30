@@ -58,14 +58,6 @@ export const useAppEvents = () => {
     isReconnecting: false
   });
 
-  const onMediaDownloaded = ({ hash, groupId, src }) => {
-    if (groupId?.startsWith('monograph')) return;
-    editorController.current?.commands.updateImage({
-      hash: hash,
-      src: src
-    });
-  };
-
   const onLoadingAttachmentProgress = data => {
     useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
   };
@@ -112,7 +104,6 @@ export const useAppEvents = () => {
     EV.subscribe(EVENTS.userSessionExpired, onSessionExpired);
     EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
     EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
-    EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
     eSubscribeEvent('userLoggedIn', onUserUpdated);
 
@@ -123,7 +114,6 @@ export const useAppEvents = () => {
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
       EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
-      EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
       EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
       EV.unsubscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);

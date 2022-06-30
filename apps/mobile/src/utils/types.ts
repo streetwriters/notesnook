@@ -64,6 +64,10 @@ export interface NoteType extends Entity<'note'> {
   contentId?: string;
   headline?: string;
   color?: string;
+  content?: {
+    data: string;
+    type: string;
+  };
 }
 
 export interface NotebookType extends Entity<'notebook'> {

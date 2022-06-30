@@ -1,21 +1,19 @@
 import KeepAwake from '@sayem314/react-native-keep-awake';
-import { EV, EVENTS } from 'notes-core/common';
-import React, { createRef, useEffect, useState } from 'react';
-import { Modal, Platform, SafeAreaView, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal, SafeAreaView, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import WebView from 'react-native-webview';
+import Editor from '../../screens/editor';
 import { editorController } from '../../screens/editor/tiptap/utils';
 import { DDS } from '../../services/device-detection';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/event-manager';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import Sync from '../../services/sync';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { dHeight } from '../../utils';
 import { db } from '../../utils/database';
-import { eApplyChanges, eShowMergeDialog } from '../../utils/events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { normalize, SIZE } from '../../utils/size';
+import { eOnLoadNote, eShowMergeDialog } from '../../utils/events';
+import { SIZE } from '../../utils/size';
 import { timeConverter } from '../../utils/time';
 import BaseDialog from '../dialog/base-dialog';
 import DialogButtons from '../dialog/dialog-buttons';
@@ -28,128 +26,42 @@ import Paragraph from '../ui/typography/paragraph';
 
 const sourceUri = '';
 
-const primaryWebView = createRef();
-const secondaryWebView = createRef();
-let note = null;
-let primaryData = null;
-let secondaryData = null;
-
-function onMediaLoaded({ hash, src }) {
-  console.log('on media download complete');
-  let inject = `
-  (function(){
-    const elements = document.querySelectorAll("img[data-hash=${hash}]");
-    if (!elements || !elements.length) return;
-    for (let element of elements) element.setAttribute("src", "${src}");
-  })();`;
-  primaryWebView.current?.injectJavaScript(inject);
-  secondaryWebView.current?.injectJavaScript(inject);
-}
-
 const MergeConflicts = () => {
   const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);
-  const [primary, setPrimary] = useState(true);
-  const [secondary, setSecondary] = useState(true);
-  const [keepContentFrom, setKeepContentFrom] = useState(null);
-  const [copyToSave, setCopyToSave] = useState(null);
-  const [disardedContent, setDiscardedContent] = useState(null);
+  const [keep, setKeep] = useState(null);
+  const [copy, setCopy] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [loadingAttachments, setLoadingAttachments] = useState(false);
   const insets = useSafeAreaInsets();
-
-  const onPrimaryWebViewLoad = async () => {
-    let content = await db.content.insertPlaceholders(primaryData, 'placeholder.svg');
-    postMessage(primaryWebView, 'htmldiff', content.data);
-    let theme = { ...colors };
-    theme.factor = normalize(1);
-
-    primaryWebView.current?.injectJavaScript(`
-    (function() {
-      let v = ${JSON.stringify(theme)}
-      if (pageTheme) {
-        pageTheme.colors = v;
-      }
-      
-      setTheme();
-  
-  })();
-    `);
-  };
-
-  const onSecondaryWebViewLoad = async () => {
-    if (!secondaryData) return;
-    let content = await db.content.insertPlaceholders(secondaryData, 'placeholder.svg');
-    postMessage(secondaryWebView, 'htmldiff', content?.data);
-    let theme = { ...colors };
-    theme.factor = normalize(1);
-    secondaryWebView.current?.injectJavaScript(`
-    (function() {
-        let v = ${JSON.stringify(theme)}
-        if (pageTheme) {
-          pageTheme.colors = v;
-        }
-        setTheme();
-    })();
-    `);
-  };
-
-  function postMessage(webview, type, value = null) {
-    let message = {
-      type: type,
-      value
-    };
-    webview.current?.postMessage(JSON.stringify(message));
-  }
-
-  const _onShouldStartLoadWithRequest = request => {
-    if (request.url.includes('http')) {
-      openLinkInBrowser(request.url, colors)
-        .catch(e =>
-          ToastEvent.show({
-            title: 'Failed to open link',
-            message: e.message,
-            type: 'success',
-            context: 'local'
-          })
-        )
-        .then(r => {
-          console.log('closed');
-        });
-
-      return false;
-    } else {
-      return true;
-    }
-  };
+  const content = useRef({});
+  const isKeepingConflicted = !keep?.conflicted;
+  const isKeeping = !!keep;
 
   const applyChanges = async () => {
-    let content = keepContentFrom === 'primary' ? primaryData : secondaryData;
-    let keepCopy =
-      copyToSave === 'primary' ? primaryData : copyToSave === 'secondary' ? secondaryData : null;
-
+    let _content = keep;
+    let note = db.notes.note(_content.noteId).data;
     await db.notes.add({
       id: note.id,
       conflicted: false,
-      dateEdited: content.dateEdited
+      dateEdited: _content.dateEdited
     });
 
     await db.content.add({
       id: note.contentId,
-      data: content.data,
-      type: content.type,
-      dateResolved: secondaryData.dateModified,
+      data: _content.data,
+      type: _content.type,
+      dateResolved: content.current.conflicted.dateModified,
       sessionId: Date.now(),
       conflicted: false
     });
 
-    if (keepCopy) {
+    if (copy) {
       await db.notes.add({
+        title: note.title + ' (Copy)',
         content: {
-          data: keepCopy.data,
-          type: keepCopy.type
-        },
-        id: null
+          data: copy.data,
+          type: copy.type
+        }
       });
     }
     Navigation.queueRoutesForUpdate(
@@ -167,89 +79,126 @@ const MergeConflicts = () => {
   };
 
   const show = async item => {
-    note = item;
-    let content = await db.content.raw(note.contentId);
-    switch (content.type) {
+    let noteContent = await db.content.raw(item.contentId);
+    switch (noteContent.type) {
       case 'tiny':
-        primaryData = content;
-        secondaryData = content.conflicted;
+        content.current = { ...noteContent };
+        if (!noteContent.conflicted) {
+          content.current.conflicted = { ...noteContent };
+        }
     }
     setVisible(true);
   };
 
   useEffect(() => {
-    eSubscribeEvent(eApplyChanges, applyChanges);
     eSubscribeEvent(eShowMergeDialog, show);
     return () => {
-      eUnSubscribeEvent(eApplyChanges, applyChanges);
       eUnSubscribeEvent(eShowMergeDialog, show);
     };
   }, []);
 
-  const onPressKeepFromPrimaryWebView = () => {
-    if (keepContentFrom == 'primary') {
-      setKeepContentFrom(null);
-    } else {
-      setKeepContentFrom('primary');
-    }
-  };
-
-  const onPressSaveCopyFromPrimaryWebView = () => {
-    setCopyToSave('primary');
-    setDialogVisible(true);
-  };
-
-  const onPressKeepFromSecondaryWebView = () => {
-    if (keepContentFrom == 'secondary') {
-      setKeepContentFrom(null);
-    } else {
-      setKeepContentFrom('secondary');
-    }
-  };
-
-  const onPressSaveCopyFromSecondaryWebView = () => {
-    setCopyToSave('secondary');
-    setDialogVisible(true);
-  };
-
-  const onPressDiscardFromPrimaryWebView = () => {
-    setDiscardedContent('primary');
-    setDialogVisible(true);
-  };
-
-  const onPressDiscardFromSecondaryWebView = () => {
-    setDiscardedContent('secondary');
-    setDialogVisible(true);
-  };
-
   const close = () => {
-    db.fs.cancel(primaryData?.noteId);
-
-    EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
     setVisible(false);
-    setPrimary(true);
-    setSecondary(true);
-    setCopyToSave(null);
-    setDiscardedContent(null);
-    setKeepContentFrom(null);
+    setCopy(null);
+    setKeep(null);
     setDialogVisible(false);
-    primaryData = null;
-    secondaryData = null;
-    note = null;
   };
 
-  const onLoadImages = async () => {
-    try {
-      setLoadingAttachments(true);
-      EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
-      await db.content.downloadMedia(primaryData.data.noteId, primaryData);
-      await db.content.downloadMedia(primaryData.data.noteId, secondaryData);
-      EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
-      setLoadingAttachments(false);
-    } catch (e) {
-      setLoadingAttachments(false);
-      eUnSubscribeEvent(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
-    }
+  const ConfigBar = ({ isDiscarded, keeping, back, isCurrent, contentToKeep }) => {
+    return (
+      <View
+        style={{
+          width: '100%',
+          height: 50,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 12,
+          paddingLeft: 6
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexShrink: 1
+          }}
+        >
+          {back && <IconButton onPress={close} color={colors.pri} name="arrow-left" />}
+          <Paragraph style={{ flexWrap: 'wrap' }} color={colors.icon} size={SIZE.xs}>
+            <Text style={{ color: isCurrent ? colors.accent : colors.red, fontWeight: 'bold' }}>
+              {isCurrent ? '(This Device)' : '(Incoming)'}
+            </Text>
+            {'\n'}
+            {timeConverter(contentToKeep.dateEdited)}
+          </Paragraph>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-end'
+          }}
+        >
+          {isDiscarded ? (
+            <Button
+              onPress={() => {
+                setCopy(contentToKeep);
+                setDialogVisible(true);
+              }}
+              title="Save a copy"
+              type="grayBg"
+              height={30}
+              style={{
+                borderRadius: 100,
+                paddingHorizontal: 12
+              }}
+              fontSize={SIZE.xs}
+            />
+          ) : null}
+          <View style={{ width: 10 }} />
+          {isDiscarded ? (
+            <Button
+              title="Discard"
+              type="accent"
+              accentColor="red"
+              height={30}
+              style={{
+                borderRadius: 100,
+                paddingHorizontal: 12
+              }}
+              fontSize={SIZE.xs}
+              accentText="light"
+              color={colors.errorText}
+              onPress={() => {
+                setDialogVisible(true);
+              }}
+            />
+          ) : null}
+          {isDiscarded ? null : (
+            <>
+              <Button
+                height={30}
+                style={{
+                  borderRadius: 100,
+                  paddingHorizontal: 12,
+                  minWidth: 60,
+                  marginLeft: 10
+                }}
+                type="accent"
+                fontSize={SIZE.xs}
+                title={keeping && !isDiscarded ? 'Undo' : 'Keep'}
+                onPress={() => {
+                  setKeep(keeping && !isDiscarded ? null : contentToKeep);
+                }}
+              />
+            </>
+          )}
+        </View>
+      </View>
+    );
   };
 
   return !visible ? null : (
@@ -302,103 +251,13 @@ const MergeConflicts = () => {
             backgroundColor: DDS.isLargeTablet() ? 'rgba(0,0,0,0.3)' : null
           }}
         >
-          <View
-            style={{
-              width: '100%',
-              height: 50,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingHorizontal: 12,
-              paddingLeft: 6
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexShrink: 1
-              }}
-            >
-              <IconButton onPress={close} color={colors.pri} name="arrow-left" />
-              <Paragraph style={{ flexWrap: 'wrap' }} color={colors.icon} size={SIZE.xs}>
-                <Text style={{ color: colors.accent, fontWeight: 'bold' }}>(This Device)</Text>
-                {'\n'}
-                {timeConverter(primaryData?.dateEdited)}
-              </Paragraph>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-end'
-              }}
-            >
-              {keepContentFrom === 'secondary' ? (
-                <Button
-                  onPress={onPressSaveCopyFromPrimaryWebView}
-                  title="Save a copy"
-                  type="grayBg"
-                  height={30}
-                  style={{
-                    borderRadius: 100,
-                    paddingHorizontal: 12
-                  }}
-                  fontSize={SIZE.xs}
-                />
-              ) : null}
-              <View style={{ width: 10 }} />
-              {keepContentFrom === 'secondary' ? (
-                <Button
-                  title="Discard"
-                  type="accent"
-                  accentColor="red"
-                  height={30}
-                  style={{
-                    borderRadius: 100,
-                    paddingHorizontal: 12
-                  }}
-                  fontSize={SIZE.xs}
-                  accentText="light"
-                  color={colors.errorText}
-                  onPress={onPressDiscardFromPrimaryWebView}
-                />
-              ) : null}
-              {keepContentFrom === 'secondary' ? null : (
-                <>
-                  <Button
-                    type="grayBg"
-                    title="Load images"
-                    onPress={onLoadImages}
-                    height={30}
-                    loading={loadingAttachments}
-                    fontSize={SIZE.xs}
-                    icon="download"
-                    style={{
-                      borderRadius: 100,
-                      paddingHorizontal: 12,
-                      minWidth: 60
-                    }}
-                  />
-                  <Button
-                    height={30}
-                    style={{
-                      borderRadius: 100,
-                      paddingHorizontal: 12,
-                      minWidth: 60,
-                      marginLeft: 10
-                    }}
-                    type="accent"
-                    fontSize={SIZE.xs}
-                    title={keepContentFrom === 'primary' ? 'Undo' : 'Keep'}
-                    onPress={onPressKeepFromPrimaryWebView}
-                  />
-                </>
-              )}
-            </View>
-          </View>
+          <ConfigBar
+            back={true}
+            isCurrent={true}
+            isDiscarded={isKeeping && isKeepingConflicted}
+            keeping={isKeeping}
+            contentToKeep={content.current}
+          />
 
           <Animated.View
             style={{
@@ -408,129 +267,26 @@ const MergeConflicts = () => {
               borderBottomColor: colors.nav
             }}
           >
-            <WebView
-              onLoad={onPrimaryWebViewLoad}
-              ref={primaryWebView}
-              style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'transparent'
-              }}
-              onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
-              cacheMode="LOAD_DEFAULT"
-              domStorageEnabled={true}
-              scrollEnabled={true}
-              bounces={false}
-              allowFileAccess={true}
-              scalesPageToFit={true}
-              allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
-              allowFileAccessFromFileURLs={true}
-              allowUniversalAccessFromFileURLs={true}
-              originWhitelist={['*']}
-              javaScriptEnabled={true}
-              cacheEnabled={true}
-              source={{
-                uri: sourceUri + 'plaineditor.html'
+            <Editor
+              noHeader
+              noToolbar
+              readonly
+              editorId=":conflictPrimary"
+              onLoad={() => {
+                const note = db.notes.note(content.current?.noteId)?.data;
+                if (!note) return;
+                eSendEvent(eOnLoadNote + ':conflictPrimary', { ...note, content: content.current });
               }}
             />
           </Animated.View>
 
-          <View
-            style={{
-              width: '100%',
-              height: 50,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingHorizontal: 12
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexShrink: 1
-              }}
-            >
-              <Paragraph style={{ flexWrap: 'wrap' }} color={colors.icon} size={SIZE.xs}>
-                <Text style={{ color: 'red', fontWeight: 'bold' }}>(Incoming)</Text>
-                {'\n'}
-                {timeConverter(secondaryData?.dateEdited)}
-              </Paragraph>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-end'
-              }}
-            >
-              {keepContentFrom === 'primary' ? (
-                <Button
-                  height={30}
-                  style={{
-                    borderRadius: 100,
-                    paddingHorizontal: 12,
-                    minWidth: 60
-                  }}
-                  type="accent"
-                  fontSize={SIZE.xs}
-                  onPress={onPressSaveCopyFromSecondaryWebView}
-                  title="Save a copy"
-                />
-              ) : null}
-              <View style={{ width: 10 }} />
-              {keepContentFrom === 'primary' ? (
-                <Button
-                  title="Discard"
-                  type="accent"
-                  height={30}
-                  style={{
-                    borderRadius: 100,
-                    paddingHorizontal: 12,
-                    minWidth: 60
-                  }}
-                  fontSize={SIZE.xs}
-                  accentColor="red"
-                  accentText="light"
-                  onPress={onPressDiscardFromSecondaryWebView}
-                />
-              ) : null}
-
-              {keepContentFrom === 'primary' ? null : (
-                <>
-                  <Button
-                    type="grayBg"
-                    title="Load images"
-                    height={30}
-                    loading={loadingAttachments}
-                    fontSize={SIZE.xs}
-                    icon="download"
-                    style={{
-                      borderRadius: 100,
-                      paddingHorizontal: 12,
-                      minWidth: 60
-                    }}
-                  />
-                  <Button
-                    height={30}
-                    style={{
-                      borderRadius: 100,
-                      paddingHorizontal: 12,
-                      minWidth: 60,
-                      marginLeft: 10
-                    }}
-                    type="accent"
-                    fontSize={SIZE.xs}
-                    title={keepContentFrom === 'secondary' ? 'Undo' : 'Keep'}
-                    onPress={onPressKeepFromSecondaryWebView}
-                  />
-                </>
-              )}
-            </View>
-          </View>
+          <ConfigBar
+            back={false}
+            isCurrent={false}
+            isDiscarded={isKeeping && !isKeepingConflicted}
+            keeping={isKeeping}
+            contentToKeep={content.current.conflicted}
+          />
 
           <Animated.View
             style={{
@@ -539,29 +295,18 @@ const MergeConflicts = () => {
               borderRadius: 10
             }}
           >
-            <WebView
-              onLoad={onSecondaryWebViewLoad}
-              ref={secondaryWebView}
-              style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'transparent'
-              }}
-              onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
-              cacheMode="LOAD_DEFAULT"
-              domStorageEnabled={true}
-              scrollEnabled={true}
-              bounces={false}
-              allowFileAccess={true}
-              scalesPageToFit={true}
-              allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
-              allowFileAccessFromFileURLs={true}
-              allowUniversalAccessFromFileURLs={true}
-              originWhitelist={['*']}
-              javaScriptEnabled={true}
-              cacheEnabled={true}
-              source={{
-                uri: sourceUri + 'plaineditor.html'
+            <Editor
+              noHeader
+              noToolbar
+              readonly
+              editorId=":conflictSecondary"
+              onLoad={() => {
+                const note = db.notes.note(content.current?.noteId)?.data;
+                if (!note) return;
+                eSendEvent(eOnLoadNote + ':conflictSecondary', {
+                  ...note,
+                  content: content.current.conflicted
+                });
               }}
             />
           </Animated.View>

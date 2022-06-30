@@ -87,21 +87,6 @@ const Launcher = React.memo(
     const hideSplashScreen = async () => {
       if (requireIntro.value) await sleep(500);
       await RNBootSplash.hide({ fade: true });
-      setTimeout(async () => {
-        if (Platform.OS === 'android') {
-          NativeModules.RNBars.setStatusBarStyle(!colors.night ? 'light-content' : 'dark-content');
-          NativeModules.RNBars.setNavigationBarStyle(
-            !colors.night ? 'light-content' : 'dark-content'
-          );
-          await sleep(5);
-          NativeModules.RNBars.setStatusBarStyle(colors.night ? 'light-content' : 'dark-content');
-          NativeModules.RNBars.setNavigationBarStyle(
-            colors.night ? 'light-content' : 'dark-content'
-          );
-        } else {
-          StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-        }
-      }, 1000);
     };
 
     useEffect(() => {
@@ -161,6 +146,7 @@ const Launcher = React.memo(
     };
 
     const checkAppUpdateAvailable = async () => {
+      return;
       try {
         const version = await checkVersion();
         if (!version.needsUpdate) return false;

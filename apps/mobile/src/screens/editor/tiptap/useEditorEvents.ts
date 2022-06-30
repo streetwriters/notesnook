@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { BackHandler, InteractionManager, NativeEventSubscription } from 'react-native';
+import { WebViewMessageEvent } from 'react-native-webview';
 import { Properties } from '../../../components/properties';
 import { DDS } from '../../../services/device-detection';
 import {
@@ -29,8 +30,8 @@ import { tabBarRef } from '../../../utils/global-refs';
 import { NoteType } from '../../../utils/types';
 import { useDragState } from '../../settings/editor/state';
 import picker from './picker';
-import { EditorMessage, useEditorType } from './types';
-import { editorController, EditorEvents, editorState } from './utils';
+import { EditorMessage, EditorProps, useEditorType } from './types';
+import { EditorEvents, editorState } from './utils';
 
 export const EventTypes = {
   selection: 'editor-event:selection',
@@ -49,7 +50,7 @@ export const EventTypes = {
   properties: 'editor-event:properties'
 };
 
-const publishNote = async () => {
+const publishNote = async (editor: useEditorType) => {
   const user = useUserStore.getState().user;
   if (!user) {
     ToastEvent.show({
@@ -72,7 +73,7 @@ const publishNote = async () => {
     });
     return;
   }
-  const currentNote = editorController.current?.note?.current;
+  const currentNote = editor?.note?.current;
   if (currentNote?.id) {
     let note = db.notes?.note(currentNote.id)?.data as NoteType;
     if (note?.locked) {
@@ -90,8 +91,8 @@ const publishNote = async () => {
   }
 };
 
-const showActionsheet = async () => {
-  const currentNote = editorController.current?.note?.current;
+const showActionsheet = async (editor: useEditorType) => {
+  const currentNote = editor?.note?.current;
   if (currentNote?.id) {
     let note = db.notes?.note(currentNote.id)?.data as NoteType;
     if (!note) {
@@ -112,11 +113,10 @@ const showActionsheet = async () => {
   }
 };
 
-export const useEditorEvents = (editor: useEditorType) => {
+export const useEditorEvents = (editor: useEditorType, editorProps: Partial<EditorProps>) => {
   const deviceMode = useSettingStore(state => state.deviceMode);
   const fullscreen = useSettingStore(state => state.fullscreen);
   const handleBack = useRef<NativeEventSubscription>();
-  const currentEditingNote = useEditorStore(state => state.currentEditingNote);
   const readonly = useEditorStore(state => state.readonly);
   const isPremium = useUserStore(state => state.premium);
   const tools = useDragState(state => state.data);
@@ -129,17 +129,10 @@ export const useEditorEvents = (editor: useEditorType) => {
       fullscreen: fullscreen,
       premium: isPremium,
       readonly: readonly,
-      tools: tools
+      tools: tools,
+      ...editorProps
     });
-  }, [
-    currentEditingNote,
-    fullscreen,
-    isPremium,
-    readonly,
-    editor.sessionId,
-    editor.loading,
-    tools
-  ]);
+  }, [fullscreen, isPremium, readonly, editor.sessionId, editor.loading, tools]);
 
   const onBackPress = useCallback(async () => {
     const editorHandledBack = await editor.commands.handleBack();
@@ -165,7 +158,7 @@ export const useEditorEvents = (editor: useEditorType) => {
       });
       setImmediate(() => useEditorStore.getState().setCurrentlyEditingNote(null));
       editorState().currentlyEditing = false;
-      editorController.current?.reset();
+      editor.reset();
     }, 1);
   }, []);
 
@@ -217,8 +210,8 @@ export const useEditorEvents = (editor: useEditorType) => {
   }, [fullscreen]);
 
   useEffect(() => {
-    eSubscribeEvent(eOnLoadNote, onLoadNote);
-    eSubscribeEvent(eClearEditor, onCallClear);
+    eSubscribeEvent(eOnLoadNote + editor.editorId, onLoadNote);
+    eSubscribeEvent(eClearEditor + editor.editorId, onCallClear);
     return () => {
       eUnSubscribeEvent(eClearEditor, onCallClear);
       eUnSubscribeEvent(eOnLoadNote, onLoadNote);
@@ -226,8 +219,7 @@ export const useEditorEvents = (editor: useEditorType) => {
   }, []);
 
   const onMessage = useCallback(
-    event => {
-      event;
+    (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
       let editorMessage = JSON.parse(data) as EditorMessage;
 
@@ -303,10 +295,10 @@ export const useEditorEvents = (editor: useEditorType) => {
           eSendEvent(eOpenPremiumDialog);
           break;
         case EventTypes.monograph:
-          publishNote();
+          publishNote(editor);
           break;
         case EventTypes.properties:
-          showActionsheet();
+          showActionsheet(editor);
           break;
         case EventTypes.back:
           onBackPress();

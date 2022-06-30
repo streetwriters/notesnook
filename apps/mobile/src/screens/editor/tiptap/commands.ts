@@ -4,21 +4,14 @@ import { EdgeInsets } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import { db } from '../../../utils/database';
 import { sleep } from '../../../utils/time';
-import { Note } from './types';
+import { Note, Settings } from './types';
 import { getResponse, randId, textInput } from './utils';
 import { Attachment, AttachmentProgress } from 'notesnook-editor/dist/extensions/attachment/index';
 import { ImageAttributes } from 'notesnook-editor/dist/extensions/image/index';
-import { ToolbarGroupDefinition } from 'notesnook-editor/dist/toolbar/types';
+import { NoteType } from '../../../utils/types';
+import { sanitizeFilename } from '../../../utils/sanitizer';
 
 type Action = { job: string; id: string };
-
-export type Settings = {
-  readonly: boolean;
-  fullscreen: boolean;
-  deviceMode: string;
-  premium: boolean;
-  tools: ToolbarGroupDefinition[];
-};
 
 async function call(webview: RefObject<WebView | undefined>, action?: Action) {
   if (!webview.current || !action) return;
@@ -26,7 +19,7 @@ async function call(webview: RefObject<WebView | undefined>, action?: Action) {
   let response = await getResponse(action.id);
   console.log('webview job: ', action.id, response ? response.value : response);
   if (!response) {
-    console.warn('webview job failed', action.id, action.job);
+    console.warn('webview job failed', action.id);
   }
   return response ? response.value : response;
 }
@@ -49,17 +42,17 @@ const fn = (fn: string) => {
 
 class Commands {
   ref = createRef<WebView | undefined>();
-  constructor(ref: MutableRefObject<WebView | undefined>) {
+  constructor(ref: RefObject<WebView>) {
     this.ref = ref;
   }
 
   async doAsync<T>(job: string) {
-    if (!this.ref) return false;
+    if (!this.ref.current) return false;
     return call(this.ref, fn(job)) as Promise<T>;
   }
 
   focus = async () => {
-    if (!this.ref) return;
+    if (!this.ref.current) return;
     if (Platform.OS === 'android') {
       this.ref.current?.requestFocus();
       setTimeout(async () => {
@@ -74,16 +67,20 @@ class Commands {
     }
   };
 
-  blur = async () => await this.doAsync(`editor.commands.blur();editorTitle.current?.blur()`);
+  blur = async () =>
+    await this.doAsync(`
+  editor && editor.commands.blur();
+  typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTitle.current.blur();
+  `);
 
   clearContent = async () => {
     await this.doAsync(
       `
 editor.commands.blur();
-editorTitle.current?.blur();
+typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
 editor?.commands.clearContent(false);
 editorController.setTitle(null);
-statusBar.current.set({date:"",saved:""});
+typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",saved:""});
         `
     );
   };
@@ -91,7 +88,9 @@ statusBar.current.set({date:"",saved:""});
   setSessionId = async (id: string | null) => await this.doAsync(`globalThis.sessionId = "${id}"`);
 
   setStatus = async (date: string | undefined, saved: string) =>
-    await this.doAsync(`statusBar.current.set({date:"${date}",saved:"${saved}"})`);
+    await this.doAsync(
+      `typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"${date}",saved:"${saved}"})`
+    );
 
   setPlaceholder = async (placeholder: string) => {
     await this.doAsync(`
@@ -119,7 +118,7 @@ statusBar.current.set({date:"",saved:""});
     `);
   };
 
-  setTags = async (note: Note | null | undefined) => {
+  setTags = async (note: NoteType | null | undefined) => {
     if (!note) return;
     let tags = note.tags
       .map((t: any) =>

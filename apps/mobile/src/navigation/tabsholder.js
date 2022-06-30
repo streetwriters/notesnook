@@ -1,12 +1,11 @@
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useRef } from 'react';
-import { Platform, View } from 'react-native';
-import { NavigationBar, StatusBar } from 'react-native-bars';
+import { Platform, View, StatusBar } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
-import { NewTabs } from '../components/tabs';
+import { FluidTabs } from '../components/tabs';
 import { editorState } from '../screens/editor/tiptap/utils';
 import { EditorWrapper } from '../screens/editor/wrapper';
 import { DDS } from '../services/device-detection';
@@ -255,18 +254,22 @@ export const TabsHolder = React.memo(
           paddingBottom: Platform.OS === 'android' ? insets?.bottom : 0
         }}
       >
-        <StatusBar animated={true} barStyle={colors.night ? 'light-content' : 'dark-content'} />
-        <NavigationBar barStyle={colors.night ? 'light-content' : 'dark-content'} />
+        <StatusBar
+          animated={true}
+          barStyle={colors.night ? 'light-content' : 'dark-content'}
+          translucent={true}
+          backgroundColor="transparent"
+        />
 
         {deviceMode && widths[deviceMode] ? (
-          <NewTabs
+          <FluidTabs
             ref={tabBarRef}
             dimensions={dimensions}
             widths={widths[deviceMode]}
             enabled={deviceMode !== 'tablet'}
             onScroll={onScroll}
             onChangeTab={onChangeTab}
-            onDrawerStateChange={state => {}}
+            onDrawerStateChange={state => true}
           >
             <View
               key="1"
@@ -309,7 +312,7 @@ export const TabsHolder = React.memo(
               <NavigationStack />
             </View>
             <EditorWrapper key="3" width={widths} dimensions={dimensions} />
-          </NewTabs>
+          </FluidTabs>
         ) : null}
       </View>
     );

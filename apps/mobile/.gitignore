@@ -23,8 +23,10 @@ DerivedData
 *.ipa
 *.xcuserstate
 *.hprof
+ios/.xcode.env.local
 # Android/IntelliJ
 #
+rn-build-deps/
 build/
 .idea
 .gradle

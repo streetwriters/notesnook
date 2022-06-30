@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { Button } from '../../components/ui/button';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
@@ -11,47 +11,43 @@ import { SIZE } from '../../utils/size';
 import { timeConverter } from '../../utils/time';
 import { editorState } from './tiptap/utils';
 
-let timer = null;
-let timerError = null;
-let timerClosing = null;
-const EditorOverlay = () => {
+const EditorOverlay = ({ editorId = '', editor }) => {
   const colors = useThemeStore(state => state.colors);
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value
-    };
+  const isDefaultEditor = editorId === '';
+  const timers = useRef({
+    loading: 0,
+    error: 0,
+    closing: 0
   });
+
+  const clearTimers = () => {
+    clearTimeout(timers.current.loading);
+    clearTimeout(timers.current.error);
+    clearTimeout(timers.current.closing);
+  };
 
   const load = async _loading => {
     editorState().overlay = true;
-    clearTimeout(timer);
-    clearTimeout(timerError);
-    clearTimeout(timerClosing);
+    clearTimers();
     if (_loading) {
       opacity.value = 1;
       setLoading(_loading);
-      timerError = setTimeout(() => {
+      timers.current.error = setTimeout(() => {
         if (_loading) {
-          let _n = _loading;
-          _n.forced = true;
-          eSendEvent(eOnLoadNote, _n);
+          let note = _loading;
+          note.forced = true;
+          eSendEvent(eOnLoadNote + editorId, note);
         }
         setError(true);
       }, 4000);
     } else {
-      clearTimeout(timer);
-      clearTimeout(timerError);
-      clearTimeout(timerClosing);
+      clearTimers();
       setError(false);
       editorState().overlay = false;
-      opacity.value = withTiming(0, { duration: 150 });
-      timerClosing = setTimeout(() => {
-        setLoading(null);
-      }, 150);
+      setLoading(null);
     }
   };
 
@@ -62,11 +58,18 @@ const EditorOverlay = () => {
   }, [loading]);
 
   useEffect(() => {
-    eSubscribeEvent('loadingNote', load);
+    eSubscribeEvent('loadingNote' + editorId, load);
     return () => {
-      eUnSubscribeEvent('loadingNote', load);
+      clearTimers();
+      eUnSubscribeEvent('loadingNote' + editorId, load);
     };
-  }, [loading]);
+  }, [loading, editorId]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value
+    };
+  });
 
   return (
     <Animated.View
@@ -98,26 +101,28 @@ const EditorOverlay = () => {
           paddingVertical: 20
         }}
       >
-        <View
-          style={{
-            flexDirection: 'row',
-            height: 10,
-            width: 100,
-            marginBottom: 15,
-            borderRadius: 5,
-            overflow: 'hidden',
-            backgroundColor: colors.nav
-          }}
-        >
-          <Animated.View
+        {isDefaultEditor ? (
+          <View
             style={{
+              flexDirection: 'row',
               height: 10,
-              borderRadius: 5,
               width: 100,
-              backgroundColor: colors.accent
+              marginBottom: 15,
+              borderRadius: 5,
+              overflow: 'hidden',
+              backgroundColor: colors.nav
             }}
-          />
-        </View>
+          >
+            <Animated.View
+              style={{
+                height: 10,
+                borderRadius: 5,
+                width: 100,
+                backgroundColor: colors.accent
+              }}
+            />
+          </View>
+        ) : null}
 
         {loading?.title ? (
           <Heading
@@ -129,7 +134,7 @@ const EditorOverlay = () => {
           </Heading>
         ) : null}
 
-        {loading?.dateEdited ? (
+        {loading?.dateEdited && isDefaultEditor ? (
           <Paragraph
             textBreakStrategy="balanced"
             style={{ textAlign: 'center' }}
@@ -155,7 +160,8 @@ const EditorOverlay = () => {
             }}
             onPress={() => {
               setError(false);
-              eSendEvent('webviewreset');
+              editor.setLoading(true);
+              setTimeout(() => editor.setLoading(false), 10);
             }}
             title="Taking too long? Reload editor"
           />

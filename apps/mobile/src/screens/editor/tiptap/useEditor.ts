@@ -13,15 +13,17 @@ import { MMKV } from '../../../utils/database/mmkv';
 import { eOnLoadNote } from '../../../utils/events';
 import { tabBarRef } from '../../../utils/global-refs';
 import { timeConverter } from '../../../utils/time';
+import { NoteType } from '../../../utils/types';
 import Commands from './commands';
 import { AppState, Content, EditorState, Note, SavePayload } from './types';
 import { defaultState, EditorEvents, isEditorLoaded, makeSessionId, post } from './utils';
 
-export const useEditor = () => {
+export const useEditor = (editorId = '', readonly?: boolean) => {
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>(makeSessionId());
-  const editorRef = useRef<WebView>();
-  const currentNote = useRef<Note | null>();
+  const sessionIdRef = useRef(sessionId);
+  const editorRef = useRef<WebView>(null);
+  const currentNote = useRef<NoteType | null>();
   const currentContent = useRef<Content | null>();
   const timers = useRef<{ [name: string]: NodeJS.Timeout }>({});
   const commands = useMemo(() => new Commands(editorRef), []);
@@ -30,15 +32,20 @@ export const useEditor = () => {
   const placeholderTip = useRef(TipManager.placeholderTip());
   const tags = useTagStore(state => state.tags);
   const insets = useSafeAreaInsets();
+  const isDefaultEditor = editorId === '';
 
   const postMessage = useCallback(
-    async (type: string, data: any) => await post(editorRef, type, data),
-    []
+    async (type: string, data: any) => await post(editorRef, sessionIdRef.current, type, data),
+    [sessionIdRef]
   );
 
   useEffect(() => {
-    commands.setInsets(insets);
+    commands.setInsets(isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 });
   }, [insets]);
+
+  useEffect(() => {
+    sessionIdRef.current = sessionId;
+  }, [sessionId]);
 
   useEffect(() => {
     commands.setTags(currentNote.current);
@@ -69,11 +76,11 @@ export const useEditor = () => {
   }, [sessionId, loading]);
 
   const overlay = (show: boolean, data = { type: 'new' }) => {
-    eSendEvent('loadingNote', show ? currentNote.current || data : false);
+    eSendEvent('loadingNote' + editorId, show ? currentNote.current || data : false);
   };
 
   const onReady = useCallback(async () => {
-    if (!(await isEditorLoaded(editorRef))) {
+    if (!(await isEditorLoaded(editorRef, sessionId))) {
       console.log('reload editor');
       overlay(true);
       setLoading(true);
@@ -99,7 +106,7 @@ export const useEditor = () => {
     await commands.clearContent();
     console.log('reset state: ', resetState);
     if (resetState) {
-      useEditorStore.getState().setCurrentlyEditingNote(null);
+      isDefaultEditor && useEditorStore.getState().setCurrentlyEditingNote(null);
       placeholderTip.current = TipManager.placeholderTip();
       await commands.setPlaceholder(placeholderTip.current);
     }
@@ -115,9 +122,10 @@ export const useEditor = () => {
       sessionHistoryId: currentSessionHistoryId
     }: SavePayload) => {
       console.log('saving note', id);
+      if (readonly) return;
       try {
         if (id && !db.notes?.note(id)) {
-          useEditorStore.getState().setCurrentlyEditingNote(null);
+          isDefaultEditor && useEditorStore.getState().setCurrentlyEditingNote(null);
           await reset();
           return;
         }
@@ -144,11 +152,11 @@ export const useEditor = () => {
         if (!locked) {
           id = await db.notes?.add(noteData);
           if (!note && id) {
-            currentNote.current = db.notes?.note(id).data as Note;
+            currentNote.current = db.notes?.note(id).data as NoteType;
             state.current?.onNoteCreated && state.current.onNoteCreated(id);
           }
 
-          if (useEditorStore.getState().currentEditingNote !== id) {
+          if (useEditorStore.getState().currentEditingNote !== id && isDefaultEditor) {
             setTimeout(() => {
               id && useEditorStore.getState().setCurrentlyEditingNote(id);
             });
@@ -179,31 +187,25 @@ export const useEditor = () => {
     [commands, reset]
   );
 
-  const loadContent = useCallback(async (note: Note) => {
+  const loadContent = useCallback(async (note: NoteType) => {
     currentNote.current = note;
-    if (note.locked) {
+    if (note.locked || note.content) {
       currentContent.current = {
-        data: note.content.data,
-        type: note.content.type
+        data: note.content?.data,
+        type: note.content?.type || 'tiny'
       };
     } else {
-      let data = await db.content?.raw(note.contentId);
-      if (data) {
-        data = await db.content?.insertPlaceholders(data, 'placeholder.svg');
-        currentContent.current = {
-          data: data.data,
-          type: data.type
-        };
-      }
+      currentContent.current = await db.content?.raw(note.contentId);
     }
   }, []);
 
   const loadNote = useCallback(
-    async (item: Note) => {
-      console.log('loading note', item.type);
+    async (item: NoteType) => {
+      console.log('loading note', item.type, eOnLoadNote + editorId);
       state.current.currentlyEditing = true;
       const editorState = useEditorStore.getState();
 
+      //@ts-ignore todo
       if (item && item.type === 'new') {
         currentNote.current && (await reset());
         let nextSessionId = makeSessionId(item);
@@ -212,8 +214,9 @@ export const useEditor = () => {
         await commands.setSessionId(nextSessionId);
         await commands.focus();
       } else {
+        //@ts-ignore todo
         if (!item.forced && currentNote.current?.id === item.id) return;
-        editorState.setCurrentlyEditingNote(item.id);
+        isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
         overlay(true, item);
         currentNote.current && (await reset(false));
         await loadContent(item);
@@ -242,11 +245,11 @@ export const useEditor = () => {
   };
 
   useEffect(() => {
-    eSubscribeEvent(eOnLoadNote, loadNote);
+    eSubscribeEvent(eOnLoadNote + editorId, loadNote);
     return () => {
-      eUnSubscribeEvent(eOnLoadNote, loadNote);
+      eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
     };
-  }, []);
+  }, [editorId]);
 
   const saveContent = useCallback(
     ({ title, content, type }: { title?: string; content?: string; type: string }) => {
@@ -284,13 +287,14 @@ export const useEditor = () => {
     state.current.ready = true;
     onReady();
     postMessage(EditorEvents.theme, useThemeStore.getState().colors);
+    commands.setInsets(isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 });
     if (currentNote.current) {
       console.log('force reload note');
+      //@ts-ignore
       loadNote({ ...currentNote.current, forced: true });
     } else {
       await commands.setPlaceholder(placeholderTip.current);
-      commands.setInsets(insets);
-      restoreEditorState();
+      isDefaultEditor && restoreEditorState();
     }
   }, [state, currentNote, loadNote]);
 
@@ -311,7 +315,9 @@ export const useEditor = () => {
           tabBarRef.current?.goToPage(1);
         }
         setTimeout(() => {
+          console.log('restoring app state here');
           if (appState.note) {
+            //@ts-ignore
             loadNote(appState.note);
           }
         }, 1);
@@ -339,6 +345,7 @@ export const useEditor = () => {
     setSessionId,
     note: currentNote,
     onReady,
-    saveContent
+    saveContent,
+    editorId: editorId
   };
 };
