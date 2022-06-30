@@ -123,7 +123,6 @@ export const useEditorEvents = (editor: useEditorType, editorProps: Partial<Edit
   if (!editor) return null;
 
   useEffect(() => {
-    console.log('setting settings');
     editor.commands.setSettings({
       deviceMode: deviceMode || 'mobile',
       fullscreen: fullscreen,

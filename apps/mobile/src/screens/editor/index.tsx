@@ -26,9 +26,20 @@ const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
 };
 
 const Editor = React.memo(
-  ({ readonly, noToolbar, noHeader, withController, editorId, onLoad }: EditorProps) => {
+  ({
+    readonly = false,
+    noToolbar = false,
+    noHeader = false,
+    withController = true,
+    editorId = '',
+    onLoad
+  }: EditorProps) => {
     const editor = useEditor(editorId || '', readonly);
-    const onMessage = useEditorEvents(editor, { readonly, noToolbar, noHeader });
+    const onMessage = useEditorEvents(editor, {
+      readonly,
+      noToolbar,
+      noHeader
+    });
 
     const onMediaDownloaded = ({
       hash,
@@ -75,10 +86,10 @@ const Editor = React.memo(
           nestedScrollEnabled
           onError={onError}
           injectedJavaScriptBeforeContentLoaded={`
-        globalThis.readonly=${readonly};
-        globalThis.noToolbar=${noToolbar};
-        globalThis.noHeader=${noHeader};
-        `}
+          globalThis.readonly=${readonly};
+          globalThis.noToolbar=${noToolbar};
+          globalThis.noHeader=${noHeader};
+          `}
           injectedJavaScript={`
         globalThis.sessionId="${editor.sessionId}";`}
           javaScriptEnabled={true}
