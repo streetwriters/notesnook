@@ -1,8 +1,10 @@
+import "notesnook-editor/styles/styles.css";
+import "notesnook-editor/styles/katex.min.css";
+import "notesnook-editor/styles/prism-theme.css";
 import { Theme } from "@notesnook/theme";
 import { useTheme } from "emotion-theming";
 import { Toolbar, useTiptap, PortalProvider, Editor } from "notesnook-editor";
 import { Box, Flex } from "rebass";
-import "notesnook-editor/dist/styles.css";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import useMobile from "../../utils/use-mobile";
 import { Attachment } from "./picker";
