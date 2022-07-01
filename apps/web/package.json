@@ -95,6 +95,7 @@
     "ip": "^1.1.8",
     "lorem-ipsum": "^2.0.4",
     "patch-package": "^6.4.7",
+    "progress-bar-webpack-plugin": "^2.1.0",
     "source-map-explorer": "^2.5.2",
     "typescript": "^4.1.5",
     "webpack-bundle-analyzer": "^4.5.0",

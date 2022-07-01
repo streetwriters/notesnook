@@ -1,5 +1,4 @@
-import { DEFAULT_TOOLS } from "notesnook-editor";
-import { ToolbarGroupDefinition } from "notesnook-editor/dist/toolbar/types";
+import { DEFAULT_TOOLS, ToolbarGroupDefinition } from "notesnook-editor";
 import { db } from "./db";
 
 export type PresetId = "default" | "minimal" | "custom";

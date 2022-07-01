@@ -3,7 +3,13 @@ import "notesnook-editor/styles/katex.min.css";
 import "notesnook-editor/styles/prism-theme.css";
 import { Theme } from "@notesnook/theme";
 import { useTheme } from "emotion-theming";
-import { Toolbar, useTiptap, PortalProvider, Editor } from "notesnook-editor";
+import {
+  Toolbar,
+  useTiptap,
+  PortalProvider,
+  Editor,
+  AttachmentType,
+} from "notesnook-editor";
 import { Box, Flex } from "rebass";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import useMobile from "../../utils/use-mobile";
@@ -11,7 +17,6 @@ import { Attachment } from "./picker";
 import { CharacterCounter, IEditor } from "./types";
 import { useConfigureEditor, useSearch, useToolbarConfig } from "./context";
 import { createPortal } from "react-dom";
-import { AttachmentType } from "notesnook-editor/dist/extensions/attachment";
 import { getCurrentPreset } from "../../common/toolbar-config";
 
 type TipTapProps = {

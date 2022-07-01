@@ -5,13 +5,12 @@ import {
   DEFAULT_TOOLS,
   getAllTools,
   getToolDefinition,
-} from "notesnook-editor";
-import {
+  Icon,
+  Icons,
   ToolbarGroupDefinition,
   ToolDefinition,
-} from "notesnook-editor/dist/toolbar/types";
-import { Icons } from "notesnook-editor/dist/toolbar/icons";
-import { Icon } from "notesnook-editor/dist/toolbar/components/icon";
+  ToolId,
+} from "notesnook-editor";
 import {
   closestCenter,
   DndContext,
@@ -44,7 +43,6 @@ import {
   Preset,
   PresetId,
 } from "../../common/toolbar-config";
-import { ToolId } from "notesnook-editor/dist/toolbar/tools";
 import { showToast } from "../../utils/toast";
 
 export type ToolbarConfigDialogProps = {
