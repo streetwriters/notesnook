@@ -77,6 +77,9 @@ export declare const Icons: {
     math: string;
     mathBlock: string;
     outlineList: string;
+    fontFamily: string;
+    fontSize: string;
+    heading: string;
     plus: string;
     minus: string;
     close: string;

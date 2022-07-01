@@ -79,6 +79,9 @@ import {
   mdiMathIntegral,
   mdiFunctionVariant,
   mdiFileTreeOutline,
+  mdiFormatFont,
+  mdiFormatFontSizeIncrease,
+  mdiFormatHeaderPound,
 } from "@mdi/js";
 
 export const Icons = {
@@ -169,6 +172,9 @@ export const Icons = {
   math: mdiFunctionVariant,
   mathBlock: mdiMathIntegral,
   outlineList: mdiFileTreeOutline,
+  fontFamily: mdiFormatFont,
+  fontSize: mdiFormatFontSizeIncrease,
+  heading: mdiFormatHeaderPound,
 
   plus: mdiPlus,
   minus: mdiMinus,

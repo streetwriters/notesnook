@@ -66,6 +66,7 @@ const tools: Record<ToolId, ToolDefinition> = {
   insertBlock: {
     icon: "plus",
     title: "Insert",
+    conditional: true,
   },
   bulletList: {
     icon: "bulletList",
@@ -76,15 +77,15 @@ const tools: Record<ToolId, ToolDefinition> = {
     title: "Numbered list",
   },
   fontFamily: {
-    icon: "none",
+    icon: "fontFamily",
     title: "Font family",
   },
   fontSize: {
-    icon: "none",
+    icon: "fontSize",
     title: "Font size",
   },
   headings: {
-    icon: "none",
+    icon: "heading",
     title: "Headings",
   },
   alignCenter: {
