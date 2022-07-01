@@ -1,6 +1,7 @@
 import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
 import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
+import { findSelectedNode } from "../../toolbar/utils/prosemirror";
 import { onBackspacePressed } from "../list-item/commands";
 import { OutlineList } from "../outline-list/outline-list";
 import { createNodeView } from "../react";
@@ -63,7 +64,8 @@ export const OutlineListItem = Node.create<ListItemOptions>({
       },
       Enter: ({ editor }) => {
         const subList = findSublist(editor, this.type);
-        if (!subList) return false;
+        if (!subList) return this.editor.commands.splitListItem(this.name);
+
         const { isCollapsed, subListPos } = subList;
 
         if (isCollapsed) {

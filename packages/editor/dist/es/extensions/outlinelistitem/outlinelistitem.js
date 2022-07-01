@@ -41,7 +41,7 @@ export const OutlineListItem = Node.create({
             Enter: ({ editor }) => {
                 const subList = findSublist(editor, this.type);
                 if (!subList)
-                    return false;
+                    return this.editor.commands.splitListItem(this.name);
                 const { isCollapsed, subListPos } = subList;
                 if (isCollapsed) {
                     return this.editor.commands.toggleOutlineCollapse(subListPos, false);
