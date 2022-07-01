@@ -16,7 +16,14 @@ import { timeConverter } from '../../../utils/time';
 import { NoteType } from '../../../utils/types';
 import Commands from './commands';
 import { AppState, Content, EditorState, Note, SavePayload } from './types';
-import { defaultState, EditorEvents, isEditorLoaded, makeSessionId, post } from './utils';
+import {
+  defaultState,
+  EditorEvents,
+  isContentInvalid,
+  isEditorLoaded,
+  makeSessionId,
+  post
+} from './utils';
 
 export const useEditor = (editorId = '', readonly?: boolean) => {
   const [loading, setLoading] = useState(false);
@@ -33,6 +40,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
   const tags = useTagStore(state => state.tags);
   const insets = useSafeAreaInsets();
   const isDefaultEditor = editorId === '';
+  const saveCount = useRef(0);
 
   const postMessage = useCallback(
     async (type: string, data: any) => await post(editorRef, sessionIdRef.current, type, data),
@@ -103,6 +111,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
     currentNote.current = null;
     currentContent.current = null;
     sessionHistoryId.current = undefined;
+    saveCount.current = 0;
     await commands.clearContent();
     console.log('reset state: ', resetState);
     if (resetState) {
@@ -133,9 +142,16 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
         let locked = note?.locked;
         if (note?.conflicted) return;
 
+        if (isContentInvalid(data)) {
+          // Create a new history session if recieved empty or invalid content
+          // To ensure that history is preserved for correct content.
+          sessionHistoryId.current = Date.now();
+          currentSessionHistoryId = sessionHistoryId.current;
+        }
+
         let noteData: Partial<Note> = {
           id,
-          sessionId: currentSessionHistoryId
+          sessionId: isContentInvalid(data) ? null : currentSessionHistoryId
         };
 
         if (title) {
@@ -167,17 +183,19 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
           //@ts-ignore
           await db.vault?.save(noteData);
         }
-        if (id && sessionId === currentSessionId) {
+        if (id && sessionIdRef.current === currentSessionId) {
           note = db.notes?.note(id)?.data as Note;
           await commands.setStatus(timeConverter(note.dateEdited), 'Saved');
 
           if (
+            saveCount.current < 2 ||
             currentNote.current?.title !== note.title ||
-            currentNote.current?.headline !== note.headline
+            currentNote.current?.headline?.slice(0, 200) !== note.headline?.slice(0, 200)
           ) {
             Navigation.queueRoutesForUpdate('ColoredNotes', 'Notes', 'TaggedNotes', 'TopicNotes');
           }
         }
+        saveCount.current++;
 
         return id;
       } catch (e) {
@@ -221,7 +239,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
         currentNote.current && (await reset(false));
         await loadContent(item);
         let nextSessionId = makeSessionId(item);
-        sessionHistoryId.current = item.dateEdited;
+        sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
         await commands.setSessionId(nextSessionId);
         currentNote.current = item;

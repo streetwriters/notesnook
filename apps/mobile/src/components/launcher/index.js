@@ -64,10 +64,9 @@ const Launcher = React.memo(
       await restoreEditorState();
       setImmediate(() => {
         db.notes.init().then(() => {
-          setNotes();
-          setFavorites();
-          setLoading(false);
           Walkthrough.init();
+          initialize();
+          setImmediate(() => setLoading(false));
         });
       });
     };
@@ -75,7 +74,6 @@ const Launcher = React.memo(
     const init = async () => {
       if (!dbInitCompleted.current) {
         await db.init();
-        initialize();
         dbInitCompleted.current = true;
       }
 

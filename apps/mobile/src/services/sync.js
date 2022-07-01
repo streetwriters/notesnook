@@ -54,14 +54,10 @@ const run = async (context = 'global', forced = false, full = true) => {
       }
     }
   } finally {
-    userstore.setLastSynced(await db.lastSynced());
-    initialize();
-    if (editorController.current?.note?.id) {
-      //await updateNoteInEditor();
+    if (full || forced) {
+      db.eventManager.publish(EVENTS.syncCompleted);
     }
-    db.eventManager.publish(EVENTS.syncCompleted);
     console.log('sync done');
-    userstore.setSyncing(false);
   }
   return result;
 };

@@ -76,3 +76,14 @@ export const getResponse = async (type: string): Promise<WebviewResponseData | f
     }, 5000);
   });
 };
+
+export function isContentInvalid(content: string | undefined) {
+  return (
+    !content ||
+    content === '' ||
+    content.trim() === '' ||
+    content === '<p></p>' ||
+    content === '<p><br></p>' ||
+    content === '<p>&nbsp;</p>'
+  );
+}
