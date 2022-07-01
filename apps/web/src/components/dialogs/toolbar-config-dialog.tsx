@@ -527,7 +527,12 @@ function moveItem(items: TreeNode[], fromId: string, toId: string): TreeNode[] {
   // depth accordingly.
   if (movingToGroup) fromItem.depth = toItem.depth + 1;
 
-  return arrayMove(items, fromIndex, toIndex);
+  const newArray = arrayMove(items, fromIndex, toIndex);
+
+  // do not allow moving an item if there's no group over it
+  if (!isGroup(getItemGroup(newArray, fromItem))) return items;
+
+  return newArray;
 }
 
 function removeGroup(items: TreeNode[], groupId: string): TreeNode[] {
