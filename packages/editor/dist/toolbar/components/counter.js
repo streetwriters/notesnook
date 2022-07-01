@@ -29,8 +29,13 @@ function _Counter(props) {
                 mr: 0,
             },
         } }, { children: [(0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, { toggled: false, title: "Decrease ".concat(title), icon: "minus", variant: "small", onClick: onDecrease }), (0, jsx_runtime_1.jsx)(button_1.Button, __assign({ sx: {
+                    color: "text",
                     bg: "transparent",
-                }, onClick: onReset }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Text, __assign({ variant: "body", sx: { fontSize: "subBody", mx: 1, textAlign: "center" }, title: "Reset ".concat(title) }, { children: value })) })), (0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, { toggled: false, title: "Increase ".concat(title), icon: "plus", variant: "small", onClick: onIncrease })] })));
+                    px: 0,
+                    fontSize: "subBody",
+                    mx: 1,
+                    textAlign: "center",
+                }, onClick: onReset, title: "Reset ".concat(title) }, { children: value })), (0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, { toggled: false, title: "Increase ".concat(title), icon: "plus", variant: "small", onClick: onIncrease })] })));
 }
 exports.Counter = react_1.default.memo(_Counter, function (prev, next) {
     return prev.value === next.value;

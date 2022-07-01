@@ -33,17 +33,17 @@ function _Counter(props: CounterProps) {
 
       <Button
         sx={{
+          color: "text",
           bg: "transparent",
+          px: 0,
+          fontSize: "subBody",
+          mx: 1,
+          textAlign: "center",
         }}
         onClick={onReset}
+        title={`Reset ${title}`}
       >
-        <Text
-          variant={"body"}
-          sx={{ fontSize: "subBody", mx: 1, textAlign: "center" }}
-          title={`Reset ${title}`}
-        >
-          {value}
-        </Text>
+        {value}
       </Button>
 
       <ToolButton
