@@ -654,7 +654,7 @@ function addGroup(items: TreeNode[]) {
 
   const newArray = items.slice();
   const groups = items.filter((t) => isGroup(t) && !isSubgroup(t));
-  const newGroup = createGroup({ title: `Group ${groups.length + 1}` });
+  const newGroup = createGroup({ title: `Group ${groups.length}` });
   newArray.splice(insertIndex, 0, newGroup);
   return newArray;
 }
