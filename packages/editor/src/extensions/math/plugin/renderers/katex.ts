@@ -1,22 +1,31 @@
 import { MathRenderer } from "./types";
-import katex from "katex";
 
-// Chemistry formulas support
-import "katex/contrib/mhchem/mhchem";
+async function loadKatex() {
+  // @ts-ignore
+  const { default: katex } = await import("katex");
+  // Chemistry formulas support
+  // @ts-ignore
+  await import("katex/contrib/mhchem/mhchem");
+  return katex;
+}
 
 export const KatexRenderer: MathRenderer = {
   inline: (text, element) => {
-    katex.render(text, element, {
-      displayMode: false,
-      globalGroup: true,
-      throwOnError: false,
+    loadKatex().then((katex) => {
+      katex.render(text, element, {
+        displayMode: false,
+        globalGroup: true,
+        throwOnError: false,
+      });
     });
   },
   block: (text, element) => {
-    katex.render(text, element, {
-      displayMode: true,
-      globalGroup: true,
-      throwOnError: false,
+    loadKatex().then((katex) => {
+      katex.render(text, element, {
+        displayMode: true,
+        globalGroup: true,
+        throwOnError: false,
+      });
     });
   },
 };

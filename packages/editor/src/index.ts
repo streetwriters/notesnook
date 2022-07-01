@@ -2,7 +2,6 @@ import "./extensions";
 import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
-import { EditorOptions, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect, useMemo, useRef } from "react";
 import { EditorView } from "prosemirror-view";
@@ -41,8 +40,9 @@ import {
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
-import { Editor } from "./types";
 import { useIsMobile } from "./toolbar/stores/toolbar-store";
+import { useEditor } from "./hooks/use-editor";
+import { EditorOptions } from "@tiptap/core";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -152,7 +152,7 @@ const useTiptap = (
       ...restOptions,
     },
     deps
-  ) as Editor | null;
+  );
 
   const editorRef = useRef(editor);
   useEffect(() => {
@@ -184,4 +184,5 @@ const useTiptap = (
 export { useTiptap, Toolbar };
 export * from "./types";
 export * from "./extensions/react";
-export * from "./toolbar/tool-definitions";
+export * from "./toolbar";
+export { type AttachmentType } from "./extensions/attachment";
