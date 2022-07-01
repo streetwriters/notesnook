@@ -108,10 +108,11 @@ export function ActionSheetPresenter(
 
   const handleBackPress = useCallback(
     (event: Event) => {
+      if (!isOpen) return;
       event.preventDefault();
       onBeforeClose();
     },
-    [onBeforeClose]
+    [isOpen, onBeforeClose]
   );
 
   useEffect(() => {

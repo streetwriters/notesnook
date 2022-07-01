@@ -115,9 +115,11 @@ function ActionSheetPresenter(props) {
         });
     }, [animation, onClose, contentRef.current]);
     var handleBackPress = (0, react_1.useCallback)(function (event) {
+        if (!isOpen)
+            return;
         event.preventDefault();
         onBeforeClose();
-    }, [onBeforeClose]);
+    }, [isOpen, onBeforeClose]);
     (0, react_1.useEffect)(function () {
         // Note: this is a custom event implemented on the React Native
         // side to handle back button when action sheet is opened.
