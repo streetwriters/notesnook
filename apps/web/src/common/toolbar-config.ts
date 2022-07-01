@@ -50,3 +50,7 @@ export function getAllPresets() {
 export function getPreset(id: PresetId) {
   return presets[id];
 }
+
+export function getPresetTools(preset: Preset) {
+  return preset.id === "default" ? preset.tools.slice(1) : preset.tools;
+}

@@ -1,8 +1,15 @@
 import { Button, Flex, FlexProps, Text } from "rebass";
 import { Perform } from "../../common/dialog-controller";
 import Dialog from "./dialog";
-import { DEFAULT_TOOLS, getToolDefinition } from "notesnook-editor";
-import { ToolbarGroupDefinition } from "notesnook-editor/dist/toolbar/types";
+import {
+  DEFAULT_TOOLS,
+  getAllTools,
+  getToolDefinition,
+} from "notesnook-editor";
+import {
+  ToolbarGroupDefinition,
+  ToolDefinition,
+} from "notesnook-editor/dist/toolbar/types";
 import { Icons } from "notesnook-editor/dist/toolbar/icons";
 import { Icon } from "notesnook-editor/dist/toolbar/components/icon";
 import {
@@ -33,9 +40,12 @@ import {
   getAllPresets,
   getCurrentPreset,
   getPreset,
+  getPresetTools,
   Preset,
   PresetId,
 } from "../../common/toolbar-config";
+import { ToolId } from "notesnook-editor/dist/toolbar/tools";
+import { showToast } from "../../utils/toast";
 
 export type ToolbarConfigDialogProps = {
   onClose: Perform;
@@ -58,12 +68,9 @@ export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
   const { setToolbarConfig } = useToolbarConfig();
 
   useEffect(() => {
-    const items = flatten(
-      currentPreset.id === "default"
-        ? currentPreset.tools.slice(1)
-        : currentPreset.tools
-    );
+    const items = flatten(getPresetTools(currentPreset));
     items.push(createTrash());
+    items.push(...flatten([getDisabledTools(items)]).slice(1));
     setItems(items);
   }, [currentPreset]);
 
@@ -93,96 +100,134 @@ export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
       }}
       negativeButton={{ text: "Cancel", onClick: props.onClose }}
     >
-      <Flex sx={{ p: 1 }}>
-        {getAllPresets().map((preset) => (
-          <Label variant="text.body" sx={{ alignItems: "center" }}>
-            <Radio
-              id={preset.id.toString()}
-              name="preset"
-              value={preset.id}
-              checked={preset.id === currentPreset.id}
-              onChange={(e) => {
-                const { value } = e.target;
-                setCurrentPreset(getPreset(value as PresetId));
-              }}
-            />
-            {preset.title}
-          </Label>
-        ))}
-      </Flex>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={(event) => {
-          if (currentPreset.id !== "custom") {
-            setCurrentPreset((c) => ({
-              ...getPreset("custom"),
-              tools: c.tools,
-            }));
-          }
+      <Flex sx={{ flexDirection: "column" }}>
+        <Flex
+          sx={{ p: 1, justifyContent: "space-between", alignItems: "center" }}
+        >
+          <Flex>
+            {getAllPresets().map((preset) => (
+              <Label
+                variant="text.body"
+                sx={{ alignItems: "center", width: "auto", mr: 2 }}
+              >
+                <Radio
+                  id={preset.id.toString()}
+                  name="preset"
+                  value={preset.id}
+                  checked={preset.id === currentPreset.id}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    setCurrentPreset(getPreset(value as PresetId));
+                  }}
+                />
+                {preset.title}
+              </Label>
+            ))}
+          </Flex>
+          <Button
+            variant={"secondary"}
+            sx={{
+              display: "flex",
+              flexShrink: 0,
+              alignItems: "center",
+              p: 1,
+            }}
+            title="Add group"
+            onClick={() => {
+              setItems(addGroup);
+              showToast("success", "Group added successfully");
+            }}
+          >
+            <Icon path={Icons.plus} color="text" size={18} />
+          </Button>
+        </Flex>
 
-          const { active } = event;
-          const activeItem = items.find((item) => item.id === active.id);
-          setActiveItem(activeItem);
-        }}
-        onDragEnd={(event) => {
-          const { active, over } = event;
-          if (activeItem && over && active.id !== over.id) {
-            // const newIndex = items.findIndex((i) => i.id === over.id);
-            if (isGroup(activeItem) || isSubgroup(activeItem)) {
-              setItems(moveGroup(items, activeItem.id, over.id as string));
-            } else {
-              setItems(moveItem(items, activeItem.id, over.id as string));
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={(event) => {
+            if (currentPreset.id !== "custom") {
+              setCurrentPreset((c) => ({
+                ...getPreset("custom"),
+                tools: getPresetTools(c),
+              }));
             }
 
-            setTimeout(() => {
-              const element = document.getElementById(over.id as string);
-              element?.scrollIntoView({ behavior: "auto", block: "nearest" });
-            }, 500);
-          }
-          setActiveItem(undefined);
-        }}
-        measuring={{
-          droppable: { strategy: MeasuringStrategy.Always },
-        }}
-      >
-        <SortableContext items={items} strategy={verticalListSortingStrategy}>
-          {items?.map((item, index) => {
-            const deleted = isDeleted(items, item);
-            return (
-              <TreeNodeComponent
-                key={item.id}
-                item={item}
-                activeItem={activeItem}
-                onRemoveGroup={
-                  deleted
-                    ? undefined
-                    : (group) => {
-                        setItems(removeGroup(items, group.id));
-                      }
-                }
-                onRemoveItem={
-                  deleted
-                    ? undefined
-                    : (item) => {
-                        setItems(removeItem(items, item.id));
-                      }
-                }
-              />
-            );
-          })}
-          {activeItem &&
-            createPortal(
-              <DragOverlay
-              // dropAnimation={dropAnimationConfig}
-              // modifiers={indicator ? [adjustTranslate] : undefined}
-              >
-                <TreeNodeComponent overlay item={activeItem} />
-              </DragOverlay>,
-              ReactModalContent || document.body
-            )}
-        </SortableContext>
-      </DndContext>
+            const { active } = event;
+            const activeItem = items.find((item) => item.id === active.id);
+            setActiveItem(activeItem);
+          }}
+          onDragEnd={(event) => {
+            const { active, over } = event;
+            if (activeItem && over && active.id !== over.id) {
+              // const newIndex = items.findIndex((i) => i.id === over.id);
+              if (isGroup(activeItem) || isSubgroup(activeItem)) {
+                setItems(moveGroup(items, activeItem.id, over.id as string));
+              } else {
+                setItems(moveItem(items, activeItem.id, over.id as string));
+              }
+
+              setTimeout(() => {
+                const element = document.getElementById(over.id as string);
+                element?.scrollIntoView({ behavior: "auto", block: "nearest" });
+              }, 500);
+            }
+            setActiveItem(undefined);
+          }}
+          measuring={{
+            droppable: { strategy: MeasuringStrategy.Always },
+          }}
+        >
+          <SortableContext items={items} strategy={verticalListSortingStrategy}>
+            {items?.map((item, index) => {
+              const deleted = isDeleted(items, item);
+              const hasSubGroup =
+                isGroup(item) &&
+                !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
+
+              return (
+                <TreeNodeComponent
+                  key={item.id}
+                  item={item}
+                  activeItem={activeItem}
+                  onAddSubGroup={
+                    deleted || hasSubGroup
+                      ? undefined
+                      : () => {
+                          setItems((items) => addSubGroup(items, item.id));
+                          showToast("success", "Subgroup added successfully");
+                        }
+                  }
+                  onRemoveGroup={
+                    deleted
+                      ? undefined
+                      : (group) => {
+                          setItems(removeGroup(items, group.id));
+                        }
+                  }
+                  onRemoveItem={
+                    deleted
+                      ? undefined
+                      : (item) => {
+                          setItems(removeItem(items, item.id));
+                        }
+                  }
+                />
+              );
+            })}
+            {activeItem &&
+              createPortal(
+                <DragOverlay
+                // dropAnimation={dropAnimationConfig}
+                // modifiers={indicator ? [adjustTranslate] : undefined}
+                >
+                  <TreeNodeComponent overlay item={activeItem} />
+                </DragOverlay>,
+                ReactModalContent || document.body
+              )}
+          </SortableContext>
+        </DndContext>
+      </Flex>
     </Dialog>
   );
 }
@@ -192,10 +237,12 @@ type TreeNodeComponentProps = {
   activeItem?: TreeNode;
   overlay?: boolean;
   onRemoveGroup?: (item: TreeNode) => void;
+  onAddSubGroup?: () => void;
   onRemoveItem?: (item: TreeNode) => void;
 };
 function TreeNodeComponent(props: TreeNodeComponentProps) {
-  const { item, activeItem, onRemoveGroup, onRemoveItem } = props;
+  const { item, activeItem, onRemoveGroup, onRemoveItem, onAddSubGroup } =
+    props;
   if (activeItem && isCollapsed(item, activeItem)) return null;
   const isDraggable = !isTrash(item);
 
@@ -205,12 +252,13 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         {...props}
         draggable={isDraggable}
         onRemove={onRemoveGroup}
+        onAdd={isGroup(item) ? onAddSubGroup : undefined}
         sx={{
           bg: "background",
           border: "1px solid var(--border)",
           borderRadius: "default",
           p: 1,
-          my: 1,
+          mb: 1,
           ml: item.depth * 15,
           alignItems: "center",
         }}
@@ -252,7 +300,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
 }
 
 type SortableWrapperProps = TreeNodeComponentProps &
-  FlexProps & { onRemove?: (item: TreeNode) => void };
+  FlexProps & { onRemove?: (item: TreeNode) => void; onAdd?: () => void };
 
 function SortableWrapper(props: SortableWrapperProps) {
   const {
@@ -263,6 +311,7 @@ function SortableWrapper(props: SortableWrapperProps) {
     children,
     draggable,
     onRemove,
+    onAdd,
     ...flexProps
   } = props;
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -282,7 +331,7 @@ function SortableWrapper(props: SortableWrapperProps) {
         transform: CSS.Transform.toString(transform),
         transition,
         justifyContent: "space-between",
-        ":hover #remove-item": { opacity: 1 },
+        ":hover #remove-item, :hover #add-item": { opacity: 1 },
         ...sx,
       }}
     >
@@ -293,20 +342,32 @@ function SortableWrapper(props: SortableWrapperProps) {
       >
         {children}
       </Flex>
-      {onRemove && (
-        <Button
-          id="remove-item"
-          variant={"tool"}
-          sx={{ p: "small", opacity: 0 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            onRemove(item);
-          }}
-        >
-          <Icon path={Icons.delete} size={16} color="icon" />
-        </Button>
-      )}
+      <Flex sx={{ alignItems: "center" }}>
+        {onAdd && (
+          <Button
+            id="add-item"
+            variant={"tool"}
+            sx={{ p: "small", opacity: 0, mr: 1 }}
+            onClick={(e) => {
+              onAdd();
+            }}
+          >
+            <Icon path={Icons.plus} size={16} color="icon" />
+          </Button>
+        )}
+        {onRemove && (
+          <Button
+            id="remove-item"
+            variant={"tool"}
+            sx={{ p: "small", opacity: 0 }}
+            onClick={(e) => {
+              onRemove(item);
+            }}
+          >
+            <Icon path={Icons.delete} size={16} color="icon" />
+          </Button>
+        )}
+      </Flex>
     </Flex>
   );
 }
@@ -572,4 +633,41 @@ function getGroup(items: TreeNode[], groupId: string): ResolvedGroup | null {
       nextGroupIndex < 0 ? items.length : nextGroupIndex
     ),
   };
+}
+
+function addSubGroup(items: TreeNode[], groupId: string) {
+  const group = getGroup(items, groupId);
+  if (!group) return items;
+  const newArray = items.slice();
+  newArray.splice(
+    group.index + group.items.length,
+    0,
+    createGroup({ title: "Subgroup 1", depth: 1 })
+  );
+  return newArray;
+}
+
+function addGroup(items: TreeNode[]) {
+  let insertIndex = items.length;
+  const trashIndex = items.findIndex((item) => isTrash(item));
+  if (trashIndex > -1) insertIndex = trashIndex;
+
+  const newArray = items.slice();
+  const groups = items.filter((t) => isGroup(t) && !isSubgroup(t));
+  const newGroup = createGroup({ title: `Group ${groups.length + 1}` });
+  newArray.splice(insertIndex, 0, newGroup);
+  return newArray;
+}
+
+export function getDisabledTools(tools: TreeNode[]) {
+  const allTools = getAllTools() as Record<string, ToolDefinition>;
+  const disabled: ToolbarGroupDefinition = [];
+  const items: Item[] = tools.filter((t) => isItem(t)) as Item[];
+  for (const key in allTools) {
+    const tool = allTools[key];
+    if (tool.conditional) continue;
+    if (items.findIndex((t) => t.toolId === key) <= -1)
+      disabled.push(key as ToolId);
+  }
+  return disabled;
 }
