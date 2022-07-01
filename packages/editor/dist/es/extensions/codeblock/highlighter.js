@@ -39,28 +39,7 @@ function getLineDecoration(from, line, total, isActive) {
         total,
         from,
     };
-    // Prosemirror has a selection issue with the widget decoration
-    // on the first line. To work around that we use inline decoration
-    // for the first line.
-    if (line === 1 ||
-        // Android Composition API (aka the virtual keyboard) doesn't behave well
-        // with Decoration widgets so we have to resort to inline line numbers.
-        isAndroid()) {
-        return Decoration.inline(from, from + 1, attributes, spec);
-    }
-    return Decoration.widget(from, () => {
-        const element = document.createElement("span");
-        element.classList.add("line-number-widget");
-        if (isActive)
-            element.classList.add("active");
-        element.innerHTML = attributes["data-line"];
-        return element;
-    }, Object.assign(Object.assign({}, spec), { 
-        // should rerender when any of these change:
-        // 1. line number
-        // 2. line active state
-        // 3. the max length of all lines
-        key: `${line}-${isActive ? "active" : ""}-${maxLength}` }));
+    return Decoration.inline(from, from + 1, attributes, spec);
 }
 function getDecorations({ doc, name, defaultLanguage, caretPosition, }) {
     const decorations = [];
@@ -99,8 +78,12 @@ export function HighlighterPlugin({ name, defaultLanguage, }) {
     return new Plugin({
         key,
         state: {
-            init: () => {
-                return DecorationSet.empty;
+            init: (config, state) => {
+                return getDecorations({
+                    doc: state.doc,
+                    name,
+                    defaultLanguage,
+                });
             },
             apply: (transaction, decorationSet, oldState, newState) => {
                 const oldNodeName = oldState.selection.$head.parent.type.name;
@@ -154,9 +137,10 @@ export function HighlighterPlugin({ name, defaultLanguage, }) {
                 prevState.selection.$from.parent.type.name === name) &&
                 prevState.selection.$from.pos !== nextState.selection.$from.pos;
             findChildren(nextState.doc, (node) => node.type.name === name).forEach((block) => {
+                var _a;
                 const { node, pos } = block;
                 const attributes = Object.assign({}, node.attrs);
-                if (docChanged) {
+                if (docChanged || !((_a = attributes.lines) === null || _a === void 0 ? void 0 : _a.length)) {
                     const lines = toCodeLines(node.textContent, pos);
                     attributes.lines = lines.slice();
                 }
