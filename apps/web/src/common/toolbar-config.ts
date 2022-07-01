@@ -7,6 +7,7 @@ export type Preset = {
   id: PresetId;
   title: string;
   tools: ToolbarGroupDefinition[];
+  editable?: boolean;
 };
 const presets: Record<PresetId, Preset> = {
   default: { id: "default", title: "Default", tools: DEFAULT_TOOLS },
@@ -25,7 +26,7 @@ const presets: Record<PresetId, Preset> = {
       ],
     ],
   },
-  custom: { id: "custom", title: "Custom", tools: [] },
+  custom: { id: "custom", title: "Custom", tools: [], editable: true },
 };
 
 export function getCurrentPreset() {

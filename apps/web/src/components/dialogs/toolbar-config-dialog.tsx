@@ -124,22 +124,24 @@ export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
               </Label>
             ))}
           </Flex>
-          <Button
-            variant={"secondary"}
-            sx={{
-              display: "flex",
-              flexShrink: 0,
-              alignItems: "center",
-              p: 1,
-            }}
-            title="Add group"
-            onClick={() => {
-              setItems(addGroup);
-              showToast("success", "Group added successfully");
-            }}
-          >
-            <Icon path={Icons.plus} color="text" size={18} />
-          </Button>
+          {currentPreset.editable && (
+            <Button
+              variant={"secondary"}
+              sx={{
+                display: "flex",
+                flexShrink: 0,
+                alignItems: "center",
+                p: 1,
+              }}
+              title="Add group"
+              onClick={() => {
+                setItems(addGroup);
+                showToast("success", "Group added successfully");
+              }}
+            >
+              <Icon path={Icons.plus} color="text" size={18} />
+            </Button>
+          )}
         </Flex>
 
         <DndContext
@@ -184,6 +186,10 @@ export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
               const hasSubGroup =
                 isGroup(item) &&
                 !!getGroup(items, item.id)?.items.some((t) => isSubgroup(t));
+              const canAddSubGroup =
+                currentPreset.editable && !deleted && !hasSubGroup;
+              const canRemoveGroup = currentPreset.editable && !deleted;
+              const canRemoveItem = currentPreset.editable && !deleted;
 
               return (
                 <TreeNodeComponent
@@ -191,26 +197,26 @@ export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
                   item={item}
                   activeItem={activeItem}
                   onAddSubGroup={
-                    deleted || hasSubGroup
-                      ? undefined
-                      : () => {
+                    canAddSubGroup
+                      ? () => {
                           setItems((items) => addSubGroup(items, item.id));
                           showToast("success", "Subgroup added successfully");
                         }
+                      : undefined
                   }
                   onRemoveGroup={
-                    deleted
-                      ? undefined
-                      : (group) => {
+                    canRemoveGroup
+                      ? (group) => {
                           setItems(removeGroup(items, group.id));
                         }
+                      : undefined
                   }
                   onRemoveItem={
-                    deleted
-                      ? undefined
-                      : (item) => {
+                    canRemoveItem
+                      ? (item) => {
                           setItems(removeItem(items, item.id));
                         }
+                      : undefined
                   }
                 />
               );
