@@ -758,7 +758,7 @@ export const settingsGroups: SettingSection[] = [
         id: 'join-telegram',
         name: 'Join our Telegram group',
         description: "We are on telegram, let's talk",
-        icon: 'telegram',
+        // icon: 'telegram',
         modifer: () => {
           Linking.openURL('https://t.me/notesnook').catch(console.log);
         }

@@ -17,7 +17,12 @@ export const ConfigureToolbar = () => {
 
   const renderGroups = () => {
     return data.map((item, index) =>
-      index === 0 ? <View /> : <Group key={`group-${index}`} item={item} index={index} />
+      index === 0 ? (
+        //@ts-ignore
+        <View key={item[0]} />
+      ) : (
+        <Group key={`group-${index}`} item={item} index={index} />
+      )
     );
   };
 

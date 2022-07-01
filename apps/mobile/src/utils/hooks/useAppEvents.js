@@ -40,6 +40,7 @@ import {
   ToastEvent
 } from '../../services/event-manager';
 import { useEditorStore } from '../../stores/use-editor-store';
+import { useDragState } from '../../screens/settings/editor/state';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -251,6 +252,7 @@ export const useAppEvents = () => {
       user = await db.user.getUser();
       await PremiumService.setPremiumStatus();
       setLastSynced(await db.lastSynced());
+      await useDragState.getState().init();
       if (!user) {
         return setLoginMessage();
       }
