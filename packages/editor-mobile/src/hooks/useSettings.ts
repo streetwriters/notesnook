@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 const settingsJson = localStorage.getItem("editorSettings");
-
 const initialState = {
   readonly: false,
   fullscreen: false,
@@ -37,6 +36,8 @@ const initialState = {
     ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
     ["clearformatting"],
   ],
+  noHeader: false,
+  noToolbar: false,
 };
 
 global.settingsController = {

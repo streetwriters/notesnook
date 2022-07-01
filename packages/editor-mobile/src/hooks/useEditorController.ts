@@ -1,4 +1,4 @@
-import { Editor } from "@tiptap/core";
+import { Editor } from "notesnook-editor";
 import { Attachment } from "notesnook-editor/dist/extensions/attachment";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useEditorThemeStore } from "../state/theme";

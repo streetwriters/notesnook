@@ -1,4 +1,4 @@
-import { Editor } from "@tiptap/react";
+import { Editor } from "notesnook-editor";
 
 type ButtonType = {
   editor: Editor | null;

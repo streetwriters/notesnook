@@ -3,21 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@notesnook/theme": "file:../themeprovider",
-    "@tiptap/starter-kit": "2.0.0-beta.185",
-    "@tiptap/core": "2.0.0-beta.176",
-    "@tiptap/react": "2.0.0-beta.109",
+    "@notesnook/theme": "github:streetwriters/themeprovider",
     "framer-motion": "^4.1.17",
     "mdi-react": "^8.4.0",
-    "notesnook-editor": "file:../notesnook-editor",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "notesnook-editor": "github:streetwriters/notesnook-editor#develop",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "zustand": "^3.6.8"
   },
   "resolutions": {
-    "react": "17.0.2",
-    "@types/react": "17.0.39",
-    "@types/react-dom": "17.0.11"
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.0",
@@ -28,7 +24,7 @@
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
     "react-error-overlay": "6.0.9",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "^4.0.3",
     "typescript": "^4.7.2",
     "web-vitals": "^1.1.2"
   },
