@@ -122,7 +122,7 @@ const Tiptap = () => {
           marginBottom: "5px",
         }}
       >
-        <Header noHeader={initialProps.noHeader || false} />
+        <Header settings={settings} noHeader={initialProps.noHeader || false} />
         <div
           onScroll={controller.scroll}
           ref={containerRef}
@@ -165,7 +165,7 @@ const Tiptap = () => {
               theme={toolbarTheme}
               editor={editor}
               location="bottom"
-              tools={settings.tools}
+              tools={[...settings.tools]}
             />
           </div>
         )}

@@ -3,10 +3,10 @@ import CloudUploadOutlineIcon from "mdi-react/CloudUploadOutlineIcon";
 import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
-import React, { useEffect } from "react";
+import React from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
 import { useSettings } from "../hooks/useSettings";
-import { EventTypes } from "../utils";
+import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
 
 const Button = ({
@@ -42,9 +42,14 @@ const Button = ({
 };
 
 export default React.memo(
-  function Header({ noHeader }: { noHeader: boolean }) {
+  function Header({
+    noHeader,
+    settings,
+  }: {
+    noHeader: boolean;
+    settings: Settings;
+  }) {
     const insets = useSafeArea();
-    const settings = useSettings();
     return (
       <div
         style={{
@@ -175,5 +180,7 @@ export default React.memo(
       </div>
     );
   },
-  (prev, next) => prev.noHeader !== next.noHeader
+  (prev, next) =>
+    prev.noHeader !== next.noHeader ||
+    prev.settings.premium !== next.settings.premium
 );
