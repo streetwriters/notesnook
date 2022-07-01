@@ -13,7 +13,7 @@ exports.MathBlock = core_1.Node.create({
     parseHTML: function () {
         return [
             {
-                tag: "div[class*='math-display']", // important!
+                tag: "div[class*='math-block']", // important!
             },
         ];
     },
@@ -21,7 +21,7 @@ exports.MathBlock = core_1.Node.create({
         var HTMLAttributes = _a.HTMLAttributes;
         return [
             "div",
-            (0, core_1.mergeAttributes)({ class: "math-display math-node" }, HTMLAttributes),
+            (0, core_1.mergeAttributes)({ class: "math-block math-node" }, HTMLAttributes),
             0,
         ];
     },
