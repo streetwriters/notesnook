@@ -6,10 +6,6 @@
   pointer-events: none;
 }
 
-.ProseMirror {
-  color: var(--text);
-}
-
 .ProseMirror code:not(pre code) {
   background-color: var(--bgSecondary);
 }
@@ -166,7 +162,7 @@ img.ProseMirror-separator {
 }
 
 .tableWrapper {
-  padding: 1rem 0;
+  /* padding: 1rem 0; */
   overflow-x: auto;
 }
 
@@ -216,3 +212,177 @@ pre *::selection {
   background-color: var(--codeSelection) !important;
   color: currentColor;
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.ProseMirror blockquote {
+  border-left: 5px solid var(--border);
+  padding-left: 15px;
+}
+
+/****************************************************************/
+/* Styles taken from https://github.com/curvenote/prosemirror-codemark/blob/main/src/codemark.css */
+/****************************************************************/
+
+@keyframes blink {
+  49% {
+    border-color: unset;
+  }
+  50% {
+    border-color: #fff;
+  }
+  99% {
+    border-color: #fff;
+  }
+}
+.no-cursor {
+  caret-color: transparent;
+}
+div:focus .fake-cursor,
+span:focus .fake-cursor {
+  margin-right: -1px;
+  border-left-width: 1px;
+  border-left-style: solid;
+  animation: blink 1s;
+  animation-iteration-count: infinite;
+  position: relative;
+  z-index: 1;
+}
+
+/*******************************************/
+/* MATH STYLES */
+/*******************************************/
+
+/*---------------------------------------------------------
+ *  Author: Benjamin R. Bray
+ *  License: MIT (see LICENSE in project root for details)
+ *--------------------------------------------------------*/
+
+/* == Math Nodes ======================================== */
+
+.math-node {
+  min-width: 1em;
+  min-height: 1em;
+  font-size: 0.95em;
+  font-family: "Consolas", "Ubuntu Mono", monospace;
+  cursor: auto;
+}
+
+.math-node.empty-math .math-render::before {
+  content: "(empty)";
+  color: red;
+}
+
+.math-node .math-render.parse-error::before {
+  content: "(math error)";
+  color: red;
+  cursor: help;
+}
+
+.math-node.ProseMirror-selectednode {
+  outline: none;
+}
+
+.math-node .math-src {
+  display: none;
+  color: var(--text);
+  tab-size: 4;
+}
+
+.math-node.ProseMirror-selectednode .math-src {
+  display: inline;
+}
+.math-node.ProseMirror-selectednode .math-render {
+  display: none;
+}
+
+/* -- Inline Math --------------------------------------- */
+
+.math-inline {
+  display: inline;
+  white-space: nowrap;
+}
+
+.math-inline .math-render {
+  display: inline-block;
+  /* font-size: 0.85em; */
+  cursor: pointer;
+}
+
+.math-inline .math-src .ProseMirror {
+  display: inline;
+  /* Necessary to fix FireFox bug with contenteditable, https://bugzilla.mozilla.org/show_bug.cgi?id=1252108 */
+  border-right: 1px solid transparent;
+  border-left: 1px solid transparent;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+    Liberation Mono, monospace !important;
+}
+
+.math-inline.ProseMirror-selectednode {
+  background-color: var(--bgSecondary);
+  padding: 3px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+}
+
+.math-inline .math-src::after,
+.math-inline .math-src::before {
+  content: "$$";
+  color: var(--disabled);
+}
+
+/* -- Block Math ---------------------------------------- */
+
+.math-block {
+  display: block;
+}
+
+.math-block .math-render {
+  display: block;
+}
+
+.math-block.ProseMirror-selectednode {
+  background-color: var(--bgSecondary);
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+}
+
+.math-block .math-src .ProseMirror {
+  width: 100%;
+  display: block;
+  margin-top: 10px;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+    Liberation Mono, monospace !important;
+}
+
+/* .math-block .math-src::after, */
+.math-block .math-src::before {
+  content: "Math";
+  text-align: left;
+  color: var(--disabled);
+  margin-bottom: 10px;
+}
+
+.math-block .katex-display {
+  margin: 0;
+}
+
+/* -- Selection Plugin ---------------------------------- */
+
+/* p::selection,
+p > *::selection {
+  background-color: #c0c0c0;
+}
+.katex-html *::selection {
+  background-color: none !important;
+}
+
+.math-node.math-select .math-render {
+  background-color: #c0c0c0ff;
+}
+.math-inline.math-select .math-render {
+  padding-top: 2px;
+} */
