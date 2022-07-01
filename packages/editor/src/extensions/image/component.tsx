@@ -69,56 +69,50 @@ export function ImageComponent(
           }}
           lockAspectRatio={true}
         >
-          <Flex
-            width={"100%"}
-            data-drag-handle
-            draggable
-            sx={{
-              position: "relative",
-              justifyContent: "end",
-              borderTop: editor.isEditable
-                ? "20px solid var(--bgSecondary)"
-                : "none",
-              borderTopLeftRadius: "default",
-              borderTopRightRadius: "default",
-              borderColor: selected ? "border" : "bgSecondary",
-              cursor: "pointer",
-              ":hover": {
-                borderColor: "border",
-              },
-            }}
-          >
-            <DesktopOnly>
-              {selected && (
-                <Flex sx={{ position: "relative", justifyContent: "end" }}>
-                  <Flex
+          <DesktopOnly>
+            {selected && (
+              <Flex sx={{ position: "relative", justifyContent: "end" }}>
+                <Flex
+                  sx={{
+                    position: "absolute",
+                    top: -40,
+                    mb: 2,
+                    alignItems: "end",
+                  }}
+                >
+                  <ToolbarGroup
+                    editor={editor}
+                    tools={[
+                      "imageAlignLeft",
+                      "imageAlignCenter",
+                      "imageAlignRight",
+                      "imageProperties",
+                    ]}
                     sx={{
-                      position: "absolute",
-                      top: -40,
-                      mb: 2,
-                      alignItems: "end",
+                      boxShadow: "menu",
+                      borderRadius: "default",
+                      bg: "background",
                     }}
-                  >
-                    <ToolbarGroup
-                      editor={editor}
-                      tools={[
-                        "imageAlignLeft",
-                        "imageAlignCenter",
-                        "imageAlignRight",
-                        "imageProperties",
-                      ]}
-                      sx={{
-                        boxShadow: "menu",
-                        borderRadius: "default",
-                        bg: "background",
-                      }}
-                    />
-                  </Flex>
+                  />
                 </Flex>
-              )}
-            </DesktopOnly>
-          </Flex>
-
+              </Flex>
+            )}
+          </DesktopOnly>
+          {selected && (
+            <Icon
+              className="drag-handle"
+              data-drag-handle
+              draggable
+              path={Icons.dragHandle}
+              sx={{
+                cursor: "grab",
+                position: "absolute",
+                top: 2,
+                left: 2,
+                zIndex: 999,
+              }}
+            />
+          )}
           <Image
             data-drag-image
             ref={imageRef}
