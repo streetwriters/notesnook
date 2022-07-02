@@ -1,27 +1,44 @@
 import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
+import { IconNames } from "../icons";
+import { useRefValue } from "../../hooks/use-ref-value";
 
+type TextDirection = "ltr" | "rtl";
 type TextDirectionToolProps = ToolProps & {
-  direction: "ltr" | "rtl";
+  direction: TextDirection;
 };
 function TextDirectionTool(props: TextDirectionToolProps) {
   const { editor, direction, ...toolProps } = props;
+  const directionRef = useRefValue(direction);
 
   return (
     <ToolButton
       {...toolProps}
       onClick={() =>
-        editor.current?.chain().focus().setTextDirection(direction).run()
+        editor.current
+          ?.chain()
+          .focus()
+          .setTextDirection(directionRef.current)
+          .run()
       }
-      toggled={editor.isActive({ textDirection: direction })}
+      toggled={false}
     />
   );
 }
 
-export function RightToLeft(props: ToolProps) {
-  return <TextDirectionTool direction="rtl" {...props} />;
-}
+export function TextDirection(props: ToolProps) {
+  const { editor } = props;
+  const { textDirection } = {
+    ...editor.getAttributes("paragraph"),
+    ...editor.getAttributes("heading"),
+  } as { textDirection: TextDirection };
 
-export function LeftToRight(props: ToolProps) {
-  return <TextDirectionTool direction="ltr" {...props} />;
+  const newTextDirection: TextDirection =
+    textDirection === "ltr" ? "rtl" : "ltr";
+
+  const icon: IconNames = textDirection === "ltr" ? "ltr" : "rtl";
+
+  return (
+    <TextDirectionTool direction={newTextDirection} {...props} icon={icon} />
+  );
 }

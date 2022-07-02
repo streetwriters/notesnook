@@ -11,19 +11,33 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 import { jsx as _jsx } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
+import { useRefValue } from "../../hooks/use-ref-value";
 function AlignmentTool(props) {
     const { editor, alignment } = props, toolProps = __rest(props, ["editor", "alignment"]);
-    return (_jsx(ToolButton, Object.assign({}, toolProps, { onClick: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextAlign(alignment).run(); }, toggled: editor.isActive({ textAlign: alignment }) })));
+    const alignmentRef = useRefValue(alignment);
+    return (_jsx(ToolButton, Object.assign({}, toolProps, { onClick: () => {
+            var _a;
+            (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextAlign(alignmentRef.current).run();
+        }, toggled: false })));
 }
-export function AlignCenter(props) {
-    return _jsx(AlignmentTool, Object.assign({ alignment: "center" }, props));
-}
-export function AlignLeft(props) {
-    return _jsx(AlignmentTool, Object.assign({ alignment: "left" }, props));
-}
-export function AlignRight(props) {
-    return _jsx(AlignmentTool, Object.assign({ alignment: "right" }, props));
-}
-export function AlignJustify(props) {
-    return _jsx(AlignmentTool, Object.assign({ alignment: "justify" }, props));
+export function Alignment(props) {
+    const { editor } = props;
+    const { textAlign } = Object.assign(Object.assign({}, editor.getAttributes("paragraph")), editor.getAttributes("heading"));
+    const newAlignment = textAlign === "left"
+        ? "center"
+        : textAlign === "center"
+            ? "right"
+            : textAlign === "right"
+                ? "justify"
+                : textAlign === "justify"
+                    ? "left"
+                    : "left";
+    const icon = textAlign === "center"
+        ? "alignCenter"
+        : textAlign === "justify"
+            ? "alignJustify"
+            : textAlign === "right"
+                ? "alignRight"
+                : "alignLeft";
+    return _jsx(AlignmentTool, Object.assign({ alignment: newAlignment }, props, { icon: icon }));
 }

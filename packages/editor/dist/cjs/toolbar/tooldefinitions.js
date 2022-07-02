@@ -88,29 +88,13 @@ const tools = {
         icon: "heading",
         title: "Headings",
     },
-    alignCenter: {
+    alignment: {
         icon: "alignCenter",
-        title: "Align center",
+        title: "Alignment",
     },
-    alignLeft: {
-        icon: "alignLeft",
-        title: "Align left",
-    },
-    alignRight: {
-        icon: "alignRight",
-        title: "Align right",
-    },
-    alignJustify: {
-        icon: "alignJustify",
-        title: "Justify",
-    },
-    ltr: {
+    textDirection: {
         icon: "ltr",
-        title: "Left to right",
-    },
-    rtl: {
-        icon: "rtl",
-        title: "Right to left",
+        title: "Text direction",
     },
     highlight: {
         icon: "highlight",
@@ -331,6 +315,6 @@ exports.DEFAULT_TOOLS = [
     ["headings", "fontFamily"],
     ["numberedList", "bulletList"],
     ["addLink"],
-    ["alignCenter", ["alignLeft", "alignRight", "alignJustify", "ltr", "rtl"]],
+    ["alignment", "textDirection"],
     ["clearformatting"],
 ];

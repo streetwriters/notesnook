@@ -61,6 +61,6 @@ export const ToolButton = React.memo(
     );
   },
   (prev, next) => {
-    return prev.toggled === next.toggled;
+    return prev.toggled === next.toggled && prev.icon === next.icon;
   }
 );

@@ -14,7 +14,7 @@ import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
@@ -47,7 +47,7 @@ import { NodeViewSelectionNotifier, usePortalProvider, } from "./extensions/reac
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
-import { useIsMobile } from "./toolbar/stores/toolbar-store";
+import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
@@ -55,11 +55,10 @@ EditorView.prototype.updateState = function updateState(state) {
     this.updateStateInner(state, this.state.plugins != state.plugins);
 };
 const useTiptap = (options = {}, deps = []) => {
-    const { theme, onDownloadAttachment, onOpenAttachmentPicker } = options, restOptions = __rest(options, ["theme", "onDownloadAttachment", "onOpenAttachmentPicker"]);
+    const { theme, isMobile, onDownloadAttachment, onOpenAttachmentPicker } = options, restOptions = __rest(options, ["theme", "isMobile", "onDownloadAttachment", "onOpenAttachmentPicker"]);
     const PortalProviderAPI = usePortalProvider();
-    const isMobile = useIsMobile();
+    const setIsMobile = useToolbarStore((store) => store.setIsMobile);
     const defaultOptions = useMemo(() => ({
-        // enableInputRules: ,
         extensions: [
             NodeViewSelectionNotifier,
             SearchReplace,
@@ -139,6 +138,9 @@ const useTiptap = (options = {}, deps = []) => {
         isMobile,
     ]);
     const editor = useEditor(Object.assign(Object.assign({}, defaultOptions), restOptions), deps);
+    useEffect(() => {
+        setIsMobile(isMobile || false);
+    }, [isMobile]);
     return editor;
 };
 export { useTiptap, Toolbar };

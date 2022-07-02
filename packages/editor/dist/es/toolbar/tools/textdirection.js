@@ -11,13 +11,19 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 import { jsx as _jsx } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
+import { useRefValue } from "../../hooks/use-ref-value";
 function TextDirectionTool(props) {
     const { editor, direction } = props, toolProps = __rest(props, ["editor", "direction"]);
-    return (_jsx(ToolButton, Object.assign({}, toolProps, { onClick: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextDirection(direction).run(); }, toggled: editor.isActive({ textDirection: direction }) })));
+    const directionRef = useRefValue(direction);
+    return (_jsx(ToolButton, Object.assign({}, toolProps, { onClick: () => {
+            var _a;
+            return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setTextDirection(directionRef.current).run();
+        }, toggled: false })));
 }
-export function RightToLeft(props) {
-    return _jsx(TextDirectionTool, Object.assign({ direction: "rtl" }, props));
-}
-export function LeftToRight(props) {
-    return _jsx(TextDirectionTool, Object.assign({ direction: "ltr" }, props));
+export function TextDirection(props) {
+    const { editor } = props;
+    const { textDirection } = Object.assign(Object.assign({}, editor.getAttributes("paragraph")), editor.getAttributes("heading"));
+    const newTextDirection = textDirection === "ltr" ? "rtl" : "ltr";
+    const icon = textDirection === "ltr" ? "ltr" : "rtl";
+    return (_jsx(TextDirectionTool, Object.assign({ direction: newTextDirection }, props, { icon: icon })));
 }

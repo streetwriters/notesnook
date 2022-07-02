@@ -73,9 +73,9 @@ Total Tools:
 
 What's next:
 
-- [ ] Port codeblock extension from tinymce to tiptap
-- [ ] Optimize toolbar & editor UI for mobile
-- [ ] Refactor & finalize UI + styling
+- [x] Port codeblock extension from tinymce to tiptap
+- [x] Optimize toolbar & editor UI for mobile
+- [x] Refactor & finalize UI + styling
 - [ ] Write tests
 
 ## Optimize toolbar & editor UI for mobile

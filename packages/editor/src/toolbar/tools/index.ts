@@ -14,10 +14,10 @@ import {
 } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
-import { AlignCenter, AlignLeft, AlignRight, AlignJustify } from "./alignment";
+import { Alignment } from "./alignment";
 import { Headings } from "./headings";
 import { NumberedList, BulletList } from "./lists";
-import { LeftToRight, RightToLeft } from "./text-direction";
+import { TextDirection } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import {
   TableSettings,
@@ -85,12 +85,8 @@ const tools = {
   fontSize: FontSize,
   fontFamily: FontFamily,
   headings: Headings,
-  alignCenter: AlignCenter,
-  alignRight: AlignRight,
-  alignLeft: AlignLeft,
-  alignJustify: AlignJustify,
-  ltr: LeftToRight,
-  rtl: RightToLeft,
+  alignment: Alignment,
+  textDirection: TextDirection,
   textColor: TextColor,
   highlight: Highlight,
   math: Math,
