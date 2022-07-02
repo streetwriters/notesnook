@@ -1,7 +1,7 @@
-import { Icons } from 'notesnook-editor/dist/toolbar/icons';
-import { DEFAULT_TOOLS, getAllTools } from 'notesnook-editor/dist/toolbar/tooldefinitions';
-import { ToolId } from 'notesnook-editor/dist/toolbar/tools';
-import { ToolbarGroupDefinition } from 'notesnook-editor/dist/toolbar/types';
+import { Icons } from 'notesnook-editor/dist/es/toolbar/icons';
+import { DEFAULT_TOOLS, getAllTools } from 'notesnook-editor/dist/es/toolbar/tooldefinitions';
+import { ToolId } from 'notesnook-editor/dist/es/toolbar/tools';
+import { ToolbarGroupDefinition } from 'notesnook-editor/dist/es/toolbar/index';
 import { useThemeStore } from '../../../stores/use-theme-store';
 
 export const tools = getAllTools();

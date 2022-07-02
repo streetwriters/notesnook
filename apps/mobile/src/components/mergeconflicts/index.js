@@ -24,8 +24,6 @@ import { IconButton } from '../ui/icon-button';
 import Seperator from '../ui/seperator';
 import Paragraph from '../ui/typography/paragraph';
 
-const sourceUri = '';
-
 const MergeConflicts = () => {
   const colors = useThemeStore(state => state.colors);
   const [visible, setVisible] = useState(false);

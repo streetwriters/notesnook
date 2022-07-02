@@ -4,14 +4,17 @@ import { Linking, ViewStyle } from 'react-native';
 import WebView from 'react-native-webview';
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
 import { notesnook } from '../../../e2e/test.ids';
+import { IconButton } from '../../components/ui/icon-button';
+import { useEditorStore } from '../../stores/use-editor-store';
+import { getElevation } from '../../utils';
+import { db } from '../../utils/database';
+import { NoteType } from '../../utils/types';
 import EditorOverlay from './loading';
-import { EditorProps } from './tiptap/types';
+import { EDITOR_URI } from './source';
+import { EditorProps, useEditorType } from './tiptap/types';
 import { useEditor } from './tiptap/use-editor';
 import { useEditorEvents } from './tiptap/use-editor-events';
 import { editorController } from './tiptap/utils';
-
-const sourceUri = '';
-const source = { uri: sourceUri + 'index.html' };
 
 const style: ViewStyle = {
   height: '100%',
@@ -111,13 +114,14 @@ const Editor = React.memo(
           allowUniversalAccessFromFileURLs={true}
           originWhitelist={['*']}
           source={{
-            uri: 'http://localhost:3000'
+            uri: __DEV__ ? 'http://localhost:3000' : EDITOR_URI
           }}
           style={style}
           autoManageStatusBarEnabled={false}
           onMessage={onMessage || undefined}
         />
         <EditorOverlay editorId={editorId || ''} editor={editor} />
+        <ReadonlyButton editor={editor} />
       </>
     );
   },
@@ -125,5 +129,33 @@ const Editor = React.memo(
 );
 
 export default Editor;
+
+const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
+  const readonly = useEditorStore(state => state.readonly);
+
+  const onPress = async () => {
+    if (editor.note.current) {
+      await db.notes?.note(editor.note.current.id).readonly();
+      editor.note.current = db.notes?.note(editor.note.current.id).data as NoteType;
+      useEditorStore.getState().setReadonly(false);
+    }
+  };
+  return readonly ? (
+    <IconButton
+      name="pencil-lock"
+      type="grayBg"
+      onPress={onPress}
+      color="accent"
+      customStyle={{
+        position: 'absolute',
+        bottom: 20,
+        width: 60,
+        height: 60,
+        right: 12,
+        ...getElevation(5)
+      }}
+    />
+  ) : null;
+};
 
 // test uri "http://192.168.10.8:3000/index.html"

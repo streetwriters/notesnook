@@ -113,7 +113,10 @@ const showActionsheet = async (editor: useEditorType) => {
   }
 };
 
-export const useEditorEvents = (editor: useEditorType, editorProps: Partial<EditorProps>) => {
+export const useEditorEvents = (
+  editor: useEditorType,
+  { readonly: editorPropReadonly, noHeader, noToolbar }: Partial<EditorProps>
+) => {
   const deviceMode = useSettingStore(state => state.deviceMode);
   const fullscreen = useSettingStore(state => state.fullscreen);
   const handleBack = useRef<NativeEventSubscription>();
@@ -123,22 +126,24 @@ export const useEditorEvents = (editor: useEditorType, editorProps: Partial<Edit
   if (!editor) return null;
 
   useEffect(() => {
+    console.log('settings', readonly);
     editor.commands.setSettings({
       deviceMode: deviceMode || 'mobile',
       fullscreen: fullscreen,
       premium: isPremium,
-      readonly: readonly,
+      readonly: readonly || editorPropReadonly,
       tools: tools,
-      ...editorProps
+      noHeader: noHeader,
+      noToolbar: readonly || editorPropReadonly || noToolbar
     });
   }, [fullscreen, isPremium, readonly, editor.sessionId, editor.loading, tools]);
 
   const onBackPress = useCallback(async () => {
     const editorHandledBack = await editor.commands.handleBack();
-    // if (!editorHandledBack) {
-    //   logger.info('editor handled back event', editorHandledBack);
-    //   return;
-    // }
+    if (!editorHandledBack) {
+      logger.info('editor handled back event', editorHandledBack);
+      return;
+    }
     setTimeout(async () => {
       if (deviceMode !== 'mobile' && fullscreen) {
         if (fullscreen) {
@@ -312,7 +317,7 @@ export const useEditorEvents = (editor: useEditorType, editorProps: Partial<Edit
       }
       eSendEvent(editorMessage.type, editorMessage);
     },
-    [editor.sessionId]
+    [editor.sessionId, editor.saveContent]
   );
 
   return onMessage;

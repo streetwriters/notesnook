@@ -9,7 +9,7 @@ import { enableScreens } from 'react-native-screens';
 import { name as appName } from './app.json';
 import Notifications from './src/services/notifications';
 import './src/utils/logger/index';
-
+console.log(`V8 version is ${global._v8runtime().version}`);
 global.Buffer = require('buffer').Buffer;
 enableLayoutAnimations(true);
 

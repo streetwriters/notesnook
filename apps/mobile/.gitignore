@@ -32,6 +32,7 @@ build/
 .gradle
 local.properties
 *.iml
+web.bundle
 
 # node.js
 #

@@ -1,15 +1,17 @@
-import { createRef, MutableRefObject, RefObject } from 'react';
+import {
+  Attachment,
+  AttachmentProgress
+} from 'notesnook-editor/dist/cjs/extensions/attachment/index';
+import { ImageAttributes } from 'notesnook-editor/dist/cjs/extensions/image/index';
+import { createRef, RefObject } from 'react';
 import { Platform } from 'react-native';
 import { EdgeInsets } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import { db } from '../../../utils/database';
 import { sleep } from '../../../utils/time';
-import { Note, Settings } from './types';
-import { getResponse, randId, textInput } from './utils';
-import { Attachment, AttachmentProgress } from 'notesnook-editor/dist/extensions/attachment/index';
-import { ImageAttributes } from 'notesnook-editor/dist/extensions/image/index';
 import { NoteType } from '../../../utils/types';
-import { sanitizeFilename } from '../../../utils/sanitizer';
+import { Settings } from './types';
+import { getResponse, randId, textInput } from './utils';
 
 type Action = { job: string; id: string };
 
@@ -33,7 +35,8 @@ const fn = (fn: string) => {
         ${fn}
         post("${id}",response);
       } catch(e) {
-        logger('error', "webview: ", e.message, e.stack);
+        const DEV_MODE = ${__DEV__};
+        if (DEV_MODE) logger('error', "webview: ", e.message, e.stack);
       }
     })();`,
     id: id

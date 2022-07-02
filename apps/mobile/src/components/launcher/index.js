@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { NativeModules, Platform, StatusBar, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
 import { editorState } from '../../screens/editor/tiptap/utils';
-import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import BackupService from '../../services/backup';
 import BiometricService from '../../services/biometrics';
 import { DDS } from '../../services/device-detection';
@@ -12,7 +11,6 @@ import { setRateAppMessage } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
 import { initialize } from '../../stores';
-import { useFavoriteStore } from '../../stores/use-favorite-store';
 import { useMessageStore } from '../../stores/use-message-store';
 import { useNoteStore } from '../../stores/use-notes-store';
 import { useSettingStore } from '../../stores/use-setting-store';
@@ -40,8 +38,6 @@ import { Walkthrough } from '../walkthroughs';
 const Launcher = React.memo(
   () => {
     const colors = useThemeStore(state => state.colors);
-    const setNotes = useNoteStore(state => state.setNotes);
-    const setFavorites = useFavoriteStore(state => state.setFavorites);
     const setLoading = useNoteStore(state => state.setLoading);
     const loading = useNoteStore(state => state.loading);
     const user = useUserStore(state => state.user);

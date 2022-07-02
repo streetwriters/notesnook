@@ -18,7 +18,7 @@ import { PressableButton, PressableButtonProps } from '../pressable';
 interface IconButtonProps extends PressableButtonProps {
   name: string;
   color?: ColorValue;
-  size: number;
+  size?: number;
   left?: number;
   right?: number;
   top?: number;

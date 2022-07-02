@@ -112,6 +112,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
     currentContent.current = null;
     sessionHistoryId.current = undefined;
     saveCount.current = 0;
+    useEditorStore.getState().setReadonly(false);
     await commands.clearContent();
     console.log('reset state: ', resetState);
     if (resetState) {
@@ -130,8 +131,9 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
       sessionId: currentSessionId,
       sessionHistoryId: currentSessionHistoryId
     }: SavePayload) => {
+      if (readonly || useEditorStore.getState().readonly || currentNote.current?.readonly) return;
+
       console.log('saving note', id);
-      if (readonly) return;
       try {
         if (id && !db.notes?.note(id)) {
           isDefaultEditor && useEditorStore.getState().setCurrentlyEditingNote(null);
@@ -183,7 +185,9 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
           //@ts-ignore
           await db.vault?.save(noteData);
         }
+        console.log(id, sessionIdRef.current, currentSessionId);
         if (id && sessionIdRef.current === currentSessionId) {
+          console.log('updating state');
           note = db.notes?.note(id)?.data as Note;
           await commands.setStatus(timeConverter(note.dateEdited), 'Saved');
 
@@ -228,9 +232,11 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
         currentNote.current && (await reset());
         let nextSessionId = makeSessionId(item);
         setSessionId(nextSessionId);
+        sessionIdRef.current = nextSessionId;
         sessionHistoryId.current = Date.now();
         await commands.setSessionId(nextSessionId);
         await commands.focus();
+        useEditorStore.getState().setReadonly(false);
       } else {
         //@ts-ignore todo
         if (!item.forced && currentNote.current?.id === item.id) return;
@@ -241,11 +247,13 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
         let nextSessionId = makeSessionId(item);
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
+        sessionIdRef.current = nextSessionId;
         await commands.setSessionId(nextSessionId);
         currentNote.current = item;
         await commands.setStatus(timeConverter(item.dateEdited), 'Saved');
         await postMessage(EditorEvents.title, item.title);
         await postMessage(EditorEvents.html, currentContent.current?.data);
+        useEditorStore.getState().setReadonly(item.readonly);
         loadImages();
         await commands.setTags(currentNote.current);
         overlay(false);
@@ -297,7 +305,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
         500
       );
     },
-    []
+    [sessionIdRef, sessionId]
   );
 
   const onLoad = useCallback(async () => {
