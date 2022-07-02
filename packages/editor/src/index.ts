@@ -154,30 +154,6 @@ const useTiptap = (
     deps
   );
 
-  const editorRef = useRef(editor);
-  useEffect(() => {
-    editorRef.current = editor;
-
-    if (editor && !editor.current)
-      Object.defineProperty(editor, "current", {
-        get: () => editorRef.current,
-      });
-  }, [editor]);
-
-  useEffect(() => {
-    function onDragEnter(event: DragEvent) {
-      if (!!editor?.view.dragging) {
-        event.preventDefault();
-        return true;
-      }
-    }
-
-    editor?.view.dom.addEventListener("dragenter", onDragEnter);
-    return () => {
-      editor?.view.dom.removeEventListener("dragenter", onDragEnter);
-    };
-  }, [editor?.view.dom]);
-
   return editor;
 };
 

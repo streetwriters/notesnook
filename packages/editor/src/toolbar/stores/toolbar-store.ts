@@ -1,4 +1,3 @@
-import { Editor } from "@tiptap/core";
 import create from "zustand";
 
 export type ToolbarLocation = "top" | "bottom";

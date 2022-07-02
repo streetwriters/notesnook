@@ -1,5 +1,5 @@
 import { EditorOptions, Editor } from "@tiptap/core";
-import { DependencyList, useEffect, useState } from "react";
+import { DependencyList, useEffect, useRef, useState } from "react";
 import { Editor as EditorType } from "../types";
 
 function useForceUpdate() {
@@ -12,8 +12,9 @@ export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
 ) => {
-  const [editor, setEditor] = useState<Editor | null>(null);
+  const [editor, setEditor] = useState<EditorType | null>(null);
   const forceUpdate = useForceUpdate();
+  const editorRef = useRef<EditorType | null>(editor);
 
   useEffect(() => {
     let isMounted = true;
@@ -38,5 +39,30 @@ export const useEditor = (
     };
   }, deps);
 
-  return editor as EditorType;
+  useEffect(() => {
+    editorRef.current = editor;
+
+    if (editor && !editor.current)
+      Object.defineProperty(editor, "current", {
+        get: () => editorRef.current,
+      });
+  }, [editor]);
+
+  useEffect(() => {
+    // this is required for the drag/drop to work properly
+    // in the editor.
+    function onDragEnter(event: DragEvent) {
+      if (!!editor?.view.dragging) {
+        event.preventDefault();
+        return true;
+      }
+    }
+
+    editor?.view.dom.addEventListener("dragenter", onDragEnter);
+    return () => {
+      editor?.view.dom.removeEventListener("dragenter", onDragEnter);
+    };
+  }, [editor?.view.dom]);
+
+  return editor;
 };

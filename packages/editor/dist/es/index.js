@@ -14,7 +14,7 @@ import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
@@ -138,26 +138,6 @@ const useTiptap = (options = {}, deps = []) => {
         isMobile,
     ]);
     const editor = useEditor(Object.assign(Object.assign({}, defaultOptions), restOptions), deps);
-    const editorRef = useRef(editor);
-    useEffect(() => {
-        editorRef.current = editor;
-        if (editor && !editor.current)
-            Object.defineProperty(editor, "current", {
-                get: () => editorRef.current,
-            });
-    }, [editor]);
-    useEffect(() => {
-        function onDragEnter(event) {
-            if (!!(editor === null || editor === void 0 ? void 0 : editor.view.dragging)) {
-                event.preventDefault();
-                return true;
-            }
-        }
-        editor === null || editor === void 0 ? void 0 : editor.view.dom.addEventListener("dragenter", onDragEnter);
-        return () => {
-            editor === null || editor === void 0 ? void 0 : editor.view.dom.removeEventListener("dragenter", onDragEnter);
-        };
-    }, [editor === null || editor === void 0 ? void 0 : editor.view.dom]);
     return editor;
 };
 export { useTiptap, Toolbar };
