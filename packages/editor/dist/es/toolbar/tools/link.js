@@ -1,3 +1,14 @@
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
@@ -93,12 +104,12 @@ export function OpenLink(props) {
     return (_jsxs(Flex, Object.assign({ sx: { alignItems: "center" } }, { children: [_jsx(Text, Object.assign({ as: "a", href: href, target: "_blank", variant: "body", sx: { mr: 1 } }, { children: href })), _jsx(ToolButton, Object.assign({}, props, { toggled: false, onClick: () => window.open(href, "_blank") }))] })));
 }
 function LinkTool(props) {
-    const { isEditing, onClick, onDone } = props;
+    const { isEditing, onClick, onDone } = props, toolProps = __rest(props, ["isEditing", "onClick", "onDone"]);
     const buttonRef = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
     const [href, setHref] = useState();
     const [text, setText] = useState();
-    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, Object.assign({}, props, { buttonRef: buttonRef, onClick: () => {
+    return (_jsxs(_Fragment, { children: [_jsx(ToolButton, Object.assign({}, toolProps, { buttonRef: buttonRef, onClick: () => {
                     const result = onClick();
                     if (!result)
                         return;

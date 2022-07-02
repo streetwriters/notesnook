@@ -146,7 +146,7 @@ type LinkToolProps = ToolProps & {
   onClick: () => { href?: string; text: string } | undefined;
 };
 function LinkTool(props: LinkToolProps) {
-  const { isEditing, onClick, onDone } = props;
+  const { isEditing, onClick, onDone, ...toolProps } = props;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -156,7 +156,7 @@ function LinkTool(props: LinkToolProps) {
   return (
     <>
       <ToolButton
-        {...props}
+        {...toolProps}
         buttonRef={buttonRef}
         onClick={() => {
           const result = onClick();
