@@ -23,7 +23,7 @@ export function FontSize(props) {
         }, onReset: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setFontSize(`16px`).run(); }, value: fontSize }));
 }
 const fontFamilies = {
-    System: "Open Sans",
+    Default: "Open Sans",
     Serif: "serif",
     Monospace: "monospace",
 };
@@ -31,7 +31,7 @@ export function FontFamily(props) {
     var _a, _b;
     const { editor } = props;
     const currentFontFamily = ((_b = (_a = Object.entries(fontFamilies)
-        .find(([key, value]) => editor.isActive("textStyle", { fontFamily: value }))) === null || _a === void 0 ? void 0 : _a.map((a) => a)) === null || _b === void 0 ? void 0 : _b.at(0)) || "System";
+        .find(([key, value]) => editor.isActive("textStyle", { fontFamily: value }))) === null || _a === void 0 ? void 0 : _a.map((a) => a)) === null || _b === void 0 ? void 0 : _b.at(0)) || "Default";
     const items = useMemo(() => toMenuItems(editor, currentFontFamily), [currentFontFamily]);
     return (_jsx(Dropdown, { selectedItem: currentFontFamily, items: items, menuWidth: 130 }));
 }
