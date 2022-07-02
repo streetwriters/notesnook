@@ -28,21 +28,18 @@ type ToolbarProps = {
   theme: Theme;
   editor: Editor | null;
   location: ToolbarLocation;
-  isMobile?: boolean;
   tools?: ToolbarDefinition;
 };
 
 export function Toolbar(props: ToolbarProps) {
-  const { editor, theme, location, isMobile, tools = DEFAULT_TOOLS } = props;
-  const setIsMobile = useToolbarStore((store) => store.setIsMobile);
+  const { editor, theme, location, tools = DEFAULT_TOOLS } = props;
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation
   );
 
   useEffect(() => {
-    setIsMobile(isMobile || false);
     setToolbarLocation(location);
-  }, [isMobile, location]);
+  }, [location]);
 
   if (!editor) return null;
   return (

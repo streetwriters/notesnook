@@ -59,6 +59,7 @@ const useTiptap = (options = {}, deps = []) => {
     const PortalProviderAPI = usePortalProvider();
     const isMobile = useIsMobile();
     const defaultOptions = useMemo(() => ({
+        // enableInputRules: ,
         extensions: [
             NodeViewSelectionNotifier,
             SearchReplace,

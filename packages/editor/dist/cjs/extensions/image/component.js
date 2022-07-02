@@ -15,6 +15,8 @@ const rebass_1 = require("rebass");
 const re_resizable_1 = require("re-resizable");
 const react_1 = require("react");
 const responsive_1 = require("../../components/responsive");
+const icon_1 = require("../../toolbar/components/icon");
+const icons_1 = require("../../toolbar/icons");
 const toolbargroup_1 = require("../../toolbar/components/toolbargroup");
 function ImageComponent(props) {
     const { editor, updateAttributes, node, selected } = props;
@@ -59,34 +61,27 @@ function ImageComponent(props) {
                         width: ref.clientWidth,
                         height: ref.clientHeight,
                     });
-                }, lockAspectRatio: true }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ width: "100%", "data-drag-handle": true, draggable: true, sx: {
-                            position: "relative",
-                            justifyContent: "end",
-                            borderTop: editor.isEditable
-                                ? "20px solid var(--bgSecondary)"
-                                : "none",
-                            borderTopLeftRadius: "default",
-                            borderTopRightRadius: "default",
-                            borderColor: selected ? "border" : "bgSecondary",
-                            cursor: "pointer",
-                            ":hover": {
-                                borderColor: "border",
-                            },
-                        } }, { children: (0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: { position: "relative", justifyContent: "end" } }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: {
-                                        position: "absolute",
-                                        top: -40,
-                                        mb: 2,
-                                        alignItems: "end",
-                                    } }, { children: (0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { editor: editor, tools: [
-                                            "imageAlignLeft",
-                                            "imageAlignCenter",
-                                            "imageAlignRight",
-                                            "imageProperties",
-                                        ], sx: {
-                                            boxShadow: "menu",
-                                            borderRadius: "default",
-                                            bg: "background",
-                                        } }) })) }))) }) })), (0, jsx_runtime_1.jsx)(rebass_1.Image, Object.assign({ "data-drag-image": true, ref: imageRef, alt: alt, src: "/placeholder.svg", title: title, width: "100%", height: "100%", sx: {
+                }, lockAspectRatio: true }, { children: [(0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: { position: "relative", justifyContent: "end" } }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: {
+                                    position: "absolute",
+                                    top: -40,
+                                    mb: 2,
+                                    alignItems: "end",
+                                } }, { children: (0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { editor: editor, tools: [
+                                        "imageAlignLeft",
+                                        "imageAlignCenter",
+                                        "imageAlignRight",
+                                        "imageProperties",
+                                    ], sx: {
+                                        boxShadow: "menu",
+                                        borderRadius: "default",
+                                        bg: "background",
+                                    } }) })) }))) }), selected && ((0, jsx_runtime_1.jsx)(icon_1.Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: icons_1.Icons.dragHandle, sx: {
+                            cursor: "grab",
+                            position: "absolute",
+                            top: 2,
+                            left: 2,
+                            zIndex: 999,
+                        } })), (0, jsx_runtime_1.jsx)(rebass_1.Image, Object.assign({ "data-drag-image": true, ref: imageRef, alt: alt, src: "/placeholder.svg", title: title, width: "100%", height: "100%", sx: {
                             bg: "bgSecondary",
                             border: selected
                                 ? "2px solid var(--primary)"

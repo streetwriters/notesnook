@@ -11,13 +11,11 @@ const toolbarstore_1 = require("./stores/toolbarstore");
 const toolbargroup_1 = require("./components/toolbargroup");
 const popuprenderer_1 = require("../components/popup-presenter/popuprenderer");
 function Toolbar(props) {
-    const { editor, theme, location, isMobile, tools = tooldefinitions_1.DEFAULT_TOOLS } = props;
-    const setIsMobile = (0, toolbarstore_1.useToolbarStore)((store) => store.setIsMobile);
+    const { editor, theme, location, tools = tooldefinitions_1.DEFAULT_TOOLS } = props;
     const setToolbarLocation = (0, toolbarstore_1.useToolbarStore)((store) => store.setToolbarLocation);
     (0, react_1.useEffect)(() => {
-        setIsMobile(isMobile || false);
         setToolbarLocation(location);
-    }, [isMobile, location]);
+    }, [location]);
     if (!editor)
         return null;
     return ((0, jsx_runtime_1.jsx)(emotion_theming_1.ThemeProvider, Object.assign({ theme: theme }, { children: (0, jsx_runtime_1.jsx)(popuprenderer_1.EditorContext.Provider, Object.assign({ value: editor }, { children: (0, jsx_runtime_1.jsxs)(popuprenderer_1.PopupRenderer, Object.assign({ editor: editor }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ className: "editor-toolbar", sx: { flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] } }, { children: tools.map((tools) => {

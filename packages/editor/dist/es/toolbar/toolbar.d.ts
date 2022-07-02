@@ -7,7 +7,6 @@ declare type ToolbarProps = {
     theme: Theme;
     editor: Editor | null;
     location: ToolbarLocation;
-    isMobile?: boolean;
     tools?: ToolbarDefinition;
 };
 export declare function Toolbar(props: ToolbarProps): JSX.Element | null;

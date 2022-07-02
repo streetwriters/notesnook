@@ -172,8 +172,8 @@ exports.CodeBlock = core_2.Node.create({
                 if (!codeblock)
                     return false;
                 return editor.commands.setTextSelection({
-                    from: codeblock.pos,
-                    to: codeblock.pos + codeblock.node.nodeSize,
+                    from: codeblock.pos + 1,
+                    to: codeblock.pos + codeblock.node.nodeSize - 1,
                 });
             },
             // remove code block when at start of document or code block is empty

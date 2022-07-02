@@ -40,7 +40,7 @@ import {
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
-import { useIsMobile } from "./toolbar/stores/toolbar-store";
+import { useIsMobile, useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
 import { EditorOptions } from "@tiptap/core";
 
@@ -49,18 +49,22 @@ EditorView.prototype.updateState = function updateState(state) {
   (this as any).updateStateInner(state, this.state.plugins != state.plugins);
 };
 
+type TiptapOptions = EditorOptions &
+  AttachmentOptions & { theme: Theme; isMobile?: boolean };
+
 const useTiptap = (
-  options: Partial<EditorOptions & AttachmentOptions & { theme: Theme }> = {},
+  options: Partial<TiptapOptions> = {},
   deps: React.DependencyList = []
 ) => {
   const {
     theme,
+    isMobile,
     onDownloadAttachment,
     onOpenAttachmentPicker,
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
-  const isMobile = useIsMobile();
+  const setIsMobile = useToolbarStore((store) => store.setIsMobile);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
@@ -153,6 +157,10 @@ const useTiptap = (
     },
     deps
   );
+
+  useEffect(() => {
+    setIsMobile(isMobile || false);
+  }, [isMobile]);
 
   return editor;
 };

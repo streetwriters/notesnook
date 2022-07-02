@@ -76,9 +76,9 @@ prosemirror_view_1.EditorView.prototype.updateState = function updateState(state
     this.updateStateInner(state, this.state.plugins != state.plugins);
 };
 const useTiptap = (options = {}, deps = []) => {
-    const { theme, onDownloadAttachment, onOpenAttachmentPicker } = options, restOptions = __rest(options, ["theme", "onDownloadAttachment", "onOpenAttachmentPicker"]);
+    const { theme, isMobile, onDownloadAttachment, onOpenAttachmentPicker } = options, restOptions = __rest(options, ["theme", "isMobile", "onDownloadAttachment", "onOpenAttachmentPicker"]);
     const PortalProviderAPI = (0, react_2.usePortalProvider)();
-    const isMobile = (0, toolbarstore_1.useIsMobile)();
+    const setIsMobile = (0, toolbarstore_1.useToolbarStore)((store) => store.setIsMobile);
     const defaultOptions = (0, react_1.useMemo)(() => ({
         extensions: [
             react_2.NodeViewSelectionNotifier,
@@ -159,26 +159,9 @@ const useTiptap = (options = {}, deps = []) => {
         isMobile,
     ]);
     const editor = (0, useEditor_1.useEditor)(Object.assign(Object.assign({}, defaultOptions), restOptions), deps);
-    const editorRef = (0, react_1.useRef)(editor);
     (0, react_1.useEffect)(() => {
-        editorRef.current = editor;
-        if (editor && !editor.current)
-            Object.defineProperty(editor, "current", {
-                get: () => editorRef.current,
-            });
-    }, [editor]);
-    (0, react_1.useEffect)(() => {
-        function onDragEnter(event) {
-            if (!!(editor === null || editor === void 0 ? void 0 : editor.view.dragging)) {
-                event.preventDefault();
-                return true;
-            }
-        }
-        editor === null || editor === void 0 ? void 0 : editor.view.dom.addEventListener("dragenter", onDragEnter);
-        return () => {
-            editor === null || editor === void 0 ? void 0 : editor.view.dom.removeEventListener("dragenter", onDragEnter);
-        };
-    }, [editor === null || editor === void 0 ? void 0 : editor.view.dom]);
+        setIsMobile(isMobile || false);
+    }, [isMobile]);
     return editor;
 };
 exports.useTiptap = useTiptap;

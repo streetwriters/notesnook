@@ -8,13 +8,11 @@ import { useToolbarStore, } from "./stores/toolbar-store";
 import { ToolbarGroup } from "./components/toolbar-group";
 import { EditorContext, PopupRenderer, } from "../components/popup-presenter/popuprenderer";
 export function Toolbar(props) {
-    const { editor, theme, location, isMobile, tools = DEFAULT_TOOLS } = props;
-    const setIsMobile = useToolbarStore((store) => store.setIsMobile);
+    const { editor, theme, location, tools = DEFAULT_TOOLS } = props;
     const setToolbarLocation = useToolbarStore((store) => store.setToolbarLocation);
     useEffect(() => {
-        setIsMobile(isMobile || false);
         setToolbarLocation(location);
-    }, [isMobile, location]);
+    }, [location]);
     if (!editor)
         return null;
     return (_jsx(ThemeProvider, Object.assign({ theme: theme }, { children: _jsx(EditorContext.Provider, Object.assign({ value: editor }, { children: _jsxs(PopupRenderer, Object.assign({ editor: editor }, { children: [_jsx(Flex, Object.assign({ className: "editor-toolbar", sx: { flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] } }, { children: tools.map((tools) => {
