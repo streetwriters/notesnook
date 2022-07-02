@@ -25,6 +25,7 @@ export class NNStorage {
   }
 
   read<T>(key: string): Promise<T | null> {
+    if (!key) return Promise.resolve(null);
     return this.database.getItem(key);
   }
 

@@ -25,14 +25,12 @@ import {
 } from "../common/dialog-controller";
 import { hashNavigate } from ".";
 import { Suspense } from "react";
-import EditorLoading from "../components/editor/loading";
 import EditorPlaceholder from "../components/editor/-placeholder";
 import { EditorLoader } from "../components/loaders/editor-loader";
 const Editor = React.lazy(() => import("../components/editor"));
 
 const hashroutes = {
   "/": () => {
-    closeOpenedDialog();
     return !editorStore.get().session.state && <EditorPlaceholder />;
   },
   "/email/verify": () => {

@@ -10,7 +10,7 @@ type TitleBoxProps = {
 
 function TitleBox(props: TitleBoxProps) {
   const { readonly, setTitle, title, nonce } = props;
-  const [currentTitle, setCurrentTitle] = useState<string>();
+  const [currentTitle, setCurrentTitle] = useState<string>("");
 
   useEffect(() => {
     setCurrentTitle(title);

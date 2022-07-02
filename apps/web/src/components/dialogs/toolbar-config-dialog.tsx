@@ -105,6 +105,7 @@ export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
           <Flex>
             {getAllPresets().map((preset) => (
               <Label
+                key={preset.id}
                 variant="text.body"
                 sx={{ alignItems: "center", width: "auto", mr: 2 }}
               >
@@ -245,15 +246,22 @@ type TreeNodeComponentProps = {
   onRemoveItem?: (item: TreeNode) => void;
 };
 function TreeNodeComponent(props: TreeNodeComponentProps) {
-  const { item, activeItem, onRemoveGroup, onRemoveItem, onAddSubGroup } =
-    props;
+  const {
+    item,
+    activeItem,
+    onRemoveGroup,
+    onRemoveItem,
+    onAddSubGroup,
+    ...restProps
+  } = props;
   if (activeItem && isCollapsed(item, activeItem)) return null;
   const isDraggable = !isTrash(item);
 
   if (isGroup(item) || isSubgroup(item)) {
     return (
       <SortableWrapper
-        {...props}
+        {...restProps}
+        item={item}
         draggable={isDraggable}
         onRemove={onRemoveGroup}
         onAdd={isGroup(item) ? onAddSubGroup : undefined}
@@ -279,7 +287,8 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
 
   return (
     <SortableWrapper
-      {...props}
+      {...restProps}
+      item={item}
       draggable={isDraggable}
       onRemove={onRemoveItem}
       sx={{

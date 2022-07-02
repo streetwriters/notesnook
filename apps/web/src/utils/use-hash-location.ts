@@ -28,10 +28,11 @@ export default function useHashLocation() {
   useEffect(() => {
     // this function is called whenever the hash changes
     const handler = (e: HashChangeEvent) => {
-      const notify = (e as any).notify === undefined ? true : (e as any).notify;
+      const update = (e as any).notify === undefined ? true : (e as any).notify;
+      console.log(currentLocation());
       setLoc({
         location: currentLocation(),
-        update: notify,
+        update,
       });
       setQueryParams(currentQuery());
     };

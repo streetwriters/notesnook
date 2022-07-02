@@ -5,6 +5,7 @@ import { getHomeRoute, hardNavigate } from "../../navigation";
 import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
 import { isTesting } from "../../utils/platform";
+import { useEffect } from "react";
 
 type CallToAction = {
   title: string;
@@ -65,12 +66,14 @@ type FeatureDialogProps = {
 };
 
 function FeatureDialog(props: FeatureDialogProps) {
-  const { featureName } = props;
+  const { featureName, onClose } = props;
   const feature = features[featureName];
-  if (!feature || (feature.shouldShow && !feature.shouldShow())) {
-    props.onClose(false);
-    return null;
-  }
+
+  useEffect(() => {
+    if (!feature || (feature.shouldShow && !feature.shouldShow())) {
+      onClose(false);
+    }
+  }, [feature, onClose]);
 
   return (
     <Dialog
