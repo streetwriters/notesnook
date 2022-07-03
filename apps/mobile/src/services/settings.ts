@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 import { enabled } from 'react-native-privacy-snapshot';
-import { SettingStore } from '../stores/interfaces';
+import { SettingStore } from '../stores/use-setting-store';
 import { useSettingStore } from '../stores/use-setting-store';
 import { AndroidModule } from '../utils';
 import { getColorScheme } from '../utils/color-scheme/utils';

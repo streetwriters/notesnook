@@ -1,5 +1,4 @@
 import { Platform } from 'react-native';
-import 'react-native-get-random-values';
 import RNFetchBlob from 'rn-fetch-blob';
 import {
   decrypt,

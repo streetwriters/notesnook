@@ -1,6 +1,6 @@
 import React from 'react';
 import { Linking, View } from 'react-native';
-import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
+//import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { eCloseAnnouncementDialog } from '../../utils/events';
@@ -35,11 +35,11 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
         )
       });
     } else if (item.type === 'backup') {
-      presentSheet({
-        title: 'Backup & restore',
-        paragraph: 'Please enable automatic backups to keep your data safe',
-        component: <SettingsBackupAndRestore isSheet={true} />
-      });
+      // presentSheet({
+      //   title: 'Backup & restore',
+      //   paragraph: 'Please enable automatic backups to keep your data safe',
+      //   component: <SettingsBackupAndRestore isSheet={true} />
+      // });
     }
   };
   return (

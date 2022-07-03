@@ -1,5 +1,5 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import { getLinkPreview } from 'link-preview-js';
+//import { getLinkPreview } from 'link-preview-js';
 import { parseHTML } from 'notes-core/utils/htmlparser';
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
@@ -28,6 +28,7 @@ import Storage from '../src/utils/database/storage';
 import { sleep } from '../src/utils/time';
 import { Search } from './search';
 import { useShareStore } from './store';
+const getLinkPreview = () => {};
 async function sanitizeHtml(site) {
   try {
     let html = await fetch(site);

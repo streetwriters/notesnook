@@ -5,7 +5,7 @@ import FileViewer from 'react-native-file-viewer';
 import QRCode from 'react-native-qrcode-svg';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import Share from 'react-native-share';
-import { LOGO_BASE64 } from '../../../assets/images/assets';
+//import { LOGO_BASE64 } from '../../../assets/images/assets';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import { clearMessage } from '../../../services/message';
 import SettingsService from '../../../services/settings';
@@ -245,7 +245,7 @@ class RecoveryKeySheet extends React.Component {
                 getRef={this.svg}
                 size={500}
                 value={this.state.key}
-                logo={{ uri: LOGO_BASE64 }}
+                //logo={{ uri: LOGO_BASE64 }}
                 logoBorderRadius={10}
               />
             ) : null}

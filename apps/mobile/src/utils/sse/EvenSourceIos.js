@@ -23,14 +23,8 @@
  *
  */
 'use strict';
-
-var _eventTargetShim = _interopRequireDefault(require('event-target-shim'));
-
-var _reactNative = require('react-native');
-
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
-}
+import _reactNative from 'react-native';
+import _eventTargetShim from 'event-target-shim';
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -497,4 +491,4 @@ _defineProperty(EventSource, 'XMLHTTP_LOADING', 3);
 
 _defineProperty(EventSource, 'XMLHTTP_DONE', 4);
 
-module.exports = EventSource;
+export default EventSource;
