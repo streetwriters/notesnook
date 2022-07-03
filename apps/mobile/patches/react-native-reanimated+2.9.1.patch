@@ -1,17 +1,17 @@
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/dependencies-accessors/dependencies-accessors.lock b/node_modules/react-native-reanimated/android/.gradle/7.2/dependencies-accessors/dependencies-accessors.lock
 deleted file mode 100644
-index 6ac7fe6..0000000
+index fabf460..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/7.2/dependencies-accessors/dependencies-accessors.lock and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/dependencies-accessors/gc.properties b/node_modules/react-native-reanimated/android/.gradle/7.2/dependencies-accessors/gc.properties
 deleted file mode 100644
 index e69de29..0000000
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/executionHistory/executionHistory.bin b/node_modules/react-native-reanimated/android/.gradle/7.2/executionHistory/executionHistory.bin
 deleted file mode 100644
-index d9dc031..0000000
+index a73e625..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/7.2/executionHistory/executionHistory.bin and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/executionHistory/executionHistory.lock b/node_modules/react-native-reanimated/android/.gradle/7.2/executionHistory/executionHistory.lock
 deleted file mode 100644
-index 97d4dff..0000000
+index 3c6c4ff..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/7.2/executionHistory/executionHistory.lock and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/fileChanges/last-build.bin b/node_modules/react-native-reanimated/android/.gradle/7.2/fileChanges/last-build.bin
 deleted file mode 100644
@@ -19,58 +19,55 @@ index f76dd23..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/7.2/fileChanges/last-build.bin and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/fileHashes.bin b/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/fileHashes.bin
 deleted file mode 100644
-index ed1f2b7..0000000
+index 2c5c450..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/fileHashes.bin and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/fileHashes.lock b/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/fileHashes.lock
 deleted file mode 100644
-index 4879334..0000000
+index f611649..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/fileHashes.lock and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/resourceHashesCache.bin b/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/resourceHashesCache.bin
 deleted file mode 100644
-index 5f19386..0000000
+index be6673f..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/7.2/fileHashes/resourceHashesCache.bin and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/7.2/gc.properties b/node_modules/react-native-reanimated/android/.gradle/7.2/gc.properties
 deleted file mode 100644
 index e69de29..0000000
 diff --git a/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock b/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock
 deleted file mode 100644
-index 3ec0901..0000000
+index 17defa6..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/buildOutputCleanup.lock and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/cache.properties b/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/cache.properties
 deleted file mode 100644
-index a77fc64..0000000
+index 1184471..0000000
 --- a/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/cache.properties
 +++ /dev/null
 @@ -1,2 +0,0 @@
--#Thu Apr 21 15:44:53 UTC 2022
+-#Fri Jul 01 09:56:56 UTC 2022
 -gradle.version=7.2
 diff --git a/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/outputFiles.bin b/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/outputFiles.bin
 deleted file mode 100644
-index bd1926f..0000000
+index 2467136..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/buildOutputCleanup/outputFiles.bin and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/checksums/checksums.lock b/node_modules/react-native-reanimated/android/.gradle/checksums/checksums.lock
 deleted file mode 100644
-index 1337501..0000000
+index 3c0a9ad..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/checksums/checksums.lock and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/checksums/md5-checksums.bin b/node_modules/react-native-reanimated/android/.gradle/checksums/md5-checksums.bin
 deleted file mode 100644
-index 9588d7e..0000000
+index bbd404e..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/checksums/md5-checksums.bin and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/checksums/sha1-checksums.bin b/node_modules/react-native-reanimated/android/.gradle/checksums/sha1-checksums.bin
 deleted file mode 100644
-index b104bf9..0000000
+index 89c4caa..0000000
 Binary files a/node_modules/react-native-reanimated/android/.gradle/checksums/sha1-checksums.bin and /dev/null differ
 diff --git a/node_modules/react-native-reanimated/android/.gradle/vcs-1/gc.properties b/node_modules/react-native-reanimated/android/.gradle/vcs-1/gc.properties
 deleted file mode 100644
 index e69de29..0000000
 diff --git a/node_modules/react-native-reanimated/android/CMakeLists.txt b/node_modules/react-native-reanimated/android/CMakeLists.txt
-index e6ff5f2..a0c884f 100644
+index 063582c..472019c 100644
 --- a/node_modules/react-native-reanimated/android/CMakeLists.txt
 +++ b/node_modules/react-native-reanimated/android/CMakeLists.txt
-@@ -1,49 +1,50 @@
-+
-+project(Reanimated)
- cmake_minimum_required(VERSION 3.5.1)
+@@ -3,49 +3,47 @@ cmake_minimum_required(VERSION 3.5.1)
  
  set (CMAKE_VERBOSE_MAKEFILE ON)
  set (CMAKE_CXX_STANDARD 14)
@@ -88,6 +85,7 @@ index e6ff5f2..a0c884f 100644
  set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
  
 -set (PACKAGE_NAME "reanimated")
+-set (BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
 -set (SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 +set(PACKAGE_NAME "reanimated")
 +set(BUILD_DIR ${CMAKE_SOURCE_DIR}/build)
@@ -148,7 +146,7 @@ index e6ff5f2..a0c884f 100644
  
  add_library(
          ${PACKAGE_NAME}
-@@ -67,7 +68,7 @@ add_library(
+@@ -69,7 +67,7 @@ add_library(
  
  # includes
  
@@ -157,7 +155,7 @@ index e6ff5f2..a0c884f 100644
  
  target_include_directories(
          ${PACKAGE_NAME}
-@@ -86,7 +87,6 @@ target_include_directories(
+@@ -88,7 +86,6 @@ target_include_directories(
          "${NODE_MODULES_DIR}/react-native/ReactCommon/jsi"
          "${NODE_MODULES_DIR}/react-native/ReactCommon/turbomodule/core"
          "${NODE_MODULES_DIR}/react-native/ReactCommon/turbomodule"
@@ -165,7 +163,7 @@ index e6ff5f2..a0c884f 100644
          "${COMMON_SRC_DIR}/cpp/headers/Tools"
          "${COMMON_SRC_DIR}/cpp/headers/SpecTools"
          "${COMMON_SRC_DIR}/cpp/headers/NativeModules"
-@@ -100,45 +100,25 @@ target_include_directories(
+@@ -102,41 +99,12 @@ target_include_directories(
  
  # find libraries
  
@@ -189,16 +187,26 @@ index e6ff5f2..a0c884f 100644
 -        PATHS ${LIBRN_DIR}
 -        NO_CMAKE_FIND_ROOT_PATH
 -)
--find_library(
--        FOLLY_JSON_LIB
--        folly_json
--        PATHS ${LIBRN_DIR}
--        NO_CMAKE_FIND_ROOT_PATH
--)
-+
+-
+-if(${REACT_NATIVE_TARGET_VERSION} LESS 69)
+-        find_library(
+-                FOLLY_LIB
+-                folly_json
+-                PATHS ${LIBRN_DIR}
+-                NO_CMAKE_FIND_ROOT_PATH
+-        )
+-else()
+-        find_library(
+-                FOLLY_LIB
+-                folly_runtime
+-                PATHS ${LIBRN_DIR}
+-                NO_CMAKE_FIND_ROOT_PATH
+-        )
+-endif()
+ 
  find_library(
          REACT_NATIVE_JNI_LIB
-         reactnativejni
+@@ -144,14 +112,12 @@ find_library(
          PATHS ${LIBRN_DIR}
          NO_CMAKE_FIND_ROOT_PATH
  )
@@ -213,7 +221,7 @@ index e6ff5f2..a0c884f 100644
  find_library(
          FBJNI_LIB
          fbjni
-@@ -146,22 +126,53 @@ find_library(
+@@ -159,22 +125,53 @@ find_library(
          NO_CMAKE_FIND_ROOT_PATH
  )
  
@@ -278,12 +286,7 @@ index e6ff5f2..a0c884f 100644
      target_link_libraries(
              ${PACKAGE_NAME}
              ${LOG_LIB}
-@@ -169,11 +180,44 @@ if(${FOR_HERMES})
-             ${HERMES_LIB}
-             ${GLOG_LIB}
-             ${FBJNI_LIB}
--            ${FOLLY_JSON_LIB}
-+            ${FOLLY_LIB}
+@@ -186,7 +183,40 @@ if(${FOR_HERMES})
              ${REACT_NATIVE_JNI_LIB}
              android
      )
@@ -325,12 +328,7 @@ index e6ff5f2..a0c884f 100644
      target_link_libraries(
              ${PACKAGE_NAME}
              ${LOG_LIB}
-@@ -181,13 +225,13 @@ else()
-             ${JSEXECUTOR_LIB}
-             ${GLOG_LIB}
-             ${FBJNI_LIB}
--            ${FOLLY_JSON_LIB}
-+            ${FOLLY_LIB}
+@@ -198,9 +228,9 @@ else()
              ${REACT_NATIVE_JNI_LIB}
              android
      )
@@ -342,17 +340,19 @@ index e6ff5f2..a0c884f 100644
      add_library(
              turbomodulejsijni
              # Sets the library as a shared library.
-@@ -195,4 +239,4 @@ if(${REACT_NATIVE_TARGET_VERSION} LESS 64)
+@@ -208,4 +238,4 @@ if(${REACT_NATIVE_TARGET_VERSION} LESS 64)
              # Provides a relative path to your source file(s).
              ./empty.cpp
      )
 -endif()
 +endif ()
+\ No newline at end of file
 diff --git a/node_modules/react-native-reanimated/android/build.gradle b/node_modules/react-native-reanimated/android/build.gradle
-index cc460da..3b86812 100644
+index dfb79c8..51875ce 100644
 --- a/node_modules/react-native-reanimated/android/build.gradle
 +++ b/node_modules/react-native-reanimated/android/build.gradle
-@@ -1,10 +1,8 @@
+@@ -1,10 +1,9 @@
++
 +import com.android.Version
 +
  import java.nio.file.Paths
@@ -365,7 +365,7 @@ index cc460da..3b86812 100644
  
  /**
   * Finds the path of the installed npm package with the given name using Node's
-@@ -45,18 +43,6 @@ def safeExtGet(prop, fallback) {
+@@ -45,18 +44,6 @@ def safeExtGet(prop, fallback) {
      rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
  }
  
@@ -384,7 +384,7 @@ index cc460da..3b86812 100644
  def resolveBuildType() {
      def buildType = System.getenv("CLIENT_SIDE_BUILD")
      if (buildType != null) {
-@@ -86,127 +72,6 @@ def resolveReactNativeDirectory() {
+@@ -86,127 +73,6 @@ def resolveReactNativeDirectory() {
      return file("$projectDir/../../react-native")
  }
  
@@ -451,10 +451,10 @@ index cc460da..3b86812 100644
 -            println "\n\n\n"
 -            println "****************************************************************************************"
 -            println "\n\n\n"
--            println "WARNING reanimated - no version-specific reanimated AAR for react-native version $rnMinorVersion found."
+-            println "WARNING reanimated - no version-specific reanimated AAR for react-native version $minor found."
 -            println "Falling back to AAR for react-native version $rnMinorVersionCopy."
 -            println "The react-native JSI interface is not ABI-safe yet, this may result in crashes."
--            println "Please post a pull request to implement support for react-native version $rnMinorVersion to the reanimated repo."
+-            println "Please post a pull request to implement support for react-native version $minor to the reanimated repo."
 -            println "Thanks!"
 -            println "\n\n\n"
 -            println "****************************************************************************************"
@@ -512,7 +512,7 @@ index cc460da..3b86812 100644
  boolean CLIENT_SIDE_BUILD = resolveBuildType()
  if (CLIENT_SIDE_BUILD) {
      configurations.maybeCreate("default")
-@@ -217,70 +82,6 @@ def reactNativeManifestAsJson = new JsonSlurper().parseText(reactNativeManifest.
+@@ -217,70 +83,6 @@ def reactNativeManifestAsJson = new JsonSlurper().parseText(reactNativeManifest.
  def reactNativeVersion = reactNativeManifestAsJson.version as String
  def (major, minor, patch) = reactNativeVersion.tokenize('.')
  def rnMinorVersion = Integer.parseInt(minor)
@@ -583,7 +583,7 @@ index cc460da..3b86812 100644
  
  def localProps = new Properties()
  def localPropertiesFile = file("local.properties")
-@@ -309,13 +110,36 @@ def thirdPartyNdkDir = new File("$buildDir/third-party-ndk")
+@@ -309,13 +111,36 @@ def thirdPartyNdkDir = new File("$buildDir/third-party-ndk")
  def reactNativeThirdParty = new File("$reactNative/ReactAndroid/src/main/jni/third-party")
  
  def _stackProtectorFlag = true
@@ -626,7 +626,18 @@ index cc460da..3b86812 100644
  
  def reactNativeArchitectures() {
      def value = project.getProperties().get("reactNativeArchitectures")
-@@ -376,14 +200,15 @@ android {
+@@ -351,8 +176,8 @@ buildscript {
+         }
+     }
+     dependencies {
+-        classpath "com.android.tools.build:gradle:7.1.1"
+-        classpath "de.undercouch:gradle-download-task:5.0.1"
++        classpath "com.android.tools.build:gradle:4.2.2"
++        classpath "de.undercouch:gradle-download-task:4.1.2"
+         classpath "com.diffplug.spotless:spotless-plugin-gradle:5.15.0"
+     }
+ }
+@@ -376,13 +201,15 @@ android {
              cmake {
                  arguments "-DANDROID_STL=c++_shared",
                          "-DNATIVE_DEBUG=${debugNativeLibraries}",
@@ -636,23 +647,16 @@ index cc460da..3b86812 100644
                          "-DBOOST_VERSION=${BOOST_VERSION}",
                          "-DBUILD_DIR=${buildDir}",
 -                        "-DFOR_HERMES=${FOR_HERMES}",
--                        "-DCLIENT_SIDE_BUILD=${CLIENT_SIDE_BUILD}",
--                        "--clean-first"
--                abiFilters (*reactNativeArchitectures())
 +                        "-DNODE_MODULES_DIR=${CMAKE_NODE_MODULES_DIR}",
 +                        "-DJS_RUNTIME=${JS_RUNTIME}",
 +                        "-DJS_RUNTIME_DIR=${jsRuntimeDir}",
-+                        "-DCLIENT_SIDE_BUILD=${CLIENT_SIDE_BUILD}"
+                         "-DCLIENT_SIDE_BUILD=${CLIENT_SIDE_BUILD}"
+-                abiFilters (*reactNativeArchitectures())
 +                abiFilters(*reactNativeArchitectures())
                  _stackProtectorFlag ? (cppFlags("-fstack-protector-all")) : null
              }
          }
-@@ -407,10 +232,12 @@ android {
-                 "**/libfbjni.so",
-                 "**/libjsi.so",
-                 "**/libfolly_json.so",
-+                "**/libfolly_runtime.so",
-                 "**/libglog.so",
+@@ -411,6 +238,7 @@ android {
                  "**/libhermes.so",
                  "**/libreactnativejni.so",
                  "**/libjscexecutor.so",
@@ -660,7 +664,7 @@ index cc460da..3b86812 100644
          ]
      }
      tasks.withType(JavaCompile) {
-@@ -435,7 +262,7 @@ task cleanCmakeCache() {
+@@ -435,7 +263,7 @@ task cleanCmakeCache() {
  }
  
  task printVersions {
@@ -669,7 +673,7 @@ index cc460da..3b86812 100644
      println "Gradle: ${project.gradle.gradleVersion}"
  }
  
-@@ -446,10 +273,10 @@ task Log {
+@@ -446,10 +274,10 @@ task Log {
  task applyJavaPatches(type: Copy) {
      def patchDirectory = file("${projectDir}/rnVersionPatch/${rnMinorVersion}")
      if (patchDirectory.exists()) {
@@ -682,21 +686,7 @@ index cc460da..3b86812 100644
      }
  }
  
-@@ -459,7 +286,12 @@ task createNativeDepsDirectories(dependsOn: applyJavaPatches) {
- }
- 
- task downloadBoost(dependsOn: createNativeDepsDirectories, type: Download) {
--    src("https://github.com/react-native-community/boost-for-react-native/releases/download/v${BOOST_VERSION.replace("_", ".")}-0/boost_${BOOST_VERSION}.tar.gz")
-+    def transformedVersion = BOOST_VERSION.replace("_", ".")
-+    def srcUrl = "https://boostorg.jfrog.io/artifactory/main/release/${transformedVersion}/source/boost_${BOOST_VERSION}.tar.gz"
-+    if (rnMinorVersion < 69) {
-+        srcUrl = "https://github.com/react-native-community/boost-for-react-native/releases/download/v${transformedVersion}-0/boost_${BOOST_VERSION}.tar.gz"
-+    }
-+    src(srcUrl)
-     onlyIfNewer(true)
-     overwrite(false)
-     dest(new File(downloadsDir, "boost_${BOOST_VERSION}.tar.gz"))
-@@ -638,7 +470,7 @@ task extractSOFiles {
+@@ -643,7 +471,7 @@ task extractSOFiles {
  task packageNdkLibs(type: Copy) {
      from("$buildDir/reanimated-ndk/all")
      include("**/libreanimated.so")
@@ -705,7 +695,7 @@ index cc460da..3b86812 100644
          include("**/libturbomodulejsijni.so")
      }
      into("$projectDir/src/main/jniLibs")
-@@ -663,8 +495,7 @@ dependencies {
+@@ -668,8 +496,7 @@ dependencies {
      implementation "com.facebook.yoga:proguard-annotations:1.19.0"
      if (isDeveloperMode()) {
          implementation "com.facebook.fbjni:fbjni:" + FBJNI_VERSION
@@ -715,28 +705,24 @@ index cc460da..3b86812 100644
          implementation "com.facebook.fbjni:fbjni-java-only:" + FBJNI_VERSION
      }
      implementation "com.facebook.react:react-native:+" // From node_modules
-@@ -672,26 +503,50 @@ dependencies {
+@@ -677,6 +504,11 @@ dependencies {
      extractHeaders("com.facebook.fbjni:fbjni:" + FBJNI_VERSION + ":headers")
      extractSO("com.facebook.fbjni:fbjni:" + FBJNI_VERSION)
  
--    def rnAAR = fileTree("$reactNative/android").matching({ it.include "**/**/*.aar" }).singleFile
-     def jscAAR = fileTree("$reactNative/../jsc-android/dist/org/webkit/android-jsc").matching({ it.include "**/**/*.aar" }).singleFile
--    extractSO(files(rnAAR, jscAAR))
++    def jscAAR = fileTree("$reactNative/../jsc-android/dist/org/webkit/android-jsc").matching({ it.include "**/**/*.aar" }).singleFile
 +    extractSO(files(jscAAR))
 +}
 +
 +task unpackReactNativeAAR {
-+    def buildType = "debug"
-+    tasks.all({ task ->
-+        if (task.name == "buildCMakeRelease") {
-+            buildType = "release"
-+        }
-+    })
-+    def rnAarMatcher = "**/react-native/**/*${buildType}.aar"
-+    if (rnMinorVersion < 69) {
-+        rnAarMatcher = "**/**/*.aar"
-+    }
-+    def rnAAR = fileTree("$reactNative/android").matching({ it.include rnAarMatcher }).singleFile
+     def buildType = "debug"
+     tasks.all({ task ->
+         if (task.name == "buildCMakeRelease") {
+@@ -688,25 +520,33 @@ dependencies {
+         rnAarMatcher = "**/**/*.aar"
+     }
+     def rnAAR = fileTree("$reactNative/android").matching({ it.include rnAarMatcher }).singleFile
+-    def jscAAR = fileTree("$reactNative/../jsc-android/dist/org/webkit/android-jsc").matching({ it.include "**/**/*.aar" }).singleFile
+-    extractSO(files(rnAAR, jscAAR))
 +    def file = rnAAR.absoluteFile
 +    def packageName = file.name.tokenize('-')[0]
 +    copy {
@@ -759,9 +745,8 @@ index cc460da..3b86812 100644
 +        dependsOn(downloadGlog)
 +    }
  }
-     
+ 
 -task prepareThirdPartyNdkHeaders(dependsOn:[downloadNdkBuildDependencies, prepareBoost, prepareDoubleConversion, prepareFolly, prepareGlog]) {
-+
 +task prepareThirdPartyNdkHeaders(dependsOn: [downloadNdkBuildDependencies, prepareBoost, prepareDoubleConversion, prepareFolly, prepareGlog, unpackReactNativeAAR]) {
  }
  
@@ -773,7 +758,7 @@ index cc460da..3b86812 100644
      buildTasks.forEach { task -> task.dependsOn(dependsOnTask) }
  }
  
-@@ -702,11 +557,30 @@ afterEvaluate {
+@@ -717,11 +557,30 @@ afterEvaluate {
      nativeBuildDependsOn(prepareThirdPartyNdkHeaders)
      nativeBuildDependsOn(extractAARHeaders)
      nativeBuildDependsOn(extractSOFiles)
@@ -805,23 +790,8 @@ index cc460da..3b86812 100644
      if (aar == null) {
          throw GradleScriptException("AAR build failed. No AAR found in ${aarDir}.")
      }
-diff --git a/node_modules/react-native-reanimated/android/gradle/wrapper/gradle-wrapper.jar b/node_modules/react-native-reanimated/android/gradle/wrapper/gradle-wrapper.jar
-deleted file mode 100644
-index 7454180..0000000
-Binary files a/node_modules/react-native-reanimated/android/gradle/wrapper/gradle-wrapper.jar and /dev/null differ
-diff --git a/node_modules/react-native-reanimated/android/gradle/wrapper/gradle-wrapper.properties b/node_modules/react-native-reanimated/android/gradle/wrapper/gradle-wrapper.properties
-deleted file mode 100644
-index ffed3a2..0000000
---- a/node_modules/react-native-reanimated/android/gradle/wrapper/gradle-wrapper.properties
-+++ /dev/null
-@@ -1,5 +0,0 @@
--distributionBase=GRADLE_USER_HOME
--distributionPath=wrapper/dists
--distributionUrl=https\://services.gradle.org/distributions/gradle-7.2-bin.zip
--zipStoreBase=GRADLE_USER_HOME
--zipStorePath=wrapper/dists
 diff --git a/node_modules/react-native-reanimated/android/src/main/cpp/NativeProxy.cpp b/node_modules/react-native-reanimated/android/src/main/cpp/NativeProxy.cpp
-index efa6463..8ac8931 100644
+index 0e4014c..872c77b 100644
 --- a/node_modules/react-native-reanimated/android/src/main/cpp/NativeProxy.cpp
 +++ b/node_modules/react-native-reanimated/android/src/main/cpp/NativeProxy.cpp
 @@ -7,8 +7,10 @@
@@ -836,7 +806,7 @@ index efa6463..8ac8931 100644
  #else
  #include <jsi/JSCRuntime.h>
  #endif
-@@ -136,11 +138,17 @@ void NativeProxy::installJSIBindings() {
+@@ -136,15 +138,22 @@ void NativeProxy::installJSIBindings() {
    auto setGestureStateFunction = [this](int handlerTag, int newState) -> void {
      setGestureState(handlerTag, newState);
    };
@@ -851,7 +821,12 @@ index efa6463..8ac8931 100644
 +  config->enableInspector = false;
 +  config->appName = "reanimated";
 +  std::shared_ptr<jsi::Runtime> animatedRuntime =
-+      rnv8::createSharedV8Runtime(runtime_, std::move(config));
++      rnv8::createSharedV8Runtime(runtime_, std::move(config));      
  #else
    std::shared_ptr<jsi::Runtime> animatedRuntime =
        facebook::jsc::makeJSCRuntime();
+ #endif
++
+   auto workletRuntimeValue = runtime_->global()
+     .getProperty(*runtime_, "ArrayBuffer")
+     .asObject(*runtime_)

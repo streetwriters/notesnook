@@ -1,0 +1,41 @@
+diff --git a/node_modules/react-native-file-viewer/.DS_Store b/node_modules/react-native-file-viewer/.DS_Store
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-file-viewer/android/.DS_Store b/node_modules/react-native-file-viewer/android/.DS_Store
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-file-viewer/android/src/.DS_Store b/node_modules/react-native-file-viewer/android/src/.DS_Store
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-file-viewer/android/src/main/.DS_Store b/node_modules/react-native-file-viewer/android/src/main/.DS_Store
+new file mode 100644
+index 0000000..e69de29
+diff --git a/node_modules/react-native-file-viewer/android/src/main/java/com/vinzscam/reactnativefileviewer/RNFileViewerModule.java b/node_modules/react-native-file-viewer/android/src/main/java/com/vinzscam/reactnativefileviewer/RNFileViewerModule.java
+index 93f7881..bb47bb0 100644
+--- a/node_modules/react-native-file-viewer/android/src/main/java/com/vinzscam/reactnativefileviewer/RNFileViewerModule.java
++++ b/node_modules/react-native-file-viewer/android/src/main/java/com/vinzscam/reactnativefileviewer/RNFileViewerModule.java
+@@ -77,15 +77,19 @@ public class RNFileViewerModule extends ReactContextBaseJavaModule {
+     String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+ 
+     Intent shareIntent = new Intent();
++    if (options.hasKey("shareFile")) {
++      shareIntent.setAction(Intent.ACTION_SEND);
++    } else {
++      shareIntent.setAction(Intent.ACTION_VIEW);
++    }
+ 
+-    shareIntent.setAction(Intent.ACTION_VIEW);
+     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+     shareIntent.setDataAndType(contentUri, mimeType);
+     shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+     Intent intentActivity;
+ 
+     if (showOpenWithDialog) {
+-      intentActivity = Intent.createChooser(shareIntent, "Open with");
++      intentActivity = Intent.createChooser(shareIntent, options.hasKey("shareFile") ? "Share" :"Open with");
+     } else {
+       intentActivity = shareIntent;
+     }
+diff --git a/node_modules/react-native-file-viewer/android/src/main/res/.DS_Store b/node_modules/react-native-file-viewer/android/src/main/res/.DS_Store
+new file mode 100644
+index 0000000..e69de29
