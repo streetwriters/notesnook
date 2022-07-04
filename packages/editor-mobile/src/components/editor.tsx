@@ -1,10 +1,16 @@
 import { useTheme } from "@notesnook/theme";
-import { PortalProvider, Toolbar, useTiptap } from "notesnook-editor";
+import {
+  Editor,
+  PortalProvider,
+  Toolbar,
+  usePermissionHandler,
+  useTiptap,
+} from "notesnook-editor";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import { useEditorThemeStore } from "../state/theme";
-import { Settings } from "../utils";
+import { EventTypes, Settings } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
@@ -72,14 +78,21 @@ const Tiptap = () => {
     px: 5,
     height: "45px",
   };
-
+  usePermissionHandler({
+    claims: {
+      premium: settings.premium,
+    },
+    onPermissionDenied: () => {
+      post(EventTypes.pro);
+    },
+  });
   const editor = useTiptap(
     {
       onUpdate: ({ editor }) => {
-        global.editorController.contentChange(editor);
+        global.editorController.contentChange(editor as Editor);
       },
       onSelectionUpdate: (props) => {
-        global.editorController.selectionChange(props.editor);
+        global.editorController.selectionChange(props.editor as Editor);
       },
       onOpenAttachmentPicker: (editor, type) => {
         global.editorController.openFilePicker(type);
@@ -95,6 +108,8 @@ const Tiptap = () => {
       editorProps: {
         editable: () => !initialProps.readonly,
       },
+      content: global.editorController?.content?.current,
+      isMobile: true,
     },
     [layout, initialProps.readonly]
   );
@@ -138,7 +153,11 @@ const Tiptap = () => {
           {initialProps.noHeader ? null : (
             <>
               <Tags />
-              <Title controller={controllerRef} title={controller.title} />
+              <Title
+                readonly={settings.readonly}
+                controller={controllerRef}
+                title={controller.title}
+              />
               <StatusBar container={containerRef} editor={editor} />
             </>
           )}
@@ -161,7 +180,6 @@ const Tiptap = () => {
             }}
           >
             <Toolbar
-              isMobile={true}
               theme={toolbarTheme}
               editor={editor}
               location="bottom"

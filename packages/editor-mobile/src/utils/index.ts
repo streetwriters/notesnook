@@ -1,5 +1,5 @@
-import { ToolbarGroupDefinition } from "notesnook-editor/dist/toolbar/types";
-import { Editor } from "notesnook-editor/dist/types";
+import { ToolbarGroupDefinition } from "notesnook-editor";
+import { Editor } from "notesnook-editor";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 

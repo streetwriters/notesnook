@@ -5,7 +5,6 @@ import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
 import React from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
-import { useSettings } from "../hooks/useSettings";
 import { EventTypes, Settings } from "../utils";
 import styles from "./styles.module.css";
 

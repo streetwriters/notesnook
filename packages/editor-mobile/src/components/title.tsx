@@ -5,9 +5,11 @@ import styles from "./styles.module.css";
 function Title({
   controller,
   title,
+  readonly,
 }: {
   controller: RefObject<EditorController>;
   title: string;
+  readonly: boolean;
 }) {
   const titleRef = useRef<HTMLInputElement>(null);
   const emitUpdate = useRef(true);
@@ -25,8 +27,8 @@ function Title({
     <input
       ref={titleRef}
       className={styles.titleBar}
-      contentEditable={!global.readonly}
-      disabled={global.readonly}
+      contentEditable={!readonly}
+      disabled={readonly}
       style={{
         height: 50,
         fontSize: 27,
@@ -51,5 +53,6 @@ function Title({
 
 export default React.memo(Title, (prev, next) => {
   if (prev.title !== next.title) return false;
+  if (prev.readonly !== next.readonly) return false;
   return true;
 });

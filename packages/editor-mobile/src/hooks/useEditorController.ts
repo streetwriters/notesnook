@@ -1,8 +1,20 @@
 import { Editor } from "notesnook-editor";
-import { Attachment } from "notesnook-editor/dist/extensions/attachment";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useEditorThemeStore } from "../state/theme";
 import { EventTypes, isReactNative, post, timerFn } from "../utils";
+
+type Attachment = {
+  hash: string;
+  filename: string;
+  type: string;
+  size: number;
+};
 
 export type Selection = {
   [name: string]: {
@@ -27,11 +39,12 @@ export type EditorController = {
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   openFilePicker: (type: "image" | "file" | "camera") => void;
   downloadAttachment: (attachment: Attachment) => void;
+  content: MutableRefObject<string | null>;
 };
 
 export function useEditorController(editor: Editor | null): EditorController {
   const [title, setTitle] = useState("");
-
+  const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
     change: null,
@@ -81,7 +94,8 @@ export function useEditorController(editor: Editor | null): EditorController {
       selectionChange(editor);
       timers.current.change = timerFn(
         () => {
-          post(EventTypes.content, editor.getHTML());
+          htmlContentRef.current = editor.getHTML();
+          post(EventTypes.content, htmlContentRef.current);
         },
         300,
         timers.current?.change
@@ -107,7 +121,8 @@ export function useEditorController(editor: Editor | null): EditorController {
       global.sessionId = message.sessionId;
       switch (type) {
         case "native:html":
-          editor?.commands.setContent(value, false, {
+          htmlContentRef.current = value;
+          editor?.commands.setContent(htmlContentRef.current, false, {
             preserveWhitespace: true,
           });
           break;
@@ -170,5 +185,6 @@ export function useEditorController(editor: Editor | null): EditorController {
     setTitle,
     openFilePicker,
     downloadAttachment,
+    content: htmlContentRef,
   };
 }
