@@ -1,4 +1,4 @@
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 import { Node as PMNode, Attrs } from "prosemirror-model";
 
 export interface ReactNodeProps {

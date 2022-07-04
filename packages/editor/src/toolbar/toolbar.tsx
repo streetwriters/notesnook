@@ -1,6 +1,6 @@
 import { Theme, useTheme } from "@notesnook/theme";
 import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
-import { Editor } from "@tiptap/core";
+import { Editor } from "../types";
 import { Flex, FlexProps } from "rebass";
 import { findTool, ToolId } from "./tools";
 import { ThemeProvider } from "emotion-theming";

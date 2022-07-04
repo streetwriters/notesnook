@@ -3,7 +3,8 @@ import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
 import { Node as PMNode } from "prosemirror-model";
 import { PortalProviderAPI } from "./react-portal-provider";
 import { ReactNodeViewProps, ReactNodeViewOptions, GetPosNode, ForwardRef, ContentDOM } from "./types";
-import { Editor, NodeViewRendererProps } from "@tiptap/core";
+import { NodeViewRendererProps } from "@tiptap/core";
+import { Editor } from "../../types";
 export declare class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     protected readonly editor: Editor;
     protected readonly getPos: GetPosNode;

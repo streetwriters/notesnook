@@ -264,7 +264,12 @@ const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
         component: ({ onClick }) => (
           <ImageUploadPopup
             onInsert={(image) => {
-              editor.current?.chain().focus().insertImage(image).run();
+              editor
+                .requestPermission("insertImage")
+                ?.chain()
+                .focus()
+                .insertImage(image)
+                .run();
               onClick?.();
             }}
             onClose={() => {
@@ -283,13 +288,17 @@ const uploadImageFromURL = (editor: Editor): MenuItem => ({
   title: "Attach from URL",
   icon: "link",
   onClick: () => {
-    if (!editor) return;
     showPopup({
       theme: editor.storage.theme,
       popup: (hide) => (
         <ImageUploadPopup
           onInsert={(image) => {
-            editor.current?.chain().focus().insertImage(image).run();
+            editor
+              .requestPermission("insertImage")
+              ?.chain()
+              .focus()
+              .insertImage(image)
+              .run();
             hide();
           }}
           onClose={hide}

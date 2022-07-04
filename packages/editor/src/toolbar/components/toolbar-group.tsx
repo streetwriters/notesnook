@@ -1,7 +1,7 @@
 import { ToolbarGroupDefinition, ToolButtonVariant } from "../types";
 import { findTool } from "../tools";
 import { Flex, FlexProps } from "rebass";
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 import { MoreTools } from "./more-tools";
 import { getToolDefinition } from "../tool-definitions";
 import { NodeWithOffset } from "../utils/prosemirror";

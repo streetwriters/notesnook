@@ -11,11 +11,12 @@ import {
   ForwardRef,
   ContentDOM,
 } from "./types";
-import { Editor, NodeViewRendererProps } from "@tiptap/core";
+import { NodeViewRendererProps } from "@tiptap/core";
 import { Theme } from "@notesnook/theme";
 import { ThemeProvider } from "emotion-theming";
 // @ts-ignore
 import { __serializeForClipboard } from "prosemirror-view";
+import { Editor } from "../../types";
 
 export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;
@@ -431,7 +432,7 @@ export function createNodeView<TProps extends ReactNodeViewProps>(
   return ({ node, getPos, editor }: NodeViewRendererProps) => {
     const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
 
-    return new ReactNodeView<TProps>(node, editor, _getPos, {
+    return new ReactNodeView<TProps>(node, editor as Editor, _getPos, {
       ...options,
       component,
     }).init();

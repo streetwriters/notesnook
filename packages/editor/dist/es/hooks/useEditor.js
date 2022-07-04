@@ -1,5 +1,5 @@
-import { Editor } from "@tiptap/core";
 import { useEffect, useRef, useState } from "react";
+import { Editor } from "../types";
 function useForceUpdate() {
     const [, setValue] = useState(0);
     return () => setValue((value) => value + 1);
@@ -28,10 +28,21 @@ export const useEditor = (options = {}, deps = []) => {
     }, deps);
     useEffect(() => {
         editorRef.current = editor;
-        if (editor && !editor.current)
+        if (!editor)
+            return;
+        if (!editor.current) {
             Object.defineProperty(editor, "current", {
                 get: () => editorRef.current,
             });
+        }
+        // if (!editor.executor) {
+        //   Object.defineProperty(editor, "executor", {
+        //     get: () => (id?: string) => {
+        //       console.log(id);
+        //       return editorRef.current;
+        //     },
+        //   });
+        // }
     }, [editor]);
     useEffect(() => {
         // this is required for the drag/drop to work properly

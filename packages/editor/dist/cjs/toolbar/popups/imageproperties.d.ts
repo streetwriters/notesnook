@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { ImageAlignmentOptions, ImageSizeOptions } from "../../extensions/image";
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 export declare type ImagePropertiesProps = ImageSizeOptions & ImageAlignmentOptions & {
     editor: Editor;
     onClose: () => void;

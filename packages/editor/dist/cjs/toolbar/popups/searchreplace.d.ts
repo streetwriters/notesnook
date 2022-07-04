@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 export declare type SearchReplacePopupProps = {
     editor: Editor;
 };

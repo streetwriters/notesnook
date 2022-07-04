@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import { ToolbarGroupDefinition, ToolButtonVariant } from "../types";
 import { FlexProps } from "rebass";
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 import { NodeWithOffset } from "../utils/prosemirror";
 export declare type ToolbarGroupProps = FlexProps & {
     tools: ToolbarGroupDefinition;

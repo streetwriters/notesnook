@@ -2,7 +2,8 @@ import React from "react";
 import { Node as PMNode } from "prosemirror-model";
 import { ReactNodeViewOptions, GetPosNode, SelectionBasedReactNodeViewProps, ForwardRef } from "./types";
 import { ReactNodeView } from "./react-node-view";
-import { Editor, NodeViewRendererProps } from "@tiptap/core";
+import { NodeViewRendererProps } from "@tiptap/core";
+import { Editor } from "../../types";
 /**
  * A ReactNodeView that handles React components sensitive
  * to selection changes.

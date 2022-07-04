@@ -1,5 +1,4 @@
 import { ToolProps } from "../types";
-import { Editor } from "@tiptap/core";
 import { Box, Button, Flex } from "rebass";
 import { IconNames } from "../icons";
 import { useCallback, useMemo, useRef, useState } from "react";

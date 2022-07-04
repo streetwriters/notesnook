@@ -1,4 +1,3 @@
-import { Editor } from "@tiptap/core";
 import React, { useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";

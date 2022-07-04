@@ -1,6 +1,6 @@
-import { EditorOptions, Editor } from "@tiptap/core";
+import { EditorOptions } from "@tiptap/core";
 import { DependencyList, useEffect, useRef, useState } from "react";
-import { Editor as EditorType } from "../types";
+import { Editor } from "../types";
 
 function useForceUpdate() {
   const [, setValue] = useState(0);
@@ -12,9 +12,9 @@ export const useEditor = (
   options: Partial<EditorOptions> = {},
   deps: DependencyList = []
 ) => {
-  const [editor, setEditor] = useState<EditorType | null>(null);
+  const [editor, setEditor] = useState<Editor | null>(null);
   const forceUpdate = useForceUpdate();
-  const editorRef = useRef<EditorType | null>(editor);
+  const editorRef = useRef<Editor | null>(editor);
 
   useEffect(() => {
     let isMounted = true;
@@ -42,10 +42,21 @@ export const useEditor = (
   useEffect(() => {
     editorRef.current = editor;
 
-    if (editor && !editor.current)
+    if (!editor) return;
+
+    if (!editor.current) {
       Object.defineProperty(editor, "current", {
         get: () => editorRef.current,
       });
+    }
+    // if (!editor.executor) {
+    //   Object.defineProperty(editor, "executor", {
+    //     get: () => (id?: string) => {
+    //       console.log(id);
+    //       return editorRef.current;
+    //     },
+    //   });
+    // }
   }, [editor]);
 
   useEffect(() => {

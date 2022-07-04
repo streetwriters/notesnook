@@ -16,9 +16,10 @@ import {
   ForwardRef,
 } from "./types";
 import { ReactNodeView } from "./react-node-view";
-import { Editor, NodeViewRendererProps } from "@tiptap/core";
+import { NodeViewRendererProps } from "@tiptap/core";
 import { Theme } from "@notesnook/theme";
 import { ThemeProvider } from "emotion-theming";
+import { Editor } from "../../types";
 
 /**
  * A ReactNodeView that handles React components sensitive
@@ -251,7 +252,7 @@ export function createSelectionBasedNodeView<
 ) {
   return ({ node, getPos, editor }: NodeViewRendererProps) => {
     const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
-    return new SelectionBasedNodeView(node, editor, _getPos, {
+    return new SelectionBasedNodeView(node, editor as Editor, _getPos, {
       ...options,
       component,
     }).init();

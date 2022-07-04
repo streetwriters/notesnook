@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Flex, Text } from "rebass";
 import { SearchStorage } from "../../extensions/search-replace";
 import { ToolButton } from "../components/tool-button";
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 
 export type SearchReplacePopupProps = { editor: Editor };
 export function SearchReplacePopup(props: SearchReplacePopupProps) {

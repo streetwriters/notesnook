@@ -113,3 +113,21 @@ What's next:
 
 1. Keyboard shouldn't close on tool click
 2. Handle context toolbar menus on scroll
+
+## Premium restriction
+
+1. `isAuthorized` method on the editor
+2. `execCommand` method on the editor that emits an event (onBeforeExecCommand)
+
+Requirements:
+
+    1. We will need to check the user status sometimes outside the editor commands
+    2. For this reason, we shouldn't attach this to the editor
+    3. Or if we do, we shouldn't make it command specific.
+    4. Secondly, we need a way to authorize user actions without spreading it all over the codebase.
+    5. One option is to put it in the base buttons etc. and pass an "isPro" prop
+      1. But I don't like this because not all buttons need it.
+    6. What we should do it emit an event before each command
+      1. We can have a `requestPermission` method on the editor that sends an id
+      2. This can be used to allow/deny user actions
+    7. And also have a function to check authorization for non-command actions.

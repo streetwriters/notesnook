@@ -28,7 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Toolbar = exports.useTiptap = void 0;
+exports.usePermissionHandler = exports.Toolbar = exports.useTiptap = void 0;
 require("./extensions");
 const extension_character_count_1 = __importDefault(require("@tiptap/extension-character-count"));
 const extension_placeholder_1 = __importDefault(require("@tiptap/extension-placeholder"));
@@ -70,6 +70,8 @@ const outlinelistitem_1 = require("./extensions/outlinelistitem");
 const table_1 = require("./extensions/table");
 const toolbarstore_1 = require("./toolbar/stores/toolbarstore");
 const useEditor_1 = require("./hooks/useEditor");
+const usePermissionHandler_1 = require("./hooks/usePermissionHandler");
+Object.defineProperty(exports, "usePermissionHandler", { enumerable: true, get: function () { return usePermissionHandler_1.usePermissionHandler; } });
 prosemirror_view_1.EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -79,6 +81,9 @@ const useTiptap = (options = {}, deps = []) => {
     const { theme, isMobile, onDownloadAttachment, onOpenAttachmentPicker } = options, restOptions = __rest(options, ["theme", "isMobile", "onDownloadAttachment", "onOpenAttachmentPicker"]);
     const PortalProviderAPI = (0, react_2.usePortalProvider)();
     const setIsMobile = (0, toolbarstore_1.useToolbarStore)((store) => store.setIsMobile);
+    (0, react_1.useEffect)(() => {
+        setIsMobile(isMobile || false);
+    }, [isMobile]);
     const defaultOptions = (0, react_1.useMemo)(() => ({
         extensions: [
             react_2.NodeViewSelectionNotifier,
@@ -159,9 +164,6 @@ const useTiptap = (options = {}, deps = []) => {
         isMobile,
     ]);
     const editor = (0, useEditor_1.useEditor)(Object.assign(Object.assign({}, defaultOptions), restOptions), deps);
-    (0, react_1.useEffect)(() => {
-        setIsMobile(isMobile || false);
-    }, [isMobile]);
     return editor;
 };
 exports.useTiptap = useTiptap;

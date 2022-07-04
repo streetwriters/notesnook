@@ -49,6 +49,7 @@ import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
+import { usePermissionHandler } from "./hooks/use-permission-handler";
 EditorView.prototype.updateState = function updateState(state) {
     if (!this.docView)
         return; // This prevents the matchesNode error on hot reloads
@@ -58,6 +59,9 @@ const useTiptap = (options = {}, deps = []) => {
     const { theme, isMobile, onDownloadAttachment, onOpenAttachmentPicker } = options, restOptions = __rest(options, ["theme", "isMobile", "onDownloadAttachment", "onOpenAttachmentPicker"]);
     const PortalProviderAPI = usePortalProvider();
     const setIsMobile = useToolbarStore((store) => store.setIsMobile);
+    useEffect(() => {
+        setIsMobile(isMobile || false);
+    }, [isMobile]);
     const defaultOptions = useMemo(() => ({
         extensions: [
             NodeViewSelectionNotifier,
@@ -138,12 +142,9 @@ const useTiptap = (options = {}, deps = []) => {
         isMobile,
     ]);
     const editor = useEditor(Object.assign(Object.assign({}, defaultOptions), restOptions), deps);
-    useEffect(() => {
-        setIsMobile(isMobile || false);
-    }, [isMobile]);
     return editor;
 };
-export { useTiptap, Toolbar };
+export { useTiptap, Toolbar, usePermissionHandler };
 export * from "./types";
 export * from "./extensions/react";
 export * from "./toolbar";

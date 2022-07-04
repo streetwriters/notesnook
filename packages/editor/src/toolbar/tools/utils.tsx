@@ -1,4 +1,4 @@
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 import { MenuButton } from "../../components/menu/types";
 import { ToolButton } from "../components/tool-button";
 import { ToolProps } from "../types";

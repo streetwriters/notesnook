@@ -40,9 +40,10 @@ import {
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { Table } from "./extensions/table";
-import { useIsMobile, useToolbarStore } from "./toolbar/stores/toolbar-store";
+import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
 import { EditorOptions } from "@tiptap/core";
+import { usePermissionHandler } from "./hooks/use-permission-handler";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -50,7 +51,10 @@ EditorView.prototype.updateState = function updateState(state) {
 };
 
 type TiptapOptions = EditorOptions &
-  AttachmentOptions & { theme: Theme; isMobile?: boolean };
+  AttachmentOptions & {
+    theme: Theme;
+    isMobile?: boolean;
+  };
 
 const useTiptap = (
   options: Partial<TiptapOptions> = {},
@@ -65,6 +69,10 @@ const useTiptap = (
   } = options;
   const PortalProviderAPI = usePortalProvider();
   const setIsMobile = useToolbarStore((store) => store.setIsMobile);
+
+  useEffect(() => {
+    setIsMobile(isMobile || false);
+  }, [isMobile]);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
@@ -158,14 +166,10 @@ const useTiptap = (
     deps
   );
 
-  useEffect(() => {
-    setIsMobile(isMobile || false);
-  }, [isMobile]);
-
   return editor;
 };
 
-export { useTiptap, Toolbar };
+export { useTiptap, Toolbar, usePermissionHandler };
 export * from "./types";
 export * from "./extensions/react";
 export * from "./toolbar";

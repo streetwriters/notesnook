@@ -210,7 +210,8 @@ const uploadImageFromURLMobile = (editor) => ({
                 type: "popup",
                 component: ({ onClick }) => (_jsx(ImageUploadPopup, { onInsert: (image) => {
                         var _a;
-                        (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertImage(image).run();
+                        (_a = editor
+                            .requestPermission("insertImage")) === null || _a === void 0 ? void 0 : _a.chain().focus().insertImage(image).run();
                         onClick === null || onClick === void 0 ? void 0 : onClick();
                     }, onClose: () => {
                         onClick === null || onClick === void 0 ? void 0 : onClick();
@@ -225,13 +226,12 @@ const uploadImageFromURL = (editor) => ({
     title: "Attach from URL",
     icon: "link",
     onClick: () => {
-        if (!editor)
-            return;
         showPopup({
             theme: editor.storage.theme,
             popup: (hide) => (_jsx(ImageUploadPopup, { onInsert: (image) => {
                     var _a;
-                    (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().insertImage(image).run();
+                    (_a = editor
+                        .requestPermission("insertImage")) === null || _a === void 0 ? void 0 : _a.chain().focus().insertImage(image).run();
                     hide();
                 }, onClose: hide })),
         });

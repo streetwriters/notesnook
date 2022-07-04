@@ -6,7 +6,7 @@ import {
   ImageAlignmentOptions,
   ImageSizeOptions,
 } from "../../extensions/image";
-import { Editor } from "@tiptap/core";
+import { Editor } from "../../types";
 import { InlineInput } from "../../components/inline-input";
 
 export type ImagePropertiesProps = ImageSizeOptions &
