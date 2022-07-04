@@ -1,6 +1,8 @@
-import { DEFAULT_TOOLS, ToolbarGroupDefinition } from "notesnook-editor";
+import { getDefaultPresets, ToolbarGroupDefinition } from "notesnook-editor";
 import { db } from "./db";
 
+const defaultPresets = getDefaultPresets();
+export const DEFAULT_TOOLS = defaultPresets.default;
 export type PresetId = "default" | "minimal" | "custom";
 export type Preset = {
   id: PresetId;
@@ -9,21 +11,11 @@ export type Preset = {
   editable?: boolean;
 };
 const presets: Record<PresetId, Preset> = {
-  default: { id: "default", title: "Default", tools: DEFAULT_TOOLS },
+  default: { id: "default", title: "Default", tools: defaultPresets.default },
   minimal: {
     id: "minimal",
     title: "Minimal",
-    tools: [
-      [
-        "bold",
-        "italic",
-        "underline",
-        "strikethrough",
-        "code",
-        "highlight",
-        "textColor",
-      ],
-    ],
+    tools: defaultPresets.minimal,
   },
   custom: { id: "custom", title: "Custom", tools: [], editable: true },
 };

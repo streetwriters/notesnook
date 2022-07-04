@@ -2,7 +2,6 @@ import { Button, Flex, FlexProps, Text } from "rebass";
 import { Perform } from "../../common/dialog-controller";
 import Dialog from "./dialog";
 import {
-  DEFAULT_TOOLS,
   getAllTools,
   getToolDefinition,
   Icon,
@@ -36,6 +35,7 @@ import { Label, Radio } from "@rebass/forms";
 import { db } from "../../common/db";
 import { useToolbarConfig } from "../editor/context";
 import {
+  DEFAULT_TOOLS,
   getAllPresets,
   getCurrentPreset,
   getPreset,
