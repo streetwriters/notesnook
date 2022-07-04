@@ -1,7 +1,7 @@
 {
   "name": "notesnook",
   "description": "Your private note taking space",
-  "version": "1.8.10",
+  "version": "2.0.0",
   "private": true,
   "main": "./src/App.js",
   "homepage": "https://notesnook.com/",
@@ -107,6 +107,7 @@
     "start": "env-cmd -e all,dev,web react-scripts start",
     "start:desktop": "env-cmd -e all,desktop react-scripts start",
     "build": "env-cmd -e all,web react-scripts build",
+    "build:beta": "env-cmd -e all,web,beta react-scripts build",
     "build:profile": "env-cmd -e all,web react-scripts build --profile",
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
