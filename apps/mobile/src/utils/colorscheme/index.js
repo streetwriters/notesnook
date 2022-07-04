@@ -113,11 +113,11 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
 
   useThemeStore.getState().setColors({ ...COLOR_SCHEME });
 
-  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content', true);
+  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content', false);
   if (Platform.OS === 'android') {
     AndroidModule.setBackgroundColor(COLOR_SCHEME.bg);
-    StatusBar.setBackgroundColor('transparent', true);
-    StatusBar.setTranslucent(true, true);
+    StatusBar.setBackgroundColor('transparent', false);
+    StatusBar.setTranslucent(true, false);
   }
   eSendEvent(eThemeUpdated);
 

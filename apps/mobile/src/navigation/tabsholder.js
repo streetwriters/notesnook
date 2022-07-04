@@ -255,7 +255,6 @@ export const TabsHolder = React.memo(
         }}
       >
         <StatusBar
-          animated={true}
           barStyle={colors.night ? 'light-content' : 'dark-content'}
           translucent={true}
           backgroundColor="transparent"
