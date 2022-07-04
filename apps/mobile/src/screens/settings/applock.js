@@ -166,10 +166,8 @@ const AppLock = ({ welcome, s = 0 }) => {
 };
 
 AppLock.present = async isWelcome => {
-  let available = await BiometricService.isBiometryAvailable();
-  let user = await db.user.getUser();
   presentSheet({
-    component: <AppLock welcome={isWelcome} s={!available && !user ? 1 : 0} />,
+    component: <AppLock welcome={isWelcome} s={0} />,
     disableClosing: isWelcome
   });
 };
