@@ -38,7 +38,7 @@ const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Setti
   );
 
   return (
-    <DelayLayout type="settings" delay={100}>
+    <DelayLayout type="settings" delay={300}>
       <View
         style={{
           flex: 1

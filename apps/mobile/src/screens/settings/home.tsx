@@ -44,7 +44,7 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
   }, []);
 
   return (
-    <DelayLayout delay={100} type="settings">
+    <DelayLayout delay={300} type="settings">
       <View>
         {loading && (
           //@ts-ignore

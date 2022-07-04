@@ -19,7 +19,7 @@ const placeholder = {
 
 export default function DelayLayout(props: IDelayLayoutProps) {
   const colors = useThemeStore(state => state.colors);
-  const loading = useDelayLayout(props.delay || 300);
+  const loading = useDelayLayout(!props.delay || props.delay < 300 ? 300 : props.delay);
 
   const Placeholder = placeholder[props.type || 'default'];
 
