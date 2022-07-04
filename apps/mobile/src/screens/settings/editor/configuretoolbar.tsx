@@ -89,7 +89,7 @@ export const ConfigureToolbar = () => {
             ))}
           </View>
         </View>
-        <DraxScrollView>
+        <DraxScrollView showsVerticalScrollIndicator={false}>
           {renderGroups()}
           <View
             style={{

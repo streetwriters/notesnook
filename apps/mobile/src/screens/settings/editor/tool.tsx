@@ -33,9 +33,9 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
     width: 0
   });
   //@ts-ignore
-  const tool = isSubgroup ? null : findToolById(item);
+  const tool = isSubgroup || item === 'dummy' ? null : findToolById(item);
   //@ts-ignore
-  const iconSvgString = isSubgroup ? null : getToolIcon(tool.icon);
+  const iconSvgString = isSubgroup || !tool ? null : getToolIcon(tool.icon);
 
   const buttons = isSubgroup
     ? [
@@ -75,11 +75,14 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
             if (!groupIndex) return;
             const _data = useDragState.getState().data.slice();
             if (!parentIndex) {
+              const index = _data[groupIndex].findIndex(tool => tool === item);
               _data[groupIndex].splice(index, 1);
             } else {
               //@ts-ignore
+              const index = _data[parentIndex][groupIndex].findIndex(tool => tool === item);
               _data[parentIndex][groupIndex].splice(index, 1);
             }
+            console.log(_data[groupIndex]);
             setData(_data);
           }
         }
@@ -259,7 +262,7 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
             ? false
             : true
         }
-        longPressDelay={1000}
+        longPressDelay={500}
         onDragStart={() => {
           setDragged({
             item,
@@ -277,6 +280,7 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
           borderRadius: 10
         }}
         renderHoverContent={() => renderChild(true)}
+        draggable={item !== 'dummy'}
         onDragDrop={data => {
           setDragged({});
         }}
@@ -293,7 +297,16 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
         }}
         onReceiveDragEnter={onRecieveData}
       >
-        {isDragged ? <View /> : renderChild()}
+        {isDragged || item === 'dummy' ? (
+          <View
+            style={{
+              width: '100%',
+              height: item === 'dummy' ? 10 : 0
+            }}
+          />
+        ) : (
+          renderChild()
+        )}
       </DraxView>
     </Animated.View>
   );

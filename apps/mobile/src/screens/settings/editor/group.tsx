@@ -200,7 +200,7 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
   return (
     <Animated.View layout={Layout}>
       <DraxView
-        longPressDelay={1000}
+        longPressDelay={500}
         receptive={
           (dragged.type === 'subgroup' && dragged.groupIndex === groupIndex) ||
           (dragged.type === 'tool' && item.length > 0) ||

@@ -33,6 +33,10 @@ export interface DragState extends State {
   init: () => Promise<void>;
 }
 
+function clone(value: any[]) {
+  return JSON.parse(JSON.stringify(value));
+}
+
 export const useDragState = create<DragState>(
   persist(
     (set, get) => ({
@@ -44,19 +48,23 @@ export const useDragState = create<DragState>(
       data: presets['default'],
       customPresetData: presets['custom'],
       setData: data => {
-        presets['custom'] = data;
+        const _data = clone(data);
+        presets['custom'] = _data;
         db.settings?.setToolbarConfig(useSettingStore.getState().deviceMode || 'mobile', {
           preset: 'custom',
-          config: data
+          config: clone(_data)
         });
-        set({ data: data, preset: 'custom', customPresetData: data });
+        set({ data: _data, preset: 'custom', customPresetData: _data });
       },
       setPreset: preset => {
         db.settings?.setToolbarConfig(useSettingStore.getState().deviceMode || 'mobile', {
           preset,
-          config: preset === 'custom' ? get().customPresetData : []
+          config: preset === 'custom' ? clone(get().customPresetData) : []
         });
-        set({ preset, data: preset === 'custom' ? get().customPresetData : presets[preset] });
+        set({
+          preset,
+          data: preset === 'custom' ? clone(get().customPresetData) : clone(presets[preset])
+        });
       },
       init: async () => {
         const user = await db.user?.getUser();
@@ -73,8 +81,9 @@ export const useDragState = create<DragState>(
         set({
           //@ts-ignore
           preset: preset,
-          data: preset === 'custom' ? toolbarConfig?.config : presets[preset],
-          customPresetData: preset === 'custom' ? toolbarConfig?.config : presets['custom']
+          data: preset === 'custom' ? clone(toolbarConfig?.config) : clone(presets[preset]),
+          customPresetData:
+            preset === 'custom' ? clone(toolbarConfig?.config) : clone(presets['custom'])
         });
       }
     }),
@@ -83,17 +92,14 @@ export const useDragState = create<DragState>(
       //@ts-ignore
       getStorage: () => MMKV,
       onRehydrateStorage: () => {
-        return state => {
-          logger.info('DragState', 'rehydrated drag state');
+        return () => {
+          logger.info('DragState', 'rehydrated drag state', useNoteStore.getState().loading);
           if (!useNoteStore.getState().loading) {
-            state?.init();
+            useDragState.getState().init();
           } else {
-            const unsub = useNoteStore.subscribe(_state => {
-              if (!_state.loading) {
-                state?.init();
-                unsub();
-              }
-            });
+            setTimeout(() => {
+              useDragState.getState().init();
+            }, 1000);
           }
         };
       } // (optional) by default, 'localStorage' is used
