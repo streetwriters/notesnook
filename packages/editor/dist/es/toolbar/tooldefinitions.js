@@ -282,34 +282,44 @@ export function getToolDefinition(id) {
 export function getAllTools() {
     return tools;
 }
-export const DEFAULT_TOOLS = [
-    [
-        "insertBlock",
-        "tableSettings",
-        "imageSettings",
-        "embedSettings",
-        "attachmentSettings",
-        "linkSettings",
-        "codeRemove",
-    ],
-    [
-        "bold",
-        "italic",
-        "underline",
+export function getDefaultPresets() {
+    return defaultPresets;
+}
+const defaultPresets = {
+    default: [
         [
-            "strikethrough",
-            "code",
-            "subscript",
-            "superscript",
-            "highlight",
-            "textColor",
-            "math",
+            "insertBlock",
+            "tableSettings",
+            "imageSettings",
+            "embedSettings",
+            "attachmentSettings",
+            "linkSettings",
+            "codeRemove",
         ],
+        [
+            "bold",
+            "italic",
+            "underline",
+            [
+                "strikethrough",
+                "code",
+                "subscript",
+                "superscript",
+                "highlight",
+                "textColor",
+                "math",
+            ],
+        ],
+        ["fontSize"],
+        ["headings", "fontFamily"],
+        ["numberedList", "bulletList"],
+        ["addLink"],
+        ["alignment", "textDirection"],
+        ["clearformatting"],
     ],
-    ["fontSize"],
-    ["headings", "fontFamily"],
-    ["numberedList", "bulletList"],
-    ["addLink"],
-    ["alignment", "textDirection"],
-    ["clearformatting"],
-];
+    minimal: [
+        ["bold", "italic", "underline", "strikethrough", "code"],
+        ["headings", "addLink"],
+        ["clearformatting"],
+    ],
+};

@@ -290,34 +290,45 @@ export function getAllTools() {
   return tools;
 }
 
-export const DEFAULT_TOOLS: ToolbarDefinition = [
-  [
-    "insertBlock",
-    "tableSettings",
-    "imageSettings",
-    "embedSettings",
-    "attachmentSettings",
-    "linkSettings",
-    "codeRemove",
-  ],
-  [
-    "bold",
-    "italic",
-    "underline",
+export function getDefaultPresets() {
+  return defaultPresets;
+}
+
+const defaultPresets: Record<"default" | "minimal", ToolbarDefinition> = {
+  default: [
     [
-      "strikethrough",
-      "code",
-      "subscript",
-      "superscript",
-      "highlight",
-      "textColor",
-      "math",
+      "insertBlock",
+      "tableSettings",
+      "imageSettings",
+      "embedSettings",
+      "attachmentSettings",
+      "linkSettings",
+      "codeRemove",
     ],
+    [
+      "bold",
+      "italic",
+      "underline",
+      [
+        "strikethrough",
+        "code",
+        "subscript",
+        "superscript",
+        "highlight",
+        "textColor",
+        "math",
+      ],
+    ],
+    ["fontSize"],
+    ["headings", "fontFamily"],
+    ["numberedList", "bulletList"],
+    ["addLink"],
+    ["alignment", "textDirection"],
+    ["clearformatting"],
   ],
-  ["fontSize"],
-  ["headings", "fontFamily"],
-  ["numberedList", "bulletList"],
-  ["addLink"],
-  ["alignment", "textDirection"],
-  ["clearformatting"],
-];
+  minimal: [
+    ["bold", "italic", "underline", "strikethrough", "code"],
+    ["headings", "addLink"],
+    ["clearformatting"],
+  ],
+};

@@ -2,13 +2,13 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Flex } from "rebass";
 import { ThemeProvider } from "emotion-theming";
 import { EditorFloatingMenus } from "./floating-menus";
-import { DEFAULT_TOOLS } from "./tool-definitions";
+import { getDefaultPresets } from "./tool-definitions";
 import { useEffect } from "react";
 import { useToolbarStore, } from "./stores/toolbar-store";
 import { ToolbarGroup } from "./components/toolbar-group";
 import { EditorContext, PopupRenderer, } from "../components/popup-presenter/popuprenderer";
 export function Toolbar(props) {
-    const { editor, theme, location, tools = DEFAULT_TOOLS } = props;
+    const { editor, theme, location, tools = getDefaultPresets().default, } = props;
     const setToolbarLocation = useToolbarStore((store) => store.setToolbarLocation);
     useEffect(() => {
         setToolbarLocation(location);

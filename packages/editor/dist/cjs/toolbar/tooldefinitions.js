@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DEFAULT_TOOLS = exports.getAllTools = exports.getToolDefinition = void 0;
+exports.getDefaultPresets = exports.getAllTools = exports.getToolDefinition = void 0;
 const tools = {
     bold: {
         icon: "bold",
@@ -287,34 +287,45 @@ function getAllTools() {
     return tools;
 }
 exports.getAllTools = getAllTools;
-exports.DEFAULT_TOOLS = [
-    [
-        "insertBlock",
-        "tableSettings",
-        "imageSettings",
-        "embedSettings",
-        "attachmentSettings",
-        "linkSettings",
-        "codeRemove",
-    ],
-    [
-        "bold",
-        "italic",
-        "underline",
+function getDefaultPresets() {
+    return defaultPresets;
+}
+exports.getDefaultPresets = getDefaultPresets;
+const defaultPresets = {
+    default: [
         [
-            "strikethrough",
-            "code",
-            "subscript",
-            "superscript",
-            "highlight",
-            "textColor",
-            "math",
+            "insertBlock",
+            "tableSettings",
+            "imageSettings",
+            "embedSettings",
+            "attachmentSettings",
+            "linkSettings",
+            "codeRemove",
         ],
+        [
+            "bold",
+            "italic",
+            "underline",
+            [
+                "strikethrough",
+                "code",
+                "subscript",
+                "superscript",
+                "highlight",
+                "textColor",
+                "math",
+            ],
+        ],
+        ["fontSize"],
+        ["headings", "fontFamily"],
+        ["numberedList", "bulletList"],
+        ["addLink"],
+        ["alignment", "textDirection"],
+        ["clearformatting"],
     ],
-    ["fontSize"],
-    ["headings", "fontFamily"],
-    ["numberedList", "bulletList"],
-    ["addLink"],
-    ["alignment", "textDirection"],
-    ["clearformatting"],
-];
+    minimal: [
+        ["bold", "italic", "underline", "strikethrough", "code"],
+        ["headings", "addLink"],
+        ["clearformatting"],
+    ],
+};

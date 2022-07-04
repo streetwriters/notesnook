@@ -5,7 +5,7 @@ import { Flex, FlexProps } from "rebass";
 import { findTool, ToolId } from "./tools";
 import { ThemeProvider } from "emotion-theming";
 import { EditorFloatingMenus } from "./floating-menus";
-import { DEFAULT_TOOLS, getToolDefinition } from "./tool-definitions";
+import { getDefaultPresets, getToolDefinition } from "./tool-definitions";
 import { Dropdown } from "./components/dropdown";
 import { ToolButton } from "./components/tool-button";
 import { useContext, useEffect, useRef, useState } from "react";
@@ -32,7 +32,12 @@ type ToolbarProps = {
 };
 
 export function Toolbar(props: ToolbarProps) {
-  const { editor, theme, location, tools = DEFAULT_TOOLS } = props;
+  const {
+    editor,
+    theme,
+    location,
+    tools = getDefaultPresets().default,
+  } = props;
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation
   );

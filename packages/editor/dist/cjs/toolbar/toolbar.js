@@ -11,7 +11,7 @@ const toolbarstore_1 = require("./stores/toolbarstore");
 const toolbargroup_1 = require("./components/toolbargroup");
 const popuprenderer_1 = require("../components/popup-presenter/popuprenderer");
 function Toolbar(props) {
-    const { editor, theme, location, tools = tooldefinitions_1.DEFAULT_TOOLS } = props;
+    const { editor, theme, location, tools = (0, tooldefinitions_1.getDefaultPresets)().default, } = props;
     const setToolbarLocation = (0, toolbarstore_1.useToolbarStore)((store) => store.setToolbarLocation);
     (0, react_1.useEffect)(() => {
         setToolbarLocation(location);
