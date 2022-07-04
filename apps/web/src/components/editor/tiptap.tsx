@@ -9,6 +9,7 @@ import {
   PortalProvider,
   Editor,
   AttachmentType,
+  usePermissionHandler,
 } from "notesnook-editor";
 import { Box, Flex } from "rebass";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -18,6 +19,8 @@ import { CharacterCounter, IEditor } from "./types";
 import { useConfigureEditor, useSearch, useToolbarConfig } from "./context";
 import { createPortal } from "react-dom";
 import { getCurrentPreset } from "../../common/toolbar-config";
+import { useIsUserPremium } from "../../hooks/use-is-user-premium";
+import { showBuyDialog } from "../../common/dialog-controller";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -45,14 +48,25 @@ function TipTap(props: TipTapProps) {
   } = props;
 
   const theme: Theme = useTheme();
+  const isUserPremium = useIsUserPremium();
   const isMobile = useMobile();
   const counter = useRef<CharacterCounter>();
   const configure = useConfigureEditor();
   const { toolbarConfig } = useToolbarConfig();
   const { isSearching, toggleSearch } = useSearch();
 
+  usePermissionHandler({
+    claims: {
+      premium: isUserPremium,
+    },
+    onPermissionDenied: (claim) => {
+      if (claim === "premium") showBuyDialog();
+    },
+  });
+
   const editor = useTiptap(
     {
+      isMobile: isMobile || false,
       element: editorContainer,
       editable: !readonly,
       content,
@@ -61,7 +75,7 @@ function TipTap(props: TipTapProps) {
       onCreate: ({ editor }) => {
         counter.current = editor.storage.characterCount as CharacterCounter;
         configure({
-          editor: toIEditor(editor),
+          editor: toIEditor(editor as Editor),
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           toolbarConfig: getCurrentPreset().tools,
@@ -94,7 +108,7 @@ function TipTap(props: TipTapProps) {
         return true;
       },
     },
-    [readonly, nonce]
+    [readonly, nonce, isMobile]
   );
 
   useEffect(() => {
@@ -116,7 +130,6 @@ function TipTap(props: TipTapProps) {
           editor={editor}
           theme={theme}
           location={isMobile ? "bottom" : "top"}
-          isMobile={isMobile || false}
           tools={toolbarConfig}
         />
       </Portal>
