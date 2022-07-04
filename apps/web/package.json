@@ -140,5 +140,8 @@
     "name": "Streetwriters (Private) Ltd.",
     "email": "support@streetwriters.co",
     "url": "https://streetwriters.co"
+  },
+  "volta": {
+    "node": "16.15.1"
   }
 }
