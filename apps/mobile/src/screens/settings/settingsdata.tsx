@@ -693,12 +693,15 @@ export const settingsGroups: SettingSection[] = [
         icon: 'form-textbox',
         modifer: () => {
           const settings = SettingsService.get();
+          console.log('called me now', settings.notifNotes);
           if (settings.notifNotes) {
             Notifications.unpinQuickNote();
           } else {
             Notifications.pinQuickNote(false);
           }
-          SettingsService.toggle('notifNotes');
+          SettingsService.set({
+            notifNotes: !settings.notifNotes
+          });
         }
       }
     ]
@@ -712,7 +715,6 @@ export const settingsGroups: SettingSection[] = [
         type: 'screen',
         name: 'Configure toolbar',
         description: `Make the toolbar adaptable to your needs.`,
-        icon: 'form-textbox',
         component: 'configuretoolbar'
       }
     ]
@@ -837,7 +839,7 @@ export const settingsGroups: SettingSection[] = [
         icon: 'monitor',
         modifer: async () => {
           try {
-            await Linking.openURL('https://notesnook.com');
+            await Linking.openURL('https://notesnook.com/downloads');
           } catch (e) {}
         },
         description: 'Get Notesnook app on your desktop and access all notes'
@@ -859,17 +861,9 @@ export const settingsGroups: SettingSection[] = [
         icon: 'cellphone-arrow-down',
         description: 'Check for new version of Notesnook',
         modifer: async () => {
-          const version = await checkVersion();
-          if (!version.needsUpdate) {
-            ToastEvent.show({
-              heading: 'You are on latest version',
-              type: 'success',
-              context: 'global'
-            });
-            return false;
-          }
           presentSheet({
-            component: ref => <Update version={version} fwdRef={ref} />
+            //@ts-ignore
+            component: ref => <Update fwdRef={ref} />
           });
         }
       },
