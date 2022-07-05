@@ -20,7 +20,10 @@ export const RightMenus = () => {
 
   return (
     <View style={styles.rightBtnContainer}>
-      {!currentScreen.startsWith('Settings') ? (
+      {!currentScreen.startsWith('Settings') &&
+      currentScreen !== 'Auth' &&
+      currentScreen !== 'Signup' &&
+      currentScreen !== 'Login' ? (
         <IconButton
           onPress={async () => {
             SearchService.prepareSearch();

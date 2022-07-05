@@ -14,6 +14,8 @@ import Paragraph from '../ui/typography/paragraph';
 import { TimeSince } from '../ui/time-since';
 import useSyncProgress from '../../utils/hooks/use-sync-progress';
 import * as Progress from 'react-native-progress';
+import Navigation from '../../services/navigation';
+import { tabBarRef } from '../../utils/global-refs';
 
 export const UserStatus = () => {
   const colors = useThemeStore(state => state.colors);
@@ -45,7 +47,16 @@ export const UserStatus = () => {
             if (user) {
               await Sync.run();
             } else {
-              eSendEvent(eOpenLoginDialog);
+              tabBarRef.current?.closeDrawer();
+              Navigation.navigate(
+                {
+                  name: 'Login'
+                },
+                {
+                  mode: 0,
+                  canGoBack: true
+                }
+              );
             }
           }}
           type="gray"

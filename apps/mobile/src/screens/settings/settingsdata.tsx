@@ -43,6 +43,7 @@ import { verifyUser } from './functions';
 import { SettingSection } from './types';
 import { getTimeLeft } from './user-section';
 import { ConfigureToolbar } from './editor/configure-toolbar';
+import { AuthMode } from '../../components/auth';
 const format = (ver: number) => {
   let parts = ver.toString().split('');
   return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? '' : parts[2]}${

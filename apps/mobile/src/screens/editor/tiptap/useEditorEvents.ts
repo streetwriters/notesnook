@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { BackHandler, InteractionManager, NativeEventSubscription } from 'react-native';
 import { WebViewMessageEvent } from 'react-native-webview';
+import { AuthMode } from '../../../components/auth';
 import { Properties } from '../../../components/properties';
 import { DDS } from '../../../services/device-detection';
 import {
@@ -95,21 +96,18 @@ const showActionsheet = async (editor: useEditorType) => {
   const currentNote = editor?.note?.current;
   if (currentNote?.id) {
     let note = db.notes?.note(currentNote.id)?.data as NoteType;
-    if (!note) {
-      ToastEvent.show({
-        heading: 'Start writing to create a new note',
-        type: 'success',
-        context: 'global'
-      });
-
-      return;
-    }
 
     if (editorState().isFocused || editorState().isFocused) {
       editorState().isFocused = true;
     }
 
     Properties.present(note, ['Dark Mode']);
+  } else {
+    ToastEvent.show({
+      heading: 'Start writing to create a new note',
+      type: 'success',
+      context: 'global'
+    });
   }
 };
 
@@ -222,103 +220,100 @@ export const useEditorEvents = (
     };
   }, []);
 
-  const onMessage = useCallback(
-    (event: WebViewMessageEvent) => {
-      const data = event.nativeEvent.data;
-      let editorMessage = JSON.parse(data) as EditorMessage;
+  const onMessage = (event: WebViewMessageEvent) => {
+    const data = event.nativeEvent.data;
+    let editorMessage = JSON.parse(data) as EditorMessage;
 
-      logger.info('editor', editorMessage.type);
-      if (
-        editorMessage.sessionId !== editor.sessionId &&
-        editorMessage.type !== EditorEvents.status
-      ) {
-        logger.error(
-          'editor',
-          'invalid session',
-          editorMessage.type,
-          editor.sessionId,
-          editorMessage.sessionId
-        );
+    logger.info('editor', editorMessage.type);
+    if (
+      editorMessage.sessionId !== editor.sessionId &&
+      editorMessage.type !== EditorEvents.status
+    ) {
+      logger.error(
+        'editor',
+        'invalid session',
+        editorMessage.type,
+        editor.sessionId,
+        editorMessage.sessionId
+      );
 
-        return;
-      }
-      switch (editorMessage.type) {
-        case EventTypes.logger:
-          logger.info('[WEBVIEW LOG]', editorMessage.value);
-          break;
-        case EventTypes.content:
-          editor.saveContent({
-            type: editorMessage.type,
-            content: editorMessage.value
-          });
-          break;
-        case EventTypes.selection:
-          break;
-        case EventTypes.title:
-          editor.saveContent({
-            type: editorMessage.type,
-            title: editorMessage.value
-          });
-          break;
-        case EventTypes.newtag:
+      return;
+    }
+    switch (editorMessage.type) {
+      case EventTypes.logger:
+        logger.info('[WEBVIEW LOG]', editorMessage.value);
+        break;
+      case EventTypes.content:
+        editor.saveContent({
+          type: editorMessage.type,
+          content: editorMessage.value
+        });
+        break;
+      case EventTypes.selection:
+        break;
+      case EventTypes.title:
+        editor.saveContent({
+          type: editorMessage.type,
+          title: editorMessage.value
+        });
+        break;
+      case EventTypes.newtag:
+        if (!editor.note.current) return;
+        eSendEvent(eOpenTagsDialog, editor.note.current);
+        break;
+      case EventTypes.tag:
+        if (editorMessage.value) {
           if (!editor.note.current) return;
-          eSendEvent(eOpenTagsDialog, editor.note.current);
-          break;
-        case EventTypes.tag:
-          if (editorMessage.value) {
-            if (!editor.note.current) return;
-            db.notes
-              //@ts-ignore
-              ?.note(editor.note.current?.id)
-              .untag(editorMessage.value)
-              .then(async () => {
-                useTagStore.getState().setTags();
-                await editor.commands.setTags(editor.note.current);
-                Navigation.queueRoutesForUpdate(
-                  'ColoredNotes',
-                  'Notes',
-                  'TaggedNotes',
-                  'TopicNotes',
-                  'Tags'
-                );
-              });
-          }
-          break;
-        case EventTypes.filepicker:
-          picker.pick({ type: editorMessage.value });
-          break;
-        case EventTypes.download:
-          console.log('download attachment request', editorMessage.value);
-          filesystem.downloadAttachment(editorMessage.value?.hash, true);
-          break;
-        case EventTypes.pro:
-          if (editor.state.current?.isFocused) {
-            editor.state.current.isFocused = true;
-          }
-          umami.pageView('/pro-screen', '/editor');
-          eSendEvent(eOpenPremiumDialog);
-          break;
-        case EventTypes.monograph:
-          publishNote(editor);
-          break;
-        case EventTypes.properties:
-          showActionsheet(editor);
-          break;
-        case EventTypes.back:
-          onBackPress();
-          break;
-        default:
-          console.log(
-            'unhandled event recieved from editor: ',
-            editorMessage.type,
-            editorMessage.value
-          );
-          break;
-      }
-      eSendEvent(editorMessage.type, editorMessage);
-    },
-    [editor.sessionId, editor.saveContent]
-  );
+          db.notes
+            //@ts-ignore
+            ?.note(editor.note.current?.id)
+            .untag(editorMessage.value)
+            .then(async () => {
+              useTagStore.getState().setTags();
+              await editor.commands.setTags(editor.note.current);
+              Navigation.queueRoutesForUpdate(
+                'ColoredNotes',
+                'Notes',
+                'TaggedNotes',
+                'TopicNotes',
+                'Tags'
+              );
+            });
+        }
+        break;
+      case EventTypes.filepicker:
+        picker.pick({ type: editorMessage.value });
+        break;
+      case EventTypes.download:
+        console.log('download attachment request', editorMessage.value);
+        filesystem.downloadAttachment(editorMessage.value?.hash, true);
+        break;
+      case EventTypes.pro:
+        if (editor.state.current?.isFocused) {
+          editor.state.current.isFocused = true;
+        }
+        umami.pageView('/pro-screen', '/editor');
+        eSendEvent(eOpenPremiumDialog);
+        break;
+      case EventTypes.monograph:
+        publishNote(editor);
+        break;
+      case EventTypes.properties:
+        showActionsheet(editor);
+        break;
+      case EventTypes.back:
+        onBackPress();
+        break;
+      default:
+        console.log(
+          'unhandled event recieved from editor: ',
+          editorMessage.type,
+          editorMessage.value
+        );
+        break;
+    }
+    eSendEvent(editorMessage.type, editorMessage);
+  };
 
   return onMessage;
 };

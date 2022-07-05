@@ -46,11 +46,7 @@ const Launcher = React.memo(
     const deviceMode = useSettingStore(state => state.deviceMode);
     const passwordInputRef = useRef();
     const password = useRef();
-    const introCompleted = SettingsService.get().introCompleted;
-    const [requireIntro, setRequireIntro] = useState({
-      updated: introCompleted,
-      value: !introCompleted
-    });
+    const introCompleted = false; //SettingsService.get().introCompleted;
     const dbInitCompleted = useRef(false);
 
     const loadNotes = async () => {
@@ -62,13 +58,17 @@ const Launcher = React.memo(
         db.notes.init().then(() => {
           Walkthrough.init();
           initialize();
-          setImmediate(() => setLoading(false));
+          setImmediate(() => {
+            setLoading(false);
+            setImmediate(() => doAppLoadActions());
+          });
         });
       });
     };
 
     const init = async () => {
       if (!dbInitCompleted.current) {
+        await RNBootSplash.hide();
         await db.init();
         dbInitCompleted.current = true;
       }
@@ -78,24 +78,9 @@ const Launcher = React.memo(
       }
     };
 
-    const hideSplashScreen = async () => {
-      if (requireIntro.value) await sleep(500);
-      await RNBootSplash.hide({ fade: true });
-    };
-
-    useEffect(() => {
-      console.log('hide splash', requireIntro.updated);
-      if (requireIntro.updated) {
-        hideSplashScreen();
-        return;
-      }
-      let introCompleted = SettingsService.get().introCompleted;
-      console.log(requireIntro);
-      setRequireIntro({
-        updated: true,
-        value: !introCompleted
-      });
-    }, [requireIntro, verifyUser]);
+    // useEffect(() => {
+    //   hideSplashScreen();
+    // }, [verifyUser]);
 
     useEffect(() => {
       if (!loading) {
@@ -129,7 +114,7 @@ const Launcher = React.memo(
         }
       }
 
-      if (!requireIntro?.value) {
+      if (introCompleted) {
         useMessageStore.subscribe(state => {
           let dialogs = state.dialogs;
           if (dialogs.length > 0) {
@@ -141,17 +126,17 @@ const Launcher = React.memo(
 
     const checkAppUpdateAvailable = async () => {
       return;
-      try {
-        const version = await checkVersion();
-        if (!version.needsUpdate) return false;
-        presentSheet({
-          component: ref => <Update version={version} fwdRef={ref} />
-        });
+      // try {
+      //   const version = await checkVersion();
+      //   if (!version.needsUpdate) return false;
+      //   presentSheet({
+      //     component: ref => <Update version={version} fwdRef={ref} />
+      //   });
 
-        return true;
-      } catch (e) {
-        return false;
-      }
+      //   return true;
+      // } catch (e) {
+      //   return false;
+      // }
     };
 
     const restoreEditorState = async () => {
@@ -354,8 +339,6 @@ const Launcher = React.memo(
           </View>
         </View>
       </View>
-    ) : requireIntro.value && !loading ? (
-      <Intro />
     ) : null;
   },
   () => true

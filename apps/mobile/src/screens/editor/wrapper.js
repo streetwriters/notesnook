@@ -26,6 +26,7 @@ export const EditorWrapper = ({ width }) => {
   const loading = useNoteStore(state => state.loading);
   const insets = useSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
+  const introCompleted = useSettingStore(state => state.settings.introCompleted);
 
   const onAppStateChanged = async state => {
     if (editorState().movedAway) return;
@@ -54,7 +55,7 @@ export const EditorWrapper = ({ width }) => {
         borderLeftColor: DDS.isTab ? colors.nav : 'transparent'
       }}
     >
-      {loading ? null : (
+      {loading || !introCompleted ? null : (
         <SafeAreaView
           style={{
             flex: 1

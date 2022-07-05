@@ -1,12 +1,14 @@
 import React, { useRef, useState } from 'react';
-import { Dimensions, Platform, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Dimensions, View } from 'react-native';
+import Animated, { FadeInDown, FadeOutDown, FadeOutUp } from 'react-native-reanimated';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, ToastEvent } from '../../services/event-manager';
 import { clearMessage, setEmailVerifyMessage } from '../../services/message';
+import Navigation from '../../services/navigation';
 import PremiumService from '../../services/premium';
-import { useUserStore } from '../../stores/use-user-store';
+import SettingsService from '../../services/settings';
 import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import umami from '../../utils/analytics';
 import { db } from '../../utils/database';
 import { eCloseLoginDialog } from '../../utils/events';
@@ -15,13 +17,13 @@ import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import BaseDialog from '../dialog/base-dialog';
 import { Button } from '../ui/button';
-import { IconButton } from '../ui/icon-button';
 import Input from '../ui/input';
 import { SvgView } from '../ui/svg';
 import { BouncingView } from '../ui/transitions/bouncing-view';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { SVG } from './background';
+import { hideAuth } from './common';
 
 export const Signup = ({ changeMode, welcome, trial }) => {
   const colors = useThemeStore(state => state.colors);
@@ -33,9 +35,6 @@ export const Signup = ({ changeMode, welcome, trial }) => {
   const confirmPassword = useRef();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const insets = useSafeAreaInsets();
-
   const setUser = useUserStore(state => state.setUser);
   const setLastSynced = useUserStore(state => state.setLastSynced);
 
@@ -64,7 +63,7 @@ export const Signup = ({ changeMode, welcome, trial }) => {
       setLastSynced(await db.lastSynced());
       clearMessage();
       setEmailVerifyMessage();
-      eSendEvent(eCloseLoginDialog);
+      hideAuth();
       umami.pageView('/account-created', '/welcome/signup');
       await sleep(300);
       if (trial) {
@@ -86,7 +85,9 @@ export const Signup = ({ changeMode, welcome, trial }) => {
   return (
     <>
       {loading ? <BaseDialog transparent={true} visible={true} animation="fade" /> : null}
-      <View
+      <Animated.View
+        entering={FadeInDown}
+        exiting={FadeOutUp}
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
@@ -101,9 +102,7 @@ export const Signup = ({ changeMode, welcome, trial }) => {
             overflow: 'hidden'
           }}
         >
-          <BouncingView initialScale={1.05}>
-            <SvgView src={SVG(colors.night ? colors.icon : 'black')} height={700} />
-          </BouncingView>
+          <SvgView src={SVG(colors.night ? colors.icon : 'black')} height={700} />
         </View>
 
         <View
@@ -205,48 +204,14 @@ export const Signup = ({ changeMode, welcome, trial }) => {
             marginBottom={5}
             onSubmit={signup}
           />
-          <Paragraph size={SIZE.xs} color={colors.icon}>
-            By signing up, you agree to our{' '}
-            <Paragraph
-              size={SIZE.xs}
-              onPress={() => {
-                openLinkInBrowser('https://notesnook.com/tos', colors)
-                  .catch(e => {})
-                  .then(r => {});
-              }}
-              style={{
-                textDecorationLine: 'underline'
-              }}
-              color={colors.accent}
-            >
-              terms of service{' '}
-            </Paragraph>
-            and{' '}
-            <Paragraph
-              size={SIZE.xs}
-              onPress={() => {
-                openLinkInBrowser('https://notesnook.com/privacy', colors)
-                  .catch(e => {})
-                  .then(r => {});
-              }}
-              style={{
-                textDecorationLine: 'underline'
-              }}
-              color={colors.accent}
-            >
-              privacy policy.
-            </Paragraph>
-          </Paragraph>
-
           <View
             style={{
-              marginTop: 50,
+              marginTop: 25,
               alignSelf: 'center'
             }}
           >
             <Button
               style={{
-                marginTop: 10,
                 width: 250,
                 borderRadius: 100
               }}
@@ -264,15 +229,54 @@ export const Signup = ({ changeMode, welcome, trial }) => {
                   borderRadius: 100
                 }}
                 onPress={() => {
-                  eSendEvent(eCloseLoginDialog);
+                  hideAuth();
                 }}
                 type="grayBg"
                 title="Skip for now"
               />
             )}
           </View>
+
+          <Paragraph
+            style={{
+              textAlign: 'center',
+              position: 'absolute',
+              bottom: 0,
+              alignSelf: 'center',
+              marginBottom: 20
+            }}
+            size={SIZE.xs}
+            color={colors.icon}
+          >
+            By signing up, you agree to our{' '}
+            <Paragraph
+              size={SIZE.xs}
+              onPress={() => {
+                openLinkInBrowser('https://notesnook.com/tos', colors);
+              }}
+              style={{
+                textDecorationLine: 'underline'
+              }}
+              color={colors.accent}
+            >
+              terms of service{' '}
+            </Paragraph>
+            and{' '}
+            <Paragraph
+              size={SIZE.xs}
+              onPress={() => {
+                openLinkInBrowser('https://notesnook.com/privacy', colors);
+              }}
+              style={{
+                textDecorationLine: 'underline'
+              }}
+              color={colors.accent}
+            >
+              privacy policy.
+            </Paragraph>
+          </Paragraph>
         </View>
-      </View>
+      </Animated.View>
     </>
   );
 };

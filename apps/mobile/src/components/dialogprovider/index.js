@@ -3,6 +3,7 @@ import { useThemeStore } from '../../stores/use-theme-store';
 import { AnnouncementDialog } from '../announcements';
 import { AttachmentDialog } from '../attachments';
 import Auth from '../auth';
+import AuthModal from '../auth/auth-modal';
 import { SessionExpired } from '../auth/session-expired';
 import { Dialog } from '../dialog';
 import { AddTopicDialog } from '../dialogs/add-topic';
@@ -32,7 +33,7 @@ const DialogProvider = React.memo(
         <AddTopicDialog colors={colors} />
         <AddNotebookSheet colors={colors} />
         <PremiumDialog colors={colors} />
-        <Auth colors={colors} />
+        <AuthModal colors={colors} />
         <MergeConflicts />
         <ExportNotesSheet />
         <RecoveryKeySheet colors={colors} />

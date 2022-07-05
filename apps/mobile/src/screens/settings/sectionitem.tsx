@@ -133,6 +133,7 @@ export const SectionItem = React.memo(
 
         {item.type === 'switch' && item.property && (
           <ToggleSwitch
+            //@ts-ignore
             isOn={item.getter ? item.getter(item.property || current) : settings[item.property]}
             onColor={colors.accent}
             offColor={colors.icon}

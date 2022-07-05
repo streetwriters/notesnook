@@ -1,4 +1,3 @@
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { StackActions } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFavoriteStore } from '../stores/use-favorite-store';
@@ -7,7 +6,7 @@ import { useNotebookStore } from '../stores/use-notebook-store';
 import { useNoteStore } from '../stores/use-notes-store';
 import { useTagStore } from '../stores/use-tag-store';
 import { useTrashStore } from '../stores/use-trash-store';
-import { eOnNewTopicAdded, refreshNotesPage } from '../utils/events';
+import { eOnNewTopicAdded } from '../utils/events';
 import { rootNavigatorRef, tabBarRef } from '../utils/global-refs';
 import { ColorType, NotebookType, TagType, TopicType } from '../utils/types';
 import { eSendEvent } from './event-manager';
@@ -31,7 +30,13 @@ const routeNames = {
   TaggedNotes: 'TaggedNotes',
   ColoredNotes: 'ColoredNotes',
   TopicNotes: 'TopicNotes',
-  Monographs: 'Monographs'
+  Monographs: 'Monographs',
+  Auth: 'Auth',
+  Intro: 'Intro',
+  Welcome: 'Welcome',
+  AppLock: 'AppLock',
+  Login: 'Login',
+  Signup: 'Signup'
 };
 
 type GenericRouteParam = { [name: string]: never };
@@ -48,6 +53,14 @@ export type NotesScreenParams = {
   canGoBack: boolean;
 };
 
+export type AppLockRouteParams = {
+  welcome: boolean;
+};
+
+export type AuthParams = {
+  mode: number;
+};
+
 export type RouteParams = {
   Notes: GenericRouteParam;
   Notebooks: GenericRouteParam;
@@ -62,6 +75,8 @@ export type RouteParams = {
   ColoredNotes: NotesScreenParams;
   TopicNotes: NotesScreenParams;
   Monographs: NotesScreenParams;
+  AppLock: AppLockRouteParams;
+  Auth: AuthParams;
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<RouteParams, T>;
@@ -144,10 +159,10 @@ function push(screen: CurrentScreen, params: { [name: string]: any }) {
   rootNavigatorRef.current?.dispatch(StackActions.push(name, params));
 }
 
-function replace(screen: CurrentScreen, params: { [name: string]: any }) {
-  useNavigationStore.getState().update(screen, !params.menu);
+function replace<T extends RouteName>(screen: CurrentScreen, params: RouteParams[T]) {
+  useNavigationStore.getState().update(screen, params?.canGoBack);
   //@ts-ignore
-  rootNavigatorRef.current?.dispatch(StackActions.replace(name, params));
+  rootNavigatorRef.current?.dispatch(StackActions.replace(screen.name, params));
 }
 
 function popToTop() {

@@ -5,6 +5,10 @@
      <!-- Customize your theme here. -->
         <item name="android:windowDisablePreview">true</item>
         <item name="android:editTextBackground">@drawable/edit_text</item>
+        
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
      <style name="Share.Window" parent="Theme.AppCompat">

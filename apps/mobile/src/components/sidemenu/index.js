@@ -26,6 +26,7 @@ export const SideMenu = React.memo(
     const insets = useSafeAreaInsets();
     const subscriptionType = useUserStore(state => state.user?.subscription?.type);
     const loading = useNoteStore(state => state.loading);
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
     const noTextMode = false;
 
     const BottomItemsList = [
@@ -72,7 +73,7 @@ export const SideMenu = React.memo(
       []
     );
 
-    return !loading ? (
+    return !loading && introCompleted ? (
       <View
         style={{
           height: '100%',

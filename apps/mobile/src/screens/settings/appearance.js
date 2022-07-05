@@ -103,8 +103,7 @@ export const AccentColorPicker = ({ settings = true, wrap = true }) => {
         flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'center',
-        justifyContent: 'center',
-        alignContent: 'flex-start'
+        width: '100%'
       }}
     >
       {[

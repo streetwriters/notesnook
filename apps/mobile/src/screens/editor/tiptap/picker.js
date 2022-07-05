@@ -188,7 +188,6 @@ const pick = async options => {
     }
     return;
   }
-
   if (options?.type.startsWith('image') || options?.type === 'camera') {
     if (options.type === 'image') {
       gallery(options);

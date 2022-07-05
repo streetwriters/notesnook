@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import Share from 'react-native-share';
 import { editing, toTXT } from '..';
 import { notesnook } from '../../../e2e/test.ids';
+import { AuthMode } from '../../components/auth';
 import { presentDialog } from '../../components/dialog/functions';
 import NoteHistory from '../../components/note-history';
 import { MoveNotes } from '../../components/sheets/move-notes/movenote';
@@ -232,7 +233,15 @@ export const useActions = ({ close = () => {}, item }) => {
         message: 'Login to publish note',
         context: 'local',
         func: () => {
-          eSendEvent(eOpenLoginDialog);
+          Navigation.navigate(
+            {
+              name: 'Login'
+            },
+            {
+              mode: AuthMode.login,
+              canGoBack: true
+            }
+          );
         },
         actionText: 'Login'
       });

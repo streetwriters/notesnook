@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
-import { LayoutAnimation, Platform, View } from 'react-native';
+import { Dimensions, LayoutAnimation, Platform, View } from 'react-native';
+import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import BiometricService from '../../services/biometrics';
-import { PressableButton } from '../../components/ui/pressable';
-import Seperator from '../../components/ui/seperator';
-import Heading from '../../components/ui/typography/heading';
-import Paragraph from '../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { presentSheet } from '../../services/event-manager';
-import SettingsService from '../../services/settings';
-import { SIZE } from '../../utils/size';
-import { db } from '../../utils/database';
+import { SVG_Z } from '../../components/intro';
 import { WelcomeNotice } from '../../components/intro/welcome';
 import { Button } from '../../components/ui/button';
+import { PressableButton } from '../../components/ui/pressable';
+import Seperator from '../../components/ui/seperator';
+import { SvgView } from '../../components/ui/svg';
+import { BouncingView } from '../../components/ui/transitions/bouncing-view';
+import Heading from '../../components/ui/typography/heading';
+import Paragraph from '../../components/ui/typography/paragraph';
+import { presentSheet } from '../../services/event-manager';
+import SettingsService from '../../services/settings';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { getElevation } from '../../utils';
 import umami from '../../utils/analytics';
+import { SIZE } from '../../utils/size';
 
-const AppLock = ({ welcome, s = 0 }) => {
+const AppLock = ({ navigation, route }) => {
   const colors = useThemeStore(state => state.colors);
   const appLockMode = useSettingStore(state => state.settings.appLockMode);
-
-  const [step, setStep] = useState(s);
+  const [step, setStep] = useState(0);
+  const welcome = route?.params?.welcome;
 
   const modes = [
     {
@@ -50,117 +52,155 @@ const AppLock = ({ welcome, s = 0 }) => {
 
   return (
     <>
-      {step === 0 ? (
-        <>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              justifyContent: 'space-between',
-              width: '95%',
-              paddingVertical: 12,
-              paddingHorizontal: 0,
-              alignSelf: 'center',
-              minHeight: 125,
-              borderBottomWidth: 1,
-              borderBottomColor: colors.nav
-            }}
-          >
-            <Icon
-              name="shield-lock"
-              color={colors.border}
-              size={100}
+      <Animated.View
+        exiting={!welcome ? undefined : FadeOutUp}
+        entering={!welcome ? undefined : FadeInDown}
+        style={{
+          justifyContent: !welcome ? undefined : 'center',
+          height: !welcome ? undefined : '100%',
+          width: !welcome ? undefined : '100%'
+        }}
+      >
+        {step === 0 ? (
+          <>
+            <View
               style={{
-                position: 'absolute',
-                right: 0,
-                top: 6
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                justifyContent: 'space-between',
+                width: '95%',
+                paddingVertical: 12,
+                paddingHorizontal: 0,
+                alignSelf: 'center',
+                minHeight: 125,
+                borderBottomWidth: 1,
+                borderBottomColor: welcome ? 'transparent' : colors.nav
               }}
-            />
-
-            <View>
-              <Heading>Protect your notes</Heading>
-              <Paragraph size={SIZE.md}>
-                Choose how you want to secure your notes locally.
-              </Paragraph>
-            </View>
-          </View>
-          <Seperator />
-          <View
-            style={{
-              paddingHorizontal: 12
-            }}
-          >
-            {modes.map(item => (
-              <PressableButton
-                key={item.title}
-                type={appLockMode === item.value ? 'grayBg' : 'transparent'}
-                onPress={() => {
-                  SettingsService.set({ appLockMode: item.value });
-                }}
-                customStyle={{
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  paddingHorizontal: 12,
-                  paddingVertical: 12,
-                  marginTop: 0,
-                  marginBottom: 12,
-                  borderWidth: 1,
-                  borderColor: appLockMode === item.value ? item.activeColor : colors.nav
-                }}
+            >
+              <Icon
+                name="shield-lock"
+                color={colors.border}
+                size={100}
                 style={{
-                  marginBottom: 10
+                  position: 'absolute',
+                  right: 0,
+                  top: 6
+                }}
+              />
+
+              <View
+                style={{
+                  alignItems: !welcome ? undefined : 'center',
+                  width: '100%'
                 }}
               >
-                <Heading
-                  color={appLockMode === item.value ? item.activeColor : colors.pri}
-                  style={{ maxWidth: '95%' }}
+                <Heading>Protect your notes</Heading>
+                <Paragraph
+                  style={{
+                    textAlign: !welcome ? undefined : 'center'
+                  }}
                   size={SIZE.md}
                 >
-                  {item.title}
-                </Heading>
-                <Paragraph
-                  color={appLockMode === item.value ? item.activeColor : colors.icon}
-                  style={{ maxWidth: '95%' }}
-                  size={SIZE.sm}
-                >
-                  {item.desc}
+                  Choose how you want to secure your notes locally.
                 </Paragraph>
-              </PressableButton>
-            ))}
+              </View>
+            </View>
+            <Seperator />
+            <View
+              style={{
+                paddingHorizontal: 12
+              }}
+            >
+              {modes.map(item => (
+                <PressableButton
+                  key={item.title}
+                  type={appLockMode === item.value ? 'grayBg' : 'transparent'}
+                  onPress={() => {
+                    SettingsService.set({ appLockMode: item.value });
+                  }}
+                  customStyle={{
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    marginTop: 0,
+                    marginBottom: 12,
+                    borderWidth: 1,
+                    borderColor: appLockMode === item.value ? item.activeColor : colors.nav
+                  }}
+                  style={{
+                    marginBottom: 10
+                  }}
+                >
+                  <Heading
+                    color={appLockMode === item.value ? item.activeColor : colors.pri}
+                    style={{ maxWidth: '95%' }}
+                    size={SIZE.md}
+                  >
+                    {item.title}
+                  </Heading>
+                  <Paragraph
+                    color={appLockMode === item.value ? item.activeColor : colors.icon}
+                    style={{ maxWidth: '95%' }}
+                    size={SIZE.sm}
+                  >
+                    {item.desc}
+                  </Paragraph>
+                </PressableButton>
+              ))}
 
-            {welcome && (
-              <Button
-                fontSize={SIZE.md}
-                height={45}
-                width={250}
-                onPress={async () => {
-                  LayoutAnimation.configureNext({
-                    ...LayoutAnimation.Presets.linear,
-                    delete: {
-                      duration: 50,
-                      property: 'opacity',
-                      type: 'linear'
-                    }
-                  });
-                  umami.pageView('/privacymode', '/welcome');
-                  setStep(1);
-                }}
-                style={{
-                  paddingHorizontal: 24,
-                  alignSelf: 'center',
-                  borderRadius: 100,
-                  ...getElevation(5),
-                  marginTop: 30
-                }}
-                type="accent"
-                title="Next"
-              />
-            )}
-          </View>
-        </>
-      ) : (
-        <WelcomeNotice />
-      )}
+              {welcome && (
+                <Button
+                  fontSize={SIZE.md}
+                  height={45}
+                  width={250}
+                  onPress={async () => {
+                    LayoutAnimation.configureNext({
+                      ...LayoutAnimation.Presets.linear,
+                      delete: {
+                        duration: 50,
+                        property: 'opacity',
+                        type: 'linear'
+                      }
+                    });
+                    umami.pageView('/privacymode', '/welcome');
+                    setStep(1);
+                  }}
+                  style={{
+                    paddingHorizontal: 24,
+                    alignSelf: 'center',
+                    borderRadius: 100,
+                    ...getElevation(5),
+                    marginTop: 30
+                  }}
+                  type="accent"
+                  title="Next"
+                />
+              )}
+            </View>
+          </>
+        ) : (
+          <WelcomeNotice />
+        )}
+
+        {welcome ? (
+          <BouncingView
+            style={{
+              position: 'absolute',
+              bottom: -130,
+              zIndex: -1
+            }}
+            animated={false}
+            duration={3000}
+          >
+            <SvgView
+              width={Dimensions.get('window').width}
+              height={Dimensions.get('window').width}
+              src={SVG_Z}
+            />
+          </BouncingView>
+        ) : null}
+      </Animated.View>
     </>
   );
 };

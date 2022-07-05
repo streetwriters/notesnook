@@ -5,6 +5,7 @@ import Navigation from '../../services/navigation';
 import useNavigationStore from '../../stores/use-navigation-store';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
+import { tabBarRef } from '../../utils/global-refs';
 import { IconButton } from '../ui/icon-button';
 
 export const LeftMenus = () => {
@@ -19,6 +20,12 @@ export const LeftMenus = () => {
       return;
     }
     Navigation.goBack();
+    if (
+      useNavigationStore.getState().currentScreen.name === 'Signup' ||
+      useNavigationStore.getState().currentScreen.name === 'Login'
+    ) {
+      tabBarRef.current.unlock();
+    }
   };
 
   return isTablet ? null : (

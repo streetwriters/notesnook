@@ -1,8 +1,11 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
+import Auth from '../components/auth';
+import { Login } from '../components/auth/login';
+import { Signup } from '../components/auth/signup';
 import Container from '../components/container';
+import Intro from '../components/intro';
 import Favorites from '../screens/favorites';
 import Home from '../screens/home';
 import Notebook from '../screens/notebook';
@@ -13,6 +16,7 @@ import { TaggedNotes } from '../screens/notes/tagged';
 import { TopicNotes } from '../screens/notes/topic-notes';
 import { Search } from '../screens/search';
 import Settings from '../screens/settings';
+import AppLock from '../screens/settings/app-lock';
 import Tags from '../screens/tags';
 import Trash from '../screens/trash';
 import { eSendEvent } from '../services/event-manager';
@@ -24,10 +28,50 @@ import { history } from '../utils';
 import { rootNavigatorRef } from '../utils/global-refs';
 import { hideAllTooltips } from '../utils/hooks/use-tooltip';
 const NativeStack = createNativeStackNavigator();
+const IntroStack = createNativeStackNavigator();
+
+/**
+ * Intro Stack:
+ *
+ * Welcome Page
+ * Select Privacy Mode Page
+ * Login/Signup Page
+ *
+ */
+
+const IntroStackNavigator = () => {
+  const colors = useThemeStore(state => state.colors);
+  const introCompleted = SettingsService.get().introCompleted;
+  return (
+    <IntroStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        lazy: false,
+        animation: 'none',
+        contentStyle: {
+          backgroundColor: colors.bg
+        }
+      }}
+      initialRouteName={'Intro'}
+    >
+      <NativeStack.Screen name="Intro" component={Intro} />
+      <NativeStack.Screen name="AppLock" component={AppLock} />
+      <NativeStack.Screen
+        name="Auth"
+        initialParams={{
+          mode: 0
+        }}
+        component={Auth}
+      />
+    </IntroStack.Navigator>
+  );
+};
+
 const Tabs = React.memo(
   () => {
     const colors = useThemeStore(state => state.colors);
     const homepage = SettingsService.get().homepage;
+    const showWelcome = !SettingsService.get().introCompleted;
     React.useEffect(() => {
       setTimeout(() => {
         useNavigationStore.getState().update({ name: homepage });
@@ -37,7 +81,7 @@ const Tabs = React.memo(
     return (
       <NativeStack.Navigator
         tabBar={() => null}
-        initialRouteName={homepage}
+        initialRouteName={showWelcome ? 'Welcome' : homepage}
         backBehavior="history"
         screenOptions={{
           headerShown: false,
@@ -48,6 +92,21 @@ const Tabs = React.memo(
           }
         }}
       >
+        <NativeStack.Screen
+          name="Signup"
+          initialParams={{
+            mode: 1
+          }}
+          component={Auth}
+        />
+        <NativeStack.Screen
+          name="Login"
+          initialParams={{
+            mode: 0
+          }}
+          component={Auth}
+        />
+        <NativeStack.Screen name="Welcome" component={IntroStackNavigator} />
         <NativeStack.Screen name="Notes" component={Home} />
         <NativeStack.Screen name="Notebooks" component={Notebooks} />
         <NativeStack.Screen options={{ lazy: true }} name="Favorites" component={Favorites} />

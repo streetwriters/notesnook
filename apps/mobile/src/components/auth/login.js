@@ -26,7 +26,10 @@ import Paragraph from '../ui/typography/paragraph';
 import { SVG } from './background';
 import { ForgotPassword } from './forgot-password';
 import TwoFactorVerification from './two-factor';
-export const Login = ({ changeMode }) => {
+import Animated, { FadeInDown, FadeOutDown, FadeOutUp } from 'react-native-reanimated';
+import Navigation from '../../services/navigation';
+import { hideAuth } from './common';
+export const Login = ({ changeMode, welcome }) => {
   const colors = useThemeStore(state => state.colors);
   const email = useRef();
   const emailInputRef = useRef();
@@ -87,8 +90,8 @@ export const Login = ({ changeMode }) => {
         type: 'success',
         context: 'global'
       });
-      eSendEvent(eCloseLoginDialog);
-      await SettingsService.set({
+      hideAuth();
+      SettingsService.set({
         sessionExpired: false,
         userEmailConfirmed: user.isEmailConfirmed
       });
@@ -131,10 +134,11 @@ export const Login = ({ changeMode }) => {
   return (
     <>
       <ForgotPassword />
-
       <SheetProvider context="two_factor_verify" />
       {loading ? <BaseDialog transparent={true} visible={true} animation="fade" /> : null}
-      <View
+      <Animated.View
+        entering={FadeInDown}
+        exiting={FadeOutUp}
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
@@ -149,9 +153,7 @@ export const Login = ({ changeMode }) => {
             overflow: 'hidden'
           }}
         >
-          <BouncingView initialScale={1.05} duration={5000}>
-            <SvgView src={SVG(colors.night ? colors.icon : 'black')} height={700} />
-          </BouncingView>
+          <SvgView src={SVG(colors.night ? colors.icon : 'black')} height={700} />
         </View>
         <View
           style={{
@@ -250,13 +252,12 @@ export const Login = ({ changeMode }) => {
           <View
             style={{
               // position: 'absolute',
-              marginTop: 50,
+              marginTop: 25,
               alignSelf: 'center'
             }}
           >
             <Button
               style={{
-                marginTop: 10,
                 width: 250,
                 borderRadius: 100
               }}
@@ -266,9 +267,24 @@ export const Login = ({ changeMode }) => {
               type="accent"
               title={loading ? null : 'Login to your account'}
             />
+
+            {loading || !welcome ? null : (
+              <Button
+                style={{
+                  marginTop: 10,
+                  width: 250,
+                  borderRadius: 100
+                }}
+                onPress={() => {
+                  hideAuth();
+                }}
+                type="grayBg"
+                title="Skip for now"
+              />
+            )}
           </View>
         </View>
-      </View>
+      </Animated.View>
     </>
   );
 };
