@@ -36,6 +36,10 @@ export function TaskListComponent(
     const { node, pos } = parentTaskItem;
     const allChecked = areAllChecked(node, pos, editor.state.doc);
 
+    // no need to create a transaction if the check state is
+    // not changed.
+    if (node.attrs.checked === allChecked) return;
+
     // check parent item if all child items are checked.
     editor.commands.command(({ tr }) => {
       tr.setNodeMarkup(pos, undefined, { checked: allChecked });
