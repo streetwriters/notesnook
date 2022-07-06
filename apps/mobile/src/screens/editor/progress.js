@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import * as Progress from 'react-native-progress';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { useAttachmentStore } from '../../stores/use-attachment-store';
 import { SIZE } from '../../utils/size';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ProgressBarComponent } from '../../components/ui/svg/lazy';
 
 export const ProgressBar = () => {
   const colors = useThemeStore(state => state.colors);
@@ -50,14 +50,16 @@ export const ProgressBar = () => {
       }}
       onLayout={event => setWidth(event.nativeEvent.layout.width)}
     >
-      <Progress.Bar
-        size={SIZE.xxl}
-        progress={prog}
-        color={colors.accent}
-        borderWidth={0}
-        height={1}
-        width={width || 400}
-      />
+      <React.Suspense fallback={<View />}>
+        <ProgressBarComponent
+          size={SIZE.xxl}
+          progress={prog}
+          color={colors.accent}
+          borderWidth={0}
+          height={1}
+          width={width || 400}
+        />
+      </React.Suspense>
     </View>
   ) : null;
 };

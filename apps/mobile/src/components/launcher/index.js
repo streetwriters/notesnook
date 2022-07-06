@@ -16,7 +16,7 @@ import { useNoteStore } from '../../stores/use-notes-store';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { useUserStore } from '../../stores/use-user-store';
-import { db } from '../../utils/database';
+import { db, loadDatabase } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
 import { eOpenAnnouncementDialog } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
@@ -68,7 +68,8 @@ const Launcher = React.memo(
 
     const init = async () => {
       if (!dbInitCompleted.current) {
-        await RNBootSplash.hide();
+        if (!verifyUser) await RNBootSplash.hide({ fade: true });
+        await loadDatabase();
         await db.init();
         dbInitCompleted.current = true;
       }
@@ -125,18 +126,16 @@ const Launcher = React.memo(
     };
 
     const checkAppUpdateAvailable = async () => {
-      return;
-      // try {
-      //   const version = await checkVersion();
-      //   if (!version.needsUpdate) return false;
-      //   presentSheet({
-      //     component: ref => <Update version={version} fwdRef={ref} />
-      //   });
-
-      //   return true;
-      // } catch (e) {
-      //   return false;
-      // }
+      try {
+        const version = await checkVersion();
+        if (!version.needsUpdate) return false;
+        presentSheet({
+          component: ref => <Update version={version} fwdRef={ref} />
+        });
+        return true;
+      } catch (e) {
+        return false;
+      }
     };
 
     const restoreEditorState = async () => {

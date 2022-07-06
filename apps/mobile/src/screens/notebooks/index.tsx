@@ -47,21 +47,18 @@ export const Notebooks = ({ navigation, route }: NavigationProps<'Notebooks'>) =
       });
       SearchService.prepareSearch = prepareSearch;
       RightMenus.floatingButtonAction = onPressFloatingButton;
-      return !prev?.current;
-    },
-    onBlur: () => false,
-    delay: SettingsService.get().homepage === route.name ? 1 : -1
-  });
 
-  useEffect(() => {
-    if (navigation.isFocused()) {
       if (notebooks.length === 0) {
         Walkthrough.present('notebooks');
       } else {
         Walkthrough.update('notebooks');
       }
-    }
-  }, [notebooks]);
+
+      return !prev?.current;
+    },
+    onBlur: () => false,
+    delay: SettingsService.get().homepage === route.name ? 1 : -1
+  });
 
   return (
     <DelayLayout>

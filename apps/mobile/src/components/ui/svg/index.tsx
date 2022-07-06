@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { SvgXml } from 'react-native-svg';
+import { SvgXml } from './lazy';
 
 export const SvgView = ({
   width = 250,
@@ -19,7 +19,9 @@ export const SvgView = ({
         width: height || 250
       }}
     >
-      <SvgXml xml={src} width="100%" height="100%" />
+      <React.Suspense fallback={<View />}>
+        <SvgXml xml={src} width="100%" height="100%" />
+      </React.Suspense>
     </View>
   );
 };

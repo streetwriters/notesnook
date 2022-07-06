@@ -72,8 +72,8 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
   useEffect(() => {
     console.log('sessionId:', sessionId);
     async () => {
-      await commands.setSessionId(sessionId);
-      if (sessionId) {
+      await commands.setSessionId(sessionIdRef.current);
+      if (sessionIdRef.current) {
         if (!state.current?.ready) return;
         await onReady();
       }
@@ -88,7 +88,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
   };
 
   const onReady = useCallback(async () => {
-    if (!(await isEditorLoaded(editorRef, sessionId))) {
+    if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
       console.log('reload editor');
       overlay(true);
       setLoading(true);

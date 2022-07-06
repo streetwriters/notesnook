@@ -1,6 +1,5 @@
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
-import * as Progress from 'react-native-progress';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAttachmentStore } from '../../stores/use-attachment-store';
 import { useThemeStore } from '../../stores/use-theme-store';
@@ -10,6 +9,7 @@ import { useAttachmentProgress } from '../../utils/hooks/use-attachment-progress
 import { SIZE } from '../../utils/size';
 import SheetProvider from '../sheet-provider';
 import { IconButton } from '../ui/icon-button';
+import { ProgressCircleComponent } from '../ui/svg/lazy';
 import Paragraph from '../ui/typography/paragraph';
 import Actions from './actions';
 
@@ -113,24 +113,26 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
             marginRight: -5
           }}
         >
-          <Progress.Circle
-            size={SIZE.xxl}
-            progress={
-              encryptionProgress
-                ? encryptionProgress
-                : currentProgress?.value
-                ? currentProgress?.value / 100
-                : 0
-            }
-            showsText
-            textStyle={{
-              fontSize: 10
-            }}
-            color={colors.accent}
-            formatText={progress => (progress * 100).toFixed(0)}
-            borderWidth={0}
-            thickness={2}
-          />
+          <React.Suspense fallback={<View />}>
+            <ProgressCircleComponent
+              size={SIZE.xxl}
+              progress={
+                encryptionProgress
+                  ? encryptionProgress
+                  : currentProgress?.value
+                  ? currentProgress?.value / 100
+                  : 0
+              }
+              showsText
+              textStyle={{
+                fontSize: 10
+              }}
+              color={colors.accent}
+              formatText={progress => (progress * 100).toFixed(0)}
+              borderWidth={0}
+              thickness={2}
+            />
+          </React.Suspense>
         </TouchableOpacity>
       ) : (
         <>

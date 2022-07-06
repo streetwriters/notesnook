@@ -13,9 +13,9 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { TimeSince } from '../ui/time-since';
 import useSyncProgress from '../../utils/hooks/use-sync-progress';
-import * as Progress from 'react-native-progress';
 import Navigation from '../../services/navigation';
 import { tabBarRef } from '../../utils/global-refs';
+import { ProgressCircleComponent } from '../ui/svg/lazy';
 
 export const UserStatus = () => {
   const colors = useThemeStore(state => state.colors);
@@ -48,15 +48,7 @@ export const UserStatus = () => {
               await Sync.run();
             } else {
               tabBarRef.current?.closeDrawer();
-              Navigation.navigate(
-                {
-                  name: 'Login'
-                },
-                {
-                  mode: 0,
-                  canGoBack: true
-                }
-              );
+              eSendEvent(eOpenLoginDialog);
             }
           }}
           type="gray"
@@ -118,18 +110,20 @@ export const UserStatus = () => {
           {user ? (
             syncing ? (
               <>
-                <Progress.Circle
-                  size={SIZE.xl}
-                  progress={progress ? progress.current / progress.total : 0.1}
-                  textStyle={{
-                    fontSize: 8
-                  }}
-                  animated={true}
-                  color={colors.accent}
-                  unfilledColor={colors.nav}
-                  borderWidth={0}
-                  thickness={2}
-                />
+                <React.Suspense fallback={<View />}>
+                  <ProgressCircleComponent
+                    size={SIZE.xl}
+                    progress={progress ? progress.current / progress.total : 0.1}
+                    textStyle={{
+                      fontSize: 8
+                    }}
+                    animated={true}
+                    color={colors.accent}
+                    unfilledColor={colors.nav}
+                    borderWidth={0}
+                    thickness={2}
+                  />
+                </React.Suspense>
               </>
             ) : (
               <Icon color={colors.accent} name="sync" size={SIZE.lg} />

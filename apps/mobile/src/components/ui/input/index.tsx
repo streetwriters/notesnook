@@ -21,7 +21,6 @@ import { getElevation } from '../../../utils';
 import { SIZE } from '../../../utils/size';
 import { IconButton } from '../icon-button';
 import Paragraph from '../typography/paragraph';
-import phone from 'phone';
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<any>;
@@ -91,7 +90,7 @@ const Input = ({
 
   const color = error ? colors.red : focus ? customColor || colors.accent : colors.nav;
 
-  const validate = (value: string) => {
+  const validate = async (value: string) => {
     if (!validationType) return;
     if (!value || value?.length === 0) {
       setError(false);
@@ -117,6 +116,8 @@ const Input = ({
         isError = customValidator && value === customValidator();
         break;
       case 'phonenumber':
+        // eslint-disable-next-line no-case-declarations
+        const phone = await (await import('phone')).default;
         // eslint-disable-next-line no-case-declarations
         let result = phone(value, {
           strictDetection: true,

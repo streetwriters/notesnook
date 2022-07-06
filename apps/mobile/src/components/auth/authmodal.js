@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Platform, StatusBar } from 'react-native';
+import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { eCloseLoginDialog, eOpenLoginDialog } from '../../utils/events';
 import { sleep } from '../../utils/time';
 import BaseDialog from '../dialog/base-dialog';
 import { Toast } from '../toast';
 import { IconButton } from '../ui/icon-button';
-import { initialAuthMode } from './common';
+import { hideAuth, initialAuthMode } from './common';
 import { Login } from './login';
 import { Signup } from './signup';
 
@@ -37,7 +37,7 @@ const AuthModal = () => {
 
   async function open(mode) {
     setCurrentAuthMode(mode ? mode : AuthMode.login);
-    initialAuthMode.current = -1;
+    initialAuthMode.current = mode ? mode : AuthMode.login;
     setVisible(true);
     await sleep(10);
     actionSheetRef.current?.show();
@@ -60,30 +60,36 @@ const AuthModal = () => {
       bounce={false}
       background={colors.bg}
       transparent={false}
+      animated={false}
     >
       {currentAuthMode !== AuthMode.login ? (
         <Signup
           changeMode={mode => setCurrentAuthMode(mode)}
           trial={AuthMode.trialSignup === currentAuthMode}
-          welcome={currentAuthMode === AuthMode.welcomeSignup}
+          welcome={initialAuthMode.current === AuthMode.welcomeSignup}
         />
       ) : (
-        <Login changeMode={mode => setCurrentAuthMode(mode)} />
+        <Login
+          welcome={initialAuthMode.current === AuthMode.welcomeSignup}
+          changeMode={mode => setCurrentAuthMode(mode)}
+        />
       )}
 
-      <IconButton
-        name="arrow-left"
-        onPress={() => {
-          eSendEvent(eCloseLoginDialog);
-        }}
-        color={colors.pri}
-        customStyle={{
-          position: 'absolute',
-          zIndex: 999,
-          left: 12,
-          top: Platform.OS === 'ios' ? 12 + insets.top : 12
-        }}
-      />
+      {initialAuthMode.current === AuthMode.welcomeSignup ? null : (
+        <IconButton
+          name="arrow-left"
+          onPress={() => {
+            hideAuth();
+          }}
+          color={colors.pri}
+          customStyle={{
+            position: 'absolute',
+            zIndex: 999,
+            left: 12,
+            top: Platform.OS === 'ios' ? 12 + insets.top : insets.top
+          }}
+        />
+      )}
 
       <Toast context="local" />
     </BaseDialog>

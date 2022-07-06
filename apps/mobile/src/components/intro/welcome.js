@@ -1,9 +1,12 @@
 import React from 'react';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
+import SettingsService from '../../services/settings';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { getElevation } from '../../utils';
 import umami from '../../utils/analytics';
+import { eOpenLoginDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { AuthMode } from '../auth';
 import { Button } from '../ui/button';
@@ -44,14 +47,20 @@ export const WelcomeNotice = () => {
         height={45}
         width={250}
         onPress={async () => {
-          Navigation.navigate(
-            {
-              name: 'Auth'
-            },
-            {
-              mode: AuthMode.welcomeSignup
-            }
-          );
+          eSendEvent(eOpenLoginDialog, AuthMode.welcomeSignup);
+          SettingsService.set({
+            introCompleted: true
+          });
+          setTimeout(() => {
+            Navigation.replace(
+              {
+                name: 'Notes'
+              },
+              {
+                canGoBack: false
+              }
+            );
+          }, 1000);
           umami.pageView('/encryptionnotice', '/welcome/privacymode');
         }}
         style={{

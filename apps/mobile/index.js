@@ -10,7 +10,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { enableScreens } from 'react-native-screens';
 import appJson from './app.json';
 import Notifications from './src/services/notifications';
-
 enableLayoutAnimations(true);
 const appName = appJson.name;
 if (Config.isTesting) {

@@ -2,6 +2,7 @@ package com.streetwriters.notesnook;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import com.dooboolab.RNIap.RNIapModule;
 import com.facebook.react.PackageList;
@@ -34,6 +35,7 @@ import com.streetwriters.notesnook.newarchitecture.MainApplicationReactNativeHos
 import cl.json.RNShareModule;
 import px.tooltips.RNTooltipsModule;
 import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
+import androidx.annotation.Nullable;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
@@ -45,6 +47,17 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                 @Override
                 public boolean getUseDeveloperSupport() {
                     return BuildConfig.DEBUG;
+                }
+
+                @Nullable
+                @Override
+                protected String getBundleAssetName() {
+                     final String v8BundleAssetName = V8ExecutorFactory.getBundleAssetName(getApplicationContext(), getUseDeveloperSupport());
+                     if (v8BundleAssetName != null) {
+                         return v8BundleAssetName;
+                     }
+                     Log.d("Notesnook:::", "LOADED" + v8BundleAssetName + super.getBundleAssetName());
+                    return super.getBundleAssetName();
                 }
 
                 @Override

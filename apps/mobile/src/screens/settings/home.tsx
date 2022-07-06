@@ -1,10 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, View } from 'react-native';
-import { Bar } from 'react-native-progress';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import DelayLayout from '../../components/delay-layout';
 import BaseDialog from '../../components/dialog/base-dialog';
+import { ProgressBarComponent } from '../../components/ui/svg/lazy';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
@@ -71,17 +71,19 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
                   marginTop: 15
                 }}
               >
-                <Bar
-                  height={5}
-                  width={100}
-                  animated={true}
-                  useNativeDriver
-                  indeterminate
-                  indeterminateAnimationDuration={2000}
-                  unfilledColor={colors.nav}
-                  color={colors.accent}
-                  borderWidth={0}
-                />
+                <React.Suspense fallback={<View />}>
+                  <ProgressBarComponent
+                    height={5}
+                    width={100}
+                    animated={true}
+                    useNativeDriver
+                    indeterminate
+                    indeterminateAnimationDuration={2000}
+                    unfilledColor={colors.nav}
+                    color={colors.accent}
+                    borderWidth={0}
+                  />
+                </React.Suspense>
               </View>
             </View>
           </BaseDialog>

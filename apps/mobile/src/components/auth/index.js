@@ -23,7 +23,7 @@ const Auth = ({ navigation, route }) => {
   initialAuthMode.current = route?.params.mode || AuthMode.login;
   useNavigationFocus(navigation, {
     onFocus: () => {
-      tabBarRef?.current.lock();
+      //tabBarRef?.current.lock();
       initialAuthMode.current = route?.params.mode || AuthMode.login;
     }
   });

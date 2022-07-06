@@ -233,15 +233,7 @@ export const useActions = ({ close = () => {}, item }) => {
         message: 'Login to publish note',
         context: 'local',
         func: () => {
-          Navigation.navigate(
-            {
-              name: 'Login'
-            },
-            {
-              mode: AuthMode.login,
-              canGoBack: true
-            }
-          );
+          eSendEvent(eOpenLoginDialog);
         },
         actionText: 'Login'
       });

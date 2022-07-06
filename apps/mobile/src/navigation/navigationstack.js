@@ -1,9 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import Auth from '../components/auth';
-import { Login } from '../components/auth/login';
-import { Signup } from '../components/auth/signup';
 import Container from '../components/container';
 import Intro from '../components/intro';
 import Favorites from '../screens/favorites';
@@ -41,7 +38,6 @@ const IntroStack = createNativeStackNavigator();
 
 const IntroStackNavigator = () => {
   const colors = useThemeStore(state => state.colors);
-  const introCompleted = SettingsService.get().introCompleted;
   return (
     <IntroStack.Navigator
       screenOptions={{
@@ -56,13 +52,6 @@ const IntroStackNavigator = () => {
     >
       <NativeStack.Screen name="Intro" component={Intro} />
       <NativeStack.Screen name="AppLock" component={AppLock} />
-      <NativeStack.Screen
-        name="Auth"
-        initialParams={{
-          mode: 0
-        }}
-        component={Auth}
-      />
     </IntroStack.Navigator>
   );
 };
@@ -92,20 +81,6 @@ const Tabs = React.memo(
           }
         }}
       >
-        <NativeStack.Screen
-          name="Signup"
-          initialParams={{
-            mode: 1
-          }}
-          component={Auth}
-        />
-        <NativeStack.Screen
-          name="Login"
-          initialParams={{
-            mode: 0
-          }}
-          component={Auth}
-        />
         <NativeStack.Screen name="Welcome" component={IntroStackNavigator} />
         <NativeStack.Screen name="Notes" component={Home} />
         <NativeStack.Screen name="Notebooks" component={Notebooks} />
