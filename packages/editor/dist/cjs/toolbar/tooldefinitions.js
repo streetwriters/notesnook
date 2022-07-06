@@ -278,6 +278,14 @@ const tools = {
         title: "Embed properties",
         conditional: true,
     },
+    outdent: {
+        icon: "outdent",
+        title: "Lift list item",
+    },
+    indent: {
+        icon: "indent",
+        title: "Sink list item",
+    },
 };
 function getToolDefinition(id) {
     return tools[id];
@@ -301,6 +309,8 @@ const defaultPresets = {
             "attachmentSettings",
             "linkSettings",
             "codeRemove",
+            "outdent",
+            "indent",
         ],
         [
             "bold",

@@ -10,3 +10,5 @@ export declare function findSelectedDOMNode(editor: Editor, types: string[]): HT
 export declare function findSelectedNode(editor: Editor, type: string): Node | null;
 export declare function findMark(node: Node, type: string): Mark | undefined;
 export declare function selectionToOffset(selection: Selection): NodeWithOffset;
+export declare function findListItemType(editor: Editor): string | null;
+export declare function isListActive(editor: Editor): boolean;

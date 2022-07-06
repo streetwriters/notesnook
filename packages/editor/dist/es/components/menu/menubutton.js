@@ -19,7 +19,7 @@ export function MenuButton(props) {
                 ":hover": {
                     bg: isBottom ? "transparent" : "hover",
                 },
-            } }, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: "medium", sx: { mr: 2 } })), _jsx(Text, Object.assign({ as: "span", variant: "body", sx: { fontSize: "inherit" } }, { children: title }))] }), isChecked || menu || modifier ? (_jsxs(Flex, Object.assign({ sx: { ml: 4 } }, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: 14 }), menu && _jsx(Icon, { path: Icons.chevronRight, size: 14 }), modifier && (_jsx(Text, Object.assign({ as: "span", sx: {
+            } }, { children: [_jsxs(Flex, { children: [icon && (_jsx(Icon, { path: Icons[icon], color: "text", size: "medium", sx: { mr: 2 } })), _jsx(Text, Object.assign({ as: "span", variant: "body", sx: { fontSize: "inherit" } }, { children: title }))] }), isChecked || menu || modifier ? (_jsxs(Flex, Object.assign({ sx: { ml: 4 } }, { children: [isChecked && _jsx(Icon, { path: Icons.check, size: "small" }), menu && _jsx(Icon, { path: Icons.chevronRight, size: "small" }), modifier && (_jsx(Text, Object.assign({ as: "span", sx: {
                                 fontFamily: "body",
                                 fontSize: "menu",
                                 color: "fontTertiary",

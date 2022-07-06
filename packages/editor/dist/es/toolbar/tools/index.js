@@ -3,7 +3,7 @@ import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { Alignment } from "./alignment";
 import { Headings } from "./headings";
-import { NumberedList, BulletList } from "./lists";
+import { NumberedList, BulletList, Outdent, Indent } from "./lists";
 import { TextDirection } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import { TableSettings, ColumnProperties, RowProperties, CellProperties, InsertColumnLeft, InsertColumnRight, MoveColumnLeft, MoveColumnRight, DeleteColumn, SplitCells, MergeCells, InsertRowAbove, InsertRowBelow, MoveRowUp, MoveRowDown, DeleteRow, DeleteTable, CellBackgroundColor, CellBorderColor, CellTextColor, CellBorderWidth, } from "./table";
@@ -71,6 +71,8 @@ const tools = {
     moveRowDown: MoveRowDown,
     deleteRow: DeleteRow,
     deleteTable: DeleteTable,
+    outdent: Outdent,
+    indent: Indent,
 };
 export function findTool(id) {
     return tools[id];

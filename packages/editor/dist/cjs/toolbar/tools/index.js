@@ -74,6 +74,8 @@ const tools = {
     moveRowDown: table_1.MoveRowDown,
     deleteRow: table_1.DeleteRow,
     deleteTable: table_1.DeleteTable,
+    outdent: lists_1.Outdent,
+    indent: lists_1.Indent,
 };
 function findTool(id) {
     return tools[id];

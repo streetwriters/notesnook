@@ -80,6 +80,8 @@ export declare const Icons: {
     fontFamily: string;
     fontSize: string;
     heading: string;
+    indent: string;
+    outdent: string;
     plus: string;
     minus: string;
     close: string;

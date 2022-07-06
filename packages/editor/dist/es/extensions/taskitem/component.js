@@ -5,9 +5,11 @@ import { Icons } from "../../toolbar/icons";
 import { findChildren, } from "@tiptap/core";
 import { useCallback } from "react";
 import { TaskItemNode } from "./task-item";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 export function TaskItemComponent(props) {
     const { editor, updateAttributes, node, getPos, forwardRef } = props;
     const { checked } = props.node.attrs;
+    const isMobile = useIsMobile();
     const toggle = useCallback(() => {
         if (!editor.isEditable)
             return false;
@@ -20,6 +22,8 @@ export function TaskItemComponent(props) {
         return true;
     }, [editor, getPos, node, checked]);
     return (_jsx(_Fragment, { children: _jsxs(Flex, Object.assign({ "data-drag-image": true, sx: {
+                bg: "background",
+                borderRadius: "default",
                 ":hover > .dragHandle": {
                     opacity: editor.isEditable ? 1 : 0,
                 },
@@ -32,7 +36,7 @@ export function TaskItemComponent(props) {
                         ".icon:hover path": {
                             fill: "var(--checked) !important",
                         },
-                    }, size: 20 }), _jsx(Icon, { path: checked ? Icons.check : "", stroke: "1px", sx: {
+                    }, size: isMobile ? 24 : 20, onMouseDown: (e) => e.preventDefault() }), _jsx(Icon, { path: checked ? Icons.check : "", stroke: "1px", sx: {
                         border: "2px solid",
                         borderColor: checked ? "checked" : "icon",
                         borderRadius: "default",
@@ -49,7 +53,7 @@ export function TaskItemComponent(props) {
                     }, onMouseDown: (e) => {
                         e.preventDefault();
                         toggle();
-                    }, color: checked ? "checked" : "icon", size: 13 }), _jsx(Text, { as: "div", ref: forwardRef, sx: {
+                    }, color: checked ? "checked" : "icon", size: isMobile ? 16 : 14 }), _jsx(Text, { as: "div", ref: forwardRef, sx: {
                         textDecorationLine: checked ? "line-through" : "none",
                         color: checked ? "var(--checked)" : "var(--text)",
                         flex: 1,

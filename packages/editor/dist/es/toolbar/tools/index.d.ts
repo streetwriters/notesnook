@@ -5,7 +5,7 @@ import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { Alignment } from "./alignment";
 import { Headings } from "./headings";
-import { NumberedList, BulletList } from "./lists";
+import { NumberedList, BulletList, Outdent, Indent } from "./lists";
 import { TextDirection } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import { TableSettings, ColumnProperties, RowProperties, CellProperties, CellBackgroundColor, CellBorderColor, CellTextColor, CellBorderWidth } from "./table";
@@ -74,6 +74,8 @@ declare const tools: {
     moveRowDown: (props: ToolProps) => JSX.Element;
     deleteRow: (props: ToolProps) => JSX.Element;
     deleteTable: (props: ToolProps) => JSX.Element;
+    outdent: typeof Outdent;
+    indent: typeof Indent;
 };
 export declare function findTool(id: ToolId): React.FunctionComponent<ToolProps>;
 export {};

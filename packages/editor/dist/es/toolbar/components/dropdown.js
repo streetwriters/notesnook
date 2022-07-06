@@ -44,5 +44,6 @@ export function Dropdown(props) {
                     marginRight: isBottom ? "10px" : 0,
                     display: "flex",
                     alignItems: isBottom ? "center" : "unset",
+                    mr: isBottom ? 0 : 2,
                 } })] }));
 }

@@ -83,6 +83,7 @@ export function TaskListComponent(props) {
                     li: {
                         listStyleType: "none",
                         position: "relative",
+                        marginBottom: [2, "7px"],
                     },
                 } })] }));
 }

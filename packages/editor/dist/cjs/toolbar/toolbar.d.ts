@@ -1,9 +1,10 @@
 /// <reference types="react" />
 import { Theme } from "@notesnook/theme";
 import { Editor } from "../types";
+import { FlexProps } from "rebass";
 import { ToolbarLocation } from "./stores/toolbar-store";
 import { ToolbarDefinition } from "./types";
-declare type ToolbarProps = {
+declare type ToolbarProps = FlexProps & {
     theme: Theme;
     editor: Editor | null;
     location: ToolbarLocation;

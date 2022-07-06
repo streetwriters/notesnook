@@ -45,7 +45,7 @@ function getPosition(element, options) {
             position.top = y - elementHeight;
     }
     if (width && target !== "mouse" && align === "center" && elementWidth > 0) {
-        position.left -= elementWidth / 2 - width / 2;
+        position.left = (width - elementWidth) / 2;
     }
     else if (width &&
         target !== "mouse" &&

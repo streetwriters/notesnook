@@ -22,7 +22,7 @@ function MenuButton(props) {
                 ":hover": {
                     bg: isBottom ? "transparent" : "hover",
                 },
-            } }, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Flex, { children: [icon && ((0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons[icon], color: "text", size: "medium", sx: { mr: 2 } })), (0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ as: "span", variant: "body", sx: { fontSize: "inherit" } }, { children: title }))] }), isChecked || menu || modifier ? ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: { ml: 4 } }, { children: [isChecked && (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.check, size: 14 }), menu && (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.chevronRight, size: 14 }), modifier && ((0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ as: "span", sx: {
+            } }, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Flex, { children: [icon && ((0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons[icon], color: "text", size: "medium", sx: { mr: 2 } })), (0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ as: "span", variant: "body", sx: { fontSize: "inherit" } }, { children: title }))] }), isChecked || menu || modifier ? ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: { ml: 4 } }, { children: [isChecked && (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.check, size: "small" }), menu && (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.chevronRight, size: "small" }), modifier && ((0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ as: "span", sx: {
                                 fontFamily: "body",
                                 fontSize: "menu",
                                 color: "fontTertiary",

@@ -31,11 +31,12 @@ function _SplitButton(props) {
     return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ ref: ref, sx: {
                     borderRadius: "default",
                     bg: toggled ? "hover" : "transparent",
-                    ":hover": { bg: "hover" },
-                } }, { children: [(0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, Object.assign({}, toolButtonProps, { toggled: toggled })), (0, jsx_runtime_1.jsx)(button_1.Button, Object.assign({ sx: {
+                    ":hover": { bg: [toggled ? "hover" : "transparent", "hover"] },
+                    ":active": { bg: toggled ? "hover" : "transparent" },
+                } }, { children: [(0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, Object.assign({}, toolButtonProps, { toggled: false })), (0, jsx_runtime_1.jsx)(button_1.Button, Object.assign({ sx: {
                             p: 0,
                             m: 0,
-                            bg: toggled ? "hover" : "transparent",
+                            bg: "transparent",
                             ":hover": { bg: "hover" },
                             ":last-of-type": {
                                 mr: 0,

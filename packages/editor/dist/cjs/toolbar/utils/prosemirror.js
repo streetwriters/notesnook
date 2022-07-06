@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.selectionToOffset = exports.findMark = exports.findSelectedNode = exports.findSelectedDOMNode = void 0;
+exports.isListActive = exports.findListItemType = exports.selectionToOffset = exports.findMark = exports.findSelectedNode = exports.findSelectedDOMNode = void 0;
 const core_1 = require("@tiptap/core");
 function findSelectedDOMNode(editor, types) {
     var _a;
@@ -36,3 +36,23 @@ function selectionToOffset(selection) {
     return { node: $from.node(), from, to: from + $from.node().nodeSize };
 }
 exports.selectionToOffset = selectionToOffset;
+function findListItemType(editor) {
+    const isTaskList = editor.isActive("taskList");
+    const isOutlineList = editor.isActive("outlineList");
+    const isList = editor.isActive("bulletList") || editor.isActive("orderedList");
+    return isList
+        ? "listItem"
+        : isOutlineList
+            ? "outlineListItem"
+            : isTaskList
+                ? "taskItem"
+                : null;
+}
+exports.findListItemType = findListItemType;
+function isListActive(editor) {
+    const isTaskList = editor.isActive("taskList");
+    const isOutlineList = editor.isActive("outlineList");
+    const isList = editor.isActive("bulletList") || editor.isActive("orderedList");
+    return isTaskList || isOutlineList || isList;
+}
+exports.isListActive = isListActive;

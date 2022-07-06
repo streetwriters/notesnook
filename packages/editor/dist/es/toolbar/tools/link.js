@@ -104,7 +104,7 @@ export function OpenLink(props) {
     return (_jsxs(Flex, Object.assign({ sx: { alignItems: "center" } }, { children: [_jsx(Text, Object.assign({ as: "a", href: href, target: "_blank", variant: "body", sx: { mr: 1 } }, { children: href })), _jsx(ToolButton, Object.assign({}, props, { toggled: false, onClick: () => window.open(href, "_blank") }))] })));
 }
 function LinkTool(props) {
-    const { isEditing, onClick, onDone } = props, toolProps = __rest(props, ["isEditing", "onClick", "onDone"]);
+    const { isEditing, onClick, onDone, editor } = props, toolProps = __rest(props, ["isEditing", "onClick", "onDone", "editor"]);
     const buttonRef = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
     const [href, setHref] = useState();
@@ -123,7 +123,11 @@ function LinkTool(props) {
                     location: "below",
                     align: "center",
                     yOffset: 5,
-                }, title: isEditing ? "Edit link" : "Insert link", isOpen: isOpen, items: [], onClose: () => setIsOpen(false), focusOnRender: false }, { children: _jsx(LinkPopup, { href: href, text: text, isEditing: isEditing, onClose: () => setIsOpen(false), onDone: ({ href, text }) => {
+                }, title: isEditing ? "Edit link" : "Insert link", isOpen: isOpen, items: [], onClose: () => {
+                    var _a;
+                    setIsOpen(false);
+                    (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.focus();
+                }, focusOnRender: false }, { children: _jsx(LinkPopup, { href: href, text: text, isEditing: isEditing, onClose: () => setIsOpen(false), onDone: ({ href, text }) => {
                         onDone(href, text);
                         setIsOpen(false);
                     } }) }))] }));

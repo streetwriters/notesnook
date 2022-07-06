@@ -22,7 +22,10 @@ function MoreTools(props) {
                     yOffset: isBottom ? 10 : 5,
                 }, autoCloseOnUnmount: autoCloseOnUnmount, focusOnRender: false, blocking: false, renderPopup: () => ((0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { tools: tools, editor: editor, sx: {
                         flex: 1,
-                        p: 1,
+                        // this is intentionally set to a fixed value
+                        // because we want the same padding on mobile
+                        // and web.
+                        p: "5px",
                         boxShadow: "menu",
                         bg: "background",
                         borderRadius: "default",

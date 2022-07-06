@@ -2,14 +2,7 @@
   "name": "notesnook-editor",
   "version": "0.0.1",
   "private": true,
-  "main": "dist/cjs/index.js",
-  "module": "dist/es/index.js",
-  "exports": {
-    ".": {
-      "import": "./dist/es/index.js",
-      "require": "./dist/cjs/index.js"
-    }
-  },
+  "main": "dist/es/index.js",
   "dependencies": {
     "@_ueberdosis/prosemirror-tables": "^1.1.3",
     "@mdi/js": "^6.9.96",

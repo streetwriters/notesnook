@@ -84,6 +84,8 @@ exports.Icons = {
     fontFamily: js_1.mdiFormatFont,
     fontSize: js_1.mdiFormatFontSizeIncrease,
     heading: js_1.mdiFormatHeaderPound,
+    indent: js_1.mdiFormatIndentIncrease,
+    outdent: js_1.mdiFormatIndentDecrease,
     plus: js_1.mdiPlus,
     minus: js_1.mdiMinus,
     close: js_1.mdiClose,

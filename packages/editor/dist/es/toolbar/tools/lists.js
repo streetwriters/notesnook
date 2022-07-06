@@ -17,13 +17,15 @@ import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
 import { PopupWrapper } from "../../components/popup-presenter";
 import React from "react";
+import { ToolButton } from "../components/tool-button";
+import { findListItemType, isListActive } from "../utils/prosemirror";
 function _ListTool(props) {
     const { editor, onClick, isActive, subTypes, type } = props, toolProps = __rest(props, ["editor", "onClick", "isActive", "subTypes", "type"]);
     const toolbarLocation = useToolbarLocation();
     const isBottom = toolbarLocation === "bottom";
     const [isOpen, setIsOpen] = useState(false);
     const buttonRef = useRef();
-    return (_jsx(SplitButton, Object.assign({}, toolProps, { buttonRef: buttonRef, onClick: onClick, toggled: isActive || isOpen, sx: { mr: 0 }, onOpen: () => setIsOpen((s) => !s) }, { children: _jsx(PopupWrapper, { isOpen: isOpen, group: "lists", id: toolProps.title, blocking: false, focusOnRender: false, position: {
+    return (_jsx(SplitButton, Object.assign({}, toolProps, { buttonRef: buttonRef, onClick: onClick, toggled: isOpen, sx: { mr: 0 }, onOpen: () => setIsOpen((s) => !s) }, { children: _jsx(PopupWrapper, { isOpen: isOpen, group: "lists", id: toolProps.title, blocking: false, focusOnRender: false, position: {
                 isTargetAbsolute: true,
                 target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
                 align: "center",
@@ -37,9 +39,9 @@ function _ListTool(props) {
                 } }, { children: subTypes.map((item) => (_jsx(Button, Object.assign({ variant: "menuitem", sx: { width: 80 }, onClick: () => {
                         var _a;
                         let chain = (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus();
-                        if (!chain)
+                        if (!chain || !editor.current)
                             return;
-                        if (!isActive) {
+                        if (!isListActive(editor.current)) {
                             if (type === "bulletList")
                                 chain = chain.toggleBulletList();
                             else
@@ -75,12 +77,28 @@ export function NumberedList(props) {
 }
 export function BulletList(props) {
     const { editor } = props;
-    const onClick = useCallback(() => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleOrderedList().run(); }, []);
+    const onClick = useCallback(() => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleBulletList().run(); }, []);
     return (_jsx(ListTool, Object.assign({}, props, { type: "bulletList", onClick: onClick, isActive: editor.isActive("bulletList"), subTypes: [
             { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
             { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
             { type: "square", title: "Lower alpha", items: ["a", "b", "c"] },
         ] })));
+}
+export function Indent(props) {
+    const { editor } = props, toolProps = __rest(props, ["editor"]);
+    const isBottom = useToolbarLocation() === "bottom";
+    const listItemType = findListItemType(editor);
+    if (!listItemType || !isBottom)
+        return null;
+    return (_jsx(ToolButton, Object.assign({}, toolProps, { toggled: false, onClick: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().sinkListItem(listItemType).run(); } })));
+}
+export function Outdent(props) {
+    const { editor } = props, toolProps = __rest(props, ["editor"]);
+    const isBottom = useToolbarLocation() === "bottom";
+    const listItemType = findListItemType(editor);
+    if (!listItemType || !isBottom)
+        return null;
+    return (_jsx(ToolButton, Object.assign({}, toolProps, { toggled: false, onClick: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().liftListItem(listItemType).run(); } })));
 }
 function ListThumbnail(props) {
     const { listStyleType } = props;
@@ -89,7 +107,7 @@ function ListThumbnail(props) {
             flex: 1,
             p: 0,
             listStyleType,
-        } }, { children: [0, 1, 2].map((i) => (_jsx(Box, Object.assign({ as: "li", sx: {
+        }, onMouseDown: (e) => e.preventDefault() }, { children: [0, 1, 2].map((i) => (_jsx(Box, Object.assign({ as: "li", sx: {
                 display: "list-item",
                 color: "text",
                 fontSize: 8,

@@ -29,3 +29,21 @@ export function selectionToOffset(selection) {
     const { $from, from } = selection;
     return { node: $from.node(), from, to: from + $from.node().nodeSize };
 }
+export function findListItemType(editor) {
+    const isTaskList = editor.isActive("taskList");
+    const isOutlineList = editor.isActive("outlineList");
+    const isList = editor.isActive("bulletList") || editor.isActive("orderedList");
+    return isList
+        ? "listItem"
+        : isOutlineList
+            ? "outlineListItem"
+            : isTaskList
+                ? "taskItem"
+                : null;
+}
+export function isListActive(editor) {
+    const isTaskList = editor.isActive("taskList");
+    const isOutlineList = editor.isActive("outlineList");
+    const isList = editor.isActive("bulletList") || editor.isActive("orderedList");
+    return isTaskList || isOutlineList || isList;
+}
