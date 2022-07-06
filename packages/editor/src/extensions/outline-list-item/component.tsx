@@ -12,10 +12,12 @@ import {
 } from "@tiptap/core";
 import { useCallback, useEffect } from "react";
 import { OutlineList } from "../outline-list/outline-list";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 
 export function OutlineListItemComponent(props: ReactNodeViewProps) {
   const { editor, updateAttributes, node, getPos, forwardRef } = props;
 
+  const isMobile = useIsMobile();
   const isNested = node.lastChild?.type.name === OutlineList.name;
   const isCollapsed = isNested && node.lastChild?.attrs.collapsed;
 
@@ -41,13 +43,16 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
               cursor: "pointer",
               transition: `all .2s ease-in-out`,
               ":hover": {
-                transform: "scale(1.3)",
+                transform: ["unset", "scale(1.3)"],
+              },
+              ":active": {
+                transform: ["scale(1.3)", "unset"],
               },
               ".icon:hover path": {
                 fill: "var(--checked) !important",
               },
             }}
-            size={18}
+            size={isMobile ? 24 : 18}
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => {
               const [subList] = findChildren(
@@ -66,7 +71,7 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
         ) : (
           <Icon
             path={Icons.circle}
-            size={18}
+            size={isMobile ? 24 : 18}
             sx={{ transform: "scale(0.4)" }}
           />
         )}
@@ -92,7 +97,6 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
         )}
       </Flex>
       <Text
-        as="li"
         ref={forwardRef}
         sx={{
           pl: 2,

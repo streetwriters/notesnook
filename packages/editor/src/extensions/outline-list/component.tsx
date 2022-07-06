@@ -29,6 +29,9 @@ export function OutlineListComponent(
             marginBlockStart: isNested ? 5 : 0,
             marginBlockEnd: 0,
           },
+          li: {
+            listStyleType: "none",
+          },
         }}
       />
     </>

@@ -28,7 +28,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     };
   },
 
-  content: "heading* block*",
+  content: "heading* paragraph block*",
 
   defining: true,
 
@@ -63,14 +63,14 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         );
       },
       Enter: ({ editor }) => {
-        const subList = findSublist(editor, this.type);
-        if (!subList) return this.editor.commands.splitListItem(this.name);
+        // const subList = findSublist(editor, this.type);
+        // if (!subList) return this.editor.commands.splitListItem(this.name);
 
-        const { isCollapsed, subListPos } = subList;
+        // const { isCollapsed, subListPos } = subList;
 
-        if (isCollapsed) {
-          return this.editor.commands.toggleOutlineCollapse(subListPos, false);
-        }
+        // if (isCollapsed) {
+        //   return this.editor.commands.toggleOutlineCollapse(subListPos, false);
+        // }
 
         return this.editor.commands.splitListItem(this.name);
       },
@@ -97,7 +97,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
   addNodeView() {
     return createNodeView(OutlineListItemComponent, {
       contentDOMFactory: true,
-      //  wrapperFactory: () => document.createElement("li"),
+      wrapperFactory: () => document.createElement("li"),
     });
   },
 });

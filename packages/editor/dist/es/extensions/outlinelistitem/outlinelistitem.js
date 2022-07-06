@@ -11,7 +11,7 @@ export const OutlineListItem = Node.create({
             HTMLAttributes: {},
         };
     },
-    content: "heading* block*",
+    content: "heading* paragraph block*",
     defining: true,
     parseHTML() {
         return [
@@ -39,13 +39,12 @@ export const OutlineListItem = Node.create({
                 return this.editor.commands.toggleOutlineCollapse(subListPos, !isCollapsed);
             },
             Enter: ({ editor }) => {
-                const subList = findSublist(editor, this.type);
-                if (!subList)
-                    return this.editor.commands.splitListItem(this.name);
-                const { isCollapsed, subListPos } = subList;
-                if (isCollapsed) {
-                    return this.editor.commands.toggleOutlineCollapse(subListPos, false);
-                }
+                // const subList = findSublist(editor, this.type);
+                // if (!subList) return this.editor.commands.splitListItem(this.name);
+                // const { isCollapsed, subListPos } = subList;
+                // if (isCollapsed) {
+                //   return this.editor.commands.toggleOutlineCollapse(subListPos, false);
+                // }
                 return this.editor.commands.splitListItem(this.name);
             },
             Tab: () => this.editor.commands.sinkListItem(this.name),
@@ -66,7 +65,7 @@ export const OutlineListItem = Node.create({
     addNodeView() {
         return createNodeView(OutlineListItemComponent, {
             contentDOMFactory: true,
-            //  wrapperFactory: () => document.createElement("li"),
+            wrapperFactory: () => document.createElement("li"),
         });
     },
 });
