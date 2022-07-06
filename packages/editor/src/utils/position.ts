@@ -78,7 +78,7 @@ export function getPosition(
   }
 
   if (width && target !== "mouse" && align === "center" && elementWidth > 0) {
-    position.left = (width - elementWidth) / 2;
+    position.left -= (elementWidth - width) / 2;
   } else if (
     width &&
     target !== "mouse" &&

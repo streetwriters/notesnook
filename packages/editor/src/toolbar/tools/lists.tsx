@@ -53,7 +53,7 @@ function _ListTool<TListStyleTypes extends string>(
           target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
           align: "center",
           location: isBottom ? "top" : "below",
-          yOffset: isBottom ? 10 : 5,
+          yOffset: 10,
         }}
         onClosed={() => setIsOpen(false)}
         renderPopup={() => (

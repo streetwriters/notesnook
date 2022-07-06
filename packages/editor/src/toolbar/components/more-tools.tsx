@@ -37,7 +37,7 @@ export function MoreTools(props: MoreToolsProps) {
           target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
           align: "center",
           location: isBottom ? "top" : "below",
-          yOffset: isBottom ? 10 : 5,
+          yOffset: 10,
         }}
         autoCloseOnUnmount={autoCloseOnUnmount}
         focusOnRender={false}

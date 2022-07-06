@@ -30,7 +30,7 @@ function _ListTool(props) {
                 target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
                 align: "center",
                 location: isBottom ? "top" : "below",
-                yOffset: isBottom ? 10 : 5,
+                yOffset: 10,
             }, onClosed: () => setIsOpen(false), renderPopup: () => (_jsx(Box, Object.assign({ sx: {
                     bg: "background",
                     display: "grid",
