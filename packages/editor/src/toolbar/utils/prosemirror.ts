@@ -1,14 +1,9 @@
-import {
-  Editor,
-  findParentNode,
-  findParentNodeClosestToPos,
-  isNodeSelection,
-} from "@tiptap/core";
-import { Node, Mark } from "prosemirror-model";
-import { Selection } from "prosemirror-state";
+import { Editor, findParentNode, posToDOMRect } from "@tiptap/core";
+import { Node as ProsemirrorNode, Mark } from "prosemirror-model";
+import { Selection, Transaction } from "prosemirror-state";
 
 export type NodeWithOffset = {
-  node: Node;
+  node: ProsemirrorNode;
   from: number;
   to: number;
 };
@@ -30,7 +25,10 @@ export function findSelectedDOMNode(
   return (editor.view.nodeDOM(pos) as HTMLElement) || null;
 }
 
-export function findSelectedNode(editor: Editor, type: string): Node | null {
+export function findSelectedNode(
+  editor: Editor,
+  type: string
+): ProsemirrorNode | null {
   const { $anchor } = editor.state.selection;
 
   const selectedNode = editor.state.doc.nodeAt($anchor.pos);
@@ -45,7 +43,10 @@ export function findSelectedNode(editor: Editor, type: string): Node | null {
   return editor.state.doc.nodeAt(pos);
 }
 
-export function findMark(node: Node, type: string): Mark | undefined {
+export function findMark(
+  node: ProsemirrorNode,
+  type: string
+): Mark | undefined {
   const mark = node.marks.find((m) => m.type.name === type);
   return mark;
 }

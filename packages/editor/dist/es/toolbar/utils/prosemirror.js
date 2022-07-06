@@ -1,4 +1,4 @@
-import { findParentNode, } from "@tiptap/core";
+import { findParentNode } from "@tiptap/core";
 export function findSelectedDOMNode(editor, types) {
     var _a;
     const { $anchor } = editor.state.selection;

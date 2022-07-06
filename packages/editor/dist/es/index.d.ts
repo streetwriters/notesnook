@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import "./extensions";
 import Toolbar from "./toolbar";
 import { Theme } from "@notesnook/theme";
