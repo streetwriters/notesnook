@@ -56,7 +56,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                      if (v8BundleAssetName != null) {
                          return v8BundleAssetName;
                      }
-                     Log.d("Notesnook:::", "LOADED" + v8BundleAssetName + super.getBundleAssetName());
                     return super.getBundleAssetName();
                 }
 
