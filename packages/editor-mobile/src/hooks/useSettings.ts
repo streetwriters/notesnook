@@ -1,5 +1,5 @@
-import { DEFAULT_TOOLS } from "notesnook-editor";
-import { useEffect, useState } from "react";
+import { getDefaultPresets } from "notesnook-editor";
+import { useState } from "react";
 
 const settingsJson = localStorage.getItem("editorSettings");
 const initialState = {
@@ -7,7 +7,7 @@ const initialState = {
   fullscreen: false,
   deviceMode: "mobile",
   premium: false,
-  tools: DEFAULT_TOOLS,
+  tools: getDefaultPresets().default,
   noHeader: false,
   noToolbar: false,
 };
