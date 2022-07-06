@@ -48,10 +48,10 @@ export const WelcomeNotice = () => {
         width={250}
         onPress={async () => {
           eSendEvent(eOpenLoginDialog, AuthMode.welcomeSignup);
-          SettingsService.set({
-            introCompleted: true
-          });
           setTimeout(() => {
+            SettingsService.set({
+              introCompleted: true
+            });
             Navigation.replace(
               {
                 name: 'Notes'
