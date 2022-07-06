@@ -42,8 +42,7 @@ export const ToolButton = React.memo(
           m: 0,
           bg: toggled ? "hover" : "transparent",
           mr: variant === "small" ? 0 : 1,
-          ":hover": { bg: ["transparent", "hover"] },
-          ":active": { bg: "hover" },
+          ":hover": { bg: "hover" },
           ":last-of-type": {
             mr: 0,
           },

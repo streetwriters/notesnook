@@ -26,15 +26,16 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
         sx={{
           borderRadius: "default",
           bg: toggled ? "hover" : "transparent",
-          ":hover": { bg: "hover" },
+          ":hover": { bg: [toggled ? "hover" : "transparent", "hover"] },
+          ":active": { bg: toggled ? "hover" : "transparent" },
         }}
       >
-        <ToolButton {...toolButtonProps} toggled={toggled} />
+        <ToolButton {...toolButtonProps} toggled={false} />
         <Button
           sx={{
             p: 0,
             m: 0,
-            bg: toggled ? "hover" : "transparent",
+            bg: "transparent",
             ":hover": { bg: "hover" },
             ":last-of-type": {
               mr: 0,

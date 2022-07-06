@@ -4,6 +4,8 @@ import { Button as RebassButton, ButtonProps } from "rebass";
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (props: ButtonProps, forwardedRef) => {
+    const { sx, ...buttonProps } = props;
+    const hoverBg = (sx as any)?.[":hover"]?.["bg"] || "hover";
     const buttonRef = useRef<HTMLButtonElement>();
 
     useEffect(() => {
@@ -27,7 +29,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <RebassButton
-        {...props}
+        {...buttonProps}
+        sx={{
+          ...sx,
+          ":hover": { bg: ["transparent", hoverBg] },
+          ":active": { bg: hoverBg },
+        }}
         ref={(ref) => {
           buttonRef.current = ref;
           if (typeof forwardedRef === "function") forwardedRef(ref);
