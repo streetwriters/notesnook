@@ -1,6 +1,7 @@
 import { Editor, Extension, posToDOMRect } from "@tiptap/core";
 
 export const KeepInView = Extension.create({
+  name: "keepinview",
   addKeyboardShortcuts() {
     return {
       Enter: ({ editor }) => {

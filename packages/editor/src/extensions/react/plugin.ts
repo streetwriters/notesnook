@@ -49,6 +49,7 @@ export const NodeViewSelectionNotifierPlugin = new Plugin({
 });
 
 export const NodeViewSelectionNotifier = Extension.create({
+  name: "node-view-selection-notifier",
   addProseMirrorPlugins() {
     return [NodeViewSelectionNotifierPlugin];
   },
