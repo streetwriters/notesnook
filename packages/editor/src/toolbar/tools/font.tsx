@@ -44,7 +44,7 @@ export function FontSize(props: ToolProps) {
 }
 
 const fontFamilies = {
-  Default: "Open Sans",
+  "Sans-serif": "Open Sans",
   Serif: "serif",
   Monospace: "monospace",
 };
@@ -57,7 +57,7 @@ export function FontFamily(props: ToolProps) {
         editor.isActive("textStyle", { fontFamily: value })
       )
       ?.map((a) => a)
-      ?.at(0) || "Default";
+      ?.at(0) || "Sans-serif";
   const items = useMemo(
     () => toMenuItems(editor, currentFontFamily),
     [currentFontFamily]
