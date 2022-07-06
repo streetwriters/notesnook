@@ -146,7 +146,7 @@ type LinkToolProps = ToolProps & {
   onClick: () => { href?: string; text: string } | undefined;
 };
 function LinkTool(props: LinkToolProps) {
-  const { isEditing, onClick, onDone, ...toolProps } = props;
+  const { isEditing, onClick, onDone, editor, ...toolProps } = props;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -181,7 +181,10 @@ function LinkTool(props: LinkToolProps) {
         title={isEditing ? "Edit link" : "Insert link"}
         isOpen={isOpen}
         items={[]}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          editor.current?.commands.focus();
+        }}
         focusOnRender={false}
       >
         <LinkPopup
