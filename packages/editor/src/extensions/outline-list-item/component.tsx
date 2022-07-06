@@ -28,7 +28,7 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
         sx={{
           flexDirection: "column",
           alignItems: "center",
-          mt: "3px",
+          mt: isMobile ? "0px" : "3px",
         }}
       >
         {isNested ? (

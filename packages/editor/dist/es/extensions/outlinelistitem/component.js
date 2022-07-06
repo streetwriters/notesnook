@@ -14,7 +14,7 @@ export function OutlineListItemComponent(props) {
     return (_jsxs(Flex, { children: [_jsxs(Flex, Object.assign({ className: "outline", sx: {
                     flexDirection: "column",
                     alignItems: "center",
-                    mt: "3px",
+                    mt: isMobile ? "0px" : "3px",
                 } }, { children: [isNested ? (_jsx(Icon, { path: isCollapsed ? Icons.chevronRight : Icons.chevronDown, title: isCollapsed
                             ? "Click to uncollapse list"
                             : "Click to collapse list", sx: {
