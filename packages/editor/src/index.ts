@@ -173,4 +173,4 @@ export { useTiptap, Toolbar, usePermissionHandler };
 export * from "./types";
 export * from "./extensions/react";
 export * from "./toolbar";
-export { type AttachmentType } from "./extensions/attachment";
+export { type AttachmentType, type Attachment } from "./extensions/attachment";
