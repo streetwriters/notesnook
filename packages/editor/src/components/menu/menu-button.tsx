@@ -64,8 +64,8 @@ export function MenuButton(props: MenuButtonProps) {
         </Flex>
         {isChecked || menu || modifier ? (
           <Flex sx={{ ml: 4 }}>
-            {isChecked && <Icon path={Icons.check} size={14} />}
-            {menu && <Icon path={Icons.chevronRight} size={14} />}
+            {isChecked && <Icon path={Icons.check} size={"small"} />}
+            {menu && <Icon path={Icons.chevronRight} size={"small"} />}
             {modifier && (
               <Text
                 as="span"
