@@ -211,6 +211,7 @@ function ListThumbnail(props: ListThumbnailProps) {
         p: 0,
         listStyleType,
       }}
+      onMouseDown={(e) => e.preventDefault()}
     >
       {[0, 1, 2].map((i) => (
         <Box
