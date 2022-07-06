@@ -12,12 +12,14 @@ import {
 } from "@tiptap/core";
 import { useCallback, useEffect } from "react";
 import { TaskItemNode, TaskItemAttributes } from "./task-item";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 
 export function TaskItemComponent(
   props: ReactNodeViewProps<TaskItemAttributes>
 ) {
   const { editor, updateAttributes, node, getPos, forwardRef } = props;
   const { checked } = props.node.attrs;
+  const isMobile = useIsMobile();
 
   const toggle = useCallback(() => {
     if (!editor.isEditable) return false;
@@ -35,6 +37,8 @@ export function TaskItemComponent(
       <Flex
         data-drag-image
         sx={{
+          bg: "background",
+          borderRadius: "default",
           ":hover > .dragHandle": {
             opacity: editor.isEditable ? 1 : 0,
           },
@@ -58,7 +62,8 @@ export function TaskItemComponent(
               fill: "var(--checked) !important",
             },
           }}
-          size={20}
+          size={isMobile ? 24 : 20}
+          onMouseDown={(e) => e.preventDefault()}
         />
         <Icon
           path={checked ? Icons.check : ""}
@@ -83,7 +88,7 @@ export function TaskItemComponent(
             toggle();
           }}
           color={checked ? "checked" : "icon"}
-          size={13}
+          size={isMobile ? 16 : 14}
         />
 
         <Text

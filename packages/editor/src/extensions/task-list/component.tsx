@@ -152,6 +152,7 @@ export function TaskListComponent(
           li: {
             listStyleType: "none",
             position: "relative",
+            marginBottom: [2, "7px"],
           },
         }}
       />
