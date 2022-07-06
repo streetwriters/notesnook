@@ -7,7 +7,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Input } from "@rebass/forms";
 import { TaskItemNode } from "../task-item";
 import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 export function TaskListComponent(props) {
+    const isMobile = useIsMobile();
     const { editor, getPos, node, updateAttributes, forwardRef } = props;
     const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
     const { title, collapsed } = node.attrs;
@@ -43,7 +45,7 @@ export function TaskListComponent(props) {
                         top: 0,
                         right: 0,
                     }, contentEditable: false }, { children: [collapsed && (_jsxs(Text, Object.assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), _jsx(Icon, { className: "toggleSublist", path: collapsed ? Icons.chevronDown : Icons.chevronUp, sx: {
-                                opacity: collapsed ? 1 : 0,
+                                opacity: isMobile || collapsed ? 1 : 0,
                                 position: "absolute",
                                 right: 0,
                                 alignSelf: "start",
@@ -52,7 +54,7 @@ export function TaskListComponent(props) {
                                 ".icon:hover path": {
                                     fill: "var(--checked) !important",
                                 },
-                            }, size: 20, onClick: () => {
+                            }, size: isMobile ? 24 : 20, onClick: () => {
                                 updateAttributes({ collapsed: !collapsed });
                             } })] }))) : (_jsxs(Flex, Object.assign({ sx: {
                         position: "relative",

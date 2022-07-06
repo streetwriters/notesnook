@@ -13,10 +13,12 @@ import { Input } from "@rebass/forms";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
 import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
 ) {
+  const isMobile = useIsMobile();
   const { editor, getPos, node, updateAttributes, forwardRef } = props;
   const taskItemType = getNodeType(TaskItemNode.name, editor.schema);
   const { title, collapsed } = node.attrs;
@@ -78,7 +80,7 @@ export function TaskListComponent(
               className="toggleSublist"
               path={collapsed ? Icons.chevronDown : Icons.chevronUp}
               sx={{
-                opacity: collapsed ? 1 : 0,
+                opacity: isMobile || collapsed ? 1 : 0,
                 position: "absolute",
                 right: 0,
                 alignSelf: "start",
@@ -88,7 +90,7 @@ export function TaskListComponent(
                   fill: "var(--checked) !important",
                 },
               }}
-              size={20}
+              size={isMobile ? 24 : 20}
               onClick={() => {
                 updateAttributes({ collapsed: !collapsed });
               }}
