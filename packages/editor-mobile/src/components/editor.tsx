@@ -173,13 +173,19 @@ const Tiptap = () => {
         </div>
 
         {initialProps.noToolbar ? null : (
-          <Toolbar
-            sx={{ pl: "10px", pt: "5px" }}
-            theme={toolbarTheme}
-            editor={editor}
-            location="bottom"
-            tools={[...settings.tools]}
-          />
+          <div
+            style={{
+              minHeight: 50,
+            }}
+          >
+            <Toolbar
+              sx={{ pl: "10px", pt: "5px" }}
+              theme={toolbarTheme}
+              editor={editor}
+              location="bottom"
+              tools={[...settings.tools]}
+            />
+          </div>
         )}
       </div>
     </>
