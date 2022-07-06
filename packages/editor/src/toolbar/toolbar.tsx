@@ -24,7 +24,7 @@ import {
   PopupRenderer,
 } from "../components/popup-presenter/popuprenderer";
 
-type ToolbarProps = {
+type ToolbarProps = FlexProps & {
   theme: Theme;
   editor: Editor | null;
   location: ToolbarLocation;
@@ -37,6 +37,8 @@ export function Toolbar(props: ToolbarProps) {
     theme,
     location,
     tools = getDefaultPresets().default,
+    sx,
+    ...flexProps
   } = props;
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation
@@ -53,7 +55,12 @@ export function Toolbar(props: ToolbarProps) {
         <PopupRenderer editor={editor}>
           <Flex
             className="editor-toolbar"
-            sx={{ flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] }}
+            sx={{
+              ...sx,
+              flexWrap: ["nowrap", "wrap"],
+              overflowX: ["auto", "hidden"],
+            }}
+            {...flexProps}
           >
             {tools.map((tools) => {
               return (
