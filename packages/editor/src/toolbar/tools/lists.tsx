@@ -144,7 +144,7 @@ type BulletListStyleTypes = "circle" | "square" | "disc";
 export function BulletList(props: ToolProps) {
   const { editor } = props;
   const onClick = useCallback(
-    () => editor.current?.chain().focus().toggleOrderedList().run(),
+    () => editor.current?.chain().focus().toggleBulletList().run(),
     []
   );
 
