@@ -18,7 +18,7 @@ const configs = {
     production: {
       presets: ['module:metro-react-native-babel-preset'],
       plugins: [
-        //'transform-remove-console',
+        'transform-remove-console',
         '@babel/plugin-transform-named-capturing-groups-regex',
         'react-native-reanimated/plugin'
       ]

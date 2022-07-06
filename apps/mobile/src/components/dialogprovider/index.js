@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNoteStore } from '../../stores/use-notes-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { AnnouncementDialog } from '../announcements';
 import { AttachmentDialog } from '../attachments';
@@ -26,6 +27,7 @@ import RestoreDataSheet from '../sheets/restore-data';
 const DialogProvider = React.memo(
   () => {
     const colors = useThemeStore(state => state.colors);
+    const loading = useNoteStore(state => state.loading);
 
     return (
       <>
@@ -48,7 +50,7 @@ const DialogProvider = React.memo(
         <PublishNoteSheet />
         <ManageTagsSheet />
         <AttachmentDialog />
-        <Expiring />
+        {loading ? null : <Expiring />}
         <AnnouncementDialog />
         <SessionExpired />
       </>

@@ -191,8 +191,8 @@ module.exports = env => {
                   ? ['module:react-refresh/babel', 'react-native-reanimated/plugin']
                   : [
                       'react-native-reanimated/plugin',
-                      `@babel/plugin-transform-named-capturing-groups-regex`
-                      //'transform-remove-console'
+                      `@babel/plugin-transform-named-capturing-groups-regex`,
+                      'transform-remove-console'
                     ]
             }
           }

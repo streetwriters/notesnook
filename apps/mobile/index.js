@@ -5,32 +5,25 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { AppRegistry, LogBox, Platform, UIManager } from 'react-native';
 import Config from 'react-native-config';
-import { enableLayoutAnimations } from 'react-native-reanimated/lib/reanimated2/core';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { enableScreens } from 'react-native-screens';
 import appJson from './app.json';
 import Notifications from './src/services/notifications';
-enableLayoutAnimations(true);
+import App from './App';
 const appName = appJson.name;
 if (Config.isTesting) {
   Date.prototype.toLocaleString = () => 'XX-XX-XX';
 }
-
-enableScreens(true);
 UIManager.setLayoutAnimationEnabledExperimental &&
   UIManager.setLayoutAnimationEnabledExperimental(true);
 
 if (__DEV__) {
   LogBox.ignoreAllLogs();
 }
-
-let App;
 let NotesnookShare;
 Notifications.init();
 let QuickNoteIOS;
 
 const AppProvider = () => {
-  App = require('./App').default;
   return <App />;
 };
 
