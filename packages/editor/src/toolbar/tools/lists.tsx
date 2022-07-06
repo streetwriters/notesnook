@@ -38,7 +38,7 @@ function _ListTool<TListStyleTypes extends string>(
       {...toolProps}
       buttonRef={buttonRef}
       onClick={onClick}
-      toggled={isActive || isOpen}
+      toggled={isOpen}
       sx={{ mr: 0 }}
       onOpen={() => setIsOpen((s) => !s)}
     >
@@ -72,9 +72,9 @@ function _ListTool<TListStyleTypes extends string>(
                 sx={{ width: 80 }}
                 onClick={() => {
                   let chain = editor.current?.chain().focus();
-                  if (!chain) return;
+                  if (!chain || !editor.current) return;
 
-                  if (!isActive) {
+                  if (!isListActive(editor.current)) {
                     if (type === "bulletList") chain = chain.toggleBulletList();
                     else chain = chain.toggleOrderedList();
                   }
