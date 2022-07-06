@@ -7,6 +7,8 @@ import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
 import { PopupWrapper } from "../../components/popup-presenter";
 import React from "react";
+import { ToolButton } from "../components/tool-button";
+import { findListItemType, isListActive } from "../utils/prosemirror";
 
 type ListSubType<TListStyleTypes> = {
   items: string[];
@@ -157,6 +159,42 @@ export function BulletList(props: ToolProps) {
         { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
         { type: "square", title: "Lower alpha", items: ["a", "b", "c"] },
       ]}
+    />
+  );
+}
+
+export function Indent(props: ToolProps) {
+  const { editor, ...toolProps } = props;
+  const isBottom = useToolbarLocation() === "bottom";
+
+  const listItemType = findListItemType(editor);
+  if (!listItemType || !isBottom) return null;
+
+  return (
+    <ToolButton
+      {...toolProps}
+      toggled={false}
+      onClick={() =>
+        editor.current?.chain().focus().sinkListItem(listItemType).run()
+      }
+    />
+  );
+}
+
+export function Outdent(props: ToolProps) {
+  const { editor, ...toolProps } = props;
+  const isBottom = useToolbarLocation() === "bottom";
+
+  const listItemType = findListItemType(editor);
+  if (!listItemType || !isBottom) return null;
+
+  return (
+    <ToolButton
+      {...toolProps}
+      toggled={false}
+      onClick={() =>
+        editor.current?.chain().focus().liftListItem(listItemType).run()
+      }
     />
   );
 }

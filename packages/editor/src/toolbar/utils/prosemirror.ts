@@ -54,3 +54,27 @@ export function selectionToOffset(selection: Selection): NodeWithOffset {
   const { $from, from } = selection;
   return { node: $from.node(), from, to: from + $from.node().nodeSize };
 }
+
+export function findListItemType(editor: Editor): string | null {
+  const isTaskList = editor.isActive("taskList");
+  const isOutlineList = editor.isActive("outlineList");
+  const isList =
+    editor.isActive("bulletList") || editor.isActive("orderedList");
+
+  return isList
+    ? "listItem"
+    : isOutlineList
+    ? "outlineListItem"
+    : isTaskList
+    ? "taskItem"
+    : null;
+}
+
+export function isListActive(editor: Editor): boolean {
+  const isTaskList = editor.isActive("taskList");
+  const isOutlineList = editor.isActive("outlineList");
+  const isList =
+    editor.isActive("bulletList") || editor.isActive("orderedList");
+
+  return isTaskList || isOutlineList || isList;
+}
