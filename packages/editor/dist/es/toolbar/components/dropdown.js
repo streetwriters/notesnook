@@ -1,11 +1,12 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import { useRef, useState } from "react";
-import { Button, Text } from "rebass";
+import { Text } from "rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { MenuPresenter } from "../../components/menu";
 import { getToolbarElement } from "../utils/dom";
+import { Button } from "../../components/button";
 export function Dropdown(props) {
     const { items, selectedItem, buttonRef, menuWidth } = props;
     const internalRef = useRef();

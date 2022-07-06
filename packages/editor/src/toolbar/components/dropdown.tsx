@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
 // import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
@@ -7,6 +7,7 @@ import { MenuItem } from "../../components/menu/types";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { MenuPresenter } from "../../components/menu";
 import { getToolbarElement } from "../utils/dom";
+import { Button } from "../../components/button";
 
 type DropdownProps = {
   selectedItem: string | JSX.Element;
