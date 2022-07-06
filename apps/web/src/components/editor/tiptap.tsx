@@ -82,7 +82,8 @@ function TipTap(props: TipTapProps) {
         });
       },
       onUpdate: ({ editor }) => {
-        if (onChange) onChange(editor.getHTML(), counter.current);
+        if (onChange && editor.isEditable)
+          onChange(editor.getHTML(), counter.current);
       },
       onDestroy: () => {
         configure({
