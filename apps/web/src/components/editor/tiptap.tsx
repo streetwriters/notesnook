@@ -157,6 +157,7 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer">) {
             flex: 1,
             cursor: "text",
             color: "var(--text)", // TODO!
+            paddingBottom: 150,
           }}
         />
       </Flex>
