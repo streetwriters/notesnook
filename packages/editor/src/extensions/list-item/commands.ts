@@ -25,10 +25,17 @@ export function onBackspacePressed(
 
   const isEmpty = isListItemEmpty(type, editor.state);
 
-  if (isFirstOfType(type, editor.state)) {
+  if (isEmpty) {
+    if (isFirstOfType(type, editor.state)) {
+      const parentList = getListFromListItem(type, editor.state);
+      if (!parentList) return false;
+      return editor.commands.deleteNode(parentList.type);
+    }
+
+    return editor.commands.deleteNode(type);
+  } else if (isFirstOfType(type, editor.state)) {
     return editor.commands.liftListItem(type);
-  } else if (isEmpty) return editor.commands.deleteNode(type);
-  else {
+  } else {
     // we have to run join backward twice because on the first join
     // the two list items are joined i.e., the editor just puts their
     // paragraphs next to each other. The next join merges the paragraphs
@@ -61,7 +68,22 @@ const isFirstOfType = (type: NodeType, state: EditorState) => {
   if (!block) return false;
   const { pos } = block;
   const resolved = state.doc.resolve(pos);
+  console.log("isFirstOfType", resolved);
   return !resolved.nodeBefore;
+};
+
+const getListFromListItem = (type: NodeType, state: EditorState) => {
+  const block = findParentNodeOfType(type)(state.selection);
+  if (!block) return undefined;
+  const { pos } = block;
+  const resolved = state.doc.resolve(pos);
+  if (
+    !resolved.parent.type.spec.group ||
+    resolved.parent.type.spec.group?.indexOf("list") <= -1
+  )
+    return undefined;
+
+  return resolved.parent;
 };
 
 function isListItemEmpty(type: NodeType, state: EditorState) {
