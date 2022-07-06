@@ -172,6 +172,9 @@ export function ColorPicker(props: ColorPickerProps) {
               // boxShadow: "menu",
               p: 0,
               ml: [2, 2, 1],
+              ":hover": {
+                bg: currentColor,
+              },
             }}
             onClick={() => setIsPickerOpen((s) => !s)}
           >
@@ -184,7 +187,6 @@ export function ColorPicker(props: ColorPickerProps) {
           {colors.map((color) => (
             <Button
               key={color}
-              variant={"secondary"}
               sx={{
                 flex: "0 0 auto",
                 bg: color,
@@ -193,7 +195,9 @@ export function ColorPicker(props: ColorPickerProps) {
                 ml: [2, 1, 1],
                 mb: [0, 1, 1],
                 borderRadius: 50,
-                //   boxShadow: "menu",
+                ":hover": {
+                  bg: color,
+                },
               }}
               onClick={() => {
                 setCurrentColor(color);

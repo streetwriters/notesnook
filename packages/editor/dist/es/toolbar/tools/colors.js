@@ -10,7 +10,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import { jsx as _jsx } from "react/jsx-runtime";
-import React, { useState } from "react";
+import { useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { config } from "../../utils/config";
@@ -18,8 +18,7 @@ import { SplitButton } from "../components/split-button";
 import { ColorPicker } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
-// TODO test rerendering
-function _ColorTool(props) {
+export function ColorTool(props) {
     const { editor, onColorChange, getActiveColor, title, cacheKey } = props, toolProps = __rest(props, ["editor", "onColorChange", "getActiveColor", "title", "cacheKey"]);
     const activeColor = getActiveColor() || config.get(cacheKey);
     const tColor = tinycolor(activeColor);
@@ -45,7 +44,6 @@ function _ColorTool(props) {
                     config.set(cacheKey, color);
                 }, onClose: close, title: title })) }) })));
 }
-export const ColorTool = React.memo(_ColorTool, () => true);
 export function Highlight(props) {
     const { editor } = props;
     return (_jsx(ColorTool, Object.assign({}, props, { cacheKey: "highlight", getActiveColor: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.getAttributes("highlight").color; }, title: "Background color", onColorChange: (color) => {

@@ -17,7 +17,7 @@ export function Dropdown(props) {
     return (_jsxs(_Fragment, { children: [_jsxs(Button, Object.assign({ ref: (ref) => {
                     internalRef.current = ref;
                     if (buttonRef)
-                        buttonRef.current = ref;
+                        buttonRef.current = ref || undefined;
                 }, sx: {
                     p: 1,
                     m: 0,

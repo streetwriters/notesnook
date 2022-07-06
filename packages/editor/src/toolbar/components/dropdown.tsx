@@ -27,7 +27,7 @@ export function Dropdown(props: DropdownProps) {
       <Button
         ref={(ref) => {
           internalRef.current = ref;
-          if (buttonRef) buttonRef.current = ref;
+          if (buttonRef) buttonRef.current = ref || undefined;
         }}
         sx={{
           p: 1,

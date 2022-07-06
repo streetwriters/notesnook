@@ -14,8 +14,8 @@ type ColorToolProps = ToolProps & {
   title: string;
   cacheKey: string;
 };
-// TODO test rerendering
-function _ColorTool(props: ColorToolProps) {
+
+export function ColorTool(props: ColorToolProps) {
   const {
     editor,
     onColorChange,
@@ -76,8 +76,6 @@ function _ColorTool(props: ColorToolProps) {
     </SplitButton>
   );
 }
-
-export const ColorTool = React.memo(_ColorTool, () => true);
 
 export function Highlight(props: ToolProps) {
   const { editor } = props;
