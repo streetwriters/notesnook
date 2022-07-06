@@ -43,8 +43,12 @@ export const MathInline = Node.create({
     return {
       insertMathInline:
         () =>
-        ({ state, dispatch, view }) => {
-          return insertMathNode(this.type)(state, dispatch, view);
+        ({ chain, tr }) => {
+          const { $from } = tr.selection;
+          return chain()
+            .insertContent({ type: this.name, attrs: {} })
+            .setNodeSelection($from.pos)
+            .run();
         },
     };
   },

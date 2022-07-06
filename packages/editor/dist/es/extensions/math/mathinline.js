@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { inputRules } from "prosemirror-inputrules";
-import { makeInlineMathInputRule, REGEX_INLINE_MATH_DOLLARS, mathPlugin, insertMathNode, } from "./plugin";
+import { makeInlineMathInputRule, REGEX_INLINE_MATH_DOLLARS, mathPlugin, } from "./plugin";
 export const MathInline = Node.create({
     name: "mathInline",
     group: "inline math",
@@ -24,8 +24,12 @@ export const MathInline = Node.create({
     },
     addCommands() {
         return {
-            insertMathInline: () => ({ state, dispatch, view }) => {
-                return insertMathNode(this.type)(state, dispatch, view);
+            insertMathInline: () => ({ chain, tr }) => {
+                const { $from } = tr.selection;
+                return chain()
+                    .insertContent({ type: this.name, attrs: {} })
+                    .setNodeSelection($from.pos)
+                    .run();
             },
         };
     },

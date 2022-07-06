@@ -1,4 +1,4 @@
-import { NodeSelection } from "prosemirror-state";
+import { NodeSelection, TextSelection, } from "prosemirror-state";
 ////////////////////////////////////////////////////////////////////////////////
 /**
  * Returns a new command that can be used to inserts a new math node at the
@@ -11,14 +11,19 @@ import { NodeSelection } from "prosemirror-state";
  */
 export function insertMathNode(mathNodeType, initialText = "") {
     return function (state, dispatch) {
-        let { $from } = state.selection, index = $from.index();
-        if (!$from.parent.canReplaceWith(index, index, mathNodeType)) {
+        let { $from, empty } = state.selection, index = $from.index();
+        if (!empty && !$from.parent.canReplaceWith(index, index, mathNodeType)) {
             return false;
         }
         if (dispatch) {
             let mathNode = mathNodeType.create({}, initialText ? state.schema.text(initialText) : null);
             let tr = state.tr.replaceSelectionWith(mathNode);
-            tr = tr.setSelection(NodeSelection.create(tr.doc, $from.pos));
+            if (empty) {
+                tr = tr.setSelection(TextSelection.create(tr.doc, $from.pos + 1));
+            }
+            else {
+                tr = tr.setSelection(NodeSelection.create(tr.doc, $from.pos));
+            }
             dispatch(tr);
         }
         return true;

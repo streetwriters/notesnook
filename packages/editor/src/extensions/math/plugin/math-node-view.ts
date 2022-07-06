@@ -373,9 +373,16 @@ export class MathView implements NodeView, ICursorPosObserver {
     let innerPos =
       prevCursorPos <= this._getPos() ? 0 : this._node.nodeSize - 2;
 
-    this._innerView.dispatch(
-      innerState.tr.setSelection(TextSelection.create(innerState.doc, innerPos))
-    );
+    setTimeout(() => {
+      if (!this._innerView) return;
+
+      this._innerView.focus();
+      this._innerView.dispatch(
+        innerState.tr.setSelection(
+          TextSelection.create(innerState.doc, innerPos)
+        )
+      );
+    });
 
     this._isEditing = true;
   }
