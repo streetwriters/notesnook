@@ -82,6 +82,8 @@ import {
   mdiFormatFont,
   mdiFormatFontSizeIncrease,
   mdiFormatHeaderPound,
+  mdiFormatIndentIncrease,
+  mdiFormatIndentDecrease,
 } from "@mdi/js";
 
 export const Icons = {
@@ -175,6 +177,8 @@ export const Icons = {
   fontFamily: mdiFormatFont,
   fontSize: mdiFormatFontSizeIncrease,
   heading: mdiFormatHeaderPound,
+  indent: mdiFormatIndentIncrease,
+  outdent: mdiFormatIndentDecrease,
 
   plus: mdiPlus,
   minus: mdiMinus,

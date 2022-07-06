@@ -16,7 +16,7 @@ import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
 import { Alignment } from "./alignment";
 import { Headings } from "./headings";
-import { NumberedList, BulletList } from "./lists";
+import { NumberedList, BulletList, Outdent, Indent } from "./lists";
 import { TextDirection } from "./text-direction";
 import { Highlight, TextColor } from "./colors";
 import {
@@ -128,6 +128,9 @@ const tools = {
   moveRowDown: MoveRowDown,
   deleteRow: DeleteRow,
   deleteTable: DeleteTable,
+
+  outdent: Outdent,
+  indent: Indent,
 };
 
 export function findTool(id: ToolId): React.FunctionComponent<ToolProps> {
