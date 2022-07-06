@@ -857,7 +857,7 @@ index 4d78df9..3d6e414 100644
 +    }
  }
 diff --git a/node_modules/react-native-v8/src/v8runtime/V8Runtime.cpp b/node_modules/react-native-v8/src/v8runtime/V8Runtime.cpp
-index 42af9c6..83eda62 100644
+index 42af9c6..b406886 100644
 --- a/node_modules/react-native-v8/src/v8runtime/V8Runtime.cpp
 +++ b/node_modules/react-native-v8/src/v8runtime/V8Runtime.cpp
 @@ -29,7 +29,9 @@ const char kHostFunctionProxyProp[] = "__hostFunctionProxy";
@@ -890,7 +890,41 @@ index 42af9c6..83eda62 100644
      inspectorClient_ = std::make_shared<InspectorClient>(
          jsQueue_, context_.Get(isolate_), config_->appName, config_->deviceName);
      inspectorClient_->ConnectToReactFrontend();
-@@ -300,6 +304,12 @@ V8Runtime::LoadCodeCacheIfNeeded(const std::string &codecachePath) {
+@@ -241,9 +245,14 @@ void V8Runtime::OnIdle() {
+ 
+ void V8Runtime::ReportException(v8::Isolate *isolate, v8::TryCatch *tryCatch)
+     const {
+-  v8::HandleScope scopedHandle(isolate);
+-  std::string exception =
+-      JSIV8ValueConverter::ToSTLString(isolate, tryCatch->Exception());
++    v8::HandleScope scopedHandle(isolate);
++    v8::Local<v8::Context> context(isolate->GetCurrentContext());
++    v8::MaybeLocal<v8::String> exceptionString = tryCatch->Exception()->ToString(context);
++    std::string exception = "";
++    if (!exceptionString.IsEmpty()) {
++        exception = JSIV8ValueConverter::ToSTLString(isolate, exceptionString.ToLocalChecked());
++    }
++
+   v8::Local<v8::Message> message = tryCatch->Message();
+   if (message.IsEmpty()) {
+     // V8 didn't provide any extra information about this error; just
+@@ -252,7 +261,6 @@ void V8Runtime::ReportException(v8::Isolate *isolate, v8::TryCatch *tryCatch)
+     return;
+   } else {
+     std::ostringstream ss;
+-    v8::Local<v8::Context> context(isolate->GetCurrentContext());
+ 
+     // Print (filename):(line number): (message).
+     ss << JSIV8ValueConverter::ToSTLString(
+@@ -261,6 +269,7 @@ void V8Runtime::ReportException(v8::Isolate *isolate, v8::TryCatch *tryCatch)
+        << std::endl;
+ 
+     // Print line of source code.
++
+     ss << JSIV8ValueConverter::ToSTLString(
+               isolate, message->GetSourceLine(context).ToLocalChecked())
+        << std::endl;
+@@ -300,6 +309,12 @@ V8Runtime::LoadCodeCacheIfNeeded(const std::string &codecachePath) {
      return nullptr;
    }
  
@@ -903,7 +937,7 @@ index 42af9c6..83eda62 100644
    if (config_->codecacheMode == V8RuntimeConfig::CodecacheMode::kPrebuilt) {
      assert(config_->prebuiltCodecacheBlob);
      return std::make_unique<v8::ScriptCompiler::CachedData>(
-@@ -314,6 +324,7 @@ V8Runtime::LoadCodeCacheIfNeeded(const std::string &codecachePath) {
+@@ -314,6 +329,7 @@ V8Runtime::LoadCodeCacheIfNeeded(const std::string &codecachePath) {
      LOG(INFO) << "Cannot load codecache file: " << codecachePath;
      return nullptr;
    }
@@ -911,7 +945,7 @@ index 42af9c6..83eda62 100644
    fseek(file, 0, SEEK_END);
    size_t size = ftell(file);
    uint8_t *buffer = new uint8_t[size];
-@@ -346,6 +357,12 @@ bool V8Runtime::SaveCodeCacheIfNeeded(
+@@ -346,6 +362,12 @@ bool V8Runtime::SaveCodeCacheIfNeeded(
      return false;
    }
  
@@ -924,7 +958,7 @@ index 42af9c6..83eda62 100644
    v8::HandleScope scopedHandle(isolate_);
  
    v8::Local<v8::UnboundScript> unboundScript = script->GetUnboundScript();
-@@ -360,6 +377,7 @@ bool V8Runtime::SaveCodeCacheIfNeeded(
+@@ -360,6 +382,7 @@ bool V8Runtime::SaveCodeCacheIfNeeded(
      LOG(ERROR) << "Cannot save codecache file: " << codecachePath;
      return false;
    }
@@ -932,7 +966,7 @@ index 42af9c6..83eda62 100644
    fwrite(newCachedData->data, 1, newCachedData->length, file);
    fclose(file);
    return true;
-@@ -572,6 +590,19 @@ jsi::PropNameID V8Runtime::createPropNameIDFromString(const jsi::String &str) {
+@@ -572,6 +595,19 @@ jsi::PropNameID V8Runtime::createPropNameIDFromString(const jsi::String &str) {
        reinterpret_cast<const uint8_t *>(*utf8), utf8.length());
  }
  
