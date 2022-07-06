@@ -857,20 +857,21 @@ index 4d78df9..3d6e414 100644
 +    }
  }
 diff --git a/node_modules/react-native-v8/src/v8runtime/V8Runtime.cpp b/node_modules/react-native-v8/src/v8runtime/V8Runtime.cpp
-index 42af9c6..d0b427f 100644
+index 42af9c6..83eda62 100644
 --- a/node_modules/react-native-v8/src/v8runtime/V8Runtime.cpp
 +++ b/node_modules/react-native-v8/src/v8runtime/V8Runtime.cpp
-@@ -29,7 +29,8 @@ const char kHostFunctionProxyProp[] = "__hostFunctionProxy";
+@@ -29,7 +29,9 @@ const char kHostFunctionProxyProp[] = "__hostFunctionProxy";
  // static
  std::unique_ptr<v8::Platform> V8Runtime::s_platform = nullptr;
  std::mutex s_platform_mutex; // protects s_platform
 -
 +bool isMainBundleLoaded = false;
 +bool isMainBundleCached = false;
++bool isDevMode = false;
  V8Runtime::V8Runtime(std::unique_ptr<V8RuntimeConfig> config, 
  std::shared_ptr<facebook::react::MessageQueueThread> jsQueue)
      : config_(std::move(config)) {
-@@ -43,7 +44,7 @@ std::shared_ptr<facebook::react::MessageQueueThread> jsQueue)
+@@ -43,7 +45,7 @@ std::shared_ptr<facebook::react::MessageQueueThread> jsQueue)
        v8::V8::Initialize();
      }
    }
@@ -879,17 +880,30 @@ index 42af9c6..d0b427f 100644
    arrayBufferAllocator_.reset(
        v8::ArrayBuffer::Allocator::NewDefaultAllocator());
    v8::Isolate::CreateParams createParams;
-@@ -299,7 +300,8 @@ V8Runtime::LoadCodeCacheIfNeeded(const std::string &codecachePath) {
-   if (config_->codecacheMode == V8RuntimeConfig::CodecacheMode::kNone) {
+@@ -68,7 +70,9 @@ std::shared_ptr<facebook::react::MessageQueueThread> jsQueue)
+   context_.Reset(isolate_, CreateGlobalContext(isolate_));
+   v8::Context::Scope scopedContext(context_.Get(isolate_));
+   jsQueue_ = jsQueue;
++  isDevMode = false;
+   if (config_->enableInspector) {
++    isDevMode = true;
+     inspectorClient_ = std::make_shared<InspectorClient>(
+         jsQueue_, context_.Get(isolate_), config_->appName, config_->deviceName);
+     inspectorClient_->ConnectToReactFrontend();
+@@ -300,6 +304,12 @@ V8Runtime::LoadCodeCacheIfNeeded(const std::string &codecachePath) {
      return nullptr;
    }
--
-+  if (isMainBundleLoaded) return nullptr;
+ 
++  if (isDevMode) {
++    LOG(ERROR) << "Code Caching is Disabled in DEV Mode: ";
++  }
++
++  if (isMainBundleLoaded ) return nullptr;
 +  isMainBundleLoaded = true;
    if (config_->codecacheMode == V8RuntimeConfig::CodecacheMode::kPrebuilt) {
      assert(config_->prebuiltCodecacheBlob);
      return std::make_unique<v8::ScriptCompiler::CachedData>(
-@@ -314,6 +316,7 @@ V8Runtime::LoadCodeCacheIfNeeded(const std::string &codecachePath) {
+@@ -314,6 +324,7 @@ V8Runtime::LoadCodeCacheIfNeeded(const std::string &codecachePath) {
      LOG(INFO) << "Cannot load codecache file: " << codecachePath;
      return nullptr;
    }
@@ -897,16 +911,20 @@ index 42af9c6..d0b427f 100644
    fseek(file, 0, SEEK_END);
    size_t size = ftell(file);
    uint8_t *buffer = new uint8_t[size];
-@@ -346,6 +349,8 @@ bool V8Runtime::SaveCodeCacheIfNeeded(
+@@ -346,6 +357,12 @@ bool V8Runtime::SaveCodeCacheIfNeeded(
      return false;
    }
  
-+  if (isMainBundleCached) return false;
++  if (isDevMode) {
++    LOG(ERROR) << "Code Caching is Disabled in DEV Mode: ";
++  }
++
++  if (isMainBundleCached ) return false;
 +
    v8::HandleScope scopedHandle(isolate_);
  
    v8::Local<v8::UnboundScript> unboundScript = script->GetUnboundScript();
-@@ -360,6 +365,7 @@ bool V8Runtime::SaveCodeCacheIfNeeded(
+@@ -360,6 +377,7 @@ bool V8Runtime::SaveCodeCacheIfNeeded(
      LOG(ERROR) << "Cannot save codecache file: " << codecachePath;
      return false;
    }
@@ -914,7 +932,7 @@ index 42af9c6..d0b427f 100644
    fwrite(newCachedData->data, 1, newCachedData->length, file);
    fclose(file);
    return true;
-@@ -572,6 +578,19 @@ jsi::PropNameID V8Runtime::createPropNameIDFromString(const jsi::String &str) {
+@@ -572,6 +590,19 @@ jsi::PropNameID V8Runtime::createPropNameIDFromString(const jsi::String &str) {
        reinterpret_cast<const uint8_t *>(*utf8), utf8.length());
  }
  
