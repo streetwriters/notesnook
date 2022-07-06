@@ -255,9 +255,11 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           sx={{
             alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
           }}
-          maxWidth={focusMode ? "min(100%, 850px)" : "935px"}
+          maxWidth={
+            focusMode ? "min(100%, 850px)" : "max(calc(100% - 200px), 850px)"
+          }
           width="100%"
-          px={[2, 2, 35]}
+          px={2}
           onClick={onRequestFocus}
           // mt={[2, 2, 25]}
         >
