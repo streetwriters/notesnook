@@ -48,7 +48,10 @@ export function MoreTools(props: MoreToolsProps) {
             editor={editor}
             sx={{
               flex: 1,
-              p: 1,
+              // this is intentionally set to a fixed value
+              // because we want the same padding on mobile
+              // and web.
+              p: "5px",
               boxShadow: "menu",
               bg: "background",
               borderRadius: "default",
