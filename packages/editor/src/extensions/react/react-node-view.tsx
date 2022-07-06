@@ -140,18 +140,26 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
           getPos={this.getPos}
           node={this.node}
           forwardRef={forwardRef}
-          updateAttributes={(attr) => this.updateAttributes(attr, pos)}
+          updateAttributes={(attr, preventUpdate) =>
+            this.updateAttributes(attr, pos, preventUpdate)
+          }
         />
       </ThemeProvider>
     );
   }
 
-  updateAttributes(attributes: any, pos: number) {
+  updateAttributes(
+    attributes: any,
+    pos: number,
+    preventUpdate: boolean = false
+  ) {
     this.editor.commands.command(({ tr }) => {
       tr.setNodeMarkup(pos, undefined, {
         ...this.node.attrs,
         ...attributes,
       });
+      tr.setMeta("addToHistory", false);
+      tr.setMeta("preventUpdate", preventUpdate);
       return true;
     });
   }

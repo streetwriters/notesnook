@@ -36,9 +36,13 @@ export function CodeblockComponent(
 
       refractor.register(syntax);
 
-      updateAttributes({
-        language: languageDefinition.filename,
-      });
+      const preventUpdate = language === languageDefinition.filename;
+      updateAttributes(
+        {
+          language: languageDefinition.filename,
+        },
+        preventUpdate
+      );
     })();
   }, [language]);
 

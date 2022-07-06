@@ -9,7 +9,10 @@ export type GetPos = GetPosNode | boolean;
 export type GetPosNode = () => number;
 export type ForwardRef = (node: HTMLElement | null) => void;
 export type ShouldUpdate = (prevNode: PMNode, nextNode: PMNode) => boolean;
-export type UpdateAttributes<T> = (attributes: Partial<T>) => void;
+export type UpdateAttributes<T> = (
+  attributes: Partial<T>,
+  preventUpdate?: boolean
+) => void;
 export type ContentDOM =
   | {
       dom: HTMLElement;
