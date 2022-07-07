@@ -1,8 +1,10 @@
 import { Attachment } from "./picker";
 
-export type CharacterCounter = {
-  words: () => number;
-  characters: () => number;
+export type NoteStatistics = {
+  words: {
+    total: number;
+    selected?: number;
+  };
 };
 
 export interface IEditor {

@@ -216,10 +216,9 @@ export function Editor(props: EditorProps) {
         readonly={readonly}
         toolbarContainerId={headless ? undefined : "editorToolbar"}
         content={content}
-        onChange={(content, counter) => {
+        onChange={(content) => {
           const { id, sessionId } = editorstore.get().session;
           debouncedOnEditorChange(sessionId, id, sessionId, content);
-          if (counter) debouncedUpdateWordCount(counter);
         }}
         onDownloadAttachment={(attachment) =>
           downloadAttachment(attachment.hash)

@@ -15,7 +15,7 @@ import { Box, Flex } from "rebass";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import useMobile from "../../utils/use-mobile";
 import { Attachment } from "./picker";
-import { CharacterCounter, IEditor } from "./types";
+import { IEditor } from "./types";
 import { useConfigureEditor, useSearch, useToolbarConfig } from "./context";
 import { createPortal } from "react-dom";
 import { getCurrentPreset } from "../../common/toolbar-config";
@@ -24,7 +24,7 @@ import { showBuyDialog } from "../../common/dialog-controller";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
-  onChange?: (content: string, counter?: CharacterCounter) => void;
+  onChange?: (content: string) => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onFocus?: () => void;
@@ -50,7 +50,6 @@ function TipTap(props: TipTapProps) {
   const theme: Theme = useTheme();
   const isUserPremium = useIsUserPremium();
   const isMobile = useMobile();
-  const counter = useRef<CharacterCounter>();
   const configure = useConfigureEditor();
   const { toolbarConfig } = useToolbarConfig();
   const { isSearching, toggleSearch } = useSearch();
@@ -73,17 +72,29 @@ function TipTap(props: TipTapProps) {
       autofocus: "start",
       onFocus,
       onCreate: ({ editor }) => {
-        counter.current = editor.storage.characterCount as CharacterCounter;
         configure({
           editor: toIEditor(editor as Editor),
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
           toolbarConfig: getCurrentPreset().tools,
+          statistics: {
+            words: {
+              total: getTotalWords(editor as Editor),
+              selected: 0,
+            },
+          },
         });
       },
       onUpdate: ({ editor }) => {
-        if (onChange && editor.isEditable)
-          onChange(editor.getHTML(), counter.current);
+        if (onChange && editor.isEditable) onChange(editor.getHTML());
+        configure({
+          statistics: {
+            words: {
+              total: getTotalWords(editor as Editor),
+              selected: 0,
+            },
+          },
+        });
       },
       onDestroy: () => {
         configure({
@@ -91,6 +102,7 @@ function TipTap(props: TipTapProps) {
           canRedo: false,
           canUndo: false,
           searching: false,
+          statistics: undefined,
         });
       },
       onTransaction: ({ editor }) => {
@@ -98,6 +110,20 @@ function TipTap(props: TipTapProps) {
           canRedo: editor.can().redo(),
           canUndo: editor.can().undo(),
         });
+      },
+      onSelectionUpdate: ({ editor, transaction }) => {
+        configure((old) => ({
+          statistics: {
+            words: {
+              total:
+                old.statistics?.words.total || getTotalWords(editor as Editor),
+              selected: getSelectedWords(
+                editor as Editor,
+                transaction.selection
+              ),
+            },
+          },
+        }));
       },
       theme,
       onOpenAttachmentPicker: (_editor, type) => {
@@ -195,4 +221,51 @@ function toIEditor(editor: Editor): IEditor {
         progress,
       }),
   };
+}
+
+function getTotalWords(editor: Editor): number {
+  const documentText = editor.state.doc.textBetween(
+    0,
+    editor.state.doc.content.size,
+    "\n",
+    " "
+  );
+  return countWords(documentText);
+}
+
+function getSelectedWords(
+  editor: Editor,
+  selection: { from: number; to: number; empty: boolean }
+): number {
+  const selectedText = selection.empty
+    ? ""
+    : editor.state.doc.textBetween(selection.from, selection.to, "\n", " ");
+  return countWords(selectedText);
+}
+
+function countWords(str: string) {
+  let count = 0;
+  let shouldCount = false;
+
+  for (var i = 0; i < str.length; ++i) {
+    const s = str[i];
+
+    if (
+      s === " " ||
+      s === "\r" ||
+      s === "\n" ||
+      s === "*" ||
+      s === "/" ||
+      s === "&"
+    ) {
+      if (!shouldCount) continue;
+      ++count;
+      shouldCount = false;
+    } else {
+      shouldCount = true;
+    }
+  }
+
+  if (shouldCount) ++count;
+  return count;
 }

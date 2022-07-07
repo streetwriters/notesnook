@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { IEditor } from "./types";
+import { IEditor, NoteStatistics } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
 import { UseStore } from "zustand";
@@ -12,13 +12,20 @@ type EditorSubState = {
   canRedo?: boolean;
   searching?: boolean;
   toolbarConfig?: ToolbarDefinition;
+  statistics?: NoteStatistics;
 };
 class EditorContext extends BaseStore {
   subState: EditorSubState = {};
 
-  configure = (partial: Partial<EditorSubState>) => {
+  configure = (
+    partial:
+      | Partial<EditorSubState>
+      | ((oldState: EditorSubState) => Partial<EditorSubState>)
+  ) => {
     this.set((state: EditorContext) => {
-      state.subState = { ...state.subState, ...partial };
+      const newPartialState =
+        typeof partial === "function" ? partial(state.subState) : partial;
+      state.subState = { ...state.subState, ...newPartialState };
     });
   };
 }
@@ -69,4 +76,13 @@ export function useToolbarConfig() {
     [configure]
   );
   return { toolbarConfig, setToolbarConfig };
+}
+
+export function useNoteStatistics(): NoteStatistics {
+  return useEditorContext(
+    (store) =>
+      store.subState.statistics || {
+        words: { total: 0 },
+      }
+  );
 }
