@@ -37,7 +37,7 @@ function onEditorChange(noteId: string, sessionId: string, content: string) {
   if (!content) return;
 
   editorstore.get().saveSessionContent(noteId, sessionId, {
-    type: "tiny",
+    type: "tiptap",
     data: content,
   });
 }
@@ -62,9 +62,9 @@ export default function EditorManager({
   const isNewSession = !!nonce && noteId === 0;
   const isOldSession = !nonce && !!noteId;
 
-  const [content, setContent] = useState<string>("");
+  const content = useRef<string>("");
+  const title = useRef<string>("");
   const [timestamp, setTimestamp] = useState<number>(0);
-  const [title, setTitle] = useState<string>("");
 
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
@@ -84,22 +84,25 @@ export default function EditorManager({
     (async function () {
       await editorstore.newSession(nonce);
 
-      setContent("");
-      setTitle("");
+      title.current = "";
+      content.current = "";
       setTimestamp(Date.now());
+      console.log("Updating timestamp (new)");
     })();
   }, [isNewSession, nonce]);
 
   useEffect(() => {
-    if (!noteId) return;
+    if (!noteId || isOldSession) return;
 
     (async function () {
-      const content = await editorstore.get().getSessionContent();
-      setContent(content?.data);
+      const sessionContent = await editorstore.get().getSessionContent();
+      content.current = sessionContent?.data;
       setTimestamp(Date.now());
-      if (noteId && content) await db.attachments?.downloadImages(noteId);
+      if (noteId && sessionContent)
+        await db.attachments?.downloadImages(noteId);
+      console.log("Updating timestamp (preview)");
     })();
-  }, [noteId, isPreviewMode]);
+  }, [noteId, isPreviewMode, isOldSession]);
 
   useEffect(() => {
     if (!isOldSession) return;
@@ -108,12 +111,14 @@ export default function EditorManager({
       await editorstore.get().openSession(noteId);
 
       const { getSessionContent, session } = editorstore.get();
-      const content = await getSessionContent();
+      const sessionContent = await getSessionContent();
 
-      setTitle(session.title);
-      setContent(content?.data);
+      title.current = session.title;
+      content.current = sessionContent?.data;
       setTimestamp(Date.now());
-      if (noteId && content) await db.attachments?.downloadImages(noteId);
+      if (noteId && sessionContent)
+        await db.attachments?.downloadImages(noteId);
+      console.log("Updating timestamp (old)");
     })();
   }, [noteId, isOldSession]);
 
@@ -132,8 +137,8 @@ export default function EditorManager({
       {isPreviewMode && <PreviewModeNotice />}
       <Editor
         nonce={timestamp}
-        title={title}
-        content={content}
+        title={title.current}
+        content={content.current}
         options={{
           readonly: isReadonly,
           onRequestFocus: () => toggleProperties(false),
@@ -192,6 +197,7 @@ export function Editor(props: EditorProps) {
         hash: string;
         src: string;
       }) => {
+        console.log(hash, src);
         if (groupId?.startsWith("monograph")) return;
         editor.loadImage(hash, src);
       }

@@ -7,7 +7,6 @@ import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
 import { hashNavigate } from "../navigation";
-import { Mutex } from "async-mutex";
 
 const SESSION_STATES = {
   stale: "stale",

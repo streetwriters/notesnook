@@ -37,7 +37,7 @@ function DiffViewer(props) {
       await db.content.add({
         id: conflictedNote.contentId,
         data: toKeep,
-        type: "tiny",
+        type: "tiptap",
         dateResolved,
         conflicted: false,
         sessionId: Date.now(),
@@ -46,7 +46,7 @@ function DiffViewer(props) {
       if (toCopy) {
         const toCopyContent = {
           data: toCopy,
-          type: "tiny",
+          type: "tiptap",
         };
         await db.notes.add({
           content: toCopyContent,
