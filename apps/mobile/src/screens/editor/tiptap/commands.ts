@@ -80,7 +80,7 @@ class Commands {
     await this.doAsync(
       `editor.commands.blur();
 typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
-editorController.content && editorController.content.current = null;
+if (editorController.content) editorController.content.current = null;
 editorController.onUpdate();
 editorController.setTitle(null);
 typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",saved:""});

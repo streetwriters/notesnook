@@ -41,18 +41,16 @@ export const Progress = () => {
           width: 200
         }}
       >
-        <React.Suspense fallback={<View />}>
-          <ProgressBarComponent
-            height={5}
-            width={null}
-            animated={true}
-            useNativeDriver
-            progress={currentProgress || 0.1}
-            unfilledColor={colors.nav}
-            color={colors.accent}
-            borderWidth={0}
-          />
-        </React.Suspense>
+        <ProgressBarComponent
+          height={5}
+          width={null}
+          animated={true}
+          useNativeDriver
+          progress={currentProgress || 0.1}
+          unfilledColor={colors.nav}
+          color={colors.accent}
+          borderWidth={0}
+        />
       </View>
 
       {progress ? (

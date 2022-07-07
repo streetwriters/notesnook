@@ -71,19 +71,17 @@ const Home = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Settin
                   marginTop: 15
                 }}
               >
-                <React.Suspense fallback={<View />}>
-                  <ProgressBarComponent
-                    height={5}
-                    width={100}
-                    animated={true}
-                    useNativeDriver
-                    indeterminate
-                    indeterminateAnimationDuration={2000}
-                    unfilledColor={colors.nav}
-                    color={colors.accent}
-                    borderWidth={0}
-                  />
-                </React.Suspense>
+                <ProgressBarComponent
+                  height={5}
+                  width={100}
+                  animated={true}
+                  useNativeDriver
+                  indeterminate
+                  indeterminateAnimationDuration={2000}
+                  unfilledColor={colors.nav}
+                  color={colors.accent}
+                  borderWidth={0}
+                />
               </View>
             </View>
           </BaseDialog>

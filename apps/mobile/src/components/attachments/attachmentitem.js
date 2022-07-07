@@ -113,26 +113,24 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
             marginRight: -5
           }}
         >
-          <React.Suspense fallback={<View />}>
-            <ProgressCircleComponent
-              size={SIZE.xxl}
-              progress={
-                encryptionProgress
-                  ? encryptionProgress
-                  : currentProgress?.value
-                  ? currentProgress?.value / 100
-                  : 0
-              }
-              showsText
-              textStyle={{
-                fontSize: 10
-              }}
-              color={colors.accent}
-              formatText={progress => (progress * 100).toFixed(0)}
-              borderWidth={0}
-              thickness={2}
-            />
-          </React.Suspense>
+          <ProgressCircleComponent
+            size={SIZE.xxl}
+            progress={
+              encryptionProgress
+                ? encryptionProgress
+                : currentProgress?.value
+                ? currentProgress?.value / 100
+                : 0
+            }
+            showsText
+            textStyle={{
+              fontSize: 10
+            }}
+            color={colors.accent}
+            formatText={progress => (progress * 100).toFixed(0)}
+            borderWidth={0}
+            thickness={2}
+          />
         </TouchableOpacity>
       ) : (
         <>

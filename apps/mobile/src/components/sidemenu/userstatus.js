@@ -110,20 +110,18 @@ export const UserStatus = () => {
           {user ? (
             syncing ? (
               <>
-                <React.Suspense fallback={<View />}>
-                  <ProgressCircleComponent
-                    size={SIZE.xl}
-                    progress={progress ? progress.current / progress.total : 0.1}
-                    textStyle={{
-                      fontSize: 8
-                    }}
-                    animated={true}
-                    color={colors.accent}
-                    unfilledColor={colors.nav}
-                    borderWidth={0}
-                    thickness={2}
-                  />
-                </React.Suspense>
+                <ProgressCircleComponent
+                  size={SIZE.xl}
+                  progress={progress ? progress.current / progress.total : 0.1}
+                  textStyle={{
+                    fontSize: 8
+                  }}
+                  animated={true}
+                  color={colors.accent}
+                  unfilledColor={colors.nav}
+                  borderWidth={0}
+                  thickness={2}
+                />
               </>
             ) : (
               <Icon color={colors.accent} name="sync" size={SIZE.lg} />

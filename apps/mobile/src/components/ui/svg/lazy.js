@@ -1,29 +1,38 @@
 import React from 'react';
+import module_svg from './module-svg';
 
-export const QRCode = React.lazy(async () => {
-  const module = await (await import('./module-svg')).default;
-  return {
-    default: module.QRCode
-  };
-});
+export const QRCode = module_svg.QRCode;
 
-export const SvgXml = React.lazy(async () => {
-  const module = await (await import('./module-svg')).default;
-  return {
-    default: module.SvgXml
-  };
-});
+// React.lazy(async () => {
+//   const module = await (await import('./module-svg')).default;
+//   return {
+//     default: module.QRCode
+//   };
+// });
 
-export const ProgressBarComponent = React.lazy(async () => {
-  const module = await (await import('./module-svg')).default;
-  return {
-    default: module.Progress.Bar
-  };
-});
+export const SvgXml = module_svg.SvgXml;
 
-export const ProgressCircleComponent = React.lazy(async () => {
-  const module = await (await import('./module-svg')).default;
-  return {
-    default: module.Progress.Circle
-  };
-});
+// React.lazy(async () => {
+//   const module = await (await import('./module-svg')).default;
+//   return {
+//     default: module.SvgXml
+//   };
+// });
+
+export const ProgressBarComponent = module_svg.Progress.Bar;
+
+// React.lazy(async () => {
+//   const module = await (await import('./module-svg')).default;
+//   return {
+//     default: module.Progress.Bar
+//   };
+// });
+
+export const ProgressCircleComponent = module_svg.Progress.Circle;
+
+// React.lazy(async () => {
+//   const module = await (await import('./module-svg')).default;
+//   return {
+//     default: module.Progress.Circle
+//   };
+// });

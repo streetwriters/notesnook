@@ -129,7 +129,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: __DEV__ ? 'http://localhost:3000' : EDITOR_URI
+              uri: __DEV__ ? EDITOR_URI : EDITOR_URI
             }}
             style={style}
             autoManageStatusBarEnabled={false}

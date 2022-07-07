@@ -50,16 +50,14 @@ export const ProgressBar = () => {
       }}
       onLayout={event => setWidth(event.nativeEvent.layout.width)}
     >
-      <React.Suspense fallback={<View />}>
-        <ProgressBarComponent
-          size={SIZE.xxl}
-          progress={prog}
-          color={colors.accent}
-          borderWidth={0}
-          height={1}
-          width={width || 400}
-        />
-      </React.Suspense>
+      <ProgressBarComponent
+        size={SIZE.xxl}
+        progress={prog}
+        color={colors.accent}
+        borderWidth={0}
+        height={1}
+        width={width || 400}
+      />
     </View>
   ) : null;
 };

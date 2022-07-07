@@ -19,9 +19,7 @@ export const SvgView = ({
         width: height || 250
       }}
     >
-      <React.Suspense fallback={<View />}>
-        <SvgXml xml={src} width="100%" height="100%" />
-      </React.Suspense>
+      <SvgXml xml={src} width="100%" height="100%" />
     </View>
   );
 };
