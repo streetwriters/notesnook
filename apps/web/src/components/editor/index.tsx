@@ -387,7 +387,9 @@ function DropZone(props: DropZoneProps) {
         display: "none",
       }}
       onDrop={async (e) => {
-        if (!editor) return;
+        if (!editor || !e.dataTransfer.files?.length) return;
+        e.preventDefault();
+
         for (let file of e.dataTransfer.files) {
           const result = await attachFile(file);
           if (!result) continue;
@@ -423,14 +425,6 @@ function useDragOverlay() {
 
     if (!dropElement || !overlay) return;
 
-    function isFile(e: DragEvent) {
-      return (
-        e.dataTransfer &&
-        (e.dataTransfer.files?.length > 0 ||
-          e.dataTransfer.types?.some((a) => a === "Files"))
-      );
-    }
-
     function showOverlay(e: DragEvent) {
       if (!overlay || !isFile(e)) return;
 
@@ -464,4 +458,12 @@ function useDragOverlay() {
   }, []);
 
   return [dropElementRef, overlayRef] as const;
+}
+
+function isFile(e: DragEvent) {
+  return (
+    e.dataTransfer &&
+    (e.dataTransfer.files?.length > 0 ||
+      e.dataTransfer.types?.some((a) => a === "Files"))
+  );
 }
