@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __rest = (this && this.__rest) || function (s, e) {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
@@ -39,7 +16,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TextColor = exports.Highlight = exports.ColorTool = void 0;
 const jsx_runtime_1 = require("react/jsx-runtime");
-const react_1 = __importStar(require("react"));
+const react_1 = require("react");
 const tinycolor2_1 = __importDefault(require("tinycolor2"));
 const popuppresenter_1 = require("../../components/popuppresenter");
 const config_1 = require("../../utils/config");
@@ -47,8 +24,7 @@ const splitbutton_1 = require("../components/splitbutton");
 const colorpicker_1 = require("../popups/colorpicker");
 const toolbarstore_1 = require("../stores/toolbarstore");
 const dom_1 = require("../utils/dom");
-// TODO test rerendering
-function _ColorTool(props) {
+function ColorTool(props) {
     const { editor, onColorChange, getActiveColor, title, cacheKey } = props, toolProps = __rest(props, ["editor", "onColorChange", "getActiveColor", "title", "cacheKey"]);
     const activeColor = getActiveColor() || config_1.config.get(cacheKey);
     const tColor = (0, tinycolor2_1.default)(activeColor);
@@ -74,10 +50,10 @@ function _ColorTool(props) {
                     config_1.config.set(cacheKey, color);
                 }, onClose: close, title: title })) }) })));
 }
-exports.ColorTool = react_1.default.memo(_ColorTool, () => true);
+exports.ColorTool = ColorTool;
 function Highlight(props) {
     const { editor } = props;
-    return ((0, jsx_runtime_1.jsx)(exports.ColorTool, Object.assign({}, props, { cacheKey: "highlight", getActiveColor: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.getAttributes("highlight").color; }, title: "Background color", onColorChange: (color) => {
+    return ((0, jsx_runtime_1.jsx)(ColorTool, Object.assign({}, props, { cacheKey: "highlight", getActiveColor: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.getAttributes("highlight").color; }, title: "Background color", onColorChange: (color) => {
             var _a, _b;
             return color
                 ? (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().toggleHighlight({ color }).run()
@@ -87,7 +63,7 @@ function Highlight(props) {
 exports.Highlight = Highlight;
 function TextColor(props) {
     const { editor } = props;
-    return ((0, jsx_runtime_1.jsx)(exports.ColorTool, Object.assign({}, props, { cacheKey: "textColor", getActiveColor: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.getAttributes("textStyle").color; }, title: "Text color", onColorChange: (color) => {
+    return ((0, jsx_runtime_1.jsx)(ColorTool, Object.assign({}, props, { cacheKey: "textColor", getActiveColor: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.getAttributes("textStyle").color; }, title: "Text color", onColorChange: (color) => {
             var _a, _b;
             return color
                 ? (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().setColor(color).run()

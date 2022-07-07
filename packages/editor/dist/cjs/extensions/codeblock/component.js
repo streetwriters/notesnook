@@ -41,9 +41,10 @@ function CodeblockComponent(props) {
                 if (!syntax)
                     return;
                 core_1.refractor.register(syntax);
+                const preventUpdate = language === languageDefinition.filename;
                 updateAttributes({
                     language: languageDefinition.filename,
-                });
+                }, preventUpdate);
             });
         })();
     }, [language]);

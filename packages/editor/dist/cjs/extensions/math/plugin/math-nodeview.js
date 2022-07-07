@@ -256,7 +256,12 @@ class MathView {
         let prevCursorPos = maybePos !== null && maybePos !== void 0 ? maybePos : 0;
         // compute position that cursor should appear within the expanded math node
         let innerPos = prevCursorPos <= this._getPos() ? 0 : this._node.nodeSize - 2;
-        this._innerView.dispatch(innerState.tr.setSelection(prosemirror_state_1.TextSelection.create(innerState.doc, innerPos)));
+        setTimeout(() => {
+            if (!this._innerView)
+                return;
+            this._innerView.focus();
+            this._innerView.dispatch(innerState.tr.setSelection(prosemirror_state_1.TextSelection.create(innerState.doc, innerPos)));
+        });
         this._isEditing = true;
     }
     /**

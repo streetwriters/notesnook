@@ -19,7 +19,7 @@ function MoreTools(props) {
                     target: isBottom ? (0, dom_1.getToolbarElement)() : buttonRef.current || "mouse",
                     align: "center",
                     location: isBottom ? "top" : "below",
-                    yOffset: isBottom ? 10 : 5,
+                    yOffset: 10,
                 }, autoCloseOnUnmount: autoCloseOnUnmount, focusOnRender: false, blocking: false, renderPopup: () => ((0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { tools: tools, editor: editor, sx: {
                         flex: 1,
                         // this is intentionally set to a fixed value

@@ -10,7 +10,9 @@ const react_1 = require("react");
 const forms_1 = require("@rebass/forms");
 const taskitem_1 = require("../taskitem");
 const prosemirror_utils_1 = require("prosemirror-utils");
+const toolbarstore_1 = require("../../toolbar/stores/toolbarstore");
 function TaskListComponent(props) {
+    const isMobile = (0, toolbarstore_1.useIsMobile)();
     const { editor, getPos, node, updateAttributes, forwardRef } = props;
     const taskItemType = (0, core_1.getNodeType)(taskitem_1.TaskItemNode.name, editor.schema);
     const { title, collapsed } = node.attrs;
@@ -25,6 +27,10 @@ function TaskListComponent(props) {
             return;
         const { node, pos } = parentTaskItem;
         const allChecked = areAllChecked(node, pos, editor.state.doc);
+        // no need to create a transaction if the check state is
+        // not changed.
+        if (node.attrs.checked === allChecked)
+            return;
         // check parent item if all child items are checked.
         editor.commands.command(({ tr }) => {
             tr.setNodeMarkup(pos, undefined, { checked: allChecked });
@@ -46,7 +52,7 @@ function TaskListComponent(props) {
                         top: 0,
                         right: 0,
                     }, contentEditable: false }, { children: [collapsed && ((0, jsx_runtime_1.jsxs)(rebass_1.Text, Object.assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), (0, jsx_runtime_1.jsx)(icon_1.Icon, { className: "toggleSublist", path: collapsed ? icons_1.Icons.chevronDown : icons_1.Icons.chevronUp, sx: {
-                                opacity: collapsed ? 1 : 0,
+                                opacity: isMobile || collapsed ? 1 : 0,
                                 position: "absolute",
                                 right: 0,
                                 alignSelf: "start",
@@ -55,7 +61,7 @@ function TaskListComponent(props) {
                                 ".icon:hover path": {
                                     fill: "var(--checked) !important",
                                 },
-                            }, size: 20, onClick: () => {
+                            }, size: isMobile ? 24 : 20, onClick: () => {
                                 updateAttributes({ collapsed: !collapsed });
                             } })] }))) : ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: {
                         position: "relative",

@@ -9,6 +9,7 @@ const icons_1 = require("../icons");
 const toolbarstore_1 = require("../stores/toolbarstore");
 const menu_1 = require("../../components/menu");
 const dom_1 = require("../utils/dom");
+const button_1 = require("../../components/button");
 function Dropdown(props) {
     const { items, selectedItem, buttonRef, menuWidth } = props;
     const internalRef = (0, react_1.useRef)();
@@ -16,10 +17,10 @@ function Dropdown(props) {
     const toolbarLocation = (0, toolbarstore_1.useToolbarLocation)();
     const isMobile = (0, toolbarstore_1.useIsMobile)();
     const isBottom = toolbarLocation === "bottom";
-    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Button, Object.assign({ ref: (ref) => {
+    return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(button_1.Button, Object.assign({ ref: (ref) => {
                     internalRef.current = ref;
                     if (buttonRef)
-                        buttonRef.current = ref;
+                        buttonRef.current = ref || undefined;
                 }, sx: {
                     p: 1,
                     m: 0,

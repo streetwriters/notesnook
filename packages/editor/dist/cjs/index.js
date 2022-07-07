@@ -67,6 +67,7 @@ const math_1 = require("./extensions/math");
 const react_2 = require("./extensions/react");
 const outlinelist_1 = require("./extensions/outlinelist");
 const outlinelistitem_1 = require("./extensions/outlinelistitem");
+const keepinview_1 = require("./extensions/keepinview");
 const table_1 = require("./extensions/table");
 const toolbarstore_1 = require("./toolbar/stores/toolbarstore");
 const useEditor_1 = require("./hooks/useEditor");
@@ -148,6 +149,7 @@ const useTiptap = (options = {}, deps = []) => {
             codemark_1.Codemark,
             math_1.MathInline,
             math_1.MathBlock,
+            keepinview_1.KeepInView,
         ],
         onBeforeCreate: ({ editor }) => {
             if (theme) {

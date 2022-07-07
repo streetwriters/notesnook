@@ -1,4 +1,5 @@
 /// <reference types="react" />
+import { SxStyleProp } from "rebass";
 import { IconNames } from "../../toolbar/icons";
 declare type MenuItemComponentProps = {
     onClick?: (e?: any) => void;
@@ -25,6 +26,7 @@ export declare type MenuButton = BaseMenuItem<"button"> & {
         title: string;
         items: MenuItem[];
     };
+    styles?: SxStyleProp;
 };
 export declare type MenuItem = MenuButton | MenuSeperator | MenuPopup;
 export {};

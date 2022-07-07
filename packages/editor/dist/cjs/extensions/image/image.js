@@ -35,6 +35,7 @@ exports.ImageNode = core_1.Node.create({
             },
             width: { default: null },
             height: { default: null },
+            // TODO: maybe these should be stored as styles?
             float: (0, attachment_1.getDataAttribute)("float", false),
             align: (0, attachment_1.getDataAttribute)("align", "left"),
             hash: (0, attachment_1.getDataAttribute)("hash"),

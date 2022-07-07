@@ -26,5 +26,7 @@ exports.ToolButton = react_1.default.memo(function ToolButton(props) {
                 mr: 0,
             } }, sx), onMouseDown: (e) => e.preventDefault() }, buttonProps, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons[icon], color: iconColor || "icon", size: iconSize || (variant === "small" ? "medium" : "big") }) })));
 }, (prev, next) => {
-    return prev.toggled === next.toggled && prev.icon === next.icon;
+    return (prev.toggled === next.toggled &&
+        prev.icon === next.icon &&
+        JSON.stringify(prev.sx) === JSON.stringify(next.sx));
 });

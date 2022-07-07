@@ -27,8 +27,12 @@ exports.MathInline = core_1.Node.create({
     },
     addCommands() {
         return {
-            insertMathInline: () => ({ state, dispatch, view }) => {
-                return (0, plugin_1.insertMathNode)(this.type)(state, dispatch, view);
+            insertMathInline: () => ({ chain, tr }) => {
+                const { $from } = tr.selection;
+                return chain()
+                    .insertContent({ type: this.name, attrs: {} })
+                    .setNodeSelection($from.pos)
+                    .run();
             },
         };
     },

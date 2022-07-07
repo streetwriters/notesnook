@@ -18,6 +18,7 @@ function _Counter(props) {
                     fontSize: "subBody",
                     mx: 1,
                     textAlign: "center",
+                    ":hover": { bg: "transparent" },
                 }, onClick: onReset, title: `Reset ${title}` }, { children: value })), _jsx(ToolButton, { toggled: false, title: `Increase ${title}`, icon: "plus", variant: "small", onClick: onIncrease })] })));
 }
 export const Counter = React.memo(_Counter, (prev, next) => {

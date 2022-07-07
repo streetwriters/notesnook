@@ -44,5 +44,6 @@ function _SplitButton(props) {
                         }, onClick: onOpen }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: toolbarLocation === "bottom" ? icons_1.Icons.chevronUp : icons_1.Icons.chevronDown, color: "text", size: "small" }) }))] })), children] }));
 }
 exports.SplitButton = react_2.default.memo(_SplitButton, (prev, next) => {
-    return prev.toggled === next.toggled;
+    return (prev.toggled === next.toggled &&
+        JSON.stringify(prev.sx) === JSON.stringify(next.sx));
 });

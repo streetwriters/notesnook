@@ -41,6 +41,7 @@ exports.NodeViewSelectionNotifierPlugin = new prosemirror_state_1.Plugin({
     },
 });
 exports.NodeViewSelectionNotifier = core_1.Extension.create({
+    name: "node-view-selection-notifier",
     addProseMirrorPlugins() {
         return [exports.NodeViewSelectionNotifierPlugin];
     },

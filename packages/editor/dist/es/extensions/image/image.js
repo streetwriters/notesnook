@@ -32,6 +32,7 @@ export const ImageNode = Node.create({
             },
             width: { default: null },
             height: { default: null },
+            // TODO: maybe these should be stored as styles?
             float: getDataAttribute("float", false),
             align: getDataAttribute("align", "left"),
             hash: getDataAttribute("hash"),

@@ -106,7 +106,10 @@ function ColorPicker(props) {
                                     // boxShadow: "menu",
                                     p: 0,
                                     ml: [2, 2, 1],
-                                }, onClick: () => setIsPickerOpen((s) => !s) }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.palette, color: tColor.isDark() ? "static" : "icon", size: 18 }) })), colors.map((color) => ((0, jsx_runtime_1.jsx)(button_1.Button, { variant: "secondary", sx: {
+                                    ":hover": {
+                                        bg: currentColor,
+                                    },
+                                }, onClick: () => setIsPickerOpen((s) => !s) }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.palette, color: tColor.isDark() ? "static" : "icon", size: 18 }) })), colors.map((color) => ((0, jsx_runtime_1.jsx)(button_1.Button, { sx: {
                                     flex: "0 0 auto",
                                     bg: color,
                                     width: PALETTE_SIZE,
@@ -114,7 +117,9 @@ function ColorPicker(props) {
                                     ml: [2, 1, 1],
                                     mb: [0, 1, 1],
                                     borderRadius: 50,
-                                    //   boxShadow: "menu",
+                                    ":hover": {
+                                        bg: color,
+                                    },
                                 }, onClick: () => {
                                     setCurrentColor(color);
                                     onChange(color);
