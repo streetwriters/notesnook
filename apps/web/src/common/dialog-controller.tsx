@@ -46,7 +46,6 @@ function showDialog<TId extends DialogIds, TReturnType>(
       openDialogs[id] = false;
       ReactDOM.unmountComponentAtNode(container);
       container.remove();
-      closeOpenedDialog();
       resolve(result);
     };
     const PropDialog = render(Dialogs[id], perform);
