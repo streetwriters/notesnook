@@ -1,10 +1,12 @@
 import { Editor } from "notesnook-editor";
 import {
+  Dispatch,
   MutableRefObject,
+  SetStateAction,
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from "react";
 import { useEditorThemeStore } from "../state/theme";
 import { EventTypes, isReactNative, post, timerFn } from "../utils";
@@ -40,14 +42,18 @@ export type EditorController = {
   openFilePicker: (type: "image" | "file" | "camera") => void;
   downloadAttachment: (attachment: Attachment) => void;
   content: MutableRefObject<string | null>;
+  onUpdate: () => void;
 };
 
-export function useEditorController(editor: Editor | null): EditorController {
+export function useEditorController(
+  editor: Editor | null,
+  update: Dispatch<SetStateAction<number>>
+): EditorController {
   const [title, setTitle] = useState("");
   const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
-    change: null,
+    change: null
   });
 
   const selectionChange = useCallback((editor: Editor) => {
@@ -112,6 +118,10 @@ export function useEditorController(editor: Editor | null): EditorController {
     []
   );
 
+  const onUpdate = () => {
+    update((tick) => tick + 1);
+  };
+
   const onMessage = useCallback(
     (data: Event) => {
       //@ts-ignore
@@ -122,9 +132,7 @@ export function useEditorController(editor: Editor | null): EditorController {
       switch (type) {
         case "native:html":
           htmlContentRef.current = value;
-          editor?.commands.setContent(htmlContentRef.current, false, {
-            preserveWhitespace: true,
-          });
+          update((tick) => tick + 1);
           break;
         case "native:theme":
           useEditorThemeStore.getState().setColors(message.value);
@@ -141,7 +149,7 @@ export function useEditorController(editor: Editor | null): EditorController {
       }
       post(type); // Notify that message was delivered successfully.
     },
-    [editor]
+    [update]
   );
 
   // useEffect(() => {
@@ -186,5 +194,6 @@ export function useEditorController(editor: Editor | null): EditorController {
     openFilePicker,
     downloadAttachment,
     content: htmlContentRef,
+    onUpdate: onUpdate
   };
 }

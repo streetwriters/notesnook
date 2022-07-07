@@ -4,9 +4,15 @@ import {
   PortalProvider,
   Toolbar,
   usePermissionHandler,
-  useTiptap,
+  useTiptap
 } from "notesnook-editor";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useReducer,
+  useRef,
+  useState
+} from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import { useEditorThemeStore } from "../state/theme";
@@ -18,6 +24,7 @@ import Title from "./title";
 
 const Tiptap = () => {
   const settings = useSettings();
+  const [tick, setTick] = useState(0);
   const theme = useEditorThemeStore((state) => state.colors);
   const [initialProps, setInitialProps] = useState<Partial<Settings>>({
     readonly: global.readonly || settings.readonly,
@@ -26,7 +33,7 @@ const Tiptap = () => {
       global.noToolbar ||
       settings.noToolbar ||
       global.readonly ||
-      settings.readonly,
+      settings.readonly
   });
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -35,14 +42,14 @@ const Tiptap = () => {
     //todo
     accent: "green",
     scale: 1,
-    theme: theme?.night ? "dark" : "light",
+    theme: theme?.night ? "dark" : "light"
   });
 
   const editorTheme = useTheme({
     //todo
     accent: "green",
     scale: 1,
-    theme: theme?.night ? "dark" : "light",
+    theme: theme?.night ? "dark" : "light"
   });
 
   editorTheme.space = [0, 10, 12, 20];
@@ -54,37 +61,37 @@ const Tiptap = () => {
     ...toolbarTheme.buttons.menuitem,
     height: "50px",
     paddingX: "20px",
-    borderBottomWidth: 0,
+    borderBottomWidth: 0
   };
 
   toolbarTheme.iconSizes = {
     big: 20,
     medium: 18,
-    small: 18,
+    small: 18
   };
   toolbarTheme.fontSizes = {
     ...toolbarTheme.fontSizes,
     subBody: "0.8rem",
-    body: "0.9rem",
+    body: "0.9rem"
   };
 
   toolbarTheme.radii = {
     ...toolbarTheme.radii,
-    small: 5,
+    small: 5
   };
 
   toolbarTheme.buttons.menuitem = {
     ...toolbarTheme.buttons.menuitem,
     px: 5,
-    height: "45px",
+    height: "45px"
   };
   usePermissionHandler({
     claims: {
-      premium: settings.premium,
+      premium: settings.premium
     },
     onPermissionDenied: () => {
       post(EventTypes.pro);
-    },
+    }
   });
   const editor = useTiptap(
     {
@@ -106,14 +113,14 @@ const Tiptap = () => {
       element: !layout ? undefined : contentRef.current || undefined,
       editable: !initialProps.readonly,
       editorProps: {
-        editable: () => !initialProps.readonly,
+        editable: () => !initialProps.readonly
       },
       content: global.editorController?.content?.current,
-      isMobile: true,
+      isMobile: true
     },
-    [layout, initialProps.readonly]
+    [layout, initialProps.readonly, tick]
   );
-  const controller = useEditorController(editor);
+  const controller = useEditorController(editor, setTick);
   const controllerRef = useRef(controller);
   globalThis.editorController = controller;
   globalThis.editor = editor;
@@ -134,10 +141,15 @@ const Tiptap = () => {
           flex: 1,
           flexDirection: "column",
           maxWidth: "100vw",
-          marginBottom: "5px",
+          marginBottom: "5px"
         }}
       >
-        <Header settings={settings} noHeader={initialProps.noHeader || false} />
+        <Header
+          hasRedo={false}
+          hasUndo={false}
+          settings={settings}
+          noHeader={initialProps.noHeader || false}
+        />
         <div
           onScroll={controller.scroll}
           ref={containerRef}
@@ -147,7 +159,7 @@ const Tiptap = () => {
             height: "100%",
             flexGrow: 1,
             flexShrink: 1,
-            display: "flex",
+            display: "flex"
           }}
         >
           {initialProps.noHeader ? null : (
@@ -167,7 +179,7 @@ const Tiptap = () => {
               padding: 12,
               paddingTop: 0,
               color: theme?.pri,
-              flex: 1,
+              flex: 1
             }}
           />
         </div>
