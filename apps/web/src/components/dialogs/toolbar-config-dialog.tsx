@@ -35,7 +35,6 @@ import { Label, Radio } from "@rebass/forms";
 import { db } from "../../common/db";
 import { useToolbarConfig } from "../editor/context";
 import {
-  DEFAULT_TOOLS,
   getAllPresets,
   getCurrentPreset,
   getPreset,
@@ -82,10 +81,7 @@ export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
       positiveButton={{
         text: "Save",
         onClick: async () => {
-          const tools = [
-            DEFAULT_TOOLS[0],
-            ...unflatten(items.slice(0, items.length - 1)),
-          ];
+          const tools = unflatten(items.slice(0, items.length - 1));
 
           await db.settings?.setToolbarConfig("desktop", {
             preset: currentPreset.id,

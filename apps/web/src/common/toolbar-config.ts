@@ -2,7 +2,6 @@ import { getDefaultPresets, ToolbarGroupDefinition } from "notesnook-editor";
 import { db } from "./db";
 
 const defaultPresets = getDefaultPresets();
-export const DEFAULT_TOOLS = defaultPresets.default;
 export type PresetId = "default" | "minimal" | "custom";
 export type Preset = {
   id: PresetId;
@@ -44,5 +43,5 @@ export function getPreset(id: PresetId) {
 }
 
 export function getPresetTools(preset: Preset) {
-  return preset.id === "default" ? preset.tools.slice(1) : preset.tools;
+  return preset.tools;
 }
