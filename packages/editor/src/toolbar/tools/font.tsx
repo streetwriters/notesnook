@@ -78,6 +78,9 @@ function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
       title: key,
       isChecked: key === currentFontFamily,
       onClick: () => editor.current?.chain().focus().setFontFamily(value).run(),
+      styles: {
+        fontFamily: value,
+      },
     });
   }
   return menuItems;

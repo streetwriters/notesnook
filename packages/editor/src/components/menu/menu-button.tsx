@@ -16,8 +16,17 @@ type MenuButtonProps = {
 
 export function MenuButton(props: MenuButtonProps) {
   const { item, isFocused, onMouseEnter, onMouseLeave, onClick } = props;
-  const { title, key, icon, tooltip, isDisabled, isChecked, menu, modifier } =
-    item;
+  const {
+    title,
+    key,
+    icon,
+    tooltip,
+    isDisabled,
+    isChecked,
+    menu,
+    modifier,
+    styles,
+  } = item;
   const itemRef = useRef<HTMLButtonElement>(null);
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
@@ -40,6 +49,7 @@ export function MenuButton(props: MenuButtonProps) {
         disabled={isDisabled}
         onClick={onClick}
         sx={{
+          ...styles,
           bg: isFocused && !isBottom ? "hover" : "transparent",
           display: "flex",
           alignItems: "center",
@@ -49,7 +59,7 @@ export function MenuButton(props: MenuButtonProps) {
           },
         }}
       >
-        <Flex>
+        <Flex sx={{ fontSize: "inherit", fontFamily: "inherit" }}>
           {icon && (
             <Icon
               path={Icons[icon]}
@@ -58,7 +68,11 @@ export function MenuButton(props: MenuButtonProps) {
               sx={{ mr: 2 }}
             />
           )}
-          <Text as="span" variant={"body"} sx={{ fontSize: "inherit" }}>
+          <Text
+            as="span"
+            variant={"body"}
+            sx={{ fontSize: "inherit", fontFamily: "inherit" }}
+          >
             {title}
           </Text>
         </Flex>

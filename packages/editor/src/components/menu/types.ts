@@ -1,3 +1,4 @@
+import { SxStyleProp } from "rebass";
 import { IconNames } from "../../toolbar/icons";
 
 type MenuItemComponentProps = {
@@ -26,6 +27,7 @@ export type MenuButton = BaseMenuItem<"button"> & {
   isChecked?: boolean;
   modifier?: string;
   menu?: { title: string; items: MenuItem[] };
+  styles?: SxStyleProp;
 };
 
 export type MenuItem = MenuButton | MenuSeperator | MenuPopup;
