@@ -31,8 +31,8 @@ import Pricing from "./pricing";
  * @type {EventSource}
  */
 var NNEventSource;
-const DIFFERENCE_THRESHOLD = 20 * 1000;
-const MAX_TIME_ERROR_FAILURES = 5;
+// const DIFFERENCE_THRESHOLD = 20 * 1000;
+// const MAX_TIME_ERROR_FAILURES = 5;
 class Database {
   /**
    *
