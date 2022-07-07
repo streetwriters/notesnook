@@ -42,7 +42,7 @@ test("search notes with an empty note", () =>
   }).then(async ({ db }) => {
     await db.notes.add({
       title: "world is a heavy tune",
-      content: { type: "tiny", data: "<p><br></p>" },
+      content: { type: "tiptap", data: "<p><br></p>" },
     });
     let filtered = await db.lookup.notes(db.notes.all, "heavy tune");
     expect(filtered).toHaveLength(1);

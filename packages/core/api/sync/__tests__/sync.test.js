@@ -122,7 +122,7 @@ test.skip(
     for (let i = 0; i < 10; ++i) {
       const id = await deviceA.notes.add({
         content: {
-          type: "tiny",
+          type: "tiptap",
           data: `<p>deviceA=true</p>`,
         },
       });
@@ -137,7 +137,7 @@ test.skip(
       const noteId = await deviceA.notes.add({
         id,
         content: {
-          type: "tiny",
+          type: "tiptap",
           data: `<p>deviceA=true+changed=true</p>`,
         },
       });
@@ -162,7 +162,7 @@ test.skip(
       await deviceB.notes.add({
         id,
         content: {
-          type: "tiny",
+          type: "tiptap",
           data: "<p>changes from device B</p>",
         },
       });
@@ -211,7 +211,7 @@ test.skip(
     for (let i = 0; i < 3; ++i) {
       const id = await deviceA.notes.add({
         content: {
-          type: "tiny",
+          type: "tiptap",
           data: `<p>deviceA=true</p>`,
         },
       });

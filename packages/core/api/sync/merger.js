@@ -99,7 +99,7 @@ class Merger {
     if (deserialized.alg && deserialized.cipher) return deserialized;
 
     let type = deserialized.type;
-    if (!type && deserialized.data) type = "tiny";
+    if (!type && deserialized.data) type = "tiptap";
 
     if (!migrations[version]) {
       throw new Error(
@@ -110,7 +110,10 @@ class Merger {
     }
 
     const migrate = migrations[version][type];
-    if (migrate) return migrate(deserialized);
+    if (migrate) {
+      console.log(migrate, version, type);
+      return migrate(deserialized);
+    }
     return deserialized;
   }
 

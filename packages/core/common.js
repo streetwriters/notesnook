@@ -52,6 +52,7 @@ export const EVENTS = {
   syncProgress: "sync:progress",
   syncCompleted: "sync:completed",
   databaseMigrated: "db:migrated",
+  databaseMigrating: "db:migrating",
   databaseUpdated: "db:updated",
   databaseCollectionInitiated: "db:collectionInitiated",
   appRefreshRequested: "app:refreshRequested",
@@ -65,7 +66,7 @@ export const EVENTS = {
   systemTimeInvalid: "system:invalidTime",
 };
 
-export const CURRENT_DATABASE_VERSION = 5.4;
+export const CURRENT_DATABASE_VERSION = 5.5;
 
 export function setUserPersonalizationBytes(userSalt) {
   USER_PERSONALIZATION_HASH = new Uint8Array(

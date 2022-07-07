@@ -318,7 +318,7 @@ test("note content should not contain image base64 data after save", () =>
       id
     );
 
-    await db.notes.add({ id, content: { type: "tiny", data: IMG_CONTENT } });
+    await db.notes.add({ id, content: { type: "tiptap", data: IMG_CONTENT } });
     const note = db.notes.note(id);
     const content = await note.content();
     expect(content).not.toContain(`src="data:image/png;`);

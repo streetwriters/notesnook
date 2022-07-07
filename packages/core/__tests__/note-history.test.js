@@ -8,7 +8,7 @@ beforeEach(async () => {
 //   let note = await db.notes.note(noteId).data;
 //   let content = {
 //     data: await db.notes.note(noteId).content(),
-//     type: "tiny",
+//     type: "tiptap",
 //   };
 //   let session = await db.noteHistory.add(noteId, note.dateEdited, content);
 
@@ -28,7 +28,7 @@ test("editing the same note should create multiple history sessions", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
-      type: "tiny",
+      type: "tiptap",
     };
 
     await db.notes.add({
@@ -52,7 +52,7 @@ test("restoring an old session should replace note's content", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
-      type: "tiny",
+      type: "tiptap",
     };
 
     await db.notes.add({
@@ -75,7 +75,7 @@ test("date created of session should not change on edit", () =>
 
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
-      type: "tiny",
+      type: "tiptap",
     };
 
     await delay(1000);
@@ -141,7 +141,7 @@ test("auto clear sessions if they exceed the limit", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
-      type: "tiny",
+      type: "tiptap",
     };
 
     await db.notes.add({
@@ -168,7 +168,7 @@ test("save a locked note should add a locked session to note history", () =>
     await db.vault.add(id);
 
     const note = db.notes.note(id).data;
-    const editedContent = { type: "tiny", data: "<p>hello world</p>" };
+    const editedContent = { type: "tiptap", data: "<p>hello world</p>" };
     await db.vault.save({
       ...note,
       content: editedContent,

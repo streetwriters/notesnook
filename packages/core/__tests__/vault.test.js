@@ -108,7 +108,7 @@ test("save an edited locked note", () =>
     const note = db.notes.note(id).data;
     await db.vault.save({
       ...note,
-      content: { type: "tiny", data: "<p>hello world</p>" },
+      content: { type: "tiptap", data: "<p>hello world</p>" },
     });
 
     const content = await db.content.raw(note.contentId);

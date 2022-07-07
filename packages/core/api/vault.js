@@ -1,4 +1,5 @@
 import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
+import { tinyToTiptap } from "../migrations";
 
 const ERASE_TIME = 1000 * 60 * 30;
 var ERASER_TIMEOUT = null;
@@ -228,7 +229,18 @@ export default class Vault {
       encryptedContent.data
     );
 
-    return { type: encryptedContent.type, data: JSON.parse(decryptedContent) };
+    const content = {
+      type: encryptedContent.type,
+      data: JSON.parse(decryptedContent),
+    };
+
+    // #MIGRATION: convert tiny to tiptap
+    if (content.type === "tiny") {
+      content.type = "tiptap";
+      content.data = tinyToTiptap(content.data);
+    }
+
+    return content;
   }
 
   /** @private */

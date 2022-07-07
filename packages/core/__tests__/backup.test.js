@@ -104,7 +104,7 @@ describe.each([
 
       const allContent = await db.content.all();
       expect(
-        allContent.every((v) => v.type === "tiny" || v.deleted)
+        allContent.every((v) => v.type === "tiptap" || v.deleted)
       ).toBeTruthy();
       expect(allContent.every((v) => !v.persistDateEdited)).toBeTruthy();
       expect(allContent.every((v) => v.dateModified > 0)).toBeTruthy();

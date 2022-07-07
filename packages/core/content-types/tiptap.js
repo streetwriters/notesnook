@@ -6,7 +6,7 @@ var converter = new showdown.Converter();
 converter.setFlavor("original");
 
 const splitter = /\W+/gm;
-class Tiny {
+export class Tiptap {
   constructor(data) {
     this.data = data;
     this.text;
@@ -144,7 +144,6 @@ class Tiny {
     };
   }
 }
-export default Tiny;
 
 function getDatasetAttribute(element, attribute) {
   return element.getAttribute(`data-${attribute}`);

@@ -1,4 +1,4 @@
-import { CURRENT_DATABASE_VERSION, EV, EVENTS } from "../common";
+import { CURRENT_DATABASE_VERSION, EVENTS } from "../common";
 import Migrator from "../database/migrator";
 
 class Migrations {
@@ -9,6 +9,7 @@ class Migrations {
   constructor(db) {
     this._db = db;
     this._migrator = new Migrator();
+    this._isMigrating = false;
   }
 
   async init() {
@@ -18,7 +19,13 @@ class Migrations {
   }
 
   async migrate() {
-    if (this.dbVersion >= CURRENT_DATABASE_VERSION) return;
+    if (this.dbVersion >= CURRENT_DATABASE_VERSION || this._isMigrating) return;
+
+    this._isMigrating = true;
+    this._db.eventManager.publish(EVENTS.databaseMigrating, {
+      from: this.dbVersion,
+      to: CURRENT_DATABASE_VERSION,
+    });
 
     await this._db.notes.init();
     const content = await this._db.content.all();
@@ -58,10 +65,7 @@ class Migrations {
     await this._migrator.migrate(collections, (item) => item, this.dbVersion);
     await this._db.storage.write("v", CURRENT_DATABASE_VERSION);
 
-    EV.publish(EVENTS.databaseMigrated, {
-      prev: this.dbVersion,
-      current: CURRENT_DATABASE_VERSION,
-    });
+    this._db.eventManager.publish(EVENTS.databaseMigrated);
 
     this.dbVersion = CURRENT_DATABASE_VERSION;
   }

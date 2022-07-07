@@ -13,27 +13,36 @@ export const migrations = {
     tiny: (item) => {
       item = replaceDateEditedWithDateModified()(item);
 
-      if (!item.data || item.data.iv) return item;
+      if (!item.data || item.data.iv) return migrations["5.3"].tiny(item);
 
       item.data = removeToxClassFromChecklist(wrapTablesWithDiv(item.data));
-      return item;
+      return migrations["5.3"].tiny(item);
     },
     settings: replaceDateEditedWithDateModified(true),
   },
   5.3: {
     tiny: (item) => {
-      if (!item.data || item.data.iv) return item;
+      if (!item.data || item.data.iv) return migrations["5.4"].tiny(item);
       item.data = decodeWrappedTableHtml(item.data);
-      return item;
+      return migrations["5.4"].tiny(item);
     },
   },
   5.4: {
+    tiny: (item) => {
+      if (!item.data || item.data.iv) return item;
+      item.type = "tiptap";
+      item.data = tinyToTiptap(item.data);
+      return item;
+    },
+  },
+  5.5: {
     note: false,
     notebook: false,
     tag: false,
     attachment: false,
     trash: false,
     tiny: false,
+    tiptap: false,
     settings: false,
   },
 };
@@ -82,4 +91,55 @@ function decodeWrappedTableHtml(html) {
     const html = decodeHTML5(match);
     return html;
   });
+}
+
+export function tinyToTiptap(html) {
+  const document = parseHTML(html);
+
+  const tables = document.querySelectorAll("table");
+  for (const table of tables) {
+    table.removeAttribute("contenteditable");
+    if (table.parentElement?.nodeName.toLowerCase() === "div") {
+      table.parentElement.replaceWith(table);
+    }
+  }
+
+  const images = document.querySelectorAll("p > img");
+  for (const image of images) {
+    image.parentElement.replaceWith(image.cloneNode());
+  }
+
+  const breaks = document.querySelectorAll("br");
+  for (const br of breaks) {
+    br.remove();
+  }
+
+  const paragraphs = document.querySelectorAll("p");
+  for (const p of paragraphs) {
+    if (!p.childNodes.length) p.remove();
+  }
+
+  const listItems = document.querySelectorAll("li");
+  for (const li of listItems) {
+    if (li.firstChild) {
+      const p = document.createElement("p");
+      p.appendChild(li.firstChild.cloneNode());
+      li.firstChild.replaceWith(p);
+    }
+  }
+
+  const bogus = document.querySelectorAll("[data-mce-bogus]");
+  for (const element of bogus) {
+    element.remove();
+  }
+
+  const attributes = document.querySelectorAll(
+    "[data-mce-href], [data-mce-flag]"
+  );
+  for (const element of attributes) {
+    element.removeAttribute("data-mce-href");
+    element.removeAttribute("data-mce-flag");
+  }
+
+  return document.body.innerHTML;
 }
