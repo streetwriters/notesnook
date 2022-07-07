@@ -1,0 +1,16 @@
+diff --git a/node_modules/notes-core/utils/htmlparser.js b/node_modules/notes-core/utils/htmlparser.js
+index 39762f7..b256b64 100644
+--- a/node_modules/notes-core/utils/htmlparser.js
++++ b/node_modules/notes-core/utils/htmlparser.js
+@@ -1,10 +1,5 @@
+ import { decodeHTML5 } from "entities";
+-import { DOMParser } from "linkedom/worker";
+-
+-const RealDOMParser =
+-  "window" in global && "DOMParser" in window
+-    ? new window.DOMParser()
+-    : new DOMParser();
++const RealDOMParser = new DOMParser();
+ 
+ export const parseHTML = (input) =>
+   RealDOMParser.parseFromString(wrapIntoHTMLDocument(input), "text/html");

@@ -1,0 +1,839 @@
+diff --git a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
+index 4536402..89125e3 100644
+--- a/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
++++ b/node_modules/react-native/Libraries/Components/Keyboard/KeyboardAvoidingView.js
+@@ -82,6 +82,7 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+ 
+     // Calculate the displacement needed for the view such that it
+     // no longer overlaps with the keyboard
++    if (this._initialFrameHeight && frame.height < this._initialFrameHeight) frame.height = this._initialFrameHeight;
+     return Math.max(frame.y + frame.height - keyboardY, 0);
+   }
+ 
+@@ -92,7 +93,9 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+ 
+   _onLayout = (event: ViewLayoutEvent) => {
+     const wasFrameNull = this._frame == null;
++   
+     this._frame = event.nativeEvent.layout;
++
+     if (!this._initialFrameHeight) {
+       // save the initial frame height, before the keyboard is visible
+       this._initialFrameHeight = this._frame.height;
+@@ -115,7 +118,7 @@ class KeyboardAvoidingView extends React.Component<Props, State> {
+ 
+     const {duration, easing, endCoordinates} = this._keyboardEvent;
+     const height = this._relativeKeyboardHeight(endCoordinates);
+-
++    console.log('new height',height,this.state.bottom);
+     if (this.state.bottom === height) {
+       return;
+     }
+diff --git a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
+index f0f6402..d645d81 100644
+--- a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
++++ b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
+@@ -685,7 +685,18 @@ RCT_SCROLL_EVENT_HANDLER(scrollViewDidScrollToTop, onScrollToTop)
+                                          : MAX(0, _scrollView.contentSize.height - viewportSize.height);
+ 
+     // Calculate the snap offsets adjacent to the initial offset target
+-    CGFloat targetOffset = isHorizontal ? targetContentOffset->x : targetContentOffset->y;
++    //CGFloat targetOffset = isHorizontal ? targetContentOffset->x : targetContentOffset->y;
++    /**
++     * https://github.com/facebook/react-native/pull/30033/files/af9c24639073e57f4e309851893e96da2e54271d..52a3d8d87778614b84a113f9198b88fc152a5a26
++     */
++    CGFloat targetOffset = targetContentOffset->y;
++    if (isHorizontal) {
++      // Use current scroll offset to determine the next index to snap to when momentum disabled
++      targetOffset = self.disableIntervalMomentum ? scrollView.contentOffset.x : targetContentOffset->x;
++    } else {
++      targetOffset = self.disableIntervalMomentum ? scrollView.contentOffset.y : targetContentOffset->y;
++   }
++
+     CGFloat smallerOffset = 0.0;
+     CGFloat largerOffset = maximumOffset;
+ 
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libc++_shared.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libc++_shared.so
+new file mode 100644
+index 0000000..83acd19
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libc++_shared.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfabricjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfabricjni.so
+new file mode 100644
+index 0000000..e7e208b
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfabricjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfb.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfb.so
+new file mode 100644
+index 0000000..841d222
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfb.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfbjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfbjni.so
+new file mode 100644
+index 0000000..5603650
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfbjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfolly_runtime.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfolly_runtime.so
+new file mode 100644
+index 0000000..f73cc89
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libfolly_runtime.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libglog.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libglog.so
+new file mode 100644
+index 0000000..ed60902
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libglog.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libglog_init.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libglog_init.so
+new file mode 100644
+index 0000000..10ea387
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libglog_init.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libhermes-executor-debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libhermes-executor-debug.so
+new file mode 100644
+index 0000000..c358336
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libhermes-executor-debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjscexecutor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjscexecutor.so
+new file mode 100644
+index 0000000..bc0ac7c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjscexecutor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsi.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsi.so
+new file mode 100644
+index 0000000..467c592
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsi.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsijniprofiler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsijniprofiler.so
+new file mode 100644
+index 0000000..b1ab0c4
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsijniprofiler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsinspector.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsinspector.so
+new file mode 100644
+index 0000000..acfbe08
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libjsinspector.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/liblogger.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/liblogger.so
+new file mode 100644
+index 0000000..f2e7f7c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/liblogger.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libmapbufferjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libmapbufferjni.so
+new file mode 100644
+index 0000000..dcc03f2
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libmapbufferjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_codegen_rncore.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_codegen_rncore.so
+new file mode 100644
+index 0000000..99fe010
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_codegen_rncore.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_config.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_config.so
+new file mode 100644
+index 0000000..38d4613
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_config.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_debug.so
+new file mode 100644
+index 0000000..4a4c9c4
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_nativemodule_core.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_nativemodule_core.so
+new file mode 100644
+index 0000000..a953450
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_nativemodule_core.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_animations.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_animations.so
+new file mode 100644
+index 0000000..1ca15c2
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_animations.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_attributedstring.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_attributedstring.so
+new file mode 100644
+index 0000000..3195bec
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_attributedstring.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_componentregistry.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_componentregistry.so
+new file mode 100644
+index 0000000..fe0cc0c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_componentregistry.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_core.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_core.so
+new file mode 100644
+index 0000000..1221f60
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_core.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_debug.so
+new file mode 100644
+index 0000000..59bd7a0
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_graphics.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_graphics.so
+new file mode 100644
+index 0000000..adf960c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_graphics.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_imagemanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_imagemanager.so
+new file mode 100644
+index 0000000..8c1c0d1
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_imagemanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_leakchecker.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_leakchecker.so
+new file mode 100644
+index 0000000..78a0764
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_leakchecker.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_mapbuffer.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_mapbuffer.so
+new file mode 100644
+index 0000000..f9bf651
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_mapbuffer.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_mounting.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_mounting.so
+new file mode 100644
+index 0000000..d95f540
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_mounting.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_runtimescheduler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_runtimescheduler.so
+new file mode 100644
+index 0000000..12628d1
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_runtimescheduler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_scheduler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_scheduler.so
+new file mode 100644
+index 0000000..dfa57c6
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_scheduler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_telemetry.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_telemetry.so
+new file mode 100644
+index 0000000..afedf5c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_telemetry.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_templateprocessor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_templateprocessor.so
+new file mode 100644
+index 0000000..8993b33
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_templateprocessor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_textlayoutmanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_textlayoutmanager.so
+new file mode 100644
+index 0000000..846e107
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_textlayoutmanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_uimanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_uimanager.so
+new file mode 100644
+index 0000000..196dd0a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_render_uimanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_utils.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_utils.so
+new file mode 100644
+index 0000000..2a246b4
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreact_utils.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativeblob.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativeblob.so
+new file mode 100644
+index 0000000..bf2b7c9
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativeblob.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativejni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativejni.so
+new file mode 100644
+index 0000000..8bd75a8
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativejni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativeutilsjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativeutilsjni.so
+new file mode 100644
+index 0000000..6dad5fe
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactnativeutilsjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactperfloggerjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactperfloggerjni.so
+new file mode 100644
+index 0000000..bc5b60a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libreactperfloggerjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_image.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_image.so
+new file mode 100644
+index 0000000..a7e0660
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_image.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_root.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_root.so
+new file mode 100644
+index 0000000..c7565c3
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_root.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_scrollview.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_scrollview.so
+new file mode 100644
+index 0000000..b09e6bb
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_scrollview.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_text.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_text.so
+new file mode 100644
+index 0000000..601e0e9
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_text.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_textinput.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_textinput.so
+new file mode 100644
+index 0000000..b2b9d9e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_textinput.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_unimplementedview.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_unimplementedview.so
+new file mode 100644
+index 0000000..871de54
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_unimplementedview.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_view.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_view.so
+new file mode 100644
+index 0000000..a9c1d8c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/librrc_view.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libruntimeexecutor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libruntimeexecutor.so
+new file mode 100644
+index 0000000..9559f4a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libruntimeexecutor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libturbomodulejsijni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libturbomodulejsijni.so
+new file mode 100644
+index 0000000..c47f9fe
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libturbomodulejsijni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libyoga.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libyoga.so
+new file mode 100644
+index 0000000..3b30bb9
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/arm64-v8a/libyoga.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libc++_shared.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libc++_shared.so
+new file mode 100644
+index 0000000..dd2cc28
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libc++_shared.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfabricjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfabricjni.so
+new file mode 100644
+index 0000000..62279dc
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfabricjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfb.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfb.so
+new file mode 100644
+index 0000000..9059c6f
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfb.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfbjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfbjni.so
+new file mode 100644
+index 0000000..98c12eb
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfbjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfolly_runtime.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfolly_runtime.so
+new file mode 100644
+index 0000000..a7cc01e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libfolly_runtime.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libglog.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libglog.so
+new file mode 100644
+index 0000000..4431ef6
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libglog.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libglog_init.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libglog_init.so
+new file mode 100644
+index 0000000..65e77ab
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libglog_init.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libhermes-executor-debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libhermes-executor-debug.so
+new file mode 100644
+index 0000000..bfeb7e5
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libhermes-executor-debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjscexecutor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjscexecutor.so
+new file mode 100644
+index 0000000..1a3ca95
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjscexecutor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsi.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsi.so
+new file mode 100644
+index 0000000..9755ffc
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsi.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsijniprofiler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsijniprofiler.so
+new file mode 100644
+index 0000000..d9fea8a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsijniprofiler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsinspector.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsinspector.so
+new file mode 100644
+index 0000000..f95ce54
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libjsinspector.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/liblogger.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/liblogger.so
+new file mode 100644
+index 0000000..9ee2a7b
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/liblogger.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libmapbufferjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libmapbufferjni.so
+new file mode 100644
+index 0000000..0065614
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libmapbufferjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_codegen_rncore.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_codegen_rncore.so
+new file mode 100644
+index 0000000..d8ddfa1
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_codegen_rncore.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_config.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_config.so
+new file mode 100644
+index 0000000..8eed412
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_config.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_debug.so
+new file mode 100644
+index 0000000..9c8498c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_nativemodule_core.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_nativemodule_core.so
+new file mode 100644
+index 0000000..dc855e7
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_nativemodule_core.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_animations.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_animations.so
+new file mode 100644
+index 0000000..624265d
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_animations.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_attributedstring.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_attributedstring.so
+new file mode 100644
+index 0000000..118e1c0
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_attributedstring.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_componentregistry.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_componentregistry.so
+new file mode 100644
+index 0000000..0b738f8
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_componentregistry.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_core.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_core.so
+new file mode 100644
+index 0000000..1582810
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_core.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_debug.so
+new file mode 100644
+index 0000000..3162da2
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_graphics.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_graphics.so
+new file mode 100644
+index 0000000..d3719b1
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_graphics.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_imagemanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_imagemanager.so
+new file mode 100644
+index 0000000..ce0cdbb
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_imagemanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_leakchecker.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_leakchecker.so
+new file mode 100644
+index 0000000..2b77a7e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_leakchecker.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_mapbuffer.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_mapbuffer.so
+new file mode 100644
+index 0000000..855db85
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_mapbuffer.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_mounting.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_mounting.so
+new file mode 100644
+index 0000000..1f524b3
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_mounting.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_runtimescheduler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_runtimescheduler.so
+new file mode 100644
+index 0000000..6600e15
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_runtimescheduler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_scheduler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_scheduler.so
+new file mode 100644
+index 0000000..c8b78a4
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_scheduler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_telemetry.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_telemetry.so
+new file mode 100644
+index 0000000..3995c32
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_telemetry.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_templateprocessor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_templateprocessor.so
+new file mode 100644
+index 0000000..27dd58f
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_templateprocessor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_textlayoutmanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_textlayoutmanager.so
+new file mode 100644
+index 0000000..a26ef86
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_textlayoutmanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_uimanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_uimanager.so
+new file mode 100644
+index 0000000..2d79400
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_render_uimanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_utils.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_utils.so
+new file mode 100644
+index 0000000..6a3b703
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreact_utils.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativeblob.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativeblob.so
+new file mode 100644
+index 0000000..7e50576
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativeblob.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativejni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativejni.so
+new file mode 100644
+index 0000000..ede321e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativejni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativeutilsjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativeutilsjni.so
+new file mode 100644
+index 0000000..dd4297c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactnativeutilsjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactperfloggerjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactperfloggerjni.so
+new file mode 100644
+index 0000000..311cdd4
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libreactperfloggerjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_image.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_image.so
+new file mode 100644
+index 0000000..a7dde64
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_image.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_root.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_root.so
+new file mode 100644
+index 0000000..2ea25aa
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_root.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_scrollview.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_scrollview.so
+new file mode 100644
+index 0000000..ce5ae57
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_scrollview.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_text.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_text.so
+new file mode 100644
+index 0000000..6725099
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_text.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_textinput.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_textinput.so
+new file mode 100644
+index 0000000..1bc74ab
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_textinput.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_unimplementedview.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_unimplementedview.so
+new file mode 100644
+index 0000000..39b46ff
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_unimplementedview.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_view.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_view.so
+new file mode 100644
+index 0000000..2ce56c5
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/librrc_view.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libruntimeexecutor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libruntimeexecutor.so
+new file mode 100644
+index 0000000..754e385
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libruntimeexecutor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libturbomodulejsijni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libturbomodulejsijni.so
+new file mode 100644
+index 0000000..a9e6182
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libturbomodulejsijni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libyoga.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libyoga.so
+new file mode 100644
+index 0000000..d4332ed
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/armeabi-v7a/libyoga.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libc++_shared.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libc++_shared.so
+new file mode 100644
+index 0000000..2668c34
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libc++_shared.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfabricjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfabricjni.so
+new file mode 100644
+index 0000000..21babf1
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfabricjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfb.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfb.so
+new file mode 100644
+index 0000000..bb84083
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfb.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfbjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfbjni.so
+new file mode 100644
+index 0000000..92a8695
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfbjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfolly_runtime.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfolly_runtime.so
+new file mode 100644
+index 0000000..fd3687d
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libfolly_runtime.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libglog.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libglog.so
+new file mode 100644
+index 0000000..e429fe5
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libglog.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libglog_init.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libglog_init.so
+new file mode 100644
+index 0000000..97276a8
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libglog_init.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libhermes-executor-debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libhermes-executor-debug.so
+new file mode 100644
+index 0000000..fa73b8a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libhermes-executor-debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjscexecutor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjscexecutor.so
+new file mode 100644
+index 0000000..a203f0d
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjscexecutor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsi.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsi.so
+new file mode 100644
+index 0000000..3ce8602
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsi.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsijniprofiler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsijniprofiler.so
+new file mode 100644
+index 0000000..60baaf5
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsijniprofiler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsinspector.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsinspector.so
+new file mode 100644
+index 0000000..879ff90
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libjsinspector.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/liblogger.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/liblogger.so
+new file mode 100644
+index 0000000..8261a8a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/liblogger.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libmapbufferjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libmapbufferjni.so
+new file mode 100644
+index 0000000..934cf5d
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libmapbufferjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_codegen_rncore.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_codegen_rncore.so
+new file mode 100644
+index 0000000..3eeff35
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_codegen_rncore.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_config.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_config.so
+new file mode 100644
+index 0000000..17c5cda
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_config.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_debug.so
+new file mode 100644
+index 0000000..3d6ebc8
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_nativemodule_core.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_nativemodule_core.so
+new file mode 100644
+index 0000000..ab03c81
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_nativemodule_core.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_animations.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_animations.so
+new file mode 100644
+index 0000000..8759183
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_animations.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_attributedstring.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_attributedstring.so
+new file mode 100644
+index 0000000..165e904
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_attributedstring.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_componentregistry.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_componentregistry.so
+new file mode 100644
+index 0000000..82e93de
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_componentregistry.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_core.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_core.so
+new file mode 100644
+index 0000000..26d5462
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_core.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_debug.so
+new file mode 100644
+index 0000000..8c7d99a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_graphics.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_graphics.so
+new file mode 100644
+index 0000000..3999ef2
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_graphics.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_imagemanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_imagemanager.so
+new file mode 100644
+index 0000000..8a736e7
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_imagemanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_leakchecker.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_leakchecker.so
+new file mode 100644
+index 0000000..b1fe519
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_leakchecker.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_mapbuffer.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_mapbuffer.so
+new file mode 100644
+index 0000000..82d43fe
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_mapbuffer.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_mounting.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_mounting.so
+new file mode 100644
+index 0000000..68a4dd6
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_mounting.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_runtimescheduler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_runtimescheduler.so
+new file mode 100644
+index 0000000..00483ce
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_runtimescheduler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_scheduler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_scheduler.so
+new file mode 100644
+index 0000000..339be6e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_scheduler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_telemetry.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_telemetry.so
+new file mode 100644
+index 0000000..8e5b4c7
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_telemetry.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_templateprocessor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_templateprocessor.so
+new file mode 100644
+index 0000000..2a8ae7f
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_templateprocessor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_textlayoutmanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_textlayoutmanager.so
+new file mode 100644
+index 0000000..f649fc0
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_textlayoutmanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_uimanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_uimanager.so
+new file mode 100644
+index 0000000..5fedc71
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_render_uimanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_utils.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_utils.so
+new file mode 100644
+index 0000000..3a807f9
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreact_utils.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativeblob.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativeblob.so
+new file mode 100644
+index 0000000..0562d60
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativeblob.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativejni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativejni.so
+new file mode 100644
+index 0000000..5839f21
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativejni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativeutilsjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativeutilsjni.so
+new file mode 100644
+index 0000000..1e7617b
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactnativeutilsjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactperfloggerjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactperfloggerjni.so
+new file mode 100644
+index 0000000..823d0a5
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libreactperfloggerjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_image.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_image.so
+new file mode 100644
+index 0000000..a5c777e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_image.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_root.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_root.so
+new file mode 100644
+index 0000000..c96a4e7
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_root.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_scrollview.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_scrollview.so
+new file mode 100644
+index 0000000..5762a57
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_scrollview.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_text.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_text.so
+new file mode 100644
+index 0000000..d277cb0
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_text.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_textinput.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_textinput.so
+new file mode 100644
+index 0000000..423a2c7
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_textinput.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_unimplementedview.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_unimplementedview.so
+new file mode 100644
+index 0000000..d6cd571
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_unimplementedview.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_view.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_view.so
+new file mode 100644
+index 0000000..4639c7e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/librrc_view.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libruntimeexecutor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libruntimeexecutor.so
+new file mode 100644
+index 0000000..91aa4f7
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libruntimeexecutor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libturbomodulejsijni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libturbomodulejsijni.so
+new file mode 100644
+index 0000000..102a3e0
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libturbomodulejsijni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libyoga.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libyoga.so
+new file mode 100644
+index 0000000..49e3b9a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86/libyoga.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libc++_shared.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libc++_shared.so
+new file mode 100644
+index 0000000..a869cf3
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libc++_shared.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfabricjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfabricjni.so
+new file mode 100644
+index 0000000..11ac403
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfabricjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfb.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfb.so
+new file mode 100644
+index 0000000..a82d154
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfb.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfbjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfbjni.so
+new file mode 100644
+index 0000000..4c99ca1
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfbjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfolly_runtime.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfolly_runtime.so
+new file mode 100644
+index 0000000..2cfae0a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libfolly_runtime.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libglog.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libglog.so
+new file mode 100644
+index 0000000..951269c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libglog.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libglog_init.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libglog_init.so
+new file mode 100644
+index 0000000..3f183be
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libglog_init.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libhermes-executor-debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libhermes-executor-debug.so
+new file mode 100644
+index 0000000..8d2ba75
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libhermes-executor-debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjscexecutor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjscexecutor.so
+new file mode 100644
+index 0000000..8ae2a5d
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjscexecutor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsi.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsi.so
+new file mode 100644
+index 0000000..fdfaa5c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsi.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsijniprofiler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsijniprofiler.so
+new file mode 100644
+index 0000000..d673963
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsijniprofiler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsinspector.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsinspector.so
+new file mode 100644
+index 0000000..f17e53e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libjsinspector.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/liblogger.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/liblogger.so
+new file mode 100644
+index 0000000..2e54d60
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/liblogger.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libmapbufferjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libmapbufferjni.so
+new file mode 100644
+index 0000000..6c359d4
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libmapbufferjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_codegen_rncore.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_codegen_rncore.so
+new file mode 100644
+index 0000000..cffd5ac
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_codegen_rncore.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_config.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_config.so
+new file mode 100644
+index 0000000..90b91c5
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_config.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_debug.so
+new file mode 100644
+index 0000000..ede2586
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_nativemodule_core.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_nativemodule_core.so
+new file mode 100644
+index 0000000..03d5105
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_nativemodule_core.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_animations.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_animations.so
+new file mode 100644
+index 0000000..9fef214
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_animations.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_attributedstring.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_attributedstring.so
+new file mode 100644
+index 0000000..f7f13a3
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_attributedstring.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_componentregistry.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_componentregistry.so
+new file mode 100644
+index 0000000..f4d7780
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_componentregistry.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_core.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_core.so
+new file mode 100644
+index 0000000..541f5a1
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_core.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_debug.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_debug.so
+new file mode 100644
+index 0000000..d5e4cc9
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_debug.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_graphics.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_graphics.so
+new file mode 100644
+index 0000000..3625bfd
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_graphics.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_imagemanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_imagemanager.so
+new file mode 100644
+index 0000000..528dd5f
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_imagemanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_leakchecker.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_leakchecker.so
+new file mode 100644
+index 0000000..22ddf67
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_leakchecker.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_mapbuffer.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_mapbuffer.so
+new file mode 100644
+index 0000000..a5640ec
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_mapbuffer.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_mounting.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_mounting.so
+new file mode 100644
+index 0000000..3a45a22
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_mounting.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_runtimescheduler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_runtimescheduler.so
+new file mode 100644
+index 0000000..c1ec0fb
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_runtimescheduler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_scheduler.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_scheduler.so
+new file mode 100644
+index 0000000..7ed6168
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_scheduler.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_telemetry.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_telemetry.so
+new file mode 100644
+index 0000000..496c01c
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_telemetry.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_templateprocessor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_templateprocessor.so
+new file mode 100644
+index 0000000..b6bba64
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_templateprocessor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_textlayoutmanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_textlayoutmanager.so
+new file mode 100644
+index 0000000..45293bf
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_textlayoutmanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_uimanager.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_uimanager.so
+new file mode 100644
+index 0000000..bfbee89
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_render_uimanager.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_utils.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_utils.so
+new file mode 100644
+index 0000000..ab733a4
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreact_utils.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativeblob.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativeblob.so
+new file mode 100644
+index 0000000..690d272
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativeblob.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativejni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativejni.so
+new file mode 100644
+index 0000000..7ece0cb
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativejni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativeutilsjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativeutilsjni.so
+new file mode 100644
+index 0000000..7c555ec
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactnativeutilsjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactperfloggerjni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactperfloggerjni.so
+new file mode 100644
+index 0000000..eee1a98
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libreactperfloggerjni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_image.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_image.so
+new file mode 100644
+index 0000000..668e67b
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_image.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_root.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_root.so
+new file mode 100644
+index 0000000..d210781
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_root.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_scrollview.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_scrollview.so
+new file mode 100644
+index 0000000..ac4847d
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_scrollview.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_text.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_text.so
+new file mode 100644
+index 0000000..0bf3dde
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_text.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_textinput.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_textinput.so
+new file mode 100644
+index 0000000..36cda18
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_textinput.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_unimplementedview.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_unimplementedview.so
+new file mode 100644
+index 0000000..726348e
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_unimplementedview.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_view.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_view.so
+new file mode 100644
+index 0000000..e530844
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/librrc_view.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libruntimeexecutor.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libruntimeexecutor.so
+new file mode 100644
+index 0000000..3f3bd68
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libruntimeexecutor.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libturbomodulejsijni.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libturbomodulejsijni.so
+new file mode 100644
+index 0000000..4432d2a
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libturbomodulejsijni.so differ
+diff --git a/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libyoga.so b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libyoga.so
+new file mode 100644
+index 0000000..1186d67
+Binary files /dev/null and b/node_modules/react-native/ReactAndroid/src/main/jni/first-party/react/jni/x86_64/libyoga.so differ
