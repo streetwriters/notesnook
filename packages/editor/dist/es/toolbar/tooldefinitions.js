@@ -293,19 +293,21 @@ export function getAllTools() {
 export function getDefaultPresets() {
     return defaultPresets;
 }
+export const STATIC_TOOLBAR_GROUPS = [
+    [
+        "insertBlock",
+        "tableSettings",
+        "imageSettings",
+        "embedSettings",
+        "attachmentSettings",
+        "linkSettings",
+        "codeRemove",
+        "outdent",
+        "indent",
+    ],
+];
 const defaultPresets = {
     default: [
-        [
-            "insertBlock",
-            "tableSettings",
-            "imageSettings",
-            "embedSettings",
-            "attachmentSettings",
-            "linkSettings",
-            "codeRemove",
-            "outdent",
-            "indent",
-        ],
         [
             "bold",
             "italic",

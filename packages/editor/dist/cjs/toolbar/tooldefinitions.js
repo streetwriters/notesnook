@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDefaultPresets = exports.getAllTools = exports.getToolDefinition = void 0;
+exports.STATIC_TOOLBAR_GROUPS = exports.getDefaultPresets = exports.getAllTools = exports.getToolDefinition = void 0;
 const tools = {
     bold: {
         icon: "bold",
@@ -299,19 +299,21 @@ function getDefaultPresets() {
     return defaultPresets;
 }
 exports.getDefaultPresets = getDefaultPresets;
+exports.STATIC_TOOLBAR_GROUPS = [
+    [
+        "insertBlock",
+        "tableSettings",
+        "imageSettings",
+        "embedSettings",
+        "attachmentSettings",
+        "linkSettings",
+        "codeRemove",
+        "outdent",
+        "indent",
+    ],
+];
 const defaultPresets = {
     default: [
-        [
-            "insertBlock",
-            "tableSettings",
-            "imageSettings",
-            "embedSettings",
-            "attachmentSettings",
-            "linkSettings",
-            "codeRemove",
-            "outdent",
-            "indent",
-        ],
         [
             "bold",
             "italic",
