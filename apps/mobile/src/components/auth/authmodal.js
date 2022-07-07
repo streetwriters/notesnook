@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { eCloseLoginDialog, eOpenLoginDialog } from '../../utils/events';
@@ -24,7 +22,6 @@ const AuthModal = () => {
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();
-  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     eSubscribeEvent(eOpenLoginDialog, open);
@@ -85,8 +82,7 @@ const AuthModal = () => {
           customStyle={{
             position: 'absolute',
             zIndex: 999,
-            left: 12,
-            top: Platform.OS === 'ios' ? 12 + insets.top : insets.top
+            left: 12
           }}
         />
       )}

@@ -1,5 +1,5 @@
 import { EV, EVENTS } from 'notes-core/common';
-import React, { useEffect } from 'react';
+import React, { forwardRef, RefObject, useEffect, useImperativeHandle } from 'react';
 import { Linking, ViewStyle } from 'react-native';
 import WebView from 'react-native-webview';
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
@@ -29,102 +29,118 @@ const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
 };
 
 const Editor = React.memo(
-  ({
-    readonly = false,
-    noToolbar = false,
-    noHeader = false,
-    withController = true,
-    editorId = '',
-    onLoad
-  }: EditorProps) => {
-    const editor = useEditor(editorId || '', readonly);
-    const onMessage = useEditorEvents(editor, {
-      readonly,
-      noToolbar,
-      noHeader
-    });
-
-    const onMediaDownloaded = ({
-      hash,
-      groupId,
-      src
-    }: {
-      hash: string;
-      groupId: string;
-      src: string;
-    }) => {
-      console.log('onMediaDownoaded', groupId);
-      if (groupId !== editor.note.current?.id) return;
-      editor.commands.updateImage({
-        hash: hash,
-        src: src
+  forwardRef<
+    {
+      get: () => useEditorType;
+    },
+    EditorProps
+  >(
+    (
+      {
+        readonly = false,
+        noToolbar = false,
+        noHeader = false,
+        withController = true,
+        editorId = '',
+        onLoad,
+        onChange,
+        theme
+      },
+      ref
+    ) => {
+      const editor = useEditor(editorId || '', readonly, onChange, theme);
+      const onMessage = useEditorEvents(editor, {
+        readonly,
+        noToolbar,
+        noHeader
       });
-    };
 
-    useEffect(() => {
-      onLoad && onLoad();
-      EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
-      return () => {
-        EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
+      useImperativeHandle(ref, () => ({
+        get: () => editor
+      }));
+
+      const onMediaDownloaded = ({
+        hash,
+        groupId,
+        src
+      }: {
+        hash: string;
+        groupId: string;
+        src: string;
+      }) => {
+        console.log('onMediaDownoaded', groupId);
+
+        if (groupId !== editor.note.current?.id) return;
+        editor.commands.updateImage({
+          hash: hash,
+          src: src
+        });
       };
-    }, []);
 
-    if (withController) {
-      //@ts-ignore
-      editorController.current = editor;
-    }
+      useEffect(() => {
+        onLoad && onLoad();
+        EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
+        return () => {
+          EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
+        };
+      }, []);
 
-    const onError = () => {
-      editor.setLoading(true);
-      setTimeout(() => editor.setLoading(false), 10);
-    };
+      if (withController) {
+        //@ts-ignore
+        editorController.current = editor;
+      }
 
-    return editor.loading ? null : (
-      <>
-        <WebView
-          testID={notesnook.editor.id}
-          ref={editor.ref}
-          onLoad={editor.onLoad}
-          onRenderProcessGone={onError}
-          nestedScrollEnabled
-          onError={onError}
-          injectedJavaScriptBeforeContentLoaded={`
+      const onError = () => {
+        editor.setLoading(true);
+        setTimeout(() => editor.setLoading(false), 10);
+      };
+
+      return editor.loading ? null : (
+        <>
+          <WebView
+            testID={notesnook.editor.id}
+            ref={editor.ref}
+            onLoad={editor.onLoad}
+            onRenderProcessGone={onError}
+            nestedScrollEnabled
+            onError={onError}
+            injectedJavaScriptBeforeContentLoaded={`
           globalThis.readonly=${readonly};
           globalThis.noToolbar=${noToolbar};
           globalThis.noHeader=${noHeader};
           `}
-          injectedJavaScript={`
-        globalThis.sessionId="${editor.sessionId}";`}
-          javaScriptEnabled={true}
-          focusable={true}
-          setSupportMultipleWindows={false}
-          overScrollMode="never"
-          keyboardDisplayRequiresUserAction={false}
-          onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-          cacheMode="LOAD_DEFAULT"
-          cacheEnabled={true}
-          domStorageEnabled={true}
-          bounces={false}
-          setBuiltInZoomControls={false}
-          setDisplayZoomControls={false}
-          allowFileAccess={true}
-          scalesPageToFit={true}
-          hideKeyboardAccessoryView={true}
-          allowFileAccessFromFileURLs={true}
-          allowUniversalAccessFromFileURLs={true}
-          originWhitelist={['*']}
-          source={{
-            uri: __DEV__ ? 'http://localhost:3000' : EDITOR_URI
-          }}
-          style={style}
-          autoManageStatusBarEnabled={false}
-          onMessage={onMessage || undefined}
-        />
-        <EditorOverlay editorId={editorId || ''} editor={editor} />
-        <ReadonlyButton editor={editor} />
-      </>
-    );
-  },
+            injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
+            javaScriptEnabled={true}
+            focusable={true}
+            setSupportMultipleWindows={false}
+            overScrollMode="never"
+            keyboardDisplayRequiresUserAction={false}
+            onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+            cacheMode="LOAD_DEFAULT"
+            cacheEnabled={true}
+            domStorageEnabled={true}
+            bounces={false}
+            setBuiltInZoomControls={false}
+            setDisplayZoomControls={false}
+            allowFileAccess={true}
+            scalesPageToFit={true}
+            hideKeyboardAccessoryView={true}
+            allowFileAccessFromFileURLs={true}
+            allowUniversalAccessFromFileURLs={true}
+            originWhitelist={['*']}
+            source={{
+              uri: __DEV__ ? 'http://localhost:3000' : EDITOR_URI
+            }}
+            style={style}
+            autoManageStatusBarEnabled={false}
+            onMessage={onMessage || undefined}
+          />
+          {theme ? null : <EditorOverlay editorId={editorId || ''} editor={editor} />}
+          <ReadonlyButton editor={editor} />
+        </>
+      );
+    }
+  ),
   () => true
 );
 

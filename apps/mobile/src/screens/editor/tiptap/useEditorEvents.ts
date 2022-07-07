@@ -134,7 +134,7 @@ export const useEditorEvents = (
       noHeader: noHeader,
       noToolbar: readonly || editorPropReadonly || noToolbar
     });
-  }, [fullscreen, isPremium, readonly, editor.sessionId, editor.loading, tools]);
+  }, [fullscreen, isPremium, readonly, editor.sessionId, editor.loading, tools, editor.commands]);
 
   const onBackPress = useCallback(async () => {
     const editorHandledBack = await editor.commands.handleBack();

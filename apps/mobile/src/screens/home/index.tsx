@@ -11,7 +11,6 @@ import { useNoteStore } from '../../stores/use-notes-store';
 import { db } from '../../utils/database';
 import { useNavigationFocus } from '../../utils/hooks/use-navigation-focus';
 import { openEditor } from '../notes/common';
-
 const prepareSearch = () => {
   SearchService.update({
     placeholder: 'Type a keyword to search in notes',

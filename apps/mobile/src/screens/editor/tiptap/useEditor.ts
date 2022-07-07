@@ -7,7 +7,7 @@ import Navigation from '../../../services/navigation';
 import { TipManager } from '../../../services/tip-manager';
 import { useEditorStore } from '../../../stores/use-editor-store';
 import { useTagStore } from '../../../stores/use-tag-store';
-import { useThemeStore } from '../../../stores/use-theme-store';
+import { ThemeStore, useThemeStore } from '../../../stores/use-theme-store';
 import { db } from '../../../utils/database';
 import { MMKV } from '../../../utils/database/mmkv';
 import { eOnLoadNote } from '../../../utils/events';
@@ -25,7 +25,12 @@ import {
   post
 } from './utils';
 
-export const useEditor = (editorId = '', readonly?: boolean) => {
+export const useEditor = (
+  editorId = '',
+  readonly?: boolean,
+  onChange?: (html: string) => void,
+  theme?: ThemeStore['colors']
+) => {
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>(makeSessionId());
   const sessionIdRef = useRef(sessionId);
@@ -33,7 +38,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
   const currentNote = useRef<NoteType | null>();
   const currentContent = useRef<Content | null>();
   const timers = useRef<{ [name: string]: NodeJS.Timeout }>({});
-  const commands = useMemo(() => new Commands(editorRef), []);
+  const commands = useMemo(() => new Commands(editorRef), [editorRef]);
   const sessionHistoryId = useRef<number>();
   const state = useRef<Partial<EditorState>>(defaultState);
   const placeholderTip = useRef(TipManager.placeholderTip());
@@ -60,6 +65,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
   }, [tags]);
 
   useEffect(() => {
+    if (theme) return;
     let unsub = useThemeStore.subscribe(state => {
       postMessage(EditorEvents.theme, state.colors);
     });
@@ -300,6 +306,10 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
           if (currentNote.current && !params.id && params.sessionId === sessionId) {
             params.id = currentNote.current?.id;
           }
+          if (onChange && params.data) {
+            onChange(params.data);
+            return;
+          }
           saveNote(params);
         },
         500
@@ -312,7 +322,7 @@ export const useEditor = (editorId = '', readonly?: boolean) => {
     console.log('on editor load');
     state.current.ready = true;
     onReady();
-    postMessage(EditorEvents.theme, useThemeStore.getState().colors);
+    postMessage(EditorEvents.theme, theme || useThemeStore.getState().colors);
     commands.setInsets(isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 });
     if (currentNote.current) {
       console.log('force reload note');

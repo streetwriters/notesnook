@@ -1,5 +1,6 @@
 import { useEditor } from './use-editor';
-import { ToolbarGroupDefinition } from 'notesnook-editor/dist/toolbar/types';
+import { ToolbarGroupDefinition } from 'notesnook-editor/dist/es/toolbar/types';
+import { ThemeStore } from '../../../stores/use-theme-store';
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -33,6 +34,8 @@ export type EditorProps = {
   withController: boolean;
   editorId?: string;
   onLoad?: () => void;
+  onChange?: (html: string) => void;
+  theme?: ThemeStore['colors'];
 };
 
 export type EditorMessage = {

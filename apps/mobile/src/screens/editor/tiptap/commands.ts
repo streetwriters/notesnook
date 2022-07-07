@@ -114,6 +114,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   };
 
   setSettings = async (settings: Partial<Settings>) => {
+    console.log('setSettings', JSON.stringify(settings));
     await this.doAsync(`
       if (typeof globalThis.settingsController !== "undefined") {
         globalThis.settingsController.update(${JSON.stringify(settings)}) 
@@ -123,11 +124,13 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
 
   setTags = async (note: NoteType | null | undefined) => {
     if (!note) return;
-    let tags = note.tags
-      .map((t: any) =>
-        db.tags?.tag(t) ? { title: db.tags.tag(t).title, alias: db.tags.tag(t).alias } : null
-      )
-      .filter((t: any) => t !== null);
+    let tags = !note.tags
+      ? []
+      : note.tags
+          .map((t: any) =>
+            db.tags?.tag(t) ? { title: db.tags.tag(t).title, alias: db.tags.tag(t).alias } : null
+          )
+          .filter((t: any) => t !== null);
     await this.doAsync(`
     if (typeof editorTags !== "undefined" && editorTags.current) {
       editorTags.current.setTags(${JSON.stringify(tags)});

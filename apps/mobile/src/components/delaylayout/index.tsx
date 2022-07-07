@@ -1,6 +1,5 @@
 import React from 'react';
-import { ViewProps } from 'react-native';
-import Animated, { FadeOut } from 'react-native-reanimated';
+import { View, ViewProps } from 'react-native';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { useDelayLayout } from '../../utils/hooks/use-delay-layout';
 import { DefaultPlaceholder } from './default-placeholder';
@@ -24,8 +23,7 @@ export default function DelayLayout(props: IDelayLayoutProps) {
   const Placeholder = placeholder[props.type || 'default'];
 
   return loading || props.wait ? (
-    <Animated.View
-      exiting={FadeOut}
+    <View
       style={{
         backgroundColor: colors.bg,
         flex: 1,
@@ -33,7 +31,7 @@ export default function DelayLayout(props: IDelayLayoutProps) {
       }}
     >
       <Placeholder />
-    </Animated.View>
+    </View>
   ) : (
     <>{props.children}</>
   );
