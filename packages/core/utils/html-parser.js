@@ -19,6 +19,7 @@ export function getInnerText(element) {
 }
 
 function wrapIntoHTMLDocument(input) {
+  if (typeof input !== "string") return input;
   if (input.includes("<body>")) return input;
 
   return `<!doctype html><html lang="en"><head><title>Document Fragment</title></head><body>${input}</body></html>`;
