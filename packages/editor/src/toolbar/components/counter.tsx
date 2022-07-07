@@ -39,6 +39,7 @@ function _Counter(props: CounterProps) {
           fontSize: "subBody",
           mx: 1,
           textAlign: "center",
+          ":hover": { bg: "transparent" },
         }}
         onClick={onReset}
         title={`Reset ${title}`}
