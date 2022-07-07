@@ -1,23 +1,12 @@
-import { Theme, useTheme } from "@notesnook/theme";
-import { ThemeConfig } from "@notesnook/theme/dist/theme/types";
+import { Theme } from "@notesnook/theme";
 import { Editor } from "../types";
 import { Flex, FlexProps } from "rebass";
-import { findTool, ToolId } from "./tools";
 import { ThemeProvider } from "emotion-theming";
 import { EditorFloatingMenus } from "./floating-menus";
-import { getDefaultPresets, getToolDefinition } from "./tool-definitions";
-import { Dropdown } from "./components/dropdown";
-import { ToolButton } from "./components/tool-button";
-import { useContext, useEffect, useRef, useState } from "react";
-// import { MenuPresenter } from "../components/menu";
-import { Popup } from "./components/popup";
-import {
-  ToolbarLocation,
-  useToolbarLocation,
-  useToolbarStore,
-} from "./stores/toolbar-store";
-import { getToolbarElement } from "./utils/dom";
-import { ToolbarDefinition, ToolProps } from "./types";
+import { getDefaultPresets, STATIC_TOOLBAR_GROUPS } from "./tool-definitions";
+import { useEffect, useMemo } from "react";
+import { ToolbarLocation, useToolbarStore } from "./stores/toolbar-store";
+import { ToolbarDefinition } from "./types";
 import { ToolbarGroup } from "./components/toolbar-group";
 import {
   EditorContext,
@@ -40,6 +29,12 @@ export function Toolbar(props: ToolbarProps) {
     sx,
     ...flexProps
   } = props;
+
+  const toolbarTools = useMemo(
+    () => [...STATIC_TOOLBAR_GROUPS, ...tools],
+    [tools]
+  );
+
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation
   );
@@ -62,7 +57,7 @@ export function Toolbar(props: ToolbarProps) {
             }}
             {...flexProps}
           >
-            {tools.map((tools) => {
+            {toolbarTools.map((tools) => {
               return (
                 <ToolbarGroup
                   key={tools.join("")}
