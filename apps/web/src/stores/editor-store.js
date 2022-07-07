@@ -39,13 +39,6 @@ export const getDefaultSession = (sessionId = Date.now()) => {
   };
 };
 
-const getDefaultPreviewSession = () => ({
-  sessionType: "preview",
-  state: undefined,
-  dateEdited: 0,
-  dateCreated: 0,
-});
-
 class EditorStore extends BaseStore {
   session = getDefaultSession();
   arePropertiesVisible = false;
@@ -70,19 +63,6 @@ class EditorStore extends BaseStore {
     this.set((state) => {
       state.session.tags = state.session.tags.slice();
     });
-  };
-
-  openPreviewSession = (session) => {
-    this.set((state) => {
-      state.session = {
-        ...getDefaultPreviewSession(),
-        ...session,
-        id: state.session.id,
-        title: state.session.title,
-        state: SESSION_STATES.new,
-      };
-    });
-    appStore.setIsEditorOpen(true);
   };
 
   openLockedSession = async (note) => {
@@ -253,8 +233,6 @@ class EditorStore extends BaseStore {
     switch (session.sessionType) {
       case "default":
         return await db.content.raw(session.contentId);
-      case "preview":
-        return session.content;
       case "locked":
         return session.content;
       default:

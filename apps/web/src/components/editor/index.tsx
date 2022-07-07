@@ -12,8 +12,7 @@ import Toolbar from "./toolbar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
 import { formatDate } from "notes-core/utils/date";
-import { debounce, debounceWithId } from "../../utils/debounce";
-import { CharacterCounter } from "./types";
+import { debounceWithId } from "../../utils/debounce";
 import Tiptap from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
@@ -26,12 +25,11 @@ import { db } from "../../common/db";
 import useMobile from "../../utils/use-mobile";
 import Titlebox from "./title-box";
 
-function updateWordCount(counter?: CharacterCounter) {
-  AppEventManager.publish(
-    AppEvents.UPDATE_WORD_COUNT,
-    counter ? counter.words() : 0
-  );
-}
+type PreviewSession = {
+  content: { data: string; type: string };
+  dateCreated: number;
+  dateEdited: number;
+};
 
 function onEditorChange(noteId: string, sessionId: string, content: string) {
   if (!content) return;
@@ -48,7 +46,6 @@ function onTitleChange(noteId: string, title: string) {
   editorstore.get().setTitle(noteId, title);
 }
 
-const debouncedUpdateWordCount = debounce(updateWordCount, 1000);
 const debouncedOnEditorChange = debounceWithId(onEditorChange, 100);
 const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);
 
@@ -62,21 +59,36 @@ export default function EditorManager({
   const isNewSession = !!nonce && noteId === 0;
   const isOldSession = !nonce && !!noteId;
 
+  // the only state that changes. Everything else is
+  // stored in refs. Update this value to trigger an
+  // update.
+  const [timestamp, setTimestamp] = useState<number>(0);
+
   const content = useRef<string>("");
   const title = useRef<string>("");
-  const [timestamp, setTimestamp] = useState<number>(0);
+  const previewSession = useRef<PreviewSession>();
+  const [dropRef, overlayRef] = useDragOverlay();
 
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
-  const isPreviewMode = useStore(
-    (store) => store.session.sessionType === "preview"
-  );
   const isReadonly = useStore(
-    (store) => store.session.readonly || isPreviewMode
+    (store) => store.session.readonly || !!previewSession.current
   );
-  const [dropRef, overlayRef] = useDragOverlay();
   // TODO move this somewhere more appropriate
   // const init = useStore((store) => store.init);
+
+  const openSession = useCallback(async (noteId) => {
+    await editorstore.get().openSession(noteId);
+
+    const { getSessionContent, session } = editorstore.get();
+    const sessionContent = await getSessionContent();
+
+    previewSession.current = undefined;
+    title.current = session.title;
+    content.current = sessionContent?.data;
+    setTimestamp(Date.now());
+    if (noteId && sessionContent) await db.attachments?.downloadImages(noteId);
+  }, []);
 
   useEffect(() => {
     if (!isNewSession) return;
@@ -87,40 +99,14 @@ export default function EditorManager({
       title.current = "";
       content.current = "";
       setTimestamp(Date.now());
-      console.log("Updating timestamp (new)");
     })();
   }, [isNewSession, nonce]);
 
   useEffect(() => {
-    if (!noteId || isOldSession) return;
-
-    (async function () {
-      const sessionContent = await editorstore.get().getSessionContent();
-      content.current = sessionContent?.data;
-      setTimestamp(Date.now());
-      if (noteId && sessionContent)
-        await db.attachments?.downloadImages(noteId);
-      console.log("Updating timestamp (preview)");
-    })();
-  }, [noteId, isPreviewMode, isOldSession]);
-
-  useEffect(() => {
     if (!isOldSession) return;
 
-    (async function () {
-      await editorstore.get().openSession(noteId);
-
-      const { getSessionContent, session } = editorstore.get();
-      const sessionContent = await getSessionContent();
-
-      title.current = session.title;
-      content.current = sessionContent?.data;
-      setTimestamp(Date.now());
-      if (noteId && sessionContent)
-        await db.attachments?.downloadImages(noteId);
-      console.log("Updating timestamp (old)");
-    })();
-  }, [noteId, isOldSession]);
+    openSession(noteId);
+  }, [openSession, noteId, isOldSession]);
 
   return (
     <Flex
@@ -134,7 +120,12 @@ export default function EditorManager({
         overflow: "hidden",
       }}
     >
-      {isPreviewMode && <PreviewModeNotice />}
+      {previewSession.current && (
+        <PreviewModeNotice
+          {...previewSession.current}
+          onDiscard={() => openSession(noteId)}
+        />
+      )}
       <Editor
         nonce={timestamp}
         title={title.current}
@@ -144,7 +135,20 @@ export default function EditorManager({
           onRequestFocus: () => toggleProperties(false),
         }}
       />
-      {arePropertiesVisible && <Properties />}
+      {arePropertiesVisible && (
+        <Properties
+          onOpenPreviewSession={async (session: PreviewSession) => {
+            const { content: sessionContent } = session;
+            content.current = sessionContent.data;
+            previewSession.current = session;
+            setTimestamp(Date.now());
+
+            if (noteId && sessionContent.data) {
+              await db.content?.downloadMedia(noteId, sessionContent, true);
+            }
+          }}
+        />
+      )}
       <DropZone overlayRef={overlayRef} />
     </Flex>
   );
@@ -197,7 +201,6 @@ export function Editor(props: EditorProps) {
         hash: string;
         src: string;
       }) => {
-        console.log(hash, src);
         if (groupId?.startsWith("monograph")) return;
         editor.loadImage(hash, src);
       }
@@ -315,14 +318,21 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
   );
 }
 
-function PreviewModeNotice() {
-  const disablePreviewMode = useCallback(async (cancelled) => {
-    const { id, sessionId, content } = editorstore.get().session;
-    if (!cancelled) {
-      await editorstore.saveSessionContent(id, sessionId, content);
-    }
-    await editorstore.openSession(id, true);
-  }, []);
+type PreviewModeNoticeProps = PreviewSession & {
+  onDiscard: () => void;
+};
+function PreviewModeNotice(props: PreviewModeNoticeProps) {
+  const { dateCreated, dateEdited, content, onDiscard } = props;
+  const disablePreviewMode = useCallback(
+    async (cancelled) => {
+      const { id, sessionId } = editorstore.get().session;
+      if (!cancelled) {
+        await editorstore.saveSessionContent(id, sessionId, content);
+      }
+      onDiscard();
+    },
+    [onDiscard, content]
+  );
 
   return (
     <Flex
@@ -334,9 +344,8 @@ function PreviewModeNotice() {
       <Flex flexDirection={"column"} mr={4}>
         <Text variant={"subtitle"}>Preview</Text>
         <Text variant={"body"}>
-          You are previewing note version edited from{" "}
-          {formatDate(editorstore.get().session.dateCreated)} to{" "}
-          {formatDate(editorstore.get().session.dateEdited)}.
+          You are previewing note version edited from {formatDate(dateCreated)}{" "}
+          to {formatDate(dateEdited)}.
         </Text>
       </Flex>
       <Flex>
