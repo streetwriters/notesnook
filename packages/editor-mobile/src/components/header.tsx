@@ -119,7 +119,7 @@ export default React.memo(
               )}
               <Button
                 onPress={() => {
-                  //
+                  editor?.commands.startSearch();
                 }}
                 style={{
                   borderWidth: 0,

@@ -20,7 +20,7 @@ const Tiptap = () => {
   const settings = useSettings();
   const theme = useEditorThemeStore((state) => state.colors);
   const [initialProps, setInitialProps] = useState<Partial<Settings>>({
-    readonly: global.readonly || global.readonly || settings.readonly,
+    readonly: global.readonly || settings.readonly,
     noHeader: global.noHeader || settings.noHeader,
     noToolbar:
       global.noToolbar ||
@@ -173,19 +173,13 @@ const Tiptap = () => {
         </div>
 
         {initialProps.noToolbar ? null : (
-          <div
-            style={{
-              minHeight: 50,
-            }}
-          >
-            <Toolbar
-              sx={{ pl: "10px", pt: "5px" }}
-              theme={toolbarTheme}
-              editor={editor}
-              location="bottom"
-              tools={[...settings.tools]}
-            />
-          </div>
+          <Toolbar
+            sx={{ pl: "10px", pt: "5px", minHeight: 45 }}
+            theme={toolbarTheme}
+            editor={editor}
+            location="bottom"
+            tools={[...settings.tools]}
+          />
         )}
       </div>
     </>

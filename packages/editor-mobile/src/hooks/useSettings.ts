@@ -3,13 +3,13 @@ import { useState } from "react";
 
 const settingsJson = localStorage.getItem("editorSettings");
 const initialState = {
-  readonly: false,
   fullscreen: false,
   deviceMode: "mobile",
   premium: false,
   tools: getDefaultPresets().default,
-  noHeader: false,
-  noToolbar: false,
+  noToolbar: global.noToolbar,
+  noHeader: global.noHeader,
+  readonly: global.readonly,
 };
 
 global.settingsController = {
