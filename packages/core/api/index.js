@@ -181,36 +181,37 @@ class Database {
         }
 
         switch (type) {
-          case "heartbeat": {
-            const { t: serverTime } = data;
-            const localTime = Date.now();
+          // TODO: increase reliablity for this.
+          // case "heartbeat": {
+          //   const { t: serverTime } = data;
+          //   const localTime = Date.now();
 
-            if (!this.lastHeartbeat) {
-              this.lastHeartbeat = { local: localTime, server: serverTime };
-              break;
-            }
+          //   if (!this.lastHeartbeat) {
+          //     this.lastHeartbeat = { local: localTime, server: serverTime };
+          //     break;
+          //   }
 
-            const timeElapsed = {
-              local: localTime - this.lastHeartbeat.local,
-              server: serverTime - this.lastHeartbeat.server,
-            };
-            const travelTime = timeElapsed.local - timeElapsed.server;
-            const actualTime = localTime - travelTime;
+          //   const timeElapsed = {
+          //     local: localTime - this.lastHeartbeat.local,
+          //     server: serverTime - this.lastHeartbeat.server,
+          //   };
+          //   const travelTime = timeElapsed.local - timeElapsed.server;
+          //   const actualTime = localTime - travelTime;
 
-            const diff = actualTime - serverTime;
+          //   const diff = actualTime - serverTime;
 
-            // Fail several times consecutively before raising an error. This is done to root out
-            // false positives.
-            if (Math.abs(diff) > DIFFERENCE_THRESHOLD) {
-              if (this.timeErrorFailures >= MAX_TIME_ERROR_FAILURES) {
-                EV.publish(EVENTS.systemTimeInvalid, { serverTime, localTime });
-              } else this.timeErrorFailures++;
-            } else this.timeErrorFailures = 0;
+          //   // Fail several times consecutively before raising an error. This is done to root out
+          //   // false positives.
+          //   if (Math.abs(diff) > DIFFERENCE_THRESHOLD) {
+          //     if (this.timeErrorFailures >= MAX_TIME_ERROR_FAILURES) {
+          //       EV.publish(EVENTS.systemTimeInvalid, { serverTime, localTime });
+          //     } else this.timeErrorFailures++;
+          //   } else this.timeErrorFailures = 0;
 
-            this.lastHeartbeat.local = localTime;
-            this.lastHeartbeat.server = serverTime;
-            break;
-          }
+          //   this.lastHeartbeat.local = localTime;
+          //   this.lastHeartbeat.server = serverTime;
+          //   break;
+          // }
           case "upgrade": {
             const user = await this.user.getUser();
             user.subscription = data;
