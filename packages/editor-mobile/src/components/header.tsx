@@ -2,6 +2,8 @@ import ArrowBackIcon from "mdi-react/ArrowBackIcon";
 import CloudUploadOutlineIcon from "mdi-react/CloudUploadOutlineIcon";
 import CrownIcon from "mdi-react/CrownIcon";
 import DotsHorizontalIcon from "mdi-react/DotsHorizontalIcon";
+import ArrowULeftTopIcon from "mdi-react/ArrowULeftTopIcon";
+import ArrowURightTopIcon from "mdi-react/ArrowURightTopIcon";
 import MagnifyIcon from "mdi-react/MagnifyIcon";
 import React from "react";
 import { useSafeArea } from "../hooks/useSafeArea";
@@ -11,7 +13,7 @@ import styles from "./styles.module.css";
 const Button = ({
   onPress,
   children,
-  style,
+  style
 }: {
   onPress: () => void;
   children: React.ReactNode;
@@ -24,7 +26,10 @@ const Button = ({
       onMouseUp={(e) => {
         e.preventDefault();
       }}
-      onMouseDown={(e) => e.preventDefault()}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onPress();
+      }}
       onTouchEnd={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -44,9 +49,13 @@ export default React.memo(
   function Header({
     noHeader,
     settings,
+    hasUndo,
+    hasRedo
   }: {
     noHeader: boolean;
     settings: Settings;
+    hasUndo: boolean;
+    hasRedo: boolean;
   }) {
     const insets = useSafeArea();
     return (
@@ -57,7 +66,7 @@ export default React.memo(
           height: noHeader ? `${insets.top}px` : `${50 + insets.top}px`,
           backgroundColor: "var(--nn_bg)",
           position: "sticky",
-          width: "100vw",
+          width: "100vw"
         }}
       >
         {noHeader ? null : (
@@ -67,7 +76,7 @@ export default React.memo(
               width: "100%",
               justifyContent: "space-between",
               flexDirection: "row",
-              paddingTop: insets.top,
+              paddingTop: insets.top
             }}
           >
             <Button
@@ -84,7 +93,7 @@ export default React.memo(
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "start",
-                flexDirection: "column",
+                flexDirection: "column"
               }}
             >
               <ArrowBackIcon size={28} color="var(--nn_pri)" />
@@ -94,9 +103,46 @@ export default React.memo(
               style={{
                 display: "flex",
                 alignItems: "center",
-                flexDirection: "row",
+                flexDirection: "row"
               }}
             >
+              <Button
+                onPress={() => {
+                  editor?.commands.undo();
+                }}
+                style={{
+                  borderWidth: 0,
+                  borderRadius: 100,
+                  color: "var(--nn_icon)",
+                  marginRight: 10,
+                  width: 39,
+                  height: 39,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <ArrowULeftTopIcon size={28} color={"var(--nn_pri)"} />
+              </Button>
+
+              <Button
+                onPress={() => {
+                  editor?.commands.redo();
+                }}
+                style={{
+                  borderWidth: 0,
+                  borderRadius: 100,
+                  color: "var(--nn_icon)",
+                  marginRight: 10,
+                  width: 39,
+                  height: 39,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <ArrowURightTopIcon size={28} color={"var(--nn_pri)"} />
+              </Button>
               {!settings.premium && (
                 <Button
                   onPress={() => {
@@ -111,7 +157,7 @@ export default React.memo(
                     height: 39,
                     display: "flex",
                     justifyContent: "center",
-                    alignItems: "center",
+                    alignItems: "center"
                   }}
                 >
                   <CrownIcon size={28} color="orange" />
@@ -131,7 +177,7 @@ export default React.memo(
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
               >
                 <MagnifyIcon size={28} color="var(--nn_pri)" />
@@ -149,7 +195,7 @@ export default React.memo(
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
               >
                 <CloudUploadOutlineIcon size={28} color="var(--nn_pri)" />
@@ -168,7 +214,7 @@ export default React.memo(
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
               >
                 <DotsHorizontalIcon size={28} color="var(--nn_pri)" />
@@ -181,5 +227,7 @@ export default React.memo(
   },
   (prev, next) =>
     prev.noHeader !== next.noHeader ||
-    prev.settings.premium !== next.settings.premium
+    prev.settings.premium !== next.settings.premium ||
+    prev.hasRedo !== next.hasRedo ||
+    prev.hasUndo !== next.hasUndo
 );
