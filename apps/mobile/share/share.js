@@ -150,7 +150,7 @@ let defaultNote = {
   title: null,
   id: null,
   content: {
-    type: 'tiny',
+    type: 'tiptap',
     data: null
   }
 };
@@ -300,7 +300,7 @@ const ShareView = ({ quicknote = false }) => {
     eSendEvent(eOnLoadNote + 'shareEditor', {
       id: null,
       content: {
-        type: 'tiny',
+        type: 'tiptap',
         data: noteContent.current
       }
     });
@@ -323,7 +323,7 @@ const ShareView = ({ quicknote = false }) => {
       _note = {
         content: {
           data: raw.data + '\n' + noteContent.current,
-          type: 'tiny'
+          type: 'tiptap'
         },
         id: appendNote.id,
         sessionId: Date.now()

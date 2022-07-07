@@ -288,13 +288,13 @@ export const useEditor = (
       if (type === EditorEvents.content) {
         currentContent.current = {
           data: content,
-          type: 'tiny'
+          type: 'tiptap'
         };
       }
       let params = {
         title,
         data: content,
-        type: 'tiny',
+        type: 'tiptap',
         sessionId,
         id: currentNote.current?.id,
         sessionHistoryId: sessionHistoryId.current

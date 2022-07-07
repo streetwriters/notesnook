@@ -85,7 +85,7 @@ function init() {
           await db.init();
           await db.notes?.add({
             content: {
-              type: 'tiny',
+              type: 'tiptap',
               //@ts-ignore
               data: `<p>${notification.reply_text} </p>`
             }

@@ -16,14 +16,7 @@ export const ConfigureToolbar = () => {
   const colors = useThemeStore(state => state.colors);
 
   const renderGroups = () => {
-    return data.map((item, index) =>
-      index === 0 ? (
-        //@ts-ignore
-        <View key={item[0]} />
-      ) : (
-        <Group key={`group-${index}`} item={item} index={index} />
-      )
-    );
+    return data.map((item, index) => <Group key={`group-${index}`} item={item} index={index} />);
   };
 
   return (

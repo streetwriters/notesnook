@@ -1,14 +1,14 @@
 import { Icons } from 'notesnook-editor/dist/es/toolbar/icons';
-import { DEFAULT_TOOLS, getAllTools } from 'notesnook-editor/dist/es/toolbar/tooldefinitions';
+import { getDefaultPresets, getAllTools } from 'notesnook-editor/dist/es/toolbar/tooldefinitions';
 import { ToolId } from 'notesnook-editor/dist/es/toolbar/tools';
 import { ToolbarGroupDefinition } from 'notesnook-editor/dist/es/toolbar/index';
 import { useThemeStore } from '../../../stores/use-theme-store';
 
 export const tools = getAllTools();
 export const presets: { [name: string]: ToolbarGroupDefinition[] } = {
-  default: DEFAULT_TOOLS,
-  minimal: [...DEFAULT_TOOLS.slice(0, 2)],
-  custom: [DEFAULT_TOOLS.slice(0)]
+  default: getDefaultPresets().default,
+  minimal: getDefaultPresets().default,
+  custom: []
 };
 
 export function findToolById(id: keyof typeof tools): { title: string; icon: string } {
