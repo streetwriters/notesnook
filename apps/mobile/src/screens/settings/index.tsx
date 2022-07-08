@@ -21,14 +21,14 @@ const screenListeners = {
 // const Home = React.lazy(() => import(/* webpackChunkName: "settings-home" */ './home'));
 // const Group = React.lazy(() => import(/* webpackChunkName: "settings-group" */ './group'));
 
-const Fallback = () => {
-  return (
-    <>
-      <Header />
-      <DelayLayout wait={true} type="settings" />
-    </>
-  );
-};
+// const Fallback = () => {
+//   return (
+//     <>
+//       <Header />
+//       <DelayLayout wait={true} type="settings" />
+//     </>
+//   );
+// };
 
 // const HomeScreen = (props: NativeStackScreenProps<RouteParams, 'SettingsHome'>) => {
 //   return (
