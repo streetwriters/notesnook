@@ -28,6 +28,7 @@ export interface TabsRef {
   closeDrawer: () => void;
   page: number;
   setScrollEnabled: () => true;
+  isDrawerOpen: () => boolean;
 }
 
 export const FluidTabs = forwardRef<TabsRef, TabProps>(
@@ -105,6 +106,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           forcedLock.value = true;
           return true;
         },
+        isDrawerOpen: () => isDrawerOpen.value,
         openDrawer: () => {
           translateX.value = withSpring(drawerPosition, {
             mass: 0.5

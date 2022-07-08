@@ -1,6 +1,12 @@
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Platform, View, StatusBar } from 'react-native';
+import {
+  addSpecificOrientationListener,
+  getInitialOrientation,
+  getSpecificOrientation,
+  removeSpecificOrientationListener
+} from 'react-native-orientation';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
@@ -39,6 +45,21 @@ export const TabsHolder = React.memo(
     const animatedOpacity = useSharedValue(0);
     const animatedTranslateY = useSharedValue(-9999);
     const overlayRef = useRef();
+    const [orientation, setOrientation] = useState(getInitialOrientation());
+
+    const onOrientationChange = (o, o2) => {
+      setOrientation(o || o2);
+    };
+
+    useEffect(() => {
+      if (Platform.OS === 'ios') {
+        addSpecificOrientationListener(onOrientationChange);
+        getSpecificOrientation && getSpecificOrientation(onOrientationChange);
+      }
+      return () => {
+        removeSpecificOrientationListener(onOrientationChange);
+      };
+    }, []);
 
     const showFullScreenEditor = () => {
       setFullscreen(true);
@@ -72,7 +93,9 @@ export const TabsHolder = React.memo(
     };
 
     useEffect(() => {
-      toggleView(false);
+      if (!tabBarRef.current?.isDrawerOpen()) {
+        toggleView(false);
+      }
       eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
       eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
 
@@ -241,17 +264,17 @@ export const TabsHolder = React.memo(
           }
         ]
       };
-    });
+    }, []);
 
     return (
       <View
         onLayout={_onLayout}
         testID={notesnook.ids.default.root}
         style={{
-          width: '100%',
-          height: '100%',
+          flex: 1,
           backgroundColor: colors.bg,
-          paddingBottom: Platform.OS === 'android' ? insets?.bottom : 0
+          paddingBottom: Platform.OS === 'android' ? insets?.bottom : 0,
+          marginLeft: orientation === 'LANDSCAPE-LEFT' && Platform.OS === 'ios' ? insets.left : 0
         }}
       >
         <StatusBar
