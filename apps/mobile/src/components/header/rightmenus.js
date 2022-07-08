@@ -69,7 +69,10 @@ export const RightMenus = () => {
             borderRadius: 5,
             backgroundColor: colors.bg
           }}
-          button={
+          onRequestClose={() => {
+            menuRef.current?.hide();
+          }}
+          anchor={
             <IconButton
               onPress={() => {
                 menuRef.current?.show();
