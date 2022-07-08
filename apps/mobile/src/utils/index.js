@@ -141,7 +141,7 @@ export function showTooltip(event, text, position = 2) {
   prevTarget && RNTooltips.Dismiss(prevTarget);
   prevTarget = null;
   prevTarget = event._targetInst.ref.current;
-  RNTooltips.Show(prevTarget, tabBarRef.current, {
+  RNTooltips.Show(prevTarget, tabBarRef.current?.node?.current, {
     text: text,
     tintColor: '#000000',
     corner: Platform.OS === 'ios' ? 5 : 40,

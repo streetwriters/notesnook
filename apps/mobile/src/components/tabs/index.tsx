@@ -1,4 +1,12 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, {
+  forwardRef,
+  MutableRefObject,
+  RefObject,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from 'react';
 import { BackHandler, ViewProps } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -29,6 +37,7 @@ export interface TabsRef {
   page: number;
   setScrollEnabled: () => true;
   isDrawerOpen: () => boolean;
+  node: RefObject<Animated.View>;
 }
 
 export const FluidTabs = forwardRef<TabsRef, TabProps>(
@@ -48,6 +57,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const locked = useSharedValue(false);
     const forcedLock = useSharedValue(false);
     const [disabled, setDisabled] = useState(false);
+    const node = useRef<Animated.View>(null);
     const containerWidth = widths ? widths.a + widths.b + widths.c : dimensions.width;
     const drawerPosition = 0;
     const homePosition = widths.a;
@@ -120,7 +130,8 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           isDrawerOpen.value = false;
         },
         page: currentTab.value,
-        setScrollEnabled: () => true
+        setScrollEnabled: () => true,
+        node: node
       }),
       []
     );
@@ -250,6 +261,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     return (
       <GestureDetector gesture={gesture}>
         <Animated.View
+          ref={node}
           removeClippedSubviews={false}
           collapsable={false}
           style={[
