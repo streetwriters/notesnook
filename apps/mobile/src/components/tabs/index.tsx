@@ -1,5 +1,5 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { ViewProps } from 'react-native';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { BackHandler, ViewProps } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
@@ -52,6 +52,21 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const homePosition = widths.a;
     const editorPosition = widths.a + widths.b;
 
+    useEffect(() => {
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+        if (isDrawerOpen.value) {
+          translateX.value = withTiming(homePosition);
+          onDrawerStateChange(false);
+          isDrawerOpen.value = false;
+          return true;
+        }
+        return false;
+      });
+      return () => {
+        sub && sub.remove();
+      };
+    }, []);
+
     useImperativeHandle(
       ref,
       (): TabsRef => ({
@@ -94,11 +109,13 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           translateX.value = withSpring(drawerPosition, {
             mass: 0.5
           });
+          isDrawerOpen.value = true;
           onDrawerStateChange(true);
         },
         closeDrawer: () => {
           translateX.value = withTiming(homePosition);
           onDrawerStateChange(false);
+          isDrawerOpen.value = false;
         },
         page: currentTab.value,
         setScrollEnabled: () => true
@@ -215,6 +232,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         runOnJS(onDrawerStateChange)(false);
         translateX.value = withSpring(homePosition, animationConfig);
         currentTab.value = 1;
+        isDrawerOpen.value = false;
         startX.value = 0;
       });
 
