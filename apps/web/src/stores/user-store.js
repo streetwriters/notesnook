@@ -81,7 +81,9 @@ class UserStore extends BaseStore {
 
       onPageVisibilityChanged(async function (type, documentHidden) {
         if (!documentHidden) {
-          await db.connectSSE({ force: type === "online" });
+          await db
+            .connectSSE({ force: type === "online" })
+            .catch(console.error);
         }
       });
 
