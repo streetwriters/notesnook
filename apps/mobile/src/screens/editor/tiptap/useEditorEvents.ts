@@ -154,7 +154,12 @@ export const useEditorEvents = (
         editorState().movedAway = true;
         tabBarRef.current?.goToPage(0);
       }
-      setImmediate(() => useEditorStore.getState().setCurrentlyEditingNote(null));
+      setImmediate(() => {
+        useEditorStore.getState().setCurrentlyEditingNote(null);
+        setTimeout(() => {
+          Navigation.queueRoutesForUpdate('ColoredNotes', 'Notes', 'TaggedNotes', 'TopicNotes');
+        }, 500);
+      });
       editorState().currentlyEditing = false;
       editor.reset();
     }, 1);
