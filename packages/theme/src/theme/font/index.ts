@@ -1,5 +1,44 @@
 import { FontSizes, getFontSizes } from "./fontsize";
 
+const SANS_FONT_STACK = [
+  `"Open Sans"`,
+  `"Noto Sans"`,
+  "Frutiger",
+  '"Frutiger Linotype"',
+  "Univers",
+  "Calibri",
+  '"Gill Sans"',
+  '"Gill Sans MT"',
+  '"Myriad Pro"',
+  "Myriad",
+  '"DejaVu Sans Condensed"',
+  '"Liberation Sans"',
+  '"Nimbus Sans L"',
+  "Tahoma",
+  "Geneva",
+  '"Helvetica Neue"',
+  "Helvetica",
+  "Arial",
+  "-apple-system",
+  "BlinkMacSystemFont",
+  "sans-serif",
+];
+const MONOSPACE_FONT_STACK = [
+  '"Courier New"',
+  "Consolas",
+  '"Andale Mono WT"',
+  '"Andale Mono"',
+  '"Lucida Console"',
+  '"Lucida Sans Typewriter"',
+  '"DejaVu Sans Mono"',
+  '"Bitstream Vera Sans Mono"',
+  '"Liberation Mono"',
+  '"Nimbus Mono L"',
+  "Monaco",
+  "Courier",
+  "monospace",
+];
+
 export type FontConfig = {
   fontSizes: FontSizes;
   fontWeights: {
@@ -20,10 +59,9 @@ export function getFontConfig(scale?: number): FontConfig {
       bold: 600,
     },
     fonts: {
-      body: `Open Sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Oxygen-Sans,Ubuntu,Cantarell,sans-serif;`,
-      monospace:
-        "ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace",
-      heading: `Open Sans,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Oxygen-Sans,Ubuntu,Cantarell,sans-serif;`,
+      body: SANS_FONT_STACK.join(","),
+      monospace: MONOSPACE_FONT_STACK.join(","),
+      heading: SANS_FONT_STACK.join(","),
     },
   };
 }
