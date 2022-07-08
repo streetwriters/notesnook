@@ -9,6 +9,7 @@ interface IDelayLayoutProps extends ViewProps {
   delay?: number;
   wait?: boolean;
   type?: 'default' | 'settings';
+  color?: string;
 }
 
 const placeholder = {
@@ -30,7 +31,7 @@ export default function DelayLayout(props: IDelayLayoutProps) {
         paddingTop: 20
       }}
     >
-      <Placeholder />
+      <Placeholder color={props.color} />
     </View>
   ) : (
     <>{props.children}</>
