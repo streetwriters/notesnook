@@ -123,7 +123,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             preferredSize={paneSizes[0]}
             visible={!isFocusMode}
           >
-            <Flex sx={{ overflow: "hidden" }}>
+            <Flex sx={{ overflow: "hidden", flex: 1 }}>
               <SuspenseLoader
                 condition={isAppLoaded}
                 component={NavigationMenu}
