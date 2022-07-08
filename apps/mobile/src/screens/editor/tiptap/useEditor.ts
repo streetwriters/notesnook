@@ -178,6 +178,9 @@ export const useEditor = (
           if (!note && id) {
             currentNote.current = db.notes?.note(id).data as NoteType;
             state.current?.onNoteCreated && state.current.onNoteCreated(id);
+            if (!noteData.title) {
+              postMessage(EditorEvents.titleplaceholder, currentNote.current.title);
+            }
           }
 
           if (useEditorStore.getState().currentEditingNote !== id && isDefaultEditor) {
