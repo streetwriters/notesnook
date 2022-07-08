@@ -63,7 +63,7 @@ export const setOnFirstSave = (
     return;
   }
   //@ts-ignore
-  editorState().onNoteCreated = onNoteCreated(id, data);
+  editorState().onNoteCreated = id => onNoteCreated(id, data);
 };
 
 export function isSynced(params: NotesScreenParams) {
