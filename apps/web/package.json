@@ -15,7 +15,7 @@
     "@mdi/react": "^1.4.0",
     "@notesnook/crypto": "^1.0.0",
     "@notesnook/desktop": "file:desktop",
-    "@notesnook/theme": "file:../themeprovider",
+    "@notesnook/theme": "github:streetwriters/themeprovider",
     "@rebass/forms": "^4.0.6",
     "@types/rebass": "^4.0.10",
     "allotment": "^1.12.1",
