@@ -34,6 +34,5 @@ export const getServerNameFromHost = (host) => {
       "Subscriptions Management Server",
     [extractHostname(hosts.ISSUES_HOST)]: "Bug Reporting Server",
   };
-  console.log(names, host);
   return names[host];
 };

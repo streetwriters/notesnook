@@ -17,17 +17,18 @@ class Monographs {
   }
 
   async init() {
-    const user = await this._db.user.getUser();
-    const token = await this._db.user.tokenManager.getAccessToken();
-    if (!user || !token || !user.isEmailConfirmed) return;
-    let monographs = await this._db.storage.read("monographs", true);
     try {
+      const user = await this._db.user.getUser();
+      const token = await this._db.user.tokenManager.getAccessToken();
+      if (!user || !token || !user.isEmailConfirmed) return;
+      let monographs = await this._db.storage.read("monographs", true);
       monographs = await http.get(`${Constants.API_HOST}/monographs`, token);
       await this._db.storage.write("monographs", monographs);
+
+      if (monographs) this.monographs = monographs;
     } catch (e) {
       console.error(e);
     }
-    if (monographs) this.monographs = monographs;
   }
 
   /**

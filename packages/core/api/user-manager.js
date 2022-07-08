@@ -206,7 +206,7 @@ class UserManager {
         return await this.getUser();
       }
     } catch (e) {
-      console.error(e);
+      console.error("Error fetching user", e);
       return await this.getUser();
     }
   }
