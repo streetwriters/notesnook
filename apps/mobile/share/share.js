@@ -272,7 +272,7 @@ const ShareView = ({ quicknote = false }) => {
   useEffect(() => {
     console.log('setting value in storage');
     (async () => {
-      await loadDatabase();
+      //await loadDatabase();
       Editor = require('../src/screens/editor/index').default;
       setLoadingExtension(false);
       loadData();
@@ -375,9 +375,9 @@ const ShareView = ({ quicknote = false }) => {
     <SafeAreaView
       style={{
         width: width > 500 ? 500 : width,
-        height: height - kh,
+        height: quicknote ? height : height - kh,
         alignSelf: 'center',
-        justifyContent: 'flex-end'
+        justifyContent: quicknote ? 'flex-start' : 'flex-end'
       }}
     >
       {quicknote && !showSearch ? (
