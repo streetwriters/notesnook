@@ -15,13 +15,8 @@ export function toCamelCase(title: string) {
 export function getAlias(params: NotesScreenParams) {
   if (!params) return '';
   const { item } = params;
-  let alias =
-    item.type === 'tag'
-      ? db.tags?.alias(item.id)
-      : item.type === 'color'
-      ? db.colors?.alias(item.id)
-      : params?.title;
-  return alias || item.title;
+  //@ts-ignore
+  return item.alias || item.title;
 }
 
 export function openMonographsWebpage() {
@@ -78,7 +73,6 @@ export function isSynced(params: NotesScreenParams) {
 
 async function onNoteCreated(id: string, params: FirstSaveData) {
   if (!params) return;
-
   switch (params.type) {
     case 'topic': {
       await db.notes?.move(

@@ -47,7 +47,7 @@ export const TagsSection = React.memo(
       });
     };
     const renderItem = ({ item, index }) => {
-      let alias = item ? (item.type === 'tag' ? db.tags.alias(item.title) : item.title) : null;
+      let alias = item.alias || item.title;
       return <PinItem item={item} index={index} alias={alias} onPress={onPress} />;
     };
 
@@ -85,7 +85,7 @@ export const PinItem = React.memo(
   ({ item, index, onPress, placeholder, alias }) => {
     const colors = useThemeStore(state => state.colors);
     const setMenuPins = useMenuStore(state => state.setMenuPins);
-    alias = !item ? '' : item.type === 'tag' ? db.tags.alias(item.title) : item.title;
+    alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
     const color = headerTextState?.id === item.id ? colors.accent : colors.pri;

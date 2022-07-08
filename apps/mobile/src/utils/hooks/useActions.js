@@ -47,12 +47,7 @@ export const useActions = ({ close = () => {}, item }) => {
   console.log(item.readonly, 'readonly');
   const user = useUserStore(state => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
-  const alias =
-    item.type === 'tag'
-      ? db.tags.alias(item.id)
-      : item.type === 'color'
-      ? db.colors.alias(item.id)
-      : item.title;
+  const alias = item.alias || item.title;
 
   const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
 

@@ -48,7 +48,7 @@ const TagItem = React.memo(
             >
               #
             </Heading>
-            {db.tags.alias(item.id)}
+            {item.alias}
           </Heading>
           <Paragraph
             color={colors.icon}

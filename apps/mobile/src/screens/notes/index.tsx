@@ -50,6 +50,14 @@ export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   rightButtons?: (params: NotesScreenParams) => HeaderRightButton[];
 }
 
+function getItemType(routeName: RouteName) {
+  if (routeName === 'TaggedNotes') return 'tag';
+  if (routeName === 'ColoredNotes') return 'color';
+  if (routeName === 'TopicNotes') return 'topic';
+  if (routeName === 'Monographs') return 'monograph';
+  return 'note';
+}
+
 const NotesPage = ({
   route,
   navigation,
@@ -108,7 +116,7 @@ const NotesPage = ({
 
     !isMonograph &&
       setOnFirstSave({
-        type: item.type,
+        type: getItemType(route.name),
         id: item.id,
         color: item.title,
         //@ts-ignore
