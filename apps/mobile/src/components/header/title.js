@@ -17,10 +17,14 @@ const titleState = {};
 export const Title = () => {
   const colors = useThemeStore(state => state.colors);
   const currentScreen = useNavigationStore(state => state.currentScreen);
-  const isTopic = currentScreen.type === 'topic';
+  const isTopic = currentScreen?.name === 'TopicNotes';
   const [hide, setHide] = useState(isTopic ? true : false);
   const isHidden = titleState[currentScreen.id];
-  const notebook = isTopic ? db.notebooks?.notebook(currentScreen.notebookId)?.data : null;
+  console.log(currentScreen, 'header');
+  const notebook =
+    isTopic && currentScreen.notebookId
+      ? db.notebooks?.notebook(currentScreen.notebookId)?.data
+      : null;
   const title = currentScreen.title;
   const isTag = title.slice(0, 1) === '#';
 
