@@ -57,7 +57,10 @@ export default class SyncManager {
   }
 
   async start(full, force) {
-    if (this.syncMutex.isLocked()) return false;
+    if (this.syncMutex.isLocked()) {
+      throw new Error("A sync is already in progress.");
+    }
+
     return this.syncMutex.runExclusive(async () => {
       await this.sync.autoSync.start();
       try {
