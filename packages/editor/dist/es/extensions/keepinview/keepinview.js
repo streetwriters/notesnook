@@ -37,11 +37,14 @@ const findScrollContainer = (element) => {
     }
     let parent = element.parentElement;
     while (parent) {
-        const { overflow } = parent.style;
-        if (overflow.split(" ").every((o) => o === "auto" || o === "scroll")) {
+        const { overflow, overflowY } = parent.style;
+        if (isOverlow(overflow) || isOverlow(overflowY)) {
             return parent;
         }
         parent = parent.parentElement;
     }
     return document.documentElement;
 };
+function isOverlow(str) {
+    return str.split(" ").every((o) => o === "auto" || o === "scroll");
+}
