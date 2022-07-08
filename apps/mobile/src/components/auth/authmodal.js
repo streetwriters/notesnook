@@ -2,9 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { eCloseLoginDialog, eOpenLoginDialog } from '../../utils/events';
+import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import BaseDialog from '../dialog/base-dialog';
 import { Toast } from '../toast';
+import { Button } from '../ui/button';
 import { IconButton } from '../ui/icon-button';
 import { hideAuth, initialAuthMode } from './common';
 import { Login } from './login';
@@ -84,6 +86,31 @@ const AuthModal = () => {
             zIndex: 999,
             left: 12,
             top: 0
+          }}
+        />
+      )}
+
+      {initialAuthMode.current !== AuthMode.welcomeSignup ? null : (
+        <Button
+          title="Skip"
+          onPress={() => {
+            hideAuth();
+          }}
+          iconSize={20}
+          type="gray"
+          iconPosition="right"
+          icon="chevron-right"
+          height={25}
+          iconStyle={{
+            marginTop: 2
+          }}
+          style={{
+            position: 'absolute',
+            zIndex: 999,
+            right: 12,
+            top: 0,
+            marginTop: 12.5,
+            paddingHorizontal: 6
           }}
         />
       )}
