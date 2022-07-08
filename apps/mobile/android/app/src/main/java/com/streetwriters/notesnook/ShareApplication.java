@@ -13,7 +13,7 @@ import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.react.modules.systeminfo.AndroidInfoHelpers;
 import com.facebook.soloader.SoLoader;
 
-import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
+//import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
 import androidx.annotation.Nullable;
 
 public class ShareApplication extends MultiDexApplication implements ReactApplication {
@@ -24,24 +24,24 @@ public class ShareApplication extends MultiDexApplication implements ReactApplic
                     return BuildConfig.DEBUG;
                 }
 
-                @Nullable
-                @Override
-                protected String getBundleAssetName() {
-                     final String v8BundleAssetName = V8ExecutorFactory.getBundleAssetName(getApplicationContext(), getUseDeveloperSupport());
-                     if (v8BundleAssetName != null) {
-                         return v8BundleAssetName;
-                     }
-                    return super.getBundleAssetName();
-                }
+                // @Nullable
+                // @Override
+                // protected String getBundleAssetName() {
+                //      final String v8BundleAssetName = V8ExecutorFactory.getBundleAssetName(getApplicationContext(), getUseDeveloperSupport());
+                //      if (v8BundleAssetName != null) {
+                //          return v8BundleAssetName;
+                //      }
+                //     return super.getBundleAssetName();
+                // }
 
-                @Override
-                protected JavaScriptExecutorFactory getJavaScriptExecutorFactory() {
-                    return new V8ExecutorFactory(
-                            getApplicationContext(),
-                            getPackageName(),
-                            AndroidInfoHelpers.getFriendlyDeviceName(),
-                            getUseDeveloperSupport());
-                }
+                // @Override
+                // protected JavaScriptExecutorFactory getJavaScriptExecutorFactory() {
+                //     return new V8ExecutorFactory(
+                //             getApplicationContext(),
+                //             getPackageName(),
+                //             AndroidInfoHelpers.getFriendlyDeviceName(),
+                //             getUseDeveloperSupport());
+                // }
 
                 @Override
                 protected List<ReactPackage> getPackages() {
