@@ -14,19 +14,25 @@ export const useNavigationFocus = (
 ) => {
   const [isFocused, setFocused] = useState(focusOnInit);
   const prev = useRef(false);
+  const isBlurred = useRef(false);
 
   const _onFocus = useCallback(() => {
-    setTimeout(() => {
-      console.log('on focus', prev);
-      let shouldFocus = onFocus ? onFocus(prev) : true;
-      if (shouldFocus) {
-        setFocused(true);
-        prev.current = true;
-      }
-    }, delay || 300);
+    setTimeout(
+      () => {
+        console.log('on focus', prev);
+        let shouldFocus = onFocus ? onFocus(prev) : true;
+        if (shouldFocus) {
+          setFocused(true);
+          prev.current = true;
+        }
+        isBlurred.current = false;
+      },
+      isBlurred.current ? 0 : delay || 300
+    );
   }, [onFocus, prev]);
 
   const _onBlur = useCallback(() => {
+    isBlurred.current = true;
     setTimeout(() => {
       let shouldBlur = onBlur ? onBlur(prev) : true;
       if (shouldBlur) {

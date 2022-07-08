@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { RefreshControl, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { notesnook } from '../../../e2e/test.ids';
 import { eSendEvent } from '../../services/event-manager';
 import Sync from '../../services/sync';
@@ -108,7 +109,8 @@ const List = ({
 
   return (
     <>
-      <FlatList
+      <Animated.FlatList
+        entering={type === 'search' ? undefined : FadeInDown}
         style={styles}
         keyExtractor={_keyExtractor}
         ref={scrollRef}
