@@ -32,7 +32,7 @@ TaggedNotes.navigate = (item: TagType, canGoBack: boolean) => {
   Navigation.navigate<'TaggedNotes'>(
     {
       name: 'TaggedNotes',
-      alias: '#' + alias,
+      alias: alias,
       title: item.title,
       id: item.id,
       type: 'tag'
@@ -40,7 +40,7 @@ TaggedNotes.navigate = (item: TagType, canGoBack: boolean) => {
     {
       item: item,
       canGoBack,
-      title: '#' + alias
+      title: alias
     }
   );
 };

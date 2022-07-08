@@ -21,7 +21,7 @@ export function getAlias(params: NotesScreenParams) {
       : item.type === 'color'
       ? db.colors?.alias(item.id)
       : params?.title;
-  return alias || '';
+  return alias || item.title;
 }
 
 export function openMonographsWebpage() {

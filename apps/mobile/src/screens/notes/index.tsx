@@ -86,16 +86,17 @@ const NotesPage = ({
   const syncWithNavigation = () => {
     const { item, title } = params.current;
     //@ts-ignore
-    let alias = getAlias({ item: item });
+    let alias = getAlias(params.current);
+    console.log(alias, title, 'syncWithNavigation', params.current);
     useNavigationStore.getState().update(
       {
         name: route.name,
-        title: title,
+        title: alias || title,
         id: item?.id,
         type: 'notes',
         //@ts-ignore
         notebookId: item?.notebookId,
-        alias: toCamelCase(alias),
+        alias: route.name === 'ColoredNotes' ? toCamelCase(alias) : alias,
         //@ts-ignore
         color: item.type === 'color' ? item.title?.toLowerCase() : undefined
       },
@@ -156,7 +157,10 @@ const NotesPage = ({
   };
 
   return (
-    <DelayLayout wait={loading || loadingNotes}>
+    <DelayLayout
+      color={route.name === 'ColoredNotes' ? params.current?.item.title.toLowerCase() : undefined}
+      wait={loading || loadingNotes}
+    >
       <List
         listData={notes}
         warning={warning ? WARNING_DATA : null}
@@ -166,8 +170,7 @@ const NotesPage = ({
         screen="Notes"
         headerProps={{
           heading: params.current.title,
-          color:
-            params.current?.item?.type === 'color' ? params.current?.item.title.toLowerCase() : null
+          color: route.name === 'ColoredNotes' ? params.current?.item.title.toLowerCase() : null
         }}
         placeholderData={placeholderData}
       />

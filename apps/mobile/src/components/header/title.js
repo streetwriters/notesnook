@@ -26,7 +26,7 @@ export const Title = () => {
       ? db.notebooks?.notebook(currentScreen.notebookId)?.data
       : null;
   const title = currentScreen.title;
-  const isTag = title.slice(0, 1) === '#';
+  const isTag = currentScreen?.name === 'TaggedNotes';
 
   const onScroll = data => {
     if (currentScreen.name !== 'Notebook') {
@@ -97,7 +97,7 @@ export const Title = () => {
               #
             </Heading>
           ) : null}
-          {isTag ? title.slice(1) : title}
+          {title}
         </Heading>
       ) : null}
     </View>

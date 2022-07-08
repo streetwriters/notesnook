@@ -33,7 +33,7 @@ ColoredNotes.navigate = (item: ColorType, canGoBack: boolean) => {
     {
       name: 'ColoredNotes',
       alias: toCamelCase(alias),
-      title: item.title,
+      title: toCamelCase(item.title),
       id: item.id,
       type: 'color',
       //@ts-ignore
