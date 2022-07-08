@@ -96,7 +96,10 @@ export function TaskListComponent(
               }}
               size={isMobile ? 24 : 20}
               onClick={() => {
-                updateAttributes({ collapsed: !collapsed });
+                updateAttributes(
+                  { collapsed: !collapsed },
+                  { addToHistory: false, preventUpdate: true }
+                );
               }}
             />
           </Flex>
@@ -133,7 +136,10 @@ export function TaskListComponent(
               sx={{ p: 0, px: 2, zIndex: 1, color: "fontTertiary" }}
               placeholder="Untitled"
               onChange={(e) => {
-                updateAttributes({ title: e.target.value });
+                updateAttributes(
+                  { title: e.target.value },
+                  { addToHistory: true, preventUpdate: false }
+                );
               }}
             />
             <Flex sx={{ flexShrink: 0, pr: 2 }}>

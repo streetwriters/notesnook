@@ -32,7 +32,7 @@ export declare class ReactNodeView<P extends ReactNodeViewProps> implements Node
     handleRef: (node: HTMLElement | null) => void;
     private _handleRef;
     render(props?: P, forwardRef?: ForwardRef): React.ReactElement<any> | null;
-    updateAttributes(attributes: any, pos: number, preventUpdate?: boolean): void;
+    updateAttributes(attributes: any, pos: number, addToHistory?: boolean, preventUpdate?: boolean): void;
     update(node: PMNode, _decorations: readonly Decoration[], _innerDecorations: DecorationSource): boolean;
     onDragStart(event: DragEvent): void;
     stopEvent(event: Event): boolean;

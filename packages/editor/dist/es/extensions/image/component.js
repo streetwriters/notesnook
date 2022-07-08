@@ -57,7 +57,7 @@ export function ImageComponent(props) {
                     updateAttributes({
                         width: ref.clientWidth,
                         height: ref.clientHeight,
-                    });
+                    }, { addToHistory: true, preventUpdate: false });
                 }, lockAspectRatio: true }, { children: [_jsx(DesktopOnly, { children: selected && (_jsx(Flex, Object.assign({ sx: { position: "relative", justifyContent: "end" } }, { children: _jsx(Flex, Object.assign({ sx: {
                                     position: "absolute",
                                     top: -40,

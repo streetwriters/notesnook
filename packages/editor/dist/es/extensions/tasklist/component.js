@@ -59,7 +59,7 @@ export function TaskListComponent(props) {
                                     fill: "var(--checked) !important",
                                 },
                             }, size: isMobile ? 24 : 20, onClick: () => {
-                                updateAttributes({ collapsed: !collapsed });
+                                updateAttributes({ collapsed: !collapsed }, { addToHistory: false, preventUpdate: true });
                             } })] }))) : (_jsxs(Flex, Object.assign({ sx: {
                         position: "relative",
                         bg: "bgSecondary",
@@ -78,7 +78,7 @@ export function TaskListComponent(props) {
                                 left: 0,
                                 transition: "width 250ms ease-out",
                             } }), _jsx(Input, { readOnly: !editor.isEditable, value: title || "", variant: "clean", sx: { p: 0, px: 2, zIndex: 1, color: "fontTertiary" }, placeholder: "Untitled", onChange: (e) => {
-                                updateAttributes({ title: e.target.value });
+                                updateAttributes({ title: e.target.value }, { addToHistory: true, preventUpdate: false });
                             } }), _jsxs(Flex, Object.assign({ sx: { flexShrink: 0, pr: 2 } }, { children: [_jsx(Icon, { path: Icons.checkbox, size: 15, color: "fontTertiary" }), _jsxs(Text, Object.assign({ variant: "body", sx: { ml: 1, color: "fontTertiary" } }, { children: [stats.checked, "/", stats.total] }))] }))] }))) })), _jsx(Text, { as: "div", ref: forwardRef, sx: {
                     ul: {
                         display: collapsed ? "none" : "block",

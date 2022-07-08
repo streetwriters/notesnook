@@ -62,10 +62,13 @@ export function ImageComponent(
           }}
           maxWidth="100%"
           onResizeStop={(e, direction, ref, d) => {
-            updateAttributes({
-              width: ref.clientWidth,
-              height: ref.clientHeight,
-            });
+            updateAttributes(
+              {
+                width: ref.clientWidth,
+                height: ref.clientHeight,
+              },
+              { addToHistory: true, preventUpdate: false }
+            );
           }}
           lockAspectRatio={true}
         >

@@ -130,7 +130,6 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   ): React.ReactElement<any> | null {
     if (!this.options.component) return null;
     const theme = this.editor.storage.theme as Theme;
-    const pos = this.getPos();
 
     return (
       <ThemeProvider theme={theme}>
@@ -140,8 +139,13 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
           getPos={this.getPos}
           node={this.node}
           forwardRef={forwardRef}
-          updateAttributes={(attr, preventUpdate) =>
-            this.updateAttributes(attr, pos, preventUpdate)
+          updateAttributes={(attr, options) =>
+            this.updateAttributes(
+              attr,
+              this.getPos(),
+              options?.addToHistory,
+              options?.preventUpdate
+            )
           }
         />
       </ThemeProvider>
@@ -151,6 +155,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   updateAttributes(
     attributes: any,
     pos: number,
+    addToHistory: boolean = false,
     preventUpdate: boolean = false
   ) {
     this.editor.commands.command(({ tr }) => {
@@ -158,7 +163,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
         ...this.node.attrs,
         ...attributes,
       });
-      tr.setMeta("addToHistory", false);
+      tr.setMeta("addToHistory", addToHistory);
       tr.setMeta("preventUpdate", preventUpdate);
       return true;
     });

@@ -27,7 +27,7 @@ export function EmbedComponent(props) {
                     updateAttributes({
                         width: ref.clientWidth,
                         height: ref.clientHeight,
-                    });
+                    }, { addToHistory: true, preventUpdate: false });
                 }, lockAspectRatio: true }, { children: [_jsx(Flex, Object.assign({ width: "100%", sx: {
                             position: "relative",
                             justifyContent: "end",

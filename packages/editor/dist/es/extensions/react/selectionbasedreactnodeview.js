@@ -80,7 +80,7 @@ export class SelectionBasedNodeView extends ReactNodeView {
         const theme = this.editor.storage.theme;
         const isSelected = this.editor.isEditable &&
             (this.insideSelection() || this.nodeInsideSelection());
-        return (_jsx(ThemeProvider, Object.assign({ theme: theme }, { children: _jsx(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: (attr) => this.updateAttributes(attr, this.pos) })) })));
+        return (_jsx(ThemeProvider, Object.assign({ theme: theme }, { children: _jsx(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: (attr, options) => this.updateAttributes(attr, this.pos, options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) })));
     }
     /**
      * Update current node's start and end positions.

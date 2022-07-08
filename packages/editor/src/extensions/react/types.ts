@@ -11,7 +11,7 @@ export type ForwardRef = (node: HTMLElement | null) => void;
 export type ShouldUpdate = (prevNode: PMNode, nextNode: PMNode) => boolean;
 export type UpdateAttributes<T> = (
   attributes: Partial<T>,
-  preventUpdate?: boolean
+  options?: { addToHistory?: boolean; preventUpdate?: boolean }
 ) => void;
 export type ContentDOM =
   | {

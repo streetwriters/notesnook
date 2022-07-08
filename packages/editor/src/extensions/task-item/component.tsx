@@ -63,7 +63,7 @@ export function TaskItemComponent(
             },
           }}
           size={isMobile ? 24 : 20}
-          onMouseDown={(e) => e.preventDefault()}
+          // onMouseDown={(e) => e.preventDefault()}
         />
         <Icon
           path={checked ? Icons.check : ""}
@@ -96,7 +96,7 @@ export function TaskItemComponent(
           ref={forwardRef}
           sx={{
             textDecorationLine: checked ? "line-through" : "none",
-            color: checked ? "var(--checked)" : "var(--text)",
+            opacity: checked ? 0.8 : 1,
             flex: 1,
           }}
         />

@@ -85,13 +85,12 @@ export class ReactNodeView {
         if (!this.options.component)
             return null;
         const theme = this.editor.storage.theme;
-        const pos = this.getPos();
-        return (_jsx(ThemeProvider, Object.assign({ theme: theme }, { children: _jsx(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: (attr, preventUpdate) => this.updateAttributes(attr, pos, preventUpdate) })) })));
+        return (_jsx(ThemeProvider, Object.assign({ theme: theme }, { children: _jsx(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: (attr, options) => this.updateAttributes(attr, this.getPos(), options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) })));
     }
-    updateAttributes(attributes, pos, preventUpdate = false) {
+    updateAttributes(attributes, pos, addToHistory = false, preventUpdate = false) {
         this.editor.commands.command(({ tr }) => {
             tr.setNodeMarkup(pos, undefined, Object.assign(Object.assign({}, this.node.attrs), attributes));
-            tr.setMeta("addToHistory", false);
+            tr.setMeta("addToHistory", addToHistory);
             tr.setMeta("preventUpdate", preventUpdate);
             return true;
         });

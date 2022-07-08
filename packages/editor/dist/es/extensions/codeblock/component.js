@@ -38,7 +38,7 @@ export function CodeblockComponent(props) {
                 const preventUpdate = language === languageDefinition.filename;
                 updateAttributes({
                     language: languageDefinition.filename,
-                }, preventUpdate);
+                }, { preventUpdate, addToHistory: false });
             });
         })();
     }, [language]);
@@ -97,7 +97,7 @@ export function CodeblockComponent(props) {
                     location: "top",
                     yOffset: 5,
                 }, title: "Change code block language" }, { children: _jsx(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: (language) => {
-                        updateAttributes({ language });
+                        updateAttributes({ language }, { addToHistory: true, preventUpdate: false });
                         setIsOpen(false);
                     }, onClose: () => setIsOpen(false) }) }))] }));
 }

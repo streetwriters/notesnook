@@ -41,7 +41,7 @@ export function CodeblockComponent(
         {
           language: languageDefinition.filename,
         },
-        preventUpdate
+        { preventUpdate, addToHistory: false }
       );
     })();
   }, [language]);
@@ -161,7 +161,10 @@ export function CodeblockComponent(
         <LanguageSelector
           selectedLanguage={languageDefinition?.filename || "Plaintext"}
           onLanguageSelected={(language) => {
-            updateAttributes({ language });
+            updateAttributes(
+              { language },
+              { addToHistory: true, preventUpdate: false }
+            );
             setIsOpen(false);
           }}
           onClose={() => setIsOpen(false)}

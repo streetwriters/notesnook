@@ -90,7 +90,14 @@ export class SelectionBasedNodeView<
           node={this.node}
           forwardRef={forwardRef}
           selected={isSelected}
-          updateAttributes={(attr) => this.updateAttributes(attr, this.pos)}
+          updateAttributes={(attr, options) =>
+            this.updateAttributes(
+              attr,
+              this.pos,
+              options?.addToHistory,
+              options?.preventUpdate
+            )
+          }
         />
       </ThemeProvider>
     );
