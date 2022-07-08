@@ -1,5 +1,4 @@
 import React from 'react';
-import { View } from 'react-native';
 import DelayLayout from '../components/delay-layout';
 import DialogProvider from '../components/dialog-provider';
 import { Header } from '../components/header';
@@ -17,7 +16,7 @@ export const ApplicationHolder = React.memo(
     return loading && introCompleted ? (
       <>
         <Header />
-        <DelayLayout wait={loading} />
+        <DelayLayout animated={false} wait={loading} />
       </>
     ) : (
       <>

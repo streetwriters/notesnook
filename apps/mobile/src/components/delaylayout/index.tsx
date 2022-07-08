@@ -11,6 +11,7 @@ interface IDelayLayoutProps extends ViewProps {
   wait?: boolean;
   type?: 'default' | 'settings';
   color?: string;
+  animated?: boolean;
 }
 
 const placeholder = {
@@ -18,14 +19,14 @@ const placeholder = {
   settings: SettingsPlaceholder
 };
 
-export default function DelayLayout(props: IDelayLayoutProps) {
+export default function DelayLayout({ animated = true, ...props }: IDelayLayoutProps) {
   const colors = useThemeStore(state => state.colors);
   const loading = useDelayLayout(!props.delay || props.delay < 300 ? 300 : props.delay);
   const Placeholder = placeholder[props.type || 'default'];
 
   return loading || props.wait ? (
     <Animated.View
-      exiting={FadeOutUp}
+      exiting={animated ? FadeOutUp : undefined}
       style={{
         backgroundColor: colors.bg,
         flex: 1,

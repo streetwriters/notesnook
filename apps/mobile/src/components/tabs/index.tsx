@@ -1,6 +1,5 @@
 import React, {
   forwardRef,
-  MutableRefObject,
   RefObject,
   useEffect,
   useImperativeHandle,
@@ -85,7 +84,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           page = page + 1;
           if (page === 1) {
             onDrawerStateChange(false);
-            console.log('coming here');
             translateX.value = withTiming(homePosition);
             currentTab.value = 1;
           } else if (page === 2) {
@@ -95,7 +93,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           }
         },
         goToIndex: (index: number) => {
-          console.log('index', index);
           if (index === 0) {
             onDrawerStateChange(true);
             return (translateX.value = withSpring(0));
@@ -183,9 +180,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
 
         if (vx < 0) vx = vx * -1;
         if (vy < 0) vy = vy * -1;
-
-        console.log(event.velocityX, event.velocityY, diffX, diffY);
-        console.log('diff: ', vx / vy, 'lock: ', vx / vy < 5, vy > vx);
         // if vy is greater than vx, user is swiping vertically. lock swiping.
         if (vy > vx) locked.value = true;
         // if dividend of vx/vy is less than 4, user is swiping diagonally. lock swiping
