@@ -117,7 +117,7 @@ const Input = ({
         break;
       case 'phonenumber':
         // eslint-disable-next-line no-case-declarations
-        const phone = await (await import('phone')).default;
+        const phone = require('phone').default;
         // eslint-disable-next-line no-case-declarations
         let result = phone(value, {
           strictDetection: true,
