@@ -64,7 +64,13 @@ export function FontFamily(props: ToolProps) {
   );
 
   return (
-    <Dropdown selectedItem={currentFontFamily} items={items} menuWidth={130} />
+    <Dropdown
+      id="fontFamily"
+      group="font"
+      selectedItem={currentFontFamily}
+      items={items}
+      menuWidth={130}
+    />
   );
 }
 

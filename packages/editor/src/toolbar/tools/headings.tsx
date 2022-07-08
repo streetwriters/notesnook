@@ -22,6 +22,8 @@ export function Headings(props: ToolProps) {
 
   return (
     <Dropdown
+      id="headings"
+      group="headings"
       selectedItem={
         currentHeadingLevel ? `Heading ${currentHeadingLevel}` : "Paragraph"
       }

@@ -14,10 +14,7 @@ import {
 import { useFocus } from "./use-focus";
 import { MenuSeparator } from "./menu-separator";
 import { MenuButton } from "./menu-button";
-import {
-  PopupPresenter as _PopupPresenter,
-  PopupPresenterProps as _PopupPresenterProps,
-} from "../popup-presenter";
+import { PopupPresenter, PopupPresenterProps } from "../popup-presenter";
 
 type MenuProps = MenuContainerProps & {
   items?: MenuItemType[];
@@ -187,12 +184,12 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
   );
 }
 
-export type MenuPresenterProps = _PopupPresenterProps & MenuProps;
+export type MenuPresenterProps = PopupPresenterProps & MenuProps;
 export function MenuPresenter(props: PropsWithChildren<MenuPresenterProps>) {
   const { items = [], ...restProps } = props;
   return (
-    <_PopupPresenter {...restProps}>
+    <PopupPresenter {...restProps}>
       {props.children ? props.children : <Menu items={items} {...restProps} />}
-    </_PopupPresenter>
+    </PopupPresenter>
   );
 }

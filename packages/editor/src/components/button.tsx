@@ -6,6 +6,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (props: ButtonProps, forwardedRef) => {
     const { sx, ...buttonProps } = props;
     const hoverBg = (sx as any)?.[":hover"]?.["bg"] || "hover";
+    const bg = (sx as any)?.["bg"] || "unset";
     const buttonRef = useRef<HTMLButtonElement>();
 
     useEffect(() => {
@@ -32,7 +33,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...buttonProps}
         sx={{
           ...sx,
-          ":hover": { bg: ["transparent", hoverBg] },
+          ":hover": { bg: [bg, hoverBg] },
           ":active": { bg: hoverBg },
         }}
         ref={(ref) => {
@@ -41,7 +42,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           else if (forwardedRef) forwardedRef.current = ref;
         }}
         onClick={props.onClick}
-        onMouseDown={() => {}}
       />
     );
   }

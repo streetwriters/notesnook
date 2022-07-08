@@ -1,27 +1,43 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Flex, Text } from "rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
 // import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
 import { MenuItem } from "../../components/menu/types";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import {
+  useIsMobile,
+  useToolbarLocation,
+  useToolbarStore,
+} from "../stores/toolbar-store";
 import { MenuPresenter } from "../../components/menu";
 import { getToolbarElement } from "../utils/dom";
 import { Button } from "../../components/button";
+import { usePopupHandler } from "../../components/popup-presenter";
 
 type DropdownProps = {
+  id: string;
+  group: string;
   selectedItem: string | JSX.Element;
   items: MenuItem[];
   buttonRef?: React.MutableRefObject<HTMLButtonElement | undefined>;
   menuWidth?: number;
 };
 export function Dropdown(props: DropdownProps) {
-  const { items, selectedItem, buttonRef, menuWidth } = props;
+  let { id, group, items, selectedItem, buttonRef, menuWidth } = props;
   const internalRef = useRef<any>();
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
   const isBottom = toolbarLocation === "bottom";
+
+  const { closePopup, isPopupOpen } = usePopupHandler({
+    group,
+    id,
+    isOpen,
+    onClosed: () => setIsOpen(false),
+    onClosePopup: () => closePopup(id),
+  });
+
   return (
     <>
       <Button
@@ -32,7 +48,7 @@ export function Dropdown(props: DropdownProps) {
         sx={{
           p: 1,
           m: 0,
-          bg: isOpen ? "hover" : "transparent",
+          bg: isPopupOpen ? "hover" : "transparent",
           mr: 1,
           display: "flex",
           alignItems: "center",
@@ -59,9 +75,9 @@ export function Dropdown(props: DropdownProps) {
       </Button>
 
       <MenuPresenter
-        isOpen={isOpen}
+        isOpen={isPopupOpen}
         items={items}
-        onClose={() => setIsOpen(false)}
+        onClose={() => closePopup(id)}
         position={{
           target: isBottom
             ? getToolbarElement()

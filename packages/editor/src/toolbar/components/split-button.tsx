@@ -25,17 +25,20 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
         ref={ref}
         sx={{
           borderRadius: "default",
-          bg: toggled ? "hover" : "transparent",
-          ":hover": { bg: [toggled ? "hover" : "transparent", "hover"] },
-          ":active": { bg: toggled ? "hover" : "transparent" },
         }}
       >
-        <ToolButton {...toolButtonProps} toggled={false} />
+        <ToolButton
+          {...toolButtonProps}
+          sx={{ mr: 0, ":hover": { bg: "hover" } }}
+          toggled={false}
+        />
         <Button
           sx={{
+            flexShrink: 0,
             p: 0,
             m: 0,
-            bg: "transparent",
+            px: "3px",
+            bg: "bgSecondary",
             ":hover": { bg: "hover" },
             ":last-of-type": {
               mr: 0,
@@ -49,6 +52,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
             }
             color="text"
             size={"small"}
+            sx={{ flexShrink: 0 }}
           />
         </Button>
       </Flex>
