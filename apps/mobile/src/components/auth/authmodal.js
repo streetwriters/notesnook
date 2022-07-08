@@ -82,7 +82,8 @@ const AuthModal = () => {
           customStyle={{
             position: 'absolute',
             zIndex: 999,
-            left: 12
+            left: 12,
+            top: 0
           }}
         />
       )}
