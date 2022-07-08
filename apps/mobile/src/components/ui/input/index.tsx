@@ -317,7 +317,8 @@ const Input = ({
       {validationType === 'password' && focus && (
         <View
           style={{
-            paddingTop: 5
+            marginTop: -5,
+            marginBottom: 5
           }}
         >
           {
