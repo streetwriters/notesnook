@@ -43,6 +43,8 @@ export type EditorController = {
   downloadAttachment: (attachment: Attachment) => void;
   content: MutableRefObject<string | null>;
   onUpdate: () => void;
+  titlePlaceholder: string;
+  setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export function useEditorController(
@@ -50,6 +52,7 @@ export function useEditorController(
   update: () => void
 ): EditorController {
   const [title, setTitle] = useState("");
+  const [titlePlaceholder, setTitlePlaceholder] = useState("Note title");
   const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
@@ -141,6 +144,7 @@ export function useEditorController(
           setTitle(value);
           break;
         case "native:titleplaceholder":
+          setTitlePlaceholder(value);
           break;
         case "native:status":
           break;
@@ -191,6 +195,8 @@ export function useEditorController(
     scroll,
     title,
     setTitle,
+    titlePlaceholder,
+    setTitlePlaceholder,
     openFilePicker,
     downloadAttachment,
     content: htmlContentRef,

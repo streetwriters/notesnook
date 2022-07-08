@@ -118,6 +118,7 @@ const Tiptap = () => {
   const update = () => {
     setTick((tick) => tick + 1);
     setLayout(false);
+    controller.setTitlePlaceholder("Note title");
     setImmediate(() => setLayout(true));
   };
 
@@ -167,6 +168,7 @@ const Tiptap = () => {
             <>
               <Tags />
               <Title
+                titlePlaceholder={controller.titlePlaceholder}
                 readonly={settings.readonly}
                 controller={controllerRef}
                 title={controller.title}

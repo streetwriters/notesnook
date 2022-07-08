@@ -5,10 +5,12 @@ import styles from "./styles.module.css";
 function Title({
   controller,
   title,
+  titlePlaceholder,
   readonly,
 }: {
   controller: RefObject<EditorController>;
   title: string;
+  titlePlaceholder: string;
   readonly: boolean;
 }) {
   const titleRef = useRef<HTMLInputElement>(null);
@@ -46,13 +48,14 @@ function Title({
         if (!emitUpdate.current) return;
         controller.current?.titleChange(event.target.value);
       }}
-      placeholder="Note title"
+      placeholder={titlePlaceholder}
     />
   );
 }
 
 export default React.memo(Title, (prev, next) => {
   if (prev.title !== next.title) return false;
+  if (prev.titlePlaceholder !== next.titlePlaceholder) return false;
   if (prev.readonly !== next.readonly) return false;
   return true;
 });
