@@ -12,16 +12,23 @@ export declare type PopupPresenterProps = {
     movable?: boolean;
 };
 export declare function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>): JSX.Element | null;
-export declare type PopupWrapperProps = {
-    id: string;
-    group: string;
+export declare type PopupWrapperProps = UsePopupHandlerOptions & {
     position: PositionOptions;
-    isOpen: boolean;
-    onClosed?: () => void;
     renderPopup: (closePopup: () => void) => React.ReactNode;
-    autoCloseOnUnmount?: boolean;
 } & Partial<Omit<PopupPresenterProps, "onClose">>;
 export declare function PopupWrapper(props: PopupWrapperProps): null;
+declare type UsePopupHandlerOptions = {
+    id: string;
+    group: string;
+    isOpen: boolean;
+    autoCloseOnUnmount?: boolean;
+    onClosed?: () => void;
+    onClosePopup?: () => void;
+};
+export declare function usePopupHandler(options: UsePopupHandlerOptions): {
+    isPopupOpen: boolean;
+    closePopup: (popupId: string) => void;
+};
 declare type ShowPopupOptions = {
     theme: Theme;
     popup: (closePopup: () => void) => React.ReactNode;

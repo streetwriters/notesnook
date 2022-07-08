@@ -37,7 +37,7 @@ function FontFamily(props) {
     const currentFontFamily = ((_b = (_a = Object.entries(fontFamilies)
         .find(([key, value]) => editor.isActive("textStyle", { fontFamily: value }))) === null || _a === void 0 ? void 0 : _a.map((a) => a)) === null || _b === void 0 ? void 0 : _b.at(0)) || "Sans-serif";
     const items = (0, react_1.useMemo)(() => toMenuItems(editor, currentFontFamily), [currentFontFamily]);
-    return ((0, jsx_runtime_1.jsx)(dropdown_1.Dropdown, { selectedItem: currentFontFamily, items: items, menuWidth: 130 }));
+    return ((0, jsx_runtime_1.jsx)(dropdown_1.Dropdown, { id: "fontFamily", group: "font", selectedItem: currentFontFamily, items: items, menuWidth: 130 }));
 }
 exports.FontFamily = FontFamily;
 function toMenuItems(editor, currentFontFamily) {

@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.showPopup = exports.PopupWrapper = exports.PopupPresenter = void 0;
+exports.showPopup = exports.usePopupHandler = exports.PopupWrapper = exports.PopupPresenter = void 0;
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = require("react");
 const rebass_1 = require("rebass");
@@ -154,39 +154,7 @@ exports.PopupPresenter = PopupPresenter;
 function PopupWrapper(props) {
     let { id, group, position, renderPopup, isOpen, onClosed, autoCloseOnUnmount } = props, presenterProps = __rest(props, ["id", "group", "position", "renderPopup", "isOpen", "onClosed", "autoCloseOnUnmount"]);
     const PopupRenderer = (0, popuprenderer_1.usePopupRenderer)();
-    const isPopupOpen = (0, toolbarstore_1.useToolbarStore)((store) => !!store.openedPopups[id]);
-    const openPopup = (0, toolbarstore_1.useToolbarStore)((store) => store.openPopup);
-    const closePopup = (0, toolbarstore_1.useToolbarStore)((store) => store.closePopup);
-    const closePopupGroup = (0, toolbarstore_1.useToolbarStore)((store) => store.closePopupGroup);
-    const isBottom = (0, toolbarstore_1.useToolbarStore)((store) => store.toolbarLocation === "bottom");
-    if (isBottom)
-        group = "popup";
-    (0, react_1.useEffect)(() => {
-        if (isOpen)
-            openPopup({ id, group });
-        else
-            closePopup(id);
-    }, [isOpen, id, group, openPopup, closePopup]);
-    (0, react_1.useEffect)(() => {
-        if (!autoCloseOnUnmount)
-            return;
-        return () => {
-            PopupRenderer === null || PopupRenderer === void 0 ? void 0 : PopupRenderer.closePopup(id);
-        };
-    }, [autoCloseOnUnmount, id]);
-    (0, react_1.useEffect)(() => {
-        if (!isPopupOpen)
-            onClosed === null || onClosed === void 0 ? void 0 : onClosed();
-    }, [isPopupOpen]);
-    (0, react_1.useEffect)(() => {
-        if (isPopupOpen) {
-            closePopupGroup(group, [id]);
-        }
-    }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
-    (0, react_1.useEffect)(() => {
-        if (!isOpen)
-            closePopup(id);
-    }, [isOpen, id, group, closePopup]);
+    const { closePopup, isPopupOpen } = usePopupHandler(props);
     (0, react_1.useEffect)(() => {
         if (PopupRenderer && isPopupOpen) {
             PopupRenderer.openPopup(id, function Popup({ id }) {
@@ -210,6 +178,44 @@ function PopupWrapper(props) {
     return null;
 }
 exports.PopupWrapper = PopupWrapper;
+function usePopupHandler(options) {
+    let { autoCloseOnUnmount, group, isOpen, id, onClosed, onClosePopup } = options;
+    const isPopupOpen = (0, toolbarstore_1.useToolbarStore)((store) => !!store.openedPopups[id]);
+    const openPopup = (0, toolbarstore_1.useToolbarStore)((store) => store.openPopup);
+    const closePopup = (0, toolbarstore_1.useToolbarStore)((store) => store.closePopup);
+    const closePopupGroup = (0, toolbarstore_1.useToolbarStore)((store) => store.closePopupGroup);
+    const isBottom = (0, toolbarstore_1.useToolbarStore)((store) => store.toolbarLocation === "bottom");
+    if (isBottom)
+        group = "popup";
+    (0, react_1.useEffect)(() => {
+        if (isOpen)
+            openPopup({ id, group });
+        else
+            closePopup(id);
+    }, [isOpen, id, group, openPopup, closePopup]);
+    (0, react_1.useEffect)(() => {
+        if (!autoCloseOnUnmount)
+            return;
+        return () => {
+            onClosePopup === null || onClosePopup === void 0 ? void 0 : onClosePopup();
+        };
+    }, [autoCloseOnUnmount, onClosePopup]);
+    (0, react_1.useEffect)(() => {
+        if (!isPopupOpen)
+            onClosed === null || onClosed === void 0 ? void 0 : onClosed();
+    }, [isPopupOpen]);
+    (0, react_1.useEffect)(() => {
+        if (isPopupOpen) {
+            closePopupGroup(group, [id]);
+        }
+    }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
+    (0, react_1.useEffect)(() => {
+        if (!isOpen)
+            closePopup(id);
+    }, [isOpen, id, group, closePopup]);
+    return { isPopupOpen, closePopup };
+}
+exports.usePopupHandler = usePopupHandler;
 function showPopup(options) {
     const { theme, popup } = options, props = __rest(options, ["theme", "popup"]);
     function hide() {

@@ -11,7 +11,7 @@ function Headings(props) {
     const toolbarLocation = (0, toolbarstore_1.useToolbarLocation)();
     const currentHeadingLevel = defaultLevels.find((level) => editor.isActive("heading", { level }));
     const items = (0, react_1.useMemo)(() => toMenuItems(editor, toolbarLocation, currentHeadingLevel), [currentHeadingLevel]);
-    return ((0, jsx_runtime_1.jsx)(dropdown_1.Dropdown, { selectedItem: currentHeadingLevel ? `Heading ${currentHeadingLevel}` : "Paragraph", items: items, menuWidth: 130 }));
+    return ((0, jsx_runtime_1.jsx)(dropdown_1.Dropdown, { id: "headings", group: "headings", selectedItem: currentHeadingLevel ? `Heading ${currentHeadingLevel}` : "Paragraph", items: items, menuWidth: 130 }));
 }
 exports.Headings = Headings;
 function toMenuItems(editor, toolbarLocation, currentHeadingLevel) {

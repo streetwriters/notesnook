@@ -17,6 +17,7 @@ export const Button = forwardRef((props, forwardedRef) => {
     var _a;
     const { sx } = props, buttonProps = __rest(props, ["sx"]);
     const hoverBg = ((_a = sx === null || sx === void 0 ? void 0 : sx[":hover"]) === null || _a === void 0 ? void 0 : _a["bg"]) || "hover";
+    const bg = (sx === null || sx === void 0 ? void 0 : sx["bg"]) || "unset";
     const buttonRef = useRef();
     useEffect(() => {
         if (!buttonRef.current)
@@ -35,11 +36,11 @@ export const Button = forwardRef((props, forwardedRef) => {
     const onMouseDown = useCallback((e) => {
         e.preventDefault();
     }, []);
-    return (_jsx(RebassButton, Object.assign({}, buttonProps, { sx: Object.assign(Object.assign({}, sx), { ":hover": { bg: ["transparent", hoverBg] }, ":active": { bg: hoverBg } }), ref: (ref) => {
+    return (_jsx(RebassButton, Object.assign({}, buttonProps, { sx: Object.assign(Object.assign({}, sx), { ":hover": { bg: [bg, hoverBg] }, ":active": { bg: hoverBg } }), ref: (ref) => {
             buttonRef.current = ref;
             if (typeof forwardedRef === "function")
                 forwardedRef(ref);
             else if (forwardedRef)
                 forwardedRef.current = ref;
-        }, onClick: props.onClick, onMouseDown: () => { } })));
+        }, onClick: props.onClick })));
 });

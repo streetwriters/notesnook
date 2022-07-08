@@ -30,18 +30,17 @@ function _SplitButton(props) {
     const toolbarLocation = (0, toolbarstore_1.useToolbarLocation)();
     return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ ref: ref, sx: {
                     borderRadius: "default",
-                    bg: toggled ? "hover" : "transparent",
-                    ":hover": { bg: [toggled ? "hover" : "transparent", "hover"] },
-                    ":active": { bg: toggled ? "hover" : "transparent" },
-                } }, { children: [(0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, Object.assign({}, toolButtonProps, { toggled: false })), (0, jsx_runtime_1.jsx)(button_1.Button, Object.assign({ sx: {
+                } }, { children: [(0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, Object.assign({}, toolButtonProps, { sx: { mr: 0, ":hover": { bg: "hover" } }, toggled: false })), (0, jsx_runtime_1.jsx)(button_1.Button, Object.assign({ sx: {
+                            flexShrink: 0,
                             p: 0,
                             m: 0,
-                            bg: "transparent",
+                            px: "3px",
+                            bg: "bgSecondary",
                             ":hover": { bg: "hover" },
                             ":last-of-type": {
                                 mr: 0,
                             },
-                        }, onClick: onOpen }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: toolbarLocation === "bottom" ? icons_1.Icons.chevronUp : icons_1.Icons.chevronDown, color: "text", size: "small" }) }))] })), children] }));
+                        }, onClick: onOpen }, { children: (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: toolbarLocation === "bottom" ? icons_1.Icons.chevronUp : icons_1.Icons.chevronDown, color: "text", size: "small", sx: { flexShrink: 0 } }) }))] })), children] }));
 }
 exports.SplitButton = react_2.default.memo(_SplitButton, (prev, next) => {
     return (prev.toggled === next.toggled &&

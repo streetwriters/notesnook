@@ -10,13 +10,21 @@ const toolbarstore_1 = require("../stores/toolbarstore");
 const menu_1 = require("../../components/menu");
 const dom_1 = require("../utils/dom");
 const button_1 = require("../../components/button");
+const popuppresenter_1 = require("../../components/popuppresenter");
 function Dropdown(props) {
-    const { items, selectedItem, buttonRef, menuWidth } = props;
+    let { id, group, items, selectedItem, buttonRef, menuWidth } = props;
     const internalRef = (0, react_1.useRef)();
     const [isOpen, setIsOpen] = (0, react_1.useState)(false);
     const toolbarLocation = (0, toolbarstore_1.useToolbarLocation)();
     const isMobile = (0, toolbarstore_1.useIsMobile)();
     const isBottom = toolbarLocation === "bottom";
+    const { closePopup, isPopupOpen } = (0, popuppresenter_1.usePopupHandler)({
+        group,
+        id,
+        isOpen,
+        onClosed: () => setIsOpen(false),
+        onClosePopup: () => closePopup(id),
+    });
     return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(button_1.Button, Object.assign({ ref: (ref) => {
                     internalRef.current = ref;
                     if (buttonRef)
@@ -24,7 +32,7 @@ function Dropdown(props) {
                 }, sx: {
                     p: 1,
                     m: 0,
-                    bg: isOpen ? "hover" : "transparent",
+                    bg: isPopupOpen ? "hover" : "transparent",
                     mr: 1,
                     display: "flex",
                     alignItems: "center",
@@ -32,7 +40,7 @@ function Dropdown(props) {
                     ":last-of-type": {
                         mr: 0,
                     },
-                }, onClick: () => setIsOpen((s) => !s), onMouseDown: (e) => e.preventDefault() }, { children: [typeof selectedItem === "string" ? ((0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ sx: { fontSize: "subBody", mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: isBottom ? icons_1.Icons.chevronUp : icons_1.Icons.chevronDown, size: "small", color: "text" })] })), (0, jsx_runtime_1.jsx)(menu_1.MenuPresenter, { isOpen: isOpen, items: items, onClose: () => setIsOpen(false), position: {
+                }, onClick: () => setIsOpen((s) => !s), onMouseDown: (e) => e.preventDefault() }, { children: [typeof selectedItem === "string" ? ((0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ sx: { fontSize: "subBody", mr: 1, color: "text" } }, { children: selectedItem }))) : (selectedItem), (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: isBottom ? icons_1.Icons.chevronUp : icons_1.Icons.chevronDown, size: "small", color: "text" })] })), (0, jsx_runtime_1.jsx)(menu_1.MenuPresenter, { isOpen: isPopupOpen, items: items, onClose: () => closePopup(id), position: {
                     target: isBottom
                         ? (0, dom_1.getToolbarElement)()
                         : internalRef.current || "mouse",

@@ -16,7 +16,7 @@ import { getPosition } from "../../utils/position";
 import { useFocus } from "./use-focus";
 import { MenuSeparator } from "./menu-separator";
 import { MenuButton } from "./menu-button";
-import { PopupPresenter as _PopupPresenter, } from "../popup-presenter";
+import { PopupPresenter } from "../popup-presenter";
 export function Menu(props) {
     const { items = [], title, onClose } = props, containerProps = __rest(props, ["items", "title", "onClose"]);
     const hoverTimeout = useRef();
@@ -109,5 +109,5 @@ function MenuContainer(props) {
 }
 export function MenuPresenter(props) {
     const { items = [] } = props, restProps = __rest(props, ["items"]);
-    return (_jsx(_PopupPresenter, Object.assign({}, restProps, { children: props.children ? props.children : _jsx(Menu, Object.assign({ items: items }, restProps)) })));
+    return (_jsx(PopupPresenter, Object.assign({}, restProps, { children: props.children ? props.children : _jsx(Menu, Object.assign({ items: items }, restProps)) })));
 }

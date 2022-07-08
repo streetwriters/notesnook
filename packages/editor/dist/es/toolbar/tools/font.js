@@ -33,7 +33,7 @@ export function FontFamily(props) {
     const currentFontFamily = ((_b = (_a = Object.entries(fontFamilies)
         .find(([key, value]) => editor.isActive("textStyle", { fontFamily: value }))) === null || _a === void 0 ? void 0 : _a.map((a) => a)) === null || _b === void 0 ? void 0 : _b.at(0)) || "Sans-serif";
     const items = useMemo(() => toMenuItems(editor, currentFontFamily), [currentFontFamily]);
-    return (_jsx(Dropdown, { selectedItem: currentFontFamily, items: items, menuWidth: 130 }));
+    return (_jsx(Dropdown, { id: "fontFamily", group: "font", selectedItem: currentFontFamily, items: items, menuWidth: 130 }));
 }
 function toMenuItems(editor, currentFontFamily) {
     const menuItems = [];

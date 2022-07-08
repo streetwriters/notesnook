@@ -24,18 +24,17 @@ function _SplitButton(props) {
     const toolbarLocation = useToolbarLocation();
     return (_jsxs(_Fragment, { children: [_jsxs(Flex, Object.assign({ ref: ref, sx: {
                     borderRadius: "default",
-                    bg: toggled ? "hover" : "transparent",
-                    ":hover": { bg: [toggled ? "hover" : "transparent", "hover"] },
-                    ":active": { bg: toggled ? "hover" : "transparent" },
-                } }, { children: [_jsx(ToolButton, Object.assign({}, toolButtonProps, { toggled: false })), _jsx(Button, Object.assign({ sx: {
+                } }, { children: [_jsx(ToolButton, Object.assign({}, toolButtonProps, { sx: { mr: 0, ":hover": { bg: "hover" } }, toggled: false })), _jsx(Button, Object.assign({ sx: {
+                            flexShrink: 0,
                             p: 0,
                             m: 0,
-                            bg: "transparent",
+                            px: "3px",
+                            bg: "bgSecondary",
                             ":hover": { bg: "hover" },
                             ":last-of-type": {
                                 mr: 0,
                             },
-                        }, onClick: onOpen }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small" }) }))] })), children] }));
+                        }, onClick: onOpen }, { children: _jsx(Icon, { path: toolbarLocation === "bottom" ? Icons.chevronUp : Icons.chevronDown, color: "text", size: "small", sx: { flexShrink: 0 } }) }))] })), children] }));
 }
 export const SplitButton = React.memo(_SplitButton, (prev, next) => {
     return (prev.toggled === next.toggled &&

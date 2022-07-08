@@ -147,39 +147,7 @@ export function PopupPresenter(props) {
 export function PopupWrapper(props) {
     let { id, group, position, renderPopup, isOpen, onClosed, autoCloseOnUnmount } = props, presenterProps = __rest(props, ["id", "group", "position", "renderPopup", "isOpen", "onClosed", "autoCloseOnUnmount"]);
     const PopupRenderer = usePopupRenderer();
-    const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
-    const openPopup = useToolbarStore((store) => store.openPopup);
-    const closePopup = useToolbarStore((store) => store.closePopup);
-    const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
-    const isBottom = useToolbarStore((store) => store.toolbarLocation === "bottom");
-    if (isBottom)
-        group = "popup";
-    useEffect(() => {
-        if (isOpen)
-            openPopup({ id, group });
-        else
-            closePopup(id);
-    }, [isOpen, id, group, openPopup, closePopup]);
-    useEffect(() => {
-        if (!autoCloseOnUnmount)
-            return;
-        return () => {
-            PopupRenderer === null || PopupRenderer === void 0 ? void 0 : PopupRenderer.closePopup(id);
-        };
-    }, [autoCloseOnUnmount, id]);
-    useEffect(() => {
-        if (!isPopupOpen)
-            onClosed === null || onClosed === void 0 ? void 0 : onClosed();
-    }, [isPopupOpen]);
-    useEffect(() => {
-        if (isPopupOpen) {
-            closePopupGroup(group, [id]);
-        }
-    }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
-    useEffect(() => {
-        if (!isOpen)
-            closePopup(id);
-    }, [isOpen, id, group, closePopup]);
+    const { closePopup, isPopupOpen } = usePopupHandler(props);
     useEffect(() => {
         if (PopupRenderer && isPopupOpen) {
             PopupRenderer.openPopup(id, function Popup({ id }) {
@@ -201,6 +169,43 @@ export function PopupWrapper(props) {
         }
     }, [PopupRenderer, isPopupOpen]);
     return null;
+}
+export function usePopupHandler(options) {
+    let { autoCloseOnUnmount, group, isOpen, id, onClosed, onClosePopup } = options;
+    const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
+    const openPopup = useToolbarStore((store) => store.openPopup);
+    const closePopup = useToolbarStore((store) => store.closePopup);
+    const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
+    const isBottom = useToolbarStore((store) => store.toolbarLocation === "bottom");
+    if (isBottom)
+        group = "popup";
+    useEffect(() => {
+        if (isOpen)
+            openPopup({ id, group });
+        else
+            closePopup(id);
+    }, [isOpen, id, group, openPopup, closePopup]);
+    useEffect(() => {
+        if (!autoCloseOnUnmount)
+            return;
+        return () => {
+            onClosePopup === null || onClosePopup === void 0 ? void 0 : onClosePopup();
+        };
+    }, [autoCloseOnUnmount, onClosePopup]);
+    useEffect(() => {
+        if (!isPopupOpen)
+            onClosed === null || onClosed === void 0 ? void 0 : onClosed();
+    }, [isPopupOpen]);
+    useEffect(() => {
+        if (isPopupOpen) {
+            closePopupGroup(group, [id]);
+        }
+    }, [onClosed, isPopupOpen, closePopupGroup, id, group]);
+    useEffect(() => {
+        if (!isOpen)
+            closePopup(id);
+    }, [isOpen, id, group, closePopup]);
+    return { isPopupOpen, closePopup };
 }
 export function showPopup(options) {
     const { theme, popup } = options, props = __rest(options, ["theme", "popup"]);
