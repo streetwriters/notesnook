@@ -154,7 +154,9 @@ async function shouldShowAnnouncement(announcement: Announcement) {
   }
 
   if (!show) return false;
-  const subStatus = PremiumService.getUser()?.subscription?.type;
+  if (!show) return false;
+  const user = (await db.user?.getUser()) as User;
+  const subStatus = user?.subscription?.type || SUBSCRIPTION_STATUS.BASIC;
   show = announcement.userTypes.some(userType => {
     switch (userType) {
       case 'pro':
@@ -164,13 +166,13 @@ async function shouldShowAnnouncement(announcement: Announcement) {
       case 'trialExpired':
         return subStatus === SUBSCRIPTION_STATUS.BASIC;
       case 'loggedOut':
-        return !PremiumService.getUser();
+        return !user;
       case 'verified':
-        return PremiumService.getUser()?.isEmailVerified;
+        return user.isEmailConfirmed;
       case 'loggedIn':
-        return !!PremiumService.getUser();
+        return !!user;
       case 'unverified':
-        return !PremiumService.getUser()?.isEmailVerified;
+        return !user.isEmailConfirmed;
       case 'proExpired':
         return (
           subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
@@ -178,7 +180,7 @@ async function shouldShowAnnouncement(announcement: Announcement) {
         );
       case 'any':
       default:
-        return true;
+        return false;
     }
   });
 

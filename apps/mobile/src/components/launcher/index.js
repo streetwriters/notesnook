@@ -98,14 +98,12 @@ const Launcher = React.memo(
         eSendEvent('session_expired');
         return;
       }
-
+      await useMessageStore.getState().setAnnouncement();
       if (NewFeature.present()) return;
       if (await checkAppUpdateAvailable()) return;
       if (await checkForRateAppRequest()) return;
       if (await checkNeedsBackup()) return;
       if (await PremiumService.getRemainingTrialDaysStatus()) return;
-      await useMessageStore.getState().setAnnouncement();
-
       if (PremiumService.get() && user) {
         if (SettingsService.get().reminder === 'off') {
           SettingsService.set({ reminder: 'daily' });
