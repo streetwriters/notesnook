@@ -6,7 +6,7 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from "react";
 import { useEditorThemeStore } from "../state/theme";
 import { EventTypes, isReactNative, post, timerFn } from "../utils";
@@ -47,13 +47,13 @@ export type EditorController = {
 
 export function useEditorController(
   editor: Editor | null,
-  update: Dispatch<SetStateAction<number>>
+  update: () => void
 ): EditorController {
   const [title, setTitle] = useState("");
   const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
-    change: null
+    change: null,
   });
 
   const selectionChange = useCallback((editor: Editor) => {
@@ -119,7 +119,7 @@ export function useEditorController(
   );
 
   const onUpdate = () => {
-    update((tick) => tick + 1);
+    update();
   };
 
   const onMessage = useCallback(
@@ -132,7 +132,7 @@ export function useEditorController(
       switch (type) {
         case "native:html":
           htmlContentRef.current = value;
-          update((tick) => tick + 1);
+          update();
           break;
         case "native:theme":
           useEditorThemeStore.getState().setColors(message.value);
@@ -194,6 +194,6 @@ export function useEditorController(
     openFilePicker,
     downloadAttachment,
     content: htmlContentRef,
-    onUpdate: onUpdate
+    onUpdate: onUpdate,
   };
 }

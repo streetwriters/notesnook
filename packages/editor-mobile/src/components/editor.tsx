@@ -87,7 +87,7 @@ const Tiptap = () => {
       post(EventTypes.pro);
     },
   });
-  const editor = useTiptap(
+  const _editor = useTiptap(
     {
       onUpdate: ({ editor }) => {
         global.editorController.contentChange(editor as Editor);
@@ -114,10 +114,17 @@ const Tiptap = () => {
     },
     [layout, initialProps.readonly, tick]
   );
-  const controller = useEditorController(editor, setTick);
+
+  const update = () => {
+    setTick((tick) => tick + 1);
+    setLayout(false);
+    setImmediate(() => setLayout(true));
+  };
+
+  const controller = useEditorController(_editor, update);
   const controllerRef = useRef(controller);
   globalThis.editorController = controller;
-  globalThis.editor = editor;
+  globalThis.editor = _editor;
 
   useEffect(() => {
     setInitialProps({ ...settings });
@@ -139,8 +146,8 @@ const Tiptap = () => {
         }}
       >
         <Header
-          hasRedo={false}
-          hasUndo={false}
+          hasRedo={_editor?.can().redo() || false}
+          hasUndo={_editor?.can().undo() || false}
           settings={settings}
           noHeader={initialProps.noHeader || false}
         />
@@ -164,7 +171,7 @@ const Tiptap = () => {
                 controller={controllerRef}
                 title={controller.title}
               />
-              <StatusBar container={containerRef} editor={editor} />
+              <StatusBar container={containerRef} editor={_editor} />
             </>
           )}
           <div
@@ -192,11 +199,11 @@ const Tiptap = () => {
           />
         </div>
 
-        {initialProps.noToolbar ? null : (
+        {initialProps.noToolbar || !layout ? null : (
           <Toolbar
             sx={{ pl: "10px", pt: "5px", minHeight: 45 }}
             theme={toolbarTheme}
-            editor={editor}
+            editor={_editor}
             location="bottom"
             tools={[...settings.tools]}
           />

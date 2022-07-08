@@ -115,7 +115,10 @@ export default React.memo(
                   alignItems: "center",
                 }}
               >
-                <ArrowULeftTopIcon size={28} color={"var(--nn_pri)"} />
+                <ArrowULeftTopIcon
+                  size={28}
+                  color={!hasUndo ? "var(--nn_nav)" : "var(--nn_pri)"}
+                />
               </Button>
 
               <Button
@@ -134,7 +137,10 @@ export default React.memo(
                   alignItems: "center",
                 }}
               >
-                <ArrowURightTopIcon size={28} color={"var(--nn_pri)"} />
+                <ArrowURightTopIcon
+                  size={28}
+                  color={!hasRedo ? "var(--nn_nav)" : "var(--nn_pri)"}
+                />
               </Button>
               {!settings.premium && (
                 <Button
@@ -221,9 +227,15 @@ export default React.memo(
       </div>
     );
   },
-  (prev, next) =>
-    prev.noHeader !== next.noHeader ||
-    prev.settings.premium !== next.settings.premium ||
-    prev.hasRedo !== next.hasRedo ||
-    prev.hasUndo !== next.hasUndo
+  (prev, next) => {
+    if (
+      prev.noHeader !== next.noHeader ||
+      prev.settings.premium !== next.settings.premium ||
+      prev.hasRedo !== next.hasRedo ||
+      prev.hasUndo !== next.hasUndo
+    )
+      return false;
+
+    return true;
+  }
 );
