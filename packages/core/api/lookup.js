@@ -16,11 +16,7 @@ export default class Lookup {
 
     return search(notes, query, (note) => {
       let text = note.title;
-      if (
-        !note.locked &&
-        !!note.contentId &&
-        Object.prototype.hasOwnProperty.call(contents, note.contentId)
-      )
+      if (!note.locked && !!note.contentId && !!contents[note.contentId])
         text += contents[note.contentId]["data"];
       return text;
     });
