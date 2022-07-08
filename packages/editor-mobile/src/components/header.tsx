@@ -13,31 +13,21 @@ import styles from "./styles.module.css";
 const Button = ({
   onPress,
   children,
-  style
+  style,
+  preventDefault = true,
 }: {
   onPress: () => void;
   children: React.ReactNode;
   style: React.CSSProperties;
+  preventDefault?: boolean;
 }) => {
   return (
     <button
       className={styles.btn_header}
       style={style}
-      onMouseUp={(e) => {
-        e.preventDefault();
-      }}
       onMouseDown={(e) => {
-        e.preventDefault();
+        if (preventDefault) e.preventDefault();
         onPress();
-      }}
-      onTouchEnd={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        onPress();
-      }}
-      onTouchStart={(e) => {
-        editor?.commands.blur();
-        e.preventDefault();
       }}
     >
       {children}
@@ -50,7 +40,7 @@ export default React.memo(
     noHeader,
     settings,
     hasUndo,
-    hasRedo
+    hasRedo,
   }: {
     noHeader: boolean;
     settings: Settings;
@@ -66,7 +56,7 @@ export default React.memo(
           height: noHeader ? `${insets.top}px` : `${50 + insets.top}px`,
           backgroundColor: "var(--nn_bg)",
           position: "sticky",
-          width: "100vw"
+          width: "100vw",
         }}
       >
         {noHeader ? null : (
@@ -76,13 +66,14 @@ export default React.memo(
               width: "100%",
               justifyContent: "space-between",
               flexDirection: "row",
-              paddingTop: insets.top
+              paddingTop: insets.top,
             }}
           >
             <Button
               onPress={() => {
                 post(EventTypes.back);
               }}
+              preventDefault={false}
               style={{
                 borderWidth: 0,
                 borderRadius: 100,
@@ -93,7 +84,7 @@ export default React.memo(
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "start",
-                flexDirection: "column"
+                flexDirection: "column",
               }}
             >
               <ArrowBackIcon size={28} color="var(--nn_pri)" />
@@ -103,7 +94,7 @@ export default React.memo(
               style={{
                 display: "flex",
                 alignItems: "center",
-                flexDirection: "row"
+                flexDirection: "row",
               }}
             >
               <Button
@@ -119,7 +110,7 @@ export default React.memo(
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <ArrowULeftTopIcon size={28} color={"var(--nn_pri)"} />
@@ -138,7 +129,7 @@ export default React.memo(
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <ArrowURightTopIcon size={28} color={"var(--nn_pri)"} />
@@ -148,6 +139,7 @@ export default React.memo(
                   onPress={() => {
                     post(EventTypes.pro);
                   }}
+                  preventDefault={false}
                   style={{
                     borderWidth: 0,
                     borderRadius: 100,
@@ -157,7 +149,7 @@ export default React.memo(
                     height: 39,
                     display: "flex",
                     justifyContent: "center",
-                    alignItems: "center"
+                    alignItems: "center",
                   }}
                 >
                   <CrownIcon size={28} color="orange" />
@@ -177,7 +169,7 @@ export default React.memo(
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <MagnifyIcon size={28} color="var(--nn_pri)" />
@@ -186,6 +178,7 @@ export default React.memo(
                 onPress={() => {
                   post(EventTypes.monograph);
                 }}
+                preventDefault={false}
                 style={{
                   borderWidth: 0,
                   borderRadius: 100,
@@ -195,7 +188,7 @@ export default React.memo(
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <CloudUploadOutlineIcon size={28} color="var(--nn_pri)" />
@@ -205,6 +198,7 @@ export default React.memo(
                 onPress={() => {
                   post(EventTypes.properties);
                 }}
+                preventDefault={false}
                 style={{
                   borderWidth: 0,
                   borderRadius: 100,
@@ -214,7 +208,7 @@ export default React.memo(
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <DotsHorizontalIcon size={28} color="var(--nn_pri)" />
