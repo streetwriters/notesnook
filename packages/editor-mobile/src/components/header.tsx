@@ -67,6 +67,8 @@ export default React.memo(
               justifyContent: "space-between",
               flexDirection: "row",
               paddingTop: insets.top,
+              height: 50,
+              alignItems: "center",
             }}
           >
             <Button
