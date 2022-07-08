@@ -85,12 +85,19 @@ const NotesPage = ({
 
   const syncWithNavigation = () => {
     const { item, title } = params.current;
+    //@ts-ignore
+    let alias = getAlias({ item: item });
     useNavigationStore.getState().update(
       {
         name: route.name,
         title: title,
         id: item?.id,
-        type: 'notes'
+        type: 'notes',
+        //@ts-ignore
+        notebookId: item?.notebookId,
+        alias: toCamelCase(alias),
+        //@ts-ignore
+        color: item.type === 'color' ? item.title?.toLowerCase() : undefined
       },
       params.current.canGoBack,
       rightButtons && rightButtons(params.current)
@@ -165,7 +172,7 @@ const NotesPage = ({
         placeholderData={placeholderData}
       />
 
-      {notes?.length > 0 || isFocused ? (
+      {notes?.length > 0 || (isFocused && !isMonograph) ? (
         <FloatingButton title="Create a note" onPress={onPressFloatingButton} />
       ) : null}
     </DelayLayout>
