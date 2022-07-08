@@ -60,7 +60,7 @@ function ImageComponent(props) {
                     updateAttributes({
                         width: ref.clientWidth,
                         height: ref.clientHeight,
-                    });
+                    }, { addToHistory: true, preventUpdate: false });
                 }, lockAspectRatio: true }, { children: [(0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: { position: "relative", justifyContent: "end" } }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: {
                                     position: "absolute",
                                     top: -40,

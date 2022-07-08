@@ -62,7 +62,7 @@ function TaskListComponent(props) {
                                     fill: "var(--checked) !important",
                                 },
                             }, size: isMobile ? 24 : 20, onClick: () => {
-                                updateAttributes({ collapsed: !collapsed });
+                                updateAttributes({ collapsed: !collapsed }, { addToHistory: false, preventUpdate: true });
                             } })] }))) : ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: {
                         position: "relative",
                         bg: "bgSecondary",
@@ -81,7 +81,7 @@ function TaskListComponent(props) {
                                 left: 0,
                                 transition: "width 250ms ease-out",
                             } }), (0, jsx_runtime_1.jsx)(forms_1.Input, { readOnly: !editor.isEditable, value: title || "", variant: "clean", sx: { p: 0, px: 2, zIndex: 1, color: "fontTertiary" }, placeholder: "Untitled", onChange: (e) => {
-                                updateAttributes({ title: e.target.value });
+                                updateAttributes({ title: e.target.value }, { addToHistory: true, preventUpdate: false });
                             } }), (0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: { flexShrink: 0, pr: 2 } }, { children: [(0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.checkbox, size: 15, color: "fontTertiary" }), (0, jsx_runtime_1.jsxs)(rebass_1.Text, Object.assign({ variant: "body", sx: { ml: 1, color: "fontTertiary" } }, { children: [stats.checked, "/", stats.total] }))] }))] }))) })), (0, jsx_runtime_1.jsx)(rebass_1.Text, { as: "div", ref: forwardRef, sx: {
                     ul: {
                         display: collapsed ? "none" : "block",

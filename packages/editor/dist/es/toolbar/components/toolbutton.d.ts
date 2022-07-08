@@ -14,8 +14,8 @@ export declare type ToolButtonProps = ButtonProps & {
 };
 export declare const ToolButton: React.NamedExoticComponent<ButtonProps & {
     icon: IconNames;
-    iconColor?: "background" | "border" | "text" | "blue" | "gray" | "green" | "orange" | "purple" | "red" | "yellow" | "checked" | "disabled" | "placeholder" | "icon" | "overlay" | "primary" | "bgSecondary" | keyof import("@notesnook/theme/dist/theme/colorscheme/static").StaticColors | "bgTransparent" | "accent" | "bgSecondaryText" | "bgSecondaryHover" | "hover" | "fontSecondary" | "fontTertiary" | "secondary" | undefined;
-    iconSize?: number | "small" | "big" | "medium" | undefined;
+    iconColor?: "background" | "border" | "text" | "blue" | "gray" | "green" | "orange" | "purple" | "red" | "yellow" | "checked" | "disabled" | "placeholder" | "icon" | keyof import("@notesnook/theme/dist/theme/colorscheme/static").StaticColors | "primary" | "bgTransparent" | "accent" | "bgSecondary" | "bgSecondaryText" | "bgSecondaryHover" | "hover" | "fontSecondary" | "fontTertiary" | "overlay" | "secondary" | undefined;
+    iconSize?: number | "big" | "small" | "medium" | undefined;
     toggled: boolean;
     buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined> | undefined;
     variant?: ToolButtonVariant | undefined;

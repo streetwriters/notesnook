@@ -30,7 +30,7 @@ function EmbedComponent(props) {
                     updateAttributes({
                         width: ref.clientWidth,
                         height: ref.clientHeight,
-                    });
+                    }, { addToHistory: true, preventUpdate: false });
                 }, lockAspectRatio: true }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ width: "100%", sx: {
                             position: "relative",
                             justifyContent: "end",

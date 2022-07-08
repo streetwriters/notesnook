@@ -39,7 +39,7 @@ function TaskItemComponent(props) {
                         ".icon:hover path": {
                             fill: "var(--checked) !important",
                         },
-                    }, size: isMobile ? 24 : 20, onMouseDown: (e) => e.preventDefault() }), (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: checked ? icons_1.Icons.check : "", stroke: "1px", sx: {
+                    }, size: isMobile ? 24 : 20 }), (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: checked ? icons_1.Icons.check : "", stroke: "1px", sx: {
                         border: "2px solid",
                         borderColor: checked ? "checked" : "icon",
                         borderRadius: "default",
@@ -58,7 +58,7 @@ function TaskItemComponent(props) {
                         toggle();
                     }, color: checked ? "checked" : "icon", size: isMobile ? 16 : 14 }), (0, jsx_runtime_1.jsx)(rebass_1.Text, { as: "div", ref: forwardRef, sx: {
                         textDecorationLine: checked ? "line-through" : "none",
-                        color: checked ? "var(--checked)" : "var(--text)",
+                        opacity: checked ? 0.8 : 1,
                         flex: 1,
                     } })] })) }));
 }

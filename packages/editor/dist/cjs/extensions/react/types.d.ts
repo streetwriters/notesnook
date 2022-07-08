@@ -11,7 +11,10 @@ export declare type GetPos = GetPosNode | boolean;
 export declare type GetPosNode = () => number;
 export declare type ForwardRef = (node: HTMLElement | null) => void;
 export declare type ShouldUpdate = (prevNode: PMNode, nextNode: PMNode) => boolean;
-export declare type UpdateAttributes<T> = (attributes: Partial<T>, preventUpdate?: boolean) => void;
+export declare type UpdateAttributes<T> = (attributes: Partial<T>, options?: {
+    addToHistory?: boolean;
+    preventUpdate?: boolean;
+}) => void;
 export declare type ContentDOM = {
     dom: HTMLElement;
     contentDOM?: HTMLElement | null | undefined;
