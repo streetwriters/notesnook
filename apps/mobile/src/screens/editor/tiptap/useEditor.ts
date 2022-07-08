@@ -262,6 +262,7 @@ export const useEditor = (
         useEditorStore.getState().setReadonly(item.readonly);
         loadImages();
         await commands.setTags(currentNote.current);
+        await commands.setSettings();
         overlay(false);
       }
     },
@@ -270,9 +271,14 @@ export const useEditor = (
 
   const loadImages = () => {
     if (!currentNote.current?.id) return;
-    const images = db.attachments?.ofNote(currentNote.current?.id, 'images');
-    if (images && images.length > 0) {
-      db.attachments?.downloadImages(currentNote.current.id);
+    //@ts-ignore
+    if (currentNote.current?.content?.isPreview) {
+      db.content?.downloadMedia(currentNote.current?.id, currentNote.current.content, true);
+    } else {
+      const images = db.attachments?.ofNote(currentNote.current?.id, 'images');
+      if (images && images.length > 0) {
+        db.attachments?.downloadImages(currentNote.current.id);
+      }
     }
   };
 

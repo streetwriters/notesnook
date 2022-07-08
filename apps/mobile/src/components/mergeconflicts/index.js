@@ -270,7 +270,13 @@ const MergeConflicts = () => {
               onLoad={() => {
                 const note = db.notes.note(content.current?.noteId)?.data;
                 if (!note) return;
-                eSendEvent(eOnLoadNote + ':conflictPrimary', { ...note, content: content.current });
+                eSendEvent(eOnLoadNote + ':conflictPrimary', {
+                  ...note,
+                  content: {
+                    ...content.current,
+                    isPreview: true
+                  }
+                });
               }}
             />
           </Animated.View>
@@ -300,7 +306,7 @@ const MergeConflicts = () => {
                 if (!note) return;
                 eSendEvent(eOnLoadNote + ':conflictSecondary', {
                   ...note,
-                  content: content.current.conflicted
+                  content: { ...content.current.conflicted, isPreview: true }
                 });
               }}
             />

@@ -58,7 +58,13 @@ export default function NotePreview({ session, content }) {
             editorId={editorId}
             onLoad={() => {
               const note = db.notes.note(session.noteId)?.data;
-              eSendEvent(eOnLoadNote + editorId, { ...note, content });
+              eSendEvent(eOnLoadNote + editorId, {
+                ...note,
+                content: {
+                  ...content,
+                  isPreview: true
+                }
+              });
             }}
           />
         </>

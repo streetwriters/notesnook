@@ -154,10 +154,6 @@ export const useEditorEvents = (
         editorState().movedAway = true;
         tabBarRef.current?.goToPage(0);
       }
-      eSendEvent('historyEvent', {
-        undo: 0,
-        redo: 0
-      });
       setImmediate(() => useEditorStore.getState().setCurrentlyEditingNote(null));
       editorState().currentlyEditing = false;
       editor.reset();
