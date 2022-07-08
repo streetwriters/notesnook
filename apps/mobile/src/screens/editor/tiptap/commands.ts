@@ -1,8 +1,8 @@
-import {
+import type {
   Attachment,
   AttachmentProgress
-} from 'notesnook-editor/dist/cjs/extensions/attachment/index';
-import { ImageAttributes } from 'notesnook-editor/dist/cjs/extensions/image/index';
+} from 'notesnook-editor/dist/es/extensions/attachment/index';
+import type { ImageAttributes } from 'notesnook-editor/dist/es/extensions/image/index';
 import { createRef, RefObject } from 'react';
 import { Platform } from 'react-native';
 import { EdgeInsets } from 'react-native-safe-area-context';
@@ -36,7 +36,7 @@ const fn = (fn: string) => {
         post("${id}",response);
       } catch(e) {
         const DEV_MODE = ${__DEV__};
-        if (DEV_MODE) logger('error', "webview: ", e.message, e.stack);
+        if (DEV_MODE && typeof logger !== "undefined") logger('error', "webview: ", e.message, e.stack);
       }
     })();`,
     id: id
@@ -45,8 +45,10 @@ const fn = (fn: string) => {
 
 class Commands {
   ref = createRef<WebView | undefined>();
+  previousSettings: Partial<Settings> | null;
   constructor(ref: RefObject<WebView>) {
     this.ref = ref;
+    this.previousSettings = null;
   }
 
   async doAsync<T>(job: string) {
@@ -57,12 +59,12 @@ class Commands {
   focus = async () => {
     if (!this.ref.current) return;
     if (Platform.OS === 'android') {
-      this.ref.current?.requestFocus();
+      //this.ref.current?.requestFocus();
       setTimeout(async () => {
         if (!this.ref) return;
         textInput.current?.focus();
-        this.ref?.current?.requestFocus();
         await this.doAsync(`editor.commands.focus()`);
+        this.ref?.current?.requestFocus();
       }, 1);
     } else {
       await sleep(200);
@@ -77,6 +79,7 @@ class Commands {
   `);
 
   clearContent = async () => {
+    this.previousSettings = null;
     await this.doAsync(
       `editor.commands.blur();
 typeof globalThis.editorTitle !== "undefined" && editorTitle.current && editorTitle.current?.blur();
@@ -113,7 +116,16 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     `);
   };
 
-  setSettings = async (settings: Partial<Settings>) => {
+  setSettings = async (settings?: Partial<Settings>) => {
+    if (settings) {
+      this.previousSettings = settings;
+    } else {
+      if (this.previousSettings) {
+        settings = this.previousSettings;
+      } else {
+        return;
+      }
+    }
     console.log('setSettings', JSON.stringify(settings));
     await this.doAsync(`
       if (typeof globalThis.settingsController !== "undefined") {
