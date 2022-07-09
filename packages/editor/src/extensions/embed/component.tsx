@@ -1,11 +1,12 @@
 import { Box, Flex } from "rebass";
 import { Resizable } from "re-resizable";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { Icon, Icons } from "../../toolbar";
+import { Resizer } from "../../components/resizer";
 
 export function EmbedComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -13,6 +14,7 @@ export function EmbedComponent(
   >
 ) {
   const { editor, updateAttributes, selected, node } = props;
+  const [isLoading, setIsLoading] = useState(true);
   const embedRef = useRef<HTMLIFrameElement>();
   const { src, width, height, align } = node.attrs;
 
@@ -22,82 +24,51 @@ export function EmbedComponent(
         sx={{
           display: "flex",
           justifyContent:
-            align === "center" ? "center" : align === "left" ? "start" : "end"
+            align === "center" ? "center" : align === "left" ? "start" : "end",
+          position: "relative",
         }}
       >
-        <Resizable
-          enable={{
-            bottom: false,
-            left: false,
-            right: false,
-            top: false,
-            bottomLeft: false,
-            bottomRight: editor.isEditable && selected,
-            topLeft: false,
-            topRight: false
-          }}
-          size={{
-            height: height || "auto",
-            width: width || "auto"
-          }}
-          maxWidth="100%"
-          handleComponent={{
-            bottomRight: (
-              <Icon
-                sx={{
-                  width: 25,
-                  height: 25,
-                  marginLeft: -17,
-                  marginTop: "3px",
-                  borderTopLeftRadius: "default",
-                  borderBottomRightRadius: "default"
-                }}
-                path={Icons.resize}
-                size={25}
-                color="primary"
-              />
-            )
-          }}
-          onResizeStop={(e, direction, ref, d) => {
+        <Resizer
+          editor={editor}
+          selected={selected}
+          width={width}
+          height={height}
+          onResize={(width, height) => {
             updateAttributes(
               {
-                width: ref.clientWidth,
-                height: ref.clientHeight
+                width,
+                height,
               },
               { addToHistory: true, preventUpdate: false }
             );
           }}
-          lockAspectRatio={true}
         >
-          {/* <Flex sx={{ position: "relative", justifyContent: "end" }}>
-              
-            </Flex> */}
           <Flex
             width={"100%"}
             sx={{
               position: "relative",
               justifyContent: "end",
-              borderTop: editor.isEditable
-                ? "20px solid var(--bgSecondary)"
-                : "none",
+              p: "small",
+              bg: editor.isEditable ? "bgSecondary" : "transparent",
               borderTopLeftRadius: "default",
               borderTopRightRadius: "default",
               borderColor: selected ? "border" : "bgSecondary",
               cursor: "pointer",
               ":hover": {
-                borderColor: "border"
-              }
+                borderColor: "border",
+              },
             }}
           >
+            <Icon path={Icons.dragHandle} size={"big"} />
             <DesktopOnly>
               {selected && (
                 <Flex sx={{ position: "relative", justifyContent: "end" }}>
                   <Flex
                     sx={{
                       position: "absolute",
-                      top: -40,
+                      top: -10,
                       mb: 2,
-                      alignItems: "end"
+                      alignItems: "end",
                     }}
                   >
                     <ToolbarGroup
@@ -106,12 +77,12 @@ export function EmbedComponent(
                         "embedAlignLeft",
                         "embedAlignCenter",
                         "embedAlignRight",
-                        "embedProperties"
+                        "embedProperties",
                       ]}
                       sx={{
                         boxShadow: "menu",
                         borderRadius: "default",
-                        bg: "background"
+                        bg: "background",
                       }}
                     />
                   </Flex>
@@ -126,14 +97,30 @@ export function EmbedComponent(
             width={"100%"}
             height={"100%"}
             sx={{
+              bg: "bgSecondary",
               border: selected
                 ? "2px solid var(--primary)"
                 : "2px solid transparent",
-              borderRadius: "default"
+              borderRadius: "default",
             }}
+            onLoad={() => setIsLoading(false)}
             {...props}
           />
-        </Resizable>
+          {isLoading && (
+            <Flex
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                width: "100%",
+                height: "calc(100% - 20px)",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Icon path={Icons.loading} rotate size={32} color="disabled" />
+            </Flex>
+          )}
+        </Resizer>
       </Box>
     </>
   );
