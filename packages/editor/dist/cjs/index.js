@@ -68,6 +68,7 @@ const react_2 = require("./extensions/react");
 const outlinelist_1 = require("./extensions/outlinelist");
 const outlinelistitem_1 = require("./extensions/outlinelistitem");
 const keepinview_1 = require("./extensions/keepinview");
+const selectionpersist_1 = require("./extensions/selectionpersist");
 const table_1 = require("./extensions/table");
 const toolbarstore_1 = require("./toolbar/stores/toolbarstore");
 const useEditor_1 = require("./hooks/useEditor");
@@ -152,6 +153,7 @@ const useTiptap = (options = {}, deps = []) => {
             math_1.MathInline,
             math_1.MathBlock,
             keepinview_1.KeepInView,
+            selectionpersist_1.SelectionPersist,
         ],
         onBeforeCreate: ({ editor }) => {
             editor.storage.portalProviderAPI = PortalProviderAPI;

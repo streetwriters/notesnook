@@ -47,6 +47,7 @@ import { NodeViewSelectionNotifier, usePortalProvider, } from "./extensions/reac
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
 import { KeepInView } from "./extensions/keep-in-view";
+import { SelectionPersist } from "./extensions/selection-persist";
 import { Table } from "./extensions/table";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
@@ -130,6 +131,7 @@ const useTiptap = (options = {}, deps = []) => {
             MathInline,
             MathBlock,
             KeepInView,
+            SelectionPersist,
         ],
         onBeforeCreate: ({ editor }) => {
             editor.storage.portalProviderAPI = PortalProviderAPI;

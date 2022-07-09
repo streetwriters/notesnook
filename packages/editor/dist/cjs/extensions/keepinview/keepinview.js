@@ -2,8 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.keepLastLineInView = exports.KeepInView = void 0;
 const core_1 = require("@tiptap/core");
+let onWindowResize = undefined;
 exports.KeepInView = core_1.Extension.create({
     name: "keepinview",
+    onCreate() {
+        onWindowResize = () => {
+            keepLastLineInView(this.editor);
+        };
+        window.addEventListener("resize", onWindowResize);
+    },
+    onDestroy() {
+        if (!onWindowResize)
+            return;
+        window.removeEventListener("resize", onWindowResize);
+        onWindowResize = undefined;
+    },
     addKeyboardShortcuts() {
         return {
             Enter: ({ editor }) => {
