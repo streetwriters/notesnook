@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import Clipboard from '@react-native-clipboard/clipboard';
-//import { getLinkPreview } from 'link-preview-js';
 import { getPreviewData } from '@flyerhq/react-native-link-preview';
 import { parseHTML } from 'notes-core/utils/htmlparser';
-import React, { Fragment, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Keyboard,
-  Modal,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -22,14 +19,15 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ShareExtension from 'rn-extensions-share';
 import isURL from 'validator/lib/isURL';
+import { eSendEvent } from '../src/services/event-manager';
 import { getElevation } from '../src/utils';
-import { db, loadDatabase } from '../src/utils/database';
+import { db } from '../src/utils/database';
 import Storage from '../src/utils/database/storage';
+import { eOnLoadNote } from '../src/utils/events';
+import { useAppState } from '../src/utils/hooks/use-app-state';
 import { sleep } from '../src/utils/time';
 import { Search } from './search';
 import { useShareStore } from './store';
-import { eSendEvent } from '../src/services/event-manager';
-import { eOnLoadNote } from '../src/utils/events';
 let Editor = null;
 const getLinkPreview = url => {
   return getPreviewData(url, 5000);
@@ -139,10 +137,8 @@ function sanitize(html, baseUrl) {
   parser = removeInvalidElements(parser);
   parser = replaceSrcWithAbsoluteUrls(parser, baseUrl);
   parser = fixCodeBlocks(parser);
-  let htmlString = parser.outerHTML;
-
+  let htmlString = parser.body.outerHTML;
   htmlString = htmlString + `<hr>${makeHtmlFromUrl(baseUrl)}`;
-
   return htmlString;
 }
 
@@ -194,6 +190,7 @@ const ShareView = ({ quicknote = false }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [kh, setKh] = useState(0);
   const editorRef = useRef();
+  const appState = useAppState();
 
   const onKeyboardDidShow = event => {
     let kHeight = event.endCoordinates.height;
@@ -264,6 +261,7 @@ const ShareView = ({ quicknote = false }) => {
         }
       }
       setNote({ ...note });
+      console.log(data, 'share data');
       onLoad();
     } catch (e) {}
     setLoadingIntent(false);
@@ -271,6 +269,11 @@ const ShareView = ({ quicknote = false }) => {
 
   useEffect(() => {
     console.log('setting value in storage');
+    if (appState !== 'active') {
+      console.log('app state is not active');
+      return;
+    }
+    console.log('app state is active');
     (async () => {
       //await loadDatabase();
       Editor = require('../src/screens/editor/index').default;
@@ -283,7 +286,7 @@ const ShareView = ({ quicknote = false }) => {
         });
       });
     })();
-  }, []);
+  }, [appState]);
 
   const close = async () => {
     setNote({ ...defaultNote });
@@ -296,13 +299,15 @@ const ShareView = ({ quicknote = false }) => {
     }
   };
 
-  const onLoad = () => {
+  const onLoad = editor => {
+    if (editor) return loadData();
     eSendEvent(eOnLoadNote + 'shareEditor', {
       id: null,
       content: {
         type: 'tiptap',
         data: noteContent.current
-      }
+      },
+      forced: true
     });
   };
 
@@ -352,6 +357,8 @@ const ShareView = ({ quicknote = false }) => {
         let html = await sanitizeHtml(rawData.value);
         setNote(note => {
           note.content.data = html;
+          noteContent.current = html;
+          onLoad();
           return { ...note };
         });
       } else {
@@ -586,7 +593,9 @@ const ShareView = ({ quicknote = false }) => {
                       noHeader={true}
                       noToolbar={true}
                       readonly={false}
-                      onLoad={onLoad}
+                      onLoad={() => {
+                        onLoad(true);
+                      }}
                       onChange={html => {
                         noteContent.current = html;
                       }}
