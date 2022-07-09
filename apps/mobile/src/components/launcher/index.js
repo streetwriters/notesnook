@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Platform, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
@@ -23,7 +23,6 @@ import { tabBarRef } from '../../utils/global-refs';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { SVG } from '../auth/background';
-import Intro from '../intro';
 import NewFeature from '../sheets/new-feature/index';
 import { Update } from '../sheets/update';
 import { Button } from '../ui/button';
@@ -46,7 +45,7 @@ const Launcher = React.memo(
     const deviceMode = useSettingStore(state => state.deviceMode);
     const passwordInputRef = useRef();
     const password = useRef();
-    const introCompleted = false; //SettingsService.get().introCompleted;
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
     const dbInitCompleted = useRef(false);
 
     const loadNotes = async () => {

@@ -87,7 +87,8 @@ const AuthModal = () => {
           paddingHorizontal: 12,
           width: '100%',
           height: 50,
-          justifyContent: 'space-between'
+          justifyContent:
+            initialAuthMode.current !== AuthMode.welcomeSignup ? 'space-between' : 'flex-end'
         }}
       >
         {initialAuthMode.current === AuthMode.welcomeSignup ? null : (
