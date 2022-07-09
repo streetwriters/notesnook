@@ -38,6 +38,7 @@ const fn = (fn: string) => {
         const DEV_MODE = ${__DEV__};
         if (DEV_MODE && typeof logger !== "undefined") logger('error', "webview: ", e.message, e.stack);
       }
+      return true;
     })();`,
     id: id
   };
