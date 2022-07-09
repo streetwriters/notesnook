@@ -8,7 +8,7 @@ import {
   findChildren,
   findParentNode,
   getNodeType,
-  NodeWithPos,
+  NodeWithPos
 } from "@tiptap/core";
 import { useCallback, useEffect } from "react";
 import { TaskItemNode, TaskItemAttributes } from "./task-item";
@@ -40,8 +40,8 @@ export function TaskItemComponent(
           bg: "background",
           borderRadius: "default",
           ":hover > .dragHandle": {
-            opacity: editor.isEditable ? 1 : 0,
-          },
+            opacity: editor.isEditable ? 1 : 0
+          }
         }}
       >
         <Icon
@@ -59,8 +59,8 @@ export function TaskItemComponent(
             bg: "transparent",
             cursor: "grab",
             ".icon:hover path": {
-              fill: "var(--checked) !important",
-            },
+              fill: "var(--checked) !important"
+            }
           }}
           size={isMobile ? 24 : 20}
           // onMouseDown={(e) => e.preventDefault()}
@@ -77,13 +77,17 @@ export function TaskItemComponent(
             p: "1px",
             cursor: editor.isEditable ? "pointer" : "unset",
             ":hover": {
-              borderColor: "checked",
+              borderColor: "checked"
             },
             ":hover .icon path": {
-              fill: "var(--checked) !important",
-            },
+              fill: "var(--checked) !important"
+            }
           }}
           onMouseDown={(e) => {
+            e.preventDefault();
+            toggle();
+          }}
+          onTouchStart={(e) => {
             e.preventDefault();
             toggle();
           }}
@@ -97,7 +101,7 @@ export function TaskItemComponent(
           sx={{
             textDecorationLine: checked ? "line-through" : "none",
             opacity: checked ? 0.8 : 1,
-            flex: 1,
+            flex: 1
           }}
         />
       </Flex>
@@ -119,7 +123,7 @@ function toggleChildren(
     // need to add 1 to get inside the node
     const actualPos = pos + parentPos + 1;
     tr.setNodeMarkup(actualPos, undefined, {
-      checked: toggleState,
+      checked: toggleState
     });
   }
   return tr;
