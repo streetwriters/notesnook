@@ -1,0 +1,11 @@
+1. Attach image from gallery
+2. Attacah image from camera
+3. Add a file
+4. Logout
+5. Login
+6. Image download progress
+7. Attachment download progress
+
+// Issues
+
+1. Attachment properties are not opening

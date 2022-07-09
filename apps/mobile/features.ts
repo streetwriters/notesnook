@@ -3,7 +3,7 @@ import { FeatureType } from './src/components/sheets/new-feature';
 export const features: FeatureType[] = [
   {
     title: 'A brand new editor',
-    body: 'We have switched to a completely new editor for Notesnook. Why? Because we wanted something that was extensible and future proof so that we could build amazing features fast!'
+    body: 'We have switched to a completely new editor for Notesnook. Why? Because we wanted something that was extensible and future proof.'
   },
   {
     title: 'Configurable toolbar',
@@ -16,6 +16,10 @@ export const features: FeatureType[] = [
   {
     title: 'Task list',
     body: 'A new task list that keeps track of your progess and supports reordering items with drag & drop.'
+  },
+  {
+    title: 'Math support',
+    body: 'Inline and multi-line math support is here using KaTex.'
   },
   {
     title: 'Overhaul Settings UI',
