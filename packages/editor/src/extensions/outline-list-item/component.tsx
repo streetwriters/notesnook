@@ -8,7 +8,7 @@ import {
   findChildren,
   findParentNode,
   getNodeType,
-  NodeWithPos,
+  NodeWithPos
 } from "@tiptap/core";
 import { useCallback, useEffect } from "react";
 import { OutlineList } from "../outline-list/outline-list";
@@ -21,6 +21,17 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
   const isNested = node.lastChild?.type.name === OutlineList.name;
   const isCollapsed = isNested && node.lastChild?.attrs.collapsed;
 
+  const onClick = () => {
+    const [subList] = findChildren(
+      node,
+      (node) => node.type.name === OutlineList.name
+    );
+    if (!subList) return;
+    const { pos } = subList;
+
+    editor.commands.toggleOutlineCollapse(pos + getPos() + 1, !isCollapsed);
+  };
+
   return (
     <Flex>
       <Flex
@@ -28,7 +39,7 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
         sx={{
           flexDirection: "column",
           alignItems: "center",
-          mt: isMobile ? "0px" : "3px",
+          mt: isMobile ? "0px" : "3px"
         }}
       >
         {isNested ? (
@@ -43,30 +54,22 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
               cursor: "pointer",
               transition: `all .2s ease-in-out`,
               ":hover": {
-                transform: ["unset", "scale(1.3)"],
+                transform: ["unset", "scale(1.3)"]
               },
               ":active": {
-                transform: ["scale(1.3)", "unset"],
+                transform: ["scale(1.3)", "unset"]
               },
               ".icon:hover path": {
-                fill: "var(--checked) !important",
-              },
+                fill: "var(--checked) !important"
+              }
             }}
             size={isMobile ? 24 : 18}
             onMouseDown={(e) => e.preventDefault()}
-            onClick={() => {
-              const [subList] = findChildren(
-                node,
-                (node) => node.type.name === OutlineList.name
-              );
-              if (!subList) return;
-              const { pos } = subList;
-
-              editor.commands.toggleOutlineCollapse(
-                pos + getPos() + 1,
-                !isCollapsed
-              );
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              onClick();
             }}
+            onClick={onClick}
           />
         ) : (
           <Icon
@@ -89,8 +92,8 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
               transition: `all .2s ease-in-out`,
               ":hover": {
                 backgroundColor: "fontTertiary",
-                width: 4,
-              },
+                width: 4
+              }
             }}
             contentEditable={false}
           />
@@ -99,9 +102,9 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
       <Text
         ref={forwardRef}
         sx={{
-          pl: 2,
+          pl: 1,
           listStyleType: "none",
-          flex: 1,
+          flex: 1
         }}
       />
     </Flex>
