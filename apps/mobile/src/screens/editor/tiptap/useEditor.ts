@@ -265,7 +265,7 @@ export const useEditor = (
         useEditorStore.getState().setReadonly(item.readonly);
         loadImages();
         await commands.setTags(currentNote.current);
-        await commands.setSettings();
+        commands.setSettings();
         overlay(false);
       }
     },

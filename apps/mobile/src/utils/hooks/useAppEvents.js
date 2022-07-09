@@ -60,6 +60,7 @@ export const useAppEvents = () => {
   });
 
   const onLoadingAttachmentProgress = data => {
+    console.log('loading', data);
     useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
   };
 

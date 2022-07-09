@@ -54,5 +54,5 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   encryptionProgress: 0,
   setEncryptionProgress: encryptionProgress => set({ encryptionProgress: encryptionProgress }),
   loading: { total: 0, current: 0 },
-  setLoading: data => set({ loading: data })
+  setLoading: data => set({ loading: data ? { ...data } : data })
 }));

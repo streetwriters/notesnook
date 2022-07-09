@@ -14,8 +14,11 @@ type PurchaseInfo = {
 const skuInfos: { [name: string]: PurchaseInfo | undefined } = {};
 
 export const usePricing = (period: 'monthly' | 'yearly') => {
-  const [current, setCurrent] =
-    useState<{ period: string; info?: PurchaseInfo; product?: Subscription }>();
+  const [current, setCurrent] = useState<{
+    period: string;
+    info?: PurchaseInfo;
+    product?: Subscription;
+  }>();
 
   const getDefaultSku = (period: 'monthly' | 'yearly') => {
     return period === 'monthly'

@@ -17,6 +17,7 @@ export const ProgressBar = () => {
 
   useEffect(() => {
     if (loading) {
+      console.log(loading);
       if (loading.current !== loading.total) {
         setVisible(true);
         setProg(loading.current / loading.total);
