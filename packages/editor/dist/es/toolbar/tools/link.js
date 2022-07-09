@@ -31,26 +31,30 @@ export function AddLink(props) {
     const { editor } = props;
     const isActive = props.editor.isActive("link");
     const onDone = useCallback((href, text) => {
-        var _a;
+        var _a, _b;
         if (!href)
             return;
         let commandChain = (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus();
         if (!commandChain)
             return;
+        const isSelection = !((_b = editor.current) === null || _b === void 0 ? void 0 : _b.state.selection.empty);
         commandChain
             .extendMarkRange("link")
             .toggleLink({ href, target: "_blank" })
             .insertContent(text || href)
-            .focus()
-            .unsetMark("link")
-            .insertContent(" ")
-            .run();
+            .focus();
+        if (!isSelection)
+            commandChain = commandChain.unsetMark("link").insertContent(" ");
+        commandChain.run();
     }, []);
     if (isActive)
         return _jsx(EditLink, Object.assign({}, props));
     return (_jsx(LinkTool, Object.assign({}, props, { onDone: onDone, onClick: () => {
-            let { from, to } = editor.state.selection;
-            const selectedText = editor.state.doc.textBetween(from, to);
+            if (!editor.current)
+                return;
+            const { state } = editor.current;
+            let { from, to } = state.selection;
+            const selectedText = state.doc.textBetween(from, to);
             return { text: selectedText };
         } })));
 }

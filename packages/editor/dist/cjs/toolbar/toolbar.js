@@ -24,13 +24,14 @@ const popuprenderer_1 = require("../components/popup-presenter/popuprenderer");
 function Toolbar(props) {
     const { editor, theme, location, tools = (0, tooldefinitions_1.getDefaultPresets)().default, sx } = props, flexProps = __rest(props, ["editor", "theme", "location", "tools", "sx"]);
     const toolbarTools = (0, react_1.useMemo)(() => [...tooldefinitions_1.STATIC_TOOLBAR_GROUPS, ...tools], [tools]);
+    const isMobile = (0, toolbarstore_1.useIsMobile)();
     const setToolbarLocation = (0, toolbarstore_1.useToolbarStore)((store) => store.setToolbarLocation);
     (0, react_1.useEffect)(() => {
         setToolbarLocation(location);
     }, [location]);
     if (!editor)
         return null;
-    return ((0, jsx_runtime_1.jsx)(emotion_theming_1.ThemeProvider, Object.assign({ theme: theme }, { children: (0, jsx_runtime_1.jsx)(popuprenderer_1.EditorContext.Provider, Object.assign({ value: editor }, { children: (0, jsx_runtime_1.jsxs)(popuprenderer_1.PopupRenderer, Object.assign({ editor: editor }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ className: "editor-toolbar", sx: Object.assign(Object.assign({}, sx), { flexWrap: ["nowrap", "wrap"], overflowX: ["auto", "hidden"] }) }, flexProps, { children: toolbarTools.map((tools) => {
+    return ((0, jsx_runtime_1.jsx)(emotion_theming_1.ThemeProvider, Object.assign({ theme: theme }, { children: (0, jsx_runtime_1.jsx)(popuprenderer_1.EditorContext.Provider, Object.assign({ value: editor }, { children: (0, jsx_runtime_1.jsxs)(popuprenderer_1.PopupRenderer, Object.assign({ editor: editor }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ className: "editor-toolbar", sx: Object.assign(Object.assign({}, sx), { flexWrap: isMobile ? "nowrap" : "wrap", overflowX: isMobile ? "auto" : "hidden" }) }, flexProps, { children: toolbarTools.map((tools) => {
                             return ((0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { tools: tools, editor: editor, sx: {
                                     flexShrink: 0,
                                     pr: 2,
