@@ -252,15 +252,14 @@ export default class Vault {
     if (!contentId) throw new Error("Cannot lock note because it is empty.");
 
     // Case: when note is being newly locked
-    if (!data || !type) {
-      if (note.locked) return;
+    if (!note.locked && (!data || !type)) {
       let content = await this._db.content.raw(contentId, false);
       // NOTE:
       // At this point, the note already has all the attachments extracted
       // so we should just encrypt it as normal.
       data = content.data;
       type = content.type;
-    } else {
+    } else if (data && type) {
       const content = await this._db.content.extractAttachments({
         data,
         type,
@@ -270,7 +269,8 @@ export default class Vault {
       type = content.type;
     }
 
-    await this._encryptContent(contentId, sessionId, data, type, password);
+    if (data && type)
+      await this._encryptContent(contentId, sessionId, data, type, password);
 
     return await this._db.notes.add({
       id,
