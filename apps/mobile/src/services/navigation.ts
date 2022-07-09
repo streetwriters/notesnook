@@ -120,15 +120,15 @@ function routeNeedsUpdate(routeName: Route, callback: () => void) {
 function queueRoutesForUpdate(...routes: Route[]) {
   console.log('updating routes', routes);
   const currentScreen = useNavigationStore.getState().currentScreen;
-  const routeHistory = rootNavigatorRef.current?.getRootState()?.routes || [
-    { key: currentScreen.name }
-  ];
+  // const routeHistory = rootNavigatorRef.current?.getRootState()?.routes || [
+  //   { key: currentScreen.name }
+  // ];
 
   // filter out routes that are not rendered to prevent unnecessary updates
-  routes = routes.filter(
-    //@ts-ignore
-    routeName => routeHistory?.findIndex(route => route.key?.startsWith(routeName)) > -1
-  );
+  // routes = routes.filter(
+  //   //@ts-ignore
+  //   routeName => routeHistory?.findIndex(route => route.key?.startsWith(routeName)) > -1
+  // );
 
   if (routes.indexOf(currentScreen.name) > -1) {
     console.log('updating current route');
@@ -141,7 +141,7 @@ function queueRoutesForUpdate(...routes: Route[]) {
 
   routesUpdateQueue = routesUpdateQueue.concat(routes);
   routesUpdateQueue = [...new Set(routesUpdateQueue)];
-  console.log(routesUpdateQueue);
+  //console.log(routesUpdateQueue);
 }
 
 function navigate<T extends RouteName>(screen: CurrentScreen, params: RouteParams[T]) {
