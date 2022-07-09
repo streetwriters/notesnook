@@ -1,6 +1,5 @@
 import { PropsWithChildren } from "react";
 import { PositionOptions } from "../../utils/position";
-import { Theme } from "@notesnook/theme";
 import React from "react";
 import { ResponsivePresenterProps } from "../responsive";
 export declare type PopupPresenterProps = {
@@ -30,7 +29,6 @@ export declare function usePopupHandler(options: UsePopupHandlerOptions): {
     closePopup: (popupId: string) => void;
 };
 declare type ShowPopupOptions = {
-    theme: Theme;
     popup: (closePopup: () => void) => React.ReactNode;
 } & Partial<ResponsivePresenterProps>;
 export declare function showPopup(options: ShowPopupOptions): () => void;

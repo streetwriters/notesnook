@@ -1,6 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import React, { useCallback, useRef, useState, useEffect, } from "react";
-import { useTheme } from "emotion-theming";
 import { Box, Button, Flex, Text } from "rebass";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
@@ -8,6 +7,7 @@ import { MenuButton } from "../menu/menu-button";
 import { MenuSeparator } from "../menu/menu-separator";
 import Modal from "react-modal";
 import { motion, useMotionValue, useTransform, useAnimation, } from "framer-motion";
+import { useTheme } from "../../toolbar/stores/toolbar-store";
 const AnimatedFlex = motion(Flex);
 const TRANSITION = {
     type: "spring",
@@ -104,7 +104,7 @@ export function ActionSheetPresenter(props) {
                 bg: "background",
                 borderTopLeftRadius: 15,
                 borderTopRightRadius: 15,
-                boxShadow: theme.shadows.menu,
+                boxShadow: (theme === null || theme === void 0 ? void 0 : theme.shadows.menu) || "none",
                 flex: 1,
                 flexDirection: "column",
             } }, { children: [draggable && (_jsx(AnimatedFlex, Object.assign({ drag: "y", 

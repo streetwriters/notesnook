@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createNodeView = exports.ReactNodeView = void 0;
 const jsx_runtime_1 = require("react/jsx-runtime");
 const prosemirror_state_1 = require("prosemirror-state");
-const emotion_theming_1 = require("emotion-theming");
 // @ts-ignore
 const prosemirror_view_1 = require("prosemirror-view");
+const themeprovider_1 = require("../../components/themeprovider");
 class ReactNodeView {
     constructor(node, editor, getPos, options) {
         this.editor = editor;
@@ -87,8 +87,7 @@ class ReactNodeView {
     render(props = {}, forwardRef) {
         if (!this.options.component)
             return null;
-        const theme = this.editor.storage.theme;
-        return ((0, jsx_runtime_1.jsx)(emotion_theming_1.ThemeProvider, Object.assign({ theme: theme }, { children: (0, jsx_runtime_1.jsx)(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: (attr, options) => this.updateAttributes(attr, this.getPos(), options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) })));
+        return ((0, jsx_runtime_1.jsx)(themeprovider_1.ThemeProvider, { children: (0, jsx_runtime_1.jsx)(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: (attr, options) => this.updateAttributes(attr, this.getPos(), options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) }));
     }
     updateAttributes(attributes, pos, addToHistory = false, preventUpdate = false) {
         this.editor.commands.command(({ tr }) => {

@@ -29,7 +29,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionSheetPresenter = void 0;
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = __importStar(require("react"));
-const emotion_theming_1 = require("emotion-theming");
 const rebass_1 = require("rebass");
 const icon_1 = require("../../toolbar/components/icon");
 const icons_1 = require("../../toolbar/icons");
@@ -37,6 +36,7 @@ const menubutton_1 = require("../menu/menubutton");
 const menuseparator_1 = require("../menu/menuseparator");
 const react_modal_1 = __importDefault(require("react-modal"));
 const framer_motion_1 = require("framer-motion");
+const toolbarstore_1 = require("../../toolbar/stores/toolbarstore");
 const AnimatedFlex = (0, framer_motion_1.motion)(rebass_1.Flex);
 const TRANSITION = {
     type: "spring",
@@ -71,7 +71,7 @@ function useHistory(initial) {
 function ActionSheetPresenter(props) {
     var _a;
     const { isOpen, title, items, onClose, blocking = true, focusOnRender = true, draggable = true, children, } = props;
-    const theme = (0, emotion_theming_1.useTheme)();
+    const theme = (0, toolbarstore_1.useTheme)();
     const contentRef = (0, react_1.useRef)();
     const y = (0, framer_motion_1.useMotionValue)(0);
     const opacity = (0, framer_motion_1.useTransform)(y, [0, ((_a = contentRef.current) === null || _a === void 0 ? void 0 : _a.offsetHeight) || window.innerHeight], [1, 0]);
@@ -133,7 +133,7 @@ function ActionSheetPresenter(props) {
                 bg: "background",
                 borderTopLeftRadius: 15,
                 borderTopRightRadius: 15,
-                boxShadow: theme.shadows.menu,
+                boxShadow: (theme === null || theme === void 0 ? void 0 : theme.shadows.menu) || "none",
                 flex: 1,
                 flexDirection: "column",
             } }, { children: [draggable && ((0, jsx_runtime_1.jsx)(AnimatedFlex, Object.assign({ drag: "y", 

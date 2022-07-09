@@ -21,11 +21,11 @@ const rebass_1 = require("rebass");
 const position_1 = require("../../utils/position");
 const react_modal_1 = __importDefault(require("react-modal"));
 const react_dom_1 = __importDefault(require("react-dom"));
-const emotion_theming_1 = require("emotion-theming");
 const dom_1 = require("../../toolbar/utils/dom");
 const toolbarstore_1 = require("../../toolbar/stores/toolbarstore");
 const popuprenderer_1 = require("./popuprenderer");
 const responsive_1 = require("../responsive");
+const themeprovider_1 = require("../themeprovider");
 function _PopupPresenter(props) {
     const { isOpen, position, onClose, blocking = true, focusOnRender = true, children, } = props;
     const isMobile = (0, toolbarstore_1.useIsMobile)();
@@ -217,17 +217,17 @@ function usePopupHandler(options) {
 }
 exports.usePopupHandler = usePopupHandler;
 function showPopup(options) {
-    const { theme, popup } = options, props = __rest(options, ["theme", "popup"]);
+    const { popup } = options, props = __rest(options, ["popup"]);
     function hide() {
         react_dom_1.default.unmountComponentAtNode((0, dom_1.getPopupContainer)());
     }
-    react_dom_1.default.render((0, jsx_runtime_1.jsx)(emotion_theming_1.ThemeProvider, Object.assign({ theme: theme }, { children: (0, jsx_runtime_1.jsx)(responsive_1.ResponsivePresenter, Object.assign({ isOpen: true, onClose: hide, position: {
+    react_dom_1.default.render((0, jsx_runtime_1.jsx)(themeprovider_1.ThemeProvider, { children: (0, jsx_runtime_1.jsx)(responsive_1.ResponsivePresenter, Object.assign({ isOpen: true, onClose: hide, position: {
                 target: (0, dom_1.getToolbarElement)(),
                 isTargetAbsolute: true,
                 location: "below",
                 align: "end",
                 yOffset: 10,
-            }, blocking: true, focusOnRender: true }, props, { children: popup(hide) })) })), (0, dom_1.getPopupContainer)());
+            }, blocking: true, focusOnRender: true }, props, { children: popup(hide) })) }), (0, dom_1.getPopupContainer)());
     return hide;
 }
 exports.showPopup = showPopup;

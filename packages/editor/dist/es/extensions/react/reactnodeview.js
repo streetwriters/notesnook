@@ -1,8 +1,8 @@
 import { jsx as _jsx } from "react/jsx-runtime";
 import { NodeSelection } from "prosemirror-state";
-import { ThemeProvider } from "emotion-theming";
 // @ts-ignore
 import { __serializeForClipboard } from "prosemirror-view";
+import { ThemeProvider } from "../../components/theme-provider";
 export class ReactNodeView {
     constructor(node, editor, getPos, options) {
         this.editor = editor;
@@ -84,8 +84,7 @@ export class ReactNodeView {
     render(props = {}, forwardRef) {
         if (!this.options.component)
             return null;
-        const theme = this.editor.storage.theme;
-        return (_jsx(ThemeProvider, Object.assign({ theme: theme }, { children: _jsx(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: (attr, options) => this.updateAttributes(attr, this.getPos(), options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) })));
+        return (_jsx(ThemeProvider, { children: _jsx(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, updateAttributes: (attr, options) => this.updateAttributes(attr, this.getPos(), options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) }));
     }
     updateAttributes(attributes, pos, addToHistory = false, preventUpdate = false) {
         this.editor.commands.command(({ tr }) => {

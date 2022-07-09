@@ -166,7 +166,6 @@ const embedDesktop = (editor) => ({
         if (!editor)
             return;
         (0, popuppresenter_1.showPopup)({
-            theme: editor.storage.theme,
             popup: (hide) => ((0, jsx_runtime_1.jsx)(embedpopup_1.EmbedPopup, { title: "Insert embed", onClose: (embed) => {
                     var _a;
                     if (!embed)
@@ -231,7 +230,6 @@ const uploadImageFromURL = (editor) => ({
     icon: "link",
     onClick: () => {
         (0, popuppresenter_1.showPopup)({
-            theme: editor.storage.theme,
             popup: (hide) => ((0, jsx_runtime_1.jsx)(imageupload_1.ImageUploadPopup, { onInsert: (image) => {
                     var _a;
                     (_a = editor

@@ -1,9 +1,13 @@
 import create from "zustand";
 export const useToolbarStore = create((set, get) => ({
+    theme: undefined,
     isMobile: false,
     openedPopups: {},
     setIsMobile: (isMobile) => set((state) => {
         state.isMobile = isMobile;
+    }),
+    setTheme: (theme) => set((state) => {
+        state.theme = theme;
     }),
     toolbarLocation: "top",
     setToolbarLocation: (location) => set((state) => {
@@ -31,3 +35,8 @@ export function useToolbarLocation() {
 export function useIsMobile() {
     return useToolbarStore((store) => store.isMobile);
 }
+export const useTheme = Object.defineProperty(() => {
+    return useToolbarStore((store) => store.theme);
+}, "theme", {
+    get: () => useToolbarStore.getState().theme,
+});

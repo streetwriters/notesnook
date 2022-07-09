@@ -11,14 +11,16 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 import { jsx as _jsx } from "react/jsx-runtime";
 import MDIIcon from "@mdi/react";
-import { useTheme } from "emotion-theming";
 import { Flex } from "rebass";
+import { useTheme } from "../stores/toolbar-store";
 function MDIIconWrapper({ title, path, size = 24, color = "icon", stroke, rotate, }) {
     const theme = useTheme();
-    const themedColor = theme.colors
+    const themedColor = (theme === null || theme === void 0 ? void 0 : theme.colors)
         ? theme.colors[color]
         : color;
-    return (_jsx(MDIIcon, { className: "icon", title: title, path: path, size: typeof size === "string" ? `${theme.iconSizes[size]}px` : `${size}px`, style: {
+    return (_jsx(MDIIcon, { className: "icon", title: title, path: path, size: typeof size === "string"
+            ? `${(theme === null || theme === void 0 ? void 0 : theme.iconSizes[size]) || 24}px`
+            : `${size}px`, style: {
             strokeWidth: stroke || "0px",
             stroke: themedColor,
         }, color: themedColor, spin: rotate }));

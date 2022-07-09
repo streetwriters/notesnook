@@ -3,7 +3,7 @@ import { DecorationSet } from "prosemirror-view";
 import { NodeSelection } from "prosemirror-state";
 import { stateKey as SelectionChangePluginKey, } from "./plugin";
 import { ReactNodeView } from "./react-node-view";
-import { ThemeProvider } from "emotion-theming";
+import { ThemeProvider } from "../../components/theme-provider";
 /**
  * A ReactNodeView that handles React components sensitive
  * to selection changes.
@@ -77,10 +77,9 @@ export class SelectionBasedNodeView extends ReactNodeView {
     render(props = {}, forwardRef) {
         if (!this.options.component)
             return null;
-        const theme = this.editor.storage.theme;
         const isSelected = this.editor.isEditable &&
             (this.insideSelection() || this.nodeInsideSelection());
-        return (_jsx(ThemeProvider, Object.assign({ theme: theme }, { children: _jsx(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: (attr, options) => this.updateAttributes(attr, this.pos, options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) })));
+        return (_jsx(ThemeProvider, { children: _jsx(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: (attr, options) => this.updateAttributes(attr, this.pos, options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) }));
     }
     /**
      * Update current node's start and end positions.

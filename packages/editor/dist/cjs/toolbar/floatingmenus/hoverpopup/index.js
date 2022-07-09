@@ -47,7 +47,6 @@ function HoverPopupHandler(props) {
                             from: pos,
                             to: pos + node.nodeSize,
                         } })),
-                    theme: editor.storage.theme,
                     blocking: false,
                     focusOnRender: false,
                     position: {

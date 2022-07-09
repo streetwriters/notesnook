@@ -15,11 +15,11 @@ import { Box } from "rebass";
 import { getPosition } from "../../utils/position";
 import Modal from "react-modal";
 import ReactDOM from "react-dom";
-import { ThemeProvider } from "emotion-theming";
 import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
 import { useIsMobile, useToolbarStore, } from "../../toolbar/stores/toolbar-store";
 import { EditorContext, usePopupRenderer, } from "./popuprenderer";
 import { ResponsivePresenter } from "../responsive";
+import { ThemeProvider } from "../theme-provider";
 function _PopupPresenter(props) {
     const { isOpen, position, onClose, blocking = true, focusOnRender = true, children, } = props;
     const isMobile = useIsMobile();
@@ -208,16 +208,16 @@ export function usePopupHandler(options) {
     return { isPopupOpen, closePopup };
 }
 export function showPopup(options) {
-    const { theme, popup } = options, props = __rest(options, ["theme", "popup"]);
+    const { popup } = options, props = __rest(options, ["popup"]);
     function hide() {
         ReactDOM.unmountComponentAtNode(getPopupContainer());
     }
-    ReactDOM.render(_jsx(ThemeProvider, Object.assign({ theme: theme }, { children: _jsx(ResponsivePresenter, Object.assign({ isOpen: true, onClose: hide, position: {
+    ReactDOM.render(_jsx(ThemeProvider, { children: _jsx(ResponsivePresenter, Object.assign({ isOpen: true, onClose: hide, position: {
                 target: getToolbarElement(),
                 isTargetAbsolute: true,
                 location: "below",
                 align: "end",
                 yOffset: 10,
-            }, blocking: true, focusOnRender: true }, props, { children: popup(hide) })) })), getPopupContainer());
+            }, blocking: true, focusOnRender: true }, props, { children: popup(hide) })) }), getPopupContainer());
     return hide;
 }

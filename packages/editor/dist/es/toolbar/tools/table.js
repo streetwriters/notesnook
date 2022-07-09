@@ -148,7 +148,6 @@ const deleteRow = (editor) => (Object.assign(Object.assign({}, getToolDefinition
 const deleteTable = (editor) => (Object.assign(Object.assign({}, getToolDefinition("deleteTable")), { key: "deleteTable", type: "button", onClick: () => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.chain().focus().deleteTable().run(); } }));
 const cellProperties = (editor) => (Object.assign(Object.assign({}, getToolDefinition("cellProperties")), { key: "cellProperties", type: "button", onClick: () => {
         showPopup({
-            theme: editor.storage.theme,
             popup: (hide) => _jsx(CellPropertiesPopup, { onClose: hide, editor: editor }),
         });
     } }));

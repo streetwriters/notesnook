@@ -6,7 +6,7 @@ const prosemirror_view_1 = require("prosemirror-view");
 const prosemirror_state_1 = require("prosemirror-state");
 const plugin_1 = require("./plugin");
 const reactnodeview_1 = require("./reactnodeview");
-const emotion_theming_1 = require("emotion-theming");
+const themeprovider_1 = require("../../components/themeprovider");
 /**
  * A ReactNodeView that handles React components sensitive
  * to selection changes.
@@ -80,10 +80,9 @@ class SelectionBasedNodeView extends reactnodeview_1.ReactNodeView {
     render(props = {}, forwardRef) {
         if (!this.options.component)
             return null;
-        const theme = this.editor.storage.theme;
         const isSelected = this.editor.isEditable &&
             (this.insideSelection() || this.nodeInsideSelection());
-        return ((0, jsx_runtime_1.jsx)(emotion_theming_1.ThemeProvider, Object.assign({ theme: theme }, { children: (0, jsx_runtime_1.jsx)(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: (attr, options) => this.updateAttributes(attr, this.pos, options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) })));
+        return ((0, jsx_runtime_1.jsx)(themeprovider_1.ThemeProvider, { children: (0, jsx_runtime_1.jsx)(this.options.component, Object.assign({}, props, { editor: this.editor, getPos: this.getPos, node: this.node, forwardRef: forwardRef, selected: isSelected, updateAttributes: (attr, options) => this.updateAttributes(attr, this.pos, options === null || options === void 0 ? void 0 : options.addToHistory, options === null || options === void 0 ? void 0 : options.preventUpdate) })) }));
     }
     /**
      * Update current node's start and end positions.

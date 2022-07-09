@@ -17,14 +17,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Icon = void 0;
 const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = __importDefault(require("@mdi/react"));
-const emotion_theming_1 = require("emotion-theming");
 const rebass_1 = require("rebass");
+const toolbarstore_1 = require("../stores/toolbarstore");
 function MDIIconWrapper({ title, path, size = 24, color = "icon", stroke, rotate, }) {
-    const theme = (0, emotion_theming_1.useTheme)();
-    const themedColor = theme.colors
+    const theme = (0, toolbarstore_1.useTheme)();
+    const themedColor = (theme === null || theme === void 0 ? void 0 : theme.colors)
         ? theme.colors[color]
         : color;
-    return ((0, jsx_runtime_1.jsx)(react_1.default, { className: "icon", title: title, path: path, size: typeof size === "string" ? `${theme.iconSizes[size]}px` : `${size}px`, style: {
+    return ((0, jsx_runtime_1.jsx)(react_1.default, { className: "icon", title: title, path: path, size: typeof size === "string"
+            ? `${(theme === null || theme === void 0 ? void 0 : theme.iconSizes[size]) || 24}px`
+            : `${size}px`, style: {
             strokeWidth: stroke || "0px",
             stroke: themedColor,
         }, color: themedColor, spin: rotate }));

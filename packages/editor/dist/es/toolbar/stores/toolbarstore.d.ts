@@ -1,9 +1,12 @@
+import { Theme } from "@notesnook/theme";
 export declare type ToolbarLocation = "top" | "bottom";
 export declare type PopupRef = {
     id: string;
     group: string;
 };
 interface ToolbarState {
+    theme?: Theme;
+    setTheme: (theme?: Theme) => void;
     isMobile: boolean;
     openedPopups: Record<string, PopupRef | false>;
     setIsMobile: (isMobile: boolean) => void;
@@ -17,4 +20,7 @@ interface ToolbarState {
 export declare const useToolbarStore: import("zustand").UseBoundStore<ToolbarState, import("zustand").StoreApi<ToolbarState>>;
 export declare function useToolbarLocation(): ToolbarLocation;
 export declare function useIsMobile(): boolean;
+export declare const useTheme: (() => Theme | undefined) & {
+    theme: Theme | undefined;
+};
 export {};

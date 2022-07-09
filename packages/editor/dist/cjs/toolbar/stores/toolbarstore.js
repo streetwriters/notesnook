@@ -3,13 +3,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useIsMobile = exports.useToolbarLocation = exports.useToolbarStore = void 0;
+exports.useTheme = exports.useIsMobile = exports.useToolbarLocation = exports.useToolbarStore = void 0;
 const zustand_1 = __importDefault(require("zustand"));
 exports.useToolbarStore = (0, zustand_1.default)((set, get) => ({
+    theme: undefined,
     isMobile: false,
     openedPopups: {},
     setIsMobile: (isMobile) => set((state) => {
         state.isMobile = isMobile;
+    }),
+    setTheme: (theme) => set((state) => {
+        state.theme = theme;
     }),
     toolbarLocation: "top",
     setToolbarLocation: (location) => set((state) => {
@@ -39,3 +43,8 @@ function useIsMobile() {
     return (0, exports.useToolbarStore)((store) => store.isMobile);
 }
 exports.useIsMobile = useIsMobile;
+exports.useTheme = Object.defineProperty(() => {
+    return (0, exports.useToolbarStore)((store) => store.theme);
+}, "theme", {
+    get: () => exports.useToolbarStore.getState().theme,
+});

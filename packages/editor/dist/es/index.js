@@ -57,12 +57,14 @@ EditorView.prototype.updateState = function updateState(state) {
     this.updateStateInner(state, this.state.plugins != state.plugins);
 };
 const useTiptap = (options = {}, deps = []) => {
-    const { theme, isMobile, onDownloadAttachment, onOpenAttachmentPicker } = options, restOptions = __rest(options, ["theme", "isMobile", "onDownloadAttachment", "onOpenAttachmentPicker"]);
+    const { theme, isMobile, onDownloadAttachment, onOpenAttachmentPicker, onBeforeCreate } = options, restOptions = __rest(options, ["theme", "isMobile", "onDownloadAttachment", "onOpenAttachmentPicker", "onBeforeCreate"]);
     const PortalProviderAPI = usePortalProvider();
     const setIsMobile = useToolbarStore((store) => store.setIsMobile);
+    const setTheme = useToolbarStore((store) => store.setTheme);
     useEffect(() => {
         setIsMobile(isMobile || false);
-    }, [isMobile]);
+        setTheme(theme);
+    }, [isMobile, theme]);
     const defaultOptions = useMemo(() => ({
         extensions: [
             NodeViewSelectionNotifier,
@@ -130,18 +132,16 @@ const useTiptap = (options = {}, deps = []) => {
             KeepInView,
         ],
         onBeforeCreate: ({ editor }) => {
-            if (theme) {
-                editor.storage.theme = theme;
-            }
             editor.storage.portalProviderAPI = PortalProviderAPI;
+            if (onBeforeCreate)
+                onBeforeCreate({ editor });
         },
         injectCSS: false,
     }), [
-        theme,
         onDownloadAttachment,
         onOpenAttachmentPicker,
         PortalProviderAPI,
-        isMobile,
+        onBeforeCreate,
     ]);
     const editor = useEditor(Object.assign(Object.assign({}, defaultOptions), restOptions), deps);
     return editor;
