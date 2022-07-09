@@ -8,7 +8,7 @@ import {
   findChildren,
   findParentNode,
   getNodeType,
-  NodeWithPos
+  NodeWithPos,
 } from "@tiptap/core";
 import { useCallback, useEffect } from "react";
 import { TaskItemNode, TaskItemAttributes } from "./task-item";
@@ -24,13 +24,17 @@ export function TaskItemComponent(
   const toggle = useCallback(() => {
     if (!editor.isEditable) return false;
     updateAttributes({ checked: !checked });
+
+    const pos = getPos();
+    const node = editor.current?.state.doc.nodeAt(pos);
+    if (!node) return false;
+
     editor.commands.command(({ tr }) => {
-      const parentPos = getPos();
-      toggleChildren(node, tr, !checked, parentPos);
+      toggleChildren(node, tr, !checked, pos);
       return true;
     });
     return true;
-  }, [editor, getPos, node, checked]);
+  }, [editor, getPos, checked]);
 
   return (
     <>
@@ -40,8 +44,8 @@ export function TaskItemComponent(
           bg: "background",
           borderRadius: "default",
           ":hover > .dragHandle": {
-            opacity: editor.isEditable ? 1 : 0
-          }
+            opacity: editor.isEditable ? 1 : 0,
+          },
         }}
       >
         <Icon
@@ -59,8 +63,8 @@ export function TaskItemComponent(
             bg: "transparent",
             cursor: "grab",
             ".icon:hover path": {
-              fill: "var(--checked) !important"
-            }
+              fill: "var(--checked) !important",
+            },
           }}
           size={isMobile ? 24 : 20}
           // onMouseDown={(e) => e.preventDefault()}
@@ -77,11 +81,11 @@ export function TaskItemComponent(
             p: "1px",
             cursor: editor.isEditable ? "pointer" : "unset",
             ":hover": {
-              borderColor: "checked"
+              borderColor: "checked",
             },
             ":hover .icon path": {
-              fill: "var(--checked) !important"
-            }
+              fill: "var(--checked) !important",
+            },
           }}
           onMouseDown={(e) => {
             e.preventDefault();
@@ -99,11 +103,11 @@ export function TaskItemComponent(
           as="div"
           ref={forwardRef}
           sx={{
-            p: {
+            "> .taskitem-content-wrapper > p": {
               textDecorationLine: checked ? "line-through" : "none",
-              opacity: checked ? 0.8 : 1
+              opacity: checked ? 0.8 : 1,
             },
-            flex: 1
+            flex: 1,
           }}
         />
       </Flex>
@@ -121,11 +125,12 @@ function toggleChildren(
     node,
     (node) => node.type.name === TaskItemNode.name
   );
+
   for (const { pos } of children) {
     // need to add 1 to get inside the node
     const actualPos = pos + parentPos + 1;
     tr.setNodeMarkup(actualPos, undefined, {
-      checked: toggleState
+      checked: toggleState,
     });
   }
   return tr;

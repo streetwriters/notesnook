@@ -4,11 +4,11 @@ import { Node } from "prosemirror-model";
 import {
   findParentNodeClosestToPos,
   findChildren,
-  getNodeType
+  getNodeType,
 } from "@tiptap/core";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Input } from "@rebass/forms";
 import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
@@ -24,16 +24,19 @@ export function TaskListComponent(
   const { title, collapsed } = node.attrs;
   const [stats, setStats] = useState({ checked: 0, total: 0, percentage: 0 });
 
-  const parentTaskItem = useMemo(() => {
+  const getParent = useCallback(() => {
     const pos = editor.state.doc.resolve(getPos());
     return findParentNodeOfTypeClosestToPos(pos, taskItemType);
   }, []);
 
-  const nested = !!parentTaskItem;
+  const isNested = useMemo(() => {
+    return !!getParent();
+  }, [getParent]);
 
   useEffect(() => {
-    if (!parentTaskItem) return;
-    const { node, pos } = parentTaskItem;
+    const parent = getParent();
+    if (!parent) return;
+    const { node, pos } = parent;
     const allChecked = areAllChecked(node, pos, editor.state.doc);
 
     // no need to create a transaction if the check state is
@@ -45,7 +48,7 @@ export function TaskListComponent(
       tr.setNodeMarkup(pos, undefined, { checked: allChecked });
       return true;
     });
-  }, [node, parentTaskItem]);
+  }, [node, node.childCount]);
 
   useEffect(() => {
     const children = findChildren(
@@ -56,22 +59,22 @@ export function TaskListComponent(
     const total = children.length;
     const percentage = Math.round((checked / total) * 100);
     setStats({ checked, total, percentage });
-  }, [nested, node]);
+  }, [isNested, node]);
 
   return (
     <>
       <Flex
         sx={{
           flexDirection: "column",
-          ":hover > div > .toggleSublist": { opacity: 1 }
+          ":hover > div > .toggleSublist": { opacity: 1 },
         }}
       >
-        {nested ? (
+        {isNested ? (
           <Flex
             sx={{
               position: "absolute",
               top: 0,
-              right: 0
+              right: 0,
             }}
             contentEditable={false}
           >
@@ -91,8 +94,8 @@ export function TaskListComponent(
                 mr: 2,
                 cursor: "pointer",
                 ".icon:hover path": {
-                  fill: "var(--checked) !important"
-                }
+                  fill: "var(--checked) !important",
+                },
               }}
               size={isMobile ? 24 : 20}
               onClick={() => {
@@ -113,7 +116,7 @@ export function TaskListComponent(
               mb: 2,
               alignItems: "center",
               justifyContent: "end",
-              overflow: "hidden"
+              overflow: "hidden",
             }}
             contentEditable={false}
           >
@@ -126,7 +129,7 @@ export function TaskListComponent(
 
                 zIndex: 0,
                 left: 0,
-                transition: "width 250ms ease-out"
+                transition: "width 250ms ease-out",
               }}
             />
             <Input
@@ -158,15 +161,15 @@ export function TaskListComponent(
           ul: {
             display: collapsed ? "none" : "block",
             paddingInlineStart: 0,
-            marginBlockStart: nested ? 10 : 0,
+            marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,
-            marginLeft: nested ? -35 : 0
+            marginLeft: isNested ? -35 : 0,
           },
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: [2, "7px"]
-          }
+            marginBottom: [2, "7px"],
+          },
         }}
       />
     </>
