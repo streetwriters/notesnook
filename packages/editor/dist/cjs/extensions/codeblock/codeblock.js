@@ -179,12 +179,27 @@ exports.CodeBlock = core_2.Node.create({
             // remove code block when at start of document or code block is empty
             Backspace: () => {
                 const { empty, $anchor } = this.editor.state.selection;
+                const currentNode = $anchor.parent;
+                const nextNode = this.editor.state.doc.nodeAt($anchor.pos + 1);
+                const isCodeBlock = (node) => node && node.type.name === this.name;
                 const isAtStart = $anchor.pos === 1;
-                if (!empty || $anchor.parent.type.name !== this.name) {
+                if (!empty) {
                     return false;
                 }
-                if (isAtStart || !$anchor.parent.textContent.length) {
+                if (isAtStart ||
+                    (isCodeBlock(currentNode) && !currentNode.textContent.length)) {
                     return this.editor.commands.deleteNode(this.type);
+                }
+                // on android due to composition issues with various keyboards,
+                // sometimes backspace is detected one node behind. We need to
+                // manually handle this case.
+                else if (nextNode &&
+                    isCodeBlock(nextNode) &&
+                    !nextNode.textContent.length) {
+                    return this.editor.commands.command(({ tr }) => {
+                        tr.delete($anchor.pos + 1, $anchor.pos + 1 + nextNode.nodeSize);
+                        return true;
+                    });
                 }
                 return false;
             },
