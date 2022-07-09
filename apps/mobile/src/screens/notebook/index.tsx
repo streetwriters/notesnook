@@ -18,7 +18,6 @@ const Notebook = ({ route, navigation }: NavigationProps<'Notebook'>) => {
   const [topics, setTopics] = useState(
     groupArray(qclone(route?.params.item?.topics) || [], db.settings?.getGroupOptions('topics'))
   );
-  console.log(route.params);
   const params = useRef<NotebookScreenParams>(route?.params);
   useNavigationFocus(navigation, {
     onFocus: () => {

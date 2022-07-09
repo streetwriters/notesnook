@@ -9,8 +9,7 @@ export function validateEmail(email) {
 }
 
 export const ERRORS_LIST = {
-  SHORT_PASS: 'Atleast 8 characters',
-  error: null
+  SHORT_PASS: 'Atleast 8 characters'
 };
 
 export function validatePass(password) {

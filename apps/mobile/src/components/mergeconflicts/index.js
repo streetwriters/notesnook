@@ -70,7 +70,8 @@ const MergeConflicts = () => {
       'TopicNotes'
     );
     if (editorController.current?.note?.id === note.id) {
-      //TODO
+      // reload the note in editor
+      eSendEvent(eOnLoadNote, { ...editorController.current?.note, forced: true });
     }
     close();
     await Sync.run();
@@ -79,8 +80,10 @@ const MergeConflicts = () => {
   const show = async item => {
     let noteContent = await db.content.raw(item.contentId);
     content.current = { ...noteContent };
-    if (!noteContent.conflicted) {
-      content.current.conflicted = { ...noteContent };
+    if (__DEV__) {
+      if (!noteContent.conflicted) {
+        content.current.conflicted = { ...noteContent };
+      }
     }
     setVisible(true);
   };
@@ -270,7 +273,13 @@ const MergeConflicts = () => {
               onLoad={() => {
                 const note = db.notes.note(content.current?.noteId)?.data;
                 if (!note) return;
-                eSendEvent(eOnLoadNote + ':conflictPrimary', { ...note, content: content.current });
+                eSendEvent(eOnLoadNote + ':conflictPrimary', {
+                  ...note,
+                  content: {
+                    ...content.current,
+                    isPreview: true
+                  }
+                });
               }}
             />
           </Animated.View>
@@ -300,7 +309,7 @@ const MergeConflicts = () => {
                 if (!note) return;
                 eSendEvent(eOnLoadNote + ':conflictSecondary', {
                   ...note,
-                  content: content.current.conflicted
+                  content: { ...content.current.conflicted, isPreview: true }
                 });
               }}
             />

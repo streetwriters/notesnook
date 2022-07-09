@@ -220,21 +220,6 @@ export const Signup = ({ changeMode, welcome, trial }) => {
               type="accent"
               title={loading ? null : 'Agree and continue'}
             />
-
-            {loading || !welcome ? null : (
-              <Button
-                style={{
-                  marginTop: 10,
-                  width: 250,
-                  borderRadius: 100
-                }}
-                onPress={() => {
-                  hideAuth();
-                }}
-                type="grayBg"
-                title="Skip for now"
-              />
-            )}
           </View>
 
           <Paragraph

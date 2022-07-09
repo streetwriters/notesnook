@@ -93,7 +93,7 @@ export const Login = ({ changeMode, welcome }) => {
       hideAuth();
       SettingsService.set({
         sessionExpired: false,
-        userEmailConfirmed: user.isEmailConfirmed
+        userEmailConfirmed: user?.isEmailConfirmed
       });
       eSendEvent('userLoggedIn', true);
       await sleep(500);
@@ -267,21 +267,6 @@ export const Login = ({ changeMode, welcome }) => {
               type="accent"
               title={loading ? null : 'Login to your account'}
             />
-
-            {loading || !welcome ? null : (
-              <Button
-                style={{
-                  marginTop: 10,
-                  width: 250,
-                  borderRadius: 100
-                }}
-                onPress={() => {
-                  hideAuth();
-                }}
-                type="grayBg"
-                title="Skip for now"
-              />
-            )}
           </View>
         </View>
       </Animated.View>

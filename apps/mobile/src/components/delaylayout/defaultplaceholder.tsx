@@ -2,12 +2,16 @@ import React from 'react';
 import { View } from 'react-native';
 import { useMessageStore } from '../../stores/use-message-store';
 import { useThemeStore } from '../../stores/use-theme-store';
+import { COLORS_NOTE } from '../../utils/color-scheme';
+import { hexToRGBA } from '../../utils/color-scheme/utils';
 
-export const DefaultPlaceholder = () => {
+export const DefaultPlaceholder = ({ color }: { color: string }) => {
   const colors = useThemeStore(state => state.colors);
   const message = useMessageStore(state => state.message);
   const annoucements = useMessageStore(state => state.announcements);
   const hasAnnoucements = annoucements.length > 0;
+  //@ts-ignore
+  const shadeColor = color ? hexToRGBA(COLORS_NOTE[color?.toLowerCase()], 0.15) : colors.shade;
 
   return (
     <View
@@ -49,7 +53,7 @@ export const DefaultPlaceholder = () => {
             style={{
               width: 60,
               height: 15,
-              backgroundColor: colors.shade,
+              backgroundColor: shadeColor,
               borderRadius: 3,
               marginTop: 10
             }}
@@ -73,7 +77,7 @@ export const DefaultPlaceholder = () => {
             style={{
               width: 40,
               height: 40,
-              backgroundColor: colors.shade,
+              backgroundColor: shadeColor,
               borderRadius: 100,
               marginRight: 10
             }}
@@ -117,7 +121,7 @@ export const DefaultPlaceholder = () => {
           style={{
             width: 60,
             height: 15,
-            backgroundColor: colors.shade,
+            backgroundColor: shadeColor,
             borderRadius: 3
           }}
         />

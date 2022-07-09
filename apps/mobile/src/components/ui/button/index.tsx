@@ -29,6 +29,7 @@ export interface ButtonProps extends PressableButtonProps {
   };
   bold?: boolean;
   iconColor?: ColorValue;
+  iconStyle?: TextStyle;
 }
 export const Button = ({
   height = 45,
@@ -51,6 +52,7 @@ export const Button = ({
   bold,
   iconColor,
   fwdRef,
+  iconStyle,
   ...restProps
 }: ButtonProps) => {
   const colors = useThemeStore(state => state.colors);
@@ -104,9 +106,7 @@ export const Button = ({
       {icon && !loading && iconPosition === 'left' ? (
         <Icon
           name={icon}
-          style={{
-            marginRight: 0
-          }}
+          style={[{ marginRight: 0 }, iconStyle]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />
@@ -133,9 +133,7 @@ export const Button = ({
       {icon && !loading && iconPosition === 'right' ? (
         <Icon
           name={icon}
-          style={{
-            marginLeft: 0
-          }}
+          style={[{ marginLeft: 0 }, iconStyle]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />

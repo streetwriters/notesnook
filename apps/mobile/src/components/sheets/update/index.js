@@ -82,16 +82,14 @@ export const Update = ({ version: appVersion, fwdRef }) => {
           >
             {!version ? (
               <>
-                <React.Suspense fallback={<View />}>
-                  <ProgressBarComponent
-                    size={SIZE.xxl}
-                    indeterminate={true}
-                    color={colors.accent}
-                    borderWidth={0}
-                    height={5}
-                    width={250}
-                  />
-                </React.Suspense>
+                <ProgressBarComponent
+                  size={SIZE.xxl}
+                  indeterminate={true}
+                  color={colors.accent}
+                  borderWidth={0}
+                  height={5}
+                  width={250}
+                />
                 <Paragraph
                   style={{
                     marginTop: 5

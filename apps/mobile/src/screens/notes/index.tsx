@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { InteractionManager } from 'react-native';
 import { FloatingButton } from '../../components/container/floating-button';
 import DelayLayout from '../../components/delay-layout';
 import { RightMenus } from '../../components/header/right-menus';
@@ -50,6 +51,14 @@ export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   rightButtons?: (params: NotesScreenParams) => HeaderRightButton[];
 }
 
+function getItemType(routeName: RouteName) {
+  if (routeName === 'TaggedNotes') return 'tag';
+  if (routeName === 'ColoredNotes') return 'color';
+  if (routeName === 'TopicNotes') return 'topic';
+  if (routeName === 'Monographs') return 'monograph';
+  return 'note';
+}
+
 const NotesPage = ({
   route,
   navigation,
@@ -85,12 +94,20 @@ const NotesPage = ({
 
   const syncWithNavigation = () => {
     const { item, title } = params.current;
+    //@ts-ignore
+    let alias = getAlias(params.current);
+    console.log(alias, title, 'syncWithNavigation', params.current);
     useNavigationStore.getState().update(
       {
         name: route.name,
-        title: title,
+        title: alias || title,
         id: item?.id,
-        type: 'notes'
+        type: 'notes',
+        //@ts-ignore
+        notebookId: item?.notebookId,
+        alias: route.name === 'ColoredNotes' ? toCamelCase(alias) : alias,
+        //@ts-ignore
+        color: item.type === 'color' ? item.title?.toLowerCase() : undefined
       },
       params.current.canGoBack,
       rightButtons && rightButtons(params.current)
@@ -100,7 +117,7 @@ const NotesPage = ({
 
     !isMonograph &&
       setOnFirstSave({
-        type: item.type,
+        type: getItemType(route.name),
         id: item.id,
         color: item.title,
         //@ts-ignore
@@ -109,8 +126,8 @@ const NotesPage = ({
   };
 
   const onRequestUpdate = (data?: NotesScreenParams) => {
-    if (data) params.current = data;
     const isNew = data?.item?.id !== params.current?.item?.id;
+    if (data) params.current = data;
     params.current.title = params.current.title || params.current.item.title;
     const { item } = params.current;
     try {
@@ -126,7 +143,9 @@ const NotesPage = ({
   };
 
   useEffect(() => {
-    if (loadingNotes) setLoadingNotes(false);
+    if (loadingNotes) {
+      setTimeout(() => setLoadingNotes(false), 300);
+    }
   }, [notes]);
 
   useEffect(() => {
@@ -149,7 +168,10 @@ const NotesPage = ({
   };
 
   return (
-    <DelayLayout wait={loading || loadingNotes}>
+    <DelayLayout
+      color={route.name === 'ColoredNotes' ? params.current?.item.title.toLowerCase() : undefined}
+      wait={loading || loadingNotes}
+    >
       <List
         listData={notes}
         warning={warning ? WARNING_DATA : null}
@@ -159,13 +181,12 @@ const NotesPage = ({
         screen="Notes"
         headerProps={{
           heading: params.current.title,
-          color:
-            params.current?.item?.type === 'color' ? params.current?.item.title.toLowerCase() : null
+          color: route.name === 'ColoredNotes' ? params.current?.item.title.toLowerCase() : null
         }}
         placeholderData={placeholderData}
       />
 
-      {notes?.length > 0 || isFocused ? (
+      {notes?.length > 0 || (isFocused && !isMonograph) ? (
         <FloatingButton title="Create a note" onPress={onPressFloatingButton} />
       ) : null}
     </DelayLayout>

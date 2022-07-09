@@ -16,17 +16,13 @@ import { Synced } from './synced';
 import { Tags } from './tags';
 import { Topics } from './topics';
 import SearchService from '../../services/search';
+import { COLORS_NOTE } from '../../utils/color-scheme';
 
 export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => {
   const colors = useThemeStore(state => state.colors);
 
-  const alias = item
-    ? item.type === 'tag'
-      ? db.tags.alias(item.id)
-      : item.type === 'color'
-      ? db.colors.alias(item.id)
-      : item.title
-    : null;
+  const alias = item.alias || item.title;
+  const isColor = !!COLORS_NOTE[item.title];
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
@@ -62,7 +58,11 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
             }}
           >
             <Heading size={SIZE.lg}>
-              {item.type === 'tag' ? '#' : null}
+              {item.type === 'tag' && !isColor ? (
+                <Heading size={SIZE.xl} color={colors.accent}>
+                  #
+                </Heading>
+              ) : null}
               {alias}
             </Heading>
 

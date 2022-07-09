@@ -47,12 +47,7 @@ export const useActions = ({ close = () => {}, item }) => {
   console.log(item.readonly, 'readonly');
   const user = useUserStore(state => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
-  const alias =
-    item.type === 'tag'
-      ? db.tags.alias(item.id)
-      : item.type === 'color'
-      ? db.colors.alias(item.id)
-      : item.title;
+  const alias = item.alias || item.title;
 
   const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
 
@@ -514,7 +509,7 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function toggleLocalOnly() {
-    if (!checkNoteSynced()) return;
+    if (!checkNoteSynced() || !user) return;
     db.notes.note(item.id).localOnly();
     Navigation.queueRoutesForUpdate(
       'TaggedNotes',
@@ -569,7 +564,7 @@ export const useActions = ({ close = () => {}, item }) => {
       icon: 'plus',
       func: async () => {
         close();
-        await sleep(300);
+        await sleep(500);
         MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
       }
     },

@@ -17,6 +17,7 @@ export const ProgressBar = () => {
 
   useEffect(() => {
     if (loading) {
+      console.log(loading);
       if (loading.current !== loading.total) {
         setVisible(true);
         setProg(loading.current / loading.total);
@@ -50,16 +51,14 @@ export const ProgressBar = () => {
       }}
       onLayout={event => setWidth(event.nativeEvent.layout.width)}
     >
-      <React.Suspense fallback={<View />}>
-        <ProgressBarComponent
-          size={SIZE.xxl}
-          progress={prog}
-          color={colors.accent}
-          borderWidth={0}
-          height={1}
-          width={width || 400}
-        />
-      </React.Suspense>
+      <ProgressBarComponent
+        size={SIZE.xxl}
+        progress={prog}
+        color={colors.accent}
+        borderWidth={0}
+        height={1}
+        width={width || 400}
+      />
     </View>
   ) : null;
 };

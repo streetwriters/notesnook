@@ -133,7 +133,7 @@ module.exports = env => {
        */
       rules: [
         {
-          test: /\.[jt]sx?$/,
+          test: /\.mjs$|cjs$|js$|jsx$|ts$|tsx$/,
           include: [
             /node_modules(.*[/\\])+react/,
             /node_modules(.*[/\\])+@react-native/,
@@ -151,7 +151,11 @@ module.exports = env => {
             /node_modules(.*[/\\])+notes-core/,
             /node_modules(.*[/\\])+@microsoft/,
             /node_modules(.*[/\\])+@msgpack/,
-            /node_modules(.*[/\\])+liqe/
+            /node_modules(.*[/\\])+liqe/,
+            /node_modules(.*[/\\])+selderee/,
+            /node_modules(.*[/\\])+html-to-text/,
+            /node_modules(.*[/\\])+buffer/,
+            /node_modules(.*[/\\])+readable-stream/
           ],
           use: {
             loader: 'babel-loader',
@@ -183,9 +187,7 @@ module.exports = env => {
               configFile: false,
               cacheDirectory: path.join(__dirname, 'node_modules/.webpack-cache'),
               babelrc: false,
-              presets: [
-                ['module:metro-react-native-babel-preset', { disableImportExportTransform: true }]
-              ],
+              presets: [['module:metro-react-native-babel-preset']],
               plugins:
                 devServer && devServer.hmr
                   ? ['module:react-refresh/babel', 'react-native-reanimated/plugin']

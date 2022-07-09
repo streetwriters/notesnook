@@ -66,7 +66,7 @@ const publishNote = async (editor: useEditorType) => {
     return;
   }
 
-  if (!user.isEmailConfirmed) {
+  if (!user?.isEmailConfirmed) {
     ToastEvent.show({
       heading: 'Email not verified',
       message: 'Please verify your email first.',
@@ -154,11 +154,12 @@ export const useEditorEvents = (
         editorState().movedAway = true;
         tabBarRef.current?.goToPage(0);
       }
-      eSendEvent('historyEvent', {
-        undo: 0,
-        redo: 0
+      setImmediate(() => {
+        useEditorStore.getState().setCurrentlyEditingNote(null);
+        setTimeout(() => {
+          Navigation.queueRoutesForUpdate('ColoredNotes', 'Notes', 'TaggedNotes', 'TopicNotes');
+        }, 500);
       });
-      setImmediate(() => useEditorStore.getState().setCurrentlyEditingNote(null));
       editorState().currentlyEditing = false;
       editor.reset();
     }, 1);

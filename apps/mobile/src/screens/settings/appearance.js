@@ -38,7 +38,10 @@ export const HomagePageSelector = () => {
           width: width,
           marginTop: 60
         }}
-        button={
+        onRequestClose={() => {
+          menuRef.current?.hide();
+        }}
+        anchor={
           <PressableButton
             onPress={async () => {
               await PremiumService.verify(menuRef.current?.show);

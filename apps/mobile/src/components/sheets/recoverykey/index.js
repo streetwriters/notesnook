@@ -241,15 +241,13 @@ class RecoveryKeySheet extends React.Component {
             }}
           >
             {this.state.key ? (
-              <React.Suspense>
-                <QRCode
-                  getRef={this.svg}
-                  size={500}
-                  value={this.state.key}
-                  //logo={{ uri: LOGO_BASE64 }}
-                  logoBorderRadius={10}
-                />
-              </React.Suspense>
+              <QRCode
+                getRef={this.svg}
+                size={500}
+                value={this.state.key}
+                //logo={{ uri: LOGO_BASE64 }}
+                logoBorderRadius={10}
+              />
             ) : null}
           </View>
 

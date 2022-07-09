@@ -262,6 +262,7 @@ export const settingsGroups: SettingSection[] = [
                     eSendEvent('settings-loading', true);
                     setImmediate(async () => {
                       eSendEvent(eCloseSimpleDialog);
+                      Navigation.popToTop();
                       db.user?.logout();
                       setLoginMessage();
                       await PremiumService.setPremiumStatus();
@@ -270,14 +271,15 @@ export const settingsGroups: SettingSection[] = [
                       await db.init();
                       await clearAllStores();
                       SettingsService.init();
-                      SettingsService.set({
-                        introCompleted: true
-                      });
+                      setTimeout(() => {
+                        SettingsService.set({
+                          introCompleted: true
+                        });
+                      }, 1000);
                       useUserStore.getState().setUser(null);
                       useUserStore.getState().setSyncing(false);
-                      console.log('HIDING');
                       Navigation.goBack();
-                      Navigation.goBack();
+                      Navigation.popToTop();
                       eSendEvent('settings-loading', false);
                     });
                   } catch (e) {

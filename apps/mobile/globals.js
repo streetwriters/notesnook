@@ -1,42 +1,43 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 global.Buffer = require('buffer').Buffer;
-import { ScriptManager, Script } from '@callstack/repack/client';
+//import { ScriptManager, Script } from '@callstack/repack/client';
 import './src/utils/logger/index';
+import { DOMParser } from './worker.js';
 
-class DOM {
-  static domparser;
+// class DOM {
+//   static domparser;
 
-  parseFromString(markupLanguage, mimeType, globals) {
-    return DOM.domparser?.parseFromString(markupLanguage, mimeType, globals);
-  }
+//   parseFromString(markupLanguage, mimeType, globals) {
+//     return DOM.domparser?.parseFromString(markupLanguage, mimeType, globals);
+//   }
 
-  static async prepare() {
-    if (!DOM.domparser) {
-      let module = await import('./worker.js');
-      DOM.domparser = new module.DOMParser();
-    }
-  }
-}
-global.DOMParser = DOM;
+//   static async prepare() {
+//     if (!DOM.domparser) {
+//       let module = await import('./worker.js');
+//       DOM.domparser = new module.DOMParser();
+//     }
+//   }
+// }
+global.DOMParser = DOMParser;
 
-try {
-  const shared = ScriptManager.shared;
-} catch (e) {
-  new ScriptManager({
-    resolve: async (scriptId, caller) => {
-      if (__DEV__) {
-        return {
-          url: Script.getDevServerURL(scriptId),
-          cache: false
-        };
-      }
+// try {
+//   const shared = ScriptManager.shared;
+// } catch (e) {
+//   new ScriptManager({
+//     resolve: async (scriptId, caller) => {
+//       if (__DEV__) {
+//         return {
+//           url: Script.getDevServerURL(scriptId),
+//           cache: false
+//         };
+//       }
 
-      return {
-        url: Script.getFileSystemURL(scriptId)
-      };
-    }
-  });
-}
+//       return {
+//         url: Script.getFileSystemURL(scriptId)
+//       };
+//     }
+//   });
+// }
 if (__DEV__) {
   // ScriptManager.shared.on('resolving', (...args) => {
   //   console.log('DEBUG/resolving', ...args);

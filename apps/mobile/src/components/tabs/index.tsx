@@ -1,5 +1,12 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { ViewProps } from 'react-native';
+import React, {
+  forwardRef,
+  RefObject,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState
+} from 'react';
+import { BackHandler, ViewProps } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
@@ -28,6 +35,8 @@ export interface TabsRef {
   closeDrawer: () => void;
   page: number;
   setScrollEnabled: () => true;
+  isDrawerOpen: () => boolean;
+  node: RefObject<Animated.View>;
 }
 
 export const FluidTabs = forwardRef<TabsRef, TabProps>(
@@ -47,10 +56,26 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const locked = useSharedValue(false);
     const forcedLock = useSharedValue(false);
     const [disabled, setDisabled] = useState(false);
+    const node = useRef<Animated.View>(null);
     const containerWidth = widths ? widths.a + widths.b + widths.c : dimensions.width;
     const drawerPosition = 0;
     const homePosition = widths.a;
     const editorPosition = widths.a + widths.b;
+
+    useEffect(() => {
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+        if (isDrawerOpen.value) {
+          translateX.value = withTiming(homePosition);
+          onDrawerStateChange(false);
+          isDrawerOpen.value = false;
+          return true;
+        }
+        return false;
+      });
+      return () => {
+        sub && sub.remove();
+      };
+    }, []);
 
     useImperativeHandle(
       ref,
@@ -59,7 +84,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           page = page + 1;
           if (page === 1) {
             onDrawerStateChange(false);
-            console.log('coming here');
             translateX.value = withTiming(homePosition);
             currentTab.value = 1;
           } else if (page === 2) {
@@ -69,7 +93,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           }
         },
         goToIndex: (index: number) => {
-          console.log('index', index);
           if (index === 0) {
             onDrawerStateChange(true);
             return (translateX.value = withSpring(0));
@@ -90,18 +113,22 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           forcedLock.value = true;
           return true;
         },
+        isDrawerOpen: () => isDrawerOpen.value,
         openDrawer: () => {
           translateX.value = withSpring(drawerPosition, {
             mass: 0.5
           });
+          isDrawerOpen.value = true;
           onDrawerStateChange(true);
         },
         closeDrawer: () => {
           translateX.value = withTiming(homePosition);
           onDrawerStateChange(false);
+          isDrawerOpen.value = false;
         },
         page: currentTab.value,
-        setScrollEnabled: () => true
+        setScrollEnabled: () => true,
+        node: node
       }),
       []
     );
@@ -153,9 +180,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
 
         if (vx < 0) vx = vx * -1;
         if (vy < 0) vy = vy * -1;
-
-        console.log(event.velocityX, event.velocityY, diffX, diffY);
-        console.log('diff: ', vx / vy, 'lock: ', vx / vy < 5, vy > vx);
         // if vy is greater than vx, user is swiping vertically. lock swiping.
         if (vy > vx) locked.value = true;
         // if dividend of vx/vy is less than 4, user is swiping diagonally. lock swiping
@@ -215,6 +239,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         runOnJS(onDrawerStateChange)(false);
         translateX.value = withSpring(homePosition, animationConfig);
         currentTab.value = 1;
+        isDrawerOpen.value = false;
         startX.value = 0;
       });
 
@@ -230,6 +255,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     return (
       <GestureDetector gesture={gesture}>
         <Animated.View
+          ref={node}
           removeClippedSubviews={false}
           collapsable={false}
           style={[

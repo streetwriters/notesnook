@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Animated, { Layout } from 'react-native-reanimated';
 import Notebook from '../../screens/notebook';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
@@ -17,12 +17,16 @@ const titleState = {};
 export const Title = () => {
   const colors = useThemeStore(state => state.colors);
   const currentScreen = useNavigationStore(state => state.currentScreen);
-  const isTopic = currentScreen.type === 'topic';
+  const isTopic = currentScreen?.name === 'TopicNotes';
   const [hide, setHide] = useState(isTopic ? true : false);
   const isHidden = titleState[currentScreen.id];
-  const notebook = isTopic ? db.notebooks?.notebook(currentScreen.notebookId)?.data : null;
+  console.log(currentScreen, 'header');
+  const notebook =
+    isTopic && currentScreen.notebookId
+      ? db.notebooks?.notebook(currentScreen.notebookId)?.data
+      : null;
   const title = currentScreen.title;
-  const isTag = title.slice(0, 1) === '#';
+  const isTag = currentScreen?.name === 'TaggedNotes';
 
   const onScroll = data => {
     if (currentScreen.name !== 'Notebook') {
@@ -78,7 +82,8 @@ export const Title = () => {
           numberOfLines={isTopic ? 2 : 1}
           size={isTopic ? SIZE.md + 2 : SIZE.xl}
           style={{
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            marginTop: Platform.OS === 'ios' ? -1 : 0
           }}
           color={currentScreen.color}
         >
@@ -93,7 +98,7 @@ export const Title = () => {
               #
             </Heading>
           ) : null}
-          {isTag ? title.slice(1) : title}
+          {title}
         </Heading>
       ) : null}
     </View>

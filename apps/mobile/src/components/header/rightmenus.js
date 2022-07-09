@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Menu from 'react-native-reanimated-material-menu';
 import { notesnook } from '../../../e2e/test.ids';
 import Navigation from '../../services/navigation';
@@ -8,6 +8,7 @@ import useNavigationStore from '../../stores/use-navigation-store';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
+import { sleep } from '../../utils/time';
 import { Button } from '../ui/button';
 import { IconButton } from '../ui/icon-button';
 
@@ -68,7 +69,10 @@ export const RightMenus = () => {
             borderRadius: 5,
             backgroundColor: colors.bg
           }}
-          button={
+          onRequestClose={() => {
+            menuRef.current?.hide();
+          }}
+          anchor={
             <IconButton
               onPress={() => {
                 menuRef.current?.show();
@@ -92,7 +96,11 @@ export const RightMenus = () => {
               }}
               key={item.title}
               title={item.title}
-              onPress={item.onPress}
+              onPress={async () => {
+                menuRef.current?.hide();
+                if (Platform.OS === 'ios') await sleep(300);
+                item.onPress();
+              }}
             />
           ))}
         </Menu>

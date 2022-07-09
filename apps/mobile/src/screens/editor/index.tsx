@@ -1,6 +1,6 @@
 import { EV, EVENTS } from 'notes-core/common';
-import React, { forwardRef, RefObject, useEffect, useImperativeHandle } from 'react';
-import { Linking, ViewStyle } from 'react-native';
+import React, { forwardRef, useEffect, useImperativeHandle } from 'react';
+import { ViewStyle } from 'react-native';
 import WebView from 'react-native-webview';
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
 import { notesnook } from '../../../e2e/test.ids';
@@ -24,8 +24,9 @@ const style: ViewStyle = {
   backgroundColor: 'transparent'
 };
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
-  Linking.openURL(request.url);
-  return false;
+  // if (request.url.startsWith('http://')) return true;
+  // Linking.openURL(request.url);
+  return true;
 };
 
 const Editor = React.memo(
@@ -114,6 +115,7 @@ const Editor = React.memo(
             focusable={true}
             setSupportMultipleWindows={false}
             overScrollMode="never"
+            scrollEnabled={false}
             keyboardDisplayRequiresUserAction={false}
             onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
             cacheMode="LOAD_DEFAULT"
@@ -129,7 +131,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: __DEV__ ? 'http://localhost:3000' : EDITOR_URI
+              uri: __DEV__ ? 'http://localhost:3000/' : EDITOR_URI
             }}
             style={style}
             autoManageStatusBarEnabled={false}

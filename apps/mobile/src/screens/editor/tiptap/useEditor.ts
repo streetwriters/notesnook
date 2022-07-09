@@ -178,6 +178,9 @@ export const useEditor = (
           if (!note && id) {
             currentNote.current = db.notes?.note(id).data as NoteType;
             state.current?.onNoteCreated && state.current.onNoteCreated(id);
+            if (!noteData.title) {
+              postMessage(EditorEvents.titleplaceholder, currentNote.current.title);
+            }
           }
 
           if (useEditorStore.getState().currentEditingNote !== id && isDefaultEditor) {
@@ -262,6 +265,7 @@ export const useEditor = (
         useEditorStore.getState().setReadonly(item.readonly);
         loadImages();
         await commands.setTags(currentNote.current);
+        commands.setSettings();
         overlay(false);
       }
     },
@@ -270,9 +274,14 @@ export const useEditor = (
 
   const loadImages = () => {
     if (!currentNote.current?.id) return;
-    const images = db.attachments?.ofNote(currentNote.current?.id, 'images');
-    if (images && images.length > 0) {
-      db.attachments?.downloadImages(currentNote.current.id);
+    //@ts-ignore
+    if (currentNote.current?.content?.isPreview) {
+      db.content?.downloadMedia(currentNote.current?.id, currentNote.current.content, true);
+    } else {
+      const images = db.attachments?.ofNote(currentNote.current?.id, 'images');
+      if (images && images.length > 0) {
+        db.attachments?.downloadImages(currentNote.current.id);
+      }
     }
   };
 

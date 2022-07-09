@@ -20,7 +20,7 @@ import java.util.Map;
 import androidx.multidex.MultiDexApplication;
 
 import com.facebook.react.bridge.JavaScriptExecutorFactory;
-import com.facebook.react.modules.systeminfo.AndroidInfoHelpers;
+//import com.facebook.react.modules.systeminfo.AndroidInfoHelpers;
 import com.facebook.react.TurboReactPackage;
 import com.facebook.react.module.model.ReactModuleInfo;
 import com.facebook.react.module.model.ReactModuleInfoProvider;
@@ -34,7 +34,7 @@ import com.streetwriters.notesnook.newarchitecture.MainApplicationReactNativeHos
 
 import cl.json.RNShareModule;
 import px.tooltips.RNTooltipsModule;
-import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
+//import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
 import androidx.annotation.Nullable;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
@@ -49,24 +49,24 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                     return BuildConfig.DEBUG;
                 }
 
-                @Nullable
-                @Override
-                protected String getBundleAssetName() {
-                     final String v8BundleAssetName = V8ExecutorFactory.getBundleAssetName(getApplicationContext(), getUseDeveloperSupport());
-                     if (v8BundleAssetName != null) {
-                         return v8BundleAssetName;
-                     }
-                    return super.getBundleAssetName();
-                }
+                // @Nullable
+                // @Override
+                // protected String getBundleAssetName() {
+                //      final String v8BundleAssetName = V8ExecutorFactory.getBundleAssetName(getApplicationContext(), getUseDeveloperSupport());
+                //      if (v8BundleAssetName != null) {
+                //          return v8BundleAssetName;
+                //      }
+                //     return super.getBundleAssetName();
+                // }
 
-                @Override
-                protected JavaScriptExecutorFactory getJavaScriptExecutorFactory() {
-                    return new V8ExecutorFactory(
-                            getApplicationContext(),
-                            getPackageName(),
-                            AndroidInfoHelpers.getFriendlyDeviceName(),
-                            getUseDeveloperSupport());
-                }
+                // @Override
+                // protected JavaScriptExecutorFactory getJavaScriptExecutorFactory() {
+                //     return new V8ExecutorFactory(
+                //             getApplicationContext(),
+                //             getPackageName(),
+                //             AndroidInfoHelpers.getFriendlyDeviceName(),
+                //             getUseDeveloperSupport());
+                // }
 
                 @Override
                 protected List<ReactPackage> getPackages() {

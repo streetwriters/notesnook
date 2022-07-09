@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { eSendEvent } from '../../services/event-manager';
+import Notebook from '../../screens/notebook';
+import { TaggedNotes } from '../../screens/notes/tagged';
+import { TopicNotes } from '../../screens/notes/topic-notes';
 import Navigation from '../../services/navigation';
-import useNavigationStore from '../../stores/use-navigation-store';
 import { useMenuStore } from '../../stores/use-menu-store';
+import useNavigationStore from '../../stores/use-navigation-store';
 import { useNoteStore } from '../../stores/use-notes-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
-import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/events';
 import { normalize, SIZE } from '../../utils/size';
 import { Properties } from '../properties';
 import { Button } from '../ui/button';
@@ -18,9 +19,6 @@ import Seperator from '../ui/seperator';
 import SheetWrapper from '../ui/sheet';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
-import { TaggedNotes } from '../../screens/notes/tagged';
-import { TopicNotes } from '../../screens/notes/topic-notes';
-import Notebook from '../../screens/notebook';
 
 export const TagsSection = React.memo(
   () => {
@@ -47,7 +45,7 @@ export const TagsSection = React.memo(
       });
     };
     const renderItem = ({ item, index }) => {
-      let alias = item ? (item.type === 'tag' ? db.tags.alias(item.title) : item.title) : null;
+      let alias = item.alias || item.title;
       return <PinItem item={item} index={index} alias={alias} onPress={onPress} />;
     };
 
@@ -85,7 +83,7 @@ export const PinItem = React.memo(
   ({ item, index, onPress, placeholder, alias }) => {
     const colors = useThemeStore(state => state.colors);
     const setMenuPins = useMenuStore(state => state.setMenuPins);
-    alias = !item ? '' : item.type === 'tag' ? db.tags.alias(item.title) : item.title;
+    alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
     const color = headerTextState?.id === item.id ? colors.accent : colors.pri;

@@ -19,7 +19,7 @@ export const Subscription = () => {
   const subscriptionProviderInfo = SUBSCRIPTION_PROVIDER[user?.subscription?.provider];
 
   const manageSubscription = () => {
-    if (!user.isEmailConfirmed) {
+    if (!user?.isEmailConfirmed) {
       PremiumService.showVerifyEmailDialog();
       return;
     }
@@ -62,7 +62,7 @@ export const Subscription = () => {
           type="accent"
           onPress={manageSubscription}
           title={
-            !user.isEmailConfirmed
+            !user?.isEmailConfirmed
               ? 'Confirm your email'
               : user.subscription?.provider === 3 &&
                 user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED

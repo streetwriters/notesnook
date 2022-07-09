@@ -33,6 +33,7 @@ export const Home = ({ navigation, route }: NavigationProps<'Notes'>) => {
   const loading = useNoteStore(state => state.loading);
   const isFocused = useNavigationFocus(navigation, {
     onFocus: prev => {
+      console.log('updating', route.name, 'on focus');
       Navigation.routeNeedsUpdate(route.name, Navigation.routeUpdateFunctions[route.name]);
       useNavigationStore.getState().update({
         name: route.name
