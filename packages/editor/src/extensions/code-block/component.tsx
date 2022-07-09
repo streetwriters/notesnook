@@ -39,7 +39,7 @@ export function CodeblockComponent(
       const preventUpdate = language === languageDefinition.filename;
       updateAttributes(
         {
-          language: languageDefinition.filename,
+          language: languageDefinition.filename
         },
         { preventUpdate, addToHistory: false }
       );
@@ -52,19 +52,21 @@ export function CodeblockComponent(
         sx={{
           flexDirection: "column",
           borderRadius: "default",
-          overflow: "hidden",
+          overflow: "hidden"
         }}
       >
         <Text
           ref={forwardRef}
           as="pre"
+          autoCorrect="off"
+          autoCapitalize="none"
           sx={{
             "div, span.token, span.line-number-widget, span.line-number::before":
               {
                 fontFamily: "monospace",
                 fontSize: "code",
                 whiteSpace: "pre !important",
-                tabSize: 1,
+                tabSize: 1
               },
             position: "relative",
             lineHeight: "20px",
@@ -74,7 +76,7 @@ export function CodeblockComponent(
             display: "flex",
             px: 2,
             pt: 2,
-            pb: 1,
+            pb: 1
           }}
           spellCheck={false}
         />
@@ -84,8 +86,8 @@ export function CodeblockComponent(
           sx={{
             bg: "codeBg",
             alignItems: "center",
-            justifyContent: "end",
-            borderTop: "1px solid var(--codeBorder)",
+            justifyContent: "flex-end",
+            borderTop: "1px solid var(--codeBorder)"
           }}
         >
           {caretPosition ? (
@@ -103,7 +105,7 @@ export function CodeblockComponent(
             onClick={() => {
               editor.commands.changeCodeBlockIndentation({
                 type: indentType === "space" ? "tab" : "space",
-                amount: indentLength,
+                amount: indentLength
               });
             }}
           >
@@ -117,7 +119,7 @@ export function CodeblockComponent(
               p: 1,
               mr: 1,
               bg: isOpen ? "codeSelection" : "transparent",
-              ":hover": { bg: "codeSelection" },
+              ":hover": { bg: "codeSelection" }
             }}
             onClick={() => {
               setIsOpen(true);
@@ -154,7 +156,7 @@ export function CodeblockComponent(
           align: "end",
           isTargetAbsolute: true,
           location: "top",
-          yOffset: 5,
+          yOffset: 5
         }}
         title="Change code block language"
       >
@@ -191,7 +193,7 @@ function LanguageSelector(props: LanguageSelectorProps) {
           height: 200,
           width: ["auto", 300],
           overflowY: "auto",
-          bg: "background",
+          bg: "background"
         }}
       >
         <Input
@@ -207,7 +209,7 @@ function LanguageSelector(props: LanguageSelectorProps) {
             bg: "background",
             mx: 2,
             p: "7px",
-            zIndex: 999,
+            zIndex: 999
           }}
           onChange={(e) => {
             if (!e.target.value) return setLanguages(Languages);
@@ -228,7 +230,7 @@ function LanguageSelector(props: LanguageSelectorProps) {
           sx={{
             flexDirection: "column",
             pt: 1,
-            mt: 1,
+            mt: 1
           }}
         >
           {languages.map((lang) => (
@@ -240,7 +242,7 @@ function LanguageSelector(props: LanguageSelectorProps) {
                 py: 1,
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "center",
+                alignItems: "center"
               }}
               onClick={() => onLanguageSelected(lang.filename)}
             >
