@@ -107,7 +107,7 @@ const NotesPage = ({
         notebookId: item?.notebookId,
         alias: route.name === 'ColoredNotes' ? toCamelCase(alias) : alias,
         //@ts-ignore
-        color: item.type === 'color' ? item.title?.toLowerCase() : undefined
+        color: route.name === 'ColoredNotes' ? item.title?.toLowerCase() : undefined
       },
       params.current.canGoBack,
       rightButtons && rightButtons(params.current)

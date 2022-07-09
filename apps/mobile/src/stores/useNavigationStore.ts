@@ -57,7 +57,7 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
   canGoBack: false,
   update: (currentScreen, canGoBack, headerRightButtons) => {
     //@ts-ignore
-    const color = COLORS_NOTE[currentScreen.title?.toLowerCase()];
+    const color = COLORS_NOTE[currentScreen.color?.toLowerCase()];
     if (JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)) return;
 
     set({

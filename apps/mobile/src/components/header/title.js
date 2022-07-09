@@ -6,6 +6,7 @@ import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager
 import Navigation from '../../services/navigation';
 import useNavigationStore from '../../stores/use-navigation-store';
 import { useThemeStore } from '../../stores/use-theme-store';
+import { COLORS_NOTE } from '../../utils/color-scheme';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -67,7 +68,7 @@ export const Title = () => {
     if (!isTopic) return;
     Notebook.navigate(notebook, true);
   }
-
+  console.log('color', currentScreen.color);
   return (
     <View
       style={{
@@ -85,7 +86,7 @@ export const Title = () => {
             flexWrap: 'wrap',
             marginTop: Platform.OS === 'ios' ? -1 : 0
           }}
-          color={currentScreen.color}
+          color={currentScreen.color || colors.heading}
         >
           {isTopic ? (
             <Paragraph numberOfLines={1} size={SIZE.xs + 1}>
