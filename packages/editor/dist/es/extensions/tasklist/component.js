@@ -1,6 +1,6 @@
 import { jsxs as _jsxs, jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
 import { Box, Flex, Text } from "rebass";
-import { findChildren, getNodeType, } from "@tiptap/core";
+import { findChildren, getNodeType } from "@tiptap/core";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useEffect, useMemo, useState } from "react";
@@ -43,11 +43,11 @@ export function TaskListComponent(props) {
     }, [nested, node]);
     return (_jsxs(_Fragment, { children: [_jsx(Flex, Object.assign({ sx: {
                     flexDirection: "column",
-                    ":hover > div > .toggleSublist": { opacity: 1 },
+                    ":hover > div > .toggleSublist": { opacity: 1 }
                 } }, { children: nested ? (_jsxs(Flex, Object.assign({ sx: {
                         position: "absolute",
                         top: 0,
-                        right: 0,
+                        right: 0
                     }, contentEditable: false }, { children: [collapsed && (_jsxs(Text, Object.assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), _jsx(Icon, { className: "toggleSublist", path: collapsed ? Icons.chevronDown : Icons.chevronUp, sx: {
                                 opacity: isMobile || collapsed ? 1 : 0,
                                 position: "absolute",
@@ -56,8 +56,8 @@ export function TaskListComponent(props) {
                                 mr: 2,
                                 cursor: "pointer",
                                 ".icon:hover path": {
-                                    fill: "var(--checked) !important",
-                                },
+                                    fill: "var(--checked) !important"
+                                }
                             }, size: isMobile ? 24 : 20, onClick: () => {
                                 updateAttributes({ collapsed: !collapsed }, { addToHistory: false, preventUpdate: true });
                             } })] }))) : (_jsxs(Flex, Object.assign({ sx: {
@@ -68,7 +68,7 @@ export function TaskListComponent(props) {
                         mb: 2,
                         alignItems: "center",
                         justifyContent: "end",
-                        overflow: "hidden",
+                        overflow: "hidden"
                     }, contentEditable: false }, { children: [_jsx(Box, { sx: {
                                 height: "100%",
                                 width: `${stats.percentage}%`,
@@ -76,7 +76,7 @@ export function TaskListComponent(props) {
                                 bg: "border",
                                 zIndex: 0,
                                 left: 0,
-                                transition: "width 250ms ease-out",
+                                transition: "width 250ms ease-out"
                             } }), _jsx(Input, { readOnly: !editor.isEditable, value: title || "", variant: "clean", sx: { p: 0, px: 2, zIndex: 1, color: "fontTertiary" }, placeholder: "Untitled", onChange: (e) => {
                                 updateAttributes({ title: e.target.value }, { addToHistory: true, preventUpdate: false });
                             } }), _jsxs(Flex, Object.assign({ sx: { flexShrink: 0, pr: 2 } }, { children: [_jsx(Icon, { path: Icons.checkbox, size: 15, color: "fontTertiary" }), _jsxs(Text, Object.assign({ variant: "body", sx: { ml: 1, color: "fontTertiary" } }, { children: [stats.checked, "/", stats.total] }))] }))] }))) })), _jsx(Text, { as: "div", ref: forwardRef, sx: {
@@ -85,12 +85,13 @@ export function TaskListComponent(props) {
                         paddingInlineStart: 0,
                         marginBlockStart: nested ? 10 : 0,
                         marginBlockEnd: 0,
+                        marginLeft: nested ? -35 : 0
                     },
                     li: {
                         listStyleType: "none",
                         position: "relative",
-                        marginBottom: [2, "7px"],
-                    },
+                        marginBottom: [2, "7px"]
+                    }
                 } })] }));
 }
 function areAllChecked(node, pos, doc) {

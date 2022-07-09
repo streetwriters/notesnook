@@ -53,12 +53,14 @@ export function TaskItemComponent(props) {
                     }, onMouseDown: (e) => {
                         e.preventDefault();
                         toggle();
-                    }, onTouchStart: (e) => {
+                    }, onTouchEnd: (e) => {
                         e.preventDefault();
                         toggle();
                     }, color: checked ? "checked" : "icon", size: isMobile ? 16 : 14 }), _jsx(Text, { as: "div", ref: forwardRef, sx: {
-                        textDecorationLine: checked ? "line-through" : "none",
-                        opacity: checked ? 0.8 : 1,
+                        p: {
+                            textDecorationLine: checked ? "line-through" : "none",
+                            opacity: checked ? 0.8 : 1
+                        },
                         flex: 1
                     } })] })) }));
 }

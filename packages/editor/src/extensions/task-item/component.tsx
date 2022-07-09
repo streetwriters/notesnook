@@ -87,7 +87,7 @@ export function TaskItemComponent(
             e.preventDefault();
             toggle();
           }}
-          onTouchStart={(e) => {
+          onTouchEnd={(e) => {
             e.preventDefault();
             toggle();
           }}
@@ -99,8 +99,10 @@ export function TaskItemComponent(
           as="div"
           ref={forwardRef}
           sx={{
-            textDecorationLine: checked ? "line-through" : "none",
-            opacity: checked ? 0.8 : 1,
+            p: {
+              textDecorationLine: checked ? "line-through" : "none",
+              opacity: checked ? 0.8 : 1
+            },
             flex: 1
           }}
         />

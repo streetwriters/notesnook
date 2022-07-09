@@ -4,7 +4,7 @@ import { Node } from "prosemirror-model";
 import {
   findParentNodeClosestToPos,
   findChildren,
-  getNodeType,
+  getNodeType
 } from "@tiptap/core";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
@@ -63,7 +63,7 @@ export function TaskListComponent(
       <Flex
         sx={{
           flexDirection: "column",
-          ":hover > div > .toggleSublist": { opacity: 1 },
+          ":hover > div > .toggleSublist": { opacity: 1 }
         }}
       >
         {nested ? (
@@ -71,7 +71,7 @@ export function TaskListComponent(
             sx={{
               position: "absolute",
               top: 0,
-              right: 0,
+              right: 0
             }}
             contentEditable={false}
           >
@@ -91,8 +91,8 @@ export function TaskListComponent(
                 mr: 2,
                 cursor: "pointer",
                 ".icon:hover path": {
-                  fill: "var(--checked) !important",
-                },
+                  fill: "var(--checked) !important"
+                }
               }}
               size={isMobile ? 24 : 20}
               onClick={() => {
@@ -113,7 +113,7 @@ export function TaskListComponent(
               mb: 2,
               alignItems: "center",
               justifyContent: "end",
-              overflow: "hidden",
+              overflow: "hidden"
             }}
             contentEditable={false}
           >
@@ -126,7 +126,7 @@ export function TaskListComponent(
 
                 zIndex: 0,
                 left: 0,
-                transition: "width 250ms ease-out",
+                transition: "width 250ms ease-out"
               }}
             />
             <Input
@@ -160,12 +160,13 @@ export function TaskListComponent(
             paddingInlineStart: 0,
             marginBlockStart: nested ? 10 : 0,
             marginBlockEnd: 0,
+            marginLeft: nested ? -35 : 0
           },
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: [2, "7px"],
-          },
+            marginBottom: [2, "7px"]
+          }
         }}
       />
     </>
