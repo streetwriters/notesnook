@@ -19,7 +19,7 @@ export const features: FeatureType[] = [
   },
   {
     title: 'Math support',
-    body: 'Inline and multi-line math support is here using KaTex.'
+    body: 'Inline and multi-line math support is here with KaTex.'
   },
   {
     title: 'Overhaul Settings UI',
