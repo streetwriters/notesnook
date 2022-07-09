@@ -8,7 +8,6 @@ import Constants from "../../utils/constants";
 import TokenManager from "../token-manager";
 import Collector from "./collector";
 import { areAllEmpty } from "./utils";
-import { Mutex } from "async-mutex";
 import * as signalr from "@microsoft/signalr";
 import Merger from "./merger";
 import Conflicts from "./conflicts";
@@ -53,33 +52,40 @@ export default class SyncManager {
    */
   constructor(db) {
     this.sync = new Sync(db);
-    this.syncMutex = new Mutex();
+    this.isSyncing = false;
   }
 
   async start(full, force) {
-    if (this.syncMutex.isLocked()) {
-      throw new Error("A sync is already in progress.");
-    }
+    if (this.isSyncing) return false;
 
-    return this.syncMutex.runExclusive(async () => {
+    try {
+      this.isSyncing = true;
+
       await this.sync.autoSync.start();
-      try {
-        await this.sync.start(full, force);
-      } catch (e) {
-        var isHubException = e.message.includes("HubException:");
-        if (isHubException) {
-          var actualError = /HubException: (.*)/gm.exec(e.message);
-          if (actualError.length > 1) throw new Error(actualError[1]);
-        }
-        throw e;
+      await this.sync.start(full, force);
+      return true;
+    } catch (e) {
+      var isHubException = e.message.includes("HubException:");
+      if (isHubException) {
+        var actualError = /HubException: (.*)/gm.exec(e.message);
+        if (actualError.length > 1) throw new Error(actualError[1]);
       }
-    });
+      throw e;
+    } finally {
+      this.isSyncing = false;
+    }
   }
 
   async acquireLock(callback) {
-    this.sync.autoSync.stop();
-    await this.syncMutex.runExclusive(callback);
-    await this.sync.autoSync.start();
+    try {
+      this.isSyncing = true;
+
+      this.sync.autoSync.stop();
+      await callback();
+      await this.sync.autoSync.start();
+    } finally {
+      this.isSyncing = false;
+    }
   }
 
   async stop() {
