@@ -106,8 +106,9 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
         },
       removeAttachment:
         () =>
-        ({ commands }) =>
-          commands.deleteNode(this.name),
+        ({ commands, tr }) => {
+          return commands.deleteSelection();
+        },
       downloadAttachment:
         (attachment) =>
         ({ editor }) => {

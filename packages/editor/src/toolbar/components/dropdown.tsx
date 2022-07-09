@@ -35,7 +35,6 @@ export function Dropdown(props: DropdownProps) {
     id,
     isOpen,
     onClosed: () => setIsOpen(false),
-    onClosePopup: () => closePopup(id),
   });
 
   return (

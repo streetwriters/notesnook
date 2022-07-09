@@ -229,6 +229,7 @@ export function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
 }
 
 export type PopupWrapperProps = UsePopupHandlerOptions & {
+  autoCloseOnUnmount?: boolean;
   position: PositionOptions;
   renderPopup: (closePopup: () => void) => React.ReactNode;
 } & Partial<Omit<PopupPresenterProps, "onClose">>;
@@ -245,6 +246,13 @@ export function PopupWrapper(props: PopupWrapperProps) {
   } = props;
   const PopupRenderer = usePopupRenderer();
   const { closePopup, isPopupOpen } = usePopupHandler(props);
+
+  useEffect(() => {
+    if (!autoCloseOnUnmount) return;
+    return () => {
+      PopupRenderer?.closePopup(id);
+    };
+  }, [autoCloseOnUnmount, id, PopupRenderer]);
 
   useEffect(() => {
     if (PopupRenderer && isPopupOpen) {
@@ -296,13 +304,10 @@ type UsePopupHandlerOptions = {
   id: string;
   group: string;
   isOpen: boolean;
-  autoCloseOnUnmount?: boolean;
   onClosed?: () => void;
-  onClosePopup?: () => void;
 };
 export function usePopupHandler(options: UsePopupHandlerOptions) {
-  let { autoCloseOnUnmount, group, isOpen, id, onClosed, onClosePopup } =
-    options;
+  let { group, isOpen, id, onClosed } = options;
 
   const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
   const openPopup = useToolbarStore((store) => store.openPopup);
@@ -319,13 +324,6 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
     if (isOpen) openPopup({ id, group });
     else closePopup(id);
   }, [isOpen, id, group, openPopup, closePopup]);
-
-  useEffect(() => {
-    if (!autoCloseOnUnmount) return;
-    return () => {
-      onClosePopup?.();
-    };
-  }, [autoCloseOnUnmount, onClosePopup]);
 
   useEffect(() => {
     if (!isPopupOpen) onClosed?.();
@@ -358,7 +356,6 @@ export function showPopup(options: ShowPopupOptions) {
     <ThemeProvider>
       <ResponsivePresenter
         isOpen
-        onClose={hide}
         position={{
           target: getToolbarElement(),
           isTargetAbsolute: true,
@@ -369,6 +366,10 @@ export function showPopup(options: ShowPopupOptions) {
         blocking
         focusOnRender
         {...props}
+        onClose={() => {
+          hide();
+          props.onClose?.();
+        }}
       >
         {popup(hide)}
       </ResponsivePresenter>

@@ -1,9 +1,9 @@
 import { Editor, findParentNode, posToDOMRect } from "@tiptap/core";
 import { Node as ProsemirrorNode, Mark } from "prosemirror-model";
-import { Selection, Transaction } from "prosemirror-state";
+import { Selection, EditorState } from "prosemirror-state";
 
 export type NodeWithOffset = {
-  node: ProsemirrorNode;
+  node?: ProsemirrorNode;
   from: number;
   to: number;
 };
@@ -51,9 +51,13 @@ export function findMark(
   return mark;
 }
 
-export function selectionToOffset(selection: Selection): NodeWithOffset {
-  const { $from, from } = selection;
-  return { node: $from.node(), from, to: from + $from.node().nodeSize };
+export function selectionToOffset(state: EditorState): NodeWithOffset {
+  const { $from, from } = state.selection;
+  return {
+    node: state.doc.nodeAt(from) || undefined,
+    from,
+    to: from + $from.node().nodeSize,
+  };
 }
 
 export function findListItemType(editor: Editor): string | null {

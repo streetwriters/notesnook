@@ -94,7 +94,7 @@ export function ImageProperties(props: ToolProps) {
   const buttonRef = useRef<HTMLButtonElement>();
 
   // TODO: defer until user opens the popup
-  const image = useMemo(() => findSelectedNode(editor, "image"), []);
+  const image = findSelectedNode(editor, "image");
   const { float, align, width, height } = (image?.attrs ||
     {}) as ImageAlignmentOptions & ImageSizeOptions;
 

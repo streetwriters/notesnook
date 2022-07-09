@@ -2,7 +2,6 @@ import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
-import { Popup } from "../components/popup";
 import { LinkPopup } from "../popups/link-popup";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
@@ -64,13 +63,14 @@ export function AddLink(props: ToolProps) {
 export function EditLink(props: ToolProps) {
   const { editor, selectedNode: _selectedNode } = props;
   const selectedNode = useRefValue(
-    _selectedNode || selectionToOffset(editor.state.selection)
+    _selectedNode || selectionToOffset(editor.state)
   );
 
   const onDone = useCallback((href: string, text: string) => {
-    if (!href || !editor.current) return;
-
     const { from, node, to } = selectedNode.current;
+
+    if (!href || !editor.current || !node) return;
+
     const mark = findMark(node, "link");
     if (!mark) return;
 
@@ -94,6 +94,8 @@ export function EditLink(props: ToolProps) {
       onDone={onDone}
       onClick={() => {
         const { node } = selectedNode.current;
+        if (!node) return;
+
         const selectedText = node.textContent;
         const mark = findMark(node, "link");
 
@@ -120,9 +122,12 @@ export function RemoveLink(props: ToolProps) {
 }
 
 export function OpenLink(props: ToolProps) {
-  const { editor, selectedNode } = props;
-  const node = selectedNode?.node || editor.state.selection.$anchor.node();
-  const link = selectedNode ? findMark(node, "link") : null;
+  const { editor, selectedNode: _selectedNode } = props;
+  const selectedNode = useRefValue(
+    _selectedNode || selectionToOffset(editor.state)
+  );
+  const { node } = selectedNode.current;
+  const link = node ? findMark(node, "link") : null;
   if (!link) return null;
   const href = link?.attrs.href;
 

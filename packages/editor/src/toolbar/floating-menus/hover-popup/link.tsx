@@ -6,7 +6,7 @@ function LinkHoverPopup(props: HoverPopupProps) {
   const { node } = selectedNode;
 
   if (
-    !node.isText ||
+    !node?.isText ||
     node.marks.length <= 0 ||
     !node.marks.some((mark) => mark.type.name === "link")
   )

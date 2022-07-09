@@ -7,6 +7,7 @@ import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 
 export function ImageComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -14,7 +15,8 @@ export function ImageComponent(
   >
 ) {
   const { editor, updateAttributes, node, selected } = props;
-  const { src, alt, title, width, height, align, float } = node.attrs;
+  const isMobile = useIsMobile();
+  let { src, alt, title, width, height, align, float } = node.attrs;
   const imageRef = useRef<HTMLImageElement>();
 
   useEffect(() => {
@@ -23,6 +25,8 @@ export function ImageComponent(
       imageRef.current.src = await dataUriToBlobURL(src);
     })();
   }, [src, imageRef]);
+
+  if (isMobile) float = false;
 
   return (
     <>

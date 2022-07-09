@@ -140,6 +140,7 @@ export function ActionSheetPresenter(
       onRequestClose={() => onBeforeClose()}
       portalClassName={"bottom-sheet-presenter-portal"}
       onAfterOpen={() => {
+        console.log("OPEGN!");
         animation.start({ transition: TRANSITION, y: 0 });
       }}
       overlayElement={(props, contentEl) => {
