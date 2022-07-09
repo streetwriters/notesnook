@@ -48,5 +48,13 @@ export function EmbedProperties(props) {
                     location: "below",
                     yOffset: 10,
                     isTargetAbsolute: true,
-                } }, { children: _jsx(EmbedPopup, { title: "Embed properties", onClose: () => setIsOpen(false), embed: embed, onSourceChanged: (src) => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setEmbedSource(src); }, onSizeChanged: (size) => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setEmbedSize(size); } }) }))] }));
+                } }, { children: _jsx(EmbedPopup, { title: "Embed properties", onClose: (newEmbed) => {
+                        var _a, _b;
+                        if (!newEmbed) {
+                            (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setEmbedSize(embed);
+                        }
+                        else if (newEmbed.src !== embed.src)
+                            (_b = editor.current) === null || _b === void 0 ? void 0 : _b.commands.setEmbedSource(newEmbed.src);
+                        setIsOpen(false);
+                    }, embed: embed, onSizeChanged: (size) => { var _a; return (_a = editor.current) === null || _a === void 0 ? void 0 : _a.commands.setEmbedSize(size); } }) }))] }));
 }

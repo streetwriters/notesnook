@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { Flex, Text } from "rebass";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { findChildren } from "@tiptap/core";
+import { findChildren, } from "@tiptap/core";
 import { useCallback } from "react";
 import { TaskItemNode } from "./task-item";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
@@ -11,22 +11,26 @@ export function TaskItemComponent(props) {
     const { checked } = props.node.attrs;
     const isMobile = useIsMobile();
     const toggle = useCallback(() => {
+        var _a;
         if (!editor.isEditable)
             return false;
         updateAttributes({ checked: !checked });
+        const pos = getPos();
+        const node = (_a = editor.current) === null || _a === void 0 ? void 0 : _a.state.doc.nodeAt(pos);
+        if (!node)
+            return false;
         editor.commands.command(({ tr }) => {
-            const parentPos = getPos();
-            toggleChildren(node, tr, !checked, parentPos);
+            toggleChildren(node, tr, !checked, pos);
             return true;
         });
         return true;
-    }, [editor, getPos, node, checked]);
+    }, [editor, getPos, checked]);
     return (_jsx(_Fragment, { children: _jsxs(Flex, Object.assign({ "data-drag-image": true, sx: {
                 bg: "background",
                 borderRadius: "default",
                 ":hover > .dragHandle": {
-                    opacity: editor.isEditable ? 1 : 0
-                }
+                    opacity: editor.isEditable ? 1 : 0,
+                },
             } }, { children: [_jsx(Icon, { className: "dragHandle", draggable: "true", "data-drag-handle": true, path: Icons.dragHandle, sx: {
                         opacity: [1, 1, 0],
                         alignSelf: "start",
@@ -34,8 +38,8 @@ export function TaskItemComponent(props) {
                         bg: "transparent",
                         cursor: "grab",
                         ".icon:hover path": {
-                            fill: "var(--checked) !important"
-                        }
+                            fill: "var(--checked) !important",
+                        },
                     }, size: isMobile ? 24 : 20 }), _jsx(Icon, { path: checked ? Icons.check : "", stroke: "1px", sx: {
                         border: "2px solid",
                         borderColor: checked ? "checked" : "icon",
@@ -45,11 +49,11 @@ export function TaskItemComponent(props) {
                         p: "1px",
                         cursor: editor.isEditable ? "pointer" : "unset",
                         ":hover": {
-                            borderColor: "checked"
+                            borderColor: "checked",
                         },
                         ":hover .icon path": {
-                            fill: "var(--checked) !important"
-                        }
+                            fill: "var(--checked) !important",
+                        },
                     }, onMouseDown: (e) => {
                         e.preventDefault();
                         toggle();
@@ -57,11 +61,11 @@ export function TaskItemComponent(props) {
                         e.preventDefault();
                         toggle();
                     }, color: checked ? "checked" : "icon", size: isMobile ? 16 : 14 }), _jsx(Text, { as: "div", ref: forwardRef, sx: {
-                        p: {
+                        "> .taskitem-content-wrapper > p": {
                             textDecorationLine: checked ? "line-through" : "none",
-                            opacity: checked ? 0.8 : 1
+                            opacity: checked ? 0.8 : 1,
                         },
-                        flex: 1
+                        flex: 1,
                     } })] })) }));
 }
 function toggleChildren(node, tr, toggleState, parentPos) {
@@ -70,7 +74,7 @@ function toggleChildren(node, tr, toggleState, parentPos) {
         // need to add 1 to get inside the node
         const actualPos = pos + parentPos + 1;
         tr.setNodeMarkup(actualPos, undefined, {
-            checked: toggleState
+            checked: toggleState,
         });
     }
     return tr;

@@ -10,7 +10,7 @@ const lib_1 = require("@social-embed/lib");
 const inlineinput_1 = require("../../components/inlineinput");
 const tabs_1 = require("../../components/tabs");
 function EmbedPopup(props) {
-    const { onClose, onSizeChanged, onSourceChanged, title, embed } = props;
+    const { onClose, onSizeChanged, title, embed } = props;
     const [width, setWidth] = (0, react_1.useState)((embed === null || embed === void 0 ? void 0 : embed.width) || 300);
     const [height, setHeight] = (0, react_1.useState)((embed === null || embed === void 0 ? void 0 : embed.height) || 150);
     const [src, setSrc] = (0, react_1.useState)((embed === null || embed === void 0 ? void 0 : embed.src) || "");
@@ -36,11 +36,8 @@ function EmbedPopup(props) {
         if (onSizeChanged)
             onSizeChanged(size);
     }, [width, height]);
-    (0, react_1.useEffect)(() => {
-        onSourceChanged && onSourceChanged(src);
-    }, [onSourceChanged, src]);
     return ((0, jsx_runtime_1.jsx)(popup_1.Popup, Object.assign({ title: title, onClose: () => onClose(), action: {
-            title,
+            title: "Save",
             onClick: () => {
                 setError(null);
                 let _src = src;

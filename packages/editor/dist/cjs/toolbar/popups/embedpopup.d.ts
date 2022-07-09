@@ -5,6 +5,5 @@ export declare type EmbedPopupProps = {
     title: string;
     embed?: Embed;
     onSizeChanged?: (size: EmbedSizeOptions) => void;
-    onSourceChanged?: (src: string) => void;
 };
 export declare function EmbedPopup(props: EmbedPopupProps): JSX.Element;

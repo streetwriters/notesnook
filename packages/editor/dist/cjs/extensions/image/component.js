@@ -12,13 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImageComponent = void 0;
 const jsx_runtime_1 = require("react/jsx-runtime");
 const rebass_1 = require("rebass");
-const re_resizable_1 = require("re-resizable");
 const react_1 = require("react");
 const responsive_1 = require("../../components/responsive");
 const icon_1 = require("../../toolbar/components/icon");
 const icons_1 = require("../../toolbar/icons");
 const toolbargroup_1 = require("../../toolbar/components/toolbargroup");
 const toolbarstore_1 = require("../../toolbar/stores/toolbarstore");
+const resizer_1 = require("../../components/resizer");
 function ImageComponent(props) {
     const { editor, updateAttributes, node, selected } = props;
     const isMobile = (0, toolbarstore_1.useIsMobile)();
@@ -43,63 +43,39 @@ function ImageComponent(props) {
                             ? "start"
                             : "end",
                 ":hover .drag-handle, :active .drag-handle": {
-                    opacity: 1
-                }
-            } }, { children: (0, jsx_runtime_1.jsxs)(re_resizable_1.Resizable, Object.assign({ enable: {
-                    bottom: false,
-                    left: false,
-                    right: false,
-                    top: false,
-                    bottomLeft: false,
-                    bottomRight: editor.isEditable && selected,
-                    topLeft: false,
-                    topRight: false
-                }, handleComponent: {
-                    bottomRight: ((0, jsx_runtime_1.jsx)(icon_1.Icon, { sx: {
-                            width: 25,
-                            height: 25,
-                            marginLeft: -17,
-                            marginTop: -17,
-                            borderTopLeftRadius: "default",
-                            borderBottomRightRadius: "default"
-                        }, path: icons_1.Icons.resize, size: 25, color: "primary" }))
-                }, style: {
-                    position: "relative",
-                    float: float ? (align === "left" ? "left" : "right") : "none"
-                }, size: {
-                    height: height || "auto",
-                    width: width || "auto"
-                }, maxWidth: "100%", onResizeStop: (e, direction, ref, d) => {
+                    opacity: 1,
+                },
+            } }, { children: (0, jsx_runtime_1.jsxs)(resizer_1.Resizer, Object.assign({ editor: editor, selected: selected, width: width, height: height, onResize: (width, height) => {
                     updateAttributes({
-                        width: ref.clientWidth,
-                        height: ref.clientHeight
+                        width,
+                        height,
                     }, { addToHistory: true, preventUpdate: false });
-                }, lockAspectRatio: true }, { children: [(0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: { position: "relative", justifyContent: "end" } }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: {
+                } }, { children: [(0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: { position: "relative", justifyContent: "end" } }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: {
                                     position: "absolute",
                                     top: -40,
                                     mb: 2,
-                                    alignItems: "end"
+                                    alignItems: "end",
                                 } }, { children: (0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { editor: editor, tools: [
                                         "imageAlignLeft",
                                         "imageAlignCenter",
                                         "imageAlignRight",
-                                        "imageProperties"
+                                        "imageProperties",
                                     ], sx: {
                                         boxShadow: "menu",
                                         borderRadius: "default",
-                                        bg: "background"
+                                        bg: "background",
                                     } }) })) }))) }), selected && ((0, jsx_runtime_1.jsx)(icon_1.Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: icons_1.Icons.dragHandle, sx: {
                             cursor: "grab",
                             position: "absolute",
                             top: 2,
                             left: 2,
-                            zIndex: 999
+                            zIndex: 999,
                         } })), (0, jsx_runtime_1.jsx)(rebass_1.Image, Object.assign({ "data-drag-image": true, ref: imageRef, alt: alt, src: "/placeholder.svg", title: title, width: "100%", height: "100%", sx: {
                             bg: "bgSecondary",
                             border: selected
                                 ? "2px solid var(--primary)"
                                 : "2px solid transparent",
-                            borderRadius: "default"
+                            borderRadius: "default",
                         } }, props))] })) })) }));
 }
 exports.ImageComponent = ImageComponent;

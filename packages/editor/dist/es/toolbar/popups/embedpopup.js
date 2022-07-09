@@ -1,13 +1,13 @@
 import { jsxs as _jsxs, jsx as _jsx } from "react/jsx-runtime";
 import { Flex, Text } from "rebass";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Popup } from "../components/popup";
 import { Input, Textarea } from "@rebass/forms";
 import { convertUrlToEmbedUrl } from "@social-embed/lib";
 import { InlineInput } from "../../components/inline-input";
 import { Tabs, Tab } from "../../components/tabs";
 export function EmbedPopup(props) {
-    const { onClose, onSizeChanged, onSourceChanged, title, embed } = props;
+    const { onClose, onSizeChanged, title, embed } = props;
     const [width, setWidth] = useState((embed === null || embed === void 0 ? void 0 : embed.width) || 300);
     const [height, setHeight] = useState((embed === null || embed === void 0 ? void 0 : embed.height) || 150);
     const [src, setSrc] = useState((embed === null || embed === void 0 ? void 0 : embed.src) || "");
@@ -33,11 +33,8 @@ export function EmbedPopup(props) {
         if (onSizeChanged)
             onSizeChanged(size);
     }, [width, height]);
-    useEffect(() => {
-        onSourceChanged && onSourceChanged(src);
-    }, [onSourceChanged, src]);
     return (_jsx(Popup, Object.assign({ title: title, onClose: () => onClose(), action: {
-            title,
+            title: "Save",
             onClick: () => {
                 setError(null);
                 let _src = src;
