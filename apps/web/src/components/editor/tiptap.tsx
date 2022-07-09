@@ -24,6 +24,7 @@ import { showBuyDialog } from "../../common/dialog-controller";
 
 type TipTapProps = {
   editorContainer: HTMLElement;
+  onLoad?: () => void;
   onChange?: (content: string) => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
@@ -36,6 +37,7 @@ type TipTapProps = {
 
 function TipTap(props: TipTapProps) {
   const {
+    onLoad,
     onChange,
     onInsertAttachment,
     onDownloadAttachment,
@@ -84,9 +86,12 @@ function TipTap(props: TipTapProps) {
             },
           },
         });
+        if (onLoad) onLoad();
       },
       onUpdate: ({ editor }) => {
-        if (onChange && editor.isEditable) onChange(editor.getHTML());
+        if (!editor.isEditable) return;
+
+        if (onChange) onChange(editor.getHTML());
         configure({
           statistics: {
             words: {
@@ -135,7 +140,8 @@ function TipTap(props: TipTapProps) {
         return true;
       },
     },
-    [readonly, nonce, isMobile]
+    // IMPORTANT: only put stuff here that the editor depends on.
+    [readonly, nonce]
   );
 
   useEffect(() => {
@@ -205,17 +211,18 @@ function Portal(props: PropsWithChildren<{ containerId?: string }>) {
 
 function toIEditor(editor: Editor): IEditor {
   return {
-    focus: () => editor.commands.focus("start"),
-    undo: () => editor.commands.undo(),
-    redo: () => editor.commands.redo(),
+    focus: () => editor.current?.commands.focus("start"),
+    undo: () => editor.current?.commands.undo(),
+    redo: () => editor.current?.commands.redo(),
     attachFile: (file: Attachment) => {
       if (file.dataurl) {
-        editor.commands.insertImage({ ...file, src: file.dataurl });
-      } else editor.commands.insertAttachment(file);
+        editor.current?.commands.insertImage({ ...file, src: file.dataurl });
+      } else editor.current?.commands.insertAttachment(file);
     },
-    loadImage: (hash, src) => editor.commands.updateImage({ hash, src }),
+    loadImage: (hash, src) =>
+      editor.current?.commands.updateImage({ hash, src }),
     sendAttachmentProgress: (hash, type, progress) =>
-      editor.commands.setAttachmentProgress({
+      editor.current?.commands.setAttachmentProgress({
         hash,
         type: type as any,
         progress,

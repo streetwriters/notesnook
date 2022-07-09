@@ -87,8 +87,19 @@ export default function EditorManager({
     title.current = session.title;
     content.current = sessionContent?.data;
     setTimestamp(Date.now());
-    if (noteId && sessionContent) await db.attachments?.downloadImages(noteId);
   }, []);
+
+  const loadMedia = useCallback(async () => {
+    if (previewSession.current) {
+      await db.content?.downloadMedia(
+        noteId,
+        previewSession.current.content,
+        true
+      );
+    } else if (noteId && content.current) {
+      await db.attachments?.downloadImages(noteId);
+    }
+  }, [noteId]);
 
   useEffect(() => {
     if (!isNewSession) return;
@@ -133,6 +144,7 @@ export default function EditorManager({
         options={{
           readonly: isReadonly,
           onRequestFocus: () => toggleProperties(false),
+          onLoadMedia: loadMedia,
         }}
       />
       {arePropertiesVisible && (
@@ -142,10 +154,6 @@ export default function EditorManager({
             content.current = sessionContent.data;
             previewSession.current = session;
             setTimestamp(Date.now());
-
-            if (noteId && sessionContent.data) {
-              await db.content?.downloadMedia(noteId, sessionContent, true);
-            }
           }}
         />
       )}
@@ -159,6 +167,7 @@ type EditorOptions = {
   readonly?: boolean;
   focusMode?: boolean;
   onRequestFocus?: () => void;
+  onLoadMedia?: () => void;
 };
 type EditorProps = {
   title?: string;
@@ -168,7 +177,7 @@ type EditorProps = {
 };
 export function Editor(props: EditorProps) {
   const { content, nonce, options } = props;
-  const { readonly, headless } = options || {
+  const { readonly, headless, onLoadMedia } = options || {
     headless: false,
     readonly: false,
     focusMode: false,
@@ -219,6 +228,9 @@ export function Editor(props: EditorProps) {
         readonly={readonly}
         toolbarContainerId={headless ? undefined : "editorToolbar"}
         content={content}
+        onLoad={() => {
+          if (onLoadMedia) onLoadMedia();
+        }}
         onChange={(content) => {
           const { id, sessionId } = editorstore.get().session;
           debouncedOnEditorChange(sessionId, id, sessionId, content);
