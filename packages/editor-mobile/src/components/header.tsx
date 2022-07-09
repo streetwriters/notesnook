@@ -14,7 +14,7 @@ const Button = ({
   onPress,
   children,
   style,
-  preventDefault = true,
+  preventDefault = true
 }: {
   onPress: () => void;
   children: React.ReactNode;
@@ -40,7 +40,7 @@ export default React.memo(
     noHeader,
     settings,
     hasUndo,
-    hasRedo,
+    hasRedo
   }: {
     noHeader: boolean;
     settings: Settings;
@@ -56,7 +56,7 @@ export default React.memo(
           height: noHeader ? `${insets.top}px` : `${50 + insets.top}px`,
           backgroundColor: "var(--nn_bg)",
           position: "sticky",
-          width: "100vw",
+          width: "100vw"
         }}
       >
         {noHeader ? null : (
@@ -68,7 +68,7 @@ export default React.memo(
               flexDirection: "row",
               paddingTop: insets.top,
               height: 50,
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Button
@@ -85,18 +85,25 @@ export default React.memo(
                 height: 40,
                 display: "flex",
                 justifyContent: "center",
-                alignItems: "start",
+                alignItems: "center",
                 flexDirection: "column",
+                position: "relative"
               }}
             >
-              <ArrowBackIcon size={28} color="var(--nn_pri)" />
+              <ArrowBackIcon
+                size={27}
+                style={{
+                  position: "absolute"
+                }}
+                color="var(--nn_pri)"
+              />
             </Button>
 
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                flexDirection: "row",
+                flexDirection: "row"
               }}
             >
               <Button
@@ -113,11 +120,15 @@ export default React.memo(
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  position: "relative"
                 }}
               >
                 <ArrowULeftTopIcon
-                  size={28}
                   color={!hasUndo ? "var(--nn_nav)" : "var(--nn_pri)"}
+                  size={25}
+                  style={{
+                    position: "absolute"
+                  }}
                 />
               </Button>
 
@@ -135,11 +146,15 @@ export default React.memo(
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  position: "relative"
                 }}
               >
                 <ArrowURightTopIcon
-                  size={28}
                   color={!hasRedo ? "var(--nn_nav)" : "var(--nn_pri)"}
+                  size={25}
+                  style={{
+                    position: "absolute"
+                  }}
                 />
               </Button>
               {!settings.premium && (
@@ -158,9 +173,16 @@ export default React.memo(
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
+                    position: "relative"
                   }}
                 >
-                  <CrownIcon size={28} color="orange" />
+                  <CrownIcon
+                    size={25}
+                    style={{
+                      position: "absolute"
+                    }}
+                    color="orange"
+                  />
                 </Button>
               )}
               <Button
@@ -172,15 +194,21 @@ export default React.memo(
                   borderRadius: 100,
                   color: "var(--nn_icon)",
                   marginRight: 10,
-
                   width: 39,
                   height: 39,
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  position: "relative"
                 }}
               >
-                <MagnifyIcon size={28} color="var(--nn_pri)" />
+                <MagnifyIcon
+                  size={25}
+                  style={{
+                    position: "absolute"
+                  }}
+                  color="var(--nn_pri)"
+                />
               </Button>
               <Button
                 onPress={() => {
@@ -197,9 +225,16 @@ export default React.memo(
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  position: "relative"
                 }}
               >
-                <CloudUploadOutlineIcon size={28} color="var(--nn_pri)" />
+                <CloudUploadOutlineIcon
+                  size={25}
+                  style={{
+                    position: "absolute"
+                  }}
+                  color="var(--nn_pri)"
+                />
               </Button>
 
               <Button
@@ -217,9 +252,16 @@ export default React.memo(
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  position: "relative"
                 }}
               >
-                <DotsHorizontalIcon size={28} color="var(--nn_pri)" />
+                <DotsHorizontalIcon
+                  size={25}
+                  style={{
+                    position: "absolute"
+                  }}
+                  color="var(--nn_pri)"
+                />
               </Button>
             </div>
           </div>

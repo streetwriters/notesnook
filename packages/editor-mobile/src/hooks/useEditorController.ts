@@ -1,12 +1,10 @@
 import { Editor } from "notesnook-editor";
 import {
-  Dispatch,
   MutableRefObject,
-  SetStateAction,
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from "react";
 import { useEditorThemeStore } from "../state/theme";
 import { EventTypes, isReactNative, post, timerFn } from "../utils";
@@ -56,7 +54,7 @@ export function useEditorController(
   const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
-    change: null,
+    change: null
   });
 
   const selectionChange = useCallback((editor: Editor) => {
@@ -127,6 +125,10 @@ export function useEditorController(
 
   const onMessage = useCallback(
     (data: Event) => {
+      console.log(data);
+
+      //@ts-ignore
+      if (data?.data[0] !== "{") return;
       //@ts-ignore
       let message = JSON.parse(data.data);
       let type = message.type;
@@ -200,6 +202,6 @@ export function useEditorController(
     openFilePicker,
     downloadAttachment,
     content: htmlContentRef,
-    onUpdate: onUpdate,
+    onUpdate: onUpdate
   };
 }

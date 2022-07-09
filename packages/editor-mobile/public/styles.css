@@ -10,6 +10,16 @@
   background-color: var(--bgSecondary);
 }
 
+.ProseMirror:first-child {
+  margin-top: 10px;
+}
+
+.ProseMirror hr {
+  background-color: var(--border);
+  border-width: 0;
+  height: 2px;
+}
+
 .ProseMirror code:not(pre code) {
   background-color: var(--bgSecondary);
   border: 1px solid var(--border);
