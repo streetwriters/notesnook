@@ -70,7 +70,8 @@ const MergeConflicts = () => {
       'TopicNotes'
     );
     if (editorController.current?.note?.id === note.id) {
-      //TODO
+      // reload the note in editor
+      eSendEvent(eOnLoadNote, { ...editorController.current?.note, forced: true });
     }
     close();
     await Sync.run();
