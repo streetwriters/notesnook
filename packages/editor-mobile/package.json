@@ -1,6 +1,6 @@
 {
   "name": "tiptap",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@notesnook/theme": "git+https://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:x-oauth-basic@github.com/streetwriters/themeprovider.git",
