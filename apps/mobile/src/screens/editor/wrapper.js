@@ -16,7 +16,6 @@ import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
-import EditorOverlay from './loading';
 import { ProgressBar } from './progress';
 import { editorController, editorState, textInput } from './tiptap/utils';
 
@@ -56,30 +55,24 @@ export const EditorWrapper = ({ width }) => {
       }}
     >
       {loading || !introCompleted ? null : (
-        <SafeAreaView
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{
             flex: 1
           }}
+          enabled={!floating}
+          keyboardVerticalOffset={0}
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{
-              flex: 1
-            }}
-            enabled={!floating}
-            keyboardVerticalOffset={0}
-          >
-            <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
-            <TextInput
-              key="input"
-              ref={textInput}
-              style={{ height: 1, padding: 0, width: 1, position: 'absolute' }}
-              blurOnSubmit={false}
-            />
-            <ProgressBar />
-            <Editor key="editor" withController={true} />
-          </KeyboardAvoidingView>
-        </SafeAreaView>
+          <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
+          <TextInput
+            key="input"
+            ref={textInput}
+            style={{ height: 1, padding: 0, width: 1, position: 'absolute' }}
+            blurOnSubmit={false}
+          />
+          <ProgressBar />
+          <Editor key="editor" withController={true} />
+        </KeyboardAvoidingView>
       )}
     </View>
   );
