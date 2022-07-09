@@ -84,6 +84,7 @@ import {
   mdiFormatHeaderPound,
   mdiFormatIndentIncrease,
   mdiFormatIndentDecrease,
+  mdiResizeBottomRight
 } from "@mdi/js";
 
 export const Icons = {
@@ -191,8 +192,8 @@ export const Icons = {
   chevronLeft: mdiChevronLeft,
   circle: mdiCircle,
   arrowLeft: mdiArrowLeft,
-
-  none: "",
+  resize: mdiResizeBottomRight,
+  none: ""
 };
 
 export type IconNames = keyof typeof Icons;

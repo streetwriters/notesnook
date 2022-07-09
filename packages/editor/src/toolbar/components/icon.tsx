@@ -18,7 +18,7 @@ function MDIIconWrapper({
   size = 24,
   color = "icon",
   stroke,
-  rotate,
+  rotate
 }: IconProps) {
   const theme = useTheme();
 
@@ -38,7 +38,7 @@ function MDIIconWrapper({
       }
       style={{
         strokeWidth: stroke || "0px",
-        stroke: themedColor,
+        stroke: themedColor
       }}
       color={themedColor}
       spin={rotate}
@@ -57,7 +57,7 @@ export function Icon(props: NNIconProps) {
         flexShrink: 0,
         justifyContent: "center",
         alignItems: "center",
-        ...sx,
+        ...sx
       }}
       {...restProps}
     >

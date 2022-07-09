@@ -5,6 +5,7 @@ import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
+import { Icon, Icons } from "../../toolbar";
 
 export function EmbedComponent(
   props: SelectionBasedReactNodeViewProps<
@@ -21,30 +22,47 @@ export function EmbedComponent(
         sx={{
           display: "flex",
           justifyContent:
-            align === "center" ? "center" : align === "left" ? "start" : "end",
+            align === "center" ? "center" : align === "left" ? "start" : "end"
         }}
       >
         <Resizable
           enable={{
-            bottom: editor.isEditable,
-            left: editor.isEditable,
-            right: editor.isEditable,
-            top: editor.isEditable,
-            bottomLeft: editor.isEditable,
-            bottomRight: editor.isEditable,
-            topLeft: editor.isEditable,
-            topRight: editor.isEditable,
+            bottom: false,
+            left: false,
+            right: false,
+            top: false,
+            bottomLeft: false,
+            bottomRight: editor.isEditable && selected,
+            topLeft: false,
+            topRight: false
           }}
           size={{
             height: height || "auto",
-            width: width || "auto",
+            width: width || "auto"
           }}
           maxWidth="100%"
+          handleComponent={{
+            bottomRight: (
+              <Icon
+                sx={{
+                  width: 25,
+                  height: 25,
+                  marginLeft: -17,
+                  marginTop: "3px",
+                  borderTopLeftRadius: "default",
+                  borderBottomRightRadius: "default"
+                }}
+                path={Icons.resize}
+                size={25}
+                color="primary"
+              />
+            )
+          }}
           onResizeStop={(e, direction, ref, d) => {
             updateAttributes(
               {
                 width: ref.clientWidth,
-                height: ref.clientHeight,
+                height: ref.clientHeight
               },
               { addToHistory: true, preventUpdate: false }
             );
@@ -67,8 +85,8 @@ export function EmbedComponent(
               borderColor: selected ? "border" : "bgSecondary",
               cursor: "pointer",
               ":hover": {
-                borderColor: "border",
-              },
+                borderColor: "border"
+              }
             }}
           >
             <DesktopOnly>
@@ -79,7 +97,7 @@ export function EmbedComponent(
                       position: "absolute",
                       top: -40,
                       mb: 2,
-                      alignItems: "end",
+                      alignItems: "end"
                     }}
                   >
                     <ToolbarGroup
@@ -88,12 +106,12 @@ export function EmbedComponent(
                         "embedAlignLeft",
                         "embedAlignCenter",
                         "embedAlignRight",
-                        "embedProperties",
+                        "embedProperties"
                       ]}
                       sx={{
                         boxShadow: "menu",
                         borderRadius: "default",
-                        bg: "background",
+                        bg: "background"
                       }}
                     />
                   </Flex>
@@ -111,7 +129,7 @@ export function EmbedComponent(
               border: selected
                 ? "2px solid var(--primary)"
                 : "2px solid transparent",
-              borderRadius: "default",
+              borderRadius: "default"
             }}
             {...props}
           />
