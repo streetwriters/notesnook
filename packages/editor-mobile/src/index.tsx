@@ -5,6 +5,8 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import "notesnook-editor/styles/katex.min.css";
 import "notesnook-editor/styles/prism-theme.css";
+import "notesnook-editor/styles/fonts.css";
+import "notesnook-editor/styles/styles.css";
 
 ReactDOM.render(
   <React.StrictMode>
