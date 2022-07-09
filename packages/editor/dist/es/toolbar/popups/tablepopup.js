@@ -15,11 +15,11 @@ export function TablePopup(props) {
     const { onInsertTable } = props;
     const [cellLocation, setCellLocation] = useState({
         column: 0,
-        row: 0,
+        row: 0
     });
     const [tableSize, setTableSize] = useState({
         columns: MIN_COLUMNS,
-        rows: MIN_ROWS,
+        rows: MIN_ROWS
     });
     useEffect(() => {
         if (!autoExpand)
@@ -36,7 +36,7 @@ export function TablePopup(props) {
                     : Math.min(old.columns + columnFactor, MAX_COLUMNS),
                 rows: isDecrease
                     ? Math.max(row + rowFactor, MIN_ROWS)
-                    : Math.min(old.rows + rowFactor, MAX_ROWS),
+                    : Math.min(old.rows + rowFactor, MAX_ROWS)
             };
         });
     }, [cellLocation, autoExpand]);
@@ -47,14 +47,14 @@ export function TablePopup(props) {
             disabled: !cellLocation.column || !cellLocation.row,
             onClick: () => onInsertTable({
                 columns: cellLocation.column,
-                rows: cellLocation.row,
-            }),
+                rows: cellLocation.row
+            })
         } }, { children: _jsxs(Flex, Object.assign({ sx: { px: 1, pt: 1, flexDirection: "column", alignItems: "center" } }, { children: [_jsx(Box, Object.assign({ sx: {
                         display: "grid",
                         gridTemplateColumns: `repeat(${tableSize.columns}, minmax(${cellSize}px, 1fr))`,
                         gap: "small",
                         bg: "background",
-                        width: "100%",
+                        width: "100%"
                     }, onTouchMove: (e) => {
                         const touch = e.touches.item(0);
                         const element = document.elementFromPoint(touch.pageX, touch.pageY);
@@ -71,21 +71,23 @@ export function TablePopup(props) {
                             borderRadius: "small",
                             bg: isCellHighlighted(index, cellLocation, tableSize)
                                 ? "disabled"
-                                : "transparent",
+                                : "transparent"
                         }, onTouchStart: () => {
                             setCellLocation(getCellLocation(index, tableSize));
                         }, onMouseEnter: () => {
                             setCellLocation(getCellLocation(index, tableSize));
+                        }, onTouchEnd: (e) => {
+                            e.preventDefault();
                         }, onClick: () => {
                             onInsertTable({
                                 columns: cellLocation.column,
-                                rows: cellLocation.row,
+                                rows: cellLocation.row
                             });
                         } }, index))) })), _jsxs(Flex, Object.assign({ sx: {
                         display: ["flex", "none", "none"],
                         mt: 1,
                         alignItems: "center",
-                        justifyContent: "center",
+                        justifyContent: "center"
                     } }, { children: [_jsx(InlineInput, { containerProps: { sx: { mr: 1 } }, label: "columns", placeholder: `${cellLocation.column} columns`, type: "number", value: cellLocation.column, onChange: (e) => {
                                 setCellLocation((l) => (Object.assign(Object.assign({}, l), { column: e.target.valueAsNumber || 0 })));
                             } }), _jsx(InlineInput, { label: "rows", placeholder: `${cellLocation.row} rows`, type: "number", value: cellLocation.row, onChange: (e) => {

@@ -26,11 +26,11 @@ export function TablePopup(props: TablePopupProps) {
   const { onInsertTable } = props;
   const [cellLocation, setCellLocation] = useState<CellLocation>({
     column: 0,
-    row: 0,
+    row: 0
   });
   const [tableSize, setTableSize] = useState<TableSize>({
     columns: MIN_COLUMNS,
-    rows: MIN_ROWS,
+    rows: MIN_ROWS
   });
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export function TablePopup(props: TablePopupProps) {
           : Math.min(old.columns + columnFactor, MAX_COLUMNS),
         rows: isDecrease
           ? Math.max(row + rowFactor, MIN_ROWS)
-          : Math.min(old.rows + rowFactor, MAX_ROWS),
+          : Math.min(old.rows + rowFactor, MAX_ROWS)
       };
     });
   }, [cellLocation, autoExpand]);
@@ -66,8 +66,8 @@ export function TablePopup(props: TablePopupProps) {
         onClick: () =>
           onInsertTable({
             columns: cellLocation.column,
-            rows: cellLocation.row,
-          }),
+            rows: cellLocation.row
+          })
       }}
     >
       <Flex
@@ -79,7 +79,7 @@ export function TablePopup(props: TablePopupProps) {
             gridTemplateColumns: `repeat(${tableSize.columns}, minmax(${cellSize}px, 1fr))`, // "1fr ".repeat(tableSize.columns),
             gap: "small",
             bg: "background",
-            width: "100%",
+            width: "100%"
           }}
           onTouchMove={(e) => {
             const touch = e.touches.item(0);
@@ -105,7 +105,7 @@ export function TablePopup(props: TablePopupProps) {
                   borderRadius: "small",
                   bg: isCellHighlighted(index, cellLocation, tableSize)
                     ? "disabled"
-                    : "transparent",
+                    : "transparent"
                 }}
                 onTouchStart={() => {
                   setCellLocation(getCellLocation(index, tableSize));
@@ -113,10 +113,13 @@ export function TablePopup(props: TablePopupProps) {
                 onMouseEnter={() => {
                   setCellLocation(getCellLocation(index, tableSize));
                 }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                }}
                 onClick={() => {
                   onInsertTable({
                     columns: cellLocation.column,
-                    rows: cellLocation.row,
+                    rows: cellLocation.row
                   });
                 }}
               />
@@ -127,7 +130,7 @@ export function TablePopup(props: TablePopupProps) {
             display: ["flex", "none", "none"],
             mt: 1,
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "center"
           }}
         >
           <InlineInput
@@ -139,7 +142,7 @@ export function TablePopup(props: TablePopupProps) {
             onChange={(e) => {
               setCellLocation((l) => ({
                 ...l,
-                column: e.target.valueAsNumber || 0,
+                column: e.target.valueAsNumber || 0
               }));
             }}
           />
@@ -151,7 +154,7 @@ export function TablePopup(props: TablePopupProps) {
             onChange={(e) => {
               setCellLocation((l) => ({
                 ...l,
-                row: e.target.valueAsNumber || 0,
+                row: e.target.valueAsNumber || 0
               }));
             }}
           />
