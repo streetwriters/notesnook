@@ -41,35 +41,52 @@ export function ImageComponent(
             ? "start"
             : "end",
           ":hover .drag-handle, :active .drag-handle": {
-            opacity: 1,
-          },
+            opacity: 1
+          }
         }}
       >
         <Resizable
           enable={{
-            bottom: editor.isEditable,
-            left: editor.isEditable,
-            right: editor.isEditable,
-            top: editor.isEditable,
-            bottomLeft: editor.isEditable,
-            bottomRight: editor.isEditable,
-            topLeft: editor.isEditable,
-            topRight: editor.isEditable,
+            bottom: false,
+            left: false,
+            right: false,
+            top: false,
+            bottomLeft: false,
+            bottomRight: editor.isEditable && selected,
+            topLeft: false,
+            topRight: false
+          }}
+          handleComponent={{
+            bottomRight: (
+              <Icon
+                sx={{
+                  width: 25,
+                  height: 25,
+                  marginLeft: -17,
+                  marginTop: -17,
+                  borderTopLeftRadius: "default",
+                  borderBottomRightRadius: "default"
+                }}
+                path={Icons.resize}
+                size={25}
+                color="primary"
+              />
+            )
           }}
           style={{
             position: "relative",
-            float: float ? (align === "left" ? "left" : "right") : "none",
+            float: float ? (align === "left" ? "left" : "right") : "none"
           }}
           size={{
             height: height || "auto",
-            width: width || "auto",
+            width: width || "auto"
           }}
           maxWidth="100%"
           onResizeStop={(e, direction, ref, d) => {
             updateAttributes(
               {
                 width: ref.clientWidth,
-                height: ref.clientHeight,
+                height: ref.clientHeight
               },
               { addToHistory: true, preventUpdate: false }
             );
@@ -84,7 +101,7 @@ export function ImageComponent(
                     position: "absolute",
                     top: -40,
                     mb: 2,
-                    alignItems: "end",
+                    alignItems: "end"
                   }}
                 >
                   <ToolbarGroup
@@ -93,12 +110,12 @@ export function ImageComponent(
                       "imageAlignLeft",
                       "imageAlignCenter",
                       "imageAlignRight",
-                      "imageProperties",
+                      "imageProperties"
                     ]}
                     sx={{
                       boxShadow: "menu",
                       borderRadius: "default",
-                      bg: "background",
+                      bg: "background"
                     }}
                   />
                 </Flex>
@@ -116,7 +133,7 @@ export function ImageComponent(
                 position: "absolute",
                 top: 2,
                 left: 2,
-                zIndex: 999,
+                zIndex: 999
               }}
             />
           )}
@@ -133,7 +150,7 @@ export function ImageComponent(
               border: selected
                 ? "2px solid var(--primary)"
                 : "2px solid transparent",
-              borderRadius: "default",
+              borderRadius: "default"
             }}
             {...props}
           />
