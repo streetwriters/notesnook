@@ -278,6 +278,8 @@ export default class Vault {
       headline: "",
       title: note.title,
       favorite: note.favorite,
+      localOnly: note.localOnly,
+      readonly: note.readonly,
       dateEdited: Date.now(),
     });
   }
