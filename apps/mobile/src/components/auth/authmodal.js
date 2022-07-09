@@ -11,6 +11,8 @@ import { IconButton } from '../ui/icon-button';
 import { hideAuth, initialAuthMode } from './common';
 import { Login } from './login';
 import { Signup } from './signup';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform, View } from 'react-native';
 
 export const AuthMode = {
   login: 0,
@@ -24,6 +26,7 @@ const AuthModal = () => {
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     eSubscribeEvent(eOpenLoginDialog, open);
@@ -74,46 +77,49 @@ const AuthModal = () => {
         />
       )}
 
-      {initialAuthMode.current === AuthMode.welcomeSignup ? null : (
-        <IconButton
-          name="arrow-left"
-          onPress={() => {
-            hideAuth();
-          }}
-          color={colors.pri}
-          customStyle={{
-            position: 'absolute',
-            zIndex: 999,
-            left: 12,
-            top: 0
-          }}
-        />
-      )}
+      <View
+        style={{
+          position: 'absolute',
+          top: Platform.OS === 'ios' ? insets.top : 0,
+          zIndex: 999,
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 12,
+          width: '100%',
+          height: 50,
+          justifyContent: 'space-between'
+        }}
+      >
+        {initialAuthMode.current === AuthMode.welcomeSignup ? null : (
+          <IconButton
+            name="arrow-left"
+            onPress={() => {
+              hideAuth();
+            }}
+            color={colors.pri}
+          />
+        )}
 
-      {initialAuthMode.current !== AuthMode.welcomeSignup ? null : (
-        <Button
-          title="Skip"
-          onPress={() => {
-            hideAuth();
-          }}
-          iconSize={20}
-          type="gray"
-          iconPosition="right"
-          icon="chevron-right"
-          height={25}
-          iconStyle={{
-            marginTop: 2
-          }}
-          style={{
-            position: 'absolute',
-            zIndex: 999,
-            right: 12,
-            top: 0,
-            marginTop: 12.5,
-            paddingHorizontal: 6
-          }}
-        />
-      )}
+        {initialAuthMode.current !== AuthMode.welcomeSignup ? null : (
+          <Button
+            title="Skip for now"
+            onPress={() => {
+              hideAuth();
+            }}
+            iconSize={20}
+            type="gray"
+            iconPosition="right"
+            icon="chevron-right"
+            height={25}
+            iconStyle={{
+              marginTop: 2
+            }}
+            style={{
+              paddingHorizontal: 6
+            }}
+          />
+        )}
+      </View>
 
       <Toast context="local" />
     </BaseDialog>
