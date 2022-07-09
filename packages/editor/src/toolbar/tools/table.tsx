@@ -390,7 +390,6 @@ const cellProperties = (editor: Editor): MenuButton => ({
   type: "button",
   onClick: () => {
     showPopup({
-      theme: editor.storage.theme,
       popup: (hide) => <CellPropertiesPopup onClose={hide} editor={editor} />,
     });
   },

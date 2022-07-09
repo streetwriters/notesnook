@@ -69,7 +69,6 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
                 }}
               />
             ),
-            theme: editor.storage.theme,
             blocking: false,
             focusOnRender: false,
             position: {

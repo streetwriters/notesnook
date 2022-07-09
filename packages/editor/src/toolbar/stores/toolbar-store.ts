@@ -1,9 +1,12 @@
+import { Theme } from "@notesnook/theme";
 import create from "zustand";
 
 export type ToolbarLocation = "top" | "bottom";
 
 export type PopupRef = { id: string; group: string };
 interface ToolbarState {
+  theme?: Theme;
+  setTheme: (theme?: Theme) => void;
   isMobile: boolean;
   openedPopups: Record<string, PopupRef | false>;
   setIsMobile: (isMobile: boolean) => void;
@@ -16,11 +19,16 @@ interface ToolbarState {
 }
 
 export const useToolbarStore = create<ToolbarState>((set, get) => ({
+  theme: undefined,
   isMobile: false,
   openedPopups: {},
   setIsMobile: (isMobile) =>
     set((state) => {
       state.isMobile = isMobile;
+    }),
+  setTheme: (theme) =>
+    set((state) => {
+      state.theme = theme;
     }),
   toolbarLocation: "top",
   setToolbarLocation: (location) =>
@@ -60,3 +68,13 @@ export function useToolbarLocation() {
 export function useIsMobile() {
   return useToolbarStore((store) => store.isMobile);
 }
+
+export const useTheme = Object.defineProperty(
+  () => {
+    return useToolbarStore((store) => store.theme);
+  },
+  "theme",
+  {
+    get: () => useToolbarStore.getState().theme,
+  }
+) as (() => Theme | undefined) & { theme: Theme | undefined };

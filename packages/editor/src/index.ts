@@ -66,14 +66,17 @@ const useTiptap = (
     isMobile,
     onDownloadAttachment,
     onOpenAttachmentPicker,
+    onBeforeCreate,
     ...restOptions
   } = options;
   const PortalProviderAPI = usePortalProvider();
   const setIsMobile = useToolbarStore((store) => store.setIsMobile);
+  const setTheme = useToolbarStore((store) => store.setTheme);
 
   useEffect(() => {
     setIsMobile(isMobile || false);
-  }, [isMobile]);
+    setTheme(theme);
+  }, [isMobile, theme]);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
@@ -144,19 +147,16 @@ const useTiptap = (
         KeepInView,
       ],
       onBeforeCreate: ({ editor }) => {
-        if (theme) {
-          editor.storage.theme = theme;
-        }
         editor.storage.portalProviderAPI = PortalProviderAPI;
+        if (onBeforeCreate) onBeforeCreate({ editor });
       },
       injectCSS: false,
     }),
     [
-      theme,
       onDownloadAttachment,
       onOpenAttachmentPicker,
       PortalProviderAPI,
-      isMobile,
+      onBeforeCreate,
     ]
   );
 

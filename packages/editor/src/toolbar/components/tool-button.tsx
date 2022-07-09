@@ -1,6 +1,5 @@
 import { Theme } from "@notesnook/theme";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
-import { useTheme } from "emotion-theming";
 import React from "react";
 import { ButtonProps } from "rebass";
 import { IconNames, Icons } from "../icons";

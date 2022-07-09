@@ -6,8 +6,6 @@ import React, {
   useEffect,
 } from "react";
 import { MenuItem } from "../menu/types";
-import { useTheme } from "emotion-theming";
-import { Theme } from "@notesnook/theme";
 import { Box, Button, Flex, Text } from "rebass";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
@@ -22,6 +20,7 @@ import {
   useTransform,
   useAnimation,
 } from "framer-motion";
+import { useTheme } from "../../toolbar/stores/toolbar-store";
 
 const AnimatedFlex = motion(Flex);
 type ActionSheetHistoryItem = {
@@ -84,7 +83,7 @@ export function ActionSheetPresenter(
     draggable = true,
     children,
   } = props;
-  const theme: Theme = useTheme();
+  const theme = useTheme();
   const contentRef = useRef<HTMLDivElement>();
 
   const y = useMotionValue(0);
@@ -205,7 +204,7 @@ export function ActionSheetPresenter(
           bg: "background",
           borderTopLeftRadius: 15,
           borderTopRightRadius: 15,
-          boxShadow: theme.shadows.menu,
+          boxShadow: theme?.shadows.menu || "none",
           flex: 1,
           flexDirection: "column",
         }}

@@ -10,7 +10,6 @@ import { getPosition, PositionOptions } from "../../utils/position";
 import Modal from "react-modal";
 import ReactDOM from "react-dom";
 import { Editor } from "@tiptap/core";
-import { ThemeProvider } from "emotion-theming";
 import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
 import { Theme } from "@notesnook/theme";
 import {
@@ -24,6 +23,7 @@ import {
   usePopupRenderer,
 } from "./popuprenderer";
 import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
+import { ThemeProvider } from "../theme-provider";
 
 export type PopupPresenterProps = {
   isOpen: boolean;
@@ -345,18 +345,17 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
 }
 
 type ShowPopupOptions = {
-  theme: Theme;
   popup: (closePopup: () => void) => React.ReactNode;
 } & Partial<ResponsivePresenterProps>;
 export function showPopup(options: ShowPopupOptions) {
-  const { theme, popup, ...props } = options;
+  const { popup, ...props } = options;
 
   function hide() {
     ReactDOM.unmountComponentAtNode(getPopupContainer());
   }
 
   ReactDOM.render(
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <ResponsivePresenter
         isOpen
         onClose={hide}

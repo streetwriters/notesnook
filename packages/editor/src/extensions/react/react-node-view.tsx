@@ -13,10 +13,10 @@ import {
 } from "./types";
 import { NodeViewRendererProps } from "@tiptap/core";
 import { Theme } from "@notesnook/theme";
-import { ThemeProvider } from "emotion-theming";
 // @ts-ignore
 import { __serializeForClipboard } from "prosemirror-view";
 import { Editor } from "../../types";
+import { ThemeProvider } from "../../components/theme-provider";
 
 export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;
@@ -129,10 +129,9 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     forwardRef?: ForwardRef
   ): React.ReactElement<any> | null {
     if (!this.options.component) return null;
-    const theme = this.editor.storage.theme as Theme;
 
     return (
-      <ThemeProvider theme={theme}>
+      <ThemeProvider>
         <this.options.component
           {...props}
           editor={this.editor}

@@ -207,7 +207,6 @@ const embedDesktop = (editor: Editor): MenuItem => ({
   onClick: () => {
     if (!editor) return;
     showPopup({
-      theme: editor.storage.theme,
       popup: (hide) => (
         <EmbedPopup
           title="Insert embed"
@@ -289,7 +288,6 @@ const uploadImageFromURL = (editor: Editor): MenuItem => ({
   icon: "link",
   onClick: () => {
     showPopup({
-      theme: editor.storage.theme,
       popup: (hide) => (
         <ImageUploadPopup
           onInsert={(image) => {
