@@ -1,6 +1,6 @@
 import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
 import { ToolButton } from "../components/tool-button";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MoreTools } from "../components/more-tools";
 import { useToolbarLocation } from "../stores/toolbar-store";
@@ -47,7 +47,7 @@ export function ImageProperties(props) {
     const [isOpen, setIsOpen] = useState(false);
     const buttonRef = useRef();
     // TODO: defer until user opens the popup
-    const image = useMemo(() => findSelectedNode(editor, "image"), []);
+    const image = findSelectedNode(editor, "image");
     const { float, align, width, height } = ((image === null || image === void 0 ? void 0 : image.attrs) ||
         {});
     return (_jsxs(_Fragment, { children: [_jsx(ToolButton, Object.assign({ buttonRef: buttonRef, toggled: isOpen }, props, { onClick: () => setIsOpen((s) => !s) })), _jsx(ResponsivePresenter, Object.assign({ isOpen: isOpen, desktop: "menu", mobile: "sheet", onClose: () => setIsOpen(false), blocking: true, focusOnRender: false, position: {

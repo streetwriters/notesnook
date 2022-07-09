@@ -20,7 +20,6 @@ export function Dropdown(props) {
         id,
         isOpen,
         onClosed: () => setIsOpen(false),
-        onClosePopup: () => closePopup(id),
     });
     return (_jsxs(_Fragment, { children: [_jsxs(Button, Object.assign({ ref: (ref) => {
                     internalRef.current = ref;

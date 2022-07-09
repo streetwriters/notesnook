@@ -31,9 +31,13 @@ function findMark(node, type) {
     return mark;
 }
 exports.findMark = findMark;
-function selectionToOffset(selection) {
-    const { $from, from } = selection;
-    return { node: $from.node(), from, to: from + $from.node().nodeSize };
+function selectionToOffset(state) {
+    const { $from, from } = state.selection;
+    return {
+        node: state.doc.nodeAt(from) || undefined,
+        from,
+        to: from + $from.node().nodeSize,
+    };
 }
 exports.selectionToOffset = selectionToOffset;
 function findListItemType(editor) {

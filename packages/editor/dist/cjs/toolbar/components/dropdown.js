@@ -23,7 +23,6 @@ function Dropdown(props) {
         id,
         isOpen,
         onClosed: () => setIsOpen(false),
-        onClosePopup: () => closePopup(id),
     });
     return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(button_1.Button, Object.assign({ ref: (ref) => {
                     internalRef.current = ref;

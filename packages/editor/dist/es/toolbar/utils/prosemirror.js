@@ -25,9 +25,13 @@ export function findMark(node, type) {
     const mark = node.marks.find((m) => m.type.name === type);
     return mark;
 }
-export function selectionToOffset(selection) {
-    const { $from, from } = selection;
-    return { node: $from.node(), from, to: from + $from.node().nodeSize };
+export function selectionToOffset(state) {
+    const { $from, from } = state.selection;
+    return {
+        node: state.doc.nodeAt(from) || undefined,
+        from,
+        to: from + $from.node().nodeSize,
+    };
 }
 export function findListItemType(editor) {
     const isTaskList = editor.isActive("taskList");

@@ -3,7 +3,7 @@ import { ToolbarGroup } from "../../components/toolbar-group";
 function LinkHoverPopup(props) {
     const { editor, selectedNode } = props;
     const { node } = selectedNode;
-    if (!node.isText ||
+    if (!(node === null || node === void 0 ? void 0 : node.isText) ||
         node.marks.length <= 0 ||
         !node.marks.some((mark) => mark.type.name === "link"))
         return null;

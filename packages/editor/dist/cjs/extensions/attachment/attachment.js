@@ -61,7 +61,9 @@ exports.AttachmentNode = core_1.Node.create({
                     attrs: attachment,
                 });
             },
-            removeAttachment: () => ({ commands }) => commands.deleteNode(this.name),
+            removeAttachment: () => ({ commands, tr }) => {
+                return commands.deleteSelection();
+            },
             downloadAttachment: (attachment) => ({ editor }) => {
                 return this.options.onDownloadAttachment(editor, attachment);
             },

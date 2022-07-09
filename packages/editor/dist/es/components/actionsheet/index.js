@@ -75,6 +75,7 @@ export function ActionSheetPresenter(props) {
     if (!isOpen)
         return null;
     return (_jsx(Modal, Object.assign({ contentRef: (ref) => (contentRef.current = ref), className: "bottom-sheet-presenter", role: "menu", isOpen: isOpen, appElement: document.body, shouldCloseOnEsc: blocking, shouldReturnFocusAfterClose: focusOnRender, shouldCloseOnOverlayClick: blocking, shouldFocusAfterRender: focusOnRender, ariaHideApp: blocking, preventScroll: blocking, onRequestClose: () => onBeforeClose(), portalClassName: "bottom-sheet-presenter-portal", onAfterOpen: () => {
+            console.log("OPEGN!");
             animation.start({ transition: TRANSITION, y: 0 });
         }, overlayElement: (props, contentEl) => {
             return (_jsxs(Box, Object.assign({}, props, { 

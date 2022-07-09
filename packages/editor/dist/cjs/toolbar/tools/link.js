@@ -61,11 +61,11 @@ function AddLink(props) {
 exports.AddLink = AddLink;
 function EditLink(props) {
     const { editor, selectedNode: _selectedNode } = props;
-    const selectedNode = (0, useRefValue_1.useRefValue)(_selectedNode || (0, prosemirror_1.selectionToOffset)(editor.state.selection));
+    const selectedNode = (0, useRefValue_1.useRefValue)(_selectedNode || (0, prosemirror_1.selectionToOffset)(editor.state));
     const onDone = (0, react_1.useCallback)((href, text) => {
-        if (!href || !editor.current)
-            return;
         const { from, node, to } = selectedNode.current;
+        if (!href || !editor.current || !node)
+            return;
         const mark = (0, prosemirror_1.findMark)(node, "link");
         if (!mark)
             return;
@@ -83,6 +83,8 @@ function EditLink(props) {
     }, []);
     return ((0, jsx_runtime_1.jsx)(LinkTool, Object.assign({}, props, { isEditing: true, onDone: onDone, onClick: () => {
             const { node } = selectedNode.current;
+            if (!node)
+                return;
             const selectedText = node.textContent;
             const mark = (0, prosemirror_1.findMark)(node, "link");
             if (!mark)
@@ -102,9 +104,10 @@ function RemoveLink(props) {
 }
 exports.RemoveLink = RemoveLink;
 function OpenLink(props) {
-    const { editor, selectedNode } = props;
-    const node = (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.node) || editor.state.selection.$anchor.node();
-    const link = selectedNode ? (0, prosemirror_1.findMark)(node, "link") : null;
+    const { editor, selectedNode: _selectedNode } = props;
+    const selectedNode = (0, useRefValue_1.useRefValue)(_selectedNode || (0, prosemirror_1.selectionToOffset)(editor.state));
+    const { node } = selectedNode.current;
+    const link = node ? (0, prosemirror_1.findMark)(node, "link") : null;
     if (!link)
         return null;
     const href = link === null || link === void 0 ? void 0 : link.attrs.href;

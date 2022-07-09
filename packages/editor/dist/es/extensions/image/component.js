@@ -15,9 +15,11 @@ import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 export function ImageComponent(props) {
     const { editor, updateAttributes, node, selected } = props;
-    const { src, alt, title, width, height, align, float } = node.attrs;
+    const isMobile = useIsMobile();
+    let { src, alt, title, width, height, align, float } = node.attrs;
     const imageRef = useRef();
     useEffect(() => {
         (() => __awaiter(this, void 0, void 0, function* () {
@@ -26,6 +28,8 @@ export function ImageComponent(props) {
             imageRef.current.src = yield dataUriToBlobURL(src);
         }))();
     }, [src, imageRef]);
+    if (isMobile)
+        float = false;
     return (_jsx(_Fragment, { children: _jsx(Box, Object.assign({ sx: {
                 display: float ? "block" : "flex",
                 justifyContent: float

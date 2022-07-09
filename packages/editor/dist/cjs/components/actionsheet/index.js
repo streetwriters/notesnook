@@ -104,6 +104,7 @@ function ActionSheetPresenter(props) {
     if (!isOpen)
         return null;
     return ((0, jsx_runtime_1.jsx)(react_modal_1.default, Object.assign({ contentRef: (ref) => (contentRef.current = ref), className: "bottom-sheet-presenter", role: "menu", isOpen: isOpen, appElement: document.body, shouldCloseOnEsc: blocking, shouldReturnFocusAfterClose: focusOnRender, shouldCloseOnOverlayClick: blocking, shouldFocusAfterRender: focusOnRender, ariaHideApp: blocking, preventScroll: blocking, onRequestClose: () => onBeforeClose(), portalClassName: "bottom-sheet-presenter-portal", onAfterOpen: () => {
+            console.log("OPEGN!");
             animation.start({ transition: TRANSITION, y: 0 });
         }, overlayElement: (props, contentEl) => {
             return ((0, jsx_runtime_1.jsxs)(rebass_1.Box, Object.assign({}, props, { 

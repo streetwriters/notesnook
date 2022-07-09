@@ -18,9 +18,11 @@ const responsive_1 = require("../../components/responsive");
 const icon_1 = require("../../toolbar/components/icon");
 const icons_1 = require("../../toolbar/icons");
 const toolbargroup_1 = require("../../toolbar/components/toolbargroup");
+const toolbarstore_1 = require("../../toolbar/stores/toolbarstore");
 function ImageComponent(props) {
     const { editor, updateAttributes, node, selected } = props;
-    const { src, alt, title, width, height, align, float } = node.attrs;
+    const isMobile = (0, toolbarstore_1.useIsMobile)();
+    let { src, alt, title, width, height, align, float } = node.attrs;
     const imageRef = (0, react_1.useRef)();
     (0, react_1.useEffect)(() => {
         (() => __awaiter(this, void 0, void 0, function* () {
@@ -29,6 +31,8 @@ function ImageComponent(props) {
             imageRef.current.src = yield dataUriToBlobURL(src);
         }))();
     }, [src, imageRef]);
+    if (isMobile)
+        float = false;
     return ((0, jsx_runtime_1.jsx)(jsx_runtime_1.Fragment, { children: (0, jsx_runtime_1.jsx)(rebass_1.Box, Object.assign({ sx: {
                 display: float ? "block" : "flex",
                 justifyContent: float

@@ -12,6 +12,7 @@ export declare type PopupPresenterProps = {
 };
 export declare function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>): JSX.Element | null;
 export declare type PopupWrapperProps = UsePopupHandlerOptions & {
+    autoCloseOnUnmount?: boolean;
     position: PositionOptions;
     renderPopup: (closePopup: () => void) => React.ReactNode;
 } & Partial<Omit<PopupPresenterProps, "onClose">>;
@@ -20,9 +21,7 @@ declare type UsePopupHandlerOptions = {
     id: string;
     group: string;
     isOpen: boolean;
-    autoCloseOnUnmount?: boolean;
     onClosed?: () => void;
-    onClosePopup?: () => void;
 };
 export declare function usePopupHandler(options: UsePopupHandlerOptions): {
     isPopupOpen: boolean;

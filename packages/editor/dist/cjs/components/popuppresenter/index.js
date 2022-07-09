@@ -156,6 +156,13 @@ function PopupWrapper(props) {
     const PopupRenderer = (0, popuprenderer_1.usePopupRenderer)();
     const { closePopup, isPopupOpen } = usePopupHandler(props);
     (0, react_1.useEffect)(() => {
+        if (!autoCloseOnUnmount)
+            return;
+        return () => {
+            PopupRenderer === null || PopupRenderer === void 0 ? void 0 : PopupRenderer.closePopup(id);
+        };
+    }, [autoCloseOnUnmount, id, PopupRenderer]);
+    (0, react_1.useEffect)(() => {
         if (PopupRenderer && isPopupOpen) {
             PopupRenderer.openPopup(id, function Popup({ id }) {
                 const isPopupOpen = (0, toolbarstore_1.useToolbarStore)((store) => !!store.openedPopups[id]);
@@ -179,7 +186,7 @@ function PopupWrapper(props) {
 }
 exports.PopupWrapper = PopupWrapper;
 function usePopupHandler(options) {
-    let { autoCloseOnUnmount, group, isOpen, id, onClosed, onClosePopup } = options;
+    let { group, isOpen, id, onClosed } = options;
     const isPopupOpen = (0, toolbarstore_1.useToolbarStore)((store) => !!store.openedPopups[id]);
     const openPopup = (0, toolbarstore_1.useToolbarStore)((store) => store.openPopup);
     const closePopup = (0, toolbarstore_1.useToolbarStore)((store) => store.closePopup);
@@ -193,13 +200,6 @@ function usePopupHandler(options) {
         else
             closePopup(id);
     }, [isOpen, id, group, openPopup, closePopup]);
-    (0, react_1.useEffect)(() => {
-        if (!autoCloseOnUnmount)
-            return;
-        return () => {
-            onClosePopup === null || onClosePopup === void 0 ? void 0 : onClosePopup();
-        };
-    }, [autoCloseOnUnmount, onClosePopup]);
     (0, react_1.useEffect)(() => {
         if (!isPopupOpen)
             onClosed === null || onClosed === void 0 ? void 0 : onClosed();
@@ -221,13 +221,17 @@ function showPopup(options) {
     function hide() {
         react_dom_1.default.unmountComponentAtNode((0, dom_1.getPopupContainer)());
     }
-    react_dom_1.default.render((0, jsx_runtime_1.jsx)(themeprovider_1.ThemeProvider, { children: (0, jsx_runtime_1.jsx)(responsive_1.ResponsivePresenter, Object.assign({ isOpen: true, onClose: hide, position: {
+    react_dom_1.default.render((0, jsx_runtime_1.jsx)(themeprovider_1.ThemeProvider, { children: (0, jsx_runtime_1.jsx)(responsive_1.ResponsivePresenter, Object.assign({ isOpen: true, position: {
                 target: (0, dom_1.getToolbarElement)(),
                 isTargetAbsolute: true,
                 location: "below",
                 align: "end",
                 yOffset: 10,
-            }, blocking: true, focusOnRender: true }, props, { children: popup(hide) })) }), (0, dom_1.getPopupContainer)());
+            }, blocking: true, focusOnRender: true }, props, { onClose: () => {
+                var _a;
+                hide();
+                (_a = props.onClose) === null || _a === void 0 ? void 0 : _a.call(props);
+            } }, { children: popup(hide) })) }), (0, dom_1.getPopupContainer)());
     return hide;
 }
 exports.showPopup = showPopup;

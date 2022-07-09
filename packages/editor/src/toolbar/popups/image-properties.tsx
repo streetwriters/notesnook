@@ -1,13 +1,14 @@
 import { Flex, Text } from "rebass";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Popup } from "../components/popup";
-import { Checkbox } from "@rebass/forms";
+import { Checkbox, Label } from "@rebass/forms";
 import {
   ImageAlignmentOptions,
   ImageSizeOptions,
 } from "../../extensions/image";
 import { Editor } from "../../types";
 import { InlineInput } from "../../components/inline-input";
+import { DesktopOnly } from "../../components/responsive";
 
 export type ImagePropertiesProps = ImageSizeOptions &
   ImageAlignmentOptions & { editor: Editor; onClose: () => void };
@@ -39,18 +40,23 @@ export function ImageProperties(props: ImagePropertiesProps) {
   return (
     <Popup title="Image properties" onClose={onClose}>
       <Flex sx={{ width: ["auto", 300], flexDirection: "column", p: 1 }}>
-        <Flex sx={{ justifyContent: "space-between", alignItems: "center" }}>
-          <Text variant={"body"}>Floating?</Text>
-          <Checkbox
-            checked={float}
-            onClick={() =>
-              editor
-                .chain()
-                .setImageAlignment({ float: !float, align: "left" })
-                .run()
-            }
-          />
-        </Flex>
+        <DesktopOnly>
+          <Label
+            variant="text.body"
+            sx={{ justifyContent: "space-between", alignItems: "center" }}
+          >
+            Float image
+            <Checkbox
+              checked={float}
+              onClick={() =>
+                editor
+                  .chain()
+                  .setImageAlignment({ float: !float, align: "left" })
+                  .run()
+              }
+            />
+          </Label>
+        </DesktopOnly>
         <Flex sx={{ alignItems: "center", mt: 2 }}>
           <InlineInput
             label="width"

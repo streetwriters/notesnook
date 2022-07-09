@@ -56,11 +56,11 @@ export function AddLink(props) {
 }
 export function EditLink(props) {
     const { editor, selectedNode: _selectedNode } = props;
-    const selectedNode = useRefValue(_selectedNode || selectionToOffset(editor.state.selection));
+    const selectedNode = useRefValue(_selectedNode || selectionToOffset(editor.state));
     const onDone = useCallback((href, text) => {
-        if (!href || !editor.current)
-            return;
         const { from, node, to } = selectedNode.current;
+        if (!href || !editor.current || !node)
+            return;
         const mark = findMark(node, "link");
         if (!mark)
             return;
@@ -78,6 +78,8 @@ export function EditLink(props) {
     }, []);
     return (_jsx(LinkTool, Object.assign({}, props, { isEditing: true, onDone: onDone, onClick: () => {
             const { node } = selectedNode.current;
+            if (!node)
+                return;
             const selectedText = node.textContent;
             const mark = findMark(node, "link");
             if (!mark)
@@ -95,9 +97,10 @@ export function RemoveLink(props) {
         } })));
 }
 export function OpenLink(props) {
-    const { editor, selectedNode } = props;
-    const node = (selectedNode === null || selectedNode === void 0 ? void 0 : selectedNode.node) || editor.state.selection.$anchor.node();
-    const link = selectedNode ? findMark(node, "link") : null;
+    const { editor, selectedNode: _selectedNode } = props;
+    const selectedNode = useRefValue(_selectedNode || selectionToOffset(editor.state));
+    const { node } = selectedNode.current;
+    const link = node ? findMark(node, "link") : null;
     if (!link)
         return null;
     const href = link === null || link === void 0 ? void 0 : link.attrs.href;

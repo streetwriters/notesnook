@@ -149,6 +149,13 @@ export function PopupWrapper(props) {
     const PopupRenderer = usePopupRenderer();
     const { closePopup, isPopupOpen } = usePopupHandler(props);
     useEffect(() => {
+        if (!autoCloseOnUnmount)
+            return;
+        return () => {
+            PopupRenderer === null || PopupRenderer === void 0 ? void 0 : PopupRenderer.closePopup(id);
+        };
+    }, [autoCloseOnUnmount, id, PopupRenderer]);
+    useEffect(() => {
         if (PopupRenderer && isPopupOpen) {
             PopupRenderer.openPopup(id, function Popup({ id }) {
                 const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
@@ -171,7 +178,7 @@ export function PopupWrapper(props) {
     return null;
 }
 export function usePopupHandler(options) {
-    let { autoCloseOnUnmount, group, isOpen, id, onClosed, onClosePopup } = options;
+    let { group, isOpen, id, onClosed } = options;
     const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
     const openPopup = useToolbarStore((store) => store.openPopup);
     const closePopup = useToolbarStore((store) => store.closePopup);
@@ -185,13 +192,6 @@ export function usePopupHandler(options) {
         else
             closePopup(id);
     }, [isOpen, id, group, openPopup, closePopup]);
-    useEffect(() => {
-        if (!autoCloseOnUnmount)
-            return;
-        return () => {
-            onClosePopup === null || onClosePopup === void 0 ? void 0 : onClosePopup();
-        };
-    }, [autoCloseOnUnmount, onClosePopup]);
     useEffect(() => {
         if (!isPopupOpen)
             onClosed === null || onClosed === void 0 ? void 0 : onClosed();
@@ -212,12 +212,16 @@ export function showPopup(options) {
     function hide() {
         ReactDOM.unmountComponentAtNode(getPopupContainer());
     }
-    ReactDOM.render(_jsx(ThemeProvider, { children: _jsx(ResponsivePresenter, Object.assign({ isOpen: true, onClose: hide, position: {
+    ReactDOM.render(_jsx(ThemeProvider, { children: _jsx(ResponsivePresenter, Object.assign({ isOpen: true, position: {
                 target: getToolbarElement(),
                 isTargetAbsolute: true,
                 location: "below",
                 align: "end",
                 yOffset: 10,
-            }, blocking: true, focusOnRender: true }, props, { children: popup(hide) })) }), getPopupContainer());
+            }, blocking: true, focusOnRender: true }, props, { onClose: () => {
+                var _a;
+                hide();
+                (_a = props.onClose) === null || _a === void 0 ? void 0 : _a.call(props);
+            } }, { children: popup(hide) })) }), getPopupContainer());
     return hide;
 }

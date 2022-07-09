@@ -54,7 +54,7 @@ function ImageProperties(props) {
     const [isOpen, setIsOpen] = (0, react_1.useState)(false);
     const buttonRef = (0, react_1.useRef)();
     // TODO: defer until user opens the popup
-    const image = (0, react_1.useMemo)(() => (0, prosemirror_1.findSelectedNode)(editor, "image"), []);
+    const image = (0, prosemirror_1.findSelectedNode)(editor, "image");
     const { float, align, width, height } = ((image === null || image === void 0 ? void 0 : image.attrs) ||
         {});
     return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(toolbutton_1.ToolButton, Object.assign({ buttonRef: buttonRef, toggled: isOpen }, props, { onClick: () => setIsOpen((s) => !s) })), (0, jsx_runtime_1.jsx)(responsive_1.ResponsivePresenter, Object.assign({ isOpen: isOpen, desktop: "menu", mobile: "sheet", onClose: () => setIsOpen(false), blocking: true, focusOnRender: false, position: {

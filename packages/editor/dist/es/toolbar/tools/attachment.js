@@ -8,7 +8,7 @@ export function AttachmentSettings(props) {
     const isBottom = useToolbarLocation() === "bottom";
     if (!editor.isActive("attachment") || !isBottom)
         return null;
-    return (_jsx(MoreTools, Object.assign({}, props, { autoCloseOnUnmount: true, popupId: "attachmentSettings", tools: [] })));
+    return (_jsx(MoreTools, Object.assign({}, props, { autoCloseOnUnmount: true, popupId: "attachmentSettings", tools: ["downloadAttachment", "removeAttachment"] })));
 }
 export function DownloadAttachment(props) {
     const { editor } = props;
