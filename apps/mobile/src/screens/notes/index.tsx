@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { InteractionManager } from 'react-native';
 import { FloatingButton } from '../../components/container/floating-button';
 import DelayLayout from '../../components/delay-layout';
 import { RightMenus } from '../../components/header/right-menus';
@@ -125,8 +126,8 @@ const NotesPage = ({
   };
 
   const onRequestUpdate = (data?: NotesScreenParams) => {
-    if (data) params.current = data;
     const isNew = data?.item?.id !== params.current?.item?.id;
+    if (data) params.current = data;
     params.current.title = params.current.title || params.current.item.title;
     const { item } = params.current;
     try {
@@ -142,7 +143,9 @@ const NotesPage = ({
   };
 
   useEffect(() => {
-    if (loadingNotes) setLoadingNotes(false);
+    if (loadingNotes) {
+      setTimeout(() => setLoadingNotes(false), 300);
+    }
   }, [notes]);
 
   useEffect(() => {
