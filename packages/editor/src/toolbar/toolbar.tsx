@@ -5,7 +5,11 @@ import { ThemeProvider } from "emotion-theming";
 import { EditorFloatingMenus } from "./floating-menus";
 import { getDefaultPresets, STATIC_TOOLBAR_GROUPS } from "./tool-definitions";
 import { useEffect, useMemo } from "react";
-import { ToolbarLocation, useToolbarStore } from "./stores/toolbar-store";
+import {
+  ToolbarLocation,
+  useIsMobile,
+  useToolbarStore,
+} from "./stores/toolbar-store";
 import { ToolbarDefinition } from "./types";
 import { ToolbarGroup } from "./components/toolbar-group";
 import {
@@ -35,6 +39,8 @@ export function Toolbar(props: ToolbarProps) {
     [tools]
   );
 
+  const isMobile = useIsMobile();
+
   const setToolbarLocation = useToolbarStore(
     (store) => store.setToolbarLocation
   );
@@ -52,8 +58,8 @@ export function Toolbar(props: ToolbarProps) {
             className="editor-toolbar"
             sx={{
               ...sx,
-              flexWrap: ["nowrap", "wrap"],
-              overflowX: ["auto", "hidden"],
+              flexWrap: isMobile ? "nowrap" : "wrap",
+              overflowX: isMobile ? "auto" : "hidden",
             }}
             {...flexProps}
           >
