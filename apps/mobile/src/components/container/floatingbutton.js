@@ -66,6 +66,11 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
       sub2?.remove();
     };
   }, [deviceMode]);
+  const paddings = {
+    ios: insets.bottom === 0 ? 70 : insets.bottom + 15,
+    android: insets.bottom,
+    iPad: insets.bottom
+  };
 
   return deviceMode !== 'mobile' && !shouldShow ? null : (
     <Animated.View
@@ -73,12 +78,7 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
         {
           position: 'absolute',
           right: 12,
-          bottom:
-            Platform.OS === 'ios' && insets.bottom !== 0
-              ? Platform.isPad
-                ? insets.bottom - 12
-                : insets.bottom - 24
-              : insets.bottom,
+          bottom: paddings[Platform.isPad ? 'iPad' : Platform.OS],
           zIndex: 10
         },
         animatedStyle

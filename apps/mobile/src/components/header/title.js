@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import Animated, { Layout } from 'react-native-reanimated';
 import Notebook from '../../screens/notebook';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
@@ -82,7 +82,8 @@ export const Title = () => {
           numberOfLines={isTopic ? 2 : 1}
           size={isTopic ? SIZE.md + 2 : SIZE.xl}
           style={{
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            marginTop: Platform.OS === 'ios' ? -1 : 0
           }}
           color={currentScreen.color}
         >
