@@ -80,8 +80,10 @@ const MergeConflicts = () => {
   const show = async item => {
     let noteContent = await db.content.raw(item.contentId);
     content.current = { ...noteContent };
-    if (!noteContent.conflicted) {
-      content.current.conflicted = { ...noteContent };
+    if (__DEV__) {
+      if (!noteContent.conflicted) {
+        content.current.conflicted = { ...noteContent };
+      }
     }
     setVisible(true);
   };
