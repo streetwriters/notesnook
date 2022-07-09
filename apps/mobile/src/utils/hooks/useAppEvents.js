@@ -273,7 +273,7 @@ export const useAppEvents = () => {
       }
 
       await PremiumService.setPremiumStatus();
-      if (user.isEmailConfirmed && !userEmailConfirmed) {
+      if (user?.isEmailConfirmed && !userEmailConfirmed) {
         setTimeout(() => {
           onEmailVerified();
         }, 1000);
@@ -293,7 +293,7 @@ export const useAppEvents = () => {
     ) {
       setRecoveryKeyMessage();
     }
-    if (!user.isEmailConfirmed) setEmailVerifyMessage();
+    if (!user?.isEmailConfirmed) setEmailVerifyMessage();
     refValues.current.isUserReady = true;
 
     syncedOnLaunch.current = true;
@@ -349,7 +349,7 @@ export const useAppEvents = () => {
       await checkIntentState();
       await MMKV.removeItem('appState');
       let user = await db.user.getUser();
-      if (user && !user.isEmailConfirmed) {
+      if (user && !user?.isEmailConfirmed) {
         try {
           let user = await db.user.fetchUser();
           if (user?.isEmailConfirmed) {

@@ -181,7 +181,7 @@ const pick = async options => {
     if (editorState().isFocused) {
       editorState().isFocused = true;
     }
-    if (user && !PremiumService.get() && !user.isEmailConfirmed) {
+    if (user && !PremiumService.get() && !user?.isEmailConfirmed) {
       PremiumService.showVerifyEmailDialog();
     } else {
       PremiumService.sheet();

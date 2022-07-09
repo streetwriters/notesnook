@@ -124,7 +124,7 @@ export const SessionExpired = () => {
       });
       await SettingsService.set({
         sessionExpired: false,
-        userEmailConfirmed: user.isEmailConfirmed
+        userEmailConfirmed: user?.isEmailConfirmed
       });
       eSendEvent('userLoggedIn', true);
       await sleep(500);

@@ -66,7 +66,7 @@ const publishNote = async (editor: useEditorType) => {
     return;
   }
 
-  if (!user.isEmailConfirmed) {
+  if (!user?.isEmailConfirmed) {
     ToastEvent.show({
       heading: 'Email not verified',
       message: 'Please verify your email first.',

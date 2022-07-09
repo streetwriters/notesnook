@@ -23,7 +23,7 @@ export const ChangePassword = () => {
   const user = useUserStore(state => state.user);
 
   const changePassword = async () => {
-    if (!user.isEmailConfirmed) {
+    if (!user?.isEmailConfirmed) {
       ToastEvent.show({
         heading: 'Email not confirmed',
         message: 'Please confirm your email to change account password',
