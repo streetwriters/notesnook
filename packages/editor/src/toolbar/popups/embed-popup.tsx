@@ -21,11 +21,10 @@ export type EmbedPopupProps = {
 
   embed?: Embed;
   onSizeChanged?: (size: EmbedSizeOptions) => void;
-  onSourceChanged?: (src: string) => void;
 };
 
 export function EmbedPopup(props: EmbedPopupProps) {
-  const { onClose, onSizeChanged, onSourceChanged, title, embed } = props;
+  const { onClose, onSizeChanged, title, embed } = props;
   const [width, setWidth] = useState(embed?.width || 300);
   const [height, setHeight] = useState(embed?.height || 150);
   const [src, setSrc] = useState(embed?.src || "");
@@ -55,16 +54,12 @@ export function EmbedPopup(props: EmbedPopupProps) {
     [width, height]
   );
 
-  useEffect(() => {
-    onSourceChanged && onSourceChanged(src);
-  }, [onSourceChanged, src]);
-
   return (
     <Popup
       title={title}
       onClose={() => onClose()}
       action={{
-        title,
+        title: "Save",
         onClick: () => {
           setError(null);
           let _src = src;
