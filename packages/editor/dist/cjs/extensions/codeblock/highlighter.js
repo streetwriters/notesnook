@@ -35,16 +35,17 @@ function getLineDecoration(from, line, total, isActive) {
     const attributes = {
         class: `line-number ${isActive ? "active" : ""}`,
         "data-line": String(line).padEnd(maxLength, " "),
+        autocapitalize: "none"
     };
     const spec = {
         line: line,
         active: isActive,
         total,
-        from,
+        from
     };
     return prosemirror_view_1.Decoration.inline(from, from + 1, attributes, spec);
 }
-function getDecorations({ doc, name, defaultLanguage, caretPosition, }) {
+function getDecorations({ doc, name, defaultLanguage, caretPosition }) {
     const decorations = [];
     const languages = core_2.refractor.listLanguages();
     (0, core_1.findChildren)(doc, (node) => node.type.name === name).forEach((block) => {
@@ -67,7 +68,7 @@ function getDecorations({ doc, name, defaultLanguage, caretPosition, }) {
             const to = from + node.text.length;
             if (node.classes.length) {
                 const decoration = prosemirror_view_1.Decoration.inline(from, to, {
-                    class: node.classes.join(" "),
+                    class: node.classes.join(" ")
                 });
                 decorations.push(decoration);
             }
@@ -76,7 +77,7 @@ function getDecorations({ doc, name, defaultLanguage, caretPosition, }) {
     });
     return prosemirror_view_1.DecorationSet.create(doc, decorations);
 }
-function HighlighterPlugin({ name, defaultLanguage, }) {
+function HighlighterPlugin({ name, defaultLanguage }) {
     const key = new prosemirror_state_1.PluginKey("highlighter");
     return new prosemirror_state_1.Plugin({
         key,
@@ -85,7 +86,7 @@ function HighlighterPlugin({ name, defaultLanguage, }) {
                 return getDecorations({
                     doc: state.doc,
                     name,
-                    defaultLanguage,
+                    defaultLanguage
                 });
             },
             apply: (transaction, decorationSet, oldState, newState) => {
@@ -120,17 +121,17 @@ function HighlighterPlugin({ name, defaultLanguage, }) {
                         doc: transaction.doc,
                         name,
                         defaultLanguage,
-                        caretPosition: position,
+                        caretPosition: position
                     });
                 }
                 decorationSet = getActiveLineDecorations(transaction.doc, decorationSet, position);
                 return decorationSet.map(transaction.mapping, transaction.doc);
-            },
+            }
         },
         props: {
             decorations(state) {
                 return key.getState(state);
-            },
+            }
         },
         appendTransaction: (transactions, prevState, nextState) => {
             const tr = nextState.tr;
@@ -157,7 +158,7 @@ function HighlighterPlugin({ name, defaultLanguage, }) {
                 }
             });
             return modified ? tr : null;
-        },
+        }
     });
 }
 exports.HighlighterPlugin = HighlighterPlugin;
@@ -182,7 +183,7 @@ function getActiveLineDecorations(doc, decorations, position) {
     decorations = decorations.remove(lineDecorations);
     const newDecorations = [];
     for (const decoration of cloned) {
-        const { from, spec: { line, total }, } = decoration;
+        const { from, spec: { line, total } } = decoration;
         const isActive = line === (position === null || position === void 0 ? void 0 : position.line);
         const newDecoration = getLineDecoration(from, line, (position === null || position === void 0 ? void 0 : position.total) || total, isActive);
         newDecorations.push(newDecoration);

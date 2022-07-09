@@ -46,11 +46,11 @@ function TaskListComponent(props) {
     }, [nested, node]);
     return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: {
                     flexDirection: "column",
-                    ":hover > div > .toggleSublist": { opacity: 1 },
+                    ":hover > div > .toggleSublist": { opacity: 1 }
                 } }, { children: nested ? ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: {
                         position: "absolute",
                         top: 0,
-                        right: 0,
+                        right: 0
                     }, contentEditable: false }, { children: [collapsed && ((0, jsx_runtime_1.jsxs)(rebass_1.Text, Object.assign({ variant: "body", sx: { color: "fontTertiary", mr: 35 } }, { children: [stats.checked, "/", stats.total] }))), (0, jsx_runtime_1.jsx)(icon_1.Icon, { className: "toggleSublist", path: collapsed ? icons_1.Icons.chevronDown : icons_1.Icons.chevronUp, sx: {
                                 opacity: isMobile || collapsed ? 1 : 0,
                                 position: "absolute",
@@ -59,8 +59,8 @@ function TaskListComponent(props) {
                                 mr: 2,
                                 cursor: "pointer",
                                 ".icon:hover path": {
-                                    fill: "var(--checked) !important",
-                                },
+                                    fill: "var(--checked) !important"
+                                }
                             }, size: isMobile ? 24 : 20, onClick: () => {
                                 updateAttributes({ collapsed: !collapsed }, { addToHistory: false, preventUpdate: true });
                             } })] }))) : ((0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: {
@@ -71,7 +71,7 @@ function TaskListComponent(props) {
                         mb: 2,
                         alignItems: "center",
                         justifyContent: "end",
-                        overflow: "hidden",
+                        overflow: "hidden"
                     }, contentEditable: false }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Box, { sx: {
                                 height: "100%",
                                 width: `${stats.percentage}%`,
@@ -79,7 +79,7 @@ function TaskListComponent(props) {
                                 bg: "border",
                                 zIndex: 0,
                                 left: 0,
-                                transition: "width 250ms ease-out",
+                                transition: "width 250ms ease-out"
                             } }), (0, jsx_runtime_1.jsx)(forms_1.Input, { readOnly: !editor.isEditable, value: title || "", variant: "clean", sx: { p: 0, px: 2, zIndex: 1, color: "fontTertiary" }, placeholder: "Untitled", onChange: (e) => {
                                 updateAttributes({ title: e.target.value }, { addToHistory: true, preventUpdate: false });
                             } }), (0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: { flexShrink: 0, pr: 2 } }, { children: [(0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.checkbox, size: 15, color: "fontTertiary" }), (0, jsx_runtime_1.jsxs)(rebass_1.Text, Object.assign({ variant: "body", sx: { ml: 1, color: "fontTertiary" } }, { children: [stats.checked, "/", stats.total] }))] }))] }))) })), (0, jsx_runtime_1.jsx)(rebass_1.Text, { as: "div", ref: forwardRef, sx: {
@@ -88,12 +88,13 @@ function TaskListComponent(props) {
                         paddingInlineStart: 0,
                         marginBlockStart: nested ? 10 : 0,
                         marginBlockEnd: 0,
+                        marginLeft: nested ? -35 : 0
                     },
                     li: {
                         listStyleType: "none",
                         position: "relative",
-                        marginBottom: [2, "7px"],
-                    },
+                        marginBottom: [2, "7px"]
+                    }
                 } })] }));
 }
 exports.TaskListComponent = TaskListComponent;

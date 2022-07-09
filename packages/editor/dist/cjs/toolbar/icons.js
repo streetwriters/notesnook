@@ -97,5 +97,6 @@ exports.Icons = {
     chevronLeft: js_1.mdiChevronLeft,
     circle: js_1.mdiCircle,
     arrowLeft: js_1.mdiArrowLeft,
-    none: "",
+    resize: js_1.mdiResizeBottomRight,
+    none: ""
 };

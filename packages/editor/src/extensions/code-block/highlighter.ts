@@ -8,14 +8,14 @@ import {
   AddMarkStep,
   RemoveMarkStep,
   ReplaceAroundStep,
-  ReplaceStep
+  ReplaceStep,
 } from "prosemirror-transform";
 import {
   CaretPosition,
   CodeBlockAttributes,
   getLines,
   toCaretPosition,
-  toCodeLines
+  toCodeLines,
 } from "./code-block";
 
 export type MergedStep =
@@ -64,13 +64,12 @@ function getLineDecoration(
   const attributes = {
     class: `line-number ${isActive ? "active" : ""}`,
     "data-line": String(line).padEnd(maxLength, " "),
-    autocapitalize: "none"
   };
   const spec: any = {
     line: line,
     active: isActive,
     total,
-    from
+    from,
   };
 
   return Decoration.inline(from, from + 1, attributes, spec);
@@ -80,7 +79,7 @@ function getDecorations({
   doc,
   name,
   defaultLanguage,
-  caretPosition
+  caretPosition,
 }: {
   caretPosition?: CaretPosition;
   doc: ProsemirrorNode;
@@ -116,7 +115,7 @@ function getDecorations({
       const to = from + node.text.length;
       if (node.classes.length) {
         const decoration = Decoration.inline(from, to, {
-          class: node.classes.join(" ")
+          class: node.classes.join(" "),
         });
         decorations.push(decoration);
       }
@@ -129,7 +128,7 @@ function getDecorations({
 
 export function HighlighterPlugin({
   name,
-  defaultLanguage
+  defaultLanguage,
 }: {
   name: string;
   defaultLanguage: string | null | undefined;
@@ -143,7 +142,7 @@ export function HighlighterPlugin({
         return getDecorations({
           doc: state.doc,
           name,
-          defaultLanguage
+          defaultLanguage,
         });
       },
       apply: (
@@ -197,7 +196,7 @@ export function HighlighterPlugin({
             doc: transaction.doc,
             name,
             defaultLanguage,
-            caretPosition: position
+            caretPosition: position,
           });
         }
 
@@ -208,13 +207,13 @@ export function HighlighterPlugin({
         );
 
         return decorationSet.map(transaction.mapping, transaction.doc);
-      }
+      },
     },
 
     props: {
       decorations(state) {
         return key.getState(state);
-      }
+      },
     },
 
     appendTransaction: (transactions, prevState, nextState) => {
@@ -255,7 +254,7 @@ export function HighlighterPlugin({
       );
 
       return modified ? tr : null;
-    }
+    },
   });
 }
 
@@ -293,7 +292,7 @@ function getActiveLineDecorations(
   for (const decoration of cloned) {
     const {
       from,
-      spec: { line, total }
+      spec: { line, total },
     } = decoration;
 
     const isActive = line === position?.line;

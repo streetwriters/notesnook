@@ -17,13 +17,13 @@ function OutlineListComponent(props) {
                 ul: {
                     display: collapsed ? "none" : "block",
                     paddingInlineStart: 0,
-                    paddingLeft: isNested ? 1 : 0,
+                    paddingLeft: 0,
                     marginBlockStart: isNested ? 5 : 0,
-                    marginBlockEnd: 0,
+                    marginBlockEnd: 0
                 },
                 li: {
-                    listStyleType: "none",
-                },
+                    listStyleType: "none"
+                }
             } }) }));
 }
 exports.OutlineListComponent = OutlineListComponent;

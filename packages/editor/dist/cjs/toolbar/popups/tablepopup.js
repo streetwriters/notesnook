@@ -18,11 +18,11 @@ function TablePopup(props) {
     const { onInsertTable } = props;
     const [cellLocation, setCellLocation] = (0, react_1.useState)({
         column: 0,
-        row: 0,
+        row: 0
     });
     const [tableSize, setTableSize] = (0, react_1.useState)({
         columns: MIN_COLUMNS,
-        rows: MIN_ROWS,
+        rows: MIN_ROWS
     });
     (0, react_1.useEffect)(() => {
         if (!autoExpand)
@@ -39,7 +39,7 @@ function TablePopup(props) {
                     : Math.min(old.columns + columnFactor, MAX_COLUMNS),
                 rows: isDecrease
                     ? Math.max(row + rowFactor, MIN_ROWS)
-                    : Math.min(old.rows + rowFactor, MAX_ROWS),
+                    : Math.min(old.rows + rowFactor, MAX_ROWS)
             };
         });
     }, [cellLocation, autoExpand]);
@@ -50,14 +50,14 @@ function TablePopup(props) {
             disabled: !cellLocation.column || !cellLocation.row,
             onClick: () => onInsertTable({
                 columns: cellLocation.column,
-                rows: cellLocation.row,
-            }),
+                rows: cellLocation.row
+            })
         } }, { children: (0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: { px: 1, pt: 1, flexDirection: "column", alignItems: "center" } }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Box, Object.assign({ sx: {
                         display: "grid",
                         gridTemplateColumns: `repeat(${tableSize.columns}, minmax(${cellSize}px, 1fr))`,
                         gap: "small",
                         bg: "background",
-                        width: "100%",
+                        width: "100%"
                     }, onTouchMove: (e) => {
                         const touch = e.touches.item(0);
                         const element = document.elementFromPoint(touch.pageX, touch.pageY);
@@ -74,21 +74,23 @@ function TablePopup(props) {
                             borderRadius: "small",
                             bg: isCellHighlighted(index, cellLocation, tableSize)
                                 ? "disabled"
-                                : "transparent",
+                                : "transparent"
                         }, onTouchStart: () => {
                             setCellLocation(getCellLocation(index, tableSize));
                         }, onMouseEnter: () => {
                             setCellLocation(getCellLocation(index, tableSize));
+                        }, onTouchEnd: (e) => {
+                            e.preventDefault();
                         }, onClick: () => {
                             onInsertTable({
                                 columns: cellLocation.column,
-                                rows: cellLocation.row,
+                                rows: cellLocation.row
                             });
                         } }, index))) })), (0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: {
                         display: ["flex", "none", "none"],
                         mt: 1,
                         alignItems: "center",
-                        justifyContent: "center",
+                        justifyContent: "center"
                     } }, { children: [(0, jsx_runtime_1.jsx)(inlineinput_1.InlineInput, { containerProps: { sx: { mr: 1 } }, label: "columns", placeholder: `${cellLocation.column} columns`, type: "number", value: cellLocation.column, onChange: (e) => {
                                 setCellLocation((l) => (Object.assign(Object.assign({}, l), { column: e.target.valueAsNumber || 0 })));
                             } }), (0, jsx_runtime_1.jsx)(inlineinput_1.InlineInput, { label: "rows", placeholder: `${cellLocation.row} rows`, type: "number", value: cellLocation.row, onChange: (e) => {

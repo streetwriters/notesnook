@@ -93,6 +93,7 @@ export declare const Icons: {
     chevronLeft: string;
     circle: string;
     arrowLeft: string;
+    resize: string;
     none: string;
 };
 export declare type IconNames = keyof typeof Icons;

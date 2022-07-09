@@ -19,7 +19,7 @@ const jsx_runtime_1 = require("react/jsx-runtime");
 const react_1 = __importDefault(require("@mdi/react"));
 const rebass_1 = require("rebass");
 const toolbarstore_1 = require("../stores/toolbarstore");
-function MDIIconWrapper({ title, path, size = 24, color = "icon", stroke, rotate, }) {
+function MDIIconWrapper({ title, path, size = 24, color = "icon", stroke, rotate }) {
     const theme = (0, toolbarstore_1.useTheme)();
     const themedColor = (theme === null || theme === void 0 ? void 0 : theme.colors)
         ? theme.colors[color]
@@ -28,7 +28,7 @@ function MDIIconWrapper({ title, path, size = 24, color = "icon", stroke, rotate
             ? `${(theme === null || theme === void 0 ? void 0 : theme.iconSizes[size]) || 24}px`
             : `${size}px`, style: {
             strokeWidth: stroke || "0px",
-            stroke: themedColor,
+            stroke: themedColor
         }, color: themedColor, spin: rotate }));
 }
 function Icon(props) {

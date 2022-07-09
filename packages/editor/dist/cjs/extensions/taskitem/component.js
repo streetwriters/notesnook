@@ -28,8 +28,8 @@ function TaskItemComponent(props) {
                 bg: "background",
                 borderRadius: "default",
                 ":hover > .dragHandle": {
-                    opacity: editor.isEditable ? 1 : 0,
-                },
+                    opacity: editor.isEditable ? 1 : 0
+                }
             } }, { children: [(0, jsx_runtime_1.jsx)(icon_1.Icon, { className: "dragHandle", draggable: "true", "data-drag-handle": true, path: icons_1.Icons.dragHandle, sx: {
                         opacity: [1, 1, 0],
                         alignSelf: "start",
@@ -37,8 +37,8 @@ function TaskItemComponent(props) {
                         bg: "transparent",
                         cursor: "grab",
                         ".icon:hover path": {
-                            fill: "var(--checked) !important",
-                        },
+                            fill: "var(--checked) !important"
+                        }
                     }, size: isMobile ? 24 : 20 }), (0, jsx_runtime_1.jsx)(icon_1.Icon, { path: checked ? icons_1.Icons.check : "", stroke: "1px", sx: {
                         border: "2px solid",
                         borderColor: checked ? "checked" : "icon",
@@ -48,18 +48,23 @@ function TaskItemComponent(props) {
                         p: "1px",
                         cursor: editor.isEditable ? "pointer" : "unset",
                         ":hover": {
-                            borderColor: "checked",
+                            borderColor: "checked"
                         },
                         ":hover .icon path": {
-                            fill: "var(--checked) !important",
-                        },
+                            fill: "var(--checked) !important"
+                        }
                     }, onMouseDown: (e) => {
                         e.preventDefault();
                         toggle();
+                    }, onTouchEnd: (e) => {
+                        e.preventDefault();
+                        toggle();
                     }, color: checked ? "checked" : "icon", size: isMobile ? 16 : 14 }), (0, jsx_runtime_1.jsx)(rebass_1.Text, { as: "div", ref: forwardRef, sx: {
-                        textDecorationLine: checked ? "line-through" : "none",
-                        opacity: checked ? 0.8 : 1,
-                        flex: 1,
+                        p: {
+                            textDecorationLine: checked ? "line-through" : "none",
+                            opacity: checked ? 0.8 : 1
+                        },
+                        flex: 1
                     } })] })) }));
 }
 exports.TaskItemComponent = TaskItemComponent;
@@ -69,7 +74,7 @@ function toggleChildren(node, tr, toggleState, parentPos) {
         // need to add 1 to get inside the node
         const actualPos = pos + parentPos + 1;
         tr.setNodeMarkup(actualPos, undefined, {
-            checked: toggleState,
+            checked: toggleState
         });
     }
     return tr;

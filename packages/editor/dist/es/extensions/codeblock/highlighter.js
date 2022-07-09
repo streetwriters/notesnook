@@ -2,7 +2,7 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import { findChildren } from "@tiptap/core";
 import { refractor } from "refractor/lib/core";
-import { toCaretPosition, toCodeLines } from "./code-block";
+import { toCaretPosition, toCodeLines, } from "./code-block";
 function parseNodes(nodes, className = []) {
     return nodes.reduce((result, node) => {
         if (node.type === "comment" || node.type === "doctype")
@@ -32,17 +32,16 @@ function getLineDecoration(from, line, total, isActive) {
     const attributes = {
         class: `line-number ${isActive ? "active" : ""}`,
         "data-line": String(line).padEnd(maxLength, " "),
-        autocapitalize: "none"
     };
     const spec = {
         line: line,
         active: isActive,
         total,
-        from
+        from,
     };
     return Decoration.inline(from, from + 1, attributes, spec);
 }
-function getDecorations({ doc, name, defaultLanguage, caretPosition }) {
+function getDecorations({ doc, name, defaultLanguage, caretPosition, }) {
     const decorations = [];
     const languages = refractor.listLanguages();
     findChildren(doc, (node) => node.type.name === name).forEach((block) => {
@@ -65,7 +64,7 @@ function getDecorations({ doc, name, defaultLanguage, caretPosition }) {
             const to = from + node.text.length;
             if (node.classes.length) {
                 const decoration = Decoration.inline(from, to, {
-                    class: node.classes.join(" ")
+                    class: node.classes.join(" "),
                 });
                 decorations.push(decoration);
             }
@@ -74,7 +73,7 @@ function getDecorations({ doc, name, defaultLanguage, caretPosition }) {
     });
     return DecorationSet.create(doc, decorations);
 }
-export function HighlighterPlugin({ name, defaultLanguage }) {
+export function HighlighterPlugin({ name, defaultLanguage, }) {
     const key = new PluginKey("highlighter");
     return new Plugin({
         key,
@@ -83,7 +82,7 @@ export function HighlighterPlugin({ name, defaultLanguage }) {
                 return getDecorations({
                     doc: state.doc,
                     name,
-                    defaultLanguage
+                    defaultLanguage,
                 });
             },
             apply: (transaction, decorationSet, oldState, newState) => {
@@ -118,17 +117,17 @@ export function HighlighterPlugin({ name, defaultLanguage }) {
                         doc: transaction.doc,
                         name,
                         defaultLanguage,
-                        caretPosition: position
+                        caretPosition: position,
                     });
                 }
                 decorationSet = getActiveLineDecorations(transaction.doc, decorationSet, position);
                 return decorationSet.map(transaction.mapping, transaction.doc);
-            }
+            },
         },
         props: {
             decorations(state) {
                 return key.getState(state);
-            }
+            },
         },
         appendTransaction: (transactions, prevState, nextState) => {
             const tr = nextState.tr;
@@ -155,7 +154,7 @@ export function HighlighterPlugin({ name, defaultLanguage }) {
                 }
             });
             return modified ? tr : null;
-        }
+        },
     });
 }
 /**
@@ -179,7 +178,7 @@ function getActiveLineDecorations(doc, decorations, position) {
     decorations = decorations.remove(lineDecorations);
     const newDecorations = [];
     for (const decoration of cloned) {
-        const { from, spec: { line, total } } = decoration;
+        const { from, spec: { line, total }, } = decoration;
         const isActive = line === (position === null || position === void 0 ? void 0 : position.line);
         const newDecoration = getLineDecoration(from, line, (position === null || position === void 0 ? void 0 : position.total) || total, isActive);
         newDecorations.push(newDecoration);

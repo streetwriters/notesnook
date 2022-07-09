@@ -43,54 +43,63 @@ function ImageComponent(props) {
                             ? "start"
                             : "end",
                 ":hover .drag-handle, :active .drag-handle": {
-                    opacity: 1,
-                },
+                    opacity: 1
+                }
             } }, { children: (0, jsx_runtime_1.jsxs)(re_resizable_1.Resizable, Object.assign({ enable: {
-                    bottom: editor.isEditable,
-                    left: editor.isEditable,
-                    right: editor.isEditable,
-                    top: editor.isEditable,
-                    bottomLeft: editor.isEditable,
-                    bottomRight: editor.isEditable,
-                    topLeft: editor.isEditable,
-                    topRight: editor.isEditable,
+                    bottom: false,
+                    left: false,
+                    right: false,
+                    top: false,
+                    bottomLeft: false,
+                    bottomRight: editor.isEditable && selected,
+                    topLeft: false,
+                    topRight: false
+                }, handleComponent: {
+                    bottomRight: ((0, jsx_runtime_1.jsx)(icon_1.Icon, { sx: {
+                            width: 25,
+                            height: 25,
+                            marginLeft: -17,
+                            marginTop: -17,
+                            borderTopLeftRadius: "default",
+                            borderBottomRightRadius: "default"
+                        }, path: icons_1.Icons.resize, size: 25, color: "primary" }))
                 }, style: {
                     position: "relative",
-                    float: float ? (align === "left" ? "left" : "right") : "none",
+                    float: float ? (align === "left" ? "left" : "right") : "none"
                 }, size: {
                     height: height || "auto",
-                    width: width || "auto",
+                    width: width || "auto"
                 }, maxWidth: "100%", onResizeStop: (e, direction, ref, d) => {
                     updateAttributes({
                         width: ref.clientWidth,
-                        height: ref.clientHeight,
+                        height: ref.clientHeight
                     }, { addToHistory: true, preventUpdate: false });
                 }, lockAspectRatio: true }, { children: [(0, jsx_runtime_1.jsx)(responsive_1.DesktopOnly, { children: selected && ((0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: { position: "relative", justifyContent: "end" } }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: {
                                     position: "absolute",
                                     top: -40,
                                     mb: 2,
-                                    alignItems: "end",
+                                    alignItems: "end"
                                 } }, { children: (0, jsx_runtime_1.jsx)(toolbargroup_1.ToolbarGroup, { editor: editor, tools: [
                                         "imageAlignLeft",
                                         "imageAlignCenter",
                                         "imageAlignRight",
-                                        "imageProperties",
+                                        "imageProperties"
                                     ], sx: {
                                         boxShadow: "menu",
                                         borderRadius: "default",
-                                        bg: "background",
+                                        bg: "background"
                                     } }) })) }))) }), selected && ((0, jsx_runtime_1.jsx)(icon_1.Icon, { className: "drag-handle", "data-drag-handle": true, draggable: true, path: icons_1.Icons.dragHandle, sx: {
                             cursor: "grab",
                             position: "absolute",
                             top: 2,
                             left: 2,
-                            zIndex: 999,
+                            zIndex: 999
                         } })), (0, jsx_runtime_1.jsx)(rebass_1.Image, Object.assign({ "data-drag-image": true, ref: imageRef, alt: alt, src: "/placeholder.svg", title: title, width: "100%", height: "100%", sx: {
                             bg: "bgSecondary",
                             border: selected
                                 ? "2px solid var(--primary)"
                                 : "2px solid transparent",
-                            borderRadius: "default",
+                            borderRadius: "default"
                         } }, props))] })) })) }));
 }
 exports.ImageComponent = ImageComponent;

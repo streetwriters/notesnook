@@ -43,7 +43,7 @@ function CodeblockComponent(props) {
                 core_1.refractor.register(syntax);
                 const preventUpdate = language === languageDefinition.filename;
                 updateAttributes({
-                    language: languageDefinition.filename,
+                    language: languageDefinition.filename
                 }, { preventUpdate, addToHistory: false });
             });
         })();
@@ -51,13 +51,13 @@ function CodeblockComponent(props) {
     return ((0, jsx_runtime_1.jsxs)(jsx_runtime_1.Fragment, { children: [(0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ sx: {
                     flexDirection: "column",
                     borderRadius: "default",
-                    overflow: "hidden",
-                } }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Text, { ref: forwardRef, as: "pre", sx: {
+                    overflow: "hidden"
+                } }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Text, { ref: forwardRef, as: "pre", autoCorrect: "off", autoCapitalize: "none", sx: {
                             "div, span.token, span.line-number-widget, span.line-number::before": {
                                 fontFamily: "monospace",
                                 fontSize: "code",
                                 whiteSpace: "pre !important",
-                                tabSize: 1,
+                                tabSize: 1
                             },
                             position: "relative",
                             lineHeight: "20px",
@@ -67,24 +67,24 @@ function CodeblockComponent(props) {
                             display: "flex",
                             px: 2,
                             pt: 2,
-                            pb: 1,
+                            pb: 1
                         }, spellCheck: false }), (0, jsx_runtime_1.jsxs)(rebass_1.Flex, Object.assign({ ref: toolbarRef, contentEditable: false, sx: {
                             bg: "codeBg",
                             alignItems: "center",
-                            justifyContent: "end",
-                            borderTop: "1px solid var(--codeBorder)",
+                            justifyContent: "flex-end",
+                            borderTop: "1px solid var(--codeBorder)"
                         } }, { children: [caretPosition ? ((0, jsx_runtime_1.jsxs)(rebass_1.Text, Object.assign({ variant: "subBody", sx: { mr: 2, color: "codeFg" } }, { children: ["Line ", caretPosition.line, ", Column ", caretPosition.column, " ", caretPosition.selected
                                         ? `(${caretPosition.selected} selected)`
                                         : ""] }))) : null, (0, jsx_runtime_1.jsx)(button_1.Button, Object.assign({ variant: "icon", sx: { p: 1, mr: 1, ":hover": { bg: "codeSelection" } }, title: "Toggle indentation mode", onClick: () => {
                                     editor.commands.changeCodeBlockIndentation({
                                         type: indentType === "space" ? "tab" : "space",
-                                        amount: indentLength,
+                                        amount: indentLength
                                     });
                                 } }, { children: (0, jsx_runtime_1.jsxs)(rebass_1.Text, Object.assign({ variant: "subBody", sx: { color: "codeFg" } }, { children: [indentType === "space" ? "Spaces" : "Tabs", ": ", indentLength] })) })), (0, jsx_runtime_1.jsx)(button_1.Button, Object.assign({ variant: "icon", sx: {
                                     p: 1,
                                     mr: 1,
                                     bg: isOpen ? "codeSelection" : "transparent",
-                                    ":hover": { bg: "codeSelection" },
+                                    ":hover": { bg: "codeSelection" }
                                 }, onClick: () => {
                                     setIsOpen(true);
                                 }, title: "Change language" }, { children: (0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ variant: "subBody", spellCheck: false, sx: { color: "codeFg" } }, { children: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.title) || "Plaintext" })) }))] }))] })), (0, jsx_runtime_1.jsx)(responsive_1.ResponsivePresenter, Object.assign({ isOpen: isOpen, onClose: () => {
@@ -101,7 +101,7 @@ function CodeblockComponent(props) {
                     align: "end",
                     isTargetAbsolute: true,
                     location: "top",
-                    yOffset: 5,
+                    yOffset: 5
                 }, title: "Change code block language" }, { children: (0, jsx_runtime_1.jsx)(LanguageSelector, { selectedLanguage: (languageDefinition === null || languageDefinition === void 0 ? void 0 : languageDefinition.filename) || "Plaintext", onLanguageSelected: (language) => {
                         updateAttributes({ language }, { addToHistory: true, preventUpdate: false });
                         setIsOpen(false);
@@ -116,7 +116,7 @@ function LanguageSelector(props) {
                 height: 200,
                 width: ["auto", 300],
                 overflowY: "auto",
-                bg: "background",
+                bg: "background"
             } }, { children: [(0, jsx_runtime_1.jsx)(forms_1.Input, { onFocus: () => {
                         console.log("EHLLO!");
                     }, autoFocus: true, placeholder: "Search languages", sx: {
@@ -126,7 +126,7 @@ function LanguageSelector(props) {
                         bg: "background",
                         mx: 2,
                         p: "7px",
-                        zIndex: 999,
+                        zIndex: 999
                     }, onChange: (e) => {
                         if (!e.target.value)
                             return setLanguages(languages_json_1.default);
@@ -139,12 +139,12 @@ function LanguageSelector(props) {
                     } }), (0, jsx_runtime_1.jsx)(rebass_1.Flex, Object.assign({ sx: {
                         flexDirection: "column",
                         pt: 1,
-                        mt: 1,
+                        mt: 1
                     } }, { children: languages.map((lang) => ((0, jsx_runtime_1.jsxs)(button_1.Button, Object.assign({ variant: "menuitem", sx: {
                             textAlign: "left",
                             py: 1,
                             display: "flex",
                             justifyContent: "space-between",
-                            alignItems: "center",
+                            alignItems: "center"
                         }, onClick: () => onLanguageSelected(lang.filename) }, { children: [(0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ variant: "body" }, { children: lang.title })), selectedLanguage === lang.filename ? ((0, jsx_runtime_1.jsx)(icon_1.Icon, { path: icons_1.Icons.check, size: "small" })) : lang.alias ? ((0, jsx_runtime_1.jsx)(rebass_1.Text, Object.assign({ variant: "subBody", sx: { fontSize: "10px" } }, { children: lang.alias.slice(0, 3).join(", ") }))) : null] }), lang.title))) }))] })) })));
 }
