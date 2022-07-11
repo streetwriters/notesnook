@@ -5,6 +5,7 @@ import { Platform, ViewStyle } from 'react-native';
 import WebView from 'react-native-webview';
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
 import { notesnook } from '../../../e2e/test.ids';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useEditorStore } from '../../stores/use-editor-store';
 import { getElevation } from '../../utils';
 import { db } from '../../utils/database';
@@ -84,8 +85,10 @@ const Editor = React.memo(
 
       useEffect(() => {
         onLoad && onLoad();
+        eSubscribeEvent('webview_reset', onError);
         EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
         return () => {
+          eUnSubscribeEvent('webview_reset', onError);
           EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
         };
       }, []);
@@ -96,10 +99,11 @@ const Editor = React.memo(
       }
 
       const onError = () => {
+        console.log('RENDER PROCESS GONE!!!');
         editor.setLoading(true);
         setTimeout(() => editor.setLoading(false), 10);
       };
-
+      console.log(editor.loading, 'loading editor');
       return editor.loading ? null : (
         <>
           <WebView

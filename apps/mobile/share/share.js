@@ -271,11 +271,6 @@ const ShareView = ({ quicknote = false }) => {
       setLoadingExtension(false);
       loadData();
       useShareStore.getState().restoreAppendNote();
-      sleep(50).then(() => {
-        sleep(500).then(r => {
-          Storage.write('shareExtensionOpened', 'opened');
-        });
-      });
     })();
   }, []);
 
@@ -291,7 +286,10 @@ const ShareView = ({ quicknote = false }) => {
   };
 
   const onLoad = editor => {
-    if (editor) return loadData();
+    if (editor) {
+      Storage.write('shareExtensionOpened', 'opened');
+      return loadData();
+    }
     eSendEvent(eOnLoadNote + 'shareEditor', {
       id: null,
       content: {

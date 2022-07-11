@@ -154,9 +154,6 @@ export const TabsHolder = React.memo(
         }, 2500);
       } else {
         setDeviceMode('mobile', size);
-        setTimeout(() => {
-          tabBarRef.current?.closeDrawer();
-        }, 2500);
       }
     }
 
