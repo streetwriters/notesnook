@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { notesnook } from '../../../e2e/test.ids';
 import { eSendEvent } from '../../services/event-manager';
@@ -109,57 +109,63 @@ const List = ({
 
   return (
     <>
-      <Animated.FlatList
-        entering={type === 'search' ? undefined : FadeInDown}
-        style={styles}
-        keyExtractor={_keyExtractor}
-        ref={scrollRef}
-        testID={notesnook.list.id}
-        data={listData}
-        renderItem={renderItem}
-        onScroll={_onScroll}
-        windowSize={5}
-        onMomentumScrollEnd={() => {
-          tabBarRef.current?.unlock();
+      <Animated.View
+        style={{
+          flex: 1
         }}
-        initialNumToRender={10}
-        keyboardShouldPersistTaps="always"
-        keyboardDismissMode="interactive"
-        refreshControl={
-          <RefreshControl
-            tintColor={colors.accent}
-            colors={[colors.accent]}
-            progressBackgroundColor={colors.nav}
-            onRefresh={_onRefresh}
-            refreshing={false}
-          />
-        }
-        ListEmptyComponent={
-          <Empty
-            loading={loading}
-            placeholderData={placeholderData}
-            headerProps={headerProps}
-            type={type}
-            screen={screen}
-          />
-        }
-        ListFooterComponent={<Footer />}
-        ListHeaderComponent={
-          <>
-            {ListHeader ? (
-              ListHeader
-            ) : (
-              <Header
-                title={headerProps.heading}
-                color={headerProps.color}
-                type={type}
-                screen={screen}
-                warning={warning}
-              />
-            )}
-          </>
-        }
-      />
+        entering={type === 'search' ? undefined : FadeInDown}
+      >
+        <FlatList
+          style={styles}
+          keyExtractor={_keyExtractor}
+          ref={scrollRef}
+          testID={notesnook.list.id}
+          data={listData}
+          renderItem={renderItem}
+          onScroll={_onScroll}
+          windowSize={5}
+          onMomentumScrollEnd={() => {
+            tabBarRef.current?.unlock();
+          }}
+          initialNumToRender={10}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="interactive"
+          refreshControl={
+            <RefreshControl
+              tintColor={colors.accent}
+              colors={[colors.accent]}
+              progressBackgroundColor={colors.nav}
+              onRefresh={_onRefresh}
+              refreshing={false}
+            />
+          }
+          ListEmptyComponent={
+            <Empty
+              loading={loading}
+              placeholderData={placeholderData}
+              headerProps={headerProps}
+              type={type}
+              screen={screen}
+            />
+          }
+          ListFooterComponent={<Footer />}
+          ListHeaderComponent={
+            <>
+              {ListHeader ? (
+                ListHeader
+              ) : (
+                <Header
+                  title={headerProps.heading}
+                  color={headerProps.color}
+                  type={type}
+                  screen={screen}
+                  warning={warning}
+                />
+              )}
+            </>
+          }
+        />
+      </Animated.View>
       <JumpToSectionDialog
         screen={screen}
         data={listData}
