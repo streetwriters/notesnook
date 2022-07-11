@@ -64,7 +64,9 @@ export const TabsHolder = React.memo(
 
     const showFullScreenEditor = () => {
       setFullscreen(true);
-      tabBarRef.current?.openDrawer();
+      if (deviceMode === 'smallTablet') {
+        tabBarRef.current?.openDrawer();
+      }
       editorRef.current?.setNativeProps({
         style: {
           width: dimensions.width,
@@ -76,7 +78,9 @@ export const TabsHolder = React.memo(
     };
 
     const closeFullScreenEditor = () => {
-      tabBarRef.current?.closeDrawer();
+      if (deviceMode === 'smallTablet') {
+        tabBarRef.current?.closeDrawer();
+      }
       setFullscreen(false);
       editorController.current?.commands.updateSettings({
         fullscreen: false
