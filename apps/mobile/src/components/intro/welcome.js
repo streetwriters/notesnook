@@ -1,5 +1,6 @@
 import React from 'react';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { DDS } from '../../services/device-detection';
 import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import SettingsService from '../../services/settings';
@@ -25,7 +26,8 @@ export const WelcomeNotice = () => {
         padding: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '100%'
+        width: DDS.isTab ? '50%' : '95%',
+        alignSelf: 'center'
       }}
     >
       <SvgView width={200} height={200} src={IMAGE(colors.accent)} />

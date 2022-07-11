@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
 import { FluidTabs } from '../components/tabs';
-import { editorState } from '../screens/editor/tiptap/utils';
+import { editorController, editorState } from '../screens/editor/tiptap/utils';
 import { EditorWrapper } from '../screens/editor/wrapper';
 import { DDS } from '../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
@@ -46,6 +46,7 @@ export const TabsHolder = React.memo(
     const animatedTranslateY = useSharedValue(-9999);
     const overlayRef = useRef();
     const [orientation, setOrientation] = useState(getInitialOrientation());
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
 
     const onOrientationChange = (o, o2) => {
       setOrientation(o || o2);
@@ -63,6 +64,7 @@ export const TabsHolder = React.memo(
 
     const showFullScreenEditor = () => {
       setFullscreen(true);
+      tabBarRef.current?.openDrawer();
       editorRef.current?.setNativeProps({
         style: {
           width: dimensions.width,
@@ -74,7 +76,11 @@ export const TabsHolder = React.memo(
     };
 
     const closeFullScreenEditor = () => {
+      tabBarRef.current?.closeDrawer();
       setFullscreen(false);
+      editorController.current?.commands.updateSettings({
+        fullscreen: false
+      });
       editorRef.current?.setNativeProps({
         style: {
           width:
@@ -287,7 +293,7 @@ export const TabsHolder = React.memo(
           <FluidTabs
             ref={tabBarRef}
             dimensions={dimensions}
-            widths={widths[deviceMode]}
+            widths={!introCompleted ? widths['mobile'] : widths[deviceMode]}
             enabled={deviceMode !== 'tablet'}
             onScroll={onScroll}
             onChangeTab={onChangeTab}
@@ -297,7 +303,7 @@ export const TabsHolder = React.memo(
               key="1"
               style={{
                 height: '100%',
-                width: fullscreen ? 0 : widths[deviceMode]?.a
+                width: fullscreen ? 0 : widths[!introCompleted ? 'mobile' : deviceMode]?.a
               }}
             >
               <SideMenu />
@@ -307,7 +313,7 @@ export const TabsHolder = React.memo(
               key="2"
               style={{
                 height: '100%',
-                width: fullscreen ? 0 : widths[deviceMode]?.b
+                width: fullscreen ? 0 : widths[!introCompleted ? 'mobile' : deviceMode]?.b
               }}
             >
               {deviceMode === 'mobile' ? (

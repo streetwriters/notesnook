@@ -21,6 +21,7 @@ import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
+  eOpenFullscreenEditor,
   eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenPublishNoteDialog,
@@ -48,7 +49,8 @@ export const EventTypes = {
   back: 'editor-event:back',
   pro: 'editor-event:pro',
   monograph: 'editor-event:monograph',
-  properties: 'editor-event:properties'
+  properties: 'editor-event:properties',
+  fullscreen: 'editor-event:fullscreen'
 };
 
 const publishNote = async (editor: useEditorType) => {
@@ -124,17 +126,26 @@ export const useEditorEvents = (
   if (!editor) return null;
 
   useEffect(() => {
-    console.log('settings', readonly);
+    console.log('settings', fullscreen);
     editor.commands.setSettings({
       deviceMode: deviceMode || 'mobile',
-      fullscreen: fullscreen,
+      fullscreen: fullscreen || false,
       premium: isPremium,
       readonly: readonly || editorPropReadonly,
       tools: tools,
       noHeader: noHeader,
       noToolbar: readonly || editorPropReadonly || noToolbar
     });
-  }, [fullscreen, isPremium, readonly, editor.sessionId, editor.loading, tools, editor.commands]);
+  }, [
+    fullscreen,
+    isPremium,
+    readonly,
+    editor.sessionId,
+    editor.loading,
+    deviceMode,
+    tools,
+    editor.commands
+  ]);
 
   const onBackPress = useCallback(async () => {
     const editorHandledBack = await editor.commands.handleBack();
@@ -163,7 +174,7 @@ export const useEditorEvents = (
       editorState().currentlyEditing = false;
       editor.reset();
     }, 1);
-  }, []);
+  }, [fullscreen, deviceMode]);
 
   const onHardwareBackPress = useCallback(() => {
     if (editorState().currentlyEditing) {
@@ -301,6 +312,10 @@ export const useEditorEvents = (
         break;
       case EventTypes.properties:
         showActionsheet(editor);
+        break;
+      case EventTypes.fullscreen:
+        editorState().isFullscreen = true;
+        eSendEvent(eOpenFullscreenEditor);
         break;
       case EventTypes.back:
         onBackPress();

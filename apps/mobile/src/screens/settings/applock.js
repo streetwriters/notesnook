@@ -11,6 +11,7 @@ import { SvgView } from '../../components/ui/svg';
 import { BouncingView } from '../../components/ui/transitions/bouncing-view';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
+import { DDS } from '../../services/device-detection';
 import { presentSheet } from '../../services/event-manager';
 import SettingsService from '../../services/settings';
 import { useSettingStore } from '../../stores/use-setting-store';
@@ -68,7 +69,7 @@ const AppLock = ({ navigation, route }) => {
                 flexDirection: 'row',
                 alignItems: 'flex-end',
                 justifyContent: 'space-between',
-                width: '95%',
+                width: DDS.isTab && welcome ? '50%' : '95%',
                 paddingVertical: 12,
                 paddingHorizontal: 0,
                 alignSelf: 'center',
@@ -108,7 +109,9 @@ const AppLock = ({ navigation, route }) => {
             <Seperator />
             <View
               style={{
-                paddingHorizontal: 12
+                paddingHorizontal: 12,
+                width: DDS.isTab && welcome ? '50%' : undefined,
+                alignSelf: 'center'
               }}
             >
               {modes.map(item => (
@@ -187,7 +190,7 @@ const AppLock = ({ navigation, route }) => {
           <BouncingView
             style={{
               position: 'absolute',
-              bottom: -130,
+              bottom: DDS.isTab ? -300 : -130,
               zIndex: -1
             }}
             animated={false}

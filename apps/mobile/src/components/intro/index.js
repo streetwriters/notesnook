@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Dimensions, Image, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { DDS } from '../../services/device-detection';
 import SettingsService from '../../services/settings';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
@@ -153,7 +154,7 @@ const Intro = ({ navigation, route }) => {
       <BouncingView
         style={{
           position: 'absolute',
-          bottom: -100,
+          bottom: DDS.isTab ? -300 : -100,
           zIndex: -1
         }}
         duration={3000}

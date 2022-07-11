@@ -117,6 +117,19 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     `);
   };
 
+  updateSettings = async (settings?: Partial<Settings>) => {
+    if (!this.previousSettings) return;
+    this.previousSettings = {
+      ...this.previousSettings,
+      ...settings
+    };
+    await this.doAsync(`
+      if (typeof globalThis.settingsController !== "undefined") {
+        globalThis.settingsController.update(${JSON.stringify(this.previousSettings)}) 
+      }
+    `);
+  };
+
   setSettings = async (settings?: Partial<Settings>) => {
     if (settings) {
       this.previousSettings = settings;

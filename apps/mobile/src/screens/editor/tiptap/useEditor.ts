@@ -341,6 +341,7 @@ export const useEditor = (
       await commands.setPlaceholder(placeholderTip.current);
       isDefaultEditor && restoreEditorState();
     }
+    commands.setSettings();
   }, [state, currentNote, loadNote]);
 
   async function restoreEditorState() {

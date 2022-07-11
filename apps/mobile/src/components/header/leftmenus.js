@@ -16,7 +16,11 @@ export const LeftMenus = () => {
 
   const onLeftButtonPress = () => {
     if (!canGoBack) {
-      Navigation.openDrawer();
+      if (tabBarRef.current?.isDrawerOpen()) {
+        Navigation.closeDrawer();
+      } else {
+        Navigation.openDrawer();
+      }
       return;
     }
     Navigation.goBack();

@@ -1,12 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  AppState,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  TextInput,
-  View
-} from 'react-native';
+import { AppState, KeyboardAvoidingView, Platform, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
 import { PremiumToast } from '../../components/premium/premium-toast';
@@ -16,6 +9,7 @@ import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { editorRef } from '../../utils/global-refs';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
+import useKeyboard from '../../utils/hooks/use-keyboard';
 import { ProgressBar } from './progress';
 import { editorController, editorState, textInput } from './tiptap/utils';
 
@@ -26,6 +20,7 @@ export const EditorWrapper = ({ width }) => {
   const insets = useSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
   const introCompleted = useSettingStore(state => state.settings.introCompleted);
+  const keyboard = useKeyboard();
 
   const onAppStateChanged = async state => {
     if (editorState().movedAway) return;
@@ -47,7 +42,7 @@ export const EditorWrapper = ({ width }) => {
       testID="editor-wrapper"
       ref={editorRef}
       style={{
-        width: width[deviceMode]?.c,
+        width: width[!introCompleted ? 'mobile' : deviceMode]?.c,
         height: '100%',
         backgroundColor: colors.bg,
         borderLeftWidth: DDS.isTab ? 1 : 0,
@@ -58,7 +53,13 @@ export const EditorWrapper = ({ width }) => {
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{
-            flex: 1
+            flex: 1,
+            marginBottom:
+              Platform.OS === 'ios'
+                ? keyboard?.keyboardShown && !floating
+                  ? 16
+                  : insets.bottom
+                : 6
           }}
           enabled={!floating}
           keyboardVerticalOffset={0}

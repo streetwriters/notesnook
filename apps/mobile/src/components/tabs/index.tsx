@@ -16,6 +16,7 @@ import Animated, {
   withSpring,
   withTiming
 } from 'react-native-reanimated';
+import { useSettingStore } from '../../stores/use-setting-store';
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
@@ -44,6 +45,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     { children, dimensions, widths, onChangeTab, onScroll, enabled, onDrawerStateChange }: TabProps,
     ref
   ) => {
+    const deviceMode = useSettingStore(state => state.deviceMode);
     const translateX = useSharedValue(widths ? widths.a : 0);
     const startX = useSharedValue(0);
     const currentTab = useSharedValue(1);
@@ -58,9 +60,11 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const [disabled, setDisabled] = useState(false);
     const node = useRef<Animated.View>(null);
     const containerWidth = widths ? widths.a + widths.b + widths.c : dimensions.width;
+    console.log(containerWidth, dimensions.width);
     const drawerPosition = 0;
     const homePosition = widths.a;
     const editorPosition = widths.a + widths.b;
+    const isSmallTab = deviceMode === 'smallTablet';
 
     useEffect(() => {
       const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -189,7 +193,13 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
       .onChange(event => {
         if (locked.value || forcedLock.value) return;
         let value = translateX.value + event.changeX * -1;
-        if (value < 0 || currentTab.value === 2 || value > editorPosition) return;
+        if (
+          value < 0 ||
+          currentTab.value === 2 ||
+          value > editorPosition ||
+          (value >= homePosition && isSmallTab)
+        )
+          return;
         translateX.value = value;
       })
       .onEnd(event => {

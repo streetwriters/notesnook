@@ -190,10 +190,11 @@ export const Login = ({ changeMode, welcome }) => {
         </View>
         <View
           style={{
-            width: focused ? '100%' : '99.9%',
+            width: DDS.isTab ? (focused ? '50%' : '49.99%') : focused ? '100%' : '99.9%',
             padding: 12,
             backgroundColor: colors.bg,
-            flexGrow: 1
+            flexGrow: 1,
+            alignSelf: 'center'
           }}
         >
           <Input
