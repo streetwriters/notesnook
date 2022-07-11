@@ -142,6 +142,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         closeDrawer: () => {
           if (deviceMode === 'tablet') {
             translateX.value = withTiming(0);
+            return;
           }
           translateX.value = withTiming(homePosition);
           onDrawerStateChange(false);
