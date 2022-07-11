@@ -95,6 +95,7 @@ export const useEditor = (
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
+      console.log('ON READY CALLED');
       overlay(true);
       setLoading(true);
     }

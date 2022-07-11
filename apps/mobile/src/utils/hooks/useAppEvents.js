@@ -41,6 +41,7 @@ import {
 } from '../../services/event-manager';
 import { useEditorStore } from '../../stores/use-editor-store';
 import { useDragState } from '../../screens/settings/editor/state';
+import { sleep } from '../time';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -418,6 +419,7 @@ export const useAppEvents = () => {
   }
 
   async function checkIntentState() {
+    console.log(checkIntentState, 'CHECK INTENT STATE');
     try {
       let notesAddedFromIntent = MMKV.getString('notesAddedFromIntent');
       let shareExtensionOpened = MMKV.getString('shareExtensionOpened');
@@ -432,14 +434,12 @@ export const useAppEvents = () => {
         initialize();
         eSendEvent(refreshNotesPage);
       }
+      console.log('CHECK INTENT STATE', notesAddedFromIntent || shareExtensionOpened);
       if (notesAddedFromIntent || shareExtensionOpened) {
         let id = useEditorStore.getState().currentEditingNote;
         let note = id && db.notes.note(id).data;
         eSendEvent('loadingNote', note);
-        editorController.current?.setLoading(true);
-        setTimeout(() => {
-          editorController.current?.setLoading(false);
-        }, 100);
+        eSendEvent('webview_reset');
         MMKV.removeItem('shareExtensionOpened');
       }
     } catch (e) {
