@@ -15,6 +15,12 @@ const initialState = {
 global.settingsController = {
   update: (settings) => {
     const nextSettings = settings;
+    if (
+      JSON.stringify(nextSettings) ===
+      JSON.stringify(global.settingsController.previous)
+    ) {
+      return;
+    }
     if (global.settingsController.set)
       global.settingsController.set(nextSettings);
     if (settings) {

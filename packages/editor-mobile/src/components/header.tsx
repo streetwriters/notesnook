@@ -48,7 +48,6 @@ export default function Header({
   hasRedo: boolean;
 }) {
   const insets = useSafeArea();
-  logger("info", settings.deviceMode, settings.fullscreen);
   return (
     <div
       style={{

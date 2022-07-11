@@ -114,12 +114,9 @@ const Tiptap = () => {
     },
     [layout, initialProps.readonly, tick]
   );
-
   const update = () => {
     setTick((tick) => tick + 1);
-    setLayout(false);
     controller.setTitlePlaceholder("Note title");
-    setImmediate(() => setLayout(true));
   };
 
   const controller = useEditorController(_editor, update);
@@ -127,13 +124,10 @@ const Tiptap = () => {
   globalThis.editorController = controller;
   globalThis.editor = _editor;
 
-  useEffect(() => {
-    setInitialProps({ ...settings });
-  }, [settings]);
-
   useLayoutEffect(() => {
+    setInitialProps({ ...settings });
     setLayout(true);
-  }, []);
+  }, [settings]);
 
   return (
     <>
