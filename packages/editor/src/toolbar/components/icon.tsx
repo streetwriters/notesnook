@@ -2,7 +2,7 @@ import MDIIcon from "@mdi/react";
 import { Theme } from "@notesnook/theme";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { Flex, FlexProps } from "rebass";
-import { useTheme } from "../stores/toolbar-store";
+import { useTheme } from "emotion-theming";
 
 type IconProps = {
   title?: string;
@@ -18,9 +18,9 @@ function MDIIconWrapper({
   size = 24,
   color = "icon",
   stroke,
-  rotate
+  rotate,
 }: IconProps) {
-  const theme = useTheme();
+  const theme: Theme = useTheme();
 
   const themedColor: string = theme?.colors
     ? (theme.colors[color] as string)
@@ -38,7 +38,7 @@ function MDIIconWrapper({
       }
       style={{
         strokeWidth: stroke || "0px",
-        stroke: themedColor
+        stroke: themedColor,
       }}
       color={themedColor}
       spin={rotate}
@@ -57,7 +57,7 @@ export function Icon(props: NNIconProps) {
         flexShrink: 0,
         justifyContent: "center",
         alignItems: "center",
-        ...sx
+        ...sx,
       }}
       {...restProps}
     >
