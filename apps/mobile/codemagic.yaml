@@ -16,7 +16,7 @@ workflows:
         APP_STORE_APP_ID: 1544027013 # <-- Put the app id number here. This is found in App Store Connect > App > General > App Information
 
       node: 16.13.2
-      xcode: 12.4
+      xcode: latest
       cocoapods: default
     cache:
       cache_paths:
@@ -24,7 +24,7 @@ workflows:
     scripts:
       - name: Install npm dependencies
         script: |
-          npm install
+          yarn install --network-concurrency 1
       - name: Install CocoaPods dependencies
         script: |
           cd ios && pod install
