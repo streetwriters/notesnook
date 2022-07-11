@@ -12,8 +12,8 @@ var __rest = (this && this.__rest) || function (s, e) {
 import { jsx as _jsx } from "react/jsx-runtime";
 import MDIIcon from "@mdi/react";
 import { Flex } from "rebass";
-import { useTheme } from "../stores/toolbar-store";
-function MDIIconWrapper({ title, path, size = 24, color = "icon", stroke, rotate }) {
+import { useTheme } from "emotion-theming";
+function MDIIconWrapper({ title, path, size = 24, color = "icon", stroke, rotate, }) {
     const theme = useTheme();
     const themedColor = (theme === null || theme === void 0 ? void 0 : theme.colors)
         ? theme.colors[color]
@@ -22,7 +22,7 @@ function MDIIconWrapper({ title, path, size = 24, color = "icon", stroke, rotate
             ? `${(theme === null || theme === void 0 ? void 0 : theme.iconSizes[size]) || 24}px`
             : `${size}px`, style: {
             strokeWidth: stroke || "0px",
-            stroke: themedColor
+            stroke: themedColor,
         }, color: themedColor, spin: rotate }));
 }
 export function Icon(props) {
