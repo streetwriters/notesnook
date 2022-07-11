@@ -46,6 +46,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     ref
   ) => {
     const deviceMode = useSettingStore(state => state.deviceMode);
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
     const translateX = useSharedValue(widths ? widths.a : 0);
     const startX = useSharedValue(0);
     const currentTab = useSharedValue(1);
@@ -68,8 +69,10 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const isLoaded = useRef(false);
 
     useEffect(() => {
-      if (!isLoaded.current) {
+      if (!isLoaded.current && introCompleted && deviceMode === 'tablet') {
         translateX.value = 0;
+        isLoaded.current = true;
+      } else {
         isLoaded.current = true;
       }
       const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -90,7 +93,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
       ref,
       (): TabsRef => ({
         goToPage: (page: number) => {
-          translateX.value = 0;
           if (deviceMode === 'tablet') {
             translateX.value = withTiming(0);
             return;

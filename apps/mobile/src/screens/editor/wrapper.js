@@ -57,7 +57,9 @@ export const EditorWrapper = ({ width }) => {
             marginBottom:
               Platform.OS === 'ios'
                 ? keyboard?.keyboardShown && !floating
-                  ? 16
+                  ? Platform.isPad
+                    ? 16
+                    : insets.bottom
                   : insets.bottom
                 : 6
           }}
