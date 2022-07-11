@@ -9,12 +9,12 @@ const initialState = {
   tools: getDefaultPresets().default,
   noToolbar: global.noToolbar,
   noHeader: global.noHeader,
-  readonly: global.readonly,
+  readonly: global.readonly
 };
 
 global.settingsController = {
   update: (settings) => {
-    const nextSettings = { ...settingsController.previous, ...settings };
+    const nextSettings = settings;
     if (global.settingsController.set)
       global.settingsController.set(nextSettings);
     if (settings) {
@@ -24,12 +24,12 @@ global.settingsController = {
     }
     settingsController.previous = { ...nextSettings };
   },
-  previous: settingsJson ? JSON.parse(settingsJson) : { ...initialState },
+  previous: settingsJson ? JSON.parse(settingsJson) : { ...initialState }
 };
 
 export const useSettings = () => {
   const [settings, setSettings] = useState({
-    ...global.settingsController.previous,
+    ...global.settingsController.previous
   });
   global.settingsController.set = setSettings;
 

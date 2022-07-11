@@ -120,6 +120,7 @@ export const EventTypes = {
   pro: "editor-event:pro",
   monograph: "editor-event:monograph",
   properties: "editor-event:properties",
+  fullscreen: "editor-event:fullscreen"
 };
 
 export function isReactNative(): boolean {
@@ -143,7 +144,7 @@ export function post(type: string, value?: unknown) {
         //@ts-ignore
         type: EventTypes[type] || type,
         value: value,
-        sessionId: global.sessionId,
+        sessionId: global.sessionId
       })
     );
   } else {
