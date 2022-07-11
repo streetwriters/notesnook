@@ -1,4 +1,9 @@
-- Improvements to sync performance
-- Added sort by title option in sort menu
+- A new editor for Notesnook
+- Configurable toolbar - Everyone deserves their own toolbar
+- KaTex Math support
+- Outline lists
+- Task lists with progress & reordering
+- Overhaul Settings for better UI and UX
+- Lot's of bug fixes and performance improvements
 
 Thank you for using Notesnook!
