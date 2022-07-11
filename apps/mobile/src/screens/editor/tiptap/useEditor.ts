@@ -95,7 +95,6 @@ export const useEditor = (
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
-      console.log('reload editor');
       overlay(true);
       setLoading(true);
     }
@@ -119,6 +118,7 @@ export const useEditor = (
     sessionHistoryId.current = undefined;
     saveCount.current = 0;
     useEditorStore.getState().setReadonly(false);
+    postMessage(EditorEvents.title, '');
     await commands.clearContent();
     console.log('reset state: ', resetState);
     if (resetState) {
