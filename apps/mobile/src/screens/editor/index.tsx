@@ -1,6 +1,6 @@
 import { EV, EVENTS } from 'notes-core/common';
 import React, { forwardRef, useEffect, useImperativeHandle } from 'react';
-import { ViewStyle } from 'react-native';
+import { Platform, ViewStyle } from 'react-native';
 import WebView from 'react-native-webview';
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
 import { notesnook } from '../../../e2e/test.ids';
@@ -8,6 +8,7 @@ import { IconButton } from '../../components/ui/icon-button';
 import { useEditorStore } from '../../stores/use-editor-store';
 import { getElevation } from '../../utils';
 import { db } from '../../utils/database';
+import { openLinkInBrowser } from '../../utils/functions';
 import { NoteType } from '../../utils/types';
 import EditorOverlay from './loading';
 import { EDITOR_URI } from './source';
@@ -24,9 +25,13 @@ const style: ViewStyle = {
   backgroundColor: 'transparent'
 };
 const onShouldStartLoadWithRequest = (request: ShouldStartLoadRequest) => {
-  // if (request.url.startsWith('http://')) return true;
-  // Linking.openURL(request.url);
-  return true;
+  if (request.url.includes('https')) {
+    if (Platform.OS === 'ios' && !request.isTopFrame) return true;
+    openLinkInBrowser(request.url);
+    return false;
+  } else {
+    return true;
+  }
 };
 
 const Editor = React.memo(
