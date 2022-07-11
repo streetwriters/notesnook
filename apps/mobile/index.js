@@ -8,7 +8,6 @@ import Config from 'react-native-config';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import appJson from './app.json';
 import Notifications from './src/services/notifications';
-import App from './App';
 const appName = appJson.name;
 if (Config.isTesting) {
   Date.prototype.toLocaleString = () => 'XX-XX-XX';
@@ -24,6 +23,7 @@ Notifications.init();
 let QuickNoteIOS;
 
 const AppProvider = () => {
+  const App = require('./App.js').default;
   return <App />;
 };
 

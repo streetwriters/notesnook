@@ -1,16 +1,15 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { EV, EVENTS } from 'notes-core/common';
-import React, { forwardRef, useEffect, useImperativeHandle } from 'react';
+import React, { forwardRef, ReactElement, useEffect, useImperativeHandle, useState } from 'react';
 import { Platform, ViewStyle } from 'react-native';
 import WebView from 'react-native-webview';
 import { ShouldStartLoadRequest } from 'react-native-webview/lib/WebViewTypes';
 import { notesnook } from '../../../e2e/test.ids';
-import { IconButton } from '../../components/ui/icon-button';
 import { useEditorStore } from '../../stores/use-editor-store';
 import { getElevation } from '../../utils';
 import { db } from '../../utils/database';
 import { openLinkInBrowser } from '../../utils/functions';
 import { NoteType } from '../../utils/types';
-import EditorOverlay from './loading';
 import { EDITOR_URI } from './source';
 import { EditorProps, useEditorType } from './tiptap/types';
 import { useEditor } from './tiptap/use-editor';
@@ -136,14 +135,13 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: __DEV__ ? 'http://192.168.10.7:3000' : EDITOR_URI
+              uri: __DEV__ ? EDITOR_URI : EDITOR_URI
             }}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={onMessage || undefined}
           />
-          {theme ? null : <EditorOverlay editorId={editorId || ''} editor={editor} />}
-          <ReadonlyButton editor={editor} />
+          {editorId === 'shareEditor' ? null : <AppSection editor={editor} editorId={editorId} />}
         </>
       );
     }
@@ -153,9 +151,30 @@ const Editor = React.memo(
 
 export default Editor;
 
+//@ts-ignore
+let EditorOverlay: React.ElementType;
+//@ts-ignore
+let IconButton: React.ElementType;
+//@ts-ignore
+const AppSection = ({ editor, editorId }) => {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    //@ts-ignore
+    EditorOverlay = require('./loading.js').default;
+    //@ts-ignore
+    IconButton = require('../../components/ui/icon-button/index.tsx').IconButton;
+    setLoaded(true);
+  }, []);
+  return loaded ? (
+    <>
+      {EditorOverlay ? <EditorOverlay editorId={editorId || ''} editor={editor} /> : null}
+      <ReadonlyButton editor={editor} />
+    </>
+  ) : null;
+};
+
 const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
   const readonly = useEditorStore(state => state.readonly);
-
   const onPress = async () => {
     if (editor.note.current) {
       await db.notes?.note(editor.note.current.id).readonly();
@@ -163,7 +182,8 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
       useEditorStore.getState().setReadonly(false);
     }
   };
-  return readonly ? (
+
+  return readonly && IconButton ? (
     <IconButton
       name="pencil-lock"
       type="grayBg"

@@ -19,16 +19,15 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ShareExtension from 'rn-extensions-share';
 import isURL from 'validator/lib/isURL';
+import Editor from '../src/screens/editor';
 import { eSendEvent } from '../src/services/event-manager';
 import { getElevation } from '../src/utils';
 import { db } from '../src/utils/database';
 import Storage from '../src/utils/database/storage';
 import { eOnLoadNote } from '../src/utils/events';
-import { useAppState } from '../src/utils/hooks/use-app-state';
 import { sleep } from '../src/utils/time';
 import { Search } from './search';
 import { useShareStore } from './store';
-let Editor = null;
 const getLinkPreview = url => {
   return getPreviewData(url, 5000);
 };
@@ -190,7 +189,6 @@ const ShareView = ({ quicknote = false }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [kh, setKh] = useState(0);
   const editorRef = useRef();
-  const appState = useAppState();
 
   const onKeyboardDidShow = event => {
     let kHeight = event.endCoordinates.height;
@@ -268,15 +266,8 @@ const ShareView = ({ quicknote = false }) => {
   };
 
   useEffect(() => {
-    console.log('setting value in storage');
-    if (appState !== 'active') {
-      console.log('app state is not active');
-      return;
-    }
-    console.log('app state is active');
     (async () => {
       //await loadDatabase();
-      Editor = require('../src/screens/editor/index').default;
       setLoadingExtension(false);
       loadData();
       useShareStore.getState().restoreAppendNote();
@@ -286,7 +277,7 @@ const ShareView = ({ quicknote = false }) => {
         });
       });
     })();
-  }, [appState]);
+  }, []);
 
   const close = async () => {
     setNote({ ...defaultNote });
@@ -582,7 +573,7 @@ const ShareView = ({ quicknote = false }) => {
                     flex: 1
                   }}
                 >
-                  {Editor && (
+                  {!loadingExtension && (
                     <Editor
                       ref={editorRef}
                       theme={{

@@ -1,8 +1,8 @@
+/* eslint-disable no-case-declarations */
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { useCallback, useEffect, useRef } from 'react';
 import { BackHandler, InteractionManager, NativeEventSubscription } from 'react-native';
 import { WebViewMessageEvent } from 'react-native-webview';
-import { AuthMode } from '../../../components/auth';
-import { Properties } from '../../../components/properties';
 import { DDS } from '../../../services/device-detection';
 import {
   eSendEvent,
@@ -31,7 +31,6 @@ import filesystem from '../../../utils/filesystem';
 import { tabBarRef } from '../../../utils/global-refs';
 import { NoteType } from '../../../utils/types';
 import { useDragState } from '../../settings/editor/state';
-import picker from './picker';
 import { EditorMessage, EditorProps, useEditorType } from './types';
 import { EditorEvents, editorState } from './utils';
 
@@ -102,7 +101,7 @@ const showActionsheet = async (editor: useEditorType) => {
     if (editorState().isFocused || editorState().isFocused) {
       editorState().isFocused = true;
     }
-
+    const { Properties } = require('../../../components/properties/index.js');
     Properties.present(note, ['Dark Mode']);
   } else {
     ToastEvent.show({
@@ -294,7 +293,8 @@ export const useEditorEvents = (
         }
         break;
       case EventTypes.filepicker:
-        picker.pick({ type: editorMessage.value });
+        const { pick } = require('./picker.js').default;
+        pick({ type: 'image' });
         break;
       case EventTypes.download:
         console.log('download attachment request', editorMessage.value);
