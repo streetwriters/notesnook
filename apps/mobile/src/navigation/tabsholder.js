@@ -144,10 +144,19 @@ export const TabsHolder = React.memo(
 
       if (DDS.isLargeTablet()) {
         setDeviceMode('tablet', size);
+        setTimeout(() => {
+          tabBarRef.current?.goToIndex(0);
+        }, 2500);
       } else if (DDS.isSmallTab) {
         setDeviceMode('smallTablet', size);
+        setTimeout(() => {
+          tabBarRef.current?.closeDrawer();
+        }, 2500);
       } else {
         setDeviceMode('mobile', size);
+        setTimeout(() => {
+          tabBarRef.current?.closeDrawer();
+        }, 2500);
       }
     }
 

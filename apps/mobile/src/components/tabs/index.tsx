@@ -65,8 +65,13 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const homePosition = widths.a;
     const editorPosition = widths.a + widths.b;
     const isSmallTab = deviceMode === 'smallTablet';
+    const isLoaded = useRef(false);
 
     useEffect(() => {
+      if (!isLoaded.current) {
+        translateX.value = 0;
+        isLoaded.current = true;
+      }
       const sub = BackHandler.addEventListener('hardwareBackPress', () => {
         if (isDrawerOpen.value) {
           translateX.value = withTiming(homePosition);
@@ -85,6 +90,11 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
       ref,
       (): TabsRef => ({
         goToPage: (page: number) => {
+          translateX.value = 0;
+          if (deviceMode === 'tablet') {
+            translateX.value = withTiming(0);
+            return;
+          }
           page = page + 1;
           if (page === 1) {
             onDrawerStateChange(false);
@@ -97,6 +107,10 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           }
         },
         goToIndex: (index: number) => {
+          if (deviceMode === 'tablet') {
+            translateX.value = withTiming(0);
+            return;
+          }
           if (index === 0) {
             onDrawerStateChange(true);
             return (translateX.value = withSpring(0));
@@ -126,6 +140,9 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           onDrawerStateChange(true);
         },
         closeDrawer: () => {
+          if (deviceMode === 'tablet') {
+            translateX.value = withTiming(0);
+          }
           translateX.value = withTiming(homePosition);
           onDrawerStateChange(false);
           isDrawerOpen.value = false;
@@ -134,7 +151,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         setScrollEnabled: () => true,
         node: node
       }),
-      []
+      [deviceMode, homePosition, editorPosition]
     );
 
     useAnimatedReaction(
