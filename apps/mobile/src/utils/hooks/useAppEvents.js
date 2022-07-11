@@ -436,7 +436,10 @@ export const useAppEvents = () => {
         let id = useEditorStore.getState().currentEditingNote;
         let note = id && db.notes.note(id).data;
         eSendEvent('loadingNote', note);
-        eSendEvent('webviewreset', true);
+        editorController.current?.setLoading(true);
+        setTimeout(() => {
+          editorController.current?.setLoading(false);
+        }, 100);
         MMKV.removeItem('shareExtensionOpened');
       }
     } catch (e) {
