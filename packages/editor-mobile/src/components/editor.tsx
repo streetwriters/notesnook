@@ -124,10 +124,13 @@ const Tiptap = () => {
   globalThis.editorController = controller;
   globalThis.editor = _editor;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setInitialProps({ ...settings });
-    setLayout(true);
   }, [settings]);
+
+  useLayoutEffect(() => {
+    setLayout(true);
+  }, []);
 
   return (
     <>
