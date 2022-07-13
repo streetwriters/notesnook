@@ -40,10 +40,10 @@ import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@rebass/forms";
 import useZoomFactor from "../hooks/use-zoom-factor";
-import debounce from "just-debounce-it";
 import { PATHS } from "@notesnook/desktop/paths";
 import { openPath } from "../commands/open";
 import { getAllAccents } from "@notesnook/theme";
+import { debounce } from "../utils/debounce";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;

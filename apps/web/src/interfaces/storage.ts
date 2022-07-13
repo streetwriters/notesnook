@@ -1,7 +1,6 @@
 import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import * as MemoryDriver from "localforage-driver-memory";
-import sort from "fast-sort";
 import { getNNCrypto } from "./nncrypto.stub";
 import { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
 
@@ -31,7 +30,7 @@ export class NNStorage {
 
   readMulti(keys: string[]) {
     if (keys.length <= 0) return [];
-    return this.database.getItems(sort(keys).asc());
+    return this.database.getItems(keys.sort());
   }
 
   write<T>(key: string, data: T) {
