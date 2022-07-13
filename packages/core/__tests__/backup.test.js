@@ -116,11 +116,6 @@ describe.each([
             !v.data.includes("tox-checklist--checked")
         )
       ).toBeTruthy();
-
-      const tableContent = allContent.find((a) => a.data.includes("<table"));
-      expect(
-        !tableContent || tableContent.data.includes(`class="table-container"`)
-      ).toBe(true);
     });
   });
 
