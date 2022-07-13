@@ -20,10 +20,13 @@ class Merger {
         set: (item) => this._db.notes.merge(item),
       },
       notebook: {
+        threshold: 1000,
         get: (id) => this._db.notebooks.notebook(id),
         set: (item) => this._db.notebooks.merge(item),
+        conflict: (_local, remote) => this._db.notebooks.merge(remote),
       },
       content: {
+        threshold: process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000,
         get: (id) => this._db.content.raw(id),
         set: (item) => this._db.content.add(item),
         conflict: async (local, remote) => {
@@ -138,7 +141,13 @@ class Merger {
     }
   }
 
-  async _mergeItemWithConflicts(remoteItem, get, add, markAsConflicted) {
+  async _mergeItemWithConflicts(
+    remoteItem,
+    get,
+    add,
+    markAsConflicted,
+    threshold
+  ) {
     remoteItem = await this._deserialize(remoteItem);
     let localItem = await get(remoteItem.id);
 
@@ -149,15 +158,13 @@ class Merger {
       const isModified = localItem.dateModified > this._lastSynced;
       if (isModified && !isResolved) {
         // If time difference between local item's edits & remote item's edits
-        // is less than 1 minute, we shouldn't trigger a merge conflict; instead
+        // is less than threshold, we shouldn't trigger a merge conflict; instead
         // we will keep the most recently changed item.
         const timeDiff =
           Math.max(remoteItem.dateModified, localItem.dateModified) -
           Math.min(remoteItem.dateModified, localItem.dateModified);
 
-        const ONE_MINUTE =
-          process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000;
-        if (timeDiff < ONE_MINUTE) {
+        if (timeDiff < threshold) {
           if (remoteItem.dateModified > localItem.dateModified) {
             await add(remoteItem);
           }
@@ -188,7 +195,8 @@ class Merger {
         item,
         definition.get,
         definition.set,
-        definition.conflict
+        definition.conflict,
+        definition.threshold
       );
     } else if (definition.get && definition.set) {
       await this._mergeItem(item, definition.get, definition.set);

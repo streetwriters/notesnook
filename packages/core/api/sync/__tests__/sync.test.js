@@ -259,6 +259,46 @@ test.skip(
   60 * 1000
 );
 
+test.skip(
+  "issue: new topics on 2 devices are not properly synced",
+  async () => {
+    const deviceA = await initializeDevice("deviceA");
+    const deviceB = await initializeDevice("deviceB");
+
+    const id = await deviceA.notebooks.add({ title: "Notebook 1" });
+
+    await syncAndWait(deviceA, deviceB, false);
+
+    expect(deviceB.notebooks.notebook(id)).toBeDefined();
+
+    await deviceA.notebooks.notebook(id).topics.add("Topic 1");
+
+    // to create a conflict
+    await delay(1500);
+
+    await deviceB.notebooks.notebook(id).topics.add("Topic 2");
+
+    expect(deviceA.notebooks.notebook(id).topics.has("Topic 1")).toBeTruthy();
+
+    expect(deviceB.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
+
+    await syncAndWait(deviceA, deviceB, false);
+
+    await delay(1000);
+
+    await syncAndWait(deviceB, deviceB, false);
+
+    expect(deviceA.notebooks.notebook(id).topics.has("Topic 1")).toBeTruthy();
+    expect(deviceB.notebooks.notebook(id).topics.has("Topic 1")).toBeTruthy();
+
+    expect(deviceA.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
+    expect(deviceB.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
+
+    await cleanup(deviceA, deviceB);
+  },
+  60 * 1000
+);
+
 /**
  *
  * @param {string} id
@@ -274,11 +314,11 @@ async function initializeDevice(id, capabilities = []) {
 
   const device = new Database(new NodeStorageInterface(), EventSource, FS);
   device.host({
-    API_HOST: "http://192.168.43.221:5264",
-    AUTH_HOST: "http://192.168.43.221:8264",
-    SSE_HOST: "http://192.168.43.221:7264",
-    ISSUES_HOST: "http://192.168.43.221:2624",
-    SUBSCRIPTIONS_HOST: "http://192.168.43.221:9264",
+    API_HOST: "http://192.168.10.29:5264",
+    AUTH_HOST: "http://192.168.10.29:8264",
+    SSE_HOST: "http://192.168.10.29:7264",
+    ISSUES_HOST: "http://192.168.10.29:2624",
+    SUBSCRIPTIONS_HOST: "http://192.168.10.29:9264",
   });
 
   await device.init(id);

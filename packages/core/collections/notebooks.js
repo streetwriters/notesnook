@@ -47,7 +47,7 @@ export default class Notebooks extends Collection {
           isChanged = true;
         }
       }
-      if (isChanged) remoteNotebook.dateModified = Date.now(); // we update the dateEdited so it can be synced back
+      remoteNotebook.remote = !isChanged;
     }
     return await this._collection.addItem(remoteNotebook);
   }
