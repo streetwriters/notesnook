@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import TitleBox from "./title-box";
 import { useStore } from "../../stores/editor-store";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
@@ -18,8 +17,6 @@ function Header({ readonly }) {
 
   return (
     <>
-      <TitleBox readonly={readonly} />
-
       {!readonly && id && (
         <Flex alignItems="center" flexWrap="wrap" sx={{ lineHeight: 2.5 }}>
           {tags?.map((tag) => (

@@ -1,34 +1,19 @@
 import { SerializedKey } from "@notesnook/crypto/dist/src/types";
 import Compressor from "compressorjs";
-import type { Editor, TinyMCE } from "tinymce";
-import { AppEventManager, AppEvents } from "../../../common/app-events";
-import { db } from "../../../common/db";
-import { showBuyDialog } from "../../../common/dialog-controller";
-import { TaskManager } from "../../../common/task-manager";
-import { isUserPremium } from "../../../hooks/use-is-user-premium";
-import fs from "../../../interfaces/fs";
-import { showToast } from "../../../utils/toast";
+import { AppEventManager, AppEvents } from "../../common/app-events";
+import { db } from "../../common/db";
+import { showBuyDialog } from "../../common/dialog-controller";
+import { TaskManager } from "../../common/task-manager";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
+import fs from "../../interfaces/fs";
+import { showToast } from "../../utils/toast";
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
 type MimeType = string; //`${string}/${string}`;
 
-function register(editor: Editor) {
-  editor.ui.registry.addButton("attachment", {
-    icon: "attachment",
-    tooltip: "Attach a file",
-    onAction: () => insertAttachment(editor, "*/*"),
-  });
-
-  editor.ui.registry.addButton("image", {
-    icon: "image",
-    tooltip: "Insert image",
-    onAction: () => insertAttachment(editor, "image/*"),
-  });
-}
-
-async function insertAttachment(editor: Editor, type: MimeType) {
+export async function insertAttachment(type: MimeType = "*/*") {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
@@ -39,24 +24,18 @@ async function insertAttachment(editor: Editor, type: MimeType) {
   });
   if (!selectedFile) return;
 
-  await attachFile(editor, selectedFile);
+  return await attachFile(selectedFile);
 }
 
-export async function attachFile(editor: Editor, selectedFile: File) {
+export async function attachFile(selectedFile: File) {
   if (!isUserPremium()) {
     await showBuyDialog();
     return;
   }
   if (selectedFile.type.startsWith("image/")) {
-    const image = await pickImage(selectedFile);
-    if (!image) return;
-    //@ts-ignore
-    editor.execCommand("mceAttachImage", image);
+    return await pickImage(selectedFile);
   } else {
-    const file = await pickFile(selectedFile);
-    if (!file) return;
-    //@ts-ignore
-    editor.execCommand("mceAttachFile", file);
+    return await pickFile(selectedFile);
   }
 }
 
@@ -82,10 +61,6 @@ export async function reuploadAttachment(
     const file = await pickFile(selectedFile, options);
     if (!file) return;
   }
-}
-
-export function addPickerPlugin(tinymce: TinyMCE) {
-  tinymce.PluginManager.add("picker", register);
 }
 
 /**
@@ -176,10 +151,19 @@ function compressImage(file: File): Promise<CompressionResult> {
   });
 }
 
-type AttachmentProgress = {
+export type AttachmentProgress = {
+  hash: string;
   type: "encrypt" | "download" | "upload";
   total: number;
   loaded: number;
+};
+
+export type Attachment = {
+  hash: string;
+  filename: string;
+  type: string;
+  size: number;
+  dataurl?: string;
 };
 
 type AddAttachmentOptions = {
@@ -192,7 +176,7 @@ async function addAttachment(
   file: File,
   dataurl: string | undefined,
   options: AddAttachmentOptions = {}
-) {
+): Promise<Attachment> {
   const { expectedFileHash, forceWrite, showProgress = true } = options;
 
   const action = async () => {

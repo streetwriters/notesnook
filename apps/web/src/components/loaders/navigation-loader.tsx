@@ -16,8 +16,9 @@ export const NavigationLoader = memo(function NavigationLoader() {
       }}
       bg={"bgSecondary"}
     >
-      {[0, 1, 2, 3, 4, 5].map(() => (
+      {[0, 1, 2, 3, 4, 5].map((i) => (
         <Flex
+          key={i}
           px={2}
           py={"9px"}
           mx={1}

@@ -44,10 +44,11 @@ const metadataItems = [
   },
 ];
 
-function Properties() {
+function Properties(props) {
+  const { onOpenPreviewSession } = props;
+
   const [versionHistory, setVersionHistory] = useState([]);
 
-  const openPreviewSession = useStore((store) => store.openPreviewSession);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const session = useStore((store) => store.session);
@@ -271,7 +272,12 @@ function Properties() {
               )} occupied`}
             >
               {attachments.map((attachment, i) => (
-                <Attachment item={attachment} index={i} isCompact />
+                <Attachment
+                  key={attachment.id}
+                  item={attachment}
+                  index={i}
+                  isCompact
+                />
               ))}
             </Card>
           )}
@@ -300,6 +306,7 @@ function Properties() {
 
               return (
                 <Flex
+                  key={session.id}
                   data-test-id={`session-${index}`}
                   py={1}
                   px={2}
@@ -322,7 +329,7 @@ function Properties() {
                         try {
                           const decryptedContent =
                             await db.vault.decryptContent(content, password);
-                          openPreviewSession({
+                          onOpenPreviewSession({
                             content: decryptedContent,
                             dateCreated: session.dateCreated,
                             dateEdited: session.dateModified,
@@ -333,7 +340,7 @@ function Properties() {
                         }
                       });
                     } else {
-                      openPreviewSession({
+                      onOpenPreviewSession({
                         content,
                         dateCreated: session.dateCreated,
                         dateEdited: session.dateModified,

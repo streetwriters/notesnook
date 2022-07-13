@@ -10,6 +10,9 @@ const APP_VERSION = version.replaceAll(".", "");
 console.log("App version:", APP_VERSION);
 console.log("Ip address:", ip.address());
 module.exports = {
+  beta: {
+    REACT_APP_BETA: true,
+  },
   test: {
     TEST_ALL: true,
   },

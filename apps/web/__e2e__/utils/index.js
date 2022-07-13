@@ -56,7 +56,7 @@ async function createNote(note, actionButtonId) {
 }
 
 async function editNote(title, content, noDelay = false) {
-  await page.waitForSelector(".mce-content-body");
+  await page.waitForSelector(".ProseMirror");
 
   // await page.waitForTimeout(1000);
 
@@ -69,9 +69,9 @@ async function editNote(title, content, noDelay = false) {
   if (content) {
     if (!noDelay) await page.waitForTimeout(100);
 
-    await page.focus(".mce-content-body");
+    await page.focus(".ProseMirror");
 
-    await page.type(".mce-content-body", content);
+    await page.type(".ProseMirror", content);
   }
 
   if (!noDelay) await page.waitForTimeout(200);
@@ -94,13 +94,11 @@ async function getEditorTitle() {
 }
 
 async function getEditorContent() {
-  return (await page.innerText(".mce-content-body"))
-    .trim()
-    .replace(/\n+/gm, "\n");
+  return (await page.innerText(".ProseMirror")).trim().replace(/\n+/gm, "\n");
 }
 
 async function getEditorContentAsHTML() {
-  return await page.innerHTML(".mce-content-body");
+  return await page.innerHTML(".ProseMirror");
 }
 
 function isTestAll() {

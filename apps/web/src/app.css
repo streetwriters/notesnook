@@ -92,6 +92,7 @@ textarea,
   -ms-user-select: none;
   user-select: none;
   outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 *::-moz-focus-inner {

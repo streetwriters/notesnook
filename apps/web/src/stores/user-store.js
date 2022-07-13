@@ -81,7 +81,14 @@ class UserStore extends BaseStore {
 
       onPageVisibilityChanged(async function (type, documentHidden) {
         if (!documentHidden) {
-          await db.connectSSE({ force: type === "online" });
+          if (type === "online") {
+            // a slight delay to make sure sockets are open and can be connected
+            // to. Otherwise, this fails miserably.
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+          }
+          await db
+            .connectSSE({ force: type === "online" })
+            .catch(console.error);
         }
       });
 

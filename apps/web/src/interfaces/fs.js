@@ -89,7 +89,10 @@ async function writeEncrypted(filename, { data, type, key }) {
   const { hash, type: hashType } = await hashBuffer(data);
   if (!filename) filename = hash;
 
-  const file = new File([data], filename, { type });
+  const file = new File([data.buffer], filename, {
+    type: "application/octet-stream",
+  });
+
   const result = await writeEncryptedFile(file, key, hash);
   return {
     ...result,

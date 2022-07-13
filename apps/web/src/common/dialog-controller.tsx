@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import Dialogs from "../components/dialogs";
-import { hardNavigate, hashNavigate } from "../navigation";
+import { hardNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import { qclone } from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
@@ -46,7 +46,6 @@ function showDialog<TId extends DialogIds, TReturnType>(
       openDialogs[id] = false;
       ReactDOM.unmountComponentAtNode(container);
       container.remove();
-      hashNavigate("/", { replace: true, notify: false });
       resolve(result);
     };
     const PropDialog = render(Dialogs[id], perform);
@@ -59,7 +58,9 @@ function showDialog<TId extends DialogIds, TReturnType>(
 }
 
 export function closeOpenedDialog() {
-  const dialogs = document.querySelectorAll(".ReactModalPortal");
+  const dialogs = document.querySelectorAll(
+    ".ReactModalPortal,[data-react-modal-body-trap]"
+  );
   dialogs.forEach((elem) => elem.remove());
 }
 
@@ -165,6 +166,13 @@ export function showPromptDialog(props: {
       }}
     />
   ));
+}
+
+export function showToolbarConfigDialog() {
+  return showDialog<"ToolbarConfigDialog", string | null>(
+    "ToolbarConfigDialog",
+    (Dialog, perform) => <Dialog onClose={() => perform(null)} />
+  );
 }
 
 export function showError(title: string, message: string) {

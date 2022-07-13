@@ -15,7 +15,7 @@ function showToast(
   type: ToastType,
   message: string,
   actions?: ToastAction[],
-  hideAfter?: number
+  hideAfter: number = 5000
 ): { hide: () => void } {
   if (appstore.get().isFocusMode) return { hide: () => {} }; // TODO
 

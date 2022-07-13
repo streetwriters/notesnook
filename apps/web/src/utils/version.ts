@@ -4,14 +4,21 @@ export const appVersion = {
   formatted: format(
     process.env.REACT_APP_VERSION,
     process.env.REACT_APP_GIT_HASH,
-    process.env.REACT_APP_PLATFORM as Platforms
+    process.env.REACT_APP_PLATFORM as Platforms,
+    process.env.REACT_APP_BETA === "true"
   ),
   clean: formatVersion(process.env.REACT_APP_VERSION),
   numerical: parseInt(process.env.REACT_APP_VERSION || "0"),
+  isBeta: process.env.REACT_APP_BETA === "true",
 };
 
-function format(version?: string, hash?: string, type?: "web" | "desktop") {
-  return `${formatVersion(version)}-${hash}-${type}`;
+function format(
+  version?: string,
+  hash?: string,
+  type?: "web" | "desktop",
+  beta?: boolean
+) {
+  return `${formatVersion(version)}-${hash}-${type}${beta ? "-beta" : ""}`;
 }
 
 function formatVersion(version?: string) {
@@ -38,6 +45,7 @@ export function getServiceWorkerVersion(
         formatted: formatVersion(version),
         numerical: parseInt(version),
         clean: formatVersion(version),
+        isBeta: appVersion.isBeta,
       });
     });
     serviceWorker.postMessage({ type: "GET_VERSION" });

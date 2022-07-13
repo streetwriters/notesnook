@@ -462,10 +462,9 @@ test.describe("run tests independently", () => {
 
     await openLockedNote(noteSelector);
 
-    await page.waitForSelector(".mce-content-body");
+    await page.waitForTimeout(1000);
 
-    await expect(page.textContent(".mce-content-body")).resolves.toContain(
-      `${content}${NOTE.content}`
-    );
+    const editorContent = await getEditorContent();
+    expect(editorContent).toContain(`${content}${NOTE.content}`);
   });
 });

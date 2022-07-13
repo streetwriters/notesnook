@@ -5,6 +5,7 @@ import { getHomeRoute, hardNavigate } from "../../navigation";
 import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
 import { isTesting } from "../../utils/platform";
+import { useEffect } from "react";
 
 type CallToAction = {
   title: string;
@@ -36,9 +37,40 @@ const features: Record<FeatureKeys, Feature> = {
     },
   },
   highlights: {
-    title: "✨ Highlights ✨",
-    subtitle: `Welcome to v${appVersion.clean}`,
-    subFeatures: [],
+    title: appVersion.isBeta
+      ? "Welcome to Notesnook Beta!"
+      : "✨ Highlights ✨",
+    subtitle: appVersion.isBeta
+      ? `v${appVersion.clean}-beta`
+      : `Welcome to v${appVersion.clean}`,
+    subFeatures: appVersion.isBeta
+      ? [
+          {
+            icon: Icon.Warn,
+            title: "Notice",
+            subtitle: (
+              <>
+                This is the beta version and as such will contain bugs. Things
+                are expected to break but should be generally stable. Please use
+                the <Code text="Report an issue" /> button to report all bugs.
+                Thank you!
+              </>
+            ),
+          },
+          {
+            icon: Icon.Warn,
+            title: "Notice 2",
+            subtitle: (
+              <>
+                Switching between beta &amp; stable versions can cause weird
+                issues including data loss. It is recommended that you do not
+                use both simultaneously. You can switch once the beta version
+                enters stable.
+              </>
+            ),
+          },
+        ]
+      : [],
     cta: {
       title: "Got it",
       icon: Icon.Checkmark,
@@ -51,7 +83,8 @@ const features: Record<FeatureKeys, Feature> = {
 
       const key = `${appVersion.numerical}:highlights`;
       const hasShownBefore = Config.get(key, false) as boolean;
-      const hasShownAny = Config.has((k) => k.endsWith(":highlights"));
+      const hasShownAny =
+        appVersion.isBeta || Config.has((k) => k.endsWith(":highlights"));
       if (!hasShownAny) Config.set(key, true);
 
       return hasShownAny && !isTesting() && !hasShownBefore;
@@ -65,12 +98,14 @@ type FeatureDialogProps = {
 };
 
 function FeatureDialog(props: FeatureDialogProps) {
-  const { featureName } = props;
+  const { featureName, onClose } = props;
   const feature = features[featureName];
-  if (!feature || (feature.shouldShow && !feature.shouldShow())) {
-    props.onClose(false);
-    return null;
-  }
+
+  useEffect(() => {
+    if (!feature || (feature.shouldShow && !feature.shouldShow())) {
+      onClose(false);
+    }
+  }, [feature, onClose]);
 
   return (
     <Dialog

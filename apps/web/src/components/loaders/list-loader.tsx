@@ -29,7 +29,7 @@ export const ListLoader = memo(function ListLoader() {
         </Flex>
       </Flex>
       {Lines.map((width) => (
-        <Box sx={{ py: 2, px: 1 }}>
+        <Box key={width} sx={{ py: 2, px: 1 }}>
           <Skeleton
             height={16}
             baseColor="var(--border)"

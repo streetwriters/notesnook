@@ -1,7 +1,7 @@
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 
-function EditorLoading({ text }) {
+function EditorLoading({ text }: { text?: string }) {
   return (
     <Flex
       flexDirection="column"
