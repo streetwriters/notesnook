@@ -260,7 +260,7 @@ test.skip(
 );
 
 test.skip(
-  "issue: new topics on 2 devices are not properly synced",
+  "issue: new topic on device A gets replaced by the new topic on device B",
   async () => {
     const deviceA = await initializeDevice("deviceA");
     const deviceB = await initializeDevice("deviceB");
@@ -293,6 +293,53 @@ test.skip(
 
     expect(deviceA.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
     expect(deviceB.notebooks.notebook(id).topics.has("Topic 2")).toBeTruthy();
+
+    await cleanup(deviceA, deviceB);
+  },
+  60 * 1000
+);
+
+test.skip(
+  "issue: remove notebook reference from notes that are removed from topic during merge",
+  async () => {
+    const deviceA = await initializeDevice("deviceA");
+    const deviceB = await initializeDevice("deviceB");
+
+    const id = await deviceA.notebooks.add({
+      title: "Notebook 1",
+      topics: ["Topic 1"],
+    });
+
+    await syncAndWait(deviceA, deviceB, false);
+
+    expect(deviceB.notebooks.notebook(id)).toBeDefined();
+
+    const noteA = await deviceA.notes.add({ title: "Note 1" });
+    await deviceA.notes.move({ id, topic: "Topic 1" }, noteA);
+
+    expect(
+      deviceA.notebooks.notebook(id).topics.topic("Topic 1").totalNotes
+    ).toBe(1);
+
+    await delay(2000);
+
+    const noteB = await deviceB.notes.add({ title: "Note 2" });
+    await deviceB.notes.move({ id, topic: "Topic 1" }, noteB);
+
+    expect(
+      deviceB.notebooks.notebook(id).topics.topic("Topic 1").totalNotes
+    ).toBe(1);
+
+    await syncAndWait(deviceB, deviceA, false);
+
+    expect(
+      deviceA.notebooks.notebook(id).topics.topic("Topic 1").totalNotes
+    ).toBe(1);
+    expect(
+      deviceB.notebooks.notebook(id).topics.topic("Topic 1").totalNotes
+    ).toBe(1);
+
+    expect(deviceA.notes.note(noteA).data.notebooks).toHaveLength(0);
 
     await cleanup(deviceA, deviceB);
   },

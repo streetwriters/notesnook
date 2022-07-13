@@ -46,6 +46,20 @@ export default class Notebooks extends Collection {
           };
           isChanged = true;
         }
+        // CASE 4: if topic exists in both notebooks:
+        //      if newTopic.dateEdited > oldTopic.dateEdited: we iterate
+        //      on all notes that are not in newTopic (if any)
+        //      and dereference them.
+        else if (newTopic && newTopic.dateEdited > oldTopic.dateEdited) {
+          const removedNotes = setManipulator.complement(
+            oldTopic.notes,
+            newTopic.notes
+          );
+
+          await this.notebook(remoteNotebook.id)
+            .topics.topic(oldTopic.id)
+            .delete(...removedNotes);
+        }
       }
       remoteNotebook.remote = !isChanged;
     }
