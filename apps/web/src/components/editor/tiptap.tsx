@@ -1,5 +1,6 @@
 import "notesnook-editor/styles/styles.css";
 import "notesnook-editor/styles/katex.min.css";
+import "notesnook-editor/styles/katexfonts.css";
 import "notesnook-editor/styles/fonts.css";
 import "notesnook-editor/styles/prism-theme.css";
 import { Theme } from "@notesnook/theme";
