@@ -125,6 +125,7 @@ export const TabsHolder = React.memo(
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
         setDeviceMode(deviceMode, size);
+        checkDeviceType(size);
         return;
       }
 
@@ -145,13 +146,19 @@ export const TabsHolder = React.memo(
       if (DDS.isLargeTablet()) {
         setDeviceMode('tablet', size);
         setTimeout(() => {
-          tabBarRef.current?.goToIndex(0);
-        }, 2500);
+          introCompleted && tabBarRef.current?.goToIndex(0);
+        }, 500);
       } else if (DDS.isSmallTab) {
         setDeviceMode('smallTablet', size);
-        setTimeout(() => {
-          tabBarRef.current?.closeDrawer();
-        }, 2500);
+        if (!fullscreen) {
+          setTimeout(() => {
+            introCompleted && tabBarRef.current?.closeDrawer();
+          }, 500);
+        } else {
+          setTimeout(() => {
+            introCompleted && tabBarRef.current?.openDrawer();
+          }, 500);
+        }
       } else {
         setDeviceMode('mobile', size);
       }
@@ -304,7 +311,7 @@ export const TabsHolder = React.memo(
             ref={tabBarRef}
             dimensions={dimensions}
             widths={!introCompleted ? widths['mobile'] : widths[deviceMode]}
-            enabled={deviceMode !== 'tablet'}
+            enabled={deviceMode !== 'tablet' && !fullscreen}
             onScroll={onScroll}
             onChangeTab={onChangeTab}
             onDrawerStateChange={state => true}

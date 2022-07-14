@@ -37,6 +37,13 @@ export const EditorWrapper = ({ width }) => {
     };
   }, [loading]);
 
+  const getMarginBottom = () => {
+    if (!keyboard.keyboardShown) return 0;
+    if (Platform.isPad && !floating) return 16;
+    if (Platform.OS == 'ios') return insets.bottom;
+    return 6;
+  };
+
   return (
     <View
       testID="editor-wrapper"
@@ -54,14 +61,7 @@ export const EditorWrapper = ({ width }) => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{
             flex: 1,
-            marginBottom:
-              Platform.OS === 'ios'
-                ? keyboard?.keyboardShown && !floating
-                  ? Platform.isPad
-                    ? 16
-                    : insets.bottom
-                  : insets.bottom
-                : 6
+            marginBottom: getMarginBottom
           }}
           enabled={!floating}
           keyboardVerticalOffset={0}

@@ -23,7 +23,7 @@ export const SVG_Z = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245.4
 
 const Intro = ({ navigation, route }) => {
   const colors = useThemeStore(state => state.colors);
-  const introCompleted = SettingsService.get().introCompleted;
+  const introCompleted = useSettingStore(state => state.settings.introCompleted);
   const isTelemetryEnabled = useSettingStore(state => state.settings.telemetry);
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();

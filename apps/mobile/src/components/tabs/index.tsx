@@ -7,7 +7,7 @@ import React, {
   useState
 } from 'react';
 import { BackHandler, ViewProps } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, State } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -46,6 +46,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     ref
   ) => {
     const deviceMode = useSettingStore(state => state.deviceMode);
+    const fullscreen = useSettingStore(state => state.fullscreen);
     const introCompleted = useSettingStore(state => state.settings.introCompleted);
     const translateX = useSharedValue(widths ? widths.a : 0);
     const startX = useSharedValue(0);
@@ -67,14 +68,20 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const editorPosition = widths.a + widths.b;
     const isSmallTab = deviceMode === 'smallTablet';
     const isLoaded = useRef(false);
+    const prevWidths = useRef(widths);
 
     useEffect(() => {
-      if (!isLoaded.current && introCompleted && deviceMode === 'tablet') {
-        translateX.value = 0;
+      console.log(deviceMode);
+      if (introCompleted) {
+        if (deviceMode === 'tablet' || fullscreen) {
+          translateX.value = 0;
+        } else {
+          if (prevWidths.current?.a !== widths.a) translateX.value = widths.a;
+        }
         isLoaded.current = true;
-      } else {
-        isLoaded.current = true;
+        prevWidths.current = widths;
       }
+
       const sub = BackHandler.addEventListener('hardwareBackPress', () => {
         if (isDrawerOpen.value) {
           translateX.value = withTiming(homePosition);
@@ -87,7 +94,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
       return () => {
         sub && sub.remove();
       };
-    }, []);
+    }, [introCompleted, deviceMode, widths]);
 
     useImperativeHandle(
       ref,
