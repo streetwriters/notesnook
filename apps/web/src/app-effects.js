@@ -4,6 +4,7 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import { useStore as useThemeStore } from "./stores/theme-store";
 import { useStore as useAttachmentStore } from "./stores/attachment-store";
+import { useStore as useEditorStore } from "./stores/editor-store";
 import { resetReminders } from "./common/reminders";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
@@ -11,7 +12,6 @@ import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
-import { loadTrackerScript } from "./utils/analytics";
 import useAnnouncements from "./utils/use-announcements";
 import {
   showAnnouncementDialog,
@@ -39,6 +39,7 @@ export default function AppEffects({ setShow }) {
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
   const setTheme = useThemeStore((store) => store.setTheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
+  const initEditorStore = useEditorStore((store) => store.init);
   const [announcements, remove] = useAnnouncements("dialog");
   const isSystemThemeDark = useSystemTheme();
 
@@ -72,6 +73,8 @@ export default function AppEffects({ setShow }) {
       initAttachments();
       refreshNavItems();
       initNotes();
+      initEditorStore();
+
       (async function () {
         await updateLastSynced();
         if (await initUser()) {
@@ -83,11 +86,13 @@ export default function AppEffects({ setShow }) {
         await showOnboardingDialog(interruptedOnboarding());
         await showFeatureDialog("highlights");
       })();
+
       return () => {
         userCheckStatusEvent.unsubscribe();
       };
     },
     [
+      initEditorStore,
       initStore,
       initAttachments,
       sync,

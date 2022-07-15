@@ -74,8 +74,6 @@ export default function EditorManager({
   const isReadonly = useStore(
     (store) => store.session.readonly || !!previewSession.current
   );
-  // TODO move this somewhere more appropriate
-  // const init = useStore((store) => store.init);
 
   const openSession = useCallback(async (noteId) => {
     await editorstore.get().openSession(noteId);
