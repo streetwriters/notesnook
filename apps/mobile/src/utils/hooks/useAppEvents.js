@@ -80,15 +80,13 @@ export const useAppEvents = () => {
   useEffect(() => {
     if (!loading) {
       const eventManager = db?.eventManager;
-      eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress);
-      let sub = eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
       eventManager?.subscribe(EVENTS.syncCompleted, onSyncComplete);
-      console.log('SUBSCRIBED', sub);
+      db?.eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress);
+      db?.eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
     }
 
     return () => {
       const eventManager = db?.eventManager;
-      console.log('UNSUBSCRIBED');
       eventManager?.unsubscribe(EVENTS.syncCompleted, onSyncComplete);
       eventManager?.unsubscribe(EVENTS.syncProgress, onSyncProgress);
       eventManager?.unsubscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
@@ -101,6 +99,7 @@ export const useAppEvents = () => {
       Linking.addEventListener('url', onUrlRecieved),
       SodiumEventEmitter.addListener('onSodiumProgress', onFileEncryptionProgress)
     ];
+
     EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
     EV.subscribe(EVENTS.userLoggedOut, onLogout);
     EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);

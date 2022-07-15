@@ -1,5 +1,6 @@
+import { EVENTS } from 'notes-core/common';
 import React, { useEffect, useRef } from 'react';
-import { Platform, View } from 'react-native';
+import { NativeModules, Platform, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
 import { editorState } from '../../screens/editor/tiptap/utils';
@@ -18,7 +19,7 @@ import { useThemeStore } from '../../stores/use-theme-store';
 import { useUserStore } from '../../stores/use-user-store';
 import { db, loadDatabase } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
-import { eOpenAnnouncementDialog } from '../../utils/events';
+import { eCloseProgressDialog, eOpenAnnouncementDialog } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
@@ -60,15 +61,30 @@ const Launcher = React.memo(
           setImmediate(() => {
             setLoading(false);
             setImmediate(() => doAppLoadActions());
+            db?.eventManager?.unsubscribe(EVENTS.databaseMigrating, onDatabaseMigratingProgess);
           });
         });
       });
     };
 
+    const onDatabaseMigratingProgess = React.useCallback(data => {
+      presentSheet({
+        progress: true,
+        title: 'Migrating database',
+        paragraph: 'Please wait while we migrate your data. Do not close the app.'
+      });
+    });
+
+    const onMigrationCompleted = React.useCallback(data => {
+      eSendEvent(eCloseProgressDialog);
+    });
+
     const init = async () => {
       if (!dbInitCompleted.current) {
-        if (!verifyUser) await RNBootSplash.hide({ fade: true });
+        await RNBootSplash.hide({ fade: true });
         await loadDatabase();
+        db?.eventManager?.subscribe(EVENTS.databaseMigrating, onDatabaseMigratingProgess);
+        db?.eventManager?.subscribe(EVENTS.databaseMigrated, onMigrationCompleted);
         await db.init();
         dbInitCompleted.current = true;
       }
@@ -202,6 +218,10 @@ const Launcher = React.memo(
         onUnlockBiometrics();
       }
       init();
+
+      return () => {
+        db?.eventManager?.unsubscribe(EVENTS.databaseMigrated, onMigrationCompleted);
+      };
     }, [verifyUser]);
 
     const onSubmit = async () => {

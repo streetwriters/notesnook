@@ -15,6 +15,7 @@ const KeychainConfig = Platform.select({
 
 async function isBiometryAvailable() {
   try {
+    console.log('scanner status', FingerprintScanner);
     return await FingerprintScanner.isSensorAvailable();
   } catch (e) {
     console.log(e, 'sensor not available');

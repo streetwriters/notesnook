@@ -12,17 +12,19 @@ export const ApplicationHolder = React.memo(
   () => {
     const loading = useNoteStore(state => state.loading);
     const introCompleted = useSettingStore(state => state.settings.introCompleted);
-    return loading && introCompleted ? (
+    return (
       <>
-        <SafeAreaView>
-          <Header />
-          <DelayLayout animated={false} wait={loading} />
-        </SafeAreaView>
-      </>
-    ) : (
-      <>
-        <TabsHolder />
-        <Toast />
+        {loading && introCompleted ? (
+          <>
+            <Header />
+            <DelayLayout animated={false} wait={loading} />
+          </>
+        ) : (
+          <>
+            <TabsHolder />
+            <Toast />
+          </>
+        )}
         <DialogProvider />
       </>
     );
