@@ -94,12 +94,17 @@ function decodeWrappedTableHtml(html) {
 }
 
 export function tinyToTiptap(html) {
+  if (typeof html !== "string") return html;
+
   const document = parseHTML(html);
 
   const tables = document.querySelectorAll("table");
   for (const table of tables) {
     table.removeAttribute("contenteditable");
-    if (table.parentElement?.nodeName.toLowerCase() === "div") {
+    if (
+      table.parentElement &&
+      table.parentElement.nodeName.toLowerCase() === "div"
+    ) {
       table.parentElement.replaceWith(table);
     }
   }
@@ -117,15 +122,6 @@ export function tinyToTiptap(html) {
   const paragraphs = document.querySelectorAll("p");
   for (const p of paragraphs) {
     if (!p.childNodes.length) p.remove();
-  }
-
-  const listItems = document.querySelectorAll("li");
-  for (const li of listItems) {
-    if (li.firstChild) {
-      const p = document.createElement("p");
-      p.appendChild(li.firstChild.cloneNode());
-      li.firstChild.replaceWith(p);
-    }
   }
 
   const bogus = document.querySelectorAll("[data-mce-bogus]");
