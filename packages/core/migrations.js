@@ -35,7 +35,8 @@ export const migrations = {
       return item;
     },
   },
-  5.5: {
+  5.5: {},
+  5.6: {
     note: false,
     notebook: false,
     tag: false,
