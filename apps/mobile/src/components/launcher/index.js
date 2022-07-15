@@ -1,4 +1,4 @@
-import { EVENTS } from 'notes-core/common';
+import { EVENTS } from '@streetwriters/notesnook-core/common';
 import React, { useEffect, useRef } from 'react';
 import { NativeModules, Platform, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';

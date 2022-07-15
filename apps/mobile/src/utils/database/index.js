@@ -3,10 +3,10 @@ import filesystem from '../filesystem';
 import EventSource from '../sse/even-source-ios';
 import AndroidEventSource from '../sse/event-source';
 import Storage from './storage';
-import Database from 'notes-core/api/index';
+import Database from '@streetwriters/notesnook-core/api/index';
 
 /**
- * @type {import("notes-core/api/index").default}
+ * @type {import("@streetwriters/notesnook-core/api/index").default}
  */
 export var db = new Database(
   Storage,

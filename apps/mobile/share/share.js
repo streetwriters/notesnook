@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { getPreviewData } from '@flyerhq/react-native-link-preview';
-import { parseHTML } from 'notes-core/utils/htmlparser';
+import { parseHTML } from '@streetwriters/notesnook-core/utils/htmlparser';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,

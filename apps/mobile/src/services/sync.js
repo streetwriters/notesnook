@@ -1,5 +1,5 @@
 import NetInfo from '@react-native-community/netinfo';
-import { EVENTS } from 'notes-core/common';
+import { EVENTS } from '@streetwriters/notesnook-core/common';
 import { editorController } from '../screens/editor/tiptap/utils';
 import { initialize } from '../stores';
 import { useUserStore } from '../stores/use-user-store';

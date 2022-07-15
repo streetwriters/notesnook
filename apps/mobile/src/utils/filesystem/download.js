@@ -9,7 +9,7 @@ import { presentSheet, ToastEvent } from '../../services/event-manager';
 import { db } from '../database';
 import Storage from '../database/storage';
 import { cacheDir, fileCheck } from './utils';
-import hosts from 'notes-core/utils/constants';
+import hosts from '@streetwriters/notesnook-core/utils/constants';
 import NetInfo from '@react-native-community/netinfo';
 
 export async function downloadFile(filename, data, cancelToken) {

@@ -1,4 +1,4 @@
-import { groupArray } from 'notes-core/utils/grouping';
+import { groupArray } from '@streetwriters/notesnook-core/utils/grouping';
 import { qclone } from 'qclone';
 import React, { useEffect, useRef, useState } from 'react';
 import { FloatingButton } from '../../components/container/floating-button';

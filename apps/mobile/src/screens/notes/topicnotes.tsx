@@ -1,4 +1,4 @@
-import { groupArray } from 'notes-core/utils/grouping';
+import { groupArray } from '@streetwriters/notesnook-core/utils/grouping';
 import React from 'react';
 import NotesPage, { PLACEHOLDER_DATA } from '.';
 import { MoveNotes } from '../../components/sheets/move-notes/movenote';

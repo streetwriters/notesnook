@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { EV, EVENTS } from 'notes-core/common';
+import { EV, EVENTS } from '@streetwriters/notesnook-core/common';
 import React, { forwardRef, ReactElement, useEffect, useImperativeHandle, useState } from 'react';
 import { Platform, ViewStyle } from 'react-native';
 import WebView from 'react-native-webview';

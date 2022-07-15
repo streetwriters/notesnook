@@ -1,6 +1,6 @@
 //@ts-ignore
-import 'notes-core/types';
-import { groupArray } from 'notes-core/utils/grouping';
+import '@streetwriters/notesnook-core/types';
+import { groupArray } from '@streetwriters/notesnook-core/utils/grouping';
 import create, { State } from 'zustand';
 import { db } from '../utils/database';
 import { TagType } from '../utils/types';

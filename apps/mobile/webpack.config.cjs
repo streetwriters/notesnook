@@ -148,7 +148,7 @@ module.exports = env => {
             /node_modules(.*[/\\])+@react-native-masked-view\/masked-view/,
             /node_modules(.*[/\\])+toggle-switch-react-native/,
             /node_modules(.*[/\\])+rn-fetch-blob/,
-            /node_modules(.*[/\\])+notes-core/,
+            /node_modules(.*[/\\])+@streetwriters[/\\]notesnook-core/,
             /node_modules(.*[/\\])+@microsoft/,
             /node_modules(.*[/\\])+@msgpack/,
             /node_modules(.*[/\\])+liqe/,

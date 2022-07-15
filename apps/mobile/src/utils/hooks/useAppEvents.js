@@ -1,5 +1,5 @@
 import NetInfo from '@react-native-community/netinfo';
-import { EV, EVENTS } from 'notes-core/common';
+import { EV, EVENTS } from '@streetwriters/notesnook-core/common';
 import { useEffect, useRef } from 'react';
 import {
   Appearance,

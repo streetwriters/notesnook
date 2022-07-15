@@ -1,4 +1,4 @@
-import { CHECK_IDS } from 'notes-core/common';
+import { CHECK_IDS } from '@streetwriters/notesnook-core/common';
 import React from 'react';
 import { Platform } from 'react-native';
 import * as RNIap from 'react-native-iap';
