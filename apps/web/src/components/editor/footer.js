@@ -1,9 +1,8 @@
 import { formatDate } from "notes-core/utils/date";
-import { useEffect, useState } from "react";
 import { Flex, Text } from "rebass";
-import { AppEventManager, AppEvents } from "../../common/app-events";
 import { useStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
+import { useNoteStatistics } from "./context";
 
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
@@ -12,22 +11,12 @@ const SAVE_STATE_ICON_MAP = {
 };
 
 function EditorFooter() {
-  const [totalWords, setTotalWords] = useState(0);
+  const { words } = useNoteStatistics();
   const dateEdited = useStore((store) => store.session.dateEdited);
   const id = useStore((store) => store.session.id);
   const SaveStateIcon = useStore(
     (store) => SAVE_STATE_ICON_MAP[store.session.saveState]
   );
-
-  useEffect(() => {
-    const updateWordCountEvent = AppEventManager.subscribe(
-      AppEvents.UPDATE_WORD_COUNT,
-      (count) => setTotalWords(count)
-    );
-    return () => {
-      updateWordCountEvent.unsubscribe();
-    };
-  }, []);
 
   if (!id) return null;
   return (
@@ -39,7 +28,8 @@ function EditorFooter() {
         color="bgSecondaryText"
         mr={2}
       >
-        {totalWords + " words"}
+        {words.total + " words"}
+        {words.selected ? ` (${words.selected} selected)` : ""}
       </Text>
       <Text
         className="selectable"

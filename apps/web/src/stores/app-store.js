@@ -175,13 +175,14 @@ class AppStore extends BaseStore {
     this.updateSyncStatus("syncing");
     return db
       .sync(full, force)
-      .then(async () => {
-        if (full) this.updateSyncStatus("completed");
+      .then(async (result) => {
+        if (!result) return this.updateSyncStatus("failed");
+        else if (full) this.updateSyncStatus("completed");
+
         await this.updateLastSynced();
         return await this.refresh();
       })
       .catch(async (err) => {
-        showToast("error", err.message);
         console.error(err);
         if (err.code === "MERGE_CONFLICT") {
           if (editorstore.get().session.id)
@@ -191,6 +192,10 @@ class AppStore extends BaseStore {
         } else {
           this.updateSyncStatus("failed");
         }
+
+        if (err?.message?.indexOf("Failed to fetch") > -1) return;
+
+        showToast("error", err.message);
       })
       .finally(() => {
         if (this.get().syncStatus.key === "conflicts") return;

@@ -70,7 +70,7 @@ export function FlexScrollContainer({
           {...props}
           className={className}
           style={{
-            overflow: "scroll",
+            overflow: "auto",
             position: "relative",
             flex: "1 1 auto",
             ...viewStyle,

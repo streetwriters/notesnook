@@ -18,9 +18,11 @@ import { MultifactorDialog, RecoveryCodesDialog } from "./multi-factor-dialog";
 import OnboardingDialog from "./onboarding-dialog";
 import AttachmentsDialog from "./attachmentsdialog";
 import { Prompt } from "./prompt";
+import { ToolbarConfigDialog } from "./toolbarconfigdialog";
 
 const Dialogs = {
   AddNotebookDialog,
+  ToolbarConfigDialog,
   TrackingDetailsDialog,
   BuyDialog,
   Confirm,

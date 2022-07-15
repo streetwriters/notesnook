@@ -7,7 +7,6 @@ import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
 import { hashNavigate } from "../navigation";
-import { Mutex } from "async-mutex";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -17,7 +16,7 @@ const SESSION_STATES = {
   opening: "opening",
 };
 
-const getDefaultSession = (sessionId = Date.now()) => {
+export const getDefaultSession = (sessionId = Date.now()) => {
   return {
     sessionType: "default",
     readonly: false,
@@ -39,13 +38,6 @@ const getDefaultSession = (sessionId = Date.now()) => {
     attachmentsLength: 0,
   };
 };
-
-const getDefaultPreviewSession = () => ({
-  sessionType: "preview",
-  state: undefined,
-  dateEdited: 0,
-  dateCreated: 0,
-});
 
 class EditorStore extends BaseStore {
   session = getDefaultSession();
@@ -71,19 +63,6 @@ class EditorStore extends BaseStore {
     this.set((state) => {
       state.session.tags = state.session.tags.slice();
     });
-  };
-
-  openPreviewSession = (session) => {
-    this.set((state) => {
-      state.session = {
-        ...getDefaultPreviewSession(),
-        ...session,
-        id: state.session.id,
-        title: state.session.title,
-        state: SESSION_STATES.new,
-      };
-    });
-    appStore.setIsEditorOpen(true);
   };
 
   openLockedSession = async (note) => {
@@ -237,12 +216,12 @@ class EditorStore extends BaseStore {
     appStore.setIsEditorOpen(false);
   };
 
-  setTitle = (sessionId, title) => {
-    return this.saveSession(sessionId, { title });
+  setTitle = (noteId, title) => {
+    return this.saveSession(noteId, { title });
   };
 
-  toggle = (sessionId, name, value) => {
-    return this.saveSession(sessionId, { [name]: value });
+  toggle = (noteId, name, value) => {
+    return this.saveSession(noteId, { [name]: value });
   };
 
   saveSessionContent = (noteId, sessionId, content) => {
@@ -253,12 +232,7 @@ class EditorStore extends BaseStore {
     const session = this.get().session;
     switch (session.sessionType) {
       case "default":
-        return await db.content.insertPlaceholders(
-          await db.content.raw(session.contentId),
-          "/placeholder.svg"
-        );
-      case "preview":
-        return session.content;
+        return await db.content.raw(session.contentId);
       case "locked":
         return session.content;
       default:

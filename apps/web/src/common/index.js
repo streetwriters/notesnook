@@ -13,7 +13,7 @@ import { store as userstore } from "../stores/user-store";
 import FileSaver from "file-saver";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
-import { showFilePicker } from "../components/editor/plugins/picker";
+import { showFilePicker } from "../components/editor/picker";
 
 export const CREATE_BUTTON_MAP = {
   notes: {

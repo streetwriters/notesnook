@@ -7,6 +7,7 @@ import { hashNavigate } from "../navigation";
 import useNavigate from "../utils/use-navigate";
 
 function Home() {
+  useStore((store) => store.nonce);
   const notes = useStore((store) => store.notes);
   const refresh = useStore((store) => store.refresh);
   const clearContext = useStore((store) => store.clearContext);
@@ -23,10 +24,10 @@ function Home() {
         store.refresh();
         setIsLoading(false);
       }
-      // const note = db.notes.note("f90f344ee3c13c2f686bd5c1").data;
+      // const note = db.notes.note("62bc3f28a1a1a10000707077").data;
       // const data = await db.content.raw(note.contentId);
 
-      // const note2 = db.notes.note("3e9a515cc63199a101ec49bb").data;
+      // const note2 = db.notes.note("62bc3f1ca1a1a10000707075").data;
       // const data2 = await db.content.raw(note2.contentId);
 
       // const data3 = { ...data, conflicted: data2 };

@@ -7,7 +7,6 @@ import { useStore as useThemeStore } from "../stores/theme-store";
 import { useStore as useSettingStore } from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
-import accents from "../theme/accents";
 import {
   showEmailVerificationDialog,
   showImportDialog,
@@ -22,6 +21,7 @@ import {
   showMultifactorDialog,
   showAttachmentsDialog,
   show2FARecoveryCodesDialog,
+  showToolbarConfigDialog,
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
@@ -40,9 +40,10 @@ import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@rebass/forms";
 import useZoomFactor from "../hooks/use-zoom-factor";
-import debounce from "just-debounce-it";
 import { PATHS } from "@notesnook/desktop/paths";
 import { openPath } from "../commands/open";
+import { getAllAccents } from "@notesnook/theme";
+import { debounce } from "../utils/debounce";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -101,6 +102,7 @@ const otherItems = [
 function Settings(props) {
   const [groups, setGroups] = useState({
     appearance: false,
+    editor: false,
     mfa: false,
     backup: false,
     importer: false,
@@ -366,7 +368,7 @@ function Settings(props) {
                 borderRadius: "default",
               }}
             >
-              {accents.map((color) => (
+              {getAllAccents().map((color) => (
                 <AccentItem
                   key={color.code}
                   code={color.code}
@@ -418,6 +420,28 @@ function Settings(props) {
           </>
         )}
 
+        <Header
+          title="Editor settings"
+          isOpen={groups.editor}
+          onClick={() => {
+            setGroups((g) => ({ ...g, editor: !g.editor }));
+          }}
+        />
+        {groups.editor && (
+          <>
+            <Button
+              variant="list"
+              onClick={async () => {
+                await showToolbarConfigDialog();
+              }}
+            >
+              <Tip
+                text="Configure toolbar"
+                tip="Customize the editor toolbar to fit your needs."
+              />
+            </Button>
+          </>
+        )}
         <Header
           title="Backup & restore"
           isOpen={groups.backup}

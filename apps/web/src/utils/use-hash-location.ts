@@ -5,7 +5,7 @@ import { hashNavigate } from "../navigation";
 // (excluding the leading '#' symbol)
 const currentLocation = () => {
   const location = window.location.hash.replace(/^#/, "") || "/";
-  let end = location.indexOf("?");
+  let end: number | undefined = location.indexOf("?");
   if (end <= -1) end = undefined;
   return location.substring(0, end);
 };
@@ -17,14 +17,23 @@ const currentQuery = () => {
   );
 };
 
+type HashLocation = { location: string; update: boolean };
 export default function useHashLocation() {
-  const [loc, setLoc] = useState(currentLocation());
+  const [loc, setLoc] = useState<HashLocation>({
+    location: currentLocation(),
+    update: true,
+  });
   const [queryParams, setQueryParams] = useState(currentQuery());
 
   useEffect(() => {
     // this function is called whenever the hash changes
-    const handler = () => {
-      setLoc(currentLocation());
+    const handler = (e: HashChangeEvent) => {
+      const update = (e as any).notify === undefined ? true : (e as any).notify;
+      console.log(currentLocation());
+      setLoc({
+        location: currentLocation(),
+        update,
+      });
       setQueryParams(currentQuery());
     };
 
@@ -32,5 +41,5 @@ export default function useHashLocation() {
     window.addEventListener("hashchange", handler);
     return () => window.removeEventListener("hashchange", handler);
   }, []);
-  return [loc, queryParams, hashNavigate];
+  return [loc, queryParams, hashNavigate] as const;
 }

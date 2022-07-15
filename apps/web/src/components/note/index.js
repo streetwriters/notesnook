@@ -264,7 +264,7 @@ const menuItems = [
     key: "favorite",
     title: ({ note }) => (note.favorite ? "Unfavorite" : "Favorite"),
     icon: Icon.StarOutline,
-    onClick: ({ note }) => store.favorite(note),
+    onClick: ({ note }) => store.favorite(note.id),
   },
   {
     key: "addtonotebook",

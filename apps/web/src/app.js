@@ -1,18 +1,19 @@
 import React, { useState, Suspense, useMemo, useRef, useEffect } from "react";
 import { Box, Flex } from "rebass";
 import ThemeProvider from "./components/theme-provider";
-import StatusBarPlaceholder from "./components/statusbar/index.lite";
 import useMobile from "./utils/use-mobile";
 import useTablet from "./utils/use-tablet";
 import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
-import Loader from "./components/loader";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
 import Config from "./utils/config";
-import EditorLoading from "./components/editor/loading";
-import NavigationMenuPlaceholder from "./components/navigationmenu/index.lite";
 import { useStore } from "./stores/app-store";
+import { Toaster } from "react-hot-toast";
+import { ViewLoader } from "./components/loaders/view-loader";
+import { NavigationLoader } from "./components/loaders/navigation-loader";
+import { StatusBarLoader } from "./components/loaders/status-bar-loader";
+import { EditorLoader } from "./components/loaders/editor-loader";
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")
@@ -63,6 +64,7 @@ function App() {
               show={show}
             />
           )}
+          <Toaster />
         </Flex>
       </ThemeProvider>
     </LazyMotion>
@@ -121,7 +123,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             preferredSize={paneSizes[0]}
             visible={!isFocusMode}
           >
-            <Flex flex={1}>
+            <Flex sx={{ overflow: "hidden", flex: 1 }}>
               <SuspenseLoader
                 condition={isAppLoaded}
                 component={NavigationMenu}
@@ -131,7 +133,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
                   },
                   isTablet: isTablet || isNarrow,
                 }}
-                fallback={<NavigationMenuPlaceholder />}
+                fallback={<NavigationLoader />}
               />
             </Flex>
           </Allotment.Pane>
@@ -145,12 +147,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
               <SuspenseLoader
                 condition={isAppLoaded}
                 component={CachedRouter}
-                fallback={
-                  <Loader
-                    title="Did you know?"
-                    text="All your notes are encrypted on your device."
-                  />
-                }
+                fallback={<ViewLoader />}
               />
             </Flex>
           </Allotment.Pane>
@@ -164,12 +161,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
               flexDirection="column"
             >
               <SuspenseLoader
-                fallback={
-                  <Loader
-                    title="Fun fact"
-                    text="Notesnook was released in January 2021 by a team of only 3 people."
-                  />
-                }
+                fallback={<EditorLoader />}
                 component={HashRouter}
                 condition={isAppLoaded}
               />
@@ -177,8 +169,9 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
           </Allotment.Pane>
         </Allotment>
       </Flex>
+
       <SuspenseLoader
-        fallback={<StatusBarPlaceholder />}
+        fallback={<StatusBarLoader />}
         component={StatusBar}
         condition={isAppLoaded}
       />
@@ -215,7 +208,7 @@ function MobileAppContents({ isAppLoaded }) {
           props={{
             toggleNavigationContainer: () => {},
           }}
-          fallback={<NavigationMenuPlaceholder />}
+          fallback={<NavigationLoader />}
         />
       </Flex>
       <Flex
@@ -232,12 +225,7 @@ function MobileAppContents({ isAppLoaded }) {
         <SuspenseLoader
           condition={isAppLoaded}
           component={CachedRouter}
-          fallback={
-            <Loader
-              title="Did you know?"
-              text="All your notes are encrypted on your device."
-            />
-          }
+          fallback={<ViewLoader />}
         />
         <Box
           id="overlay"
@@ -265,7 +253,7 @@ function MobileAppContents({ isAppLoaded }) {
         flexDirection="column"
       >
         <SuspenseLoader
-          fallback={<EditorLoading />}
+          fallback={<EditorLoader />}
           component={HashRouter}
           condition={isAppLoaded}
         />

@@ -5,6 +5,7 @@ import { getHomeRoute, hardNavigate } from "../../navigation";
 import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
 import { isTesting } from "../../utils/platform";
+import { useEffect } from "react";
 
 type CallToAction = {
   title: string;
@@ -36,9 +37,80 @@ const features: Record<FeatureKeys, Feature> = {
     },
   },
   highlights: {
-    title: "✨ Highlights ✨",
-    subtitle: `Welcome to v${appVersion.clean}`,
-    subFeatures: [],
+    title: appVersion.isBeta
+      ? "Welcome to Notesnook Beta!"
+      : "✨ Highlights ✨",
+    subtitle: appVersion.isBeta
+      ? `v${appVersion.clean}-beta`
+      : `Welcome to v${appVersion.clean}`,
+    subFeatures: appVersion.isBeta
+      ? [
+          {
+            icon: Icon.Warn,
+            title: "Notice",
+            subtitle: (
+              <>
+                This is the beta version and as such will contain bugs. Things
+                are expected to break but should be generally stable. Please use
+                the <Code text="Report an issue" /> button to report all bugs.
+                Thank you!
+              </>
+            ),
+          },
+          {
+            icon: Icon.Warn,
+            title: "Notice 2",
+            subtitle: (
+              <>
+                Switching between beta &amp; stable versions can cause weird
+                issues including data loss. It is recommended that you do not
+                use both simultaneously. You can switch once the beta version
+                enters stable.
+              </>
+            ),
+          },
+        ]
+      : [
+          {
+            title: "A brand new editor",
+            subtitle:
+              "We have switched to a completely new editor for Notesnook. Why? Because we wanted something that was extensible and future proof.",
+          },
+          {
+            title: "Configurable toolbar",
+            subtitle: (
+              <>
+                Everyone's deserves their own toolbar that fits their needs
+                perfectly. Go to <Code text="Settings > Editor Settings" /> and
+                build your very own toolbar.
+              </>
+            ),
+          },
+          {
+            title: "Outline list",
+            subtitle: (
+              <>
+                Click on the <Code text="+" /> button in the toolbar to try it
+                out. It works just like Workflowy/Obsidian.
+              </>
+            ),
+          },
+          {
+            title: "Task list",
+            subtitle:
+              "A new task list that keeps track of your progress and supports reordering items via drag & drop.",
+          },
+          {
+            title: "Math support",
+            subtitle:
+              "Inline and multi-line Math & formula (Chemistry) support is here with KaTex.",
+          },
+          {
+            title: "Selected word count",
+            subtitle:
+              "Word counter now shows total words under selection when you select some text.",
+          },
+        ],
     cta: {
       title: "Got it",
       icon: Icon.Checkmark,
@@ -51,7 +123,8 @@ const features: Record<FeatureKeys, Feature> = {
 
       const key = `${appVersion.numerical}:highlights`;
       const hasShownBefore = Config.get(key, false) as boolean;
-      const hasShownAny = Config.has((k) => k.endsWith(":highlights"));
+      const hasShownAny =
+        appVersion.isBeta || Config.has((k) => k.endsWith(":highlights"));
       if (!hasShownAny) Config.set(key, true);
 
       return hasShownAny && !isTesting() && !hasShownBefore;
@@ -65,12 +138,14 @@ type FeatureDialogProps = {
 };
 
 function FeatureDialog(props: FeatureDialogProps) {
-  const { featureName } = props;
+  const { featureName, onClose } = props;
   const feature = features[featureName];
-  if (!feature || (feature.shouldShow && !feature.shouldShow())) {
-    props.onClose(false);
-    return null;
-  }
+
+  useEffect(() => {
+    if (!feature || (feature.shouldShow && !feature.shouldShow())) {
+      onClose(false);
+    }
+  }, [feature, onClose]);
 
   return (
     <Dialog

@@ -1,28 +1,18 @@
-import React from "react";
-import { ThemeProvider as EmotionThemeProvider } from "emotion-theming";
 import { useStore } from "../../stores/theme-store";
-import ThemeFactory from "../../theme";
-import { injectCss } from "../../utils/css";
+import { ThemeProvider as EmotionThemeProvider } from "emotion-theming";
+import { useTheme } from "@notesnook/theme";
 
-const factory = new ThemeFactory();
-
-function ThemeProvider(props) {
-  const themeType = useStore((store) => store.theme);
+function ThemeProviderWrapper(props) {
+  const theme = useStore((store) => store.theme);
   const accent = useStore((store) => store.accent);
-
-  const theme = factory.construct({
-    theme: themeType,
-    accent,
-    scale: 1,
-  });
-  injectCss(factory.transform("css", theme));
+  const themeProperties = useTheme({ accent, theme });
 
   return (
-    <EmotionThemeProvider theme={theme}>
+    <EmotionThemeProvider theme={themeProperties}>
       {props.children instanceof Function
-        ? props.children(theme)
+        ? props.children(themeProperties)
         : props.children}
     </EmotionThemeProvider>
   );
 }
-export default ThemeProvider;
+export default ThemeProviderWrapper;

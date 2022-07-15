@@ -39,7 +39,7 @@ async function getNotesFromImport(files) {
 }
 
 async function importNote(note) {
-  if (note.content.type === "html") note.content.type = "tiny";
+  if (note.content.type === "html") note.content.type = "tiptap";
   else throw new Error("Invalid content type: " + note.content.type);
 
   if (note.attachments) await importAttachments(note.attachments);
