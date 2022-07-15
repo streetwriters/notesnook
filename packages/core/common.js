@@ -66,7 +66,7 @@ export const EVENTS = {
   systemTimeInvalid: "system:invalidTime",
 };
 
-export const CURRENT_DATABASE_VERSION = 5.5;
+export const CURRENT_DATABASE_VERSION = 5.6;
 
 export function setUserPersonalizationBytes(userSalt) {
   USER_PERSONALIZATION_HASH = new Uint8Array(

@@ -65,9 +65,10 @@ class Migrations {
     await this._migrator.migrate(collections, (item) => item, this.dbVersion);
     await this._db.storage.write("v", CURRENT_DATABASE_VERSION);
 
-    this._db.eventManager.publish(EVENTS.databaseMigrated);
-
-    this.dbVersion = CURRENT_DATABASE_VERSION;
+    setTimeout(() => {
+      this._db.eventManager.publish(EVENTS.databaseMigrated);
+      this.dbVersion = CURRENT_DATABASE_VERSION;
+    }, 5000);
   }
 }
 export default Migrations;
