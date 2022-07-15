@@ -82,7 +82,8 @@
   },
   "np": {
     "tests": false,
-    "releaseDraft": false
+    "releaseDraft": false,
+    "message": "chore: bump version to %s"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
