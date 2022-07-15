@@ -1,4 +1,4 @@
-import http from "./http";
+import http from "../utils/http";
 
 const BASE_URL = `https://notesnook.com/api/v1/prices`;
 class Pricing {
