@@ -1,4 +1,4 @@
-import http from "notes-core/utils/http";
+import http from "./http";
 
 const BASE_URL = `https://notesnook.com/api/v1/prices`;
 class Pricing {

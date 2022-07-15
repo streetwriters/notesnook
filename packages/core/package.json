@@ -1,8 +1,12 @@
 {
-  "name": "notes-core",
+  "name": "@streetwriters/notesnook-core",
   "version": "7.0.0",
-  "private": true,
   "main": "./api/index.js",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/streetwriters/notesnook-core.git"
+  },
   "devDependencies": {
     "@babel/core": "^7.7.4",
     "@babel/plugin-transform-runtime": "^7.7.4",

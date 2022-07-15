@@ -1,0 +1,5 @@
+*
+!{api,collections,contenttypes,database,models,utils}/**/*
+!common.js
+!migrations.js
+!types.js
