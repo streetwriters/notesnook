@@ -61,7 +61,7 @@ export const EditorWrapper = ({ width }) => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{
             flex: 1,
-            marginBottom: getMarginBottom
+            marginBottom: getMarginBottom()
           }}
           enabled={!floating}
           keyboardVerticalOffset={0}
