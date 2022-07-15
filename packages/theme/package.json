@@ -1,8 +1,12 @@
 {
-  "name": "@notesnook/theme",
-  "version": "0.0.1",
-  "private": true,
+  "name": "@streetwriters/theme",
+  "version": "1.0.0",
   "main": "./dist/index.js",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/streetwriters/themeprovider.git"
+  },
   "dependencies": {
     "@rebass/forms": "^4.0.6",
     "@types/rebass": "^4.0.10",
@@ -25,6 +29,7 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "pub": "npm run build && npm publish"
   }
 }
