@@ -44,5 +44,12 @@
     "qclone": "^1.0.4",
     "showdown": "github:thecodrr/showdown",
     "spark-md5": "^3.0.1"
+  },
+  "np": {
+    "releaseDraft": false
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   }
 }
