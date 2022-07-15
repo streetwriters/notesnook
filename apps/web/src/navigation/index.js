@@ -1,5 +1,5 @@
 import { useState } from "react";
-import EventManager from "notes-core/utils/eventmanager";
+import EventManager from "@streetwriters/notesnook-core/utils/eventmanager";
 import Config from "../utils/config";
 
 export function navigate(url, replaceOrQuery, replace) {

@@ -7,7 +7,7 @@ import TopicsPlaceholder from "../components/placeholders/topics-placeholder";
 import { Button, Flex, Text } from "rebass";
 import { Edit, RemoveShortcutLink, ShortcutLink } from "../components/icons";
 import { getTotalNotes } from "../common";
-import { formatDate } from "notes-core/utils/date";
+import { formatDate } from "@streetwriters/notesnook-core/utils/date";
 import { db } from "../common/db";
 import { pluralize } from "../utils/string";
 

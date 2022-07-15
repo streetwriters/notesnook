@@ -20,7 +20,7 @@ import { usePersistentState } from "../../utils/hooks";
 import AccentItem from "../accent-item";
 import { useCallback, useState } from "react";
 import Config from "../../utils/config";
-import { getAllAccents } from "@notesnook/theme";
+import { getAllAccents } from "@streetwriters/theme";
 
 const newUserSteps = [
   {

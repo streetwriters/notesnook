@@ -1,4 +1,7 @@
-import { getDefaultPresets, ToolbarGroupDefinition } from "notesnook-editor";
+import {
+  getDefaultPresets,
+  ToolbarGroupDefinition,
+} from "@streetwriters/editor";
 import { db } from "./db";
 
 const defaultPresets = getDefaultPresets();

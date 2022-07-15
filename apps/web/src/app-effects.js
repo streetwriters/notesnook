@@ -8,7 +8,7 @@ import { resetReminders } from "./common/reminders";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
-import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
+import { CHECK_IDS, EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import { loadTrackerScript } from "./utils/analytics";

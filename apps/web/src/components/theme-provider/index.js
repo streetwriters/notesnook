@@ -1,6 +1,6 @@
 import { useStore } from "../../stores/theme-store";
 import { ThemeProvider as EmotionThemeProvider } from "emotion-theming";
-import { useTheme } from "@notesnook/theme";
+import { useTheme } from "@streetwriters/theme";
 
 function ThemeProviderWrapper(props) {
   const theme = useStore((store) => store.theme);

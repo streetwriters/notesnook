@@ -9,7 +9,7 @@ import { store as attachmentStore } from "./attachment-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
-import { EVENTS } from "notes-core/common";
+import { EVENTS } from "@streetwriters/notesnook-core/common";
 
 var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;

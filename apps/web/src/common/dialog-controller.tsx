@@ -14,7 +14,7 @@ import { Box, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 
-import { formatDate } from "notes-core/utils/date";
+import { formatDate } from "@streetwriters/notesnook-core/utils/date";
 import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
 import { AppVersion, getChangelog } from "../utils/version";

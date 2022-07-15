@@ -2,7 +2,7 @@ import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
 import changeAppTheme from "../commands/change-app-theme";
-import { getDefaultAccentColor } from "@notesnook/theme";
+import { getDefaultAccentColor } from "@streetwriters/theme";
 
 class ThemeStore extends BaseStore {
   theme = Config.get("theme", "light");

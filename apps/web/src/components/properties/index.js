@@ -12,7 +12,7 @@ import Toggle from "./toggle";
 import { navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import ScrollContainer from "../scroll-container";
-import { formatDate } from "notes-core/utils/date";
+import { formatDate } from "@streetwriters/notesnook-core/utils/date";
 import Vault from "../../common/vault";
 import TimeAgo from "../time-ago";
 import Attachment from "../attachment";

@@ -9,7 +9,7 @@ import {
   ToolbarGroupDefinition,
   ToolDefinition,
   ToolId,
-} from "notesnook-editor";
+} from "@streetwriters/editor";
 import {
   closestCenter,
   DndContext,
@@ -30,7 +30,7 @@ import {
 import { useEffect, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { createPortal } from "react-dom";
-import id from "notes-core/utils/id";
+import id from "@streetwriters/notesnook-core/utils/id";
 import { Label, Radio } from "@rebass/forms";
 import { db } from "../../common/db";
 import { useToolbarConfig } from "../editor/context";

@@ -1,13 +1,15 @@
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
-import { EVENTS } from "notes-core/common";
+import { EVENTS } from "@streetwriters/notesnook-core/common";
 import { TaskManager } from "./task-manager";
 
 /**
- * @type {import("notes-core/api").default}
+ * @type {import("@streetwriters/notesnook-core/api").default}
  */
 var db;
 async function initializeDatabase(persistence) {
-  const { default: Database } = await import("notes-core/api");
+  const { default: Database } = await import(
+    "@streetwriters/notesnook-core/api"
+  );
   const { NNStorage } = await import("../interfaces/storage");
   const { default: FS } = await import("../interfaces/fs");
   db = new Database(new NNStorage(persistence), EventSource, FS);

@@ -1,4 +1,4 @@
-import EventManager from "notes-core/utils/eventmanager";
+import EventManager from "@streetwriters/notesnook-core/utils/eventmanager";
 
 export const AppEventManager = new EventManager();
 export const AppEvents = {

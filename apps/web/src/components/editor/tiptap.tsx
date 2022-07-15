@@ -1,9 +1,9 @@
-import "notesnook-editor/styles/styles.css";
-import "notesnook-editor/styles/katex.min.css";
-import "notesnook-editor/styles/katexfonts.css";
-import "notesnook-editor/styles/fonts.css";
-import "notesnook-editor/styles/prism-theme.css";
-import { Theme } from "@notesnook/theme";
+import "@streetwriters/editor/styles/styles.css";
+import "@streetwriters/editor/styles/katex.min.css";
+import "@streetwriters/editor/styles/katexfonts.css";
+import "@streetwriters/editor/styles/fonts.css";
+import "@streetwriters/editor/styles/prism-theme.css";
+import { Theme } from "@streetwriters/theme";
 import { useTheme } from "emotion-theming";
 import {
   Toolbar,
@@ -12,7 +12,7 @@ import {
   Editor,
   AttachmentType,
   usePermissionHandler,
-} from "notesnook-editor";
+} from "@streetwriters/editor";
 import { Box, Flex } from "rebass";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import useMobile from "../../utils/use-mobile";
