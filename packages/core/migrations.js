@@ -93,8 +93,18 @@ function decodeWrappedTableHtml(html) {
   });
 }
 
+const NEWLINE_TOKEN = "[[%NN_NEWLINE_IN_PRE%]]";
+const NEWLINE_TOKEN_REGEX = /\[\[%NN_NEWLINE_IN_PRE%\]\]/gm;
+const NEWLINE_REPLACEMENT_REGEX = /\n|<br>|<br\/>/gm;
+const PREBLOCK_REGEX = /<pre.*<\/pre>/gm;
+
 export function tinyToTiptap(html) {
   if (typeof html !== "string") return html;
+
+  // Preserve newlines in pre blocks
+  html = html.replace(PREBLOCK_REGEX, (pre) => {
+    return pre.replace(NEWLINE_REPLACEMENT_REGEX, NEWLINE_TOKEN);
+  });
 
   const document = parseHTML(html);
 
@@ -122,6 +132,11 @@ export function tinyToTiptap(html) {
   const paragraphs = document.querySelectorAll("p");
   for (const p of paragraphs) {
     if (!p.childNodes.length) p.remove();
+  }
+
+  const codeblocks = document.querySelectorAll("pre");
+  for (const pre of codeblocks) {
+    pre.innerHTML = pre.innerText.replace(NEWLINE_TOKEN_REGEX, "<br/>");
   }
 
   const bogus = document.querySelectorAll("[data-mce-bogus]");
