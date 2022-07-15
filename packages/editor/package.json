@@ -77,6 +77,11 @@
   "scripts": {
     "build": "./scripts/build.sh",
     "watch": "./scripts/build.sh --watch",
-    "pub": "./scripts/compile.sh && npm publish"
+    "prepub": "./scripts/compile.sh",
+    "pub": "np"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   }
 }
