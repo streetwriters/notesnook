@@ -80,6 +80,10 @@
     "prepub": "./scripts/compile.sh",
     "pub": "np"
   },
+  "np": {
+    "tests": false,
+    "releaseDraft": false
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
