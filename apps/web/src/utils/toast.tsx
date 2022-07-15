@@ -28,7 +28,7 @@ function showToast(
     duration: hideAfter || Infinity,
     icon: <RenderedIcon />,
     id: message,
-    position: "top-right",
+    position: "bottom-right",
     style: {
       maxWidth: "auto",
     },
@@ -46,6 +46,7 @@ function ToastContainer(props: ToastContainerProps) {
   return (
     <ThemeProvider>
       <Flex
+        bg={"background"}
         data-test-id="toast"
         justifyContent="center"
         alignItems="center"
