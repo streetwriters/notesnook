@@ -11,7 +11,7 @@ import Modal from "react-modal";
 import ReactDOM from "react-dom";
 import { Editor } from "@tiptap/core";
 import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
-import { Theme } from "@notesnook/theme";
+import { Theme } from "@streetwriters/theme";
 import {
   useIsMobile,
   useToolbarStore,

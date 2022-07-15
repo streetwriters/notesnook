@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { Theme } from "@notesnook/theme";
+import { Theme } from "@streetwriters/theme";
 import { Editor } from "../types";
 import { FlexProps } from "rebass";
 import { ToolbarLocation } from "./stores/toolbar-store";

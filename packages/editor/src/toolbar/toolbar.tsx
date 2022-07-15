@@ -1,4 +1,4 @@
-import { Theme } from "@notesnook/theme";
+import { Theme } from "@streetwriters/theme";
 import { Editor } from "../types";
 import { Flex, FlexProps } from "rebass";
 import { ThemeProvider } from "emotion-theming";

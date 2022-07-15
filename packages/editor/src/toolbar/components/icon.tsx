@@ -1,6 +1,6 @@
 import MDIIcon from "@mdi/react";
-import { Theme } from "@notesnook/theme";
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { Theme } from "@streetwriters/theme";
+import { SchemeColors } from "@streetwriters/theme/dist/theme/colorscheme";
 import { Flex, FlexProps } from "rebass";
 import { useTheme } from "emotion-theming";
 

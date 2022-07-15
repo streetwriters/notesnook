@@ -17,7 +17,7 @@ import {
 } from "./types";
 import { ReactNodeView } from "./react-node-view";
 import { NodeViewRendererProps } from "@tiptap/core";
-import { Theme } from "@notesnook/theme";
+import { Theme } from "@streetwriters/theme";
 import { Editor } from "../../types";
 import { ThemeProvider } from "../../components/theme-provider";
 

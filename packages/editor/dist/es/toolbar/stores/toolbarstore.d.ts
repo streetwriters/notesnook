@@ -1,4 +1,4 @@
-import { Theme } from "@notesnook/theme";
+import { Theme } from "@streetwriters/theme";
 export declare type ToolbarLocation = "top" | "bottom";
 export declare type PopupRef = {
     id: string;

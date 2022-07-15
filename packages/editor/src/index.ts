@@ -21,7 +21,7 @@ import TableRow from "@tiptap/extension-table-row";
 import TableCell from "./extensions/table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import { ImageNode } from "./extensions/image";
-import { Theme } from "@notesnook/theme";
+import { Theme } from "@streetwriters/theme";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import { TaskListNode } from "./extensions/task-list";
 import { TaskItemNode } from "./extensions/task-item";

@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import "./extensions";
 import Toolbar from "./toolbar";
-import { Theme } from "@notesnook/theme";
+import { Theme } from "@streetwriters/theme";
 import { AttachmentOptions } from "./extensions/attachment";
 import { EditorOptions } from "@tiptap/core";
 import { usePermissionHandler } from "./hooks/use-permission-handler";

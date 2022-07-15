@@ -1,5 +1,5 @@
-import { Theme } from "@notesnook/theme";
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { Theme } from "@streetwriters/theme";
+import { SchemeColors } from "@streetwriters/theme/dist/theme/colorscheme";
 import React from "react";
 import { ButtonProps } from "rebass";
 import { IconNames } from "../icons";
@@ -14,7 +14,7 @@ export declare type ToolButtonProps = ButtonProps & {
 };
 export declare const ToolButton: React.NamedExoticComponent<ButtonProps & {
     icon: IconNames;
-    iconColor?: "background" | "border" | "text" | "blue" | "gray" | "green" | "orange" | "purple" | "red" | "yellow" | "checked" | "disabled" | "placeholder" | "icon" | keyof import("@notesnook/theme/dist/theme/colorscheme/static").StaticColors | "primary" | "bgTransparent" | "accent" | "bgSecondary" | "bgSecondaryText" | "bgSecondaryHover" | "hover" | "fontSecondary" | "fontTertiary" | "overlay" | "secondary" | undefined;
+    iconColor?: "background" | "border" | "text" | "blue" | "gray" | "green" | "orange" | "purple" | "red" | "yellow" | "checked" | "disabled" | "placeholder" | "icon" | keyof import("@streetwriters/theme/dist/theme/colorscheme/static").StaticColors | "primary" | "bgTransparent" | "accent" | "bgSecondary" | "bgSecondaryText" | "bgSecondaryHover" | "hover" | "fontSecondary" | "fontTertiary" | "overlay" | "secondary" | undefined;
     iconSize?: number | "big" | "small" | "medium" | undefined;
     toggled: boolean;
     buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined> | undefined;

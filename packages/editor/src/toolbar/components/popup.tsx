@@ -2,7 +2,7 @@ import { Button, ButtonProps, Flex, Text } from "rebass";
 import { Icon } from "./icon";
 import { IconNames, Icons } from "../icons";
 import { PropsWithChildren } from "react";
-import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@streetwriters/theme/dist/theme/colorscheme";
 import { DesktopOnly, MobileOnly } from "../../components/responsive";
 
 type Action = {

@@ -12,7 +12,7 @@ import {
   ContentDOM,
 } from "./types";
 import { NodeViewRendererProps } from "@tiptap/core";
-import { Theme } from "@notesnook/theme";
+import { Theme } from "@streetwriters/theme";
 // @ts-ignore
 import { __serializeForClipboard } from "prosemirror-view";
 import { Editor } from "../../types";
