@@ -168,6 +168,11 @@ class Sync {
       await this.connection.start();
 
     await this.conflicts.recalculate();
+    if (await this.conflicts.check()) {
+      throw new Error(
+        "Merge conflicts detected. Please resolve all conflicts to continue syncing."
+      );
+    }
 
     let lastSynced = await this.db.lastSynced();
     if (isForceSync) lastSynced = 0;
