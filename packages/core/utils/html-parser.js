@@ -1,13 +1,10 @@
 import { decodeHTML5 } from "entities";
-import { DOMParser } from "linkedom/worker";
-
-const RealDOMParser =
-  "window" in global && "DOMParser" in window
-    ? new window.DOMParser()
-    : new DOMParser();
 
 export const parseHTML = (input) =>
-  RealDOMParser.parseFromString(wrapIntoHTMLDocument(input), "text/html");
+  new globalThis.DOMParser().parseFromString(
+    wrapIntoHTMLDocument(input),
+    "text/html"
+  );
 
 export function getDummyDocument() {
   const doc = parseHTML("<div></div>");
