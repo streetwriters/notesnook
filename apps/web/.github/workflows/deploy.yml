@@ -27,7 +27,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup npmrc
-        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.PERSONAL_GH_TOKEN}}" > .npmrc
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" > .npmrc
 
       - name: Use Node.js 16.x
         uses: actions/setup-node@v2.1.5

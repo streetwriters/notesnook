@@ -1,5 +1,9 @@
 name: Build/release
 
+permissions:
+  packages: read
+  contents: read
+
 on: workflow_dispatch
 
 jobs:
@@ -11,6 +15,9 @@ jobs:
         uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
         with:
           persist-credentials: false
+
+      - name: Setup npmrc
+        run: echo "//npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" > .npmrc
 
       - name: Use Node.js 16.x
         uses: actions/setup-node@v2.1.5
