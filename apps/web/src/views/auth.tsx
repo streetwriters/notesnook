@@ -173,7 +173,10 @@ function Auth(props: AuthProps) {
                 alignSelf: "end",
                 alignItems: "center",
               }}
-              onClick={() => db.user?.logout()}
+              onClick={async () => {
+                await db.user?.logout();
+                openURL("/login");
+              }}
               color="error"
             >
               <Logout size={16} sx={{ mr: 1 }} color="error" /> Logout
@@ -352,6 +355,9 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       const isSessionExpired = Config.get("sessionExpired", false);
       if (user && isSessionExpired) {
         setUser(user);
+      } else if (!user) {
+        Config.set("sessionExpired", false);
+        openURL("/login");
       } else openURL("/");
     })();
   }, [isAppLoaded]);

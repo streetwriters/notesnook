@@ -48,7 +48,11 @@ const ROUTES = {
   default: { component: () => import("./app"), props: {} },
 };
 
-const sessionExpiryExceptions = ["/recover", "/account/recovery"];
+const sessionExpiryExceptions = [
+  "/recover",
+  "/account/recovery",
+  "/sessionexpired",
+];
 
 function getRoute() {
   const path = getCurrentPath();
