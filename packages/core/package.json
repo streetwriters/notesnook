@@ -46,7 +46,8 @@
     "spark-md5": "^3.0.1"
   },
   "np": {
-    "releaseDraft": false
+    "releaseDraft": false,
+    "message": "chore: bump version to %s"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
