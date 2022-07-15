@@ -3,3 +3,5 @@
 !common.js
 !migrations.js
 !types.js
+!package.json
+**/*/__tests__/**/*
