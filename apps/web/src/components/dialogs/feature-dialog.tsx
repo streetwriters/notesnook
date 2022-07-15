@@ -70,7 +70,47 @@ const features: Record<FeatureKeys, Feature> = {
             ),
           },
         ]
-      : [],
+      : [
+          {
+            title: "A brand new editor",
+            subtitle:
+              "We have switched to a completely new editor for Notesnook. Why? Because we wanted something that was extensible and future proof.",
+          },
+          {
+            title: "Configurable toolbar",
+            subtitle: (
+              <>
+                Everyone's deserves their own toolbar that fits their needs
+                perfectly. Go to <Code text="Settings > Editor Settings" /> and
+                build your very own toolbar.
+              </>
+            ),
+          },
+          {
+            title: "Outline list",
+            subtitle: (
+              <>
+                Click on the <Code text="+" /> button in the toolbar to try it
+                out. It works just like Workflowy/Obsidian.
+              </>
+            ),
+          },
+          {
+            title: "Task list",
+            subtitle:
+              "A new task list that keeps track of your progress and supports reordering items via drag & drop.",
+          },
+          {
+            title: "Math support",
+            subtitle:
+              "Inline and multi-line Math & formula (Chemistry) support is here with KaTex.",
+          },
+          {
+            title: "Selected word count",
+            subtitle:
+              "Word counter now shows total words under selection when you select some text.",
+          },
+        ],
     cta: {
       title: "Got it",
       icon: Icon.Checkmark,
