@@ -8,6 +8,7 @@ workflows:
         - appstore_credentials
         - certificate_credentials
         - provisioning_profile
+        - github_token
 
       vars:
         XCODE_WORKSPACE: 'Notesnook.xcworkspace' # <-- Put the name of your Xcode workspace here
@@ -22,6 +23,15 @@ workflows:
       cache_paths:
         - $HOME/Library/Caches/CocoaPods
     scripts:
+      - name: Setup npmrc
+        run: |
+          echo "registry=https://npm.pkg.github.com" > .npmrc
+          echo "@streetwriters:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=$PACKAGES_TOKEN" >> .npmrc
+
+      - name: Setup yarnrc
+        run: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
+        
       - name: Install npm dependencies
         script: |
           yarn install --network-concurrency 1
