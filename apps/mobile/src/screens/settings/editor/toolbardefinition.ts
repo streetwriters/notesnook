@@ -1,7 +1,10 @@
-import { Icons } from 'notesnook-editor/dist/es/toolbar/icons';
-import { getDefaultPresets, getAllTools } from 'notesnook-editor/dist/es/toolbar/tooldefinitions';
-import { ToolId } from 'notesnook-editor/dist/es/toolbar/tools';
-import { ToolbarGroupDefinition } from 'notesnook-editor/dist/es/toolbar/index';
+import { Icons } from '@streetwriters/editor/dist/es/toolbar/icons';
+import {
+  getDefaultPresets,
+  getAllTools
+} from '@streetwriters/editor/dist/es/toolbar/tooldefinitions';
+import { ToolId } from '@streetwriters/editor/dist/es/toolbar/tools';
+import { ToolbarGroupDefinition } from '@streetwriters/editor/dist/es/toolbar/index';
 import { useThemeStore } from '../../../stores/use-theme-store';
 
 export const tools = getAllTools();

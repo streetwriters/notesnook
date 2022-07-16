@@ -5,6 +5,8 @@
 *Issues.md
 
 build_cache/
+.yarnrc
+.npmrc
 
 # Xcode
 #
