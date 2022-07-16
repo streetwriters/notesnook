@@ -18,11 +18,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup npmrc
-        run: |
-        echo "registry=https://npm.pkg.github.com
-        @streetwriters:registry=https://npm.pkg.github.com
-
-        //npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" > .npmrc
+        run: echo "registry=https://npm.pkg.github.com\n@streetwriters:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" > .npmrc
 
       - name: Setup yarnrc
         run: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" .yarnrc
