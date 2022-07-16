@@ -237,6 +237,8 @@ PODS:
     - React-Core
   - react-native-document-picker (7.1.3):
     - React-Core
+  - react-native-fingerprint-scanner (5.0.0):
+    - React-Core
   - react-native-get-random-values (1.8.0):
     - React-Core
   - react-native-html-to-pdf-lite (0.9.1):
@@ -328,6 +330,8 @@ PODS:
     - React-jsi (= 0.69.1)
     - React-logger (= 0.69.1)
     - React-perflogger (= 0.69.1)
+  - ReactNativeExceptionHandler (2.10.10):
+    - React-Core
   - rn-extensions-share (2.4.0):
     - React-Core
   - rn-fetch-blob (0.12.0):
@@ -433,6 +437,7 @@ DEPENDENCIES:
   - react-native-begin-background-task (from `../node_modules/react-native-begin-background-task`)
   - react-native-config (from `../node_modules/react-native-config`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
+  - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-html-to-pdf-lite (from `../node_modules/react-native-html-to-pdf-lite`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
@@ -455,6 +460,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - ReactNativeExceptionHandler (from `../node_modules/react-native-exception-handler`)
   - rn-extensions-share (from `../node_modules/rn-extensions-share`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - RNBootSplash (from `../node_modules/react-native-bootsplash`)
@@ -537,6 +543,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-config"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
+  react-native-fingerprint-scanner:
+    :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
   react-native-html-to-pdf-lite:
@@ -581,6 +589,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  ReactNativeExceptionHandler:
+    :path: "../node_modules/react-native-exception-handler"
   rn-extensions-share:
     :path: "../node_modules/rn-extensions-share"
   rn-fetch-blob:
@@ -665,6 +675,7 @@ SPEC CHECKSUMS:
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
   react-native-config: 7cd105e71d903104e8919261480858940a6b9c0e
   react-native-document-picker: ec07866a30707f23660c0f3ae591d669d3e89096
+  react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-get-random-values: a6ea6a8a65dc93e96e24a11105b1a9c8cfe1d72a
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-image-picker: 9c8a2687b69300ad9e95cec5d38f35ab9d32467d
@@ -687,6 +698,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: e8b7dd6635cc95689b5db643b5a3848f1e05b30b
   React-runtimeexecutor: 27f468c5576eaf05ffb7a907528e44c75a3fcbae
   ReactCommon: e30ec17dfb1d4c4f3419eac254350d6abca6d5a2
+  ReactNativeExceptionHandler: b11ff67c78802b2f62eed0e10e75cb1ef7947c60
   rn-extensions-share: 3f0ecce20dfbca1f0358deb4ebfb9ee121a6d92a
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNBootSplash: e8a36a88f8c868769ec998c5afe3082032e82fc2
