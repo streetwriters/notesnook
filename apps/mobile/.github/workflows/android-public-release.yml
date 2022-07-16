@@ -19,9 +19,9 @@ jobs:
 
       - name: Setup npmrc
         run: |
-        echo "registry=https://npm.pkg.github.com" > .npmrc
-        echo "@streetwriters:registry=https://npm.pkg.github.com" >> .npmrc
-        echo "//npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" >> .npmrc
+          echo "registry=https://npm.pkg.github.com" > .npmrc
+          echo "@streetwriters:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" >> .npmrc
 
       - name: Setup yarnrc
         run: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
