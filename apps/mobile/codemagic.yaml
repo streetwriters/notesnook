@@ -24,13 +24,13 @@ workflows:
         - $HOME/Library/Caches/CocoaPods
     scripts:
       - name: Setup npmrc
-        run: |
+        script: |
           echo "registry=https://npm.pkg.github.com" > .npmrc
           echo "@streetwriters:registry=https://npm.pkg.github.com" >> .npmrc
           echo "//npm.pkg.github.com/:_authToken=$PACKAGES_TOKEN" >> .npmrc
 
       - name: Setup yarnrc
-        run: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
+        script: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
         
       - name: Install npm dependencies
         script: |
