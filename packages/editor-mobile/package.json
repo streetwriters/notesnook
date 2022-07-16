@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@notesnook/theme": "git+https://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:x-oauth-basic@github.com/streetwriters/themeprovider.git",
+    "@streetwriters/editor": "^1.0.3",
+    "@streetwriters/theme": "^1.0.0",
     "framer-motion": "^4.1.17",
     "mdi-react": "^8.4.0",
-    "notesnook-editor": "file:../notesnook-editor",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "zustand": "^3.6.8"

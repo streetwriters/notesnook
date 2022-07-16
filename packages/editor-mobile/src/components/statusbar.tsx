@@ -1,4 +1,4 @@
-import { Editor } from "notesnook-editor";
+import { Editor } from "@streetwriters/editor";
 import React, { RefObject, useEffect, useRef, useState } from "react";
 
 export default function StatusBar({

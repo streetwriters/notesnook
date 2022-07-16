@@ -1,4 +1,4 @@
-import { Editor } from "notesnook-editor";
+import { Editor } from "@streetwriters/editor";
 
 type ButtonType = {
   editor: Editor | null;

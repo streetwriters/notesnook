@@ -1,11 +1,11 @@
-import { useTheme } from "@notesnook/theme";
+import { useTheme } from "@streetwriters/theme";
 import {
   Editor,
   PortalProvider,
   Toolbar,
   usePermissionHandler,
   useTiptap
-} from "notesnook-editor";
+} from "@streetwriters/editor";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";

@@ -1,4 +1,4 @@
-import { getDefaultPresets } from "notesnook-editor";
+import { getDefaultPresets } from "@streetwriters/editor";
 import { useState } from "react";
 
 const settingsJson = localStorage.getItem("editorSettings");

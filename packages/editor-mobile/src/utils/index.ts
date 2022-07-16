@@ -1,5 +1,5 @@
-import { ToolbarGroupDefinition } from "notesnook-editor";
-import { Editor } from "notesnook-editor";
+import { ToolbarGroupDefinition } from "@streetwriters/editor";
+import { Editor } from "@streetwriters/editor";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 
