@@ -21,7 +21,7 @@ jobs:
         run: echo "registry=https://npm.pkg.github.com\n@streetwriters:registry=https://npm.pkg.github.com\n//npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" > .npmrc
 
       - name: Setup yarnrc
-        run: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" .yarnrc
+        run: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
 
       - uses: actions/setup-node@master
         with:
