@@ -15,7 +15,6 @@ import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
 import BulletList from "./extensions/bullet-list";
 import OrderedList from "./extensions/ordered-list";
-import Highlight from "@tiptap/extension-highlight";
 import Color from "@tiptap/extension-color";
 import TableRow from "@tiptap/extension-table-row";
 import TableCell from "./extensions/table-cell";
@@ -46,6 +45,7 @@ import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
 import { EditorOptions } from "@tiptap/core";
 import { usePermissionHandler } from "./hooks/use-permission-handler";
+import { Highlight } from "./extensions/highlight";
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -119,9 +119,7 @@ const useTiptap = (
         TableRow,
         TableCell,
         TableHeader,
-        Highlight.configure({
-          multicolor: true,
-        }),
+        Highlight,
         CodeBlock,
         Color,
         TextAlign.configure({

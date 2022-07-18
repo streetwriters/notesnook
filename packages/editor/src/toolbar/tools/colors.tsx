@@ -10,7 +10,7 @@ import { getToolbarElement } from "../utils/dom";
 
 type ColorToolProps = ToolProps & {
   onColorChange: (color?: string) => void;
-  getActiveColor: () => string;
+  activeColor: string;
   title: string;
   cacheKey: string;
 };
@@ -19,12 +19,12 @@ export function ColorTool(props: ColorToolProps) {
   const {
     editor,
     onColorChange,
-    getActiveColor,
+    activeColor: _activeColor,
     title,
     cacheKey,
     ...toolProps
   } = props;
-  const activeColor = getActiveColor() || config.get(cacheKey);
+  const activeColor = _activeColor || config.get(cacheKey);
   const tColor = tinycolor(activeColor);
   const isBottom = useToolbarLocation() === "bottom";
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -79,16 +79,15 @@ export function ColorTool(props: ColorToolProps) {
 
 export function Highlight(props: ToolProps) {
   const { editor } = props;
-
   return (
     <ColorTool
       {...props}
       cacheKey="highlight"
-      getActiveColor={() => editor.current?.getAttributes("highlight").color}
+      activeColor={editor.getAttributes("textStyle").backgroundColor}
       title={"Background color"}
       onColorChange={(color) =>
         color
-          ? editor.current?.chain().focus().toggleHighlight({ color }).run()
+          ? editor.current?.chain().focus().setHighlight(color).run()
           : editor.current?.chain().focus().unsetHighlight().run()
       }
     />
@@ -101,7 +100,7 @@ export function TextColor(props: ToolProps) {
     <ColorTool
       {...props}
       cacheKey={"textColor"}
-      getActiveColor={() => editor.current?.getAttributes("textStyle").color}
+      activeColor={editor.getAttributes("textStyle").color}
       title="Text color"
       onColorChange={(color) =>
         color

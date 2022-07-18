@@ -14,7 +14,7 @@ import React from "react";
 
 export type SplitButtonProps = ToolButtonProps & { onOpen: () => void };
 function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
-  const { children, toggled, onOpen, ...toolButtonProps } = props;
+  const { children, toggled, onOpen, sx, ...toolButtonProps } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const toolbarLocation = useToolbarLocation();
@@ -29,7 +29,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
       >
         <ToolButton
           {...toolButtonProps}
-          sx={{ mr: 0, ":hover": { bg: "hover" } }}
+          sx={{ mr: 0, ":hover": { bg: "hover" }, ...sx }}
           toggled={false}
         />
         <Button
