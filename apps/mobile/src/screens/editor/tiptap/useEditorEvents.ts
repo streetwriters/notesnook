@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { BackHandler, InteractionManager, NativeEventSubscription } from 'react-native';
 import { WebViewMessageEvent } from 'react-native-webview';
-import useKeyboard from 'src/utils/hooks/use-keyboard';
+import useKeyboard from '../../../utils/hooks/use-keyboard';
 import { DDS } from '../../../services/device-detection';
 import {
   eSendEvent,
