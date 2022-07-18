@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import React from 'react';
 import { Linking, Platform } from 'react-native';
-import { checkVersion } from 'react-native-check-version';
 import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
 import { APP_VERSION } from '../../../version';
@@ -20,10 +19,10 @@ import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
 import Sync from '../../services/sync';
 import { clearAllStores } from '../../stores';
-import { useUserStore } from '../../stores/use-user-store';
 import { useSettingStore } from '../../stores/use-setting-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { AndroidModule } from '../../utils';
-import { toggleDarkMode, getColorScheme } from '../../utils/color-scheme/utils';
+import { getColorScheme, toggleDarkMode } from '../../utils/color-scheme/utils';
 import { SUBSCRIPTION_STATUS } from '../../utils/constants';
 import { db } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
@@ -42,8 +41,6 @@ import AppLock from './app-lock';
 import { verifyUser } from './functions';
 import { SettingSection } from './types';
 import { getTimeLeft } from './user-section';
-import { ConfigureToolbar } from './editor/configure-toolbar';
-import { AuthMode } from '../../components/auth';
 const format = (ver: number) => {
   let parts = ver.toString().split('');
   return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? '' : parts[2]}${
