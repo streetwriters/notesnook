@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@streetwriters/editor": "^1.0.3",
+    "@streetwriters/editor": "^1.1.1",
     "@streetwriters/theme": "^1.0.0",
     "framer-motion": "^4.1.17",
     "mdi-react": "^8.4.0",
