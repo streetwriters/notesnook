@@ -31,8 +31,9 @@ export function TaskItemComponent(
         (node) => node.type.name === TaskItemNode.name
       );
       editor.current.commands.command(({ tr }) => {
-        for (const { pos } of selectedTaskItems) {
+        for (const { node, pos } of selectedTaskItems) {
           tr.setNodeMarkup(pos, null, { checked: !checked });
+          toggleChildren(node, tr, !checked, pos);
         }
         return true;
       });
