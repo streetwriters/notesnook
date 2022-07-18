@@ -283,10 +283,12 @@ const tools: Record<ToolId, ToolDefinition> = {
   outdent: {
     icon: "outdent",
     title: "Lift list item",
+    conditional: true,
   },
   indent: {
     icon: "indent",
     title: "Sink list item",
+    conditional: true,
   },
 };
 
