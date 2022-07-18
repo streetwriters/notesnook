@@ -1,4 +1,3 @@
-import { useTheme } from "@streetwriters/theme";
 import {
   Editor,
   PortalProvider,
@@ -6,11 +5,12 @@ import {
   usePermissionHandler,
   useTiptap,
 } from "@streetwriters/editor";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTheme } from "@streetwriters/theme";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import { useEditorThemeStore } from "../state/theme";
-import { EventTypes, Settings } from "../utils";
+import { EventTypes } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
@@ -20,15 +20,6 @@ const Tiptap = () => {
   const settings = useSettings();
   const [tick, setTick] = useState(0);
   const theme = useEditorThemeStore((state) => state.colors);
-  const [initialProps, setInitialProps] = useState<Partial<Settings>>({
-    readonly: global.readonly || settings.readonly,
-    noHeader: global.noHeader || settings.noHeader,
-    noToolbar:
-      global.noToolbar ||
-      settings.noToolbar ||
-      global.readonly ||
-      settings.readonly,
-  });
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState(false);
@@ -45,6 +36,8 @@ const Tiptap = () => {
     scale: 1,
     theme: theme?.night ? "dark" : "light",
   });
+
+  editorTheme.colors.background = theme?.bg || "#f0f0f0";
 
   editorTheme.space = [0, 10, 12, 20];
   toolbarTheme.space = [0, 10, 12, 18];
@@ -105,16 +98,17 @@ const Tiptap = () => {
       },
       theme: editorTheme,
       element: !layout ? undefined : contentRef.current || undefined,
-      editable: !initialProps.readonly,
+      editable: !settings.readonly,
       editorProps: {
-        editable: () => !initialProps.readonly,
+        editable: () => !settings.readonly,
       },
       content: global.editorController?.content?.current,
       isMobile: true,
       isKeyboardOpen: settings.keyboardShown,
     },
-    [layout, initialProps.readonly, tick]
+    [layout, settings.readonly, tick]
   );
+
   const update = () => {
     setTick((tick) => tick + 1);
     controller.setTitlePlaceholder("Note title");
@@ -124,11 +118,6 @@ const Tiptap = () => {
   const controllerRef = useRef(controller);
   globalThis.editorController = controller;
   globalThis.editor = _editor;
-
-  useEffect(() => {
-    logger("info", "keyboardShown", settings.keyboardShown);
-    setInitialProps({ ...settings });
-  }, [settings]);
 
   useLayoutEffect(() => {
     setLayout(true);
@@ -149,7 +138,7 @@ const Tiptap = () => {
           hasRedo={_editor?.can().redo() || false}
           hasUndo={_editor?.can().undo() || false}
           settings={settings}
-          noHeader={initialProps.noHeader || false}
+          noHeader={settings.noHeader || false}
         />
         <div
           onScroll={controller.scroll}
@@ -163,7 +152,7 @@ const Tiptap = () => {
             display: "flex",
           }}
         >
-          {initialProps.noHeader ? null : (
+          {settings.noHeader ? null : (
             <>
               <Tags />
               <Title
@@ -200,7 +189,7 @@ const Tiptap = () => {
           />
         </div>
 
-        {initialProps.noToolbar || !layout ? null : (
+        {settings.noToolbar || !layout ? null : (
           <Toolbar
             sx={{ pl: "10px", pt: "5px", minHeight: 45 }}
             theme={toolbarTheme}
