@@ -32,7 +32,7 @@ export const SettingsPlaceholder = () => {
           style={{
             width: 40,
             height: 40,
-            backgroundColor: colors.gray,
+            backgroundColor: colors.transGray,
             borderRadius: 100,
             marginRight: 20
           }}
