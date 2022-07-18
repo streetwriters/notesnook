@@ -63,7 +63,6 @@ export function TaskItemComponent(
             opacity: editor.isEditable ? 1 : 0,
           },
         }}
-        contentEditable={false}
       >
         <Icon
           className="dragHandle"
