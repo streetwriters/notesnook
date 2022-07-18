@@ -68,6 +68,7 @@ export default function EditorManager({
   const title = useRef<string>("");
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
+  const editor = useEditorInstance();
 
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
@@ -127,6 +128,21 @@ export default function EditorManager({
         position: "relative",
         alignSelf: "stretch",
         overflow: "hidden",
+      }}
+      onPaste={async (event) => {
+        if (!editor) return;
+
+        if (event.clipboardData?.items?.length) {
+          event.preventDefault();
+
+          for (let item of event.clipboardData.items) {
+            const file = item.getAsFile();
+            if (!file) continue;
+            const result = await attachFile(file);
+            if (!result) continue;
+            editor.attachFile(result);
+          }
+        }
       }}
     >
       {previewSession.current && (
