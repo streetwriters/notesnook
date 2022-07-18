@@ -1,7 +1,12 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { useCallback, useEffect, useRef } from 'react';
-import { BackHandler, InteractionManager, NativeEventSubscription } from 'react-native';
+import {
+  BackHandler,
+  DeviceEventEmitter,
+  InteractionManager,
+  NativeEventSubscription
+} from 'react-native';
 import { WebViewMessageEvent } from 'react-native-webview';
 import useKeyboard from '../../../utils/hooks/use-keyboard';
 import { DDS } from '../../../services/device-detection';
@@ -34,6 +39,7 @@ import { NoteType } from '../../../utils/types';
 import { useDragState } from '../../settings/editor/state';
 import { EditorMessage, EditorProps, useEditorType } from './types';
 import { EditorEvents, editorState } from './utils';
+import { executeNativeBackPress } from 'react-native-screens';
 
 export const EventTypes = {
   selection: 'editor-event:selection',
@@ -127,7 +133,7 @@ export const useEditorEvents = (
   if (!editor) return null;
 
   useEffect(() => {
-    console.log('settings', fullscreen);
+    console.log('keyboardShown', keyboardShown);
     editor.commands.setSettings({
       deviceMode: deviceMode || 'mobile',
       fullscreen: fullscreen || false,
@@ -193,7 +199,6 @@ export const useEditorEvents = (
       }
     });
   }, []);
-
   const onCallClear = useCallback(async (value: string) => {
     if (value === 'removeHandler') {
       if (handleBack.current) {

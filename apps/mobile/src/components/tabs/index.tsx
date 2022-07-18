@@ -6,17 +6,20 @@ import React, {
   useRef,
   useState
 } from 'react';
-import { BackHandler, ViewProps } from 'react-native';
-import { Gesture, GestureDetector, State } from 'react-native-gesture-handler';
+import { BackHandler, Platform, ViewProps } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  WithSpringConfig,
   withTiming
 } from 'react-native-reanimated';
 import { useSettingStore } from '../../stores/use-setting-store';
+import { eSendEvent } from '../../services/event-manager';
+import { eClearEditor } from '../../utils/events';
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
@@ -62,16 +65,16 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const [disabled, setDisabled] = useState(false);
     const node = useRef<Animated.View>(null);
     const containerWidth = widths ? widths.a + widths.b + widths.c : dimensions.width;
-    console.log(containerWidth, dimensions.width);
+
     const drawerPosition = 0;
     const homePosition = widths.a;
     const editorPosition = widths.a + widths.b;
     const isSmallTab = deviceMode === 'smallTablet';
     const isLoaded = useRef(false);
     const prevWidths = useRef(widths);
+    const isIPhone = Platform.OS === 'ios';
 
     useEffect(() => {
-      console.log(deviceMode);
       if (introCompleted) {
         if (deviceMode === 'tablet' || fullscreen) {
           translateX.value = 0;
@@ -169,7 +172,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
       result => {
         if (setDisabled) {
           if (result === 2) {
-            runOnJS(setDisabled)(true);
+            runOnJS(setDisabled)(!isIPhone);
           } else {
             runOnJS(setDisabled)(false);
           }
@@ -189,6 +192,12 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
       },
       []
     );
+
+    const clearEditor = () => {
+      setTimeout(() => {
+        eSendEvent(eClearEditor);
+      }, 300);
+    };
 
     const gesture = Gesture.Pan()
       .maxPointers(1)
@@ -222,24 +231,28 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         let value = translateX.value + event.changeX * -1;
         if (
           value < 0 ||
-          currentTab.value === 2 ||
-          value > editorPosition ||
-          (value >= homePosition && isSmallTab)
+          (currentTab.value === 2 && Platform.OS === 'android') ||
+          (currentTab.value === 2 && gestureStartValue.value.x > 25 && Platform.OS === 'ios') ||
+          (value >= homePosition && isSmallTab) ||
+          value > editorPosition
         )
           return;
         translateX.value = value;
       })
       .onEnd(event => {
-        if (currentTab.value === 2) return;
+        if (currentTab.value === 2 && Platform.OS === 'android') return;
         let velocityX = event.velocityX < 0 ? event.velocityX * -1 : event.velocityX;
         let isSwipeLeft = startX.value > translateX.value;
         let finalValue = isSwipeLeft
           ? translateX.value - velocityX / 40.0
           : translateX.value + velocityX / 40.0;
 
-        const animationConfig = {
-          velocity: event.velocityX,
-          mass: 0.01
+        const animationConfig: WithSpringConfig = {
+          velocity: velocityX,
+          mass: 0.5,
+          overshootClamping: true,
+          damping: 800,
+          stiffness: 800
         };
 
         if (finalValue < homePosition) {
@@ -271,6 +284,19 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
             isDrawerOpen.value = false;
             return;
           }
+        }
+
+        if (currentTab.value === 2) {
+          if (finalValue < editorPosition - 100 && isSwipeLeft) {
+            translateX.value = withSpring(homePosition, animationConfig);
+            currentTab.value = 1;
+            isDrawerOpen.value = false;
+            runOnJS(clearEditor)();
+          } else {
+            translateX.value = withSpring(editorPosition, animationConfig);
+            currentTab.value = 2;
+          }
+          return;
         }
 
         runOnJS(onDrawerStateChange)(false);
