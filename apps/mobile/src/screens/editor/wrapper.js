@@ -38,9 +38,9 @@ export const EditorWrapper = ({ width }) => {
   }, [loading]);
 
   const getMarginBottom = () => {
-    if (!keyboard.keyboardShown) return 0;
+    if (!keyboard.keyboardShown) return insets.bottom / 2;
     if (Platform.isPad && !floating) return 16;
-    if (Platform.OS == 'ios') return insets.bottom;
+    if (Platform.OS === 'ios') return 0;
     return 6;
   };
 
