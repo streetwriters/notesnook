@@ -25,8 +25,7 @@ global.DOMParser = DOMParser;
 //=================================================
 // ADVANCED use case:
 const exceptionhandler = (error, isFatal) => {
-  // your error handler function
-  alert('Exception Handler: ' + error.stack);
+  // TODO
 };
 setJSExceptionHandler(exceptionhandler, true);
 
