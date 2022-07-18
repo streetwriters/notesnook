@@ -1,3 +1,4 @@
+import { ToolId } from '@streetwriters/editor/dist/es/toolbar';
 import React, { RefObject } from 'react';
 import { View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
@@ -20,9 +21,9 @@ export default function ToolSheet({
 }) {
   const colors = useThemeStore(state => state.colors);
   const data = useDragState(state => state.data);
-  const ungrouped = getUngroupedTools(data);
+  const ungrouped = getUngroupedTools(data) as ToolId[];
 
-  const renderTool = React.useCallback((item: string) => {
+  const renderTool = React.useCallback((item: ToolId) => {
     //@ts-ignore
     const tool = findToolById(item);
     //@ts-ignore
@@ -87,7 +88,7 @@ export default function ToolSheet({
         }}
         nestedScrollEnabled={true}
       >
-        {ungrouped.length === 0 ? (
+        {!ungrouped || ungrouped.length === 0 ? (
           <Paragraph
             style={{
               alignSelf: 'center'

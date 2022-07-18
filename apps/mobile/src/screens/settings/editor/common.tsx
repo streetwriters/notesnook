@@ -6,6 +6,8 @@ import { Tool } from './tool';
 export const renderTool = ({ item, groupIndex, parentIndex }: DraggableItem) => {
   const data = item as string[];
 
+  if (!data) return null;
+
   const tools = data.map((item, index) => (
     <Tool
       key={Array.isArray(item) ? `subgroup-${index}` : item}

@@ -82,7 +82,13 @@ export const ConfigureToolbar = () => {
             ))}
           </View>
         </View>
-        <DraxScrollView showsVerticalScrollIndicator={false}>
+        <DraxScrollView
+          style={{
+            flex: 1
+          }}
+          scrollEventThrottle={13}
+          showsVerticalScrollIndicator={false}
+        >
           {renderGroups()}
           <View
             style={{

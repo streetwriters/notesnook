@@ -64,10 +64,11 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
     }
 
     if (dragged.type === 'tool') {
-      const insertFrom = dragged.parentIndex
-        ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
-        : (_data[dragged.groupIndex] as string[]);
-
+      const insertFrom =
+        typeof dragged.parentIndex === 'number'
+          ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
+          : (_data[dragged.groupIndex] as string[]);
+      //@ts-ignore
       _data[groupIndex].push(insertFrom.splice(dragged.index, 1)[0]);
     }
 

@@ -204,17 +204,22 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
     const dragged = data.dragged.payload;
     const reciever = data.receiver.payload;
     let _data = useDragState.getState().data.slice();
+
+    const isFromSubgroup = typeof dragged.parentIndex === 'number';
+    const isDroppedAtSubgroup = typeof reciever.parentIndex === 'number';
+
     if (dragged.type === 'tool') {
       const fromIndex = dragged.index;
       const toIndex = isDroppedAbove ? Math.max(0, reciever.index) : reciever.index + 1;
 
-      const insertAt = reciever.parentIndex
+      console.log('indexes', reciever.parentIndex, reciever.groupIndex);
+
+      const insertAt = isDroppedAtSubgroup
         ? (_data[reciever.parentIndex][reciever.groupIndex] as string[])
         : (_data[reciever.groupIndex] as string[]);
-      const insertFrom = dragged.parentIndex
+      const insertFrom = isFromSubgroup
         ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
         : (_data[dragged.groupIndex] as string[]);
-
       insertAt.splice(
         toIndex > fromIndex ? toIndex - 1 : toIndex,
         0,
@@ -223,7 +228,7 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
 
       // Remove the group or subgroup if it is empty.
       if (insertFrom.length === 0) {
-        dragged.parentIndex
+        isFromSubgroup
           ? _data[dragged.parentIndex].splice(_data[dragged.parentIndex].length - 1, 1)
           : _data.splice(dragged.groupIndex, 1);
       }
