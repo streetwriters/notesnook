@@ -5,6 +5,7 @@ import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
 import { confirm, showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
+import { store as userstore } from "../../stores/user-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
 import { db } from "../../common/db";
 import { showUnpinnedToast } from "../../common/toasts";
@@ -366,6 +367,7 @@ const menuItems = [
   },
   {
     key: "sync-disable",
+    hidden: () => !userstore.get().isLoggedIn,
     disabled: ({ note }) =>
       !db.notes.note(note.id).synced() ? notFullySyncedText : false,
     title: ({ note }) => (note.localOnly ? "Enable sync" : "Disable sync"),
