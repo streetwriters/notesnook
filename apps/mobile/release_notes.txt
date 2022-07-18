@@ -1,9 +1,9 @@
-- A new editor for Notesnook
-- Configurable toolbar - Everyone deserves their own toolbar
-- KaTex Math support
-- Outline lists
-- Task lists with progress & reordering
-- Overhaul Settings for better UI and UX
-- Lot's of bug fixes and performance improvements
+- You can now swipe left from the edge to close the editor on iPhone
+- Fix toolbar appears at incorrect position
+- Fixed a crash when trying to configure toolbar
+- Fixed toggling task item causing keyboard to open
+- Fixed minimal toolbar preset shows default toolbar
+- Improved gestures and drawer animations
+- Removed the annoying alert on app launch
 
 Thank you for using Notesnook!
