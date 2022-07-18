@@ -30,22 +30,21 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         width: width || "auto",
       }}
       maxWidth="100%"
-      minWidth={150}
-      minHeight={150}
+      minWidth={135}
       handleComponent={{
         bottomRight: (
           <Icon
             sx={{
               width: 25,
               height: 25,
-              marginLeft: -17,
-              marginTop: "3px",
+              marginLeft: -20,
+              marginTop: -20,
               borderTopLeftRadius: "default",
               borderBottomRightRadius: "default",
             }}
             path={Icons.resize}
             size={25}
-            color="primary"
+            color="icon"
           />
         ),
       }}
