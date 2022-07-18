@@ -4,12 +4,7 @@ import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { Node } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
-import {
-  findChildren,
-  findParentNode,
-  getNodeType,
-  NodeWithPos,
-} from "@tiptap/core";
+import { findChildren, findChildrenInRange, NodeWithPos } from "@tiptap/core";
 import { useCallback, useEffect } from "react";
 import { TaskItemNode, TaskItemAttributes } from "./task-item";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
@@ -22,17 +17,34 @@ export function TaskItemComponent(
   const isMobile = useIsMobile();
 
   const toggle = useCallback(() => {
-    if (!editor.isEditable) return false;
-    updateAttributes({ checked: !checked });
+    if (!editor.isEditable || !editor.current) return false;
 
-    const pos = getPos();
-    const node = editor.current?.state.doc.nodeAt(pos);
-    if (!node) return false;
+    const { empty, from, to, $from } = editor.current.state.selection;
+    if (!empty) {
+      const selectedTaskItems = findChildrenInRange(
+        editor.current.state.doc,
+        { from, to },
+        (node) => node.type.name === TaskItemNode.name
+      );
+      editor.current.commands.command(({ tr }) => {
+        for (const { pos } of selectedTaskItems) {
+          tr.setNodeMarkup(pos, null, { checked: !checked });
+        }
+        return true;
+      });
+    } else {
+      updateAttributes({ checked: !checked });
 
-    editor.commands.command(({ tr }) => {
-      toggleChildren(node, tr, !checked, pos);
-      return true;
-    });
+      const pos = getPos();
+      const node = editor.current?.state.doc.nodeAt(pos);
+      if (!node) return false;
+
+      editor.commands.command(({ tr }) => {
+        toggleChildren(node, tr, !checked, pos);
+        return true;
+      });
+    }
+
     return true;
   }, [editor, getPos, checked]);
 
