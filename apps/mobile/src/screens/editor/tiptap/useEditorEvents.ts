@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { BackHandler, InteractionManager, NativeEventSubscription } from 'react-native';
 import { WebViewMessageEvent } from 'react-native-webview';
+import useKeyboard from 'src/utils/hooks/use-keyboard';
 import { DDS } from '../../../services/device-detection';
 import {
   eSendEvent,
@@ -122,6 +123,7 @@ export const useEditorEvents = (
   const readonly = useEditorStore(state => state.readonly);
   const isPremium = useUserStore(state => state.premium);
   const tools = useDragState(state => state.data);
+  const { keyboardShown } = useKeyboard();
   if (!editor) return null;
 
   useEffect(() => {
@@ -133,7 +135,8 @@ export const useEditorEvents = (
       readonly: readonly || editorPropReadonly,
       tools: tools,
       noHeader: noHeader,
-      noToolbar: readonly || editorPropReadonly || noToolbar
+      noToolbar: readonly || editorPropReadonly || noToolbar,
+      keyboardShown: keyboardShown || false
     });
   }, [
     fullscreen,
@@ -143,7 +146,8 @@ export const useEditorEvents = (
     editor.loading,
     deviceMode,
     tools,
-    editor.commands
+    editor.commands,
+    keyboardShown
   ]);
 
   const onBackPress = useCallback(async () => {

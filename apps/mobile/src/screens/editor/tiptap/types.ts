@@ -25,6 +25,7 @@ export type Settings = {
   tools: ToolbarGroupDefinition[];
   noToolbar?: boolean;
   noHeader?: boolean;
+  keyboardShown?: boolean;
 };
 
 export type EditorProps = {
