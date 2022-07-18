@@ -15,10 +15,9 @@ import {
 export function TaskItemComponent(
   props: ReactNodeViewProps<TaskItemAttributes>
 ) {
-  const { editor, updateAttributes, node, getPos, forwardRef } = props;
+  const { editor, updateAttributes, getPos, forwardRef } = props;
   const { checked } = props.node.attrs;
   const isMobile = useIsMobile();
-  const isKeyboardOpen = useIsKeyboardOpen();
 
   const toggle = useCallback(() => {
     if (!editor.isEditable || !editor.current) return false;
@@ -89,6 +88,7 @@ export function TaskItemComponent(
           path={checked ? Icons.check : ""}
           stroke="1px"
           contentEditable={false}
+          tabIndex={1}
           sx={{
             border: "2px solid",
             borderColor: checked ? "checked" : "icon",
@@ -105,13 +105,13 @@ export function TaskItemComponent(
             },
           }}
           onMouseDown={(e) => {
-            if (isKeyboardOpen) {
+            if (useIsKeyboardOpen.current) {
               e.preventDefault();
             }
             toggle();
           }}
           onTouchEnd={(e) => {
-            if (isKeyboardOpen) {
+            if (useIsKeyboardOpen.current) {
               e.preventDefault();
               toggle();
             }
