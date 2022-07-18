@@ -37,7 +37,7 @@
   "build": {
     "appId": "com.streetwriters.notesnook",
     "productName": "Notesnook",
-    "copyright": "Copyright © 2021 Streetwriters (Private) Ltd.",
+    "copyright": "Copyright © 2022 Streetwriters (Private) Ltd.",
     "artifactName": "notesnook_${arch}.${ext}",
     "files": [
       "!*.chunk.js.map",
