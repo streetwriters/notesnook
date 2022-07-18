@@ -10,7 +10,7 @@ import { useThemeStore } from '../../../stores/use-theme-store';
 export const tools = getAllTools();
 export const presets: { [name: string]: ToolbarGroupDefinition[] } = {
   default: getDefaultPresets().default,
-  minimal: getDefaultPresets().default,
+  minimal: getDefaultPresets().minimal,
   custom: []
 };
 
