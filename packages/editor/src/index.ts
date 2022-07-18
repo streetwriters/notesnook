@@ -56,6 +56,7 @@ type TiptapOptions = EditorOptions &
   AttachmentOptions & {
     theme: Theme;
     isMobile?: boolean;
+    isKeyboardOpen?: boolean;
   };
 
 const useTiptap = (
@@ -65,6 +66,7 @@ const useTiptap = (
   const {
     theme,
     isMobile,
+    isKeyboardOpen,
     onDownloadAttachment,
     onOpenAttachmentPicker,
     onBeforeCreate,
@@ -73,11 +75,13 @@ const useTiptap = (
   const PortalProviderAPI = usePortalProvider();
   const setIsMobile = useToolbarStore((store) => store.setIsMobile);
   const setTheme = useToolbarStore((store) => store.setTheme);
+  const setIsKeyboardOpen = useToolbarStore((store) => store.setIsKeyboardOpen);
 
   useEffect(() => {
     setIsMobile(isMobile || false);
     setTheme(theme);
-  }, [isMobile, theme]);
+    setIsKeyboardOpen(isKeyboardOpen || false);
+  }, [isMobile, theme, isKeyboardOpen]);
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({

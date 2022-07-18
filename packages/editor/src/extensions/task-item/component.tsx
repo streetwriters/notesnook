@@ -7,7 +7,10 @@ import { Transaction } from "prosemirror-state";
 import { findChildren, findChildrenInRange, NodeWithPos } from "@tiptap/core";
 import { useCallback, useEffect } from "react";
 import { TaskItemNode, TaskItemAttributes } from "./task-item";
-import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import {
+  useIsKeyboardOpen,
+  useIsMobile,
+} from "../../toolbar/stores/toolbar-store";
 
 export function TaskItemComponent(
   props: ReactNodeViewProps<TaskItemAttributes>
@@ -15,11 +18,12 @@ export function TaskItemComponent(
   const { editor, updateAttributes, node, getPos, forwardRef } = props;
   const { checked } = props.node.attrs;
   const isMobile = useIsMobile();
+  const isKeyboardOpen = useIsKeyboardOpen();
 
   const toggle = useCallback(() => {
     if (!editor.isEditable || !editor.current) return false;
 
-    const { empty, from, to, $from } = editor.current.state.selection;
+    const { empty, from, to } = editor.current.state.selection;
     if (!empty) {
       const selectedTaskItems = findChildrenInRange(
         editor.current.state.doc,
@@ -59,6 +63,7 @@ export function TaskItemComponent(
             opacity: editor.isEditable ? 1 : 0,
           },
         }}
+        contentEditable={false}
       >
         <Icon
           className="dragHandle"
@@ -79,11 +84,11 @@ export function TaskItemComponent(
             },
           }}
           size={isMobile ? 24 : 20}
-          // onMouseDown={(e) => e.preventDefault()}
         />
         <Icon
           path={checked ? Icons.check : ""}
           stroke="1px"
+          contentEditable={false}
           sx={{
             border: "2px solid",
             borderColor: checked ? "checked" : "icon",
@@ -100,12 +105,16 @@ export function TaskItemComponent(
             },
           }}
           onMouseDown={(e) => {
-            e.preventDefault();
+            if (isKeyboardOpen) {
+              e.preventDefault();
+            }
             toggle();
           }}
           onTouchEnd={(e) => {
-            e.preventDefault();
-            toggle();
+            if (isKeyboardOpen) {
+              e.preventDefault();
+              toggle();
+            }
           }}
           color={checked ? "checked" : "icon"}
           size={isMobile ? 16 : 14}

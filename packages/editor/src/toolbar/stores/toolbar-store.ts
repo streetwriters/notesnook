@@ -7,6 +7,8 @@ export type PopupRef = { id: string; group: string };
 interface ToolbarState {
   theme?: Theme;
   setTheme: (theme?: Theme) => void;
+  isKeyboardOpen: boolean;
+  setIsKeyboardOpen: (isKeyboardOpen: boolean) => void;
   isMobile: boolean;
   openedPopups: Record<string, PopupRef | false>;
   setIsMobile: (isMobile: boolean) => void;
@@ -21,7 +23,12 @@ interface ToolbarState {
 export const useToolbarStore = create<ToolbarState>((set, get) => ({
   theme: undefined,
   isMobile: false,
+  isKeyboardOpen: true,
   openedPopups: {},
+  setIsKeyboardOpen: (isKeyboardOpen) =>
+    set((state) => {
+      state.isKeyboardOpen = isKeyboardOpen;
+    }),
   setIsMobile: (isMobile) =>
     set((state) => {
       state.isMobile = isMobile;
@@ -73,8 +80,18 @@ export const useTheme = Object.defineProperty(
   () => {
     return useToolbarStore((store) => store.theme);
   },
-  "theme",
+  "current",
   {
     get: () => useToolbarStore.getState().theme,
   }
-) as (() => Theme | undefined) & { theme: Theme | undefined };
+) as (() => Theme | undefined) & { current: Theme | undefined };
+
+export const useIsKeyboardOpen = Object.defineProperty(
+  () => {
+    return useToolbarStore((store) => store.isKeyboardOpen);
+  },
+  "current",
+  {
+    get: () => useToolbarStore.getState().isKeyboardOpen,
+  }
+) as (() => boolean) & { current: boolean };
