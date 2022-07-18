@@ -11,7 +11,6 @@ import "@tiptap/extension-text-style";
 import "@tiptap/extension-font-family";
 import "./extensions/bullet-list";
 import "./extensions/ordered-list";
-import "@tiptap/extension-highlight";
 import "@tiptap/extension-color";
 import "@tiptap/extension-table-row";
 import "./extensions/table-cell";
