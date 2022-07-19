@@ -160,9 +160,9 @@ async function run(progress) {
     } else {
       backupFilePath = await ScopedStorage.writeFile(
         androidBackupDirectory.uri,
+        backup,
         backupName,
         'nnbackup/json',
-        backup,
         'utf8',
         false
       );

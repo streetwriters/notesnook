@@ -352,9 +352,9 @@ async function saveToPDF(note) {
   if (Platform.OS === 'android') {
     fileUri = await ScopedStorage.writeFile(
       androidSavePath,
+      res.base64,
       fileName,
       'application/pdf',
-      res.base64,
       'base64',
       false
     );
@@ -387,9 +387,9 @@ async function saveToMarkdown(note) {
   if (Platform.OS === 'android') {
     fileUri = await ScopedStorage.writeFile(
       path,
+      markdown,
       fileName + '.md',
       'text/markdown',
-      markdown,
       'utf8',
       false
     );
@@ -422,9 +422,9 @@ async function saveToText(note) {
   if (Platform.OS === 'android') {
     fileUri = await ScopedStorage.writeFile(
       path,
+      text,
       fileName + '.txt',
       'text/plain',
-      text,
       'utf8',
       false
     );
@@ -463,9 +463,9 @@ async function saveToHTML(note) {
   if (Platform.OS === 'android') {
     fileUri = await ScopedStorage.writeFile(
       path,
+      html3,
       fileName + '.html',
       'text/html',
-      html3,
       'utf8',
       false
     );
