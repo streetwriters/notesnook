@@ -1,5 +1,5 @@
 import { parseHTML } from "./utils/html-parser";
-import { decodeHTML5 } from "entities";
+import { decodeHTML5, encodeHTML5 } from "entities";
 
 export const migrations = {
   5.0: {},
@@ -123,16 +123,6 @@ export function tinyToTiptap(html) {
   const images = document.querySelectorAll("p > img");
   for (const image of images) {
     image.parentElement.replaceWith(image.cloneNode());
-  }
-
-  const breaks = document.querySelectorAll("br");
-  for (const br of breaks) {
-    br.remove();
-  }
-
-  const paragraphs = document.querySelectorAll("p");
-  for (const p of paragraphs) {
-    if (!p.childNodes.length) p.remove();
   }
 
   const codeblocks = document.querySelectorAll("pre");
