@@ -4,6 +4,7 @@ import {
   consoleReporter,
   format,
   LogLevel,
+  NoopLogger,
 } from "@streetwriters/logger";
 
 // Database logger reporter:
@@ -73,19 +74,12 @@ class DatabaseLogWriter {
   }
 }
 
-class DatabaseLogger extends Logger {
+class DatabaseLogManager {
   /**
    *
    * @param {import("./database/storage").default} storage
    */
   constructor(storage) {
-    super({
-      reporter: combineReporters([
-        new DatabaseLogReporter(storage),
-        consoleReporter,
-      ]),
-      lastTime: Date.now(),
-    });
     this.storage = storage;
   }
 
@@ -116,11 +110,25 @@ class DatabaseLogger extends Logger {
  * @param {import("./database/storage").default} storage
  */
 function initalize(storage) {
-  logger = new DatabaseLogger(storage);
+  if (storage) {
+    let reporters = [new DatabaseLogReporter(storage)];
+    if (process.env.NODE_ENV !== "production") reporters.push(consoleReporter);
+    logger = new Logger({
+      reporter: combineReporters(reporters),
+      lastTime: Date.now(),
+    });
+    logManager = new DatabaseLogManager(storage);
+  }
 }
 
 /**
- * @type {DatabaseLogger}
+ * @type {import("@streetwriters/logger").ILogger}
  */
-var logger;
-export { logger, initalize, format, LogLevel };
+var logger = new NoopLogger();
+
+/**
+ * @type {DatabaseLogManager | undefined}
+ */
+var logManager;
+
+export { logger, logManager, initalize, format, LogLevel };
