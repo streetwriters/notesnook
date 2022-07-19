@@ -37,12 +37,6 @@ export function format(log: LogMessage) {
     { value: LogLevel[log.level].toUpperCase(), separator: " | " },
     { value: log.scope ? `[${log.scope}]` : "", separator: ": " },
     { value: log.message },
-    {
-      value:
-        log.error instanceof Error && typeof log.error.stack < "u"
-          ? log.error.stack?.trim()
-          : undefined,
-    },
   ];
 
   if (log.extras) tokens.push({ value: JSON.stringify(log.extras) });

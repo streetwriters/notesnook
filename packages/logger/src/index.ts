@@ -1,7 +1,24 @@
 import { consoleReporter } from "./reporters/console";
 import { ILogReporter, LoggerConfig, LogLevel } from "./types";
 
-export class Logger {
+type LogLevelFunc = (message: string, extras?: Record<string, any>) => void;
+type ErrorLogLevelFunc = (
+  error: Error,
+  fallbackMessage?: string,
+  extras?: Record<string, any>
+) => void;
+export interface ILogger {
+  fatal: ErrorLogLevelFunc;
+  warn: LogLevelFunc;
+  debug: LogLevelFunc;
+  error: ErrorLogLevelFunc;
+  info: LogLevelFunc;
+  log: LogLevelFunc;
+  measure: (tag: string) => void;
+  scope: (scope: string) => void;
+}
+
+export class Logger implements ILogger {
   constructor(
     private readonly config: LoggerConfig = {
       reporter: consoleReporter,
@@ -31,6 +48,18 @@ export class Logger {
     }
   }
 }
+
+export class NoopLogger implements ILogger {
+  fatal() {}
+  warn() {}
+  debug() {}
+  error() {}
+  info() {}
+  log() {}
+  measure(_tag: string) {}
+  scope(_scope: string) {}
+}
+
 export * from "./types";
 export * from "./reporters";
 
@@ -50,12 +79,19 @@ function logLevelFactory(level: LogLevel, config: LoggerConfig) {
 }
 
 function errorLogLevelFactory(level: LogLevel, config: LoggerConfig) {
-  return (error: Error, message?: string, extras?: Record<string, any>) => {
+  return (
+    error: Error,
+    fallbackMessage?: string,
+    extras?: Record<string, any>
+  ) => {
     const now = Date.now();
     config.reporter.write({
-      error,
       level,
-      message: message || "",
+      message: error.stack
+        ? error.stack.trim()
+        : fallbackMessage
+        ? fallbackMessage
+        : "An error occurred.",
       timestamp: now,
       extras,
       scope: config.scope,

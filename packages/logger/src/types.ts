@@ -12,7 +12,6 @@ export enum LogLevel {
 }
 
 export type LogMessage = {
-  error?: Error;
   timestamp: number;
   message: string;
   level: LogLevel;
