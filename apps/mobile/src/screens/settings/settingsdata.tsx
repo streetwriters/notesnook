@@ -749,14 +749,14 @@ export const settingsGroups: SettingSection[] = [
         name: 'Debug mode',
         description: 'Show debug options on items',
         property: 'devMode'
+      },
+      {
+        id: 'debug-logs',
+        type: 'screen',
+        name: 'Debug logs',
+        description: 'View debug logs from the app',
+        component: 'debug-logs'
       }
-      // {
-      //   id: 'debug-logs',
-      //   type: 'screen',
-      //   name: 'Debug logs',
-      //   description: 'View debug logs from the app',
-      //   component: 'debug-logs'
-      // }
     ]
   },
   {

@@ -17,7 +17,7 @@ import { useNoteStore } from '../../stores/use-notes-store';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { useUserStore } from '../../stores/use-user-store';
-import { db, loadDatabase } from '../../utils/database';
+import { DatabaseLogger, db, loadDatabase } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
 import { eCloseProgressDialog, eOpenAnnouncementDialog } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
@@ -85,6 +85,7 @@ const Launcher = React.memo(
         await loadDatabase();
         db?.eventManager?.subscribe(EVENTS.databaseMigrating, onDatabaseMigratingProgess);
         db?.eventManager?.subscribe(EVENTS.databaseMigrated, onMigrationCompleted);
+        DatabaseLogger.info('Initializing database');
         await db.init();
         dbInitCompleted.current = true;
       }
@@ -139,6 +140,7 @@ const Launcher = React.memo(
     };
 
     const checkAppUpdateAvailable = async () => {
+      if (__DEV__) return;
       try {
         const version = await checkVersion();
         if (!version.needsUpdate) return false;

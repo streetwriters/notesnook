@@ -12,53 +12,71 @@ import {
 } from './encryption';
 import { MMKV } from './mmkv';
 
-async function read(key) {
-  if (!key) return null;
-  let data = MMKV.getString(key);
-  if (!data) return null;
-  try {
-    let parse = JSON.parse(data);
-    return parse;
-  } catch (e) {
-    return data;
+export class KV {
+  storage = null;
+  constructor(storage) {
+    this.storage = storage;
+  }
+  async read(key) {
+    if (!key) return null;
+    let data = this.storage.getString(key);
+    if (!data) return null;
+    try {
+      let parse = JSON.parse(data);
+      return parse;
+    } catch (e) {
+      return data;
+    }
+  }
+
+  async write(key, data) {
+    this.storage.setString(key, typeof data === 'string' ? data : JSON.stringify(data));
+    return true;
+  }
+
+  async readMulti(keys) {
+    if (keys.length <= 0) {
+      return [];
+    } else {
+      let data = await this.storage.getMultipleItemsAsync(keys.slice());
+
+      return data.map(([key, value]) => {
+        let obj;
+        try {
+          obj = JSON.parse(value);
+        } catch (e) {
+          obj = value;
+        }
+
+        return [key, obj];
+      });
+    }
+  }
+
+  async remove(key) {
+    return await this.storage.removeItem(key);
+  }
+
+  async clear() {
+    return await this.storage.clearStore();
+  }
+
+  async getAllKeys() {
+    let keys = (await this.storage.indexer.getKeys()) || [];
+    keys = keys.filter(
+      k =>
+        k !== 'stringIndex' &&
+        k !== 'boolIndex' &&
+        k !== 'mapIndex' &&
+        k !== 'arrayIndex' &&
+        k !== 'numberIndex' &&
+        k !== this.storage.instanceID
+    );
+    return keys;
   }
 }
 
-async function write(key, data) {
-  MMKV.setString(key, typeof data === 'string' ? data : JSON.stringify(data));
-  return true;
-}
-
-async function readMulti(keys) {
-  if (keys.length <= 0) {
-    return [];
-  } else {
-    let data = await MMKV.getMultipleItemsAsync(keys.slice());
-
-    return data.map(([key, value]) => {
-      let obj;
-      try {
-        obj = JSON.parse(value);
-      } catch (e) {
-        obj = value;
-      }
-
-      return [key, obj];
-    });
-  }
-}
-
-async function remove(key) {
-  return await MMKV.removeItem(key);
-}
-
-async function clear() {
-  return await MMKV.clearStore();
-}
-
-async function getAllKeys() {
-  return await MMKV.indexer.getKeys();
-}
+const DefaultStorage = new KV(MMKV);
 
 async function requestPermission() {
   if (Platform.OS === 'ios') return true;
@@ -84,14 +102,14 @@ async function checkAndCreateDir(path) {
 }
 
 export default {
-  read,
-  write,
-  readMulti,
-  remove,
-  clear,
+  read: key => DefaultStorage.read(key),
+  write: (key, value) => DefaultStorage.write(key, value),
+  readMulti: keys => DefaultStorage.readMulti(keys),
+  remove: key => DefaultStorage.remove(key),
+  clear: () => DefaultStorage.clear(),
+  getAllKeys: () => DefaultStorage.getAllKeys(),
   encrypt,
   decrypt,
-  getAllKeys,
   getRandomBytes,
   checkAndCreateDir,
   requestPermission,
