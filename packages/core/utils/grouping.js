@@ -69,7 +69,27 @@ export function groupArray(
   }
 
   if (options.groupBy === "none") {
-    return [{ title: "All", type: "header" }, ...array];
+    let array = [];
+    const conflicted = [];
+    const pinned = [];
+    const others = [];
+    for (const item of array) {
+      if (item.pinned) {
+        pinned.push(item);
+        continue;
+      } else if (item.conflicted) {
+        conflicted.push(item);
+        continue;
+      } else others.push(item);
+    }
+    const groups = [];
+    if (conflicted.length > 0)
+      groups.push({ title: "Conflicted", type: "header" }, ...conflicted);
+    if (pinned.length > 0)
+      groups.push({ title: "Pinned", type: "header" }, ...pinned);
+    if (others.length > 0)
+      groups.push({ title: "All", type: "header" }, ...others);
+    return groups;
   }
 
   const groups = new Map([
