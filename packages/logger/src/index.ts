@@ -15,7 +15,7 @@ export interface ILogger {
   info: LogLevelFunc;
   log: LogLevelFunc;
   measure: (tag: string) => void;
-  scope: (scope: string) => void;
+  scope: (scope: string) => ILogger;
 }
 
 export class Logger implements ILogger {
@@ -57,7 +57,9 @@ export class NoopLogger implements ILogger {
   info() {}
   log() {}
   measure(_tag: string) {}
-  scope(_scope: string) {}
+  scope(_scope: string) {
+    return this;
+  }
 }
 
 export * from "./types";
