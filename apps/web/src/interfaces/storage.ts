@@ -12,13 +12,13 @@ const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 
 export class NNStorage {
   database: LocalForage;
-  constructor(persistence: "memory" | "db" = "db") {
+  constructor(name: string, persistence: "memory" | "db" = "db") {
     const drivers =
       persistence === "memory"
         ? [MemoryDriver._driver]
         : [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE];
     this.database = localforage.createInstance({
-      name: "Notesnook",
+      name,
       driver: drivers,
     });
   }

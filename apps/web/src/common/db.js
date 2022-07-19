@@ -12,7 +12,7 @@ async function initializeDatabase(persistence) {
   );
   const { NNStorage } = await import("../interfaces/storage");
   const { default: FS } = await import("../interfaces/fs");
-  db = new Database(new NNStorage(persistence), EventSource, FS);
+  db = new Database(new NNStorage("Notesnook", persistence), EventSource, FS);
 
   // if (isTesting()) {
   db.host({
