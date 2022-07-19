@@ -137,7 +137,10 @@ export function tinyToTiptap(html) {
 
   const codeblocks = document.querySelectorAll("pre");
   for (const pre of codeblocks) {
-    pre.innerHTML = pre.innerText.replace(NEWLINE_TOKEN_REGEX, "<br/>");
+    pre.innerHTML = encodeHTML5(pre.innerText).replace(
+      NEWLINE_TOKEN_REGEX,
+      "<br/>"
+    );
   }
 
   const bogus = document.querySelectorAll("[data-mce-bogus]");
