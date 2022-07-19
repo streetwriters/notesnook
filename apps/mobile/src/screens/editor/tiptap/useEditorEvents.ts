@@ -1,14 +1,9 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { getDefaultPresets } from '@streetwriters/editor/dist/es/toolbar';
 import { useCallback, useEffect, useRef } from 'react';
-import {
-  BackHandler,
-  DeviceEventEmitter,
-  InteractionManager,
-  NativeEventSubscription
-} from 'react-native';
+import { BackHandler, InteractionManager, NativeEventSubscription } from 'react-native';
 import { WebViewMessageEvent } from 'react-native-webview';
-import useKeyboard from '../../../utils/hooks/use-keyboard';
 import { DDS } from '../../../services/device-detection';
 import {
   eSendEvent,
@@ -35,11 +30,11 @@ import {
 } from '../../../utils/events';
 import filesystem from '../../../utils/filesystem';
 import { tabBarRef } from '../../../utils/global-refs';
+import useKeyboard from '../../../utils/hooks/use-keyboard';
 import { NoteType } from '../../../utils/types';
 import { useDragState } from '../../settings/editor/state';
 import { EditorMessage, EditorProps, useEditorType } from './types';
 import { EditorEvents, editorState } from './utils';
-import { executeNativeBackPress } from 'react-native-screens';
 
 export const EventTypes = {
   selection: 'editor-event:selection',
@@ -139,7 +134,7 @@ export const useEditorEvents = (
       fullscreen: fullscreen || false,
       premium: isPremium,
       readonly: readonly || editorPropReadonly,
-      tools: tools,
+      tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
       noToolbar: readonly || editorPropReadonly || noToolbar,
       keyboardShown: keyboardShown || false
