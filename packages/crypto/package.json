@@ -12,10 +12,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "libsodium-wrappers": "^0.7.9"
+    "libsodium-wrappers": "0.7.9"
   },
   "devDependencies": {
-    "@types/libsodium-wrappers": "^0.7.9"
+    "@types/libsodium-wrappers": "0.7.9"
   },
   "repository": {
     "type": "git",
