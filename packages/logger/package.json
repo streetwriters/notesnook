@@ -4,7 +4,7 @@
   "description": "A really simple logger with a pluggable interface.",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pub": "tsc && np"
   },
   "repository": {
     "type": "git",
