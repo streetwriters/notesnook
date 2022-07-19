@@ -340,9 +340,19 @@ export const settingsGroups: SettingSection[] = [
         description: 'Try force sync to resolve issues with syncing',
         icon: 'sync-alert',
         modifer: async () => {
-          Progress.present();
-          await Sync.run('global', true);
-          eSendEvent(eCloseProgressDialog);
+          presentDialog({
+            title: 'Force sync',
+            paragraph: `If your data on two devices is out of sync even after trying to sync normally. You can try running force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on the device is reuploaded to the server.`,
+            negativeText: 'Cancel',
+            positiveText: 'Start',
+            positivePress: async () => {
+              eSendEvent(eCloseProgressDialog);
+              await sleep(300);
+              Progress.present();
+              await Sync.run('global', true);
+              eSendEvent(eCloseProgressDialog);
+            }
+          });
         }
       }
     ]
@@ -744,18 +754,27 @@ export const settingsGroups: SettingSection[] = [
         icon: 'file-document'
       },
       {
-        id: 'debug-mode',
-        type: 'switch',
-        name: 'Debug mode',
-        description: 'Show debug options on items',
-        property: 'devMode'
-      },
-      {
-        id: 'debug-logs',
+        id: 'debugging',
+        name: 'Debugging',
+        description: 'Get helpful debug info about the app to help us find bugs.',
         type: 'screen',
-        name: 'Debug logs',
-        description: 'View debug logs from the app',
-        component: 'debug-logs'
+        icon: 'bug',
+        sections: [
+          {
+            id: 'debug-mode',
+            type: 'switch',
+            name: 'Debug mode',
+            description: 'Show debug options on items',
+            property: 'devMode'
+          },
+          {
+            id: 'debug-logs',
+            type: 'screen',
+            name: 'Debug logs',
+            description: 'View debug logs from the app',
+            component: 'debug-logs'
+          }
+        ]
       }
     ]
   },

@@ -1,5 +1,6 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import React, { useState } from 'react';
+import { format, LogLevel, logManager } from '@streetwriters/notesnook-core/logger';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Platform, TouchableOpacity, View } from 'react-native';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -11,28 +12,25 @@ import { ToastEvent } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { hexToRGBA } from '../../utils/color-scheme/utils';
 import Storage from '../../utils/database/storage';
-import { sanitizeFilename } from '../../utils/sanitizer';
-import { DatabaseLogger } from '../../utils/database/index';
-import { useEffect } from 'react';
 import useTimer from '../../utils/hooks/use-timer';
-import { LogLevel } from '@streetwriters/notesnook-core/logger';
+import { sanitizeFilename } from '../../utils/sanitizer';
 
-function getLevelString(level: number) {
-  switch (level) {
-    case LogLevel.Debug:
-      return 'DEBUG';
-    case LogLevel.Info:
-      return 'INFO';
-    case LogLevel.Log:
-      return 'LOG';
-    case LogLevel.Error:
-      return 'ERROR';
-    case LogLevel.Warn:
-      return 'WARN';
-    case LogLevel.Fatal:
-      return 'FATAL';
-  }
-}
+// function getLevelString(level: number) {
+//   switch (level) {
+//     case LogLevel.Debug:
+//       return 'DEBUG';
+//     case LogLevel.Info:
+//       return 'INFO';
+//     case LogLevel.Log:
+//       return 'LOG';
+//     case LogLevel.Error:
+//       return 'ERROR';
+//     case LogLevel.Warn:
+//       return 'WARN';
+//     case LogLevel.Fatal:
+//       return 'FATAL';
+//   }
+// }
 
 export default function DebugLogs() {
   const colors = useThemeStore(state => state.colors);
@@ -52,7 +50,8 @@ export default function DebugLogs() {
     (async () => {
       if (seconds === 0) {
         start(5, 'debug_logs_timer');
-        let logs = await DatabaseLogger.get();
+        let logs = await logManager?.get();
+        if (!logs) return;
         if (logs.length > 0 && !currentLog) {
           setCurrentLog(logs[0]);
         } else {
@@ -63,7 +62,7 @@ export default function DebugLogs() {
     })();
   }, [seconds]);
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({ item, index }: { item: any; index: number }) => {
     const background =
       item.level === LogLevel.Error || item.level === LogLevel.Fatal
         ? hexToRGBA(colors.red, 0.2)
@@ -78,11 +77,11 @@ export default function DebugLogs() {
         ? colors.orange
         : colors.pri;
 
-    return (
+    return !item ? null : (
       <TouchableOpacity
         activeOpacity={1}
         onLongPress={() => {
-          Clipboard.setString(item.error);
+          Clipboard.setString(format(item));
           ToastEvent.show({
             heading: 'Debug log copied!',
             context: 'global',
@@ -107,11 +106,87 @@ export default function DebugLogs() {
           size={12}
           color={color}
         >
-          [{getLevelString(item.level)}] {item.message}
+          {format(item)}
         </Paragraph>
       </TouchableOpacity>
     );
   };
+
+  const downloadLogs = async () => {
+    try {
+      let path = null;
+      const fileName = sanitizeFilename(`notesnook_logs_${Date.now()}`);
+      const data = currentLog?.logs
+        .map(log => {
+          return !log ? '' : format(log);
+        })
+        .join(`\n`);
+      if (!data) return;
+      if (Platform.OS === 'android') {
+        let file = await ScopedStorage.createDocument(
+          fileName + '.txt',
+          'text/plain',
+          data,
+          'utf8'
+        );
+        if (!file) return;
+        path = file.uri;
+      } else {
+        path = await Storage.checkAndCreateDir('/');
+        await RNFetchBlob.fs.writeFile(path + fileName + '.txt', data, 'utf8');
+        path = path + fileName;
+      }
+
+      if (path) {
+        ToastEvent.show({
+          heading: 'Debug logs downloaded',
+          context: 'global',
+          type: 'success'
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const copyLogs = () => {
+    const data = currentLog?.logs
+      .map(log => {
+        return !log ? '' : format(log);
+      })
+      .join(`\n`);
+    if (!data) return;
+    Clipboard.setString(data);
+    ToastEvent.show({
+      heading: 'Debug log copied!',
+      context: 'global',
+      type: 'success'
+    });
+  };
+
+  const clearLogs = () => {
+    if (!currentLog) return;
+    presentDialog({
+      title: 'Clear logs',
+      paragraph: `Are you sure you want to delete all logs from ${currentLog.key}?`,
+      negativeText: 'Cancel',
+      positiveText: 'Clear',
+      positivePress: () => {
+        let index = logs.findIndex(l => (l.key = currentLog.key));
+        logManager?.delete(currentLog.key);
+        if (logs.length > 1) {
+          if (logs.length - 1 === index) {
+            setCurrentLog(logs[index - 1]);
+          } else {
+            setCurrentLog(logs[index + 1]);
+          }
+        } else {
+          setCurrentLog(undefined);
+        }
+      }
+    });
+  };
+
   return (
     <View
       style={{
@@ -124,7 +199,7 @@ export default function DebugLogs() {
         }}
       >
         <Notice
-          text="If you are facing an issue in the app. You can send us the logs from here to help us investigate the issue."
+          text="All logs are local only and are not sent to any server. You can share the logs from here with us if you face an issue to help us find the root cause."
           type="information"
         />
       </View>
@@ -188,14 +263,7 @@ export default function DebugLogs() {
                 }}
               >
                 <IconButton
-                  onPress={() => {
-                    Clipboard.setString('All logs copied');
-                    ToastEvent.show({
-                      heading: 'Debug log copied!',
-                      context: 'global',
-                      type: 'success'
-                    });
-                  }}
+                  onPress={copyLogs}
                   size={20}
                   customStyle={{
                     width: 30,
@@ -206,47 +274,7 @@ export default function DebugLogs() {
                   color={colors.gray}
                 />
                 <IconButton
-                  onPress={async () => {
-                    try {
-                      let path = null;
-                      const fileName = sanitizeFilename(`notesnook_logs_${Date.now()}`);
-                      const data = currentLog?.logs
-                        .map(
-                          log =>
-                            `${new Date(log.timestamp).toUTCString()}: [${getLevelString(
-                              log.level
-                            )}] ${log.message || log.error?.message}${
-                              log.error?.stack ? '\n' + log.error?.stack : ''
-                            }`
-                        )
-                        .join(`\n`);
-                      if (!data) return;
-                      if (Platform.OS === 'android') {
-                        let file = await ScopedStorage.createDocument(
-                          fileName + '.txt',
-                          'text/plain',
-                          data,
-                          'utf8'
-                        );
-                        if (!file) return;
-                        path = file.uri;
-                      } else {
-                        path = await Storage.checkAndCreateDir('/');
-                        await RNFetchBlob.fs.writeFile(path + fileName + '.txt', data, 'utf8');
-                        path = path + fileName;
-                      }
-
-                      if (path) {
-                        ToastEvent.show({
-                          heading: 'Debug logs downloaded',
-                          context: 'global',
-                          type: 'success'
-                        });
-                      }
-                    } catch (e) {
-                      console.log(e);
-                    }
-                  }}
+                  onPress={downloadLogs}
                   customStyle={{
                     width: 30,
                     height: 30,
@@ -254,6 +282,18 @@ export default function DebugLogs() {
                   }}
                   size={20}
                   name="download"
+                  color={colors.gray}
+                />
+
+                <IconButton
+                  onPress={clearLogs}
+                  customStyle={{
+                    width: 30,
+                    height: 30,
+                    marginRight: 5
+                  }}
+                  size={20}
+                  name="delete"
                   color={colors.gray}
                 />
               </View>
