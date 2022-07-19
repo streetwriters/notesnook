@@ -70,6 +70,7 @@ export function getColorScheme() {
   const darkTheme = pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK;
 
   if (useSystemTheme) {
+    setAccentColor(theme.accent);
     Appearance.getColorScheme() === 'dark'
       ? setColorScheme(darkTheme)
       : setColorScheme(COLOR_SCHEME_LIGHT);
