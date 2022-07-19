@@ -1,6 +1,7 @@
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
 import { EVENTS } from "@streetwriters/notesnook-core/common";
 import { TaskManager } from "./task-manager";
+import { initalize, logger } from "@streetwriters/notesnook-core/logger";
 
 /**
  * @type {import("@streetwriters/notesnook-core/api").default}
@@ -12,6 +13,8 @@ async function initializeDatabase(persistence) {
   );
   const { NNStorage } = await import("../interfaces/storage");
   const { default: FS } = await import("../interfaces/fs");
+
+  initalize(new NNStorage("Logs", persistence));
   db = new Database(new NNStorage("Notesnook", persistence), EventSource, FS);
 
   // if (isTesting()) {

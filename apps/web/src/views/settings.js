@@ -24,7 +24,13 @@ import {
   showToolbarConfigDialog,
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
-import { createBackup, importBackup, verifyAccount } from "../common";
+import {
+  clearLogs,
+  createBackup,
+  downloadLogs,
+  importBackup,
+  verifyAccount,
+} from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
@@ -656,6 +662,18 @@ function Settings(props) {
               onToggled={() => setDebugMode(!debugMode)}
               isToggled={debugMode}
             />
+            <Button variant="list" onClick={() => downloadLogs()}>
+              <Tip
+                text="Download logs"
+                tip="Logs do not contain any sensitive information like your data, access token or encryption key."
+              />
+            </Button>
+            <Button variant="list" onClick={() => clearLogs()}>
+              <Tip
+                text="Clear logs"
+                tip="Clear all logs stored in the database."
+              />
+            </Button>
             {isDesktop() && (
               <Button
                 variant="list"
