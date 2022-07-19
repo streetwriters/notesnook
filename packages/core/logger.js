@@ -98,6 +98,17 @@ class DatabaseLogger extends Logger {
     }
     return logs;
   }
+
+  async clear() {
+    const logKeys = await this.storage.getAllKeys();
+    for (const key of logKeys) {
+      await this.storage.remove(key);
+    }
+  }
+
+  async delete(key) {
+    await this.storage.remove(key);
+  }
 }
 
 /**
