@@ -1,11 +1,10 @@
-import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useEffect } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import RNBootSplash from 'react-native-bootsplash';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Dialog } from './src/components/dialog';
 import Launcher from './src/components/launcher';
-import { Button } from './src/components/ui/button';
-import Paragraph from './src/components/ui/typography/paragraph';
+import { Issue } from './src/components/sheets/github/issue';
 import { ApplicationHolder } from './src/navigation';
 import Notifications from './src/services/notifications';
 import SettingsService from './src/services/settings';
@@ -13,7 +12,13 @@ import { TipManager } from './src/services/tip-manager';
 import { useUserStore } from './src/stores/use-user-store';
 import { useAppEvents } from './src/utils/hooks/use-app-events';
 
-class MyErrorBoundary extends React.Component {
+const error =
+  stack => `Please let us know what happened. What steps we can take to reproduce the issue here.
+
+_______________________________
+Stacktrace: ${stack}`;
+
+class ExceptionHandler extends React.Component {
   state = {
     hasError: false,
     error: null
@@ -25,47 +30,28 @@ class MyErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     // A custom error logging function
   }
+
+  componentDidMount() {
+    RNBootSplash.hide();
+  }
+
   render() {
     return this.state.hasError ? (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingHorizontal: 12,
-          paddingVertical: 50
-        }}
-      >
-        <ScrollView
+      <SafeAreaProvider>
+        <SafeAreaView
           style={{
-            borderWidth: 1,
-            borderRadius: 10,
-            padding: 12,
-            borderColor: 'red'
+            flex: 1,
+            paddingTop: 10
           }}
         >
-          <Paragraph
-            style={{
-              color: 'red'
-            }}
-            selectable={true}
-          >
-            {this.state.error.stack}
-          </Paragraph>
-        </ScrollView>
-        <Button
-          title="Copy Error"
-          type="error"
-          style={{
-            marginTop: 20,
-            width: '100%'
-          }}
-          onPress={() => {
-            Clipboard.setString(this.state.error.stack);
-            alert('Error copied');
-          }}
-        />
-      </View>
+          <Issue
+            defaultBody={error(this.state.error?.stack)}
+            defaultTitle={this.state.error?.title || 'Unknown Error'}
+            issueTitle="An exception occured"
+          />
+          <Dialog />
+        </SafeAreaView>
+      </SafeAreaProvider>
     ) : (
       this.props.children
     );
@@ -82,27 +68,31 @@ const App = () => {
       useUserStore.getState().setVerifyUser(true);
     }
     setTimeout(() => {
-      console.log('run later');
       SettingsService.onFirstLaunch();
       Notifications.get();
       TipManager.init();
     }, 100);
   }, []);
-
   return (
-    <MyErrorBoundary>
-      <GestureHandlerRootView
-        style={{
-          flex: 1
-        }}
-      >
-        <SafeAreaProvider>
-          <ApplicationHolder />
-          <Launcher />
-        </SafeAreaProvider>
-      </GestureHandlerRootView>
-    </MyErrorBoundary>
+    <GestureHandlerRootView
+      style={{
+        flex: 1
+      }}
+    >
+      <SafeAreaProvider>
+        <ApplicationHolder />
+        <Launcher />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 };
 
-export default App;
+const AppWithErrorBoundry = () => {
+  return (
+    <ExceptionHandler>
+      <App />
+    </ExceptionHandler>
+  );
+};
+
+export default AppWithErrorBoundry;
