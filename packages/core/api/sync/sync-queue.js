@@ -1,5 +1,6 @@
 import set from "../../utils/set";
 import { qclone } from "qclone";
+import { logger } from "../../logger";
 
 export class SyncQueue {
   /**
@@ -8,6 +9,7 @@ export class SyncQueue {
    */
   constructor(storage) {
     this.storage = storage;
+    this.logger = logger.scope("SyncQueue");
   }
 
   async new(data, syncedAt) {
@@ -24,6 +26,8 @@ export class SyncQueue {
     const itemIds = set.union(syncQueue.itemIds, mapToIds(data));
     const syncData = { itemIds, syncedAt };
     await this.save(syncData);
+
+    this.logger.info("Ids after merge", { itemIds });
     return syncData;
   }
 
@@ -34,9 +38,11 @@ export class SyncQueue {
     for (let id of ids) {
       const index = itemIds.findIndex((i) => i === id);
       if (index <= -1) continue;
-      syncQueue.itemIds.splice(index, 1);
+      itemIds.splice(index, 1);
     }
-    if (syncQueue.itemIds.length <= 0) await this.save(null);
+    this.logger.info("Ids after dequeue", { itemIds });
+
+    if (itemIds.length <= 0) await this.save(null);
     else await this.save(syncQueue);
   }
 

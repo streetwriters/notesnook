@@ -15,6 +15,7 @@ import { SyncQueue } from "./syncqueue";
 import { AutoSync } from "./auto-sync";
 import { toChunks } from "../../utils/array";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
+import { logger } from "../../logger";
 
 const ITEM_TYPE_MAP = {
   attachments: "attachment",
@@ -105,6 +106,7 @@ class Sync {
     this.queue = new SyncQueue(db.storage);
     this.merger = new Merger(db);
     this.autoSync = new AutoSync(db, 1000);
+    this.logger = logger.scope("Sync");
 
     const tokenManager = new TokenManager(db.storage);
     this.connection = new signalr.HubConnectionBuilder()
@@ -112,9 +114,30 @@ class Sync {
         accessTokenFactory: () => tokenManager.getAccessToken(),
         skipNegotiation: true,
         transport: signalr.HttpTransportType.WebSockets,
-        logger: signalr.LogLevel.Debug,
+        logger: {
+          log(level, message) {
+            const scopedLogger = logger.scope("SignalR::SyncHub");
+            switch (level) {
+              case signalr.LogLevel.Critical:
+                return scopedLogger.fatal(new Error(message));
+              case signalr.LogLevel.Debug:
+                return scopedLogger.debug(message);
+              case signalr.LogLevel.Error:
+                return scopedLogger.error(new Error(message));
+              case signalr.LogLevel.Information:
+                return scopedLogger.info(message);
+              case signalr.LogLevel.None:
+                return scopedLogger.log(message);
+              case signalr.LogLevel.Trace:
+                return scopedLogger.log(message);
+              case signalr.LogLevel.Warning:
+                return scopedLogger.warn(message);
+            }
+          },
+        },
       })
       .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
+      .withAutomaticReconnect()
       .build();
 
     EV.subscribe(EVENTS.userLoggedOut, async () => {
@@ -141,24 +164,36 @@ class Sync {
    *
    * @param {boolean} full
    * @param {boolean} force
-   * @param {Object} ignoredIds
+   * @param {number} serverLastSynced
    */
   async start(full, force, serverLastSynced) {
-    this.connection.onclose(() => {
+    this.logger.info("Starting sync", { full, force, serverLastSynced });
+
+    this.connection.onclose((error) => {
+      this.logger.error(error || new Error("Connection closed."));
       throw new Error("Connection closed.");
     });
 
     const { lastSynced, oldLastSynced } = await this.init(force);
+    this.logger.info("Initialized sync", { lastSynced, oldLastSynced });
 
     const { newLastSynced, data } = await this.collect(lastSynced, force);
+    this.logger.info("Data collected for sync", {
+      newLastSynced,
+      isEmpty: areAllEmpty(data),
+    });
 
     const serverResponse = full ? await this.fetch(lastSynced) : null;
+    this.logger.info("Data fetched", serverResponse);
 
     if (await this.send(data, newLastSynced)) {
+      this.logger.info("New data sent");
       await this.stop(newLastSynced);
     } else if (serverResponse) {
+      this.logger.info("No new data to send.");
       await this.stop(serverResponse.lastSynced);
     } else {
+      this.logger.info("Nothing to do.");
       await this.stop(serverLastSynced || oldLastSynced);
     }
   }
@@ -253,6 +288,7 @@ class Sync {
     if (areAllEmpty(data)) return false;
 
     const { itemIds } = await this.queue.get();
+    this.logger.info("Data to send", { itemIds });
     if (!itemIds) return false;
 
     const arrays = itemIds.reduce(
@@ -288,6 +324,8 @@ class Sync {
 
     let done = 0;
     for (let i = 0; i < arrays.ids.length; ++i) {
+      this.logger.info(`Sending batch ${done}/${total}`);
+
       const ids = arrays.ids[i];
       const items = arrays.items[i];
       const types = arrays.types[i];
@@ -304,12 +342,19 @@ class Sync {
         done += ids.length;
         await this.queue.dequeue(...ids);
         sendSyncProgressEvent(this.db.eventManager, "upload", total, done);
+
+        this.logger.info(`Batch sent (${done}/${total})`);
+      } else {
+        this.logger.error(
+          new Error(`Failed to send batch. Server returned falsy response.`)
+        );
       }
     }
     return await this.connection.invoke("SyncCompleted", lastSynced);
   }
 
   async stop(lastSynced) {
+    this.logger.info("Stopping sync", { lastSynced });
     const storedLastSynced = await this.db.lastSynced();
     if (lastSynced > storedLastSynced)
       await this.db.storage.write("lastSynced", lastSynced);
@@ -325,6 +370,8 @@ class Sync {
    */
   async uploadAttachments() {
     const attachments = this.db.attachments.pending;
+    this.logger.info("Uploading attachments...", { total: attachments.length });
+
     for (var i = 0; i < attachments.length; ++i) {
       const attachment = attachments[i];
       const { hash } = attachment.metadata;

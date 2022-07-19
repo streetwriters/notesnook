@@ -1,4 +1,5 @@
 import { CURRENT_DATABASE_VERSION } from "../../common";
+import { logger } from "../../logger";
 
 class Collector {
   /**
@@ -7,6 +8,7 @@ class Collector {
    */
   constructor(db) {
     this._db = db;
+    this.logger = logger.scope("SyncCollector");
   }
 
   async collect(lastSyncedTimestamp, isForceSync) {
@@ -54,7 +56,8 @@ class Collector {
    */
   _collect(array, isForceSync) {
     if (!array.length) return [];
-    return array.reduce((prev, item) => {
+
+    const result = array.reduce((prev, item) => {
       if (!item) return prev;
       const isSyncable = !item.synced || isForceSync;
       const isUnsynced =
@@ -68,6 +71,8 @@ class Collector {
 
       return prev;
     }, []);
+    this.logger.info(`Collected items ${result.length}/${array.length}`);
+    return result;
   }
 
   // _map(item) {
@@ -101,7 +106,11 @@ class Collector {
     const newData = {};
     for (let array of arrays) {
       if (!data[array]) continue;
+      this.logger.info(`Filtering from ${data[array].length} ${array}`);
       newData[array] = data[array].filter(predicate);
+      this.logger.info(
+        `Length after filtering ${array}: ${newData[array].length}`
+      );
     }
     return newData;
   }

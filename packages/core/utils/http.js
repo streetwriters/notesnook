@@ -1,4 +1,5 @@
 import { EV, EVENTS } from "../common";
+import { logger } from "../logger";
 import { getServerNameFromHost } from "./constants";
 import { extractHostname } from "./hostname";
 
@@ -51,24 +52,30 @@ function transformer(data, type) {
  * @returns
  */
 async function handleResponse(response) {
-  const contentType = response.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    const json = await response.json();
-    if (response.ok) {
-      return json;
-    }
-    throw new RequestError(errorTransformer(json));
-  } else {
-    if (response.status === 429) throw new Error("You are being rate limited.");
+  try {
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      const json = await response.json();
+      if (response.ok) {
+        return json;
+      }
+      throw new RequestError(errorTransformer(json));
+    } else {
+      if (response.status === 429)
+        throw new Error("You are being rate limited.");
 
-    if (response.ok) return await response.text();
-    else if (response.status === 401) {
-      EV.publish(EVENTS.userUnauthorized, response.url);
-      throw new Error("Unauthorized.");
-    } else
-      throw new Error(
-        `Request failed with status code: ${response.status} ${response.statusText}.`
-      );
+      if (response.ok) return await response.text();
+      else if (response.status === 401) {
+        EV.publish(EVENTS.userUnauthorized, response.url);
+        throw new Error("Unauthorized.");
+      } else
+        throw new Error(
+          `Request failed with status code: ${response.status} ${response.statusText}.`
+        );
+    }
+  } catch (e) {
+    logger.error(e, "Error while sending request:", { url: response.url });
+    throw e;
   }
 }
 
@@ -126,7 +133,6 @@ export function errorTransformer(errorJson) {
         default:
           errorMessage = error_description || error;
           errorCode = error || "invalid_grant";
-          console.log(errorMessage, errorCode);
           break outer;
       }
     }

@@ -2,6 +2,7 @@ import http from "../utils/http";
 import constants from "../utils/constants";
 import { EV, EVENTS } from "../common";
 import { withTimeout, Mutex } from "async-mutex";
+import { logger } from "../logger";
 
 const ENDPOINTS = {
   token: "/connect/token",
@@ -18,15 +19,22 @@ class TokenManager {
   constructor(storage) {
     this._storage = storage;
     this._refreshTokenMutex = withTimeout(new Mutex(), 10 * 1000);
+    this.logger = logger.scope("TokenManager");
   }
 
   async getToken(renew = true, forceRenew = false) {
     let token = await this._storage.read("token");
     if (!token) return;
+
+    this.logger.info("Access token requested", {
+      accessToken: token.access_token.slice(0, 10),
+    });
+
     if (forceRenew || (renew && this._isTokenExpired(token))) {
       await this._refreshToken(forceRenew);
       return await this.getToken();
     }
+
     return token;
   }
 
@@ -46,6 +54,8 @@ class TokenManager {
 
   async _refreshToken(forceRenew = false) {
     await this._refreshTokenMutex.runExclusive(async () => {
+      this.logger.info("Refreshing access token");
+
       const token = await this.getToken(false, false);
       if (!forceRenew && !this._isTokenExpired(token)) {
         return;

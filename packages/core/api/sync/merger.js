@@ -2,6 +2,7 @@ import { migrations } from "../../migrations";
 import SparkMD5 from "spark-md5";
 import setManipulator from "../../utils/set";
 import { CURRENT_DATABASE_VERSION } from "../../common";
+import { logger } from "../../logger";
 
 class Merger {
   /**
@@ -10,6 +11,8 @@ class Merger {
    */
   constructor(db) {
     this._db = db;
+    this.logger = logger.scope("Merger");
+
     this._mergeDefinition = {
       settings: {
         get: () => this._db.settings.raw,
@@ -171,6 +174,15 @@ class Merger {
           return;
         }
 
+        this.logger.info("Conflict detected", {
+          itemId: remoteItem.id,
+          isResolved,
+          isModified,
+          timeDiff,
+          remote: remoteItem.dateModified,
+          local: localItem.dateModified,
+        });
+
         await markAsConflicted(localItem, remoteItem);
       } else if (!isResolved) {
         await add(remoteItem);
@@ -179,6 +191,8 @@ class Merger {
   }
 
   async mergeItem(type, item) {
+    this.logger.info(`Merging ${type}`, { itemId: item.id });
+
     this._lastSynced = await this._db.lastSynced();
 
     const definition = this._mergeDefinition[type];
@@ -203,6 +217,7 @@ class Merger {
     } else if (!definition.get && definition.set) {
       await definition.set(item);
     }
+    this.logger.info(`Merged`, { itemId: item.id });
   }
 }
 export default Merger;

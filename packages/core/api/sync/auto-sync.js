@@ -1,4 +1,5 @@
 import { checkIsUserPremium, CHECK_IDS, EVENTS } from "../../common";
+import { logger } from "../../logger";
 
 export class AutoSync {
   /**
@@ -11,9 +12,12 @@ export class AutoSync {
     this.interval = interval;
     this.timeout = null;
     this.isAutoSyncing = false;
+    this.logger = logger.scope("AutoSync");
   }
 
   async start() {
+    this.logger.info(`Auto sync requested`);
+
     if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) return;
     if (this.isAutoSyncing) return;
 
@@ -22,12 +26,16 @@ export class AutoSync {
       EVENTS.databaseUpdated,
       this.schedule.bind(this)
     );
+
+    this.logger.info(`Auto sync started`);
   }
 
   stop() {
     this.isAutoSyncing = false;
     clearTimeout(this.timeout);
     if (this.databaseUpdatedEvent) this.databaseUpdatedEvent.unsubscribe();
+
+    this.logger.info(`Auto sync stopped`);
   }
 
   /**
@@ -38,7 +46,7 @@ export class AutoSync {
 
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
-      console.log("SYNC REQUESTED by", id);
+      this.logger.info(`Sync requested by: ${id}`);
       this.db.eventManager.publish(EVENTS.databaseSyncRequested, false, false);
     }, this.interval);
   }
