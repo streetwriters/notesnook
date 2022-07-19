@@ -10,7 +10,6 @@ export const Announcement = ({ color }) => {
   const announcements = useMessageStore(state => state.announcements);
   let announcement = announcements.length > 0 ? announcements[0] : null;
   const selectionMode = useSelectionStore(state => state.selectionMode);
-
   return !announcement || selectionMode ? null : (
     <View
       style={{
@@ -26,7 +25,8 @@ export const Announcement = ({ color }) => {
           width: '100%',
           borderRadius: 10,
           overflow: 'hidden',
-          backgroundColor: colors.nav
+          backgroundColor: colors.nav,
+          paddingBottom: 12
         }}
       >
         <View>
