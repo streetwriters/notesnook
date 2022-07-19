@@ -342,7 +342,7 @@ export const settingsGroups: SettingSection[] = [
         modifer: async () => {
           presentDialog({
             title: 'Force sync',
-            paragraph: `If your data on two devices is out of sync even after trying to sync normally. You can try running force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on the device is reuploaded to the server.`,
+            paragraph: `If your data on two devices is out of sync even after trying to sync normally. You can run force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on this device is reuploaded to the server.`,
             negativeText: 'Cancel',
             positiveText: 'Start',
             positivePress: async () => {
