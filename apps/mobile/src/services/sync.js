@@ -6,9 +6,15 @@ import { doInBackground } from '../utils';
 import { db } from '../utils/database';
 import { ToastEvent } from './event-manager';
 import { DatabaseLogger } from '../utils/database/index';
+import Navigation from './navigation';
+import { initAfterSync } from '../stores/index';
 
 NetInfo.configure({
-  reachabilityUrl: 'https://bing.com'
+  reachabilityUrl: 'https://bing.com',
+  reachabilityTest: response => {
+    if (!response) return false;
+    return response?.status >= 200 && response?.status < 300;
+  }
 });
 
 export const ignoredMessages = [
@@ -26,7 +32,7 @@ const run = async (context = 'global', forced = false, full = true) => {
     DatabaseLogger.warn('Internet not reachable');
   }
   if (!user || !status.isInternetReachable) {
-    initialize();
+    initAfterSync();
     return true;
   }
   userstore.setSyncing(true);
@@ -45,7 +51,7 @@ const run = async (context = 'global', forced = false, full = true) => {
       }
     });
     if (!res) {
-      initialize();
+      initAfterSync();
       return false;
     }
     if (typeof res === 'string') throw error;
