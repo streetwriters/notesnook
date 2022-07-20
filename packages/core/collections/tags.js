@@ -5,7 +5,8 @@ import setManipulator from "../utils/set";
 import { Mutex } from "async-mutex";
 
 export default class Tags extends Collection {
-  init() {
+  async init() {
+    await super.init();
     this.mutex = new Mutex();
   }
 
