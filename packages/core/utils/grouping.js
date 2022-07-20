@@ -69,7 +69,6 @@ export function groupArray(
   }
 
   if (options.groupBy === "none") {
-    let array = [];
     const conflicted = [];
     const pinned = [];
     const others = [];
