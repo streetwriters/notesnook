@@ -189,8 +189,7 @@ class Sync {
   }
 
   async init(isForceSync) {
-    if (this.connection.state !== signalr.HubConnectionState.Connected)
-      await this.connection.start();
+    await this.checkConnection();
 
     await this.conflicts.recalculate();
     if (await this.conflicts.check()) {
@@ -207,6 +206,8 @@ class Sync {
   }
 
   async fetch(lastSynced) {
+    await this.checkConnection();
+
     const serverResponse = await new Promise((resolve, reject) => {
       let counter = { count: 0, queue: null };
       this.connection.stream("FetchItems", lastSynced).subscribe({
@@ -379,7 +380,14 @@ class Sync {
    */
   async sendBatchToServer(batch) {
     if (!batch) return false;
+    await this.checkConnection();
+
     const result = await this.connection.invoke("SyncItem", batch);
     return result === 1;
+  }
+
+  async checkConnection() {
+    if (this.connection.state !== signalr.HubConnectionState.Connected)
+      await this.connection.start();
   }
 }
