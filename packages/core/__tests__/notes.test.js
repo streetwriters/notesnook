@@ -7,7 +7,6 @@ import {
   TEST_NOTE,
   TEST_NOTEBOOK,
   IMG_CONTENT,
-  notebookTest,
 } from "./utils";
 
 beforeEach(async () => {
