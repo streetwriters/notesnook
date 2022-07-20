@@ -127,6 +127,7 @@ const List = ({
           onMomentumScrollEnd={() => {
             tabBarRef.current?.unlock();
           }}
+          directionalLockEnabled={true}
           initialNumToRender={10}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="interactive"
