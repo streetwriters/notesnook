@@ -126,7 +126,7 @@ const NotesPage = ({
   };
 
   const onRequestUpdate = (data?: NotesScreenParams) => {
-    const isNew = data?.item?.id !== params.current?.item?.id;
+    const isNew = data && data?.item?.id !== params.current?.item?.id;
     if (data) params.current = data;
     params.current.title = params.current.title || params.current.item.title;
     const { item } = params.current;
