@@ -175,7 +175,7 @@ function SyncStatus() {
     <Button
       variant="statusitem"
       display="flex"
-      onClick={sync}
+      onClick={() => sync()}
       sx={{ alignItems: "center", justifyContent: "center" }}
       title={status.tooltip}
       data-test-id={`sync-status-${status.key}`}
