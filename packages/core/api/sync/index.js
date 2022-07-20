@@ -387,7 +387,11 @@ class Sync {
   }
 
   async checkConnection() {
-    if (this.connection.state !== signalr.HubConnectionState.Connected)
+    if (this.connection.state !== signalr.HubConnectionState.Connected) {
+      if (this.connection.state !== signalr.HubConnectionState.Disconnected)
+        await this.connection.stop();
+
       await this.connection.start();
+    }
   }
 }
