@@ -4,10 +4,10 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from "react";
 import { useEditorThemeStore } from "../state/theme";
-import { EventTypes, isReactNative, post, timerFn } from "../utils";
+import { EventTypes, isReactNative, post } from "../utils";
 
 type Attachment = {
   hash: string;
@@ -54,7 +54,7 @@ export function useEditorController(
   const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
-    change: null
+    change: null,
   });
 
   const selectionChange = useCallback((editor: Editor) => {
@@ -95,21 +95,16 @@ export function useEditorController(
     post(EventTypes.title, title);
   };
 
-  const contentChange = useCallback(
-    (editor: Editor) => {
-      if (!editor) return;
-      selectionChange(editor);
-      timers.current.change = timerFn(
-        () => {
-          htmlContentRef.current = editor.getHTML();
-          post(EventTypes.content, htmlContentRef.current);
-        },
-        300,
-        timers.current?.change
-      );
-    },
-    [selectionChange]
-  );
+  const contentChange = useCallback((editor: Editor) => {
+    if (!editor) return;
+    if (typeof timers.current.change === "number") {
+      clearTimeout(timers.current?.change);
+    }
+    timers.current.change = setTimeout(() => {
+      htmlContentRef.current = editor.getHTML();
+      post(EventTypes.content, htmlContentRef.current);
+    }, 300);
+  }, []);
 
   const scroll = useCallback(
     (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
@@ -202,6 +197,6 @@ export function useEditorController(
     openFilePicker,
     downloadAttachment,
     content: htmlContentRef,
-    onUpdate: onUpdate
+    onUpdate: onUpdate,
   };
 }

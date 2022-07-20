@@ -68,7 +68,7 @@ const DefaultColors = {
 
 injectCss(transform(DefaultColors));
 interface ThemeState extends State {
-  colors: Colors | null;
+  colors: Colors;
   setColors: (colors: Colors) => void;
 }
 

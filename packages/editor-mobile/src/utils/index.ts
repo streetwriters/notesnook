@@ -93,17 +93,9 @@ declare global {
   }
 }
 
-export const timerFn = (
-  callback: () => void,
-  duration: number,
-  timer: NodeJS.Timeout | null
-) => {
-  if (timer) {
-    clearTimeout(timer);
-    timer = null;
-  }
-  timer = setTimeout(callback, duration);
-  return timer;
+export const timerFn = (callback: () => void, duration: number) => {
+  // timer = setTimeout(callback, duration);
+  // return timer;
 };
 
 export const EventTypes = {

@@ -25,14 +25,14 @@ const Tiptap = () => {
   const [layout, setLayout] = useState(false);
   const toolbarTheme = useTheme({
     //todo
-    accent: "green",
+    accent: theme?.accent,
     scale: 1,
     theme: theme?.night ? "dark" : "light",
   });
 
   const editorTheme = useTheme({
     //todo
-    accent: "green",
+    accent: theme?.accent,
     scale: 1,
     theme: theme?.night ? "dark" : "light",
   });
