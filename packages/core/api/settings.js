@@ -18,8 +18,9 @@ class Settings {
     this._initSettings(settings);
     await this._saveSettings(false);
 
-    EV.subscribe(EVENTS.userLoggedOut, () => {
+    EV.subscribe(EVENTS.userLoggedOut, async () => {
       this._initSettings();
+      await this._saveSettings(false);
     });
   }
 
@@ -29,6 +30,7 @@ class Settings {
 
   async merge(item) {
     if (this._settings.dateModified > (await this._db.lastSynced())) {
+      this._settings = item.id;
       this._settings.pins = setManipulator.union(
         this._settings.pins,
         item.pins,
