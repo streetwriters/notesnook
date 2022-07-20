@@ -9,7 +9,8 @@ import { store as attachmentStore } from "./attachment-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
-import { EVENTS } from "@streetwriters/notesnook-core/common";
+import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
+import { logger } from "../utils/logger";
 
 var syncStatusTimeout = 0;
 const BATCH_SIZE = 50;
@@ -32,6 +33,8 @@ class AppStore extends BaseStore {
 
   init = () => {
     let count = 0;
+    EV.subscribe(EVENTS.appRefreshRequested, () => this.refresh());
+
     db.eventManager.subscribe(
       EVENTS.syncProgress,
       ({ type, total, current }) => {
@@ -61,6 +64,8 @@ class AppStore extends BaseStore {
   };
 
   refresh = async () => {
+    logger.measure("refreshing app");
+
     await this.updateLastSynced();
     await resetReminders();
     noteStore.refresh();
@@ -69,6 +74,8 @@ class AppStore extends BaseStore {
     tagStore.refresh();
     attachmentStore.refresh();
     this.refreshNavItems();
+
+    logger.measure("refreshing app");
   };
 
   refreshNavItems = () => {
@@ -180,10 +187,9 @@ class AppStore extends BaseStore {
         else if (full) this.updateSyncStatus("completed");
 
         await this.updateLastSynced();
-        return await this.refresh();
       })
       .catch(async (err) => {
-        console.error(err);
+        logger.error(err);
         if (err.code === "MERGE_CONFLICT") {
           if (editorstore.get().session.id)
             editorstore.openSession(editorstore.get().session.id, true);
@@ -211,6 +217,7 @@ class AppStore extends BaseStore {
    * @param {"synced" | "syncing" | "conflicts" | "failed" | "completed"} key
    */
   updateSyncStatus = (key) => {
+    logger.info(`Sync status updated: ${key}`);
     this.set((state) => (state.syncStatus.key = key));
   };
 }

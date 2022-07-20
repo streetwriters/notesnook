@@ -10,6 +10,9 @@ import Config from "./utils/config";
 import { isTesting } from "./utils/platform";
 import { getServiceWorkerVersion } from "./utils/version";
 import { initializeDatabase } from "./common/db";
+import { initalizeLogger, logger } from "./utils/logger";
+
+initalizeLogger();
 if (process.env.REACT_APP_PLATFORM === "desktop") require("./commands");
 
 const ROUTES = {
@@ -56,8 +59,12 @@ const sessionExpiryExceptions = [
 
 function getRoute() {
   const path = getCurrentPath();
+  logger.info(`Getting route for path: ${path}`);
+
   const isSessionExpired = Config.get("sessionExpired", false);
   if (isSessionExpired && !sessionExpiryExceptions.includes(path)) {
+    logger.info(`User session has expired. Routing to /sessionexpired`);
+
     window.history.replaceState(
       {},
       null,
@@ -81,11 +88,13 @@ if (process.env.NODE_ENV === "development") {
 
 function renderApp() {
   const route = getRoute();
+  logger.measure("app render");
   return route?.component()?.then(({ default: Component }) => {
     render(
       <Component {...route.props} />,
       document.getElementById("root"),
       () => {
+        logger.measure("app render");
         document.getElementById("splash").remove();
       }
     );

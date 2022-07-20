@@ -7,6 +7,7 @@ import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import { hashNavigate } from "../navigation";
+import { logger } from "../utils/logger";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -178,7 +179,7 @@ class EditorStore extends BaseStore {
       this.setSaveState(1);
     } catch (err) {
       this.setSaveState(-1);
-      console.error(err);
+      logger.info(err);
       if (session.locked) {
         hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
       }

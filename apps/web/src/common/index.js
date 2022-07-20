@@ -14,8 +14,7 @@ import FileSaver from "file-saver";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
 import { showFilePicker } from "../components/editor/picker";
-import { logManager } from "@streetwriters/notesnook-core/logger";
-import { zip } from "../utils/zip";
+import { logger } from "../utils/logger";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -198,21 +197,7 @@ async function restore(backup, password) {
     await db.backup.import(backup, password);
     showToast("success", "Backup restored!");
   } catch (e) {
-    console.error(e);
-    await showToast("error", `Could not restore the backup: ${e.message || e}`);
+    logger.error(e, "Could not restore the backup");
+    showToast("error", `Could not restore the backup: ${e.message || e}`);
   }
-}
-
-export async function downloadLogs() {
-  const allLogs = await logManager.get();
-  const files = allLogs.map((log) => ({
-    filename: log.key,
-    content: log.logs.map((line) => JSON.stringify(line)).join("\n"),
-  }));
-  const archive = await zip(files, "log");
-  FileSaver.saveAs(new Blob([archive.buffer]), "notesnook-logs.zip");
-}
-
-export async function clearLogs() {
-  await logManager.clear();
 }
