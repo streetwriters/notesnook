@@ -24,7 +24,7 @@ export const UserStatus = () => {
   const lastSynced = useUserStore(state => state.lastSynced);
   const insets = useSafeAreaInsets();
   const { progress } = useSyncProgress();
-
+  console.log('SYNC PROGRESS', progress);
   return (
     <View
       style={{
@@ -110,18 +110,7 @@ export const UserStatus = () => {
           {user ? (
             syncing ? (
               <>
-                <ProgressCircleComponent
-                  size={SIZE.xl}
-                  progress={progress ? progress.current / progress.total : 0.1}
-                  textStyle={{
-                    fontSize: 8
-                  }}
-                  animated={true}
-                  color={colors.accent}
-                  unfilledColor={colors.nav}
-                  borderWidth={0}
-                  thickness={2}
-                />
+                <ActivityIndicator color={colors.accent} size={SIZE.xl} />
               </>
             ) : (
               <Icon color={colors.accent} name="sync" size={SIZE.lg} />
