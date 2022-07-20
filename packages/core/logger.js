@@ -41,22 +41,34 @@ class DatabaseLogWriter {
   constructor(storage) {
     this.storage = storage;
     this.key = new Date().toLocaleDateString();
+    this.queue = [];
+
+    setInterval(() => {
+      setTimeout(() => this.flush());
+    }, 2000);
   }
 
-  async push(message) {
-    const logs = await this.read();
-
-    if (!logs) {
-      await this.rotate();
-      return this.push(message);
-    }
-
-    logs.push(message);
-    await this.storage.write(this.key, logs);
+  push(message) {
+    this.queue.push(message);
   }
 
   async read() {
     return await this.storage.read(this.key, true);
+  }
+
+  async flush() {
+    if (this.queue.length <= 0) return;
+    const queueCopy = this.queue.slice();
+    this.queue = [];
+
+    let logs = await this.read();
+    if (!logs) {
+      await this.rotate();
+      logs = await this.read();
+    }
+
+    logs.push(...queueCopy);
+    await this.storage.write(this.key, logs);
   }
 
   async rotate() {
