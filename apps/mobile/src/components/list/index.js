@@ -81,10 +81,11 @@ const List = ({
   );
 
   const _onRefresh = async () => {
-    await Sync.run();
-    if (refreshCallback) {
-      refreshCallback();
-    }
+    Sync.run('global', false, true, () => {
+      if (refreshCallback) {
+        refreshCallback();
+      }
+    });
   };
 
   const _onScroll = React.useCallback(

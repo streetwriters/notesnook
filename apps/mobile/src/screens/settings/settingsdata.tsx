@@ -349,8 +349,9 @@ export const settingsGroups: SettingSection[] = [
               eSendEvent(eCloseProgressDialog);
               await sleep(300);
               Progress.present();
-              await Sync.run('global', true);
-              eSendEvent(eCloseProgressDialog);
+              Sync.run('global', true, true, () => {
+                eSendEvent(eCloseProgressDialog);
+              });
             }
           });
         }

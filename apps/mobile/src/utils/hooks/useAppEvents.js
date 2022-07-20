@@ -48,7 +48,6 @@ export const useAppEvents = () => {
   const loading = useNoteStore(state => state.loading);
   const setLastSynced = useUserStore(state => state.setLastSynced);
   const setUser = useUserStore(state => state.setUser);
-  const setSyncing = useUserStore(state => state.setSyncing);
   const syncedOnLaunch = useRef(false);
   const refValues = useRef({
     subsriptionSuccessListener: null,
@@ -165,7 +164,6 @@ export const useAppEvents = () => {
     console.log('sync complete');
     initAfterSync();
     setLastSynced(await db.lastSynced());
-    setSyncing(false);
     eSendEvent(eCloseProgressDialog, 'sync_progress');
     let id = useEditorStore.getState().currentEditingNote;
     let note = id && db.notes.note(id).data;
@@ -224,10 +222,8 @@ export const useAppEvents = () => {
     console.log('auto sync request', full, force);
     if (full || force) {
       await Sync.run('global', force, full);
-      setSyncing(false);
     } else {
       await Sync.run('global', false, false);
-      setSyncing(false);
     }
   };
 

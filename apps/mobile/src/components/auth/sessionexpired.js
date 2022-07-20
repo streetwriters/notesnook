@@ -85,11 +85,19 @@ export const SessionExpired = () => {
       let res = await db.user.tokenManager.getToken();
       if (!res) throw new Error('no token found');
       if (db.user.tokenManager._isTokenExpired(res)) throw new Error('token expired');
-      if (!(await Sync.run())) throw new Error('e');
-      await SettingsService.set({
-        sessionExpired: false
+      Sync.run('global', false, true, async complete => {
+        if (!complete) {
+          let user = await db.user.getUser();
+          if (!user) return;
+          email.current = user.email;
+          setVisible(true);
+          return;
+        }
+        SettingsService.set({
+          sessionExpired: false
+        });
+        setVisible(false);
       });
-      setVisible(false);
     } catch (e) {
       console.log(e);
       let user = await db.user.getUser();

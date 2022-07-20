@@ -74,7 +74,7 @@ const MergeConflicts = () => {
       eSendEvent(eOnLoadNote, { ...editorController.current?.note, forced: true });
     }
     close();
-    await Sync.run();
+    Sync.run();
   };
 
   const show = async item => {

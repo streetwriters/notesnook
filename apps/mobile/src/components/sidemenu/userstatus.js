@@ -45,7 +45,7 @@ export const UserStatus = () => {
         <PressableButton
           onPress={async () => {
             if (user) {
-              await Sync.run();
+              Sync.run();
             } else {
               tabBarRef.current?.closeDrawer();
               eSendEvent(eOpenLoginDialog);
