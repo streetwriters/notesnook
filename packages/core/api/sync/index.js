@@ -43,15 +43,10 @@ export default class SyncManager {
    */
   constructor(db) {
     this.sync = new Sync(db);
-    this.isSyncing = false;
   }
 
   async start(full, force) {
-    if (this.isSyncing) return false;
-
     try {
-      this.isSyncing = true;
-
       await this.sync.autoSync.start();
       await this.sync.start(full, force);
       return true;
@@ -62,20 +57,15 @@ export default class SyncManager {
         if (actualError.length > 1) throw new Error(actualError[1]);
       }
       throw e;
-    } finally {
-      this.isSyncing = false;
     }
   }
 
   async acquireLock(callback) {
     try {
-      this.isSyncing = true;
-
       this.sync.autoSync.stop();
       await callback();
-      await this.sync.autoSync.start();
     } finally {
-      this.isSyncing = false;
+      await this.sync.autoSync.start();
     }
   }
 
