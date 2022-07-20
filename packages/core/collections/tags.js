@@ -2,8 +2,13 @@ import Collection from "./collection";
 import { makeId } from "../utils/id";
 import { deleteItems, hasItem } from "../utils/array";
 import setManipulator from "../utils/set";
+import { Mutex } from "async-mutex";
 
 export default class Tags extends Collection {
+  init() {
+    this.mutex = new Mutex();
+  }
+
   tag(id) {
     const tagItem = this.all.find((t) => t.id === id || t.title === id);
     return tagItem;
@@ -15,33 +20,35 @@ export default class Tags extends Collection {
   }
 
   async add(tagId, ...noteIds) {
-    tagId = this.sanitize(tagId);
-    if (!tagId) throw new Error("Tag title cannot be empty.");
+    return this.mutex.runExclusive(async () => {
+      tagId = this.sanitize(tagId);
+      if (!tagId) throw new Error("Tag title cannot be empty.");
 
-    let tag = this.tag(tagId);
+      let tag = this.tag(tagId);
 
-    if (tag && !noteIds.length)
-      throw new Error("A tag with this id already exists.");
+      if (tag && !noteIds.length)
+        throw new Error("A tag with this id already exists.");
 
-    tag = tag || {
-      title: tagId,
-    };
+      tag = tag || {
+        title: tagId,
+      };
 
-    let id = tag.id || makeId(tag.title.toLowerCase());
-    let notes = tag.noteIds || [];
+      let id = tag.id || makeId(tag.title.toLowerCase());
+      let notes = tag.noteIds || [];
 
-    tag = {
-      type: "tag",
-      id,
-      title: tag.title,
-      noteIds: setManipulator.union(notes, noteIds),
-      localOnly: true,
-    };
+      tag = {
+        type: "tag",
+        id,
+        title: tag.title,
+        noteIds: setManipulator.union(notes, noteIds),
+        localOnly: true,
+      };
 
-    await this._collection.addItem(tag);
-    if (!this._db.settings.getAlias(tag.id))
-      await this._db.settings.setAlias(tag.id, tag.title);
-    return tag;
+      await this._collection.addItem(tag);
+      if (!this._db.settings.getAlias(tag.id))
+        await this._db.settings.setAlias(tag.id, tag.title);
+      return tag;
+    });
   }
 
   async rename(tagId, newName) {
