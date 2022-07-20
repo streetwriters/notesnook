@@ -38,6 +38,7 @@ import { useVaultStatus } from '../../utils/hooks/use-vault-status';
 import { sleep } from '../../utils/time';
 import { MFARecoveryCodes, MFASheet } from './2fa';
 import AppLock from './app-lock';
+import { useDragState } from './editor/state';
 import { verifyUser } from './functions';
 import { SettingSection } from './types';
 import { getTimeLeft } from './user-section';
@@ -727,6 +728,14 @@ export const settingsGroups: SettingSection[] = [
         name: 'Configure toolbar',
         description: `Make the toolbar adaptable to your needs.`,
         component: 'configuretoolbar'
+      },
+      {
+        id: 'reset-toolbar',
+        name: 'Reset toolbar',
+        description: `Reset toolbar configuration to default`,
+        modifer: () => {
+          useDragState.getState().setPreset('default');
+        }
       }
     ]
   },
