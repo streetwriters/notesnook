@@ -2,6 +2,7 @@ import showdown from "showdown";
 import dataurl from "../utils/dataurl";
 import { getDummyDocument, parseHTML } from "../utils/html-parser";
 
+showdown.helper.document = getDummyDocument();
 var converter = new showdown.Converter();
 converter.setFlavor("original");
 
@@ -22,7 +23,7 @@ export class Tiptap {
   }
 
   toMD() {
-    return converter.makeMarkdown(this.data, getDummyDocument());
+    return converter.makeMarkdown(this.data);
   }
 
   toHeadline() {

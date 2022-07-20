@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`convert HTML to markdown with code blocks: html-to-md-codeblock.md 1`] = `
+exports[`convert HTML to markdown with codeblocks: html-to-md-codeblocks.md 1`] = `
 "Typescript is one of those languages that appear to be very simple. It's often described as \\"Javascript with types\\" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript*is *a language and like all other languages it has it's own \\"secrets\\", it's own set of quirks.
 
 When I started out with Typescript a few years back, I absolutely hated it. It was unnecessary, a box of clutter, making me write code that would never actually run. I hated defining interfaces, typing out all my functions, and thinking in terms I was not used to as a Javascript developer. Before Javascript, I had coded in C# and I had never really liked C# (I still don't) mostly for the huge amounts of boilerplate and magic involved. Typescript is heavily inspired by C# and seeing that contaminate the Javascript ecosystem irked me no end.
@@ -17,9 +17,9 @@ Think of a container that can take any type of item as long as it is not a circl
 
 \`\`\`javascript
 var container = [];
-function¨NBSP;putIntoContainer(item) {
-    if (item.type === \\"round\\") throw new Error(\\"Rounded items not supported.\\")
-    container.push(item);
+function putIntoContainer(item) {
+    if (item.type === \\"round\\") throw new Error(\\"Rounded items not supported.\\")
+    container.push(item);
 }
 
 var square = {type: \\"square\\"}
@@ -44,9 +44,9 @@ type ItemTypes = \\"square\\" | \\"round\\";
 // defined in ItemTypes.
 // i.e. Item<\\"triangle\\"> will give an error.
 type Item<TItemType extends ItemTypes> = {
- type?: TItemType;
- width: number;
- height: number;
+ type?: TItemType;
+ width: number;
+ height: number;
 };
 
 // This is just syntax sugar to increase readability.
@@ -63,10 +63,10 @@ var roundContainer: Container<\\"round\\"> = [];
 // This wrapper is unnecessary, of course, because array.push
 // already does this. Only for demonstration purposes.
 function putIntoContainer<
- TItemType extends ItemTypes,
- TItem extends Item<TItemType>
+ TItemType extends ItemTypes,
+ TItem extends Item<TItemType>
 >(container: Container<TItemType>, item: TItem) {
- container.push(item);
+ container.push(item);
 }
 
 var square: Square = { width: 100, height: 200 };
@@ -81,7 +81,9 @@ putIntoContainer(squareContainer, circle); // Error: Argument of type 'Circle' i
 A lot more code, I know, and if you don't know how generics work that blob of code is utter nonsense. One of the main reasons I avoided Typescript for a long time. But look at the benefits:
 
 1. You have 100% compile-time type safety.
-2. You can't put a round item in a square container (you will get compiler error).  
+
+2. You can't put a round item in a square container (you will get compiler error).
+
 3. You didn't write any extra runtime code.
 
 Expanding on point #3, after transpilation the above code will turn more-or-less into:
@@ -91,7 +93,7 @@ var squareContainer = [];
 var roundContainer = [];
 
 function putIntoContainer(container, item) {
- container.push(item);
+ container.push(item);
 }
 
 var square = { width: 100, height: 200 };
@@ -113,7 +115,27 @@ But this post was supposed to be about the \\"Secrets\\" of Typescript Generics,
 
 ## 4\\\\. Type inference using interface properties
 
+"
+`;
 
+exports[`convert HTML to markdown with outlinelists: html-to-md-outlinelists.md 1`] = `
+"Testing outline list:
+
+- My outline list
+
+- works
+
+- but sometimes
+
+    - It doesn't
+
+    - what do I do?
+
+    - I need to do something!
+
+- Makes no sense!
+
+- Yes it doesn't!
 
 "
 `;
@@ -139,7 +161,7 @@ Features:
 6. Encrypted attachments
 7. Session history & automatic backups
 8. Note publishing
-9. Note exports  
+9. Note exports
 10. Collapsible headers
 
 ### Promos
@@ -154,6 +176,36 @@ Features:
 2. What's coming/roadmap
 3. What we are working on
 4. Join the community
+
+"
+`;
+
+exports[`convert HTML to markdown with tasklists: html-to-md-tasklists.md 1`] = `
+"Hello
+
+- [x] Task item 1
+
+- [x] Task item 2
+
+- [x] Task item 3
+
+- [ ] Task item 4
+
+    - [ ] Sub task item 1
+
+    - [ ] Sub task item 2
+
+- [ ] Task Item 5
+
+Nene
+
+- dasvsadv
+
+- adsva\\\\\`sd
+
+- vasd
+
+- vsadvdsa
 
 "
 `;
