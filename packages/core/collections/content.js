@@ -16,7 +16,7 @@ export default class Content extends Collection {
         )}</p>`;
     }
 
-    if (content.remote || content.deleted || content.migrated)
+    if (content.remote || content.deleted)
       return await this._collection.addItem(
         await this.extractAttachments(content)
       );

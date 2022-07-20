@@ -64,7 +64,7 @@ class Collector {
           deleted: true,
           dateModified: Date.now(),
         });
-      } else if ((isUnsynced && isSyncable) || item.migrated) {
+      } else if (isUnsynced && isSyncable) {
         prev.push({ ...item, type });
       }
 
@@ -91,8 +91,7 @@ class Collector {
   async _map(item) {
     // in case of resolved content
     delete item.resolved;
-    // turn the migrated flag off so we don't keep syncing this item repeated
-    delete item.migrated;
+    // synced is a local only property
     delete item.synced;
 
     return {

@@ -15,7 +15,7 @@ export default class Tags extends Collection {
   }
 
   async merge(tag) {
-    if (!tag.migrated) return;
+    if (!tag) return;
     await this._collection.addItem(tag);
   }
 

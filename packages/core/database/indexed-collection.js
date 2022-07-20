@@ -38,7 +38,6 @@ export default class IndexedCollection {
     }
     // the item has become local now, so remove the flags
     delete item.remote;
-    delete item.migrated;
 
     // if (await this.getEncryptionKey()) {
     //   const encrypted = await this.indexer.encrypt(
@@ -47,7 +46,6 @@ export default class IndexedCollection {
     //   );
     //   encrypted.dateModified = item.dateModified;
     //   encrypted.localOnly = item.localOnly;
-    //   encrypted.migrated = item.migrated;
     //   encrypted.id = item.id;
     //   await this.indexer.write(item.id, encrypted);
     // } else

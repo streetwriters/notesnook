@@ -45,9 +45,7 @@ export default class Trash {
   async add(item) {
     const collection = collectionNameFromItem(item);
     if (!item || !item.type || !collection) return;
-    // if (item.dateDeleted || item.deleted || item.migrated) {
-    //   return await this._collection.addItem(item);
-    // }
+
     await this.collections[collection]._collection.updateItem({
       ...item,
       id: item.itemId || item.id,

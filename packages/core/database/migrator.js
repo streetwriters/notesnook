@@ -17,7 +17,6 @@ class Migrator {
         }
         const migrate = migrations[version][item.type || collection.type];
         if (migrate) item = migrate(item);
-        item.migrated = true;
 
         if (collection.dbCollection.merge) {
           await collection.dbCollection.merge(item);
