@@ -156,7 +156,8 @@ module.exports = env => {
             /node_modules(.*[/\\])+html-to-text/,
             /node_modules(.*[/\\])+buffer/,
             /node_modules(.*[/\\])+readable-stream/,
-            /node_modules(.*[/\\])+react-native-fingerprint-scanner/
+            /node_modules(.*[/\\])+react-native-fingerprint-scanner/,
+            /node_modules(.*[/\\])+@streetwriters[/\\]logger/
           ],
           use: {
             loader: 'babel-loader',
