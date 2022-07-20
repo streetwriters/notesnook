@@ -51,8 +51,6 @@ export const EVENTS = {
   databaseSyncRequested: "db:syncRequested",
   syncProgress: "sync:progress",
   syncCompleted: "sync:completed",
-  databaseMigrated: "db:migrated",
-  databaseMigrating: "db:migrating",
   databaseUpdated: "db:updated",
   databaseCollectionInitiated: "db:collectionInitiated",
   appRefreshRequested: "app:refreshRequested",

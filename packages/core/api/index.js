@@ -26,6 +26,7 @@ import NoteHistory from "../collections/note-history";
 import MFAManager from "./mfa-manager";
 import EventManager from "../utils/event-manager";
 import Pricing from "./pricing";
+import { logger } from "../logger";
 
 /**
  * @type {EventSource}
@@ -125,9 +126,11 @@ class Database {
     await this.settings.init();
     await this.outbox.init();
     await this.user.init();
-
     await this.migrations.init();
-    await this.migrations.migrate();
+
+    if (this.migrations.required()) {
+      logger.warn("Database migration is required.");
+    }
   }
 
   disconnectSSE() {
