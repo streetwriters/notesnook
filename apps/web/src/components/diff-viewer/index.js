@@ -255,7 +255,7 @@ function DiffViewer(props) {
               }}
             />
             <ScrollSyncPane>
-              <Flex sx={{ px: 2 }}>
+              <Flex sx={{ px: 2, overflow: "auto" }}>
                 <Editor
                   content={htmlDiff.after}
                   nonce={0}
