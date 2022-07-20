@@ -27,7 +27,7 @@ import { db } from '../database';
 import { MMKV } from '../database/mmkv';
 import { eClearEditor, eCloseProgressDialog, refreshNotesPage } from '../events';
 import Sync from '../../services/sync';
-import { clearAllStores, initialize } from '../../stores';
+import { clearAllStores, initAfterSync, initialize } from '../../stores';
 import { useUserStore } from '../../stores/use-user-store';
 import { useMessageStore } from '../../stores/use-message-store';
 import { useSettingStore } from '../../stores/use-setting-store';
@@ -73,7 +73,7 @@ export const useAppEvents = () => {
     console.log(type, total, current);
     if (type !== 'download') return;
     if (total < 10 || current % 10 === 0) {
-      initialize();
+      initAfterSync();
     }
   };
 
@@ -163,7 +163,7 @@ export const useAppEvents = () => {
 
   const onSyncComplete = async () => {
     console.log('sync complete');
-    initialize();
+    initAfterSync();
     setLastSynced(await db.lastSynced());
     setSyncing(false);
     eSendEvent(eCloseProgressDialog, 'sync_progress');
@@ -430,7 +430,7 @@ export const useAppEvents = () => {
         useNoteStore.getState().setNotes();
         eSendEvent(refreshNotesPage);
         MMKV.removeItem('notesAddedFromIntent');
-        initialize();
+        initAfterSync();
         eSendEvent(refreshNotesPage);
       }
       console.log('CHECK INTENT STATE', notesAddedFromIntent || shareExtensionOpened);
