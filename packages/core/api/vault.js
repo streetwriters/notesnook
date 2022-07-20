@@ -50,13 +50,13 @@ export default class Vault {
   async create(password) {
     if (!(await checkIsUserPremium(CHECK_IDS.vaultAdd))) return;
 
-    const vaultKey = await this._storage.read("vaultKey");
+    const vaultKey = await this._getKey();
     if (!vaultKey || !vaultKey.cipher || !vaultKey.iv) {
       const encryptedData = await this._storage.encrypt(
         { password },
         this._key
       );
-      await this._storage.write("vaultKey", encryptedData);
+      await this._setKey(encryptedData);
       this._password = password;
     }
     return true;
@@ -69,7 +69,7 @@ export default class Vault {
    * @returns {Promise<Boolean>}
    */
   async unlock(password) {
-    const vaultKey = await this._storage.read("vaultKey");
+    const vaultKey = await this._getKey();
     if (!(await this.exists(vaultKey))) throw new Error(this.ERRORS.noVault);
     try {
       await this._storage.decrypt({ password }, vaultKey);
@@ -186,7 +186,7 @@ export default class Vault {
   }
 
   async exists(vaultKey) {
-    if (!vaultKey) vaultKey = await this._storage.read("vaultKey");
+    if (!vaultKey) vaultKey = await this._getKey();
     return vaultKey && vaultKey.cipher && vaultKey.iv;
   }
 
@@ -309,7 +309,7 @@ export default class Vault {
 
   /** @inner */
   async _getKey() {
-    if (await this.exists()) return await this._storage.read("vaultKey");
+    return await this._storage.read("vaultKey");
   }
 
   /** @inner */
