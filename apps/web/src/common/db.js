@@ -1,18 +1,19 @@
 import { EventSourcePolyfill as EventSource } from "event-source-polyfill";
-import { EVENTS } from "@streetwriters/notesnook-core/common";
-import { TaskManager } from "./task-manager";
+import { NNStorage } from "../interfaces/storage";
+import { logger } from "../utils/logger";
 
 /**
  * @type {import("@streetwriters/notesnook-core/api").default}
  */
 var db;
 async function initializeDatabase(persistence) {
+  logger.measure("Database initialization");
+
   const { default: Database } = await import(
     "@streetwriters/notesnook-core/api"
   );
-  const { NNStorage } = await import("../interfaces/storage");
   const { default: FS } = await import("../interfaces/fs");
-  db = new Database(new NNStorage(persistence), EventSource, FS);
+  db = new Database(new NNStorage("Notesnook", persistence), EventSource, FS);
 
   // if (isTesting()) {
   db.host({
@@ -36,22 +37,18 @@ async function initializeDatabase(persistence) {
   // });
   // }
 
-  db.eventManager.subscribe(EVENTS.databaseMigrating, async ({ from, to }) => {
-    await TaskManager.startTask({
-      type: "modal",
-      title: `Migrating your database`,
-      subtitle:
-        "Please do not close your browser/app before the migration is done.",
-      action: (task) => {
-        task({ text: `Migrating database from v${from} to v${to}` });
-        return new Promise((resolve) => {
-          db.eventManager.subscribe(EVENTS.databaseMigrated, resolve);
-        });
-      },
-    });
-  });
+  // db.eventManager.subscribe(EVENTS.databaseMigrating, async ({ from, to }) => {
+
+  // });
 
   await db.init();
+
+  logger.measure("Database initialization");
+
+  if (db.migrations.required()) {
+    const { showMigrationDialog } = await import("./dialog-controller");
+    await showMigrationDialog();
+  }
   return db;
 }
 

@@ -31,6 +31,7 @@ function showToast(
     position: "bottom-right",
     style: {
       maxWidth: "auto",
+      backgroundColor: "var(--background)",
     },
   });
   return { hide: () => toast.dismiss(id) };

@@ -233,7 +233,7 @@ test.skip("last line doesn't get saved if it's font is different", async () => {
   expect(content).toMatchSnapshot(`last-line-with-different-font.txt`);
 });
 
-test.only("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
+test("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
   page,
 }, { setTimeout }) => {
   await createNoteAndCheckPresence({

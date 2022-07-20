@@ -14,6 +14,7 @@ import FileSaver from "file-saver";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
 import { showFilePicker } from "../components/editor/picker";
+import { logger } from "../utils/logger";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -196,7 +197,7 @@ async function restore(backup, password) {
     await db.backup.import(backup, password);
     showToast("success", "Backup restored!");
   } catch (e) {
-    console.error(e);
-    await showToast("error", `Could not restore the backup: ${e.message || e}`);
+    logger.error(e, "Could not restore the backup");
+    showToast("error", `Could not restore the backup: ${e.message || e}`);
   }
 }

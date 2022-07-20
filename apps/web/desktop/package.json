@@ -2,7 +2,7 @@
   "name": "@notesnook/desktop",
   "productName": "Notesnook",
   "description": "Your private note taking space",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "private": true,
   "main": "./build/electron.js",
   "homepage": "https://notesnook.com/",
@@ -37,7 +37,7 @@
   "build": {
     "appId": "com.streetwriters.notesnook",
     "productName": "Notesnook",
-    "copyright": "Copyright © 2021 Streetwriters (Private) Ltd.",
+    "copyright": "Copyright © 2022 Streetwriters (Private) Ltd.",
     "artifactName": "notesnook_${arch}.${ext}",
     "files": [
       "!*.chunk.js.map",

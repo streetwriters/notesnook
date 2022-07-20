@@ -69,6 +69,7 @@ function TipTap(props: TipTapProps) {
 
   const editor = useTiptap(
     {
+      isKeyboardOpen: true,
       isMobile: isMobile || false,
       element: editorContainer,
       editable: !readonly,

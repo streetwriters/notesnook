@@ -44,6 +44,7 @@ import { PATHS } from "@notesnook/desktop/paths";
 import { openPath } from "../commands/open";
 import { getAllAccents } from "@streetwriters/theme";
 import { debounce } from "../utils/debounce";
+import { clearLogs, downloadLogs } from "../utils/logger";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -656,6 +657,18 @@ function Settings(props) {
               onToggled={() => setDebugMode(!debugMode)}
               isToggled={debugMode}
             />
+            <Button variant="list" onClick={downloadLogs}>
+              <Tip
+                text="Download logs"
+                tip="Logs are stored locally & do not contain any sensitive information."
+              />
+            </Button>
+            <Button variant="list" onClick={clearLogs}>
+              <Tip
+                text="Clear logs"
+                tip="Clear all logs stored in the database."
+              />
+            </Button>
             {isDesktop() && (
               <Button
                 variant="list"

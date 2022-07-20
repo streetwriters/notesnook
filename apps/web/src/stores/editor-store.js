@@ -7,6 +7,7 @@ import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import { hashNavigate } from "../navigation";
+import { logger } from "../utils/logger";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -121,12 +122,14 @@ class EditorStore extends BaseStore {
   saveSession = async (sessionId, session) => {
     const currentSession = this.get().session;
     if (currentSession.readonly && session.readonly !== false) return; // do not allow saving of readonly session
+    if (currentSession.saveState === 0) return;
 
     this.setSaveState(0);
 
     try {
       const id = await this._getSaveFn()({ ...session, id: sessionId });
-      if (currentSession && currentSession.id !== sessionId) return;
+      if (currentSession && currentSession.id !== sessionId)
+        throw new Error("Aborting save operation: old session.");
 
       let note = db.notes.note(id)?.data;
       if (!note) throw new Error("Note not saved.");
@@ -173,9 +176,10 @@ class EditorStore extends BaseStore {
         noteStore.setSelectedNote(id);
         hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
       }
+      this.setSaveState(1);
     } catch (err) {
       this.setSaveState(-1);
-      console.error(err);
+      logger.info(err);
       if (session.locked) {
         hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
       }
@@ -300,3 +304,7 @@ class EditorStore extends BaseStore {
  */
 const [useStore, store] = createStore(EditorStore);
 export { useStore, store, SESSION_STATES };
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

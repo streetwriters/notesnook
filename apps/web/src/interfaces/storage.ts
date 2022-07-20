@@ -2,23 +2,25 @@ import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import * as MemoryDriver from "localforage-driver-memory";
 import { getNNCrypto } from "./nncrypto.stub";
-import { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
-
-type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
+import type { Cipher, SerializedKey } from "@notesnook/crypto/dist/src/types";
 
 localforage.defineDriver(MemoryDriver);
 extendPrototype(localforage);
+
+type EncryptedKey = { iv: Uint8Array; cipher: BufferSource };
+export type DatabasePersistence = "memory" | "db";
+
 const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 
 export class NNStorage {
   database: LocalForage;
-  constructor(persistence: "memory" | "db" = "db") {
+  constructor(name: string, persistence: DatabasePersistence = "db") {
     const drivers =
       persistence === "memory"
         ? [MemoryDriver._driver]
         : [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE];
     this.database = localforage.createInstance({
-      name: "Notesnook",
+      name,
       driver: drivers,
     });
   }
