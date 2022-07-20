@@ -7,23 +7,13 @@ import {
 import Constants from "../../utils/constants";
 import TokenManager from "../token-manager";
 import Collector from "./collector";
-import { areAllEmpty } from "./utils";
 import * as signalr from "@microsoft/signalr";
 import Merger from "./merger";
 import Conflicts from "./conflicts";
-import { SyncQueue } from "./syncqueue";
 import { AutoSync } from "./auto-sync";
 import { toChunks } from "../../utils/array";
 import { MessagePackHubProtocol } from "@microsoft/signalr-protocol-msgpack";
 import { logger } from "../../logger";
-
-const ITEM_TYPE_MAP = {
-  attachments: "attachment",
-  content: "content",
-  notes: "note",
-  notebooks: "notebook",
-  settings: "settings",
-};
 
 /**
  * @typedef {{
@@ -103,7 +93,6 @@ class Sync {
     this.db = db;
     this.conflicts = new Conflicts(db);
     this.collector = new Collector(db);
-    this.queue = new SyncQueue(db.storage);
     this.merger = new Merger(db);
     this.autoSync = new AutoSync(db, 1000);
     this.logger = logger.scope("Sync");
@@ -180,7 +169,8 @@ class Sync {
     const { newLastSynced, data } = await this.collect(lastSynced, force);
     this.logger.info("Data collected for sync", {
       newLastSynced,
-      isEmpty: areAllEmpty(data),
+      length: data.items.length,
+      isEmpty: data.items.length <= 0,
     });
 
     const serverResponse = full ? await this.fetch(lastSynced) : null;
@@ -259,75 +249,47 @@ class Sync {
 
   async collect(lastSynced, force) {
     const newLastSynced = Date.now();
-
-    let data = await this.collector.collect(lastSynced, force);
-
-    let { syncedAt } = await this.queue.get();
-    if (syncedAt) {
-      const newData = this.collector.filter(
-        data,
-        (item) => item.dateModified > syncedAt
-      );
-      await this.queue.merge(newData, newLastSynced);
-    } else {
-      await this.queue.new(data, newLastSynced);
-    }
-
+    const data = await this.collector.collect(lastSynced, force);
     return { newLastSynced, data };
   }
 
   /**
    *
-   * @param {object} data
+   * @param {{ items: any[]; vaultKey: any; }} data
    * @param {number} lastSynced
    * @returns {Promise<boolean>}
    */
   async send(data, lastSynced) {
     await this.uploadAttachments();
 
-    if (areAllEmpty(data)) return false;
+    if (data.items.length <= 0) return false;
 
-    const { itemIds } = await this.queue.get();
-    this.logger.info("Data to send", { itemIds });
-    if (!itemIds) return false;
-
-    const arrays = itemIds.reduce(
-      (arrays, id) => {
-        const [arrayKey, itemId] = id.split(":");
-        const array = data[arrayKey] || [];
-
-        const item = array.find((item) => item.id === itemId);
-        if (!item) return arrays;
-
-        const type = ITEM_TYPE_MAP[arrayKey];
-
-        arrays.types.push(type);
-        arrays.items.push(JSON.stringify(item));
-        arrays.ids.push(id);
-
+    const arrays = data.items.reduce(
+      (arrays, item) => {
+        arrays.types.push(item.type);
+        arrays.items.push(item);
         return arrays;
       },
-      { items: [], types: [], ids: [] }
+      { items: [], types: [] }
     );
 
     if (data.vaultKey) {
-      arrays.ids.push("vaultKey");
       arrays.types.push("vaultKey");
-      arrays.items.push(JSON.stringify(data.vaultKey));
+      arrays.items.push(data.vaultKey);
     }
 
-    let total = arrays.ids.length;
+    let total = arrays.items.length;
 
-    arrays.ids = toChunks(arrays.ids, 30);
     arrays.types = toChunks(arrays.types, 30);
     arrays.items = toChunks(arrays.items, 30);
 
     let done = 0;
-    for (let i = 0; i < arrays.ids.length; ++i) {
+    for (let i = 0; i < arrays.items.length; ++i) {
       this.logger.info(`Sending batch ${done}/${total}`);
 
-      const ids = arrays.ids[i];
-      const items = arrays.items[i];
+      const items = (await this.collector.encrypt(arrays.items[i])).map(
+        (item) => JSON.stringify(item)
+      );
       const types = arrays.types[i];
 
       const result = await this.sendBatchToServer({
@@ -339,8 +301,7 @@ class Sync {
       });
 
       if (result) {
-        done += ids.length;
-        await this.queue.dequeue(...ids);
+        done += items.length;
         sendSyncProgressEvent(this.db.eventManager, "upload", total, done);
 
         this.logger.info(`Batch sent (${done}/${total})`);
@@ -362,6 +323,7 @@ class Sync {
   }
 
   async cancel() {
+    this.logger.info("Sync canceled");
     await this.connection.stop();
   }
 
@@ -383,7 +345,7 @@ class Sync {
 
         await this.db.attachments.markAsUploaded(attachment.id);
       } catch (e) {
-        console.error(e, attachment);
+        logger.error(e, { attachment });
         const error = e.message;
         await this.db.attachments.markAsFailed(attachment.id, error);
       }

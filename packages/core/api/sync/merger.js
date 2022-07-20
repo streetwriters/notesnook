@@ -191,8 +191,6 @@ class Merger {
   }
 
   async mergeItem(type, item) {
-    this.logger.info(`Merging ${type}`, { itemId: item.id });
-
     this._lastSynced = await this._db.lastSynced();
 
     const definition = this._mergeDefinition[type];
@@ -217,7 +215,6 @@ class Merger {
     } else if (!definition.get && definition.set) {
       await definition.set(item);
     }
-    this.logger.info(`Merged`, { itemId: item.id });
   }
 }
 export default Merger;

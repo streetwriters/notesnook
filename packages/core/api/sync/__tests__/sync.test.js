@@ -56,130 +56,130 @@ test.skip(
   30 * 1000
 );
 
-test.skip(
-  "case 4: Device A's sync is interrupted halfway and Device B makes some changes afterwards and syncs.",
-  async () => {
-    const deviceA = await initializeDevice("deviceA");
-    const deviceB = await initializeDevice("deviceB");
+// test.skip(
+//   "case 4: Device A's sync is interrupted halfway and Device B makes some changes afterwards and syncs.",
+//   async () => {
+//     const deviceA = await initializeDevice("deviceA");
+//     const deviceB = await initializeDevice("deviceB");
 
-    const unsyncedNoteIds = [];
-    for (let i = 0; i < 10; ++i) {
-      const id = await deviceA.notes.add({
-        title: `Test note ${i} from device A`,
-      });
-      unsyncedNoteIds.push(id);
-    }
+//     const unsyncedNoteIds = [];
+//     for (let i = 0; i < 10; ++i) {
+//       const id = await deviceA.notes.add({
+//         title: `Test note ${i} from device A`,
+//       });
+//       unsyncedNoteIds.push(id);
+//     }
 
-    const half = unsyncedNoteIds.length / 2 + 1;
-    deviceA.eventManager.subscribe(
-      EVENTS.syncProgress,
-      async ({ type, current }) => {
-        if (type === "upload" && current === half) {
-          await deviceA.syncer.stop();
-        }
-      }
-    );
+//     const half = unsyncedNoteIds.length / 2 + 1;
+//     deviceA.eventManager.subscribe(
+//       EVENTS.syncProgress,
+//       async ({ type, current }) => {
+//         if (type === "upload" && current === half) {
+//           await deviceA.syncer.stop();
+//         }
+//       }
+//     );
 
-    await expect(deviceA.sync(true)).rejects.toThrow();
+//     await expect(deviceA.sync(true)).rejects.toThrow();
 
-    let syncedNoteIds = [];
-    for (let i = 0; i < unsyncedNoteIds.length; ++i) {
-      const expectedNoteId = unsyncedNoteIds[i];
-      if (deviceB.notes.note(expectedNoteId))
-        syncedNoteIds.push(expectedNoteId);
-    }
-    expect(
-      syncedNoteIds.length === half - 1 || syncedNoteIds.length === half
-    ).toBe(true);
+//     let syncedNoteIds = [];
+//     for (let i = 0; i < unsyncedNoteIds.length; ++i) {
+//       const expectedNoteId = unsyncedNoteIds[i];
+//       if (deviceB.notes.note(expectedNoteId))
+//         syncedNoteIds.push(expectedNoteId);
+//     }
+//     expect(
+//       syncedNoteIds.length === half - 1 || syncedNoteIds.length === half
+//     ).toBe(true);
 
-    const deviceBNoteId = await deviceB.notes.add({
-      title: "Test note of case 4 from device B",
-    });
+//     const deviceBNoteId = await deviceB.notes.add({
+//       title: "Test note of case 4 from device B",
+//     });
 
-    await deviceB.sync(true);
+//     await deviceB.sync(true);
 
-    await syncAndWait(deviceA, deviceB);
+//     await syncAndWait(deviceA, deviceB);
 
-    expect(deviceA.notes.note(deviceBNoteId)).toBeTruthy();
-    expect(
-      unsyncedNoteIds
-        .map((id) => !!deviceB.notes.note(id))
-        .every((res) => res === true)
-    ).toBe(true);
+//     expect(deviceA.notes.note(deviceBNoteId)).toBeTruthy();
+//     expect(
+//       unsyncedNoteIds
+//         .map((id) => !!deviceB.notes.note(id))
+//         .every((res) => res === true)
+//     ).toBe(true);
 
-    await cleanup(deviceA, deviceB);
-  },
-  60 * 1000
-);
+//     await cleanup(deviceA, deviceB);
+//   },
+//   60 * 1000
+// );
 
-test.skip(
-  "case 5: Device A's sync is interrupted halfway and Device B makes changes on the same note's content that didn't get synced on Device A due to interruption.",
-  async () => {
-    const deviceA = await initializeDevice("deviceA");
-    const deviceB = await initializeDevice("deviceB");
+// test.only(
+//   "case 5: Device A's sync is interrupted halfway and Device B makes changes on the same note's content that didn't get synced on Device A due to interruption.",
+//   async () => {
+//     const deviceA = await initializeDevice("deviceA");
+//     const deviceB = await initializeDevice("deviceB");
 
-    const noteIds = [];
-    for (let i = 0; i < 10; ++i) {
-      const id = await deviceA.notes.add({
-        content: {
-          type: "tiptap",
-          data: `<p>deviceA=true</p>`,
-        },
-      });
-      noteIds.push(id);
-    }
+//     const noteIds = [];
+//     for (let i = 0; i < 10; ++i) {
+//       const id = await deviceA.notes.add({
+//         content: {
+//           type: "tiptap",
+//           data: `<p>deviceA=true</p>`,
+//         },
+//       });
+//       noteIds.push(id);
+//     }
 
-    await deviceA.sync(true);
-    await deviceB.sync(true);
+//     await deviceA.sync(true);
+//     await deviceB.sync(true);
 
-    const unsyncedNoteIds = [];
-    for (let id of noteIds) {
-      const noteId = await deviceA.notes.add({
-        id,
-        content: {
-          type: "tiptap",
-          data: `<p>deviceA=true+changed=true</p>`,
-        },
-      });
-      unsyncedNoteIds.push(noteId);
-    }
+//     const unsyncedNoteIds = [];
+//     for (let id of noteIds) {
+//       const noteId = await deviceA.notes.add({
+//         id,
+//         content: {
+//           type: "tiptap",
+//           data: `<p>deviceA=true+changed=true</p>`,
+//         },
+//       });
+//       unsyncedNoteIds.push(noteId);
+//     }
 
-    deviceA.eventManager.subscribe(
-      EVENTS.syncProgress,
-      async ({ type, total, current }) => {
-        const half = total / 2 + 1;
-        if (type === "upload" && current === half) {
-          await deviceA.syncer.stop();
-        }
-      }
-    );
+//     deviceA.eventManager.subscribe(
+//       EVENTS.syncProgress,
+//       async ({ type, total, current }) => {
+//         const half = total / 2 + 1;
+//         if (type === "upload" && current === half) {
+//           await deviceA.syncer.stop();
+//         }
+//       }
+//     );
 
-    await expect(deviceA.sync(true)).rejects.toThrow();
+//     await expect(deviceA.sync(true)).rejects.toThrow();
 
-    await delay(10 * 1000);
+//     await delay(10 * 1000);
 
-    for (let id of unsyncedNoteIds) {
-      await deviceB.notes.add({
-        id,
-        content: {
-          type: "tiptap",
-          data: "<p>changes from device B</p>",
-        },
-      });
-    }
+//     for (let id of unsyncedNoteIds) {
+//       await deviceB.notes.add({
+//         id,
+//         content: {
+//           type: "tiptap",
+//           data: "<p>changes from device B</p>",
+//         },
+//       });
+//     }
 
-    const error = await withError(async () => {
-      await deviceB.sync(true);
-      await deviceA.sync(true);
-    });
+//     const error = await withError(async () => {
+//       await deviceB.sync(true);
+//       await deviceA.sync(true);
+//     });
 
-    expect(error).not.toBeInstanceOf(NoErrorThrownError);
-    expect(error.message.includes("Merge")).toBeTruthy();
+//     expect(error).not.toBeInstanceOf(NoErrorThrownError);
+//     expect(error.message.includes("Merge")).toBeTruthy();
 
-    await cleanup(deviceA, deviceB);
-  },
-  60 * 1000
-);
+//     await cleanup(deviceA, deviceB);
+//   },
+//   60 * 1000
+// );
 
 test.skip(
   "issue: running force sync from device A makes device B always download everything",
@@ -228,33 +228,15 @@ test.skip(
 
     await syncAndWait(deviceA, deviceB);
 
+    await delay(2000);
+
     const purpleColor = deviceB.colors.tag("purple");
-    console.log(purpleColor.noteIds, noteIds);
+    console.log(noteIds, purpleColor.noteIds);
     expect(noteIds.every((id) => purpleColor.noteIds.indexOf(id) > -1)).toBe(
       true
     );
 
     await cleanup(deviceA, deviceB);
-  },
-  60 * 1000
-);
-
-test.skip(
-  "issue: running force sync from device A makes device B always download everything",
-  async () => {
-    const deviceA = await initializeDevice("deviceA");
-    const deviceB = await initializeDevice("deviceB");
-
-    await syncAndWait(deviceA, deviceB, true);
-
-    const handler = jest.fn();
-    deviceB.eventManager.subscribe(EVENTS.syncProgress, handler);
-
-    await deviceB.sync(true);
-
-    expect(handler).not.toHaveBeenCalled();
-
-    await cleanup(deviceB);
   },
   60 * 1000
 );
@@ -397,13 +379,13 @@ async function cleanup(...devices) {
  * @param {Database} device
  * @returns
  */
-function waitForSyncCompleted(device) {
-  return new Promise((resolve) =>
-    device.eventManager.subscribe(EVENTS.syncCompleted, () => {
-      resolve();
-    })
-  );
-}
+// function waitForSyncCompleted(device) {
+//   return new Promise((resolve) =>
+//     device.eventManager.subscribe(EVENTS.syncCompleted, () => {
+//       resolve();
+//     })
+//   );
+// }
 
 /**
  *

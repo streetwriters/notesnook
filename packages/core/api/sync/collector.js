@@ -16,27 +16,20 @@ class Collector {
 
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.getEncryptionKey();
-    return {
-      // notes: this._collect(await this._db.notes.encrypted()),
-      // notebooks: this._collect(await this._db.notebooks.encrypted()),
-      // content: this._collect(await this._db.content.encrypted()),
-      notes: await this._encrypt(
-        this._collect(this._db.notes.raw, isForceSync)
+
+    const items = [
+      ...this._collect("note", this._db.notes.raw, isForceSync),
+      ...this._collect("notebook", this._db.notebooks.raw, isForceSync),
+      ...this._collect("content", await this._db.content.all(), isForceSync),
+      ...this._collect(
+        "attachment",
+        this._db.attachments.syncable,
+        isForceSync
       ),
-      notebooks: await this._encrypt(
-        this._collect(this._db.notebooks.raw, isForceSync)
-      ),
-      content: await this._encrypt(
-        this._collect(await this._db.content.all(), isForceSync)
-      ),
-      attachments: await this._encrypt(
-        this._collect(this._db.attachments.syncable, isForceSync)
-      ),
-      settings: await this._encrypt(
-        this._collect([this._db.settings.raw], isForceSync)
-      ),
-      vaultKey: await this._serialize(await this._db.vault._getKey()),
-    };
+      ...this._collect("settings", [this._db.settings.raw], isForceSync),
+    ];
+
+    return { items, vaultKey: await this._db.vault._getKey() };
   }
 
   _serialize(item) {
@@ -44,7 +37,7 @@ class Collector {
     return this._db.storage.encrypt(this.key, JSON.stringify(item));
   }
 
-  _encrypt(array) {
+  encrypt(array) {
     if (!array.length) return [];
     return Promise.all(array.map(this._map, this));
   }
@@ -54,24 +47,32 @@ class Collector {
    * @param {Array} array
    * @returns {Array}
    */
-  _collect(array, isForceSync) {
+  _collect(type, array, isForceSync) {
     if (!array.length) return [];
 
     const result = array.reduce((prev, item) => {
       if (!item) return prev;
+
       const isSyncable = !item.synced || isForceSync;
       const isUnsynced =
         item.dateModified > this._lastSyncedTimestamp || isForceSync;
 
       if (item.localOnly) {
-        prev.push({ id: item.id, deleted: true, dateModified: Date.now() });
+        prev.push({
+          id: item.id,
+          type,
+          deleted: true,
+          dateModified: Date.now(),
+        });
       } else if ((isUnsynced && isSyncable) || item.migrated) {
-        prev.push(item);
+        prev.push({ ...item, type });
       }
 
       return prev;
     }, []);
-    this.logger.info(`Collected items ${result.length}/${array.length}`);
+    this.logger.info(
+      `Collected items: ${type} (${result.length}/${array.length})`
+    );
     return result;
   }
 

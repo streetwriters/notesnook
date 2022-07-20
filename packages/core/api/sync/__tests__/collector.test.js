@@ -19,9 +19,10 @@ test("newly created note should get included in collector", () =>
     const noteId = await db.notes.add(TEST_NOTE);
 
     const data = await collector.collect(lastSyncedTime);
+    const notes = data.items.filter((i) => i.type === "note");
 
-    expect(data.notes).toHaveLength(1);
-    expect(data.notes[0].id).toBe(noteId);
+    expect(notes).toHaveLength(1);
+    expect(notes[0].id).toBe(noteId);
   }));
 
 test("edited note after last synced time should get included in collector", () =>
@@ -36,9 +37,10 @@ test("edited note after last synced time should get included in collector", () =
     await db.notes.add({ id: noteId, pinned: true });
 
     const data = await collector.collect(lastSyncedTime);
+    const notes = data.items.filter((i) => i.type === "note");
 
-    expect(data.notes).toHaveLength(1);
-    expect(data.notes[0].id).toBe(noteId);
+    expect(notes).toHaveLength(1);
+    expect(notes[0].id).toBe(noteId);
   }));
 
 test("note edited before last synced time should not get included in collector", () =>
@@ -53,8 +55,9 @@ test("note edited before last synced time should not get included in collector",
     const lastSyncedTime = Date.now();
 
     const data = await collector.collect(lastSyncedTime);
+    const notes = data.items.filter((i) => i.type === "note");
 
-    expect(data.notes).toHaveLength(0);
+    expect(notes).toHaveLength(0);
   }));
 
 test("localOnly note should get included as a deleted item in collector", () =>
@@ -63,7 +66,7 @@ test("localOnly note should get included as a deleted item in collector", () =>
     await db.notes.add({ ...TEST_NOTE, localOnly: true });
 
     const data = await collector.collect(0);
-
-    expect(data.notes).toHaveLength(1);
-    expect(data.notes[0].cipher).toContain(`"deleted":true`);
+    const notes = data.items.filter((i) => i.type === "note");
+    expect(notes).toHaveLength(1);
+    expect(notes[0].deleted).toBe(true);
   }));
