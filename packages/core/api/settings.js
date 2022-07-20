@@ -10,7 +10,6 @@ class Settings {
    */
   constructor(db) {
     this._db = db;
-    this._initSettings();
   }
 
   async init() {
@@ -30,7 +29,7 @@ class Settings {
 
   async merge(item) {
     if (this._settings.dateModified > (await this._db.lastSynced())) {
-      this._settings = item.id;
+      this._settings.id = item.id;
       this._settings.pins = setManipulator.union(
         this._settings.pins,
         item.pins,

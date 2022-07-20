@@ -15,8 +15,10 @@ class Merger {
 
     this._mergeDefinition = {
       settings: {
+        threshold: 1000,
         get: () => this._db.settings.raw,
         set: (item) => this._db.settings.merge(item),
+        conflict: (_local, remote) => this._db.settings.merge(remote),
       },
       note: {
         get: (id) => this._db.notes.note(id),
