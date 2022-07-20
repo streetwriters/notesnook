@@ -1,6 +1,5 @@
 import NetInfo from '@react-native-community/netinfo';
 import { EVENTS } from '@streetwriters/notesnook-core/common';
-import { editorController } from '../screens/editor/tiptap/utils';
 import { initialize } from '../stores';
 import { useUserStore } from '../stores/use-user-store';
 import { doInBackground } from '../utils';
@@ -23,7 +22,9 @@ const run = async (context = 'global', forced = false, full = true) => {
   const status = await NetInfo.fetch();
   const userstore = useUserStore.getState();
   const user = await db.user.getUser();
-  DatabaseLogger.warn('Internet not reachable');
+  if (!status.isInternetReachable) {
+    DatabaseLogger.warn('Internet not reachable');
+  }
   if (!user || !status.isInternetReachable) {
     initialize();
     return true;
