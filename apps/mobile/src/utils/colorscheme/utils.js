@@ -65,18 +65,24 @@ export const RGB_Linear_Shade = (p, rgba) => {
   );
 };
 
-export function getColorScheme() {
+export function getColorScheme(overrideSystemTheme) {
   let { pitchBlack, theme, useSystemTheme } = SettingsService.get();
   const darkTheme = pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK;
 
-  if (useSystemTheme) {
+  if (useSystemTheme && !overrideSystemTheme) {
     setAccentColor(theme.accent);
     Appearance.getColorScheme() === 'dark'
       ? setColorScheme(darkTheme)
       : setColorScheme(COLOR_SCHEME_LIGHT);
-
+    SettingsService.set({
+      theme: {
+        ...theme,
+        dark: Appearance.getColorScheme() === 'dark'
+      }
+    });
     return COLOR_SCHEME;
   }
+  console.log('override system theme');
   setAccentColor(theme.accent);
   setColorScheme(theme.dark ? darkTheme : COLOR_SCHEME_LIGHT);
   return COLOR_SCHEME;
@@ -85,7 +91,7 @@ export function getColorScheme() {
 export const switchAccentColor = async color => {
   setAccentColor(color);
   let settings = SettingsService.get();
-  await SettingsService.set({
+  SettingsService.set({
     theme: {
       ...settings.theme,
       accent: color
@@ -96,11 +102,11 @@ export const switchAccentColor = async color => {
 
 export const toggleDarkMode = async () => {
   let settings = SettingsService.get();
-  await SettingsService.set({
+  SettingsService.set({
     theme: {
       ...settings.theme,
       dark: !settings.theme?.dark
     }
   });
-  getColorScheme();
+  getColorScheme(true);
 };
