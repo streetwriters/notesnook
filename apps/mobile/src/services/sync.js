@@ -8,6 +8,10 @@ import { db } from '../utils/database';
 import { ToastEvent } from './event-manager';
 import { DatabaseLogger } from '../utils/database/index';
 
+NetInfo.configure({
+  reachabilityUrl: 'https://bing.com'
+});
+
 export const ignoredMessages = [
   'Sync already running',
   'Not allowed to start service intent',
@@ -16,9 +20,11 @@ export const ignoredMessages = [
 
 const run = async (context = 'global', forced = false, full = true) => {
   let result = false;
+  const status = await NetInfo.fetch();
   const userstore = useUserStore.getState();
   const user = await db.user.getUser();
-  if (!user) {
+  DatabaseLogger.warn('Internet not reachable');
+  if (!user || !status.isInternetReachable) {
     initialize();
     return true;
   }
@@ -47,9 +53,10 @@ const run = async (context = 'global', forced = false, full = true) => {
     result = true;
   } catch (e) {
     result = false;
+
     if (!ignoredMessages.find(im => e.message?.includes(im)) && userstore.user) {
       userstore.setSyncing(false);
-      let status = await NetInfo.fetch();
+      console.log(status.isConnected, status.isInternetReachable);
       if (status.isConnected && status.isInternetReachable) {
         ToastEvent.error(e, 'Sync failed', context);
       }
