@@ -67,9 +67,9 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
     };
   }, [deviceMode]);
   const paddings = {
-    ios: insets.bottom === 0 ? 70 : insets.bottom + 15,
+    ios: 20,
     android: 20,
-    iPad: insets.bottom
+    iPad: 20
   };
 
   return deviceMode !== 'mobile' && !shouldShow ? null : (

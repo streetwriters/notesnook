@@ -106,7 +106,8 @@ If you face any other issues or are unsure about what to do, feel free to reach 
           }}
           style={{
             borderRadius: 100,
-            height: 45
+            height: 45,
+            marginTop: 20
           }}
         />
       )}
