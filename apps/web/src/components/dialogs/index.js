@@ -19,6 +19,7 @@ import OnboardingDialog from "./onboarding-dialog";
 import AttachmentsDialog from "./attachmentsdialog";
 import { Prompt } from "./prompt";
 import { ToolbarConfigDialog } from "./toolbarconfigdialog";
+import { MigrationDialog } from "./migrationdialog";
 
 const Dialogs = {
   AddNotebookDialog,
@@ -43,5 +44,6 @@ const Dialogs = {
   RecoveryCodesDialog,
   OnboardingDialog,
   AttachmentsDialog,
+  MigrationDialog,
 };
 export default Dialogs;

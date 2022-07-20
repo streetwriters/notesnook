@@ -278,6 +278,12 @@ export function showEmailVerificationDialog() {
   ));
 }
 
+export function showMigrationDialog() {
+  return showDialog("MigrationDialog", (Dialog, perform) => (
+    <Dialog onClose={() => perform(false)} />
+  ));
+}
+
 type LoadingDialogProps = {
   title: string;
   message?: string;
