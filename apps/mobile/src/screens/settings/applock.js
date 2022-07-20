@@ -12,13 +12,15 @@ import { BouncingView } from '../../components/ui/transitions/bouncing-view';
 import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { DDS } from '../../services/device-detection';
-import { presentSheet } from '../../services/event-manager';
+import { presentSheet, ToastEvent } from '../../services/event-manager';
 import SettingsService from '../../services/settings';
 import { useSettingStore } from '../../stores/use-setting-store';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { getElevation } from '../../utils';
 import umami from '../../utils/analytics';
 import { SIZE } from '../../utils/size';
+import BiometicService from '../../services/biometrics';
+import { useUserStore } from '../../stores/use-user-store';
 
 const AppLock = ({ navigation, route }) => {
   const colors = useThemeStore(state => state.colors);
@@ -118,7 +120,19 @@ const AppLock = ({ navigation, route }) => {
                 <PressableButton
                   key={item.title}
                   type={appLockMode === item.value ? 'grayBg' : 'transparent'}
-                  onPress={() => {
+                  onPress={async () => {
+                    if (
+                      !(await BiometicService.isBiometryAvailable()) &&
+                      !useUserStore.getState().user
+                    ) {
+                      ToastEvent.show({
+                        heading: 'Biometrics not enrolled',
+                        type: 'error',
+                        message:
+                          'To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone or create an account.'
+                      });
+                      return;
+                    }
                     SettingsService.set({ appLockMode: item.value });
                   }}
                   customStyle={{

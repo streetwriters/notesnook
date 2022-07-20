@@ -1,6 +1,5 @@
-import { EVENTS } from '@streetwriters/notesnook-core/common';
 import React, { useEffect, useRef } from 'react';
-import { NativeModules, Platform, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
 import { editorState } from '../../screens/editor/tiptap/utils';
@@ -19,11 +18,12 @@ import { useThemeStore } from '../../stores/use-theme-store';
 import { useUserStore } from '../../stores/use-user-store';
 import { DatabaseLogger, db, loadDatabase } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
-import { eCloseProgressDialog, eOpenAnnouncementDialog } from '../../utils/events';
+import { eOpenAnnouncementDialog } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { SVG } from '../auth/background';
+import Migrate from '../sheets/migrate';
 import NewFeature from '../sheets/new-feature/index';
 import { Update } from '../sheets/update';
 import { Button } from '../ui/button';
@@ -48,7 +48,6 @@ const Launcher = React.memo(
     const password = useRef();
     const introCompleted = useSettingStore(state => state.settings.introCompleted);
     const dbInitCompleted = useRef(false);
-
     const loadNotes = async () => {
       if (verifyUser) {
         return;
@@ -61,37 +60,35 @@ const Launcher = React.memo(
           setImmediate(() => {
             setLoading(false);
             setImmediate(() => doAppLoadActions());
-            db?.eventManager?.unsubscribe(EVENTS.databaseMigrating, onDatabaseMigratingProgess);
           });
         });
       });
     };
 
-    const onDatabaseMigratingProgess = React.useCallback(data => {
-      presentSheet({
-        progress: true,
-        title: 'Migrating database',
-        paragraph: 'Please wait while we migrate your data. Do not close the app.'
-      });
-    });
-
-    const onMigrationCompleted = React.useCallback(data => {
-      eSendEvent(eCloseProgressDialog);
-    });
-
     const init = async () => {
       if (!dbInitCompleted.current) {
         await RNBootSplash.hide({ fade: true });
         await loadDatabase();
-        db?.eventManager?.subscribe(EVENTS.databaseMigrating, onDatabaseMigratingProgess);
-        db?.eventManager?.subscribe(EVENTS.databaseMigrated, onMigrationCompleted);
         DatabaseLogger.info('Initializing database');
         await db.init();
         dbInitCompleted.current = true;
       }
 
+      if (db.migrations.required() && !verifyUser) {
+        presentSheet({
+          component: <Migrate />,
+          onClose: () => {
+            loadNotes();
+          },
+          disableClosing: true
+        });
+        return;
+      }
+
       if (!verifyUser) {
         loadNotes();
+      } else {
+        useUserStore.getState().setUser(await db.user?.getUser());
       }
     };
 
@@ -220,10 +217,6 @@ const Launcher = React.memo(
         onUnlockBiometrics();
       }
       init();
-
-      return () => {
-        db?.eventManager?.unsubscribe(EVENTS.databaseMigrated, onMigrationCompleted);
-      };
     }, [verifyUser]);
 
     const onSubmit = async () => {

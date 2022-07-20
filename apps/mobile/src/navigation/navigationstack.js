@@ -63,7 +63,7 @@ const Tabs = React.memo(
   () => {
     const colors = useThemeStore(state => state.colors);
     const homepage = SettingsService.get().homepage;
-    const showWelcome = !SettingsService.get().introCompleted;
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
     const height = useSettingStore(state => state.dimensions.height);
     const insets = useSafeAreaInsets();
     const screenHeight = height - (50 + insets.top + insets.bottom);
@@ -76,7 +76,7 @@ const Tabs = React.memo(
     return (
       <NativeStack.Navigator
         tabBar={() => null}
-        initialRouteName={showWelcome ? 'Welcome' : homepage}
+        initialRouteName={!introCompleted ? 'Welcome' : homepage}
         backBehavior="history"
         screenOptions={{
           headerShown: false,
@@ -84,7 +84,7 @@ const Tabs = React.memo(
           animation: 'none',
           contentStyle: {
             backgroundColor: colors.bg,
-            height: screenHeight
+            height: !introCompleted ? undefined : screenHeight
           }
         }}
       >

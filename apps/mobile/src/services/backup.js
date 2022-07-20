@@ -40,7 +40,7 @@ async function getDirectoryAndroid() {
   return subfolder;
 }
 
-async function checkBackupDirExists(reset = false) {
+async function checkBackupDirExists(reset = false, context = 'global') {
   if (Platform.OS === 'ios') return true;
   let dir = SettingsService.get().backupDirectoryAndroid;
   if (reset) dir = null;
@@ -65,7 +65,11 @@ async function checkBackupDirExists(reset = false) {
         positivePress: async () => {
           resolve(await getDirectoryAndroid());
         },
-        positiveText: 'Select'
+        onClose: () => {
+          resolve(null);
+        },
+        positiveText: 'Select',
+        context: context
       });
     });
   }
@@ -123,8 +127,8 @@ async function updateNextBackupTime() {
   });
 }
 
-async function run(progress) {
-  let androidBackupDirectory = await checkBackupDirExists();
+async function run(progress, context) {
+  let androidBackupDirectory = await checkBackupDirExists(false, context);
   if (!androidBackupDirectory) return;
 
   let backup;
@@ -179,6 +183,7 @@ async function run(progress) {
 
     let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
     console.log(backupFilePath);
+    if (context) return backupFilePath;
     await sleep(300);
     if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
@@ -189,6 +194,7 @@ async function run(progress) {
   } catch (e) {
     progress && eSendEvent(eCloseProgressDialog);
     ToastEvent.error(e, 'Backup failed!');
+    return null;
   }
 }
 
