@@ -43,19 +43,18 @@ export function MigrationDialog(props: MigrationDialogProps) {
           your data.
         </Text>
         <Text as="li" variant={"body"}>
-          Some <b>merge conflicts</b> in your notes after a migration are
-          expected. It is <b>recommended</b> that you go through them &amp;
-          resolve them carefully.
+          Some <b>merge conflicts</b> are expected in your notes after a
+          migration. It is <b>recommended</b> that you resolve them carefully.
           <Text as="ol" sx={{ paddingInlineStart: 20 }}>
             <Text as="li" variant={"body"}>
-              <b>But if you are feeling reckless</b> and want to risk losing
-              some data, you can logout &amp; log back in.
+              <b>But if you are feeling reckless enough</b> to risk losing some
+              data, you can logout &amp; log back in.
             </Text>
           </Text>
         </Text>
         <Text as="li" variant={"body"}>
-          If you face any other issues or are unsure about what to do, feel free
-          to reach out to us via{" "}
+          If you face any other issues or if you are unsure about what to do,
+          feel free to reach out to us via{" "}
           <a href="https://discord.com/invite/zQBK97EE22">Discord</a> or email
           us at{" "}
           <a href="mailto:support@streetwriters.co">support@streetwriters.co</a>
