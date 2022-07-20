@@ -6,6 +6,7 @@ import { useUserStore } from '../stores/use-user-store';
 import { doInBackground } from '../utils';
 import { db } from '../utils/database';
 import { ToastEvent } from './event-manager';
+import { DatabaseLogger } from '../utils/database/index';
 
 export const ignoredMessages = [
   'Sync already running',
@@ -53,6 +54,7 @@ const run = async (context = 'global', forced = false, full = true) => {
         ToastEvent.error(e, 'Sync failed', context);
       }
     }
+    DatabaseLogger.error(e, '[Client] Failed to sync');
   } finally {
     if (full || forced) {
       db.eventManager.publish(EVENTS.syncCompleted);
