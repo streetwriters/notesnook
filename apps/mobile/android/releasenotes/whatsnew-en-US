@@ -1,8 +1,7 @@
-- Fix toolbar appears at incorrect position
-- Fixed a crash when trying to configure toolbar
-- Fixed toggling task item causing keyboard to open
-- Fixed minimal toolbar preset shows default toolbar
+- Add a button in settings to reset toolbar config
+- Fix accent color not applied in some parts of editor
+- Fix changing grouping causes notes list to be empty
 - Improved gestures and drawer animations
-- Removed the annoying alerts on app launch
+- Fixed sync issues
 
 Thank you for using Notesnook!
