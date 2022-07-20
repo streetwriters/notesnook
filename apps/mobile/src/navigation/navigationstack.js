@@ -24,6 +24,9 @@ import { useThemeStore } from '../stores/use-theme-store';
 import { history } from '../utils';
 import { rootNavigatorRef } from '../utils/global-refs';
 import { hideAllTooltips } from '../utils/hooks/use-tooltip';
+import { useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSettingStore } from '../stores/use-setting-store';
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
 
@@ -61,6 +64,9 @@ const Tabs = React.memo(
     const colors = useThemeStore(state => state.colors);
     const homepage = SettingsService.get().homepage;
     const showWelcome = !SettingsService.get().introCompleted;
+    const height = useSettingStore(state => state.dimensions.height);
+    const insets = useSafeAreaInsets();
+    const screenHeight = height - (50 + insets.top + insets.bottom);
     React.useEffect(() => {
       setTimeout(() => {
         useNavigationStore.getState().update({ name: homepage });
@@ -77,7 +83,8 @@ const Tabs = React.memo(
           lazy: false,
           animation: 'none',
           contentStyle: {
-            backgroundColor: colors.bg
+            backgroundColor: colors.bg,
+            height: screenHeight
           }
         }}
       >
