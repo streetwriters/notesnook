@@ -297,6 +297,8 @@ export const TabsHolder = React.memo(
           flex: 1,
           backgroundColor: colors.bg,
           paddingBottom: Platform.OS === 'android' ? insets?.bottom : 0,
+          marginRight:
+            orientation === 'LANDSCAPE-RIGHT' && Platform.OS === 'ios' ? insets.right : 0,
           marginLeft: orientation === 'LANDSCAPE-LEFT' && Platform.OS === 'ios' ? insets.left : 0
         }}
       >
