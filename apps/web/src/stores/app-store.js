@@ -176,6 +176,8 @@ class AppStore extends BaseStore {
   };
 
   sync = async (full = true, force = false) => {
+    if (this.isSyncing()) return;
+
     clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
 
@@ -219,6 +221,11 @@ class AppStore extends BaseStore {
   updateSyncStatus = (key) => {
     logger.info(`Sync status updated: ${key}`);
     this.set((state) => (state.syncStatus.key = key));
+  };
+
+  isSyncing = () => {
+    const status = this.get().syncStatus.key;
+    return status === "syncing";
   };
 }
 
