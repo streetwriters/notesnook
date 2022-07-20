@@ -17,7 +17,7 @@
     "@notesnook/desktop": "file:desktop",
     "@rebass/forms": "^4.0.6",
     "@streetwriters/editor": "^1.1.2",
-    "@streetwriters/notesnook-core": "^7.2.1",
+    "@streetwriters/notesnook-core": "^7.3.0",
     "@streetwriters/theme": "1.0.0",
     "allotment": "^1.12.1",
     "async-mutex": "^0.3.2",
