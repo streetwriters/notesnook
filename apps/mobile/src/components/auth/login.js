@@ -69,12 +69,10 @@ export const Login = ({ changeMode, welcome }) => {
     if (!validateInfo() || error) return;
     setLoading(true);
     let user;
-    console.log(mfa);
     try {
       if (mfa) {
         await db.user.mfaLogin(email.current.toLowerCase(), password.current, mfa);
       } else {
-        console.log(email.current, password.current);
         await db.user.login(email.current.toLowerCase(), password.current);
       }
       callback && callback(true);
@@ -100,14 +98,7 @@ export const Login = ({ changeMode, welcome }) => {
       Progress.present();
     } catch (e) {
       callback && callback(false);
-      console.log(
-        'Login error',
-        e.message,
-        e.data,
-        e.message === 'Multifactor authentication required.'
-      );
       if (e.message === 'Multifactor authentication required.') {
-        console.log(TwoFactorVerification.present, 'calling 2fa');
         setLoading(false);
         await sleep(300);
         TwoFactorVerification.present(async mfa => {
@@ -119,7 +110,6 @@ export const Login = ({ changeMode, welcome }) => {
           }
         }, e.data);
       } else {
-        console.log(e.stack);
         setLoading(false);
         ToastEvent.show({
           heading: user ? 'Failed to sync' : 'Login failed',
