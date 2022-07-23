@@ -1,50 +1,15 @@
 <p align="center">
-
 <img style="align:center;" src="https://app.notesnook.com/apple-touch-icon.png" alt="Notesnook Logo" width="100" />
+</p>
 
 <h1 align="center">Notesnook</h1>
-<h2 align="center">Take private notes, capture ideas, make lists & sync them anywhere</h2>
-
 <p align="center">
-<a href="https://discord.gg/5davZnhw3V"><img alt="Chat with us on Discord" src="https://img.shields.io/discord/796015620436787241?label=Chat%20with%20us&logo=discord&logoColor=white"/></a>
-<a href="https://GitHub.com/streetwriters/notesnook/issues/"><img src="https://img.shields.io/github/issues/streetwriters/notesnook.svg"/></a>
-<a href="https://twitter.com/notesnook"><img alt="Follow us on Twitter @notesnook" src="https://img.shields.io/twitter/follow/notesnook?label=Follow%20us%20%40notesnook&logo=twitter&style=social"></a>
+<a href="https://notesnook.com/">Website</a> | <a href="https://notesnook.com/roadmap">Roadmap</a> | <a href="https://notesnook.com/downloads">Downloads</a> | <a href="https://twitter.com/@notesnook">Twitter</a> | <a href="https://discord.gg/5davZnhw3V">Discord</a>
 </p>
 
-<p align="center"><img src="https://github.com/streetwriters/notesnook/raw/main/banners/crossplatform.jpg" alt="Notesnook - Take private notes" width="75%"/></p>
-</p>
-
-<p align="center">
-<a href="https://play.google.com/store/apps/details?id=com.streetwriters.notesnook">
-<img alt="Get it on Google Play" src="https://github.com/streetwriters/notesnook/raw/main/badges/google.png" height="50px">
-</a>
-<a href="https://apps.apple.com/pk/app/notesnook-take-private-notes/id1544027013">
-  <img alt="Download on the App Store" src="https://raw.githubusercontent.com/irshad/notesnook/main/badges/app-store-badge.png" height="50px">
-</a>
-<a href="https://app.notesnook.com/">
-<img alt="Try Notesnook on the Web" src="https://github.com/streetwriters/notesnook/raw/main/badges/web.png" height="50px" style="margin-left: 15px">
-</a>
-</p>
-
-## 😎 Features
-
-Privacy isn't the only thing we have:
-
-1. Cross platform - Notesnook has apps on all platforms
-2. End to end encrypted sync to unlimted devices
-3. Organize your notes using:
-   1. Notebooks
-   2. Topics
-   3. Tags
-   4. Colors
-4. Encrypt/lock your notes locally
-5. Full rich text editor with markdown support
-6. Focus mode (distraction-free mode)
-7. Export notes as HTML, MD, PDF & TXT
-8. Automatic backups
-9. Dark mode and custom accents
-
-**_Note: You can checkout a preview of all these features on [the website](https://notesnook.com/)._**
+> ## Announcement:
+>
+> ### We will be open sourcing Notesnook in July-August, 2022. Follow our [Twitter](https://twitter.com/@notesnook) for updates.
 
 ## Support
 
@@ -59,7 +24,7 @@ We take all queries, issues, bug reports that you might have. Feel free to ask.
 
 ## 🛣️ Roadmap
 
-This is just the beginning; we are not stopping here. **Read what we have planned for Notesnook in [our roadmap](https://github.com/streetwriters/notesnook/blob/main/ROADMAP.md).**
+This is just the beginning; we are not stopping here. **Read what we have planned for Notesnook in [our roadmap](https://notesnook.com/roadmap).**
 
 ## ❓ FAQs
 
@@ -78,13 +43,11 @@ At Notesnook we believe in `simple privacy`. Simple privacy means giving you ful
 
 ### If you are so privacy focused, why did you not make Notesnook open source?
 
-Notesnook is developed & maintained by a small team (only 3 people). The effort required to make it "open source-able" (writing good docs, managing pull requests etc) is currently out of our scope. We want to make a good product and ship it to you as fast as possible.
-
-However, we have plans to open source the core parts of Notesnook (like the auth, encryption, storage etc.) that'll be reusable and auditable by the public.
+Notesnook is going open source in July-August 2022 (subject to change).
 
 ### Can I self host Notesnook?
 
-Nope. Not right now. We might make the sync server available for self-hosting in the future (after certain procedures) but as of now, no.
+Nope. Not right now. We have plans to make the sync server available for self-hosting in the future (after certain procedures) after the client apps are open sourced.
 
 ### What happens to my notes if Notesnook is abandoned?
 
@@ -116,7 +79,7 @@ Anyone offering privacy for free is scamming you to sell your data. Why? Because
 `$4.49/mo` is worth it because:
 
 1. It is cheaper than all other premium note taking apps (like Evernote, Standard Notes).
-2. It is the minimum viable price you can spend to ensure your notes' privacy. (If you self host, the cheapest VPS will cost you around $5).
+2. It is the minimum viable price you can spend to ensure your notes' privacy. (If you self host, the cheapest VPS will cost you around \$5).
 3. Your subscription is evidence that privacy is a global issue and should be addressed. That you care.
 
 If you still think $4.49/mo is too much, you are welcome to spend >$4.49/mo on some other privacy invasive note taking app. :)
@@ -145,8 +108,3 @@ Social proof helps other people know what they are getting. If you have tried ou
 2. Posting on Facebook, Reddit or any other social media.
 
 We take all social proofs and publish them on the website for the public to see.
-
----
-
-<sup>1</sup>Google Play and the Google Play logo are trademarks of Google LLC.<br/>
-<sup>2</sup>Apple logo® is a trademark of Apple Inc.
