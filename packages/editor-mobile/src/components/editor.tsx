@@ -5,73 +5,37 @@ import {
   usePermissionHandler,
   useTiptap,
 } from "@streetwriters/editor";
-import { useTheme } from "@streetwriters/theme";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { Theme, useTheme } from "@streetwriters/theme";
+import {
+  forwardRef,
+  memo,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import { useEditorThemeStore } from "../state/theme";
-import { EventTypes } from "../utils";
+import { EventTypes, Settings } from "../utils";
 import Header from "./header";
 import StatusBar from "./statusbar";
 import Tags from "./tags";
 import Title from "./title";
 
-const Tiptap = () => {
-  const settings = useSettings();
+const Tiptap = ({
+  editorTheme,
+  toolbarTheme,
+  settings,
+}: {
+  editorTheme: Theme;
+  toolbarTheme: Theme;
+  settings: Settings;
+}) => {
   const [tick, setTick] = useState(0);
-  const theme = useEditorThemeStore((state) => state.colors);
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState(false);
-  const toolbarTheme = useTheme({
-    //todo
-    accent: theme?.accent,
-    scale: 1,
-    theme: theme?.night ? "dark" : "light",
-  });
-
-  const editorTheme = useTheme({
-    //todo
-    accent: theme?.accent,
-    scale: 1,
-    theme: theme?.night ? "dark" : "light",
-  });
-
-  editorTheme.colors.background = theme?.bg || "#f0f0f0";
-
-  editorTheme.space = [0, 10, 12, 20];
-  toolbarTheme.space = [0, 10, 12, 18];
-  //@ts-ignore
-  toolbarTheme.space.small = "10px";
-
-  toolbarTheme.buttons.menuitem = {
-    ...toolbarTheme.buttons.menuitem,
-    height: "50px",
-    paddingX: "20px",
-    borderBottomWidth: 0,
-  };
-
-  toolbarTheme.iconSizes = {
-    big: 20,
-    medium: 18,
-    small: 18,
-  };
-  toolbarTheme.fontSizes = {
-    ...toolbarTheme.fontSizes,
-    subBody: "0.8rem",
-    body: "0.9rem",
-  };
-
-  toolbarTheme.radii = {
-    ...toolbarTheme.radii,
-    small: 5,
-  };
-
-  toolbarTheme.buttons.menuitem = {
-    ...toolbarTheme.buttons.menuitem,
-    px: 5,
-    height: "45px",
-  };
   usePermissionHandler({
     claims: {
       premium: settings.premium,
@@ -161,18 +125,12 @@ const Tiptap = () => {
                 controller={controllerRef}
                 title={controller.title}
               />
-              <StatusBar container={containerRef} editor={_editor} />
+              <StatusBar container={containerRef} />
             </>
           )}
-          <div
-            ref={contentRef}
-            style={{
-              padding: 12,
-              paddingTop: 0,
-              color: theme?.pri,
-              flex: 1,
-            }}
-          />
+
+          <ContentDiv ref={contentRef} />
+
           <div
             onDoubleClick={() => {
               const lastPosition = globalThis.editor?.state.doc.content.size;
@@ -203,10 +161,86 @@ const Tiptap = () => {
   );
 };
 
+const ContentDiv = memo(
+  forwardRef<HTMLDivElement>((props, ref) => {
+    const theme = useEditorThemeStore((state) => state.colors);
+    return (
+      <div
+        ref={ref}
+        style={{
+          padding: 12,
+          paddingTop: 0,
+          flex: 1,
+          color: theme.pri,
+          marginTop: -12,
+        }}
+      />
+    );
+  }),
+  () => true
+);
+
+const modifyToolbarTheme = (toolbarTheme: Theme) => {
+  toolbarTheme.space = [0, 10, 12, 18];
+  //@ts-ignore
+  toolbarTheme.space.small = "10px";
+
+  toolbarTheme.buttons.menuitem = {
+    ...toolbarTheme.buttons.menuitem,
+    height: "50px",
+    paddingX: "20px",
+    borderBottomWidth: 0,
+  };
+
+  toolbarTheme.iconSizes = {
+    big: 20,
+    medium: 18,
+    small: 18,
+  };
+  toolbarTheme.fontSizes = {
+    ...toolbarTheme.fontSizes,
+    subBody: "0.8rem",
+    body: "0.9rem",
+  };
+
+  toolbarTheme.radii = {
+    ...toolbarTheme.radii,
+    small: 5,
+  };
+
+  toolbarTheme.buttons.menuitem = {
+    ...toolbarTheme.buttons.menuitem,
+    px: 5,
+    height: "45px",
+  };
+};
+
 const TiptapProvider = () => {
+  const settings = useSettings();
+  const theme = useEditorThemeStore((state) => state.colors);
+  const toolbarTheme = useTheme({
+    //todo
+    accent: theme?.accent,
+    scale: 1,
+    theme: theme?.night ? "dark" : "light",
+  });
+  modifyToolbarTheme(toolbarTheme);
+  const editorTheme = useTheme({
+    //todo
+    accent: theme?.accent,
+    scale: 1,
+    theme: theme?.night ? "dark" : "light",
+  });
+  editorTheme.colors.background = theme?.bg || "#f0f0f0";
+  editorTheme.space = [0, 10, 12, 20];
+
   return (
     <PortalProvider>
-      <Tiptap />
+      <Tiptap
+        editorTheme={editorTheme}
+        toolbarTheme={toolbarTheme}
+        settings={settings}
+      />
     </PortalProvider>
   );
 };

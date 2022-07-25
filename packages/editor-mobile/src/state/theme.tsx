@@ -1,6 +1,6 @@
 import create, { State } from "zustand";
 import { injectCss, transform } from "../utils/css";
-type Colors = {
+export type Colors = {
   night: boolean;
   bg: string;
   navbg: string;

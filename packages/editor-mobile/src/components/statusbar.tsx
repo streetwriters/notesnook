@@ -1,13 +1,6 @@
-import { Editor } from "@streetwriters/editor";
 import React, { RefObject, useEffect, useRef, useState } from "react";
 
-export default function StatusBar({
-  editor,
-  container,
-}: {
-  editor: Editor | null;
-  container: RefObject<HTMLDivElement>;
-}) {
+function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const [status, setStatus] = useState({
     date: "",
     saved: "",
@@ -16,7 +9,9 @@ export default function StatusBar({
   const stickyRef = useRef(false);
   const prevScroll = useRef(0);
   const lastStickyChangeTime = useRef(0);
-  const words = editor?.storage?.characterCount?.words() + " words";
+  const [words, setWords] = useState("0 words");
+  const currentWords = useRef(words);
+  const interval = useRef(0);
   const statusBar = useRef({
     set: setStatus,
   });
@@ -48,6 +43,23 @@ export default function StatusBar({
   }, []);
 
   useEffect(() => {
+    currentWords.current = words;
+  }, [words]);
+
+  useEffect(() => {
+    clearInterval(interval.current);
+    //@ts-ignore
+    interval.current = setInterval(() => {
+      const words = editor?.storage?.characterCount?.words() + " words";
+      if (currentWords.current === words) return;
+      setWords(words);
+    }, 3000);
+    return () => {
+      clearInterval(interval.current);
+    };
+  }, []);
+
+  useEffect(() => {
     const node = container.current;
     node?.addEventListener("scroll", onScroll);
     return () => {
@@ -61,6 +73,7 @@ export default function StatusBar({
     fontSize: "12px",
     color: "var(--nn_icon)",
     marginRight: 8,
+    paddingBottom: 0,
   };
 
   return (
@@ -68,16 +81,15 @@ export default function StatusBar({
       style={{
         flexDirection: "row",
         display: "flex",
-        height: sticky ? 30 : 15,
         paddingRight: 12,
         paddingLeft: 12,
         position: sticky ? "sticky" : "relative",
-        top: -2,
+        top: -3,
         backgroundColor: "var(--nn_bg)",
         zIndex: 1,
-        paddingTop: 5,
-        paddingBottom: 3,
         justifyContent: sticky ? "center" : "flex-start",
+        paddingTop: 2,
+        paddingBottom: 2,
       }}
     >
       <p style={paragraphStyle}>{words}</p>
@@ -86,3 +98,5 @@ export default function StatusBar({
     </div>
   );
 }
+
+export default React.memo(StatusBar, () => true);

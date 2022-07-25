@@ -33,7 +33,7 @@ function Title({
       disabled={readonly}
       style={{
         height: 50,
-        fontSize: 27,
+        fontSize: 25,
         width: "100%",
         boxSizing: "border-box",
         borderWidth: 0,
