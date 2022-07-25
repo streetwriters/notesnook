@@ -72,14 +72,15 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
         {
           name: 'minus',
           onPress: () => {
-            if (!groupIndex) return;
+            if (typeof groupIndex !== 'number') return;
             const _data = useDragState.getState().data.slice();
-            if (!parentIndex) {
+            if (typeof parentIndex !== 'number') {
               const index = _data[groupIndex].findIndex(tool => tool === item);
               _data[groupIndex].splice(index, 1);
             } else {
               //@ts-ignore
               const index = _data[parentIndex][groupIndex].findIndex(tool => tool === item);
+              //@ts-ignore
               _data[parentIndex][groupIndex].splice(index, 1);
             }
             console.log(_data[groupIndex]);
