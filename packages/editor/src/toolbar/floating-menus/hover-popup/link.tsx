@@ -28,4 +28,7 @@ function LinkHoverPopup(props: HoverPopupProps) {
   );
 }
 
-export const LinkHoverPopupHandler = { a: LinkHoverPopup };
+export const LinkHoverPopupHandler = {
+  isActive: (e: HTMLElement) => !!e.closest("a"),
+  popup: LinkHoverPopup,
+};

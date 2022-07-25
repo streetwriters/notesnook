@@ -10,8 +10,7 @@ export type HoverPopupProps = {
   selectedNode: NodeWithOffset;
 };
 
-const handlers: Record<string, (props: HoverPopupProps) => JSX.Element | null> =
-  { ...LinkHoverPopupHandler };
+const handlers = [LinkHoverPopupHandler];
 
 const HOVER_TIMEOUT = 500;
 
@@ -48,10 +47,10 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
 
       hoverTimeoutId.current = setTimeout(
         () => {
-          const nodeName = element.nodeName.toLowerCase();
-          const PopupHandler = handlers[nodeName];
+          const PopupHandler = handlers.find((h) => h.isActive(element));
           if (!PopupHandler || !editor.current) return;
 
+          const { popup: Popup } = PopupHandler;
           const pos = editor.current.view.posAtDOM(element, 0);
           const node = editor.current.view.state.doc.nodeAt(pos);
 
@@ -59,7 +58,7 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
 
           const hidePopup = showPopup({
             popup: () => (
-              <PopupHandler
+              <Popup
                 editor={editor}
                 selectedNode={{
                   node,
