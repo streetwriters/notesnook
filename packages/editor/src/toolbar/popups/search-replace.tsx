@@ -8,7 +8,7 @@ import { Editor } from "../../types";
 export type SearchReplacePopupProps = { editor: Editor };
 export function SearchReplacePopup(props: SearchReplacePopupProps) {
   const { editor } = props;
-  const { selectedText, results } = editor.storage
+  const { selectedText, results, selectedIndex } = editor.storage
     .searchreplace as SearchStorage;
 
   const [isReplacing, setIsReplacing] = useState(false);
@@ -160,8 +160,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                   px: 1,
                 }}
               >
-                {results ? `${results.length}` : "0"}
-                {isExpanded ? "" : " results"}
+                {results ? `${selectedIndex + 1}/${results.length}` : ""}
               </Text>
             </Flex>
           </Flex>
