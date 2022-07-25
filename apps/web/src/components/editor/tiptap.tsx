@@ -148,8 +148,9 @@ function TipTap(props: TipTapProps) {
   );
 
   useEffect(() => {
+    const isEditorSearching = editor?.storage.searchreplace?.isSearching;
     if (isSearching) editor?.commands.startSearch();
-    else editor?.commands.endSearch();
+    else if (isEditorSearching) editor?.commands.endSearch();
   }, [isSearching]);
 
   useEffect(() => {
