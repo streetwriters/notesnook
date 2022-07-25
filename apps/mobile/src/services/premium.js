@@ -189,11 +189,13 @@ const showVerifyEmailDialog = () => {
 
 const subscriptions = {
   get: async () => {
+    if (Platform.OS === 'android') return;
     let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (!_subscriptions) return [];
     return JSON.parse(_subscriptions);
   },
   set: async subscription => {
+    if (Platform.OS === 'android') return;
     let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (_subscriptions) {
       _subscriptions = JSON.parse(_subscriptions);
@@ -209,6 +211,7 @@ const subscriptions = {
     MMKV.setString('subscriptionsIOS', JSON.stringify(_subscriptions));
   },
   remove: async transactionId => {
+    if (Platform.OS === 'android') return;
     let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (_subscriptions) {
       _subscriptions = JSON.parse(_subscriptions);
@@ -222,6 +225,7 @@ const subscriptions = {
     }
   },
   verify: async subscription => {
+    if (Platform.OS === 'android') return;
     console.log('verifying: ', new Date(subscription.transactionDate).toLocaleString());
 
     if (subscription.transactionReceipt) {
@@ -257,6 +261,7 @@ const subscriptions = {
     }
   },
   clear: async _subscription => {
+    if (Platform.OS === 'android') return;
     let _subscriptions = await subscriptions.get();
     let subscription = null;
     if (_subscription) {
