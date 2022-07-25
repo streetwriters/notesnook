@@ -185,6 +185,10 @@ img.ProseMirror-separator {
   background-color: var(--text) !important;
 }
 
+.search-result.selected {
+  background-color: var(--dimPrimary) !important;
+}
+
 .search-result {
   background-color: var(--disabled);
 }

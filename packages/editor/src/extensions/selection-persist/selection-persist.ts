@@ -1,6 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
+import { SearchStorage } from "../search-replace";
 
 const key = new PluginKey("selection-persist-key");
 export const SelectionPersist = Extension.create({
@@ -9,6 +10,7 @@ export const SelectionPersist = Extension.create({
   addProseMirrorPlugins() {
     let isFocused = false;
     let isBlurred = false;
+    const editor = this.editor;
     return [
       new Plugin({
         key,
@@ -22,6 +24,10 @@ export const SelectionPersist = Extension.create({
             return DecorationSet.empty;
           },
           apply(tr, value, oldState, newState) {
+            const { isSearching } = (editor.storage.searchreplace ||
+              {}) as Partial<SearchStorage>;
+            if (isSearching) return DecorationSet.empty;
+
             // isBlurred should remain true until isFocused becomes true
             // isFocused should remain true until isBlurred becomes true
 

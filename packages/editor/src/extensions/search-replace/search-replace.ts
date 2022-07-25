@@ -1,4 +1,4 @@
-import { Extension } from "@tiptap/core";
+import { Editor, Extension } from "@tiptap/core";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   EditorState,
@@ -7,7 +7,6 @@ import {
   TextSelection,
   Transaction,
 } from "prosemirror-state";
-import { Node as ProsemirrorNode } from "prosemirror-model";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -51,7 +50,12 @@ interface TextNodesWithPosition {
   pos: number;
 }
 
-const updateView = (state: EditorState, dispatch: any) => dispatch(state.tr);
+const updateView = (state: EditorState, dispatch: any) => {
+  if (!state.tr) return;
+
+  state.tr.setMeta("forceUpdate", true);
+  dispatch(state.tr);
+};
 
 const regex = (s: string, settings: SearchSettings): RegExp => {
   const { enableRegex, matchCase, matchWholeWord } = settings;
@@ -66,17 +70,23 @@ const regex = (s: string, settings: SearchSettings): RegExp => {
 };
 
 function searchDocument(
-  doc: ProsemirrorNode,
+  tr: Transaction,
   searchResultClass: string,
-  searchTerm?: RegExp
-): { decorationSet: DecorationSet; results: Result[] } {
-  if (!searchTerm) return { decorationSet: DecorationSet.empty, results: [] };
+  searchTerm?: RegExp,
+  selectedIndex?: number
+): { decorationSet: DecorationSet; results: Result[]; startIndex: number } {
+  if (!searchTerm)
+    return {
+      decorationSet: DecorationSet.empty,
+      results: [],
+      startIndex: selectedIndex || 0,
+    };
 
+  const doc = tr.doc;
   const decorations: Decoration[] = [];
   const results: Result[] = [];
 
   let index = 0;
-
   let textNodesWithPosition: TextNodesWithPosition[] = [];
 
   doc?.descendants((node, pos) => {
@@ -113,11 +123,29 @@ function searchDocument(
     }
   }
 
-  for (const { from, to } of results) {
-    decorations.push(Decoration.inline(from, to, { class: searchResultClass }));
+  const { from: selectedFrom, to: selectedTo } = tr.selection;
+  for (let i = 0; i < results.length; i++) {
+    const { from, to } = results[i];
+    if (
+      // if a result is already selected, persist it
+      (selectedFrom === from && to === selectedTo) ||
+      // otherwise select the first matching result after the selection
+      from >= selectedFrom
+    ) {
+      selectedIndex = i;
+      break;
+    }
+  }
+
+  for (let i = 0; i < results.length; i++) {
+    const { from, to } = results[i];
+    const resultClass =
+      i === selectedIndex ? `${searchResultClass} selected` : searchResultClass;
+    decorations.push(Decoration.inline(from, to, { class: resultClass }));
   }
 
   return {
+    startIndex: selectedIndex || 0,
     decorationSet: DecorationSet.create(doc, decorations),
     results,
   };
@@ -174,26 +202,30 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         },
       endSearch:
         () =>
-        ({ state, dispatch }) => {
+        ({ state, dispatch, editor }) => {
           this.storage.isSearching = false;
+          this.storage.selectedText = undefined;
           this.storage.searchTerm = "";
+          editor.commands.focus();
           updateView(state, dispatch);
           return true;
         },
       search:
         (term, options?: SearchSettings) =>
         ({ state, dispatch }) => {
+          this.storage.selectedIndex = 0;
           this.storage.searchTerm = term;
           this.storage.enableRegex = options?.enableRegex || false;
           this.storage.matchCase = options?.matchCase || false;
           this.storage.matchWholeWord = options?.matchWholeWord || false;
           this.storage.results = [];
+
           updateView(state, dispatch);
           return true;
         },
       moveToNextResult:
         () =>
-        ({ chain }) => {
+        ({ state, dispatch, commands }) => {
           const { selectedIndex, results } = this.storage;
           if (!results || results.length <= 0) return false;
 
@@ -201,18 +233,16 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           if (isNaN(nextIndex) || nextIndex >= results.length) nextIndex = 0;
 
           const { from, to } = results[nextIndex];
-          console.log("[moveToNextResult]", from, to);
-          const result = chain()
-            .focus(undefined, { scrollIntoView: true })
-            .setTextSelection({ from, to })
-            .run();
+          commands.setTextSelection({ from, to });
+          scrollIntoView(this.editor, from);
 
-          if (result) this.storage.selectedIndex = nextIndex;
-          return result;
+          this.storage.selectedIndex = nextIndex;
+          updateView(state, dispatch);
+          return true;
         },
       moveToPreviousResult:
         () =>
-        ({ chain }) => {
+        ({ state, dispatch, commands }) => {
           const { selectedIndex, results } = this.storage;
           if (!results || results.length <= 0) return false;
 
@@ -220,13 +250,13 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           if (isNaN(prevIndex) || prevIndex < 0) prevIndex = results.length - 1;
 
           const { from, to } = results[prevIndex];
-          const result = chain()
-            .focus(undefined, { scrollIntoView: true })
-            .setTextSelection({ from, to })
-            .run();
+          commands.setTextSelection({ from, to });
+          scrollIntoView(this.editor, from);
 
-          if (result) this.storage.selectedIndex = prevIndex;
-          return result;
+          this.storage.selectedIndex = prevIndex;
+          updateView(state, dispatch);
+
+          return true;
         },
       replace:
         (term) =>
@@ -281,6 +311,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 
   addProseMirrorPlugins() {
     const key = new PluginKey("searchreplace");
+
     return [
       new Plugin({
         key,
@@ -288,25 +319,37 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           init() {
             return DecorationSet.empty;
           },
-          apply: ({ doc, docChanged, setSelection }) => {
-            const { searchTerm, enableRegex, matchCase, matchWholeWord } =
-              this.storage;
-            const { searchResultClass } = this.options;
+          apply: (tr, value) => {
+            const { docChanged } = tr;
+            const forceUpdate = tr.getMeta("forceUpdate");
+            const {
+              searchTerm,
+              enableRegex,
+              matchCase,
+              matchWholeWord,
+              selectedIndex,
+              isSearching,
+            } = this.storage;
+            if (docChanged || forceUpdate) {
+              const { searchResultClass } = this.options;
 
-            if (docChanged || searchTerm) {
               const searchRegex = searchTerm
                 ? regex(searchTerm, { enableRegex, matchCase, matchWholeWord })
                 : undefined;
-              const { decorationSet, results } = searchDocument(
-                doc,
+              const result = searchDocument(
+                tr,
                 searchResultClass,
-                searchRegex
+                searchRegex,
+                selectedIndex
               );
+              const { decorationSet, results, startIndex } = result;
               this.storage.results = results;
+              this.storage.selectedIndex = startIndex;
 
               return decorationSet;
             }
-            return DecorationSet.empty;
+
+            return isSearching ? value : DecorationSet.empty;
           },
         },
         props: {
@@ -318,3 +361,14 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
     ];
   },
 });
+
+function scrollIntoView(editor: Editor, from: number) {
+  // const { top } = posToDOMRect(editor.view, from, to);
+  let { node: domNode } = editor.view.domAtPos(from);
+  if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode)
+    domNode = domNode.parentNode;
+
+  if (domNode instanceof HTMLElement) {
+    domNode.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
