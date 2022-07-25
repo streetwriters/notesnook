@@ -11,6 +11,7 @@ import {
   useIsKeyboardOpen,
   useIsMobile,
 } from "../../toolbar/stores/toolbar-store";
+import { isiOS } from "../../utils/platform";
 
 export function TaskItemComponent(
   props: ReactNodeViewProps<TaskItemAttributes>
@@ -111,7 +112,7 @@ export function TaskItemComponent(
             toggle();
           }}
           onTouchEnd={(e) => {
-            if (useIsKeyboardOpen.current) {
+            if (useIsKeyboardOpen.current || isiOS()) {
               e.preventDefault();
               toggle();
             }
@@ -155,21 +156,4 @@ function toggleChildren(
     });
   }
   return tr;
-}
-
-function getChildren(node: Node, parentPos: number) {
-  const children: NodeWithPos[] = [];
-  node.forEach((node, offset) => {
-    children.push({ node, pos: parentPos + offset + 1 });
-  });
-  return children;
-}
-
-function areAllChecked(node: Node) {
-  const children = findChildren(
-    node,
-    (node) => node.type.name === TaskItemNode.name
-  );
-  if (children.length <= 0) return undefined;
-  return children.every((node) => node.node.attrs.checked);
 }
