@@ -112,19 +112,20 @@ const Launcher = React.memo(
         return;
       }
       await useMessageStore.getState().setAnnouncement();
-      if (NewFeature.present()) return;
-      if (await checkAppUpdateAvailable()) return;
-      if (await checkForRateAppRequest()) return;
-      if (await checkNeedsBackup()) return;
-      if (await PremiumService.getRemainingTrialDaysStatus()) return;
+
       if (PremiumService.get() && user) {
         if (SettingsService.get().reminder === 'off') {
           SettingsService.set({ reminder: 'daily' });
         }
         if (BackupService.checkBackupRequired()) {
-          sleep(2000).then(() => BackupService.checkAndRun());
+          sleep(2000).then(() => BackupService.run());
         }
       }
+      if (NewFeature.present()) return;
+      if (await checkAppUpdateAvailable()) return;
+      if (await checkForRateAppRequest()) return;
+      if (await checkNeedsBackup()) return;
+      if (await PremiumService.getRemainingTrialDaysStatus()) return;
 
       if (introCompleted) {
         useMessageStore.subscribe(state => {
@@ -175,7 +176,7 @@ const Launcher = React.memo(
       let rateApp = SettingsService.get().rateApp;
       if (rateApp && rateApp < Date.now() && !useMessageStore.getState().message?.visible) {
         setRateAppMessage();
-        return true;
+        return false;
       }
       return false;
     };
