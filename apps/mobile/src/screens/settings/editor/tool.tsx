@@ -48,7 +48,7 @@ export const Tool = ({ item, index, groupIndex, parentIndex }: DraggableItem) =>
               positiveText: 'Delete',
               paragraph: 'All tools in the collapsed section will also be removed.',
               positivePress: () => {
-                if (!groupIndex) return;
+                if (typeof groupIndex !== 'number') return;
                 const _data = useDragState.getState().data.slice();
                 _data[groupIndex].splice(index, 1);
                 setData(_data);
