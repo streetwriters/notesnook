@@ -6,7 +6,7 @@ import {
   useTiptap,
 } from "@streetwriters/editor";
 import { useTheme } from "@streetwriters/theme";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
 import { useEditorThemeStore } from "../state/theme";
@@ -86,7 +86,7 @@ const Tiptap = () => {
         global.editorController.contentChange(editor as Editor);
       },
       onSelectionUpdate: (props) => {
-        global.editorController.selectionChange(props.editor as Editor);
+        props.transaction.scrollIntoView();
       },
       onOpenAttachmentPicker: (editor, type) => {
         global.editorController.openFilePicker(type);
@@ -109,12 +109,12 @@ const Tiptap = () => {
     [layout, settings.readonly, tick]
   );
 
-  const update = () => {
+  const update = useCallback(() => {
     setTick((tick) => tick + 1);
-    controller.setTitlePlaceholder("Note title");
-  };
+    globalThis.editorController.setTitlePlaceholder("Note title");
+  }, []);
 
-  const controller = useEditorController(_editor, update);
+  const controller = useEditorController(update);
   const controllerRef = useRef(controller);
   globalThis.editorController = controller;
   globalThis.editor = _editor;

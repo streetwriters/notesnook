@@ -45,10 +45,7 @@ export type EditorController = {
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export function useEditorController(
-  editor: Editor | null,
-  update: () => void
-): EditorController {
+export function useEditorController(update: () => void): EditorController {
   const [title, setTitle] = useState("");
   const [titlePlaceholder, setTitlePlaceholder] = useState("Note title");
   const htmlContentRef = useRef<string | null>(null);
@@ -57,43 +54,11 @@ export function useEditorController(
     change: null,
   });
 
-  const selectionChange = useCallback((editor: Editor) => {
-    // if (!editor) return;
-    // timers.current.selectionChange = timerFn(
-    //   () => {
-    //     let selection: Selection = {};
-    //     let { view, state, schema } = editor;
-    //     let { to, from } = view.state.selection;
-    //     selection.attributes = {
-    //       text: state.doc.textBetween(from, to, ""),
-    //       length: to - from,
-    //     };
-    //     let marks = Object.keys(schema.marks);
-    //     let nodes = Object.keys(schema.nodes);
-    //     for (let mark of marks) {
-    //       if (!editor.isActive(mark)) continue;
-    //       selection[mark] = {
-    //         attributes: editor.getAttributes(mark),
-    //         type: "mark",
-    //       };
-    //     }
-    //     for (let node of nodes) {
-    //       if (!editor.isActive(node)) continue;
-    //       selection[node] = {
-    //         attributes: editor.getAttributes(node),
-    //         type: "node",
-    //       };
-    //     }
-    //     post(EventTypes.selection, selection);
-    //   },
-    //   500,
-    //   timers.current?.selectionChange
-    // );
-  }, []);
+  const selectionChange = useCallback((editor: Editor) => {}, []);
 
-  const titleChange = (title: string) => {
+  const titleChange = useCallback((title: string) => {
     post(EventTypes.title, title);
-  };
+  }, []);
 
   const contentChange = useCallback((editor: Editor) => {
     if (!editor) return;
@@ -114,9 +79,9 @@ export function useEditorController(
     []
   );
 
-  const onUpdate = () => {
+  const onUpdate = useCallback(() => {
     update();
-  };
+  }, [update]);
 
   const onMessage = useCallback(
     (data: Event) => {
@@ -153,13 +118,6 @@ export function useEditorController(
     [update]
   );
 
-  // useEffect(() => {
-  //   post(EventTypes.history, {
-  //     undo: false, // editor?.can().undo(),
-  //     redo: false, // editor?.can().redo(),
-  //   });
-  // }, [editor]);
-
   useEffect(() => {
     if (!isReactNative()) return; // Subscribe only in react native webview.
     let isSafari = navigator.vendor.match(/apple/i);
@@ -168,7 +126,7 @@ export function useEditorController(
       //@ts-ignore
       root = window;
     }
-
+    console.log("recreating messaging");
     root.addEventListener("message", onMessage);
 
     return () => {
@@ -181,7 +139,6 @@ export function useEditorController(
   }, []);
 
   const downloadAttachment = useCallback((attachment: Attachment) => {
-    alert("downloadAttachment" + attachment.hash);
     post(EventTypes.download, attachment);
   }, []);
 
