@@ -13,6 +13,7 @@ export default function StatusBar({
     saved: "",
   });
   const [sticky, setSticky] = useState(false);
+  const stickyRef = useRef(false);
   const prevScroll = useRef(0);
   const lastStickyChangeTime = useRef(0);
   const words = editor?.storage?.characterCount?.words() + " words";
@@ -25,11 +26,22 @@ export default function StatusBar({
   const onScroll = React.useCallback((event) => {
     //@ts-ignore
     const currentOffset = event.target.scrollTop;
+    if (currentOffset < 200) {
+      if (stickyRef.current) {
+        stickyRef.current = false;
+        setSticky(false);
+        lastStickyChangeTime.current = Date.now();
+        prevScroll.current = currentOffset;
+      }
+      return;
+    }
     if (Date.now() - lastStickyChangeTime.current < 300) return;
     if (currentOffset > prevScroll.current) {
       setSticky(false);
+      stickyRef.current = false;
     } else {
       setSticky(true);
+      stickyRef.current = true;
     }
     lastStickyChangeTime.current = Date.now();
     prevScroll.current = currentOffset;
@@ -56,13 +68,16 @@ export default function StatusBar({
       style={{
         flexDirection: "row",
         display: "flex",
-        height: sticky ? 20 : 15,
+        height: sticky ? 30 : 15,
         paddingRight: 12,
         paddingLeft: 12,
         position: sticky ? "sticky" : "relative",
-        top: 0,
+        top: -2,
         backgroundColor: "var(--nn_bg)",
         zIndex: 1,
+        paddingTop: 5,
+        paddingBottom: 3,
+        justifyContent: sticky ? "center" : "flex-start",
       }}
     >
       <p style={paragraphStyle}>{words}</p>
