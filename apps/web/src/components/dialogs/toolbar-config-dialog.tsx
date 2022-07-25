@@ -539,7 +539,8 @@ function moveItem(items: TreeNode[], fromId: string, toId: string): TreeNode[] {
   const newArray = arrayMove(items, fromIndex, toIndex);
 
   // do not allow moving an item if there's no group over it
-  if (!isGroup(getItemGroup(newArray, fromItem))) return items;
+  const itemGroup = getItemGroup(newArray, fromItem);
+  if (!isGroup(itemGroup) && !isSubgroup(itemGroup)) return items;
 
   return newArray;
 }
