@@ -129,7 +129,7 @@ const MergeConflicts = () => {
               {isCurrent ? '(This Device)' : '(Incoming)'}
             </Text>
             {'\n'}
-            {timeConverter(contentToKeep.dateEdited)}
+            {timeConverter(contentToKeep?.dateEdited)}
           </Paragraph>
         </View>
 
@@ -289,7 +289,7 @@ const MergeConflicts = () => {
             isCurrent={false}
             isDiscarded={isKeeping && !isKeepingConflicted}
             keeping={isKeeping}
-            contentToKeep={content.current.conflicted}
+            contentToKeep={content.current.conflicted || content.current}
           />
 
           <Animated.View
