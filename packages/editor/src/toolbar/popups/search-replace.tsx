@@ -90,6 +90,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               onChange={(e) => {
                 search(e.target.value);
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  editor.commands.moveToNextResult();
+                }
+              }}
             />
             <Flex
               sx={{
