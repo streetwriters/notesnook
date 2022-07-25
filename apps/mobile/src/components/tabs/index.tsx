@@ -202,8 +202,8 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const gesture = Gesture.Pan()
       .maxPointers(1)
       .enabled(enabled && !disabled)
-      .activeOffsetX([-1, 1])
-      .failOffsetY([-1, 1])
+      .activeOffsetX([-10, 10])
+      .failOffsetY([-15, 15])
       .onBegin(event => {
         locked.value = false;
         gestureStartValue.value = {
@@ -212,6 +212,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         };
       })
       .onStart(event => {
+        console.log('gesture activated');
         let diffX = gestureStartValue.value.x - event.absoluteX;
         let diffY = gestureStartValue.value.y - event.absoluteY;
 
@@ -224,7 +225,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         if (vy > vx) locked.value = true;
         // if dividend of vx/vy is less than 4, user is swiping diagonally. lock swiping
         console.log(vx / vy);
-        if (vx / vy < 4) locked.value = true;
+        if (vx / vy < 1.5) locked.value = true;
         startX.value = translateX.value;
       })
       .onChange(event => {
