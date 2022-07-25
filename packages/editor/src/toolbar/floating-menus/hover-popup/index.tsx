@@ -38,7 +38,6 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
         if (isInsidePopup) return;
 
         if (isOutsideEditor || !isActiveElement) {
-          console.log("HIDING", isOutsideEditor, isActiveElement, element);
           activePopup.current.hide();
           activePopup.current = undefined;
           return;
