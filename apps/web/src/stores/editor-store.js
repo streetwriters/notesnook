@@ -122,10 +122,10 @@ class EditorStore extends BaseStore {
   saveSession = async (sessionId, session) => {
     const currentSession = this.get().session;
     if (currentSession.readonly && session.readonly !== false) return; // do not allow saving of readonly session
-    if (currentSession.saveState === 0) return;
+    if (currentSession.saveState === 0 || (currentSession.id && !sessionId))
+      return;
 
     this.setSaveState(0);
-
     try {
       const id = await this._getSaveFn()({ ...session, id: sessionId });
       if (currentSession && currentSession.id !== sessionId)
@@ -133,6 +133,11 @@ class EditorStore extends BaseStore {
 
       let note = db.notes.note(id)?.data;
       if (!note) throw new Error("Note not saved.");
+
+      if (!sessionId) {
+        noteStore.setSelectedNote(id);
+        hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
+      }
 
       if (currentSession.context) {
         const { type, value } = currentSession.context;
@@ -167,15 +172,10 @@ class EditorStore extends BaseStore {
         state.session.context = null;
         state.session.id = note.id;
         state.session.title = note.title;
-        state.session.saveState = 1;
         state.session.dateEdited = note.dateEdited;
         state.session.attachmentsLength = attachments.length;
       });
 
-      if (!sessionId) {
-        noteStore.setSelectedNote(id);
-        hashNavigate(`/notes/${id}/edit`, { replace: true, notify: false });
-      }
       this.setSaveState(1);
     } catch (err) {
       this.setSaveState(-1);
