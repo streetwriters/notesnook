@@ -24,6 +24,7 @@ export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const user = useUserStore(state => state.user);
   const [loading, setLoading] = useState(false);
   const bodyRef = useRef();
+  const initialLayout = useRef(false);
 
   const onPress = async () => {
     if (loading) return;
@@ -139,6 +140,8 @@ For example:
         textAlignVertical="top"
         onChangeText={v => (body.current = v)}
         onLayout={() => {
+          if (initialLayout.current) return;
+          initialLayout.current = true;
           if (body.current) {
             bodyRef.current?.setNativeProps({
               text: body.current,
