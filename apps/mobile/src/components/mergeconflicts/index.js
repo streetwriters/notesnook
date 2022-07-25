@@ -31,7 +31,7 @@ const MergeConflicts = () => {
   const [copy, setCopy] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
   const insets = useSafeAreaInsets();
-  const content = useRef({});
+  const content = useRef(null);
   const isKeepingConflicted = !keep?.conflicted;
   const isKeeping = !!keep;
 
@@ -48,7 +48,7 @@ const MergeConflicts = () => {
       id: note.contentId,
       data: _content.data,
       type: _content.type,
-      dateResolved: content.current.conflicted.dateModified,
+      dateResolved: content.current?.conflicted?.dateModified || Date.now(),
       sessionId: Date.now(),
       conflicted: false
     });
@@ -289,7 +289,7 @@ const MergeConflicts = () => {
             isCurrent={false}
             isDiscarded={isKeeping && !isKeepingConflicted}
             keeping={isKeeping}
-            contentToKeep={content.current.conflicted || content.current}
+            contentToKeep={content.current.conflicted}
           />
 
           <Animated.View

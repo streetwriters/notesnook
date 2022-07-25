@@ -108,37 +108,39 @@ const EditorOverlay = ({ editorId = '', editor }) => {
           paddingTop: insets.top
         }}
       >
-        <View
-          style={{
-            flexDirection: 'row',
-            height: 50,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            width: '100%',
-            paddingLeft: 6,
-            paddingRight: 12
-          }}
-        >
-          <IconButton
-            onPress={() => {
-              eSendEvent(eClearEditor);
-              opacity.value = 0;
-              translateValue.value = 6000;
-            }}
-            name="arrow-left"
-            color={colors.pri}
-          />
-
+        {isDefaultEditor ? (
           <View
             style={{
               flexDirection: 'row',
               height: 50,
-              alignItems: 'center'
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              paddingLeft: 6,
+              paddingRight: 12
             }}
           >
-            <IconButton name="dots-horizontal" color={colors.pri} />
+            <IconButton
+              onPress={() => {
+                eSendEvent(eClearEditor);
+                opacity.value = 0;
+                translateValue.value = 6000;
+              }}
+              name="arrow-left"
+              color={colors.pri}
+            />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                height: 50,
+                alignItems: 'center'
+              }}
+            >
+              <IconButton name="dots-horizontal" color={colors.pri} />
+            </View>
           </View>
-        </View>
+        ) : null}
 
         <View
           style={{
@@ -147,32 +149,34 @@ const EditorOverlay = ({ editorId = '', editor }) => {
             alignItems: 'flex-start'
           }}
         >
-          <View
-            style={{
-              height: 30,
-              backgroundColor: colors.nav,
-              borderRadius: 100,
-              marginBottom: 10,
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              flexDirection: 'row',
-              paddingHorizontal: 10,
-              marginTop: 10
-            }}
-          >
-            <Paragraph color={colors.icon} size={13}>
-              Add a tag
-            </Paragraph>
-            <IconButton
-              size={20}
-              customStyle={{
-                width: 26,
-                height: 26
+          {isDefaultEditor ? (
+            <View
+              style={{
+                height: 30,
+                backgroundColor: colors.nav,
+                borderRadius: 100,
+                marginBottom: 10,
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                flexDirection: 'row',
+                paddingHorizontal: 10,
+                marginTop: 10
               }}
-              name="plus"
-              color={colors.accent}
-            />
-          </View>
+            >
+              <Paragraph color={colors.icon} size={13}>
+                Add a tag
+              </Paragraph>
+              <IconButton
+                size={20}
+                customStyle={{
+                  width: 26,
+                  height: 26
+                }}
+                name="plus"
+                color={colors.accent}
+              />
+            </View>
+          ) : null}
 
           <View
             style={{
