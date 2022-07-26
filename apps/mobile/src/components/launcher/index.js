@@ -111,8 +111,8 @@ const Launcher = React.memo(
         eSendEvent('session_expired');
         return;
       }
+      const user = await db.user.getUser();
       await useMessageStore.getState().setAnnouncement();
-
       if (PremiumService.get() && user) {
         if (SettingsService.get().reminder === 'off') {
           SettingsService.set({ reminder: 'daily' });
