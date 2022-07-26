@@ -210,20 +210,18 @@ async function checkBackupRequired(type) {
     return true;
   }
   lastBackupDate = parseInt(lastBackupDate);
-
   if (type === 'daily' && lastBackupDate + MS_DAY < now) {
-    console.log('daily');
+    console.log('daily backup started');
     return true;
   } else if (type === 'weekly' && lastBackupDate + MS_WEEK < now) {
-    console.log('weekly');
+    console.log('weekly backup started');
     return true;
   } else if (type === 'monthly' && lastBackupDate + MONTH < now) {
-    console.log('monthly');
+    console.log('monthly backup started');
     return true;
-  } else {
-    console.log('no need', lastBackupDate);
-    return false;
   }
+  console.log('no need', lastBackupDate);
+  return false;
 }
 
 const checkAndRun = async () => {

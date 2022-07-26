@@ -117,7 +117,7 @@ const Launcher = React.memo(
         if (SettingsService.get().reminder === 'off') {
           SettingsService.set({ reminder: 'daily' });
         }
-        if (BackupService.checkBackupRequired()) {
+        if (await BackupService.checkBackupRequired(SettingsService.get().reminder)) {
           sleep(2000).then(() => BackupService.run());
         }
       }
