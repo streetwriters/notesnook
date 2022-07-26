@@ -47,8 +47,6 @@ export type ToolbarConfigDialogProps = {
   onClose: Perform;
 };
 
-const ReactModalContent = document.querySelector(".ReactModal__Overlay");
-
 export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -223,7 +221,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
                 >
                   <TreeNodeComponent overlay item={activeItem} />
                 </DragOverlay>,
-                ReactModalContent || document.body
+                document.querySelector(".ReactModal__Overlay") || document.body
               )}
           </SortableContext>
         </DndContext>
@@ -592,6 +590,8 @@ function isCollapsed(item: TreeNode, activeItem: TreeNode): boolean {
 
   // if a subgroup is selected, we collapse only the items.
   if (isSubgroup(activeItem) && isItem(item)) return true;
+
+  if (item.id === activeItem.id) return true;
 
   return false;
 }
