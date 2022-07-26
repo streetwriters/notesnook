@@ -202,7 +202,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const gesture = Gesture.Pan()
       .maxPointers(1)
       .enabled(enabled && !disabled)
-      .activeOffsetX([-10, 10])
+      .activeOffsetX([-5, 5])
       .failOffsetY([-15, 15])
       .onBegin(event => {
         locked.value = false;
