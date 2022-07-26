@@ -132,14 +132,12 @@ export default function EditorManager({
       onPaste={async (event) => {
         if (!editor) return;
 
-        if (event.clipboardData?.items?.length) {
+        if (event.clipboardData?.files?.length) {
           event.preventDefault();
-
-          for (let item of event.clipboardData.items) {
-            const file = item.getAsFile();
-            if (!file) continue;
+          for (let file of event.clipboardData.files) {
             const result = await attachFile(file);
             if (!result) continue;
+
             editor.attachFile(result);
           }
         }
