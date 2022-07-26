@@ -114,7 +114,7 @@ const useTiptap = (
         OrderedList,
         TaskItemNode.configure({ nested: true }),
         TaskListNode,
-        Link.configure({ openOnClick: !isMobile, autolink: false }),
+        Link.configure({ openOnClick: !isMobile, validate: () => false }),
         Table.configure({
           resizable: true,
           allowTableNodeSelection: true,
