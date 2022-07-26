@@ -245,7 +245,7 @@ export default class Vault {
 
   /** @private */
   async _lockNote(note, password) {
-    let { id, content: { type, data } = {}, sessionId } = note;
+    let { id, content: { type, data } = {}, sessionId, title } = note;
 
     note = this._db.notes.note(id).data;
     const contentId = note.contentId;
@@ -276,7 +276,7 @@ export default class Vault {
       id,
       locked: true,
       headline: "",
-      title: note.title,
+      title: title || note.title,
       favorite: note.favorite,
       localOnly: note.localOnly,
       readonly: note.readonly,
