@@ -85,8 +85,6 @@ export function useEditorController(update: () => void): EditorController {
 
   const onMessage = useCallback(
     (data: Event) => {
-      console.log(data);
-
       //@ts-ignore
       if (data?.data[0] !== "{") return;
       //@ts-ignore
