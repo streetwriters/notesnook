@@ -146,3 +146,7 @@ textarea,
   --sash-size: 10px;
   --sash-hover-size: 4px;
 }
+
+.rc-scrollbars-view:hover ~ .rc-scrollbars-track {
+  opacity: 1 !important;
+}
