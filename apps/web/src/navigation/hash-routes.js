@@ -1,4 +1,3 @@
-import React from "react";
 import Vault from "../common/vault";
 import {
   showBuyDialog,
@@ -24,10 +23,8 @@ import {
   showCreateTopicDialog,
 } from "../common/dialog-controller";
 import { hashNavigate } from ".";
-import { Suspense } from "react";
 import EditorPlaceholder from "../components/editor/-placeholder";
-import { EditorLoader } from "../components/loaders/editor-loader";
-const Editor = React.lazy(() => import("../components/editor"));
+import Editor from "../components/editor";
 
 const hashroutes = {
   "/": () => {
@@ -60,20 +57,12 @@ const hashroutes = {
   },
   "/notes/create/:nonce": ({ nonce }) => {
     closeOpenedDialog();
-    return (
-      <Suspense fallback={<EditorLoader />}>
-        <Editor noteId={0} nonce={nonce} />
-      </Suspense>
-    );
+    return <Editor noteId={0} nonce={nonce} />;
   },
   "/notes/:noteId/edit": ({ noteId }) => {
     closeOpenedDialog();
 
-    return (
-      <Suspense fallback={<EditorLoader />}>
-        <Editor noteId={noteId} />
-      </Suspense>
-    );
+    return <Editor noteId={noteId} />;
   },
   "/notes/:noteId/unlock": ({ noteId }) => {
     closeOpenedDialog();
