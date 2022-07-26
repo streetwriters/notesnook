@@ -1,3 +1,803 @@
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libc++_shared.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libc++_shared.so
+new file mode 100644
+index 0000000..83acd19
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libc++_shared.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfabricjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfabricjni.so
+new file mode 100644
+index 0000000..3cd0acc
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfabricjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfb.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfb.so
+new file mode 100644
+index 0000000..841d222
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfb.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfbjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfbjni.so
+new file mode 100644
+index 0000000..5603650
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfbjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfolly_runtime.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfolly_runtime.so
+new file mode 100644
+index 0000000..f73cc89
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libfolly_runtime.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libglog.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libglog.so
+new file mode 100644
+index 0000000..ed60902
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libglog.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libglog_init.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libglog_init.so
+new file mode 100644
+index 0000000..10ea387
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libglog_init.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libhermes-executor-debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libhermes-executor-debug.so
+new file mode 100644
+index 0000000..c358336
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libhermes-executor-debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjscexecutor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjscexecutor.so
+new file mode 100644
+index 0000000..bc0ac7c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjscexecutor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsi.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsi.so
+new file mode 100644
+index 0000000..467c592
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsi.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsijniprofiler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsijniprofiler.so
+new file mode 100644
+index 0000000..b1ab0c4
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsijniprofiler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsinspector.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsinspector.so
+new file mode 100644
+index 0000000..acfbe08
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libjsinspector.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/liblogger.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/liblogger.so
+new file mode 100644
+index 0000000..f2e7f7c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/liblogger.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libmapbufferjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libmapbufferjni.so
+new file mode 100644
+index 0000000..dcc03f2
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libmapbufferjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_codegen_rncore.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_codegen_rncore.so
+new file mode 100644
+index 0000000..07c1c3b
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_codegen_rncore.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_config.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_config.so
+new file mode 100644
+index 0000000..38d4613
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_config.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_debug.so
+new file mode 100644
+index 0000000..4a4c9c4
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_nativemodule_core.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_nativemodule_core.so
+new file mode 100644
+index 0000000..a953450
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_nativemodule_core.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_animations.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_animations.so
+new file mode 100644
+index 0000000..47a3899
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_animations.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_attributedstring.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_attributedstring.so
+new file mode 100644
+index 0000000..3195bec
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_attributedstring.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_componentregistry.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_componentregistry.so
+new file mode 100644
+index 0000000..fe0cc0c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_componentregistry.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_core.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_core.so
+new file mode 100644
+index 0000000..1221f60
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_core.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_debug.so
+new file mode 100644
+index 0000000..59bd7a0
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_graphics.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_graphics.so
+new file mode 100644
+index 0000000..adf960c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_graphics.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_imagemanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_imagemanager.so
+new file mode 100644
+index 0000000..8c1c0d1
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_imagemanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_leakchecker.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_leakchecker.so
+new file mode 100644
+index 0000000..78a0764
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_leakchecker.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_mapbuffer.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_mapbuffer.so
+new file mode 100644
+index 0000000..f9bf651
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_mapbuffer.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_mounting.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_mounting.so
+new file mode 100644
+index 0000000..e8fec49
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_mounting.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_runtimescheduler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_runtimescheduler.so
+new file mode 100644
+index 0000000..12628d1
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_runtimescheduler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_scheduler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_scheduler.so
+new file mode 100644
+index 0000000..e54cd03
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_scheduler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_telemetry.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_telemetry.so
+new file mode 100644
+index 0000000..afedf5c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_telemetry.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_templateprocessor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_templateprocessor.so
+new file mode 100644
+index 0000000..fb7a4ce
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_templateprocessor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_textlayoutmanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_textlayoutmanager.so
+new file mode 100644
+index 0000000..846e107
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_textlayoutmanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_uimanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_uimanager.so
+new file mode 100644
+index 0000000..9f94638
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_render_uimanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_utils.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_utils.so
+new file mode 100644
+index 0000000..2a246b4
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreact_utils.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativeblob.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativeblob.so
+new file mode 100644
+index 0000000..bf2b7c9
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativeblob.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativejni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativejni.so
+new file mode 100644
+index 0000000..ffa17d2
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativejni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativeutilsjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativeutilsjni.so
+new file mode 100644
+index 0000000..b64d29d
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactnativeutilsjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactperfloggerjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactperfloggerjni.so
+new file mode 100644
+index 0000000..bc5b60a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libreactperfloggerjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_image.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_image.so
+new file mode 100644
+index 0000000..a463af5
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_image.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_root.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_root.so
+new file mode 100644
+index 0000000..73dd5aa
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_root.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_scrollview.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_scrollview.so
+new file mode 100644
+index 0000000..ba44ff0
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_scrollview.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_text.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_text.so
+new file mode 100644
+index 0000000..1d87105
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_text.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_textinput.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_textinput.so
+new file mode 100644
+index 0000000..d9d03ee
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_textinput.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_unimplementedview.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_unimplementedview.so
+new file mode 100644
+index 0000000..2e70cae
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_unimplementedview.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_view.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_view.so
+new file mode 100644
+index 0000000..7de6118
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/librrc_view.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libruntimeexecutor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libruntimeexecutor.so
+new file mode 100644
+index 0000000..9559f4a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libruntimeexecutor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libturbomodulejsijni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libturbomodulejsijni.so
+new file mode 100644
+index 0000000..c47f9fe
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libturbomodulejsijni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libyoga.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libyoga.so
+new file mode 100644
+index 0000000..b4acc62
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/arm64-v8a/libyoga.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libc++_shared.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libc++_shared.so
+new file mode 100644
+index 0000000..dd2cc28
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libc++_shared.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfabricjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfabricjni.so
+new file mode 100644
+index 0000000..c1fda42
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfabricjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfb.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfb.so
+new file mode 100644
+index 0000000..9059c6f
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfb.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfbjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfbjni.so
+new file mode 100644
+index 0000000..98c12eb
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfbjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfolly_runtime.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfolly_runtime.so
+new file mode 100644
+index 0000000..a7cc01e
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libfolly_runtime.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libglog.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libglog.so
+new file mode 100644
+index 0000000..4431ef6
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libglog.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libglog_init.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libglog_init.so
+new file mode 100644
+index 0000000..65e77ab
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libglog_init.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libhermes-executor-debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libhermes-executor-debug.so
+new file mode 100644
+index 0000000..304fc03
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libhermes-executor-debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjscexecutor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjscexecutor.so
+new file mode 100644
+index 0000000..068ff03
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjscexecutor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsi.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsi.so
+new file mode 100644
+index 0000000..9755ffc
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsi.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsijniprofiler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsijniprofiler.so
+new file mode 100644
+index 0000000..d9fea8a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsijniprofiler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsinspector.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsinspector.so
+new file mode 100644
+index 0000000..f95ce54
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libjsinspector.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/liblogger.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/liblogger.so
+new file mode 100644
+index 0000000..9ee2a7b
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/liblogger.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libmapbufferjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libmapbufferjni.so
+new file mode 100644
+index 0000000..0065614
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libmapbufferjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_codegen_rncore.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_codegen_rncore.so
+new file mode 100644
+index 0000000..d735514
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_codegen_rncore.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_config.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_config.so
+new file mode 100644
+index 0000000..8eed412
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_config.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_debug.so
+new file mode 100644
+index 0000000..9c8498c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_nativemodule_core.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_nativemodule_core.so
+new file mode 100644
+index 0000000..7dbfcb6
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_nativemodule_core.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_animations.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_animations.so
+new file mode 100644
+index 0000000..3bced33
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_animations.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_attributedstring.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_attributedstring.so
+new file mode 100644
+index 0000000..118e1c0
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_attributedstring.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_componentregistry.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_componentregistry.so
+new file mode 100644
+index 0000000..0b738f8
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_componentregistry.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_core.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_core.so
+new file mode 100644
+index 0000000..1582810
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_core.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_debug.so
+new file mode 100644
+index 0000000..3162da2
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_graphics.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_graphics.so
+new file mode 100644
+index 0000000..d3719b1
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_graphics.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_imagemanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_imagemanager.so
+new file mode 100644
+index 0000000..ce0cdbb
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_imagemanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_leakchecker.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_leakchecker.so
+new file mode 100644
+index 0000000..2b77a7e
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_leakchecker.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_mapbuffer.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_mapbuffer.so
+new file mode 100644
+index 0000000..855db85
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_mapbuffer.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_mounting.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_mounting.so
+new file mode 100644
+index 0000000..8e225db
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_mounting.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_runtimescheduler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_runtimescheduler.so
+new file mode 100644
+index 0000000..6600e15
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_runtimescheduler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_scheduler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_scheduler.so
+new file mode 100644
+index 0000000..bd8273b
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_scheduler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_telemetry.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_telemetry.so
+new file mode 100644
+index 0000000..3995c32
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_telemetry.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_templateprocessor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_templateprocessor.so
+new file mode 100644
+index 0000000..575f333
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_templateprocessor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_textlayoutmanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_textlayoutmanager.so
+new file mode 100644
+index 0000000..a26ef86
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_textlayoutmanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_uimanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_uimanager.so
+new file mode 100644
+index 0000000..edb0530
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_render_uimanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_utils.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_utils.so
+new file mode 100644
+index 0000000..6a3b703
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreact_utils.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativeblob.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativeblob.so
+new file mode 100644
+index 0000000..78c07dc
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativeblob.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativejni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativejni.so
+new file mode 100644
+index 0000000..271bace
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativejni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativeutilsjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativeutilsjni.so
+new file mode 100644
+index 0000000..3580c58
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactnativeutilsjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactperfloggerjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactperfloggerjni.so
+new file mode 100644
+index 0000000..311cdd4
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libreactperfloggerjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_image.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_image.so
+new file mode 100644
+index 0000000..a43c851
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_image.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_root.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_root.so
+new file mode 100644
+index 0000000..5b6d32b
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_root.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_scrollview.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_scrollview.so
+new file mode 100644
+index 0000000..be1a61f
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_scrollview.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_text.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_text.so
+new file mode 100644
+index 0000000..458796a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_text.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_textinput.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_textinput.so
+new file mode 100644
+index 0000000..432822e
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_textinput.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_unimplementedview.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_unimplementedview.so
+new file mode 100644
+index 0000000..8165c51
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_unimplementedview.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_view.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_view.so
+new file mode 100644
+index 0000000..aa52be5
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/librrc_view.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libruntimeexecutor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libruntimeexecutor.so
+new file mode 100644
+index 0000000..754e385
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libruntimeexecutor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libturbomodulejsijni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libturbomodulejsijni.so
+new file mode 100644
+index 0000000..35992ac
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libturbomodulejsijni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libyoga.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libyoga.so
+new file mode 100644
+index 0000000..e44fd9e
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/armeabi-v7a/libyoga.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libc++_shared.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libc++_shared.so
+new file mode 100644
+index 0000000..2668c34
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libc++_shared.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfabricjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfabricjni.so
+new file mode 100644
+index 0000000..f654f61
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfabricjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfb.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfb.so
+new file mode 100644
+index 0000000..bb84083
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfb.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfbjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfbjni.so
+new file mode 100644
+index 0000000..92a8695
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfbjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfolly_runtime.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfolly_runtime.so
+new file mode 100644
+index 0000000..fd3687d
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libfolly_runtime.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libglog.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libglog.so
+new file mode 100644
+index 0000000..e429fe5
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libglog.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libglog_init.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libglog_init.so
+new file mode 100644
+index 0000000..97276a8
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libglog_init.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libhermes-executor-debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libhermes-executor-debug.so
+new file mode 100644
+index 0000000..fa1a417
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libhermes-executor-debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjscexecutor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjscexecutor.so
+new file mode 100644
+index 0000000..a203f0d
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjscexecutor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsi.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsi.so
+new file mode 100644
+index 0000000..3ce8602
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsi.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsijniprofiler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsijniprofiler.so
+new file mode 100644
+index 0000000..60baaf5
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsijniprofiler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsinspector.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsinspector.so
+new file mode 100644
+index 0000000..879ff90
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libjsinspector.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/liblogger.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/liblogger.so
+new file mode 100644
+index 0000000..8261a8a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/liblogger.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libmapbufferjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libmapbufferjni.so
+new file mode 100644
+index 0000000..934cf5d
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libmapbufferjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_codegen_rncore.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_codegen_rncore.so
+new file mode 100644
+index 0000000..266aa84
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_codegen_rncore.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_config.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_config.so
+new file mode 100644
+index 0000000..17c5cda
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_config.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_debug.so
+new file mode 100644
+index 0000000..3d6ebc8
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_nativemodule_core.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_nativemodule_core.so
+new file mode 100644
+index 0000000..f7db797
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_nativemodule_core.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_animations.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_animations.so
+new file mode 100644
+index 0000000..f866dbd
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_animations.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_attributedstring.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_attributedstring.so
+new file mode 100644
+index 0000000..165e904
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_attributedstring.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_componentregistry.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_componentregistry.so
+new file mode 100644
+index 0000000..82e93de
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_componentregistry.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_core.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_core.so
+new file mode 100644
+index 0000000..26d5462
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_core.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_debug.so
+new file mode 100644
+index 0000000..8c7d99a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_graphics.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_graphics.so
+new file mode 100644
+index 0000000..3999ef2
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_graphics.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_imagemanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_imagemanager.so
+new file mode 100644
+index 0000000..8a736e7
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_imagemanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_leakchecker.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_leakchecker.so
+new file mode 100644
+index 0000000..b1fe519
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_leakchecker.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_mapbuffer.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_mapbuffer.so
+new file mode 100644
+index 0000000..82d43fe
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_mapbuffer.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_mounting.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_mounting.so
+new file mode 100644
+index 0000000..c4255f7
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_mounting.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_runtimescheduler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_runtimescheduler.so
+new file mode 100644
+index 0000000..00483ce
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_runtimescheduler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_scheduler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_scheduler.so
+new file mode 100644
+index 0000000..d73cb7d
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_scheduler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_telemetry.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_telemetry.so
+new file mode 100644
+index 0000000..8e5b4c7
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_telemetry.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_templateprocessor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_templateprocessor.so
+new file mode 100644
+index 0000000..64e47f9
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_templateprocessor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_textlayoutmanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_textlayoutmanager.so
+new file mode 100644
+index 0000000..f649fc0
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_textlayoutmanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_uimanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_uimanager.so
+new file mode 100644
+index 0000000..72879e5
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_render_uimanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_utils.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_utils.so
+new file mode 100644
+index 0000000..3a807f9
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreact_utils.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativeblob.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativeblob.so
+new file mode 100644
+index 0000000..73700ab
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativeblob.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativejni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativejni.so
+new file mode 100644
+index 0000000..0b2ec48
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativejni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativeutilsjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativeutilsjni.so
+new file mode 100644
+index 0000000..1ffe39f
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactnativeutilsjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactperfloggerjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactperfloggerjni.so
+new file mode 100644
+index 0000000..823d0a5
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libreactperfloggerjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_image.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_image.so
+new file mode 100644
+index 0000000..1a80601
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_image.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_root.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_root.so
+new file mode 100644
+index 0000000..2f4a264
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_root.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_scrollview.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_scrollview.so
+new file mode 100644
+index 0000000..69fd3ca
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_scrollview.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_text.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_text.so
+new file mode 100644
+index 0000000..88021cc
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_text.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_textinput.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_textinput.so
+new file mode 100644
+index 0000000..e2349c6
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_textinput.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_unimplementedview.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_unimplementedview.so
+new file mode 100644
+index 0000000..1c1bcef
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_unimplementedview.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_view.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_view.so
+new file mode 100644
+index 0000000..54c4a22
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/librrc_view.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libruntimeexecutor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libruntimeexecutor.so
+new file mode 100644
+index 0000000..91aa4f7
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libruntimeexecutor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libturbomodulejsijni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libturbomodulejsijni.so
+new file mode 100644
+index 0000000..72c122d
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libturbomodulejsijni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libyoga.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libyoga.so
+new file mode 100644
+index 0000000..07f6a38
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86/libyoga.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libc++_shared.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libc++_shared.so
+new file mode 100644
+index 0000000..a869cf3
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libc++_shared.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfabricjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfabricjni.so
+new file mode 100644
+index 0000000..5ad50d5
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfabricjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfb.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfb.so
+new file mode 100644
+index 0000000..a82d154
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfb.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfbjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfbjni.so
+new file mode 100644
+index 0000000..4c99ca1
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfbjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfolly_runtime.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfolly_runtime.so
+new file mode 100644
+index 0000000..2cfae0a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libfolly_runtime.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libglog.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libglog.so
+new file mode 100644
+index 0000000..951269c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libglog.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libglog_init.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libglog_init.so
+new file mode 100644
+index 0000000..3f183be
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libglog_init.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libhermes-executor-debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libhermes-executor-debug.so
+new file mode 100644
+index 0000000..789663a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libhermes-executor-debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjscexecutor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjscexecutor.so
+new file mode 100644
+index 0000000..8ae2a5d
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjscexecutor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsi.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsi.so
+new file mode 100644
+index 0000000..fdfaa5c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsi.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsijniprofiler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsijniprofiler.so
+new file mode 100644
+index 0000000..d673963
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsijniprofiler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsinspector.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsinspector.so
+new file mode 100644
+index 0000000..f17e53e
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libjsinspector.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/liblogger.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/liblogger.so
+new file mode 100644
+index 0000000..2e54d60
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/liblogger.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libmapbufferjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libmapbufferjni.so
+new file mode 100644
+index 0000000..6c359d4
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libmapbufferjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_codegen_rncore.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_codegen_rncore.so
+new file mode 100644
+index 0000000..f4c8144
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_codegen_rncore.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_config.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_config.so
+new file mode 100644
+index 0000000..90b91c5
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_config.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_debug.so
+new file mode 100644
+index 0000000..ede2586
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_nativemodule_core.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_nativemodule_core.so
+new file mode 100644
+index 0000000..5906671
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_nativemodule_core.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_animations.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_animations.so
+new file mode 100644
+index 0000000..a2ab806
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_animations.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_attributedstring.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_attributedstring.so
+new file mode 100644
+index 0000000..f7f13a3
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_attributedstring.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_componentregistry.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_componentregistry.so
+new file mode 100644
+index 0000000..f4d7780
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_componentregistry.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_core.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_core.so
+new file mode 100644
+index 0000000..541f5a1
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_core.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_debug.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_debug.so
+new file mode 100644
+index 0000000..d5e4cc9
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_debug.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_graphics.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_graphics.so
+new file mode 100644
+index 0000000..3625bfd
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_graphics.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_imagemanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_imagemanager.so
+new file mode 100644
+index 0000000..528dd5f
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_imagemanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_leakchecker.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_leakchecker.so
+new file mode 100644
+index 0000000..22ddf67
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_leakchecker.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_mapbuffer.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_mapbuffer.so
+new file mode 100644
+index 0000000..a5640ec
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_mapbuffer.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_mounting.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_mounting.so
+new file mode 100644
+index 0000000..0627f03
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_mounting.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_runtimescheduler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_runtimescheduler.so
+new file mode 100644
+index 0000000..c1ec0fb
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_runtimescheduler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_scheduler.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_scheduler.so
+new file mode 100644
+index 0000000..c84bce0
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_scheduler.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_telemetry.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_telemetry.so
+new file mode 100644
+index 0000000..496c01c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_telemetry.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_templateprocessor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_templateprocessor.so
+new file mode 100644
+index 0000000..54efb01
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_templateprocessor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_textlayoutmanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_textlayoutmanager.so
+new file mode 100644
+index 0000000..45293bf
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_textlayoutmanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_uimanager.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_uimanager.so
+new file mode 100644
+index 0000000..187e18e
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_render_uimanager.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_utils.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_utils.so
+new file mode 100644
+index 0000000..ab733a4
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreact_utils.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativeblob.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativeblob.so
+new file mode 100644
+index 0000000..190b550
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativeblob.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativejni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativejni.so
+new file mode 100644
+index 0000000..6a2155a
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativejni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativeutilsjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativeutilsjni.so
+new file mode 100644
+index 0000000..cac6bdf
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactnativeutilsjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactperfloggerjni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactperfloggerjni.so
+new file mode 100644
+index 0000000..eee1a98
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libreactperfloggerjni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_image.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_image.so
+new file mode 100644
+index 0000000..15d93f2
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_image.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_root.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_root.so
+new file mode 100644
+index 0000000..3571328
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_root.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_scrollview.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_scrollview.so
+new file mode 100644
+index 0000000..bf734ec
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_scrollview.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_text.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_text.so
+new file mode 100644
+index 0000000..d71ef23
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_text.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_textinput.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_textinput.so
+new file mode 100644
+index 0000000..0247688
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_textinput.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_unimplementedview.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_unimplementedview.so
+new file mode 100644
+index 0000000..205005c
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_unimplementedview.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_view.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_view.so
+new file mode 100644
+index 0000000..a9b8ba6
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/librrc_view.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libruntimeexecutor.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libruntimeexecutor.so
+new file mode 100644
+index 0000000..3f3bd68
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libruntimeexecutor.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libturbomodulejsijni.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libturbomodulejsijni.so
+new file mode 100644
+index 0000000..7b898c1
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libturbomodulejsijni.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libyoga.so b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libyoga.so
+new file mode 100644
+index 0000000..7a5c24e
+Binary files /dev/null and b/node_modules/react-native-mmkv-storage/android/react-native-0.69.1-debug.aar/jni/x86_64/libyoga.so differ
+diff --git a/node_modules/react-native-mmkv-storage/android/src/main/java/com/ammarahmed/mmkv/RNMMKVModule.java b/node_modules/react-native-mmkv-storage/android/src/main/java/com/ammarahmed/mmkv/RNMMKVModule.java
+index 6c2d1a0..0d52812 100644
+--- a/node_modules/react-native-mmkv-storage/android/src/main/java/com/ammarahmed/mmkv/RNMMKVModule.java
++++ b/node_modules/react-native-mmkv-storage/android/src/main/java/com/ammarahmed/mmkv/RNMMKVModule.java
+@@ -194,10 +194,4 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
+         return secureKeystore.getSecureKey(key);
+     }
+ 
+-
+-    @Override
+-    public void onCatalystInstanceDestroy() {
+-        super.onCatalystInstanceDestroy();
+-        destroy();
+-    }
+ }
+\ No newline at end of file
 diff --git a/node_modules/react-native-mmkv-storage/ios/MMKVNative.mm b/node_modules/react-native-mmkv-storage/ios/MMKVNative.mm
 index 9af089d..f64a04a 100644
 --- a/node_modules/react-native-mmkv-storage/ios/MMKVNative.mm
