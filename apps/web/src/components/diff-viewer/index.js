@@ -89,11 +89,6 @@ function DiffViewer(props) {
           toKeepDateEdited: content.dateEdited,
         });
 
-      content.conflicted = await db.content.insertPlaceholders(
-        content.conflicted,
-        "/placeholder.svg"
-      );
-
       setConflictedNote(note);
       setLocalContent({ ...content, conflicted: false });
       setRemoteContent(content.conflicted);
