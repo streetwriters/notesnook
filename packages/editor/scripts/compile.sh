@@ -16,8 +16,8 @@ cat >dist/cjs/package.json <<!EOF
 }
 !EOF
 
-cat >dist/es/package.json <<!EOF
-{
-    "type": "module"
-}
-!EOF
+# cat >dist/es/package.json <<!EOF
+# {
+#     "type": "module"
+# }
+# !EOF
