@@ -77,7 +77,8 @@
     "build": "./scripts/build.sh",
     "watch": "./scripts/build.sh --watch",
     "prepub": "./scripts/compile.sh",
-    "pub": "np"
+    "pub": "np",
+    "postinstall": "npx patch-package"
   },
   "np": {
     "tests": false,
