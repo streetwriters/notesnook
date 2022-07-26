@@ -1,7 +1,10 @@
-- Add a button in settings to reset toolbar config
-- Fix accent color not applied in some parts of editor
-- Fix changing grouping causes notes list to be empty
-- Improved gestures and drawer animations
-- Fixed sync issues
+- Fix group/subgroup with index 0 cannot be removed in toolbar
+- Fix press events getting cancelled
+- Fix a crash when opening merge dialog
+- Fix auto backups not working on some devices
+- Fix images placeholders are not loaded in editor
+- Fix editor lags on large notes
+- Fix cursor jumps to start on typing issue
+- Improved note loading in editor
 
 Thank you for using Notesnook!
