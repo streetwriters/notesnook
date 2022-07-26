@@ -19,7 +19,16 @@ clientsClaim();
 // Their URLs are injected into the manifest variable below.
 // This variable must be present somewhere in your service worker file,
 // even if you decide not to use precaching. See https://cra.link/PWA
-precacheAndRoute(self.__WB_MANIFEST);
+/**
+ * @type {import("workbox-precaching/_types").PrecacheEntry[]}
+ */
+var precacheRoutes = self.__WB_MANIFEST;
+const filters = [/KaTeX/i, /hack/i];
+precacheAndRoute(
+  precacheRoutes.filter((route) => {
+    return filters.every((filter) => !filter.test(route.url));
+  })
+);
 
 // Set up App Shell-style routing, so that all navigation requests
 // are fulfilled with your index.html shell. Learn more at
