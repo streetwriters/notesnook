@@ -1,4 +1,3 @@
-import { notesFromContext } from "../common";
 import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
@@ -180,3 +179,31 @@ class NoteStore extends BaseStore {
  */
 const [useStore, store] = createStore(NoteStore);
 export { useStore, store };
+
+function notesFromContext(context) {
+  let notes = [];
+  switch (context.type) {
+    case "tag":
+      notes = db.notes.tagged(context.value);
+      break;
+    case "color":
+      notes = db.notes.colored(context.value);
+      break;
+    case "topic":
+      const notebook = db.notebooks.notebook(context?.value?.id);
+      if (!notebook) break;
+      const topic = notebook.topics?.topic(context?.value?.topic);
+      if (!topic) break;
+      notes = topic.all;
+      break;
+    case "favorite":
+      notes = db.notes.favorites;
+      break;
+    case "monographs":
+      notes = db.monographs.all;
+      break;
+    default:
+      return [];
+  }
+  return notes;
+}

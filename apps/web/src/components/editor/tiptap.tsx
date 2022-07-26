@@ -148,14 +148,28 @@ function TipTap(props: TipTapProps) {
   );
 
   useEffect(() => {
+    const isEditorSearching = editor?.storage.searchreplace?.isSearching;
     if (isSearching) editor?.commands.startSearch();
-    else editor?.commands.endSearch();
+    else if (isEditorSearching) editor?.commands.endSearch();
   }, [isSearching]);
 
   useEffect(() => {
     const isEditorSearching = editor?.storage.searchreplace?.isSearching;
     if (isSearching && !isEditorSearching) toggleSearch();
   }, [toggleSearch, editor?.storage.searchreplace?.isSearching]);
+
+  useEffect(() => {
+    if (!editorContainer) return;
+    const currentEditor = editor;
+    function onClick(e: MouseEvent) {
+      if (currentEditor?.isFocused || e.target !== editorContainer) return;
+      currentEditor?.commands.focus("end");
+    }
+    editorContainer.addEventListener("click", onClick);
+    return () => {
+      editorContainer.removeEventListener("click", onClick);
+    };
+  }, [editor, editorContainer]);
 
   if (!toolbarContainerId) return null;
 

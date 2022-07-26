@@ -274,8 +274,8 @@ test("editing a note and switching immediately to another note and making an edi
 
 test("editing a note and switching immediately to another note and editing the title shouldn't overlap both notes", async ({
   page,
-}, { setTimeout }) => {
-  setTimeout(0);
+}, testInfo) => {
+  testInfo.setTimeout(0);
   await createNoteAndCheckPresence({
     title: "Test note 1",
     content: "53ad8e4e40ebebd0f400498d",

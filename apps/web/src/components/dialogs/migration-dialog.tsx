@@ -9,7 +9,7 @@ export type MigrationDialogProps = {
   onClose: Perform;
 };
 
-export function MigrationDialog(props: MigrationDialogProps) {
+export default function MigrationDialog(props: MigrationDialogProps) {
   return (
     <Dialog
       width={500}

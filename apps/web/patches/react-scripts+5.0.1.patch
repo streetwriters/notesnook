@@ -1,0 +1,18 @@
+diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
+index e465d8e..35fcbd4 100644
+--- a/node_modules/react-scripts/config/webpack.config.js
++++ b/node_modules/react-scripts/config/webpack.config.js
+@@ -304,6 +304,13 @@ module.exports = function (webpackEnv) {
+     },
+     resolve: {
+       // This allows you to set a fallback for where webpack should look for modules.
++      fallback: {
++        crypto: false,
++        module: false,
++        dgram: false,
++        path: false,
++        url: false,
++      },
+       // We placed these paths second because we want `node_modules` to "win"
+       // if there are any conflicts. This matches Node resolution mechanism.
+       // https://github.com/facebook/create-react-app/issues/253

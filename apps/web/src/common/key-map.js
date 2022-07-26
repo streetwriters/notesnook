@@ -39,7 +39,7 @@ const KEYMAP = [
     description: "Search all notes",
     global: false,
     action: (e) => {
-      if (e.currentTarget !== window) return;
+      if (e.target?.classList.contains("ProseMirror")) return;
       e.preventDefault();
 
       navigate("/search/notes");

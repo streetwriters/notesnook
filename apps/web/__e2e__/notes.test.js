@@ -79,11 +79,11 @@ async function lockUnlockNote(noteSelector) {
   await expect(isToastPresent()).resolves.toBeTruthy();
 }
 
-async function openLockedNote(noteSelector) {
+async function openLockedNote(noteSelector, title = NOTE.title) {
   await page.click(noteSelector);
 
   await expect(page.textContent(getTestId("unlock-note-title"))).resolves.toBe(
-    NOTE.title
+    title
   );
 
   await page.fill(getTestId("unlock-note-password"), PASSWORD);
@@ -466,5 +466,28 @@ test.describe("run tests independently", () => {
 
     const editorContent = await getEditorContent();
     expect(editorContent).toContain(`${content}${NOTE.content}`);
+  });
+
+  test.only("change title of a locked note", async () => {
+    const title = "NEW TITLE!";
+
+    const noteSelector = await createNoteAndCheckPresence();
+
+    await lockUnlockNote(noteSelector, "lock");
+
+    await checkNoteLocked(noteSelector);
+
+    await openLockedNote(noteSelector);
+
+    await editNote(title);
+
+    await page.waitForTimeout(1000);
+
+    await openLockedNote(noteSelector, title);
+
+    await page.waitForTimeout(1000);
+
+    const editorTitle = await getEditorTitle();
+    expect(editorTitle).toContain(title);
   });
 });

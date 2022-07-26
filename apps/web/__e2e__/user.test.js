@@ -57,7 +57,7 @@ test("login user and change password repeatedly", async ({
   let newPassword = USER.NEW.password;
   let email = USER.email;
 
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 3; i++) {
     await test.step(
       `login user using password ${currentPassword} (${i})`,
       async () => {

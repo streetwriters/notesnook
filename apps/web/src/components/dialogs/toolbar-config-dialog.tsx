@@ -43,14 +43,13 @@ import {
   PresetId,
 } from "../../common/toolbar-config";
 import { showToast } from "../../utils/toast";
-
 export type ToolbarConfigDialogProps = {
   onClose: Perform;
 };
 
 const ReactModalContent = document.querySelector(".ReactModal__Overlay");
 
-export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
+export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -539,7 +538,8 @@ function moveItem(items: TreeNode[], fromId: string, toId: string): TreeNode[] {
   const newArray = arrayMove(items, fromIndex, toIndex);
 
   // do not allow moving an item if there's no group over it
-  if (!isGroup(getItemGroup(newArray, fromItem))) return items;
+  const itemGroup = getItemGroup(newArray, fromItem);
+  if (!isGroup(itemGroup) && !isSubgroup(itemGroup)) return items;
 
   return newArray;
 }

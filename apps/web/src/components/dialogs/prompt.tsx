@@ -11,7 +11,7 @@ export type PromptDialogProps = {
   defaultValue?: string;
 };
 
-export function Prompt(props: PromptDialogProps) {
+export default function Prompt(props: PromptDialogProps) {
   const inputRef = useRef<HTMLInputElement>();
   return (
     <Dialog
