@@ -21,9 +21,9 @@ import Loader from "../components/loader";
 import { showToast } from "../utils/toast";
 import AuthContainer from "../components/auth-container";
 import { isTesting } from "../utils/platform";
-import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
 import { useTimer } from "../hooks/use-timer";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
+import { AuthenticatorType } from "../components/dialogs/mfa/types";
 
 type LoginFormData = {
   email: string;

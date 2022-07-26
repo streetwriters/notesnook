@@ -1,6 +1,5 @@
 import createStore from "../common/store";
 import { db } from "../common/db";
-import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
 import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
@@ -71,8 +70,7 @@ class UserStore extends BaseStore {
           state.isLoggedIn = false;
         });
         config.clear();
-        await appStore.refresh();
-
+        EV.publish(EVENTS.appRefreshRequested);
         if (!!reason) {
           await showAccountLoggedOutNotice(reason);
         }
