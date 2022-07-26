@@ -1,5 +1,5 @@
 import { parseHTML } from "./utils/html-parser";
-import { decodeHTML5, encodeHTML5 } from "entities";
+import { decodeHTML5 } from "entities";
 
 export const migrations = {
   5.0: {},
@@ -94,18 +94,24 @@ function decodeWrappedTableHtml(html) {
   });
 }
 
-const NEWLINE_TOKEN = "[[%NN_NEWLINE_IN_PRE%]]";
-const NEWLINE_TOKEN_REGEX = /\[\[%NN_NEWLINE_IN_PRE%\]\]/gm;
 const NEWLINE_REPLACEMENT_REGEX = /\n|<br>|<br\/>/gm;
-const PREBLOCK_REGEX = /<pre.*<\/pre>/gm;
+const PREBLOCK_REGEX = /(<pre.*?>)(.*?)(<\/pre>)/gm;
+const SPAN_REGEX = /<span class=.*?>(.*?)<\/span>/gm;
 
 export function tinyToTiptap(html) {
   if (typeof html !== "string") return html;
 
   // Preserve newlines in pre blocks
-  html = html.replace(PREBLOCK_REGEX, (pre) => {
-    return pre.replace(NEWLINE_REPLACEMENT_REGEX, NEWLINE_TOKEN);
-  });
+  html = html
+    .replace(/\n/gm, "<br/>")
+    .replace(PREBLOCK_REGEX, (_pre, start, inner, end) => {
+      let codeblock = start;
+      codeblock += inner
+        .replace(NEWLINE_REPLACEMENT_REGEX, "<br/>")
+        .replace(SPAN_REGEX, (_span, inner) => inner);
+      codeblock += end;
+      return codeblock;
+    });
 
   const document = parseHTML(html);
 
@@ -123,14 +129,6 @@ export function tinyToTiptap(html) {
   const images = document.querySelectorAll("p > img");
   for (const image of images) {
     image.parentElement.replaceWith(image.cloneNode());
-  }
-
-  const codeblocks = document.querySelectorAll("pre");
-  for (const pre of codeblocks) {
-    pre.innerHTML = encodeHTML5(pre.innerText).replace(
-      NEWLINE_TOKEN_REGEX,
-      "<br/>"
-    );
   }
 
   const bogus = document.querySelectorAll("[data-mce-bogus]");
