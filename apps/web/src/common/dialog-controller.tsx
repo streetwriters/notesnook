@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import Dialogs from "../components/dialogs";
+import { Dialogs } from "../components/dialogs";
 import { hardNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import { qclone } from "qclone";
@@ -13,18 +13,19 @@ import { showToast } from "../utils/toast";
 import { Box, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
-
 import { formatDate } from "@streetwriters/notesnook-core/utils/date";
 import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
 import { AppVersion, getChangelog } from "../utils/version";
 import { isDesktop } from "../utils/platform";
 import { Period } from "../components/dialogs/buy-dialog/types";
-import { AuthenticatorType } from "../components/dialogs/multi-factor-dialog";
 import { FeatureKeys } from "../components/dialogs/feature-dialog";
+import { AuthenticatorType } from "../components/dialogs/mfa/types";
+import { Suspense } from "react";
+import DialogLoader from "../components/dialogs/dialog-loader";
 
-type DialogIds = keyof DialogTypes;
 type DialogTypes = typeof Dialogs;
+type DialogIds = keyof DialogTypes;
 export type Perform = (result: boolean) => void;
 type RenderDialog<TId extends DialogIds, TReturnType> = (
   dialog: DialogTypes[TId],
@@ -48,9 +49,13 @@ function showDialog<TId extends DialogIds, TReturnType>(
       container.remove();
       resolve(result);
     };
-    const PropDialog = render(Dialogs[id], perform);
+    const PropDialog = () => render(Dialogs[id], perform);
     ReactDOM.render(
-      <ThemeProvider>{PropDialog}</ThemeProvider>,
+      <ThemeProvider>
+        <Suspense fallback={<DialogLoader />}>
+          <PropDialog />
+        </Suspense>
+      </ThemeProvider>,
       container,
       () => (openDialogs[id] = true)
     );

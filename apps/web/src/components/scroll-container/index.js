@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { Box } from "rebass";
 import { Scrollbars } from "rc-scrollbars";
-import "./style.css";
 
 const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
   const ref = useRef();

@@ -1,19 +1,14 @@
 import React, {
   PropsWithChildren,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { Text, Flex, Button, Box, BoxProps } from "rebass";
-import Dialog from "./dialog";
-import { db } from "../../common/db";
-import { ReactComponent as MFA } from "../../assets/mfa.svg";
-import { ReactComponent as Fallback2FA } from "../../assets/fallback2fa.svg";
-import * as clipboard from "clipboard-polyfill/text";
-import { Suspense } from "react";
-import FileSaver from "file-saver";
+import { Text, Flex, Button, Box } from "rebass";
+import { useSessionState } from "../../../utils/hooks";
 import {
   Loading,
   MFAAuthenticator,
@@ -24,49 +19,41 @@ import {
   Copy,
   Refresh,
   Checkmark,
-} from "../icons";
-import Field from "../field";
-import { useSessionState } from "../../utils/hooks";
-import { exportToPDF } from "../../common/export";
-import { useTimer } from "../../hooks/use-timer";
+} from "../../icons";
+import Field from "../../field";
+import { exportToPDF } from "../../../common/export";
+import { useTimer } from "../../../hooks/use-timer";
 import { phone } from "phone";
-import { Perform, showMultifactorDialog } from "../../common/dialog-controller";
-const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
+import { db } from "../../../common/db";
+import FileSaver from "file-saver";
+import * as clipboard from "clipboard-polyfill/text";
+import { ReactComponent as MFA } from "../../../assets/mfa.svg";
+import { ReactComponent as Fallback2FA } from "../../../assets/fallback2fa.svg";
+import {
+  Authenticator,
+  AuthenticatorType,
+  StepComponent,
+  SubmitCodeFunction,
+  StepComponentProps,
+} from "./types";
+import { showMultifactorDialog } from "../../../common/dialog-controller";
+const QRCode = React.lazy(() => import("../../../re-exports/react-qrcode-logo"));
 
-export type AuthenticatorType = "app" | "sms" | "email";
-type StepKeys = keyof Steps; // "choose" | "setup" | "recoveryCodes" | "finish";
-type FallbackStepKeys = keyof FallbackSteps;
-type Steps = typeof steps;
-type FallbackSteps = typeof fallbackSteps;
+export type Steps = typeof steps;
+export type FallbackSteps = typeof fallbackSteps;
+export type StepKeys = keyof Steps; // "choose" | "setup" | "recoveryCodes" | "finish";
+export type FallbackStepKeys = keyof FallbackSteps;
 
-type Authenticator = {
-  type: AuthenticatorType;
-  title: string;
-  subtitle: string;
-  icon: React.FunctionComponent<BoxProps>;
-  recommended?: boolean;
-};
-
-type StepComponentProps = {
-  onNext: (...args: any[]) => void;
-  onClose?: Perform;
-  onError?: (error: string) => void;
-};
-
-type StepComponent = React.FunctionComponent<StepComponentProps>;
-
-type Step = {
+export type Step = {
   title?: string;
   description?: string;
   component?: StepComponent;
   next?: StepKeys;
   cancellable?: boolean;
 };
-type FallbackStep = Step & {
+export type FallbackStep = Step & {
   next?: FallbackStepKeys;
 };
-
-type SubmitCodeFunction = (code: string) => void;
 
 type AuthenticatorSelectorProps = StepComponentProps & {
   authenticator: AuthenticatorType;
@@ -79,16 +66,6 @@ type VerifyAuthenticatorFormProps = PropsWithChildren<{
 }>;
 
 type SetupAuthenticatorProps = { onSubmitCode: SubmitCodeFunction };
-
-type MultifactorDialogProps = {
-  onClose: Perform;
-  primaryMethod?: AuthenticatorType;
-};
-
-type RecoveryCodesDialogProps = {
-  onClose: Perform;
-  primaryMethod: AuthenticatorType;
-};
 
 const defaultAuthenticators: AuthenticatorType[] = ["app", "sms", "email"];
 const Authenticators: Authenticator[] = [
@@ -114,7 +91,7 @@ const Authenticators: Authenticator[] = [
   },
 ];
 
-const steps = {
+export const steps = {
   choose: (): Step => ({
     title: "Protect your notes by enabling 2FA",
     description: "Choose how you want to receive your authentication codes.",
@@ -170,7 +147,7 @@ const steps = {
   }),
 } as const;
 
-const fallbackSteps = {
+export const fallbackSteps = {
   choose: (primaryMethod: AuthenticatorType): FallbackStep => ({
     title: "Add a fallback 2FA method",
     description:
@@ -213,93 +190,6 @@ const fallbackSteps = {
     ),
   }),
 } as const;
-
-export function MultifactorDialog(props: MultifactorDialogProps) {
-  const { onClose, primaryMethod } = props;
-  const [step, setStep] = useState<FallbackStep | Step>(
-    primaryMethod ? fallbackSteps.choose(primaryMethod) : steps.choose()
-  );
-  const [error, setError] = useState<string>();
-
-  return (
-    <Dialog
-      isOpen={true}
-      title={step.title}
-      description={step.description}
-      width={500}
-      positiveButton={
-        step.next
-          ? {
-              text: "Continue",
-              props: { form: "2faForm" },
-            }
-          : null
-      }
-      negativeButton={
-        step.cancellable
-          ? {
-              text: "Cancel",
-              onClick: onClose,
-            }
-          : null
-      }
-    >
-      {step.component && (
-        <step.component
-          onNext={(...args) => {
-            if (!step.next) return onClose(true);
-
-            const nextStepCreator: Function =
-              step.next !== "recoveryCodes" && primaryMethod
-                ? fallbackSteps[step.next]
-                : steps[step.next];
-
-            const nextStep = primaryMethod
-              ? nextStepCreator(...args, primaryMethod)
-              : nextStepCreator(...args);
-
-            setStep(nextStep);
-          }}
-          onError={setError}
-          onClose={onClose}
-        />
-      )}
-      {error && (
-        <Text variant={"error"} bg="errorBg" p={1} mt={2}>
-          {error}
-        </Text>
-      )}
-    </Dialog>
-  );
-}
-
-export function RecoveryCodesDialog(props: RecoveryCodesDialogProps) {
-  const { onClose, primaryMethod } = props;
-  const [error, setError] = useState<string>();
-  const step = steps.recoveryCodes(primaryMethod);
-
-  return (
-    <Dialog
-      isOpen={true}
-      title={step.title}
-      description={step.description}
-      width={500}
-      positiveButton={{
-        text: "Okay",
-        onClick: onClose,
-      }}
-    >
-      {step.component && (
-        <step.component onNext={() => {}} onError={setError} />
-      )}
-      {error && (
-        <Text variant={"error"} bg="errorBg" p={1} mt={2}>
-          {error}
-        </Text>
-      )}
-    </Dialog>
-  );
-}
 
 type ChooseAuthenticatorProps = StepComponentProps & {
   authenticators: AuthenticatorType[];

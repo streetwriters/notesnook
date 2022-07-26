@@ -43,14 +43,13 @@ import {
   PresetId,
 } from "../../common/toolbar-config";
 import { showToast } from "../../utils/toast";
-
 export type ToolbarConfigDialogProps = {
   onClose: Perform;
 };
 
 const ReactModalContent = document.querySelector(".ReactModal__Overlay");
 
-export function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
+export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
