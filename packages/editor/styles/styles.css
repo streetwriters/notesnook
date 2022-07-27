@@ -385,7 +385,7 @@ span:focus .fake-cursor {
 }
 
 .math-block .katex {
-  max-width: 100vw;
+  max-width: 100%;
   overflow-x: auto;
 }
 
