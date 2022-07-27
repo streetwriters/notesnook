@@ -13,6 +13,8 @@ type ResizerProps = {
 export function Resizer(props: PropsWithChildren<ResizerProps>) {
   const { editor, selected, onResize, width, height, children } = props;
 
+  if (!editor.isEditable) return <>{children}</>;
+
   return (
     <Resizable
       enable={{
@@ -21,7 +23,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         right: false,
         top: false,
         bottomLeft: false,
-        bottomRight: editor.isEditable && selected,
+        bottomRight: selected,
         topLeft: false,
         topRight: false,
       }}
