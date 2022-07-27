@@ -20,7 +20,7 @@ You can reach out to us via:
 3. [Twitter](https://twitter.com/notesnook)
 4. [Create an issue](https://github.com/streetwriters/notesnook/issues/new)
 
-We take all queries, issues, bug reports that you might have. Feel free to ask.
+We take all queries, issues and bug reports that you might have. Feel free to ask.
 
 ## 🛣️ Roadmap
 
@@ -34,8 +34,8 @@ There are [many](https://en.wikipedia.org/wiki/Comparison_of_note-taking_softwar
 
 These are the 4 problems that Notesnook solves:
 
-1. No compromise on security and user privacy
-2. No sacrifice on important note taking features (e.g. note locking, PDF exports, organize via notebooks, topics & tags)
+1. No compromise on security and user privacy.
+2. No sacrifice on important note taking features (e.g. note locking, PDF exports, organize via notebooks, topics & tags).
 3. Provides a simple, easy to use user interface.
 4. Works exactly the same on all platforms.
 
@@ -82,7 +82,7 @@ Anyone offering privacy for free is scamming you to sell your data. Why? Because
 2. It is the minimum viable price you can spend to ensure your notes' privacy. (If you self host, the cheapest VPS will cost you around \$5).
 3. Your subscription is evidence that privacy is a global issue and should be addressed. That you care.
 
-If you still think $4.49/mo is too much, you are welcome to spend >$4.49/mo on some other privacy invasive note taking app. :)
+If you still think $4.49/mo is too much, you are welcome to spend >$4.49/mo on some other privacy invasive note taking app :)
 
 ## Contribute
 
@@ -98,13 +98,13 @@ Bug reports are given utmost priority. Report it and we'll fix it ASAP.
 
 ### Join our Discord server & help out in the community
 
-You can join [our Discord server](https://discord.gg/5davZnhw3V) and help other Notesnook users. We also post announcements, host polls, ask for early feedback there.
+You can join [our Discord server](https://discord.gg/5davZnhw3V) and help other Notesnook users. We also post announcements, host polls and ask for early feedback there.
 
 ### Help us out by giving social proof
 
 Social proof helps other people know what they are getting. If you have tried out Notesnook and loved it, you can give social proof:
 
-1. By tweeting about @notesnook on Twitter
+1. By tweeting about @notesnook on Twitter.
 2. Posting on Facebook, Reddit or any other social media.
 
 We take all social proofs and publish them on the website for the public to see.
