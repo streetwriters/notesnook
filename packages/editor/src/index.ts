@@ -135,7 +135,7 @@ const useTiptap = (
           placeholder: "Start writing your note...",
         }),
 
-        ImageNode,
+        ImageNode.configure({ allowBase64: true }),
         EmbedNode,
         AttachmentNode.configure({
           onDownloadAttachment,
