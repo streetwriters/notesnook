@@ -65,26 +65,28 @@ export function TaskItemComponent(
           },
         }}
       >
-        <Icon
-          className="dragHandle"
-          draggable="true"
-          // NOTE: Turning this off somehow makes drag/drop stop working
-          // properly on touch devices.
-          // contentEditable={false}
-          data-drag-handle
-          path={Icons.dragHandle}
-          sx={{
-            opacity: [1, 1, 0],
-            alignSelf: "start",
-            mr: 2,
-            bg: "transparent",
-            cursor: "grab",
-            ".icon:hover path": {
-              fill: "var(--checked) !important",
-            },
-          }}
-          size={isMobile ? 24 : 20}
-        />
+        {editor.isEditable && (
+          <Icon
+            className="dragHandle"
+            draggable="true"
+            // NOTE: Turning this off somehow makes drag/drop stop working
+            // properly on touch devices.
+            // contentEditable={false}
+            data-drag-handle
+            path={Icons.dragHandle}
+            sx={{
+              opacity: [1, 1, 0],
+              alignSelf: "start",
+              mr: 2,
+              bg: "transparent",
+              cursor: "grab",
+              ".icon:hover path": {
+                fill: "var(--checked) !important",
+              },
+            }}
+            size={isMobile ? 24 : 20}
+          />
+        )}
         <Icon
           path={checked ? Icons.check : ""}
           stroke="1px"

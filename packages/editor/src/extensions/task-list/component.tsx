@@ -136,7 +136,13 @@ export function TaskListComponent(
               readOnly={!editor.isEditable}
               value={title || ""}
               variant={"clean"}
-              sx={{ p: 0, px: 2, zIndex: 1, color: "fontTertiary" }}
+              sx={{
+                p: 0,
+                px: 2,
+                zIndex: 1,
+                color: "fontTertiary",
+                fontSize: "body",
+              }}
               placeholder="Untitled"
               onChange={(e) => {
                 updateAttributes(
@@ -163,12 +169,12 @@ export function TaskListComponent(
             paddingInlineStart: 0,
             marginBlockStart: isNested ? 10 : 0,
             marginBlockEnd: 0,
-            marginLeft: isNested ? -35 : 0,
+            marginLeft: isNested ? (editor.isEditable ? -35 : -10) : 0,
           },
           li: {
             listStyleType: "none",
             position: "relative",
-            marginBottom: [2, "7px"],
+            marginBottom: isNested ? [1, "3px"] : [2, "7px"],
           },
         }}
       />

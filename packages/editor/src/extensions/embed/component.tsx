@@ -43,9 +43,10 @@ export function EmbedComponent(
             );
           }}
         >
-          <Flex
+          <Box
             width={"100%"}
             sx={{
+              display: editor.isEditable ? "flex" : "none",
               position: "relative",
               justifyContent: "end",
               p: "small",
@@ -89,7 +90,7 @@ export function EmbedComponent(
                 </Flex>
               )}
             </DesktopOnly>
-          </Flex>
+          </Box>
           <Box
             as="iframe"
             ref={embedRef}
