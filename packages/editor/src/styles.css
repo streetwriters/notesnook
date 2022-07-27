@@ -384,6 +384,11 @@ span:focus .fake-cursor {
   margin: 0;
 }
 
+.math-block .katex {
+  max-width: 100vw;
+  overflow-x: auto;
+}
+
 /* -- Selection Plugin ---------------------------------- */
 
 /* p::selection,
