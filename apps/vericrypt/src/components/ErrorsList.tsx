@@ -26,7 +26,8 @@ export function ErrorsList(props: ErrorsListProps) {
           onClick={() =>
             window.open(
               "https://github.com/streetwriters/notesnook/issues/new",
-              "_blank"
+              "_blank",
+              "noopener"
             )
           }
         >

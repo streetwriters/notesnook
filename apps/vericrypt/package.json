@@ -20,6 +20,7 @@
     "typescript": "^4.1.2"
   },
   "dependencies": {
+    "@microsoft/signalr-protocol-msgpack": "^6.0.7",
     "@notesnook/crypto": "^1.0.0",
     "clipboard-polyfill": "^3.0.3",
     "colord": "^2.9.2",

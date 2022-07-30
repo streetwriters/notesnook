@@ -84,8 +84,8 @@ const steps = {
     <>
       On the right panel, you'll see an input with the placeholder "Start from
       key" at the top. Type <Code text="user" /> in that input. If you don't see
-      the 'user' object, scroll down in key-value pair list and the search
-      again.
+      the 'user' object, scroll to end using <Code text="Page down" /> key in
+      key-value pair list and then search again.
     </>,
     `At the top of the list, you'll see an entry with key "user". Expand the value.`,
     <Flex sx={{ flexDirection: "column" }}>
