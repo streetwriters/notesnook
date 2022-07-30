@@ -29,6 +29,7 @@ jobs:
       - run: |
           cd apps/vericrypt
           npm i
+          npm run build
           mv ./build/ ./public_html/
 
       - uses: blbecker/rsync-deploy@v1.0
