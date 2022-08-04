@@ -1,4 +1,5 @@
-import { mergeAttributes, Node } from "@tiptap/core";
+import { Editor, mergeAttributes, Node } from "@tiptap/core";
+import { NodeType } from "prosemirror-model";
 import { HardBreak } from "@tiptap/extension-hard-break";
 
 export interface ParagraphOptions {
@@ -33,22 +34,22 @@ export const Paragraph = Node.create<ParagraphOptions>({
 
   content: "inline*",
 
-  // addAttributes() {
-  //   return {
-  //     spacing: {
-  //       keepOnSplit: false,
-  //       default: getSpacing(this.options.doubleSpaced),
-  //       parseHTML: (element) => element.dataset.spacing,
-  //       renderHTML: (attributes) => {
-  //         if (!attributes.spacing) return;
+  addAttributes() {
+    return {
+      spacing: {
+        keepOnSplit: false,
+        default: getSpacing(this.options.doubleSpaced),
+        parseHTML: (element) => element.dataset.spacing,
+        renderHTML: (attributes) => {
+          if (!attributes.spacing) return;
 
-  //         return {
-  //           "data-spacing": attributes.spacing,
-  //         };
-  //       },
-  //     },
-  //   };
-  // },
+          return {
+            "data-spacing": attributes.spacing,
+          };
+        },
+      },
+    };
+  },
 
   parseHTML() {
     return [{ tag: "p" }];
@@ -77,28 +78,27 @@ export const Paragraph = Node.create<ParagraphOptions>({
       Enter: ({ editor }) => {
         if (this.options.doubleSpaced) return false;
 
-        // if (this.options.doubleSpaced) return false;
-
         const { state } = editor;
         const { selection } = state;
         const { $from, empty } = selection;
 
-        if (!empty || $from.parent.type !== this.type) {
+        if (!empty || $from.parent.type !== this.type || $from.depth > 1) {
           return false;
         }
 
-        const endsWithNewline = $from.nodeBefore?.type.name === HardBreak.name;
+        const endsWithNewline = $from.nodeBefore === null;
 
         if (endsWithNewline) {
-          return this.editor.commands.command(({ tr }) => {
-            const { from } = tr.selection;
-            tr.delete(from - 1, from);
-            return false;
-          });
+          createParagraph(editor, this.type, true, false);
+          return true;
         }
 
-        return this.editor.commands.setHardBreak();
+        return false;
       },
+      "Mod-Enter": ({ editor }) =>
+        createParagraph(editor, this.type, false, true),
+      "Shift-Enter": ({ editor }) =>
+        createParagraph(editor, this.type, false, true),
       "Mod-Alt-0": () => this.editor.commands.setParagraph(),
     };
   },
@@ -106,4 +106,29 @@ export const Paragraph = Node.create<ParagraphOptions>({
 
 function getSpacing(doubleSpaced: boolean): "single" | "double" {
   return doubleSpaced ? "double" : "single";
+}
+
+function createParagraph(
+  editor: Editor,
+  type: NodeType,
+  doubleSpaced: boolean,
+  skipEmpty: boolean = true
+) {
+  return editor
+    .chain()
+    .command(({ tr }) => {
+      const { from } = tr.selection;
+      const currentParagraph = tr.doc.nodeAt(from - 1);
+      if (currentParagraph?.type !== type) return true;
+      if (currentParagraph.attrs.spacing === "double") return true;
+      // if paragraph is empty, skip
+      if (skipEmpty && currentParagraph.nodeSize === 2) return true;
+      tr.delete(from - 1, from);
+      return true;
+    })
+    .splitBlock({ keepMarks: true })
+    .updateAttributes(type, {
+      spacing: getSpacing(doubleSpaced),
+    })
+    .run();
 }
