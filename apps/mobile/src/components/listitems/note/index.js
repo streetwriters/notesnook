@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../../e2e/test.ids';
 import { TaggedNotes } from '../../../screens/notes/tagged';
 import { TopicNotes } from '../../../screens/notes/topic-notes';
+import useNavigationStore from '../../../stores/use-navigation-store';
 import { useSettingStore } from '../../../stores/use-setting-store';
 import { useThemeStore } from '../../../stores/use-theme-store';
 import { COLORS_NOTE } from '../../../utils/color-scheme';
@@ -34,16 +35,14 @@ const showActionSheet = item => {
 function getNotebook(item) {
   const isTrash = item.type === 'trash';
   if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
-  let item_notebook = item.notebooks?.slice(0, 1)[0];
-  let notebook = db.notebooks.notebook(item_notebook.id);
-
+  const currentScreen = useNavigationStore.getState().currentScreen;
+  const filteredNotebooks = item.notebooks?.filter(n => n.id !== currentScreen.notebookId);
+  let item_notebook = filteredNotebooks?.length > 0 ? filteredNotebooks.slice(0, 1)[0] : null;
+  let notebook = item_notebook && db.notebooks.notebook(item_notebook.id);
   if (!notebook) return [];
   let topic = notebook.topics.topic(item_notebook.topics[0])?._topic;
-
   if (!topic) return [];
-
   notebook = notebook.data;
-
   return [
     {
       title: `${notebook?.title} › ${topic?.title}`,
