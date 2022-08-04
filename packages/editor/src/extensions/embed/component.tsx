@@ -23,12 +23,14 @@ export function EmbedComponent(
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           justifyContent:
             align === "center" ? "center" : align === "left" ? "start" : "end",
           position: "relative",
         }}
       >
         <Resizer
+          handleColor="primary"
           editor={editor}
           selected={selected}
           width={width}
@@ -47,7 +49,8 @@ export function EmbedComponent(
             width={"100%"}
             sx={{
               display: editor.isEditable ? "flex" : "none",
-              position: "relative",
+              position: "absolute",
+              top: -24,
               justifyContent: "end",
               p: "small",
               bg: editor.isEditable ? "bgSecondary" : "transparent",
