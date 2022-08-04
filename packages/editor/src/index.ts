@@ -43,9 +43,19 @@ import { SelectionPersist } from "./extensions/selection-persist";
 import { Table } from "./extensions/table";
 import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
-import { EditorOptions } from "@tiptap/core";
+import {
+  EditorOptions,
+  extensions as TiptapCoreExtensions,
+} from "@tiptap/core";
 import { usePermissionHandler } from "./hooks/use-permission-handler";
 import { Highlight } from "./extensions/highlight";
+import { Paragraph } from "./extensions/paragraph";
+import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
+
+const CoreExtensions = Object.entries(TiptapCoreExtensions)
+  // we will implement our own customized clipboard serializer
+  .filter(([name]) => name !== "ClipboardTextSerializer")
+  .map(([, extension]) => extension);
 
 EditorView.prototype.updateState = function updateState(state) {
   if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
@@ -57,6 +67,7 @@ type TiptapOptions = EditorOptions &
     theme: Theme;
     isMobile?: boolean;
     isKeyboardOpen?: boolean;
+    doubleSpacedLines?: boolean;
   };
 
 const useTiptap = (
@@ -65,6 +76,7 @@ const useTiptap = (
 ) => {
   const {
     theme,
+    doubleSpacedLines = true,
     isMobile,
     isKeyboardOpen,
     onDownloadAttachment,
@@ -85,16 +97,26 @@ const useTiptap = (
 
   const defaultOptions = useMemo<Partial<EditorOptions>>(
     () => ({
+      enableCoreExtensions: false,
       extensions: [
+        ...CoreExtensions,
+        ClipboardTextSerializer,
         NodeViewSelectionNotifier,
         SearchReplace,
         TextStyle,
+        Paragraph.configure({
+          doubleSpaced: doubleSpacedLines,
+        }),
         StarterKit.configure({
           dropcursor: false,
           codeBlock: false,
           listItem: false,
           orderedList: false,
           bulletList: false,
+          paragraph: false,
+          hardBreak: {
+            keepMarks: true,
+          },
           history: {
             depth: 200,
             newGroupDelay: 1000,
