@@ -270,11 +270,11 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         });
       },
       // remove code block when at start of document or code block is empty
-      Backspace: () => {
-        const { empty, $anchor } = this.editor.state.selection;
+      Backspace: ({ editor }) => {
+        const { empty, $anchor } = editor.state.selection;
 
         const currentNode = $anchor.parent;
-        const nextNode = this.editor.state.doc.nodeAt($anchor.pos + 1);
+        const nextNode = editor.state.doc.nodeAt($anchor.pos + 1);
         const isCodeBlock = (node: ProsemirrorNode | null) =>
           node && node.type.name === this.name;
         const isAtStart = $anchor.pos === 1;

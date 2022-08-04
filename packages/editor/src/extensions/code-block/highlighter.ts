@@ -1,28 +1,16 @@
-import { Plugin, PluginKey, Transaction, EditorState } from "prosemirror-state";
+import { Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
-import { Node as ProsemirrorNode } from "prosemirror-model";
-import { findChildren } from "@tiptap/core";
+import {
+  findChildren,
+  findParentNodeClosestToPos,
+  NodeWithPos,
+} from "@tiptap/core";
 import { Root, refractor } from "refractor/lib/core";
 import { RootContent } from "hast";
-import {
-  AddMarkStep,
-  RemoveMarkStep,
-  ReplaceAroundStep,
-  ReplaceStep,
-} from "prosemirror-transform";
-import {
-  CaretPosition,
-  CodeBlockAttributes,
-  getLines,
-  toCaretPosition,
-  toCodeLines,
-} from "./code-block";
+import { ReplaceAroundStep, ReplaceStep } from "prosemirror-transform";
+import { toCaretPosition, toCodeLines } from "./code-block";
 
-export type MergedStep =
-  | AddMarkStep
-  | RemoveMarkStep
-  | ReplaceAroundStep
-  | ReplaceStep;
+export type ReplaceMergedStep = ReplaceAroundStep | ReplaceStep;
 
 function parseNodes(
   nodes: RootContent[],
@@ -54,76 +42,37 @@ function getHighlightNodes(result: Root) {
   return result.children || [];
 }
 
-function getLineDecoration(
-  from: number,
-  line: number,
-  total: number,
-  isActive: boolean
-) {
-  const maxLength = String(total).length;
-  const attributes = {
-    class: `line-number ${isActive ? "active" : ""}`,
-    "data-line": String(line).padEnd(maxLength, " "),
-  };
-  const spec: any = {
-    line: line,
-    active: isActive,
-    total,
-    from,
-  };
-
-  return Decoration.inline(from, from + 1, attributes, spec);
-}
-
 function getDecorations({
-  doc,
-  name,
+  block,
   defaultLanguage,
-  caretPosition,
 }: {
-  caretPosition?: CaretPosition;
-  doc: ProsemirrorNode;
-  name: string;
+  block: NodeWithPos;
   defaultLanguage: string | null | undefined;
 }) {
   const decorations: Decoration[] = [];
   const languages = refractor.listLanguages();
-  findChildren(doc, (node) => node.type.name === name).forEach((block) => {
-    const code = block.node.textContent;
 
-    const lines = toCodeLines(code, block.pos);
-    for (const line of lines || []) {
-      const lineNumber = line.index + 1;
-      const isActive =
-        lineNumber === caretPosition?.line && line.from === caretPosition?.from;
-      const decoration = getLineDecoration(
-        line.from,
-        lineNumber,
-        lines?.length || 0,
-        isActive
-      );
+  const { node, pos } = block;
+  const code = node.textContent;
+
+  const language = node.attrs.language || defaultLanguage;
+  const nodes = languages.includes(language)
+    ? getHighlightNodes(refractor.highlight(code, language))
+    : null;
+  if (!nodes) return;
+  let from = pos + 1;
+  parseNodes(nodes).forEach((node) => {
+    const to = from + node.text.length;
+    if (node.classes.length) {
+      const decoration = Decoration.inline(from, to, {
+        class: node.classes.join(" "),
+      });
       decorations.push(decoration);
     }
-
-    const language = block.node.attrs.language || defaultLanguage;
-    const nodes = languages.includes(language)
-      ? getHighlightNodes(refractor.highlight(code, language))
-      : null;
-    if (!nodes) return;
-    let from = block.pos + 1;
-    parseNodes(nodes).forEach((node) => {
-      const to = from + node.text.length;
-      if (node.classes.length) {
-        const decoration = Decoration.inline(from, to, {
-          class: node.classes.join(" "),
-        });
-        decorations.push(decoration);
-      }
-      from = to;
-    });
+    from = to;
   });
 
-  return DecorationSet.create(doc, decorations);
+  return decorations;
 }
 
 export function HighlighterPlugin({
@@ -139,11 +88,15 @@ export function HighlighterPlugin({
 
     state: {
       init: (config, state) => {
-        return getDecorations({
-          doc: state.doc,
-          name,
-          defaultLanguage,
-        });
+        const allDecorations: Decoration[] = [];
+        findChildren(state.doc, (node) => node.type.name === name).forEach(
+          (block) => {
+            allDecorations.push(
+              ...(getDecorations({ block, defaultLanguage }) || [])
+            );
+          }
+        );
+        return DecorationSet.create(state.doc, allDecorations);
       },
       apply: (
         transaction,
@@ -154,57 +107,29 @@ export function HighlighterPlugin({
         const oldNodeName = oldState.selection.$head.parent.type.name;
         const newNodeName = newState.selection.$head.parent.type.name;
 
-        const oldNodes = findChildren(
-          oldState.doc,
-          (node) => node.type.name === name
-        );
-        const newNodes = findChildren(
-          newState.doc,
-          (node) => node.type.name === name
-        );
+        const isInsideCodeblock = oldNodeName === name || newNodeName === name;
+        const isDocChanged = transaction.docChanged;
 
-        const position = toCaretPosition(newState.selection);
-        // const isDocChanged =
-        //   transaction.docChanged &&
-        //   // TODO
-        //   !transaction.steps.every((step) => step instanceof ReplaceAroundStep);
-        // console.log("Selection", transaction.docChanged, isDocChanged);
-        if (
-          transaction.docChanged &&
-          // Apply decorations if:
-          // selection includes named node,
-          ([oldNodeName, newNodeName].includes(name) ||
-            // OR transaction adds/removes named node,
-            newNodes.length !== oldNodes.length ||
-            // OR transaction has changes that completely encapsulte a node
-            // (for example, a transaction that affects the entire document).
-            // Such transactions can happen during collab syncing via y-prosemirror, for example.
-            (transaction.steps as MergedStep[]).some((step) => {
-              return (
-                step.from !== undefined &&
-                step.to !== undefined &&
-                oldNodes.some((node) => {
-                  return (
-                    node.pos >= step.from &&
-                    node.pos + node.node.nodeSize <= step.to
-                  );
-                })
-              );
-            }))
-        ) {
-          return getDecorations({
-            doc: transaction.doc,
-            name,
+        // TODO: we need to find a way to trigger decoration changes
+        // when user pastes something.
+
+        if (isDocChanged && isInsideCodeblock) {
+          const block = findParentNodeClosestToPos(
+            newState.selection.$head,
+            (node) => node.type.name === name
+          );
+          if (!block)
+            return decorationSet.map(transaction.mapping, transaction.doc);
+
+          const newDecorations = getDecorations({
+            block,
             defaultLanguage,
-            caretPosition: position,
           });
-        }
+          if (!newDecorations)
+            return decorationSet.map(transaction.mapping, transaction.doc);
 
-        decorationSet = getActiveLineDecorations(
-          transaction.doc,
-          decorationSet,
-          position
-        );
+          return decorationSet.add(transaction.doc, newDecorations);
+        }
 
         return decorationSet.map(transaction.mapping, transaction.doc);
       },
@@ -216,98 +141,46 @@ export function HighlighterPlugin({
       },
     },
 
-    appendTransaction: (transactions, prevState, nextState) => {
-      const tr = nextState.tr;
-      let modified = false;
+    appendTransaction: (transactions, oldState, newState) => {
+      const oldNodeName = oldState.selection.$head.parent.type.name;
+      const newNodeName = newState.selection.$head.parent.type.name;
 
-      const docChanged = transactions.some(
+      const isDocChanged = transactions.some(
         (transaction) => transaction.docChanged
       );
-      const selectionChanged =
-        (nextState.selection.$from.parent.type.name === name ||
-          prevState.selection.$from.parent.type.name === name) &&
-        prevState.selection.$from.pos !== nextState.selection.$from.pos;
+      const isInsideCodeblock = oldNodeName === name || newNodeName === name;
+      const isSelectionChanged =
+        isInsideCodeblock && !oldState.selection.eq(newState.selection);
 
-      findChildren(nextState.doc, (node) => node.type.name === name).forEach(
-        (block) => {
-          const { node, pos } = block;
-          const attributes = { ...node.attrs };
+      if (isDocChanged || isSelectionChanged) {
+        const block = findParentNodeClosestToPos(
+          newState.selection.$head,
+          (node) => node.type.name === name
+        );
+        if (!block) return null;
+        const { tr } = newState;
+        const { node, pos } = block;
+        const attributes = { ...node.attrs };
 
-          if (docChanged || !attributes.lines?.length) {
-            const lines = toCodeLines(node.textContent, pos);
-            attributes.lines = lines.slice();
-          }
-
-          if (selectionChanged) {
-            const position = toCaretPosition(
-              nextState.selection,
-              docChanged ? toCodeLines(node.textContent, pos) : undefined
-            );
-            attributes.caretPosition = position;
-          }
-
-          if (docChanged || selectionChanged) {
-            tr.setNodeMarkup(pos, node.type, attributes);
-            modified = true;
-          }
+        if (isDocChanged || !attributes.lines?.length) {
+          const lines = toCodeLines(node.textContent, pos);
+          attributes.lines = lines.slice();
         }
-      );
 
-      return modified ? tr : null;
+        if (isDocChanged) {
+          const position = toCaretPosition(
+            newState.selection,
+            isDocChanged ? toCodeLines(node.textContent, pos) : undefined
+          );
+          attributes.caretPosition = position;
+        }
+
+        if (isDocChanged || isSelectionChanged) {
+          tr.setNodeMarkup(pos, node.type, attributes);
+        }
+
+        return tr;
+      }
     },
   });
-}
-
-/**
- * When `position` is undefined, all active line decorations
- * are reset (e.g. when you focus out of the code block).
- */
-function getActiveLineDecorations(
-  doc: ProsemirrorNode,
-  decorations: DecorationSet,
-  position?: CaretPosition
-) {
-  const lineDecorations = decorations.find(
-    undefined,
-    undefined,
-    ({ line, active, from }) => {
-      const isSame = position
-        ? line === position.line && from === position.from
-        : false;
-      return isSame || active;
-    }
-  );
-
-  if (!lineDecorations.length) return decorations;
-
-  // we have to clone because prosemirror operates in-place
-  const cloned = lineDecorations.slice();
-
-  // remove old line decorations which inclue the current line decoration
-  // and the previous current line decoration. We'll replace these with
-  // new decorations.
-  decorations = decorations.remove(lineDecorations);
-
-  const newDecorations: Decoration[] = [];
-  for (const decoration of cloned) {
-    const {
-      from,
-      spec: { line, total },
-    } = decoration;
-
-    const isActive = line === position?.line;
-    const newDecoration = getLineDecoration(
-      from,
-      line,
-      position?.total || total,
-      isActive
-    );
-    newDecorations.push(newDecoration);
-  }
-  return decorations.add(doc, newDecorations);
-}
-
-function isAndroid() {
-  var ua = navigator.userAgent.toLowerCase();
-  return ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
 }
