@@ -26,7 +26,7 @@ function parseNodes(
     // this is required so that even plain text is wrapped in a span
     // during highlighting. Without this, Prosemirror's selection acts
     // weird for the first highlighted node/span.
-    else classes.push("token", "text");
+    // else classes.push("token", "text");
 
     if (node.type === "element") {
       result.push(...parseNodes(node.children, classes));
@@ -128,7 +128,9 @@ export function HighlighterPlugin({
           if (!newDecorations)
             return decorationSet.map(transaction.mapping, transaction.doc);
 
-          return decorationSet.add(transaction.doc, newDecorations);
+          return decorationSet
+            .map(transaction.mapping, transaction.doc)
+            .add(transaction.doc, newDecorations);
         }
 
         return decorationSet.map(transaction.mapping, transaction.doc);
