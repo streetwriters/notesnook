@@ -2,6 +2,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { EV, EVENTS } from '@streetwriters/notesnook-core/common';
 import { useEffect, useRef } from 'react';
 import {
+  Alert,
   Appearance,
   AppState,
   Linking,
@@ -320,7 +321,12 @@ export const useAppEvents = () => {
       ) {
         enabled(false);
       }
-
+      console.log(
+        'unlocking',
+        refValues.current?.prevState,
+        refValues.current.showingDialog,
+        SettingsService.get().appLockMode
+      );
       if (SettingsService.get().appLockMode === 'background') {
         if (useSettingStore.getState().requestBiometrics) {
           console.log('requesting biometrics');
@@ -331,8 +337,13 @@ export const useAppEvents = () => {
           refValues.current.showingDialog = true;
           refValues.current.prevState = 'active';
           useUserStore.getState().setVerifyUser(true);
-
           let result = await BiometricService.validateUser('Unlock to access your notes');
+          let sub = useUserStore.subscribe(state => {
+            if (!state.verifyUser) {
+              sub();
+              refValues.current.showingDialog = false;
+            }
+          });
           if (result) {
             useUserStore.getState().setVerifyUser(false);
             refValues.current.showingDialog = false;
