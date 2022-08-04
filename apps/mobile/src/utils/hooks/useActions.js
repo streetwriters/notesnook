@@ -4,7 +4,6 @@ import { Platform } from 'react-native';
 import Share from 'react-native-share';
 import { editing, toTXT } from '..';
 import { notesnook } from '../../../e2e/test.ids';
-import { AuthMode } from '../../components/auth';
 import { presentDialog } from '../../components/dialog/functions';
 import NoteHistory from '../../components/note-history';
 import { MoveNotes } from '../../components/sheets/move-notes/movenote';
@@ -37,8 +36,9 @@ import {
 } from '../events';
 import { deleteItems } from '../functions';
 import { sleep } from '../time';
+import useNavigationStore from '../../stores/use-navigation-store';
 
-export const useActions = ({ close = () => {}, item }) => {
+export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore(state => state.colors);
   const clearSelection = useSelectionStore(state => state.clearSelection);
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
@@ -75,12 +75,11 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   const isNoteInTopic = () => {
-    if (item.type !== 'note' || editing.actionAfterFirstSave?.type !== 'topic') return;
-    console.log(editing.actionAfterFirstSave, 'save item');
-
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (item.type !== 'note' || currentScreen.name !== 'TopicNotes') return;
     return db.notebooks
-      .notebook(editing.actionAfterFirstSave.notebook)
-      .topics.topic(editing.actionAfterFirstSave.id)
+      .notebook(currentScreen.notebookId)
+      .topics.topic(currentScreen.id)
       .has(item.id);
   };
 
@@ -449,9 +448,11 @@ export const useActions = ({ close = () => {}, item }) => {
     }
   }
   async function removeNoteFromTopic() {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (currentScreen.name !== 'TopicNotes') return;
     await db.notebooks
-      .notebook(editing.actionAfterFirstSave.notebook)
-      .topics.topic(editing.actionAfterFirstSave.id)
+      .notebook(currentScreen.notebookId)
+      .topics.topic(currentScreen.id)
       .delete(item.id);
     Navigation.queueRoutesForUpdate(
       'TaggedNotes',
@@ -550,7 +551,7 @@ export const useActions = ({ close = () => {}, item }) => {
     );
     close();
   };
-
+  console.log('isNoteInTopic', isNoteInTopic());
   const actions = [
     {
       name: 'Add to notebook',
