@@ -24,6 +24,7 @@ import { getCurrentPreset } from "../../common/toolbar-config";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 
+var saveTimeout = 0;
 type TipTapProps = {
   editorContainer: HTMLElement;
   onLoad?: () => void;
@@ -94,15 +95,19 @@ function TipTap(props: TipTapProps) {
       onUpdate: ({ editor }) => {
         if (!editor.isEditable) return;
 
-        if (onChange) onChange(editor.getHTML());
-        configure({
-          statistics: {
-            words: {
-              total: getTotalWords(editor as Editor),
-              selected: 0,
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          if (onChange) onChange(editor.getHTML());
+
+          configure({
+            statistics: {
+              words: {
+                total: countWords(editor.view.dom.innerText),
+                selected: 0,
+              },
             },
-          },
-        });
+          });
+        }, 500) as unknown as number;
       },
       onDestroy: () => {
         configure({
@@ -124,7 +129,8 @@ function TipTap(props: TipTapProps) {
           statistics: {
             words: {
               total:
-                old.statistics?.words.total || getTotalWords(editor as Editor),
+                old.statistics?.words.total ||
+                countWords(editor.view.dom.innerText),
               selected: getSelectedWords(
                 editor as Editor,
                 transaction.selection
