@@ -47,6 +47,36 @@
   filter: brightness(70%);
 }
 
+.ProseMirror p {
+  margin-bottom: 0px;
+}
+
+.ProseMirror > p[data-spacing="double"] {
+  margin-top: 1em;
+}
+
+.ProseMirror > p[data-spacing="single"] {
+  margin-top: 0px;
+}
+
+.ProseMirror > div.codeblock-view-content-wrap,
+.ProseMirror > div.taskList-view-content-wrap,
+.ProseMirror > div.outlineList-view-content-wrap,
+.ProseMirror > div.image-view-content-wrap {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.ProseMirror > div.embed-view-content-wrap {
+  margin-top: calc(1em + 24px);
+  margin-bottom: 1em;
+}
+
+.ProseMirror > div.table-view-content-wrap {
+  margin-top: 1.6em;
+  margin-bottom: 1em;
+}
+
 .ProseMirror {
   position: relative;
 }
