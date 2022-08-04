@@ -73,7 +73,7 @@ export function setLoginMessage() {
 const emailMessage = {
   visible: true,
   message: 'Email not confirmed',
-  actionText: 'Please confrim your email to sync notes.',
+  actionText: 'Please confirm your email to sync notes.',
   onPress: () => {
     PremiumService.showVerifyEmailDialog();
   },
