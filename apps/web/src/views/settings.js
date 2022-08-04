@@ -124,6 +124,10 @@ function Settings(props) {
   const toggleFollowSystemTheme = useThemeStore(
     (store) => store.toggleFollowSystemTheme
   );
+  const toggleDoubleSpacedLines = useSettingStore(
+    (store) => store.toggleDoubleSpacedLines
+  );
+  const doubleSpacedLines = useSettingStore((store) => store.doubleSpacedLines);
   const encryptBackups = useSettingStore((store) => store.encryptBackups);
   const toggleEncryptBackups = useSettingStore(
     (store) => store.toggleEncryptBackups
@@ -430,6 +434,19 @@ function Settings(props) {
         />
         {groups.editor && (
           <>
+            <Toggle
+              title="Use double spaced lines"
+              onTip="New lines will be double spaced (old ones won't be affected)."
+              offTip="New lines will be single spaced (old ones won't be affected)."
+              onToggled={() => {
+                toggleDoubleSpacedLines();
+                showToast(
+                  "success",
+                  "Re-open the editor for changes to take effect."
+                );
+              }}
+              isToggled={doubleSpacedLines}
+            />
             <Button
               variant="list"
               onClick={async () => {

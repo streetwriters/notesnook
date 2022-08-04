@@ -23,6 +23,7 @@ import { createPortal } from "react-dom";
 import { getCurrentPreset } from "../../common/toolbar-config";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
+import { useStore as useSettingsStore } from "../../stores/setting-store";
 
 var saveTimeout = 0;
 type TipTapProps = {
@@ -56,6 +57,9 @@ function TipTap(props: TipTapProps) {
   const isUserPremium = useIsUserPremium();
   const isMobile = useMobile();
   const configure = useConfigureEditor();
+  const doubleSpacedLines = useSettingsStore(
+    (store) => store.doubleSpacedLines
+  );
   const { toolbarConfig } = useToolbarConfig();
   const { isSearching, toggleSearch } = useSearch();
 
@@ -70,6 +74,7 @@ function TipTap(props: TipTapProps) {
 
   const editor = useTiptap(
     {
+      doubleSpacedLines,
       isKeyboardOpen: true,
       isMobile: isMobile || false,
       element: editorContainer,
