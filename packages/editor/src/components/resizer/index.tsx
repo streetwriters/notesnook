@@ -1,3 +1,4 @@
+import { SchemeColors } from "@streetwriters/theme/dist/theme/colorscheme";
 import { Resizable } from "re-resizable";
 import { PropsWithChildren } from "react";
 import { Icon, Icons } from "../../toolbar";
@@ -8,10 +9,12 @@ type ResizerProps = {
   selected: boolean;
   width?: number;
   height?: number;
+  handleColor?: keyof SchemeColors;
   onResize: (width: number, height: number) => void;
 };
 export function Resizer(props: PropsWithChildren<ResizerProps>) {
-  const { editor, selected, onResize, width, height, children } = props;
+  const { editor, selected, onResize, width, height, children, handleColor } =
+    props;
 
   if (!editor.isEditable) return <>{children}</>;
 
@@ -46,7 +49,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
             }}
             path={Icons.resize}
             size={25}
-            color="icon"
+            color={handleColor || "icon"}
           />
         ),
       }}
