@@ -114,9 +114,7 @@ const useTiptap = (
           orderedList: false,
           bulletList: false,
           paragraph: false,
-          hardBreak: {
-            keepMarks: true,
-          },
+          hardBreak: false,
           history: {
             depth: 200,
             newGroupDelay: 1000,
