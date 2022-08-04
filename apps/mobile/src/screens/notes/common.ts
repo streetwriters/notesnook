@@ -2,6 +2,7 @@ import { DDS } from '../../services/device-detection';
 import { eSendEvent } from '../../services/event-manager';
 import Navigation, { NotesScreenParams } from '../../services/navigation';
 import { useMenuStore } from '../../stores/use-menu-store';
+import { useTagStore } from '../../stores/use-tag-store';
 import { db } from '../../utils/database';
 import { eOnLoadNote } from '../../utils/events';
 import { openLinkInBrowser } from '../../utils/functions';
@@ -103,7 +104,7 @@ async function onNoteCreated(id: string, params: FirstSaveData) {
         'Favorites',
         'Notes'
       );
-      eSendEvent('updateTags');
+      useTagStore.getState().setTags();
       break;
     }
     case 'color': {

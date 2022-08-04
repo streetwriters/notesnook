@@ -164,6 +164,14 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   `);
   };
 
+  clearTags = async () => {
+    await this.doAsync(`
+    if (typeof editorTags !== "undefined" && editorTags.current) {
+      editorTags.current.setTags([]);
+    }
+  `);
+  };
+
   insertAttachment = async (attachment: Attachment) => {
     await this.doAsync(`editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`);
   };

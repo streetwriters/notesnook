@@ -151,6 +151,7 @@ const NotesPage = ({
   useEffect(() => {
     eSubscribeEvent(route.name, onRequestUpdate);
     return () => {
+      setOnFirstSave(null);
       eUnSubscribeEvent(route.name, onRequestUpdate);
     };
   }, []);

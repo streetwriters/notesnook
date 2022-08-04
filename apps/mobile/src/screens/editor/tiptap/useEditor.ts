@@ -121,6 +121,7 @@ export const useEditor = (
     useEditorStore.getState().setReadonly(false);
     postMessage(EditorEvents.title, '');
     await commands.clearContent();
+    await commands.clearTags();
     console.log('reset state: ', resetState);
     if (resetState) {
       isDefaultEditor && useEditorStore.getState().setCurrentlyEditingNote(null);
