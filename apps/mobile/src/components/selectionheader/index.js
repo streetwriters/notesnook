@@ -6,7 +6,7 @@ import { useSelectionStore } from '../../stores/use-selection-store';
 import { eSendEvent, ToastEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import { db } from '../../utils/database';
-import { eOpenMoveNoteDialog, refreshNotesPage } from '../../utils/events';
+import { eOpenMoveNoteDialog } from '../../utils/events';
 import { deleteItems } from '../../utils/functions';
 import { tabBarRef } from '../../utils/global-refs';
 import layoutmanager from '../../utils/layout-manager';
@@ -221,14 +221,11 @@ export const SelectionHeader = React.memo(() => {
           <IconButton
             onPress={async () => {
               if (selectedItemsList.length > 0) {
-                //TODO
-                let extras = {};
+                const currentTopic = useNavigationStore.getState().currentScreen;
                 await db.notebooks
-                  .notebook(extras.notebook)
-                  .topics.topic(extras.topic)
+                  .notebook(currentTopic.notebookId)
+                  .topics.topic(currentTopic.id)
                   .delete(...selectedItemsList.map(item => item.id));
-
-                eSendEvent(refreshNotesPage);
                 Navigation.queueRoutesForUpdate(
                   'Notes',
                   'Favorites',

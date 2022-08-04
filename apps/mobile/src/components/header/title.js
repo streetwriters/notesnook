@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Platform, View } from 'react-native';
-import Animated, { Layout } from 'react-native-reanimated';
 import Notebook from '../../screens/notebook';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import Navigation from '../../services/navigation';
 import useNavigationStore from '../../stores/use-navigation-store';
 import { useThemeStore } from '../../stores/use-theme-store';
-import { COLORS_NOTE } from '../../utils/color-scheme';
 import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/events';
 import { SIZE } from '../../utils/size';
@@ -18,8 +15,15 @@ const titleState = {};
 export const Title = () => {
   const colors = useThemeStore(state => state.colors);
   const currentScreen = useNavigationStore(state => state.currentScreen);
+  const isNotebook = currentScreen.name === 'Notebook';
   const isTopic = currentScreen?.name === 'TopicNotes';
-  const [hide, setHide] = useState(isTopic ? true : false);
+  const [hide, setHide] = useState(
+    isNotebook
+      ? typeof titleState[currentScreen.id] === 'boolean'
+        ? titleState[currentScreen.id]
+        : true
+      : false
+  );
   const isHidden = titleState[currentScreen.id];
   console.log(currentScreen, 'header');
   const notebook =
@@ -68,7 +72,6 @@ export const Title = () => {
     if (!isTopic) return;
     Notebook.navigate(notebook, true);
   }
-  console.log('color', currentScreen.color);
   return (
     <View
       style={{
