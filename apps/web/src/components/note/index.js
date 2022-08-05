@@ -3,7 +3,11 @@ import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
-import { confirm, showMoveNoteDialog } from "../../common/dialog-controller";
+import {
+  confirm,
+  showError,
+  showMoveNoteDialog,
+} from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";
@@ -209,7 +213,8 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
     prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
-    JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags)
+    JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags) &&
+    JSON.stringify(prevProps.context) === JSON.stringify(nextProps.context)
   );
 });
 
@@ -420,11 +425,22 @@ const topicNoteMenuItems = [
     color: "error",
     iconColor: "error",
     onClick: async ({ items, context }) => {
-      await db.notebooks
-        .notebook(context.value.id)
-        .topics.topic(context.value.topic)
-        .delete(...items.map((i) => i.id));
-      store.refresh();
+      try {
+        if (!context.value?.topic || !context.value?.id)
+          throw new Error("context is missing");
+
+        const ids = items.map((i) => i.id);
+        const topic = db.notebooks
+          .notebook(context.value.id)
+          ?.topics?.topic(context.value.topic);
+        if (!topic) throw new Error("topic not found");
+        await topic.delete(...ids);
+        store.refresh();
+
+        showToast("success", "Note removed from topic.");
+      } catch (e) {
+        showToast("error", `Failed to remove note from topic: ${e.message}.`);
+      }
     },
     multiSelect: true,
   },
