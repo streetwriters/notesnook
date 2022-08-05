@@ -934,7 +934,9 @@ function AccountStatus(props) {
             else showEmailVerificationDialog();
           }}
         >
-          {user.isEmailConfirmed
+          {isProCancelled
+            ? "Resubscribe to Notesnook Pro"
+            : user.isEmailConfirmed
             ? "Upgrade to Notesnook Pro"
             : "Confirm your email to sync your notes."}
         </Button>
