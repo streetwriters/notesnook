@@ -93,7 +93,7 @@ export function ImageComponent(
               path={
                 error
                   ? Icons.imageFailed
-                  : !source && !isDataUrl(src)
+                  : isDownloadable(source, src)
                   ? Icons.imageDownload
                   : Icons.image
               }
@@ -114,8 +114,8 @@ export function ImageComponent(
             >
               {error
                 ? `There was an error loading the image: ${error}`
-                : !source
-                ? `Downloading image from ${new URL(src).hostname}`
+                : isDownloadable(source, src)
+                ? `Downloading image from ${getHostname(src)}`
                 : ""}
             </Text>
             {error ? (
@@ -217,48 +217,12 @@ export function ImageComponent(
   );
 }
 
-type ImageHeaderToolbarProps = {
-  editor: Editor;
-  float?: boolean;
-  selected: boolean;
-};
-function _ImageHeaderToolbar(props: ImageHeaderToolbarProps) {
-  const { editor, float, selected } = props;
+function getHostname(src?: string) {
+  if (!src) return null;
 
-  if (!selected) return null;
-  return (
-    <Flex sx={{ position: "relative", justifyContent: "end" }}>
-      <Flex
-        sx={{
-          position: "absolute",
-          top: -40,
-          mb: 2,
-          alignItems: "end",
-        }}
-      >
-        <ToolbarGroup
-          editor={editor}
-          tools={
-            float
-              ? ["imageAlignLeft", "imageAlignRight", "imageProperties"]
-              : [
-                  "imageAlignLeft",
-                  "imageAlignCenter",
-                  "imageAlignRight",
-                  "imageProperties",
-                ]
-          }
-          sx={{
-            boxShadow: "menu",
-            borderRadius: "default",
-            bg: "background",
-          }}
-        />
-      </Flex>
-    </Flex>
-  );
+  return new URL(src).hostname;
 }
 
-const ImageHeaderToolbar = React.memo(_ImageHeaderToolbar, (prev, next) => {
-  return prev.float === next.float && prev.selected === next.selected;
-});
+function isDownloadable(source?: string, src?: string) {
+  return !source && src && !isDataUrl(src);
+}
