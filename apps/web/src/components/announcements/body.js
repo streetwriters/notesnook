@@ -12,6 +12,8 @@ import {
 } from "../../common/dialog-controller";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import * as Icon from "../icons";
+import { store as appStore } from "../../stores/app-store";
+import { createBackup } from "../../common";
 
 var margins = [0, 2];
 var HORIZONTAL_MARGIN = 3;
@@ -263,9 +265,6 @@ function InlineCalltoActions({ item }) {
 function CalltoAction({ action, variant, sx, removeAnnouncement }) {
   return (
     <Button
-      as={action.type === "link" ? "a" : "button"}
-      href={action.type === "link" ? action.data : ""}
-      target="_blank"
       variant={variant}
       sx={sx}
       onClick={async () => {
@@ -275,12 +274,19 @@ function CalltoAction({ action, variant, sx, removeAnnouncement }) {
         switch (action.type) {
           case "link":
             const url = new URL(action.data);
-            if (url.origin === window.location.origin)
-              window.open(action.data, "_self");
+            const target =
+              url.origin === window.location.origin ? "_self" : "_blank";
+            window.open(action.data, target, "noopener noreferrer");
             break;
           case "promo":
             const [coupon, plan] = action.data.split(":");
             await showBuyDialog(plan, coupon);
+            break;
+          case "force-sync":
+            await appStore.sync(true, true);
+            break;
+          case "backup":
+            await createBackup(true);
             break;
           default:
             return;
