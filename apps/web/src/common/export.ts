@@ -2,6 +2,7 @@ import { db } from "./db";
 import { TaskManager } from "./task-manager";
 import { zip } from "../utils/zip";
 import { saveAs } from "file-saver";
+import { showToast } from "../utils/toast";
 
 export async function exportToPDF(
   title: string,
@@ -48,7 +49,9 @@ export async function exportNotes(
           text: `Exporting "${note.title}"...`,
         });
         console.log("Exporting", note.title);
-        const content: string = await note.export(format, null).catch(() => {});
+        const content: string = await note.export(format, null).catch((e) => {
+          showToast("error", e.message);
+        });
         if (!content) continue;
         files.push({ filename: note.title, content });
       }
