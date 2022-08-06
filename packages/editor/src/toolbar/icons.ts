@@ -84,7 +84,10 @@ import {
   mdiFormatHeaderPound,
   mdiFormatIndentIncrease,
   mdiFormatIndentDecrease,
-  mdiResizeBottomRight
+  mdiResizeBottomRight,
+  mdiImageOutline,
+  mdiProgressDownload,
+  mdiProgressAlert,
 } from "@mdi/js";
 
 export const Icons = {
@@ -119,7 +122,9 @@ export const Icons = {
     "M7 7h4v2H7c-1.6568542 0-3 1.343146-3 3s1.3431458 3 3 3h4v2H7c-2.7614237 0-5-2.238576-5-5 0-2.7614237 2.2385763-5 5-5m10 0c2.761424 0 5 2.2385763 5 5h-2c0-1.656854-1.343146-3-3-3h-4V7h4m-9 4h8v2H8v-2m15.119777 8.323608-1.07-.82c.02-.17.04-.33.04-.5 0-.17-.01-.33-.04-.5l1.06-.82c.09258-.07939.117526-.212463.06-.32l-1-1.73c-.06-.13-.19-.13-.33-.13l-1.22.5c-.28-.18-.54-.35-.85-.47l-.19-1.32c-.01-.12-.12-.21-.24-.21h-2c-.12 0-.23.09-.25.21l-.19 1.32c-.3.13-.59.29-.85.47l-1.24-.5c-.11 0-.24 0-.31.13l-1 1.73c-.06.11-.04.24.06.32l1.06.82c-.03989.33214-.03989.66786 0 1l-1.06.82c-.09258.07939-.117526.212462-.06.32l1 1.73c.06.13.19.13.31.13l1.24-.5c.26.18.54.35.85.47l.19 1.32c.02.12.12.21.25.21h2c.12 0 .23-.09.25-.21l.19-1.32c.3-.13.56-.29.84-.47l1.22.5c.14 0 .27 0 .34-.13l1-1.73c.05753-.107538.03258-.240607-.06-.32m-4.78.18c-.83 0-1.5-.67-1.5-1.5s.68-1.5 1.5-1.5 1.5.67 1.5 1.5-.66 1.5-1.5 1.5z",
 
   url: mdiLink,
-  image: mdiImage,
+  image: mdiImageOutline,
+  imageDownload: mdiProgressDownload,
+  imageFailed: mdiProgressAlert,
   imageSettings: mdiImageEditOutline,
   colorClear: mdiInvertColorsOff,
   check: mdiCheck,
@@ -193,7 +198,7 @@ export const Icons = {
   circle: mdiCircle,
   arrowLeft: mdiArrowLeft,
   resize: mdiResizeBottomRight,
-  none: ""
+  none: "",
 };
 
 export type IconNames = keyof typeof Icons;

@@ -2,8 +2,8 @@ import { Input } from "@rebass/forms";
 import { useState } from "react";
 import { Flex, Text } from "rebass";
 import { ImageAttributes } from "../../extensions/image";
-import { Button } from "../../components/button";
 import { Popup } from "../components/popup";
+import { downloadImage, toDataURL } from "../../utils/downloader";
 
 export type ImageUploadPopupProps = {
   onInsert: (image: ImageAttributes) => void;
@@ -28,24 +28,8 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           setError(undefined);
 
           try {
-            const response = await fetch(url);
-            if (!response.ok)
-              return setError(`invalid status code ${response.status}`);
-
-            const contentType = response.headers.get("Content-Type");
-            const contentLength = response.headers.get("Content-Length");
-
-            if (
-              !contentType ||
-              !contentLength ||
-              contentLength === "0" ||
-              !contentType.startsWith("image/")
-            )
-              return setError("not an image");
-
-            const size = parseInt(contentLength);
-            const dataurl = await toDataURL(await response.blob());
-            onInsert({ src: dataurl, type: contentType, size });
+            const { blob, size, type } = await downloadImage(url);
+            onInsert({ src: await toDataURL(blob), size, type });
           } catch (e) {
             if (e instanceof Error) setError(e.message);
           } finally {
@@ -97,27 +81,3 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
     </Popup>
   );
 }
-
-function toDataURL(blob: Blob): Promise<string> {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (_e) => resolve(reader.result as string);
-    reader.onerror = (_e) => reject(reader.error);
-    reader.onabort = (_e) => reject(new Error("Read aborted"));
-    reader.readAsDataURL(blob);
-  });
-}
-
-// async function validateURL(url: string): Promise<boolean> {
-//   try {
-//     const response = await fetch(url, { method: "HEAD" });
-
-//     return (
-//       response.ok &&
-//       !!response.headers.get("Content-Type")?.startsWith("image/") &&
-//       response.headers.get("Content-Length") !== "0"
-//     );
-//   } catch {
-//     return false;
-//   }
-// }
