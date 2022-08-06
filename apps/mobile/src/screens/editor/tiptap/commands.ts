@@ -187,8 +187,12 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     await this.doAsync(`editor && editor.commands.insertImage(${JSON.stringify(image)})`);
   };
 
-  updateImage = async (image: ImageAttributes) => {
-    await this.doAsync(`editor && editor.commands.updateImage(${JSON.stringify(image)})`);
+  updateImage = async ({ src, hash }: ImageAttributes) => {
+    await this.doAsync(
+      `editor && editor.commands.updateImage(${JSON.stringify({
+        hash
+      })},${JSON.stringify({ src, hash, preventUpdate: true })})`
+    );
   };
 
   handleBack = async () => {
