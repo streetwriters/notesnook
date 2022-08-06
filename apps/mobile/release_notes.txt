@@ -1,12 +1,5 @@
-- fix group/subgroup with index 0 cannot be removed in toolbar
-- fix Fluid tabs sensitivity conflicting with press events
-- fix incorrect bottom insets hide some part of the toolbar
-- fix a crash when opening merge conflict dialog
-- fix auto backups not working on some devices
-- fix images placeholders are not loaded in editor
-- fix toggling checklist opens the keyboard
-- fix editor becomes very laggy on large notes
-- fix cursor jumps to start on typing issue description
-- improved note loading in editor for better UX
+- Now you can disable double spaced lines in editor
+- Uploading full quality images is not supported.
+- Many bug fixes and performance improvements
 
 Thank you for using Notesnook!
