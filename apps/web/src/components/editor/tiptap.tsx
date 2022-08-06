@@ -25,6 +25,7 @@ import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 
+const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 0 : 300;
 var saveTimeout = 0;
 type TipTapProps = {
   editorContainer: HTMLElement;
@@ -112,7 +113,7 @@ function TipTap(props: TipTapProps) {
               },
             },
           });
-        }, 500) as unknown as number;
+        }, SAVE_INTERVAL) as unknown as number;
       },
       onDestroy: () => {
         configure({
