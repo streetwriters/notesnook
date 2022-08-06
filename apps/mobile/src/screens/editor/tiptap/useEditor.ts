@@ -265,10 +265,10 @@ export const useEditor = (
         await postMessage(EditorEvents.title, item.title);
         await postMessage(EditorEvents.html, currentContent.current?.data);
         useEditorStore.getState().setReadonly(item.readonly);
-        loadImages();
         await commands.setTags(currentNote.current);
         commands.setSettings();
         overlay(false);
+        loadImages();
       }
     },
     [setSessionId]
@@ -276,15 +276,18 @@ export const useEditor = (
 
   const loadImages = () => {
     if (!currentNote.current?.id) return;
-    //@ts-ignore
-    if (currentNote.current?.content?.isPreview) {
-      db.content?.downloadMedia(currentNote.current?.id, currentNote.current.content, true);
-    } else {
-      const images = db.attachments?.ofNote(currentNote.current?.id, 'images');
-      if (images && images.length > 0) {
-        db.attachments?.downloadImages(currentNote.current.id);
+    setTimeout(() => {
+      if (!currentNote.current?.id) return;
+      //@ts-ignore
+      if (currentNote.current?.content?.isPreview) {
+        db.content?.downloadMedia(currentNote.current?.id, currentNote.current.content, true);
+      } else {
+        const images = db.attachments?.ofNote(currentNote.current?.id, 'images');
+        if (images && images.length > 0) {
+          db.attachments?.downloadImages(currentNote.current.id);
+        }
       }
-    }
+    }, 300);
   };
 
   useEffect(() => {
