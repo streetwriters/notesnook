@@ -33,8 +33,8 @@ export function toDataURL(blob: Blob): Promise<string> {
   });
 }
 
-export function isDataUrl(url: string): boolean {
-  return url.startsWith("data:");
+export function isDataUrl(url?: string): boolean {
+  return url?.startsWith("data:") || false;
 }
 
 export async function toBlobURL(dataurl: string) {
