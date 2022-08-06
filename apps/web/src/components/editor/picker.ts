@@ -89,8 +89,8 @@ async function pickImage(selectedImage: File, options?: AddAttachmentOptions) {
       throw new Error("Image too big. You cannot add images over 50 MB.");
     if (!selectedImage) return;
 
-    const { dataurl, file } = await compressImage(selectedImage);
-    return await addAttachment(file, dataurl, options);
+    const dataurl = await toDataURL(selectedImage);
+    return await addAttachment(selectedImage, dataurl, options);
   } catch (e) {
     showToast("error", (e as Error).message);
   }
@@ -121,34 +121,10 @@ export function showFilePicker({
   });
 }
 
-type CompressionResult = { dataurl: string; file: File };
-function compressImage(file: File): Promise<CompressionResult> {
-  return new Promise((resolve, reject) => {
-    new Compressor(file, {
-      quality: 0.8,
-      mimeType: file.type,
-      maxWidth: 4000,
-      maxHeight: 4000,
-      /**
-       *
-       * @param {Blob} result
-       */
-      async success(result) {
-        const buffer = await result.arrayBuffer();
-        const base64 = Buffer.from(buffer).toString("base64");
-        resolve({
-          dataurl: `data:${file.type};base64,${base64}`,
-          file: new File([result], file.name, {
-            lastModified: file.lastModified,
-            type: file.type,
-          }),
-        });
-      },
-      error(err) {
-        reject(err);
-      },
-    });
-  });
+async function toDataURL(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString("base64");
+  return `data:${file.type};base64,${base64}`;
 }
 
 export type AttachmentProgress = {
