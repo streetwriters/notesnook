@@ -31,6 +31,8 @@ export const SectionItem = React.memo(
         //@ts-ignore
         [item.property]: !settings[item.property]
       });
+      //@ts-ignore
+      item.onChange?.(!settings[item.property]);
     };
 
     const styles =

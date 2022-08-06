@@ -42,6 +42,7 @@ export type Settings = {
   lastVerificationEmailTime?: number;
   sessionExpired: boolean;
   version: number | null;
+  doubleSpacedLines?: boolean;
 };
 
 type Dimensions = {
@@ -103,7 +104,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     },
     showBackupCompleteSheet: true,
     sessionExpired: false,
-    version: null
+    version: null,
+    doubleSpacedLines: true
   },
   sheetKeyboardHandler: true,
   fullscreen: false,

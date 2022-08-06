@@ -736,6 +736,22 @@ export const settingsGroups: SettingSection[] = [
         modifer: () => {
           useDragState.getState().setPreset('default');
         }
+      },
+      {
+        id: 'double-spaced-lines',
+        name: 'Use double spaced lines',
+        description: `New lines will be double spaced (old ones won't be affected).`,
+        type: 'switch',
+        property: 'doubleSpacedLines',
+        icon: 'format-line-spacing',
+        onChange: property => {
+          ToastEvent.show({
+            heading: 'Line spacing changed',
+            type: 'success',
+            message:
+              'Close and reopen the current opened note or restart the app for changes to take affect.'
+          });
+        }
       }
     ]
   },

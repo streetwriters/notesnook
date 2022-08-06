@@ -123,6 +123,7 @@ export const useEditorEvents = (
   const handleBack = useRef<NativeEventSubscription>();
   const readonly = useEditorStore(state => state.readonly);
   const isPremium = useUserStore(state => state.premium);
+  const doubleSpacedLines = useSettingStore(state => state.settings?.doubleSpacedLines);
   const tools = useDragState(state => state.data);
   const { keyboardShown } = useKeyboard();
   if (!editor) return null;
@@ -137,7 +138,8 @@ export const useEditorEvents = (
       tools: tools || getDefaultPresets().default,
       noHeader: noHeader,
       noToolbar: readonly || editorPropReadonly || noToolbar,
-      keyboardShown: keyboardShown || false
+      keyboardShown: keyboardShown || false,
+      doubleSpacedLines: doubleSpacedLines
     });
   }, [
     fullscreen,
@@ -148,7 +150,8 @@ export const useEditorEvents = (
     deviceMode,
     tools,
     editor.commands,
-    keyboardShown
+    keyboardShown,
+    doubleSpacedLines
   ]);
 
   const onBackPress = useCallback(async () => {
@@ -298,7 +301,7 @@ export const useEditorEvents = (
         break;
       case EventTypes.filepicker:
         const { pick } = require('./picker.js').default;
-        pick({ type: 'image' });
+        pick({ type: editorMessage.value });
         break;
       case EventTypes.download:
         console.log('download attachment request', editorMessage.value);

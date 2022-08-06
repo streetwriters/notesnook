@@ -13,6 +13,7 @@ export type SettingSection = {
   getter?: (...args: any[]) => any;
   useHook?: (...args: any[]) => unknown;
   hidden?: (current: any) => boolean;
+  onChange?: (property: boolean) => void;
 };
 
 export type SettingsGroup = {
