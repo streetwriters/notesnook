@@ -10,6 +10,7 @@ const initialState = {
   noToolbar: global.noToolbar,
   noHeader: global.noHeader,
   readonly: global.readonly,
+  doubleSpacedLines: true,
 };
 
 global.settingsController = {

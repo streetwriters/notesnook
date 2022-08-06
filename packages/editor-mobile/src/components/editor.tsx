@@ -69,12 +69,14 @@ const Tiptap = ({
       content: global.editorController?.content?.current,
       isMobile: true,
       isKeyboardOpen: settings.keyboardShown,
+      doubleSpacedLines: settings.doubleSpacedLines,
     },
     [layout, settings.readonly, tick]
   );
 
   const update = useCallback(() => {
     setTick((tick) => tick + 1);
+
     globalThis.editorController.setTitlePlaceholder("Note title");
   }, []);
 
@@ -129,7 +131,10 @@ const Tiptap = ({
             </>
           )}
 
-          <ContentDiv ref={contentRef} />
+          <ContentDiv
+            padding={settings.doubleSpacedLines ? 0 : 6}
+            ref={contentRef}
+          />
 
           <div
             onDoubleClick={() => {
@@ -137,13 +142,19 @@ const Tiptap = ({
               if (!lastPosition) return;
               globalThis.editor
                 ?.chain()
-                .focus()
                 .insertContentAt(lastPosition - 1, "<p></p>", {
                   updateSelection: true,
                 })
                 .run();
+              setTimeout(() => {
+                globalThis.editor?.commands.focus();
+              }, 1);
             }}
-            style={{ flexShrink: 0, height: 150, width: "100%" }}
+            style={{
+              flexShrink: 0,
+              height: 150,
+              width: "100%",
+            }}
           />
         </div>
 
@@ -162,14 +173,14 @@ const Tiptap = ({
 };
 
 const ContentDiv = memo(
-  forwardRef<HTMLDivElement>((props, ref) => {
+  forwardRef<HTMLDivElement, { padding: number }>((props, ref) => {
     const theme = useEditorThemeStore((state) => state.colors);
     return (
       <div
         ref={ref}
         style={{
           padding: 12,
-          paddingTop: 0,
+          paddingTop: props.padding,
           flex: 1,
           color: theme.pri,
           marginTop: -12,

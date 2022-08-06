@@ -44,6 +44,7 @@ function Title({
         backgroundColor: "transparent",
         color: "var(--nn_heading)",
       }}
+      maxLength={150}
       onChange={(event) => {
         if (!emitUpdate.current) return;
         controller.current?.titleChange(event.target.value);

@@ -19,6 +19,7 @@ export type Settings = {
   noToolbar?: boolean;
   noHeader?: boolean;
   keyboardShown?: boolean;
+  doubleSpacedLines?: boolean;
 };
 
 declare global {
