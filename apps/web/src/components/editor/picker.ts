@@ -1,5 +1,4 @@
 import { SerializedKey } from "@notesnook/crypto/dist/src/types";
-import Compressor from "compressorjs";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
 import { showBuyDialog } from "../../common/dialog-controller";

@@ -248,7 +248,10 @@ function toIEditor(editor: Editor): IEditor {
       } else editor.current?.commands.insertAttachment(file);
     },
     loadImage: (hash, src) =>
-      editor.current?.commands.updateImage({ hash, src }),
+      editor.current?.commands.updateImage(
+        { hash },
+        { hash, src, preventUpdate: true }
+      ),
     sendAttachmentProgress: (hash, type, progress) =>
       editor.current?.commands.setAttachmentProgress({
         hash,
