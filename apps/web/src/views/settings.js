@@ -930,12 +930,15 @@ function AccountStatus(props) {
           bg={user.isEmailConfirmed ? "primary" : "error"}
           mt={1}
           onClick={() => {
-            if (user.isEmailConfirmed) showBuyDialog();
+            if (user.isEmailConfirmed)
+              showBuyDialog("monthly", isTrial ? "TRIAL2PRO" : undefined);
             else showEmailVerificationDialog();
           }}
         >
           {isProCancelled
             ? "Resubscribe to Notesnook Pro"
+            : isTrial
+            ? "Upgrade at 50% OFF (first month)"
             : user.isEmailConfirmed
             ? "Upgrade to Notesnook Pro"
             : "Confirm your email to sync your notes."}

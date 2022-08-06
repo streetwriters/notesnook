@@ -6,7 +6,7 @@ export const COLORS = [
   "blue",
   "purple",
   "gray",
-];
+] as const;
 
 export const SUBSCRIPTION_STATUS = {
   BASIC: 0,
@@ -15,4 +15,4 @@ export const SUBSCRIPTION_STATUS = {
   PREMIUM: 5,
   PREMIUM_EXPIRED: 6,
   PREMIUM_CANCELED: 7,
-};
+} as const;
