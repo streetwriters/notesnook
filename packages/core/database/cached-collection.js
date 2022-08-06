@@ -66,7 +66,7 @@ export default class CachedCollection extends IndexedCollection {
   }
 
   getItems(map = undefined) {
-    if (this.items) return this.items;
+    if (this.items && this.items.length === this.map.size) return this.items;
 
     this.items = [];
     this.map.forEach((value) => {
