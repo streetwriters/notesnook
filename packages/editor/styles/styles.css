@@ -61,8 +61,7 @@
 
 .ProseMirror > div.codeblock-view-content-wrap,
 .ProseMirror > div.taskList-view-content-wrap,
-.ProseMirror > div.outlineList-view-content-wrap,
-.ProseMirror > div.image-view-content-wrap {
+.ProseMirror > div.outlineList-view-content-wrap {
   margin-top: 1em;
   margin-bottom: 1em;
 }
@@ -75,6 +74,12 @@
 .ProseMirror > div.table-view-content-wrap {
   margin-top: 1.6em;
   margin-bottom: 1em;
+}
+
+.ProseMirror a > span.image-view-content-wrap {
+  display: inline-block;
+  text-decoration: none !important;
+  text-decoration-line: none !important;
 }
 
 .ProseMirror {

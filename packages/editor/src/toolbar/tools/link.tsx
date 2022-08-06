@@ -9,6 +9,7 @@ import { useRefValue } from "../../hooks/use-ref-value";
 import { findMark, selectionToOffset } from "../utils/prosemirror";
 import { setTextSelection } from "prosemirror-utils";
 import { Flex, Text } from "rebass";
+import { ImageNode } from "../../extensions/image";
 
 export function LinkSettings(props: ToolProps) {
   const { editor } = props;
@@ -30,7 +31,8 @@ export function AddLink(props: ToolProps) {
 
   const isActive = props.editor.isActive("link");
 
-  const onDone = useCallback((href: string, text: string) => {
+  const onDone = useCallback((link: LinkDefinition) => {
+    const { href, text, isImage } = link;
     if (!href) return;
 
     let commandChain = editor.current?.chain().focus();
@@ -38,19 +40,20 @@ export function AddLink(props: ToolProps) {
 
     const isSelection = !editor.current?.state.selection.empty;
 
-    commandChain
+    commandChain = commandChain
       .extendMarkRange("link")
-      .toggleLink({ href, target: "_blank" })
-      .insertContent(text || href)
-      .focus();
+      .toggleLink({ href, target: "_blank" });
+    if (!isImage) commandChain = commandChain.insertContent(text || href);
 
-    if (!isSelection)
+    commandChain = commandChain.focus();
+
+    if (!isSelection && !isImage)
       commandChain = commandChain.unsetMark("link").insertContent(" ");
 
     commandChain.run();
   }, []);
 
-  if (isActive) return <EditLink {...props} />;
+  if (isActive) return <EditLink {...props} icon={"linkEdit"} />;
   return (
     <LinkTool
       {...props}
@@ -59,6 +62,10 @@ export function AddLink(props: ToolProps) {
         if (!editor.current) return;
         const { state } = editor.current;
         let { from, to } = state.selection;
+
+        const isImage = state.doc.nodeAt(from)?.type.name === ImageNode.name;
+        if (isImage) return { isImage };
+
         const selectedText = state.doc.textBetween(from, to);
         return { text: selectedText };
       }}
@@ -72,7 +79,8 @@ export function EditLink(props: ToolProps) {
     _selectedNode || selectionToOffset(editor.state)
   );
 
-  const onDone = useCallback((href: string, text: string) => {
+  const onDone = useCallback((link: LinkDefinition) => {
+    const { href, text, isImage } = link;
     const { from, node, to } = selectedNode.current;
 
     if (!href || !editor.current || !node) return;
@@ -106,7 +114,11 @@ export function EditLink(props: ToolProps) {
         const mark = findMark(node, "link");
 
         if (!mark) return;
-        return { text: selectedText, href: mark.attrs.href };
+        return {
+          text: selectedText,
+          href: mark.attrs.href,
+          isImage: node.type.name === ImageNode.name,
+        };
       }}
     />
   );
@@ -154,18 +166,22 @@ export function OpenLink(props: ToolProps) {
   );
 }
 
+export type LinkDefinition = {
+  href?: string;
+  text?: string;
+  isImage?: boolean;
+};
 type LinkToolProps = ToolProps & {
   isEditing?: boolean;
-  onDone: (href: string, text: string) => void;
-  onClick: () => { href?: string; text: string } | undefined;
+  onDone: (link: LinkDefinition) => void;
+  onClick: () => LinkDefinition | undefined;
 };
 function LinkTool(props: LinkToolProps) {
   const { isEditing, onClick, onDone, editor, ...toolProps } = props;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const [href, setHref] = useState<string>();
-  const [text, setText] = useState<string>();
+  const [linkDefinition, setLinkDefinition] = useState<LinkDefinition>();
 
   return (
     <>
@@ -175,9 +191,7 @@ function LinkTool(props: LinkToolProps) {
         onClick={() => {
           const result = onClick();
           if (!result) return;
-          const { text, href } = result;
-          setHref(href);
-          setText(text);
+          setLinkDefinition(result);
           setIsOpen(true);
         }}
         toggled={isOpen}
@@ -202,12 +216,11 @@ function LinkTool(props: LinkToolProps) {
         focusOnRender={false}
       >
         <LinkPopup
-          href={href}
-          text={text}
+          link={linkDefinition}
           isEditing={isEditing}
           onClose={() => setIsOpen(false)}
-          onDone={({ href, text }) => {
-            onDone(href, text);
+          onDone={(link) => {
+            onDone(link);
             setIsOpen(false);
           }}
         />

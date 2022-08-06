@@ -1,25 +1,19 @@
 import { Input } from "@rebass/forms";
 import { useState } from "react";
 import { Flex, Button } from "rebass";
+import { useRefValue } from "../../hooks/use-ref-value";
 import { Popup } from "../components/popup";
+import { LinkDefinition } from "../tools/link";
 
 export type LinkPopupProps = {
-  text?: string;
-  href?: string;
+  link?: LinkDefinition;
   isEditing?: boolean;
-  onDone: (link: { text: string; href: string }) => void;
+  onDone: (link: LinkDefinition) => void;
   onClose: () => void;
 };
 export function LinkPopup(props: LinkPopupProps) {
-  const {
-    text: _text,
-    href: _href,
-    isEditing = false,
-    onDone,
-    onClose,
-  } = props;
-  const [href, setHref] = useState<string>(_href || "");
-  const [text, setText] = useState<string>(_text || "");
+  const { link: _link, isEditing = false, onDone, onClose } = props;
+  const link = useRefValue(_link);
 
   return (
     <Popup
@@ -27,23 +21,32 @@ export function LinkPopup(props: LinkPopupProps) {
       onClose={onClose}
       action={{
         title: isEditing ? "Save edits" : "Insert link",
-        onClick: () => onDone({ text, href }),
+        onClick: () => {
+          if (!link.current) return;
+          onDone(link.current);
+        },
       }}
     >
       <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>
-        <Input
-          type="text"
-          placeholder="Link text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
+        {!link.current?.isImage && (
+          <Input
+            type="text"
+            placeholder="Link text"
+            value={link.current?.text}
+            sx={{ mb: 1 }}
+            onChange={(e) =>
+              (link.current = { ...link.current, text: e.target.value })
+            }
+          />
+        )}
         <Input
           type="url"
-          sx={{ mt: 1 }}
           autoFocus
           placeholder="https://example.com/"
-          value={href}
-          onChange={(e) => setHref(e.target.value)}
+          value={link.current?.href}
+          onChange={(e) =>
+            (link.current = { ...link.current, href: e.target.value })
+          }
         />
       </Flex>
     </Popup>
