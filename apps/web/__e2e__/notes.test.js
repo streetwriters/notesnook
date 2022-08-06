@@ -468,7 +468,7 @@ test.describe("run tests independently", () => {
     expect(editorContent).toContain(`${content}${NOTE.content}`);
   });
 
-  test.only("change title of a locked note", async () => {
+  test("change title of a locked note", async () => {
     const title = "NEW TITLE!";
 
     const noteSelector = await createNoteAndCheckPresence();

@@ -147,6 +147,8 @@ test("delete a tag and make sure all associated notes are untagged", async ({
     await clickMenuItem("delete");
   });
 
+  await page.waitForTimeout(1000);
+
   expect(await page.isVisible(tagSelector.build())).toBe(false);
 
   await navigateTo("notes");
