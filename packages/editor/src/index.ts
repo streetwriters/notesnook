@@ -51,6 +51,7 @@ import { usePermissionHandler } from "./hooks/use-permission-handler";
 import { Highlight } from "./extensions/highlight";
 import { Paragraph } from "./extensions/paragraph";
 import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
+import { Code } from "@tiptap/extension-code";
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
@@ -108,6 +109,7 @@ const useTiptap = (
           doubleSpaced: doubleSpacedLines,
         }),
         StarterKit.configure({
+          code: false,
           dropcursor: false,
           codeBlock: false,
           listItem: false,
@@ -164,6 +166,7 @@ const useTiptap = (
         OutlineListItem,
         OutlineList,
         ListItem,
+        Code.extend({ excludes: "" }),
         Codemark,
         MathInline,
         MathBlock,
