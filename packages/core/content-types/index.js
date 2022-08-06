@@ -5,6 +5,8 @@ export function getContentFromData(type, data) {
     case "tiptap":
       return new Tiptap(data);
     default:
-      return null;
+      throw new Error(
+        `Unknown content type: "${type}". Please report this error at support@streetwriters.co.`
+      );
   }
 }

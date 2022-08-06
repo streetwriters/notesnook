@@ -107,7 +107,11 @@ class Merger {
     if (deserialized.alg && deserialized.cipher) return deserialized;
 
     let type = deserialized.type;
-    if (!type && deserialized.data) type = "tiptap";
+    // temporary fix for streetwriters/notesnook#751
+    if (type === "content") {
+      type = "tiptap";
+      deserialized.type = type;
+    }
 
     if (!migrations[version]) {
       throw new Error(
@@ -119,7 +123,6 @@ class Merger {
 
     const migrate = migrations[version][type];
     if (migrate) {
-      console.log(migrate, version, type);
       return migrate(deserialized);
     }
     return deserialized;

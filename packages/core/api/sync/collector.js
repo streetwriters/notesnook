@@ -47,7 +47,7 @@ class Collector {
    * @param {Array} array
    * @returns {Array}
    */
-  _collect(type, array, isForceSync) {
+  _collect(collectionId, array, isForceSync) {
     if (!array.length) return [];
 
     const result = array.reduce((prev, item) => {
@@ -60,18 +60,18 @@ class Collector {
       if (item.localOnly) {
         prev.push({
           id: item.id,
-          type,
+          collectionId,
           deleted: true,
           dateModified: Date.now(),
         });
       } else if (isUnsynced && isSyncable) {
-        prev.push({ ...item, type });
+        prev.push({ ...item, collectionId });
       }
 
       return prev;
     }, []);
     this.logger.info(
-      `Collected items: ${type} (${result.length}/${array.length})`
+      `Collected items: ${collectionId} (${result.length}/${array.length})`
     );
     return result;
   }

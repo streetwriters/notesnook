@@ -257,7 +257,9 @@ class Sync {
 
     const arrays = data.items.reduce(
       (arrays, item) => {
-        arrays.types.push(item.type);
+        arrays.types.push(item.collectionId);
+
+        delete item.collectionId;
         arrays.items.push(item);
         return arrays;
       },
