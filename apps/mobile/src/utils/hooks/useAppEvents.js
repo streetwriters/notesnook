@@ -200,9 +200,7 @@ export const useAppEvents = () => {
 
   const attachIAPListeners = async () => {
     await RNIap.initConnection()
-      .catch(e => {
-        console.log(e);
-      })
+      .catch(e => null)
       .then(async () => {
         refValues.current.subsriptionSuccessListener =
           RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
