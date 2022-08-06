@@ -154,6 +154,8 @@ import {
   mdiVectorLink,
   mdiCodeBraces,
   mdiArrowCollapseHorizontal,
+  mdiSpeedometer,
+  mdiFormatLineSpacing,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -383,3 +385,5 @@ export const Uploaded = createIcon(mdiCloudCheckOutline);
 export const References = createIcon(mdiVectorLink);
 export const Codeblock = createIcon(mdiCodeBraces);
 export const Resize = createIcon(mdiArrowCollapseHorizontal);
+export const Performance = createIcon(mdiSpeedometer);
+export const LineSpacing = createIcon(mdiFormatLineSpacing);

@@ -70,7 +70,36 @@ const features: Record<FeatureKeys, Feature> = {
             ),
           },
         ]
-      : [],
+      : [
+          {
+            icon: Icon.Performance,
+            title: "Improved editor performance for large notes",
+            subtitle:
+              "For notes >200k words the performance should be much better (we're still not done optimizing so hang tight).",
+          },
+          {
+            icon: Icon.LineSpacing,
+            title: "Single/double line spacing",
+            subtitle: (
+              <>
+                You can now configure if you want to use single or double spaced
+                lines by going into <Code text="Settings > Editor settings" />.
+              </>
+            ),
+          },
+          {
+            icon: Icon.ImageMultiple,
+            title: "Image compression disabled",
+            subtitle: (
+              <>
+                Image compression has been fully disabled. All new images
+                attached will be in their original quality. (Do note that adding
+                too many high quality images will have negative impact on
+                performance.)
+              </>
+            ),
+          },
+        ],
     cta: {
       title: "Got it",
       icon: Icon.Checkmark,
