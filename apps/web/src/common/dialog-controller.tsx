@@ -52,7 +52,7 @@ function showDialog<TId extends DialogIds, TReturnType>(
     const PropDialog = () => render(Dialogs[id], perform);
     ReactDOM.render(
       <ThemeProvider>
-        <Suspense fallback={<DialogLoader />}>
+        <Suspense fallback={<div />}>
           <PropDialog />
         </Suspense>
       </ThemeProvider>,
