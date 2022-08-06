@@ -32,7 +32,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
             height: 0,
           };
 
-      editor.chain().setImageSize(size).run();
+      editor.current?.chain().setImageSize(size).run();
     },
     [width, height]
   );

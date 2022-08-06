@@ -42,7 +42,10 @@ declare module "@tiptap/core" {
        * Add an image
        */
       insertImage: (options: ImageAttributes) => ReturnType;
-      updateImage: (options: ImageAttributes) => ReturnType;
+      updateImage: (
+        query: { src?: string; hash?: string },
+        options: ImageAttributes & { preventUpdate?: boolean }
+      ) => ReturnType;
       setImageAlignment: (options: ImageAlignmentOptions) => ReturnType;
       setImageSize: (options: ImageSizeOptions) => ReturnType;
     };
@@ -56,8 +59,8 @@ export const ImageNode = Node.create<ImageOptions>({
 
   addOptions() {
     return {
-      inline: false,
-      allowBase64: false,
+      inline: true,
+      allowBase64: true,
       HTMLAttributes: {},
     };
   },
@@ -128,29 +131,37 @@ export const ImageNode = Node.create<ImageOptions>({
         },
       setImageAlignment:
         (options) =>
-        ({ commands }) => {
-          return commands.updateAttributes(this.name, { ...options });
+        ({ chain, tr }) => {
+          const { from } = tr.selection;
+          return chain()
+            .updateAttributes(this.name, { ...options })
+            .setNodeSelection(from)
+            .run();
         },
       setImageSize:
         (options) =>
-        ({ commands }) => {
-          return commands.updateAttributes(this.name, { ...options });
+        ({ chain, tr }) => {
+          const { from } = tr.selection;
+          return chain()
+            .updateAttributes(this.name, { ...options })
+            .setNodeSelection(from)
+            .run();
         },
       updateImage:
-        (options) =>
+        (query, options) =>
         ({ state, tr, dispatch }) => {
-          const query = options.hash
-            ? { key: "hash", value: options.hash }
-            : options.src
-            ? { key: "src", value: options.src }
+          const keyedQuery = query.hash
+            ? { key: "hash", value: query.hash }
+            : query.src
+            ? { key: "src", value: query.src }
             : null;
-          if (!query) return false;
+          if (!keyedQuery) return false;
 
           const images = findChildren(
             state.doc,
             (node) =>
               node.type.name === this.name &&
-              node.attrs[query.key] === query.value
+              node.attrs[keyedQuery.key] === keyedQuery.value
           );
           for (const image of images) {
             tr.setNodeMarkup(image.pos, image.node.type, {
@@ -158,7 +169,7 @@ export const ImageNode = Node.create<ImageOptions>({
               ...options,
             });
           }
-          tr.setMeta("preventUpdate", true);
+          tr.setMeta("preventUpdate", options.preventUpdate || false);
           tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
