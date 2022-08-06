@@ -180,6 +180,21 @@ Features:
 "
 `;
 
+exports[`convert HTML to markdown with tables2: html-to-md-tables2.md 1`] = `
+"# Note 8/6/22, 10:48 AM
+
+hell
+
+what
+
+| sdsdavav       | daskvjbdsva    | vsadjkvsadbvjk |
+| -------------- | -------------- | -------------- |
+| dsvsajkdb      | dskajvbsadj    | kjdasvbkj      |
+| daskvbkdsa     | kdsajvbsajkd   | kjdsavbdsa     |
+
+"
+`;
+
 exports[`convert HTML to markdown with tasklists: html-to-md-tasklists.md 1`] = `
 "Hello
 
