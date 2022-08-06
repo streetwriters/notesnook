@@ -4,7 +4,7 @@ import Field from "../field";
 import Dialog from "./dialog";
 import platform from "platform";
 import { useState } from "react";
-import { confirm } from "../../common/dialog-controller";
+import { confirm, Perform } from "../../common/dialog-controller";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import * as clipboard from "clipboard-polyfill/text";
 import { store as userstore } from "../../stores/user-store";
@@ -22,25 +22,12 @@ For example things like:
 This is all optional, of course.`,
 };
 
-function getDeviceInfo() {
-  const version = appVersion.formatted;
-  const os = platform.os;
-  const browser = `${platform.name} ${platform.version}`;
-
-  return `App version: ${version}
-OS: ${os}
-Browser: ${browser}
-Pro: ${isUserPremium()}`;
-}
-const BODY_TEMPLATE = (body) => {
-  const info = `**Device information:**\n${getDeviceInfo()}`;
-  if (!body) return info;
-  return `${body}\n\n${info}`;
+type IssueDialogProps = {
+  onClose: Perform;
 };
-
-function IssueDialog(props) {
+function IssueDialog(props: IssueDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState();
+  const [error, setError] = useState<string>();
 
   return (
     <Dialog
@@ -48,7 +35,7 @@ function IssueDialog(props) {
       title={"Report an issue"}
       onClose={props.onClose}
       positiveButton={{
-        text: "Report",
+        text: "Submit",
         props: {
           form: "issueForm",
         },
@@ -65,22 +52,26 @@ function IssueDialog(props) {
           e.preventDefault();
           try {
             setIsSubmitting(true);
-            setError();
+            setError(undefined);
 
-            const formData = new FormData(e.target);
-            const requestData = Object.fromEntries(formData.entries());
+            const formData = new FormData(e.target as HTMLFormElement);
+            const requestData = Object.fromEntries(
+              formData.entries() as IterableIterator<[string, string]>
+            );
+
             if (!requestData.title.trim() || !requestData.body.trim()) return;
             requestData.body = BODY_TEMPLATE(requestData.body);
-            const url = await db.debug.report({
+            const url = await db.debug?.report({
               title: requestData.title,
               body: requestData.body,
               userId: userstore.get().user?.id,
             });
+            if (!url) throw new Error("Could not submit bug report.");
 
-            props.onClose();
+            props.onClose(true);
             await showIssueReportedDialog({ url });
           } catch (e) {
-            setError(e.message);
+            if (e instanceof Error) setError(e.message);
           } finally {
             setIsSubmitting(false);
           }
@@ -142,7 +133,7 @@ function IssueDialog(props) {
 
 export default IssueDialog;
 
-function showIssueReportedDialog({ url }) {
+function showIssueReportedDialog({ url }: { url: string }) {
   return confirm({
     title: "Thank you for reporting!",
     yesAction: () => clipboard.writeText(url),
@@ -179,3 +170,20 @@ function showIssueReportedDialog({ url }) {
     ),
   });
 }
+
+function getDeviceInfo() {
+  const version = appVersion.formatted;
+  const os = platform.os;
+  const browser = `${platform.name} ${platform.version}`;
+
+  return `App version: ${version}
+OS: ${os}
+Browser: ${browser}
+Pro: ${isUserPremium()}`;
+}
+
+const BODY_TEMPLATE = (body: string) => {
+  const info = `**Device information:**\n${getDeviceInfo()}`;
+  if (!body) return info;
+  return `${body}\n\n${info}`;
+};
