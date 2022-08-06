@@ -18,8 +18,8 @@ function Home() {
 
   useEffect(() => {
     (async function () {
-      const intitialized = db.notes.initialized;
-      if (!intitialized || !store.get().notes.length) {
+      const initialized = db.notes.initialized;
+      if (!initialized || !notes.length) {
         await db.notes.init();
         store.refresh();
         setIsLoading(false);
@@ -36,7 +36,7 @@ function Home() {
       // await db.notes.add({ id: note.id, conflicted: true, resolved: false });
       // console.log(data3);
     })();
-  }, []);
+  }, [notes.length]);
 
   return (
     <ListContainer
