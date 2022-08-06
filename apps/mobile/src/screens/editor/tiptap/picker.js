@@ -130,9 +130,6 @@ const camera = async options => {
     launchCamera(
       {
         includeBase64: true,
-        maxWidth: 4000,
-        maxHeight: 4000,
-        quality: 0.8,
         mediaType: 'photo'
       },
       response => handleImageResponse(response, options)
@@ -156,9 +153,6 @@ const gallery = async options => {
     launchImageLibrary(
       {
         includeBase64: true,
-        maxWidth: 4000,
-        maxHeight: 4000,
-        quality: 0.8,
         mediaType: 'photo',
         selectionLimit: 1
       },
@@ -188,6 +182,7 @@ const pick = async options => {
     }
     return;
   }
+  console.log('opening picker', options.type);
   if (options?.type.startsWith('image') || options?.type === 'camera') {
     if (options.type === 'image') {
       gallery(options);
