@@ -50,6 +50,7 @@ export const useAppEvents = () => {
   const setLastSynced = useUserStore(state => state.setLastSynced);
   const setUser = useUserStore(state => state.setUser);
   const syncedOnLaunch = useRef(false);
+  const verify = useUserStore(state => state.verifyUser);
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,
@@ -134,8 +135,10 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     let sub;
-    if (!loading) {
-      sub = AppState.addEventListener('change', onAppStateChanged);
+    if (!loading && !verify) {
+      setTimeout(() => {
+        sub = AppState.addEventListener('change', onAppStateChanged);
+      }, 1000);
       (async () => {
         try {
           let url = await Linking.getInitialURL();
@@ -154,7 +157,7 @@ export const useAppEvents = () => {
       sub?.remove();
       unsubIAP();
     };
-  }, [loading]);
+  }, [loading, verify]);
 
   const onInternetStateChanged = async state => {
     if (!syncedOnLaunch.current) return;
@@ -319,41 +322,26 @@ export const useAppEvents = () => {
       ) {
         enabled(false);
       }
-      console.log(
-        'unlocking',
-        refValues.current?.prevState,
-        refValues.current.showingDialog,
-        SettingsService.get().appLockMode
-      );
       if (SettingsService.get().appLockMode === 'background') {
         if (useSettingStore.getState().requestBiometrics) {
           console.log('requesting biometrics');
           useSettingStore.getState().setRequestBiometrics(false);
           return;
         }
-        if (refValues.current?.prevState === 'background' && !refValues.current?.showingDialog) {
-          refValues.current.showingDialog = true;
+        if (refValues.current?.prevState === 'background') {
           refValues.current.prevState = 'active';
           useUserStore.getState().setVerifyUser(true);
           let result = await BiometricService.validateUser('Unlock to access your notes');
-          let sub = useUserStore.subscribe(state => {
-            if (!state.verifyUser) {
-              sub();
-              refValues.current.showingDialog = false;
-            }
-          });
           if (result) {
             useUserStore.getState().setVerifyUser(false);
-            refValues.current.showingDialog = false;
           }
         }
       }
       refValues.current.prevState = 'active';
-      console.log('reconnect sse');
       await reconnectSSE();
 
       await checkIntentState();
-      await MMKV.removeItem('appState');
+      MMKV.removeItem('appState');
       let user = await db.user.getUser();
       if (user && !user?.isEmailConfirmed) {
         try {
@@ -375,6 +363,7 @@ export const useAppEvents = () => {
         SettingsService.get().privacyScreen ||
         SettingsService.get().appLockMode === 'background'
       ) {
+        useUserStore.getState().setVerifyUser(true);
         enabled(true);
       }
     }
