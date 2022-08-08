@@ -35,6 +35,7 @@ import { SvgView } from '../ui/svg';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { Walkthrough } from '../walkthroughs';
+import { useAppState } from '../../utils/hooks/use-app-state';
 
 const Launcher = React.memo(
   () => {
@@ -45,6 +46,7 @@ const Launcher = React.memo(
     const verifyUser = useUserStore(state => state.verifyUser);
     const setVerifyUser = useUserStore(state => state.setVerifyUser);
     const deviceMode = useSettingStore(state => state.deviceMode);
+    const appState = useAppState();
     const passwordInputRef = useRef();
     const password = useRef();
     const introCompleted = useSettingStore(state => state.settings.introCompleted);
@@ -220,11 +222,14 @@ const Launcher = React.memo(
     };
 
     useEffect(() => {
-      if (verifyUser) {
-        onUnlockBiometrics();
-      }
       init();
     }, [verifyUser]);
+
+    useEffect(() => {
+      if (verifyUser && appState === 'active') {
+        onUnlockBiometrics();
+      }
+    }, [appState]);
 
     const onSubmit = async () => {
       if (!password.current) return;

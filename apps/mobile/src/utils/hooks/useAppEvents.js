@@ -328,19 +328,11 @@ export const useAppEvents = () => {
           useSettingStore.getState().setRequestBiometrics(false);
           return;
         }
-        if (refValues.current?.prevState === 'background') {
-          refValues.current.prevState = 'active';
-          useUserStore.getState().setVerifyUser(true);
-          let result = await BiometricService.validateUser('Unlock to access your notes');
-          if (result) {
-            useUserStore.getState().setVerifyUser(false);
-            enabled(false);
-          }
-        }
       }
-      refValues.current.prevState = 'active';
-      await reconnectSSE();
 
+      refValues.current.prevState = 'active';
+
+      await reconnectSSE();
       await checkIntentState();
       MMKV.removeItem('appState');
       let user = await db.user.getUser();
@@ -364,8 +356,13 @@ export const useAppEvents = () => {
         SettingsService.get().privacyScreen ||
         SettingsService.get().appLockMode === 'background'
       ) {
+        !useSettingStore.getState().requestBiometrics ? enabled(true) : null;
+      }
+      if (
+        SettingsService.get().appLockMode === 'background' &&
+        !useSettingStore.getState().requestBiometrics
+      ) {
         useUserStore.getState().setVerifyUser(true);
-        enabled(true);
       }
     }
   };
