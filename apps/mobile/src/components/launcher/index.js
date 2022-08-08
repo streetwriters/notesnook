@@ -269,7 +269,8 @@ const Launcher = React.memo(
             width: deviceMode !== 'mobile' ? '50%' : Platform.OS == 'ios' ? '95%' : '100%',
             paddingHorizontal: 12,
             marginBottom: 30,
-            marginTop: 15
+            marginTop: 15,
+            alignSelf: 'center'
           }}
         >
           <IconButton
@@ -327,7 +328,7 @@ const Launcher = React.memo(
 
             <View
               style={{
-                marginTop: user ? 50 : 25
+                marginTop: user ? 25 : 25
               }}
             >
               {user ? (
