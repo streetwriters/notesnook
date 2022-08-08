@@ -59,6 +59,9 @@ async function getCredentials(title?: string, description?: string) {
     });
     //@ts-ignore
     await FingerprintScanner.authenticate(options);
+    setTimeout(() => {
+      useSettingStore.getState().setRequestBiometrics(false);
+    }, 1000);
     FingerprintScanner.release();
     return await Keychain.getInternetCredentials('nn_vault');
   } catch (e) {

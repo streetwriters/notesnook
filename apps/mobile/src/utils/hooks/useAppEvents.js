@@ -324,13 +324,10 @@ export const useAppEvents = () => {
       }
       if (SettingsService.get().appLockMode === 'background') {
         if (useSettingStore.getState().requestBiometrics) {
-          console.log('requesting biometrics');
           useSettingStore.getState().setRequestBiometrics(false);
           return;
         }
       }
-
-      refValues.current.prevState = 'active';
 
       await reconnectSSE();
       await checkIntentState();
@@ -345,7 +342,6 @@ export const useAppEvents = () => {
         } catch (e) {}
       }
     } else {
-      refValues.current.prevState = 'background';
       let id = useEditorStore.getState().currentEditingNote;
       let note = id && db.notes.note(id).data;
       if (note?.locked && SettingsService.get().appLockMode === 'background') {
@@ -353,16 +349,17 @@ export const useAppEvents = () => {
       }
       await storeAppState();
       if (
+        SettingsService.get().appLockMode === 'background' &&
+        !useSettingStore.getState().requestBiometrics &&
+        !useUserStore.getState().verifyUser
+      ) {
+        useUserStore.getState().setVerifyUser(true);
+      }
+      if (
         SettingsService.get().privacyScreen ||
         SettingsService.get().appLockMode === 'background'
       ) {
         !useSettingStore.getState().requestBiometrics ? enabled(true) : null;
-      }
-      if (
-        SettingsService.get().appLockMode === 'background' &&
-        !useSettingStore.getState().requestBiometrics
-      ) {
-        useUserStore.getState().setVerifyUser(true);
       }
     }
   };
