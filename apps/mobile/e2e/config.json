@@ -3,7 +3,7 @@
   "testRunner": "jest-circus/runner",
   "setupFilesAfterEnv": ["./setup.ts"],
   "testTimeout": 120000,
-  "testRegex": "\\.e2e\\.js$",
+  "testRegex": "index\\.e2e\\.js$",
   "reporters": ["detox/runners/jest/streamlineReporter"],
   "verbose": true
 }

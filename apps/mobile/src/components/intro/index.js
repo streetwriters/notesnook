@@ -41,6 +41,7 @@ const Intro = ({ navigation, route }) => {
 
   return (
     <View
+      testID="notesnook.splashscreen"
       style={{
         width: '100%',
         height: '100%',

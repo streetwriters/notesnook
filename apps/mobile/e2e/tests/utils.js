@@ -1,7 +1,10 @@
 const { notesnook } = require('../test.ids');
 const fs = require('fs');
+const { expect: jestExpect } = require('@jest/globals');
+const { toMatchImageSnapshot } = require('jest-image-snapshot');
+jestExpect.extend({ toMatchImageSnapshot });
 
-export const sleep = duration =>
+const sleep = duration =>
   new Promise(resolve =>
     setTimeout(() => {
       console.log('Sleeping for ' + duration / 1000 + ' secs');
@@ -9,8 +12,7 @@ export const sleep = duration =>
     }, duration)
   );
 
-export async function LaunchApp() {
-  await expect(element(by.id(notesnook.ids.default.root))).toBeVisible();
+async function LaunchApp() {
   await expect(element(by.id('notesnook.splashscreen'))).toBeVisible();
   await sleep(500);
   await element(by.text('Get started')).tap();
@@ -24,39 +26,39 @@ export async function LaunchApp() {
   await sleep(300);
 }
 
-export function elementById(id) {
+function elementById(id) {
   return element(by.id(id)).atIndex(0);
 }
 
-export function elementByText(text) {
+function elementByText(text) {
   return element(by.text(text)).atIndex(0);
 }
 
-export async function tapById(id) {
+async function tapById(id) {
   await elementById(id).tap();
 }
 
-export async function tapByText(text) {
+async function tapByText(text) {
   await elementByText(text).tap();
 }
 
-export async function visibleByText(text) {
+async function visibleByText(text) {
   await expect(elementByText(text)).toBeVisible();
 }
 
-export async function visibleById(id) {
+async function visibleById(id) {
   await expect(elementById(id)).toBeVisible();
 }
 
-export async function notVisibleById(id) {
+async function notVisibleById(id) {
   await expect(elementById(id)).not.toBeVisible();
 }
 
-export async function notVisibleByText(text) {
+async function notVisibleByText(text) {
   await expect(elementByText(text)).not.toBeVisible();
 }
 
-export async function createNote(_title, _body) {
+async function createNote(_title, _body) {
   let title = _title || 'Test note description that ';
   let body = _body || 'Test note description that is very long and should not fit in text.';
 
@@ -73,13 +75,13 @@ export async function createNote(_title, _body) {
   return { title, body };
 }
 
-export async function openSideMenu() {
+async function openSideMenu() {
   let menu = elementById(notesnook.ids.default.header.buttons.left);
   await menu.tap();
   await sleep(100);
 }
 
-export async function navigate(screen) {
+async function navigate(screen) {
   await sleep(500);
   let menu = elementById(notesnook.ids.default.header.buttons.left);
   await menu.tap();
@@ -91,7 +93,7 @@ const testvars = {
   isFirstTest: true
 };
 
-export async function prepare() {
+async function prepare() {
   if (testvars.isFirstTest) {
     console.log('Launching App Directly without reset');
     testvars.isFirstTest = false;
@@ -104,12 +106,26 @@ export async function prepare() {
   await LaunchApp();
 }
 
-const jestExpect = require('expect');
-const { toMatchImageSnapshot } = require('jest-image-snapshot');
-jestExpect.extend({ toMatchImageSnapshot });
-
-export async function matchSnapshot(element, name) {
+async function matchSnapshot(element, name) {
   let path = await element.takeScreenshot(name);
   const bitmapBuffer = fs.readFileSync(path);
   jestExpect(bitmapBuffer).toMatchImageSnapshot();
 }
+
+module.exports = {
+  matchSnapshot,
+  prepare,
+  LaunchApp,
+  createNote,
+  navigate,
+  openSideMenu,
+  notVisibleById,
+  notVisibleByText,
+  visibleById,
+  visibleByText,
+  tapById,
+  tapByText,
+  elementByText,
+  elementById,
+  sleep
+};

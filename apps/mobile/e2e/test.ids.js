@@ -1,19 +1,19 @@
-export const notesnook = {
-  editor:{
-    back:"editor.back",
-    id:"editor.id"
+const notesnook = {
+  editor: {
+    back: 'editor.back',
+    id: 'editor.id'
   },
-  buttons:{
-    add:"buttons.add"
+  buttons: {
+    add: 'buttons.add'
   },
   toast: {
-    button:"toast.button"
+    button: 'toast.button'
   },
-  listitem:{
-    menu:"listitem.menu"
+  listitem: {
+    menu: 'listitem.menu'
   },
-  list:{
-    id:"list.id"
+  list: {
+    id: 'list.id'
   },
   ids: {
     default: {
@@ -21,43 +21,43 @@ export const notesnook = {
       menu: 'menu',
       dialog: {
         yes: 'yes',
-        no: 'no',
+        no: 'no'
       },
       editor: 'editor',
       header: {
         buttons: {
           left: 'left',
           right: 'right',
-          back: 'back',
-        },
+          back: 'back'
+        }
       },
       actionsheetBackdrop: 'backdrop',
       loginToSync: 'login_to_sync',
-      addBtn: 'btn-add-item',
+      addBtn: 'btn-add-item'
     },
     dialogs: {
       notebook: {
         inputs: {
           title: 'title',
           description: 'description',
-          topic: 'topic',
+          topic: 'topic'
         },
         buttons: {
-          add: 'add',
-        },
+          add: 'add'
+        }
       },
       export: {
         pdf: 'pdf',
         text: 'text',
         md: 'md',
-        html: 'html',
+        html: 'html'
       },
       vault: {
         changePwd: 'change_pwd',
         pwd: 'pwd',
         confirmPwd: 'pwd',
         pwdAlt: 'pwd_alt',
-        fingerprint: 'fingerprint',
+        fingerprint: 'fingerprint'
       },
       sortBy: {
         order: 'orderby',
@@ -65,13 +65,13 @@ export const notesnook = {
         alphabetical: 'btn-alphabetical',
         year: 'btn-year',
         week: 'btn-week',
-        month: 'btn-month',
+        month: 'btn-month'
       },
       addTo: {
         addNotebook: 'input-addNotebook',
         addTopic: 'input-addTopic',
         btnNotebook: 'btn-addNotebook',
-        btnTopic: 'btn-addTopic',
+        btnTopic: 'btn-addTopic'
       },
       actionsheet: {
         delete: 'icon-Delete',
@@ -85,30 +85,34 @@ export const notesnook = {
         copy: 'icon-Copy',
         sync: 'btn-sync-now',
         night: 'nightswitch',
-        color: (color) => 'icon-color-' + color,
-      },
+        color: color => 'icon-color-' + color
+      }
     },
     menu: {
-      nightmode: 'night',
+      nightmode: 'night'
     },
     note: {
       menu: 'note_menu',
-      get:(index) => 'note-item-' + index
+      get: index => 'note-item-' + index
     },
     notebook: {
       menu: 'notebook_menu',
-      get:(index) => 'notebook-item-' + index
+      get: index => 'notebook-item-' + index
     },
     topic: {
       menu: 'topic_menu',
-      get:(index) => 'topic-item-' + index
+      get: index => 'topic-item-' + index
     },
-    tag: {                       
+    tag: {
       menu: 'tag_menu',
-      get:(index) => 'tag-item-' + index
+      get: index => 'tag-item-' + index
     },
     list: {
-      getByType: (type) => 'list-' + type,
-    },
-  },
+      getByType: type => 'list-' + type
+    }
+  }
+};
+
+module.exports = {
+  notesnook
 };
