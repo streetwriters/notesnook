@@ -1,21 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button } from '../../components/ui/button';
 import { IconButton } from '../../components/ui/icon-button';
-import Heading from '../../components/ui/typography/heading';
 import Paragraph from '../../components/ui/typography/paragraph';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { useThemeStore } from '../../stores/use-theme-store';
 import { eClearEditor, eOnLoadNote } from '../../utils/events';
 import { SIZE } from '../../utils/size';
-import { timeConverter } from '../../utils/time';
 import { editorState } from './tiptap/utils';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const EditorOverlay = ({ editorId = '', editor }) => {
   const colors = useThemeStore(state => state.colors);
-  const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
   const translateValue = useSharedValue(6000);
@@ -38,7 +35,6 @@ const EditorOverlay = ({ editorId = '', editor }) => {
     clearTimers();
     if (_loading) {
       opacity.value = 1;
-      setLoading(_loading);
       translateValue.value = 0;
       timers.current.error = setTimeout(() => {
         if (_loading) {
@@ -53,7 +49,6 @@ const EditorOverlay = ({ editorId = '', editor }) => {
       setTimeout(() => {
         setError(false);
         editorState().overlay = false;
-        setLoading(null);
         opacity.value = withTiming(0, {
           duration: 500
         });
@@ -70,7 +65,7 @@ const EditorOverlay = ({ editorId = '', editor }) => {
       clearTimers();
       eUnSubscribeEvent('loadingNote' + editorId, load);
     };
-  }, [loading, editorId]);
+  }, [editorId]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

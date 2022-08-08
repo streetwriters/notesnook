@@ -334,6 +334,7 @@ export const useAppEvents = () => {
           let result = await BiometricService.validateUser('Unlock to access your notes');
           if (result) {
             useUserStore.getState().setVerifyUser(false);
+            enabled(false);
           }
         }
       }
@@ -412,7 +413,6 @@ export const useAppEvents = () => {
   }
 
   async function checkIntentState() {
-    console.log(checkIntentState, 'CHECK INTENT STATE');
     try {
       let notesAddedFromIntent = MMKV.getString('notesAddedFromIntent');
       let shareExtensionOpened = MMKV.getString('shareExtensionOpened');

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Platform, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
+import { enabled } from 'react-native-privacy-snapshot';
 import { editorState } from '../../screens/editor/tiptap/utils';
 import BackupService from '../../services/backup';
 import BiometricService from '../../services/biometrics';
@@ -52,14 +53,18 @@ const Launcher = React.memo(
       if (verifyUser) {
         return;
       }
-      await restoreEditorState();
+      if (!dbInitCompleted.current) {
+        await restoreEditorState();
+      }
       setImmediate(() => {
         db.notes.init().then(() => {
           Walkthrough.init();
           initialize();
           setImmediate(() => {
             setLoading(false);
-            setImmediate(() => doAppLoadActions());
+            if (!dbInitCompleted.current) {
+              setImmediate(() => doAppLoadActions());
+            }
           });
         });
       });
@@ -209,6 +214,7 @@ const Launcher = React.memo(
       let verified = await BiometricService.validateUser('Unlock to access your notes', '');
       if (verified) {
         setVerifyUser(false);
+        enabled(false);
         password.current = null;
       }
     };
@@ -226,6 +232,7 @@ const Launcher = React.memo(
         let verified = await db.user.verifyPassword(password.current);
         if (verified) {
           setVerifyUser(false);
+          enabled(false);
           password.current = null;
         }
       } catch (e) {}
