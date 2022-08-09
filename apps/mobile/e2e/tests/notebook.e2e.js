@@ -46,7 +46,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', false, false);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await visibleByText('Notebook 1');
   });
@@ -57,7 +58,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', true, false);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await visibleByText('Notebook 1');
   });
@@ -68,7 +70,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', false, false);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await visibleByText('Notebook 1');
   });
@@ -80,6 +83,7 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', true, true);
+    await sleep(500);
     await tapByText('Topic');
     await sleep(500);
     await tapById('listitem.select');
@@ -96,7 +100,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', true, false);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await tapByText('Notebook 1');
     await tapById(notesnook.buttons.add);
@@ -112,7 +117,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', true, true);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await tapByText('Notebook 1');
     await sleep(300);
@@ -130,7 +136,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', true, true);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await tapByText('Topic');
     await createNote();
@@ -142,7 +149,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', true, true);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await tapByText('Topic');
     let note = await createNote();
@@ -158,7 +166,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', true, true);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await navigate('Notes');
     let note = await createNote();
@@ -178,7 +187,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook();
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await visibleByText('Notebook 1');
     await tapById(notesnook.ids.notebook.menu);
@@ -204,7 +214,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', false, false);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await visibleByText('Notebook 1');
     await tapById(notesnook.ids.notebook.menu);
@@ -220,7 +231,8 @@ describe('NOTEBOOKS', () => {
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1', false, false);
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await visibleByText('Notebook 1');
     await tapById(notesnook.ids.notebook.menu);
@@ -230,13 +242,14 @@ describe('NOTEBOOKS', () => {
     await visibleByText('Notebook 1');
   });
 
-  it('Pin topic to side menu', async () => {
+  it.only('Pin topic to side menu', async () => {
     await prepare();
     await navigate('Notebooks');
     await tapByText('Skip introduction');
     await sleep(500);
     await createNotebook('Notebook 1');
-    await elementById('sheet-backdrop').tap();
+    await sleep(500);
+    await device.pressBack();
     await sleep(500);
     await tapByText('Notebook 1');
     await tapById(notesnook.ids.notebook.menu);
