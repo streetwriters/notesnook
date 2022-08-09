@@ -7,12 +7,9 @@ const {
   prepare,
   visibleById,
   notVisibleById,
-  elementById,
-  tapByText,
-  matchSnapshot,
-  elementByText
+  sleep,
+  exitEditor
 } = require('./utils');
-const { sleep } = require('./utils');
 
 describe('NOTE TESTS', () => {
   it('Create a note in editor', async () => {
@@ -24,7 +21,7 @@ describe('NOTE TESTS', () => {
     await prepare();
     await createNote();
     await tapById(notesnook.ids.note.get(1));
-    await tapById(notesnook.editor.back);
+    await exitEditor();
   });
 
   it('Notes properties should show', async () => {

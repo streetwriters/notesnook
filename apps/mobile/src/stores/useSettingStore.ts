@@ -1,5 +1,6 @@
 //@ts-ignore
 import { Dimensions } from 'react-native';
+import Config from 'react-native-config';
 import { FileType } from 'react-native-scoped-storage';
 import create, { State } from 'zustand';
 import { ACCENT } from '../utils/color-scheme';
@@ -93,7 +94,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     reduceAnimations: false,
     rateApp: false,
     migrated: false,
-    introCompleted: false,
+    introCompleted: Config.isTesting ? true : false,
     nextBackupRequestTime: undefined,
     lastBackupDate: undefined,
     userEmailConfirmed: false,

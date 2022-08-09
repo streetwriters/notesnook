@@ -17,7 +17,6 @@ const credentials = {
 describe('AUTH', () => {
   it('Sign up', async () => {
     await prepare();
-
     await openSideMenu();
     await tapByText('Login to sync your notes.');
     await sleep(500);
@@ -42,7 +41,7 @@ describe('AUTH', () => {
     await visibleByText('Tap here to sync your notes.');
   });
 
-  it.only('Delete account', async () => {
+  it('Delete account', async () => {
     await prepare();
     await openSideMenu();
     await tapByText('Login to sync your notes.');
@@ -50,7 +49,6 @@ describe('AUTH', () => {
     await elementById('input.password').typeText(credentials.password);
     await elementById('input.password').tapReturnKey();
     await sleep(5000);
-
     await tapByText('Settings');
     await sleep(1000);
     await elementById('scrollview').scrollToIndex(6);

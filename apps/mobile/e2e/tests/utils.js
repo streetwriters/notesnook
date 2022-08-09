@@ -2,6 +2,7 @@ const { notesnook } = require('../test.ids');
 const fs = require('fs');
 const { expect: jestExpect } = require('@jest/globals');
 const { toMatchImageSnapshot } = require('jest-image-snapshot');
+const detox = require('detox');
 jestExpect.extend({ toMatchImageSnapshot });
 
 const sleep = duration =>
@@ -13,17 +14,8 @@ const sleep = duration =>
   );
 
 async function LaunchApp() {
-  await expect(element(by.id('notesnook.splashscreen'))).toBeVisible();
+  await expect(element(by.id(notesnook.ids.default.root))).toBeVisible();
   await sleep(500);
-  await element(by.text('Get started')).tap();
-  await sleep(500);
-  await element(by.text('Next')).tap();
-
-  await sleep(500);
-  await element(by.text('Create your account')).tap();
-  await sleep(500);
-  await element(by.text('Skip for now')).tap();
-  await sleep(300);
 }
 
 function elementById(id) {
@@ -58,18 +50,21 @@ async function notVisibleByText(text) {
   await expect(elementByText(text)).not.toBeVisible();
 }
 
+async function exitEditor() {
+  await detox.device.pressBack();
+  await detox.device.pressBack();
+}
+
 async function createNote(_title, _body) {
   let title = _title || 'Test note description that ';
   let body = _body || 'Test note description that is very long and should not fit in text.';
 
   await tapById(notesnook.buttons.add);
-  await elementById(notesnook.editor.id).tap({
-    x: 15,
-    y: 15
-  });
-  await elementById(notesnook.editor.id).typeText(body);
-  await tapById(notesnook.editor.back);
-  await sleep(500);
+  let webview = web(by.id(notesnook.editor.id));
+  await expect(webview.element(by.web.className('ProseMirror'))).toExist();
+  await webview.element(by.web.className('ProseMirror')).tap();
+  await webview.element(by.web.className('ProseMirror')).typeText(body, true);
+  await exitEditor();
   await expect(element(by.text(body))).toBeVisible();
 
   return { title, body };
@@ -127,5 +122,6 @@ module.exports = {
   tapByText,
   elementByText,
   elementById,
-  sleep
+  sleep,
+  exitEditor
 };

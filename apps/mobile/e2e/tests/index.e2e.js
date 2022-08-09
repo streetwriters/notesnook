@@ -1,6 +1,4 @@
-const { notesnook } = require('../test.ids');
-const { navigate, tapByText, prepare } = require('./utils');
-const { sleep } = require('./utils');
+const { navigate, tapByText, prepare, sleep } = require('./utils');
 
 describe('APP LAUNCH AND NAVIGATION', () => {
   it('App should launch successfully & hide welcome screen', async () => {
