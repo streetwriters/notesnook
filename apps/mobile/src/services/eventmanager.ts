@@ -2,6 +2,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import EventManager from '@streetwriters/notesnook-core/utils/event-manager';
 import { RefObject } from 'react';
 import ActionSheet from 'react-native-actions-sheet';
+import { Config } from 'react-native-config';
 import {
   eHideToast,
   eOnNoteEdited,
@@ -9,6 +10,7 @@ import {
   eOpenVaultDialog,
   eShowToast
 } from '../utils/events';
+
 const eventManager = new EventManager();
 
 export const eSubscribeEvent = (eventName: string, action?: (data: any) => void) => {
@@ -107,16 +109,18 @@ export const ToastEvent = {
     duration = 3000,
     func,
     actionText
-  }: ShowToastEvent) =>
+  }: ShowToastEvent) => {
+    if (Config.isTesting) return;
     eSendEvent(eShowToast, {
       heading: heading,
       message: message,
       type: type,
       context: context,
-      duration: duration,
+      duration: 3000,
       func: func,
       actionText: actionText
-    }),
+    });
+  },
   hide: () => eSendEvent(eHideToast),
   error: (e: Error, title?: string, context?: 'global' | 'local') => {
     ToastEvent.show({

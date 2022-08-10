@@ -10,7 +10,8 @@ const {
   expectBitmapsToBeEqual,
   matchSnapshot,
   notVisibleById,
-  navigate
+  navigate,
+  openSideMenu
 } = require('./utils');
 const { sleep } = require('./utils');
 
@@ -48,7 +49,7 @@ async function openLockedNote(pwd) {
 
 async function goToPrivacySecuritySettings() {
   await navigate('Settings');
-  await tapByText('Privacy & security');
+  await tapByText('Vault');
 }
 
 describe('VAULT', () => {
@@ -72,8 +73,8 @@ describe('VAULT', () => {
     await elementById(notesnook.ids.dialogs.vault.pwd).typeText('1234');
     await elementById(notesnook.ids.dialogs.vault.changePwd).typeText('2362');
     await tapByText('Change');
-    await sleep(100);
-    await navigate('Notes');
+    await device.pressBack();
+    await device.pressBack();
     await openLockedNote('2362');
   });
 
@@ -87,7 +88,8 @@ describe('VAULT', () => {
     await tapByText('Delete');
     await sleep(500);
     await visibleByText('Create vault');
-    await navigate('Notes');
+    await device.pressBack();
+    await device.pressBack();
     await visibleById(notesnook.listitem.menu);
   });
 
@@ -102,7 +104,8 @@ describe('VAULT', () => {
     await tapByText('Delete');
     await sleep(500);
     await visibleByText('Create vault');
-    await navigate('Notes');
+    await device.pressBack();
+    await device.pressBack();
     await notVisibleById(notesnook.listitem.menu);
   });
 

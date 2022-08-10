@@ -8,7 +8,8 @@ const {
   visibleById,
   notVisibleById,
   sleep,
-  exitEditor
+  exitEditor,
+  tapByText
 } = require('./utils');
 
 describe('NOTE TESTS', () => {
@@ -103,7 +104,10 @@ describe('NOTE TESTS', () => {
     await createNote();
     await tapById(notesnook.listitem.menu);
     await tapById('icon-Delete');
-    await tapById(notesnook.toast.button);
+    await navigate('Trash');
+    await tapById(notesnook.listitem.menu);
+    await tapByText('Restore note');
+    await device.pressBack();
     await visibleByText('Test note description that is very long and should not fit in text.');
   });
 });

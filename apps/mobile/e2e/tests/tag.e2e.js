@@ -75,6 +75,7 @@ describe('Tags', () => {
     await device.pressBack();
     await navigate('Tags');
     await tapById(notesnook.ids.tag.menu);
+    await sleep(500);
     await tapByText('Rename tag');
     await sleep(500);
     await elementById('input-value').clearText();

@@ -27,20 +27,19 @@ describe('Sort & filter', () => {
     await sleep(300);
     await tapByText('Note 1');
     await sleep(500);
-    await elementById(notesnook.editor.id).tap({
-      x: 40,
-      y: 100
-    });
-    await elementById(notesnook.editor.id).typeText(' hello');
-    await tapById(notesnook.editor.back);
-    await sleep(500);
+    let webview = web(by.id(notesnook.editor.id));
+    await expect(webview.element(by.web.className('ProseMirror'))).toExist();
+    await webview.element(by.web.className('ProseMirror')).tap();
+    await webview.element(by.web.className('ProseMirror')).typeText('Edited ', true);
+    await device.pressBack();
+    await device.pressBack();
     await sortBy('Date created');
     await tapById(notesnook.listitem.menu);
     await visibleByText('Note 2');
     await device.pressBack();
     await sortBy('Date edited');
     await tapById(notesnook.listitem.menu);
-    await visibleByText('Note 1 hello');
+    await visibleByText('Edited Note 1');
     await device.pressBack();
   });
 
