@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, ColorValue, TextStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../utils';
 import { BUTTON_TYPES } from '../../../utils/constants';
 import { SIZE } from '../../../utils/size';
@@ -9,7 +9,7 @@ import { PressableButton, PressableButtonProps } from '../pressable';
 import Heading from '../typography/heading';
 import Paragraph from '../typography/paragraph';
 
-interface ButtonProps extends PressableButtonProps {
+export interface ButtonProps extends PressableButtonProps {
   height?: number;
   icon?: string;
   fontSize?: number;
@@ -29,6 +29,7 @@ interface ButtonProps extends PressableButtonProps {
   };
   bold?: boolean;
   iconColor?: ColorValue;
+  iconStyle?: TextStyle;
 }
 export const Button = ({
   height = 45,
@@ -51,6 +52,7 @@ export const Button = ({
   bold,
   iconColor,
   fwdRef,
+  iconStyle,
   ...restProps
 }: ButtonProps) => {
   const colors = useThemeStore(state => state.colors);
@@ -104,9 +106,7 @@ export const Button = ({
       {icon && !loading && iconPosition === 'left' ? (
         <Icon
           name={icon}
-          style={{
-            marginRight: 0
-          }}
+          style={[{ marginRight: 0 }, iconStyle]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />
@@ -114,6 +114,7 @@ export const Button = ({
 
       {!title ? null : (
         <Component
+          animated={false}
           color={textColor}
           size={fontSize}
           numberOfLines={1}
@@ -132,9 +133,7 @@ export const Button = ({
       {icon && !loading && iconPosition === 'right' ? (
         <Icon
           name={icon}
-          style={{
-            marginLeft: 0
-          }}
+          style={[{ marginLeft: 0 }, iconStyle]}
           color={iconColor || buttonType?.text || textColor}
           size={iconSize}
         />

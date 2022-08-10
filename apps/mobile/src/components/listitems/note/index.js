@@ -3,80 +3,61 @@ import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../../e2e/test.ids';
-import { useThemeStore } from '../../../stores/theme';
-import { useSettingStore } from '../../../stores/stores';
-import { eSendEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
+import { TaggedNotes } from '../../../screens/notes/tagged';
+import { TopicNotes } from '../../../screens/notes/topic-notes';
+import useNavigationStore from '../../../stores/use-navigation-store';
+import { useSettingStore } from '../../../stores/use-setting-store';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { COLORS_NOTE } from '../../../utils/color-scheme';
 import { db } from '../../../utils/database';
-import { refreshNotesPage } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
-import { IconButton } from '../../ui/icon-button';
-import { Button } from '../../ui/button';
-import { TimeSince } from '../../ui/time-since';
 import { Properties } from '../../properties';
+import { Button } from '../../ui/button';
+import { IconButton } from '../../ui/icon-button';
+import { TimeSince } from '../../ui/time-since';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 
 const navigateToTopic = topic => {
-  let routeName = 'NotesPage';
-  let params = { ...topic, menu: false, get: 'topics' };
-  let headerState = {
-    heading: topic.title,
-    id: topic.id,
-    type: topic.type
-  };
-  eSendEvent(refreshNotesPage, params);
-  Navigation.navigate(routeName, params, headerState);
+  TopicNotes.navigate(topic, true);
 };
 
 function navigateToTag(item) {
-  let _tag = db.tags.tag(item.id);
-  if (!_tag) return;
-  let params = {
-    ..._tag,
-    type: 'tag',
-    get: 'tagged'
-  };
-
-  eSendEvent(refreshNotesPage, params);
-  Navigation.navigate('NotesPage', params, {
-    heading: '#' + _tag.title,
-    id: _tag.id,
-    type: _tag.type
-  });
+  const tag = db.tags.tag(item.id);
+  if (!tag) return;
+  TaggedNotes.navigate(tag, true);
 }
 
 const showActionSheet = item => {
   Properties.present(item);
 };
 
+function getNotebook(item) {
+  const isTrash = item.type === 'trash';
+  if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
+  const currentScreen = useNavigationStore.getState().currentScreen;
+  const filteredNotebooks = item.notebooks?.filter(n => n.id !== currentScreen.notebookId);
+  let item_notebook = filteredNotebooks?.length > 0 ? filteredNotebooks.slice(0, 1)[0] : null;
+  let notebook = item_notebook && db.notebooks.notebook(item_notebook.id);
+  if (!notebook) return [];
+  let topic = notebook.topics.topic(item_notebook.topics[0])?._topic;
+  if (!topic) return [];
+  notebook = notebook.data;
+  return [
+    {
+      title: `${notebook?.title} › ${topic?.title}`,
+      notebook: notebook,
+      topic: topic
+    }
+  ];
+}
+
 const NoteItem = ({ item, isTrash, tags, dateBy = 'dateCreated', noOpen = false }) => {
   const colors = useThemeStore(state => state.colors);
   const notesListMode = useSettingStore(state => state.settings.notesListMode);
   const compactMode = notesListMode === 'compact';
   const attachmentCount = db.attachments?.ofNote(item.id, 'all')?.length || 0;
-
-  function getNotebook() {
-    if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
-    let item_notebook = item.notebooks?.slice(0, 1)[0];
-    let notebook = db.notebooks.notebook(item_notebook.id);
-
-    if (!notebook) return [];
-    let topic = notebook.topics.topic(item_notebook.topics[0])?._topic;
-
-    if (!topic) return [];
-
-    notebook = notebook.data;
-
-    return [
-      {
-        title: `${notebook?.title} › ${topic?.title}`,
-        notebook: notebook,
-        topic: topic
-      }
-    ];
-  }
+  const notebooks = React.useMemo(() => getNotebook(item), [item]);
 
   return (
     <>
@@ -96,7 +77,7 @@ const NoteItem = ({ item, isTrash, tags, dateBy = 'dateCreated', noOpen = false 
               marginBottom: 2.5
             }}
           >
-            {getNotebook().map(_item => (
+            {notebooks.map(_item => (
               <Button
                 title={_item.title}
                 key={_item}

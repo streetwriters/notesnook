@@ -1,15 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
+import { editorState } from '../../screens/editor/tiptap/utils';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { editing } from '../../utils';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
-import { EditorWebView } from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
-import { reFocusEditor } from '../../screens/editor/tiny/toolbar/constants';
 import { Button } from '../ui/button';
 import SheetWrapper from '../ui/sheet';
 import Heading from '../ui/typography/heading';
@@ -45,8 +42,8 @@ const SheetProvider = ({ context = 'global' }) => {
     setVisible(true);
     if (data.editor) {
       editor.current.refocus = false;
-      if (editing.keyboardState) {
-        tiny.call(EditorWebView, tiny.cacheRange + tiny.blur);
+      if (editorState().keyboardState) {
+        // tiny.call(EditorWebView, tiny.cacheRange + tiny.blur);
         editor.current.refocus = true;
       }
     }
@@ -59,10 +56,9 @@ const SheetProvider = ({ context = 'global' }) => {
         actionSheetRef.current?.setModalVisible(true);
         return;
       } else {
-        if (editor.current.refocus) {
-          editing.isFocused = true;
-          await reFocusEditor();
-          tiny.call(EditorWebView, tiny.restoreRange + tiny.clearRange);
+        if (editor.current?.refocus) {
+          editorState().isFocused = true;
+          //  tiny.call(EditorWebView, tiny.restoreRange + tiny.clearRange);
           editor.current.refocus = false;
         }
       }

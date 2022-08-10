@@ -40,7 +40,7 @@ async function getDirectoryAndroid() {
   return subfolder;
 }
 
-async function checkBackupDirExists(reset = false) {
+async function checkBackupDirExists(reset = false, context = 'global') {
   if (Platform.OS === 'ios') return true;
   let dir = SettingsService.get().backupDirectoryAndroid;
   if (reset) dir = null;
@@ -61,12 +61,15 @@ async function checkBackupDirExists(reset = false) {
       }
       presentDialog({
         title: 'Select backup folder',
-        paragraph:
-          'Please select a folder where you would like to store backup files. You can change or disable automatic backups in settings however we highly recommend that you keep them on.',
+        paragraph: 'Please select a folder where you would like to store backup files.',
         positivePress: async () => {
           resolve(await getDirectoryAndroid());
         },
-        positiveText: 'Select'
+        onClose: () => {
+          resolve(null);
+        },
+        positiveText: 'Select',
+        context: context
       });
     });
   }
@@ -124,8 +127,8 @@ async function updateNextBackupTime() {
   });
 }
 
-async function run(progress) {
-  let androidBackupDirectory = await checkBackupDirExists();
+async function run(progress, context) {
+  let androidBackupDirectory = await checkBackupDirExists(false, context);
   if (!androidBackupDirectory) return;
 
   let backup;
@@ -161,9 +164,9 @@ async function run(progress) {
     } else {
       backupFilePath = await ScopedStorage.writeFile(
         androidBackupDirectory.uri,
+        backup,
         backupName,
         'nnbackup/json',
-        backup,
         'utf8',
         false
       );
@@ -180,6 +183,7 @@ async function run(progress) {
 
     let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
     console.log(backupFilePath);
+    if (context) return backupFilePath;
     await sleep(300);
     if (showBackupCompleteSheet) {
       presentBackupCompleteSheet(backupFilePath);
@@ -190,6 +194,7 @@ async function run(progress) {
   } catch (e) {
     progress && eSendEvent(eCloseProgressDialog);
     ToastEvent.error(e, 'Backup failed!');
+    return null;
   }
 }
 
@@ -205,20 +210,18 @@ async function checkBackupRequired(type) {
     return true;
   }
   lastBackupDate = parseInt(lastBackupDate);
-
   if (type === 'daily' && lastBackupDate + MS_DAY < now) {
-    console.log('daily');
+    console.log('daily backup started');
     return true;
   } else if (type === 'weekly' && lastBackupDate + MS_WEEK < now) {
-    console.log('weekly');
+    console.log('weekly backup started');
     return true;
   } else if (type === 'monthly' && lastBackupDate + MONTH < now) {
-    console.log('monthly');
+    console.log('monthly backup started');
     return true;
-  } else {
-    console.log('no need', lastBackupDate);
-    return false;
   }
+  console.log('no need', lastBackupDate);
+  return false;
 }
 
 const checkAndRun = async () => {

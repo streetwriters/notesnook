@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eCloseProgressDialog } from '../../utils/events';
 import useTimer from '../../utils/hooks/use-timer';
 import { SIZE } from '../../utils/size';

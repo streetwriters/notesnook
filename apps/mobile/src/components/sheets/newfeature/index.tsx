@@ -1,9 +1,9 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { APP_VERSION } from '../../../../version';
 import { eSendEvent, presentSheet } from '../../../services/event-manager';
 import SettingsService from '../../../services/settings';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { eCloseProgressDialog } from '../../../utils/events';
 import { SIZE } from '../../../utils/size';
 import { Button } from '../../ui/button';
@@ -14,6 +14,7 @@ import { features } from '../../../../features';
 export type FeatureType = {
   title: string;
   body: string;
+  platform?: 'ios' | 'android';
 };
 
 const NewFeature = ({ features }: { features: FeatureType[] }) => {
@@ -33,7 +34,7 @@ const NewFeature = ({ features }: { features: FeatureType[] }) => {
 
       <Seperator />
 
-      {features?.map(item => (
+      {features.map(item => (
         <View
           key={item.title}
           style={{
@@ -77,6 +78,10 @@ NewFeature.present = () => {
   SettingsService.set({
     version: APP_VERSION
   });
+  let _features = features?.filter(
+    feature => !feature.platform || feature.platform === Platform.OS
+  );
+  if (_features.length === 0) return;
   presentSheet({
     component: <NewFeature features={features} />
   });

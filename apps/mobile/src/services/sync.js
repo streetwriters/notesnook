@@ -1,60 +1,81 @@
 import NetInfo from '@react-native-community/netinfo';
-import { getNote, updateNoteInEditor } from '../screens/editor/Functions';
-import { initialize, useUserStore } from '../stores/stores';
+import { EVENTS } from '@streetwriters/notesnook-core/common';
+import { initAfterSync } from '../stores/index';
+import { useUserStore } from '../stores/use-user-store';
 import { doInBackground } from '../utils';
 import { db } from '../utils/database';
+import { DatabaseLogger } from '../utils/database/index';
 import { ToastEvent } from './event-manager';
 
-export const ignoredMessages = ['Sync already running', 'Not allowed to start service intent'];
-
-const run = async (context = 'global', forced = false, full = true) => {
-  let result = false;
-  const userstore = useUserStore.getState();
-  if (!userstore.user) {
-    initialize();
-    return true;
+NetInfo.configure({
+  reachabilityUrl: 'https://bing.com',
+  reachabilityTest: response => {
+    if (!response) return false;
+    return response?.status >= 200 && response?.status < 300;
   }
-  userstore.setSyncing(true);
-  let error = null;
-  console.log('Sync.run started');
-  try {
-    let res = await doInBackground(async () => {
-      try {
-        await db.sync(full, forced);
-        return true;
-      } catch (e) {
-        error = e;
-        return e.message;
-      }
-    });
-    if (!res) {
-      initialize();
-      return false;
-    }
-    if (typeof res === 'string') throw error;
+});
 
-    userstore.setSyncing(false);
-    result = true;
-  } catch (e) {
-    result = false;
-    if (!ignoredMessages.find(im => e.message?.includes(im)) && userstore.user) {
+export const ignoredMessages = [
+  'Sync already running',
+  'Not allowed to start service intent',
+  'WebSocket failed to connect',
+  'Failed to start the HttpConnection before'
+];
+
+let syncTimer = 0;
+const run = async (context = 'global', forced = false, full = true, onCompleted) => {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    const status = await NetInfo.fetch();
+    const userstore = useUserStore.getState();
+    const user = await db.user.getUser();
+    if (!status.isInternetReachable) {
+      DatabaseLogger.warn('Internet not reachable');
+    }
+    if (!user || !status.isInternetReachable) {
+      initAfterSync();
+      return onCompleted?.(false);
+    }
+    userstore.setSyncing(true);
+    let error = null;
+    console.log('Sync.run started');
+    try {
+      console.log('DO IN BACKGROUND START');
+      let res = await doInBackground(async () => {
+        try {
+          console.log('DO IN BACKGROUND');
+          await db.sync(full, forced);
+          return true;
+        } catch (e) {
+          error = e;
+          return e.message;
+        }
+      });
+      if (!res) {
+        initAfterSync();
+        userstore.setSyncing(false);
+        return onCompleted?.(false);
+      }
+      if (typeof res === 'string') throw error;
       userstore.setSyncing(false);
-      let status = await NetInfo.fetch();
-      if (status.isConnected && status.isInternetReachable) {
-        ToastEvent.error(e, 'Sync failed', context);
+      return onCompleted?.(true);
+    } catch (e) {
+      if (!ignoredMessages.find(im => e.message?.includes(im)) && userstore.user) {
+        userstore.setSyncing(false);
+        console.log(status.isConnected, status.isInternetReachable);
+        if (status.isConnected && status.isInternetReachable) {
+          ToastEvent.error(e, 'Sync failed', context);
+        }
+      }
+      DatabaseLogger.error(e, '[Client] Failed to sync');
+      onCompleted?.(false);
+    } finally {
+      userstore.setSyncing(false);
+      if (full || forced) {
+        db.eventManager.publish(EVENTS.syncCompleted);
       }
     }
-  } finally {
-    userstore.setLastSynced(await db.lastSynced());
-    initialize();
-    if (getNote()?.id) {
-      await updateNoteInEditor();
-    }
-
-    console.log('sync done');
-    userstore.setSyncing(false);
-  }
-  return result;
+  }, 1000);
 };
 
 const Sync = {

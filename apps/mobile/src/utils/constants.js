@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { Monographs } from '../screens/notes/monographs';
 import { eSendEvent } from '../services/event-manager';
 import Navigation from '../services/navigation';
 import { refreshNotesPage } from './events';
@@ -19,8 +20,8 @@ export const GROUP = {
 
 export const SORT = {
   dateEdited: 'Date edited',
-  dateCreated: 'Date created'
-  //title:"Title",
+  dateCreated: 'Date created',
+  title: 'Title'
 };
 
 export const itemSkus = [
@@ -30,7 +31,13 @@ export const itemSkus = [
   'com.streetwriters.notesnook.sub.mo.15',
   'com.streetwriters.notesnook.sub.mo.ofr',
   'com.streetwriters.notesnook.sub.yr.trialoffer',
-  'com.streetwriters.notesnook.sub.mo.trialoffer'
+  'com.streetwriters.notesnook.sub.mo.trialoffer',
+  'com.streetwriters.notesnook.sub.mo.tier1',
+  'com.streetwriters.notesnook.sub.yr.tier1',
+  'com.streetwriters.notesnook.sub.mo.tier2',
+  'com.streetwriters.notesnook.sub.yr.tier2',
+  'com.streetwriters.notesnook.sub.mo.tier3',
+  'com.streetwriters.notesnook.sub.yr.tier3'
 ];
 
 export const SUBSCRIPTION_STATUS = {
@@ -99,20 +106,7 @@ export const MenuItemsList = [
     icon: 'text-box-multiple-outline',
     close: true,
     func: () => {
-      let params = {
-        type: 'notes',
-        menu: true,
-        get: 'monographs',
-        title: 'Monographs',
-        id: 'monographs_navigation'
-      };
-
-      eSendEvent(refreshNotesPage, params);
-      Navigation.navigate('NotesPage', params, {
-        heading: 'Monographs',
-        id: 'monographs_navigation',
-        type: 'notes'
-      });
+      Monographs.navigate();
     }
   },
   {

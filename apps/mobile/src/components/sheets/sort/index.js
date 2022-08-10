@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
 import { eSendEvent } from '../../../services/event-manager';
 import Navigation from '../../../services/navigation';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { GROUP, SORT } from '../../../utils/constants';
 import { db } from '../../../utils/database';
 import { refreshNotesPage } from '../../../utils/events';
@@ -22,7 +22,7 @@ const Sort = ({ type, screen }) => {
     layoutmanager.withSpringAnimation(600);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
-      Navigation.setRoutesToUpdate([screen]);
+      Navigation.queueRoutesForUpdate(screen);
       eSendEvent('groupOptionsUpdate');
       eSendEvent(refreshNotesPage);
     }, 1);
@@ -64,10 +64,10 @@ const Sort = ({ type, screen }) => {
         <Button
           title={
             groupOptions.sortDirection === 'asc'
-              ? groupOptions.groupBy === 'abc'
+              ? groupOptions.groupBy === 'abc' || groupOptions.sortBy === 'title'
                 ? 'A - Z'
                 : 'Old - New'
-              : groupOptions.groupBy === 'abc'
+              : groupOptions.groupBy === 'abc' || groupOptions.sortBy === 'title'
               ? 'Z - A'
               : 'New - Old'
           }
@@ -106,7 +106,7 @@ const Sort = ({ type, screen }) => {
           <Button
             type={'grayBg'}
             title="Title"
-            height={45}
+            height={40}
             iconPosition="left"
             icon={'check'}
             buttonType={{ text: colors.accent }}
@@ -114,32 +114,34 @@ const Sort = ({ type, screen }) => {
             iconSize={SIZE.md}
           />
         ) : (
-          Object.keys(SORT).map((item, index) => (
-            <Button
-              key={item}
-              type={groupOptions.sortBy === item ? 'grayBg' : 'gray'}
-              title={SORT[item]}
-              height={40}
-              iconPosition="left"
-              icon={groupOptions.sortBy === item ? 'check' : null}
-              style={{
-                marginRight: 10,
-                paddingHorizontal: 8
-              }}
-              buttonType={{
-                text: groupOptions.sortBy === item ? colors.accent : colors.icon
-              }}
-              fontSize={SIZE.sm}
-              onPress={async () => {
-                let _groupOptions = {
-                  ...groupOptions,
-                  sortBy: type === 'trash' ? 'dateDeleted' : item
-                };
-                await updateGroupOptions(_groupOptions);
-              }}
-              iconSize={SIZE.md}
-            />
-          ))
+          Object.keys(SORT).map((item, index) =>
+            item === 'title' && groupOptions.groupBy !== 'none' ? null : (
+              <Button
+                key={item}
+                type={groupOptions.sortBy === item ? 'grayBg' : 'gray'}
+                title={SORT[item]}
+                height={40}
+                iconPosition="left"
+                icon={groupOptions.sortBy === item ? 'check' : null}
+                style={{
+                  marginRight: 10,
+                  paddingHorizontal: 8
+                }}
+                buttonType={{
+                  text: groupOptions.sortBy === item ? colors.accent : colors.icon
+                }}
+                fontSize={SIZE.sm}
+                onPress={async () => {
+                  let _groupOptions = {
+                    ...groupOptions,
+                    sortBy: type === 'trash' ? 'dateDeleted' : item
+                  };
+                  await updateGroupOptions(_groupOptions);
+                }}
+                iconSize={SIZE.md}
+              />
+            )
+          )
         )}
       </View>
 

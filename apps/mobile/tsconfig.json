@@ -14,15 +14,8 @@
     "esModuleInterop": true,
     "skipLibCheck": false,
     "maxNodeModuleJsDepth": 6,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "types": ["node", "jest", "detox"]
   },
-  "exclude": [
-    "babel.config.js",
-    "metro.config.js",
-    "jest.config.js",
-    "android",
-    "ios",
-    "html",
-    "e2e"
-  ]
+  "exclude": ["android", "ios"]
 }

@@ -1,7 +1,7 @@
 import { Platform, StatusBar } from 'react-native';
 import { AndroidModule } from '..';
 import { eSendEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eThemeUpdated } from '../events';
 
 export const ACCENT = {
@@ -113,11 +113,11 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
 
   useThemeStore.getState().setColors({ ...COLOR_SCHEME });
 
-  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content', true);
+  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content', false);
   if (Platform.OS === 'android') {
     AndroidModule.setBackgroundColor(COLOR_SCHEME.bg);
-    StatusBar.setBackgroundColor('transparent', true);
-    StatusBar.setTranslucent(true, true);
+    StatusBar.setBackgroundColor('transparent', false);
+    StatusBar.setTranslucent(true, false);
   }
   eSendEvent(eThemeUpdated);
 

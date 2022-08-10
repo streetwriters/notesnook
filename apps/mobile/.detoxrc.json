@@ -1,40 +1,36 @@
 {
   "testRunner": "jest",
   "runnerConfig": "e2e/config.json",
-  "configurations": {
-    "ios": {
-      "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/Notesnook.app",
-      "build": "xcodebuild -workspace ios/Notesnook.xcworkspace -scheme Notesnook -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
-      "type": "ios.simulator",
+  "devices": {
+    "emulator": {
+      "type": "android.emulator",
       "device": {
-        "type": "iPhone 11 Pro"
+        "avdName": "Pixel_5_API_31"
       }
-    },
-    "android.emu.debug": {
-        "binaryPath": "android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk",
-        "build":
-        "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
-        "type": "android.emulator",
-        "name": "emu"
-      },
-    "android.dev.debug": {
-      "binaryPath": "android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk",
+    }
+  },
+  "apps": {
+    "android.debug": {
+      "type": "android.apk",
+      "binaryPath": "android/app/build/outputs/apk/debug/app-x86_64-debug.apk",
       "testBinaryPath": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
-      "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
-      "type": "android.attached",
-      "device": {
-        "adbName": "192.168.10.2:5555",
-        "adbNameAlt":"LMG710ULM3d3678f0"
-      }
+      "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd .."
     },
-    "android.dev.release": {
-      "binaryPath": "android/app/build/outputs/apk/release/app-arm64-v8a-release.apk",
+    "android.release": {
+      "type": "android.apk",
+      "binaryPath": "android/app/build/outputs/apk/release/app-x86_64-release.apk",
       "testBinaryPath": "android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk",
-      "build": "cd android ; ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release ; cd ..",
-      "type": "android.attached",
-      "device": {
-        "adbName": "LMG710ULM3d3678f0"
-      }
+      "build": "cd android ; ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release ; cd .."
+    }
+  },
+  "configurations": {
+    "android.emu.debug": {
+      "app": "android.debug",
+      "device": "emulator"
+    },
+    "android.emu.release": {
+      "app": "android.release",
+      "device": "emulator"
     }
   }
 }

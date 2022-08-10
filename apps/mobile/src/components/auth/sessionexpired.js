@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import BiometricService from '../../services/biometrics';
 import {
   eSendEvent,
@@ -85,11 +85,19 @@ export const SessionExpired = () => {
       let res = await db.user.tokenManager.getToken();
       if (!res) throw new Error('no token found');
       if (db.user.tokenManager._isTokenExpired(res)) throw new Error('token expired');
-      if (!(await Sync.run())) throw new Error('e');
-      await SettingsService.set({
-        sessionExpired: false
+      Sync.run('global', false, true, async complete => {
+        if (!complete) {
+          let user = await db.user.getUser();
+          if (!user) return;
+          email.current = user.email;
+          setVisible(true);
+          return;
+        }
+        SettingsService.set({
+          sessionExpired: false
+        });
+        setVisible(false);
       });
-      setVisible(false);
     } catch (e) {
       console.log(e);
       let user = await db.user.getUser();
@@ -124,7 +132,7 @@ export const SessionExpired = () => {
       });
       await SettingsService.set({
         sessionExpired: false,
-        userEmailConfirmed: user.isEmailConfirmed
+        userEmailConfirmed: user?.isEmailConfirmed
       });
       eSendEvent('userLoggedIn', true);
       await sleep(500);

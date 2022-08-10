@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
-import { useMenuStore, useNoteStore } from '../../stores/stores';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
+import useNavigationStore from '../../stores/use-navigation-store';
+import { useMenuStore } from '../../stores/use-menu-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { COLORS_NOTE } from '../../utils/color-scheme';
 import { db } from '../../utils/database';
-import { refreshNotesPage } from '../../utils/events';
 import { normalize, SIZE } from '../../utils/size';
 import { presentDialog } from '../dialog/functions';
 import { PressableButton } from '../ui/pressable';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
+import { ColoredNotes } from '../../screens/notes/colored';
 
 export const ColorSection = React.memo(
   () => {
@@ -40,10 +41,11 @@ const ColorItem = React.memo(
     const [headerTextState, setHeaderTextState] = useState(null);
     alias = db.colors.alias(item.id) || '';
 
-    const onHeaderStateChange = event => {
+    const onHeaderStateChange = state => {
       setTimeout(() => {
-        if (event.id === item.id) {
-          setHeaderTextState(event);
+        let id = state.currentScreen?.id;
+        if (id === item.id) {
+          setHeaderTextState({ id: state.currentScreen.id });
         } else {
           if (headerTextState !== null) {
             setHeaderTextState(null);
@@ -53,27 +55,18 @@ const ColorItem = React.memo(
     };
 
     useEffect(() => {
-      eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+      let unsub = useNavigationStore.subscribe(onHeaderStateChange);
       return () => {
-        eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+        unsub();
       };
     }, [headerTextState]);
 
     const onPress = item => {
-      let params = {
-        ...item,
-        type: 'color',
-        menu: true,
-        get: 'colored'
-      };
+      ColoredNotes.navigate(item, false);
 
-      eSendEvent(refreshNotesPage, params);
-      Navigation.navigate('NotesPage', params, {
-        heading: alias.slice(0, 1).toUpperCase() + alias.slice(1),
-        id: item.id,
-        type: 'color'
+      setImmediate(() => {
+        Navigation.closeDrawer();
       });
-      Navigation.closeDrawer();
     };
 
     const onLongPress = () => {

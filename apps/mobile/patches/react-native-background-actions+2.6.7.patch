@@ -1,0 +1,16 @@
+diff --git a/node_modules/react-native-background-actions/android/src/main/java/com/asterinet/react/bgactions/RNBackgroundActionsTask.java b/node_modules/react-native-background-actions/android/src/main/java/com/asterinet/react/bgactions/RNBackgroundActionsTask.java
+index 614f768..0727d65 100644
+--- a/node_modules/react-native-background-actions/android/src/main/java/com/asterinet/react/bgactions/RNBackgroundActionsTask.java
++++ b/node_modules/react-native-background-actions/android/src/main/java/com/asterinet/react/bgactions/RNBackgroundActionsTask.java
+@@ -83,8 +83,9 @@ final public class RNBackgroundActionsTask extends HeadlessJsTaskService {
+         createNotificationChannel(bgOptions.getTaskTitle(), bgOptions.getTaskDesc()); // Necessary creating channel for API 26+
+         // Create the notification
+         final Notification notification = buildNotification(this, bgOptions);
+-
+-        startForeground(SERVICE_NOTIFICATION_ID, notification);
++        try {
++            startForeground(SERVICE_NOTIFICATION_ID, notification);
++        } catch(IllegalStateException e) {}
+         return super.onStartCommand(intent, flags, startId);
+     }
+ 

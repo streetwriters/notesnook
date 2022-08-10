@@ -1,29 +1,30 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import React, { useRef, useState } from 'react';
 import { Linking, Platform, Text, TextInput, View } from 'react-native';
-import { useThemeStore } from '../../../stores/theme';
-import { useUserStore } from '../../../stores/stores';
+import { APP_VERSION } from '../../../../version';
 import { eSendEvent, ToastEvent } from '../../../services/event-manager';
 import PremiumService from '../../../services/premium';
-import { APP_VERSION } from '../../../../version';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { useUserStore } from '../../../stores/use-user-store';
 import { db } from '../../../utils/database';
 import { eCloseProgressDialog } from '../../../utils/events';
 import { openLinkInBrowser } from '../../../utils/functions';
 import { SIZE } from '../../../utils/size';
 import { sleep } from '../../../utils/time';
-import { Button } from '../../ui/button';
 import DialogHeader from '../../dialog/dialog-header';
 import { presentDialog } from '../../dialog/functions';
+import { Button } from '../../ui/button';
 import Seperator from '../../ui/seperator';
 import Paragraph from '../../ui/typography/paragraph';
-import deviceInfoModule from 'react-native-device-info';
 
-export const Issue = () => {
+export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const colors = useThemeStore(state => state.colors);
-  const body = useRef(null);
-  const title = useRef(null);
+  const body = useRef(defaultBody);
+  const title = useRef(defaultTitle);
   const user = useUserStore(state => state.user);
   const [loading, setLoading] = useState(false);
+  const bodyRef = useRef();
+  const initialLayout = useRef(false);
 
   const onPress = async () => {
     if (loading) return;
@@ -95,12 +96,17 @@ Logged in: ${user ? 'yes' : 'no'}`,
   return (
     <View
       style={{
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        width: '100%'
       }}
     >
       <DialogHeader
-        title="Report issue"
-        paragraph="Let us know if you have faced any issue/bug while using Notesnook."
+        title={issueTitle || 'Report issue'}
+        paragraph={
+          issueTitle
+            ? 'We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap.'
+            : 'Let us know if you have faced any issue/bug while using Notesnook.'
+        }
       />
 
       <Seperator half />
@@ -108,6 +114,7 @@ Logged in: ${user ? 'yes' : 'no'}`,
       <TextInput
         placeholder="Title"
         onChangeText={v => (title.current = v)}
+        defaultValue={title.current}
         style={{
           borderWidth: 1,
           borderColor: colors.nav,
@@ -122,6 +129,7 @@ Logged in: ${user ? 'yes' : 'no'}`,
       />
 
       <TextInput
+        ref={bodyRef}
         placeholder={`Tell us more about the issue you are facing.
         
 For example:
@@ -131,6 +139,19 @@ For example:
         numberOfLines={5}
         textAlignVertical="top"
         onChangeText={v => (body.current = v)}
+        onLayout={() => {
+          if (initialLayout.current) return;
+          initialLayout.current = true;
+          if (body.current) {
+            bodyRef.current?.setNativeProps({
+              text: body.current,
+              selection: {
+                start: 0,
+                end: 0
+              }
+            });
+          }
+        }}
         style={{
           borderWidth: 1,
           borderColor: colors.nav,

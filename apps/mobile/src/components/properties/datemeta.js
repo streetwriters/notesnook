@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import { timeConverter } from '../../utils/time';
 import Paragraph from '../ui/typography/paragraph';
@@ -14,6 +14,8 @@ export const DateMeta = ({ item }) => {
         return 'Created at:';
       case 'dateEdited':
         return 'Last edited at:';
+      case 'dateModified':
+        return 'Last modified at:';
       case 'dateDeleted':
         return 'Deleted at:';
       case 'dateUploaded':
@@ -24,7 +26,7 @@ export const DateMeta = ({ item }) => {
   };
 
   const renderItem = key =>
-    key.startsWith('date') && key !== 'dateModified' ? (
+    key.startsWith('date') ? (
       <View
         key={key}
         style={{

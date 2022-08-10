@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import * as Keychain from 'react-native-keychain';
-import { useSettingStore } from '../stores/stores';
+import { useSettingStore } from '../stores/use-setting-store';
 import { MMKV } from '../utils/database/mmkv';
 import Storage from '../utils/database/storage';
 import { ShowToastEvent, ToastEvent } from './event-manager';
@@ -17,8 +17,6 @@ async function isBiometryAvailable() {
   try {
     return await FingerprintScanner.isSensorAvailable();
   } catch (e) {
-    console.log(e, 'sensor not available');
-    //ToastEvent.show(e.message, 'error');
     return false;
   }
 }
@@ -61,6 +59,9 @@ async function getCredentials(title?: string, description?: string) {
     });
     //@ts-ignore
     await FingerprintScanner.authenticate(options);
+    setTimeout(() => {
+      useSettingStore.getState().setRequestBiometrics(false);
+    }, 1000);
     FingerprintScanner.release();
     return await Keychain.getInternetCredentials('nn_vault');
   } catch (e) {

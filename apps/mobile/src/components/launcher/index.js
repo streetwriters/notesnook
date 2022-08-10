@@ -1,32 +1,31 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { NativeModules, Platform, StatusBar, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Platform, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
-import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
+import { enabled } from 'react-native-privacy-snapshot';
+import { editorState } from '../../screens/editor/tiptap/utils';
+import BackupService from '../../services/backup';
 import BiometricService from '../../services/biometrics';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import { setRateAppMessage } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import {
-  initialize,
-  useFavoriteStore,
-  useMessageStore,
-  useNoteStore,
-  useSettingStore,
-  useUserStore
-} from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
-import { editing } from '../../utils';
-import { db } from '../../utils/database';
+import { initialize } from '../../stores';
+import { useMessageStore } from '../../stores/use-message-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
+import { DatabaseLogger, db, loadDatabase } from '../../utils/database';
 import { MMKV } from '../../utils/database/mmkv';
 import { eOpenAnnouncementDialog } from '../../utils/events';
 import { tabBarRef } from '../../utils/global-refs';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { SVG } from '../auth/background';
-import Intro from '../intro';
+import Migrate from '../sheets/migrate';
+import NewFeature from '../sheets/new-feature/index';
 import { Update } from '../sheets/update';
 import { Button } from '../ui/button';
 import { IconButton } from '../ui/icon-button';
@@ -36,79 +35,73 @@ import { SvgView } from '../ui/svg';
 import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { Walkthrough } from '../walkthroughs';
-import NewFeature from '../sheets/new-feature/index';
+import { useAppState } from '../../utils/hooks/use-app-state';
 
 const Launcher = React.memo(
   () => {
     const colors = useThemeStore(state => state.colors);
-    const setNotes = useNoteStore(state => state.setNotes);
-    const setFavorites = useFavoriteStore(state => state.setFavorites);
     const setLoading = useNoteStore(state => state.setLoading);
     const loading = useNoteStore(state => state.loading);
     const user = useUserStore(state => state.user);
     const verifyUser = useUserStore(state => state.verifyUser);
     const setVerifyUser = useUserStore(state => state.setVerifyUser);
     const deviceMode = useSettingStore(state => state.deviceMode);
+    const appState = useAppState();
     const passwordInputRef = useRef();
     const password = useRef();
-    const [requireIntro, setRequireIntro] = useState({
-      updated: false,
-      value: false
-    });
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
     const dbInitCompleted = useRef(false);
-
     const loadNotes = async () => {
       if (verifyUser) {
         return;
       }
-      await restoreEditorState();
-      await db.notes.init();
-      setNotes();
-      setFavorites();
-      setLoading(false);
-      Walkthrough.init();
+      if (!dbInitCompleted.current) {
+        await restoreEditorState();
+      }
+      setImmediate(() => {
+        db.notes.init().then(() => {
+          Walkthrough.init();
+          initialize();
+          setImmediate(() => {
+            setLoading(false);
+            if (!dbInitCompleted.current) {
+              setImmediate(() => doAppLoadActions());
+            }
+          });
+        });
+      });
     };
 
     const init = async () => {
       if (!dbInitCompleted.current) {
+        await RNBootSplash.hide({ fade: true });
+        await loadDatabase();
+        DatabaseLogger.info('Initializing database');
         await db.init();
-        initialize();
-        useUserStore.getState().setUser(await db.user.getUser());
         dbInitCompleted.current = true;
+      }
+
+      if (db.migrations.required() && !verifyUser) {
+        presentSheet({
+          component: <Migrate />,
+          onClose: () => {
+            loadNotes();
+          },
+          disableClosing: true
+        });
+        return;
       }
 
       if (!verifyUser) {
         loadNotes();
+      } else {
+        useUserStore.getState().setUser(await db.user?.getUser());
       }
     };
 
-    const hideSplashScreen = async () => {
-      await sleep(requireIntro.value ? 500 : 0);
-      await RNBootSplash.hide({ fade: true });
-      setTimeout(async () => {
-        if (Platform.OS === 'android') {
-          NativeModules.RNBars.setStatusBarStyle(!colors.night ? 'light-content' : 'dark-content');
-          await sleep(5);
-          NativeModules.RNBars.setStatusBarStyle(colors.night ? 'light-content' : 'dark-content');
-        } else {
-          StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-        }
-      }, 500);
-    };
-
-    useEffect(() => {
-      if (requireIntro.updated) {
-        hideSplashScreen();
-      }
-    }, [requireIntro, verifyUser]);
-
-    useEffect(() => {
-      let introCompleted = SettingsService.get().introCompleted;
-      setRequireIntro({
-        updated: true,
-        value: !introCompleted
-      });
-    }, []);
+    // useEffect(() => {
+    //   hideSplashScreen();
+    // }, [verifyUser]);
 
     useEffect(() => {
       if (!loading) {
@@ -125,14 +118,23 @@ const Launcher = React.memo(
         eSendEvent('session_expired');
         return;
       }
-
+      const user = await db.user.getUser();
+      await useMessageStore.getState().setAnnouncement();
+      if (PremiumService.get() && user) {
+        if (SettingsService.get().reminder === 'off') {
+          SettingsService.set({ reminder: 'daily' });
+        }
+        if (await BackupService.checkBackupRequired(SettingsService.get().reminder)) {
+          sleep(2000).then(() => BackupService.run());
+        }
+      }
       if (NewFeature.present()) return;
       if (await checkAppUpdateAvailable()) return;
       if (await checkForRateAppRequest()) return;
       if (await checkNeedsBackup()) return;
       if (await PremiumService.getRemainingTrialDaysStatus()) return;
-      await useMessageStore.getState().setAnnouncement();
-      if (!requireIntro?.value) {
+
+      if (introCompleted) {
         useMessageStore.subscribe(state => {
           let dialogs = state.dialogs;
           if (dialogs.length > 0) {
@@ -143,13 +145,13 @@ const Launcher = React.memo(
     };
 
     const checkAppUpdateAvailable = async () => {
+      if (__DEV__) return;
       try {
         const version = await checkVersion();
         if (!version.needsUpdate) return false;
         presentSheet({
           component: ref => <Update version={version} fwdRef={ref} />
         });
-
         return true;
       } catch (e) {
         return false;
@@ -157,7 +159,7 @@ const Launcher = React.memo(
     };
 
     const restoreEditorState = async () => {
-      let appState = await MMKV.getItem('appState');
+      let appState = MMKV.getString('appState');
       if (appState) {
         appState = JSON.parse(appState);
         if (
@@ -166,9 +168,9 @@ const Launcher = React.memo(
           !appState.movedAway &&
           Date.now() < appState.timestamp + 3600000
         ) {
-          editing.isRestoringState = true;
-          editing.currentlyEditing = true;
-          editing.movedAway = false;
+          editorState().currentlyEditing = true;
+          editorState().isRestoringState = true;
+          editorState().movedAway = false;
           if (!DDS.isTab) {
             tabBarRef.current?.goToPage(1);
           }
@@ -181,25 +183,26 @@ const Launcher = React.memo(
       let rateApp = SettingsService.get().rateApp;
       if (rateApp && rateApp < Date.now() && !useMessageStore.getState().message?.visible) {
         setRateAppMessage();
-        return true;
+        return false;
       }
       return false;
     };
 
     const checkNeedsBackup = async () => {
-      let { nextBackupRequestTime, reminder } = SettingsService.get();
-      if (reminder === 'off' || !reminder) {
-        if (nextBackupRequestTime < Date.now()) {
-          presentSheet({
-            title: 'Backup & restore',
-            paragraph: 'Please enable automatic backups to keep your data safe',
-            component: <SettingsBackupAndRestore isSheet={true} />
-          });
-
-          return true;
-        }
-      }
       return false;
+      // let { nextBackupRequestTime, reminder } = SettingsService.get();
+      // if (reminder === 'off' || !reminder) {
+      //   if (nextBackupRequestTime < Date.now()) {
+      //     presentSheet({
+      //       title: 'Backup & restore',
+      //       paragraph: 'Please enable automatic backups to keep your data safe',
+      //       component: <SettingsBackupAndRestore isSheet={true} />
+      //     });
+
+      //     return true;
+      //   }
+      // }
+      // return false;
     };
 
     const onUnlockBiometrics = async () => {
@@ -213,16 +216,20 @@ const Launcher = React.memo(
       let verified = await BiometricService.validateUser('Unlock to access your notes', '');
       if (verified) {
         setVerifyUser(false);
+        enabled(false);
         password.current = null;
       }
     };
 
     useEffect(() => {
-      if (verifyUser) {
-        onUnlockBiometrics();
-      }
       init();
     }, [verifyUser]);
+
+    useEffect(() => {
+      if (verifyUser && appState === 'active') {
+        onUnlockBiometrics();
+      }
+    }, [appState]);
 
     const onSubmit = async () => {
       if (!password.current) return;
@@ -230,6 +237,7 @@ const Launcher = React.memo(
         let verified = await db.user.verifyPassword(password.current);
         if (verified) {
           setVerifyUser(false);
+          enabled(false);
           password.current = null;
         }
       } catch (e) {}
@@ -261,7 +269,8 @@ const Launcher = React.memo(
             width: deviceMode !== 'mobile' ? '50%' : Platform.OS == 'ios' ? '95%' : '100%',
             paddingHorizontal: 12,
             marginBottom: 30,
-            marginTop: 15
+            marginTop: 15,
+            alignSelf: 'center'
           }}
         >
           <IconButton
@@ -319,7 +328,7 @@ const Launcher = React.memo(
 
             <View
               style={{
-                marginTop: user ? 50 : 25
+                marginTop: user ? 25 : 25
               }}
             >
               {user ? (
@@ -355,8 +364,6 @@ const Launcher = React.memo(
           </View>
         </View>
       </View>
-    ) : requireIntro.value && !loading ? (
-      <Intro />
     ) : null;
   },
   () => true

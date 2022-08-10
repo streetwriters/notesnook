@@ -1,4 +1,4 @@
-import { useMessageStore } from '../stores/stores';
+import { useMessageStore } from '../stores/use-message-store';
 import { eOpenLoginDialog, eOpenRateDialog, eOpenRecoveryKeyDialog } from '../utils/events';
 import { eSendEvent } from './event-manager';
 import PremiumService from './premium';
@@ -73,7 +73,7 @@ export function setLoginMessage() {
 const emailMessage = {
   visible: true,
   message: 'Email not confirmed',
-  actionText: 'Please confrim your email to sync notes.',
+  actionText: 'Please confirm your email to sync notes.',
   onPress: () => {
     PremiumService.showVerifyEmailDialog();
   },

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { SIZE } from '../../utils/size';
 import { Button } from '../ui/button';
 import { PressableButtonProps } from '../ui/pressable';
@@ -59,7 +59,7 @@ const DialogHeader = ({
               alignItems: 'center'
             }}
           >
-            <Heading style={{ textAlign: centered ? 'center' : 'left' }} size={SIZE.xl}>
+            <Heading style={{ textAlign: centered ? 'center' : 'left' }} size={SIZE.lg}>
               {title} {titlePart ? <Text style={{ color: colors.accent }}>{titlePart}</Text> : null}
             </Heading>
 

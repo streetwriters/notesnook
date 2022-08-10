@@ -2,8 +2,8 @@ package com.streetwriters.notesnook;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
-import com.RNFetchBlob.RNFetchBlob;
 import com.dooboolab.RNIap.RNIapModule;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -19,21 +19,28 @@ import java.util.Map;
 
 import androidx.multidex.MultiDexApplication;
 
+import com.facebook.react.bridge.JavaScriptExecutorFactory;
+//import com.facebook.react.modules.systeminfo.AndroidInfoHelpers;
 import com.facebook.react.TurboReactPackage;
 import com.facebook.react.module.model.ReactModuleInfo;
 import com.facebook.react.module.model.ReactModuleInfoProvider;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.learnium.RNDeviceInfo.RNDeviceModule;
-import com.oblador.keychain.KeychainPackage;
 import com.onibenjo.htmltopdf.RNHTMLtoPDFModule;
 import com.reactnativedocumentpicker.DocumentPickerModule;
 import com.vinzscam.reactnativefileviewer.RNFileViewerModule;
+import com.facebook.react.config.ReactFeatureFlags;
+import com.streetwriters.notesnook.newarchitecture.MainApplicationReactNativeHost;
 
 import cl.json.RNShareModule;
 import px.tooltips.RNTooltipsModule;
+//import io.csie.kudo.reactnative.v8.executor.V8ExecutorFactory;
+import androidx.annotation.Nullable;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
+
+    private final ReactNativeHost mNewArchitectureNativeHost =
+            new MainApplicationReactNativeHost(this);
 
     private final ReactNativeHost mReactNativeHost =
             new ReactNativeHost(this) {
@@ -42,12 +49,28 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                     return BuildConfig.DEBUG;
                 }
 
+                // @Nullable
+                // @Override
+                // protected String getBundleAssetName() {
+                //      final String v8BundleAssetName = V8ExecutorFactory.getBundleAssetName(getApplicationContext(), getUseDeveloperSupport());
+                //      if (v8BundleAssetName != null) {
+                //          return v8BundleAssetName;
+                //      }
+                //     return super.getBundleAssetName();
+                // }
+
+                // @Override
+                // protected JavaScriptExecutorFactory getJavaScriptExecutorFactory() {
+                //     return new V8ExecutorFactory(
+                //             getApplicationContext(),
+                //             getPackageName(),
+                //             AndroidInfoHelpers.getFriendlyDeviceName(),
+                //             getUseDeveloperSupport());
+                // }
+
                 @Override
                 protected List<ReactPackage> getPackages() {
-
                     List<ReactPackage> packages = new PackageList(this).getPackages();
-                    //packages.add(new KeychainPackage(new KeychainModuleBuilder().withoutWarmUp()));
-
                     packages.add(new TurboReactPackage() {
                         @Override
                         public NativeModule getModule(String name, ReactApplicationContext reactContext) {
@@ -79,7 +102,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                             return new ReactModuleInfoProvider() {
                                 @Override
                                 public Map<String, ReactModuleInfo> getReactModuleInfos() {
-                                    Map<String, ReactModuleInfo> map = new HashMap<String, ReactModuleInfo>() ;
+                                    Map<String, ReactModuleInfo> map = new HashMap<String, ReactModuleInfo>();
                                     map.put("NNativeModule", getModuleInfo("NNativeModule", "com.streetwriters.notesnook.NNativeModule"));
                                     map.put("RNTooltips", getModuleInfo("RNTooltips", "px.tooltips.RNTooltipsModule"));
                                     map.put("RNHTMLtoPDF", getModuleInfo("RNHTMLtoPDF", "com.onibenjo.htmltopdf.RNHTMLtoPDFModule"));
@@ -94,7 +117,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
 
                         }
                     });
-
                     return packages;
                 }
 
@@ -103,24 +125,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                     return "index";
                 }
             };
-
-    public ReactModuleInfo getModuleInfo(String reactClass, String className) {
-
-        return new ReactModuleInfo(reactClass, className, true, false, false, false, true);
-
-    }
-
-    @Override
-    public ReactNativeHost getReactNativeHost() {
-        return mReactNativeHost;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        SoLoader.init(this, /* native exopackage */ false);
-        initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-    }
 
     /**
      * Loads Flipper in React Native templates. Call this in the onCreate method with something like
@@ -151,5 +155,29 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                 e.printStackTrace();
             }
         }
+    }
+
+    public ReactModuleInfo getModuleInfo(String reactClass, String className) {
+
+        return new ReactModuleInfo(reactClass, className, true, false, false, false, true);
+
+    }
+
+    @Override
+    public ReactNativeHost getReactNativeHost() {
+        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+            return mNewArchitectureNativeHost;
+        } else {
+            return mReactNativeHost;
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // If you opted-in for the New Architecture, we enable the TurboModule system
+        ReactFeatureFlags.useTurboModules = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
+        SoLoader.init(this, /* native exopackage */ false);
+        initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
     }
 }

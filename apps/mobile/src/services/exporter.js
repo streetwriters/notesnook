@@ -352,9 +352,9 @@ async function saveToPDF(note) {
   if (Platform.OS === 'android') {
     fileUri = await ScopedStorage.writeFile(
       androidSavePath,
+      res.base64,
       fileName,
       'application/pdf',
-      res.base64,
       'base64',
       false
     );
@@ -380,16 +380,16 @@ async function saveToMarkdown(note) {
     path = file.uri;
   }
 
-  let markdown = await db.notes.note(note.id).export('md', markdown);
+  let markdown = await db.notes.note(note.id).export('md');
   let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
 
   let fileUri;
   if (Platform.OS === 'android') {
     fileUri = await ScopedStorage.writeFile(
       path,
+      markdown,
       fileName + '.md',
       'text/markdown',
-      markdown,
       'utf8',
       false
     );
@@ -422,9 +422,9 @@ async function saveToText(note) {
   if (Platform.OS === 'android') {
     fileUri = await ScopedStorage.writeFile(
       path,
+      text,
       fileName + '.txt',
       'text/plain',
-      text,
       'utf8',
       false
     );
@@ -463,9 +463,9 @@ async function saveToHTML(note) {
   if (Platform.OS === 'android') {
     fileUri = await ScopedStorage.writeFile(
       path,
+      html3,
       fileName + '.html',
       'text/html',
-      html3,
       'utf8',
       false
     );

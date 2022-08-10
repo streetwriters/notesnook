@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import * as ProgressBar from 'react-native-progress';
 import { presentSheet } from '../../../services/event-manager';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import useSyncProgress from '../../../utils/hooks/use-sync-progress';
 import { SIZE } from '../../../utils/size';
 import Seperator from '../../ui/seperator';
+import { ProgressBarComponent } from '../../ui/svg/lazy';
 import Heading from '../../ui/typography/heading';
 import Paragraph from '../../ui/typography/paragraph';
 
@@ -41,7 +41,7 @@ export const Progress = () => {
           width: 200
         }}
       >
-        <ProgressBar.Bar
+        <ProgressBarComponent
           height={5}
           width={null}
           animated={true}

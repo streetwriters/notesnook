@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { LAUNCH_ROCKET } from '../../assets/images/assets';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
@@ -30,6 +30,7 @@ import { Walkthrough } from '../walkthroughs';
 import { features } from './features';
 import { Group } from './group';
 import { PricingPlans } from './pricing-plans';
+import { usePricing } from '../../utils/hooks/use-pricing';
 
 export const Component = ({ close, promo, getRef }) => {
   const colors = useThemeStore(state => state.colors);
@@ -37,6 +38,7 @@ export const Component = ({ close, promo, getRef }) => {
   const userCanRequestTrial =
     user && (!user.subscription || !user.subscription.expiry) ? true : false;
   const [floatingButton, setFloatingButton] = useState(false);
+  const pricing = usePricing('monthly');
 
   const onPress = async () => {
     if (user) {
@@ -58,7 +60,6 @@ export const Component = ({ close, promo, getRef }) => {
     let contentSize = event.nativeEvent.contentSize.height;
     contentSize = contentSize - event.nativeEvent.layoutMeasurement.height;
     let yOffset = event.nativeEvent.contentOffset.y;
-
     if (yOffset > 600 && yOffset < contentSize - 400) {
       setFloatingButton(true);
     } else {
@@ -97,6 +98,7 @@ export const Component = ({ close, promo, getRef }) => {
         style={{
           paddingHorizontal: DDS.isTab ? DDS.width / 5 : 0
         }}
+        scrollEventThrottle={0}
         keyboardDismissMode="none"
         keyboardShouldPersistTaps="always"
         onScroll={onScroll}
@@ -127,15 +129,26 @@ export const Component = ({ close, promo, getRef }) => {
           </Heading>
         </Heading>
 
-        <Paragraph
-          style={{
-            alignSelf: 'center',
-            marginBottom: 20
-          }}
-          size={SIZE.md}
-        >
-          ({PremiumService.getMontlySub().localizedPrice} / mo)
-        </Paragraph>
+        {!pricing ? (
+          <ActivityIndicator
+            style={{
+              marginBottom: 20
+            }}
+            size={SIZE.md}
+            color={colors.accent}
+          />
+        ) : (
+          <Paragraph
+            style={{
+              alignSelf: 'center',
+              marginBottom: 20
+            }}
+            size={SIZE.md}
+          >
+            ({pricing?.product?.localizedPrice} / mo)
+          </Paragraph>
+        )}
+
         <Paragraph
           key="description"
           size={SIZE.md}

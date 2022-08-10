@@ -1,6 +1,16 @@
 const { notesnook } = require('../test.ids');
-const { navigate, tapById, visibleByText, createNote, prepare, visibleById } = require('./utils');
-const { sleep } = require('./utils');
+const {
+  navigate,
+  tapById,
+  visibleByText,
+  createNote,
+  prepare,
+  visibleById,
+  notVisibleById,
+  sleep,
+  exitEditor,
+  tapByText
+} = require('./utils');
 
 describe('NOTE TESTS', () => {
   it('Create a note in editor', async () => {
@@ -12,7 +22,7 @@ describe('NOTE TESTS', () => {
     await prepare();
     await createNote();
     await tapById(notesnook.ids.note.get(1));
-    await tapById(notesnook.editor.back);
+    await exitEditor();
   });
 
   it('Notes properties should show', async () => {
@@ -75,12 +85,29 @@ describe('NOTE TESTS', () => {
     await visibleByText('PDF');
   });
 
+  it('Assign colors to a note', async () => {
+    await prepare();
+    let note = await createNote();
+    await tapById(notesnook.listitem.menu);
+    await tapById(notesnook.ids.dialogs.actionsheet.color('red'));
+    await visibleById('icon-check');
+    await tapById(notesnook.ids.dialogs.actionsheet.color('red'));
+    await notVisibleById('icon-check');
+    await tapById(notesnook.ids.dialogs.actionsheet.color('green'));
+    await device.pressBack();
+    await navigate('Green');
+    await visibleByText(note.body);
+  });
+
   it('Delete & restore a note', async () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
     await tapById('icon-Delete');
-    await tapById(notesnook.toast.button);
+    await navigate('Trash');
+    await tapById(notesnook.listitem.menu);
+    await tapByText('Restore note');
+    await device.pressBack();
     await visibleByText('Test note description that is very long and should not fit in text.');
   });
 });

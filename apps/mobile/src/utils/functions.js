@@ -1,12 +1,12 @@
 import { Linking } from 'react-native';
-import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import { history } from '.';
-import { useMenuStore, useSelectionStore } from '../stores/stores';
 import { eSendEvent, ToastEvent } from '../services/event-manager';
 import Navigation from '../services/navigation';
+import SearchService from '../services/search';
+import { useSelectionStore } from '../stores/use-selection-store';
+import { useMenuStore } from '../stores/use-menu-store';
 import { db } from './database';
 import { eClearEditor } from './events';
-import SearchService from '../services/search';
 
 export const deleteItems = async item => {
   if (item && db.monographs.isPublished(item.id)) {
@@ -45,7 +45,14 @@ export const deleteItems = async item => {
 
     await db.notes.delete(...ids);
 
-    Navigation.setRoutesToUpdate([Navigation.routeNames.Notes, Navigation.routeNames.NotesPage]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Trash'
+    );
     eSendEvent(eClearEditor);
   }
   if (topics?.length > 0) {
@@ -55,7 +62,7 @@ export const deleteItems = async item => {
     }
 
     // layoutmanager.withAnimation(150);
-    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notebook]);
+    Navigation.queueRoutesForUpdate('Notebook', 'Notebooks');
     useMenuStore.getState().setMenuPins();
     ToastEvent.show({
       heading: 'Topics deleted',
@@ -68,7 +75,15 @@ export const deleteItems = async item => {
     await db.notebooks.delete(...ids);
 
     //layoutmanager.withAnimation(150);
-    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notes]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Notebooks',
+      'Trash'
+    );
     useMenuStore.getState().setMenuPins();
   }
 
@@ -91,14 +106,16 @@ export const deleteItems = async item => {
         await db.trash.restore(...ids);
 
         //layoutmanager.withAnimation(150);
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.Notebooks,
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Trash,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Notebook,
-          Navigation.routeNames.Trash
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes',
+          'Favorites',
+          'Notes',
+          'Notebook',
+          'Notebooks',
+          'Trash'
+        );
         useMenuStore.getState().setMenuPins();
         useMenuStore.getState().setColorNotes();
         ToastEvent.hide();
@@ -107,7 +124,7 @@ export const deleteItems = async item => {
     });
   }
   history.selectedItemsList = [];
-  Navigation.setRoutesToUpdate([Navigation.routeNames.Trash]);
+  Navigation.queueRoutesForUpdate('Trash');
   useSelectionStore.getState().clearSelection(true);
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
@@ -118,27 +135,7 @@ export const deleteItems = async item => {
 export const openLinkInBrowser = async (link, colors) => {
   try {
     const url = link;
-    if (await InAppBrowser.isAvailable()) {
-      await InAppBrowser.open(url, {
-        // iOS Properties
-        dismissButtonStyle: 'cancel',
-        preferredBarTintColor: colors.accent,
-        preferredControlTintColor: 'white',
-        readerMode: false,
-        animated: true,
-        modalPresentationStyle: 'fullScreen',
-        modalTransitionStyle: 'coverVertical',
-        modalEnabled: true,
-        enableBarCollapsing: false,
-        // Android Properties
-        showTitle: true,
-        toolbarColor: colors.accent,
-        secondaryToolbarColor: 'black',
-        enableUrlBarHiding: true,
-        enableDefaultShare: true,
-        forceCloseOnRedirection: false
-      });
-    } else Linking.openURL(url);
+    Linking.openURL(url);
   } catch (error) {
     console.log(error.message);
   }

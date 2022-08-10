@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import {
   ERRORS_LIST,
   validateEmail,
@@ -21,7 +21,6 @@ import { getElevation } from '../../../utils';
 import { SIZE } from '../../../utils/size';
 import { IconButton } from '../icon-button';
 import Paragraph from '../typography/paragraph';
-import phone from 'phone';
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<any>;
@@ -91,7 +90,7 @@ const Input = ({
 
   const color = error ? colors.red : focus ? customColor || colors.accent : colors.nav;
 
-  const validate = (value: string) => {
+  const validate = async (value: string) => {
     if (!validationType) return;
     if (!value || value?.length === 0) {
       setError(false);
@@ -117,6 +116,8 @@ const Input = ({
         isError = customValidator && value === customValidator();
         break;
       case 'phonenumber':
+        // eslint-disable-next-line no-case-declarations
+        const phone = require('phone').default;
         // eslint-disable-next-line no-case-declarations
         let result = phone(value, {
           strictDetection: true,
@@ -316,7 +317,8 @@ const Input = ({
       {validationType === 'password' && focus && (
         <View
           style={{
-            paddingTop: 5
+            marginTop: -5,
+            marginBottom: 5
           }}
         >
           {

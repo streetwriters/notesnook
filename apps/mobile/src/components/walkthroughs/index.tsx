@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LayoutAnimation, View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
 import { eCloseProgressDialog } from '../../utils/events';
 import { MMKV } from '../../utils/database/mmkv';
@@ -117,7 +117,7 @@ Walkthrough.update = async (id: 'notebooks' | 'trialstarted' | 'emailconfirmed' 
 };
 
 Walkthrough.init = async () => {
-  let json = await MMKV.getItem('walkthroughState');
+  let json = MMKV.getString('walkthroughState');
   if (json) {
     walkthroughState = JSON.parse(json);
     console.log(walkthroughState);

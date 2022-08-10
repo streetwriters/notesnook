@@ -1,6 +1,6 @@
 import React from 'react';
-import { Platform, ScrollView, View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { Platform, View } from 'react-native';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { DDS } from '../../services/device-detection';
 import { presentSheet } from '../../services/event-manager';
 import { db } from '../../utils/database';
@@ -16,17 +16,13 @@ import { Synced } from './synced';
 import { Tags } from './tags';
 import { Topics } from './topics';
 import SearchService from '../../services/search';
+import { COLORS_NOTE } from '../../utils/color-scheme';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => {
   const colors = useThemeStore(state => state.colors);
-
-  const alias = item
-    ? item.type === 'tag'
-      ? db.tags.alias(item.id)
-      : item.type === 'color'
-      ? db.colors.alias(item.id)
-      : item.title
-    : null;
+  const alias = item.alias || item.title;
+  const isColor = !!COLORS_NOTE[item.title];
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
@@ -42,7 +38,8 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
-        borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1
+        borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
+        maxHeight: '95%'
       }}
     >
       {!item || !item.id ? (
@@ -62,7 +59,11 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
             }}
           >
             <Heading size={SIZE.lg}>
-              {item.type === 'tag' ? '#' : null}
+              {item.type === 'tag' && !isColor ? (
+                <Heading size={SIZE.xl} color={colors.accent}>
+                  #
+                </Heading>
+              ) : null}
               {alias}
             </Heading>
 

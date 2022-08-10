@@ -2,31 +2,114 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Container from '../components/container';
-import { useThemeStore } from '../stores/theme';
-import { useSelectionStore } from '../stores/stores';
-import { eSendEvent } from '../services/event-manager';
-import Navigation from '../services/navigation';
-import { history } from '../utils';
-import { hideAllTooltips } from '../utils/hooks/use-tooltip';
-import { MMKV } from '../utils/database/mmkv';
-import { rootNavigatorRef } from '../utils/global-refs';
+import Intro from '../components/intro';
 import Favorites from '../screens/favorites';
-import Notebooks from '../screens/notebooks';
 import Home from '../screens/home';
 import Notebook from '../screens/notebook';
-import Notes from '../screens/notes';
+import Notebooks from '../screens/notebooks';
+import { ColoredNotes } from '../screens/notes/colored';
+import { Monographs } from '../screens/notes/monographs';
+import { TaggedNotes } from '../screens/notes/tagged';
+import { TopicNotes } from '../screens/notes/topic-notes';
 import { Search } from '../screens/search';
 import Settings from '../screens/settings';
+import AppLock from '../screens/settings/app-lock';
 import Tags from '../screens/tags';
 import Trash from '../screens/trash';
+import { eSendEvent } from '../services/event-manager';
+import SettingsService from '../services/settings';
+import useNavigationStore from '../stores/use-navigation-store';
+import { useSelectionStore } from '../stores/use-selection-store';
+import { useThemeStore } from '../stores/use-theme-store';
+import { history } from '../utils';
+import { rootNavigatorRef } from '../utils/global-refs';
+import { hideAllTooltips } from '../utils/hooks/use-tooltip';
+import { useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSettingStore } from '../stores/use-setting-store';
+const NativeStack = createNativeStackNavigator();
+const IntroStack = createNativeStackNavigator();
 
-const Stack = createNativeStackNavigator();
-export const NavigationStack = React.memo(
+/**
+ * Intro Stack:
+ *
+ * Welcome Page
+ * Select Privacy Mode Page
+ * Login/Signup Page
+ *
+ */
+
+const IntroStackNavigator = () => {
+  const colors = useThemeStore(state => state.colors);
+  return (
+    <IntroStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        lazy: false,
+        animation: 'none',
+        contentStyle: {
+          backgroundColor: colors.bg
+        }
+      }}
+      initialRouteName={'Intro'}
+    >
+      <NativeStack.Screen name="Intro" component={Intro} />
+      <NativeStack.Screen name="AppLock" component={AppLock} />
+    </IntroStack.Navigator>
+  );
+};
+
+const Tabs = React.memo(
   () => {
     const colors = useThemeStore(state => state.colors);
-    const [render, setRender] = React.useState(false);
+    const homepage = SettingsService.get().homepage;
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
+    const height = useSettingStore(state => state.dimensions.height);
+    const insets = useSafeAreaInsets();
+    const screenHeight = height - (50 + insets.top + insets.bottom);
+    React.useEffect(() => {
+      setTimeout(() => {
+        useNavigationStore.getState().update({ name: homepage });
+      }, 1000);
+    }, []);
+
+    return (
+      <NativeStack.Navigator
+        tabBar={() => null}
+        initialRouteName={!introCompleted ? 'Welcome' : homepage}
+        backBehavior="history"
+        screenOptions={{
+          headerShown: false,
+          lazy: false,
+          animation: 'none',
+          contentStyle: {
+            backgroundColor: colors.bg,
+            height: !introCompleted ? undefined : screenHeight
+          }
+        }}
+      >
+        <NativeStack.Screen name="Welcome" component={IntroStackNavigator} />
+        <NativeStack.Screen name="Notes" component={Home} />
+        <NativeStack.Screen name="Notebooks" component={Notebooks} />
+        <NativeStack.Screen options={{ lazy: true }} name="Favorites" component={Favorites} />
+        <NativeStack.Screen options={{ lazy: true }} name="Trash" component={Trash} />
+        <NativeStack.Screen options={{ lazy: true }} name="Tags" component={Tags} />
+        <NativeStack.Screen name="Settings" component={Settings} />
+        <NativeStack.Screen options={{ lazy: true }} name="TaggedNotes" component={TaggedNotes} />
+        <NativeStack.Screen options={{ lazy: true }} name="TopicNotes" component={TopicNotes} />
+        <NativeStack.Screen options={{ lazy: true }} name="ColoredNotes" component={ColoredNotes} />
+        <NativeStack.Screen options={{ lazy: true }} name="Monographs" component={Monographs} />
+        <NativeStack.Screen options={{ lazy: true }} name="Notebook" component={Notebook} />
+        <NativeStack.Screen options={{ lazy: true }} name="Search" component={Search} />
+      </NativeStack.Navigator>
+    );
+  },
+  () => true
+);
+
+export const NavigationStack = React.memo(
+  () => {
     const clearSelection = useSelectionStore(state => state.clearSelection);
-    const homepage = React.useRef('Notes');
 
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
@@ -36,57 +119,10 @@ export const NavigationStack = React.memo(
       eSendEvent('navigate');
     });
 
-    React.useEffect(() => {
-      (async () => {
-        let settings = await MMKV.getItem('appSettings');
-        if (settings) {
-          settings = JSON.parse(settings);
-          homepage.current = settings.homepage;
-        }
-        setRender(true);
-        Navigation.setHeaderState(
-          settings.homepage,
-          {
-            menu: true
-          },
-          {
-            heading: settings.homepage,
-            id: settings.homepage.toLowerCase() + '_navigation'
-          }
-        );
-      })();
-    }, []);
-
     return (
-      <Container root={true}>
-        <NavigationContainer
-          onStateChange={onStateChange}
-          independent={true}
-          ref={rootNavigatorRef}
-        >
-          {render ? (
-            <Stack.Navigator
-              initialRouteName={homepage.current}
-              screenOptions={{
-                headerShown: false,
-                gestureEnabled: false,
-                animation: 'none',
-                contentStyle: {
-                  backgroundColor: colors.bg
-                }
-              }}
-            >
-              <Stack.Screen name="Notes" component={Home} />
-              <Stack.Screen name="Notebooks" component={Notebooks} />
-              <Stack.Screen name="Favorites" component={Favorites} />
-              <Stack.Screen name="Trash" component={Trash} />
-              <Stack.Screen name="NotesPage" component={Notes} />
-              <Stack.Screen name="Tags" component={Tags} />
-              <Stack.Screen name="Notebook" component={Notebook} />
-              <Stack.Screen name="Settings" component={Settings} />
-              <Stack.Screen name="Search" component={Search} />
-            </Stack.Navigator>
-          ) : null}
+      <Container>
+        <NavigationContainer onStateChange={onStateChange} ref={rootNavigatorRef}>
+          <Tabs />
         </NavigationContainer>
       </Container>
     );

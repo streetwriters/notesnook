@@ -4,6 +4,10 @@
 
 *Issues.md
 
+build_cache/
+.yarnrc
+.npmrc
+
 # Xcode
 #
 build/
@@ -23,14 +27,15 @@ DerivedData
 *.ipa
 *.xcuserstate
 *.hprof
+ios/.xcode.env.local
 # Android/IntelliJ
 #
+rn-build-deps/
 build/
 .idea
 .gradle
 local.properties
 *.iml
-
 # node.js
 #
 node_modules/
@@ -57,8 +62,9 @@ buck-out/
 # Bundle artifact
 *.jsbundle
 
-# CocoaPods
+# Ruby / CocoaPods
 /ios/Pods/
+/vendor/bundle/
 
 
 # Other

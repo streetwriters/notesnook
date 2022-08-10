@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { eCloseProgressDialog } from '../../utils/events';
@@ -23,7 +23,7 @@ export const ChangePassword = () => {
   const user = useUserStore(state => state.user);
 
   const changePassword = async () => {
-    if (!user.isEmailConfirmed) {
+    if (!user?.isEmailConfirmed) {
       ToastEvent.show({
         heading: 'Email not confirmed',
         message: 'Please confirm your email to change account password',

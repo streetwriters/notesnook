@@ -1,7 +1,8 @@
 import React from 'react';
 import { FlatList, View } from 'react-native';
-import { useMessageStore, useSelectionStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useSelectionStore } from '../../stores/use-selection-store';
+import { useMessageStore } from '../../stores/use-message-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { allowedOnPlatform, renderItem } from './functions';
 
 export const Announcement = ({ color }) => {
@@ -9,7 +10,6 @@ export const Announcement = ({ color }) => {
   const announcements = useMessageStore(state => state.announcements);
   let announcement = announcements.length > 0 ? announcements[0] : null;
   const selectionMode = useSelectionStore(state => state.selectionMode);
-
   return !announcement || selectionMode ? null : (
     <View
       style={{
@@ -25,7 +25,8 @@ export const Announcement = ({ color }) => {
           width: '100%',
           borderRadius: 10,
           overflow: 'hidden',
-          backgroundColor: colors.nav
+          backgroundColor: colors.nav,
+          paddingBottom: 12
         }}
       >
         <View>

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/theme';
-import { Actions } from '../../../stores/Actions';
-import { useSelectionStore } from '../../../stores/stores';
+import { useSelectionStore } from '../../../stores/use-selection-store';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { SIZE } from '../../../utils/size';
 
 export const SelectionIcon = ({ setActionStrip, item, compactMode }) => {

@@ -1,7 +1,8 @@
 import NetInfo from '@react-native-community/netinfo';
-import { EV, EVENTS } from 'notes-core/common';
+import { EV, EVENTS } from '@streetwriters/notesnook-core/common';
 import { useEffect, useRef } from 'react';
 import {
+  Alert,
   Appearance,
   AppState,
   Linking,
@@ -11,24 +12,9 @@ import {
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
-import { doInBackground, editing } from '..';
 import { Walkthrough } from '../../components/walkthroughs';
-import {
-  EditorWebView,
-  getNote,
-  getWebviewInit,
-  updateNoteInEditor
-} from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny';
-import Backup from '../../services/backup';
+import { editorController, editorState } from '../../screens/editor/tiptap/utils';
 import BiometricService from '../../services/biometrics';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  presentSheet,
-  ToastEvent
-} from '../../services/event-manager';
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -37,30 +23,34 @@ import {
 } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import Sync, { ignoredMessages } from '../../services/sync';
-import {
-  clearAllStores,
-  initialize,
-  useAttachmentStore,
-  useMessageStore,
-  useNoteStore,
-  useSettingStore,
-  useUserStore
-} from '../../stores/stores';
 import { updateStatusBarColor } from '../color-scheme';
 import { db } from '../database';
 import { MMKV } from '../database/mmkv';
-import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage } from '../events';
+import { eClearEditor, eCloseProgressDialog, refreshNotesPage } from '../events';
+import Sync from '../../services/sync';
+import { clearAllStores, initAfterSync, initialize } from '../../stores';
+import { useUserStore } from '../../stores/use-user-store';
+import { useMessageStore } from '../../stores/use-message-store';
+import { useSettingStore } from '../../stores/use-setting-store';
+import { useAttachmentStore } from '../../stores/use-attachment-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from '../../services/event-manager';
+import { useEditorStore } from '../../stores/use-editor-store';
+import { useDragState } from '../../screens/settings/editor/state';
 import { sleep } from '../time';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
-
 export const useAppEvents = () => {
   const loading = useNoteStore(state => state.loading);
   const setLastSynced = useUserStore(state => state.setLastSynced);
   const setUser = useUserStore(state => state.setUser);
-  const setSyncing = useUserStore(state => state.setSyncing);
   const syncedOnLaunch = useRef(false);
+  const verify = useUserStore(state => state.verifyUser);
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,
@@ -71,20 +61,8 @@ export const useAppEvents = () => {
     isReconnecting: false
   });
 
-  const onMediaDownloaded = ({ hash, groupId, src }) => {
-    if (groupId?.startsWith('monograph')) return;
-    tiny.call(
-      EditorWebView,
-      `
-        (function(){
-          let image = ${JSON.stringify({ hash, src })};
-          tinymce.activeEditor._replaceImage(image);
-        })();
-        `
-    );
-  };
-
   const onLoadingAttachmentProgress = data => {
+    console.log('loading', data);
     useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
   };
 
@@ -96,16 +74,16 @@ export const useAppEvents = () => {
     console.log(type, total, current);
     if (type !== 'download') return;
     if (total < 10 || current % 10 === 0) {
-      initialize();
+      initAfterSync();
     }
   };
 
   useEffect(() => {
     if (!loading) {
       const eventManager = db?.eventManager;
-      eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress);
-      eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
       eventManager?.subscribe(EVENTS.syncCompleted, onSyncComplete);
+      db?.eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress);
+      db?.eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
     }
 
     return () => {
@@ -122,13 +100,13 @@ export const useAppEvents = () => {
       Linking.addEventListener('url', onUrlRecieved),
       SodiumEventEmitter.addListener('onSodiumProgress', onFileEncryptionProgress)
     ];
+
     EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
     EV.subscribe(EVENTS.userLoggedOut, onLogout);
     EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
     EV.subscribe(EVENTS.userSessionExpired, onSessionExpired);
     EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
     EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
-    EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
     eSubscribeEvent('userLoggedIn', onUserUpdated);
 
@@ -139,7 +117,6 @@ export const useAppEvents = () => {
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
       EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
-      EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
       EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
       EV.unsubscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
@@ -158,8 +135,10 @@ export const useAppEvents = () => {
 
   useEffect(() => {
     let sub;
-    if (!loading) {
-      sub = AppState.addEventListener('change', onAppStateChanged);
+    if (!loading && !verify) {
+      setTimeout(() => {
+        sub = AppState.addEventListener('change', onAppStateChanged);
+      }, 1000);
       (async () => {
         try {
           let url = await Linking.getInitialURL();
@@ -178,7 +157,7 @@ export const useAppEvents = () => {
       sub?.remove();
       unsubIAP();
     };
-  }, [loading]);
+  }, [loading, verify]);
 
   const onInternetStateChanged = async state => {
     if (!syncedOnLaunch.current) return;
@@ -187,12 +166,13 @@ export const useAppEvents = () => {
 
   const onSyncComplete = async () => {
     console.log('sync complete');
-    initialize();
+    initAfterSync();
     setLastSynced(await db.lastSynced());
-    setSyncing(false);
     eSendEvent(eCloseProgressDialog, 'sync_progress');
-    if (getNote()) {
-      await updateNoteInEditor();
+    let id = useEditorStore.getState().currentEditingNote;
+    let note = id && db.notes.note(id).data;
+    if (note) {
+      //await updateNoteInEditor();
     }
   };
 
@@ -223,9 +203,7 @@ export const useAppEvents = () => {
 
   const attachIAPListeners = async () => {
     await RNIap.initConnection()
-      .catch(e => {
-        console.log(e);
-      })
+      .catch(e => null)
       .then(async () => {
         refValues.current.subsriptionSuccessListener =
           RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
@@ -246,39 +224,13 @@ export const useAppEvents = () => {
     console.log('auto sync request', full, force);
     if (full || force) {
       await Sync.run('global', force, full);
-      setSyncing(false);
     } else {
       await Sync.run('global', false, false);
-      setSyncing(false);
     }
   };
 
   const onLogout = async reason => {
-    setUser(null);
-    clearAllStores();
-
-    SettingsService.init();
-    setSyncing(false);
-    setLoginMessage();
-    await PremiumService.setPremiumStatus();
-    SettingsService.set({
-      introCompleted: true
-    });
-    presentSheet({
-      title: reason ? reason : 'User logged out',
-      paragraph: `You have been logged out of your account.`,
-      action: async () => {
-        eSendEvent(eCloseProgressDialog);
-        await sleep(300);
-        eSendEvent(eOpenLoginDialog);
-      },
-      icon: 'logout',
-      actionText: 'Login'
-    });
-
-    setTimeout(() => {
-      initialize();
-    }, 1000);
+    console.log('LOGOUT', reason);
   };
 
   const unsubIAP = () => {
@@ -299,6 +251,7 @@ export const useAppEvents = () => {
       user = await db.user.getUser();
       await PremiumService.setPremiumStatus();
       setLastSynced(await db.lastSynced());
+      await useDragState.getState().init();
       if (!user) {
         return setLoginMessage();
       }
@@ -319,7 +272,7 @@ export const useAppEvents = () => {
       }
 
       await PremiumService.setPremiumStatus();
-      if (user.isEmailConfirmed && !userEmailConfirmed) {
+      if (user?.isEmailConfirmed && !userEmailConfirmed) {
         setTimeout(() => {
           onEmailVerified();
         }, 1000);
@@ -327,7 +280,9 @@ export const useAppEvents = () => {
           userEmailConfirmed: true
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      ToastEvent.error(e, 'An error occured', 'global');
+    }
 
     user = await db.user.getUser();
     if (
@@ -337,19 +292,7 @@ export const useAppEvents = () => {
     ) {
       setRecoveryKeyMessage();
     }
-    if (!user.isEmailConfirmed) setEmailVerifyMessage();
-
-    if (!login) {
-      if (PremiumService.get() && user) {
-        if (SettingsService.get().reminder === 'off') {
-          await SettingsService.set({ reminder: 'daily' });
-        }
-        if (Backup.checkBackupRequired()) {
-          sleep(2000).then(() => Backup.checkAndRun());
-        }
-      }
-    }
-
+    if (!user?.isEmailConfirmed) setEmailVerifyMessage();
     refValues.current.isUserReady = true;
 
     syncedOnLaunch.current = true;
@@ -379,35 +322,18 @@ export const useAppEvents = () => {
       ) {
         enabled(false);
       }
-
       if (SettingsService.get().appLockMode === 'background') {
         if (useSettingStore.getState().requestBiometrics) {
-          console.log('requesting biometrics');
           useSettingStore.getState().setRequestBiometrics(false);
           return;
         }
-        if (refValues.current?.prevState === 'background' && !refValues.current?.showingDialog) {
-          refValues.current.showingDialog = true;
-          refValues.current.prevState = 'active';
-          useUserStore.getState().setVerifyUser(true);
-
-          let result = await BiometricService.validateUser('Unlock to access your notes');
-          if (result) {
-            useUserStore.getState().setVerifyUser(false);
-            refValues.current.showingDialog = false;
-          }
-        }
       }
-      refValues.current.prevState = 'active';
-      console.log('reconnect sse');
+
       await reconnectSSE();
-
       await checkIntentState();
-      if (getWebviewInit()) {
-        await MMKV.removeItem('appState');
-      }
+      MMKV.removeItem('appState');
       let user = await db.user.getUser();
-      if (user && !user.isEmailConfirmed) {
+      if (user && !user?.isEmailConfirmed) {
         try {
           let user = await db.user.fetchUser();
           if (user?.isEmailConfirmed) {
@@ -416,16 +342,24 @@ export const useAppEvents = () => {
         } catch (e) {}
       }
     } else {
-      refValues.current.prevState = 'background';
-      if (getNote()?.locked && SettingsService.get().appLockMode === 'background') {
+      let id = useEditorStore.getState().currentEditingNote;
+      let note = id && db.notes.note(id).data;
+      if (note?.locked && SettingsService.get().appLockMode === 'background') {
         eSendEvent(eClearEditor);
       }
       await storeAppState();
       if (
+        SettingsService.get().appLockMode === 'background' &&
+        !useSettingStore.getState().requestBiometrics &&
+        !useUserStore.getState().verifyUser
+      ) {
+        useUserStore.getState().setVerifyUser(true);
+      }
+      if (
         SettingsService.get().privacyScreen ||
         SettingsService.get().appLockMode === 'background'
       ) {
-        enabled(true);
+        !useSettingStore.getState().requestBiometrics ? enabled(true) : null;
       }
     }
   };
@@ -458,22 +392,24 @@ export const useAppEvents = () => {
   }
 
   async function storeAppState() {
-    if (editing.currentlyEditing) {
-      if (getNote()?.locked) return;
+    if (editorState().currentlyEditing) {
+      let id = useEditorStore.getState().currentEditingNote;
+      let note = id && db.notes.note(id).data;
+      if (note?.locked) return;
       let state = JSON.stringify({
-        editing: editing.currentlyEditing,
-        note: getNote(),
-        movedAway: editing.movedAway,
+        editing: editorState().currentlyEditing,
+        note: note,
+        movedAway: editorState().movedAway,
         timestamp: Date.now()
       });
-      await MMKV.setItem('appState', state);
+      MMKV.setString('appState', state);
     }
   }
 
   async function checkIntentState() {
     try {
-      let notesAddedFromIntent = await MMKV.getItem('notesAddedFromIntent');
-      let shareExtensionOpened = await MMKV.getItem('shareExtensionOpened');
+      let notesAddedFromIntent = MMKV.getString('notesAddedFromIntent');
+      let shareExtensionOpened = MMKV.getString('shareExtensionOpened');
       if (notesAddedFromIntent) {
         if (Platform.OS === 'ios') {
           await db.init();
@@ -482,12 +418,15 @@ export const useAppEvents = () => {
         useNoteStore.getState().setNotes();
         eSendEvent(refreshNotesPage);
         MMKV.removeItem('notesAddedFromIntent');
-        initialize();
+        initAfterSync();
         eSendEvent(refreshNotesPage);
       }
+      console.log('CHECK INTENT STATE', notesAddedFromIntent || shareExtensionOpened);
       if (notesAddedFromIntent || shareExtensionOpened) {
-        eSendEvent('loadingNote', getNote());
-        eSendEvent('webviewreset', true);
+        let id = useEditorStore.getState().currentEditingNote;
+        let note = id && db.notes.note(id).data;
+        eSendEvent('loadingNote', note);
+        eSendEvent('webview_reset');
         MMKV.removeItem('shareExtensionOpened');
       }
     } catch (e) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import PremiumService from '../../services/premium';
 import { eOpenPremiumDialog, eOpenResultDialog, eOpenTrialEndingDialog } from '../../utils/events';
@@ -14,6 +14,7 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { CompactFeatures } from './compact-features';
 import { Offer } from './offer';
+import { usePricing } from '../../utils/hooks/use-pricing';
 
 export const Expiring = () => {
   const colors = useThemeStore(state => state.colors);
@@ -23,10 +24,17 @@ export const Expiring = () => {
     offer: null,
     extend: true
   });
+  const pricing = usePricing('yearly');
+  console.log(pricing?.info?.discount);
+
   const promo = status.offer
     ? {
-        promoCode: 'com.streetwriters.notesnook.sub.yr.trialoffer',
-        text: 'GET 30% OFF on yearly'
+        promoCode:
+          pricing?.info?.discount > 30
+            ? pricing.info.sku
+            : 'com.streetwriters.notesnook.sub.yr.trialoffer',
+        text: `GET ${pricing?.info?.discount > 30 ? pricing?.info?.discount : 30}% OFF on yearly`,
+        discount: pricing?.info?.discount > 30 ? pricing?.info?.discount : 30
       }
     : null;
 
@@ -80,7 +88,7 @@ export const Expiring = () => {
               >
                 {status.offer ? (
                   <>
-                    <Offer padding={20} off={status.offer} />
+                    <Offer padding={20} off={promo?.discount || 30} />
                   </>
                 ) : (
                   <>
@@ -134,7 +142,7 @@ export const Expiring = () => {
                 onPress={async () => {
                   setVisible(false);
                   await sleep(300);
-                  PremiumService.sheet(null, promo);
+                  PremiumService.sheet(null, promo?.discount > 30 ? null : promo);
                 }}
                 fontSize={SIZE.md + 2}
                 style={{

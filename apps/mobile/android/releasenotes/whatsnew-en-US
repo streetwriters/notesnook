@@ -1,10 +1,5 @@
-- Sync over web-sockets
-- Optionally disable section headers in lists
-- Formatting support for notification notes
-- Fix bold text in editor
-- Fix session-expired dialog does not hide after login
-- Fix login issues when 2FA enabled
-- Fix a race condition causing note to be empty in editor
-- Fix pin to notifications not working
+- Now you can disable double spaced lines in editor
+- Uploading full quality images is not supported.
+- Many bug fixes and performance improvements
 
 Thank you for using Notesnook!

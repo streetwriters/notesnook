@@ -1,13 +1,15 @@
 import React from 'react';
 import { Linking, View } from 'react-native';
-import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
+//import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { eSendEvent, presentSheet } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
-import { eCloseAnnouncementDialog } from '../../utils/events';
+import Sync from '../../services/sync';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { eCloseAnnouncementDialog, eCloseProgressDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import { PricingPlans } from '../premium/pricing-plans';
 import SheetProvider from '../sheet-provider';
+import { Progress } from '../sheets/progress';
 import { Button } from '../ui/button';
 import { allowedOnPlatform, getStyle } from './functions';
 
@@ -34,11 +36,12 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
           />
         )
       });
-    } else if (item.type === 'backup') {
-      presentSheet({
-        title: 'Backup & restore',
-        paragraph: 'Please enable automatic backups to keep your data safe',
-        component: <SettingsBackupAndRestore isSheet={true} />
+    } else if (item.type === 'force-sync') {
+      eSendEvent(eCloseProgressDialog);
+      await sleep(300);
+      Progress.present();
+      Sync.run('global', true, true, () => {
+        eSendEvent(eCloseProgressDialog);
       });
     }
   };

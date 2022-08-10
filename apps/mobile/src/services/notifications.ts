@@ -8,10 +8,11 @@ import { db } from '../utils/database';
 import { MMKV } from '../utils/database/mmkv';
 import { eOnLoadNote } from '../utils/events';
 import { tabBarRef } from '../utils/global-refs';
-import { useNoteStore } from '../stores/stores';
+import { useNoteStore } from '../stores/use-notes-store';
 import { DDS } from './device-detection';
 import { eSendEvent } from './event-manager';
 import SettingsService from './settings';
+import { editorState } from '../screens/editor/tiptap/utils';
 
 const NOTIFICATION_TAG = 'notesnook';
 const CHANNEL_ID = 'com.streetwriters.notesnook';
@@ -36,7 +37,7 @@ function init() {
   if (Platform.OS === 'ios') return;
   PushNotification.configure({
     onNotification: async function (notification) {
-      editing.movedAway = false;
+      editorState().movedAway = false;
       MMKV.removeItem('appState');
       if (useNoteStore?.getState()?.loading === false) {
         //@ts-ignore
@@ -84,7 +85,7 @@ function init() {
           await db.init();
           await db.notes?.add({
             content: {
-              type: 'tiny',
+              type: 'tiptap',
               //@ts-ignore
               data: `<p>${notification.reply_text} </p>`
             }

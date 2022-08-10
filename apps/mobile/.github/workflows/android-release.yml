@@ -1,17 +1,30 @@
 name: Android Release
 
+permissions:
+  packages: read
+  contents: read
+
 on: workflow_dispatch
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           persist-credentials: false
+
+      - name: Setup npmrc
+        run: |
+          echo "registry=https://npm.pkg.github.com" > .npmrc
+          echo "@streetwriters:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{secrets.PACKAGES_TOKEN}}" >> .npmrc
+
+      - name: Setup yarnrc
+        run: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
 
       - uses: actions/setup-node@master
         with:
@@ -25,7 +38,7 @@ jobs:
 
       - name: Install node modules
         run: |
-          npm install
+          yarn install --network-concurrency 1
 
       - name: Make Gradlew Executable
         run: cd android && chmod +x ./gradlew

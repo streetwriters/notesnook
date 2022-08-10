@@ -1,0 +1,17 @@
+diff --git a/node_modules/react-native-fingerprint-scanner/react-native.config.js b/node_modules/react-native-fingerprint-scanner/react-native.config.js
+deleted file mode 100644
+index 5f794ab..0000000
+--- a/node_modules/react-native-fingerprint-scanner/react-native.config.js
++++ /dev/null
+@@ -1,11 +0,0 @@
+-module.exports = {
+-  dependency: {
+-    platforms: {
+-      ios: {},
+-      android: {},
+-    },
+-    assets: [],
+-    // hooks are considered anti-pattern, please avoid them
+-    hooks: {},
+-  },
+-};

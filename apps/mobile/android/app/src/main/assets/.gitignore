@@ -1,7 +1,2 @@
-# exclude all files
+!fonts/*
 *
-# except index.css
-!index.css
-!*.ttf
-!fonts
-!.gitignore

@@ -7,8 +7,6 @@ import { notesnook } from '../../../e2e/test.ids';
 import { presentDialog } from '../../components/dialog/functions';
 import NoteHistory from '../../components/note-history';
 import { MoveNotes } from '../../components/sheets/move-notes/movenote';
-import { EditorWebView } from '../../screens/editor/Functions';
-import tiny from '../../screens/editor/tiny/tiny.js';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -19,14 +17,12 @@ import {
 } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import Notifications from '../../services/notifications';
-import {
-  useEditorStore,
-  useMenuStore,
-  useSelectionStore,
-  useTagStore,
-  useUserStore
-} from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useEditorStore } from '../../stores/use-editor-store';
+import { useMenuStore } from '../../stores/use-menu-store';
+import { useSelectionStore } from '../../stores/use-selection-store';
+import { useTagStore } from '../../stores/use-tag-store';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { toggleDarkMode } from '../color-scheme/utils';
 import { db } from '../database';
 import {
@@ -40,8 +36,9 @@ import {
 } from '../events';
 import { deleteItems } from '../functions';
 import { sleep } from '../time';
+import useNavigationStore from '../../stores/use-navigation-store';
 
-export const useActions = ({ close = () => {}, item }) => {
+export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore(state => state.colors);
   const clearSelection = useSelectionStore(state => state.clearSelection);
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
@@ -50,12 +47,7 @@ export const useActions = ({ close = () => {}, item }) => {
   console.log(item.readonly, 'readonly');
   const user = useUserStore(state => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
-  const alias =
-    item.type === 'tag'
-      ? db.tags.alias(item.id)
-      : item.type === 'color'
-      ? db.colors.alias(item.id)
-      : item.title;
+  const alias = item.alias || item.title;
 
   const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
 
@@ -83,12 +75,11 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   const isNoteInTopic = () => {
-    if (item.type !== 'note' || editing.actionAfterFirstSave?.type !== 'topic') return;
-    console.log(editing.actionAfterFirstSave, 'save item');
-
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (item.type !== 'note' || currentScreen.name !== 'TopicNotes') return;
     return db.notebooks
-      .notebook(editing.actionAfterFirstSave.notebook)
-      .topics.topic(editing.actionAfterFirstSave.id)
+      .notebook(currentScreen.notebookId)
+      .topics.topic(currentScreen.id)
       .has(item.id);
   };
 
@@ -125,11 +116,13 @@ export const useActions = ({ close = () => {}, item }) => {
     if (!item.id) return;
     close();
     await db.notes.note(item.id).favorite();
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
   }
 
   async function pinItem() {
@@ -144,7 +137,14 @@ export const useActions = ({ close = () => {}, item }) => {
       return;
     }
     await db[`${type}s`][type](item.id).pin();
-    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notes]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Notebooks'
+    );
   }
 
   async function pinToNotifications() {
@@ -180,14 +180,15 @@ export const useActions = ({ close = () => {}, item }) => {
     if (!checkNoteSynced()) return;
     close();
     await db.trash.restore(item.id);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Tags,
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Trash
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Notebooks',
+      'Trash'
+    );
     let type = item.type === 'trash' ? item.itemType : item.type;
     ToastEvent.show({
       heading: type === 'note' ? 'Note restored from trash' : 'Notebook restored from trash',
@@ -301,11 +302,13 @@ export const useActions = ({ close = () => {}, item }) => {
       let note = db.notes.note(item.id).data;
       if (note.locked) {
         close();
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes',
+          'Favorites',
+          'Notes'
+        );
       }
     } catch (e) {
       close();
@@ -363,11 +366,14 @@ export const useActions = ({ close = () => {}, item }) => {
         await db.tags.rename(item.id, db.tags.sanitize(value));
         useTagStore.getState().setTags();
         useMenuStore.getState().setMenuPins();
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Tags
-        ]);
+        Navigation.queueRoutesForUpdate(
+          'TaggedNotes',
+          'ColoredNotes',
+          'TopicNotes',
+          'Favorites',
+          'Notes',
+          'Tags'
+        );
       },
       input: true,
       defaultValue: alias,
@@ -409,11 +415,14 @@ export const useActions = ({ close = () => {}, item }) => {
         positivePress: async value => {
           await db.tags.remove(item.id);
           useTagStore.getState().setTags();
-          Navigation.setRoutesToUpdate([
-            Navigation.routeNames.Notes,
-            Navigation.routeNames.NotesPage,
-            Navigation.routeNames.Tags
-          ]);
+          Navigation.queueRoutesForUpdate(
+            'TaggedNotes',
+            'ColoredNotes',
+            'TopicNotes',
+            'Favorites',
+            'Notes',
+            'Tags'
+          );
         },
         positiveText: 'Delete',
         positiveType: 'errorShade'
@@ -439,16 +448,21 @@ export const useActions = ({ close = () => {}, item }) => {
     }
   }
   async function removeNoteFromTopic() {
+    const currentScreen = useNavigationStore.getState().currentScreen;
+    if (currentScreen.name !== 'TopicNotes') return;
     await db.notebooks
-      .notebook(editing.actionAfterFirstSave.notebook)
-      .topics.topic(editing.actionAfterFirstSave.id)
+      .notebook(currentScreen.notebookId)
+      .topics.topic(currentScreen.id)
       .delete(item.id);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Notebook
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes',
+      'Notebook',
+      'Notebooks'
+    );
     close();
   }
 
@@ -463,7 +477,7 @@ export const useActions = ({ close = () => {}, item }) => {
       negativeText: 'Cancel',
       positivePress: async () => {
         await db.trash.delete(item.id);
-        Navigation.setRoutesToUpdate([Navigation.routeNames.Trash]);
+        Navigation.queueRoutesForUpdate('Trash');
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
           heading: 'Permanantly deleted items',
@@ -479,7 +493,7 @@ export const useActions = ({ close = () => {}, item }) => {
     close();
     await sleep(300);
     presentSheet({
-      component: ref => <NoteHistory ref={ref} note={item} />
+      component: ref => <NoteHistory fwdRef={ref} note={item} />
     });
   }
 
@@ -496,13 +510,15 @@ export const useActions = ({ close = () => {}, item }) => {
   }
 
   async function toggleLocalOnly() {
-    if (!checkNoteSynced()) return;
+    if (!checkNoteSynced() || !user) return;
     db.notes.note(item.id).localOnly();
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
     close();
   }
 
@@ -511,27 +527,31 @@ export const useActions = ({ close = () => {}, item }) => {
     let current = db.notes.note(item.id).data.readonly;
     if (useEditorStore.getState().currentEditingNote === item.id) {
       useEditorStore.getState().setReadonly(current);
-      tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
+      //  tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
     }
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
     close();
   };
 
   const duplicateNote = async () => {
     if (!checkNoteSynced()) return;
     await db.notes.note(item.id).duplicate();
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'TaggedNotes',
+      'ColoredNotes',
+      'TopicNotes',
+      'Favorites',
+      'Notes'
+    );
     close();
   };
-
+  console.log('isNoteInTopic', isNoteInTopic());
   const actions = [
     {
       name: 'Add to notebook',
@@ -545,7 +565,7 @@ export const useActions = ({ close = () => {}, item }) => {
       icon: 'plus',
       func: async () => {
         close();
-        await sleep(300);
+        await sleep(500);
         MoveNotes.present(db.notebooks.notebook(item.notebookId).data, item);
       }
     },

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useMenuStore, useSettingStore } from '../../stores/stores';
+import { useMenuStore } from '../../stores/use-menu-store';
+import { useSettingStore } from '../../stores/use-setting-store';
 import { DDS } from '../../services/device-detection';
 import { eSendEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
@@ -28,11 +29,13 @@ export const ColorTags = ({ item, close }) => {
     let _note = db.notes.note(note.id).data;
     setNote({ ..._note });
     setColorNotes();
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.queueRoutesForUpdate(
+      'Notes',
+      'Favorites',
+      'ColoredNotes',
+      'TaggedNotes',
+      'TopicNotes'
+    );
     eSendEvent(refreshNotesPage);
   };
 
@@ -58,7 +61,7 @@ export const ColorTags = ({ item, close }) => {
         }}
       >
         {note.color?.toLowerCase() === color.name ? (
-          <Icon name="check" color="white" size={SIZE.lg} />
+          <Icon testID="icon-check" name="check" color="white" size={SIZE.lg} />
         ) : null}
       </PressableButton>
     );

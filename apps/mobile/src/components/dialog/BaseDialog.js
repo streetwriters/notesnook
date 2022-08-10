@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useSettingStore } from '../../stores/stores';
+import { useSettingStore } from '../../stores/use-setting-store';
 import useIsFloatingKeyboard from '../../utils/hooks/use-is-floating-keyboard';
 import { BouncingView } from '../ui/transitions/bouncing-view';
 

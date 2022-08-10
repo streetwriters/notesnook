@@ -4,9 +4,11 @@ import {
   Pressable,
   PressableProps,
   PressableStateCallbackType,
+  View,
   ViewStyle
 } from 'react-native';
-import { ThemeStore, useThemeStore } from '../../../stores/theme';
+import Animated from 'react-native-reanimated';
+import { ThemeStore, useThemeStore } from '../../../stores/use-theme-store';
 import { hexToRGBA, RGB_Linear_Shade } from '../../../utils/color-scheme/utils';
 import { BUTTON_TYPES } from '../../../utils/constants';
 import { br } from '../../../utils/size';
@@ -22,6 +24,7 @@ export interface PressableButtonProps extends PressableProps {
   customAlpha?: number;
   customOpacity?: number;
   fwdRef?: RefObject<any>;
+  animatedViewProps?: Animated.AnimateProps<View>;
 }
 
 export const PressableButton = ({
@@ -40,7 +43,8 @@ export const PressableButton = ({
   customSelectedColor,
   customAlpha,
   customOpacity,
-  fwdRef
+  fwdRef,
+  animatedViewProps
 }: PressableButtonProps) => {
   const colors = useThemeStore(state => state.colors);
 

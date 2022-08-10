@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { openLinkInBrowser } from '../../utils/functions';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';

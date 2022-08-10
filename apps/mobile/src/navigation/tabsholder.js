@@ -1,21 +1,26 @@
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
-import React, { useEffect, useRef } from 'react';
-import { Platform, View } from 'react-native';
-import { StatusBar } from 'react-native-bars';
-import Animated, { useValue } from 'react-native-reanimated';
+import React, { useEffect, useRef, useState } from 'react';
+import { Platform, View, StatusBar } from 'react-native';
+import {
+  addSpecificOrientationListener,
+  getInitialOrientation,
+  getSpecificOrientation,
+  removeSpecificOrientationListener
+} from 'react-native-orientation';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import { SideMenu } from '../components/side-menu';
-import Tabs from '../components/tabs';
-import { useThemeStore } from '../stores/theme';
-import { useEditorStore, useSettingStore } from '../stores/stores';
-import { EditorWrapper } from '../screens/editor/EditorWrapper';
-import { checkStatus, EditorWebView, getNote } from '../screens/editor/Functions';
-import tiny from '../screens/editor/tiny/tiny';
+import { FluidTabs } from '../components/tabs';
+import { editorController, editorState } from '../screens/editor/tiptap/utils';
+import { EditorWrapper } from '../screens/editor/wrapper';
 import { DDS } from '../services/device-detection';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
-import { editing, setWidthHeight } from '../utils';
-import { updateStatusBarColor } from '../utils/color-scheme';
+import { useEditorStore } from '../stores/use-editor-store';
+import { useSettingStore } from '../stores/use-setting-store';
+import { useThemeStore } from '../stores/use-theme-store';
+import { setWidthHeight } from '../utils';
+import { db } from '../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -24,49 +29,7 @@ import {
 } from '../utils/events';
 import { editorRef, tabBarRef } from '../utils/global-refs';
 import { hideAllTooltips } from '../utils/hooks/use-tooltip';
-import { sleep } from '../utils/time';
 import { NavigationStack } from './navigation-stack';
-
-let layoutTimer = null;
-
-const onChangeTab = async obj => {
-  if (obj.i === 1) {
-    editing.movedAway = false;
-    activateKeepAwake();
-    eSendEvent('navigate');
-    eSendEvent(eClearEditor, 'addHandler');
-    if (!editing.isRestoringState && (!editing.currentlyEditing || !getNote())) {
-      if (editing.overlay) {
-        editing.overlay = false;
-        return;
-      }
-      eSendEvent(eOnLoadNote, { type: 'new' });
-      editing.currentlyEditing = true;
-    }
-    if (getNote()) {
-      await checkStatus();
-    }
-    sleep(1000).then(() => {
-      updateStatusBarColor();
-    });
-  } else {
-    if (obj.from === 1) {
-      updateStatusBarColor();
-      deactivateKeepAwake();
-      eSendEvent(eClearEditor, 'removeHandler');
-      setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
-      if (getNote()?.locked) {
-        eSendEvent(eClearEditor);
-      }
-      eSendEvent('showTooltip');
-      editing.movedAway = true;
-      if (editing.currentlyEditing) {
-        tiny.call(EditorWebView, tiny.blur);
-      }
-    }
-    editing.isFocused = false;
-  }
-};
 
 export const TabsHolder = React.memo(
   () => {
@@ -79,13 +42,31 @@ export const TabsHolder = React.memo(
     const dimensions = useSettingStore(state => state.dimensions);
     const setDimensions = useSettingStore(state => state.setDimensions);
     const insets = useSafeAreaInsets();
-    const animatedOpacity = useValue(0);
-    const animatedTranslateY = useValue(-9999);
+    const animatedOpacity = useSharedValue(0);
+    const animatedTranslateY = useSharedValue(-9999);
     const overlayRef = useRef();
-    const initialLayoutCalled = useRef(false);
+    const [orientation, setOrientation] = useState(getInitialOrientation());
+    const introCompleted = useSettingStore(state => state.settings.introCompleted);
+
+    const onOrientationChange = (o, o2) => {
+      setOrientation(o || o2);
+    };
+
+    useEffect(() => {
+      if (Platform.OS === 'ios') {
+        addSpecificOrientationListener(onOrientationChange);
+        getSpecificOrientation && getSpecificOrientation(onOrientationChange);
+      }
+      return () => {
+        removeSpecificOrientationListener(onOrientationChange);
+      };
+    }, []);
 
     const showFullScreenEditor = () => {
       setFullscreen(true);
+      if (deviceMode === 'smallTablet') {
+        tabBarRef.current?.openDrawer();
+      }
       editorRef.current?.setNativeProps({
         style: {
           width: dimensions.width,
@@ -97,7 +78,13 @@ export const TabsHolder = React.memo(
     };
 
     const closeFullScreenEditor = () => {
+      if (deviceMode === 'smallTablet') {
+        tabBarRef.current?.closeDrawer();
+      }
       setFullscreen(false);
+      editorController.current?.commands.updateSettings({
+        fullscreen: false
+      });
       editorRef.current?.setNativeProps({
         style: {
           width:
@@ -116,7 +103,9 @@ export const TabsHolder = React.memo(
     };
 
     useEffect(() => {
-      toggleView(false);
+      if (!tabBarRef.current?.isDrawerOpen()) {
+        toggleView(false);
+      }
       eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
       eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
 
@@ -127,6 +116,7 @@ export const TabsHolder = React.memo(
     }, [deviceMode, dimensions, colors]);
 
     const _onLayout = async event => {
+      console.log('layout called here');
       if (layoutTimer) {
         clearTimeout(layoutTimer);
         layoutTimer = null;
@@ -135,6 +125,7 @@ export const TabsHolder = React.memo(
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
         setDeviceMode(deviceMode, size);
+        checkDeviceType(size);
         return;
       }
 
@@ -154,8 +145,20 @@ export const TabsHolder = React.memo(
 
       if (DDS.isLargeTablet()) {
         setDeviceMode('tablet', size);
+        setTimeout(() => {
+          introCompleted && tabBarRef.current?.goToIndex(0);
+        }, 500);
       } else if (DDS.isSmallTab) {
         setDeviceMode('smallTablet', size);
+        if (!fullscreen) {
+          setTimeout(() => {
+            introCompleted && tabBarRef.current?.closeDrawer();
+          }, 500);
+        } else {
+          setTimeout(() => {
+            introCompleted && tabBarRef.current?.openDrawer();
+          }, 500);
+        }
       } else {
         setDeviceMode('mobile', size);
       }
@@ -195,10 +198,10 @@ export const TabsHolder = React.memo(
         if (current === 'tablet') {
           tabBarRef.current?.goToIndex(0);
         } else {
-          if (!editing.movedAway) {
+          if (!editorState().movedAway) {
             tabBarRef.current?.goToIndex(2);
           } else {
-            console.log('index one', editing.movedAway);
+            console.log('index one', editorState().movedAway);
             tabBarRef.current?.goToIndex(1);
           }
         }
@@ -208,7 +211,7 @@ export const TabsHolder = React.memo(
     const onScroll = scrollOffset => {
       hideAllTooltips();
       if (scrollOffset > offsets[deviceMode].a - 10) {
-        animatedOpacity.setValue(0);
+        animatedOpacity.value = 0;
         toggleView(false);
       } else {
         let o = scrollOffset / 300;
@@ -218,13 +221,13 @@ export const TabsHolder = React.memo(
         } else {
           op = 1 - o;
         }
-        animatedOpacity.setValue(op);
+        animatedOpacity.value = op;
         toggleView(op < 0.1 ? false : true);
       }
     };
 
     const toggleView = show => {
-      animatedTranslateY.setValue(show ? 0 : -9999);
+      animatedTranslateY.value = show ? 0 : -9999;
     };
 
     const valueLimiter = (value, min, max) => {
@@ -275,83 +278,117 @@ export const TabsHolder = React.memo(
       }
     };
 
-    const listItems = [
-      <View
-        key="1"
-        onLayout={() => {
-          if (!initialLayoutCalled.current) {
-            tabBarRef.current?.goToIndex(1, false);
-            initialLayoutCalled.current = true;
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        opacity: animatedOpacity.value,
+        transform: [
+          {
+            translateY: animatedTranslateY.value
           }
-        }}
-        style={{
-          height: '100%',
-          width: fullscreen ? 0 : widths[deviceMode].a
-        }}
-      >
-        <SideMenu />
-      </View>,
-      <View
-        key="2"
-        style={{
-          height: '100%',
-          width: fullscreen ? 0 : widths[deviceMode].b
-        }}
-      >
-        {deviceMode === 'mobile' ? (
-          <Animated.View
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              zIndex: 999,
-              backgroundColor: 'rgba(0,0,0,0.2)',
-              opacity: animatedOpacity,
-              transform: [
-                {
-                  translateY: animatedTranslateY
-                }
-              ]
-            }}
-            ref={overlayRef}
-          />
-        ) : null}
-
-        <NavigationStack />
-      </View>,
-      <EditorWrapper key="3" width={widths} dimensions={dimensions} />
-    ];
+        ]
+      };
+    }, []);
 
     return (
       <View
         onLayout={_onLayout}
         testID={notesnook.ids.default.root}
         style={{
-          width: '100%',
-          height: '100%',
+          flex: 1,
           backgroundColor: colors.bg,
-          paddingBottom: Platform.OS === 'android' ? insets?.bottom : 0
+          paddingBottom: Platform.OS === 'android' ? insets?.bottom : 0,
+          marginRight:
+            orientation === 'LANDSCAPE-RIGHT' && Platform.OS === 'ios' ? insets.right : 0,
+          marginLeft: orientation === 'LANDSCAPE-LEFT' && Platform.OS === 'ios' ? insets.left : 0
         }}
       >
-        <StatusBar animated={true} barStyle={colors.night ? 'light-content' : 'dark-content'} />
-        {deviceMode ? (
-          <Tabs
+        <StatusBar
+          barStyle={colors.night ? 'light-content' : 'dark-content'}
+          translucent={true}
+          backgroundColor="transparent"
+        />
+
+        {deviceMode && widths[deviceMode] ? (
+          <FluidTabs
             ref={tabBarRef}
             dimensions={dimensions}
-            widths={widths[deviceMode]}
-            style={{
-              zIndex: 1
-            }}
-            initialIndex={deviceMode === 'smallTablet' || deviceMode === 'tablet' ? 0 : 1}
-            toggleOverlay={toggleView}
-            offsets={offsets[deviceMode]}
-            items={listItems}
+            widths={!introCompleted ? widths['mobile'] : widths[deviceMode]}
+            enabled={deviceMode !== 'tablet' && !fullscreen}
             onScroll={onScroll}
             onChangeTab={onChangeTab}
-          />
+            onDrawerStateChange={state => true}
+          >
+            <View
+              key="1"
+              style={{
+                height: '100%',
+                width: fullscreen ? 0 : widths[!introCompleted ? 'mobile' : deviceMode]?.a
+              }}
+            >
+              <SideMenu />
+            </View>
+
+            <View
+              key="2"
+              style={{
+                height: '100%',
+                width: fullscreen ? 0 : widths[!introCompleted ? 'mobile' : deviceMode]?.b
+              }}
+            >
+              {deviceMode === 'mobile' ? (
+                <Animated.View
+                  onTouchEnd={() => {
+                    tabBarRef.current?.closeDrawer();
+                    animatedOpacity.value = withTiming(0);
+                    animatedTranslateY.value = withTiming(-9999);
+                  }}
+                  style={[
+                    {
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      zIndex: 999,
+                      backgroundColor: 'rgba(0,0,0,0.2)'
+                    },
+                    animatedStyle
+                  ]}
+                  ref={overlayRef}
+                />
+              ) : null}
+
+              <NavigationStack />
+            </View>
+            <EditorWrapper key="3" width={widths} dimensions={dimensions} />
+          </FluidTabs>
         ) : null}
       </View>
     );
   },
   () => true
 );
+
+let layoutTimer = null;
+
+const onChangeTab = async obj => {
+  if (obj.i === 2) {
+    editorState().movedAway = false;
+    editorState().isFocused = true;
+    activateKeepAwake();
+    if (!editorState().currentlyEditing) {
+      eSendEvent(eOnLoadNote, { type: 'new' });
+    }
+  } else {
+    if (obj.from === 2) {
+      deactivateKeepAwake();
+      editorState().movedAway = true;
+      editorState().isFocused = false;
+      eSendEvent(eClearEditor, 'removeHandler');
+      setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
+      let id = useEditorStore.getState().currentEditingNote;
+      let note = db.notes.note(id);
+      if (note?.locked) {
+        eSendEvent(eClearEditor);
+      }
+    }
+  }
+};

@@ -3,18 +3,19 @@ import { Platform, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DDS } from '../../services/device-detection';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
+import { eSendEvent, ToastEvent } from '../../services/event-manager';
 import { clearMessage } from '../../services/message';
 import PremiumService from '../../services/premium';
 import SettingsService from '../../services/settings';
-import { useUserStore } from '../../stores/stores';
-import { useThemeStore } from '../../stores/theme';
+import { useUserStore } from '../../stores/use-user-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
 import { eCloseLoginDialog } from '../../utils/events';
 import { SIZE } from '../../utils/size';
 import { sleep } from '../../utils/time';
 import BaseDialog from '../dialog/base-dialog';
 import SheetProvider from '../sheet-provider';
+import { Progress } from '../sheets/progress';
 import { Button } from '../ui/button';
 import { IconButton } from '../ui/icon-button';
 import Input from '../ui/input';
@@ -25,8 +26,10 @@ import Paragraph from '../ui/typography/paragraph';
 import { SVG } from './background';
 import { ForgotPassword } from './forgot-password';
 import TwoFactorVerification from './two-factor';
-import { Progress } from '../sheets/progress';
-export const Login = ({ changeMode }) => {
+import Animated, { FadeInDown, FadeOutDown, FadeOutUp } from 'react-native-reanimated';
+import Navigation from '../../services/navigation';
+import { hideAuth } from './common';
+export const Login = ({ changeMode, welcome }) => {
   const colors = useThemeStore(state => state.colors);
   const email = useRef();
   const emailInputRef = useRef();
@@ -66,12 +69,10 @@ export const Login = ({ changeMode }) => {
     if (!validateInfo() || error) return;
     setLoading(true);
     let user;
-    console.log(mfa);
     try {
       if (mfa) {
         await db.user.mfaLogin(email.current.toLowerCase(), password.current, mfa);
       } else {
-        console.log(email.current, password.current);
         await db.user.login(email.current.toLowerCase(), password.current);
       }
       callback && callback(true);
@@ -87,24 +88,17 @@ export const Login = ({ changeMode }) => {
         type: 'success',
         context: 'global'
       });
-      eSendEvent(eCloseLoginDialog);
-      await SettingsService.set({
+      hideAuth();
+      SettingsService.set({
         sessionExpired: false,
-        userEmailConfirmed: user.isEmailConfirmed
+        userEmailConfirmed: user?.isEmailConfirmed
       });
       eSendEvent('userLoggedIn', true);
       await sleep(500);
       Progress.present();
     } catch (e) {
       callback && callback(false);
-      console.log(
-        'Login error',
-        e.message,
-        e.data,
-        e.message === 'Multifactor authentication required.'
-      );
       if (e.message === 'Multifactor authentication required.') {
-        console.log(TwoFactorVerification.present, 'calling 2fa');
         setLoading(false);
         await sleep(300);
         TwoFactorVerification.present(async mfa => {
@@ -116,7 +110,6 @@ export const Login = ({ changeMode }) => {
           }
         }, e.data);
       } else {
-        console.log(e.stack);
         setLoading(false);
         ToastEvent.show({
           heading: user ? 'Failed to sync' : 'Login failed',
@@ -130,25 +123,12 @@ export const Login = ({ changeMode }) => {
 
   return (
     <>
-      <IconButton
-        name="arrow-left"
-        onPress={() => {
-          eSendEvent(eCloseLoginDialog);
-        }}
-        color={colors.pri}
-        customStyle={{
-          position: 'absolute',
-          zIndex: 999,
-          left: 12,
-          top: Platform.OS === 'ios' ? 12 + insets.top : 12
-        }}
-      />
-
       <ForgotPassword />
-
       <SheetProvider context="two_factor_verify" />
       {loading ? <BaseDialog transparent={true} visible={true} animation="fade" /> : null}
-      <View
+      <Animated.View
+        entering={FadeInDown}
+        exiting={FadeOutUp}
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
@@ -163,128 +143,124 @@ export const Login = ({ changeMode }) => {
             overflow: 'hidden'
           }}
         >
-          <BouncingView initialScale={1.05} duration={5000}>
-            <SvgView src={SVG(colors.night ? colors.icon : 'black')} height={700} />
-          </BouncingView>
+          <SvgView src={SVG(colors.night ? colors.icon : 'black')} height={700} />
         </View>
-        <BouncingView initialScale={0.98} duration={3000}>
-          <View
+        <View
+          style={{
+            width: '100%',
+            justifyContent: 'center',
+            alignSelf: 'center',
+            paddingHorizontal: 12,
+            marginBottom: 30,
+            marginTop: 15
+          }}
+        >
+          <Heading
             style={{
-              width: '100%',
-              justifyContent: 'center',
-              alignSelf: 'center',
-              paddingHorizontal: 12,
-              marginBottom: 30,
-              marginTop: 15
+              textAlign: 'center'
             }}
+            size={30}
+            color={colors.heading}
           >
-            <Heading
-              style={{
-                textAlign: 'center'
-              }}
-              size={30}
-              color={colors.heading}
-            >
-              Welcome back!
-            </Heading>
-            <Paragraph
-              style={{
-                textDecorationLine: 'underline',
-                textAlign: 'center',
-                marginTop: 5
-              }}
-              onPress={() => {
-                changeMode(1);
-              }}
-              size={SIZE.md}
-            >
-              Don't have an account? Sign up
-            </Paragraph>
-          </View>
-          <View
+            Welcome back!
+          </Heading>
+          <Paragraph
             style={{
-              width: focused ? '100%' : '99.9%',
-              padding: 12,
-              backgroundColor: colors.bg,
-              flexGrow: 1
+              textDecorationLine: 'underline',
+              textAlign: 'center',
+              marginTop: 5
             }}
+            onPress={() => {
+              changeMode(1);
+            }}
+            size={SIZE.md}
           >
-            <Input
-              fwdRef={emailInputRef}
-              onChangeText={value => {
-                email.current = value;
-              }}
-              testID="input.email"
-              onErrorCheck={e => setError(e)}
-              returnKeyLabel="Next"
-              returnKeyType="next"
-              autoComplete="email"
-              validationType="email"
-              autoCorrect={false}
-              autoCapitalize="none"
-              errorMessage="Email is invalid"
-              placeholder="Email"
-              onSubmit={() => {
-                passwordInputRef.current?.focus();
-              }}
-            />
+            Don't have an account? Sign up
+          </Paragraph>
+        </View>
+        <View
+          style={{
+            width: DDS.isTab ? (focused ? '50%' : '49.99%') : focused ? '100%' : '99.9%',
+            padding: 12,
+            backgroundColor: colors.bg,
+            flexGrow: 1,
+            alignSelf: 'center'
+          }}
+        >
+          <Input
+            fwdRef={emailInputRef}
+            onChangeText={value => {
+              email.current = value;
+            }}
+            testID="input.email"
+            onErrorCheck={e => setError(e)}
+            returnKeyLabel="Next"
+            returnKeyType="next"
+            autoComplete="email"
+            validationType="email"
+            autoCorrect={false}
+            autoCapitalize="none"
+            errorMessage="Email is invalid"
+            placeholder="Email"
+            onSubmit={() => {
+              passwordInputRef.current?.focus();
+            }}
+          />
 
-            <Input
-              fwdRef={passwordInputRef}
-              onChangeText={value => {
-                password.current = value;
-              }}
-              testID="input.password"
-              returnKeyLabel="Done"
-              returnKeyType="done"
-              secureTextEntry
-              autoComplete="password"
-              autoCapitalize="none"
-              autoCorrect={false}
-              placeholder="Password"
-              marginBottom={0}
-              onSubmit={() => login()}
-            />
+          <Input
+            fwdRef={passwordInputRef}
+            onChangeText={value => {
+              password.current = value;
+            }}
+            testID="input.password"
+            returnKeyLabel="Done"
+            returnKeyType="done"
+            secureTextEntry
+            autoComplete="password"
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="Password"
+            marginBottom={0}
+            onSubmit={() => login()}
+          />
+          <Button
+            title="Forgot your password?"
+            style={{
+              alignSelf: 'flex-end',
+              height: 30,
+              paddingHorizontal: 0
+            }}
+            onPress={() => {
+              SheetManager.show('forgotpassword_sheet', email.current);
+            }}
+            textStyle={{
+              textDecorationLine: 'underline'
+            }}
+            fontSize={SIZE.xs}
+            type="gray"
+          />
+
+          <View
+            style={{
+              // position: 'absolute',
+              marginTop: 25,
+              alignSelf: 'center'
+            }}
+          >
             <Button
-              title="Forgot your password?"
               style={{
-                alignSelf: 'flex-end',
-                height: 30,
-                paddingHorizontal: 0
+                width: 250,
+                borderRadius: 100
               }}
-              onPress={() => {
-                SheetManager.show('forgotpassword_sheet', email.current);
-              }}
-              textStyle={{
-                textDecorationLine: 'underline'
-              }}
-              fontSize={SIZE.xs}
-              type="gray"
+              loading={loading}
+              onPress={() => login()}
+              //  width="100%"
+              type="accent"
+              title={loading ? null : 'Login to your account'}
             />
-
-            <View
-              style={{
-                // position: 'absolute',
-                marginTop: 50,
-                alignSelf: 'center'
-              }}
-            >
-              <Button
-                style={{
-                  marginTop: 10,
-                  width: 250,
-                  borderRadius: 100
-                }}
-                loading={loading}
-                onPress={() => login()}
-                //  width="100%"
-                type="accent"
-                title={loading ? null : 'Login to your account'}
-              />
-            </View>
           </View>
-        </BouncingView>
-      </View>
+        </View>
+      </Animated.View>
     </>
   );
 };

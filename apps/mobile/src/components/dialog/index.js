@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { DDS } from '../../services/device-detection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
 import { getElevation } from '../../utils';
@@ -122,6 +122,7 @@ export const Dialog = ({ context = 'global' }) => {
               onChangeText={value => {
                 setInputValue(value);
               }}
+              testID="input-value"
               secureTextEntry={dialogInfo.secureTextEntry}
               //defaultValue={dialogInfo.defaultValue}
               onSubmit={onPressPositive}

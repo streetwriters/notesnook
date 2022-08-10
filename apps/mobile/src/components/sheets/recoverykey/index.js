@@ -2,10 +2,9 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import React, { createRef } from 'react';
 import { Platform, View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
-import QRCode from 'react-native-qrcode-svg';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import Share from 'react-native-share';
-import { LOGO_BASE64 } from '../../../assets/images/assets';
+//import { LOGO_BASE64 } from '../../../assets/images/assets';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
 import { clearMessage } from '../../../services/message';
 import SettingsService from '../../../services/settings';
@@ -19,6 +18,7 @@ import DialogHeader from '../../dialog/dialog-header';
 import { Button } from '../../ui/button';
 import Seperator from '../../ui/seperator';
 import SheetWrapper from '../../ui/sheet';
+import { QRCode } from '../../ui/svg/lazy';
 import Paragraph from '../../ui/typography/paragraph';
 
 let RNFetchBlob;
@@ -245,7 +245,7 @@ class RecoveryKeySheet extends React.Component {
                 getRef={this.svg}
                 size={500}
                 value={this.state.key}
-                logo={{ uri: LOGO_BASE64 }}
+                //logo={{ uri: LOGO_BASE64 }}
                 logoBorderRadius={10}
               />
             ) : null}

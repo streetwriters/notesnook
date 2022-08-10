@@ -3,8 +3,8 @@ import { Platform, View } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { IconButton } from '../../components/ui/icon-button';
-import { useThemeStore } from '../../stores/theme';
-import { useSearchStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useSearchStore } from '../../stores/use-search-store';
 import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/event-manager';
 import Navigation from '../../services/navigation';
 import SearchService from '../../services/search';
@@ -77,16 +77,11 @@ export const SearchBar = () => {
   return (
     <View
       style={{
-        height: normalize(50),
+        height: 50,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 12,
         flexShrink: 1,
-        width: '100%',
-        paddingLeft: 6,
-        marginTop: Platform.OS === 'android' ? insets.top + 5 : 5,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.nav
+        width: '100%'
       }}
     >
       <IconButton
@@ -109,6 +104,7 @@ export const SearchBar = () => {
 
       <TextInput
         ref={inputRef}
+        testID="search-input"
         style={{
           fontSize: SIZE.md + 1,
           fontFamily: 'OpenSans-Regular',

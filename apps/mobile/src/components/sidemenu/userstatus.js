@@ -2,8 +2,8 @@ import React from 'react';
 import { ActivityIndicator, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
-import { useUserStore } from '../../stores/stores';
+import { useThemeStore } from '../../stores/use-theme-store';
+import { useUserStore } from '../../stores/use-user-store';
 import { eSendEvent } from '../../services/event-manager';
 import Sync from '../../services/sync';
 import { eOpenLoginDialog } from '../../utils/events';
@@ -13,7 +13,9 @@ import Heading from '../ui/typography/heading';
 import Paragraph from '../ui/typography/paragraph';
 import { TimeSince } from '../ui/time-since';
 import useSyncProgress from '../../utils/hooks/use-sync-progress';
-import * as Progress from 'react-native-progress';
+import Navigation from '../../services/navigation';
+import { tabBarRef } from '../../utils/global-refs';
+import { ProgressCircleComponent } from '../ui/svg/lazy';
 
 export const UserStatus = () => {
   const colors = useThemeStore(state => state.colors);
@@ -22,7 +24,7 @@ export const UserStatus = () => {
   const lastSynced = useUserStore(state => state.lastSynced);
   const insets = useSafeAreaInsets();
   const { progress } = useSyncProgress();
-
+  console.log('SYNC PROGRESS', progress);
   return (
     <View
       style={{
@@ -43,8 +45,9 @@ export const UserStatus = () => {
         <PressableButton
           onPress={async () => {
             if (user) {
-              await Sync.run();
+              Sync.run();
             } else {
+              tabBarRef.current?.closeDrawer();
               eSendEvent(eOpenLoginDialog);
             }
           }}
@@ -107,18 +110,7 @@ export const UserStatus = () => {
           {user ? (
             syncing ? (
               <>
-                <Progress.Circle
-                  size={SIZE.xl}
-                  progress={progress ? progress.current / progress.total : 0.1}
-                  textStyle={{
-                    fontSize: 8
-                  }}
-                  animated={true}
-                  color={colors.accent}
-                  unfilledColor={colors.nav}
-                  borderWidth={0}
-                  thickness={2}
-                />
+                <ActivityIndicator color={colors.accent} size={SIZE.xl} />
               </>
             ) : (
               <Icon color={colors.accent} name="sync" size={SIZE.lg} />

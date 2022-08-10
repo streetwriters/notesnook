@@ -1,4 +1,4 @@
-import { CHECK_IDS } from 'notes-core/common';
+import { CHECK_IDS } from '@streetwriters/notesnook-core/common';
 import React from 'react';
 import { Platform } from 'react-native';
 import * as RNIap from 'react-native-iap';
@@ -6,7 +6,7 @@ import DialogHeader from '../components/dialog/dialog-header';
 import { CompactFeatures } from '../components/premium/compact-features';
 import { PricingPlans } from '../components/premium/pricing-plans';
 import Seperator from '../components/ui/seperator';
-import { useUserStore } from '../stores/stores';
+import { useUserStore } from '../stores/use-user-store';
 import { itemSkus, SUBSCRIPTION_STATUS } from '../utils/constants';
 import { db } from '../utils/database';
 import { eOpenPremiumDialog, eOpenTrialEndingDialog, eShowGetPremium } from '../utils/events';
@@ -95,6 +95,7 @@ const onUserStatusCheck = async type => {
   if (userstore?.premium !== get()) {
     userstore.setPremium(get());
   }
+  console.log('status check: ', type, get());
 
   let status = get();
   let message = null;
@@ -188,12 +189,14 @@ const showVerifyEmailDialog = () => {
 
 const subscriptions = {
   get: async () => {
-    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    if (Platform.OS === 'android') return;
+    let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (!_subscriptions) return [];
     return JSON.parse(_subscriptions);
   },
   set: async subscription => {
-    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    if (Platform.OS === 'android') return;
+    let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (_subscriptions) {
       _subscriptions = JSON.parse(_subscriptions);
     } else {
@@ -205,10 +208,11 @@ const subscriptions = {
     } else {
       _subscriptions[index] = subscription;
     }
-    await MMKV.setItem('subscriptionsIOS', JSON.stringify(_subscriptions));
+    MMKV.setString('subscriptionsIOS', JSON.stringify(_subscriptions));
   },
   remove: async transactionId => {
-    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    if (Platform.OS === 'android') return;
+    let _subscriptions = MMKV.getString('subscriptionsIOS');
     if (_subscriptions) {
       _subscriptions = JSON.parse(_subscriptions);
     } else {
@@ -217,10 +221,11 @@ const subscriptions = {
     let index = _subscriptions.findIndex(s => s.transactionId === transactionId);
     if (index !== -1) {
       _subscriptions.splice(index);
-      await MMKV.setItem('subscriptionsIOS', JSON.stringify(_subscriptions));
+      MMKV.setString('subscriptionsIOS', JSON.stringify(_subscriptions));
     }
   },
   verify: async subscription => {
+    if (Platform.OS === 'android') return;
     console.log('verifying: ', new Date(subscription.transactionDate).toLocaleString());
 
     if (subscription.transactionReceipt) {
@@ -256,6 +261,7 @@ const subscriptions = {
     }
   },
   clear: async _subscription => {
+    if (Platform.OS === 'android') return;
     let _subscriptions = await subscriptions.get();
     let subscription = null;
     if (_subscription) {
@@ -282,7 +288,7 @@ async function getRemainingTrialDaysStatus() {
   let current = Date.now() - user.subscription.start;
   current = (current / total) * 100;
   console.log(current);
-  let lastTrialDialogShownAt = await MMKV.getItem('lastTrialDialogShownAt');
+  let lastTrialDialogShownAt = MMKV.getString('lastTrialDialogShownAt');
 
   if (current > 75 && isTrial && lastTrialDialogShownAt !== 'ending') {
     eSendEvent(eOpenTrialEndingDialog, {

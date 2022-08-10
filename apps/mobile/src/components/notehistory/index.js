@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { presentSheet } from '../../services/event-manager';
 import { db } from '../../utils/database';
 import { openLinkInBrowser } from '../../utils/functions';
@@ -15,7 +15,7 @@ import Seperator from '../ui/seperator';
 import Paragraph from '../ui/typography/paragraph';
 import NotePreview from './preview';
 
-export default function NoteHistory({ note, ref }) {
+export default function NoteHistory({ note, fwdRef }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const colors = useThemeStore(state => state.colors);
@@ -92,7 +92,7 @@ export default function NoteHistory({ note, ref }) {
 
       <FlatList
         onMomentumScrollEnd={() => {
-          ref?.current?.handleChildScrollEnd();
+          fwdRef?.current?.handleChildScrollEnd();
         }}
         style={{
           paddingHorizontal: 12

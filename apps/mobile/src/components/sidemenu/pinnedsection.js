@@ -1,17 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/theme';
-import { useMenuStore, useNoteStore } from '../../stores/stores';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
+import Notebook from '../../screens/notebook';
+import { TaggedNotes } from '../../screens/notes/tagged';
+import { TopicNotes } from '../../screens/notes/topic-notes';
 import Navigation from '../../services/navigation';
+import { useMenuStore } from '../../stores/use-menu-store';
+import useNavigationStore from '../../stores/use-navigation-store';
+import { useNoteStore } from '../../stores/use-notes-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
-import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/events';
 import { normalize, SIZE } from '../../utils/size';
+import { Properties } from '../properties';
 import { Button } from '../ui/button';
 import { Notice } from '../ui/notice';
 import { PressableButton } from '../ui/pressable';
-import { Properties } from '../properties';
 import Seperator from '../ui/seperator';
 import SheetWrapper from '../ui/sheet';
 import Heading from '../ui/typography/heading';
@@ -30,45 +33,19 @@ export const TagsSection = React.memo(
     }, [loading]);
 
     const onPress = item => {
-      let params = {};
       if (item.type === 'notebook') {
-        params = {
-          notebook: item,
-          title: item.title,
-          menu: true
-        };
-        eSendEvent(eOnNewTopicAdded, params);
-        Navigation.navigate('Notebook', params, {
-          heading: item.title,
-          id: item.id,
-          type: item.type
-        });
+        Notebook.navigate(item);
       } else if (item.type === 'tag') {
-        params = {
-          ...item,
-          type: 'tag',
-          menu: true,
-          get: 'tagged'
-        };
-        eSendEvent(refreshNotesPage, params);
-        Navigation.navigate('NotesPage', params, {
-          heading: '#' + db.tags.alias(item.id),
-          id: item.id,
-          type: item.type
-        });
+        TaggedNotes.navigate(item);
       } else {
-        params = { ...item, menu: true, get: 'topics' };
-        eSendEvent(refreshNotesPage, params);
-        Navigation.navigate('NotesPage', params, {
-          heading: item.title,
-          id: item.id,
-          type: item.type
-        });
+        TopicNotes.navigate(item);
       }
-      Navigation.closeDrawer();
+      setImmediate(() => {
+        Navigation.closeDrawer();
+      });
     };
     const renderItem = ({ item, index }) => {
-      let alias = item ? (item.type === 'tag' ? db.tags.alias(item.title) : item.title) : null;
+      let alias = item.alias || item.title;
       return <PinItem item={item} index={index} alias={alias} onPress={onPress} />;
     };
 
@@ -106,16 +83,19 @@ export const PinItem = React.memo(
   ({ item, index, onPress, placeholder, alias }) => {
     const colors = useThemeStore(state => state.colors);
     const setMenuPins = useMenuStore(state => state.setMenuPins);
-    alias = !item ? '' : item.type === 'tag' ? db.tags.alias(item.title) : item.title;
+    alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
     const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
     const fwdRef = useRef();
 
-    const onHeaderStateChange = event => {
+    const onHeaderStateChange = state => {
       setTimeout(() => {
-        if (event.id === item.id) {
-          setHeaderTextState(event);
+        let id = state.currentScreen?.id;
+        if (id === item.id) {
+          setHeaderTextState({
+            id: state.currentScreen.id
+          });
         } else {
           if (headerTextState !== null) {
             setHeaderTextState(null);
@@ -125,9 +105,9 @@ export const PinItem = React.memo(
     };
 
     useEffect(() => {
-      eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+      let unsub = useNavigationStore.subscribe(onHeaderStateChange);
       return () => {
-        eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+        unsub();
       };
     }, [headerTextState]);
 

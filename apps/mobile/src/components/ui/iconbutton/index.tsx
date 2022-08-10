@@ -1,7 +1,15 @@
 import React from 'react';
 import { ColorValue, GestureResponderEvent, ViewStyle } from 'react-native';
+import Animated, {
+  FadeIn,
+  FadeOut,
+  FlipInEasyX,
+  FlipInEasyY,
+  FlipOutEasyY,
+  Layout
+} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/theme';
+import { useThemeStore } from '../../../stores/use-theme-store';
 import { showTooltip, TOOLTIP_POSITIONS } from '../../../utils';
 import { hexToRGBA, RGB_Linear_Shade } from '../../../utils/color-scheme/utils';
 import { SIZE } from '../../../utils/size';
@@ -10,7 +18,7 @@ import { PressableButton, PressableButtonProps } from '../pressable';
 interface IconButtonProps extends PressableButtonProps {
   name: string;
   color?: ColorValue;
-  size: number;
+  size?: number;
   left?: number;
   right?: number;
   top?: number;
@@ -21,6 +29,7 @@ interface IconButtonProps extends PressableButtonProps {
   iconStyle?: ViewStyle;
 }
 
+const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 export const IconButton = ({
   onPress,
   name,
@@ -68,7 +77,8 @@ export const IconButton = ({
         ...customStyle
       }}
     >
-      <Icon
+      <AnimatedIcon
+        layout={Layout}
         name={name}
         style={iconStyle}
         color={

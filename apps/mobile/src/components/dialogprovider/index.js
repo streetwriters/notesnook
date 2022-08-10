@@ -1,31 +1,33 @@
 import React from 'react';
-import { useThemeStore } from '../../stores/theme';
-import { EditorSettings } from '../../screens/editor/EditorSettings';
-import { AddNotebookSheet } from '../sheets/add-notebook';
-import { AddTopicDialog } from '../dialogs/add-topic';
+import { useNoteStore } from '../../stores/use-notes-store';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { AnnouncementDialog } from '../announcements';
 import { AttachmentDialog } from '../attachments';
 import Auth from '../auth';
+import AuthModal from '../auth/auth-modal';
 import { SessionExpired } from '../auth/session-expired';
 import { Dialog } from '../dialog';
-import ExportNotesSheet from '../sheets/export-notes';
+import { AddTopicDialog } from '../dialogs/add-topic';
+import ResultDialog from '../dialogs/result';
+import { VaultDialog } from '../dialogs/vault';
 import ImagePreview from '../image-preview';
 import MergeConflicts from '../merge-conflicts';
-import AddToNotebookSheet from '../sheets/add-to';
 import PremiumDialog from '../premium';
 import { Expiring } from '../premium/expiring';
+import SheetProvider from '../sheet-provider';
+import { AddNotebookSheet } from '../sheets/add-notebook';
+import AddToNotebookSheet from '../sheets/add-to';
+import ExportNotesSheet from '../sheets/export-notes';
+import ManageTagsSheet from '../sheets/manage-tags';
 import PublishNoteSheet from '../sheets/publish-note';
 import RateAppSheet from '../sheets/rate-app';
 import RecoveryKeySheet from '../sheets/recovery-key';
 import RestoreDataSheet from '../sheets/restore-data';
-import ResultDialog from '../dialogs/result';
-import SheetProvider from '../sheet-provider';
-import ManageTagsSheet from '../sheets/manage-tags';
-import { VaultDialog } from '../dialogs/vault';
 
 const DialogProvider = React.memo(
   () => {
     const colors = useThemeStore(state => state.colors);
+    const loading = useNoteStore(state => state.loading);
 
     return (
       <>
@@ -33,7 +35,7 @@ const DialogProvider = React.memo(
         <AddTopicDialog colors={colors} />
         <AddNotebookSheet colors={colors} />
         <PremiumDialog colors={colors} />
-        <Auth colors={colors} />
+        <AuthModal colors={colors} />
         <MergeConflicts />
         <ExportNotesSheet />
         <RecoveryKeySheet colors={colors} />
@@ -45,11 +47,10 @@ const DialogProvider = React.memo(
         <AddToNotebookSheet colors={colors} />
         <RateAppSheet />
         <ImagePreview />
-        <EditorSettings />
         <PublishNoteSheet />
         <ManageTagsSheet />
         <AttachmentDialog />
-        <Expiring />
+        {loading ? null : <Expiring />}
         <AnnouncementDialog />
         <SessionExpired />
       </>

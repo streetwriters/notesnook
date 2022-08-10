@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/theme';
+import { useThemeStore } from '../../stores/use-theme-store';
 import { db } from '../../utils/database';
 import { eCloseAttachmentDialog, eOpenAttachmentsDialog } from '../../utils/events';
 import filesystem from '../../utils/filesystem';
