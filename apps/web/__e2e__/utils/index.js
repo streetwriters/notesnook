@@ -8,12 +8,12 @@ dotenv.config({ path: path.join(__dirname, ".env.local") });
 const USER = {
   email: process.env.USER_EMAIL,
   NEW: {
-    password: "",
-    key: "",
+    password: process.env.NEW_USER_PASSWORD,
+    key: process.env.NEW_USER_KEY,
   },
   CURRENT: {
-    password: process.env.USER_PASSWORD,
-    key: "",
+    password: process.env.CURRENT_USER_PASSWORD,
+    key: process.env.CURRENT_USER_KEY,
   },
 };
 
