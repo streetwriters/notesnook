@@ -1,21 +1,23 @@
 ---
 icon: pencil
 order: 990
-label: Creating a note
+label: Create a note
 ---
 
-# Creating a note
-You are in a notes app, the first thing you want to do is make a note.
+# Create a note
+Once you have successfully installed [Notesnook](https://notesnook.com/downloads/), the first thing you may want to do is create a note.
+
+To create a note on
 
 +++ Desktop/Web
-1. Click on the `+` button on top right corner or click anywhere inside the editor to focus it.
-2. Start writing and your note will be created.
-3. As you write, note will be saved automatically whenever you stop for a second.
+1. Click on the green colored `+` button in the top right corner of the `Notes` section.
+2. Start writing in the editor and your note will be created automatically with your current date and time as note title. Alternatively, you can name your note title yourself.
+3. Notes will be saved automatically whenever you stop writing for a time interval of more than one second.
 +++ Mobile/Tablet
-1. On mobile, just like desktop, regardless of what screen you have opened, you can always swipe from right to left and open the editor.
-2. You can also press the `+` button on bottom right corner to open the editor when you are in `Notes`, a `Notebook` or `Tag`.
-3. Start writing in editor and your note will be created.
-4. As you write, note will be saved automatically whenever you stop for a second.
+1. On mobile, regardless of what section of the app you have opened, you can always swipe from right to left and open the editor.
+2. Alternatively, you can also press the `+` button in the bottom right corner to open the editor when you are in `Notes`, a `Notebook`, or `Tag` section.
+3. Start writing in the editor and your note will be created automatically with your current date and time as note title. Alternatively, you can name your note title yourself.
+4. Notes will be saved automatically whenever you stop writing for a time interval of more than one second.
 +++
 
-And that is how you create your first private note on Notesnook!
+Congratulations, You have successfully created your first private note on Notesnook!
