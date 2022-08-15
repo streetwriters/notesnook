@@ -6,6 +6,7 @@ import { store as trashStore } from "./trash-store";
 import { store as tagStore } from "./tag-store";
 import { store as editorstore } from "./editor-store";
 import { store as attachmentStore } from "./attachment-store";
+import { store as monographStore } from "./monograph-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
@@ -73,6 +74,7 @@ class AppStore extends BaseStore {
     trashStore.refresh();
     tagStore.refresh();
     attachmentStore.refresh();
+    monographStore.refresh();
     this.refreshNavItems();
 
     logger.measure("refreshing app");
@@ -220,7 +222,7 @@ class AppStore extends BaseStore {
    */
   updateSyncStatus = (key) => {
     logger.info(`Sync status updated: ${key}`);
-    this.set((state) => (state.syncStatus.key = key));
+    this.set((state) => (state.syncStatus = { key }));
   };
 
   isSyncing = () => {
