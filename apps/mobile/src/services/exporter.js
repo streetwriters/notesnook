@@ -312,6 +312,15 @@ hr {
 
 </style>`;
 
+async function releasePermissions(path) {
+  const uris = await ScopedStorage.getPersistedUriPermissions();
+  for (let uri of uris) {
+    if (path.startsWith(uri)) {
+      await ScopedStorage.releasePersistableUriPermission(uri);
+    }
+  }
+}
+
 async function saveToPDF(note) {
   let androidSavePath = '/Notesnook/exported/PDF';
   if (Platform.OS === 'android') {
@@ -358,11 +367,13 @@ async function saveToPDF(note) {
       'base64',
       false
     );
-    await ScopedStorage.releasePersistableUriPermission(androidSavePath);
+
     if (res.filePath) {
       await RNFetchBlob.fs.unlink(res.filePath);
     }
   }
+
+  await releasePermissions(androidSavePath);
 
   return {
     filePath: fileUri || res.filePath,
@@ -393,7 +404,7 @@ async function saveToMarkdown(note) {
       'utf8',
       false
     );
-    await ScopedStorage.releasePersistableUriPermission(path);
+    await releasePermissions(path);
   } else {
     path = path + fileName + '.md';
     await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
@@ -428,7 +439,7 @@ async function saveToText(note) {
       'utf8',
       false
     );
-    await ScopedStorage.releasePersistableUriPermission(path);
+    await releasePermissions(path);
   } else {
     path = path + fileName + '.txt';
     await RNFetchBlob.fs.writeFile(path, text, 'utf8');
@@ -469,7 +480,7 @@ async function saveToHTML(note) {
       'utf8',
       false
     );
-    await ScopedStorage.releasePersistableUriPermission(path);
+    await releasePermissions(path);
   } else {
     path = path + fileName + '.html';
     await RNFetchBlob.fs.writeFile(path, html3, 'utf8');
