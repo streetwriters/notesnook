@@ -39,6 +39,7 @@ type TipTapProps = {
   toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
+  theme: Theme;
 };
 
 function TipTap(props: TipTapProps) {
@@ -54,9 +55,9 @@ function TipTap(props: TipTapProps) {
     editorContainer,
     readonly,
     nonce,
+    theme,
   } = props;
 
-  const theme: Theme = useTheme();
   const isUserPremium = useIsUserPremium();
   const isMobile = useMobile();
   const configure = useConfigureEditor();
@@ -213,7 +214,8 @@ function TipTap(props: TipTapProps) {
   );
 }
 
-function TiptapWrapper(props: Omit<TipTapProps, "editorContainer">) {
+function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
+  const theme: Theme = useTheme();
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>();
   useEffect(() => {
@@ -224,7 +226,11 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer">) {
     <PortalProvider>
       <Flex sx={{ flex: 1, flexDirection: "column" }}>
         {isReady && editorContainerRef.current ? (
-          <TipTap {...props} editorContainer={editorContainerRef.current} />
+          <TipTap
+            {...props}
+            editorContainer={editorContainerRef.current}
+            theme={theme}
+          />
         ) : null}
         <Box
           ref={editorContainerRef}
@@ -232,7 +238,7 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer">) {
           style={{
             flex: 1,
             cursor: "text",
-            color: "var(--text)", // TODO!
+            color: theme.colors.text, // TODO!
             paddingBottom: 150,
           }}
         />
