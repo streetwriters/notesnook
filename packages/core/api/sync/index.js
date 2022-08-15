@@ -350,6 +350,9 @@ class Sync {
    * @private
    */
   async onRemoteSyncCompleted(lastSynced) {
+    // refresh monographs on sync completed
+    await this.db.monographs.init();
+
     await this.start(false, false, lastSynced);
   }
 
