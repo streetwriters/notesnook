@@ -199,8 +199,8 @@ export function ImageComponent(
               alt={alt}
               src={source}
               title={title}
-              width={"100%"}
-              height={"100%"}
+              width={editor.isEditable ? "100%" : width}
+              height={editor.isEditable ? "100%" : height}
               sx={{
                 bg: "bgSecondary",
                 border: selected
