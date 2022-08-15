@@ -33,6 +33,7 @@ type TipTapProps = {
   onChange?: (content: string) => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
+  onAttachFile?: (file: File) => void;
   onFocus?: () => void;
   content?: string;
   toolbarContainerId?: string;
@@ -46,6 +47,7 @@ function TipTap(props: TipTapProps) {
     onChange,
     onInsertAttachment,
     onDownloadAttachment,
+    onAttachFile,
     onFocus = () => {},
     content,
     toolbarContainerId,
@@ -75,6 +77,18 @@ function TipTap(props: TipTapProps) {
 
   const editor = useTiptap(
     {
+      editorProps: {
+        handlePaste: (view, event) => {
+          if (event.clipboardData?.files?.length && onAttachFile) {
+            event.preventDefault();
+            event.stopPropagation();
+            for (let file of event.clipboardData.files) {
+              onAttachFile(file);
+            }
+            return true;
+          }
+        },
+      },
       doubleSpacedLines,
       isKeyboardOpen: true,
       isMobile: isMobile || false,

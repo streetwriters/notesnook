@@ -129,19 +129,6 @@ export default function EditorManager({
         alignSelf: "stretch",
         overflow: "hidden",
       }}
-      onPaste={async (event) => {
-        if (!editor) return;
-
-        if (event.clipboardData?.files?.length) {
-          event.preventDefault();
-          for (let file of event.clipboardData.files) {
-            const result = await attachFile(file);
-            if (!result) continue;
-
-            editor.attachFile(result);
-          }
-        }
-      }}
     >
       {previewSession.current && (
         <PreviewModeNotice
@@ -256,6 +243,11 @@ export function Editor(props: EditorProps) {
             if (!file) return;
             editor?.attachFile(file);
           });
+        }}
+        onAttachFile={async (file) => {
+          const result = await attachFile(file);
+          if (!result) return;
+          editor?.attachFile(result);
         }}
       />
     </EditorChrome>
