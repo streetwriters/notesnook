@@ -29,7 +29,11 @@ export default class Backup {
    * @param {boolean} encrypt
    */
   async export(type, encrypt = false) {
-    if (encrypt && !(await checkIsUserPremium(CHECK_IDS.backupEncrypt))) return;
+    if (encrypt && !(await checkIsUserPremium(CHECK_IDS.backupEncrypt))) {
+      throw new Error(
+        "Please upgrade your plan to Pro to use encrypted backups."
+      );
+    }
 
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
