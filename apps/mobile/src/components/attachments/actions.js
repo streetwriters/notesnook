@@ -253,7 +253,16 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
             {notes.map(item => (
               <PressableButton
                 onPress={async () => {
-                  if (item.type === 'notfound') return;
+                  if (item.type === 'notfound') {
+                    ToastEvent.show({
+                      heading: 'Note not found',
+                      message:
+                        'A note with the given id was not found. Maybe you have deleted the note or moved it to trash already.',
+                      type: 'error',
+                      context: 'local'
+                    });
+                    return;
+                  }
                   eSendEvent(eCloseProgressDialog, contextId);
                   await sleep(150);
                   eSendEvent(eCloseAttachmentDialog);
