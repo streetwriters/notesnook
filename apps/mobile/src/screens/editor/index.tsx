@@ -114,11 +114,10 @@ const Editor = React.memo(
             nestedScrollEnabled
             onError={onError}
             injectedJavaScriptBeforeContentLoaded={`
-          globalThis.readonly=${readonly};
-          globalThis.noToolbar=${noToolbar};
-          globalThis.noHeader=${noHeader};
-          `}
-            injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
+            globalThis.sessionId="${editor.sessionId}";
+            globalThis.readonly=${readonly};
+            globalThis.noToolbar=${noToolbar};
+            globalThis.noHeader=${noHeader};`}
             javaScriptEnabled={true}
             focusable={true}
             setSupportMultipleWindows={false}
@@ -139,7 +138,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: __DEV__ ? EDITOR_URI : EDITOR_URI
+              uri: __DEV__ ? `http://192.168.201.126:3000/index.html` : EDITOR_URI
             }}
             style={style}
             autoManageStatusBarEnabled={false}

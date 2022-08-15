@@ -17,6 +17,7 @@ export const RightMenus = () => {
   const deviceMode = useSettingStore(state => state.deviceMode);
   const rightButtons = useNavigationStore(state => state.headerRightButtons);
   const currentScreen = useNavigationStore(state => state.currentScreen.name);
+  const buttonAction = useNavigationStore(state => state.buttonAction);
   const menuRef = useRef();
 
   return (
@@ -38,7 +39,7 @@ export const RightMenus = () => {
 
       {deviceMode !== 'mobile' ? (
         <Button
-          onPress={RightMenus.floatingButtonAction}
+          onPress={buttonAction}
           testID={notesnook.ids.default.addBtn}
           icon={currentScreen === 'Trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
@@ -108,8 +109,6 @@ export const RightMenus = () => {
     </View>
   );
 };
-
-RightMenus.floatingButtonAction = () => {};
 
 const styles = StyleSheet.create({
   rightBtnContainer: {

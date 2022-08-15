@@ -44,6 +44,8 @@ interface NavigationStore extends State {
     headerRightButtons?: HeaderRightButton[]
   ) => void;
   headerRightButtons?: HeaderRightButton[];
+  buttonAction: () => void;
+  setButtonAction: (buttonAction: () => void) => void;
 }
 
 const useNavigationStore = create<NavigationStore>((set, get) => ({
@@ -74,7 +76,9 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
       headerRightButtons: headerRightButtons
     });
   },
-  headerRightButtons: []
+  headerRightButtons: [],
+  buttonAction: () => null,
+  setButtonAction: buttonAction => set({ buttonAction })
 }));
 
 export default useNavigationStore;

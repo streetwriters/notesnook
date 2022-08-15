@@ -46,7 +46,7 @@ export const Notebooks = ({ navigation, route }: NavigationProps<'Notebooks'>) =
         name: route.name
       });
       SearchService.prepareSearch = prepareSearch;
-      RightMenus.floatingButtonAction = onPressFloatingButton;
+      useNavigationStore.getState().setButtonAction(onPressFloatingButton);
 
       if (notebooks.length === 0) {
         Walkthrough.present('notebooks');

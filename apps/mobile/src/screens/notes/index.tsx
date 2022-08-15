@@ -113,7 +113,7 @@ const NotesPage = ({
       rightButtons && rightButtons(params.current)
     );
     SearchService.prepareSearch = prepareSearch;
-    RightMenus.floatingButtonAction = onPressFloatingButton;
+    useNavigationStore.getState().setButtonAction(onPressFloatingButton);
 
     !isMonograph &&
       setOnFirstSave({

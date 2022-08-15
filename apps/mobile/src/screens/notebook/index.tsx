@@ -23,6 +23,7 @@ const Notebook = ({ route, navigation }: NavigationProps<'Notebook'>) => {
     onFocus: () => {
       Navigation.routeNeedsUpdate(route.name, onRequestUpdate);
       syncWithNavigation();
+      useNavigationStore.getState().setButtonAction(onPressFloatingButton);
       return false;
     },
     onBlur: () => false

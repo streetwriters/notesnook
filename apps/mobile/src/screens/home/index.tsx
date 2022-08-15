@@ -39,7 +39,7 @@ export const Home = ({ navigation, route }: NavigationProps<'Notes'>) => {
         name: route.name
       });
       SearchService.prepareSearch = prepareSearch;
-      RightMenus.floatingButtonAction = openEditor;
+      useNavigationStore.getState().setButtonAction(openEditor);
       return !prev?.current;
     },
     onBlur: () => false,
