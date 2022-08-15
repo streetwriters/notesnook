@@ -1,14 +1,15 @@
 import { useState } from "react";
 
 const insetsStorage = localStorage.getItem("safeAreaInsets");
-const initialState = insetsStorage
-  ? JSON.parse(insetsStorage)
-  : {
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-    };
+const initialState =
+  insetsStorage && !globalThis.noHeader
+    ? JSON.parse(insetsStorage)
+    : {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      };
 
 global.safeAreaController = {
   update: (safeArea) => {

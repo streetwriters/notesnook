@@ -7,9 +7,9 @@ const initialState = {
   deviceMode: "mobile",
   premium: false,
   tools: JSON.parse(JSON.stringify(getDefaultPresets().default)),
-  noToolbar: global.noToolbar,
-  noHeader: global.noHeader,
-  readonly: global.readonly,
+  noToolbar: globalThis.noToolbar,
+  noHeader: globalThis.noHeader,
+  readonly: globalThis.readonly,
   doubleSpacedLines: true,
 };
 
@@ -17,9 +17,9 @@ global.settingsController = {
   update: (settings) => {
     const nextSettings = {
       ...settings,
-      noToolbar: global.noToolbar || settings.noToolbar,
-      noHeader: global.noHeader || settings.noHeader,
-      readonly: global.readonly || settings.readonly,
+      noToolbar: globalThis.noToolbar || settings.noToolbar,
+      noHeader: globalThis.noHeader || settings.noHeader,
+      readonly: globalThis.readonly || settings.readonly,
     };
     if (
       JSON.stringify(nextSettings) ===
@@ -38,6 +38,9 @@ global.settingsController = {
   },
   previous: settingsJson ? JSON.parse(settingsJson) : { ...initialState },
 };
+global.settingsController.previous.noHeader = globalThis.noHeader;
+global.settingsController.previous.noToolbar = globalThis.noToolbar;
+global.settingsController.previous.readonly = globalThis.readonly;
 
 export const useSettings = () => {
   const [settings, setSettings] = useState({
