@@ -1,6 +1,6 @@
 {
   "name": "notesnook",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "private": true,
   "scripts": {
     "run-android": "REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ react-native run-android --active-arch-only",
