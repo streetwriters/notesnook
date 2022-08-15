@@ -2,38 +2,18 @@ import { Box, Flex, Text } from "rebass";
 import { ReactNodeViewProps } from "../react";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
-import { Node } from "prosemirror-model";
-import { Transaction } from "prosemirror-state";
-import {
-  findChildren,
-  findParentNode,
-  getNodeType,
-  NodeWithPos,
-} from "@tiptap/core";
-import { useCallback, useEffect } from "react";
+import { Node as ProsemirrorNode } from "prosemirror-model";
+import { findChildren } from "@tiptap/core";
 import { OutlineList } from "../outline-list/outline-list";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import { Editor } from "../../types";
 
 export function OutlineListItemComponent(props: ReactNodeViewProps) {
-  const { editor, updateAttributes, node, getPos, forwardRef } = props;
+  const { editor, node, getPos, forwardRef } = props;
 
   const isMobile = useIsMobile();
   const isNested = node.lastChild?.type.name === OutlineList.name;
   const isCollapsed = isNested && node.lastChild?.attrs.collapsed;
-
-  const onClick = useCallback(() => {
-    const [subList] = findChildren(
-      node,
-      (node) => node.type.name === OutlineList.name
-    );
-    if (!subList) return;
-    const { pos } = subList;
-
-    editor.current?.commands.toggleOutlineCollapse(
-      pos + getPos() + 1,
-      !isCollapsed
-    );
-  }, []);
 
   return (
     <Flex>
@@ -70,9 +50,11 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
             onMouseDown={(e) => e.preventDefault()}
             onTouchEnd={(e) => {
               e.preventDefault();
-              onClick();
+              toggleOutlineList(editor, node, isCollapsed, getPos());
             }}
-            onClick={onClick}
+            onClick={() => {
+              toggleOutlineList(editor, node, isCollapsed, getPos());
+            }}
           />
         ) : (
           <Icon
@@ -111,5 +93,24 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
         }}
       />
     </Flex>
+  );
+}
+
+function toggleOutlineList(
+  editor: Editor,
+  node: ProsemirrorNode,
+  isCollapsed: boolean,
+  nodePos: number
+) {
+  const [subList] = findChildren(
+    node,
+    (node) => node.type.name === OutlineList.name
+  );
+  if (!subList) return;
+  const { pos } = subList;
+
+  editor.current?.commands.toggleOutlineCollapse(
+    pos + nodePos + 1,
+    !isCollapsed
   );
 }
