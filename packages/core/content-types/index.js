@@ -1,6 +1,8 @@
 import { Tiptap } from "./tiptap";
 
 export function getContentFromData(type, data) {
+  if (!type) return null;
+
   switch (type) {
     case "tiptap":
       return new Tiptap(data);
