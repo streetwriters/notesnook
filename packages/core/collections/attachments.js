@@ -135,8 +135,8 @@ export default class Attachments extends Collection {
     return JSON.parse(plainData);
   }
 
-  async delete(hash, noteId) {
-    const attachment = this.all.find((a) => a.metadata.hash === hash);
+  async delete(hashOrId, noteId) {
+    const attachment = this.attachment(hashOrId);
     if (!attachment || !deleteItem(attachment.noteIds, noteId)) return;
     if (!attachment.noteIds.length) {
       attachment.dateDeleted = Date.now();
@@ -145,12 +145,16 @@ export default class Attachments extends Collection {
     return await this._collection.updateItem(attachment);
   }
 
-  async remove(hash, localOnly) {
-    const attachment = this.all.find((a) => a.metadata.hash === hash);
+  async remove(hashOrId, localOnly) {
+    const attachment = this.attachment(hashOrId);
     if (!attachment) return false;
-    if (await this._db.fs.deleteFile(hash, localOnly)) {
+
+    if (!localOnly && !(await this._canDetach(attachment)))
+      throw new Error("This attachment is inside a locked note.");
+
+    if (await this._db.fs.deleteFile(attachment.metadata.hash, localOnly)) {
       if (!localOnly) {
-        await this.detach(hash);
+        await this.detach(attachment);
       }
       await this._collection.removeItem(attachment.id);
       return true;
@@ -158,10 +162,7 @@ export default class Attachments extends Collection {
     return false;
   }
 
-  async detach(hashOrId) {
-    const attachment = this.attachment(hashOrId);
-    if (!attachment) return;
-
+  async detach(attachment) {
     await this._db.notes.init();
     for (let noteId of attachment.noteIds) {
       const note = this._db.notes.note(noteId);
@@ -171,6 +172,16 @@ export default class Attachments extends Collection {
         attachment.metadata.hash,
       ]);
     }
+  }
+
+  async _canDetach(attachment) {
+    await this._db.notes.init();
+    for (let noteId of attachment.noteIds) {
+      const note = this._db.notes.note(noteId)._note;
+      if (note.locked) return false;
+    }
+
+    return true;
   }
 
   /**
