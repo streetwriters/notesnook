@@ -589,7 +589,7 @@ export const settingsGroups: SettingSection[] = [
                 await BackupService.run(true);
                 return;
               }
-              verifyUser(null, () => BackupService.run(true));
+              verifyUser('local', () => BackupService.run(true));
             }
           },
           {

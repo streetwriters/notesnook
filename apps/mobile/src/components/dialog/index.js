@@ -52,6 +52,7 @@ export const Dialog = ({ context = 'global' }) => {
         return;
       }
     }
+
     hide();
   };
 
@@ -63,6 +64,7 @@ export const Dialog = ({ context = 'global' }) => {
   };
 
   const hide = () => {
+    setInputValue(null);
     setVisible(false);
   };
 
