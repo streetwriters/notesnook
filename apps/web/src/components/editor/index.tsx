@@ -116,7 +116,7 @@ export default function EditorManager({
     if (!isOldSession) return;
 
     openSession(noteId);
-  }, [openSession, noteId, isOldSession]);
+  }, [openSession, noteId, isOldSession, isReadonly]);
 
   return (
     <Flex
