@@ -32,7 +32,7 @@ type RenderDialog<TId extends DialogIds, TReturnType> = (
   perform: (result: TReturnType) => void
 ) => JSX.Element;
 
-const openDialogs: Partial<Record<DialogIds, boolean>> = {};
+let openDialogs: Partial<Record<DialogIds, boolean>> = {};
 function showDialog<TId extends DialogIds, TReturnType>(
   id: TId,
   render: RenderDialog<TId, TReturnType>
@@ -63,6 +63,7 @@ function showDialog<TId extends DialogIds, TReturnType>(
 }
 
 export function closeOpenedDialog() {
+  openDialogs = {};
   const dialogs = document.querySelectorAll(
     ".ReactModalPortal,[data-react-modal-body-trap]"
   );
