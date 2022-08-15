@@ -185,12 +185,12 @@ export function Editor(props: EditorProps) {
   const editor = useEditorInstance();
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor.current) return;
 
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total, type }: AttachmentProgress) => {
-        editor.sendAttachmentProgress(
+        editor.current?.sendAttachmentProgress(
           hash,
           type,
           Math.round((loaded / total) * 100)
@@ -210,7 +210,7 @@ export function Editor(props: EditorProps) {
         src: string;
       }) => {
         if (groupId?.startsWith("monograph")) return;
-        editor.loadImage(hash, src);
+        editor.current?.loadImage(hash, src);
       }
     );
 
@@ -241,13 +241,13 @@ export function Editor(props: EditorProps) {
           const mime = type === "file" ? "*/*" : "image/*";
           insertAttachment(mime).then((file) => {
             if (!file) return;
-            editor?.attachFile(file);
+            editor.current?.attachFile(file);
           });
         }}
         onAttachFile={async (file) => {
           const result = await attachFile(file);
           if (!result) return;
-          editor?.attachFile(result);
+          editor.current?.attachFile(result);
         }}
       />
     </EditorChrome>
@@ -417,7 +417,7 @@ function DropZone(props: DropZoneProps) {
         for (let file of e.dataTransfer.files) {
           const result = await attachFile(file);
           if (!result) continue;
-          editor.attachFile(result);
+          editor.current?.attachFile(result);
         }
       }}
     >

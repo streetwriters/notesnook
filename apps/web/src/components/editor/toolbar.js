@@ -85,7 +85,7 @@ function Toolbar(props) {
             exitFullscreen(document);
             setIsFullscreen(false);
           }
-          if (editor) editor.focus();
+          if (editor) editor.current.focus();
         },
       },
       {
