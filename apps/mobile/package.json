@@ -87,7 +87,7 @@
     "react-native-webview": "^11.14.1",
     "rn-extensions-share": "^2.4.0",
     "rn-fetch-blob": "^0.12.0",
-    "showdown": "https://github.com/thecodrr/showdown.git",
+    "showdown": "github:thecodrr/showdown",
     "toggle-switch-react-native": "3.2.0",
     "url": "^0.11.0",
     "validator": "^13.5.2",

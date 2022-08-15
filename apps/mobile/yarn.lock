@@ -9866,14 +9866,8 @@ shell-quote@^1.6.1, shell-quote@^1.7.2, shell-quote@^1.7.3:
   integrity sha512-Vpfqwm4EnqGdlsBFNmHhxhElJYrdfcxPThu+ryKS5J8L/fhAwLazFZtq+S+TWZ9ANj2piSQLGj6NQg+lKPmxrw==
 
 "showdown@github:thecodrr/showdown":
-  version "2.0.0-alpha1"
-  resolved "https://codeload.github.com/thecodrr/showdown/tar.gz/6702aadff64520c0b18a77866cfdf809ee8f139c"
-  dependencies:
-    yargs "14.2.0"
-
-"showdown@https://github.com/thecodrr/showdown.git":
   version "3.0.0-alpha"
-  resolved "https://github.com/thecodrr/showdown.git#e9aa842cf4d32153f23d6f1ce416f91cce774758"
+  resolved "https://codeload.github.com/thecodrr/showdown/tar.gz/687b153e66561a6786359bda5ab449e7ac8c99fc"
 
 side-channel@^1.0.4:
   version "1.0.4"
