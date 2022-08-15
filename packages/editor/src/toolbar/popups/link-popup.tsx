@@ -32,7 +32,7 @@ export function LinkPopup(props: LinkPopupProps) {
           <Input
             type="text"
             placeholder="Link text"
-            value={link.current?.text}
+            defaultValue={link.current?.text}
             sx={{ mb: 1 }}
             onChange={(e) =>
               (link.current = { ...link.current, text: e.target.value })
@@ -43,7 +43,7 @@ export function LinkPopup(props: LinkPopupProps) {
           type="url"
           autoFocus
           placeholder="https://example.com/"
-          value={link.current?.href}
+          defaultValue={link.current?.href}
           onChange={(e) =>
             (link.current = { ...link.current, href: e.target.value })
           }

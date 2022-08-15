@@ -7,7 +7,7 @@ import { useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { findMark, selectionToOffset } from "../utils/prosemirror";
-import { setTextSelection } from "prosemirror-utils";
+import { TextSelection } from "prosemirror-state";
 import { Flex, Text } from "rebass";
 import { ImageNode } from "../../extensions/image";
 
@@ -82,19 +82,41 @@ export function EditLink(props: ToolProps) {
   const onDone = useCallback((link: LinkDefinition) => {
     const { href, text, isImage } = link;
     const { from, node, to } = selectedNode.current;
-
     if (!href || !editor.current || !node) return;
 
     const mark = findMark(node, "link");
     if (!mark) return;
 
-    editor.current
-      .chain()
-      .command(({ tr }) => {
+    const selection = editor.current.state.selection;
+
+    let commandChain = editor.current.chain();
+
+    if (!isImage) {
+      commandChain = commandChain.command(({ tr }) => {
         tr.removeMark(from, to, mark.type);
-        tr.addMark(from, to, mark.type.create({ href }));
-        tr.insertText(text || node.textContent, from, to);
-        setTextSelection(tr.mapping.map(from))(tr);
+        tr.insertText(
+          text || node.textContent,
+          tr.mapping.map(from),
+          tr.mapping.map(to)
+        );
+        tr.setSelection(
+          TextSelection.create(tr.doc, tr.mapping.map(from), tr.mapping.map(to))
+        );
+        return true;
+      });
+    }
+
+    commandChain
+      .extendMarkRange("link")
+      .toggleLink({ href, target: "_blank" })
+      .command(({ tr }) => {
+        tr.setSelection(
+          TextSelection.create(
+            tr.doc,
+            tr.mapping.map(selection.from),
+            tr.mapping.map(selection.to)
+          )
+        );
         return true;
       })
       .focus(undefined, { scrollIntoView: true })
