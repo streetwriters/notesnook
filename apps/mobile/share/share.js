@@ -568,7 +568,8 @@ const ShareView = ({ quicknote = false }) => {
               >
                 <SafeAreaProvider
                   style={{
-                    flex: 1
+                    flex: 1,
+                    paddingTop: 10
                   }}
                 >
                   {!loadingExtension && (
