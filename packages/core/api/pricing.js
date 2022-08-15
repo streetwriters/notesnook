@@ -27,7 +27,7 @@ class Pricing {
    *    discount: number
    * }>}
    */
-  price(period) {
+  price(period = "monthly") {
     return http.get(`${BASE_URL}/${period}`);
   }
 }

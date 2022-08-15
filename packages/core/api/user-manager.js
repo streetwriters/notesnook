@@ -2,7 +2,7 @@ import "../types";
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
-import { EV, EVENTS, setUserPersonalizationBytes } from "../common";
+import { EV, EVENTS } from "../common";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -44,7 +44,6 @@ class UserManager {
   async init() {
     const user = await this.getUser();
     if (!user) return;
-    setUserPersonalizationBytes(user.salt);
   }
 
   async signup(email, password) {
@@ -58,8 +57,8 @@ class UserManager {
     return await this._login({ email, password, hashedPassword });
   }
 
-  async login(email, password) {
-    return this._login({ email, password });
+  async login(email, password, hashedPassword = undefined) {
+    return this._login({ email, password, hashedPassword });
   }
 
   async mfaLogin(email, password, { code, method }) {
@@ -87,7 +86,6 @@ class UserManager {
     );
 
     const user = await this.fetchUser();
-    setUserPersonalizationBytes(user.salt);
     await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
       password,
       salt: user.salt,

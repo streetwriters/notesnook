@@ -100,19 +100,5 @@ class Collector {
       ...(await this._serialize(item)),
     };
   }
-
-  filter(data, predicate) {
-    const arrays = ["notes", "notebooks", "content", "attachments", "settings"];
-    const newData = {};
-    for (let array of arrays) {
-      if (!data[array]) continue;
-      this.logger.info(`Filtering from ${data[array].length} ${array}`);
-      newData[array] = data[array].filter(predicate);
-      this.logger.info(
-        `Length after filtering ${array}: ${newData[array].length}`
-      );
-    }
-    return newData;
-  }
 }
 export default Collector;

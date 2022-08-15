@@ -2,6 +2,7 @@ import hosts from "../utils/constants";
 
 export default class Debug {
   strip(item) {
+    if (!item) return "{}";
     return JSON.stringify({
       title: !!item.title,
       description: !!item.description,
@@ -9,6 +10,8 @@ export default class Debug {
       colored: !!item.color,
       type: item.type,
       notebooks: item.notebooks,
+      notes: item.notes,
+      noteIds: item.noteIds,
       tags: item.tags,
       id: item.id,
       contentId: item.contentId,

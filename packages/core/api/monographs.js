@@ -8,11 +8,11 @@ class Monographs {
    */
   constructor(db) {
     this._db = db;
-    this.monographs = [];
+    this.monographs = undefined;
   }
 
   async deinit() {
-    this.monographs = [];
+    this.monographs = undefined;
     await this._db.storage.write("monographs", this.monographs);
   }
 
@@ -37,7 +37,7 @@ class Monographs {
    * @returns {boolean} Whether note is published or not.
    */
   isPublished(noteId) {
-    return this.monographs.indexOf(noteId) > -1;
+    return this.monographs && this.monographs.indexOf(noteId) > -1;
   }
 
   /**
@@ -46,6 +46,8 @@ class Monographs {
    * @returns Monograph Id
    */
   monograph(noteId) {
+    if (!this.monographs) return;
+
     return this.monographs[this.monographs.indexOf(noteId)];
   }
 
@@ -55,7 +57,7 @@ class Monographs {
    * @param {{password: string, selfDestruct: boolean}} opts Publish options
    * @returns
    */
-  async publish(noteId, opts) {
+  async publish(noteId, opts = { password: undefined, selfDestruct: false }) {
     if (!this.monographs) await this.init();
 
     let update = !!this.isPublished(noteId);
@@ -116,8 +118,8 @@ class Monographs {
     const token = await this._db.user.tokenManager.getAccessToken();
     if (!user || !token) throw new Error("Please login to publish a note.");
 
-    const note = this._db.notes.note(noteId);
-    if (!note) throw new Error("No such note found.");
+    // const note = this._db.notes.note(noteId);
+    // if (!note) throw new Error("No such note found.");
 
     if (!this.isPublished(noteId))
       throw new Error("This note is not published.");
@@ -128,9 +130,15 @@ class Monographs {
   }
 
   get all() {
+    if (!this.monographs) return [];
+
     return this._db.notes.all.filter(
       (note) => this.monographs.indexOf(note.id) > -1
     );
+  }
+
+  async get(monographId) {
+    return await http.get(`${Constants.API_HOST}/monographs/${monographId}`);
   }
 }
 export default Monographs;
