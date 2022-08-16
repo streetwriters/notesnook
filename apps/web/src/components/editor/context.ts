@@ -27,7 +27,6 @@ class EditorContext extends BaseStore {
         typeof partial === "function" ? partial(state.subState) : partial;
       state.subState = { ...state.subState, ...newPartialState };
     });
-    console.log("Configuring editor context", this.get().subState.editor);
   };
 }
 
