@@ -257,9 +257,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            if (file("debug.keystore").exists()) {
-                signingConfig signingConfigs.release
-            }
+            // if (file("debug.keystore").exists()) {
+            //     signingConfig signingConfigs.release
+            // }
             minifyEnabled enableProguardInReleaseBuilds
             shrinkResources false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
