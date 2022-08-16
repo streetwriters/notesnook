@@ -1,6 +1,6 @@
 {
   "name": "@streetwriters/notesnook-core",
-  "version": "7.3.5",
+  "version": "7.3.6",
   "main": "./api/index.js",
   "license": "GPL-3.0",
   "repository": {
