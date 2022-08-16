@@ -382,11 +382,15 @@ class Sync {
   }
 
   async checkConnection() {
-    if (this.connection.state !== signalr.HubConnectionState.Connected) {
-      if (this.connection.state !== signalr.HubConnectionState.Disconnected)
-        await this.connection.stop();
+    try {
+      if (this.connection.state !== signalr.HubConnectionState.Connected) {
+        if (this.connection.state !== signalr.HubConnectionState.Disconnected)
+          await this.connection.stop();
 
-      await this.connection.start();
+        await this.connection.start();
+      }
+    } catch (e) {
+      this.logger.warn(e.message);
     }
   }
 }
