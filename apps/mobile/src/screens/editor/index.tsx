@@ -138,7 +138,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={{
-              uri: __DEV__ ? `http://192.168.201.126:3000/index.html` : EDITOR_URI
+              uri: __DEV__ ? `http://192.168.81.126:3000/index.html` : EDITOR_URI
             }}
             style={style}
             autoManageStatusBarEnabled={false}
