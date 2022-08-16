@@ -1,7 +1,7 @@
 import { Appearance } from 'react-native';
 import create from 'zustand';
-import { ACCENT, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../src/utils/color-scheme';
-import { MMKV } from '../src/utils/database/mmkv';
+import { ACCENT, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../app/utils/color-scheme';
+import { MMKV } from '../app/common/database/mmkv';
 
 export const useShareStore = create((set, get) => ({
   colors: Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT,

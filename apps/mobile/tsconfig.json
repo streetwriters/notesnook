@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "commonjs",
-    "lib": ["es2017"],
+    "lib": ["es2017", "DOM", "DOM.Iterable"],
     "allowJs": true,
     "baseUrl": "./",
     "jsx": "react-native",
@@ -17,5 +17,5 @@
     "downlevelIteration": true,
     "types": ["node", "jest", "detox"]
   },
-  "exclude": ["android", "ios"]
+  "exclude": ["native"]
 }

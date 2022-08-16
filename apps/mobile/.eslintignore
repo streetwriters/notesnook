@@ -1,6 +1,5 @@
 e2e
-html
-ios
-android
+native
+rn-build-deps
 .github
 patches

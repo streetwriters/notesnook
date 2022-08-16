@@ -19,13 +19,12 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ShareExtension from 'rn-extensions-share';
 import isURL from 'validator/lib/isURL';
-import Editor from '../src/screens/editor';
-import { eSendEvent } from '../src/services/event-manager';
-import { getElevation } from '../src/utils';
-import { db } from '../src/utils/database';
-import Storage from '../src/utils/database/storage';
-import { eOnLoadNote } from '../src/utils/events';
-import { sleep } from '../src/utils/time';
+import Editor from '../app/screens/editor';
+import { eSendEvent } from '../app/services/event-manager';
+import { getElevation } from '../app/utils';
+import { db } from '../app/common/database';
+import Storage from '../app/common/database/storage';
+import { eOnLoadNote } from '../app/utils/events';
 import { Search } from './search';
 import { useShareStore } from './store';
 const getLinkPreview = url => {

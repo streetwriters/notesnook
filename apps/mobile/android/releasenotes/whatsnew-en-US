@@ -1,7 +1,0 @@
-- Added /date, /time & /now shortcuts in editor
-- Fix exporting to markdown not working
-- Fix app crashes after export on some devices
-- Fix glitches when opening note widget
-- Fix + button in header not working on tablets
-
-Thank you for using Notesnook!

@@ -7,9 +7,14 @@
 build_cache/
 .yarnrc
 .npmrc
+yarnrc.yml
+.yarn
+artifacts/
 
 # Xcode
 #
+native/ios/Pods
+native/ios/DerivedData
 build/
 *.pbxuser
 !default.pbxuser

@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getElevation } from '../src/utils';
-import { db } from '../src/utils/database';
+import { getElevation } from '../app/utils';
+import { db } from '../app/common/database';
 import { useShareStore } from './store';
 
 export const Search = ({ close, getKeyboardHeight, quicknote }) => {

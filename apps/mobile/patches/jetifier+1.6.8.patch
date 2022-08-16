@@ -1,0 +1,44 @@
+diff --git a/node_modules/jetifier/CHANGELOG.md b/node_modules/jetifier/CHANGELOG.md
+index 98ea607..4b64dd1 100644
+--- a/node_modules/jetifier/CHANGELOG.md
++++ b/node_modules/jetifier/CHANGELOG.md
+@@ -1,9 +1,5 @@
+ # Changelog
+ 
+-## 2.0.0
+-
+-- this is equivalent to version 1.6.7. No functional change, but it emits deprecation on console.warn
+-
+ ## 1.6.8
+ 
+ - revert deprecation notice.
+diff --git a/node_modules/jetifier/index.js b/node_modules/jetifier/index.js
+index a8431a2..ed609e9 100644
+--- a/node_modules/jetifier/index.js
++++ b/node_modules/jetifier/index.js
+@@ -6,12 +6,11 @@ const cpus = require('os').cpus().length;
+ 
+ const arg = process.argv.slice(2)[0];
+ const mode = arg && ((arg === 'reverse') || (arg === '-r')) ? 'reverse' : 'forward';
+-const SEARCH_DIR = 'node_modules';
++const SEARCH_DIR = '../node_modules';
+ 
+ const classesMapping = getClassesMapping();
+ const files = readDir(SEARCH_DIR);
+ 
+-console.warn('Jetifier is deprecated. Future versions of react-native CLI may not run it by default.')
+ console.log(`Jetifier found ${files.length} file(s) to ${mode}-jetify. Using ${cpus} workers...`);
+ 
+ for (const filesChunk of chunk(files, cpus)) {
+diff --git a/node_modules/jetifier/src/worker.js b/node_modules/jetifier/src/worker.js
+index 1ebc758..10e42cc 100644
+--- a/node_modules/jetifier/src/worker.js
++++ b/node_modules/jetifier/src/worker.js
+@@ -6,7 +6,6 @@ process.on('message', ({ filesChunk, classesMapping, mode }) => {
+     let data = readFileSync(file, { encoding: 'utf8' });
+     for (const [oldClass, newClass] of classesMapping) {
+       if (data.includes(mode === 'forward' ? oldClass : newClass)) {
+-        console.warn(`Jetifier: propose an AndroidX conversion PR to this repository: ${file}`)
+         data = mode === 'forward' ?
+           data.replace(new RegExp(oldClass, 'g'), newClass) :
+           data.replace(new RegExp(newClass, 'g'), oldClass);
