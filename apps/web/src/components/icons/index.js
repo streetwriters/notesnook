@@ -156,6 +156,7 @@ import {
   mdiArrowCollapseHorizontal,
   mdiSpeedometer,
   mdiFormatLineSpacing,
+  mdiCalendarClockOutline,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -386,4 +387,5 @@ export const References = createIcon(mdiVectorLink);
 export const Codeblock = createIcon(mdiCodeBraces);
 export const Resize = createIcon(mdiArrowCollapseHorizontal);
 export const Performance = createIcon(mdiSpeedometer);
+export const Date = createIcon(mdiCalendarClockOutline);
 export const LineSpacing = createIcon(mdiFormatLineSpacing);
