@@ -43,6 +43,7 @@ function Title({
         fontFamily: "Open Sans",
         backgroundColor: "transparent",
         color: "var(--nn_heading)",
+        caretColor: "var(--nn_accent)",
       }}
       maxLength={150}
       onChange={(event) => {

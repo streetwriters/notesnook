@@ -184,6 +184,7 @@ const ContentDiv = memo(
           flex: 1,
           color: theme.pri,
           marginTop: -12,
+          caretColor: theme.accent,
         }}
       />
     );
