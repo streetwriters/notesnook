@@ -98,7 +98,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
   const panesRef = useRef();
 
   useEffect(() => {
-    panesRef.current.reset();
+    setIsNarrow(isTablet);
   }, [isTablet]);
 
   return (
@@ -120,7 +120,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
           <Allotment.Pane
             className="pane nav-pane"
             minSize={50}
-            preferredSize={paneSizes[0]}
+            preferredSize={isTablet ? 50 : paneSizes[0]}
             visible={!isFocusMode}
           >
             <Flex sx={{ overflow: "hidden", flex: 1 }}>
@@ -131,7 +131,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
                   toggleNavigationContainer: (state) => {
                     setShow(state || !show);
                   },
-                  isTablet: isTablet || isNarrow,
+                  isTablet: isNarrow,
                 }}
                 fallback={<NavigationLoader />}
               />

@@ -4,6 +4,7 @@ import BaseStore from "./index";
 import { AppEventManager, AppEvents } from "../common/app-events";
 import { store as editorStore } from "./editor-store";
 import { checkAttachment } from "../common/attachments";
+import { showToast } from "../utils/toast";
 
 class AttachmentStore extends BaseStore {
   attachments = [];
@@ -55,11 +56,8 @@ class AttachmentStore extends BaseStore {
         this._changeWorkingStatus(index, false, success ? null : failed);
       } catch (e) {
         console.error(e);
-        this._changeWorkingStatus(
-          index,
-          false,
-          `Rechecking failed: ${e.message}`
-        );
+        this._changeWorkingStatus(index, false, false);
+        showToast("error", `Rechecking failed: ${e.message}`);
       }
     }
   };
@@ -90,7 +88,9 @@ class AttachmentStore extends BaseStore {
       }
     } catch (e) {
       console.error(e);
-      this._changeWorkingStatus(index, false, `Failed to delete: ${e.message}`);
+      this._changeWorkingStatus(index, false, false);
+      showToast("error", `Failed to delete: ${e.message}`);
+      throw e;
     }
   };
 

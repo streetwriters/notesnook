@@ -68,13 +68,11 @@ export default function EditorManager({
   const title = useRef<string>("");
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
-  const editor = useEditorInstance();
 
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
-  const isReadonly = useStore(
-    (store) => store.session.readonly || !!previewSession.current
-  );
+  const isReadonly = useStore((store) => store.session.readonly);
+  const isPreviewSession = !!previewSession.current;
 
   const openSession = useCallback(async (noteId) => {
     await editorstore.get().openSession(noteId);
@@ -116,7 +114,7 @@ export default function EditorManager({
     if (!isOldSession) return;
 
     openSession(noteId);
-  }, [openSession, noteId, isOldSession]);
+  }, [openSession, noteId, isOldSession, isReadonly]);
 
   return (
     <Flex
@@ -128,19 +126,6 @@ export default function EditorManager({
         position: "relative",
         alignSelf: "stretch",
         overflow: "hidden",
-      }}
-      onPaste={async (event) => {
-        if (!editor) return;
-
-        if (event.clipboardData?.files?.length) {
-          event.preventDefault();
-          for (let file of event.clipboardData.files) {
-            const result = await attachFile(file);
-            if (!result) continue;
-
-            editor.attachFile(result);
-          }
-        }
       }}
     >
       {previewSession.current && (
@@ -154,7 +139,7 @@ export default function EditorManager({
         title={title.current}
         content={content.current}
         options={{
-          readonly: isReadonly,
+          readonly: isReadonly || isPreviewSession,
           onRequestFocus: () => toggleProperties(false),
           onLoadMedia: loadMedia,
         }}
@@ -198,12 +183,12 @@ export function Editor(props: EditorProps) {
   const editor = useEditorInstance();
 
   useEffect(() => {
-    if (!editor) return;
+    if (!editor.current) return;
 
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total, type }: AttachmentProgress) => {
-        editor.sendAttachmentProgress(
+        editor.current?.sendAttachmentProgress(
           hash,
           type,
           Math.round((loaded / total) * 100)
@@ -223,7 +208,7 @@ export function Editor(props: EditorProps) {
         src: string;
       }) => {
         if (groupId?.startsWith("monograph")) return;
-        editor.loadImage(hash, src);
+        editor.current?.loadImage(hash, src);
       }
     );
 
@@ -254,8 +239,13 @@ export function Editor(props: EditorProps) {
           const mime = type === "file" ? "*/*" : "image/*";
           insertAttachment(mime).then((file) => {
             if (!file) return;
-            editor?.attachFile(file);
+            editor.current?.attachFile(file);
           });
+        }}
+        onAttachFile={async (file) => {
+          const result = await attachFile(file);
+          if (!result) return;
+          editor.current?.attachFile(result);
         }}
       />
     </EditorChrome>
@@ -425,7 +415,7 @@ function DropZone(props: DropZoneProps) {
         for (let file of e.dataTransfer.files) {
           const result = await attachFile(file);
           if (!result) continue;
-          editor.attachFile(result);
+          editor.current?.attachFile(result);
         }
       }}
     >

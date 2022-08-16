@@ -1,8 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { IEditor, NoteStatistics } from "./types";
 import createStore from "../../common/store";
 import BaseStore from "../../stores";
-import { UseStore } from "zustand";
+import { UseBoundStore } from "zustand";
 import shallow from "zustand/shallow";
 import type { ToolbarDefinition } from "@streetwriters/editor";
 
@@ -31,12 +31,17 @@ class EditorContext extends BaseStore {
 }
 
 const [useEditorContext] = createStore(EditorContext) as [
-  UseStore<EditorContext>,
+  UseBoundStore<EditorContext>,
   EditorContext
 ];
 
 export function useEditorInstance() {
-  return useEditorContext((store) => store.subState.editor);
+  const editor = useEditorContext((store) => store.subState.editor);
+  const editorRef = useRef(editor);
+  useEffect(() => {
+    editorRef.current = editor;
+  }, [editor]);
+  return editorRef;
 }
 
 export function useConfigureEditor() {

@@ -72,30 +72,18 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            icon: Icon.Performance,
-            title: "Improved editor performance for large notes",
-            subtitle:
-              "For notes >200k words the performance should be much better (we're still not done optimizing so hang tight).",
-          },
-          {
-            icon: Icon.LineSpacing,
-            title: "Single/double line spacing",
+            icon: Icon.Date,
+            title: "Shortcuts for adding current date in a note",
             subtitle: (
               <>
-                You can now configure if you want to use single or double spaced
-                lines by going into <Code text="Settings > Editor settings" />.
-              </>
-            ),
-          },
-          {
-            icon: Icon.ImageMultiple,
-            title: "Image compression disabled",
-            subtitle: (
-              <>
-                Image compression has been fully disabled. All new images
-                attached will be in their original quality. (Do note that adding
-                too many high quality images will have negative impact on
-                performance.)
+                You can now use <Code text="Alt+d" /> or type{" "}
+                <Code text="/date" />
+                to add current date directly in a note.
+                <br />
+                To add current time, use <Code text="Alt+t" /> or type{" "}
+                <Code text="/time" />.<br />
+                To add current date <em>and time</em> use{" "}
+                <Code text="Ctrl+Alt+d" /> or just type <Code text="/now" />.
               </>
             ),
           },

@@ -33,11 +33,13 @@ type TipTapProps = {
   onChange?: (content: string) => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
+  onAttachFile?: (file: File) => void;
   onFocus?: () => void;
   content?: string;
   toolbarContainerId?: string;
   readonly?: boolean;
   nonce?: number;
+  theme: Theme;
 };
 
 function TipTap(props: TipTapProps) {
@@ -46,15 +48,16 @@ function TipTap(props: TipTapProps) {
     onChange,
     onInsertAttachment,
     onDownloadAttachment,
+    onAttachFile,
     onFocus = () => {},
     content,
     toolbarContainerId,
     editorContainer,
     readonly,
     nonce,
+    theme,
   } = props;
 
-  const theme: Theme = useTheme();
   const isUserPremium = useIsUserPremium();
   const isMobile = useMobile();
   const configure = useConfigureEditor();
@@ -75,6 +78,18 @@ function TipTap(props: TipTapProps) {
 
   const editor = useTiptap(
     {
+      editorProps: {
+        handlePaste: (view, event) => {
+          if (event.clipboardData?.files?.length && onAttachFile) {
+            event.preventDefault();
+            event.stopPropagation();
+            for (let file of event.clipboardData.files) {
+              onAttachFile(file);
+            }
+            return true;
+          }
+        },
+      },
       doubleSpacedLines,
       isKeyboardOpen: true,
       isMobile: isMobile || false,
@@ -199,7 +214,8 @@ function TipTap(props: TipTapProps) {
   );
 }
 
-function TiptapWrapper(props: Omit<TipTapProps, "editorContainer">) {
+function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
+  const theme: Theme = useTheme();
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>();
   useEffect(() => {
@@ -210,7 +226,11 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer">) {
     <PortalProvider>
       <Flex sx={{ flex: 1, flexDirection: "column" }}>
         {isReady && editorContainerRef.current ? (
-          <TipTap {...props} editorContainer={editorContainerRef.current} />
+          <TipTap
+            {...props}
+            editorContainer={editorContainerRef.current}
+            theme={theme}
+          />
         ) : null}
         <Box
           ref={editorContainerRef}
@@ -218,7 +238,7 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer">) {
           style={{
             flex: 1,
             cursor: "text",
-            color: "var(--text)", // TODO!
+            color: theme.colors.text, // TODO!
             paddingBottom: 150,
           }}
         />

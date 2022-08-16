@@ -304,7 +304,10 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
           p={1}
           sx={{ borderRadius: "default" }}
         >
-          Please sign up or login to use your coupon: <b>{couponCode}</b>
+          {user
+            ? "Please select a plan to use your coupon:"
+            : `Please sign up or login to use your coupon:`}{" "}
+          <b>{couponCode}</b>
         </Text>
       )}
     </>
@@ -326,6 +329,7 @@ function SelectedPlan(props: SelectedPlanProps) {
   ]);
 
   const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
+  const couponCode = useCheckoutStore((store) => store.couponCode);
   const couponInputRef = useRef<HTMLInputElement>();
 
   const applyCoupon = useCallback(() => {
@@ -347,9 +351,14 @@ function SelectedPlan(props: SelectedPlanProps) {
     const couponValue = couponInputRef.current.value;
 
     const isInvalidCoupon =
-      !!couponValue && couponValue !== pricingInfo?.coupon;
+      (!!couponValue && couponValue !== pricingInfo?.coupon) ||
+      (!!couponCode && couponCode !== pricingInfo?.coupon);
+
     setIsInvalidCoupon(isInvalidCoupon);
-    if (isInvalidCoupon) return;
+    if (isInvalidCoupon) {
+      if (couponCode) couponInputRef.current.value = couponCode;
+      return;
+    }
 
     const pricingInfoCoupon = pricingInfo?.coupon || "";
     if (couponValue !== pricingInfoCoupon) {

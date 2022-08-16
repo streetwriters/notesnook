@@ -13,6 +13,7 @@ import {
   showPromptDialog,
 } from "../../common/dialog-controller";
 import { hashNavigate } from "../../navigation";
+import { showToast } from "../../utils/toast";
 
 const workStatusMap = {
   recheck: "Rechecking...",
@@ -145,7 +146,12 @@ const menuItems = [
     items: ({ attachment }) =>
       attachment.noteIds.reduce((prev, curr) => {
         const note = db.notes.note(curr);
-        if (!note) prev.push({ key: curr, title: `Note with id ${curr}` });
+        if (!note)
+          prev.push({
+            key: curr,
+            title: `Note with id ${curr}`,
+            onClick: () => showToast("error", "This note does not exist."),
+          });
         else
           prev.push({
             key: note.id,

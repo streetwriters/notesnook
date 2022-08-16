@@ -103,7 +103,6 @@ async function deleteAttachments(attachments: any[]) {
           current: i,
           total: attachments.length,
         });
-        console.log(attachment);
         await attachmentStore.permanentDelete(attachment.metadata.hash);
       }
     },
