@@ -311,3 +311,21 @@ test("editing a note and switching immediately to another note and editing the t
     `fast-switch-and-edit-note-title-1.txt`
   );
 });
+
+test("editing a note and toggling read-only mode should show updated content", async () => {
+  const selector = await createNoteAndCheckPresence();
+
+  await page.click(getTestId("notes-action-button"));
+
+  await page.click(selector);
+
+  await editNote(null, `An edit I made`, false);
+
+  await page.click(getTestId("properties"));
+
+  await page.click(getTestId("properties-readonly"));
+
+  await page.click(getTestId("properties-close"));
+
+  expect(await getEditorContent()).toMatchSnapshot(`readonly-edited-note.txt`);
+});

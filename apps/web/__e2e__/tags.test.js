@@ -94,6 +94,8 @@ test("delete a tag", async ({ page }) => {
     await clickMenuItem("delete");
   });
 
+  await page.waitForTimeout(1000);
+
   expect(await page.isVisible(tagSelector.build())).toBe(false);
 });
 
@@ -220,6 +222,8 @@ test("delete the last note of a tag that is also a shortcut", async ({
   await useContextMenu(noteSelector, async () => {
     await clickMenuItem("movetotrash");
   });
+
+  await page.waitForTimeout(1000);
 
   expect(await page.isVisible(noteSelector)).toBe(false);
 

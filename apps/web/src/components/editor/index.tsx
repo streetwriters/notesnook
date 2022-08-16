@@ -68,13 +68,11 @@ export default function EditorManager({
   const title = useRef<string>("");
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
-  const editor = useEditorInstance();
 
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
-  const isReadonly = useStore(
-    (store) => store.session.readonly || !!previewSession.current
-  );
+  const isReadonly = useStore((store) => store.session.readonly);
+  const isPreviewSession = !!previewSession.current;
 
   const openSession = useCallback(async (noteId) => {
     await editorstore.get().openSession(noteId);
@@ -141,7 +139,7 @@ export default function EditorManager({
         title={title.current}
         content={content.current}
         options={{
-          readonly: isReadonly,
+          readonly: isReadonly || isPreviewSession,
           onRequestFocus: () => toggleProperties(false),
           onLoadMedia: loadMedia,
         }}
