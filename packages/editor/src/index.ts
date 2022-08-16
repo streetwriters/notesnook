@@ -52,6 +52,7 @@ import { Highlight } from "./extensions/highlight";
 import { Paragraph } from "./extensions/paragraph";
 import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
 import { Code } from "@tiptap/extension-code";
+import { DateTime } from "./extensions/date-time";
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
@@ -177,6 +178,7 @@ const useTiptap = (
         MathBlock,
         KeepInView,
         SelectionPersist,
+        DateTime,
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.portalProviderAPI = PortalProviderAPI;
