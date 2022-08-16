@@ -57,17 +57,6 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Deploy to Play Store (ALPHA)
-        id: deploy
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.streetwriters.notesnook
-          releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
-          track: production
-          status: completed
-          whatsNewDirectory: android/releasenotes/
-
       - name: Build Android App APKS
         run: |
           cd android && ENVFILE=.env.public ./gradlew assembleRelease --no-daemon
@@ -107,3 +96,14 @@ jobs:
             android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
             android/app/build/outputs/apk/release/notesnook-x86.apk
             android/app/build/outputs/apk/release/notesnook-x86_64.apk
+
+      - name: Deploy to Play Store (ALPHA)
+        id: deploy
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.streetwriters.notesnook
+          releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: production
+          status: completed
+          whatsNewDirectory: android/releasenotes/
