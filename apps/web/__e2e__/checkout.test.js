@@ -1,5 +1,5 @@
-const { Page, test, expect } = require("@playwright/test");
-const { getTestId, isTestAll, loginUser } = require("./utils");
+const { test, expect } = require("@playwright/test");
+const { getTestId, loginUser } = require("./utils");
 
 test.setTimeout(45 * 1000);
 /**
@@ -13,8 +13,6 @@ test.beforeEach(async ({ page: _page, baseURL }) => {
   await page.goto(baseURL);
   await page.waitForSelector(getTestId("routeHeader"));
 });
-
-if (!isTestAll()) test.skip();
 
 const plans = [
   { key: "monthly", title: "Monthly", coupon: "INTRO50" },
@@ -122,7 +120,9 @@ test("change plans", async ({ page }, info) => {
   });
 });
 
-test("confirm plan prices", async ({ page }) => {
+test("confirm plan prices", async ({ page }, info) => {
+  info.setTimeout(0);
+
   await loginUser();
 
   await page.goto("/#/buy/");
@@ -158,10 +158,10 @@ test("changing locale should show localized prices", async ({ page }, info) => {
   });
 });
 
-test("applying coupon should change discount & total price", async ({ page }, {
-  setTimeout,
-}) => {
-  setTimeout(0);
+test("applying coupon should change discount & total price", async ({
+  page,
+}, info) => {
+  info.setTimeout(0);
 
   await loginUser();
 
@@ -191,8 +191,8 @@ test("applying coupon should change discount & total price", async ({ page }, {
   });
 });
 
-test("apply coupon through url", async ({ page }, { setTimeout }) => {
-  setTimeout(0);
+test("apply coupon through url", async ({ page }, info) => {
+  info.setTimeout(0);
   await loginUser();
 
   for (let plan of plans) {
@@ -211,10 +211,8 @@ test("apply coupon through url", async ({ page }, { setTimeout }) => {
   }
 });
 
-test("apply coupon after changing country", async ({ page }, {
-  setTimeout,
-}) => {
-  setTimeout(0);
+test("apply coupon after changing country", async ({ page }, info) => {
+  info.setTimeout(0);
 
   await loginUser();
 
