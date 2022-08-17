@@ -38,8 +38,54 @@ The app codebase is distributed over two primary directories. `native/` and `app
 
 There are several other folders at the root:
 
-- `share/`: Code for the Share Extension and Android widget.
+- `share/`: Code for the iOS Share Extension and Android widget.
 - `e2e/`: Detox End to end tests
 - `patches/`: Patches for various react native dependencies.
 
-## Running the app locally
+## Setting up development environment
+
+To run the app locally, you will first have to configure react native on your machine. Follow the [guide](https://reactnative.dev/docs/environment-setup) here and select React Native CLI Quickstart. Expo is not supported.
+
+Once you have completed the configuration, follow the steps below to run the app locally.
+
+Install yarn 2 in the project.
+
+```bash
+npm install -g yarn
+```
+
+and then run:
+
+```bash
+yarn set version berry
+```
+
+Open `.yarnrc.yml` and add the following line at the top:
+
+```yml
+nodeLinker: node-modules
+```
+
+Install the dependencies
+
+```bash
+yarn install
+```
+
+## Running the app on Android
+
+[Setup an android emulator from Android studio](https://developer.android.com/studio/run/managing-avds) if you haven't already and run the following command from project root.
+
+```
+yarn run-android
+```
+
+If you want to run the app on your phone, make sure to [enable USB debugging](https://developer.android.com/studio/debug/dev-options).
+
+## Running the app on iOS
+
+To run the app on iOS, simply run the following command from project root.
+
+```
+yarn run-ios
+```
