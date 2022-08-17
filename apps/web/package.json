@@ -16,7 +16,7 @@
     "@notesnook/crypto": "^1.0.0",
     "@notesnook/desktop": "file:desktop",
     "@rebass/forms": "^4.0.6",
-    "@streetwriters/editor": "^1.3.0",
+    "@streetwriters/editor": "^1.3.1",
     "@streetwriters/notesnook-core": "^7.3.6",
     "@streetwriters/theme": "^1.0.1",
     "allotment": "^1.12.1",
