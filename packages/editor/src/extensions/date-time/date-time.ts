@@ -77,7 +77,7 @@ export const DateTime = Extension.create({
 });
 
 function currentTime() {
-  return new Date().toLocaleTimeString(undefined, {
+  return new Date().toLocaleTimeString("en-US", {
     second: undefined,
     minute: "2-digit",
     hour12: true,
@@ -86,19 +86,18 @@ function currentTime() {
 }
 
 function currentDateTime() {
-  return new Date().toLocaleString(undefined, {
-    second: undefined,
-    hour12: true,
-    hour: "2-digit",
-    minute: "2-digit",
-    day: "2-digit",
-    year: "numeric",
-    month: "2-digit",
-  });
+  return `${getISO8601Date()}, ${currentTime()}`;
 }
 
 function currentDate() {
-  return new Date().toLocaleDateString();
+  return getISO8601Date();
+}
+
+function getISO8601Date(): string {
+  const year = new Date().getFullYear();
+  const month = new Date().getMonth();
+  const day = new Date().getDate();
+  return `${year}-${month}-${day}`;
 }
 
 function shortcutInputRule(config: {
