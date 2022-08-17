@@ -74,7 +74,13 @@ yarn install
 
 ## Running the app on Android
 
-[Setup an android emulator from Android studio](https://developer.android.com/studio/run/managing-avds) if you haven't already and run the following command from project root.
+[Setup an android emulator from Android studio](https://developer.android.com/studio/run/managing-avds) if you haven't already and run the following command from `native/` folder.
+
+```
+cd native
+```
+
+and
 
 ```
 yarn run-android
@@ -84,7 +90,13 @@ If you want to run the app on your phone, make sure to [enable USB debugging](ht
 
 ## Running the app on iOS
 
-To run the app on iOS, simply run the following command from project root.
+To run the app on iOS, simply run the following command from `native/` folder.
+
+```
+cd native
+```
+
+and
 
 ```
 yarn run-ios

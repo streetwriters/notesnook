@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "postinstall": "yarn patch-package",
-    "patch-lib": "./scripts/patch-package.sh"
+    "patch-lib": "./scripts/patch-package.sh",
+    "run-android": "cd native && REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ react-native run-android --active-arch-only",
+    "run-ios": "cd native && react-native run-ios"
   },
   "packageManager": "yarn@3.2.2",
   "devDependencies": {

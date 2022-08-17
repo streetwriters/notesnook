@@ -1,11 +1,11 @@
 {
   "name": "native",
   "private": true,
-  "main": "./index.js",
+  "main": "index.js",
   "scripts": {
     "run-android": "REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ react-native run-android --active-arch-only",
     "release": "react-native run-android --variant=release",
-    "ios": "react-native run-ios",
+    "run-ios": "react-native run-ios",
     "start": "react-native start",
     "repack": "react-native webpack-start",
     "test": "jest --forceExit",
@@ -31,7 +31,7 @@
     "@sayem314/react-native-keep-awake": "^1.0.4",
     "deprecated-react-native-prop-types": "^2.3.0",
     "react": "18.0.0",
-    "react-native": "latest",
+    "react-native": "0.69.4",
     "react-native-background-actions": "^2.6.6",
     "react-native-begin-background-task": "https://github.com/blockfirm/react-native-begin-background-task.git",
     "react-native-bootsplash": "^4.1.4",

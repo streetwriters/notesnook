@@ -1,15 +1,17 @@
+.yarnrc.yml
+artifacts/
 # OSX
 #
 .DS_Store
 
 *Issues.md
-
 build_cache/
+#
 .yarnrc
 .npmrc
-yarnrc.yml
+.yarnrc.yml
 .yarn
-artifacts/
+
 
 # Xcode
 #
