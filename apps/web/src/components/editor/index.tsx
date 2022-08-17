@@ -183,8 +183,6 @@ export function Editor(props: EditorProps) {
   const editor = useEditorInstance();
 
   useEffect(() => {
-    if (!editor.current) return;
-
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, loaded, total, type }: AttachmentProgress) => {
