@@ -1,5 +1,5 @@
 import React from "react";
-import useHashRoutes from "../../utils/use-hash-routes";
+import useHashRoutes from "../../hooks/use-hash-routes";
 import hashroutes from "../../navigation/hash-routes";
 
 function HashRouter() {

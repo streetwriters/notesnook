@@ -3,7 +3,7 @@ import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";
 import { hashNavigate } from "../navigation";
-import useNavigate from "../utils/use-navigate";
+import useNavigate from "../hooks/use-navigate";
 
 function Notebooks() {
   useNavigate("notebooks", () => store.refresh());

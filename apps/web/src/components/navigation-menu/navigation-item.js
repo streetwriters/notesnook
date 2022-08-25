@@ -1,7 +1,7 @@
 import { Button, Flex, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useMenuTrigger } from "../../hooks/use-menu";
-import useMobile from "../../utils/use-mobile";
+import useMobile from "../../hooks/use-mobile";
 import * as Icons from "../icons";
 
 function NavigationItem(props) {

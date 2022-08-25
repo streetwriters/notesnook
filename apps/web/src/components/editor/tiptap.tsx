@@ -15,7 +15,7 @@ import {
 } from "@streetwriters/editor";
 import { Box, Flex } from "rebass";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
-import useMobile from "../../utils/use-mobile";
+import useMobile from "../../hooks/use-mobile";
 import { Attachment } from "./picker";
 import { IEditor } from "./types";
 import { useConfigureEditor, useSearch, useToolbarConfig } from "./context";

@@ -209,6 +209,7 @@ function Details(props: DetailsProps) {
     return (
       <PaddleCheckout
         plan={selectedPlan}
+        // @ts-ignore TODO
         theme={theme}
         user={user}
         coupon={couponCode}

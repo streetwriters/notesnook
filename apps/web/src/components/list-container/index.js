@@ -11,7 +11,7 @@ import ListProfiles from "../../common/list-profiles";
 import { CustomScrollbarsVirtualList } from "../scroll-container";
 import ReminderBar from "../reminder-bar";
 import Announcements from "../announcements";
-import useAnnouncements from "../../utils/use-announcements";
+import useAnnouncements from "../../hooks/use-announcements";
 import { ListLoader } from "../loaders/list-loader";
 
 function ListContainer(props) {

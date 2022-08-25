@@ -5,7 +5,7 @@ import {
   Image as RebassImage,
   Text as RebassText,
 } from "rebass";
-import { allowedPlatforms } from "../../utils/use-announcements";
+import { allowedPlatforms } from "../../hooks/use-announcements";
 import {
   closeOpenedDialog,
   showBuyDialog,

@@ -2,7 +2,7 @@ import React from "react";
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/tag-store";
 import TagsPlaceholder from "../components/placeholders/tags-placeholder";
-import useNavigate from "../utils/use-navigate";
+import useNavigate from "../hooks/use-navigate";
 
 function Tags() {
   useNavigate("tags", () => store.refresh());

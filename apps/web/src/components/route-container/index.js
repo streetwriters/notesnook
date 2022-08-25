@@ -3,7 +3,7 @@ import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore } from "../../stores/app-store";
 import { CREATE_BUTTON_MAP } from "../../common";
-import useMobile from "../../utils/use-mobile";
+import useMobile from "../../hooks/use-mobile";
 import { navigate } from "../../navigation";
 import { Input } from "@rebass/forms";
 

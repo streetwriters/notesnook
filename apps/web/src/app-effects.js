@@ -12,7 +12,7 @@ import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
-import useAnnouncements from "./utils/use-announcements";
+import useAnnouncements from "./hooks/use-announcements";
 import {
   showAnnouncementDialog,
   showBuyDialog,
@@ -20,7 +20,7 @@ import {
   showInvalidSystemTimeDialog,
   showOnboardingDialog,
 } from "./common/dialog-controller";
-import useSystemTheme from "./utils/use-system-theme";
+import useSystemTheme from "./hooks/use-system-theme";
 import { isTesting } from "./utils/platform";
 import { updateStatus, removeStatus, getStatus } from "./hooks/use-status";
 import { showToast } from "./utils/toast";

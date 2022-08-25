@@ -20,7 +20,7 @@ import { AnimatedFlex } from "../animated";
 import NavigationItem from "./navigation-item";
 import { hardNavigate, navigate } from "../../navigation";
 import { db } from "../../common/db";
-import useMobile from "../../utils/use-mobile";
+import useMobile from "../../hooks/use-mobile";
 import { showRenameColorDialog } from "../../common/dialog-controller";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";

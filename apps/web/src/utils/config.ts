@@ -4,9 +4,9 @@ function set<T>(key: string, value: T) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
-function get<T>(key: string, def?: T) {
+function get<T>(key: string, def?: T): T {
   const value = window.localStorage.getItem(key);
-  if (!value) return def;
+  if (!value && def) return def;
 
   return tryParse(value);
 }

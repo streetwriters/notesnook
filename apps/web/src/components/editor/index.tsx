@@ -22,7 +22,7 @@ import { DropEvent } from "react-dropzone";
 import { downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import { db } from "../../common/db";
-import useMobile from "../../utils/use-mobile";
+import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
 
 type PreviewSession = {

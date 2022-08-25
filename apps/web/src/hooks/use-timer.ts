@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useSessionState } from "../utils/hooks";
+import { useSessionState } from "./use-session-state";
 
 export function useTimer(id: string, duration: number) {
   const [seconds, setSeconds] = useSessionState(id, duration);
@@ -9,7 +9,7 @@ export function useTimer(id: string, duration: number) {
   useEffect(() => {
     if (!enabled) {
       interval.current = setInterval(() => {
-        setSeconds((seconds: number) => {
+        setSeconds((seconds) => {
           --seconds;
           if (seconds <= 0) {
             setEnabled(true);

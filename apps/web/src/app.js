@@ -1,8 +1,8 @@
 import React, { useState, Suspense, useMemo, useRef, useEffect } from "react";
 import { Box, Flex } from "rebass";
 import ThemeProvider from "./components/theme-provider";
-import useMobile from "./utils/use-mobile";
-import useTablet from "./utils/use-tablet";
+import useMobile from "./hooks/use-mobile";
+import useTablet from "./hooks/use-tablet";
 import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
 import { Allotment } from "allotment";

@@ -4,7 +4,7 @@ import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { db } from "../common/db";
 import { hashNavigate } from "../navigation";
-import useNavigate from "../utils/use-navigate";
+import useNavigate from "../hooks/use-navigate";
 
 function Home() {
   useStore((store) => store.nonce);

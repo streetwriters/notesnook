@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { getHomeRoute, NavigationEvents } from "../../navigation";
 import { store as selectionStore } from "../../stores/selection-store";
-import useRoutes from "../../utils/use-routes";
+import useRoutes from "../../hooks/use-routes";
 import RouteContainer from "../route-container";
 import ThemeProvider from "../theme-provider";
 import routes from "../../navigation/routes";

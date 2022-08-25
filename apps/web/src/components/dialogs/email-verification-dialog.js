@@ -4,7 +4,7 @@ import Dialog from "./dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
 import { useState } from "react";
-import { useSessionState } from "../../utils/hooks";
+import { useSessionState } from "../../hooks/use-session-state";
 import Accordion from "../accordion";
 
 var interval = 0;

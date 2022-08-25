@@ -26,7 +26,7 @@ import {
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
 import { db } from "../common/db";
-import { usePersistentState } from "../utils/hooks";
+import { usePersistentState } from "../hooks/use-persistent-state";
 import dayjs from "dayjs";
 import ScrollContainer from "../components/scroll-container";
 import { showToast } from "../utils/toast";

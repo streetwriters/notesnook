@@ -16,7 +16,7 @@ import { Features } from "../announcements/body";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { TaskManager } from "../../common/task-manager";
 import { db } from "../../common/db";
-import { usePersistentState } from "../../utils/hooks";
+import { usePersistentState } from "../../hooks/use-persistent-state";
 import AccentItem from "../accent-item";
 import { useCallback, useState } from "react";
 import Config from "../../utils/config";

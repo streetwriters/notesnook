@@ -5,7 +5,7 @@ import { db } from "../../common/db";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import { useStore as useNoteStore } from "../../stores/note-store";
 import { useStore as useNotebookStore } from "../../stores/notebook-store";
-import useMobile from "../../utils/use-mobile";
+import useMobile from "../../hooks/use-mobile";
 
 const groupByToTitleMap = {
   [undefined]: "Default",

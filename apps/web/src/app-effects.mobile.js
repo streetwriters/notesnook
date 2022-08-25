@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useStore } from "./stores/app-store";
 import useSlider from "./hooks/use-slider";
-import useMobile from "./utils/use-mobile";
-import useTablet from "./utils/use-tablet";
+import useMobile from "./hooks/use-mobile";
+import useTablet from "./hooks/use-tablet";
 
 export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
   const isMobile = useMobile();

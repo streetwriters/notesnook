@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { Text, Flex, Button, Box } from "rebass";
-import { useSessionState } from "../../../utils/hooks";
+import { useSessionState } from "../../../hooks/use-session-state";
 import {
   Loading,
   MFAAuthenticator,
@@ -37,7 +37,9 @@ import {
   StepComponentProps,
 } from "./types";
 import { showMultifactorDialog } from "../../../common/dialog-controller";
-const QRCode = React.lazy(() => import("../../../re-exports/react-qrcode-logo"));
+const QRCode = React.lazy(
+  () => import("../../../re-exports/react-qrcode-logo")
+);
 
 export type Steps = typeof steps;
 export type FallbackSteps = typeof fallbackSteps;

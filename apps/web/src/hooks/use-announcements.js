@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { db } from "../common/db";
-import Config from "./config";
+import Config from "../utils/config";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import { appVersion } from "./version";
+import { appVersion } from "../utils/version";
 
 var CACHED_ANNOUNCEMENTS = [];
 var cancelled = false;
