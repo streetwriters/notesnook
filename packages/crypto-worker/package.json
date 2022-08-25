@@ -1,5 +1,5 @@
 {
-  "name": "nncryptoworker",
+  "name": "@notesnook/crypto-worker",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
@@ -11,8 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@notesnook/crypto": "^1.0.0",
-    "comlink": "^4.3.1",
-    "streamablefs": "file:../streamablefs"
+    "comlink": "^4.3.1"
   },
   "devDependencies": {
     "typescript": "^4.4.3"

@@ -3,7 +3,7 @@ import localforage from "localforage";
 import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios from "axios";
 import { AppEventManager, AppEvents } from "../common/app-events";
-import { StreamableFS } from "streamablefs";
+import { StreamableFS } from "@notesnook/streamable-fs";
 import { getNNCrypto } from "./nncrypto.stub";
 import hosts from "@streetwriters/notesnook-core/utils/constants";
 import { sendAttachmentsProgressEvent } from "@streetwriters/notesnook-core/common";

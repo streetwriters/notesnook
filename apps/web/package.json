@@ -35,7 +35,7 @@
     "localforage": "^1.10.0",
     "localforage-driver-memory": "^1.0.5",
     "localforage-getitems": "https://github.com/thecodrr/localForage-getItems.git",
-    "nncryptoworker": "file:packages/nncryptoworker",
+    "@notesnook/crypto-worker": "file:../../packages/crypto-worker",
     "phone": "^3.1.14",
     "platform": "^1.3.6",
     "print-js": "^1.6.0",
@@ -54,7 +54,7 @@
     "react-virtuoso": "^2.4.0",
     "rebass": "^4.0.7",
     "showdown": "github:thecodrr/showdown",
-    "streamablefs": "file:packages/streamablefs",
+    "@notesnook/streamable-fs": "file:../../packages/streamable-fs",
     "timeago.js": "^4.0.2",
     "web-streams-polyfill": "^3.1.1",
     "wouter": "^2.7.3",
@@ -96,7 +96,6 @@
     "zx": "^2.0.0"
   },
   "scripts": {
-    "preinstall": "./scripts/build-deps.sh",
     "start": "env-cmd -e all,dev,web react-scripts start",
     "start:desktop": "env-cmd -e all,desktop react-scripts start",
     "build": "env-cmd -e all,web react-scripts --max_old_space_size=8092 build",
