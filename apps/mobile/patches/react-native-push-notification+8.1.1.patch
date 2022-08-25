@@ -1,0 +1,46 @@
+diff --git a/node_modules/react-native-push-notification/android/src/main/java/com/dieam/reactnativepushnotification/modules/RNPushNotificationHelper.java b/node_modules/react-native-push-notification/android/src/main/java/com/dieam/reactnativepushnotification/modules/RNPushNotificationHelper.java
+index 248ff08..ff198d5 100644
+--- a/node_modules/react-native-push-notification/android/src/main/java/com/dieam/reactnativepushnotification/modules/RNPushNotificationHelper.java
++++ b/node_modules/react-native-push-notification/android/src/main/java/com/dieam/reactnativepushnotification/modules/RNPushNotificationHelper.java
+@@ -56,11 +56,12 @@ public class RNPushNotificationHelper {
+     private Context context;
+     private RNPushNotificationConfig config;
+     private final SharedPreferences scheduledNotificationsPersistence;
+-
++    private int FLAG_MUTABLE = 1<<25;
+     public RNPushNotificationHelper(Application context) {
+         this.context = context;
+         this.config = new RNPushNotificationConfig(context);
+         this.scheduledNotificationsPersistence = context.getSharedPreferences(RNPushNotificationHelper.PREFERENCES_KEY, Context.MODE_PRIVATE);
++
+     }
+ 
+     public Class getMainActivityClass() {
+@@ -455,6 +456,7 @@ public class RNPushNotificationHelper {
+ 
+             int notificationID = Integer.parseInt(notificationIdString);
+ 
++
+             PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationID, intent,
+                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT);
+ 
+@@ -533,7 +535,18 @@ public class RNPushNotificationHelper {
+                         intent.putExtra("message_id", messageId);
+                     }
+ 
+-                    int flags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
++                    int flags = PendingIntent.FLAG_UPDATE_CURRENT;
++
++                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
++                        if(action.equals("ReplyInput") ) {
++                            if (Build.VERSION.SDK_INT == 31) {
++                                flags = PendingIntent.FLAG_UPDATE_CURRENT | FLAG_MUTABLE;
++                            }
++                        }
++                        else {
++                            flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
++                        }
++                    }
+ 
+                     PendingIntent pendingActionIntent = PendingIntent.getBroadcast(context, notificationID, actionIntent, flags);
+ 

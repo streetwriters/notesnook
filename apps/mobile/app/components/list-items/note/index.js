@@ -1,0 +1,284 @@
+import { decode, EntityLevel } from 'entities';
+import React from 'react';
+import { View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../../e2e/test.ids';
+import { TaggedNotes } from '../../../screens/notes/tagged';
+import { TopicNotes } from '../../../screens/notes/topic-notes';
+import useNavigationStore from '../../../stores/use-navigation-store';
+import { useSettingStore } from '../../../stores/use-setting-store';
+import { useThemeStore } from '../../../stores/use-theme-store';
+import { COLORS_NOTE } from '../../../utils/color-scheme';
+import { db } from '../../../common/database';
+import { SIZE } from '../../../utils/size';
+import { Properties } from '../../properties';
+import { Button } from '../../ui/button';
+import { IconButton } from '../../ui/icon-button';
+import { TimeSince } from '../../ui/time-since';
+import Heading from '../../ui/typography/heading';
+import Paragraph from '../../ui/typography/paragraph';
+
+const navigateToTopic = topic => {
+  TopicNotes.navigate(topic, true);
+};
+
+function navigateToTag(item) {
+  const tag = db.tags.tag(item.id);
+  if (!tag) return;
+  TaggedNotes.navigate(tag, true);
+}
+
+const showActionSheet = item => {
+  Properties.present(item);
+};
+
+function getNotebook(item) {
+  const isTrash = item.type === 'trash';
+  if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
+  const currentScreen = useNavigationStore.getState().currentScreen;
+  const filteredNotebooks = item.notebooks?.filter(n => n.id !== currentScreen.notebookId);
+  let item_notebook = filteredNotebooks?.length > 0 ? filteredNotebooks.slice(0, 1)[0] : null;
+  let notebook = item_notebook && db.notebooks.notebook(item_notebook.id);
+  if (!notebook) return [];
+  let topic = notebook.topics.topic(item_notebook.topics[0])?._topic;
+  if (!topic) return [];
+  notebook = notebook.data;
+  return [
+    {
+      title: `${notebook?.title} › ${topic?.title}`,
+      notebook: notebook,
+      topic: topic
+    }
+  ];
+}
+
+const NoteItem = ({ item, isTrash, tags, dateBy = 'dateCreated', noOpen = false }) => {
+  const colors = useThemeStore(state => state.colors);
+  const notesListMode = useSettingStore(state => state.settings.notesListMode);
+  const compactMode = notesListMode === 'compact';
+  const attachmentCount = db.attachments?.ofNote(item.id, 'all')?.length || 0;
+  const notebooks = React.useMemo(() => getNotebook(item), [item]);
+
+  return (
+    <>
+      <View
+        style={{
+          flexGrow: 1,
+          flexShrink: 1
+        }}
+      >
+        {!compactMode ? (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              zIndex: 10,
+              elevation: 10,
+              marginBottom: 2.5
+            }}
+          >
+            {notebooks.map(_item => (
+              <Button
+                title={_item.title}
+                key={_item}
+                height={20}
+                icon="book-outline"
+                type="grayBg"
+                fontSize={SIZE.xs}
+                iconSize={SIZE.sm}
+                textStyle={{
+                  marginRight: 0
+                }}
+                style={{
+                  borderRadius: 5,
+                  marginRight: 5,
+                  borderWidth: 0.5,
+                  borderColor: colors.icon,
+                  paddingHorizontal: 6
+                }}
+                onPress={() => navigateToTopic(_item.topic)}
+              />
+            ))}
+          </View>
+        ) : null}
+
+        <Heading
+          numberOfLines={1}
+          color={COLORS_NOTE[item.color?.toLowerCase()] || colors.heading}
+          style={{
+            flexWrap: 'wrap'
+          }}
+          size={SIZE.md}
+        >
+          {item.title}
+        </Heading>
+
+        {item.headline && !compactMode ? (
+          <Paragraph
+            style={{
+              flexWrap: 'wrap'
+            }}
+            numberOfLines={2}
+          >
+            {decode(item.headline, {
+              level: EntityLevel.HTML
+            })}
+          </Paragraph>
+        ) : null}
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            width: '100%',
+            marginTop: 5,
+            height: SIZE.md + 2
+          }}
+        >
+          {!isTrash ? (
+            <>
+              {item.conflicted ? (
+                <Icon
+                  name="alert-circle"
+                  style={{
+                    marginRight: 6
+                  }}
+                  size={SIZE.sm}
+                  color={colors.red}
+                />
+              ) : null}
+              <TimeSince
+                style={{
+                  fontSize: SIZE.xs,
+                  color: colors.icon,
+                  marginRight: 6
+                }}
+                time={item[dateBy]}
+                updateFrequency={Date.now() - item[dateBy] < 60000 ? 2000 : 60000}
+              />
+
+              {attachmentCount > 0 ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginRight: 6
+                  }}
+                >
+                  <Icon name="attachment" size={SIZE.md} color={colors.icon} />
+                  <Paragraph color={colors.icon} size={SIZE.xs}>
+                    {attachmentCount}
+                  </Paragraph>
+                </View>
+              ) : null}
+
+              {item.pinned ? (
+                <Icon
+                  testID="icon-pinned"
+                  name="pin-outline"
+                  size={SIZE.sm}
+                  style={{
+                    marginRight: 6
+                  }}
+                  color={COLORS_NOTE[item.color?.toLowerCase()] || colors.accent}
+                />
+              ) : null}
+
+              {item.locked ? (
+                <Icon
+                  name="lock"
+                  testID="note-locked-icon"
+                  size={SIZE.sm}
+                  style={{
+                    marginRight: 6
+                  }}
+                  color={colors.icon}
+                />
+              ) : null}
+
+              {item.favorite ? (
+                <Icon
+                  testID="icon-star"
+                  name="star"
+                  size={SIZE.md}
+                  style={{
+                    marginRight: 6
+                  }}
+                  color="orange"
+                />
+              ) : null}
+
+              {!isTrash && !compactMode && tags
+                ? tags.map(item =>
+                    item.id ? (
+                      <Button
+                        title={'#' + item.alias}
+                        key={item.id}
+                        height={23}
+                        type="gray"
+                        textStyle={{
+                          textDecorationLine: 'underline'
+                        }}
+                        hitSlop={{ top: 8, bottom: 12, left: 0, right: 0 }}
+                        fontSize={SIZE.xs}
+                        style={{
+                          borderRadius: 5,
+                          paddingHorizontal: 6,
+                          marginRight: 4,
+                          zIndex: 10,
+                          maxWidth: tags.length > 1 ? 130 : null
+                        }}
+                        onPress={() => navigateToTag(item)}
+                      />
+                    ) : null
+                  )
+                : null}
+            </>
+          ) : (
+            <>
+              <Paragraph
+                color={colors.icon}
+                size={SIZE.xs}
+                style={{
+                  marginRight: 6
+                }}
+              >
+                Deleted on{' '}
+                {item && item.dateDeleted
+                  ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                  : null}
+              </Paragraph>
+
+              <Paragraph
+                color={colors.accent}
+                size={SIZE.xs}
+                style={{
+                  marginRight: 6
+                }}
+              >
+                {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
+              </Paragraph>
+            </>
+          )}
+        </View>
+      </View>
+      <IconButton
+        testID={notesnook.listitem.menu}
+        color={colors.pri}
+        name="dots-horizontal"
+        size={SIZE.xl}
+        onPress={() => !noOpen && showActionSheet(item, isTrash)}
+        customStyle={{
+          justifyContent: 'center',
+          height: 35,
+          width: 35,
+          borderRadius: 100,
+          alignItems: 'center'
+        }}
+      />
+    </>
+  );
+};
+
+export default NoteItem;

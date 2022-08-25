@@ -1,0 +1,20 @@
+diff --git a/node_modules/react-native-reanimated-progress-bar/dist/styles.js b/node_modules/react-native-reanimated-progress-bar/dist/styles.js
+index de6096f..1eab3c5 100644
+--- a/node_modules/react-native-reanimated-progress-bar/dist/styles.js
++++ b/node_modules/react-native-reanimated-progress-bar/dist/styles.js
+@@ -3,11 +3,11 @@ export default StyleSheet.create({
+     container: {
+         flex: 1,
+         backgroundColor: "#eee",
+-        height: 4,
+-        borderRadius: 2,
++        height: 8,
++        borderRadius: 5,
+         position: "relative",
+         overflow: "hidden"
+     },
+-    progress: Object.assign({ height: 4, borderRadius: 2, position: "absolute", width: "100%", top: 0, bottom: 0, left: "-100%" }, Platform.select({ web: { transition: "0.3s all ease-in-out" } }))
++    progress: Object.assign({ height: 8, borderRadius: 5, position: "absolute", width: "100%", top: 0, bottom: 0, left: "-100%" }, Platform.select({ web: { transition: "0.3s all ease-in-out" } }))
+ });
+ //# sourceMappingURL=styles.js.map
+\ No newline at end of file

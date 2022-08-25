@@ -1,0 +1,4 @@
+diff --git a/node_modules/react-native-html-to-pdf-lite/react-native-html-to-pdf.podspec b/node_modules/react-native-html-to-pdf-lite/react-native-html-to-pdf-lite.podspec
+similarity index 100%
+rename from node_modules/react-native-html-to-pdf-lite/react-native-html-to-pdf.podspec
+rename to node_modules/react-native-html-to-pdf-lite/react-native-html-to-pdf-lite.podspec

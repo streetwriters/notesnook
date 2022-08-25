@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "lib": ["es2017", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "baseUrl": "./",
+    "jsx": "react-native",
+    "noEmit": true,
+    "isolatedModules": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": false,
+    "maxNodeModuleJsDepth": 6,
+    "downlevelIteration": true,
+    "types": ["node", "jest", "detox"]
+  },
+  "exclude": ["native"]
+}

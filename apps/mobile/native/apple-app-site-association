@@ -1,0 +1,11 @@
+{
+	"applinks:{
+		"apps":[],
+		"details":[
+			{
+				"appID":"com.streetwriters.notesnook",
+				"paths":["*"]
+			}
+		]
+	}
+}

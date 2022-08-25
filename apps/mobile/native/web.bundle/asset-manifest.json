@@ -1,0 +1,23 @@
+{
+  "files": {
+    "static/js/0.91d7b8d5.chunk.js": "./static/js/0.91d7b8d5.chunk.js",
+    "main.css": "./static/css/main.f2465fba.chunk.css",
+    "main.js": "./static/js/main.63f81e65.chunk.js",
+    "runtime-main.js": "./static/js/runtime-main.9bd4fa53.js",
+    "static/css/3.526cedf0.chunk.css": "./static/css/3.526cedf0.chunk.css",
+    "static/js/3.7fb602fe.chunk.js": "./static/js/3.7fb602fe.chunk.js",
+    "static/js/4.7884bc18.chunk.js": "./static/js/4.7884bc18.chunk.js",
+    "static/js/5.077f361c.chunk.js": "./static/js/5.077f361c.chunk.js",
+    "index.html": "./index.html",
+    "static/js/3.7fb602fe.chunk.js.LICENSE.txt": "./static/js/3.7fb602fe.chunk.js.LICENSE.txt",
+    "static/media/katexfonts.mobile.css": "./static/media/KaTeX_Typewriter-Regular.c5c02d76.ttf",
+    "static/media/fonts.mobile.css": "./static/media/hack-regular.f2412cb7.ttf"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.9bd4fa53.js",
+    "static/css/3.526cedf0.chunk.css",
+    "static/js/3.7fb602fe.chunk.js",
+    "static/css/main.f2465fba.chunk.css",
+    "static/js/main.63f81e65.chunk.js"
+  ]
+}

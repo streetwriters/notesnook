@@ -1,0 +1,38 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:padding="@dimen/widget_margin"
+    android:theme="@style/ThemeOverlay.Notesnook.AppWidgetContainer">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:id="@+id/widget_button"
+        android:layout_height="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/layout_bg"
+        android:paddingHorizontal="10dp"
+        android:elevation="5dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:textSize="16sp"
+                android:text="Take a quick note." />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

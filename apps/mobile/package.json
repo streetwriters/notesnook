@@ -1,0 +1,20 @@
+{
+  "name": "notesnook",
+  "version": "2.1.7",
+  "private": true,
+  "workspaces": [
+    "native/",
+    "app/"
+  ],
+  "scripts": {
+    "postinstall": "yarn patch-package",
+    "patch-lib": "./scripts/patch-package.sh",
+    "run-android": "cd native && REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ react-native run-android --active-arch-only",
+    "run-ios": "cd native && react-native run-ios"
+  },
+  "packageManager": "yarn@3.2.2",
+  "devDependencies": {
+    "patch-package": "^6.4.7",
+    "postinstall-postinstall": "^2.1.0"
+  }
+}
