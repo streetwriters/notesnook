@@ -1,14 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { TextProps } from 'react-native';
-import { timeSince } from '../../../utils/time';
-import Paragraph from '../typography/paragraph';
+import React, { useEffect, useRef, useState } from "react";
+import { TextProps } from "react-native";
+import { timeSince } from "../../../utils/time";
+import Paragraph from "../typography/paragraph";
 
 interface TimeSinceProps extends TextProps {
   updateFrequency: number;
   time: number;
 }
 
-export const TimeSince = ({ time, style, updateFrequency = 30000 }: TimeSinceProps) => {
+export const TimeSince = ({
+  time,
+  style,
+  updateFrequency = 30000
+}: TimeSinceProps) => {
   const [timeAgo, setTimeAgo] = useState<string | null>(null);
   const interval = useRef<NodeJS.Timer>();
 

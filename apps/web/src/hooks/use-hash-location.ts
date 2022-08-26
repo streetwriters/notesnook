@@ -21,7 +21,7 @@ type HashLocation = { location: string; update: boolean };
 export default function useHashLocation() {
   const [loc, setLoc] = useState<HashLocation>({
     location: currentLocation(),
-    update: true,
+    update: true
   });
   const [queryParams, setQueryParams] = useState(currentQuery());
 
@@ -32,7 +32,7 @@ export default function useHashLocation() {
       console.log(currentLocation());
       setLoc({
         location: currentLocation(),
-        update,
+        update
       });
       setQueryParams(currentQuery());
     };

@@ -11,11 +11,11 @@ import {
   NodeSpec,
   Schema,
   SchemaSpec,
-  NodeType,
+  NodeType
 } from "prosemirror-model";
 import {
   defaultBlockMathParseRules,
-  defaultInlineMathParseRules,
+  defaultInlineMathParseRules
 } from "./plugins/math-paste-rules";
 import { SchemaSpecMarkT, SchemaSpecNodeT } from "./utils/types";
 
@@ -59,7 +59,7 @@ export const mathSchemaSpec = createSchemaSpec({
   nodes: {
     // :: NodeSpec top-level document node
     doc: {
-      content: "block+",
+      content: "block+"
     },
     paragraph: {
       content: "inline*",
@@ -67,7 +67,7 @@ export const mathSchemaSpec = createSchemaSpec({
       parseDOM: [{ tag: "p" }],
       toDOM() {
         return ["p", 0];
-      },
+      }
     },
     math_inline: {
       group: "inline math",
@@ -75,7 +75,7 @@ export const mathSchemaSpec = createSchemaSpec({
       inline: true,
       atom: true,
       toDOM: () => ["math-inline", { class: "math-node" }, 0],
-      parseDOM: [{ tag: "math-inline" }, ...defaultInlineMathParseRules],
+      parseDOM: [{ tag: "math-inline" }, ...defaultInlineMathParseRules]
     },
     math_display: {
       group: "block math",
@@ -83,20 +83,20 @@ export const mathSchemaSpec = createSchemaSpec({
       atom: true,
       code: true,
       toDOM: () => ["math-display", { class: "math-node" }, 0],
-      parseDOM: [{ tag: "math-display" }, ...defaultBlockMathParseRules],
+      parseDOM: [{ tag: "math-display" }, ...defaultBlockMathParseRules]
     },
     text: {
-      group: "inline",
-    },
+      group: "inline"
+    }
   },
   marks: {
     math_select: {
       toDOM() {
         return ["math-select", 0];
       },
-      parseDOM: [{ tag: "math-select" }],
-    },
-  },
+      parseDOM: [{ tag: "math-select" }]
+    }
+  }
 });
 
 /**

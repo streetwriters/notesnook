@@ -4,7 +4,7 @@ import {
   Slice,
   NodeType,
   MarkType,
-  Fragment,
+  Fragment
 } from "prosemirror-model";
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +92,6 @@ class ProseMirrorTextSerializer {
 export const mathSerializer = new ProseMirrorTextSerializer({
   nodes: {
     math_inline: (node) => `$${node.textContent}$`,
-    math_display: (node) => `\n\n$$\n${node.textContent}\n$$`,
-  },
+    math_display: (node) => `\n\n$$\n${node.textContent}\n$$`
+  }
 });

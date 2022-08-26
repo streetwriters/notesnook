@@ -1,7 +1,7 @@
-import { Dimensions, PixelRatio, Platform } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
+import { Dimensions, PixelRatio, Platform } from "react-native";
+import DeviceInfo from "react-native-device-info";
 
-let windowSize = Dimensions.get('window');
+let windowSize = Dimensions.get("window");
 
 export class DeviceDetectionService {
   constructor() {
@@ -9,7 +9,7 @@ export class DeviceDetectionService {
   }
 
   setNewValues() {
-    windowSize = Dimensions.get('window');
+    windowSize = Dimensions.get("window");
     this.pixelDensity = PixelRatio.get();
     this.width = windowSize.width;
     this.height = windowSize.height;
@@ -30,7 +30,7 @@ export class DeviceDetectionService {
     this.isPhoneOrTablet();
     this.isIosOrAndroid();
     this.detectIphoneX();
-    this.checkSmallTab(size.width > size.height ? 'LANDSCAPE' : 'PORTRAIT');
+    this.checkSmallTab(size.width > size.height ? "LANDSCAPE" : "PORTRAIT");
   }
 
   getDeviceSize = () => {
@@ -44,18 +44,22 @@ export class DeviceDetectionService {
   };
 
   checkSmallTab(orientation) {
-    this.width = Dimensions.get('screen').width;
-    this.height = Dimensions.get('screen').height;
+    this.width = Dimensions.get("screen").width;
+    this.height = Dimensions.get("screen").height;
     let deviceSize = this.getDeviceSize();
 
     if (
-      (!DeviceInfo.isTablet() && orientation === 'LANDSCAPE') ||
-      (DeviceInfo.isTablet() && (orientation === 'PORTRAIT' || deviceSize < 9))
+      (!DeviceInfo.isTablet() && orientation === "LANDSCAPE") ||
+      (DeviceInfo.isTablet() && (orientation === "PORTRAIT" || deviceSize < 9))
     ) {
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = true;
-    } else if (DeviceInfo.isTablet() && orientation === 'LANDSCAPE' && deviceSize > 9) {
+    } else if (
+      DeviceInfo.isTablet() &&
+      orientation === "LANDSCAPE" &&
+      deviceSize > 9
+    ) {
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = false;
@@ -83,7 +87,7 @@ export class DeviceDetectionService {
   }
 
   isIosOrAndroid() {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       this.isIos = true;
       this.isAndroid = false;
     } else {
@@ -94,7 +98,7 @@ export class DeviceDetectionService {
 
   detectIphoneX() {
     this.isIphoneX =
-      Platform.OS === 'ios' &&
+      Platform.OS === "ios" &&
       !Platform.isTVOS &&
       !Platform.isTVOS &&
       (windowSize.height === 812 || windowSize.width === 812);

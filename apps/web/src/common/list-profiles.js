@@ -8,7 +8,7 @@ import {
   getItemHeight,
   getNotebookHeight,
   getNoteHeight,
-  MAX_HEIGHTS,
+  MAX_HEIGHTS
 } from "./height-calculator";
 import { db } from "./db";
 import { getTotalNotes } from ".";
@@ -89,7 +89,7 @@ const Profiles = {
   tags: TagsProfile,
   topics: TopicsProfile,
   trash: TrashProfile,
-  attachments: AttachmentProfile,
+  attachments: AttachmentProfile
 };
 
 export default Profiles;
@@ -121,7 +121,7 @@ function getNotebook(notebooks, contextType) {
     id: notebook.id,
     title: notebook.title,
     dateEdited: notebook.dateEdited,
-    topic: { id: topicId, title: topic.title },
+    topic: { id: topicId, title: topic.title }
   };
 }
 

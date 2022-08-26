@@ -27,7 +27,7 @@ export default function MultifactorDialog(props: MultifactorDialogProps) {
         step.next
           ? {
               text: "Continue",
-              props: { form: "2faForm" },
+              props: { form: "2faForm" }
             }
           : null
       }
@@ -35,7 +35,7 @@ export default function MultifactorDialog(props: MultifactorDialogProps) {
         step.cancellable
           ? {
               text: "Cancel",
-              onClick: onClose,
+              onClick: onClose
             }
           : null
       }

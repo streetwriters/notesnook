@@ -9,7 +9,7 @@ import {
   moveColumnLeft as moveColumnLeftAction,
   moveColumnRight as moveColumnRightAction,
   moveRowDown as moveRowDownAction,
-  moveRowUp as moveRowUpAction,
+  moveRowUp as moveRowUpAction
 } from "../../extensions/table/actions";
 import { MoreTools } from "../components/more-tools";
 import { menuButtonToTool } from "./utils";
@@ -39,7 +39,7 @@ export function TableSettings(props: ToolProps) {
         "rowProperties",
         "deleteRow",
         "deleteColumn",
-        "deleteTable",
+        "deleteTable"
       ]}
     />
   );
@@ -55,7 +55,7 @@ export function RowProperties(props: ToolProps) {
       insertRowBelow(editor),
       moveRowUp(editor),
       moveRowDown(editor),
-      deleteRow(editor),
+      deleteRow(editor)
     ],
     []
   );
@@ -78,7 +78,7 @@ export function RowProperties(props: ToolProps) {
           target: buttonRef.current,
           isTargetAbsolute: true,
           location: "below",
-          yOffset: 5,
+          yOffset: 5
         }}
         items={items}
       />
@@ -97,7 +97,7 @@ export function ColumnProperties(props: ToolProps) {
       insertColumnRight(editor),
       moveColumnLeft(editor),
       moveColumnRight(editor),
-      deleteColumn(editor),
+      deleteColumn(editor)
     ],
     []
   );
@@ -120,7 +120,7 @@ export function ColumnProperties(props: ToolProps) {
           target: buttonRef.current,
           isTargetAbsolute: true,
           location: "below",
-          yOffset: 5,
+          yOffset: 5
         }}
         items={items}
       />
@@ -145,7 +145,7 @@ export function TableProperties(props: ToolProps) {
       splitCells(editor),
       cellProperties(editor),
       { type: "separator", key: "tableSeperator" },
-      deleteTable(editor),
+      deleteTable(editor)
     ],
     []
   );
@@ -168,7 +168,7 @@ export function TableProperties(props: ToolProps) {
           target: buttonRef.current,
           isTargetAbsolute: true,
           location: "below",
-          yOffset: 5,
+          yOffset: 5
         }}
         items={items}
       />
@@ -188,7 +188,7 @@ export function CellProperties(props: ToolProps) {
           "cellBackgroundColor",
           "cellTextColor",
           "cellBorderColor",
-          "cellBorderWidth",
+          "cellBorderWidth"
         ]}
       />
     </>
@@ -292,7 +292,7 @@ const insertColumnLeft = (editor: Editor): MenuButton => ({
   ...getToolDefinition("insertColumnLeft"),
   key: "addColumnLeft",
   type: "button",
-  onClick: () => editor.current?.chain().focus().addColumnBefore().run(),
+  onClick: () => editor.current?.chain().focus().addColumnBefore().run()
 });
 
 const insertColumnRight = (editor: Editor): MenuButton => ({
@@ -301,83 +301,83 @@ const insertColumnRight = (editor: Editor): MenuButton => ({
   type: "button",
   title: "Add column right",
   onClick: () => editor.current?.chain().focus().addColumnAfter().run(),
-  icon: "insertColumnRight",
+  icon: "insertColumnRight"
 });
 
 const moveColumnLeft = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveColumnLeft"),
   key: "moveColumnLeft",
   type: "button",
-  onClick: () => moveColumnLeftAction(editor),
+  onClick: () => moveColumnLeftAction(editor)
 });
 
 const moveColumnRight = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveColumnRight"),
   key: "moveColumnRight",
   type: "button",
-  onClick: () => moveColumnRightAction(editor),
+  onClick: () => moveColumnRightAction(editor)
 });
 
 const deleteColumn = (editor: Editor): MenuButton => ({
   ...getToolDefinition("deleteColumn"),
   key: "deleteColumn",
   type: "button",
-  onClick: () => editor.current?.chain().focus().deleteColumn().run(),
+  onClick: () => editor.current?.chain().focus().deleteColumn().run()
 });
 
 const splitCells = (editor: Editor): MenuButton => ({
   ...getToolDefinition("splitCells"),
   key: "splitCells",
   type: "button",
-  onClick: () => editor.current?.chain().focus().splitCell().run(),
+  onClick: () => editor.current?.chain().focus().splitCell().run()
 });
 
 const mergeCells = (editor: Editor): MenuButton => ({
   ...getToolDefinition("mergeCells"),
   key: "mergeCells",
   type: "button",
-  onClick: () => editor.current?.chain().focus().mergeCells().run(),
+  onClick: () => editor.current?.chain().focus().mergeCells().run()
 });
 
 const insertRowAbove = (editor: Editor): MenuButton => ({
   ...getToolDefinition("insertRowAbove"),
   key: "insertRowAbove",
   type: "button",
-  onClick: () => editor.current?.chain().focus().addRowBefore().run(),
+  onClick: () => editor.current?.chain().focus().addRowBefore().run()
 });
 
 const insertRowBelow = (editor: Editor): MenuButton => ({
   ...getToolDefinition("insertRowBelow"),
   key: "insertRowBelow",
   type: "button",
-  onClick: () => editor.current?.chain().focus().addRowAfter().run(),
+  onClick: () => editor.current?.chain().focus().addRowAfter().run()
 });
 
 const moveRowUp = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveRowUp"),
   key: "moveRowUp",
   type: "button",
-  onClick: () => moveRowUpAction(editor),
+  onClick: () => moveRowUpAction(editor)
 });
 const moveRowDown = (editor: Editor): MenuButton => ({
   ...getToolDefinition("moveRowDown"),
   key: "moveRowDown",
   type: "button",
-  onClick: () => moveRowDownAction(editor),
+  onClick: () => moveRowDownAction(editor)
 });
 
 const deleteRow = (editor: Editor): MenuButton => ({
   ...getToolDefinition("deleteRow"),
   key: "deleteRow",
   type: "button",
-  onClick: () => editor.current?.chain().focus().deleteRow().run(),
+  onClick: () => editor.current?.chain().focus().deleteRow().run()
 });
 
 const deleteTable = (editor: Editor): MenuButton => ({
   ...getToolDefinition("deleteTable"),
   key: "deleteTable",
   type: "button",
-  onClick: () => editor.current?.chain().focus().deleteTable().run(),
+  onClick: () => editor.current?.chain().focus().deleteTable().run()
 });
 
 const cellProperties = (editor: Editor): MenuButton => ({
@@ -386,9 +386,9 @@ const cellProperties = (editor: Editor): MenuButton => ({
   type: "button",
   onClick: () => {
     showPopup({
-      popup: (hide) => <CellPropertiesPopup onClose={hide} editor={editor} />,
+      popup: (hide) => <CellPropertiesPopup onClose={hide} editor={editor} />
     });
-  },
+  }
 });
 
 export const InsertColumnLeft = menuButtonToTool(insertColumnLeft);

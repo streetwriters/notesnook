@@ -1,33 +1,33 @@
-import React, { useRef } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
-import Menu from 'react-native-reanimated-material-menu';
-import { notesnook } from '../../../e2e/test.ids';
-import Navigation from '../../services/navigation';
-import SearchService from '../../services/search';
-import useNavigationStore from '../../stores/use-navigation-store';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { Button } from '../ui/button';
-import { IconButton } from '../ui/icon-button';
+import React, { useRef } from "react";
+import { Platform, StyleSheet, View } from "react-native";
+import Menu from "react-native-reanimated-material-menu";
+import { notesnook } from "../../../e2e/test.ids";
+import Navigation from "../../services/navigation";
+import SearchService from "../../services/search";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
 
 export const RightMenus = () => {
-  const colors = useThemeStore(state => state.colors);
-  const deviceMode = useSettingStore(state => state.deviceMode);
-  const rightButtons = useNavigationStore(state => state.headerRightButtons);
-  const currentScreen = useNavigationStore(state => state.currentScreen.name);
-  const buttonAction = useNavigationStore(state => state.buttonAction);
+  const colors = useThemeStore((state) => state.colors);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const rightButtons = useNavigationStore((state) => state.headerRightButtons);
+  const currentScreen = useNavigationStore((state) => state.currentScreen.name);
+  const buttonAction = useNavigationStore((state) => state.buttonAction);
   const menuRef = useRef();
 
   return (
     <View style={styles.rightBtnContainer}>
-      {!currentScreen.startsWith('Settings') ? (
+      {!currentScreen.startsWith("Settings") ? (
         <IconButton
           onPress={async () => {
             SearchService.prepareSearch();
             Navigation.navigate({
-              name: 'Search'
+              name: "Search"
             });
           }}
           testID="icon-search"
@@ -37,11 +37,11 @@ export const RightMenus = () => {
         />
       ) : null}
 
-      {deviceMode !== 'mobile' ? (
+      {deviceMode !== "mobile" ? (
         <Button
           onPress={buttonAction}
           testID={notesnook.ids.default.addBtn}
-          icon={currentScreen === 'Trash' ? 'delete' : 'plus'}
+          icon={currentScreen === "Trash" ? "delete" : "plus"}
           iconSize={SIZE.xl}
           type="shade"
           hitSlop={{
@@ -88,7 +88,7 @@ export const RightMenus = () => {
             <Button
               style={{
                 width: 150,
-                justifyContent: 'flex-start',
+                justifyContent: "flex-start",
                 borderRadius: 0
               }}
               type="gray"
@@ -99,7 +99,7 @@ export const RightMenus = () => {
               title={item.title}
               onPress={async () => {
                 menuRef.current?.hide();
-                if (Platform.OS === 'ios') await sleep(300);
+                if (Platform.OS === "ios") await sleep(300);
                 item.onPress();
               }}
             />
@@ -112,12 +112,12 @@ export const RightMenus = () => {
 
 const styles = StyleSheet.create({
   rightBtnContainer: {
-    flexDirection: 'row',
-    alignItems: 'center'
+    flexDirection: "row",
+    alignItems: "center"
   },
   rightBtn: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     height: 40,
     width: 40,
     marginLeft: 10,

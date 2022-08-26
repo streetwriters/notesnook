@@ -22,7 +22,7 @@ function LinkHoverPopup(props: HoverPopupProps) {
         bg: "background",
         boxShadow: "menu",
         borderRadius: "default",
-        p: 1,
+        p: 1
       }}
     />
   );
@@ -30,5 +30,5 @@ function LinkHoverPopup(props: HoverPopupProps) {
 
 export const LinkHoverPopupHandler = {
   isActive: (e: HTMLElement) => !!e.closest("a"),
-  popup: LinkHoverPopup,
+  popup: LinkHoverPopup
 };

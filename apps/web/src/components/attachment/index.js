@@ -10,14 +10,14 @@ import { Multiselect } from "../../common/multi-select";
 import {
   closeOpenedDialog,
   showAttachmentsDialog,
-  showPromptDialog,
+  showPromptDialog
 } from "../../common/dialog-controller";
 import { hashNavigate } from "../../navigation";
 import { showToast } from "../../utils/toast";
 
 const workStatusMap = {
   recheck: "Rechecking...",
-  delete: "Deleting...",
+  delete: "Deleting..."
 };
 function Attachment({ item, isCompact, index }) {
   const attachment = item;
@@ -34,7 +34,7 @@ function Attachment({ item, isCompact, index }) {
       }
       menu={{
         items: menuItems,
-        extraData: { attachment },
+        extraData: { attachment }
       }}
       onClick={() => {
         if (isCompact) showAttachmentsDialog();
@@ -45,7 +45,7 @@ function Attachment({ item, isCompact, index }) {
             alignItems="center"
             sx={{
               fontSize: "subBody",
-              color: "fontTertiary",
+              color: "fontTertiary"
             }}
           >
             {status ? (
@@ -106,7 +106,7 @@ function Attachment({ item, isCompact, index }) {
                     my: 1,
                     bg: "primary",
                     height: "2px",
-                    width: `${status.progress}%`,
+                    width: `${status.progress}%`
                   }}
                 />
               </Flex>
@@ -115,7 +115,7 @@ function Attachment({ item, isCompact, index }) {
               alignItems="center"
               sx={{
                 fontSize: "subBody",
-                color: "fontTertiary",
+                color: "fontTertiary"
               }}
             >
               <Text mr={1}>{formatBytes(attachment.length)}</Text>
@@ -150,7 +150,7 @@ const menuItems = [
           prev.push({
             key: curr,
             title: `Note with id ${curr}`,
-            onClick: () => showToast("error", "This note does not exist."),
+            onClick: () => showToast("error", "This note does not exist.")
           });
         else
           prev.push({
@@ -159,10 +159,10 @@ const menuItems = [
             onClick: () => {
               hashNavigate(`/notes/${curr}/edit`);
               closeOpenedDialog();
-            },
+            }
           });
         return prev;
-      }, []),
+      }, [])
   },
   {
     key: "recheck",
@@ -173,7 +173,7 @@ const menuItems = [
     onClick: async ({ items }) => {
       await store.recheck(items.map((i) => i.metadata.hash));
     },
-    multiSelect: true,
+    multiSelect: true
   },
   {
     key: "rename",
@@ -183,11 +183,11 @@ const menuItems = [
       const newName = await showPromptDialog({
         title: "Rename attachment",
         description: attachment.metadata.filename,
-        defaultValue: attachment.metadata.filename,
+        defaultValue: attachment.metadata.filename
       });
       if (!newName) return;
       await store.rename(attachment.metadata.hash, newName);
-    },
+    }
   },
   {
     key: "download",
@@ -201,7 +201,7 @@ const menuItems = [
       if (isDownloading) {
         await db.fs.cancel(attachment.metadata.hash, "download");
       } else await downloadAttachment(attachment.metadata.hash);
-    },
+    }
   },
   {
     key: "reupload",
@@ -217,7 +217,7 @@ const menuItems = [
           attachment.metadata.type,
           attachment.metadata.hash
         );
-    },
+    }
   },
   {
     key: "permanent-delete",
@@ -226,6 +226,6 @@ const menuItems = [
     title: () => "Delete permanently",
     icon: Icon.DeleteForver,
     onClick: ({ items }) => Multiselect.deleteAttachments(items),
-    multiSelect: true,
-  },
+    multiSelect: true
+  }
 ];

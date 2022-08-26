@@ -1,20 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
-import { useSettingStore } from '../../../stores/use-setting-store';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { history } from '../../../utils';
-import { PressableButton } from '../../ui/pressable';
-import { ActionStrip } from './action-strip';
-import { Filler } from './back-fill';
-import { SelectionIcon } from './selection';
+import React, { useEffect, useState } from "react";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../../services/event-manager";
+import { useSettingStore } from "../../../stores/use-setting-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { history } from "../../../utils";
+import { PressableButton } from "../../ui/pressable";
+import { ActionStrip } from "./action-strip";
+import { Filler } from "./back-fill";
+import { SelectionIcon } from "./selection";
 
-const SelectionWrapper = ({ children, item, background, onLongPress, onPress, testID }) => {
-  const colors = useThemeStore(state => state.colors);
+const SelectionWrapper = ({
+  children,
+  item,
+  background,
+  onLongPress,
+  onPress,
+  testID
+}) => {
+  const colors = useThemeStore((state) => state.colors);
   const [actionStrip, setActionStrip] = useState(false);
-  const notebooksListMode = useSettingStore(state => state.settings.notebooksListMode);
-  const notesListMode = useSettingStore(state => state.settings.notesListMode);
-  const listMode = item.type === 'notebook' ? notebooksListMode : notesListMode;
-  const compactMode = (item.type === 'notebook' || item.type === 'note') && listMode === 'compact';
+  const notebooksListMode = useSettingStore(
+    (state) => state.settings.notebooksListMode
+  );
+  const notesListMode = useSettingStore(
+    (state) => state.settings.notesListMode
+  );
+  const listMode = item.type === "notebook" ? notebooksListMode : notesListMode;
+  const compactMode =
+    (item.type === "notebook" || item.type === "note") &&
+    listMode === "compact";
 
   const _onLongPress = () => {
     if (history.selectedItemsList.length > 0) return;
@@ -34,10 +50,10 @@ const SelectionWrapper = ({ children, item, background, onLongPress, onPress, te
   };
 
   useEffect(() => {
-    eSubscribeEvent('navigate', closeStrip);
+    eSubscribeEvent("navigate", closeStrip);
 
     return () => {
-      eUnSubscribeEvent('navigate', closeStrip);
+      eUnSubscribeEvent("navigate", closeStrip);
     };
   }, []);
 
@@ -51,17 +67,19 @@ const SelectionWrapper = ({ children, item, background, onLongPress, onPress, te
       customAlpha={!colors.night ? -0.02 : 0.02}
       customOpacity={1}
       customStyle={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
         borderRadius: 0,
-        overflow: 'hidden',
+        overflow: "hidden",
         paddingHorizontal: 12,
         paddingVertical: compactMode ? 8 : 12
       }}
     >
-      {item.type === 'note' ? <Filler background={background} item={item} /> : null}
+      {item.type === "note" ? (
+        <Filler background={background} item={item} />
+      ) : null}
       <SelectionIcon
         compactMode={compactMode}
         setActionStrip={setActionStrip}
@@ -70,7 +88,9 @@ const SelectionWrapper = ({ children, item, background, onLongPress, onPress, te
       />
       {children}
 
-      {actionStrip ? <ActionStrip note={item} setActionStrip={setActionStrip} /> : null}
+      {actionStrip ? (
+        <ActionStrip note={item} setActionStrip={setActionStrip} />
+      ) : null}
     </PressableButton>
   );
 };

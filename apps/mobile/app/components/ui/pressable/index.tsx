@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback } from 'react';
+import React, { RefObject, useCallback } from "react";
 import {
   ColorValue,
   Pressable,
@@ -6,19 +6,19 @@ import {
   PressableStateCallbackType,
   View,
   ViewStyle
-} from 'react-native';
-import Animated from 'react-native-reanimated';
-import { ThemeStore, useThemeStore } from '../../../stores/use-theme-store';
-import { hexToRGBA, RGB_Linear_Shade } from '../../../utils/color-scheme/utils';
-import { BUTTON_TYPES } from '../../../utils/constants';
-import { br } from '../../../utils/size';
+} from "react-native";
+import Animated from "react-native-reanimated";
+import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
+import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
+import { BUTTON_TYPES } from "../../../utils/constants";
+import { br } from "../../../utils/size";
 
 export interface PressableButtonProps extends PressableProps {
   customStyle?: ViewStyle;
   noborder?: boolean;
   type?: keyof typeof BUTTON_TYPES;
-  accentColor?: keyof ThemeStore['colors'];
-  accentText?: keyof ThemeStore['colors'];
+  accentColor?: keyof ThemeStore["colors"];
+  accentText?: keyof ThemeStore["colors"];
   customColor?: ColorValue;
   customSelectedColor?: ColorValue;
   customAlpha?: number;
@@ -35,10 +35,10 @@ export const PressableButton = ({
   hitSlop,
   testID,
   disabled,
-  type = 'gray',
+  type = "gray",
   noborder,
-  accentColor = 'accent',
-  accentText = 'light',
+  accentColor = "accent",
+  accentText = "light",
   customColor,
   customSelectedColor,
   customAlpha,
@@ -46,13 +46,13 @@ export const PressableButton = ({
   fwdRef,
   animatedViewProps
 }: PressableButtonProps) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   const selectedColor =
     customSelectedColor ||
     //@ts-ignore
     colors[
-      type === 'accent'
+      type === "accent"
         ? BUTTON_TYPES[type](accentColor, accentText).selected
         : BUTTON_TYPES[type].selected
     ];
@@ -60,13 +60,13 @@ export const PressableButton = ({
     customColor ||
     //@ts-ignore
     colors[
-      type === 'accent'
+      type === "accent"
         ? BUTTON_TYPES[type](accentColor, accentText).primary
         : BUTTON_TYPES[type].primary
     ];
   const opacity = customOpacity
     ? customOpacity
-    : type === 'accent'
+    : type === "accent"
     ? 1
     : //@ts-ignore
       BUTTON_TYPES[type].opacity;
@@ -78,11 +78,11 @@ export const PressableButton = ({
         backgroundColor: pressed
           ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity || 1))
           : hexToRGBA(primaryColor, opacity || 1 - 0.02),
-        width: '100%',
-        alignSelf: 'center',
+        width: "100%",
+        alignSelf: "center",
         borderRadius: noborder ? 0 : br,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         marginBottom: 0
       },
       customStyle

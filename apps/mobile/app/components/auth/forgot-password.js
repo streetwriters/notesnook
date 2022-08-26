@@ -1,21 +1,21 @@
-import React, { useRef, useState } from 'react';
-import { View } from 'react-native';
-import ActionSheet from 'react-native-actions-sheet';
-import { DDS } from '../../services/device-detection';
-import { ToastEvent } from '../../services/event-manager';
-import SettingsService from '../../services/settings';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { db } from '../../common/database';
-import DialogHeader from '../dialog/dialog-header';
-import { Button } from '../ui/button';
-import { IconButton } from '../ui/icon-button';
-import Input from '../ui/input';
-import Seperator from '../ui/seperator';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import React, { useRef, useState } from "react";
+import { View } from "react-native";
+import ActionSheet from "react-native-actions-sheet";
+import { DDS } from "../../services/device-detection";
+import { ToastEvent } from "../../services/event-manager";
+import SettingsService from "../../services/settings";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { db } from "../../common/database";
+import DialogHeader from "../dialog/dialog-header";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import Input from "../ui/input";
+import Seperator from "../ui/seperator";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 
 export const ForgotPassword = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const email = useRef();
   const emailInputRef = useRef();
   const [error, setError] = useState(false);
@@ -25,17 +25,20 @@ export const ForgotPassword = () => {
   const sendRecoveryEmail = async () => {
     if (!email.current || error) {
       ToastEvent.show({
-        heading: 'Account email is required.',
-        type: 'error',
-        context: 'local'
+        heading: "Account email is required.",
+        type: "error",
+        context: "local"
       });
       return;
     }
     setLoading(true);
     try {
       let lastRecoveryEmailTime = SettingsService.get().lastRecoveryEmailTime;
-      if (lastRecoveryEmailTime && Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3) {
-        throw new Error('Please wait before requesting another email');
+      if (
+        lastRecoveryEmailTime &&
+        Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3
+      ) {
+        throw new Error("Please wait before requesting another email");
       }
       await db.user.recoverAccount(email.current.toLowerCase());
       SettingsService.set({
@@ -44,8 +47,8 @@ export const ForgotPassword = () => {
       ToastEvent.show({
         heading: `Check your email to reset password`,
         message: `Recovery email has been sent to ${email.current.toLowerCase()}`,
-        type: 'success',
-        context: 'local',
+        type: "success",
+        context: "local",
         duration: 7000
       });
       setLoading(false);
@@ -53,10 +56,10 @@ export const ForgotPassword = () => {
     } catch (e) {
       setLoading(false);
       ToastEvent.show({
-        heading: 'Recovery email not sent',
+        heading: "Recovery email not sent",
         message: e.message,
-        type: 'error',
-        context: 'local'
+        type: "error",
+        context: "local"
       });
     }
   };
@@ -64,7 +67,7 @@ export const ForgotPassword = () => {
   return (
     <>
       <ActionSheet
-        onBeforeShow={data => (email.current = data)}
+        onBeforeShow={(data) => (email.current = data)}
         onClose={() => {
           setSent(false);
           setLoading(false);
@@ -82,8 +85,8 @@ export const ForgotPassword = () => {
           <View
             style={{
               padding: 12,
-              justifyContent: 'center',
-              alignItems: 'center',
+              justifyContent: "center",
+              alignItems: "center",
               paddingBottom: 50
             }}
           >
@@ -99,7 +102,7 @@ export const ForgotPassword = () => {
             <Heading>Recovery email sent!</Heading>
             <Paragraph
               style={{
-                textAlign: 'center'
+                textAlign: "center"
               }}
             >
               Please follow the link in the email to recover your account.
@@ -111,7 +114,7 @@ export const ForgotPassword = () => {
               borderRadius: DDS.isTab ? 5 : 0,
               backgroundColor: colors.bg,
               zIndex: 10,
-              width: '100%',
+              width: "100%",
               padding: 12
             }}
           >
@@ -123,11 +126,11 @@ export const ForgotPassword = () => {
 
             <Input
               fwdRef={emailInputRef}
-              onChangeText={value => {
+              onChangeText={(value) => {
                 email.current = value;
               }}
               defaultValue={email.current}
-              onErrorCheck={e => setError(e)}
+              onErrorCheck={(e) => setError(e)}
               returnKeyLabel="Next"
               returnKeyType="next"
               autoComplete="email"
@@ -142,12 +145,12 @@ export const ForgotPassword = () => {
             <Button
               style={{
                 marginTop: 10,
-                width: '100%'
+                width: "100%"
               }}
               loading={loading}
               onPress={sendRecoveryEmail}
               type="accent"
-              title={loading ? null : 'Next'}
+              title={loading ? null : "Next"}
             />
           </View>
         )}

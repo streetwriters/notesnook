@@ -34,7 +34,7 @@ import { Codemark } from "./extensions/code-mark";
 import { MathInline, MathBlock } from "./extensions/math";
 import {
   NodeViewSelectionNotifier,
-  usePortalProvider,
+  usePortalProvider
 } from "./extensions/react";
 import { OutlineList } from "./extensions/outline-list";
 import { OutlineListItem } from "./extensions/outline-list-item";
@@ -45,7 +45,7 @@ import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
 import {
   EditorOptions,
-  extensions as TiptapCoreExtensions,
+  extensions as TiptapCoreExtensions
 } from "@tiptap/core";
 import { usePermissionHandler } from "./hooks/use-permission-handler";
 import { Highlight } from "./extensions/highlight";
@@ -107,7 +107,7 @@ const useTiptap = (
         SearchReplace,
         TextStyle,
         Paragraph.configure({
-          doubleSpaced: doubleSpacedLines,
+          doubleSpaced: doubleSpacedLines
         }),
         StarterKit.configure({
           code: false,
@@ -120,11 +120,11 @@ const useTiptap = (
           hardBreak: false,
           history: {
             depth: 200,
-            newGroupDelay: 1000,
-          },
+            newGroupDelay: 1000
+          }
         }),
         Dropcursor.configure({
-          class: "drop-cursor",
+          class: "drop-cursor"
         }),
         CharacterCount,
         Underline,
@@ -139,14 +139,14 @@ const useTiptap = (
         TaskListNode,
         Link.configure({
           openOnClick: !isMobile,
-          autolink: false,
+          autolink: false
         }).extend({
-          inclusive: true,
+          inclusive: true
         }),
         Table.configure({
           resizable: true,
           allowTableNodeSelection: true,
-          cellMinWidth: 50,
+          cellMinWidth: 50
         }),
         TableRow,
         TableCell,
@@ -157,17 +157,17 @@ const useTiptap = (
         TextAlign.configure({
           types: ["heading", "paragraph"],
           alignments: ["left", "right", "center", "justify"],
-          defaultAlignment: "left",
+          defaultAlignment: "left"
         }),
         Placeholder.configure({
-          placeholder: "Start writing your note...",
+          placeholder: "Start writing your note..."
         }),
 
         ImageNode.configure({ allowBase64: true }),
         EmbedNode,
         AttachmentNode.configure({
           onDownloadAttachment,
-          onOpenAttachmentPicker,
+          onOpenAttachmentPicker
         }),
         OutlineListItem,
         OutlineList,
@@ -178,26 +178,26 @@ const useTiptap = (
         MathBlock,
         KeepInView,
         SelectionPersist,
-        DateTime,
+        DateTime
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.portalProviderAPI = PortalProviderAPI;
         if (onBeforeCreate) onBeforeCreate({ editor });
       },
-      injectCSS: false,
+      injectCSS: false
     }),
     [
       onDownloadAttachment,
       onOpenAttachmentPicker,
       PortalProviderAPI,
-      onBeforeCreate,
+      onBeforeCreate
     ]
   );
 
   const editor = useEditor(
     {
       ...defaultOptions,
-      ...restOptions,
+      ...restOptions
     },
     deps
   );

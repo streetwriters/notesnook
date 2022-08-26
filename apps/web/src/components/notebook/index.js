@@ -66,7 +66,7 @@ function Notebook(props) {
                 •
               </Text>
               {new Date(date).toLocaleDateString("en", {
-                dateStyle: "medium",
+                dateStyle: "medium"
               })}
               <Text as="span" mx={1}>
                 •
@@ -107,20 +107,20 @@ const menuItems = [
     key: "edit",
     title: "Edit",
     icon: Icon.NotebookEdit,
-    onClick: ({ notebook }) => hashNavigate(`/notebooks/${notebook.id}/edit`),
+    onClick: ({ notebook }) => hashNavigate(`/notebooks/${notebook.id}/edit`)
   },
   {
     key: "pin",
     icon: Icon.Pin,
     title: ({ notebook }) => (notebook.pinned ? "Unpin" : "Pin"),
-    onClick: ({ notebook }) => pin(notebook),
+    onClick: ({ notebook }) => pin(notebook)
   },
   {
     key: "shortcut",
     icon: Icon.Shortcut,
     title: ({ notebook }) =>
       db.settings.isPinned(notebook.id) ? "Remove shortcut" : "Create shortcut",
-    onClick: ({ notebook }) => appStore.pinItemToMenu(notebook),
+    onClick: ({ notebook }) => appStore.pinItemToMenu(notebook)
   },
   {
     key: "movetotrash",
@@ -131,6 +131,6 @@ const menuItems = [
     onClick: async ({ items }) => {
       await Multiselect.moveNotebooksToTrash(items);
     },
-    multiSelect: true,
-  },
+    multiSelect: true
+  }
 ];

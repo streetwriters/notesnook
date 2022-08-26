@@ -20,14 +20,14 @@ export class PopupRenderer extends React.Component<
 > {
   popupContainer: HTMLDivElement | null = null;
   state: PopupRendererState = {
-    popups: [] as PopupRendererState["popups"],
+    popups: [] as PopupRendererState["popups"]
   };
 
   openPopup = (id: string, popup: PopupComponent) => {
     if (!popup) return;
     this.setState((prev) => {
       return {
-        popups: [...prev.popups, { id, popup }],
+        popups: [...prev.popups, { id, popup }]
       };
     });
   };
@@ -39,7 +39,7 @@ export class PopupRenderer extends React.Component<
       const clone = prev.popups.slice();
       clone.splice(index, 1);
       return {
-        popups: clone,
+        popups: clone
       };
     });
   };

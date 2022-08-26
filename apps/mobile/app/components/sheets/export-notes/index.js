@@ -1,27 +1,30 @@
-import React, { Fragment, useEffect, useRef, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
-import FileViewer from 'react-native-file-viewer';
-import Share from 'react-native-share';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../../e2e/test.ids';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { ToastEvent } from '../../../services/event-manager';
-import Exporter from '../../../services/exporter';
-import { getElevation } from '../../../utils';
-import { ph, pv, SIZE } from '../../../utils/size';
-import { sleep } from '../../../utils/time';
-import SheetWrapper from '../../ui/sheet';
-import { Button } from '../../ui/button';
-import DialogHeader from '../../dialog/dialog-header';
-import { PressableButton } from '../../ui/pressable';
-import Seperator from '../../ui/seperator';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
-import { eOpenExportDialog, eCloseExportDialog } from '../../../utils/events';
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import { Platform, StyleSheet, View } from "react-native";
+import FileViewer from "react-native-file-viewer";
+import Share from "react-native-share";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { notesnook } from "../../../../e2e/test.ids";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { ToastEvent } from "../../../services/event-manager";
+import Exporter from "../../../services/exporter";
+import { getElevation } from "../../../utils";
+import { ph, pv, SIZE } from "../../../utils/size";
+import { sleep } from "../../../utils/time";
+import SheetWrapper from "../../ui/sheet";
+import { Button } from "../../ui/button";
+import DialogHeader from "../../dialog/dialog-header";
+import { PressableButton } from "../../ui/pressable";
+import Seperator from "../../ui/seperator";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../../services/event-manager";
+import { eOpenExportDialog, eCloseExportDialog } from "../../../utils/events";
 
 const ExportNotesSheet = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
@@ -40,12 +43,12 @@ const ExportNotesSheet = () => {
     };
   }, []);
 
-  const open = data => {
+  const open = (data) => {
     setVisible(true);
     setNotes(data);
   };
 
-  const close = data => {
+  const close = (data) => {
     setComplete(false);
     setExporting(false);
     setVisible(false);
@@ -67,7 +70,9 @@ const ExportNotesSheet = () => {
     }
     setDoneText(
       `Note exported successfully! You can find the exported note in ${
-        Platform.OS === 'ios' ? 'Files Manager/Notesnook' : `Storage/Notesnook/exported/${name}`
+        Platform.OS === "ios"
+          ? "Files Manager/Notesnook"
+          : `Storage/Notesnook/exported/${name}`
       }.`
     );
 
@@ -84,39 +89,39 @@ const ExportNotesSheet = () => {
 
   const actions = [
     {
-      title: 'PDF',
+      title: "PDF",
       func: async () => {
-        await save(Exporter.saveToPDF, 'PDF');
+        await save(Exporter.saveToPDF, "PDF");
       },
-      icon: 'file-pdf-box',
-      desc: 'Can be opened in a pdf reader like Adobe or Foxit Reader',
+      icon: "file-pdf-box",
+      desc: "Can be opened in a pdf reader like Adobe or Foxit Reader",
       id: notesnook.ids.dialogs.export.pdf
     },
     {
-      title: 'Markdown',
+      title: "Markdown",
       func: async () => {
-        await save(Exporter.saveToMarkdown, 'Markdown');
+        await save(Exporter.saveToMarkdown, "Markdown");
       },
-      icon: 'language-markdown',
-      desc: 'Can be opened in any text or markdown editor',
+      icon: "language-markdown",
+      desc: "Can be opened in any text or markdown editor",
       id: notesnook.ids.dialogs.export.md
     },
     {
-      title: 'Plain Text',
+      title: "Plain Text",
       func: async () => {
-        await save(Exporter.saveToText, 'Text');
+        await save(Exporter.saveToText, "Text");
       },
-      icon: 'card-text',
-      desc: 'Can be opened in any text editor',
+      icon: "card-text",
+      desc: "Can be opened in any text editor",
       id: notesnook.ids.dialogs.export.text
     },
     {
-      title: 'HTML',
+      title: "HTML",
       func: async () => {
-        await save(Exporter.saveToHTML, 'Html');
+        await save(Exporter.saveToHTML, "Html");
       },
-      icon: 'language-html5',
-      desc: 'Can be opened in any web browser',
+      icon: "language-html5",
+      desc: "Can be opened in any web browser",
       id: notesnook.ids.dialogs.export.html
     }
   ];
@@ -132,24 +137,26 @@ const ExportNotesSheet = () => {
           <DialogHeader
             icon="export"
             title="Export Note"
-            paragraph={'All exports are saved in Notesnook/exported folder in phone storage'}
+            paragraph={
+              "All exports are saved in Notesnook/exported folder in phone storage"
+            }
           />
         </View>
 
         <Seperator half />
         <View style={styles.buttonContainer}>
-          {actions.map(item => (
+          {actions.map((item) => (
             <Fragment key={item.title}>
               <Seperator half />
               <PressableButton
                 onPress={item.func}
                 customStyle={{
-                  width: '100%',
-                  alignItems: 'center',
-                  flexDirection: 'row',
+                  width: "100%",
+                  alignItems: "center",
+                  flexDirection: "row",
                   paddingRight: 12,
                   paddingVertical: 10,
-                  justifyContent: 'flex-start',
+                  justifyContent: "flex-start",
                   borderRadius: 0,
                   paddingHorizontal: 12
                 }}
@@ -160,11 +167,15 @@ const ExportNotesSheet = () => {
                     borderRadius: 5,
                     height: 60,
                     width: 60,
-                    justifyContent: 'center',
-                    alignItems: 'center'
+                    justifyContent: "center",
+                    alignItems: "center"
                   }}
                 >
-                  <Icon name={item.icon} color={colors.accent} size={SIZE.xxxl + 10} />
+                  <Icon
+                    name={item.icon}
+                    color={colors.accent}
+                    size={SIZE.xxxl + 10}
+                  />
                 </View>
                 <View
                   style={{
@@ -174,7 +185,11 @@ const ExportNotesSheet = () => {
                   <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
                     {item.title}
                   </Heading>
-                  <Paragraph style={{ marginLeft: 10 }} size={SIZE.sm} color={colors.icon}>
+                  <Paragraph
+                    style={{ marginLeft: 10 }}
+                    size={SIZE.sm}
+                    color={colors.icon}
+                  >
                     {item.desc}
                   </Paragraph>
                 </View>
@@ -184,7 +199,7 @@ const ExportNotesSheet = () => {
 
           <View
             style={{
-              width: '100%',
+              width: "100%",
               paddingHorizontal: 12,
               marginTop: 10
             }}
@@ -202,12 +217,12 @@ const ExportNotesSheet = () => {
                     FileViewer.open(result.filePath, {
                       showOpenWithDialog: true,
                       showAppsSuggestions: true
-                    }).catch(e => {
+                    }).catch((e) => {
                       ToastEvent.show({
-                        heading: 'Cannot open',
+                        heading: "Cannot open",
                         message: `No application found to open ${result.name} file.`,
-                        type: 'success',
-                        context: 'local'
+                        type: "success",
+                        context: "local"
                       });
                     });
                   }}
@@ -222,9 +237,9 @@ const ExportNotesSheet = () => {
                     marginTop: 10
                   }}
                   onPress={async () => {
-                    if (Platform.OS === 'ios') {
+                    if (Platform.OS === "ios") {
                       Share.open({
-                        url: 'file:/' + result.filePath
+                        url: "file:/" + result.filePath
                       }).catch(console.log);
                     } else {
                       FileViewer.open(result.filePath, {
@@ -241,16 +256,18 @@ const ExportNotesSheet = () => {
             {complete && (
               <Paragraph
                 style={{
-                  textAlign: 'center',
+                  textAlign: "center",
                   marginTop: 5
                 }}
                 color={colors.icon}
                 size={SIZE.xs}
               >
-                {'Note exported as ' + result.fileName}
+                {"Note exported as " + result.fileName}
               </Paragraph>
             )}
-            {exporting && !complete && <Button loading={true} height={50} width="100%" />}
+            {exporting && !complete && (
+              <Button loading={true} height={50} width="100%" />
+            )}
           </View>
         </View>
       </View>
@@ -265,30 +282,30 @@ const styles = StyleSheet.create({
     paddingVertical: pv
   },
   buttonContainer: {
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    justifyContent: "space-between",
+    alignItems: "center"
   },
   button: {
     paddingVertical: pv,
     paddingHorizontal: ph,
     marginTop: 10,
     borderRadius: 5,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 1,
-    flexDirection: 'row'
+    flexDirection: "row"
   },
   buttonText: {
     //fontFamily: "sans-serif",
-    color: 'white',
+    color: "white",
     fontSize: SIZE.sm,
     marginLeft: 5
   },
   overlay: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute'
+    width: "100%",
+    height: "100%",
+    position: "absolute"
   }
 });
 

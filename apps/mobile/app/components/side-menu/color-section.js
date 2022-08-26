@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import Navigation from '../../services/navigation';
-import useNavigationStore from '../../stores/use-navigation-store';
-import { useMenuStore } from '../../stores/use-menu-store';
-import { useNoteStore } from '../../stores/use-notes-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { COLORS_NOTE } from '../../utils/color-scheme';
-import { db } from '../../common/database';
-import { normalize, SIZE } from '../../utils/size';
-import { presentDialog } from '../dialog/functions';
-import { PressableButton } from '../ui/pressable';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import { ColoredNotes } from '../../screens/notes/colored';
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import Navigation from "../../services/navigation";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useMenuStore } from "../../stores/use-menu-store";
+import { useNoteStore } from "../../stores/use-notes-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { COLORS_NOTE } from "../../utils/color-scheme";
+import { db } from "../../common/database";
+import { normalize, SIZE } from "../../utils/size";
+import { presentDialog } from "../dialog/functions";
+import { PressableButton } from "../ui/pressable";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import { ColoredNotes } from "../../screens/notes/colored";
 
 export const ColorSection = React.memo(
   () => {
-    const colorNotes = useMenuStore(state => state.colorNotes);
-    const loading = useNoteStore(state => state.loading);
-    const setColorNotes = useMenuStore(state => state.setColorNotes);
+    const colorNotes = useMenuStore((state) => state.colorNotes);
+    const loading = useNoteStore((state) => state.loading);
+    const setColorNotes = useMenuStore((state) => state.setColorNotes);
 
     useEffect(() => {
       if (!loading) {
@@ -28,7 +28,9 @@ export const ColorSection = React.memo(
 
     return colorNotes.map((item, index) => {
       let alias = db.colors.alias(item.id);
-      return <ColorItem key={item.id} alias={alias} item={item} index={index} />;
+      return (
+        <ColorItem key={item.id} alias={alias} item={item} index={index} />
+      );
     });
   },
   () => true
@@ -36,12 +38,12 @@ export const ColorSection = React.memo(
 
 const ColorItem = React.memo(
   ({ item, index, alias }) => {
-    const colors = useThemeStore(state => state.colors);
-    const setColorNotes = useMenuStore(state => state.setColorNotes);
+    const colors = useThemeStore((state) => state.colors);
+    const setColorNotes = useMenuStore((state) => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);
-    alias = db.colors.alias(item.id) || '';
+    alias = db.colors.alias(item.id) || "";
 
-    const onHeaderStateChange = state => {
+    const onHeaderStateChange = (state) => {
       setTimeout(() => {
         let id = state.currentScreen?.id;
         if (id === item.id) {
@@ -61,7 +63,7 @@ const ColorItem = React.memo(
       };
     }, [headerTextState]);
 
-    const onPress = item => {
+    const onPress = (item) => {
       ColoredNotes.navigate(item, false);
 
       setImmediate(() => {
@@ -71,52 +73,54 @@ const ColorItem = React.memo(
 
     const onLongPress = () => {
       presentDialog({
-        title: 'Rename color',
+        title: "Rename color",
         input: true,
-        inputPlaceholder: 'Enter name for this color',
+        inputPlaceholder: "Enter name for this color",
         defaultValue: alias,
-        paragraph: 'You are renaming the color ' + item.title,
-        positivePress: async value => {
+        paragraph: "You are renaming the color " + item.title,
+        positivePress: async (value) => {
           if (!value || value.trim().length === 0) return;
           await db.colors.rename(item.id, value);
           setColorNotes();
-          console.log('color updated');
+          console.log("color updated");
         },
-        positiveText: 'Rename'
+        positiveText: "Rename"
       });
     };
 
     return (
       <PressableButton
-        customColor={headerTextState?.id === item.id ? 'rgba(0,0,0,0.04)' : 'transparent'}
+        customColor={
+          headerTextState?.id === item.id ? "rgba(0,0,0,0.04)" : "transparent"
+        }
         onLongPress={onLongPress}
         customSelectedColor={COLORS_NOTE[item.title.toLowerCase()]}
         customAlpha={!colors.night ? -0.02 : 0.02}
         customOpacity={0.12}
         onPress={() => onPress(item)}
         customStyle={{
-          width: '100%',
-          alignSelf: 'center',
+          width: "100%",
+          alignSelf: "center",
           borderRadius: 5,
-          flexDirection: 'row',
+          flexDirection: "row",
           paddingHorizontal: 8,
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          justifyContent: "space-between",
+          alignItems: "center",
           height: normalize(50),
           marginBottom: 5
         }}
       >
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center'
+            flexDirection: "row",
+            alignItems: "center"
           }}
         >
           <View
             style={{
               width: 30,
-              justifyContent: 'center',
-              alignItems: 'flex-start'
+              justifyContent: "center",
+              alignItems: "flex-start"
             }}
           >
             <View
@@ -125,7 +129,7 @@ const ColorItem = React.memo(
                 height: SIZE.lg - 2,
                 backgroundColor: COLORS_NOTE[item.title.toLowerCase()],
                 borderRadius: 100,
-                justifyContent: 'center',
+                justifyContent: "center",
                 marginRight: 10
               }}
             />

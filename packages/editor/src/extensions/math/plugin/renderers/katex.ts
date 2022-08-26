@@ -15,7 +15,7 @@ export const KatexRenderer: MathRenderer = {
       katex.render(text, element, {
         displayMode: false,
         globalGroup: true,
-        throwOnError: false,
+        throwOnError: false
       });
     });
   },
@@ -24,8 +24,8 @@ export const KatexRenderer: MathRenderer = {
       katex.render(text, element, {
         displayMode: true,
         globalGroup: true,
-        throwOnError: false,
+        throwOnError: false
       });
     });
-  },
+  }
 };

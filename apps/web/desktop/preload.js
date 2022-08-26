@@ -19,7 +19,7 @@ contextBridge.exposeInMainWorld("api", {
         func(args);
       });
     }
-  },
+  }
 });
 
 // Expose protected methods that allow the renderer process to use
@@ -27,9 +27,9 @@ contextBridge.exposeInMainWorld("api", {
 contextBridge.exposeInMainWorld("config", {
   zoomFactor: () => {
     return ipcRenderer.invoke("fromRenderer", {
-      type: "getZoomFactor",
+      type: "getZoomFactor"
     });
-  },
+  }
 });
 
 contextBridge.exposeInMainWorld("native", {
@@ -38,7 +38,7 @@ contextBridge.exposeInMainWorld("native", {
       type: "selectDirectory",
       title,
       buttonLabel,
-      defaultPath,
+      defaultPath
     });
-  },
+  }
 });

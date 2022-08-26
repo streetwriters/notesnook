@@ -13,7 +13,7 @@ export class StreamableFS implements IStreamableFS {
     this.storage = localforage.createInstance({
       storeName: "streamable-fs",
       name: db,
-      driver: [localforage.INDEXEDDB],
+      driver: [localforage.INDEXEDDB]
     });
   }
 
@@ -28,7 +28,7 @@ export class StreamableFS implements IStreamableFS {
       filename,
       size,
       type,
-      chunks: 0,
+      chunks: 0
     });
     return new FileHandle(this.storage, file);
   }

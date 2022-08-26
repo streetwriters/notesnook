@@ -1,6 +1,6 @@
 //@ts-ignore
-import create, { State } from 'zustand';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
+import create, { State } from "zustand";
+import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
 
 export interface EditorStore extends State {
   currentEditingNote: string | null;
@@ -16,34 +16,34 @@ export interface EditorStore extends State {
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   currentEditingNote: null,
-  setCurrentlyEditingNote: note => set({ currentEditingNote: note }),
+  setCurrentlyEditingNote: (note) => set({ currentEditingNote: note }),
   sessionId: null,
-  setSessionId: sessionId => {
-    console.log(sessionId, 'session id');
+  setSessionId: (sessionId) => {
+    console.log(sessionId, "session id");
     // tiny.call(EditorWebView, `sessionId="${sessionId}";`);
     set({ sessionId });
   },
   searchReplace: false,
   searchSelection: null,
   readonly: false,
-  setReadonly: readonly => {
+  setReadonly: (readonly) => {
     set({ readonly: readonly });
   },
-  setSearchReplace: searchReplace => {
+  setSearchReplace: (searchReplace) => {
     if (!searchReplace) {
       set({ searchSelection: null, searchReplace: false });
       return;
     }
     let func = (value: string) => {
-      eUnSubscribeEvent('selectionvalue', func);
-      console.log('setSearchReplace:', value, value.length);
+      eUnSubscribeEvent("selectionvalue", func);
+      console.log("setSearchReplace:", value, value.length);
       if (!value && get().searchReplace) {
         //  endSearch();
         return;
       }
       set({ searchSelection: value, searchReplace: true });
     };
-    eSubscribeEvent('selectionvalue', func);
+    eSubscribeEvent("selectionvalue", func);
     // tiny.call(
     //   EditorWebView,
     //   `(function() {

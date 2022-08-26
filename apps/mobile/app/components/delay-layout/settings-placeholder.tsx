@@ -1,9 +1,9 @@
-import React from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
+import React from "react";
+import { View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
 
 export const SettingsPlaceholder = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return (
     <View>
@@ -19,12 +19,12 @@ export const SettingsPlaceholder = () => {
       />
       <View
         style={{
-          width: '100%',
+          width: "100%",
           height: 60,
           borderRadius: 10,
           marginBottom: 20,
-          flexDirection: 'row',
-          alignItems: 'center',
+          flexDirection: "row",
+          alignItems: "center",
           paddingHorizontal: 16
         }}
       >
@@ -60,14 +60,14 @@ export const SettingsPlaceholder = () => {
 
       <View
         style={{
-          width: '100%',
+          width: "100%",
           height: 60,
           borderRadius: 10,
           marginBottom: 20,
-          flexDirection: 'row',
-          alignItems: 'center',
+          flexDirection: "row",
+          alignItems: "center",
           paddingHorizontal: 16,
-          justifyContent: 'space-between'
+          justifyContent: "space-between"
         }}
       >
         <View
@@ -106,8 +106,8 @@ export const SettingsPlaceholder = () => {
             backgroundColor: colors.nav,
             borderRadius: 100,
             marginLeft: 15,
-            alignItems: 'flex-end',
-            justifyContent: 'center',
+            alignItems: "flex-end",
+            justifyContent: "center",
             paddingHorizontal: 4
           }}
         >

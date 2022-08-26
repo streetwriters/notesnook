@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Keyboard, KeyboardEvent, useWindowDimensions } from 'react-native';
+import { useEffect, useState } from "react";
+import { Keyboard, KeyboardEvent, useWindowDimensions } from "react-native";
 
 /**
  * A hook that detects floating keyboard on iPad
@@ -15,7 +15,10 @@ const useIsFloatingKeyboard = () => {
   };
 
   useEffect(() => {
-    let sub1 = Keyboard.addListener('keyboardWillChangeFrame', onKeyboardWillChangeFrame);
+    let sub1 = Keyboard.addListener(
+      "keyboardWillChangeFrame",
+      onKeyboardWillChangeFrame
+    );
     return () => {
       sub1?.remove();
     };

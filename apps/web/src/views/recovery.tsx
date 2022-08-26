@@ -94,12 +94,12 @@ const routePaths: Record<RecoveryRoutes, string> = {
   "method:reset": "/account/recovery/method/reset",
   backup: "/account/recovery/backup",
   new: "/account/recovery/new",
-  final: "/account/recovery/final",
+  final: "/account/recovery/final"
 };
 
 function useAuthenticateUser({
   code,
-  userId,
+  userId
 }: {
   code: string;
   userId: string;
@@ -156,7 +156,7 @@ function Recovery(props: RecoveryProps) {
         sx={{
           zIndex: 1,
           flex: 1,
-          overflowY: "auto",
+          overflowY: "auto"
         }}
       >
         {isAuthenticating ? (
@@ -171,7 +171,7 @@ function Recovery(props: RecoveryProps) {
                 sx={{
                   display: "flex",
                   alignSelf: "end",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
                 variant={"body"}
               >
@@ -183,7 +183,7 @@ function Recovery(props: RecoveryProps) {
                   mt: 0,
                   ml: 2,
                   alignSelf: "start",
-                  alignItems: "center",
+                  alignItems: "center"
                 }}
                 variant={"secondary"}
                 onClick={() => openURL("/login")}
@@ -222,14 +222,14 @@ const recoveryMethods: RecoveryMethod[] = [
     testId: "step-recovery-key",
     title: "Use recovery key",
     description:
-      "Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption.",
+      "Your data recovery key is basically a hashed version of your password (plus some random salt). It can be used to decrypt your data for re-encryption."
   },
   {
     type: "backup",
     testId: "step-backup",
     title: "Use a backup file",
     description:
-      "If you don't have a recovery key, you can recover your data by restoring a Notesnook data backup file (.nnbackup).",
+      "If you don't have a recovery key, you can recover your data by restoring a Notesnook data backup file (.nnbackup)."
   },
   {
     type: "reset",
@@ -237,8 +237,8 @@ const recoveryMethods: RecoveryMethod[] = [
     title: "Clear data & reset account",
     description:
       "EXTREMELY DANGEROUS! This action is irreversible. All your data including notes, notebooks, attachments & settings will be deleted. This is a full account reset. Proceed with caution.",
-    isDangerous: true,
-  },
+    isDangerous: true
+  }
 ];
 function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
   const { navigate } = props;
@@ -258,7 +258,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
       onSubmit={async () => {
         const selectedMethod = recoveryMethods[selected].type;
         navigate(`method:${selectedMethod}`, {
-          userResetRequired: selectedMethod === "reset",
+          userResetRequired: selectedMethod === "reset"
         });
       }}
     >
@@ -276,7 +276,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
             alignSelf: "stretch",
             // alignItems: "center",
             textAlign: "left",
-            px: 2,
+            px: 2
           }}
           onClick={() => setSelected(index)}
         >
@@ -306,7 +306,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
       subtitle={"Use a data recovery key to reset your account password."}
       loading={{
         title: "Downloading your data",
-        subtitle: "Please wait while your data is downloaded & decrypted.",
+        subtitle: "Please wait while your data is downloaded & decrypted."
       }}
       onSubmit={async (form) => {
         const user = await db.user?.getUser();
@@ -380,7 +380,7 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
           component: <Text variant={"body"}>Browse</Text>,
           onClick: async () => {
             setBackupFile(await selectBackupFile());
-          },
+          }
         }}
       />
       <SubmitButton text="Start account recovery" />
@@ -412,7 +412,7 @@ function BackupData(props: BaseRecoveryComponentProps<"backup">) {
       loading={{
         title: "Creating backup...",
         subtitle:
-          "Please wait while we create a backup file for you to download.",
+          "Please wait while we create a backup file for you to download."
       }}
       onSubmit={async () => {
         await createBackup();
@@ -437,7 +437,7 @@ function NewPassword(props: BaseRecoveryComponentProps<"new">) {
       }
       loading={{
         title: "Resetting account password",
-        subtitle: "Please wait while we reset your account password.",
+        subtitle: "Please wait while we reset your account password."
       }}
       onSubmit={async (form) => {
         if (form.password !== form.confirmPassword)

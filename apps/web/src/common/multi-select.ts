@@ -31,10 +31,10 @@ async function moveNotesToTrash(notes: any[], confirm = true) {
     id: "deleteNotes",
     action: async (report) => {
       report({
-        text: `Deleting ${items.length} notes...`,
+        text: `Deleting ${items.length} notes...`
       });
       await noteStore.delete(...items);
-    },
+    }
   });
 
   showToast("success", `${items.length} notes moved to trash`);
@@ -54,10 +54,10 @@ async function moveNotebooksToTrash(notebooks: any[]) {
     id: "deleteNotebooks",
     action: async (report) => {
       report({
-        text: `Deleting ${notebooks.length} notebooks...`,
+        text: `Deleting ${notebooks.length} notebooks...`
       });
       await notebookStore.delete(...notebooks.map((i) => i.id));
-    },
+    }
   });
 
   if (isMultiselect) {
@@ -73,13 +73,13 @@ async function deleteTopics(notebookId: string, topics: any[]) {
     id: "deleteTopics",
     action: async (report) => {
       report({
-        text: `Deleting ${topics.length} topics...`,
+        text: `Deleting ${topics.length} topics...`
       });
       await db
         .notebooks!.notebook(notebookId)
         .topics.delete(...topics.map((t) => t.id));
       notebookStore.setSelectedNotebook(notebookId);
-    },
+    }
   });
   showToast("success", `${topics.length} topics deleted`);
 }
@@ -101,11 +101,11 @@ async function deleteAttachments(attachments: any[]) {
         report({
           text: `Deleting ${attachments.length} attachments...`,
           current: i,
-          total: attachments.length,
+          total: attachments.length
         });
         await attachmentStore.permanentDelete(attachment.metadata.hash);
       }
-    },
+    }
   });
   showToast("success", `${attachments.length} attachments deleted`);
 }
@@ -114,5 +114,5 @@ export const Multiselect = {
   moveNotebooksToTrash,
   moveNotesToTrash,
   deleteTopics,
-  deleteAttachments,
+  deleteAttachments
 };

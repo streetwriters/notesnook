@@ -4,7 +4,7 @@ import {
   EditorState,
   NodeSelection,
   Transaction,
-  TextSelection,
+  TextSelection
 } from "prosemirror-state";
 
 ////////////////////////////////////////////////////////////////////////////////

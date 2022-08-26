@@ -21,7 +21,7 @@ export class NNStorage {
         : [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE];
     this.database = localforage.createInstance({
       name,
-      driver: drivers,
+      driver: drivers
     });
   }
 
@@ -139,7 +139,7 @@ async function derivePBKDF2Key(password: string): Promise<CryptoKey> {
       name: "PBKDF2",
       salt,
       iterations: 100000,
-      hash: "SHA-256",
+      hash: "SHA-256"
     },
     key,
     { name: "AES-GCM", length: 256 },
@@ -157,7 +157,7 @@ async function aesEncrypt(
   const cipher = await window.crypto.subtle.encrypt(
     {
       name: "AES-GCM",
-      iv: iv,
+      iv: iv
     },
     cryptoKey,
     enc.encode(data)
@@ -165,7 +165,7 @@ async function aesEncrypt(
 
   return {
     iv,
-    cipher,
+    cipher
   };
 }
 
@@ -178,7 +178,7 @@ async function aesDecrypt(
   const plainText = await window.crypto.subtle.decrypt(
     {
       name: "AES-GCM",
-      iv: iv,
+      iv: iv
     },
     cryptoKey,
     cipher

@@ -43,12 +43,12 @@ function AnnouncementDialog(props) {
           padding: 0,
           overflowY: "hidden",
           border: 0,
-          zIndex: 0,
+          zIndex: 0
         },
         overlay: {
           zIndex: 999,
-          background: theme.colors.overlay,
-        },
+          background: theme.colors.overlay
+        }
       }}
     >
       <Flex
@@ -62,7 +62,7 @@ function AnnouncementDialog(props) {
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "dialog",
+          borderRadius: "dialog"
         }}
       >
         <AnnouncementBody

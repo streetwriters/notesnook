@@ -1,21 +1,25 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import WebView from 'react-native-webview';
-import { DDS } from '../../../services/device-detection';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import { TipManager } from '../../../services/tip-manager';
-import { useEditorStore } from '../../../stores/use-editor-store';
-import { useTagStore } from '../../../stores/use-tag-store';
-import { ThemeStore, useThemeStore } from '../../../stores/use-theme-store';
-import { db } from '../../../common/database';
-import { MMKV } from '../../../common/database/mmkv';
-import { eOnLoadNote } from '../../../utils/events';
-import { tabBarRef } from '../../../utils/global-refs';
-import { timeConverter } from '../../../utils/time';
-import { NoteType } from '../../../utils/types';
-import Commands from './commands';
-import { AppState, Content, EditorState, Note, SavePayload } from './types';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import WebView from "react-native-webview";
+import { DDS } from "../../../services/device-detection";
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { TipManager } from "../../../services/tip-manager";
+import { useEditorStore } from "../../../stores/use-editor-store";
+import { useTagStore } from "../../../stores/use-tag-store";
+import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
+import { db } from "../../../common/database";
+import { MMKV } from "../../../common/database/mmkv";
+import { eOnLoadNote } from "../../../utils/events";
+import { tabBarRef } from "../../../utils/global-refs";
+import { timeConverter } from "../../../utils/time";
+import { NoteType } from "../../../utils/types";
+import Commands from "./commands";
+import { AppState, Content, EditorState, Note, SavePayload } from "./types";
 import {
   defaultState,
   EditorEvents,
@@ -23,13 +27,13 @@ import {
   isEditorLoaded,
   makeSessionId,
   post
-} from './utils';
+} from "./utils";
 
 export const useEditor = (
-  editorId = '',
+  editorId = "",
   readonly?: boolean,
   onChange?: (html: string) => void,
-  theme?: ThemeStore['colors']
+  theme?: ThemeStore["colors"]
 ) => {
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>(makeSessionId());
@@ -42,18 +46,21 @@ export const useEditor = (
   const sessionHistoryId = useRef<number>();
   const state = useRef<Partial<EditorState>>(defaultState);
   const placeholderTip = useRef(TipManager.placeholderTip());
-  const tags = useTagStore(state => state.tags);
+  const tags = useTagStore((state) => state.tags);
   const insets = useSafeAreaInsets();
-  const isDefaultEditor = editorId === '';
+  const isDefaultEditor = editorId === "";
   const saveCount = useRef(0);
 
   const postMessage = useCallback(
-    async (type: string, data: any) => await post(editorRef, sessionIdRef.current, type, data),
+    async (type: string, data: any) =>
+      await post(editorRef, sessionIdRef.current, type, data),
     [sessionIdRef]
   );
 
   useEffect(() => {
-    commands.setInsets(isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 });
+    commands.setInsets(
+      isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
+    );
   }, [insets]);
 
   useEffect(() => {
@@ -66,7 +73,7 @@ export const useEditor = (
 
   useEffect(() => {
     if (theme) return;
-    let unsub = useThemeStore.subscribe(state => {
+    let unsub = useThemeStore.subscribe((state) => {
       postMessage(EditorEvents.theme, state.colors);
     });
 
@@ -76,7 +83,7 @@ export const useEditor = (
   }, []);
 
   useEffect(() => {
-    console.log('sessionId:', sessionId);
+    console.log("sessionId:", sessionId);
     async () => {
       await commands.setSessionId(sessionIdRef.current);
       if (sessionIdRef.current) {
@@ -89,13 +96,16 @@ export const useEditor = (
     };
   }, [sessionId, loading]);
 
-  const overlay = (show: boolean, data = { type: 'new' }) => {
-    eSendEvent('loadingNote' + editorId, show ? currentNote.current || data : false);
+  const overlay = (show: boolean, data = { type: "new" }) => {
+    eSendEvent(
+      "loadingNote" + editorId,
+      show ? currentNote.current || data : false
+    );
   };
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
-      console.log('ON READY CALLED');
+      console.log("ON READY CALLED");
       overlay(true);
       setLoading(true);
     }
@@ -107,10 +117,13 @@ export const useEditor = (
     }
   }, [loading]);
 
-  const withTimer = useCallback((id: string, fn: () => void, duration: number) => {
-    clearTimeout(timers.current[id]);
-    timers.current[id] = setTimeout(fn, duration);
-  }, []);
+  const withTimer = useCallback(
+    (id: string, fn: () => void, duration: number) => {
+      clearTimeout(timers.current[id]);
+      timers.current[id] = setTimeout(fn, duration);
+    },
+    []
+  );
 
   const reset = useCallback(async (resetState = true) => {
     currentNote.current?.id && db.fs.cancel(currentNote.current.id);
@@ -119,12 +132,13 @@ export const useEditor = (
     sessionHistoryId.current = undefined;
     saveCount.current = 0;
     useEditorStore.getState().setReadonly(false);
-    postMessage(EditorEvents.title, '');
+    postMessage(EditorEvents.title, "");
     await commands.clearContent();
     await commands.clearTags();
-    console.log('reset state: ', resetState);
+    console.log("reset state: ", resetState);
     if (resetState) {
-      isDefaultEditor && useEditorStore.getState().setCurrentlyEditingNote(null);
+      isDefaultEditor &&
+        useEditorStore.getState().setCurrentlyEditingNote(null);
       placeholderTip.current = TipManager.placeholderTip();
       await commands.setPlaceholder(placeholderTip.current);
     }
@@ -139,12 +153,18 @@ export const useEditor = (
       sessionId: currentSessionId,
       sessionHistoryId: currentSessionHistoryId
     }: SavePayload) => {
-      if (readonly || useEditorStore.getState().readonly || currentNote.current?.readonly) return;
+      if (
+        readonly ||
+        useEditorStore.getState().readonly ||
+        currentNote.current?.readonly
+      )
+        return;
 
-      console.log('saving note', id);
+      console.log("saving note", id);
       try {
         if (id && !db.notes?.note(id)) {
-          isDefaultEditor && useEditorStore.getState().setCurrentlyEditingNote(null);
+          isDefaultEditor &&
+            useEditorStore.getState().setCurrentlyEditingNote(null);
           await reset();
           return;
         }
@@ -181,11 +201,17 @@ export const useEditor = (
             currentNote.current = db.notes?.note(id).data as NoteType;
             state.current?.onNoteCreated && state.current.onNoteCreated(id);
             if (!noteData.title) {
-              postMessage(EditorEvents.titleplaceholder, currentNote.current.title);
+              postMessage(
+                EditorEvents.titleplaceholder,
+                currentNote.current.title
+              );
             }
           }
 
-          if (useEditorStore.getState().currentEditingNote !== id && isDefaultEditor) {
+          if (
+            useEditorStore.getState().currentEditingNote !== id &&
+            isDefaultEditor
+          ) {
             setTimeout(() => {
               id && useEditorStore.getState().setCurrentlyEditingNote(id);
             });
@@ -198,23 +224,29 @@ export const useEditor = (
         }
         console.log(id, sessionIdRef.current, currentSessionId);
         if (id && sessionIdRef.current === currentSessionId) {
-          console.log('updating state');
+          console.log("updating state");
           note = db.notes?.note(id)?.data as Note;
-          await commands.setStatus(timeConverter(note.dateEdited), 'Saved');
+          await commands.setStatus(timeConverter(note.dateEdited), "Saved");
 
           if (
             saveCount.current < 2 ||
             currentNote.current?.title !== note.title ||
-            currentNote.current?.headline?.slice(0, 200) !== note.headline?.slice(0, 200)
+            currentNote.current?.headline?.slice(0, 200) !==
+              note.headline?.slice(0, 200)
           ) {
-            Navigation.queueRoutesForUpdate('ColoredNotes', 'Notes', 'TaggedNotes', 'TopicNotes');
+            Navigation.queueRoutesForUpdate(
+              "ColoredNotes",
+              "Notes",
+              "TaggedNotes",
+              "TopicNotes"
+            );
           }
         }
         saveCount.current++;
 
         return id;
       } catch (e) {
-        console.log('error saving: ', e);
+        console.log("error saving: ", e);
       }
     },
     [commands, reset]
@@ -225,7 +257,7 @@ export const useEditor = (
     if (note.locked || note.content) {
       currentContent.current = {
         data: note.content?.data,
-        type: note.content?.type || 'tiny'
+        type: note.content?.type || "tiny"
       };
     } else {
       currentContent.current = await db.content?.raw(note.contentId);
@@ -234,12 +266,12 @@ export const useEditor = (
 
   const loadNote = useCallback(
     async (item: NoteType) => {
-      console.log('loading note', item.type, eOnLoadNote + editorId);
+      console.log("loading note", item.type, eOnLoadNote + editorId);
       state.current.currentlyEditing = true;
       const editorState = useEditorStore.getState();
 
       //@ts-ignore todo
-      if (item && item.type === 'new') {
+      if (item && item.type === "new") {
         currentNote.current && (await reset());
         let nextSessionId = makeSessionId(item);
         setSessionId(nextSessionId);
@@ -261,7 +293,7 @@ export const useEditor = (
         sessionIdRef.current = nextSessionId;
         await commands.setSessionId(nextSessionId);
         currentNote.current = item;
-        await commands.setStatus(timeConverter(item.dateEdited), 'Saved');
+        await commands.setStatus(timeConverter(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
         await postMessage(EditorEvents.html, currentContent.current?.data);
         useEditorStore.getState().setReadonly(item.readonly);
@@ -280,9 +312,16 @@ export const useEditor = (
       if (!currentNote.current?.id) return;
       //@ts-ignore
       if (currentNote.current?.content?.isPreview) {
-        db.content?.downloadMedia(currentNote.current?.id, currentNote.current.content, true);
+        db.content?.downloadMedia(
+          currentNote.current?.id,
+          currentNote.current.content,
+          true
+        );
       } else {
-        const images = db.attachments?.ofNote(currentNote.current?.id, 'images');
+        const images = db.attachments?.ofNote(
+          currentNote.current?.id,
+          "images"
+        );
         if (images && images.length > 0) {
           db.attachments?.downloadImages(currentNote.current.id);
         }
@@ -298,26 +337,38 @@ export const useEditor = (
   }, [editorId]);
 
   const saveContent = useCallback(
-    ({ title, content, type }: { title?: string; content?: string; type: string }) => {
+    ({
+      title,
+      content,
+      type
+    }: {
+      title?: string;
+      content?: string;
+      type: string;
+    }) => {
       if (type === EditorEvents.content) {
         currentContent.current = {
           data: content,
-          type: 'tiptap'
+          type: "tiptap"
         };
       }
       let params = {
         title,
         data: content,
-        type: 'tiptap',
+        type: "tiptap",
         sessionId,
         id: currentNote.current?.id,
         sessionHistoryId: sessionHistoryId.current
       };
 
       withTimer(
-        currentNote.current?.id || 'newnote',
+        currentNote.current?.id || "newnote",
         () => {
-          if (currentNote.current && !params.id && params.sessionId === sessionId) {
+          if (
+            currentNote.current &&
+            !params.id &&
+            params.sessionId === sessionId
+          ) {
             params.id = currentNote.current?.id;
           }
           if (onChange && params.data) {
@@ -333,13 +384,15 @@ export const useEditor = (
   );
 
   const onLoad = useCallback(async () => {
-    console.log('on editor load');
+    console.log("on editor load");
     state.current.ready = true;
     onReady();
     postMessage(EditorEvents.theme, theme || useThemeStore.getState().colors);
-    commands.setInsets(isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 });
+    commands.setInsets(
+      isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
+    );
     if (currentNote.current) {
-      console.log('force reload note');
+      console.log("force reload note");
       //@ts-ignore
       loadNote({ ...currentNote.current, forced: true });
     } else {
@@ -350,7 +403,7 @@ export const useEditor = (
   }, [state, currentNote, loadNote]);
 
   async function restoreEditorState() {
-    let json = await MMKV.getItem('appState');
+    let json = await MMKV.getItem("appState");
     if (json) {
       let appState = JSON.parse(json) as AppState;
       if (
@@ -366,15 +419,15 @@ export const useEditor = (
           tabBarRef.current?.goToPage(1);
         }
         setTimeout(() => {
-          console.log('restoring app state here');
+          console.log("restoring app state here");
           if (appState.note) {
             //@ts-ignore
             loadNote(appState.note);
           }
         }, 1);
-        MMKV.removeItem('appState');
+        MMKV.removeItem("appState");
         state.current.movedAway = false;
-        eSendEvent('load_overlay', 'hide_editor');
+        eSendEvent("load_overlay", "hide_editor");
         state.current.isRestoringState = false;
         return;
       }

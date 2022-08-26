@@ -17,7 +17,7 @@ const shortLocale = [
   ["1mo", "in 1mo"],
   ["%smo", "in %smo"],
   ["1yr", "in 1yr"],
-  ["%syr", "in %syr"],
+  ["%syr", "in %syr"]
 ];
 
 const enShortLocale = [
@@ -34,7 +34,7 @@ const enShortLocale = [
   ["1mo ago", "in 1mo"],
   ["%smo ago", "in %smo"],
   ["1yr ago", "in 1yr"],
-  ["%syr ago", "in %syr"],
+  ["%syr ago", "in %syr"]
 ];
 register("short", (_n, index) => shortLocale[index]);
 register("en_short", (_n, index) => enShortLocale[index]);

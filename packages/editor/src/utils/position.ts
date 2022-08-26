@@ -38,7 +38,7 @@ export function getPosition(
     xOffset = 0,
     align = "start",
     parent = document.body,
-    yAnchor,
+    yAnchor
   } = options || {};
 
   const { x, y, width, height, actualX, actualY } =
@@ -128,7 +128,7 @@ function getMousePosition(e: MouseEvent) {
     x: posx,
     y: posy,
     actualY: posy,
-    actualX: posx,
+    actualX: posx
   };
 }
 
@@ -143,7 +143,7 @@ export function getElementPosition(
     width: rect.width,
     height: rect.height,
     actualY: rect.y,
-    actualX: rect.x,
+    actualX: rect.x
   };
   if (absolute) {
     position.x = position.actualX;

@@ -1,6 +1,6 @@
 //@ts-ignore
-import create, { State } from 'zustand';
-import { history } from '../utils';
+import create, { State } from "zustand";
+import { history } from "../utils";
 
 type Item = {
   id: string;
@@ -18,12 +18,12 @@ export interface SelectionStore extends State {
 export const useSelectionStore = create<SelectionStore>((set, get) => ({
   selectedItemsList: [],
   selectionMode: false,
-  setAll: all => {
+  setAll: (all) => {
     //@ts-ignore
     history.selectedItemsList = all;
     set({ selectedItemsList: all });
   },
-  setSelectionMode: mode => {
+  setSelectionMode: (mode) => {
     if (!mode) {
       history.selectedItemsList = [];
       history.selectionMode = false;
@@ -35,7 +35,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       selectedItemsList: mode ? get().selectedItemsList : []
     });
   },
-  setSelectedItem: item => {
+  setSelectedItem: (item) => {
     let selectedItems = get().selectedItemsList;
     let index = selectedItems.findIndex((i: any) => i.id === item.id);
     if (index !== -1) {
@@ -46,13 +46,14 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     selectedItems = [...new Set(selectedItems)];
     //@ts-ignore
     history.selectedItemsList = selectedItems;
-    history.selectionMode = selectedItems.length > 0 ? get().selectionMode : false;
+    history.selectionMode =
+      selectedItems.length > 0 ? get().selectionMode : false;
     set({
       selectedItemsList: selectedItems,
       selectionMode: history.selectionMode
     });
   },
-  clearSelection: noanimation => {
+  clearSelection: (noanimation) => {
     history.selectedItemsList = [];
     history.selectionMode = false;
     set({ selectionMode: false, selectedItemsList: [] });

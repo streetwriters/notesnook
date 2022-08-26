@@ -23,7 +23,7 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
 
   defaultOptions: {
     types: ["paragraph", "heading"],
-    defaultDirection: "ltr",
+    defaultDirection: "ltr"
   },
 
   addGlobalAttributes() {
@@ -40,12 +40,12 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
               }
 
               return {
-                dir: attributes.textDirection,
+                dir: attributes.textDirection
               };
-            },
-          },
-        },
-      },
+            }
+          }
+        }
+      }
     ];
   },
 
@@ -57,7 +57,7 @@ export const TextDirection = Extension.create<TextDirectionOptions>({
           return this.options.types.every((type) =>
             commands.updateAttributes(type, { textDirection: direction })
           );
-        },
+        }
     };
-  },
+  }
 });

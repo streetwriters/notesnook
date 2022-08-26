@@ -7,7 +7,7 @@ import {
   base64_variants,
   StateAddress,
   to_string,
-  from_hex,
+  from_hex
 } from "libsodium-wrappers";
 import KeyUtils from "./keyutils";
 import {
@@ -15,7 +15,7 @@ import {
   EncryptionKey,
   OutputFormat,
   Plaintext,
-  SerializedKey,
+  SerializedKey
 } from "./types";
 
 export default class Decryption {
@@ -65,7 +65,7 @@ export default class Decryption {
           ? to_base64(plaintext, base64_variants.ORIGINAL)
           : outputFormat === "text"
           ? to_string(plaintext)
-          : plaintext,
+          : plaintext
     };
   }
 

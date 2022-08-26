@@ -1,15 +1,15 @@
-import React from 'react';
-import { ViewProps } from 'react-native';
-import Animated, { FadeOutUp } from 'react-native-reanimated';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useDelayLayout } from '../../hooks/use-delay-layout';
-import { DefaultPlaceholder } from './default-placeholder';
-import { SettingsPlaceholder } from './settings-placeholder';
+import React from "react";
+import { ViewProps } from "react-native";
+import Animated, { FadeOutUp } from "react-native-reanimated";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useDelayLayout } from "../../hooks/use-delay-layout";
+import { DefaultPlaceholder } from "./default-placeholder";
+import { SettingsPlaceholder } from "./settings-placeholder";
 
 interface IDelayLayoutProps extends ViewProps {
   delay?: number;
   wait?: boolean;
-  type?: 'default' | 'settings';
+  type?: "default" | "settings";
   color?: string;
   animated?: boolean;
 }
@@ -19,10 +19,15 @@ const placeholder = {
   settings: SettingsPlaceholder
 };
 
-export default function DelayLayout({ animated = true, ...props }: IDelayLayoutProps) {
-  const colors = useThemeStore(state => state.colors);
-  const loading = useDelayLayout(!props.delay || props.delay < 300 ? 300 : props.delay);
-  const Placeholder = placeholder[props.type || 'default'];
+export default function DelayLayout({
+  animated = true,
+  ...props
+}: IDelayLayoutProps) {
+  const colors = useThemeStore((state) => state.colors);
+  const loading = useDelayLayout(
+    !props.delay || props.delay < 300 ? 300 : props.delay
+  );
+  const Placeholder = placeholder[props.type || "default"];
 
   return loading || props.wait ? (
     <Animated.View

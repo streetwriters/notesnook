@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect } from 'react';
-import BiometicService from '../services/biometrics';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
-import { db } from '../common/database';
+import React, { useCallback, useEffect } from "react";
+import BiometicService from "../services/biometrics";
+import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
+import { db } from "../common/database";
 
 const VaultStatusCache = {
   exists: false,
@@ -13,7 +13,7 @@ export const useVaultStatus = () => {
   const [vaultStatus, setVaultStatus] = React.useState(VaultStatusCache);
 
   const checkVaultStatus = useCallback(() => {
-    db.vault.exists().then(async exists => {
+    db.vault.exists().then(async (exists) => {
       let available = await BiometicService.isBiometryAvailable();
       let fingerprint = await BiometicService.hasInternetCredentials();
       if (
@@ -32,9 +32,9 @@ export const useVaultStatus = () => {
 
   useEffect(() => {
     checkVaultStatus();
-    eSubscribeEvent('vaultUpdated', () => checkVaultStatus());
+    eSubscribeEvent("vaultUpdated", () => checkVaultStatus());
     return () => {
-      eUnSubscribeEvent('vaultUpdated', () => checkVaultStatus());
+      eUnSubscribeEvent("vaultUpdated", () => checkVaultStatus());
     };
   }, []);
 

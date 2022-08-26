@@ -11,7 +11,7 @@ const nativeFeatures = [
   "Pin notes in notifications drawer",
   "Share & append to notes from anywhere",
   "Quick note widgets",
-  "App lock",
+  "App lock"
 ];
 
 const platform = getPlatform();
@@ -26,7 +26,7 @@ function getOptions(onClose) {
       window.open(item.link, "_blank");
       onClose();
       Config.set("installNotice", false);
-    },
+    }
   }));
 }
 
@@ -44,7 +44,7 @@ export default function InstallNotice({ onClose }) {
         bg: "background",
         borderRadius: "default",
         border: "1px solid var(--border)",
-        width: ["95%", 400],
+        width: ["95%", 400]
       }}
       p={2}
     >
@@ -59,7 +59,7 @@ export default function InstallNotice({ onClose }) {
             gridTemplateColumns: "1fr 1fr",
             columnGap: 1,
             rowGap: 1,
-            mt: 1,
+            mt: 1
           }}
         >
           {nativeFeatures.map((feature) => (
@@ -67,7 +67,7 @@ export default function InstallNotice({ onClose }) {
               p={1}
               sx={{
                 borderRadius: "default",
-                border: "1px solid var(--border)",
+                border: "1px solid var(--border)"
               }}
             >
               <Text variant="body" ml={1}>

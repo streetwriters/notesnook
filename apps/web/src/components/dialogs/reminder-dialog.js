@@ -11,7 +11,7 @@ const features = [
   { icon: Icon.Backup, title: "Encrypted backups" },
   { icon: Icon.Vault, title: "Secure private vault" },
   { icon: Icon.PDF, title: "Export to PDF" },
-  { icon: Icon.Edit, title: "Rich text editor" },
+  { icon: Icon.Edit, title: "Rich text editor" }
 ];
 // TODO create trial expiry coupon codes
 const reminders = {
@@ -28,7 +28,7 @@ const reminders = {
           *
         </>
       ),
-      subtitle: "*Only for yearly plan",
+      subtitle: "*Only for yearly plan"
     },
     features,
     // footer: (
@@ -44,8 +44,8 @@ const reminders = {
         setTimeout(async () => {
           await showBuyDialog("yearly", "TRIAL2PRO");
         }, 0);
-      },
-    },
+      }
+    }
   },
   trialexpiring: {
     title: "Your free trial is ending soon",
@@ -56,7 +56,7 @@ const reminders = {
           Upgrade now to continue using all the pro features without
           interruption.
         </>
-      ),
+      )
     },
     features,
     cta: {
@@ -65,9 +65,9 @@ const reminders = {
         setTimeout(async () => {
           await showBuyDialog();
         }, 0);
-      },
-    },
-  },
+      }
+    }
+  }
 };
 
 function ReminderDialog(props) {
@@ -89,7 +89,7 @@ function ReminderDialog(props) {
           if (reminder.cta.action) await reminder.cta.action();
 
           props.onClose(true);
-        },
+        }
       }}
       footer={reminder.footer}
     >
@@ -118,7 +118,7 @@ function ReminderDialog(props) {
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               columnGap: 1,
-              rowGap: 1,
+              rowGap: 1
             }}
           >
             {reminder.features.map((feature) => (
@@ -126,7 +126,7 @@ function ReminderDialog(props) {
                 p={1}
                 sx={{
                   borderRadius: "default",
-                  border: "1px solid var(--border)",
+                  border: "1px solid var(--border)"
                 }}
               >
                 <feature.icon size={16} sx={{ alignSelf: "start" }} />

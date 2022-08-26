@@ -50,8 +50,8 @@ async function createWindow() {
       contextIsolation: true,
       nativeWindowOpen: true,
       spellcheck: false,
-      preload: __dirname + "/preload.js",
-    },
+      preload: __dirname + "/preload.js"
+    }
   });
   mainWindowState.manage(mainWindow);
   global.win = mainWindow;
@@ -79,7 +79,7 @@ async function createWindow() {
   nativeTheme.on("updated", () => {
     if (getTheme() === "system") {
       sendMessageToRenderer(EVENTS.themeChanged, {
-        theme: nativeTheme.shouldUseDarkColors ? "dark" : "light",
+        theme: nativeTheme.shouldUseDarkColors ? "dark" : "light"
       });
     }
   });

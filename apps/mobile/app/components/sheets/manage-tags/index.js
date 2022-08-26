@@ -1,24 +1,28 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ScrollView, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { useTagStore } from '../../../stores/use-tag-store';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import { db } from '../../../common/database';
-import { eCloseTagsDialog, eOpenTagsDialog } from '../../../utils/events';
-import { SIZE } from '../../../utils/size';
-import { sleep } from '../../../utils/time';
-import Input from '../../ui/input';
-import { PressableButton } from '../../ui/pressable';
-import SheetWrapper from '../../ui/sheet';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
+import React, { useEffect, useRef, useState } from "react";
+import { ScrollView, View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { useTagStore } from "../../../stores/use-tag-store";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { db } from "../../../common/database";
+import { eCloseTagsDialog, eOpenTagsDialog } from "../../../utils/events";
+import { SIZE } from "../../../utils/size";
+import { sleep } from "../../../utils/time";
+import Input from "../../ui/input";
+import { PressableButton } from "../../ui/pressable";
+import SheetWrapper from "../../ui/sheet";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 const ManageTagsSheet = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
   const [note, setNote] = useState(null);
-  const allTags = useTagStore(state => state.tags);
+  const allTags = useTagStore((state) => state.tags);
   const [tags, setTags] = useState([]);
   const [query, setQuery] = useState(null);
   const inputRef = useRef();
@@ -35,17 +39,17 @@ const ManageTagsSheet = () => {
 
   useEffect(() => {
     if (visible) {
-      console.log('sorting tags');
+      console.log("sorting tags");
       sortTags();
     }
   }, [allTags, note, query, visible]);
 
   const sortTags = () => {
     let _tags = [...allTags];
-    _tags = _tags.filter(t => t.type === 'tag');
+    _tags = _tags.filter((t) => t.type === "tag");
     _tags = _tags.sort((a, b) => a.title.localeCompare(b.title));
     if (query) {
-      _tags = _tags.filter(t => t.title.startsWith(query));
+      _tags = _tags.filter((t) => t.title.startsWith(query));
     }
 
     if (!note || !note.tags) {
@@ -54,7 +58,7 @@ const ManageTagsSheet = () => {
     }
     let noteTags = [];
     for (let tag of note.tags) {
-      let index = _tags.findIndex(t => t.title === tag);
+      let index = _tags.findIndex((t) => t.title === tag);
       if (index !== -1) {
         noteTags.push(_tags[index]);
         _tags.splice(index, 1);
@@ -65,7 +69,7 @@ const ManageTagsSheet = () => {
     setTags(combinedTags);
   };
 
-  const open = item => {
+  const open = (item) => {
     setNote(item);
     useTagStore.getState().setTags();
     sortTags();
@@ -85,11 +89,11 @@ const ManageTagsSheet = () => {
 
   const onSubmit = async () => {
     let _query = query;
-    if (!_query || _query === '' || _query.trimStart().length == 0) {
+    if (!_query || _query === "" || _query.trimStart().length == 0) {
       ToastEvent.show({
-        heading: 'Tag field is empty',
-        type: 'error',
-        context: 'local'
+        heading: "Tag field is empty",
+        type: "error",
+        context: "local"
       });
       return;
     }
@@ -98,7 +102,7 @@ const ManageTagsSheet = () => {
     setNote({ ...note, tags: note.tags ? [...note.tags, tag] : [tag] });
     setQuery(null);
     inputRef.current?.setNativeProps({
-      text: ''
+      text: ""
     });
     try {
       await db.notes.note(note.id).tag(tag);
@@ -106,21 +110,21 @@ const ManageTagsSheet = () => {
       setNote(db.notes.note(note.id).data);
     } catch (e) {
       ToastEvent.show({
-        heading: 'Cannot add tag',
-        type: 'error',
+        heading: "Cannot add tag",
+        type: "error",
         message: e.message,
-        context: 'local'
+        context: "local"
       });
     }
 
     Navigation.queueRoutesForUpdate(
-      'Notes',
-      'Favorites',
-      'ColoredNotes',
-      'TaggedNotes',
-      'TopicNotes',
-      'Notebooks',
-      'Notebook'
+      "Notes",
+      "Favorites",
+      "ColoredNotes",
+      "TaggedNotes",
+      "TopicNotes",
+      "Notebooks",
+      "Notebook"
     );
   };
 
@@ -139,22 +143,22 @@ const ManageTagsSheet = () => {
     >
       <View
         style={{
-          width: '100%',
-          alignSelf: 'center',
+          width: "100%",
+          alignSelf: "center",
           paddingHorizontal: 12,
-          minHeight: '60%'
+          minHeight: "60%"
         }}
       >
         <Input
           button={{
-            icon: 'magnify',
+            icon: "magnify",
             color: colors.accent,
             size: SIZE.lg
           }}
           testID="tag-input"
           fwdRef={inputRef}
           autoCapitalize="none"
-          onChangeText={v => {
+          onChangeText={(v) => {
             setQuery(db.tags.sanitize(v));
           }}
           onSubmit={onSubmit}
@@ -174,18 +178,18 @@ const ManageTagsSheet = () => {
         >
           {query && query !== tags[0]?.title ? (
             <PressableButton
-              key={'query_item'}
+              key={"query_item"}
               customStyle={{
-                flexDirection: 'row',
+                flexDirection: "row",
                 marginVertical: 5,
-                justifyContent: 'space-between',
+                justifyContent: "space-between",
                 padding: 12
               }}
               onPress={onSubmit}
               type="accent"
             >
               <Heading size={SIZE.sm} color={colors.light}>
-                Add {`"` + '#' + query + `"`}
+                Add {`"` + "#" + query + `"`}
               </Heading>
               <Icon name="plus" color={colors.light} size={SIZE.lg} />
             </PressableButton>
@@ -193,10 +197,10 @@ const ManageTagsSheet = () => {
           {!allTags || allTags.length === 0 ? (
             <View
               style={{
-                width: '100%',
+                width: "100%",
                 height: 200,
-                justifyContent: 'center',
-                alignItems: 'center'
+                justifyContent: "center",
+                alignItems: "center"
               }}
             >
               <Heading size={50} color={colors.icon}>
@@ -208,8 +212,13 @@ const ManageTagsSheet = () => {
             </View>
           ) : null}
 
-          {tags.map(item => (
-            <TagItem key={item.title} tag={item} note={note} setNote={setNote} />
+          {tags.map((item) => (
+            <TagItem
+              key={item.title}
+              tag={item}
+              note={note}
+              setNote={setNote}
+            />
           ))}
         </ScrollView>
       </View>
@@ -220,13 +229,15 @@ const ManageTagsSheet = () => {
 export default ManageTagsSheet;
 
 const TagItem = ({ tag, note, setNote }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   const onPress = async () => {
     let prevNote = { ...note };
     try {
       if (prevNote.tags.indexOf(tag.title) !== -1) {
-        await db.notes.note(note.id).untag(prevNote.tags[prevNote.tags.indexOf(tag.title)]);
+        await db.notes
+          .note(note.id)
+          .untag(prevNote.tags[prevNote.tags.indexOf(tag.title)]);
       } else {
         await db.notes.note(note.id).tag(tag.title);
       }
@@ -235,11 +246,11 @@ const TagItem = ({ tag, note, setNote }) => {
     } catch (e) {}
     setTimeout(() => {
       Navigation.queueRoutesForUpdate(
-        'Notes',
-        'Favorites',
-        'ColoredNotes',
-        'TaggedNotes',
-        'TopicNotes'
+        "Notes",
+        "Favorites",
+        "ColoredNotes",
+        "TaggedNotes",
+        "TopicNotes"
       );
     }, 1);
   };
@@ -247,26 +258,38 @@ const TagItem = ({ tag, note, setNote }) => {
   return (
     <PressableButton
       customStyle={{
-        flexDirection: 'row',
+        flexDirection: "row",
         marginVertical: 5,
-        justifyContent: 'space-between',
+        justifyContent: "space-between",
         padding: 12
       }}
       onPress={onPress}
-      type={note && note.tags.findIndex(t => t === tag.title) !== -1 ? 'shade' : 'grayBg'}
+      type={
+        note && note.tags.findIndex((t) => t === tag.title) !== -1
+          ? "shade"
+          : "grayBg"
+      }
     >
       <Heading
         size={SIZE.sm}
         color={
-          note && note?.tags.findIndex(t => t === tag.title) !== -1 ? colors.accent : colors.pri
+          note && note?.tags.findIndex((t) => t === tag.title) !== -1
+            ? colors.accent
+            : colors.pri
         }
       >
-        {'#' + tag.title}
+        {"#" + tag.title}
       </Heading>
       <Icon
-        name={note && note?.tags.findIndex(t => t === tag.title) !== -1 ? 'minus' : 'plus'}
+        name={
+          note && note?.tags.findIndex((t) => t === tag.title) !== -1
+            ? "minus"
+            : "plus"
+        }
         color={
-          note && note?.tags.findIndex(t => t === tag.title) !== -1 ? colors.accent : colors.accent
+          note && note?.tags.findIndex((t) => t === tag.title) !== -1
+            ? colors.accent
+            : colors.accent
         }
         size={SIZE.lg}
       />

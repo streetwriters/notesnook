@@ -1,6 +1,6 @@
-import NetInfo from '@react-native-community/netinfo';
-import { EV, EVENTS } from '@streetwriters/notesnook-core/common';
-import { useEffect, useRef } from 'react';
+import NetInfo from "@react-native-community/netinfo";
+import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
+import { useEffect, useRef } from "react";
 import {
   Alert,
   Appearance,
@@ -9,48 +9,52 @@ import {
   NativeEventEmitter,
   NativeModules,
   Platform
-} from 'react-native';
-import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
-import { Walkthrough } from '../components/walkthroughs';
-import { editorController, editorState } from '../screens/editor/tiptap/utils';
-import BiometricService from '../services/biometrics';
+} from "react-native";
+import * as RNIap from "react-native-iap";
+import { enabled } from "react-native-privacy-snapshot";
+import { Walkthrough } from "../components/walkthroughs";
+import { editorController, editorState } from "../screens/editor/tiptap/utils";
+import BiometricService from "../services/biometrics";
 import {
   clearMessage,
   setEmailVerifyMessage,
   setLoginMessage,
   setRecoveryKeyMessage
-} from '../services/message';
-import PremiumService from '../services/premium';
-import SettingsService from '../services/settings';
-import { updateStatusBarColor } from '../utils/color-scheme';
-import { db } from '../common/database';
-import { MMKV } from '../common/database/mmkv';
-import { eClearEditor, eCloseProgressDialog, refreshNotesPage } from '../utils/events';
-import Sync from '../services/sync';
-import { clearAllStores, initAfterSync, initialize } from '../stores';
-import { useUserStore } from '../stores/use-user-store';
-import { useMessageStore } from '../stores/use-message-store';
-import { useSettingStore } from '../stores/use-setting-store';
-import { useAttachmentStore } from '../stores/use-attachment-store';
-import { useNoteStore } from '../stores/use-notes-store';
+} from "../services/message";
+import PremiumService from "../services/premium";
+import SettingsService from "../services/settings";
+import { updateStatusBarColor } from "../utils/color-scheme";
+import { db } from "../common/database";
+import { MMKV } from "../common/database/mmkv";
+import {
+  eClearEditor,
+  eCloseProgressDialog,
+  refreshNotesPage
+} from "../utils/events";
+import Sync from "../services/sync";
+import { clearAllStores, initAfterSync, initialize } from "../stores";
+import { useUserStore } from "../stores/use-user-store";
+import { useMessageStore } from "../stores/use-message-store";
+import { useSettingStore } from "../stores/use-setting-store";
+import { useAttachmentStore } from "../stores/use-attachment-store";
+import { useNoteStore } from "../stores/use-notes-store";
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
-} from '../services/event-manager';
-import { useEditorStore } from '../stores/use-editor-store';
-import { useDragState } from '../screens/settings/editor/state';
-import { sleep } from '../utils/time';
+} from "../services/event-manager";
+import { useEditorStore } from "../stores/use-editor-store";
+import { useDragState } from "../screens/settings/editor/state";
+import { sleep } from "../utils/time";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
-  const loading = useNoteStore(state => state.loading);
-  const setLastSynced = useUserStore(state => state.setLastSynced);
-  const setUser = useUserStore(state => state.setUser);
+  const loading = useNoteStore((state) => state.loading);
+  const setLastSynced = useUserStore((state) => state.setLastSynced);
+  const setUser = useUserStore((state) => state.setUser);
   const syncedOnLaunch = useRef(false);
-  const verify = useUserStore(state => state.verifyUser);
+  const verify = useUserStore((state) => state.verifyUser);
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,
@@ -61,18 +65,22 @@ export const useAppEvents = () => {
     isReconnecting: false
   });
 
-  const onLoadingAttachmentProgress = data => {
-    console.log('loading', data);
-    useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
+  const onLoadingAttachmentProgress = (data) => {
+    console.log("loading", data);
+    useAttachmentStore
+      .getState()
+      .setLoading(data.total === data.current ? null : data);
   };
 
   const onFileEncryptionProgress = ({ total, progress }) => {
-    console.log('encryption progress: ', (progress / total).toFixed(2));
-    useAttachmentStore.getState().setEncryptionProgress((progress / total).toFixed(2));
+    console.log("encryption progress: ", (progress / total).toFixed(2));
+    useAttachmentStore
+      .getState()
+      .setEncryptionProgress((progress / total).toFixed(2));
   };
   const onSyncProgress = ({ type, total, current }) => {
     console.log(type, total, current);
-    if (type !== 'download') return;
+    if (type !== "download") return;
     if (total < 10 || current % 10 === 0) {
       initAfterSync();
     }
@@ -83,22 +91,31 @@ export const useAppEvents = () => {
       const eventManager = db?.eventManager;
       eventManager?.subscribe(EVENTS.syncCompleted, onSyncComplete);
       db?.eventManager?.subscribe(EVENTS.syncProgress, onSyncProgress);
-      db?.eventManager?.subscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
+      db?.eventManager?.subscribe(
+        EVENTS.databaseSyncRequested,
+        onRequestPartialSync
+      );
     }
 
     return () => {
       const eventManager = db?.eventManager;
       eventManager?.unsubscribe(EVENTS.syncCompleted, onSyncComplete);
       eventManager?.unsubscribe(EVENTS.syncProgress, onSyncProgress);
-      eventManager?.unsubscribe(EVENTS.databaseSyncRequested, onRequestPartialSync);
+      eventManager?.unsubscribe(
+        EVENTS.databaseSyncRequested,
+        onRequestPartialSync
+      );
     };
   }, [loading]);
 
   useEffect(() => {
     let subs = [
       Appearance.addChangeListener(SettingsService.setTheme),
-      Linking.addEventListener('url', onUrlRecieved),
-      SodiumEventEmitter.addListener('onSodiumProgress', onFileEncryptionProgress)
+      Linking.addEventListener("url", onUrlRecieved),
+      SodiumEventEmitter.addListener(
+        "onSodiumProgress",
+        onFileEncryptionProgress
+      )
     ];
 
     EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
@@ -108,10 +125,10 @@ export const useAppEvents = () => {
     EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
     EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachmentProgress);
-    eSubscribeEvent('userLoggedIn', onUserUpdated);
+    eSubscribeEvent("userLoggedIn", onUserUpdated);
 
     return () => {
-      eUnSubscribeEvent('userLoggedIn', onUserUpdated);
+      eUnSubscribeEvent("userLoggedIn", onUserUpdated);
 
       EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
@@ -122,7 +139,7 @@ export const useAppEvents = () => {
       EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
       EV.unsubscribeAll();
 
-      subs.forEach(sub => sub?.remove());
+      subs.forEach((sub) => sub?.remove());
     };
   }, []);
 
@@ -130,26 +147,27 @@ export const useAppEvents = () => {
     await SettingsService.set({
       sessionExpired: true
     });
-    eSendEvent('session_expired');
+    eSendEvent("session_expired");
   };
 
   useEffect(() => {
     let sub;
     if (!loading && !verify) {
       setTimeout(() => {
-        sub = AppState.addEventListener('change', onAppStateChanged);
+        sub = AppState.addEventListener("change", onAppStateChanged);
       }, 1000);
       (async () => {
         try {
           let url = await Linking.getInitialURL();
-          if (url?.startsWith('https://app.notesnook.com/account/verified')) {
+          if (url?.startsWith("https://app.notesnook.com/account/verified")) {
             await onEmailVerified();
           }
           await onUserUpdated();
         } catch (e) {}
       })();
-      refValues.current.removeInternetStateListener =
-        NetInfo.addEventListener(onInternetStateChanged);
+      refValues.current.removeInternetStateListener = NetInfo.addEventListener(
+        onInternetStateChanged
+      );
     }
     return () => {
       refValues.current?.removeInternetStateListener &&
@@ -159,16 +177,16 @@ export const useAppEvents = () => {
     };
   }, [loading, verify]);
 
-  const onInternetStateChanged = async state => {
+  const onInternetStateChanged = async (state) => {
     if (!syncedOnLaunch.current) return;
     reconnectSSE(state);
   };
 
   const onSyncComplete = async () => {
-    console.log('sync complete');
+    console.log("sync complete");
     initAfterSync();
     setLastSynced(await db.lastSynced());
-    eSendEvent(eCloseProgressDialog, 'sync_progress');
+    eSendEvent(eCloseProgressDialog, "sync_progress");
     let id = useEditorStore.getState().currentEditingNote;
     let note = id && db.notes.note(id).data;
     if (note) {
@@ -176,10 +194,10 @@ export const useAppEvents = () => {
     }
   };
 
-  const onUrlRecieved = async res => {
-    let url = res ? res.url : '';
+  const onUrlRecieved = async (res) => {
+    let url = res ? res.url : "";
     try {
-      if (url.startsWith('https://app.notesnook.com/account/verified')) {
+      if (url.startsWith("https://app.notesnook.com/account/verified")) {
         await onEmailVerified();
       } else {
         return;
@@ -195,7 +213,7 @@ export const useAppEvents = () => {
       userEmailConfirmed: true
     });
     await PremiumService.setPremiumStatus();
-    Walkthrough.present('emailconfirmed', false, true);
+    Walkthrough.present("emailconfirmed", false, true);
     if (user?.isEmailConfirmed) {
       clearMessage();
     }
@@ -203,7 +221,7 @@ export const useAppEvents = () => {
 
   const attachIAPListeners = async () => {
     await RNIap.initConnection()
-      .catch(e => null)
+      .catch((e) => null)
       .then(async () => {
         refValues.current.subsriptionSuccessListener =
           RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
@@ -212,25 +230,25 @@ export const useAppEvents = () => {
       });
   };
 
-  const onAccountStatusChange = async userStatus => {
+  const onAccountStatusChange = async (userStatus) => {
     if (!PremiumService.get() && userStatus.type === 5) {
       PremiumService.subscriptions.clear();
-      Walkthrough.present('prouser', false, true);
+      Walkthrough.present("prouser", false, true);
     }
     await PremiumService.setPremiumStatus();
   };
 
   const onRequestPartialSync = async (full, force) => {
-    console.log('auto sync request', full, force);
+    console.log("auto sync request", full, force);
     if (full || force) {
-      await Sync.run('global', force, full);
+      await Sync.run("global", force, full);
     } else {
-      await Sync.run('global', false, false);
+      await Sync.run("global", false, false);
     }
   };
 
-  const onLogout = async reason => {
-    console.log('LOGOUT', reason);
+  const onLogout = async (reason) => {
+    console.log("LOGOUT", reason);
   };
 
   const unsubIAP = () => {
@@ -244,7 +262,7 @@ export const useAppEvents = () => {
     }
   };
 
-  const onUserUpdated = async login => {
+  const onUserUpdated = async (login) => {
     console.log(`onUserUpdated: ${login}`);
     let user;
     try {
@@ -281,7 +299,7 @@ export const useAppEvents = () => {
         });
       }
     } catch (e) {
-      ToastEvent.error(e, 'An error occured', 'global');
+      ToastEvent.error(e, "An error occured", "global");
     }
 
     user = await db.user.getUser();
@@ -298,31 +316,31 @@ export const useAppEvents = () => {
     syncedOnLaunch.current = true;
   };
 
-  const onSuccessfulSubscription = async subscription => {
+  const onSuccessfulSubscription = async (subscription) => {
     await PremiumService.subscriptions.set(subscription);
     await PremiumService.subscriptions.verify(subscription);
   };
 
-  const onSubscriptionError = async error => {
+  const onSubscriptionError = async (error) => {
     ToastEvent.show({
-      heading: 'Failed to subscribe',
-      type: 'error',
+      heading: "Failed to subscribe",
+      type: "error",
       message: error.message,
-      context: 'local'
+      context: "local"
     });
   };
 
-  const onAppStateChanged = async state => {
-    console.log('onAppStateChanged');
-    if (state === 'active') {
+  const onAppStateChanged = async (state) => {
+    console.log("onAppStateChanged");
+    if (state === "active") {
       updateStatusBarColor();
       if (
-        SettingsService.get().appLockMode !== 'background' &&
+        SettingsService.get().appLockMode !== "background" &&
         !SettingsService.get().privacyScreen
       ) {
         enabled(false);
       }
-      if (SettingsService.get().appLockMode === 'background') {
+      if (SettingsService.get().appLockMode === "background") {
         if (useSettingStore.getState().requestBiometrics) {
           useSettingStore.getState().setRequestBiometrics(false);
           return;
@@ -331,7 +349,7 @@ export const useAppEvents = () => {
 
       await reconnectSSE();
       await checkIntentState();
-      MMKV.removeItem('appState');
+      MMKV.removeItem("appState");
       let user = await db.user.getUser();
       if (user && !user?.isEmailConfirmed) {
         try {
@@ -344,12 +362,12 @@ export const useAppEvents = () => {
     } else {
       let id = useEditorStore.getState().currentEditingNote;
       let note = id && db.notes.note(id).data;
-      if (note?.locked && SettingsService.get().appLockMode === 'background') {
+      if (note?.locked && SettingsService.get().appLockMode === "background") {
         eSendEvent(eClearEditor);
       }
       await storeAppState();
       if (
-        SettingsService.get().appLockMode === 'background' &&
+        SettingsService.get().appLockMode === "background" &&
         !useSettingStore.getState().requestBiometrics &&
         !useUserStore.getState().verifyUser
       ) {
@@ -357,7 +375,7 @@ export const useAppEvents = () => {
       }
       if (
         SettingsService.get().privacyScreen ||
-        SettingsService.get().appLockMode === 'background'
+        SettingsService.get().appLockMode === "background"
       ) {
         !useSettingStore.getState().requestBiometrics ? enabled(true) : null;
       }
@@ -375,7 +393,7 @@ export const useAppEvents = () => {
     }
     refValues.current.isReconnecting = true;
     let state = connection;
-    console.log('SSE:', 'TRYING TO RECONNECT');
+    console.log("SSE:", "TRYING TO RECONNECT");
     try {
       if (!state) {
         state = await NetInfo.fetch();
@@ -402,32 +420,35 @@ export const useAppEvents = () => {
         movedAway: editorState().movedAway,
         timestamp: Date.now()
       });
-      MMKV.setString('appState', state);
+      MMKV.setString("appState", state);
     }
   }
 
   async function checkIntentState() {
     try {
-      let notesAddedFromIntent = MMKV.getString('notesAddedFromIntent');
-      let shareExtensionOpened = MMKV.getString('shareExtensionOpened');
+      let notesAddedFromIntent = MMKV.getString("notesAddedFromIntent");
+      let shareExtensionOpened = MMKV.getString("shareExtensionOpened");
       if (notesAddedFromIntent) {
-        if (Platform.OS === 'ios') {
+        if (Platform.OS === "ios") {
           await db.init();
           await db.notes.init();
         }
         useNoteStore.getState().setNotes();
         eSendEvent(refreshNotesPage);
-        MMKV.removeItem('notesAddedFromIntent');
+        MMKV.removeItem("notesAddedFromIntent");
         initAfterSync();
         eSendEvent(refreshNotesPage);
       }
-      console.log('CHECK INTENT STATE', notesAddedFromIntent || shareExtensionOpened);
+      console.log(
+        "CHECK INTENT STATE",
+        notesAddedFromIntent || shareExtensionOpened
+      );
       if (notesAddedFromIntent || shareExtensionOpened) {
         let id = useEditorStore.getState().currentEditingNote;
         let note = id && db.notes.note(id).data;
-        eSendEvent('loadingNote', note);
-        eSendEvent('webview_reset');
-        MMKV.removeItem('shareExtensionOpened');
+        eSendEvent("loadingNote", note);
+        eSendEvent("webview_reset");
+        MMKV.removeItem("shareExtensionOpened");
       }
     } catch (e) {
       console.log(e);

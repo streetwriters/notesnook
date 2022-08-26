@@ -16,7 +16,7 @@ export default function DialogLoader() {
           mb: 3,
           mt: 1,
           justifyContent: "flex-end",
-          alignItems: "flex-end",
+          alignItems: "flex-end"
         }}
       >
         <Skeleton height={25} width={70} />

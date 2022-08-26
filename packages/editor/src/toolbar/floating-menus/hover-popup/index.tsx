@@ -63,7 +63,7 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
                 selectedNode={{
                   node,
                   from: pos,
-                  to: pos + node.nodeSize,
+                  to: pos + node.nodeSize
                 }}
               />
             ),
@@ -73,8 +73,8 @@ export function HoverPopupHandler(props: FloatingMenuProps) {
               target: element,
               align: "center",
               location: "top",
-              isTargetAbsolute: true,
-            },
+              isTargetAbsolute: true
+            }
           });
           activePopup.current = { element, hide: hidePopup };
         },

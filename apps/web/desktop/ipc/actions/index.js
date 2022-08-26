@@ -13,7 +13,7 @@ const actions = {
   installUpdate,
   open,
   saveFile,
-  setZoomFactor,
+  setZoomFactor
 };
 
 module.exports.getAction = function getAction(actionName) {

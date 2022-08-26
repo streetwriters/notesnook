@@ -9,9 +9,9 @@ export const TableCell = TiptapTableCell.extend({
       color: addStyleAttribute("color", "color"),
       borderWidth: addStyleAttribute("borderWidth", "border-width", "px"),
       borderStyle: addStyleAttribute("borderStyle", "border-style"),
-      borderColor: addStyleAttribute("borderColor", "border-color"),
+      borderColor: addStyleAttribute("borderColor", "border-color")
     };
-  },
+  }
 });
 
 function addStyleAttribute(
@@ -31,8 +31,8 @@ function addStyleAttribute(
       }
 
       return {
-        style: `${cssName}: ${attributes[name as string]}${unit || ""}`,
+        style: `${cssName}: ${attributes[name as string]}${unit || ""}`
       };
-    },
+    }
   };
 }

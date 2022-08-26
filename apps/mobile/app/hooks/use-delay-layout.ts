@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { InteractionManager } from 'react-native';
+import { useEffect, useState } from "react";
+import { InteractionManager } from "react-native";
 
 export const useDelayLayout = (delay: number) => {
   const [loading, setLoading] = useState(true);

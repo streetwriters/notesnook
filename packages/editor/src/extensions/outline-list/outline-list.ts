@@ -28,7 +28,7 @@ export const OutlineList = Node.create<OutlineListOptions>({
 
   addOptions() {
     return {
-      HTMLAttributes: {},
+      HTMLAttributes: {}
     };
   },
 
@@ -39,9 +39,9 @@ export const OutlineList = Node.create<OutlineListOptions>({
         keepOnSplit: false,
         parseHTML: (element) => element.dataset.collapsed === "true",
         renderHTML: (attributes) => ({
-          "data-collapsed": attributes.collapsed === true,
-        }),
-      },
+          "data-collapsed": attributes.collapsed === true
+        })
+      }
     };
   },
 
@@ -53,8 +53,8 @@ export const OutlineList = Node.create<OutlineListOptions>({
     return [
       {
         tag: `ul[data-type="${this.name}"]`,
-        priority: 52,
-      },
+        priority: 52
+      }
     ];
   },
 
@@ -62,9 +62,9 @@ export const OutlineList = Node.create<OutlineListOptions>({
     return [
       "ul",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        "data-type": this.name,
+        "data-type": this.name
       }),
-      0,
+      0
     ];
   },
 
@@ -74,13 +74,13 @@ export const OutlineList = Node.create<OutlineListOptions>({
         () =>
         ({ commands }) => {
           return commands.toggleList(this.name, outlineListItemName);
-        },
+        }
     };
   },
 
   addKeyboardShortcuts() {
     return {
-      "Mod-Shift-O": () => this.editor.commands.toggleOutlineList(),
+      "Mod-Shift-O": () => this.editor.commands.toggleOutlineList()
     };
   },
 
@@ -88,8 +88,8 @@ export const OutlineList = Node.create<OutlineListOptions>({
     return [
       wrappingInputRule({
         find: inputRegex,
-        type: this.type,
-      }),
+        type: this.type
+      })
     ];
   },
 
@@ -100,7 +100,7 @@ export const OutlineList = Node.create<OutlineListOptions>({
         content.classList.add(`${this.name.toLowerCase()}-content-wrapper`);
         content.style.whiteSpace = "inherit";
         return { dom: content };
-      },
+      }
     });
-  },
+  }
 });

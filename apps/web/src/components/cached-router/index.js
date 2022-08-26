@@ -12,8 +12,8 @@ function CachedRouter() {
   const [RouteResult, location] = useRoutes(routes, {
     fallbackRoute: getHomeRoute(),
     hooks: {
-      beforeNavigate: () => selectionStore.toggleSelectionMode(false),
-    },
+      beforeNavigate: () => selectionStore.toggleSelectionMode(false)
+    }
   });
 
   useEffect(() => {

@@ -74,7 +74,7 @@ const HOMEPAGE_ROUTE = {
   0: "/notes",
   1: "/notebooks",
   2: "/favorites",
-  3: "/tags",
+  3: "/tags"
 };
 export function getHomeRoute() {
   return HOMEPAGE_ROUTE[Config.get("homepage", 0)];

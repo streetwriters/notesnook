@@ -40,11 +40,11 @@ function PasswordDialog(props) {
       positiveButton={{
         props: {
           form: "passwordForm",
-          type: "submit",
+          type: "submit"
         },
         text: props.positiveButtonText,
         loading: isLoading,
-        disabled: isLoading,
+        disabled: isLoading
       }}
       negativeButton={{ text: "Cancel", onClick: props.onClose }}
     >

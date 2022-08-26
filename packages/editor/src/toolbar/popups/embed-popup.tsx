@@ -6,7 +6,7 @@ import {
   Embed,
   EmbedAlignmentOptions,
   EmbedAttributes,
-  EmbedSizeOptions,
+  EmbedSizeOptions
 } from "../../extensions/embed";
 import { IconNames } from "../icons";
 import { ToolButton } from "../components/tool-button";
@@ -36,16 +36,16 @@ export function EmbedPopup(props: EmbedPopupProps) {
       const size: EmbedSizeOptions = newWidth
         ? {
             width: newWidth,
-            height: newWidth * (height / width),
+            height: newWidth * (height / width)
           }
         : newHeight
         ? {
             width: newHeight * (width / height),
-            height: newHeight,
+            height: newHeight
           }
         : {
             width: 0,
-            height: 0,
+            height: 0
           };
       setWidth(size.width);
       setHeight(size.height);
@@ -91,9 +91,9 @@ export function EmbedPopup(props: EmbedPopupProps) {
           onClose({
             height: _height,
             width: _width,
-            src: _src,
+            src: _src
           });
-        },
+        }
       }}
     >
       <Flex sx={{ flexDirection: "column", width: ["auto", 300] }}>
@@ -104,7 +104,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               bg: "errorBg",
               color: "error",
               p: 1,
-              borderRadius: "default",
+              borderRadius: "default"
             }}
           >
             Error: {error}
@@ -134,7 +134,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
                 value={width}
                 sx={{
                   mr: 1,
-                  fontSize: "body",
+                  fontSize: "body"
                 }}
                 onChange={(e) => onSizeChange(e.target.valueAsNumber)}
               />

@@ -8,7 +8,7 @@ import {
   SyncError,
   Checkmark,
   Alert,
-  Issue,
+  Issue
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -19,7 +19,7 @@ import installUpdate from "../../commands/install-update";
 import checkForUpdate from "../../commands/check-for-update";
 import {
   showIssueDialog,
-  showUpdateAvailableNotice,
+  showUpdateAvailableNotice
 } from "../../common/dialog-controller";
 import useStatus from "../../hooks/use-status";
 import { getIconFromAlias } from "../icons/resolver";
@@ -215,7 +215,7 @@ const syncStatusFilters = [
       ) : (
         "click to sync"
       ),
-    tooltip: "All changes are synced.",
+    tooltip: "All changes are synced."
   },
   {
     key: "syncing",
@@ -223,14 +223,14 @@ const syncStatusFilters = [
     icon: Sync,
     loading: true,
     text: ({ syncStatus }) => <>{syncStatus.type || "sync"}ing</>,
-    tooltip: "Syncing your notes...",
+    tooltip: "Syncing your notes..."
   },
   {
     key: "completed",
     check: (syncStatus) => syncStatus === "completed",
     icon: Checkmark,
     iconColor: "success",
-    text: "",
+    text: ""
   },
   {
     key: "conflicts",
@@ -238,7 +238,7 @@ const syncStatusFilters = [
     icon: Alert,
     iconColor: "error",
     text: "Merge conflicts",
-    tooltip: "Please resolve all merge conflicts and run the sync again.",
+    tooltip: "Please resolve all merge conflicts and run the sync again."
   },
   {
     key: "emailNotConfirmed",
@@ -246,7 +246,7 @@ const syncStatusFilters = [
     icon: Alert,
     iconColor: "warn",
     text: "Sync disabled",
-    tooltip: "Please confirm your email to start syncing.",
+    tooltip: "Please confirm your email to start syncing."
   },
   {
     key: "failed",
@@ -254,6 +254,6 @@ const syncStatusFilters = [
     icon: SyncError,
     color: "error",
     text: "Sync failed",
-    tooltip: "Sync failed to completed. Please try again.",
-  },
+    tooltip: "Sync failed to completed. Please try again."
+  }
 ];

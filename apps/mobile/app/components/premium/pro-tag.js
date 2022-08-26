@@ -1,11 +1,11 @@
-import React from 'react';
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/use-theme-store';
-import Paragraph from '../ui/typography/paragraph';
+import React from "react";
+import { View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../stores/use-theme-store";
+import Paragraph from "../ui/typography/paragraph";
 
 export const ProTag = ({ width, size, background }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return (
     <View
@@ -13,10 +13,10 @@ export const ProTag = ({ width, size, background }) => {
         backgroundColor: background || colors.bg,
         borderRadius: 100,
         width: width || 60,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         paddingVertical: 2.5,
-        flexDirection: 'row'
+        flexDirection: "row"
       }}
     >
       <Icon

@@ -21,7 +21,7 @@ async function main() {
         ? Array.isArray(language.alias)
           ? language.alias
           : [language.alias]
-        : undefined,
+        : undefined
     });
   }
   console.log(JSON.stringify(output));

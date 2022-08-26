@@ -33,7 +33,7 @@ export const NodeViewSelectionNotifierPlugin = new Plugin({
     },
     apply(_tr, pluginState: ReactNodeViewState) {
       return pluginState;
-    },
+    }
   },
   key: stateKey,
   view: (view: EditorView) => {
@@ -43,14 +43,14 @@ export const NodeViewSelectionNotifierPlugin = new Plugin({
       update: (view: EditorView) => {
         const { from, to } = view.state.selection;
         pluginState.notifyNewSelection(from, to);
-      },
+      }
     };
-  },
+  }
 });
 
 export const NodeViewSelectionNotifier = Extension.create({
   name: "node-view-selection-notifier",
   addProseMirrorPlugins() {
     return [NodeViewSelectionNotifierPlugin];
-  },
+  }
 });

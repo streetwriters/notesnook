@@ -1,8 +1,8 @@
-import { Settings } from '../../stores/interfaces';
+import { Settings } from "../../stores/interfaces";
 
 export type SettingSection = {
   id: string;
-  type?: 'screen' | 'switch' | 'component' | 'danger';
+  type?: "screen" | "switch" | "component" | "danger";
   name?: string | ((current?: any) => string);
   description?: string | ((current: any) => string);
   icon?: string;

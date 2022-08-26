@@ -1,8 +1,8 @@
 process.env.NODE_ENV = "production";
 
 const webpack = require("webpack");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const webpackConfigProd = require("react-scripts/config/webpack.config")(
   "production"
 );
@@ -25,7 +25,7 @@ webpackConfigProd.plugins.push(
   new ProgressBarPlugin({
     format: `${green("analyzing...")} ${green("[:bar]")}${green(
       "[:percent]"
-    )}${green("[:elapsed seconds]")} - :msg`,
+    )}${green("[:elapsed seconds]")} - :msg`
   })
 );
 

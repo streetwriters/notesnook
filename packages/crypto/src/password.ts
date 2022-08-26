@@ -2,7 +2,7 @@ import {
   crypto_generichash,
   crypto_pwhash,
   crypto_pwhash_ALG_ARGON2ID13,
-  crypto_pwhash_SALTBYTES,
+  crypto_pwhash_SALTBYTES
 } from "libsodium-wrappers";
 
 export default class Password {

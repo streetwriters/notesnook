@@ -1,6 +1,6 @@
 import {
   getDefaultPresets,
-  ToolbarGroupDefinition,
+  ToolbarGroupDefinition
 } from "@streetwriters/editor";
 import { db } from "./db";
 
@@ -17,9 +17,9 @@ const presets: Record<PresetId, Preset> = {
   minimal: {
     id: "minimal",
     title: "Minimal",
-    tools: defaultPresets.minimal,
+    tools: defaultPresets.minimal
   },
-  custom: { id: "custom", title: "Custom", tools: [], editable: true },
+  custom: { id: "custom", title: "Custom", tools: [], editable: true }
 };
 
 export function getCurrentPreset() {

@@ -30,7 +30,7 @@ export function InsertBlock(props: ToolProps) {
       image(editor, isMobile),
       attachment(editor),
       isMobile ? embedMobile(editor) : embedDesktop(editor),
-      table(editor),
+      table(editor)
     ];
   }, [isMobile]);
 
@@ -47,8 +47,8 @@ export function InsertBlock(props: ToolProps) {
           alignItems: "center",
           ":hover": { bg: "hover" },
           ":last-of-type": {
-            mr: 0,
-          },
+            mr: 0
+          }
         }}
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => setIsOpen((s) => !s)}
@@ -67,7 +67,7 @@ export function InsertBlock(props: ToolProps) {
           target: buttonRef.current || undefined,
           isTargetAbsolute: true,
           location: toolbarLocation === "bottom" ? "top" : "below",
-          yOffset: 5,
+          yOffset: 5
         }}
       />
     </>
@@ -80,7 +80,7 @@ const horizontalRule = (editor: Editor): MenuItem => ({
   title: "Horizontal rule",
   icon: "horizontalRule",
   isChecked: editor?.isActive("horizontalRule"),
-  onClick: () => editor.current?.chain().focus().setHorizontalRule().run(),
+  onClick: () => editor.current?.chain().focus().setHorizontalRule().run()
 });
 
 const codeblock = (editor: Editor): MenuItem => ({
@@ -89,7 +89,7 @@ const codeblock = (editor: Editor): MenuItem => ({
   title: "Code block",
   icon: "codeblock",
   isChecked: editor?.isActive("codeBlock"),
-  onClick: () => editor.current?.chain().focus().toggleCodeBlock().run(),
+  onClick: () => editor.current?.chain().focus().toggleCodeBlock().run()
 });
 
 const blockquote = (editor: Editor): MenuItem => ({
@@ -98,7 +98,7 @@ const blockquote = (editor: Editor): MenuItem => ({
   title: "Quote",
   icon: "blockquote",
   isChecked: editor?.isActive("blockQuote"),
-  onClick: () => editor.current?.chain().focus().toggleBlockquote().run(),
+  onClick: () => editor.current?.chain().focus().toggleBlockquote().run()
 });
 
 const mathblock = (editor: Editor): MenuItem => ({
@@ -107,7 +107,7 @@ const mathblock = (editor: Editor): MenuItem => ({
   title: "Math & formulas",
   icon: "mathBlock",
   isChecked: editor?.isActive("mathBlock"),
-  onClick: () => editor.current?.chain().focus().insertMathBlock().run(),
+  onClick: () => editor.current?.chain().focus().insertMathBlock().run()
 });
 
 const image = (editor: Editor, isMobile: boolean): MenuItem => ({
@@ -124,7 +124,7 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         title: "Upload from disk",
         icon: "upload",
         onClick: () =>
-          editor.current?.chain().focus().openAttachmentPicker("image").run(),
+          editor.current?.chain().focus().openAttachmentPicker("image").run()
       },
       {
         key: "camera",
@@ -133,11 +133,11 @@ const image = (editor: Editor, isMobile: boolean): MenuItem => ({
         icon: "camera",
         isHidden: !isMobile,
         onClick: () =>
-          editor.current?.chain().focus().openAttachmentPicker("camera").run(),
+          editor.current?.chain().focus().openAttachmentPicker("camera").run()
       },
-      isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor),
-    ],
-  },
+      isMobile ? uploadImageFromURLMobile(editor) : uploadImageFromURL(editor)
+    ]
+  }
 });
 
 const table = (editor: Editor): MenuItem => ({
@@ -159,16 +159,16 @@ const table = (editor: Editor): MenuItem => ({
                 .focus()
                 .insertTable({
                   rows: size.rows,
-                  cols: size.columns,
+                  cols: size.columns
                 })
                 .run();
               props.onClick?.();
             }}
           />
-        ),
-      },
-    ],
-  },
+        )
+      }
+    ]
+  }
 });
 
 const embedMobile = (editor: Editor): MenuItem => ({
@@ -193,10 +193,10 @@ const embedMobile = (editor: Editor): MenuItem => ({
               }}
             />
           );
-        },
-      },
-    ],
-  },
+        }
+      }
+    ]
+  }
 });
 
 const embedDesktop = (editor: Editor): MenuItem => ({
@@ -216,9 +216,9 @@ const embedDesktop = (editor: Editor): MenuItem => ({
             hide();
           }}
         />
-      ),
+      )
     });
-  },
+  }
 });
 
 const attachment = (editor: Editor): MenuItem => ({
@@ -228,7 +228,7 @@ const attachment = (editor: Editor): MenuItem => ({
   icon: "attachment",
   isChecked: editor?.isActive("attachment"),
   onClick: () =>
-    editor.current?.chain().focus().openAttachmentPicker("file").run(),
+    editor.current?.chain().focus().openAttachmentPicker("file").run()
 });
 
 const tasklist = (editor: Editor): MenuItem => ({
@@ -237,7 +237,7 @@ const tasklist = (editor: Editor): MenuItem => ({
   title: "Task list",
   icon: "checkbox",
   isChecked: editor?.isActive("taskList"),
-  onClick: () => editor.current?.chain().focus().toggleTaskList().run(),
+  onClick: () => editor.current?.chain().focus().toggleTaskList().run()
 });
 
 const outlinelist = (editor: Editor): MenuItem => ({
@@ -246,7 +246,7 @@ const outlinelist = (editor: Editor): MenuItem => ({
   title: "Outline list",
   icon: "outlineList",
   isChecked: editor?.isActive("outlineList"),
-  onClick: () => editor.current?.chain().focus().toggleOutlineList().run(),
+  onClick: () => editor.current?.chain().focus().toggleOutlineList().run()
 });
 
 const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
@@ -275,10 +275,10 @@ const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
               onClick?.();
             }}
           />
-        ),
-      },
-    ],
-  },
+        )
+      }
+    ]
+  }
 });
 
 const uploadImageFromURL = (editor: Editor): MenuItem => ({
@@ -301,7 +301,7 @@ const uploadImageFromURL = (editor: Editor): MenuItem => ({
           }}
           onClose={hide}
         />
-      ),
+      )
     });
-  },
+  }
 });

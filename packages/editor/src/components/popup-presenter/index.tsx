@@ -3,7 +3,7 @@ import {
   useRef,
   useEffect,
   PropsWithChildren,
-  ReactNode,
+  ReactNode
 } from "react";
 import { Box } from "rebass";
 import { getPosition, PositionOptions } from "../../utils/position";
@@ -14,13 +14,13 @@ import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
 import { Theme } from "@streetwriters/theme";
 import {
   useIsMobile,
-  useToolbarStore,
+  useToolbarStore
 } from "../../toolbar/stores/toolbar-store";
 import React from "react";
 import {
   EditorContext,
   PopupRenderer,
-  usePopupRenderer,
+  usePopupRenderer
 } from "./popuprenderer";
 import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
 import { ThemeProvider } from "../theme-provider";
@@ -41,7 +41,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     onClose,
     blocking = true,
     focusOnRender = true,
-    children,
+    children
   } = props;
 
   const isMobile = useIsMobile();
@@ -163,7 +163,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
               ...props.style,
               position: !blocking ? "initial" : "fixed",
               zIndex: 1000,
-              backgroundColor: !blocking ? "transparent" : "unset",
+              backgroundColor: !blocking ? "transparent" : "unset"
             }}
             // onClick={(e) => {
             //   if (!(e.target instanceof HTMLElement)) return;
@@ -200,7 +200,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
             padding: 0,
             zIndex: 999,
             outline: 0,
-            isolation: "isolate",
+            isolation: "isolate"
           }}
         >
           {children}
@@ -210,8 +210,8 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         content: {},
         overlay: {
           zIndex: 999,
-          background: "transparent",
-        },
+          background: "transparent"
+        }
       }}
     >
       {children}
@@ -281,7 +281,7 @@ export function PopupWrapper(props: PopupWrapperProps) {
               sx={{
                 boxShadow: "menu",
                 borderRadius: "default",
-                overflow: "hidden",
+                overflow: "hidden"
                 //          width,
               }}
             >
@@ -361,7 +361,7 @@ export function showPopup(options: ShowPopupOptions) {
           isTargetAbsolute: true,
           location: "below",
           align: "end",
-          yOffset: 10,
+          yOffset: 10
         }}
         blocking
         focusOnRender

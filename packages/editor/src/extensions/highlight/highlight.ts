@@ -31,7 +31,7 @@ export const Highlight = Extension.create<HighlightOptions>({
   addOptions() {
     return {
       types: ["textStyle"],
-      HTMLAttributes: {},
+      HTMLAttributes: {}
     };
   },
 
@@ -50,12 +50,12 @@ export const Highlight = Extension.create<HighlightOptions>({
               }
 
               return {
-                style: `background-color: ${attributes.backgroundColor}`,
+                style: `background-color: ${attributes.backgroundColor}`
               };
-            },
-          },
-        },
-      },
+            }
+          }
+        }
+      }
     ];
   },
 
@@ -78,9 +78,9 @@ export const Highlight = Extension.create<HighlightOptions>({
             .setMark("textStyle", { backgroundColor: null })
             .removeEmptyTextStyle()
             .run();
-        },
+        }
     };
-  },
+  }
 
   // addKeyboardShortcuts() {
   //   return {

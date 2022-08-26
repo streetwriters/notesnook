@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { eSendEvent } from '../../services/event-manager';
-import Navigation from '../../services/navigation';
-import { db } from '../../common/database';
-import { eOpenTagsDialog, refreshNotesPage } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { Button } from '../ui/button';
-import { TaggedNotes } from '../../screens/notes/tagged';
+import React, { useState } from "react";
+import { View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { eSendEvent } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import { db } from "../../common/database";
+import { eOpenTagsDialog, refreshNotesPage } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { Button } from "../ui/button";
+import { TaggedNotes } from "../../screens/notes/tagged";
 
 export const Tags = ({ item, close }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return item.id ? (
     <View
@@ -22,9 +22,9 @@ export const Tags = ({ item, close }) => {
     >
       <View
         style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          alignItems: 'center'
+          flexDirection: "row",
+          flexWrap: "wrap",
+          alignItems: "center"
         }}
       >
         <Button
@@ -59,7 +59,7 @@ export const Tags = ({ item, close }) => {
 const TagItem = ({ tag, close }) => {
   const onPress = async () => {
     let tags = db.tags.all;
-    let _tag = tags.find(t => t.title === tag);
+    let _tag = tags.find((t) => t.title === tag);
     TaggedNotes.navigate(_tag, true);
     await sleep(300);
     close();
@@ -75,7 +75,7 @@ const TagItem = ({ tag, close }) => {
   return (
     <Button
       onPress={onPress}
-      title={'#' + tag}
+      title={"#" + tag}
       // buttonType={{
       //   text: colors.accent
       // }}

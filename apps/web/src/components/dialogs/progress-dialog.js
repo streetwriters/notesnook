@@ -6,7 +6,7 @@ function ProgressDialog(props) {
   const [{ current, total, text }, setProgress] = useState({
     current: 0,
     total: 1,
-    text: "",
+    text: ""
   });
 
   useEffect(() => {
@@ -39,7 +39,7 @@ function ProgressDialog(props) {
                 my: 1,
                 bg: "primary",
                 height: "2px",
-                width: `${(current / total) * 100}%`,
+                width: `${(current / total) * 100}%`
               }}
             />
           </>

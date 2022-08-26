@@ -27,7 +27,7 @@ test("login user & import notes", async () => {
 
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
-    page.click(getTestId("import-dialog-select-files")),
+    page.click(getTestId("import-dialog-select-files"))
   ]);
 
   await fileChooser.setFiles(path.join(__dirname, "data", "importer-data.zip"));

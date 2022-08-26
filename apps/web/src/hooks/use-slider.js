@@ -16,7 +16,7 @@ export default function useSlider(sliderId, { onSliding, onChange }) {
           index: slides.length,
           node,
           offset: last,
-          width: node.scrollWidth,
+          width: node.scrollWidth
         });
         last += node.scrollWidth;
       }

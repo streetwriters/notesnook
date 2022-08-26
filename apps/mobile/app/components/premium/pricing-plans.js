@@ -1,54 +1,63 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, Text, View } from 'react-native';
-import * as RNIap from 'react-native-iap';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useUserStore } from '../../stores/use-user-store';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
-import PremiumService from '../../services/premium';
-import { db } from '../../common/database';
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Platform, Text, View } from "react-native";
+import * as RNIap from "react-native-iap";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from "../../services/event-manager";
+import PremiumService from "../../services/premium";
+import { db } from "../../common/database";
 import {
   eClosePremiumDialog,
   eCloseProgressDialog,
   eCloseSimpleDialog,
   eOpenLoginDialog
-} from '../../utils/events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import umami from '../../common/analytics';
-import { Button } from '../ui/button';
-import { Dialog } from '../dialog';
-import BaseDialog from '../dialog/base-dialog';
-import { presentDialog } from '../dialog/functions';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import { Walkthrough } from '../walkthroughs';
-import { PricingItem } from './pricing-item';
-import { usePricing } from '../../hooks/use-pricing';
+} from "../../utils/events";
+import { openLinkInBrowser } from "../../utils/functions";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import umami from "../../common/analytics";
+import { Button } from "../ui/button";
+import { Dialog } from "../dialog";
+import BaseDialog from "../dialog/base-dialog";
+import { presentDialog } from "../dialog/functions";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import { Walkthrough } from "../walkthroughs";
+import { PricingItem } from "./pricing-item";
+import { usePricing } from "../../hooks/use-pricing";
 
 const promoCyclesMonthly = {
-  1: 'first month',
-  2: 'first 2 months',
-  3: 'first 3 months'
+  1: "first month",
+  2: "first 2 months",
+  3: "first 3 months"
 };
 
 const promoCyclesYearly = {
-  1: 'first year',
-  2: 'first 2 years',
-  3: 'first 3 years'
+  1: "first year",
+  2: "first 2 years",
+  3: "first 3 years"
 };
 
-export const PricingPlans = ({ promo, marginTop, heading = true, compact = false }) => {
-  const colors = useThemeStore(state => state.colors);
-  const user = useUserStore(state => state.user);
+export const PricingPlans = ({
+  promo,
+  marginTop,
+  heading = true,
+  compact = false
+}) => {
+  const colors = useThemeStore((state) => state.colors);
+  const user = useUserStore((state) => state.user);
   const [product, setProduct] = useState(null);
   const [buying, setBuying] = useState(false);
   const [loading, setLoading] = useState(false);
   const userCanRequestTrial =
     user && (!user.subscription || !user.subscription.expiry) ? true : false;
   const [upgrade, setUpgrade] = useState(!userCanRequestTrial);
-  const yearlyPlan = usePricing('yearly');
-  const monthlyPlan = usePricing('monthly');
+  const yearlyPlan = usePricing("yearly");
+  const monthlyPlan = usePricing("monthly");
 
   const getSkus = async () => {
     try {
@@ -59,41 +68,43 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
       setLoading(false);
     } catch (e) {
       setLoading(false);
-      console.log('error getting sku', e);
+      console.log("error getting sku", e);
     }
   };
 
-  const getPromo = async code => {
+  const getPromo = async (code) => {
     try {
       let productId;
-      if (code.startsWith('com.streetwriters.notesnook')) {
+      if (code.startsWith("com.streetwriters.notesnook")) {
         productId = code;
       } else {
-        productId = await db.offers.getCode(code.split(':')[0], Platform.OS);
+        productId = await db.offers.getCode(code.split(":")[0], Platform.OS);
       }
 
       let products = await PremiumService.getProducts();
-      let product = products.find(p => p.productId === productId);
+      let product = products.find((p) => p.productId === productId);
       if (!product) return false;
-      let isMonthly = product.productId.indexOf('.mo') > -1;
+      let isMonthly = product.productId.indexOf(".mo") > -1;
       let cycleText = isMonthly
         ? promoCyclesMonthly[
-            product.introductoryPriceCyclesAndroid || product.introductoryPriceNumberOfPeriodsIOS
+            product.introductoryPriceCyclesAndroid ||
+              product.introductoryPriceNumberOfPeriodsIOS
           ]
         : promoCyclesYearly[
-            product.introductoryPriceCyclesAndroid || product.introductoryPriceNumberOfPeriodsIOS
+            product.introductoryPriceCyclesAndroid ||
+              product.introductoryPriceNumberOfPeriodsIOS
           ];
 
       setProduct({
-        type: 'promo',
-        offerType: isMonthly ? 'monthly' : 'yearly',
+        type: "promo",
+        offerType: isMonthly ? "monthly" : "yearly",
         data: product,
         cycleText: cycleText,
-        info: 'Pay monthly, cancel anytime'
+        info: "Pay monthly, cancel anytime"
       });
       return true;
     } catch (e) {
-      console.log('PROMOCODE ERROR:', code, e);
+      console.log("PROMOCODE ERROR:", code, e);
       return false;
     }
   };
@@ -102,7 +113,7 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
     getSkus();
   }, []);
 
-  const buySubscription = async product => {
+  const buySubscription = async (product) => {
     if (buying) return;
     setBuying(true);
     try {
@@ -110,20 +121,30 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
         setBuying(false);
         return;
       }
-      umami.pageView('/iap-native', `${compact ? 'pro-sheet' : 'pro-screen'}/pro-plans`);
-      await RNIap.requestSubscription(product?.productId, false, null, null, null, user.id);
+      umami.pageView(
+        "/iap-native",
+        `${compact ? "pro-sheet" : "pro-screen"}/pro-plans`
+      );
+      await RNIap.requestSubscription(
+        product?.productId,
+        false,
+        null,
+        null,
+        null,
+        user.id
+      );
       setBuying(false);
       eSendEvent(eCloseProgressDialog);
       eSendEvent(eClosePremiumDialog);
       await sleep(500);
       presentSheet({
-        title: 'Thank you for subscribing!',
+        title: "Thank you for subscribing!",
         paragraph: `Your Notesnook Pro subscription will be activated soon. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co`,
         action: async () => {
           eSendEvent(eCloseProgressDialog);
         },
-        icon: 'check',
-        actionText: 'Continue'
+        icon: "check",
+        actionText: "Continue"
       });
     } catch (e) {
       setBuying(false);
@@ -135,8 +156,8 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
     <View
       style={{
         paddingHorizontal: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         height: 100
       }}
     >
@@ -158,7 +179,7 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
         <>
           <Paragraph
             style={{
-              alignSelf: 'center'
+              alignSelf: "center"
             }}
             size={SIZE.lg}
           >
@@ -186,7 +207,7 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
                 eSendEvent(eClosePremiumDialog);
                 eSendEvent(eCloseProgressDialog);
                 await sleep(300);
-                Walkthrough.present('trialstarted', false, true);
+                Walkthrough.present("trialstarted", false, true);
               } catch (e) {}
             }}
             title={`Try free for 14 days`}
@@ -201,25 +222,25 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
         </>
       ) : (
         <>
-          {product?.type === 'promo' ? (
+          {product?.type === "promo" ? (
             <Heading
               style={{
                 paddingVertical: 15,
-                alignSelf: 'center',
-                textAlign: 'center'
+                alignSelf: "center",
+                textAlign: "center"
               }}
               size={SIZE.lg - 4}
             >
               {product.data.introductoryPrice}
               <Paragraph
                 style={{
-                  textDecorationLine: 'line-through',
+                  textDecorationLine: "line-through",
                   color: colors.icon
                 }}
                 size={SIZE.sm}
               >
                 ({product.data.localizedPrice})
-              </Paragraph>{' '}
+              </Paragraph>{" "}
               for {product.cycleText}
             </Heading>
           ) : null}
@@ -231,19 +252,20 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
                   {monthlyPlan && monthlyPlan?.info?.discount > 0 ? (
                     <View
                       style={{
-                        alignSelf: 'center',
+                        alignSelf: "center",
                         marginTop: marginTop || 20,
                         marginBottom: 20
                       }}
                     >
                       <Heading color={colors.accent}>
-                        Get {monthlyPlan?.info?.discount}% off in {monthlyPlan?.info?.country}
+                        Get {monthlyPlan?.info?.discount}% off in{" "}
+                        {monthlyPlan?.info?.country}
                       </Heading>
                     </View>
                   ) : (
                     <Heading
                       style={{
-                        alignSelf: 'center',
+                        alignSelf: "center",
                         marginTop: marginTop || 20,
                         marginBottom: 20
                       }}
@@ -256,18 +278,18 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
 
               <View
                 style={{
-                  flexDirection: !compact ? 'column' : 'row',
-                  flexWrap: 'wrap',
-                  justifyContent: 'space-around'
+                  flexDirection: !compact ? "column" : "row",
+                  flexWrap: "wrap",
+                  justifyContent: "space-around"
                 }}
               >
                 <PricingItem
                   onPress={() => buySubscription(monthlyPlan?.product)}
                   compact={compact}
                   product={{
-                    type: 'monthly',
+                    type: "monthly",
                     data: monthlyPlan?.product,
-                    info: 'Pay monthly, cancel anytime.'
+                    info: "Pay monthly, cancel anytime."
                   }}
                 />
 
@@ -284,14 +306,14 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
                   onPress={() => buySubscription(yearlyPlan?.product)}
                   compact={compact}
                   product={{
-                    type: 'yearly',
+                    type: "yearly",
                     data: yearlyPlan?.product,
-                    info: 'Pay yearly'
+                    info: "Pay yearly"
                   }}
                 />
               </View>
 
-              {Platform.OS !== 'ios' ? (
+              {Platform.OS !== "ios" ? (
                 <Button
                   height={35}
                   style={{
@@ -299,36 +321,37 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
                   }}
                   onPress={() => {
                     presentDialog({
-                      context: 'local',
+                      context: "local",
                       input: true,
-                      inputPlaceholder: 'Enter code',
-                      positiveText: 'Apply',
-                      positivePress: async value => {
+                      inputPlaceholder: "Enter code",
+                      positiveText: "Apply",
+                      positivePress: async (value) => {
                         if (!value) return;
                         console.log(value);
                         eSendEvent(eCloseSimpleDialog);
                         setBuying(true);
                         try {
                           if (!(await getPromo(value)))
-                            throw new Error('Error applying promo code');
+                            throw new Error("Error applying promo code");
                           ToastEvent.show({
-                            heading: 'Discount applied!',
-                            type: 'success',
-                            context: 'local'
+                            heading: "Discount applied!",
+                            type: "success",
+                            context: "local"
                           });
                           setBuying(false);
                         } catch (e) {
                           setBuying(false);
                           ToastEvent.show({
-                            heading: 'Promo code invalid or expired',
+                            heading: "Promo code invalid or expired",
                             message: e.message,
-                            type: 'error',
-                            context: 'local'
+                            type: "error",
+                            context: "local"
                           });
                         }
                       },
-                      title: 'Have a promo code?',
-                      paragraph: 'Enter your promo code to get a special discount.'
+                      title: "Have a promo code?",
+                      paragraph:
+                        "Enter your promo code to get a special discount."
                     });
                   }}
                   title="I have a promo code"
@@ -363,26 +386,26 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
                       borderRadius: 100
                     }}
                   />
-                  {Platform.OS !== 'ios' &&
+                  {Platform.OS !== "ios" &&
                   promo &&
-                  !promo.promoCode.startsWith('com.streetwriters.notesnook') ? (
+                  !promo.promoCode.startsWith("com.streetwriters.notesnook") ? (
                     <Paragraph
                       size={SIZE.md}
                       textBreakStrategy="balanced"
                       style={{
-                        alignSelf: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center'
+                        alignSelf: "center",
+                        justifyContent: "center",
+                        textAlign: "center"
                       }}
                     >
-                      Use promo code{' '}
+                      Use promo code{" "}
                       <Text
                         style={{
-                          fontFamily: 'OpenSans-SemiBold'
+                          fontFamily: "OpenSans-SemiBold"
                         }}
                       >
                         {promo.promoCode}
-                      </Text>{' '}
+                      </Text>{" "}
                       at checkout
                     </Paragraph>
                   ) : null}
@@ -421,16 +444,16 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
           color={colors.icon}
           size={SIZE.xs}
           style={{
-            alignSelf: 'center',
-            textAlign: 'center',
+            alignSelf: "center",
+            textAlign: "center",
             marginTop: 10,
-            maxWidth: '80%'
+            maxWidth: "80%"
           }}
         >
           {user
             ? `On clicking "Try free for 14 days", your free trial will be activated.`
-            : `After sign up you will be asked to activate your free trial.`}{' '}
-          <Paragraph size={SIZE.xs} style={{ fontWeight: 'bold' }}>
+            : `After sign up you will be asked to activate your free trial.`}{" "}
+          <Paragraph size={SIZE.xs} style={{ fontWeight: "bold" }}>
             No credit card is required.
           </Paragraph>
         </Paragraph>
@@ -438,78 +461,79 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
 
       {user && upgrade ? (
         <>
-          {Platform.OS === 'ios' ? (
+          {Platform.OS === "ios" ? (
             <Paragraph
               textBreakStrategy="balanced"
               size={SIZE.xs}
               color={colors.icon}
               style={{
-                alignSelf: 'center',
+                alignSelf: "center",
                 marginTop: 10,
-                textAlign: 'center'
+                textAlign: "center"
               }}
             >
-              By subscribing, you will be charged to your iTunes Account for the selected plan.
-              Subscriptions will automatically renew unless cancelled within 24-hours before the end
-              of the current period.
+              By subscribing, you will be charged to your iTunes Account for the
+              selected plan. Subscriptions will automatically renew unless
+              cancelled within 24-hours before the end of the current period.
             </Paragraph>
           ) : (
             <Paragraph
               size={SIZE.xs}
               color={colors.icon}
               style={{
-                alignSelf: 'center',
+                alignSelf: "center",
                 marginTop: 10,
-                textAlign: 'center'
+                textAlign: "center"
               }}
             >
-              By subscribing, your will be charged on your Google Account, and your subscription
-              will automatically renew until you cancel prior to the end of the then current period.
+              By subscribing, your will be charged on your Google Account, and
+              your subscription will automatically renew until you cancel prior
+              to the end of the then current period.
             </Paragraph>
           )}
 
           <View
             style={{
-              width: '100%'
+              width: "100%"
             }}
           >
             <Paragraph
               size={SIZE.xs}
               color={colors.icon}
               style={{
-                maxWidth: '100%',
-                textAlign: 'center'
+                maxWidth: "100%",
+                textAlign: "center"
               }}
             >
-              By subscribing, you agree to our{' '}
+              By subscribing, you agree to our{" "}
               <Paragraph
                 size={SIZE.xs}
                 onPress={() => {
-                  openLinkInBrowser('https://notesnook.com/tos', colors)
-                    .catch(e => {})
-                    .then(r => {
-                      console.log('closed');
+                  openLinkInBrowser("https://notesnook.com/tos", colors)
+                    .catch((e) => {})
+                    .then((r) => {
+                      console.log("closed");
                     });
                 }}
                 style={{
-                  textDecorationLine: 'underline'
+                  textDecorationLine: "underline"
                 }}
                 color={colors.accent}
               >
-                Terms of Service{' '}
+                Terms of Service{" "}
               </Paragraph>
-              and{' '}
+              and{" "}
               <Paragraph
                 size={SIZE.xs}
                 onPress={() => {
-                  openLinkInBrowser('https://notesnook.com/privacy', colors)
-                    .catch(e => {})
-                    .then(r => {
-                      console.log('closed');
+                  openLinkInBrowser("https://notesnook.com/privacy", colors)
+                    .catch((e) => {})
+                    .then((r) => {
+                      console.log("closed");
                     });
                 }}
                 style={{
-                  textDecorationLine: 'underline'
+                  textDecorationLine: "underline"
                 }}
                 color={colors.accent}
               >

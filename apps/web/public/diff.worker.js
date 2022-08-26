@@ -106,7 +106,7 @@ function Match(start_in_before, start_in_after, length) {
 function return_dual_pane(before, after) {
   return {
     before: before,
-    after: after,
+    after: after
   };
 }
 
@@ -163,7 +163,7 @@ function html_to_tokens(html, components_search_rule) {
     end: 0,
     tagOpen: false,
     whitespaceOpen: false,
-    ampersandOpen: false,
+    ampersandOpen: false
   };
   for (var i = 0; i < html.length; ++i) {
     const s = html[i];
@@ -428,7 +428,7 @@ function find_matching_blocks(before_tokens, after_tokens) {
 
   var index_of_before_locations_in_after_tokens = create_index({
     find_these: before_tokens,
-    in_these: after_tokens,
+    in_these: after_tokens
   });
 
   return recursively_find_matching_blocks(
@@ -475,7 +475,7 @@ function calculate_operations(before_tokens, after_tokens) {
     "false,false": "replace",
     "true,false": "insert",
     "false,true": "delete",
-    "true,true": "none",
+    "true,true": "none"
   };
   var matches = find_matching_blocks(before_tokens, after_tokens);
   matches.push(new Match(before_tokens.length, after_tokens.length, 0));
@@ -490,7 +490,7 @@ function calculate_operations(before_tokens, after_tokens) {
       action_map[
         [
           match_starts_at_current_position_in_before,
-          match_starts_at_current_position_in_after,
+          match_starts_at_current_position_in_after
         ].toString()
       ];
     if (action_up_to_match_positions !== "none") {
@@ -505,7 +505,7 @@ function calculate_operations(before_tokens, after_tokens) {
         end_in_after:
           action_up_to_match_positions !== "delete"
             ? match.start_in_after - 1
-            : void 0,
+            : void 0
       });
     }
     if (match.length !== 0) {
@@ -514,7 +514,7 @@ function calculate_operations(before_tokens, after_tokens) {
         start_in_before: match.start_in_before,
         end_in_before: match.end_in_before,
         start_in_after: match.start_in_after,
-        end_in_after: match.end_in_after,
+        end_in_after: match.end_in_after
       });
     }
     position_in_before = match.end_in_before + 1;
@@ -523,7 +523,7 @@ function calculate_operations(before_tokens, after_tokens) {
 
   var post_processed = [];
   var last_op = {
-    action: "none",
+    action: "none"
   };
 
   function is_single_whitespace(op) {
@@ -649,13 +649,13 @@ var op_map = {
   delete: function (op, before_tokens, after_tokens, class_name) {
     var val = before_tokens.slice(op.start_in_before, op.end_in_before + 1);
     return wrap("del", val, class_name);
-  },
+  }
 };
 
 op_map.replace = function (op, before_tokens, after_tokens, class_name) {
   return [
     op_map["delete"](op, before_tokens, after_tokens, class_name),
-    op_map.insert(op, before_tokens, after_tokens, class_name),
+    op_map.insert(op, before_tokens, after_tokens, class_name)
   ];
 };
 

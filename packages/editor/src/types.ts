@@ -20,7 +20,7 @@ export class Editor extends TiptapEditor {
   requestPermission(id: keyof UnionCommands): TiptapEditor | undefined {
     const event = new CustomEvent("permissionrequest", {
       detail: { id },
-      cancelable: true,
+      cancelable: true
     });
 
     if (!window.dispatchEvent(event)) return undefined;

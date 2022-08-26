@@ -44,12 +44,12 @@ function Dialog(props) {
           padding: 0,
           overflowY: "hidden",
           border: 0,
-          zIndex: 0,
+          zIndex: 0
         },
         overlay: {
           zIndex: 999,
-          background: theme.colors.overlay,
-        },
+          background: theme.colors.overlay
+        }
       }}
     >
       <Flex
@@ -65,7 +65,7 @@ function Dialog(props) {
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "dialog",
+          borderRadius: "dialog"
         }}
       >
         {props.showClose && (
@@ -76,7 +76,7 @@ function Dialog(props) {
               top: 0,
               right: 20,
               mt: 26,
-              zIndex: 999,
+              zIndex: 999
             }}
             size={20}
             onClick={props.onClose}

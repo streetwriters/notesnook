@@ -1,14 +1,14 @@
-import React from 'react';
-import { Image, TextStyle, View, ViewStyle } from 'react-native';
-import { eSendEvent, presentSheet } from '../../services/event-manager';
-import { TTip } from '../../services/tip-manager';
-import { ThemeStore, useThemeStore } from '../../stores/use-theme-store';
-import { MMKV } from '../../common/database/mmkv';
-import { eCloseProgressDialog } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
-import Seperator from '../ui/seperator';
-import Paragraph from '../ui/typography/paragraph';
+import React from "react";
+import { Image, TextStyle, View, ViewStyle } from "react-native";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { TTip } from "../../services/tip-manager";
+import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
+import { MMKV } from "../../common/database/mmkv";
+import { eCloseProgressDialog } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
+import Seperator from "../ui/seperator";
+import Paragraph from "../ui/typography/paragraph";
 
 export const Tip = ({
   tip,
@@ -23,9 +23,9 @@ export const Tip = ({
   textStyle?: TextStyle;
   neverShowAgain: boolean;
   noImage?: boolean;
-  color?: keyof ThemeStore['colors'];
+  color?: keyof ThemeStore["colors"];
 }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return tip ? (
     <View
@@ -33,8 +33,8 @@ export const Tip = ({
         {
           borderRadius: 10,
           padding: 12,
-          width: '100%',
-          alignSelf: 'center',
+          width: "100%",
+          alignSelf: "center",
           paddingVertical: 12,
           backgroundColor: colors.nav
         },
@@ -43,8 +43,8 @@ export const Tip = ({
     >
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between'
+          flexDirection: "row",
+          justifyContent: "space-between"
         }}
       >
         <Button
@@ -58,7 +58,7 @@ export const Tip = ({
             width: null,
             height: 22,
             paddingHorizontal: 4,
-            alignSelf: 'flex-start',
+            alignSelf: "flex-start",
             borderRadius: 100,
             borderWidth: 1,
             //@ts-ignore
@@ -75,7 +75,7 @@ export const Tip = ({
             fontSize={SIZE.xs}
             iconSize={SIZE.xs}
             onPress={() => {
-              MMKV.setItem('neverShowSheetTips', 'true');
+              MMKV.setItem("neverShowSheetTips", "true");
               eSendEvent(eCloseProgressDialog);
             }}
             //@ts-ignore
@@ -83,7 +83,7 @@ export const Tip = ({
               width: null,
               height: 25,
               paddingHorizontal: 4,
-              alignSelf: 'flex-start',
+              alignSelf: "flex-start",
               borderRadius: 100,
               borderWidth: 1,
               borderColor: colors.icon
@@ -100,16 +100,16 @@ export const Tip = ({
         <View
           style={{
             borderRadius: 10,
-            overflow: 'hidden',
+            overflow: "hidden",
             marginTop: 10
           }}
         >
           <Image
             source={{ uri: tip.image }}
             style={{
-              width: '100%',
+              width: "100%",
               height: 230,
-              alignSelf: 'center'
+              alignSelf: "center"
             }}
           />
         </View>
@@ -140,7 +140,7 @@ export const Tip = ({
 
 Tip.present = async (tip: TTip) => {
   if (!tip) return;
-  let dontShow = MMKV.getString('neverShowSheetTips');
+  let dontShow = MMKV.getString("neverShowSheetTips");
   if (dontShow) return;
   presentSheet({
     component: (
@@ -148,7 +148,7 @@ Tip.present = async (tip: TTip) => {
         tip={tip}
         neverShowAgain={true}
         style={{
-          backgroundColor: 'transparent',
+          backgroundColor: "transparent",
           paddingHorizontal: 12
         }}
       />

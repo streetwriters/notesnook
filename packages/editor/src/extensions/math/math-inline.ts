@@ -4,7 +4,7 @@ import {
   makeInlineMathInputRule,
   REGEX_INLINE_MATH_DOLLARS,
   mathPlugin,
-  insertMathNode,
+  insertMathNode
 } from "./plugin";
 
 declare module "@tiptap/core" {
@@ -26,8 +26,8 @@ export const MathInline = Node.create({
   parseHTML() {
     return [
       {
-        tag: "span[class*='math-inline']", // important!,
-      },
+        tag: "span[class*='math-inline']" // important!,
+      }
     ];
   },
 
@@ -35,7 +35,7 @@ export const MathInline = Node.create({
     return [
       "span",
       mergeAttributes({ class: "math-inline math-node" }, HTMLAttributes),
-      0,
+      0
     ];
   },
 
@@ -49,15 +49,15 @@ export const MathInline = Node.create({
             .insertContent({ type: this.name, attrs: {} })
             .setNodeSelection($from.pos)
             .run();
-        },
+        }
     };
   },
 
   addProseMirrorPlugins() {
     const inputRulePlugin = inputRules({
-      rules: [makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, this.type)],
+      rules: [makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, this.type)]
     });
 
     return [mathPlugin, inputRulePlugin];
-  },
+  }
 });

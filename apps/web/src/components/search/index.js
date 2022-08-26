@@ -22,7 +22,7 @@ function SearchBox(props) {
           if (searchField && searchField.value && searchField.value.length) {
             props.onSearch(searchField.value);
           }
-        },
+        }
       }}
     />
   );

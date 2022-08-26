@@ -30,7 +30,7 @@ export function TextDirection(props: ToolProps) {
   const { editor } = props;
   const { textDirection } = {
     ...editor.getAttributes("paragraph"),
-    ...editor.getAttributes("heading"),
+    ...editor.getAttributes("heading")
   } as { textDirection: TextDirection };
 
   const newTextDirection: TextDirection =

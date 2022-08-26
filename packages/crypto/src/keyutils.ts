@@ -5,7 +5,7 @@ import {
   crypto_pwhash,
   crypto_pwhash_SALTBYTES,
   crypto_pwhash_ALG_ARGON2I13,
-  crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+  crypto_aead_xchacha20poly1305_ietf_KEYBYTES
 } from "libsodium-wrappers";
 import { EncryptionKey, SerializedKey } from "./types";
 
@@ -31,7 +31,7 @@ export default class KeyUtils {
 
     return {
       key,
-      salt: typeof salt === "string" ? salt : to_base64(saltBytes),
+      salt: typeof salt === "string" ? salt : to_base64(saltBytes)
     };
   }
 

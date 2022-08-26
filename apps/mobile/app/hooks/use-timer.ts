@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 const timers: { [name: string]: number } = {};
 
 function getSecondsLeft(id?: string) {
-  let endTime = timers[id || ''];
+  let endTime = timers[id || ""];
   if (!endTime) return 0;
   if (endTime < Date.now()) return 0;
   console.log((endTime - Date.now()) / 1000);
@@ -16,10 +16,10 @@ const useTimer = (initialId?: string) => {
   const interval = useRef<NodeJS.Timer>();
 
   const start = (sec: number, currentId = id) => {
-    console.log('started', sec, id);
+    console.log("started", sec, id);
     if (!currentId) return;
     timers[currentId] = Date.now() + sec * 1000;
-    console.log('timers:', timers[currentId]);
+    console.log("timers:", timers[currentId]);
     setSeconds(getSecondsLeft(id));
   };
 

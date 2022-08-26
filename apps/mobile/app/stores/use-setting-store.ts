@@ -1,9 +1,9 @@
 //@ts-ignore
-import { Dimensions } from 'react-native';
-import Config from 'react-native-config';
-import { FileType } from 'react-native-scoped-storage';
-import create, { State } from 'zustand';
-import { ACCENT } from '../utils/color-scheme';
+import { Dimensions } from "react-native";
+import Config from "react-native-config";
+import { FileType } from "react-native-scoped-storage";
+import create, { State } from "zustand";
+import { ACCENT } from "../utils/color-scheme";
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -20,8 +20,8 @@ export type Settings = {
   privacyScreen?: boolean;
   appLockMode?: string;
   telemetry?: boolean;
-  notebooksListMode?: 'normal' | 'compact';
-  notesListMode?: 'normal' | 'compact';
+  notebooksListMode?: "normal" | "compact";
+  notesListMode?: "normal" | "compact";
   devMode?: boolean;
   notifNotes?: boolean;
   pitchBlack?: boolean;
@@ -68,7 +68,7 @@ export interface SettingStore extends State {
   setRequestBiometrics: (requestBiometrics: boolean) => void;
 }
 
-let { width, height } = Dimensions.get('window');
+let { width, height } = Dimensions.get("window");
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
   settings: {
@@ -77,17 +77,17 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     fontScale: 1,
     forcePortraitOnTablet: false,
     useSystemTheme: false,
-    reminder: 'off',
+    reminder: "off",
     encryptedBackup: false,
-    homepage: 'Notes',
-    sort: 'default',
-    sortOrder: 'desc',
+    homepage: "Notes",
+    sort: "default",
+    sortOrder: "desc",
     screenshotMode: true,
     privacyScreen: false,
-    appLockMode: 'none',
+    appLockMode: "none",
     telemetry: true,
-    notebooksListMode: 'normal',
-    notesListMode: 'normal',
+    notebooksListMode: "normal",
+    notesListMode: "normal",
     devMode: false,
     notifNotes: false,
     pitchBlack: false,
@@ -110,15 +110,16 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   },
   sheetKeyboardHandler: true,
   fullscreen: false,
-  deviceMode: 'mobile',
+  deviceMode: "mobile",
   dimensions: { width, height },
   appLoading: true,
-  setSettings: settings => set({ settings }),
-  setFullscreen: fullscreen => set({ fullscreen }),
-  setDeviceMode: mode => set({ deviceMode: mode }),
-  setDimensions: dimensions => set({ dimensions: dimensions }),
-  setAppLoading: appLoading => set({ appLoading }),
-  setSheetKeyboardHandler: sheetKeyboardHandler => set({ sheetKeyboardHandler }),
+  setSettings: (settings) => set({ settings }),
+  setFullscreen: (fullscreen) => set({ fullscreen }),
+  setDeviceMode: (mode) => set({ deviceMode: mode }),
+  setDimensions: (dimensions) => set({ dimensions: dimensions }),
+  setAppLoading: (appLoading) => set({ appLoading }),
+  setSheetKeyboardHandler: (sheetKeyboardHandler) =>
+    set({ sheetKeyboardHandler }),
   requestBiometrics: false,
-  setRequestBiometrics: requestBiometrics => set({ requestBiometrics })
+  setRequestBiometrics: (requestBiometrics) => set({ requestBiometrics })
 }));

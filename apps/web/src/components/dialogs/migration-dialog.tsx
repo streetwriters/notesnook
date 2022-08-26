@@ -30,10 +30,10 @@ export default function MigrationDialog(props: MigrationDialogProps) {
             action: (task) => {
               task({ text: `Please wait...` });
               return db.migrations?.migrate();
-            },
+            }
           });
           props.onClose(true);
-        },
+        }
       }}
     >
       <Text variant={"subtitle"}>Read before continuing:</Text>

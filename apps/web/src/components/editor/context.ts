@@ -55,7 +55,7 @@ export function useHistory() {
         canUndo: store.subState.canUndo,
         canRedo: store.subState.canRedo,
         undo: store.subState.editor?.undo,
-        redo: store.subState.editor?.redo,
+        redo: store.subState.editor?.redo
       } as const),
     shallow
   );
@@ -87,7 +87,7 @@ export function useNoteStatistics(): NoteStatistics {
   return useEditorContext(
     (store) =>
       store.subState.statistics || {
-        words: { total: 0 },
+        words: { total: 0 }
       }
   );
 }

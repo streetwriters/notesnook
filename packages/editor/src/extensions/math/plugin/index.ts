@@ -8,7 +8,7 @@ export { MathView, type ICursorPosObserver } from "./math-node-view";
 export {
   mathPlugin,
   createMathView,
-  type IMathPluginState,
+  type IMathPluginState
 } from "./math-plugin";
 export { mathSchemaSpec, createMathSchema } from "./math-schema";
 
@@ -19,7 +19,7 @@ export {
   makeInlineMathInputRule,
   REGEX_BLOCK_MATH_DOLLARS,
   REGEX_INLINE_MATH_DOLLARS,
-  REGEX_INLINE_MATH_DOLLARS_ESCAPED,
+  REGEX_INLINE_MATH_DOLLARS_ESCAPED
 } from "./plugins/math-input-rules";
 
 // optional / experimental plugins

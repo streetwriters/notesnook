@@ -19,14 +19,14 @@ function IconTag({ text, title, icon: Icon, onClick, styles, testId }) {
         lineHeight: "initial",
         ":hover": {
           bg: "hover",
-          filter: "brightness(95%)",
+          filter: "brightness(95%)"
         },
         maxWidth: "100%",
         px: 1,
         mr: 1,
         cursor: onClick ? "pointer" : "default",
         overflow: "hidden",
-        ...styles?.container,
+        ...styles?.container
       }}
       bg="bgSecondary"
       justifyContent="center"
@@ -47,7 +47,7 @@ function IconTag({ text, title, icon: Icon, onClick, styles, testId }) {
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
           overflow: "hidden",
-          ...styles?.text,
+          ...styles?.text
         }}
       >
         {text}

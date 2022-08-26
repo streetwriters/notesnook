@@ -11,7 +11,7 @@ class WindowState {
       storageKey: "windowState",
       maximize: true,
       fullScreen: true,
-      ...options,
+      ...options
     };
 
     // Load previous state
@@ -24,7 +24,7 @@ class WindowState {
     this.state = {
       width: this.config.defaultWidth || 800,
       height: this.config.defaultHeight || 600,
-      ...this.state,
+      ...this.state
     };
   }
 
@@ -53,7 +53,7 @@ class WindowState {
       height: this.config.defaultHeight || 600,
       x: 0,
       y: 0,
-      displayBounds,
+      displayBounds
     };
   }
 

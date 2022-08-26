@@ -54,5 +54,5 @@ export const Dialogs = {
   RecoveryCodesDialog,
   OnboardingDialog,
   AttachmentsDialog,
-  MigrationDialog,
+  MigrationDialog
 };

@@ -25,7 +25,7 @@ export function MenuButton(props: MenuButtonProps) {
     isChecked,
     menu,
     modifier,
-    styles,
+    styles
   } = item;
   const itemRef = useRef<HTMLButtonElement>(null);
   const toolbarLocation = useToolbarLocation();
@@ -55,8 +55,8 @@ export function MenuButton(props: MenuButtonProps) {
           alignItems: "center",
           justifyContent: "space-between",
           ":hover": {
-            bg: isBottom ? "transparent" : "hover",
-          },
+            bg: isBottom ? "transparent" : "hover"
+          }
         }}
       >
         <Flex sx={{ fontSize: "inherit", fontFamily: "inherit" }}>
@@ -86,7 +86,7 @@ export function MenuButton(props: MenuButtonProps) {
                 sx={{
                   fontFamily: "body",
                   fontSize: "menu",
-                  color: "fontTertiary",
+                  color: "fontTertiary"
                 }}
               >
                 {modifier}

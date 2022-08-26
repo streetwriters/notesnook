@@ -2,14 +2,14 @@ import React, {
   useCallback,
   useRef,
   useEffect,
-  PropsWithChildren,
+  PropsWithChildren
 } from "react";
 import { Box, Flex, FlexProps, Text } from "rebass";
 import { getPosition } from "../../utils/position";
 import {
   MenuButton as MenuButtonType,
   MenuItem,
-  MenuItem as MenuItemType,
+  MenuItem as MenuItemType
 } from "./types";
 import { useFocus } from "./use-focus";
 import { MenuSeparator } from "./menu-separator";
@@ -63,7 +63,7 @@ export function Menu(props: MenuProps) {
     const { top, left } = getPosition(subMenuRef.current, {
       // yOffset: menuItemElement.offsetHeight,
       target: menuItemElement,
-      location: "right",
+      location: "right"
     });
 
     subMenuRef.current.style.visibility = "visible";
@@ -124,7 +124,7 @@ export function Menu(props: MenuProps) {
           ref={subMenuRef}
           style={{ visibility: "hidden" }}
           sx={{
-            position: "absolute",
+            position: "absolute"
           }}
         >
           <Menu items={focusedItem.menu.items} onClose={onClose} />
@@ -158,7 +158,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
         boxShadow: "menu",
         border: "1px solid var(--border)",
         minWidth: 220,
-        ...sx,
+        ...sx
       }}
       {...flexProps}
     >
@@ -172,7 +172,7 @@ function MenuContainer(props: PropsWithChildren<MenuContainerProps>) {
             px: 3,
             borderBottom: "1px solid",
             borderBottomColor: "border",
-            wordWrap: "break-word",
+            wordWrap: "break-word"
           }}
         >
           {title}

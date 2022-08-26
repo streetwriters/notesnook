@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { Bar, Circle } from 'react-native-progress';
-import QRCode from 'react-native-qrcode-svg';
-import { SvgXml } from 'react-native-svg';
+import { Bar, Circle } from "react-native-progress";
+import QRCode from "react-native-qrcode-svg";
+import { SvgXml } from "react-native-svg";
 
 const Progress = {
   Bar,

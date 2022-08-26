@@ -1,8 +1,11 @@
-import { AppState, Dimensions, NativeModules, Platform } from 'react-native';
-import { beginBackgroundTask, endBackgroundTask } from 'react-native-begin-background-task';
-import RNTooltips from 'react-native-tooltips';
-import { db } from '../common/database';
-import { tabBarRef } from './global-refs';
+import { AppState, Dimensions, NativeModules, Platform } from "react-native";
+import {
+  beginBackgroundTask,
+  endBackgroundTask
+} from "react-native-begin-background-task";
+import RNTooltips from "react-native-tooltips";
+import { db } from "../common/database";
+import { tabBarRef } from "./global-refs";
 
 let prevTarget = null;
 let htmlToText;
@@ -15,11 +18,11 @@ export const TOOLTIP_POSITIONS = {
 };
 
 export const sortSettings = {
-  sort: 'default',
+  sort: "default",
   /**
    * @type {"desc" | "asc"}
    */
-  sortOrder: 'desc'
+  sortOrder: "desc"
 };
 
 export const editing = {
@@ -46,21 +49,21 @@ export const history = {
 };
 
 export function formatBytes(bytes, decimals = 2) {
-  if (bytes === 0) return '0 Bytes';
+  if (bytes === 0) return "0 Bytes";
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 }
 
 export const AndroidModule = NativeModules.NNativeModule;
 
-export let dWidth = Dimensions.get('window').width;
-export let dHeight = Dimensions.get('window').height;
+export let dWidth = Dimensions.get("window").width;
+export let dHeight = Dimensions.get("window").height;
 
 export const InteractionManager = {
   runAfterInteractions: (func, time = 300) => setTimeout(func, time)
@@ -69,7 +72,7 @@ export const InteractionManager = {
 export function getElevation(elevation) {
   return {
     elevation,
-    shadowColor: 'black',
+    shadowColor: "black",
     shadowOffset: { width: 0.3 * elevation, height: 0.5 * elevation },
     shadowOpacity: 0.2,
     shadowRadius: 0.7 * elevation
@@ -77,7 +80,7 @@ export function getElevation(elevation) {
 }
 
 export async function doInBackground(cb) {
-  if (Platform.OS === 'ios') {
+  if (Platform.OS === "ios") {
     let bgTaskId;
     try {
       bgTaskId = await beginBackgroundTask();
@@ -91,7 +94,7 @@ export async function doInBackground(cb) {
     // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       try {
-        console.log('APP STATE AT SYNC: ', AppState.currentState);
+        console.log("APP STATE AT SYNC: ", AppState.currentState);
         let result = await cb();
         res(result);
       } catch (e) {
@@ -107,8 +110,8 @@ export function setWidthHeight(size) {
 }
 
 export function getTotalNotes(notebook) {
-  if (!notebook || notebook.type === 'header') return 0;
-  if (notebook.type === 'topic') {
+  if (!notebook || notebook.type === "header") return 0;
+  if (notebook.type === "topic") {
     if (!notebook.notes) return 0;
     return notebook.notes.length;
   }
@@ -126,9 +129,9 @@ export async function toTXT(note, notitle) {
   } else {
     text = await db.notes.note(note.id).content();
   }
-  htmlToText = htmlToText || require('html-to-text');
+  htmlToText = htmlToText || require("html-to-text");
   text = htmlToText.convert(text, {
-    selectors: [{ selector: 'img', format: 'skip' }]
+    selectors: [{ selector: "img", format: "skip" }]
   });
   if (!notitle) {
     text = `${note.title}\n \n ${text}`;
@@ -143,8 +146,8 @@ export function showTooltip(event, text, position = 2) {
   prevTarget = event._targetInst.ref.current;
   RNTooltips.Show(prevTarget, tabBarRef.current?.node?.current, {
     text: text,
-    tintColor: '#000000',
-    corner: Platform.OS === 'ios' ? 5 : 40,
+    tintColor: "#000000",
+    corner: Platform.OS === "ios" ? 5 : 40,
     textSize: 14,
     position: position,
     duration: 1000,

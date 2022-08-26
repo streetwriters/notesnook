@@ -9,12 +9,12 @@ const USER = {
   email: process.env.USER_EMAIL,
   NEW: {
     password: process.env.NEW_USER_PASSWORD,
-    key: process.env.NEW_USER_KEY,
+    key: process.env.NEW_USER_KEY
   },
   CURRENT: {
     password: process.env.CURRENT_USER_PASSWORD,
-    key: process.env.CURRENT_USER_KEY,
-  },
+    key: process.env.CURRENT_USER_KEY
+  }
 };
 
 async function loginUser(user = USER, navigate = true) {
@@ -35,12 +35,12 @@ async function loginUser(user = USER, navigate = true) {
 const NOTEBOOK = {
   title: "Test notebook 1",
   description: "This is test notebook 1",
-  topics: ["Topic 1", "Very long topic 2", "Topic 3"],
+  topics: ["Topic 1", "Very long topic 2", "Topic 3"]
 };
 
 const NOTE = {
   title: "Test 1",
-  content: "This is " + "Test 1".repeat(10),
+  content: "This is " + "Test 1".repeat(10)
 };
 
 const PASSWORD = "123abc123abc";
@@ -63,7 +63,7 @@ async function editNote(title, content, noDelay = false) {
   if (title)
     await page.fill(getTestId("editor-title"), title, {
       strict: true,
-      force: true,
+      force: true
     });
 
   if (content) {
@@ -118,5 +118,5 @@ module.exports = {
   getEditorContent,
   getEditorContentAsHTML,
   isTestAll,
-  loginUser,
+  loginUser
 };

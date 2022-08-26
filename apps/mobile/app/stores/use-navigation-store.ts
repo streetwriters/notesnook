@@ -1,21 +1,21 @@
-import create, { State } from 'zustand';
-import { COLORS_NOTE } from '../utils/color-scheme';
-import { LiteralUnion } from '../utils/types';
+import create, { State } from "zustand";
+import { COLORS_NOTE } from "../utils/color-scheme";
+import { LiteralUnion } from "../utils/types";
 
 export type RouteName =
-  | 'Notes'
-  | 'Notebooks'
-  | 'Notebook'
-  | 'NotesPage'
-  | 'Tags'
-  | 'Favorites'
-  | 'Trash'
-  | 'Search'
-  | 'Settings'
-  | 'TaggedNotes'
-  | 'ColoredNotes'
-  | 'TopicNotes'
-  | 'Monographs';
+  | "Notes"
+  | "Notebooks"
+  | "Notebook"
+  | "NotesPage"
+  | "Tags"
+  | "Favorites"
+  | "Trash"
+  | "Search"
+  | "Settings"
+  | "TaggedNotes"
+  | "ColoredNotes"
+  | "TopicNotes"
+  | "Monographs";
 
 export type Route = LiteralUnion<RouteName>;
 
@@ -50,22 +50,26 @@ interface NavigationStore extends State {
 
 const useNavigationStore = create<NavigationStore>((set, get) => ({
   currentScreen: {
-    name: 'Notes',
-    id: 'notes_navigation',
-    title: 'Notes',
-    type: 'notes'
+    name: "Notes",
+    id: "notes_navigation",
+    title: "Notes",
+    type: "notes"
   },
-  currentScreenRaw: { name: 'notes' },
+  currentScreenRaw: { name: "notes" },
   canGoBack: false,
   update: (currentScreen, canGoBack, headerRightButtons) => {
     //@ts-ignore
     const color = COLORS_NOTE[currentScreen.color?.toLowerCase()];
-    if (JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)) return;
+    if (
+      JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)
+    )
+      return;
 
     set({
       currentScreen: {
         name: currentScreen.name,
-        id: currentScreen.id || currentScreen.name.toLowerCase() + '_navigation',
+        id:
+          currentScreen.id || currentScreen.name.toLowerCase() + "_navigation",
         title: currentScreen.alias || currentScreen.title || currentScreen.name,
         type: currentScreen.type,
         color: color,
@@ -78,7 +82,7 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
   },
   headerRightButtons: [],
   buttonAction: () => null,
-  setButtonAction: buttonAction => set({ buttonAction })
+  setButtonAction: (buttonAction) => set({ buttonAction })
 }));
 
 export default useNavigationStore;

@@ -7,7 +7,7 @@ import { useNoteStatistics } from "./context";
 const SAVE_STATE_ICON_MAP = {
   "-1": NotSaved,
   0: Loading,
-  1: Saved,
+  1: Saved
 };
 
 function EditorFooter() {

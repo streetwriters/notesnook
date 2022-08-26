@@ -4,7 +4,7 @@ import { Popup } from "../components/popup";
 import { Checkbox, Label } from "@rebass/forms";
 import {
   ImageAlignmentOptions,
-  ImageSizeOptions,
+  ImageSizeOptions
 } from "../../extensions/image";
 import { Editor } from "../../types";
 import { InlineInput } from "../../components/inline-input";
@@ -20,16 +20,16 @@ export function ImageProperties(props: ImagePropertiesProps) {
       const size: ImageSizeOptions = newWidth
         ? {
             width: newWidth,
-            height: newWidth * (height / width),
+            height: newWidth * (height / width)
           }
         : newHeight
         ? {
             width: newHeight * (width / height),
-            height: newHeight,
+            height: newHeight
           }
         : {
             width: 0,
-            height: 0,
+            height: 0
           };
 
       editor.current?.chain().setImageSize(size).run();
@@ -63,7 +63,7 @@ export function ImageProperties(props: ImagePropertiesProps) {
             type="number"
             value={width}
             containerProps={{
-              sx: { mr: 1 },
+              sx: { mr: 1 }
             }}
             onChange={(e) => onSizeChange(e.target.valueAsNumber)}
           />

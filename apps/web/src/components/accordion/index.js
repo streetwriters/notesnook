@@ -26,7 +26,7 @@ export default function Accordion({
           cursor: "pointer",
           bg: "bgSecondary",
           p: 1,
-          borderRadius: "default",
+          borderRadius: "default"
         }}
         onClick={() => {
           setIsContentHidden((state) => !state);

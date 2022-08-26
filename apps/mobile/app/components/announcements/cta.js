@@ -1,30 +1,34 @@
-import React from 'react';
-import { Linking, View } from 'react-native';
+import React from "react";
+import { Linking, View } from "react-native";
 //import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
-import { eSendEvent, presentSheet } from '../../services/event-manager';
-import Sync from '../../services/sync';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { eCloseAnnouncementDialog, eCloseProgressDialog } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { PricingPlans } from '../premium/pricing-plans';
-import SheetProvider from '../sheet-provider';
-import { Progress } from '../sheets/progress';
-import { Button } from '../ui/button';
-import { allowedOnPlatform, getStyle } from './functions';
+import { eSendEvent, presentSheet } from "../../services/event-manager";
+import Sync from "../../services/sync";
+import { useThemeStore } from "../../stores/use-theme-store";
+import {
+  eCloseAnnouncementDialog,
+  eCloseProgressDialog
+} from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { PricingPlans } from "../premium/pricing-plans";
+import SheetProvider from "../sheet-provider";
+import { Progress } from "../sheets/progress";
+import { Button } from "../ui/button";
+import { allowedOnPlatform, getStyle } from "./functions";
 
 export const Cta = ({ actions, style = {}, color, inline }) => {
-  const colors = useThemeStore(state => state.colors);
-  let buttons = actions.filter(item => allowedOnPlatform(item.platforms)) || [];
+  const colors = useThemeStore((state) => state.colors);
+  let buttons =
+    actions.filter((item) => allowedOnPlatform(item.platforms)) || [];
 
-  const onPress = async item => {
+  const onPress = async (item) => {
     if (!inline) {
       eSendEvent(eCloseAnnouncementDialog);
       await sleep(500);
     }
-    if (item.type === 'link') {
+    if (item.type === "link") {
       Linking.openURL(item.data).catch(console.log);
-    } else if (item.type === 'promo') {
+    } else if (item.type === "promo") {
       presentSheet({
         component: (
           <PricingPlans
@@ -36,11 +40,11 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
           />
         )
       });
-    } else if (item.type === 'force-sync') {
+    } else if (item.type === "force-sync") {
       eSendEvent(eCloseProgressDialog);
       await sleep(300);
       Progress.present();
-      Sync.run('global', true, true, () => {
+      Sync.run("global", true, true, () => {
         eSendEvent(eCloseProgressDialog);
       });
     }
@@ -50,7 +54,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
       style={{
         paddingHorizontal: 12,
         ...getStyle(style),
-        flexDirection: inline ? 'row' : 'column'
+        flexDirection: inline ? "row" : "column"
       }}
     >
       <SheetProvider context="premium_cta" />
@@ -58,20 +62,20 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
       {inline ? (
         <>
           {buttons.length > 0 &&
-            buttons.slice(0, 1).map(item => (
+            buttons.slice(0, 1).map((item) => (
               <Button
                 key={item.title}
                 title={item.title}
                 fontSize={SIZE.sm}
                 type="transparent"
                 textStyle={{
-                  textDecorationLine: 'underline'
+                  textDecorationLine: "underline"
                 }}
                 onPress={() => onPress(item)}
                 bold
                 style={{
                   height: 30,
-                  alignSelf: 'flex-start',
+                  alignSelf: "flex-start",
                   paddingHorizontal: 0,
                   marginTop: -6
                 }}
@@ -89,13 +93,13 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 width={null}
                 height={30}
                 style={{
-                  alignSelf: 'flex-start',
+                  alignSelf: "flex-start",
                   paddingHorizontal: 0,
                   marginTop: -6,
                   marginLeft: 12
                 }}
                 textStyle={{
-                  textDecorationLine: 'underline'
+                  textDecorationLine: "underline"
                 }}
               />
             ))}
@@ -103,7 +107,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
       ) : (
         <>
           {buttons.length > 0 &&
-            buttons.slice(0, 1).map(item => (
+            buttons.slice(0, 1).map((item) => (
               <Button
                 key={item.title}
                 title={item.title}
@@ -134,11 +138,11 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
                 width={null}
                 height={30}
                 style={{
-                  minWidth: '50%',
+                  minWidth: "50%",
                   marginTop: 5
                 }}
                 textStyle={{
-                  textDecorationLine: 'underline'
+                  textDecorationLine: "underline"
                 }}
               />
             ))}

@@ -25,7 +25,7 @@ function Announcements({ announcements, removeAnnouncement }) {
           top: 2,
           borderRadius: 50,
           cursor: "pointer",
-          alignSelf: "end",
+          alignSelf: "end"
         }}
         title="Dismiss announcement"
         onClick={() => {

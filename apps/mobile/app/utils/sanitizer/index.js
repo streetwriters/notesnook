@@ -35,8 +35,8 @@ var windowsTrailingRe = /[. ]+$/;
 var whitespace = /\W+/g;
 
 function sanitize(input, replacement) {
-  if (typeof input !== 'string') {
-    throw new Error('Input must be string');
+  if (typeof input !== "string") {
+    throw new Error("Input must be string");
   }
   var sanitized = input
     .replace(whitespace, replacement)
@@ -49,6 +49,6 @@ function sanitize(input, replacement) {
 }
 
 export function sanitizeFilename(input, options) {
-  var replacement = (options && options.replacement) || '';
+  var replacement = (options && options.replacement) || "";
   return sanitize(input, replacement);
 }

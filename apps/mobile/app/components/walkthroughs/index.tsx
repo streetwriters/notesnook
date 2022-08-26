@@ -1,22 +1,28 @@
-import React, { useState } from 'react';
-import { LayoutAnimation, View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { eSendEvent, presentSheet } from '../../services/event-manager';
-import { eCloseProgressDialog } from '../../utils/events';
-import { MMKV } from '../../common/database/mmkv';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { Button } from '../ui/button';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import walkthroughs, { TStep } from './walkthroughs';
+import React, { useState } from "react";
+import { LayoutAnimation, View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { eCloseProgressDialog } from "../../utils/events";
+import { MMKV } from "../../common/database/mmkv";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { Button } from "../ui/button";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import walkthroughs, { TStep } from "./walkthroughs";
 
-export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip: boolean }) => {
-  const colors = useThemeStore(state => state.colors);
+export const Walkthrough = ({
+  steps,
+  canSkip = true
+}: {
+  steps: TStep[];
+  canSkip: boolean;
+}) => {
+  const colors = useThemeStore((state) => state.colors);
   const [step, setStep] = useState<TStep>(steps && steps[0]);
 
   const next = () => {
-    let index = steps.findIndex(s => s.text === step.text);
+    let index = steps.findIndex((s) => s.text === step.text);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setStep(steps[index + 1]);
   };
@@ -24,8 +30,8 @@ export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip
   return (
     <View
       style={{
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         padding: 12,
         paddingBottom: 0
       }}
@@ -36,9 +42,9 @@ export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip
       {step.text ? (
         <Paragraph
           style={{
-            textAlign: 'center',
-            alignSelf: 'center',
-            maxWidth: '80%'
+            textAlign: "center",
+            alignSelf: "center",
+            maxWidth: "80%"
           }}
           size={SIZE.md}
         >
@@ -53,7 +59,7 @@ export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip
             marginTop: 10
           }}
           textStyle={{
-            textDecorationLine: 'underline'
+            textDecorationLine: "underline"
           }}
           onPress={async () => {
             step.actionButton?.action();
@@ -72,10 +78,10 @@ export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip
         }}
         onPress={async () => {
           switch (step.button?.type) {
-            case 'next':
+            case "next":
               next();
               return;
-            case 'done':
+            case "done":
               eSendEvent(eCloseProgressDialog);
               await sleep(300);
               step.button?.action && step.button.action();
@@ -95,7 +101,7 @@ export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip
             marginTop: 10
           }}
           textStyle={{
-            textDecorationLine: 'underline'
+            textDecorationLine: "underline"
           }}
           onPress={async () => {
             eSendEvent(eCloseProgressDialog);
@@ -109,15 +115,17 @@ export const Walkthrough = ({ steps, canSkip = true }: { steps: TStep[]; canSkip
 };
 let walkthroughState: { [name: string]: boolean } = {};
 
-Walkthrough.update = async (id: 'notebooks' | 'trialstarted' | 'emailconfirmed' | 'prouser') => {
-  console.log('walkthrough state', walkthroughState);
+Walkthrough.update = async (
+  id: "notebooks" | "trialstarted" | "emailconfirmed" | "prouser"
+) => {
+  console.log("walkthrough state", walkthroughState);
   if (walkthroughState[id]) return;
   walkthroughState[id] = true;
-  MMKV.setItem('walkthroughState', JSON.stringify(walkthroughState));
+  MMKV.setItem("walkthroughState", JSON.stringify(walkthroughState));
 };
 
 Walkthrough.init = async () => {
-  let json = MMKV.getString('walkthroughState');
+  let json = MMKV.getString("walkthroughState");
   if (json) {
     walkthroughState = JSON.parse(json);
     console.log(walkthroughState);
@@ -125,13 +133,13 @@ Walkthrough.init = async () => {
 };
 
 Walkthrough.present = async (
-  id: 'notebooks' | 'trialstarted' | 'emailconfirmed' | 'prouser',
+  id: "notebooks" | "trialstarted" | "emailconfirmed" | "prouser",
   canSkip = true,
   nopersist?: boolean
 ) => {
   if (!nopersist) {
     if (!walkthroughState || Object.keys(walkthroughState).length === 0) {
-      console.log('late init of walkthrough state');
+      console.log("late init of walkthrough state");
       await Walkthrough.init();
     }
     if (walkthroughState[id]) return;

@@ -1,18 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useMessageStore } from '../../stores/use-message-store';
-import { DDS } from '../../services/device-detection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { eCloseAnnouncementDialog, eOpenAnnouncementDialog } from '../../utils/events';
-import BaseDialog from '../dialog/base-dialog';
-import { allowedOnPlatform, renderItem } from './functions';
+import React, { useEffect, useState } from "react";
+import { FlatList, View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useMessageStore } from "../../stores/use-message-store";
+import { DDS } from "../../services/device-detection";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../services/event-manager";
+import {
+  eCloseAnnouncementDialog,
+  eOpenAnnouncementDialog
+} from "../../utils/events";
+import BaseDialog from "../dialog/base-dialog";
+import { allowedOnPlatform, renderItem } from "./functions";
 
 export const AnnouncementDialog = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
   const [info, setInfo] = useState(null);
-  const remove = useMessageStore(state => state.remove);
+  const remove = useMessageStore((state) => state.remove);
 
   useEffect(() => {
     eSubscribeEvent(eOpenAnnouncementDialog, open);
@@ -23,7 +29,7 @@ export const AnnouncementDialog = () => {
     };
   }, [visible]);
 
-  const open = data => {
+  const open = (data) => {
     setInfo(data);
     setVisible(true);
   };
@@ -46,11 +52,11 @@ export const AnnouncementDialog = () => {
     >
       <View
         style={{
-          width: DDS.isTab ? 600 : '100%',
+          width: DDS.isTab ? 600 : "100%",
           backgroundColor: colors.bg,
-          maxHeight: DDS.isTab ? '90%' : '100%',
+          maxHeight: DDS.isTab ? "90%" : "100%",
           borderRadius: DDS.isTab ? 10 : 0,
-          overflow: 'hidden',
+          overflow: "hidden",
           marginBottom: DDS.isTab ? 20 : 0,
           borderTopRightRadius: 10,
           borderTopLeftRadius: 10
@@ -58,9 +64,9 @@ export const AnnouncementDialog = () => {
       >
         <FlatList
           style={{
-            width: '100%'
+            width: "100%"
           }}
-          data={info?.body.filter(item => allowedOnPlatform(item.platforms))}
+          data={info?.body.filter((item) => allowedOnPlatform(item.platforms))}
           renderItem={renderItem}
         />
 

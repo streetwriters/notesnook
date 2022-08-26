@@ -46,7 +46,7 @@ export function FontSize(props: ToolProps) {
 const fontFamilies = {
   "Sans-serif": "Open Sans",
   Serif: "serif",
-  Monospace: "monospace",
+  Monospace: "monospace"
 };
 export function FontFamily(props: ToolProps) {
   const { editor } = props;
@@ -85,8 +85,8 @@ function toMenuItems(editor: Editor, currentFontFamily: string): MenuItem[] {
       isChecked: key === currentFontFamily,
       onClick: () => editor.current?.chain().focus().setFontFamily(value).run(),
       styles: {
-        fontFamily: value,
-      },
+        fontFamily: value
+      }
     });
   }
   return menuItems;

@@ -1,21 +1,21 @@
-import React, { useRef } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-import { notesnook } from '../../../e2e/test.ids';
-import { eSendEvent } from '../../services/event-manager';
-import Sync from '../../services/sync';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { db } from '../../common/database';
-import { eScrollEvent } from '../../utils/events';
-import { tabBarRef } from '../../utils/global-refs';
-import JumpToSectionDialog from '../dialogs/jump-to-section';
-import { Footer } from '../list-items/footer';
-import { Header } from '../list-items/headers/header';
-import { SectionHeader } from '../list-items/headers/section-header';
-import { NoteWrapper } from '../list-items/note/wrapper';
-import { NotebookWrapper } from '../list-items/notebook/wrapper';
-import TagItem from '../list-items/tag';
-import { Empty } from './empty';
+import React, { useRef } from "react";
+import { FlatList, RefreshControl, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { notesnook } from "../../../e2e/test.ids";
+import { eSendEvent } from "../../services/event-manager";
+import Sync from "../../services/sync";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { db } from "../../common/database";
+import { eScrollEvent } from "../../utils/events";
+import { tabBarRef } from "../../utils/global-refs";
+import JumpToSectionDialog from "../dialogs/jump-to-section";
+import { Footer } from "../list-items/footer";
+import { Header } from "../list-items/headers/header";
+import { SectionHeader } from "../list-items/headers/section-header";
+import { NoteWrapper } from "../list-items/note/wrapper";
+import { NotebookWrapper } from "../list-items/notebook/wrapper";
+import TagItem from "../list-items/tag";
+import { Empty } from "./empty";
 
 const renderItems = {
   note: NoteWrapper,
@@ -30,12 +30,13 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
   if (!item) return <View />;
   const Item = renderItems[item.itemType || item.type] || View;
   const groupOptions = db.settings?.getGroupOptions(type);
-  const dateBy = groupOptions.sortBy !== 'title' ? groupOptions.sortBy : 'dateEdited';
+  const dateBy =
+    groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
 
   const tags =
     item.tags
       ?.slice(0, 3)
-      ?.map(item => {
+      ?.map((item) => {
         let tag = db.tags.tag(item);
 
         if (!tag) return null;
@@ -45,8 +46,17 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
           alias: tag.alias
         };
       })
-      .filter(t => t !== null) || [];
-  return <Item item={item} tags={tags} dateBy={dateBy} index={index} type={type} {...restArgs} />;
+      .filter((t) => t !== null) || [];
+  return (
+    <Item
+      item={item}
+      tags={tags}
+      dateBy={dateBy}
+      index={index}
+      type={type}
+      {...restArgs}
+    />
+  );
 };
 
 const List = ({
@@ -56,14 +66,14 @@ const List = ({
   placeholderData,
   loading,
   headerProps = {
-    heading: 'Home',
+    heading: "Home",
     color: null
   },
   screen,
   ListHeader,
   warning
 }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const scrollRef = useRef();
 
   const renderItem = React.useCallback(
@@ -73,7 +83,7 @@ const List = ({
         index={index}
         color={headerProps.color}
         title={headerProps.heading}
-        type={screen === 'Notes' ? 'home' : type}
+        type={screen === "Notes" ? "home" : type}
         screen={screen}
       />
     ),
@@ -81,7 +91,7 @@ const List = ({
   );
 
   const _onRefresh = async () => {
-    Sync.run('global', false, true, () => {
+    Sync.run("global", false, true, () => {
       if (refreshCallback) {
         refreshCallback();
       }
@@ -89,7 +99,7 @@ const List = ({
   };
 
   const _onScroll = React.useCallback(
-    event => {
+    (event) => {
       if (!event) return;
       let y = event.nativeEvent.contentOffset.y;
       eSendEvent(eScrollEvent, {
@@ -101,12 +111,12 @@ const List = ({
   );
 
   let styles = {
-    width: '100%',
+    width: "100%",
     minHeight: 1,
     minWidth: 1
   };
 
-  const _keyExtractor = item => item.id || item.title;
+  const _keyExtractor = (item) => item.id || item.title;
 
   return (
     <>
@@ -114,7 +124,7 @@ const List = ({
         style={{
           flex: 1
         }}
-        entering={type === 'search' ? undefined : FadeInDown}
+        entering={type === "search" ? undefined : FadeInDown}
       >
         <FlatList
           style={styles}
@@ -171,7 +181,7 @@ const List = ({
       <JumpToSectionDialog
         screen={screen}
         data={listData}
-        type={screen === 'Notes' ? 'home' : type}
+        type={screen === "Notes" ? "home" : type}
         scrollRef={scrollRef}
       />
     </>

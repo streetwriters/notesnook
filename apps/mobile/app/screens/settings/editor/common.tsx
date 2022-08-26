@@ -1,9 +1,13 @@
-import React from 'react';
-import { Group } from './group';
-import { DraggableItem } from './state';
-import { Tool } from './tool';
+import React from "react";
+import { Group } from "./group";
+import { DraggableItem } from "./state";
+import { Tool } from "./tool";
 
-export const renderTool = ({ item, groupIndex, parentIndex }: DraggableItem) => {
+export const renderTool = ({
+  item,
+  groupIndex,
+  parentIndex
+}: DraggableItem) => {
   const data = item as string[];
 
   if (!data) return null;
@@ -21,8 +25,8 @@ export const renderTool = ({ item, groupIndex, parentIndex }: DraggableItem) => 
   if (Array.isArray(data[0])) {
     tools.unshift(
       <Tool
-        key={'dummy'}
-        item={'dummy'}
+        key={"dummy"}
+        item={"dummy"}
         index={-1}
         groupIndex={groupIndex}
         parentIndex={parentIndex}

@@ -198,7 +198,7 @@ export function showMultiDeleteConfirmation(length: number) {
       </Text>
     ),
     yesText: `Delete selected`,
-    noText: "Cancel",
+    noText: "Cancel"
   });
 }
 
@@ -216,7 +216,7 @@ export function showMultiPermanentDeleteConfirmation(length: number) {
       </Text>
     ),
     yesText: `Permanently delete selected`,
-    noText: "Cancel",
+    noText: "Cancel"
   });
 }
 
@@ -226,7 +226,7 @@ export function showLogoutConfirmation() {
     message:
       "Logging out will delete all local data and reset the app. Make sure you have synced your data before logging out.",
     yesText: `Yes`,
-    noText: "No",
+    noText: "No"
   });
 }
 
@@ -236,7 +236,7 @@ export function showClearSessionsConfirmation() {
     message:
       "All other logged-in devices will be forced to logout stopping sync. Use with care lest you lose important notes.",
     yesText: `Yes`,
-    noText: "No",
+    noText: "No"
   });
 }
 
@@ -246,7 +246,7 @@ export function showAccountLoggedOutNotice(reason?: string) {
     message: reason,
     noText: "Okay",
     yesText: `Relogin`,
-    yesAction: () => hardNavigate("/login"),
+    yesAction: () => hardNavigate("/login")
   });
 }
 
@@ -274,7 +274,7 @@ export function showAppUpdatedNotice(
         </Text>
       </Flex>
     ),
-    yesText: `Yay!`,
+    yesText: `Yay!`
   });
 }
 
@@ -341,14 +341,14 @@ function getDialogData(type: string) {
       return {
         title: "Create your vault",
         subtitle: "A vault stores your notes in a password-encrypted storage.",
-        positiveButtonText: "Create vault",
+        positiveButtonText: "Create vault"
       };
     case "clear_vault":
       return {
         title: "Clear your vault",
         subtitle:
           "Enter vault password to unlock and remove all notes from the vault.",
-        positiveButtonText: "Clear vault",
+        positiveButtonText: "Clear vault"
       };
     case "delete_vault":
       return {
@@ -356,46 +356,46 @@ function getDialogData(type: string) {
         subtitle: "Enter your account password to delete your vault.",
         positiveButtonText: "Delete vault",
         checks: [
-          { key: "deleteAllLockedNotes", title: "Delete all locked notes?" },
-        ],
+          { key: "deleteAllLockedNotes", title: "Delete all locked notes?" }
+        ]
       };
     case "lock_note":
       return {
         title: "Lock note",
         subtitle: "Please open your vault to encrypt & lock this note.",
-        positiveButtonText: "Lock note",
+        positiveButtonText: "Lock note"
       };
     case "unlock_note":
       return {
         title: "Unlock note",
         subtitle: "Your note will be unencrypted and removed from the vault.",
-        positiveButtonText: "Unlock note",
+        positiveButtonText: "Unlock note"
       };
     case "unlock_and_delete_note":
       return {
         title: "Delete note",
         subtitle: "Please unlock this note to move it to trash.",
-        positiveButtonText: "Unlock & delete",
+        positiveButtonText: "Unlock & delete"
       };
     case "change_password":
       return {
         title: "Change vault password",
         subtitle:
           "All locked notes will be re-encrypted with the new password.",
-        positiveButtonText: "Change password",
+        positiveButtonText: "Change password"
       };
     case "ask_vault_password":
       return {
         title: "Unlock vault",
         subtitle: "Please enter your vault password to continue.",
-        positiveButtonText: "Unlock",
+        positiveButtonText: "Unlock"
       };
     case "ask_backup_password":
       return {
         title: "Encrypted backup",
         subtitle:
           "Please enter the password to decrypt and restore this backup.",
-        positiveButtonText: "Restore",
+        positiveButtonText: "Restore"
       };
     case "change_account_password":
       return {
@@ -417,13 +417,13 @@ function getDialogData(type: string) {
             </Box>
           </>
         ),
-        positiveButtonText: "Change password",
+        positiveButtonText: "Change password"
       };
     case "verify_account":
       return {
         title: "Verify it's you",
         subtitle: "Enter your account password to proceed.",
-        positiveButtonText: "Verify",
+        positiveButtonText: "Verify"
       };
     case "delete_account":
       return {
@@ -434,7 +434,7 @@ function getDialogData(type: string) {
             <b>no way of recovery</b>. Proceed with caution.
           </Text>
         ),
-        positiveButtonText: "Delete Account",
+        positiveButtonText: "Delete Account"
       };
     default:
       return {};
@@ -665,7 +665,7 @@ export function showOnboardingDialog(type: string) {
 
 export function showInvalidSystemTimeDialog({
   serverTime,
-  localTime,
+  localTime
 }: {
   serverTime: number;
   localTime: number;
@@ -687,13 +687,13 @@ export function showInvalidSystemTimeDialog({
       </>
     ),
     yesText: "Reload app",
-    yesAction: () => window.location.reload(),
+    yesAction: () => window.location.reload()
   });
 }
 
 export function showUpdateAvailableNotice({
   changelog,
-  version,
+  version
 }: {
   changelog: string;
   version: string;
@@ -702,7 +702,7 @@ export function showUpdateAvailableNotice({
     title: `New version available`,
     subtitle: `v${version} is available for download`,
     changelog,
-    action: { text: `Update now`, onClick: () => downloadUpdate() },
+    action: { text: `Update now`, onClick: () => downloadUpdate() }
   });
 }
 
@@ -714,8 +714,8 @@ export async function showUpdateReadyNotice({ version }: { version: string }) {
     changelog,
     action: {
       text: "Install now",
-      onClick: () => installUpdate(),
-    },
+      onClick: () => installUpdate()
+    }
   });
 }
 
@@ -732,7 +732,7 @@ function showUpdateDialog({
   title,
   subtitle,
   changelog,
-  action,
+  action
 }: UpdateDialogProps) {
   return confirm({
     title,
@@ -760,6 +760,6 @@ function showUpdateDialog({
     ),
     width: "500px",
     yesText: action.text,
-    yesAction: action.onClick,
+    yesAction: action.onClick
   });
 }

@@ -17,7 +17,7 @@ export const ListLoader = memo(function ListLoader() {
             flex: 1,
             ml: 1,
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "center"
           }}
         >
           <Box height={14}>

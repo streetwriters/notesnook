@@ -33,7 +33,7 @@ function RecoveryKeyDialog(props) {
         onClick: () => {
           Config.set("recoveryKeyBackupDate", Date.now());
           props.onDone();
-        },
+        }
       }}
     >
       <Flex flexDirection="column" flex={1} sx={{ overflow: "hidden" }}>

@@ -7,7 +7,7 @@ import { MenuItem } from "../../components/menu/types";
 import {
   useIsMobile,
   useToolbarLocation,
-  useToolbarStore,
+  useToolbarStore
 } from "../stores/toolbar-store";
 import { MenuPresenter } from "../../components/menu";
 import { getToolbarElement } from "../utils/dom";
@@ -34,7 +34,7 @@ export function Dropdown(props: DropdownProps) {
     group,
     id,
     isOpen,
-    onClosed: () => setIsOpen(false),
+    onClosed: () => setIsOpen(false)
   });
 
   return (
@@ -53,8 +53,8 @@ export function Dropdown(props: DropdownProps) {
           alignItems: "center",
           ":hover": { bg: "hover" },
           ":last-of-type": {
-            mr: 0,
-          },
+            mr: 0
+          }
         }}
         onClick={() => setIsOpen((s) => !s)}
         onMouseDown={(e) => e.preventDefault()}
@@ -84,7 +84,7 @@ export function Dropdown(props: DropdownProps) {
           isTargetAbsolute: true,
           location: isBottom ? "top" : "below",
           align: "center",
-          yOffset: 5,
+          yOffset: 5
         }}
         blocking={!isMobile}
         focusOnRender={!isMobile}
@@ -96,7 +96,7 @@ export function Dropdown(props: DropdownProps) {
           marginRight: isBottom ? "10px" : 0,
           display: "flex",
           alignItems: isBottom ? "center" : "unset",
-          mr: isBottom ? 0 : 2,
+          mr: isBottom ? 0 : 2
         }}
       />
     </>

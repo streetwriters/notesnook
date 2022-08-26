@@ -24,9 +24,9 @@ export const KeepInView = Extension.create({
           keepLastLineInView(editor);
         });
         return false;
-      },
+      }
     };
-  },
+  }
 });
 
 export function keepLastLineInView(editor: Editor) {

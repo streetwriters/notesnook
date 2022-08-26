@@ -44,45 +44,45 @@ type TrackerEvent = {
 export const ANALYTICS_EVENTS = {
   version: {
     name: "version",
-    description: "Sent on startup",
+    description: "Sent on startup"
   },
   checkoutStarted: {
     name: "checkout:started",
-    description: "Sent when you start Paddle checkout.",
+    description: "Sent when you start Paddle checkout."
   },
   offerClaimed: {
     name: "offer:claimed",
     description:
-      "Sent when you start Paddle checkout with a coupon code applied.",
+      "Sent when you start Paddle checkout with a coupon code applied."
   },
   announcementDismissed: {
     name: "announcement:dismissed",
-    description: "Sent when you dismiss an announcement.",
+    description: "Sent when you dismiss an announcement."
   },
   purchaseInitiated: {
     name: "purchase:initiated",
     description:
-      "Sent whenever the Premium dialog is shown to you. This can be voluntary or via accessing a premium feature.",
+      "Sent whenever the Premium dialog is shown to you. This can be voluntary or via accessing a premium feature."
   },
   socialLink: {
     name: "link:social",
     description:
-      "Sent whenever you open Notesnook social media link from the email verified screen.",
+      "Sent whenever you open Notesnook social media link from the email verified screen."
   },
   announcementCta: {
     name: "announcement:cta",
-    description: "Sent whenever you an announcement CTA is invoked.",
+    description: "Sent whenever you an announcement CTA is invoked."
   },
   accountCreated: {
     name: "/account/created",
     description: "Sent when you create an account.",
-    type: "view",
+    type: "view"
   },
   signupSkipped: {
     name: "/signup/skipped",
     description: `Sent when you press "Jump to app" button on signup screen.`,
-    type: "view",
-  },
+    type: "view"
+  }
 } as const;
 
 export function trackEvent(event: TrackerEvent, eventMessage?: string) {

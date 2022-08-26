@@ -9,7 +9,7 @@ export type PermissionHandlerOptions = {
 };
 
 const ClaimsMap: Record<Claims, (keyof UnionCommands)[]> = {
-  premium: ["insertImage"],
+  premium: ["insertImage"]
 };
 
 export function usePermissionHandler(options: PermissionHandlerOptions) {
@@ -18,7 +18,7 @@ export function usePermissionHandler(options: PermissionHandlerOptions) {
   useEffect(() => {
     function onPermissionRequested(ev: Event) {
       const {
-        detail: { id },
+        detail: { id }
       } = ev as PermissionRequestEvent;
 
       for (const key in ClaimsMap) {

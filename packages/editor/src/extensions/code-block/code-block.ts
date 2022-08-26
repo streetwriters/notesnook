@@ -5,7 +5,7 @@ import {
   PluginKey,
   TextSelection,
   Transaction,
-  Selection,
+  Selection
 } from "prosemirror-state";
 import { ResolvedPos, Node as ProsemirrorNode } from "prosemirror-model";
 import { CodeblockComponent } from "./component";
@@ -88,7 +88,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
       exitOnTripleEnter: true,
       exitOnArrowDown: true,
       exitOnArrowUp: true,
-      HTMLAttributes: {},
+      HTMLAttributes: {}
     };
   },
 
@@ -106,11 +106,11 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
     return {
       caretPosition: {
         default: undefined,
-        rendered: false,
+        rendered: false
       },
       lines: {
         default: [],
-        rendered: false,
+        rendered: false
       },
       indentType: {
         default: "space",
@@ -123,9 +123,9 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             return {};
           }
           return {
-            "data-indent-type": attributes.indentType,
+            "data-indent-type": attributes.indentType
           };
-        },
+        }
       },
       indentLength: {
         default: 2,
@@ -138,9 +138,9 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             return {};
           }
           return {
-            "data-indent-length": attributes.indentLength,
+            "data-indent-length": attributes.indentLength
           };
-        },
+        }
       },
       language: {
         default: null,
@@ -148,7 +148,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           const { languageClassPrefix } = this.options;
           const classNames = [
             ...(element.classList || []),
-            ...(element?.firstElementChild?.classList || []),
+            ...(element?.firstElementChild?.classList || [])
           ];
           const languages = classNames
             .filter((className) => className.startsWith(languageClassPrefix))
@@ -167,10 +167,10 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           }
 
           return {
-            class: `language-${attributes.language}`,
+            class: `language-${attributes.language}`
           };
-        },
-      },
+        }
+      }
     };
   },
 
@@ -178,14 +178,14 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
     return [
       {
         tag: "pre",
-        preserveWhitespace: "full",
+        preserveWhitespace: "full"
         // contentElement: (node) => {
         //   if (node instanceof HTMLElement) {
         //     node.innerText = node.innerText.replaceAll("\n\u200b\n", "\n\n");
         //   }
         //   return node;
         // },
-      },
+      }
     ];
   },
 
@@ -193,7 +193,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
     return [
       "pre",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      ["code", {}, 0],
+      ["code", {}, 0]
     ];
   },
 
@@ -231,7 +231,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             const indentLength = whitespaceLength;
             const indentToken = indent({
               type: options.type,
-              amount: indentLength,
+              amount: indentLength
             });
 
             tr.insertText(
@@ -243,10 +243,10 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
 
           commands.updateAttributes(this.type, {
             indentType: options.type,
-            indentLength: options.amount,
+            indentLength: options.amount
           });
           return true;
-        },
+        }
     };
   },
 
@@ -266,7 +266,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         if (!codeblock) return false;
         return editor.commands.setTextSelection({
           from: codeblock.pos + 1,
-          to: codeblock.pos + codeblock.node.nodeSize - 1,
+          to: codeblock.pos + codeblock.node.nodeSize - 1
         });
       },
       // remove code block when at start of document or code block is empty
@@ -438,7 +438,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             })
           )
           .run();
-      },
+      }
     };
   },
 
@@ -448,16 +448,16 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         find: backtickInputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          language: match[1],
-        }),
+          language: match[1]
+        })
       }),
       textblockTypeInputRule({
         find: tildeInputRegex,
         type: this.type,
         getAttributes: (match) => ({
-          language: match[1],
-        }),
-      }),
+          language: match[1]
+        })
+      })
     ];
   },
 
@@ -495,7 +495,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
                 this.type.create({
                   language,
                   indentType: indent.type,
-                  indentLength: indent.amount,
+                  indentLength: indent.amount
                 })
               );
             }
@@ -520,10 +520,10 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
             view.dispatch(tr);
 
             return true;
-          },
-        },
+          }
+        }
       }),
-      HighlighterPlugin({ name: this.name, defaultLanguage: "txt" }),
+      HighlighterPlugin({ name: this.name, defaultLanguage: "txt" })
     ];
   },
 
@@ -543,9 +543,9 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           prev.language !== next.language ||
           prev.indentType !== next.indentType
         );
-      },
+      }
     });
-  },
+  }
 });
 
 export type CaretPosition = {
@@ -571,7 +571,7 @@ export function toCaretPosition(
         column: lineLength - (line.to - $head.pos),
         selected: $to.pos - $from.pos,
         total: lines.length,
-        from: line.from,
+        from: line.from
       };
     }
   }
@@ -609,7 +609,7 @@ function indentOnEnter(editor: Editor, $from: ResolvedPos, options: Indent) {
   return editor
     .chain()
     .insertContent(`${newline}${indentation}`, {
-      parseOptions: { preserveWhitespace: "full" },
+      parseOptions: { preserveWhitespace: "full" }
     })
     .focus()
     .run();
@@ -625,7 +625,7 @@ function getNewline($from: ResolvedPos, options: Indent) {
 
   return {
     newline: NEWLINE,
-    indentation: indent({ amount: indentLength, type: options.type }),
+    indentation: indent({ amount: indentLength, type: options.type })
   };
 }
 
@@ -659,7 +659,7 @@ export function toCodeLines(code: string, pos: number): CodeLine[] {
           lineStart,
           length ? lineStart + length : lineStart + lineLength
         );
-      },
+      }
     });
 
     from = to + 1;
@@ -685,7 +685,7 @@ function parseIndentation(node: ProsemirrorNode): Indent | undefined {
   const { indentType, indentLength } = node.attrs;
   return {
     type: indentType,
-    amount: parseInt(indentLength),
+    amount: parseInt(indentLength)
   };
 }
 
@@ -740,7 +740,7 @@ function fixIndentation(
   const { amount, type = "space" } = indent || detectIndent(code);
   const fixed = redent(code, amount, {
     includeEmptyLines: false,
-    indent: type === "space" ? " " : "\t",
+    indent: type === "space" ? " " : "\t"
   });
   return { code: stripIndent(fixed), amount, type };
 }

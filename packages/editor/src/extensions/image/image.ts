@@ -2,13 +2,13 @@ import {
   Node,
   nodeInputRule,
   mergeAttributes,
-  findChildren,
+  findChildren
 } from "@tiptap/core";
 import { Attachment, getDataAttribute } from "../attachment";
 import {
   createNodeView,
   createSelectionBasedNodeView,
-  NodeViewSelectionNotifierPlugin,
+  NodeViewSelectionNotifierPlugin
 } from "../react";
 import { ImageComponent } from "./component";
 
@@ -61,7 +61,7 @@ export const ImageNode = Node.create<ImageOptions>({
     return {
       inline: true,
       allowBase64: true,
-      HTMLAttributes: {},
+      HTMLAttributes: {}
     };
   },
 
@@ -78,13 +78,13 @@ export const ImageNode = Node.create<ImageOptions>({
   addAttributes() {
     return {
       src: {
-        default: null,
+        default: null
       },
       alt: {
-        default: null,
+        default: null
       },
       title: {
-        default: null,
+        default: null
       },
       width: { default: null },
       height: { default: null },
@@ -96,22 +96,22 @@ export const ImageNode = Node.create<ImageOptions>({
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
       type: getDataAttribute("mime"),
-      size: getDataAttribute("size"),
+      size: getDataAttribute("size")
     };
   },
 
   parseHTML() {
     return [
       {
-        tag: this.options.allowBase64 ? "img" : 'img:not([src^="data:"])',
-      },
+        tag: this.options.allowBase64 ? "img" : 'img:not([src^="data:"])'
+      }
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
     return [
       "img",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)
     ];
   },
 
@@ -126,7 +126,7 @@ export const ImageNode = Node.create<ImageOptions>({
         ({ commands }) => {
           return commands.insertContent({
             type: this.name,
-            attrs: options,
+            attrs: options
           });
         },
       setImageAlignment:
@@ -166,14 +166,14 @@ export const ImageNode = Node.create<ImageOptions>({
           for (const image of images) {
             tr.setNodeMarkup(image.pos, image.node.type, {
               ...image.node.attrs,
-              ...options,
+              ...options
             });
           }
           tr.setMeta("preventUpdate", options.preventUpdate || false);
           tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
-        },
+        }
     };
   },
 
@@ -186,8 +186,8 @@ export const ImageNode = Node.create<ImageOptions>({
           const [, , alt, src, title] = match;
 
           return { src, alt, title };
-        },
-      }),
+        }
+      })
     ];
-  },
+  }
 });

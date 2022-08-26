@@ -35,7 +35,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
           } finally {
             setIsDownloading(false);
           }
-        },
+        }
       }}
     >
       <Flex sx={{ px: 1, flexDirection: "column", width: ["auto", 350] }}>
@@ -57,7 +57,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
               bg: "errorBg",
               mt: 1,
               p: 1,
-              borderRadius: "default",
+              borderRadius: "default"
             }}
           >
             Failed to download image: {error.toLowerCase()}.
@@ -70,7 +70,7 @@ export function ImageUploadPopup(props: ImageUploadPopupProps) {
               color: "primary",
               mt: 1,
               p: 1,
-              borderRadius: "default",
+              borderRadius: "default"
             }}
           >
             To protect your privacy, we will download the image &amp; add it to

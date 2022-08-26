@@ -5,7 +5,7 @@ import { Selection, NodeSelection } from "prosemirror-state";
 import { PortalProviderAPI } from "./react-portal-provider";
 import {
   stateKey as SelectionChangePluginKey,
-  ReactNodeViewState,
+  ReactNodeViewState
 } from "./plugin";
 import { EventDispatcher } from "./event-dispatcher";
 import {
@@ -13,7 +13,7 @@ import {
   ReactNodeViewOptions,
   GetPosNode,
   SelectionBasedReactNodeViewProps,
-  ForwardRef,
+  ForwardRef
 } from "./types";
 import { ReactNodeView } from "./react-node-view";
 import { NodeViewRendererProps } from "@tiptap/core";
@@ -119,7 +119,7 @@ export class SelectionBasedNodeView<
   private getPositionsWithDefault(pos?: number, posEnd?: number) {
     return {
       pos: typeof pos !== "number" ? this.pos : pos,
-      posEnd: typeof posEnd !== "number" ? this.posEnd : posEnd,
+      posEnd: typeof posEnd !== "number" ? this.posEnd : posEnd
     };
   }
 
@@ -156,7 +156,7 @@ export class SelectionBasedNodeView<
   private isSelectedNode = (selection: Selection): boolean => {
     if (selection instanceof NodeSelection) {
       const {
-        selection: { from, to },
+        selection: { from, to }
       } = this.editor.view.state;
       return (
         selection.node === this.node ||
@@ -171,7 +171,7 @@ export class SelectionBasedNodeView<
 
   insideSelection = () => {
     const {
-      selection: { from, to },
+      selection: { from, to }
     } = this.editor.view.state;
 
     return (
@@ -193,7 +193,7 @@ export class SelectionBasedNodeView<
     if (super.viewShouldUpdate(nextNode)) return true;
 
     const {
-      state: { selection },
+      state: { selection }
     } = this.editor.view;
 
     // update selection
@@ -260,7 +260,7 @@ export function createSelectionBasedNodeView<
     const _getPos = () => (typeof getPos === "boolean" ? -1 : getPos());
     return new SelectionBasedNodeView(node, editor as Editor, _getPos, {
       ...options,
-      component,
+      component
     }).init();
   };
 }

@@ -43,8 +43,8 @@ const KEYMAP = [
       e.preventDefault();
 
       navigate("/search/notes");
-    },
-  },
+    }
+  }
   // {
   //   keys: ["alt+n"],
   //   description: "Go to Notes",

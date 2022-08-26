@@ -1,12 +1,12 @@
-import { decode, EntityLevel } from 'entities';
-import { Platform } from 'react-native';
-import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import RNFetchBlob from 'rn-fetch-blob';
-import { toTXT } from '../utils';
-import { sanitizeFilename } from '../utils/sanitizer';
-import Storage from '../common/database/storage';
-import db from '../common/database';
+import { decode, EntityLevel } from "entities";
+import { Platform } from "react-native";
+import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
+import * as ScopedStorage from "react-native-scoped-storage";
+import RNFetchBlob from "rn-fetch-blob";
+import { toTXT } from "../utils";
+import { sanitizeFilename } from "../utils/sanitizer";
+import Storage from "../common/database/storage";
+import db from "../common/database";
 
 const defaultStyle = `<style>
 .img_size_one {
@@ -197,8 +197,8 @@ table[data-mce-selected]
  table[data-mce-selected]
   tr[data-mce-active]
   th:not([data-mce-active]) {
-  border-bottom: 1px solid ${'#008837' + 'B3'} !important;
-  border-top: 1px solid ${'#008837' + 'B3'} !important;
+  border-bottom: 1px solid ${"#008837" + "B3"} !important;
+  border-top: 1px solid ${"#008837" + "B3"} !important;
 }
 
 table[data-mce-selected]
@@ -207,7 +207,7 @@ table[data-mce-selected]
 table[data-mce-selected]
   tr[data-mce-active]
   th:not([data-mce-active]):first-child {
-  border-left: 1px solid ${'#008837' + 'B3'} !important;
+  border-left: 1px solid ${"#008837" + "B3"} !important;
 }
 
 table[data-mce-selected]
@@ -216,12 +216,12 @@ table[data-mce-selected]
 table[data-mce-selected]
   tr[data-mce-active]
   th:not([data-mce-active]):last-child {
-  border-right: 1px solid ${'#008837' + 'B3'} !important;
+  border-right: 1px solid ${"#008837" + "B3"} !important;
 }
 
 table[data-mce-selected] td[data-mce-active],
 table[data-mce-selected] th[data-mce-active] {
-  border: 2px solid ${'#008837' + 'B3'} !important;
+  border: 2px solid ${"#008837" + "B3"} !important;
   background-color: #00883712;
 }
 
@@ -322,49 +322,51 @@ async function releasePermissions(path) {
 }
 
 async function saveToPDF(note) {
-  let androidSavePath = '/Notesnook/exported/PDF';
-  if (Platform.OS === 'android') {
+  let androidSavePath = "/Notesnook/exported/PDF";
+  if (Platform.OS === "android") {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
     androidSavePath = file.uri;
   }
 
-  Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/PDF/'));
+  Platform.OS === "ios" && (await Storage.checkAndCreateDir("/exported/PDF/"));
 
-  let html = await db.notes.note(note).export('html');
+  let html = await db.notes.note(note).export("html");
   html = decode(html, {
     level: EntityLevel.HTML
   });
-  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
+  let fileName = sanitizeFilename(note.title + Date.now(), {
+    replacement: "_"
+  });
   let html3 = html;
-  if (html.indexOf('<head>') > -1) {
-    let html1 = html.substring(0, html.indexOf('<head>') + 6);
-    let html2 = html.substring(html.indexOf('<head>') + 6);
+  if (html.indexOf("<head>") > -1) {
+    let html1 = html.substring(0, html.indexOf("<head>") + 6);
+    let html2 = html.substring(html.indexOf("<head>") + 6);
     html3 = html1 + defaultStyle + html2;
   }
 
   let options = {
     html: html3,
-    fileName: Platform.OS === 'ios' ? '/exported/PDF/' + fileName : fileName,
+    fileName: Platform.OS === "ios" ? "/exported/PDF/" + fileName : fileName,
     width: 595,
     height: 852,
-    bgColor: '#FFFFFF',
+    bgColor: "#FFFFFF",
     padding: 30,
-    base64: Platform.OS === 'android'
+    base64: Platform.OS === "android"
   };
-  if (Platform.OS === 'ios') {
-    options.directory = 'Documents';
+  if (Platform.OS === "ios") {
+    options.directory = "Documents";
   }
   let res = await RNHTMLtoPDF.convert(options);
 
   let fileUri;
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     fileUri = await ScopedStorage.writeFile(
       androidSavePath,
       res.base64,
       fileName,
-      'application/pdf',
-      'base64',
+      "application/pdf",
+      "base64",
       false
     );
 
@@ -377,119 +379,131 @@ async function saveToPDF(note) {
 
   return {
     filePath: fileUri || res.filePath,
-    type: 'application/pdf',
-    name: 'PDF',
+    type: "application/pdf",
+    name: "PDF",
     fileName: fileName
   };
 }
 
 async function saveToMarkdown(note) {
-  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Markdown/'));
-  if (Platform.OS === 'android') {
+  let path =
+    Platform.OS === "ios" &&
+    (await Storage.checkAndCreateDir("/exported/Markdown/"));
+  if (Platform.OS === "android") {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
     path = file.uri;
   }
 
-  let markdown = await db.notes.note(note.id).export('md');
-  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
+  let markdown = await db.notes.note(note.id).export("md");
+  let fileName = sanitizeFilename(note.title + Date.now(), {
+    replacement: "_"
+  });
 
   let fileUri;
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     fileUri = await ScopedStorage.writeFile(
       path,
       markdown,
-      fileName + '.md',
-      'text/markdown',
-      'utf8',
+      fileName + ".md",
+      "text/markdown",
+      "utf8",
       false
     );
     await releasePermissions(path);
   } else {
-    path = path + fileName + '.md';
-    await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+    path = path + fileName + ".md";
+    await RNFetchBlob.fs.writeFile(path, markdown, "utf8");
   }
 
   return {
     filePath: fileUri || path,
-    type: 'text/markdown',
-    name: 'Markdown',
+    type: "text/markdown",
+    name: "Markdown",
     fileName: fileName
   };
 }
 
 async function saveToText(note) {
-  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Text/'));
-  if (Platform.OS === 'android') {
+  let path =
+    Platform.OS === "ios" &&
+    (await Storage.checkAndCreateDir("/exported/Text/"));
+  if (Platform.OS === "android") {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
     path = file.uri;
   }
 
   let text = await toTXT(note);
-  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
+  let fileName = sanitizeFilename(note.title + Date.now(), {
+    replacement: "_"
+  });
 
   let fileUri;
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     fileUri = await ScopedStorage.writeFile(
       path,
       text,
-      fileName + '.txt',
-      'text/plain',
-      'utf8',
+      fileName + ".txt",
+      "text/plain",
+      "utf8",
       false
     );
     await releasePermissions(path);
   } else {
-    path = path + fileName + '.txt';
-    await RNFetchBlob.fs.writeFile(path, text, 'utf8');
+    path = path + fileName + ".txt";
+    await RNFetchBlob.fs.writeFile(path, text, "utf8");
   }
 
   return {
     filePath: fileUri || path,
-    type: 'text/plain',
-    name: 'Text',
+    type: "text/plain",
+    name: "Text",
     fileName: fileName
   };
 }
 
 async function saveToHTML(note) {
-  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Html/'));
-  if (Platform.OS === 'android') {
+  let path =
+    Platform.OS === "ios" &&
+    (await Storage.checkAndCreateDir("/exported/Html/"));
+  if (Platform.OS === "android") {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
     path = file.uri;
   }
 
-  let html = await db.notes.note(note.id).export('html');
-  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
+  let html = await db.notes.note(note.id).export("html");
+  let fileName = sanitizeFilename(note.title + Date.now(), {
+    replacement: "_"
+  });
   let html3 = html;
-  if (html.indexOf('<head>') > -1) {
-    let html1 = html.substring(0, html.indexOf('<head>') + 6);
-    let html2 = html.substring(html.indexOf('<head>') + 6);
+  if (html.indexOf("<head>") > -1) {
+    let html1 = html.substring(0, html.indexOf("<head>") + 6);
+    let html2 = html.substring(html.indexOf("<head>") + 6);
     html3 = html1 + defaultStyle + html2;
   }
 
   let fileUri;
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     fileUri = await ScopedStorage.writeFile(
       path,
       html3,
-      fileName + '.html',
-      'text/html',
-      'utf8',
+      fileName + ".html",
+      "text/html",
+      "utf8",
       false
     );
     await releasePermissions(path);
   } else {
-    path = path + fileName + '.html';
-    await RNFetchBlob.fs.writeFile(path, html3, 'utf8');
+    path = path + fileName + ".html";
+    await RNFetchBlob.fs.writeFile(path, html3, "utf8");
   }
 
   return {
     filePath: fileUri || path,
-    type: 'text/html',
-    name: 'Html',
+    type: "text/html",
+    name: "Html",
     fileName: fileName
   };
 }

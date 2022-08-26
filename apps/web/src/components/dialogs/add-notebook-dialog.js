@@ -14,7 +14,7 @@ class AddNotebookDialog extends React.Component {
   state = {
     topics: [],
     isEditting: false,
-    editIndex: -1,
+    editIndex: -1
   };
 
   removeTopic(index) {
@@ -25,7 +25,7 @@ class AddNotebookDialog extends React.Component {
     }
     topics.splice(index, 1);
     this.setState({
-      topics,
+      topics
     });
   }
 
@@ -35,7 +35,7 @@ class AddNotebookDialog extends React.Component {
     const topics = this.state.topics.slice();
     topics.push({ title: topicTitle });
     this.setState({
-      topics,
+      topics
     });
     this.resetTopicInput();
   }
@@ -66,7 +66,7 @@ class AddNotebookDialog extends React.Component {
     if (!this.props.notebook) return;
     const { title, description, id, topics } = qclone(this.props.notebook);
     this.setState({
-      topics,
+      topics
     });
     this.title = title;
     this.notebookTitle = title;
@@ -80,7 +80,7 @@ class AddNotebookDialog extends React.Component {
     this.description = "";
     this.id = undefined;
     this.setState({
-      topics: [],
+      topics: []
     });
   }
 
@@ -95,7 +95,7 @@ class AddNotebookDialog extends React.Component {
         if (topic.id) return topic;
         return topic.title;
       }),
-      id: this.id,
+      id: this.id
     };
     this.props.onDone(notebook, this.deletedTopics);
   }
@@ -116,7 +116,7 @@ class AddNotebookDialog extends React.Component {
           text: props.edit ? "Save" : "Create",
           onClick: () => {
             this.createNotebook();
-          },
+          }
         }}
         onClose={props.onClose}
         negativeButton={{ text: "Cancel", onClick: props.onClose }}
@@ -162,14 +162,14 @@ class AddNotebookDialog extends React.Component {
                   this.addTopic(this._topicInputRef.value);
                 }
               },
-              icon: this.state.isEditting ? Icon.Checkmark : Icon.Plus,
+              icon: this.state.isEditting ? Icon.Checkmark : Icon.Plus
             }}
             onChange={(e) => {
               if (!this.state.isEditting) return;
               const topics = this.state.topics.slice();
               topics[this.state.editIndex].title = e.target.value;
               this.setState({
-                topics,
+                topics
               });
             }}
             onKeyUp={(e) => {
@@ -211,7 +211,7 @@ function TopicItem(props) {
     onDelete,
     isEditing,
     hideActions,
-    index,
+    index
   } = props;
   return (
     <Flex
@@ -224,7 +224,7 @@ function TopicItem(props) {
         borderBottomColor: isEditing ? "primary" : "border",
         borderBottomStyle: "solid",
         cursor: "pointer",
-        ":hover": { borderBottomColor: "primary" },
+        ":hover": { borderBottomColor: "primary" }
       }}
       onClick={isEditing ? onDoneEditing : onEdit}
     >

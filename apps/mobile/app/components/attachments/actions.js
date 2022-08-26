@@ -1,34 +1,42 @@
-import Clipboard from '@react-native-clipboard/clipboard';
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import picker from '../../screens/editor/tiptap/picker';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
-import PremiumService from '../../services/premium';
-import { useAttachmentStore } from '../../stores/use-attachment-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { formatBytes } from '../../utils';
-import { db } from '../../common/database';
-import { eCloseAttachmentDialog, eCloseProgressDialog } from '../../utils/events';
-import filesystem from '../../common/filesystem';
-import { useAttachmentProgress } from '../../hooks/use-attachment-progress';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { Dialog } from '../dialog';
-import { presentDialog } from '../dialog/functions';
-import { openNote } from '../list-items/note/wrapper';
-import { DateMeta } from '../properties/date-meta';
-import { Button } from '../ui/button';
-import { Notice } from '../ui/notice';
-import { PressableButton } from '../ui/pressable';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import Clipboard from "@react-native-clipboard/clipboard";
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
+import picker from "../../screens/editor/tiptap/picker";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from "../../services/event-manager";
+import PremiumService from "../../services/premium";
+import { useAttachmentStore } from "../../stores/use-attachment-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { formatBytes } from "../../utils";
+import { db } from "../../common/database";
+import {
+  eCloseAttachmentDialog,
+  eCloseProgressDialog
+} from "../../utils/events";
+import filesystem from "../../common/filesystem";
+import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { Dialog } from "../dialog";
+import { presentDialog } from "../dialog/functions";
+import { openNote } from "../list-items/note/wrapper";
+import { DateMeta } from "../properties/date-meta";
+import { Button } from "../ui/button";
+import { Notice } from "../ui/notice";
+import { PressableButton } from "../ui/pressable";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 
 const Actions = ({ attachment, setAttachments, fwdRef }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const contextId = attachment.metadata.hash;
   const [filename, setFilename] = useState(attachment.metadata.filename);
-  const [currentProgress, setCurrentProgress] = useAttachmentProgress(attachment);
+  const [currentProgress, setCurrentProgress] =
+    useAttachmentProgress(attachment);
   const [failed, setFailed] = useState(attachment.failed);
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState({
@@ -37,25 +45,25 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
 
   const actions = [
     {
-      name: 'Download',
+      name: "Download",
       onPress: async () => {
         if (currentProgress) {
-          await db.fs.cancel(attachment.metadata.hash, 'download');
+          await db.fs.cancel(attachment.metadata.hash, "download");
           useAttachmentStore.getState().remove(attachment.metadata.hash);
         }
         filesystem.downloadAttachment(attachment.metadata.hash, false);
         eSendEvent(eCloseProgressDialog, contextId);
       },
-      icon: 'download'
+      icon: "download"
     },
     {
-      name: 'Reupload',
+      name: "Reupload",
       onPress: async () => {
         if (!PremiumService.get()) {
           ToastEvent.show({
-            heading: 'Upgrade to pro',
-            type: 'error',
-            context: 'local'
+            heading: "Upgrade to pro",
+            type: "error",
+            context: "local"
           });
           return;
         }
@@ -66,13 +74,13 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           type: attachment.metadata.type
         });
       },
-      icon: 'upload'
+      icon: "upload"
     },
     {
-      name: 'Run file check',
+      name: "Run file check",
       onPress: async () => {
         setLoading({
-          name: 'Run file check'
+          name: "Run file check"
         });
         let res = await filesystem.checkAttachment(attachment.metadata.hash);
         if (res.failed) {
@@ -83,27 +91,27 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           db.attachments.markAsFailed(attachment.id, null);
         }
         ToastEvent.show({
-          heading: 'File check passed',
-          type: 'success',
-          context: 'local'
+          heading: "File check passed",
+          type: "success",
+          context: "local"
         });
         setAttachments([...db.attachments.all]);
         setLoading({
           name: null
         });
       },
-      icon: 'file-check'
+      icon: "file-check"
     },
     {
-      name: 'Rename',
+      name: "Rename",
       onPress: () => {
         presentDialog({
           context: contextId,
           input: true,
-          title: 'Rename file',
-          paragraph: 'Enter a new name for the file',
+          title: "Rename file",
+          paragraph: "Enter a new name for the file",
           defaultValue: attachment.metadata.filename,
-          positivePress: async value => {
+          positivePress: async (value) => {
             if (value && value.length > 0) {
               await db.attachments.add({
                 hash: attachment.metadata.hash,
@@ -113,31 +121,31 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
               setAttachments([...db.attachments.all]);
             }
           },
-          positiveText: 'Rename'
+          positiveText: "Rename"
         });
       },
-      icon: 'form-textbox'
+      icon: "form-textbox"
     },
     {
-      name: 'Delete',
+      name: "Delete",
       onPress: async () => {
         await db.attachments.remove(attachment.metadata.hash, false);
         setAttachments([...db.attachments.all]);
         eSendEvent(eCloseProgressDialog, contextId);
       },
-      icon: 'delete-outline'
+      icon: "delete-outline"
     }
   ];
 
   const getNotes = () => {
     let allNotes = db.notes.all;
-    let attachmentNotes = attachment.noteIds?.map(id => {
-      let index = allNotes?.findIndex(note => id === note.id);
+    let attachmentNotes = attachment.noteIds?.map((id) => {
+      let index = allNotes?.findIndex((note) => id === note.id);
       if (index !== -1) {
         return allNotes[index];
       } else {
         return {
-          type: 'notfound',
+          type: "notfound",
           title: `Note with id ${id} does not exist.`,
           id: id
         };
@@ -157,7 +165,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
       }}
       nestedScrollEnabled={true}
       style={{
-        maxHeight: '100%'
+        maxHeight: "100%"
       }}
     >
       <Dialog context={contextId} />
@@ -179,7 +187,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
 
         <View
           style={{
-            flexDirection: 'row',
+            flexDirection: "row",
             marginBottom: 10,
             paddingHorizontal: 12
           }}
@@ -210,15 +218,16 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
             size={SIZE.xs + 1}
             color={colors.icon}
           >
-            {attachment.noteIds.length} note{attachment.noteIds.length > 1 ? 's' : ''}
+            {attachment.noteIds.length} note
+            {attachment.noteIds.length > 1 ? "s" : ""}
           </Paragraph>
           <Paragraph
             onPress={() => {
               Clipboard.setString(attachment.metadata.hash);
               ToastEvent.show({
-                type: 'success',
-                heading: 'Attachment hash copied',
-                context: 'local'
+                type: "success",
+                heading: "Attachment hash copied",
+                context: "local"
               });
             }}
             size={SIZE.xs + 1}
@@ -250,16 +259,16 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
               List of notes:
             </Heading>
 
-            {notes.map(item => (
+            {notes.map((item) => (
               <PressableButton
                 onPress={async () => {
-                  if (item.type === 'notfound') {
+                  if (item.type === "notfound") {
                     ToastEvent.show({
-                      heading: 'Note not found',
+                      heading: "Note not found",
                       message:
-                        'A note with the given id was not found. Maybe you have deleted the note or moved it to trash already.',
-                      type: 'error',
-                      context: 'local'
+                        "A note with the given id was not found. Maybe you have deleted the note or moved it to trash already.",
+                      type: "error",
+                      context: "local"
                     });
                     return;
                   }
@@ -267,11 +276,11 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
                   await sleep(150);
                   eSendEvent(eCloseAttachmentDialog);
                   await sleep(300);
-                  openNote(item, item.type === 'trash');
+                  openNote(item, item.type === "trash");
                 }}
                 customStyle={{
                   paddingVertical: 12,
-                  alignItems: 'flex-start',
+                  alignItems: "flex-start",
 
                   paddingHorizontal: 12
                 }}
@@ -284,13 +293,13 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
         </View>
       ) : null}
 
-      {actions.map(item => (
+      {actions.map((item) => (
         <Button
           key={item.name}
           buttonType={{
             text: item.on
               ? colors.accent
-              : item.name === 'Delete' || item.name === 'PermDelete'
+              : item.name === "Delete" || item.name === "PermDelete"
               ? colors.errorText
               : colors.pri
           }}
@@ -298,13 +307,13 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           title={item.name}
           icon={item.icon}
           loading={loading?.name === item.name}
-          type={item.on ? 'shade' : 'gray'}
+          type={item.on ? "shade" : "gray"}
           fontSize={SIZE.sm}
           style={{
             borderRadius: 0,
-            justifyContent: 'flex-start',
-            alignSelf: 'flex-start',
-            width: '100%'
+            justifyContent: "flex-start",
+            alignSelf: "flex-start",
+            width: "100%"
           }}
         />
       ))}
@@ -329,7 +338,9 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
 Actions.present = (attachment, set, context) => {
   presentSheet({
     context: context,
-    component: ref => <Actions fwdRef={ref} setAttachments={set} attachment={attachment} />
+    component: (ref) => (
+      <Actions fwdRef={ref} setAttachments={set} attachment={attachment} />
+    )
   });
 };
 

@@ -1,5 +1,5 @@
 //@ts-ignore
-import create, { State } from 'zustand';
+import create, { State } from "zustand";
 export interface SearchStore extends State {
   searchResults: object[];
   searching: boolean;
@@ -12,6 +12,7 @@ export const useSearchStore = create<SearchStore>((set, get) => ({
   searchResults: [],
   searching: false,
   searchStatus: null,
-  setSearchResults: results => set({ searchResults: results }),
-  setSearchStatus: (searching, status) => set({ searching, searchStatus: status })
+  setSearchResults: (results) => set({ searchResults: results }),
+  setSearchStatus: (searching, status) =>
+    set({ searching, searchStatus: status })
 }));

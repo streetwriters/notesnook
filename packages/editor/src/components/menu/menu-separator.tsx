@@ -9,7 +9,7 @@ export function MenuSeparator() {
         height: "0.5px",
         bg: "border",
         my: 2,
-        alignSelf: "center",
+        alignSelf: "center"
       }}
     />
   );

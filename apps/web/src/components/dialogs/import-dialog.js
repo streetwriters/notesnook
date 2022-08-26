@@ -13,7 +13,7 @@ function ImportDialog(props) {
   const [progress, setProgress] = useState({
     total: 0,
     current: 0,
-    done: false,
+    done: false
   });
   const [files, setFiles] = useState([]);
   const [notes, setNotes] = useState([]);
@@ -28,7 +28,7 @@ function ImportDialog(props) {
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: [".zip"],
+    accept: [".zip"]
   });
 
   useEffect(() => {
@@ -54,14 +54,14 @@ function ImportDialog(props) {
           ? undefined
           : {
               text: "Cancel",
-              onClick: props.onClose,
+              onClick: props.onClose
             }
       }
       positiveButton={
         progress.done
           ? {
               onClick: props.onClose,
-              text: "Close",
+              text: "Close"
             }
           : {
               onClick: async () => {
@@ -86,7 +86,7 @@ function ImportDialog(props) {
                   ? `Import ${selectedNotes.length} notes`
                   : "Import",
               loading: progress.current > 0,
-              disabled: notes.length <= 0 || progress.current > 0,
+              disabled: notes.length <= 0 || progress.current > 0
             }
       }
     >
@@ -109,7 +109,7 @@ function ImportDialog(props) {
                   <Text
                     variant="body"
                     sx={{
-                      color: "error",
+                      color: "error"
                     }}
                   >
                     {error.message}
@@ -135,7 +135,7 @@ function ImportDialog(props) {
                   width: "full",
                   border: "2px dashed var(--border)",
                   borderRadius: "default",
-                  mt: 1,
+                  mt: 1
                 }}
               >
                 <Input {...getInputProps()} />
@@ -154,7 +154,7 @@ function ImportDialog(props) {
                     sx={{
                       ":hover": { bg: "hover" },
                       cursor: "pointer",
-                      borderRadius: "default",
+                      borderRadius: "default"
                     }}
                     onClick={() => {
                       setFiles((files) => {
@@ -206,7 +206,7 @@ function ImportDialog(props) {
                       sx={{
                         ":hover": { bg: "hover" },
                         cursor: "pointer",
-                        borderRadius: "default",
+                        borderRadius: "default"
                       }}
                       onClick={() => {
                         setNotes((notes) => {

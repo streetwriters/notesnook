@@ -5,7 +5,7 @@ import {
   Plugin,
   PluginKey,
   TextSelection,
-  Transaction,
+  Transaction
 } from "prosemirror-state";
 
 declare module "@tiptap/core" {
@@ -79,7 +79,7 @@ function searchDocument(
     return {
       decorationSet: DecorationSet.empty,
       results: [],
-      startIndex: selectedIndex || 0,
+      startIndex: selectedIndex || 0
     };
 
   const doc = tr.doc;
@@ -94,12 +94,12 @@ function searchDocument(
       if (textNodesWithPosition[index]) {
         textNodesWithPosition[index] = {
           text: textNodesWithPosition[index].text + node.text,
-          pos: textNodesWithPosition[index].pos,
+          pos: textNodesWithPosition[index].pos
         };
       } else {
         textNodesWithPosition[index] = {
           text: node.text || "",
-          pos,
+          pos
         };
       }
     } else {
@@ -117,7 +117,7 @@ function searchDocument(
       if (m.index !== undefined) {
         results.push({
           from: pos + m.index,
-          to: pos + m.index + m[0].length,
+          to: pos + m.index + m[0].length
         });
       }
     }
@@ -147,7 +147,7 @@ function searchDocument(
   return {
     startIndex: selectedIndex || 0,
     decorationSet: DecorationSet.create(doc, decorations),
-    results,
+    results
   };
 }
 
@@ -170,7 +170,7 @@ const replaceAll = (
       const { from, to } = results[i + 1];
       results[i + 1] = {
         from: map.map(from),
-        to: map.map(to),
+        to: map.map(to)
       };
     }
   }
@@ -182,7 +182,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 
   addOptions() {
     return {
-      searchResultClass: "search-result",
+      searchResultClass: "search-result"
     };
   },
 
@@ -274,7 +274,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             const { from, to } = results[index + 1];
             const nextResult = (results[index + 1] = {
               from: tr.mapping.map(from),
-              to: tr.mapping.map(to),
+              to: tr.mapping.map(to)
             });
 
             commands.focus();
@@ -298,14 +298,14 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
 
           dispatch(replaceAll(term, results, tr));
           return true;
-        },
+        }
     };
   },
 
   addKeyboardShortcuts() {
     return {
       "Mod-f": ({ editor }) => editor.commands.startSearch(),
-      Escape: ({ editor }) => editor.commands.endSearch(),
+      Escape: ({ editor }) => editor.commands.endSearch()
     };
   },
 
@@ -328,7 +328,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
               matchCase,
               matchWholeWord,
               selectedIndex,
-              isSearching,
+              isSearching
             } = this.storage;
             if (docChanged || forceUpdate) {
               const { searchResultClass } = this.options;
@@ -350,16 +350,16 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
             }
 
             return isSearching ? value : DecorationSet.empty;
-          },
+          }
         },
         props: {
           decorations(state) {
             return key.getState(state);
-          },
-        },
-      }),
+          }
+        }
+      })
     ];
-  },
+  }
 });
 
 function scrollIntoView(editor: Editor, from: number) {

@@ -1,5 +1,5 @@
-import { Platform } from 'react-native';
-import RNFetchBlob from 'rn-fetch-blob';
+import { Platform } from "react-native";
+import RNFetchBlob from "rn-fetch-blob";
 import {
   decrypt,
   deriveCryptoKey,
@@ -9,8 +9,8 @@ import {
   getRandomBytes,
   hash,
   removeCryptoKey
-} from './encryption';
-import { MMKV } from './mmkv';
+} from "./encryption";
+import { MMKV } from "./mmkv";
 
 export class KV {
   storage = null;
@@ -30,7 +30,10 @@ export class KV {
   }
 
   async write(key, data) {
-    this.storage.setString(key, typeof data === 'string' ? data : JSON.stringify(data));
+    this.storage.setString(
+      key,
+      typeof data === "string" ? data : JSON.stringify(data)
+    );
     return true;
   }
 
@@ -64,12 +67,12 @@ export class KV {
   async getAllKeys() {
     let keys = (await this.storage.indexer.getKeys()) || [];
     keys = keys.filter(
-      k =>
-        k !== 'stringIndex' &&
-        k !== 'boolIndex' &&
-        k !== 'mapIndex' &&
-        k !== 'arrayIndex' &&
-        k !== 'numberIndex' &&
+      (k) =>
+        k !== "stringIndex" &&
+        k !== "boolIndex" &&
+        k !== "mapIndex" &&
+        k !== "arrayIndex" &&
+        k !== "numberIndex" &&
         k !== this.storage.instanceID
     );
     return keys;
@@ -79,14 +82,14 @@ export class KV {
 const DefaultStorage = new KV(MMKV);
 
 async function requestPermission() {
-  if (Platform.OS === 'ios') return true;
+  if (Platform.OS === "ios") return true;
   return true;
 }
 async function checkAndCreateDir(path) {
   let dir =
-    Platform.OS === 'ios'
+    Platform.OS === "ios"
       ? RNFetchBlob.fs.dirs.DocumentDir + path
-      : RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/' + path;
+      : RNFetchBlob.fs.dirs.SDCardDir + "/Notesnook/" + path;
 
   try {
     let exists = await RNFetchBlob.fs.exists(dir);
@@ -102,10 +105,10 @@ async function checkAndCreateDir(path) {
 }
 
 export default {
-  read: key => DefaultStorage.read(key),
+  read: (key) => DefaultStorage.read(key),
   write: (key, value) => DefaultStorage.write(key, value),
-  readMulti: keys => DefaultStorage.readMulti(keys),
-  remove: key => DefaultStorage.remove(key),
+  readMulti: (keys) => DefaultStorage.readMulti(keys),
+  remove: (key) => DefaultStorage.remove(key),
   clear: () => DefaultStorage.clear(),
   getAllKeys: () => DefaultStorage.getAllKeys(),
   encrypt,

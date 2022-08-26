@@ -81,20 +81,20 @@ const social = [
     title: "Discord",
     hoverColor: "#7289da",
     icon: Icon.Discord,
-    link: "https://discord.com/invite/zQBK97EE22",
+    link: "https://discord.com/invite/zQBK97EE22"
   },
   {
     title: "Twitter",
     hoverColor: "#1da1f2",
     icon: Icon.Twitter,
-    link: "https://twitter.com/notesnook",
+    link: "https://twitter.com/notesnook"
   },
   {
     title: "Reddit",
     hoverColor: "#ff4500",
     icon: Icon.Reddit,
-    link: "https://reddit.com/r/Notesnook",
-  },
+    link: "https://reddit.com/r/Notesnook"
+  }
 ];
 function BlogPromoBanner(props) {
   return (

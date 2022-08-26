@@ -32,7 +32,7 @@ const useStatusStore = create<IStatusStore>((set, get) => ({
         if (!key || !statuses[key]) return;
         delete statuses[key];
       })
-    ),
+    )
 }));
 
 export default function useStatus() {

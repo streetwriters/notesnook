@@ -1,37 +1,45 @@
-import Clipboard from '@react-native-clipboard/clipboard';
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { useAttachmentStore } from '../../../stores/use-attachment-store';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import { db } from '../../../common/database';
-import { eClosePublishNoteDialog, eOpenPublishNoteDialog } from '../../../utils/events';
-import { openLinkInBrowser } from '../../../utils/functions';
-import { SIZE } from '../../../utils/size';
-import DialogHeader from '../../dialog/dialog-header';
-import { Button } from '../../ui/button';
-import { IconButton } from '../../ui/icon-button';
-import Input from '../../ui/input';
-import Seperator from '../../ui/seperator';
-import SheetWrapper from '../../ui/sheet';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
-import SearchService from '../../../services/search';
+import Clipboard from "@react-native-clipboard/clipboard";
+import React, { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { useAttachmentStore } from "../../../stores/use-attachment-store";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { db } from "../../../common/database";
+import {
+  eClosePublishNoteDialog,
+  eOpenPublishNoteDialog
+} from "../../../utils/events";
+import { openLinkInBrowser } from "../../../utils/functions";
+import { SIZE } from "../../../utils/size";
+import DialogHeader from "../../dialog/dialog-header";
+import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
+import Input from "../../ui/input";
+import Seperator from "../../ui/seperator";
+import SheetWrapper from "../../ui/sheet";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
+import SearchService from "../../../services/search";
 
 let passwordValue = null;
 const PublishNoteSheet = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
-  const loading = useAttachmentStore(state => state.loading);
+  const loading = useAttachmentStore((state) => state.loading);
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [note, setNote] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const publishUrl =
-    note && `https://monograph.notesnook.com/${db?.monographs.monograph(note?.id)}`;
+    note &&
+    `https://monograph.notesnook.com/${db?.monographs.monograph(note?.id)}`;
   const isPublished = note && db?.monographs.isPublished(note?.id);
   const pwdInput = useRef();
 
@@ -44,7 +52,7 @@ const PublishNoteSheet = () => {
     };
   }, []);
 
-  const open = item => {
+  const open = (item) => {
     setNote(item);
     setPublishing(false);
     setSelfDestruct(false);
@@ -77,19 +85,19 @@ const PublishNoteSheet = () => {
         });
         setNote(db.notes.note(note.id)?.data);
         Navigation.queueRoutesForUpdate(
-          'Notes',
-          'Favorites',
-          'ColoredNotes',
-          'TaggedNotes',
-          'TopicNotes'
+          "Notes",
+          "Favorites",
+          "ColoredNotes",
+          "TaggedNotes",
+          "TopicNotes"
         );
       }
     } catch (e) {
       ToastEvent.show({
-        heading: 'Could not publish note',
+        heading: "Could not publish note",
         message: e.message,
-        type: 'error',
-        context: 'local'
+        type: "error",
+        context: "local"
       });
     }
 
@@ -104,19 +112,19 @@ const PublishNoteSheet = () => {
         await db.monographs.unpublish(note.id);
         setNote(db.notes.note(note.id)?.data);
         Navigation.queueRoutesForUpdate(
-          'Notes',
-          'Favorites',
-          'ColoredNotes',
-          'TaggedNotes',
-          'TopicNotes'
+          "Notes",
+          "Favorites",
+          "ColoredNotes",
+          "TaggedNotes",
+          "TopicNotes"
         );
       }
     } catch (e) {
       ToastEvent.show({
-        heading: 'Could not unpublish note',
+        heading: "Could not unpublish note",
         message: e.message,
-        type: 'error',
-        context: 'local'
+        type: "error",
+        context: "local"
       });
     }
     actionSheetRef.current?.hide();
@@ -136,35 +144,38 @@ const PublishNoteSheet = () => {
     >
       <View
         style={{
-          width: '100%',
-          alignSelf: 'center',
+          width: "100%",
+          alignSelf: "center",
           paddingHorizontal: 12
         }}
       >
         <DialogHeader
           title={note.title}
           paragraph={`Anyone with the link${
-            isLocked ? ' and password' : ''
+            isLocked ? " and password" : ""
           } of the published note can view it.`}
         />
 
         {publishing ? (
           <View
             style={{
-              justifyContent: 'center',
-              alignContent: 'center',
+              justifyContent: "center",
+              alignContent: "center",
               height: 150,
-              width: '100%'
+              width: "100%"
             }}
           >
             <ActivityIndicator size={25} color={colors.accent} />
             <Paragraph
               style={{
-                textAlign: 'center'
+                textAlign: "center"
               }}
             >
               Please wait...
-              {loading && `\nDownloading attachments (${loading?.current / loading?.total})`}
+              {loading &&
+                `\nDownloading attachments (${
+                  loading?.current / loading?.total
+                })`}
             </Paragraph>
           </View>
         ) : (
@@ -172,8 +183,8 @@ const PublishNoteSheet = () => {
             {isPublished && (
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  flexDirection: "row",
+                  alignItems: "center",
                   marginTop: 15,
                   backgroundColor: colors.nav,
                   padding: 12,
@@ -182,7 +193,7 @@ const PublishNoteSheet = () => {
               >
                 <View
                   style={{
-                    width: '100%',
+                    width: "100%",
                     flexShrink: 1
                   }}
                 >
@@ -202,7 +213,8 @@ const PublishNoteSheet = () => {
                       color: colors.pri
                     }}
                   >
-                    <Icon color={colors.accent} name="open-in-new" /> Open in browser
+                    <Icon color={colors.accent} name="open-in-new" /> Open in
+                    browser
                   </Paragraph>
                 </View>
 
@@ -210,9 +222,9 @@ const PublishNoteSheet = () => {
                   onPress={() => {
                     Clipboard.setString(publishUrl);
                     ToastEvent.show({
-                      heading: 'Note publish url copied',
-                      type: 'success',
-                      context: 'local'
+                      heading: "Note publish url copied",
+                      type: "success",
+                      context: "local"
                     });
                   }}
                   color={colors.accent}
@@ -230,8 +242,8 @@ const PublishNoteSheet = () => {
               }}
               activeOpacity={0.9}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
+                flexDirection: "row",
+                alignItems: "center",
                 marginBottom: 10
               }}
             >
@@ -242,18 +254,23 @@ const PublishNoteSheet = () => {
                 }}
                 color={isLocked ? colors.accent : colors.icon}
                 size={SIZE.lg}
-                name={isLocked ? 'check-circle-outline' : 'checkbox-blank-circle-outline'}
+                name={
+                  isLocked
+                    ? "check-circle-outline"
+                    : "checkbox-blank-circle-outline"
+                }
               />
 
               <View
                 style={{
-                  width: '100%',
+                  width: "100%",
                   flexShrink: 1
                 }}
               >
                 <Heading size={SIZE.md}>Password protection</Heading>
                 <Paragraph>
-                  Published note can only be viewed by someone with the password.
+                  Published note can only be viewed by someone with the
+                  password.
                 </Paragraph>
               </View>
             </TouchableOpacity>
@@ -264,8 +281,8 @@ const PublishNoteSheet = () => {
               }}
               activeOpacity={0.9}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center'
+                flexDirection: "row",
+                alignItems: "center"
               }}
             >
               <IconButton
@@ -274,26 +291,31 @@ const PublishNoteSheet = () => {
                 }}
                 color={selfDestruct ? colors.accent : colors.icon}
                 size={SIZE.lg}
-                name={selfDestruct ? 'check-circle-outline' : 'checkbox-blank-circle-outline'}
+                name={
+                  selfDestruct
+                    ? "check-circle-outline"
+                    : "checkbox-blank-circle-outline"
+                }
               />
 
               <View
                 style={{
-                  width: '100%',
+                  width: "100%",
                   flexShrink: 1
                 }}
               >
                 <Heading size={SIZE.md}>Self destruct</Heading>
                 <Paragraph>
-                  Published note link will be automatically deleted once it is viewed by someone.
+                  Published note link will be automatically deleted once it is
+                  viewed by someone.
                 </Paragraph>
               </View>
             </TouchableOpacity>
 
             <View
               style={{
-                width: '100%',
-                alignSelf: 'center',
+                width: "100%",
+                alignSelf: "center",
                 marginTop: 10
               }}
             >
@@ -301,7 +323,7 @@ const PublishNoteSheet = () => {
                 <>
                   <Input
                     fwdRef={pwdInput}
-                    onChangeText={value => (passwordValue = value)}
+                    onChangeText={(value) => (passwordValue = value)}
                     blurOnSubmit
                     secureTextEntry
                     defaultValue={passwordValue}
@@ -320,7 +342,7 @@ const PublishNoteSheet = () => {
                 }}
                 height={50}
                 type="accent"
-                title={isPublished ? 'Update published note' : 'Publish note'}
+                title={isPublished ? "Update published note" : "Publish note"}
               />
 
               {isPublished && (
@@ -344,13 +366,16 @@ const PublishNoteSheet = () => {
           color={colors.icon}
           size={SIZE.xs}
           style={{
-            textAlign: 'center',
+            textAlign: "center",
             marginTop: 5,
-            textDecorationLine: 'underline'
+            textDecorationLine: "underline"
           }}
           onPress={async () => {
             try {
-              await openLinkInBrowser('https://docs.notesnook.com/monographs/', colors.accent);
+              await openLinkInBrowser(
+                "https://docs.notesnook.com/monographs/",
+                colors.accent
+              );
             } catch (e) {}
           }}
         >

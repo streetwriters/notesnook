@@ -1,13 +1,13 @@
-import React from 'react';
-import { ActivityIndicator, ColorValue, TextStyle } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { showTooltip, TOOLTIP_POSITIONS } from '../../../utils';
-import { BUTTON_TYPES } from '../../../utils/constants';
-import { SIZE } from '../../../utils/size';
-import { PressableButton, PressableButtonProps } from '../pressable';
-import Heading from '../typography/heading';
-import Paragraph from '../typography/paragraph';
+import React from "react";
+import { ActivityIndicator, ColorValue, TextStyle } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
+import { BUTTON_TYPES } from "../../../utils/constants";
+import { SIZE } from "../../../utils/size";
+import { PressableButton, PressableButtonProps } from "../pressable";
+import Heading from "../typography/heading";
+import Paragraph from "../typography/paragraph";
 
 export interface ButtonProps extends PressableButtonProps {
   height?: number;
@@ -15,7 +15,7 @@ export interface ButtonProps extends PressableButtonProps {
   fontSize?: number;
   tooltipText?: string;
   textStyle?: TextStyle;
-  iconPosition?: 'left' | 'right';
+  iconPosition?: "left" | "right";
   iconSize?: number;
   title?: string | null;
   loading?: boolean;
@@ -39,15 +39,15 @@ export const Button = ({
   title = null,
   icon,
   fontSize = SIZE.sm,
-  type = 'transparent',
+  type = "transparent",
   iconSize = SIZE.md,
   style = {},
-  accentColor = 'accent',
-  accentText = 'light',
+  accentColor = "accent",
+  accentText = "light",
   onLongPress,
   tooltipText,
   textStyle,
-  iconPosition = 'left',
+  iconPosition = "left",
   buttonType,
   bold,
   iconColor,
@@ -55,13 +55,13 @@ export const Button = ({
   iconStyle,
   ...restProps
 }: ButtonProps) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   const textColor = buttonType?.text
     ? buttonType.text
     : //@ts-ignore
       colors[
-        type === 'accent'
+        type === "accent"
           ? BUTTON_TYPES[type](accentColor, accentText).text
           : BUTTON_TYPES[type].text
       ];
@@ -72,7 +72,7 @@ export const Button = ({
       {...restProps}
       fwdRef={fwdRef}
       onPress={onPress}
-      onLongPress={event => {
+      onLongPress={(event) => {
         if (onLongPress) {
           onLongPress(event);
           return;
@@ -94,16 +94,18 @@ export const Button = ({
         width: width || null,
         paddingHorizontal: 12,
         borderRadius: 5,
-        alignSelf: 'center',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
+        alignSelf: "center",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
         //@ts-ignore
         ...style
       }}
     >
-      {loading ? <ActivityIndicator color={textColor} size={fontSize + 4} /> : null}
-      {icon && !loading && iconPosition === 'left' ? (
+      {loading ? (
+        <ActivityIndicator color={textColor} size={fontSize + 4} />
+      ) : null}
+      {icon && !loading && iconPosition === "left" ? (
         <Icon
           name={icon}
           style={[{ marginRight: 0 }, iconStyle]}
@@ -120,8 +122,8 @@ export const Button = ({
           numberOfLines={1}
           style={[
             {
-              marginLeft: icon || (loading && iconPosition === 'left') ? 5 : 0,
-              marginRight: icon || (loading && iconPosition === 'right') ? 5 : 0
+              marginLeft: icon || (loading && iconPosition === "left") ? 5 : 0,
+              marginRight: icon || (loading && iconPosition === "right") ? 5 : 0
             },
             textStyle
           ]}
@@ -130,7 +132,7 @@ export const Button = ({
         </Component>
       )}
 
-      {icon && !loading && iconPosition === 'right' ? (
+      {icon && !loading && iconPosition === "right" ? (
         <Icon
           name={icon}
           style={[{ marginLeft: 0 }, iconStyle]}

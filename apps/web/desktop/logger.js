@@ -9,7 +9,7 @@ enable("native");
 const LOG_FILE_PATH = path.join(app.getPath("logs"), "notesnook.log");
 const logFileStream = fs.createWriteStream(LOG_FILE_PATH, {
   autoClose: true,
-  flags: "a",
+  flags: "a"
 });
 
 const native = diary("native", (e) => {
@@ -25,7 +25,7 @@ function logFileReporter(e) {
     hour12: true,
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
+    second: "2-digit"
   });
   const extra = e.extra.map((ex) => JSON.stringify(ex)).join(" ");
   let str = `[${time}] | ${e.level} | ${e.message} ${extra}\n`;

@@ -8,7 +8,7 @@ module.exports = async function (args, win) {
     title,
     buttonLabel,
     properties: ["openDirectory"],
-    defaultPath: resolvePath(defaultPath),
+    defaultPath: resolvePath(defaultPath)
   });
   if (result.canceled) return;
 

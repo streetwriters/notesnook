@@ -3,7 +3,10 @@ function info(context: string, ...logs: any[]) {
 }
 
 function error(context: string, ...logs: any[]) {
-  console.log(`${new Date().toLocaleDateString()}::error::${context}: `, ...logs);
+  console.log(
+    `${new Date().toLocaleDateString()}::error::${context}: `,
+    ...logs
+  );
 }
 
 type Logger = {

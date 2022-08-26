@@ -1,29 +1,31 @@
-import React from 'react';
-import { View } from 'react-native';
-import { useMessageStore } from '../../stores/use-message-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { COLORS_NOTE } from '../../utils/color-scheme';
-import { hexToRGBA } from '../../utils/color-scheme/utils';
+import React from "react";
+import { View } from "react-native";
+import { useMessageStore } from "../../stores/use-message-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { COLORS_NOTE } from "../../utils/color-scheme";
+import { hexToRGBA } from "../../utils/color-scheme/utils";
 
 export const DefaultPlaceholder = ({ color }: { color: string }) => {
-  const colors = useThemeStore(state => state.colors);
-  const message = useMessageStore(state => state.message);
-  const annoucements = useMessageStore(state => state.announcements);
+  const colors = useThemeStore((state) => state.colors);
+  const message = useMessageStore((state) => state.message);
+  const annoucements = useMessageStore((state) => state.announcements);
   const hasAnnoucements = annoucements.length > 0;
   //@ts-ignore
-  const shadeColor = color ? hexToRGBA(COLORS_NOTE[color?.toLowerCase()], 0.15) : colors.shade;
+  const shadeColor = color
+    ? hexToRGBA(COLORS_NOTE[color?.toLowerCase()], 0.15)
+    : colors.shade;
 
   return (
     <View
       style={{
-        width: '100%',
+        width: "100%",
         paddingHorizontal: 12
       }}
     >
       {hasAnnoucements ? (
         <View
           style={{
-            width: '100%',
+            width: "100%",
             height: 100,
             borderRadius: 10,
             marginBottom: 20,
@@ -64,12 +66,12 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
       {message ? (
         <View
           style={{
-            width: '100%',
+            width: "100%",
             height: 60,
             borderRadius: 10,
             marginBottom: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: "row",
+            alignItems: "center",
             paddingHorizontal: 20
           }}
         >
@@ -106,15 +108,15 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
 
       <View
         style={{
-          width: '100%',
+          width: "100%",
           height: 30,
           backgroundColor: colors.nav,
           borderRadius: 10,
           marginBottom: 20,
           padding: 5,
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          alignItems: 'center'
+          justifyContent: "space-between",
+          flexDirection: "row",
+          alignItems: "center"
         }}
       >
         <View
@@ -128,7 +130,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
 
         <View
           style={{
-            flexDirection: 'row'
+            flexDirection: "row"
           }}
         >
           <View
@@ -161,7 +163,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
       />
       <View
         style={{
-          width: '85%',
+          width: "85%",
           height: 13,
           backgroundColor: colors.nav,
           borderRadius: 5,
@@ -171,7 +173,7 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
 
       <View
         style={{
-          flexDirection: 'row',
+          flexDirection: "row",
           marginTop: 10
         }}
       >

@@ -72,12 +72,12 @@ export function BuyDialog(props: BuyDialogProps) {
           padding: 0,
           overflowY: "hidden",
           border: 0,
-          zIndex: 0,
+          zIndex: 0
         },
         overlay: {
           zIndex: 999,
-          background: theme.colors.overlay,
-        },
+          background: theme.colors.overlay
+        }
       }}
     >
       <Flex
@@ -91,7 +91,7 @@ export function BuyDialog(props: BuyDialogProps) {
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "dialog",
+          borderRadius: "dialog"
         }}
       >
         <Flex
@@ -107,8 +107,8 @@ export function BuyDialog(props: BuyDialogProps) {
             "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
               {
                 bg: "bgTransparent",
-                backdropFilter: "blur(8px)",
-              },
+                backdropFilter: "blur(8px)"
+              }
           }}
           width={["100%", "100%", 350]}
           p={4}
@@ -172,10 +172,10 @@ function SideBar(props: SideBarProps) {
             id: "trialActivation",
             action: (report) => {
               report({
-                text: "Activating trial",
+                text: "Activating trial"
               });
               return db.user?.activateTrial();
-            },
+            }
           });
           if (result) onClose();
         } catch (e) {
@@ -326,7 +326,7 @@ function SelectedPlan(props: SelectedPlanProps) {
   const [isInvalidCoupon, setIsInvalidCoupon] = useState(false);
   const [isApplyingCoupon, setIsApplyingCoupon] = useCheckoutStore((store) => [
     store.isApplyingCoupon,
-    store.setIsApplyingCoupon,
+    store.setIsApplyingCoupon
   ]);
 
   const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
@@ -418,7 +418,7 @@ function SelectedPlan(props: SelectedPlanProps) {
                 ? Icon.Cross
                 : Icon.Check,
               onClick: () =>
-                pricingInfo?.coupon ? removeCoupon() : applyCoupon(),
+                pricingInfo?.coupon ? removeCoupon() : applyCoupon()
             }}
           />
           <CheckoutPricing pricingInfo={pricingInfo} />
@@ -451,13 +451,13 @@ function CheckoutPricing(props: CheckoutPricingProps) {
     {
       key: "subtotal",
       label: "Subtotal",
-      value: formatPrice(currency, price.net.toFixed(2), null),
+      value: formatPrice(currency, price.net.toFixed(2), null)
     },
     {
       key: "tax",
       label: "Sales tax",
       color: "error",
-      value: formatPrice(currency, price.tax.toFixed(2), null),
+      value: formatPrice(currency, price.tax.toFixed(2), null)
     },
     {
       key: "discount",
@@ -468,8 +468,8 @@ function CheckoutPricing(props: CheckoutPricingProps) {
         discount.amount.toFixed(2),
         null,
         discount.amount > 0
-      ),
-    },
+      )
+    }
   ];
 
   const isDiscounted = discount.recurring || discount.amount <= 0;

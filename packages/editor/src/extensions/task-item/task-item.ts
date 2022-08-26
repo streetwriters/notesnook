@@ -18,9 +18,9 @@ export const TaskItemNode = TaskItem.extend({
         keepOnSplit: false,
         parseHTML: (element) => element.classList.contains("checked"),
         renderHTML: (attributes) => ({
-          class: attributes.checked ? "checked" : "",
-        }),
-      },
+          class: attributes.checked ? "checked" : ""
+        })
+      }
     };
   },
 
@@ -28,9 +28,9 @@ export const TaskItemNode = TaskItem.extend({
     return [
       "li",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        class: "checklist--item",
+        class: "checklist--item"
       }),
-      0,
+      0
     ];
   },
 
@@ -47,8 +47,8 @@ export const TaskItemNode = TaskItem.extend({
           }
           return false;
         },
-        priority: 51,
-      },
+        priority: 51
+      }
     ];
   },
 
@@ -56,7 +56,7 @@ export const TaskItemNode = TaskItem.extend({
     return {
       ...this.parent?.(),
       Backspace: ({ editor }) =>
-        onBackspacePressed(editor, this.name, this.type),
+        onBackspacePressed(editor, this.name, this.type)
     };
   },
 
@@ -68,7 +68,7 @@ export const TaskItemNode = TaskItem.extend({
         return (
           prev.checked !== next.checked || prev.collapsed !== next.collapsed
         );
-      },
+      }
     });
-  },
+  }
 });

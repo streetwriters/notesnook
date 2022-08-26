@@ -9,7 +9,7 @@ module.exports.getChangelog = async function (tag) {
 
     const url = `https://api.github.com/repos/streetwriters/notesnook/releases/tags/v${tag}`;
     const response = await fetch(url, {
-      headers: { Accept: "application/json" },
+      headers: { Accept: "application/json" }
     });
     if (!response.ok) return "No changelog found.";
 

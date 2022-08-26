@@ -4,7 +4,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "nx run-many --target=build --all",
-    "start:web": "nx start @notesnook/web"
+    "start:web": "nx start @notesnook/web",
+    "prettier": "npx prettier . --write"
   },
   "devDependencies": {
     "lerna": "^5.4.0",

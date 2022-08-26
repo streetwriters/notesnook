@@ -11,7 +11,7 @@ import {
   PortalProvider,
   Editor,
   AttachmentType,
-  usePermissionHandler,
+  usePermissionHandler
 } from "@streetwriters/editor";
 import { Box, Flex } from "rebass";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -55,7 +55,7 @@ function TipTap(props: TipTapProps) {
     editorContainer,
     readonly,
     nonce,
-    theme,
+    theme
   } = props;
 
   const isUserPremium = useIsUserPremium();
@@ -69,11 +69,11 @@ function TipTap(props: TipTapProps) {
 
   usePermissionHandler({
     claims: {
-      premium: isUserPremium,
+      premium: isUserPremium
     },
     onPermissionDenied: (claim) => {
       if (claim === "premium") showBuyDialog();
-    },
+    }
   });
 
   const editor = useTiptap(
@@ -88,7 +88,7 @@ function TipTap(props: TipTapProps) {
             }
             return true;
           }
-        },
+        }
       },
       doubleSpacedLines,
       isKeyboardOpen: true,
@@ -107,9 +107,9 @@ function TipTap(props: TipTapProps) {
           statistics: {
             words: {
               total: getTotalWords(editor as Editor),
-              selected: 0,
-            },
-          },
+              selected: 0
+            }
+          }
         });
         if (onLoad) onLoad();
       },
@@ -124,9 +124,9 @@ function TipTap(props: TipTapProps) {
             statistics: {
               words: {
                 total: countWords(editor.view.dom.innerText),
-                selected: 0,
-              },
-            },
+                selected: 0
+              }
+            }
           });
         }, SAVE_INTERVAL) as unknown as number;
       },
@@ -136,13 +136,13 @@ function TipTap(props: TipTapProps) {
           canRedo: false,
           canUndo: false,
           searching: false,
-          statistics: undefined,
+          statistics: undefined
         });
       },
       onTransaction: ({ editor }) => {
         configure({
           canRedo: editor.can().redo(),
-          canUndo: editor.can().undo(),
+          canUndo: editor.can().undo()
         });
       },
       onSelectionUpdate: ({ editor, transaction }) => {
@@ -155,9 +155,9 @@ function TipTap(props: TipTapProps) {
               selected: getSelectedWords(
                 editor as Editor,
                 transaction.selection
-              ),
-            },
-          },
+              )
+            }
+          }
         }));
       },
       theme,
@@ -168,7 +168,7 @@ function TipTap(props: TipTapProps) {
       onDownloadAttachment: (_editor, attachment) => {
         onDownloadAttachment?.(attachment);
         return true;
-      },
+      }
     },
     // IMPORTANT: only put stuff here that the editor depends on.
     [readonly, nonce]
@@ -239,7 +239,7 @@ function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
             flex: 1,
             cursor: "text",
             color: theme.colors.text, // TODO!
-            paddingBottom: 150,
+            paddingBottom: 150
           }}
         />
       </Flex>
@@ -277,8 +277,8 @@ function toIEditor(editor: Editor): IEditor {
       editor.current?.commands.setAttachmentProgress({
         hash,
         type: type as any,
-        progress,
-      }),
+        progress
+      })
   };
 }
 

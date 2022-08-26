@@ -1,17 +1,19 @@
 //@ts-ignore
-import { db } from '../common/database';
-import { useNoteStore } from './use-notes-store';
-import { useFavoriteStore } from './use-favorite-store';
-import { useMenuStore } from './use-menu-store';
-import { useNotebookStore } from './use-notebook-store';
-import { useTagStore } from './use-tag-store';
-import { useTrashStore } from './use-trash-store';
-import Navigation from '../services/navigation';
+import { db } from "../common/database";
+import { useNoteStore } from "./use-notes-store";
+import { useFavoriteStore } from "./use-favorite-store";
+import { useMenuStore } from "./use-menu-store";
+import { useNotebookStore } from "./use-notebook-store";
+import { useTagStore } from "./use-tag-store";
+import { useTrashStore } from "./use-trash-store";
+import Navigation from "../services/navigation";
 
 export function initAfterSync() {
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
-  Navigation.queueRoutesForUpdate(...Object.keys(Navigation.routeUpdateFunctions));
+  Navigation.queueRoutesForUpdate(
+    ...Object.keys(Navigation.routeUpdateFunctions)
+  );
 }
 
 export function initialize() {

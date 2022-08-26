@@ -1,53 +1,53 @@
-import React, { useState } from 'react';
-import { Dimensions, LayoutAnimation, Platform, View } from 'react-native';
-import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SVG_Z } from '../../components/intro';
-import { WelcomeNotice } from '../../components/intro/welcome';
-import { Button } from '../../components/ui/button';
-import { PressableButton } from '../../components/ui/pressable';
-import Seperator from '../../components/ui/seperator';
-import { SvgView } from '../../components/ui/svg';
-import { BouncingView } from '../../components/ui/transitions/bouncing-view';
-import Heading from '../../components/ui/typography/heading';
-import Paragraph from '../../components/ui/typography/paragraph';
-import { DDS } from '../../services/device-detection';
-import { presentSheet, ToastEvent } from '../../services/event-manager';
-import SettingsService from '../../services/settings';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { getElevation } from '../../utils';
-import umami from '../../common/analytics';
-import { SIZE } from '../../utils/size';
-import BiometicService from '../../services/biometrics';
-import { useUserStore } from '../../stores/use-user-store';
+import React, { useState } from "react";
+import { Dimensions, LayoutAnimation, Platform, View } from "react-native";
+import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { SVG_Z } from "../../components/intro";
+import { WelcomeNotice } from "../../components/intro/welcome";
+import { Button } from "../../components/ui/button";
+import { PressableButton } from "../../components/ui/pressable";
+import Seperator from "../../components/ui/seperator";
+import { SvgView } from "../../components/ui/svg";
+import { BouncingView } from "../../components/ui/transitions/bouncing-view";
+import Heading from "../../components/ui/typography/heading";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { DDS } from "../../services/device-detection";
+import { presentSheet, ToastEvent } from "../../services/event-manager";
+import SettingsService from "../../services/settings";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { getElevation } from "../../utils";
+import umami from "../../common/analytics";
+import { SIZE } from "../../utils/size";
+import BiometicService from "../../services/biometrics";
+import { useUserStore } from "../../stores/use-user-store";
 
 const AppLock = ({ navigation, route }) => {
-  const colors = useThemeStore(state => state.colors);
-  const appLockMode = useSettingStore(state => state.settings.appLockMode);
+  const colors = useThemeStore((state) => state.colors);
+  const appLockMode = useSettingStore((state) => state.settings.appLockMode);
   const [step, setStep] = useState(0);
   const welcome = route?.params?.welcome;
 
   const modes = [
     {
-      title: 'No privacy',
-      value: 'none',
-      desc: 'Your notes are always unlocked. Anyone who has access to your phone can read them.',
+      title: "No privacy",
+      value: "none",
+      desc: "Your notes are always unlocked. Anyone who has access to your phone can read them.",
       activeColor: colors.errorText
     },
     {
-      title: 'Medium privacy',
-      value: 'launch',
-      desc: 'Your notes are locked when you exit the app but remain unlocked when you switch to other apps or background.',
+      title: "Medium privacy",
+      value: "launch",
+      desc: "Your notes are locked when you exit the app but remain unlocked when you switch to other apps or background.",
       activeColor: colors.accent
     },
     {
-      title: 'Maximum privacy (Recommended)',
-      value: 'background',
+      title: "Maximum privacy (Recommended)",
+      value: "background",
       desc: `Your notes are locked immediately when you switch to other apps or background. ${
-        Platform.OS === 'ios'
-          ? 'App contents are hidden in app switcher'
-          : 'Screenshots are disabled and app contents are hidden in app switcher.'
+        Platform.OS === "ios"
+          ? "App contents are hidden in app switcher"
+          : "Screenshots are disabled and app contents are hidden in app switcher."
       }`,
       activeColor: colors.accent
     }
@@ -59,25 +59,25 @@ const AppLock = ({ navigation, route }) => {
         exiting={!welcome ? undefined : FadeOutUp}
         entering={!welcome ? undefined : FadeInDown}
         style={{
-          justifyContent: !welcome ? undefined : 'center',
-          height: !welcome ? undefined : '100%',
-          width: !welcome ? undefined : '100%'
+          justifyContent: !welcome ? undefined : "center",
+          height: !welcome ? undefined : "100%",
+          width: !welcome ? undefined : "100%"
         }}
       >
         {step === 0 ? (
           <>
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-                justifyContent: 'space-between',
-                width: DDS.isTab && welcome ? '50%' : '95%',
+                flexDirection: "row",
+                alignItems: "flex-end",
+                justifyContent: "space-between",
+                width: DDS.isTab && welcome ? "50%" : "95%",
                 paddingVertical: 12,
                 paddingHorizontal: 0,
-                alignSelf: 'center',
+                alignSelf: "center",
                 minHeight: 125,
                 borderBottomWidth: 1,
-                borderBottomColor: welcome ? 'transparent' : colors.nav
+                borderBottomColor: welcome ? "transparent" : colors.nav
               }}
             >
               <Icon
@@ -85,7 +85,7 @@ const AppLock = ({ navigation, route }) => {
                 color={colors.border}
                 size={100}
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   right: 0,
                   top: 6
                 }}
@@ -93,14 +93,14 @@ const AppLock = ({ navigation, route }) => {
 
               <View
                 style={{
-                  alignItems: !welcome ? undefined : 'center',
-                  width: '100%'
+                  alignItems: !welcome ? undefined : "center",
+                  width: "100%"
                 }}
               >
                 <Heading>Protect your notes</Heading>
                 <Paragraph
                   style={{
-                    textAlign: !welcome ? undefined : 'center'
+                    textAlign: !welcome ? undefined : "center"
                   }}
                   size={SIZE.md}
                 >
@@ -112,53 +112,60 @@ const AppLock = ({ navigation, route }) => {
             <View
               style={{
                 paddingHorizontal: 12,
-                width: DDS.isTab && welcome ? '50%' : undefined,
-                alignSelf: 'center'
+                width: DDS.isTab && welcome ? "50%" : undefined,
+                alignSelf: "center"
               }}
             >
-              {modes.map(item => (
+              {modes.map((item) => (
                 <PressableButton
                   key={item.title}
-                  type={appLockMode === item.value ? 'grayBg' : 'transparent'}
+                  type={appLockMode === item.value ? "grayBg" : "transparent"}
                   onPress={async () => {
                     if (
                       !(await BiometicService.isBiometryAvailable()) &&
                       !useUserStore.getState().user
                     ) {
                       ToastEvent.show({
-                        heading: 'Biometrics not enrolled',
-                        type: 'error',
+                        heading: "Biometrics not enrolled",
+                        type: "error",
                         message:
-                          'To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone or create an account.'
+                          "To use app lock, you must enable biometrics such as Fingerprint lock or Face ID on your phone or create an account."
                       });
                       return;
                     }
                     SettingsService.set({ appLockMode: item.value });
                   }}
                   customStyle={{
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
+                    justifyContent: "flex-start",
+                    alignItems: "flex-start",
                     paddingHorizontal: 12,
                     paddingVertical: 12,
                     marginTop: 0,
                     marginBottom: 12,
                     borderWidth: 1,
-                    borderColor: appLockMode === item.value ? item.activeColor : colors.nav
+                    borderColor:
+                      appLockMode === item.value ? item.activeColor : colors.nav
                   }}
                   style={{
                     marginBottom: 10
                   }}
                 >
                   <Heading
-                    color={appLockMode === item.value ? item.activeColor : colors.pri}
-                    style={{ maxWidth: '95%' }}
+                    color={
+                      appLockMode === item.value ? item.activeColor : colors.pri
+                    }
+                    style={{ maxWidth: "95%" }}
                     size={SIZE.md}
                   >
                     {item.title}
                   </Heading>
                   <Paragraph
-                    color={appLockMode === item.value ? item.activeColor : colors.icon}
-                    style={{ maxWidth: '95%' }}
+                    color={
+                      appLockMode === item.value
+                        ? item.activeColor
+                        : colors.icon
+                    }
+                    style={{ maxWidth: "95%" }}
                     size={SIZE.sm}
                   >
                     {item.desc}
@@ -176,16 +183,16 @@ const AppLock = ({ navigation, route }) => {
                       ...LayoutAnimation.Presets.linear,
                       delete: {
                         duration: 50,
-                        property: 'opacity',
-                        type: 'linear'
+                        property: "opacity",
+                        type: "linear"
                       }
                     });
-                    umami.pageView('/privacymode', '/welcome');
+                    umami.pageView("/privacymode", "/welcome");
                     setStep(1);
                   }}
                   style={{
                     paddingHorizontal: 24,
-                    alignSelf: 'center',
+                    alignSelf: "center",
                     borderRadius: 100,
                     ...getElevation(5),
                     marginTop: 30
@@ -203,7 +210,7 @@ const AppLock = ({ navigation, route }) => {
         {welcome ? (
           <BouncingView
             style={{
-              position: 'absolute',
+              position: "absolute",
               bottom: DDS.isTab ? -300 : -130,
               zIndex: -1
             }}
@@ -211,8 +218,8 @@ const AppLock = ({ navigation, route }) => {
             duration={3000}
           >
             <SvgView
-              width={Dimensions.get('window').width}
-              height={Dimensions.get('window').width}
+              width={Dimensions.get("window").width}
+              height={Dimensions.get("window").width}
               src={SVG_Z}
             />
           </BouncingView>
@@ -222,7 +229,7 @@ const AppLock = ({ navigation, route }) => {
   );
 };
 
-AppLock.present = async isWelcome => {
+AppLock.present = async (isWelcome) => {
   presentSheet({
     component: <AppLock welcome={isWelcome} s={0} />,
     disableClosing: isWelcome

@@ -1,8 +1,8 @@
-import { Platform } from 'react-native';
-import 'react-native-get-random-values';
-import * as Keychain from 'react-native-keychain';
-import { generateSecureRandom } from 'react-native-securerandom';
-import Sodium from 'react-native-sodium';
+import { Platform } from "react-native";
+import "react-native-get-random-values";
+import * as Keychain from "react-native-keychain";
+import { generateSecureRandom } from "react-native-securerandom";
+import Sodium from "react-native-sodium";
 
 const KEYSTORE_CONFIG = Platform.select({
   ios: {
@@ -14,15 +14,23 @@ const KEYSTORE_CONFIG = Platform.select({
 export async function deriveCryptoKey(name, data) {
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
-    await Keychain.setInternetCredentials('notesnook', name, credentials.key, KEYSTORE_CONFIG);
+    await Keychain.setInternetCredentials(
+      "notesnook",
+      name,
+      credentials.key,
+      KEYSTORE_CONFIG
+    );
     return credentials.key;
   } catch (e) {}
 }
 
 export async function getCryptoKey(name) {
   try {
-    if (await Keychain.hasInternetCredentials('notesnook')) {
-      let credentials = await Keychain.getInternetCredentials('notesnook', KEYSTORE_CONFIG);
+    if (await Keychain.hasInternetCredentials("notesnook")) {
+      let credentials = await Keychain.getInternetCredentials(
+        "notesnook",
+        KEYSTORE_CONFIG
+      );
       return credentials.password;
     } else {
       return null;
@@ -32,7 +40,7 @@ export async function getCryptoKey(name) {
 
 export async function removeCryptoKey(name) {
   try {
-    let result = await Keychain.resetInternetCredentials('notesnook');
+    let result = await Keychain.resetInternetCredentials("notesnook");
     return result;
   } catch (e) {}
 }
@@ -51,7 +59,7 @@ export async function generateCryptoKey(password, salt) {
     let credentials = await Sodium.deriveKey(password, salt || null);
     return credentials;
   } catch (e) {
-    console.log('generateCryptoKey: ', e);
+    console.log("generateCryptoKey: ", e);
   }
 }
 
@@ -61,30 +69,32 @@ export function getAlgorithm(base64Variant) {
 
 export async function decrypt(password, data) {
   if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === '' && !password.key) return undefined;
+  if (password.password && password.password === "" && !password.key)
+    return undefined;
   let _data = { ...data };
-  _data.output = 'plain';
+  _data.output = "plain";
   return await Sodium.decrypt(password, _data);
 }
 
 export function parseAlgorithm(alg) {
   if (!alg) return {};
-  const [enc, kdf, compressed, compressionAlg, base64variant] = alg.split('-');
+  const [enc, kdf, compressed, compressionAlg, base64variant] = alg.split("-");
   return {
     encryptionAlgorithm: enc,
     kdfAlgorithm: kdf,
     compressionAlgorithm: compressionAlg,
-    isCompress: compressed === '1',
+    isCompress: compressed === "1",
     base64_variant: base64variant
   };
 }
 
 export async function encrypt(password, data) {
   if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === '' && !password.key) return undefined;
+  if (password.password && password.password === "" && !password.key)
+    return undefined;
 
   let message = {
-    type: 'plain',
+    type: "plain",
     data: data
   };
   let result = await Sodium.encrypt(password, message);

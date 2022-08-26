@@ -1,28 +1,31 @@
-import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useAttachmentStore } from '../../stores/use-attachment-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { formatBytes } from '../../utils';
-import { db } from '../../common/database';
-import { useAttachmentProgress } from '../../hooks/use-attachment-progress';
-import { SIZE } from '../../utils/size';
-import SheetProvider from '../sheet-provider';
-import { IconButton } from '../ui/icon-button';
-import { ProgressCircleComponent } from '../ui/svg/lazy';
-import Paragraph from '../ui/typography/paragraph';
-import Actions from './actions';
+import React from "react";
+import { TouchableOpacity, View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useAttachmentStore } from "../../stores/use-attachment-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { formatBytes } from "../../utils";
+import { db } from "../../common/database";
+import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
+import { SIZE } from "../../utils/size";
+import SheetProvider from "../sheet-provider";
+import { IconButton } from "../ui/icon-button";
+import { ProgressCircleComponent } from "../ui/svg/lazy";
+import Paragraph from "../ui/typography/paragraph";
+import Actions from "./actions";
 
 function getFileExtension(filename) {
   var ext = /^.+\.([^.]+)$/.exec(filename);
-  return ext == null ? '' : ext[1];
+  return ext == null ? "" : ext[1];
 }
 
 export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
-  const colors = useThemeStore(state => state.colors);
-  const [currentProgress, setCurrentProgress] = useAttachmentProgress(attachment, encryption);
+  const colors = useThemeStore((state) => state.colors);
+  const [currentProgress, setCurrentProgress] = useAttachmentProgress(
+    attachment,
+    encryption
+  );
   const encryptionProgress = encryption
-    ? useAttachmentStore(state => state.encryptionProgress)
+    ? useAttachmentStore((state) => state.encryptionProgress)
     : null;
 
   const onPress = () => {
@@ -33,9 +36,9 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
       activeOpacity={0.9}
       onPress={onPress}
       style={{
-        flexDirection: 'row',
+        flexDirection: "row",
         marginVertical: 5,
-        justifyContent: 'space-between',
+        justifyContent: "space-between",
         padding: 12,
         paddingVertical: 6,
         borderRadius: 5,
@@ -47,14 +50,14 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
       <View
         style={{
           flexShrink: 1,
-          flexDirection: 'row',
-          alignItems: 'center'
+          flexDirection: "row",
+          alignItems: "center"
         }}
       >
         <View
           style={{
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: "center",
+            alignItems: "center",
             marginLeft: -5
           }}
         >
@@ -65,7 +68,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
             size={6}
             color={colors.light}
             style={{
-              position: 'absolute'
+              position: "absolute"
             }}
           >
             {getFileExtension(attachment.metadata.filename).toUpperCase()}
@@ -81,7 +84,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
           <Paragraph
             size={SIZE.sm - 1}
             style={{
-              flexWrap: 'wrap',
+              flexWrap: "wrap",
               marginBottom: 2.5
             }}
             numberOfLines={1}
@@ -92,8 +95,10 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
           </Paragraph>
 
           <Paragraph color={colors.icon} size={SIZE.xs}>
-            {formatBytes(attachment.length)}{' '}
-            {currentProgress?.type ? '(' + currentProgress.type + 'ing - tap to cancel)' : ''}
+            {formatBytes(attachment.length)}{" "}
+            {currentProgress?.type
+              ? "(" + currentProgress.type + "ing - tap to cancel)"
+              : ""}
           </Paragraph>
         </View>
       </View>
@@ -107,7 +112,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
             setCurrentProgress(null);
           }}
           style={{
-            justifyContent: 'center',
+            justifyContent: "center",
             marginLeft: 5,
             marginTop: 5,
             marginRight: -5
@@ -127,7 +132,7 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
               fontSize: 10
             }}
             color={colors.accent}
-            formatText={progress => (progress * 100).toFixed(0)}
+            formatText={(progress) => (progress * 100).toFixed(0)}
             borderWidth={0}
             thickness={2}
           />
@@ -135,7 +140,11 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
       ) : (
         <>
           {attachment.failed ? (
-            <IconButton onPress={onPress} name="alert-circle-outline" color={colors.errorText} />
+            <IconButton
+              onPress={onPress}
+              name="alert-circle-outline"
+              color={colors.errorText}
+            />
           ) : null}
         </>
       )}

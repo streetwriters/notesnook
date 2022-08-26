@@ -21,7 +21,7 @@ export const DEFAULT_COLORS = [
   "#cddc39",
   "#ffeb3b",
   "#ffc107",
-  "#f44336",
+  "#f44336"
 ];
 
 type ColorPickerProps = {
@@ -42,7 +42,7 @@ export function ColorPicker(props: ColorPickerProps) {
     onChange,
     title,
     onClose,
-    expanded,
+    expanded
   } = props;
   const ref = useRef<HTMLDivElement>();
   const [isPickerOpen, setIsPickerOpen] = useState(expanded || false);
@@ -72,12 +72,12 @@ export function ColorPicker(props: ColorPickerProps) {
         flexDirection: "column",
         ".react-colorful": {
           width: "auto",
-          height: 150,
+          height: 150
         },
         ".react-colorful__saturation": {
-          borderRadius: ["default", 0],
+          borderRadius: ["default", 0]
         },
-        width: ["calc(100vw - 20px)", 250],
+        width: ["calc(100vw - 20px)", 250]
         //  width: ["auto", 250],
       }}
     >
@@ -89,7 +89,7 @@ export function ColorPicker(props: ColorPickerProps) {
             p: 2,
             pb: isPickerOpen ? 2 : 0,
             //pb: 0,
-            alignItems: "center",
+            alignItems: "center"
           }}
           onClick={onClose}
         >
@@ -121,7 +121,7 @@ export function ColorPicker(props: ColorPickerProps) {
               fontSize: ["title", "title", "body"],
               color: "fontTertiary",
               textAlign: "center",
-              letterSpacing: 1.5,
+              letterSpacing: 1.5
             }}
             value={currentColor.toUpperCase()}
             maxLength={7}
@@ -143,7 +143,7 @@ export function ColorPicker(props: ColorPickerProps) {
             flex: 1,
             p: 1,
             overflowX: ["auto", "hidden"],
-            flexWrap: ["nowrap", "wrap"],
+            flexWrap: ["nowrap", "wrap"]
           }}
         >
           <Button
@@ -155,7 +155,7 @@ export function ColorPicker(props: ColorPickerProps) {
               borderRadius: 50,
               boxShadow: "menu",
               p: 0,
-              ml: [2, 2, 1],
+              ml: [2, 2, 1]
             }}
             onClick={onClear}
           >
@@ -173,8 +173,8 @@ export function ColorPicker(props: ColorPickerProps) {
               p: 0,
               ml: [2, 2, 1],
               ":hover": {
-                bg: currentColor,
-              },
+                bg: currentColor
+              }
             }}
             onClick={() => setIsPickerOpen((s) => !s)}
           >
@@ -196,8 +196,8 @@ export function ColorPicker(props: ColorPickerProps) {
                 mb: [0, 1, 1],
                 borderRadius: 50,
                 ":hover": {
-                  bg: color,
-                },
+                  bg: color
+                }
               }}
               onClick={() => {
                 setCurrentColor(color);

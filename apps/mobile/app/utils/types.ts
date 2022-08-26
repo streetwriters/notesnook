@@ -2,32 +2,44 @@
 export type LiteralUnion<T extends U, U = string> = T | (U & {});
 
 // types from notesnook-core
-export type CollectionTypes = 'notes' | 'notebooks' | 'attachments' | 'content' | 'tags' | 'colors';
+export type CollectionTypes =
+  | "notes"
+  | "notebooks"
+  | "attachments"
+  | "content"
+  | "tags"
+  | "colors";
 export type EntityTypes =
-  | 'note'
-  | 'notebook'
-  | 'tiny'
-  | 'topic'
-  | 'attachment'
-  | 'settings'
-  | 'trash'
-  | 'tag'
-  | 'color'
-  | 'header';
+  | "note"
+  | "notebook"
+  | "tiny"
+  | "topic"
+  | "attachment"
+  | "settings"
+  | "trash"
+  | "tag"
+  | "color"
+  | "header";
 
 export type CollectionEntityTypeMap = {
-  notes: 'note';
-  notebooks: 'notebook';
-  attachments: 'attachment';
-  content: 'tiny';
-  tags: 'tag';
-  colors: 'color';
+  notes: "note";
+  notebooks: "notebook";
+  attachments: "attachment";
+  content: "tiny";
+  tags: "tag";
+  colors: "color";
 };
 
-export type Item = NoteType | NotebookType | TopicType | AttachmentType | TagType | TrashType;
+export type Item =
+  | NoteType
+  | NotebookType
+  | TopicType
+  | AttachmentType
+  | TagType
+  | TrashType;
 
 export type MonographType = {
-  type: 'monograph';
+  type: "monograph";
 };
 
 export interface Entity<TType extends EntityTypes> {
@@ -47,7 +59,7 @@ export type NotebookReference = {
   topics: string[];
 };
 
-export interface NoteType extends Entity<'note'> {
+export interface NoteType extends Entity<"note"> {
   title: string;
   notebooks: NotebookReference[];
   tags: string[];
@@ -70,7 +82,7 @@ export interface NoteType extends Entity<'note'> {
   };
 }
 
-export interface NotebookType extends Entity<'notebook'> {
+export interface NotebookType extends Entity<"notebook"> {
   title: string;
   description?: string;
   dateCreated: number;
@@ -79,7 +91,7 @@ export interface NotebookType extends Entity<'notebook'> {
   topics: TopicType[];
 }
 
-export interface TopicType extends Entity<'topic'> {
+export interface TopicType extends Entity<"topic"> {
   title: string;
   notebookId: string;
   notes: string[];
@@ -87,7 +99,7 @@ export interface TopicType extends Entity<'topic'> {
   dateEdited: number;
 }
 
-export interface AttachmentType extends Entity<'attachment'> {
+export interface AttachmentType extends Entity<"attachment"> {
   noteIds: string[];
   iv: string;
   salt: string;
@@ -113,24 +125,25 @@ export interface AttachmentType extends Entity<'attachment'> {
   dateDeleted: number;
 }
 
-interface BaseTag<TType extends 'tag' | 'color'> extends Entity<TType> {
+interface BaseTag<TType extends "tag" | "color"> extends Entity<TType> {
   title: string;
   alias?: string;
   noteIds: string[];
 }
 
-export type TagType = BaseTag<'tag'>;
-export type ColorType = BaseTag<'color'>;
+export type TagType = BaseTag<"tag">;
+export type ColorType = BaseTag<"color">;
 
-type TrashItem<TItem extends Entity<'note' | 'notebook'>> = Entity<'trash'> & {
+type TrashItem<TItem extends Entity<"note" | "notebook">> = Entity<"trash"> & {
   title: string;
-  itemType: TItem['type'];
+  itemType: TItem["type"];
   dateDeleted: number;
   deleted: boolean;
-} & Omit<TItem, 'id' | 'type'>;
+} & Omit<TItem, "id" | "type">;
 
 export type TrashType = TrashItem<NoteType> | TrashItem<NotebookType>;
 
-export interface GroupHeader extends Omit<Entity<'header'>, 'id' | 'dateCreated' | 'dateModified'> {
+export interface GroupHeader
+  extends Omit<Entity<"header">, "id" | "dateCreated" | "dateModified"> {
   title: string;
 }

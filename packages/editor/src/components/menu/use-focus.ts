@@ -16,7 +16,7 @@ export function useFocus(
       const element = document.getElementById(item.key);
       if (!element) return;
       element.scrollIntoView({
-        behavior: "auto",
+        behavior: "auto"
       });
     },
     [items]

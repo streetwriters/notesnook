@@ -1,8 +1,8 @@
-import React from 'react';
-import RNBootSplash from 'react-native-bootsplash';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Dialog } from '../dialog';
-import { Issue } from '../sheets/github/issue';
+import React from "react";
+import RNBootSplash from "react-native-bootsplash";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { Dialog } from "../dialog";
+import { Issue } from "../sheets/github/issue";
 
 const error = (
   stack: string,
@@ -12,7 +12,10 @@ const error = (
 _______________________________
 Stacktrace: In ${component}::${stack}`;
 
-class ExceptionHandler extends React.Component<{ children: React.ReactNode; component: string }> {
+class ExceptionHandler extends React.Component<{
+  children: React.ReactNode;
+  component: string;
+}> {
   state: {
     error: {
       title: string;
@@ -45,8 +48,11 @@ class ExceptionHandler extends React.Component<{ children: React.ReactNode; comp
           }}
         >
           <Issue
-            defaultBody={error(this.state.error?.stack || '', this.props.component)}
-            defaultTitle={this.state.error?.title || 'Unknown Error'}
+            defaultBody={error(
+              this.state.error?.stack || "",
+              this.props.component
+            )}
+            defaultTitle={this.state.error?.title || "Unknown Error"}
             issueTitle="An exception occured"
           />
           <Dialog />

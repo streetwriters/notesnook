@@ -19,7 +19,7 @@ async function initializeDatabase(persistence) {
   db.host({
     API_HOST: "https://api.notesnook.com",
     AUTH_HOST: "https://auth.streetwriters.co",
-    SSE_HOST: "https://events.streetwriters.co",
+    SSE_HOST: "https://events.streetwriters.co"
   });
   // } else {
   // db.host({

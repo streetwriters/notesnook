@@ -1,23 +1,36 @@
-import React, { createRef } from 'react';
-import { Keyboard, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
-import { notesnook } from '../../../../e2e/test.ids';
-import { useMenuStore } from '../../../stores/use-menu-store';
-import { DDS } from '../../../services/device-detection';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import { db } from '../../../common/database';
-import { eCloseAddNotebookDialog, eOpenAddNotebookDialog } from '../../../utils/events';
-import { ph, pv, SIZE } from '../../../utils/size';
-import { sleep } from '../../../utils/time';
-import { IconButton } from '../../ui/icon-button';
-import { Button } from '../../ui/button';
-import DialogHeader from '../../dialog/dialog-header';
-import Input from '../../ui/input';
-import { MoveNotes } from '../move-notes/movenote';
-import Seperator from '../../ui/seperator';
-import SheetWrapper from '../../ui/sheet';
-import { Toast } from '../../toast';
+import React, { createRef } from "react";
+import {
+  Keyboard,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import { notesnook } from "../../../../e2e/test.ids";
+import { useMenuStore } from "../../../stores/use-menu-store";
+import { DDS } from "../../../services/device-detection";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { db } from "../../../common/database";
+import {
+  eCloseAddNotebookDialog,
+  eOpenAddNotebookDialog
+} from "../../../utils/events";
+import { ph, pv, SIZE } from "../../../utils/size";
+import { sleep } from "../../../utils/time";
+import { IconButton } from "../../ui/icon-button";
+import { Button } from "../../ui/button";
+import DialogHeader from "../../dialog/dialog-header";
+import Input from "../../ui/input";
+import { MoveNotes } from "../move-notes/movenote";
+import Seperator from "../../ui/seperator";
+import SheetWrapper from "../../ui/sheet";
+import { Toast } from "../../toast";
 
 let refs = [];
 
@@ -64,7 +77,7 @@ export class AddNotebookSheet extends React.Component {
     eUnSubscribeEvent(eCloseAddNotebookDialog, this.close);
   }
 
-  open = notebook => {
+  open = (notebook) => {
     refs = [];
 
     if (notebook) {
@@ -87,7 +100,7 @@ export class AddNotebookSheet extends React.Component {
         notebook: null
       });
     }
-    sleep(100).then(r => {
+    sleep(100).then((r) => {
       this.actionSheetRef.current?.show();
     });
   };
@@ -104,7 +117,7 @@ export class AddNotebookSheet extends React.Component {
     this.id = null;
   };
 
-  onDelete = index => {
+  onDelete = (index) => {
     let { topics } = this.state;
     let prevTopics = topics;
     refs = [];
@@ -139,9 +152,9 @@ export class AddNotebookSheet extends React.Component {
 
     if (!this.title || this.title?.trim().length === 0) {
       ToastEvent.show({
-        heading: 'Notebook title is required',
-        type: 'error',
-        context: 'local'
+        heading: "Notebook title is required",
+        type: "error",
+        context: "local"
       });
       this.setState({
         loading: false
@@ -166,7 +179,9 @@ export class AddNotebookSheet extends React.Component {
     let newNotebookId = null;
     if (notebook) {
       if (this.topicsToDelete?.length > 0) {
-        await db.notebooks.notebook(toEdit.id).topics.delete(...this.topicsToDelete);
+        await db.notebooks
+          .notebook(toEdit.id)
+          .topics.delete(...this.topicsToDelete);
         toEdit = db.notebooks.notebook(toEdit.id).data;
       }
 
@@ -199,12 +214,12 @@ export class AddNotebookSheet extends React.Component {
     }
     useMenuStore.getState().setMenuPins();
     Navigation.queueRoutesForUpdate(
-      'Notes',
-      'ColoredNotes',
-      'TaggedNotes',
-      'TopicNotes',
-      'Notebooks',
-      'Notebook'
+      "Notes",
+      "ColoredNotes",
+      "TaggedNotes",
+      "TopicNotes",
+      "Notebooks",
+      "Notebook"
     );
 
     this.setState({
@@ -221,7 +236,8 @@ export class AddNotebookSheet extends React.Component {
     this.hiddenInput.current?.focus();
     let willFocus = true;
     let { topics } = this.state;
-    if (!this.currentInputValue || this.currentInputValue?.trim().length === 0) return;
+    if (!this.currentInputValue || this.currentInputValue?.trim().length === 0)
+      return;
 
     let prevTopics = [...topics];
     if (this.prevItem === null) {
@@ -259,7 +275,7 @@ export class AddNotebookSheet extends React.Component {
       }
     }
     this.topicInputRef.current?.setNativeProps({
-      text: ''
+      text: ""
     });
     willFocus && this.topicInputRef.current?.focus();
   };
@@ -292,7 +308,7 @@ export class AddNotebookSheet extends React.Component {
       >
         <View
           style={{
-            maxHeight: DDS.isTab ? '90%' : '96%',
+            maxHeight: DDS.isTab ? "90%" : "96%",
             borderRadius: DDS.isTab ? 5 : 0,
             paddingHorizontal: 12
           }}
@@ -303,24 +319,28 @@ export class AddNotebookSheet extends React.Component {
               width: 1,
               height: 1,
               opacity: 0,
-              position: 'absolute'
+              position: "absolute"
             }}
             blurOnSubmit={false}
           />
           <DialogHeader
-            title={notebook && notebook.dateCreated ? 'Edit Notebook' : 'New Notebook'}
+            title={
+              notebook && notebook.dateCreated
+                ? "Edit Notebook"
+                : "New Notebook"
+            }
             paragraph={
               notebook && notebook.dateCreated
-                ? 'You are editing ' + this.title + ' notebook.'
-                : 'Notebooks are the best way to organize your notes.'
+                ? "You are editing " + this.title + " notebook."
+                : "Notebooks are the best way to organize your notes."
             }
           />
           <Seperator half />
 
           <Input
-            fwdRef={ref => (this.titleRef = ref)}
+            fwdRef={(ref) => (this.titleRef = ref)}
             testID={notesnook.ids.dialogs.notebook.inputs.title}
-            onChangeText={value => {
+            onChangeText={(value) => {
               this.title = value;
             }}
             placeholder="Enter a title"
@@ -333,9 +353,9 @@ export class AddNotebookSheet extends React.Component {
           />
 
           <Input
-            fwdRef={ref => (this.descriptionRef = ref)}
+            fwdRef={(ref) => (this.descriptionRef = ref)}
             testID={notesnook.ids.dialogs.notebook.inputs.description}
-            onChangeText={value => {
+            onChangeText={(value) => {
               this.description = value;
             }}
             placeholder="Describe your notebook."
@@ -350,7 +370,7 @@ export class AddNotebookSheet extends React.Component {
           <Input
             fwdRef={this.topicInputRef}
             testID={notesnook.ids.dialogs.notebook.inputs.topic}
-            onChangeText={value => {
+            onChangeText={(value) => {
               this.currentInputValue = value;
               if (this.prevItem !== null) {
                 refs[this.prevIndex].setNativeProps({
@@ -368,8 +388,8 @@ export class AddNotebookSheet extends React.Component {
             }}
             blurOnSubmit={false}
             button={{
-              testID: 'topic-add-button',
-              icon: this.state.editTopic ? 'check' : 'plus',
+              testID: "topic-add-button",
+              icon: this.state.editTopic ? "check" : "plus",
               onPress: this.onSubmit,
               color: topicInputFocused ? colors.accent : colors.icon
             }}
@@ -378,7 +398,7 @@ export class AddNotebookSheet extends React.Component {
 
           <FlatList
             data={topics}
-            ref={ref => (this.listRef = ref)}
+            ref={(ref) => (this.listRef = ref)}
             nestedScrollEnabled
             keyExtractor={(item, index) => item + index.toString()}
             onMomentumScrollEnd={() => {
@@ -413,7 +433,11 @@ export class AddNotebookSheet extends React.Component {
             width="100%"
             height={50}
             fontSize={SIZE.md}
-            title={notebook && notebook.dateCreated ? 'Save changes' : 'Create notebook'}
+            title={
+              notebook && notebook.dateCreated
+                ? "Save changes"
+                : "Create notebook"
+            }
             type="accent"
             onPress={this.addNewNotebook}
           />
@@ -434,14 +458,14 @@ export class AddNotebookSheet extends React.Component {
 }
 
 const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
-  const topicRef = ref => (refs[index] = ref);
+  const topicRef = (ref) => (refs[index] = ref);
 
   return (
     <View
       style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         backgroundColor: colors.nav,
         borderRadius: 5,
         marginVertical: 5
@@ -449,10 +473,10 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
     >
       <TouchableOpacity
         style={{
-          width: '80%',
-          backgroundColor: 'transparent',
+          width: "80%",
+          backgroundColor: "transparent",
           zIndex: 10,
-          position: 'absolute',
+          position: "absolute",
           height: 30
         }}
         onPress={() => {
@@ -475,11 +499,11 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
       <View
         style={{
           width: 80,
-          position: 'absolute',
+          position: "absolute",
           right: 0,
-          alignItems: 'center',
-          flexDirection: 'row',
-          justifyContent: 'flex-end'
+          alignItems: "center",
+          flexDirection: "row",
+          justifyContent: "flex-end"
         }}
       >
         <IconButton
@@ -505,21 +529,21 @@ const TopicItem = ({ item, index, colors, onPress, onDelete }) => {
 
 const styles = StyleSheet.create({
   wrapper: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    justifyContent: 'center',
-    alignItems: 'center'
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center"
   },
   overlay: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute'
+    width: "100%",
+    height: "100%",
+    position: "absolute"
   },
   headingContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center"
   },
   headingText: {
     marginLeft: 5,
@@ -537,25 +561,25 @@ const styles = StyleSheet.create({
     marginBottom: 5
   },
   addBtn: {
-    width: '12%',
+    width: "12%",
     minHeight: 45,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
     right: 0
   },
   buttonContainer: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
-    width: '100%',
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    width: "100%",
     marginTop: 20
   },
 
   topicContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 10
   },
   topicInput: {
@@ -565,16 +589,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: ph,
     paddingRight: 40,
     paddingVertical: 10,
-    width: '100%',
-    maxWidth: '100%'
+    width: "100%",
+    maxWidth: "100%"
   },
   topicBtn: {
     borderRadius: 5,
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
     right: 0
   }
 });

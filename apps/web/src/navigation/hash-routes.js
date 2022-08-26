@@ -5,11 +5,11 @@ import {
   showEditTagDialog,
   showEmailVerificationDialog,
   showFeatureDialog,
-  showOnboardingDialog,
+  showOnboardingDialog
 } from "../common/dialog-controller";
 import {
   showAddNotebookDialog,
-  showEditNotebookDialog,
+  showEditNotebookDialog
 } from "../common/dialog-controller";
 import { closeOpenedDialog } from "../common/dialog-controller";
 import RouteContainer from "../components/route-container";
@@ -20,7 +20,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { isMobile } from "../utils/dimensions";
 import {
   showEditTopicDialog,
-  showCreateTopicDialog,
+  showCreateTopicDialog
 } from "../common/dialog-controller";
 import { hashNavigate } from ".";
 import EditorPlaceholder from "../components/editor/-placeholder";
@@ -75,10 +75,10 @@ const hashroutes = {
                 action: () =>
                   hashNavigate("/notes/create", {
                     addNonce: true,
-                    replace: true,
-                  }),
+                    replace: true
+                  })
               }
-            : undefined,
+            : undefined
         }}
         component={<Unlock noteId={noteId} />}
       />
@@ -110,7 +110,7 @@ const hashroutes = {
   },
   "/confirmed": () => {
     showFeatureDialog("confirmed");
-  },
+  }
 };
 
 export default hashroutes;

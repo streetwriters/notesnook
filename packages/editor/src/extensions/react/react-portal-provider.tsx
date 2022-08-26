@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useContext } from "react";
 import {
   createPortal,
   unstable_renderSubtreeIntoContainer,
-  unmountComponentAtNode,
+  unmountComponentAtNode
 } from "react-dom";
 import { EventDispatcher } from "./event-dispatcher";
 
@@ -35,7 +35,7 @@ export class PortalProviderAPI extends EventDispatcher {
     container: HTMLElement
   ) {
     this.portals.set(container, {
-      children,
+      children
     });
     let wrappedChildren = children() as JSX.Element;
 

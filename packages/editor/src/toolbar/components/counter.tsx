@@ -19,8 +19,8 @@ function _Counter(props: CounterProps) {
         alignItems: "center",
         mr: 1,
         ":last-of-type": {
-          mr: 0,
-        },
+          mr: 0
+        }
       }}
     >
       <ToolButton
@@ -39,7 +39,7 @@ function _Counter(props: CounterProps) {
           fontSize: "subBody",
           mx: 1,
           textAlign: "center",
-          ":hover": { bg: "transparent" },
+          ":hover": { bg: "transparent" }
         }}
         onClick={onReset}
         title={`Reset ${title}`}

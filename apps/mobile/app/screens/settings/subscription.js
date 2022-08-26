@@ -1,22 +1,30 @@
-import React from 'react';
-import { Linking, Platform, View } from 'react-native';
-import { Button } from '../../components/ui/button';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
-import PremiumService from '../../services/premium';
-import { useUserStore } from '../../stores/use-user-store';
-import { SUBSCRIPTION_PROVIDER, SUBSCRIPTION_STATUS } from '../../utils/constants';
-import { eOpenPremiumDialog } from '../../utils/events';
-import { usePricing } from '../../hooks/use-pricing';
-import { SIZE } from '../../utils/size';
+import React from "react";
+import { Linking, Platform, View } from "react-native";
+import { Button } from "../../components/ui/button";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from "../../services/event-manager";
+import PremiumService from "../../services/premium";
+import { useUserStore } from "../../stores/use-user-store";
+import {
+  SUBSCRIPTION_PROVIDER,
+  SUBSCRIPTION_STATUS
+} from "../../utils/constants";
+import { eOpenPremiumDialog } from "../../utils/events";
+import { usePricing } from "../../hooks/use-pricing";
+import { SIZE } from "../../utils/size";
 
 export const Subscription = () => {
-  const user = useUserStore(state => state.user);
-  const monthlyPlan = usePricing('monthly');
+  const user = useUserStore((state) => state.user);
+  const monthlyPlan = usePricing("monthly");
   const isNotPro =
     user?.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
     user?.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
 
-  const subscriptionProviderInfo = SUBSCRIPTION_PROVIDER[user?.subscription?.provider];
+  const subscriptionProviderInfo =
+    SUBSCRIPTION_PROVIDER[user?.subscription?.provider];
 
   const manageSubscription = () => {
     if (!user?.isEmailConfirmed) {
@@ -25,17 +33,17 @@ export const Subscription = () => {
     }
     if (
       user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-      Platform.OS === 'android'
+      Platform.OS === "android"
     ) {
       if (user.subscription?.provider === 3) {
         ToastEvent.show({
-          heading: 'Subscribed on web',
-          message: 'Open your web browser to manage your subscription.',
-          type: 'success'
+          heading: "Subscribed on web",
+          message: "Open your web browser to manage your subscription.",
+          type: "success"
         });
         return;
       }
-      Linking.openURL('https://play.google.com/store/account/subscriptions');
+      Linking.openURL("https://play.google.com/store/account/subscriptions");
 
       /**
          *   
@@ -56,19 +64,21 @@ export const Subscription = () => {
           style={{
             borderRadius: 100,
             paddingHorizontal: 16,
-            alignSelf: 'flex-start'
+            alignSelf: "flex-start"
           }}
           fontSize={SIZE.sm}
           type="accent"
           onPress={manageSubscription}
           title={
             !user?.isEmailConfirmed
-              ? 'Confirm your email'
+              ? "Confirm your email"
               : user.subscription?.provider === 3 &&
-                user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
-              ? 'Manage subscription from desktop app'
-              : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-                Platform.OS === 'android'
+                user.subscription?.type ===
+                  SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+              ? "Manage subscription from desktop app"
+              : user.subscription?.type ===
+                  SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+                Platform.OS === "android"
               ? `Resubscribe from Google Playstore`
               : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
               ? `Resubscribe to Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
@@ -89,7 +99,7 @@ export const Subscription = () => {
             });
           }}
           style={{
-            alignSelf: 'flex-start',
+            alignSelf: "flex-start",
             borderRadius: 100
           }}
           fontSize={SIZE.sm}

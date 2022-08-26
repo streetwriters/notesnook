@@ -5,9 +5,9 @@ import React, {
   useImperativeHandle,
   useRef,
   useState
-} from 'react';
-import { BackHandler, Platform, ViewProps } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+} from "react";
+import { BackHandler, Platform, ViewProps } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -16,10 +16,10 @@ import Animated, {
   withSpring,
   WithSpringConfig,
   withTiming
-} from 'react-native-reanimated';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { eSendEvent } from '../../services/event-manager';
-import { eClearEditor } from '../../utils/events';
+} from "react-native-reanimated";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { eSendEvent } from "../../services/event-manager";
+import { eClearEditor } from "../../utils/events";
 
 interface TabProps extends ViewProps {
   dimensions: { width: number; height: number };
@@ -45,12 +45,22 @@ export interface TabsRef {
 
 export const FluidTabs = forwardRef<TabsRef, TabProps>(
   (
-    { children, dimensions, widths, onChangeTab, onScroll, enabled, onDrawerStateChange }: TabProps,
+    {
+      children,
+      dimensions,
+      widths,
+      onChangeTab,
+      onScroll,
+      enabled,
+      onDrawerStateChange
+    }: TabProps,
     ref
   ) => {
-    const deviceMode = useSettingStore(state => state.deviceMode);
-    const fullscreen = useSettingStore(state => state.fullscreen);
-    const introCompleted = useSettingStore(state => state.settings.introCompleted);
+    const deviceMode = useSettingStore((state) => state.deviceMode);
+    const fullscreen = useSettingStore((state) => state.fullscreen);
+    const introCompleted = useSettingStore(
+      (state) => state.settings.introCompleted
+    );
     const translateX = useSharedValue(widths ? widths.a : 0);
     const startX = useSharedValue(0);
     const currentTab = useSharedValue(1);
@@ -64,19 +74,21 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
     const forcedLock = useSharedValue(false);
     const [disabled, setDisabled] = useState(false);
     const node = useRef<Animated.View>(null);
-    const containerWidth = widths ? widths.a + widths.b + widths.c : dimensions.width;
+    const containerWidth = widths
+      ? widths.a + widths.b + widths.c
+      : dimensions.width;
 
     const drawerPosition = 0;
     const homePosition = widths.a;
     const editorPosition = widths.a + widths.b;
-    const isSmallTab = deviceMode === 'smallTablet';
+    const isSmallTab = deviceMode === "smallTablet";
     const isLoaded = useRef(false);
     const prevWidths = useRef(widths);
-    const isIPhone = Platform.OS === 'ios';
+    const isIPhone = Platform.OS === "ios";
 
     useEffect(() => {
       if (introCompleted) {
-        if (deviceMode === 'tablet' || fullscreen) {
+        if (deviceMode === "tablet" || fullscreen) {
           translateX.value = 0;
         } else {
           if (prevWidths.current?.a !== widths.a) translateX.value = widths.a;
@@ -85,7 +97,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         prevWidths.current = widths;
       }
 
-      const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      const sub = BackHandler.addEventListener("hardwareBackPress", () => {
         if (isDrawerOpen.value) {
           translateX.value = withTiming(homePosition);
           onDrawerStateChange(false);
@@ -103,7 +115,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
       ref,
       (): TabsRef => ({
         goToPage: (page: number) => {
-          if (deviceMode === 'tablet') {
+          if (deviceMode === "tablet") {
             translateX.value = withTiming(0);
             return;
           }
@@ -119,7 +131,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           }
         },
         goToIndex: (index: number) => {
-          if (deviceMode === 'tablet') {
+          if (deviceMode === "tablet") {
             translateX.value = withTiming(0);
             return;
           }
@@ -152,7 +164,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
           onDrawerStateChange(true);
         },
         closeDrawer: () => {
-          if (deviceMode === 'tablet') {
+          if (deviceMode === "tablet") {
             translateX.value = withTiming(0);
             return;
           }
@@ -169,7 +181,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
 
     useAnimatedReaction(
       () => currentTab.value,
-      result => {
+      (result) => {
         if (setDisabled) {
           if (result === 2) {
             runOnJS(setDisabled)(!isIPhone);
@@ -187,7 +199,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
 
     useAnimatedReaction(
       () => translateX.value,
-      value => {
+      (value) => {
         runOnJS(onScroll)(value);
       },
       []
@@ -204,15 +216,15 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
       .enabled(enabled && !disabled)
       .activeOffsetX([-5, 5])
       .failOffsetY([-15, 15])
-      .onBegin(event => {
+      .onBegin((event) => {
         locked.value = false;
         gestureStartValue.value = {
           x: event.absoluteX,
           y: event.absoluteY
         };
       })
-      .onStart(event => {
-        console.log('gesture activated');
+      .onStart((event) => {
+        console.log("gesture activated");
         let diffX = gestureStartValue.value.x - event.absoluteX;
         let diffY = gestureStartValue.value.y - event.absoluteY;
 
@@ -228,22 +240,25 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
         if (vx / vy < 1.5) locked.value = true;
         startX.value = translateX.value;
       })
-      .onChange(event => {
+      .onChange((event) => {
         if (locked.value || forcedLock.value) return;
         let value = translateX.value + event.changeX * -1;
         if (
           value < 0 ||
-          (currentTab.value === 2 && Platform.OS === 'android') ||
-          (currentTab.value === 2 && gestureStartValue.value.x > 25 && Platform.OS === 'ios') ||
+          (currentTab.value === 2 && Platform.OS === "android") ||
+          (currentTab.value === 2 &&
+            gestureStartValue.value.x > 25 &&
+            Platform.OS === "ios") ||
           (value >= homePosition && isSmallTab) ||
           value > editorPosition
         )
           return;
         translateX.value = value;
       })
-      .onEnd(event => {
-        if (currentTab.value === 2 && Platform.OS === 'android') return;
-        let velocityX = event.velocityX < 0 ? event.velocityX * -1 : event.velocityX;
+      .onEnd((event) => {
+        if (currentTab.value === 2 && Platform.OS === "android") return;
+        let velocityX =
+          event.velocityX < 0 ? event.velocityX * -1 : event.velocityX;
         let isSwipeLeft = startX.value > translateX.value;
         let finalValue = isSwipeLeft
           ? translateX.value - velocityX / 40.0
@@ -327,7 +342,7 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(
             {
               flex: 1,
               width: containerWidth,
-              flexDirection: 'row'
+              flexDirection: "row"
             },
             animatedStyles
           ]}

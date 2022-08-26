@@ -156,7 +156,7 @@ import {
   mdiArrowCollapseHorizontal,
   mdiSpeedometer,
   mdiFormatLineSpacing,
-  mdiCalendarClockOutline,
+  mdiCalendarClockOutline
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -171,7 +171,7 @@ function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
       size={size + "px"}
       style={{
         strokeWidth: stroke || "0px",
-        stroke: theme.colors[color] || color,
+        stroke: theme.colors[color] || color
       }}
       color={theme.colors[color] || color}
       spin={rotate}

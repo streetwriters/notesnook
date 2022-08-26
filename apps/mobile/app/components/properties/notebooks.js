@@ -1,20 +1,20 @@
-import React from 'react';
-import { ScrollView, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { eSendEvent } from '../../services/event-manager';
-import Navigation from '../../services/navigation';
-import { db } from '../../common/database';
-import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
-import { PressableButton } from '../ui/pressable';
-import Heading from '../ui/typography/heading';
-import { TopicNotes } from '../../screens/notes/topic-notes';
-import Notebook from '../../screens/notebook';
+import React from "react";
+import { ScrollView, View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { eSendEvent } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import { db } from "../../common/database";
+import { eOnNewTopicAdded, refreshNotesPage } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
+import { PressableButton } from "../ui/pressable";
+import Heading from "../ui/typography/heading";
+import { TopicNotes } from "../../screens/notes/topic-notes";
+import Notebook from "../../screens/notebook";
 
 export default function Notebooks({ note, close }) {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   function getNotebooks(item) {
     if (!item.notebooks || item.notebooks.length < 1) return [];
@@ -27,7 +27,7 @@ export default function Notebooks({ note, close }) {
           id: notebook.id,
           title: item_notebook.title,
           topics: notebook.topics
-            .map(item => {
+            .map((item) => {
               let topic = item_notebook.topics.topic(item)?._topic;
               if (!topic) return null;
               return {
@@ -35,7 +35,7 @@ export default function Notebooks({ note, close }) {
                 title: topic.title
               };
             })
-            .filter(i => i !== null)
+            .filter((i) => i !== null)
         };
         notebooks.push(data);
       }
@@ -43,7 +43,7 @@ export default function Notebooks({ note, close }) {
     return notebooks;
   }
 
-  const navigateNotebook = id => {
+  const navigateNotebook = (id) => {
     let item = db.notebooks.notebook(id)?.data;
     if (!item) return;
     Notebook.navigate(item, true);
@@ -58,12 +58,12 @@ export default function Notebooks({ note, close }) {
   return !note.notebooks || note.notebooks.length === 0 ? null : (
     <View
       style={{
-        width: '100%',
+        width: "100%",
         borderTopWidth: 1,
         borderTopColor: colors.nav
       }}
     >
-      {getNotebooks(note).map(item => (
+      {getNotebooks(note).map((item) => (
         <PressableButton
           key={item.id}
           onPress={() => {
@@ -71,10 +71,10 @@ export default function Notebooks({ note, close }) {
             close();
           }}
           customStyle={{
-            justifyContent: 'flex-start',
+            justifyContent: "flex-start",
             paddingHorizontal: 12,
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: "row",
+            alignItems: "center",
             flexShrink: 1,
             flexGrow: 1,
             marginTop: 5,
@@ -92,7 +92,7 @@ export default function Notebooks({ note, close }) {
           <Heading
             numberOfLines={1}
             style={{
-              maxWidth: '50%'
+              maxWidth: "50%"
             }}
             size={SIZE.sm}
           >
@@ -103,14 +103,14 @@ export default function Notebooks({ note, close }) {
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               marginLeft: 8,
               borderLeftColor: colors.nav,
               borderLeftWidth: 1,
               paddingLeft: 8
             }}
           >
-            {item.topics.map(topic => (
+            {item.topics.map((topic) => (
               <Button
                 key={topic.id}
                 onPress={() => {

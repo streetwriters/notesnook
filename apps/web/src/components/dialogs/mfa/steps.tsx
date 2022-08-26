@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
 import { Text, Flex, Button, Box } from "rebass";
 import { useSessionState } from "../../../hooks/use-session-state";
@@ -18,7 +18,7 @@ import {
   Print,
   Copy,
   Refresh,
-  Checkmark,
+  Checkmark
 } from "../../icons";
 import Field from "../../field";
 import { exportToPDF } from "../../../common/export";
@@ -34,7 +34,7 @@ import {
   AuthenticatorType,
   StepComponent,
   SubmitCodeFunction,
-  StepComponentProps,
+  StepComponentProps
 } from "./types";
 import { showMultifactorDialog } from "../../../common/dialog-controller";
 const QRCode = React.lazy(
@@ -77,20 +77,20 @@ const Authenticators: Authenticator[] = [
     subtitle:
       "Use an authenticator app like Aegis or Raivo Authenticator to get the authentication codes.",
     icon: MFAAuthenticator,
-    recommended: true,
+    recommended: true
   },
   {
     type: "sms",
     title: "Set up using SMS",
     subtitle: "Notesnook will send you an SMS text with the 2FA code at login.",
-    icon: MFASMS,
+    icon: MFASMS
   },
   {
     type: "email",
     title: "Set up using Email",
     subtitle: "Notesnook will send you the 2FA code on your email at login.",
-    icon: MFAEmail,
-  },
+    icon: MFAEmail
+  }
 ];
 
 export const steps = {
@@ -104,7 +104,7 @@ export const steps = {
       />
     ),
     next: "setup",
-    cancellable: true,
+    cancellable: true
   }),
   setup: (authenticator: Authenticator): Step => ({
     title: authenticator.title,
@@ -116,7 +116,7 @@ export const steps = {
         authenticator={authenticator.type}
       />
     ),
-    cancellable: true,
+    cancellable: true
   }),
   recoveryCodes: (authenticatorType: AuthenticatorType): Step => ({
     title: "Save your recovery codes",
@@ -135,7 +135,7 @@ export const steps = {
         authenticatorType={authenticatorType}
       />
     ),
-    next: "finish",
+    next: "finish"
   }),
   finish: (authenticatorType: AuthenticatorType): Step => ({
     component: ({ onNext, onClose, onError }) => (
@@ -145,8 +145,8 @@ export const steps = {
         onError={onError}
         authenticatorType={authenticatorType}
       />
-    ),
-  }),
+    )
+  })
 } as const;
 
 export const fallbackSteps = {
@@ -163,7 +163,7 @@ export const fallbackSteps = {
       />
     ),
     next: "setup",
-    cancellable: true,
+    cancellable: true
   }),
   setup: (authenticator: Authenticator): FallbackStep => ({
     title: authenticator.title,
@@ -176,7 +176,7 @@ export const fallbackSteps = {
         authenticator={authenticator.type}
         isFallback
       />
-    ),
+    )
   }),
   finish: (
     fallbackMethod: AuthenticatorType,
@@ -189,8 +189,8 @@ export const fallbackSteps = {
         primaryMethod={primaryMethod}
         fallbackMethod={fallbackMethod}
       />
-    ),
-  }),
+    )
+  })
 } as const;
 
 type ChooseAuthenticatorProps = StepComponentProps & {
@@ -228,7 +228,7 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
             alignItems: "start",
             textAlign: "left",
             bg: "transparent",
-            px: 0,
+            px: 0
           }}
           onClick={() => setSelected(index)}
         >
@@ -239,7 +239,7 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
               borderRadius: 100,
               width: 35,
               height: 35,
-              mr: 2,
+              mr: 2
             }}
             size={16}
             color={selected === index ? "primary" : "text"}
@@ -299,7 +299,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
   const { onSubmitCode } = props;
   const [authenticatorDetails, setAuthenticatorDetails] = useState({
     sharedKey: null,
-    authenticatorUri: null,
+    authenticatorUri: null
   });
   const [copied, setCopied] = useState(false);
 
@@ -350,7 +350,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
           sx={{
             flex: 1,
             overflowWrap: "anywhere",
-            color: "text",
+            color: "text"
           }}
         >
           {authenticatorDetails.sharedKey ? (
@@ -478,7 +478,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
         autoFocus
         required
         styles={{
-          input: { flex: 1 },
+          input: { flex: 1 }
         }}
         placeholder={"+1234567890"}
         onChange={() => {
@@ -524,7 +524,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
             } finally {
               setIsSending(false);
             }
-          },
+          }
         }}
       />
       {error ? (
@@ -574,7 +574,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             "Notesnook 2FA Recovery Codes",
             recoveryCodesRef.current.outerHTML
           );
-        },
+        }
       },
       {
         title: "Copy",
@@ -591,7 +591,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
           setTimeout(() => {
             buttonText.innerHTML = "Copy";
           }, 2500);
-        },
+        }
       },
       {
         title: "Download",
@@ -601,9 +601,9 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             new Blob([Buffer.from(codes.join("\n"))]),
             `notesnook-recovery-codes.txt`
           );
-        },
+        }
       },
-      { title: "Regenerate", icon: Refresh, action: generate },
+      { title: "Regenerate", icon: Refresh, action: generate }
     ],
     [codes, generate]
   );
@@ -626,7 +626,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
           gridTemplateColumns: "1fr 1fr 1fr 1fr",
           bg: "bgSecondary",
           p: 2,
-          borderRadius: "default",
+          borderRadius: "default"
         }}
       >
         {codes.map((code) => (
@@ -775,8 +775,8 @@ function VerifyAuthenticatorForm(props: VerifyAuthenticatorFormProps) {
             width: "100%",
             fontSize: 38,
             fontFamily: "monospace",
-            textAlign: "center",
-          },
+            textAlign: "center"
+          }
         }}
       />
     </Flex>

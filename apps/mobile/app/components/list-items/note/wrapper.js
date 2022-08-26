@@ -1,24 +1,28 @@
-import React from 'react';
-import NoteItem from '.';
-import { notesnook } from '../../../../e2e/test.ids';
-import { useSelectionStore } from '../../../stores/use-selection-store';
-import { useTrashStore } from '../../../stores/use-trash-store';
-import { useEditorStore } from '../../../stores/use-editor-store';
-import { DDS } from '../../../services/device-detection';
-import { eSendEvent, openVault, ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import { history } from '../../../utils';
-import { db } from '../../../common/database';
-import { eOnLoadNote, eShowMergeDialog } from '../../../utils/events';
-import { tabBarRef } from '../../../utils/global-refs';
-import { presentDialog } from '../../dialog/functions';
-import SelectionWrapper from '../selection-wrapper';
+import React from "react";
+import NoteItem from ".";
+import { notesnook } from "../../../../e2e/test.ids";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import { useTrashStore } from "../../../stores/use-trash-store";
+import { useEditorStore } from "../../../stores/use-editor-store";
+import { DDS } from "../../../services/device-detection";
+import {
+  eSendEvent,
+  openVault,
+  ToastEvent
+} from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { history } from "../../../utils";
+import { db } from "../../../common/database";
+import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
+import { tabBarRef } from "../../../utils/global-refs";
+import { presentDialog } from "../../dialog/functions";
+import SelectionWrapper from "../selection-wrapper";
 
 const present = () =>
   presentDialog({
-    title: 'Note not synced',
-    negativeText: 'Ok',
-    paragraph: 'Please sync again to open this note for editing'
+    title: "Note not synced",
+    negativeText: "Ok",
+    paragraph: "Please sync again to open this note for editing"
   });
 
 export const openNote = async (item, isTrash, setSelectedItem) => {
@@ -55,8 +59,8 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
       novault: true,
       locked: true,
       goToEditor: true,
-      title: 'Open note',
-      description: 'Unlock note to open it in editor.'
+      title: "Open note",
+      description: "Unlock note to open it in editor."
     });
     return;
   }
@@ -64,24 +68,24 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
     presentDialog({
       title: `Restore ${item.itemType}`,
       paragraph: `Restore or delete ${item.itemType} forever`,
-      positiveText: 'Restore',
-      negativeText: 'Delete',
+      positiveText: "Restore",
+      negativeText: "Delete",
       positivePress: async () => {
         await db.trash.restore(item.id);
         Navigation.queueRoutesForUpdate(
-          'Tags',
-          'Notes',
-          'Notebooks',
-          'Favorites',
-          'Trash',
-          'TaggedNotes',
-          'ColoredNotes',
-          'TopicNotes'
+          "Tags",
+          "Notes",
+          "Notebooks",
+          "Favorites",
+          "Trash",
+          "TaggedNotes",
+          "ColoredNotes",
+          "TopicNotes"
         );
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
-          heading: 'Restore successful',
-          type: 'success'
+          heading: "Restore successful",
+          type: "success"
         });
       },
       onClose: async () => {
@@ -89,9 +93,9 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
         useTrashStore.getState().setTrash();
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
-          heading: 'Permanantly deleted items',
-          type: 'success',
-          context: 'local'
+          heading: "Permanantly deleted items",
+          type: "success",
+          context: "local"
         });
       }
     });
@@ -106,8 +110,8 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
 
 export const NoteWrapper = React.memo(
   ({ item, index, tags, dateBy }) => {
-    const isTrash = item.type === 'trash';
-    const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
+    const isTrash = item.type === "trash";
+    const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
 
     return (
       <SelectionWrapper

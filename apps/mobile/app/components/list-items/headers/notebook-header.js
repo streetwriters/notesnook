@@ -1,19 +1,21 @@
-import React, { useRef, useState } from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { useMenuStore } from '../../../stores/use-menu-store';
-import { ToastEvent } from '../../../services/event-manager';
-import { getTotalNotes } from '../../../utils';
-import { db } from '../../../common/database';
-import { SIZE } from '../../../utils/size';
-import { IconButton } from '../../ui/icon-button';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
+import React, { useRef, useState } from "react";
+import { View } from "react-native";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { useMenuStore } from "../../../stores/use-menu-store";
+import { ToastEvent } from "../../../services/event-manager";
+import { getTotalNotes } from "../../../utils";
+import { db } from "../../../common/database";
+import { SIZE } from "../../../utils/size";
+import { IconButton } from "../../ui/icon-button";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 
 export const NotebookHeader = ({ notebook, onEditNotebook }) => {
-  const colors = useThemeStore(state => state.colors);
-  const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(notebook.id));
-  const setMenuPins = useMenuStore(state => state.setMenuPins);
+  const colors = useThemeStore((state) => state.colors);
+  const [isPinnedToMenu, setIsPinnedToMenu] = useState(
+    db.settings.isPinned(notebook.id)
+  );
+  const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const totalNotes = getTotalNotes(notebook);
   const shortcutRef = useRef();
 
@@ -24,8 +26,8 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
       } else {
         await db.settings.pin(notebook.type, { id: notebook.id });
         ToastEvent.show({
-          heading: 'Shortcut created',
-          type: 'success'
+          heading: "Shortcut created",
+          type: "success"
         });
       }
       setIsPinnedToMenu(db.settings.isPinned(notebook.id));
@@ -38,10 +40,10 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
       style={{
         marginBottom: 5,
         padding: 0,
-        width: '100%',
+        width: "100%",
         paddingVertical: 15,
         paddingHorizontal: 12,
-        alignSelf: 'center',
+        alignSelf: "center",
         borderRadius: 10,
         paddingTop: 25
       }}
@@ -51,29 +53,29 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
       </Paragraph>
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center"
         }}
       >
         <Heading size={SIZE.xxl}>{notebook.title}</Heading>
 
         <View
           style={{
-            flexDirection: 'row'
+            flexDirection: "row"
           }}
         >
           <IconButton
-            name={isPinnedToMenu ? 'link-variant-off' : 'link-variant'}
+            name={isPinnedToMenu ? "link-variant-off" : "link-variant"}
             onPress={onPinNotebook}
-            tooltipText={'Create shortcut in side menu'}
+            tooltipText={"Create shortcut in side menu"}
             fwdRef={shortcutRef}
             customStyle={{
               marginRight: 15,
               width: 40,
               height: 40
             }}
-            type={isPinnedToMenu ? 'grayBg' : 'grayBg'}
+            type={isPinnedToMenu ? "grayBg" : "grayBg"}
             color={isPinnedToMenu ? colors.accent : colors.icon}
             size={SIZE.lg}
           />
@@ -101,18 +103,21 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
       <Paragraph
         style={{
           marginTop: 10,
-          fontStyle: 'italic',
+          fontStyle: "italic",
           fontFamily: null
         }}
         size={SIZE.xs}
         color={colors.icon}
       >
-        {notebook.topics.length === 1 ? '1 topic' : `${notebook.topics.length} topics`},{' '}
+        {notebook.topics.length === 1
+          ? "1 topic"
+          : `${notebook.topics.length} topics`}
+        ,{" "}
         {notebook && totalNotes > 1
-          ? totalNotes + ' notes'
+          ? totalNotes + " notes"
           : totalNotes === 1
-          ? totalNotes + ' note'
-          : '0 notes'}
+          ? totalNotes + " note"
+          : "0 notes"}
       </Paragraph>
     </View>
   );

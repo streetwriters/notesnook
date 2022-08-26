@@ -35,7 +35,7 @@ function Topic({ item, index, onClick }) {
       index={index}
       menu={{
         items: menuItems,
-        extraData: { topic, notebookId: topic.notebookId },
+        extraData: { topic, notebookId: topic.notebookId }
       }}
     />
   );
@@ -54,14 +54,14 @@ const menuItems = [
     title: "Edit",
     icon: Icon.Edit,
     onClick: ({ topic }) =>
-      hashNavigate(`/notebooks/${topic.notebookId}/topics/${topic.id}/edit`),
+      hashNavigate(`/notebooks/${topic.notebookId}/topics/${topic.id}/edit`)
   },
   {
     key: "shortcut",
     title: ({ topic }) =>
       db.settings.isPinned(topic.id) ? "Remove shortcut" : "Create shortcut",
     icon: Icon.Shortcut,
-    onClick: ({ topic }) => appStore.pinItemToMenu(topic),
+    onClick: ({ topic }) => appStore.pinItemToMenu(topic)
   },
   {
     key: "delete",
@@ -72,6 +72,6 @@ const menuItems = [
     onClick: async ({ items, notebookId }) => {
       await Multiselect.deleteTopics(notebookId, items);
     },
-    multiSelect: true,
-  },
+    multiSelect: true
+  }
 ];

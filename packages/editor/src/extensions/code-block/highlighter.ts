@@ -3,7 +3,7 @@ import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   findChildren,
   findParentNodeClosestToPos,
-  NodeWithPos,
+  NodeWithPos
 } from "@tiptap/core";
 import { Root, refractor } from "refractor/lib/core";
 import { RootContent } from "hast";
@@ -44,7 +44,7 @@ function getHighlightNodes(result: Root) {
 
 function getDecorations({
   block,
-  defaultLanguage,
+  defaultLanguage
 }: {
   block: NodeWithPos;
   defaultLanguage: string | null | undefined;
@@ -65,7 +65,7 @@ function getDecorations({
     const to = from + node.text.length;
     if (node.classes.length) {
       const decoration = Decoration.inline(from, to, {
-        class: node.classes.join(" "),
+        class: node.classes.join(" ")
       });
       decorations.push(decoration);
     }
@@ -77,7 +77,7 @@ function getDecorations({
 
 export function HighlighterPlugin({
   name,
-  defaultLanguage,
+  defaultLanguage
 }: {
   name: string;
   defaultLanguage: string | null | undefined;
@@ -123,7 +123,7 @@ export function HighlighterPlugin({
 
           const newDecorations = getDecorations({
             block,
-            defaultLanguage,
+            defaultLanguage
           });
           if (!newDecorations)
             return decorationSet.map(transaction.mapping, transaction.doc);
@@ -134,13 +134,13 @@ export function HighlighterPlugin({
         }
 
         return decorationSet.map(transaction.mapping, transaction.doc);
-      },
+      }
     },
 
     props: {
       decorations(state) {
         return key.getState(state);
-      },
+      }
     },
 
     appendTransaction: (transactions, oldState, newState) => {
@@ -183,6 +183,6 @@ export function HighlighterPlugin({
 
         return tr;
       }
-    },
+    }
   });
 }

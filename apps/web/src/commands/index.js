@@ -6,7 +6,7 @@ export function invokeCommand(type, payload = {}) {
 
   window.api.send("fromRenderer", {
     type,
-    ...payload,
+    ...payload
   });
 }
 

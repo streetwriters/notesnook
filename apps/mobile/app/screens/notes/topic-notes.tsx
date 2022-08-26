@@ -1,20 +1,23 @@
-import { groupArray } from '@streetwriters/notesnook-core/utils/grouping';
-import React from 'react';
-import NotesPage, { PLACEHOLDER_DATA } from '.';
-import { MoveNotes } from '../../components/sheets/move-notes/movenote';
-import { eSendEvent } from '../../services/event-manager';
-import Navigation, { NavigationProps, NotesScreenParams } from '../../services/navigation';
-import { db } from '../../common/database';
-import { eOpenAddTopicDialog } from '../../utils/events';
-import { TopicType } from '../../utils/types';
-import { openEditor } from './common';
+import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import React from "react";
+import NotesPage, { PLACEHOLDER_DATA } from ".";
+import { MoveNotes } from "../../components/sheets/move-notes/movenote";
+import { eSendEvent } from "../../services/event-manager";
+import Navigation, {
+  NavigationProps,
+  NotesScreenParams
+} from "../../services/navigation";
+import { db } from "../../common/database";
+import { eOpenAddTopicDialog } from "../../utils/events";
+import { TopicType } from "../../utils/types";
+import { openEditor } from "./common";
 
 const headerRightButtons = (params: NotesScreenParams) => [
   {
-    title: 'Edit topic',
+    title: "Edit topic",
     onPress: () => {
       const { item } = params;
-      if (item.type !== 'topic') return;
+      if (item.type !== "topic") return;
       eSendEvent(eOpenAddTopicDialog, {
         notebookId: item.notebookId,
         toEdit: item
@@ -22,16 +25,19 @@ const headerRightButtons = (params: NotesScreenParams) => [
     }
   },
   {
-    title: 'Move notes',
+    title: "Move notes",
     onPress: () => {
       const { item } = params;
-      if (item?.type !== 'topic') return;
+      if (item?.type !== "topic") return;
       MoveNotes.present(db.notebooks?.notebook(item.notebookId).data, item);
     }
   }
 ];
 
-export const TopicNotes = ({ navigation, route }: NavigationProps<'TopicNotes'>) => {
+export const TopicNotes = ({
+  navigation,
+  route
+}: NavigationProps<"TopicNotes">) => {
   return (
     <NotesPage
       navigation={navigation}
@@ -50,17 +56,19 @@ TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
   //@ts-ignore
   const { id, notebookId } = params.item;
   let notes = db.notebooks?.notebook(notebookId)?.topics.topic(id)?.all || [];
-  return grouped ? groupArray(notes, db.settings?.getGroupOptions('notes')) : notes;
+  return grouped
+    ? groupArray(notes, db.settings?.getGroupOptions("notes"))
+    : notes;
 };
 
 TopicNotes.navigate = (item: TopicType, canGoBack: boolean) => {
   if (!item) return;
-  Navigation.navigate<'TopicNotes'>(
+  Navigation.navigate<"TopicNotes">(
     {
-      name: 'TopicNotes',
+      name: "TopicNotes",
       title: item.title,
       id: item.id,
-      type: 'topic',
+      type: "topic",
       notebookId: item.notebookId
     },
     {

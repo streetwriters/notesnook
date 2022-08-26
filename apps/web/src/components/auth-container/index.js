@@ -16,29 +16,29 @@ const testimonials = [
     image: Grberk,
     name: "Glenn Berkshier",
     link: "https://twitter.com/grberk/status/1438955961490751489",
-    text: "Are you looking for an alternative to @evernote, or just looking for a more secure note taking platform? Take a look at @notesnook and see if it will fit your needs.",
+    text: "Are you looking for an alternative to @evernote, or just looking for a more secure note taking platform? Take a look at @notesnook and see if it will fit your needs."
   },
   {
     username: "HolensteinDan",
     image: Holenstein,
     name: "Dan Holenstein",
     link: "https://twitter.com/HolensteinDan/status/1439728355935342592",
-    text: "@notesnook app is what @evernote should have become long ago. And they're still improving.",
+    text: "@notesnook app is what @evernote should have become long ago. And they're still improving."
   },
   {
     username: "jasonbereklewis",
     image: Jason,
     name: "Jason Berek-Lewis",
     link: "https://twitter.com/jasonbereklewis/status/1438635808727044098",
-    text: "I work in content writing and communications. My day starts and ends in Notesnook. My Chrome app is always open; it's where I take all my notes. The clean design, focus mode, the tagging and color coding are all features that help keep my work organised every day.",
+    text: "I work in content writing and communications. My day starts and ends in Notesnook. My Chrome app is always open; it's where I take all my notes. The clean design, focus mode, the tagging and color coding are all features that help keep my work organised every day."
   },
   {
     username: "camflint",
     image: Cameron,
     name: "Cameron Flint",
     link: "https://twitter.com/camflint/status/1481061416434286592",
-    text: "I'm pretty impressed at the progress @notesnook are making on their app — particularly in respect to how performant the app runs and behaves, despite the overhead of end-to-end encrypting user data.",
-  },
+    text: "I'm pretty impressed at the progress @notesnook are making on their app — particularly in respect to how performant the app runs and behaves, despite the overhead of end-to-end encrypting user data."
+  }
 ];
 
 const titles = [
@@ -46,7 +46,7 @@ const titles = [
   "Privacy comes first.",
   "Take notes privately.",
   "Encrypted, private, secure.",
-  "❤️ = 🔒 + 🗒️",
+  "❤️ = 🔒 + 🗒️"
 ];
 
 function randomTestimonial() {
@@ -71,7 +71,7 @@ function AuthContainer(props) {
             position: "relative",
             overflow: "hidden",
             flexDirection: "column",
-            display: ["none", "none", "flex"],
+            display: ["none", "none", "flex"]
           }}
         >
           <Box
@@ -83,7 +83,7 @@ function AuthContainer(props) {
               position: "absolute",
               top: -100,
               left: 0,
-              height: "100%",
+              height: "100%"
               // opacity: 0.7,
             }}
           >
@@ -174,7 +174,7 @@ function AuthContainer(props) {
         <Flex
           flex={1.5}
           sx={{
-            position: "relative",
+            position: "relative"
           }}
           flexDirection="column"
         >
@@ -190,7 +190,7 @@ function AuthContainer(props) {
               right: 0,
               bottom: 0,
               width: "130%",
-              height: "100%",
+              height: "100%"
             }}
           >
             <path

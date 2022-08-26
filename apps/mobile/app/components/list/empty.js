@@ -1,49 +1,61 @@
-import React from 'react';
-import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { useTip } from '../../services/tip-manager';
-import { COLORS_NOTE } from '../../utils/color-scheme';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
-import Seperator from '../ui/seperator';
-import { Tip } from '../tip';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import { notesnook } from '../../../e2e/test.ids';
+import React from "react";
+import { ActivityIndicator, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useTip } from "../../services/tip-manager";
+import { COLORS_NOTE } from "../../utils/color-scheme";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
+import Seperator from "../ui/seperator";
+import { Tip } from "../tip";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import { notesnook } from "../../../e2e/test.ids";
 
 export const Empty = React.memo(
   ({ loading = true, placeholderData, headerProps, type, screen }) => {
-    const colors = useThemeStore(state => state.colors);
+    const colors = useThemeStore((state) => state.colors);
     const insets = useSafeAreaInsets();
     const { height } = useWindowDimensions();
-    const introCompleted = useSettingStore(state => state.settings.introCompleted);
+    const introCompleted = useSettingStore(
+      (state) => state.settings.introCompleted
+    );
 
     const tip = useTip(
-      screen === 'Notes' && introCompleted ? 'first-note' : placeholderData.type || type,
-      screen === 'Notes' ? 'notes' : null
+      screen === "Notes" && introCompleted
+        ? "first-note"
+        : placeholderData.type || type,
+      screen === "Notes" ? "notes" : null
     );
     const color =
-      colors[COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'];
+      colors[
+        COLORS_NOTE[headerProps.color?.toLowerCase()]
+          ? headerProps.color
+          : "accent"
+      ];
     return (
       <View
         style={[
           {
             height: height - (140 + insets.top),
-            width: '80%',
-            justifyContent: 'center',
-            alignSelf: 'center'
+            width: "80%",
+            justifyContent: "center",
+            alignSelf: "center"
           }
         ]}
       >
         {!loading ? (
           <>
             <Tip
-              color={COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'}
+              color={
+                COLORS_NOTE[headerProps.color?.toLowerCase()]
+                  ? headerProps.color
+                  : "accent"
+              }
               tip={tip || { text: placeholderData.paragraph }}
               style={{
-                backgroundColor: 'transparent',
+                backgroundColor: "transparent",
                 paddingHorizontal: 0
               }}
             />
@@ -56,11 +68,13 @@ export const Empty = React.memo(
                 icon="arrow-right"
                 onPress={placeholderData.action}
                 accentColor={
-                  COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'
+                  COLORS_NOTE[headerProps.color?.toLowerCase()]
+                    ? headerProps.color
+                    : "accent"
                 }
                 accentText="light"
                 style={{
-                  alignSelf: 'flex-start',
+                  alignSelf: "flex-start",
                   borderRadius: 5,
                   height: 40
                 }}
@@ -71,9 +85,9 @@ export const Empty = React.memo(
           <>
             <View
               style={{
-                alignSelf: 'center',
-                alignItems: 'flex-start',
-                width: '100%'
+                alignSelf: "center",
+                alignItems: "flex-start",
+                width: "100%"
               }}
             >
               <Heading>{placeholderData.heading}</Heading>
@@ -83,7 +97,9 @@ export const Empty = React.memo(
               <Seperator />
               <ActivityIndicator
                 size={SIZE.lg}
-                color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
+                color={
+                  COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent
+                }
               />
             </View>
           </>

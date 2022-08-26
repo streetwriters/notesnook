@@ -1,4 +1,4 @@
-import { DependencyList, EffectCallback, useEffect } from 'react';
+import { DependencyList, EffectCallback, useEffect } from "react";
 
 const useImmediateEffect = (callback: EffectCallback, deps: DependencyList) => {
   useEffect(() => {

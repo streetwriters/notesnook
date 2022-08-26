@@ -43,9 +43,9 @@ export const ToolButton = React.memo(
           mr: variant === "small" ? 0 : 1,
           ":hover": { bg: "hover" },
           ":last-of-type": {
-            mr: 0,
+            mr: 0
           },
-          ...sx,
+          ...sx
         }}
         onMouseDown={(e) => e.preventDefault()}
         {...buttonProps}

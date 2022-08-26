@@ -33,8 +33,8 @@ const features: Record<FeatureKeys, Feature> = {
     cta: {
       title: "Continue",
       icon: Icon.ArrowRight,
-      action: () => hardNavigate(getHomeRoute()),
-    },
+      action: () => hardNavigate(getHomeRoute())
+    }
   },
   highlights: {
     title: appVersion.isBeta
@@ -55,7 +55,7 @@ const features: Record<FeatureKeys, Feature> = {
                 the <Code text="Report an issue" /> button to report all bugs.
                 Thank you!
               </>
-            ),
+            )
           },
           {
             icon: Icon.Warn,
@@ -67,8 +67,8 @@ const features: Record<FeatureKeys, Feature> = {
                 use both simultaneously. You can switch once the beta version
                 enters stable.
               </>
-            ),
-          },
+            )
+          }
         ]
       : [
           {
@@ -85,15 +85,15 @@ const features: Record<FeatureKeys, Feature> = {
                 To add current date <em>and time</em> use{" "}
                 <Code text="Ctrl+Alt+d" /> or just type <Code text="/now" />.
               </>
-            ),
-          },
+            )
+          }
         ],
     cta: {
       title: "Got it",
       icon: Icon.Checkmark,
       action: () => {
         Config.set(`${appVersion.numerical}:highlights`, true);
-      },
+      }
     },
     shouldShow: () => {
       if (!features.highlights.subFeatures?.length) return false;
@@ -105,8 +105,8 @@ const features: Record<FeatureKeys, Feature> = {
       if (!hasShownAny) Config.set(key, true);
 
       return hasShownAny && !isTesting() && !hasShownBefore;
-    },
-  },
+    }
+  }
 };
 
 type FeatureDialogProps = {
@@ -142,7 +142,7 @@ function FeatureDialog(props: FeatureDialogProps) {
         onClick: () => {
           if (feature.cta.action) feature.cta.action();
           props.onClose(true);
-        },
+        }
       }}
     >
       <Flex flexDirection="column" overflowY="auto" mt={2}>
@@ -186,7 +186,7 @@ export function Code(props: CodeProps) {
         fontFamily: "monospace",
         fontSize: "subBody",
         border: "1px solid var(--border)",
-        cursor: props.href ? "pointer" : "unset",
+        cursor: props.href ? "pointer" : "unset"
       }}
       onClick={() => {
         if (props.href) window.open(props.href, "_target");

@@ -4,7 +4,7 @@ const DEFAULT_FONT_SIZE = document.getElementById("p").clientHeight - 1;
 const MAX_HEIGHTS = {
   note: SINGLE_LINE_HEIGHT * 7 * DEFAULT_FONT_SIZE,
   notebook: SINGLE_LINE_HEIGHT * 7 * DEFAULT_FONT_SIZE,
-  generic: SINGLE_LINE_HEIGHT * 4 * DEFAULT_FONT_SIZE,
+  generic: SINGLE_LINE_HEIGHT * 4 * DEFAULT_FONT_SIZE
 };
 
 function getNoteHeight(item) {

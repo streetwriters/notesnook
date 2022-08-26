@@ -139,7 +139,7 @@ export function EditLink(props: ToolProps) {
         return {
           text: selectedText,
           href: mark.attrs.href,
-          isImage: node.type.name === ImageNode.name,
+          isImage: node.type.name === ImageNode.name
         };
       }}
     />
@@ -156,7 +156,7 @@ export function RemoveLink(props: ToolProps) {
         if (selectedNode)
           editor.current?.commands.setTextSelection({
             from: selectedNode.from,
-            to: selectedNode.to,
+            to: selectedNode.to
           });
         editor.current?.chain().focus().unsetLink().run();
       }}
@@ -226,7 +226,7 @@ function LinkTool(props: LinkToolProps) {
           isTargetAbsolute: true,
           location: "below",
           align: "center",
-          yOffset: 5,
+          yOffset: 5
         }}
         title={isEditing ? "Edit link" : "Insert link"}
         isOpen={isOpen}

@@ -53,7 +53,7 @@ function Notes() {
       button={{
         content: "Make a new note",
         onClick: () =>
-          hashNavigate("/notes/create", { addNonce: true, replace: true }),
+          hashNavigate("/notes/create", { addNonce: true, replace: true })
       }}
     />
   );

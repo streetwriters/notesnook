@@ -33,7 +33,7 @@ const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
           {...props}
           style={{
             ...style,
-            backgroundColor: "var(--bgSecondaryText)",
+            backgroundColor: "var(--bgSecondaryText)"
           }}
         />
       )}
@@ -62,7 +62,7 @@ export function FlexScrollContainer({
         display: "flex",
         flexDirection: "column",
         flex: "1 1 auto",
-        ...style,
+        ...style
       }}
       renderView={({ style, ...props }) => (
         <Box
@@ -72,12 +72,12 @@ export function FlexScrollContainer({
             overflow: "auto",
             position: "relative",
             flex: "1 1 auto",
-            ...viewStyle,
+            ...viewStyle
           }}
           sx={{
             scrollbarWidth: "none",
             "::-webkit-scrollbar": { width: 0, height: 0 },
-            msOverflowStyle: "none",
+            msOverflowStyle: "none"
           }}
         />
       )}
@@ -86,7 +86,7 @@ export function FlexScrollContainer({
           {...props}
           style={{
             ...style,
-            backgroundColor: "var(--bgSecondaryText)",
+            backgroundColor: "var(--bgSecondaryText)"
           }}
         />
       )}

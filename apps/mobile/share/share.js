@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { getPreviewData } from '@flyerhq/react-native-link-preview';
-import { parseHTML } from '@streetwriters/notesnook-core/utils/htmlparser';
-import React, { useEffect, useRef, useState } from 'react';
+import { getPreviewData } from "@flyerhq/react-native-link-preview";
+import { parseHTML } from "@streetwriters/notesnook-core/utils/htmlparser";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,20 +14,23 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   View
-} from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import ShareExtension from 'rn-extensions-share';
-import isURL from 'validator/lib/isURL';
-import Editor from '../app/screens/editor';
-import { eSendEvent } from '../app/services/event-manager';
-import { getElevation } from '../app/utils';
-import { db } from '../app/common/database';
-import Storage from '../app/common/database/storage';
-import { eOnLoadNote } from '../app/utils/events';
-import { Search } from './search';
-import { useShareStore } from './store';
-const getLinkPreview = url => {
+} from "react-native";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets
+} from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import ShareExtension from "rn-extensions-share";
+import isURL from "validator/lib/isURL";
+import Editor from "../app/screens/editor";
+import { eSendEvent } from "../app/services/event-manager";
+import { getElevation } from "../app/utils";
+import { db } from "../app/common/database";
+import Storage from "../app/common/database/storage";
+import { eOnLoadNote } from "../app/utils/events";
+import { Search } from "./search";
+import { useShareStore } from "./store";
+const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
 async function sanitizeHtml(site) {
@@ -36,7 +39,7 @@ async function sanitizeHtml(site) {
     html = await html.text();
     return sanitize(html, site);
   } catch (e) {
-    return '';
+    return "";
   }
 }
 
@@ -45,51 +48,51 @@ function makeHtmlFromUrl(url) {
 }
 
 function makeHtmlFromPlainText(text) {
-  if (!text) return '';
+  if (!text) return "";
 
   return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text.replace(
     /(?:\r\n|\r|\n)/g,
-    '<br>'
+    "<br>"
   )}</p>`;
 }
 
 function getBaseUrl(site) {
-  var url = site.split('/').slice(0, 3).join('/');
+  var url = site.split("/").slice(0, 3).join("/");
   return url;
 }
 
 function wrapTablesWithDiv(document) {
-  const tables = document.getElementsByTagName('table');
+  const tables = document.getElementsByTagName("table");
   for (let table of tables) {
-    table.setAttribute('contenteditable', 'true');
-    const div = document.createElement('div');
-    div.setAttribute('contenteditable', 'false');
+    table.setAttribute("contenteditable", "true");
+    const div = document.createElement("div");
+    div.setAttribute("contenteditable", "false");
     div.innerHTML = table.outerHTML;
-    div.classList.add('table-container');
+    div.classList.add("table-container");
     table.replaceWith(div);
   }
   return document;
 }
 
 let elementBlacklist = [
-  'script',
-  'button',
-  'input',
-  'textarea',
-  'style',
-  'form',
-  'link',
-  'head',
-  'nav',
-  'iframe',
-  'canvas',
-  'select',
-  'dialog',
-  'footer'
+  "script",
+  "button",
+  "input",
+  "textarea",
+  "style",
+  "form",
+  "link",
+  "head",
+  "nav",
+  "iframe",
+  "canvas",
+  "select",
+  "dialog",
+  "footer"
 ];
 
 function removeInvalidElements(document) {
-  let elements = document.querySelectorAll(elementBlacklist.join(','));
+  let elements = document.querySelectorAll(elementBlacklist.join(","));
   for (let element of elements) {
     element.remove();
   }
@@ -97,34 +100,34 @@ function removeInvalidElements(document) {
 }
 
 function replaceSrcWithAbsoluteUrls(document, baseUrl) {
-  let images = document.querySelectorAll('img');
+  let images = document.querySelectorAll("img");
   console.log(images.length);
   for (var i = 0; i < images.length; i++) {
     let img = images[i];
     let url = getBaseUrl(baseUrl);
-    let src = img.getAttribute('src');
-    if (src.startsWith('/')) {
-      if (src.startsWith('//')) {
-        src = src.replace('//', 'https://');
+    let src = img.getAttribute("src");
+    if (src.startsWith("/")) {
+      if (src.startsWith("//")) {
+        src = src.replace("//", "https://");
       } else {
         src = url + src;
       }
     }
-    if (src.startsWith('data:')) {
+    if (src.startsWith("data:")) {
       img.remove();
     } else {
-      img.setAttribute('src', src);
+      img.setAttribute("src", src);
     }
   }
-  console.log('end');
+  console.log("end");
   return document;
 }
 
 function fixCodeBlocks(document) {
-  let elements = document.querySelectorAll('code,pre');
+  let elements = document.querySelectorAll("code,pre");
 
   for (let element of elements) {
-    element.classList.add('.hljs');
+    element.classList.add(".hljs");
   }
   return document;
 }
@@ -144,33 +147,33 @@ let defaultNote = {
   title: null,
   id: null,
   content: {
-    type: 'tiptap',
+    type: "tiptap",
     data: null
   }
 };
 
 const modes = {
   1: {
-    type: 'text',
-    title: 'Plain text',
-    icon: 'card-text-outline'
+    type: "text",
+    title: "Plain text",
+    icon: "card-text-outline"
   },
   2: {
-    type: 'clip',
-    title: 'Web clip',
-    icon: 'web'
+    type: "clip",
+    title: "Web clip",
+    icon: "web"
   },
   3: {
-    type: 'link',
-    title: 'Link',
-    icon: 'link'
+    type: "link",
+    title: "Link",
+    icon: "link"
   }
 };
 
 const ShareView = ({ quicknote = false }) => {
-  const colors = useShareStore(state => state.colors);
-  const accent = useShareStore(state => state.accent);
-  const appendNote = useShareStore(state => state.appendNote);
+  const colors = useShareStore((state) => state.colors);
+  const accent = useShareStore((state) => state.accent);
+  const appendNote = useShareStore((state) => state.appendNote);
   const [note, setNote] = useState({ ...defaultNote });
   const noteContent = useRef();
   const [loadingIntent, setLoadingIntent] = useState(true);
@@ -184,32 +187,41 @@ const ShareView = ({ quicknote = false }) => {
   const [mode, setMode] = useState(1);
   const keyboardHeight = useRef(0);
   const { width, height } = useWindowDimensions();
-  const insets = Platform.OS === 'android' ? { top: StatusBar.currentHeight } : useSafeAreaInsets();
+  const insets =
+    Platform.OS === "android"
+      ? { top: StatusBar.currentHeight }
+      : useSafeAreaInsets();
   const [showSearch, setShowSearch] = useState(false);
   const [kh, setKh] = useState(0);
   const editorRef = useRef();
 
-  const onKeyboardDidShow = event => {
+  const onKeyboardDidShow = (event) => {
     let kHeight = event.endCoordinates.height;
     keyboardHeight.current = kHeight;
     setKh(kHeight);
-    console.log('keyboard show/hide');
+    console.log("keyboard show/hide");
   };
 
   const onKeyboardDidHide = () => {
     keyboardHeight.current = 0;
     setKh(0);
-    console.log('keyboard hide');
+    console.log("keyboard hide");
   };
 
   useEffect(() => {
     useShareStore.getState().setAccent();
     let keyboardWillChangeFrame = Keyboard.addListener(
-      'keyboardWillChangeFrame',
+      "keyboardWillChangeFrame",
       onKeyboardWillChangeFrame
     );
-    let keyboardDidShow = Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
-    let keyboardDidHide = Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
+    let keyboardDidShow = Keyboard.addListener(
+      "keyboardDidShow",
+      onKeyboardDidShow
+    );
+    let keyboardDidHide = Keyboard.addListener(
+      "keyboardDidHide",
+      onKeyboardDidHide
+    );
     return () => {
       keyboardWillChangeFrame?.remove();
       keyboardDidShow?.remove();
@@ -217,7 +229,7 @@ const ShareView = ({ quicknote = false }) => {
     };
   }, []);
 
-  const onKeyboardWillChangeFrame = event => {
+  const onKeyboardWillChangeFrame = (event) => {
     setFloating(event.endCoordinates.width !== width);
   };
 
@@ -240,14 +252,14 @@ const ShareView = ({ quicknote = false }) => {
       const data = await ShareExtension.data();
       if (!data || data.length === 0) {
         setRawData({
-          value: ''
+          value: ""
         });
         setLoadingIntent(false);
         return;
       }
       let note = { ...defaultNote };
       for (let item of data) {
-        if (item.type === 'text') {
+        if (item.type === "text") {
           setRawData(item);
           if (isURL(item.value)) {
             note = await showLinkPreview(note, item.value);
@@ -258,7 +270,7 @@ const ShareView = ({ quicknote = false }) => {
         }
       }
       setNote({ ...note });
-      console.log(data, 'share data');
+      console.log(data, "share data");
       onLoad();
     } catch (e) {}
     setLoadingIntent(false);
@@ -278,21 +290,21 @@ const ShareView = ({ quicknote = false }) => {
     setLoadingIntent(true);
     setLoadingExtension(true);
     if (quicknote) {
-      ShareExtension.openURL('ShareMedia://MainApp');
+      ShareExtension.openURL("ShareMedia://MainApp");
     } else {
       ShareExtension.close();
     }
   };
 
-  const onLoad = editor => {
+  const onLoad = (editor) => {
     if (editor) {
-      Storage.write('shareExtensionOpened', 'opened');
+      Storage.write("shareExtensionOpened", "opened");
       return loadData();
     }
-    eSendEvent(eOnLoadNote + 'shareEditor', {
+    eSendEvent(eOnLoadNote + "shareEditor", {
       id: null,
       content: {
-        type: 'tiptap',
+        type: "tiptap",
         data: noteContent.current
       },
       forced: true
@@ -306,7 +318,7 @@ const ShareView = ({ quicknote = false }) => {
 
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
-      Alert.alert('The note you are trying to append to has been deleted.');
+      Alert.alert("The note you are trying to append to has been deleted.");
       return;
     }
 
@@ -315,8 +327,8 @@ const ShareView = ({ quicknote = false }) => {
       let raw = await db.content.raw(appendNote.contentId);
       _note = {
         content: {
-          data: raw.data + '\n' + noteContent.current,
-          type: 'tiptap'
+          data: raw.data + "\n" + noteContent.current,
+          type: "tiptap"
         },
         id: appendNote.id,
         sessionId: Date.now()
@@ -327,7 +339,7 @@ const ShareView = ({ quicknote = false }) => {
       _note.sessionId = Date.now();
     }
     await db.notes.add(_note);
-    await Storage.write('notesAddedFromIntent', 'added');
+    await Storage.write("notesAddedFromIntent", "added");
     close();
     setLoading(false);
   };
@@ -336,14 +348,14 @@ const ShareView = ({ quicknote = false }) => {
     useShareStore.getState().setColors();
   }, [note]);
 
-  const changeMode = async m => {
+  const changeMode = async (m) => {
     setMode(m);
 
     setLoading(true);
     try {
       if (m === 2) {
         let html = await sanitizeHtml(rawData.value);
-        setNote(note => {
+        setNote((note) => {
           note.content.data = html;
           noteContent.current = html;
           onLoad();
@@ -353,7 +365,7 @@ const ShareView = ({ quicknote = false }) => {
         let html = isURL(rawData.value)
           ? makeHtmlFromUrl(rawData.value)
           : makeHtmlFromPlainText(rawData.value);
-        setNote(note => {
+        setNote((note) => {
           note.content.data = html;
           noteContent.current = html;
           onLoad();
@@ -371,22 +383,22 @@ const ShareView = ({ quicknote = false }) => {
       style={{
         width: width > 500 ? 500 : width,
         height: quicknote ? height : height - kh,
-        alignSelf: 'center',
-        justifyContent: quicknote ? 'flex-start' : 'flex-end'
+        alignSelf: "center",
+        justifyContent: quicknote ? "flex-start" : "flex-end"
       }}
     >
       {quicknote && !showSearch ? (
         <View
           style={{
-            width: '100%',
+            width: "100%",
             backgroundColor: colors.bg,
             height: 50 + insets.top,
             paddingTop: insets.top,
             ...getElevation(1),
             marginTop: -insets.top,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between"
           }}
         >
           <Button
@@ -395,7 +407,7 @@ const ShareView = ({ quicknote = false }) => {
             iconColor={colors.pri}
             onPress={() => {
               if (showSearch) {
-                console.log('hide search');
+                console.log("hide search");
                 setShowSearch(false);
               } else {
                 close();
@@ -413,7 +425,7 @@ const ShareView = ({ quicknote = false }) => {
             style={{
               color: colors.pri,
               fontSize: 17,
-              fontFamily: 'OpenSans-Regular'
+              fontFamily: "OpenSans-Regular"
             }}
           >
             Quick note
@@ -437,23 +449,23 @@ const ShareView = ({ quicknote = false }) => {
           activeOpacity={1}
           onPress={() => {
             if (showSearch) {
-              console.log('hide search');
+              console.log("hide search");
               setShowSearch(false);
             } else {
               close();
             }
           }}
           style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute'
+            width: "100%",
+            height: "100%",
+            position: "absolute"
           }}
         >
           <View
             style={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'white',
+              width: "100%",
+              height: "100%",
+              backgroundColor: "white",
               opacity: 0.01
             }}
           />
@@ -474,28 +486,28 @@ const ShareView = ({ quicknote = false }) => {
       <View
         style={{
           paddingVertical: 25,
-          backgroundColor: 'transparent',
+          backgroundColor: "transparent",
           marginBottom: insets.top,
-          display: showSearch ? 'none' : 'flex'
+          display: showSearch ? "none" : "flex"
         }}
       >
         <View
           style={{
-            maxHeight: '100%',
+            maxHeight: "100%",
             paddingHorizontal: 12
           }}
         >
           <ScrollView
             horizontal
             contentContainerStyle={{
-              alignItems: 'center',
+              alignItems: "center",
               height: 50
             }}
             style={{
-              width: '100%',
+              width: "100%",
               height: 50,
               borderRadius: 10,
-              flexDirection: 'row',
+              flexDirection: "row",
               bottom: -10
             }}
           >
@@ -528,7 +540,9 @@ const ShareView = ({ quicknote = false }) => {
               icon="text-short"
               iconSize={18}
               iconColor={appendNote ? accent.color : colors.icon}
-              title={`${appendNote ? appendNote.title.slice(0, 25) : 'Append to note'}`}
+              title={`${
+                appendNote ? appendNote.title.slice(0, 25) : "Append to note"
+              }`}
               textColor={appendNote ? accent.color : colors.icon}
               type="rounded"
               textStyle={{
@@ -544,7 +558,7 @@ const ShareView = ({ quicknote = false }) => {
 
           <View
             style={{
-              width: '100%'
+              width: "100%"
             }}
           >
             <View
@@ -554,12 +568,12 @@ const ShareView = ({ quicknote = false }) => {
                 borderRadius: 10,
                 ...getElevation(quicknote ? 1 : 5),
                 backgroundColor: colors.bg,
-                overflow: 'hidden'
+                overflow: "hidden"
               }}
             >
               <View
                 style={{
-                  width: '100%',
+                  width: "100%",
                   height: height * 0.3,
                   paddingBottom: 15,
                   borderRadius: 10
@@ -585,7 +599,7 @@ const ShareView = ({ quicknote = false }) => {
                       onLoad={() => {
                         onLoad(true);
                       }}
-                      onChange={html => {
+                      onChange={(html) => {
                         noteContent.current = html;
                       }}
                     />
@@ -598,37 +612,37 @@ const ShareView = ({ quicknote = false }) => {
                   style={{
                     fontSize: 12,
                     color: colors.icon,
-                    fontFamily: 'OpenSans-Regular',
+                    fontFamily: "OpenSans-Regular",
                     paddingHorizontal: 12,
                     marginBottom: 10,
-                    flexWrap: 'wrap'
+                    flexWrap: "wrap"
                   }}
                 >
-                  Above content will append to{' '}
+                  Above content will append to{" "}
                   <Text
                     style={{
                       color: accent.color,
-                      fontFamily: 'OpenSans-SemiBold'
+                      fontFamily: "OpenSans-SemiBold"
                     }}
                   >
                     "{appendNote.title}"
-                  </Text>{' '}
+                  </Text>{" "}
                   . Click on "New note" to create a new note.
                 </Text>
               ) : null}
 
               <View
                 style={{
-                  flexDirection: 'row',
+                  flexDirection: "row",
                   paddingHorizontal: 12,
-                  alignItems: 'flex-end',
-                  justifyContent: 'space-between',
-                  width: '100%'
+                  alignItems: "flex-end",
+                  justifyContent: "space-between",
+                  width: "100%"
                 }}
               >
                 <View
                   style={{
-                    flexDirection: 'row'
+                    flexDirection: "row"
                   }}
                 >
                   {rawData.value && isURL(rawData.value) ? (
@@ -680,7 +694,7 @@ const ShareView = ({ quicknote = false }) => {
 
           <View
             style={{
-              height: Platform.isPad ? 150 : Platform.OS === 'ios' ? 110 : 0
+              height: Platform.isPad ? 150 : Platform.OS === "ios" ? 110 : 0
             }}
           />
         </View>
@@ -698,9 +712,9 @@ const Button = ({
   textStyle,
   icon,
   iconSize = 22,
-  type = 'button',
-  iconColor = 'gray',
-  textColor = 'white',
+  type = "button",
+  iconColor = "gray",
+  textColor = "white",
   fontSize = 18
 }) => {
   const types = {
@@ -718,9 +732,9 @@ const Button = ({
       style: {
         height: 50,
         borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
         marginBottom: 10,
         minWidth: 80,
         paddingHorizontal: 20
@@ -751,9 +765,9 @@ const Button = ({
           backgroundColor: color,
           height: 50,
           borderRadius: 5,
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'row',
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
           marginBottom: 10,
           minWidth: 80,
           paddingHorizontal: 20
@@ -764,14 +778,16 @@ const Button = ({
     >
       {loading ? <ActivityIndicator color={iconColor} /> : null}
 
-      {icon && !loading ? <Icon name={icon} size={iconSize} color={iconColor || 'white'} /> : null}
+      {icon && !loading ? (
+        <Icon name={icon} size={iconSize} color={iconColor || "white"} />
+      ) : null}
 
       {title ? (
         <Text
           style={[
             {
               fontSize: fontSize || 18,
-              fontFamily: 'OpenSans-Regular',
+              fontFamily: "OpenSans-Regular",
               color: textColor,
               marginLeft: loading ? 10 : 0
             },

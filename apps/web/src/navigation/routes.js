@@ -21,9 +21,9 @@ const routes = {
     component: <Home />,
     buttons: {
       search: {
-        title: "Search notes",
-      },
-    },
+        title: "Search notes"
+      }
+    }
   }),
   "/notebooks": () => ({
     key: "notebooks",
@@ -32,9 +32,9 @@ const routes = {
     component: <Notebooks />,
     buttons: {
       search: {
-        title: "Search notebooks",
-      },
-    },
+        title: "Search notebooks"
+      }
+    }
   }),
   "/notebooks/:notebookId": ({ notebookId }) => {
     const notebook = db.notebooks.notebook(notebookId);
@@ -47,12 +47,12 @@ const routes = {
       buttons: {
         back: {
           title: "Go back to notebooks",
-          action: () => navigate("/notebooks"),
+          action: () => navigate("/notebooks")
         },
         search: {
-          title: `Search ${notebook.title} topics`,
-        },
-      },
+          title: `Search ${notebook.title} topics`
+        }
+      }
     };
   },
   "/notebooks/:notebookId/:topicId": ({ notebookId, topicId }) => {
@@ -61,7 +61,7 @@ const routes = {
     if (!topic) return false;
     notestore.setContext({
       type: "topic",
-      value: { id: notebookId, topic: topicId },
+      value: { id: notebookId, topic: topicId }
     });
     return {
       key: "notes",
@@ -77,12 +77,12 @@ const routes = {
       buttons: {
         back: {
           title: `Go back to ${notebook.title}`,
-          action: () => navigate(`/notebooks/${notebookId}`),
+          action: () => navigate(`/notebooks/${notebookId}`)
         },
         search: {
-          title: `Search ${notebook.title} ${topic.title} notes`,
-        },
-      },
+          title: `Search ${notebook.title} ${topic.title} notes`
+        }
+      }
     };
   },
   "/favorites": () => {
@@ -94,9 +94,9 @@ const routes = {
       component: <Notes />,
       buttons: {
         search: {
-          title: "Search favorite notes",
-        },
-      },
+          title: "Search favorite notes"
+        }
+      }
     };
   },
   "/trash": () => ({
@@ -106,9 +106,9 @@ const routes = {
     component: <Trash />,
     buttons: {
       search: {
-        title: "Search trash",
-      },
-    },
+        title: "Search trash"
+      }
+    }
   }),
   "/tags": () => ({
     key: "tags",
@@ -117,9 +117,9 @@ const routes = {
     component: <Tags />,
     buttons: {
       search: {
-        title: "Search tags",
-      },
-    },
+        title: "Search tags"
+      }
+    }
   }),
   "/tags/:tagId": ({ tagId }) => {
     const tag = db.tags.tag(tagId);
@@ -135,12 +135,12 @@ const routes = {
       buttons: {
         back: {
           title: "Go back to tags",
-          action: () => navigate("/tags"),
+          action: () => navigate("/tags")
         },
         search: {
-          title: `Search #${title} notes`,
-        },
-      },
+          title: `Search #${title} notes`
+        }
+      }
     };
   },
   "/colors/:colorId": ({ colorId }) => {
@@ -156,15 +156,15 @@ const routes = {
       component: <Notes />,
       buttons: {
         search: {
-          title: `Search ${title} colored notes`,
-        },
-      },
+          title: `Search ${title} colored notes`
+        }
+      }
     };
   },
   "/settings": () => ({
     key: "settings",
     title: "Settings",
-    component: <Settings />,
+    component: <Settings />
   }),
   "/monographs": () => {
     notestore.setContext({ type: "monographs" });
@@ -175,9 +175,9 @@ const routes = {
       component: <Notes />,
       buttons: {
         search: {
-          title: "Search monograph notes",
-        },
-      },
+          title: "Search monograph notes"
+        }
+      }
     };
   },
   "/search/:type": ({ type }) => ({
@@ -187,10 +187,10 @@ const routes = {
     buttons: {
       back: {
         title: `Go back to ${type}`,
-        action: () => window.history.back(),
-      },
-    },
-  }),
+        action: () => window.history.back()
+      }
+    }
+  })
 };
 
 export default routes;

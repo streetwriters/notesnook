@@ -17,7 +17,7 @@ export const SelectionPersist = Extension.create({
         props: {
           decorations(state) {
             return key.getState(state);
-          },
+          }
         },
         state: {
           init() {
@@ -48,16 +48,16 @@ export const SelectionPersist = Extension.create({
             if (isBlurred) {
               return DecorationSet.create(tr.doc, [
                 Decoration.inline(from, to, {
-                  style: `background-color: var(--dimPrimary)`,
-                }),
+                  style: `background-color: var(--dimPrimary)`
+                })
               ]);
             } else if (isFocused) {
               return DecorationSet.empty;
             }
             return DecorationSet.empty;
-          },
-        },
-      }),
+          }
+        }
+      })
     ];
-  },
+  }
 });

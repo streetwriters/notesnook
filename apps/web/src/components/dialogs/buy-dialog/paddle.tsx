@@ -9,7 +9,7 @@ import {
   PaddleEvents,
   Plan,
   Price,
-  PricingInfo,
+  PricingInfo
 } from "./types";
 
 // const isDev = false; // process.env.NODE_ENV === "development";
@@ -20,7 +20,7 @@ const SUBSCRIBED_EVENTS: PaddleEvents[] = [
   PaddleEvents["Checkout.Loaded"],
   PaddleEvents["Checkout.Coupon.Applied"],
   PaddleEvents["Checkout.Coupon.Remove"],
-  PaddleEvents["Checkout.Location.Submit"],
+  PaddleEvents["Checkout.Location.Submit"]
 ];
 
 type PaddleCheckoutProps = {
@@ -117,7 +117,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
     onPriceUpdated,
     plan,
     reloadCheckout,
-    updatePrice,
+    updatePrice
   ]);
 
   return (
@@ -145,7 +145,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
           flex: 1,
           outline: "none",
           border: "none",
-          minHeight: 500,
+          minHeight: 500
         }}
       />
     </Flex>
@@ -185,12 +185,12 @@ function getPricingInfo(plan: Plan, checkoutData: CheckoutData): PricingInfo {
     currency: price.currency,
     discount: {
       amount: discount?.gross_discount || 0,
-      recurring: isRecurringDiscount,
+      recurring: isRecurringDiscount
     },
     period: plan.period,
     price: normalizeCheckoutPrice(price),
     recurringPrice: normalizeCheckoutPrice(recurringPrice),
-    coupon: discount?.code,
+    coupon: discount?.code
   };
 }
 
@@ -200,7 +200,7 @@ function normalizeCheckoutPrice(prices: CheckoutPrices): Price {
     gross: price.gross,
     net: price.net,
     tax: price.tax,
-    currency: prices.currency,
+    currency: prices.currency
   };
 }
 
@@ -215,7 +215,7 @@ async function applyCoupon(
   const response = await fetch(url, {
     body: JSON.stringify(body),
     headers,
-    method: "POST",
+    method: "POST"
   });
   if (!response.ok) return false;
   const json = (await response.json()) as CheckoutDataResponse;
@@ -229,7 +229,7 @@ async function removeCoupon(checkoutId: string): Promise<CheckoutData | false> {
   const url = ` https://checkout-service.paddle.com/checkout/${checkoutId}/coupon`;
 
   const response = await fetch(url, {
-    method: "DELETE",
+    method: "DELETE"
   });
   if (!response.ok) return false;
   const json = (await response.json()) as CheckoutDataResponse;
@@ -247,7 +247,7 @@ async function sendCheckoutEvent(checkoutId: string, eventName: PaddleEvents) {
   const response = await fetch(url, {
     body: JSON.stringify(body),
     headers,
-    method: "POST",
+    method: "POST"
   });
   return response.ok;
 }

@@ -12,7 +12,7 @@ function NotesPlaceholder() {
         text: "Make your first note",
         icon: Icon.Plus,
         onClick: () =>
-          hashNavigate("/notes/create", { replace: true, addNonce: true }),
+          hashNavigate("/notes/create", { replace: true, addNonce: true })
       }}
     />
   );

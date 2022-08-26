@@ -10,7 +10,7 @@ import {
   Superscript,
   ClearFormatting,
   CodeRemove,
-  Math,
+  Math
 } from "./inline";
 import { InsertBlock } from "./block";
 import { FontSize, FontFamily } from "./font";
@@ -40,26 +40,26 @@ import {
   CellBackgroundColor,
   CellBorderColor,
   CellTextColor,
-  CellBorderWidth,
+  CellBorderWidth
 } from "./table";
 import {
   ImageSettings,
   ImageAlignCenter,
   ImageAlignLeft,
   ImageAlignRight,
-  ImageProperties,
+  ImageProperties
 } from "./image";
 import {
   AttachmentSettings,
   DownloadAttachment,
-  RemoveAttachment,
+  RemoveAttachment
 } from "./attachment";
 import {
   EmbedAlignCenter,
   EmbedAlignLeft,
   EmbedAlignRight,
   EmbedProperties,
-  EmbedSettings,
+  EmbedSettings
 } from "./embed";
 import { AddLink, EditLink, RemoveLink, LinkSettings, OpenLink } from "./link";
 
@@ -130,7 +130,7 @@ const tools = {
   deleteTable: DeleteTable,
 
   outdent: Outdent,
-  indent: Indent,
+  indent: Indent
 };
 
 export function findTool(id: ToolId): React.FunctionComponent<ToolProps> {

@@ -31,7 +31,7 @@ function DiffViewer(props) {
       await db.notes.add({
         id: conflictedNote.id,
         dateEdited: toKeepDateEdited,
-        conflicted: false,
+        conflicted: false
       });
 
       await db.content.add({
@@ -40,17 +40,17 @@ function DiffViewer(props) {
         type: "tiptap",
         dateResolved,
         conflicted: false,
-        sessionId: Date.now(),
+        sessionId: Date.now()
       });
 
       if (toCopy) {
         const toCopyContent = {
           data: toCopy,
-          type: "tiptap",
+          type: "tiptap"
         };
         await db.notes.add({
           content: toCopyContent,
-          title: conflictedNote.title + " (COPY)",
+          title: conflictedNote.title + " (COPY)"
         });
       }
 
@@ -86,7 +86,7 @@ function DiffViewer(props) {
       if (!content.conflicted)
         return resolveConflict({
           toKeep: content.data,
-          toKeepDateEdited: content.dateEdited,
+          toKeepDateEdited: content.dateEdited
         });
 
       setConflictedNote(note);
@@ -119,7 +119,7 @@ function DiffViewer(props) {
           flexShrink: 0,
           whiteSpace: "nowrap",
           overflow: "hidden",
-          textOverflow: "ellipsis",
+          textOverflow: "ellipsis"
         }}
       >
         {conflictedNote.title}
@@ -136,12 +136,12 @@ function DiffViewer(props) {
               await Promise.all([
                 db.content.downloadMedia(noteId, {
                   data: htmlDiff.before,
-                  type: localContent.type,
+                  type: localContent.type
                 }),
                 db.content.downloadMedia(noteId, {
                   data: htmlDiff.after,
-                  type: remoteContent.type,
-                }),
+                  type: remoteContent.type
+                })
               ]);
             } finally {
               setIsDownloadingImages(false);
@@ -184,7 +184,7 @@ function DiffViewer(props) {
                   toKeep: remoteContent.data,
                   toCopy: saveCopy ? localContent.data : null,
                   toKeepDateEdited: localContent.dateEdited,
-                  dateResolved: remoteContent.dateModified,
+                  dateResolved: remoteContent.dateModified
                 });
               }}
               sx={{
@@ -193,7 +193,7 @@ function DiffViewer(props) {
                 borderBottomWidth: 1,
                 borderColor: "border",
                 px: 2,
-                pb: 1,
+                pb: 1
               }}
             />
             <ScrollSyncPane>
@@ -206,7 +206,7 @@ function DiffViewer(props) {
                   borderWidth: 0,
                   borderRightWidth: [0, 0, 1],
                   borderBottomWidth: [1, 1, 0],
-                  borderColor: "border",
+                  borderColor: "border"
                 }}
               >
                 <Editor
@@ -230,7 +230,7 @@ function DiffViewer(props) {
                   toKeep: localContent.data,
                   toCopy: saveCopy ? remoteContent.data : null,
                   toKeepDateEdited: remoteContent.dateEdited,
-                  dateResolved: remoteContent.dateModified,
+                  dateResolved: remoteContent.dateModified
                 });
               }}
               label="Incoming note"
@@ -246,7 +246,7 @@ function DiffViewer(props) {
                 borderColor: "border",
                 px: 2,
                 pb: 1,
-                pt: [1, 1, 0],
+                pt: [1, 1, 0]
               }}
             />
             <ScrollSyncPane>

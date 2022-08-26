@@ -1,43 +1,43 @@
-import { Platform } from 'react-native';
-import { Monographs } from '../screens/notes/monographs';
-import { eSendEvent } from '../services/event-manager';
-import Navigation from '../services/navigation';
-import { refreshNotesPage } from './events';
+import { Platform } from "react-native";
+import { Monographs } from "../screens/notes/monographs";
+import { eSendEvent } from "../services/event-manager";
+import Navigation from "../services/navigation";
+import { refreshNotesPage } from "./events";
 
 export const STORE_LINK =
-  Platform.OS === 'ios'
-    ? 'https://apps.apple.com/us/app/notesnook/id1544027013'
-    : 'https://play.google.com/store/apps/details?id=com.streetwriters.notesnook';
+  Platform.OS === "ios"
+    ? "https://apps.apple.com/us/app/notesnook/id1544027013"
+    : "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook";
 
 export const GROUP = {
-  default: 'default',
-  None: 'none',
-  abc: 'abc',
-  year: 'year',
-  week: 'week',
-  month: 'month'
+  default: "default",
+  None: "none",
+  abc: "abc",
+  year: "year",
+  week: "week",
+  month: "month"
 };
 
 export const SORT = {
-  dateEdited: 'Date edited',
-  dateCreated: 'Date created',
-  title: 'Title'
+  dateEdited: "Date edited",
+  dateCreated: "Date created",
+  title: "Title"
 };
 
 export const itemSkus = [
-  'com.streetwriters.notesnook.sub.mo',
-  'com.streetwriters.notesnook.sub.yr',
-  'com.streetwriters.notesnook.sub.yr.15',
-  'com.streetwriters.notesnook.sub.mo.15',
-  'com.streetwriters.notesnook.sub.mo.ofr',
-  'com.streetwriters.notesnook.sub.yr.trialoffer',
-  'com.streetwriters.notesnook.sub.mo.trialoffer',
-  'com.streetwriters.notesnook.sub.mo.tier1',
-  'com.streetwriters.notesnook.sub.yr.tier1',
-  'com.streetwriters.notesnook.sub.mo.tier2',
-  'com.streetwriters.notesnook.sub.yr.tier2',
-  'com.streetwriters.notesnook.sub.mo.tier3',
-  'com.streetwriters.notesnook.sub.yr.tier3'
+  "com.streetwriters.notesnook.sub.mo",
+  "com.streetwriters.notesnook.sub.yr",
+  "com.streetwriters.notesnook.sub.yr.15",
+  "com.streetwriters.notesnook.sub.mo.15",
+  "com.streetwriters.notesnook.sub.mo.ofr",
+  "com.streetwriters.notesnook.sub.yr.trialoffer",
+  "com.streetwriters.notesnook.sub.mo.trialoffer",
+  "com.streetwriters.notesnook.sub.mo.tier1",
+  "com.streetwriters.notesnook.sub.yr.tier1",
+  "com.streetwriters.notesnook.sub.mo.tier2",
+  "com.streetwriters.notesnook.sub.yr.tier2",
+  "com.streetwriters.notesnook.sub.mo.tier3",
+  "com.streetwriters.notesnook.sub.yr.tier3"
 ];
 
 export const SUBSCRIPTION_STATUS = {
@@ -50,92 +50,92 @@ export const SUBSCRIPTION_STATUS = {
 };
 
 export const SUBSCRIPTION_STATUS_STRINGS = {
-  0: 'Basic',
-  1: 'Trial',
-  2: Platform.OS === 'ios' ? 'Pro' : 'Beta',
-  5: 'Pro',
-  6: 'Expired',
-  7: 'Pro'
+  0: "Basic",
+  1: "Trial",
+  2: Platform.OS === "ios" ? "Pro" : "Beta",
+  5: "Pro",
+  6: "Expired",
+  7: "Pro"
 };
 
 export const SUBSCRIPTION_PROVIDER = {
   0: null,
   1: {
-    type: 'iOS',
-    title: 'Subscribed on iOS',
-    desc: 'You subscribed to Notesnook Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings.',
-    icon: 'ios'
+    type: "iOS",
+    title: "Subscribed on iOS",
+    desc: "You subscribed to Notesnook Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings.",
+    icon: "ios"
   },
   2: {
-    type: 'Android',
-    title: 'Subscribed on Android',
-    desc: 'You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase.',
-    icon: 'android'
+    type: "Android",
+    title: "Subscribed on Android",
+    desc: "You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase.",
+    icon: "android"
   },
   3: {
-    type: 'Web',
-    title: 'Subscribed on Web',
-    desc: 'You subscribed to Notesnook Pro on the Web/Desktop App.',
-    icon: 'web'
+    type: "Web",
+    title: "Subscribed on Web",
+    desc: "You subscribed to Notesnook Pro on the Web/Desktop App.",
+    icon: "web"
   }
 };
 
 export const MenuItemsList = [
   {
-    name: 'Notes',
-    icon: 'home-variant-outline',
+    name: "Notes",
+    icon: "home-variant-outline",
     close: true
   },
   {
-    name: 'Notebooks',
-    icon: 'book-outline',
+    name: "Notebooks",
+    icon: "book-outline",
     close: true
   },
   {
-    name: 'Favorites',
-    icon: 'star-outline',
+    name: "Favorites",
+    icon: "star-outline",
     close: true
   },
   {
-    name: 'Tags',
-    icon: 'pound',
+    name: "Tags",
+    icon: "pound",
     close: true
   },
   {
-    name: 'Monographs',
-    icon: 'text-box-multiple-outline',
+    name: "Monographs",
+    icon: "text-box-multiple-outline",
     close: true,
     func: () => {
       Monographs.navigate();
     }
   },
   {
-    name: 'Trash',
-    icon: 'delete-outline',
+    name: "Trash",
+    icon: "delete-outline",
     close: true
   }
 ];
 
 export const BUTTON_TYPES = {
   transparent: {
-    primary: 'transparent',
-    text: 'accent',
-    selected: 'nav'
+    primary: "transparent",
+    text: "accent",
+    selected: "nav"
   },
   gray: {
-    primary: 'transparent',
-    text: 'icon',
-    selected: 'transGray'
+    primary: "transparent",
+    text: "icon",
+    selected: "transGray"
   },
   grayBg: {
-    primary: 'nav',
-    text: 'icon',
-    selected: 'nav'
+    primary: "nav",
+    text: "icon",
+    selected: "nav"
   },
   grayAccent: {
-    primary: 'nav',
-    text: 'accent',
-    selected: 'nav'
+    primary: "nav",
+    text: "accent",
+    selected: "nav"
   },
   accent: (themeColor, text) => ({
     primary: themeColor,
@@ -143,49 +143,49 @@ export const BUTTON_TYPES = {
     selected: themeColor
   }),
   inverted: {
-    primary: 'bg',
-    text: 'accent',
-    selected: 'bg'
+    primary: "bg",
+    text: "accent",
+    selected: "bg"
   },
   white: {
-    primary: 'transparent',
-    text: 'light',
-    selected: 'transGray'
+    primary: "transparent",
+    text: "light",
+    selected: "transGray"
   },
   shade: {
-    primary: 'shade',
-    text: 'accent',
-    selected: 'accent',
+    primary: "shade",
+    text: "accent",
+    selected: "accent",
     opacity: 0.12
   },
   error: {
-    primary: 'red',
-    text: 'red',
-    selected: 'red',
+    primary: "red",
+    text: "red",
+    selected: "red",
     opacity: 0.12
   },
   errorShade: {
-    primary: 'transparent',
-    text: 'red',
-    selected: 'red',
+    primary: "transparent",
+    text: "red",
+    selected: "red",
     opacity: 0.12
   },
   warn: {
-    primary: 'warningBg',
-    text: 'warningText',
-    selected: 'warningBg',
+    primary: "warningBg",
+    text: "warningText",
+    selected: "warningBg",
     opacity: 0.12
   }
 };
 
 export const bgTaskOptions = {
-  taskName: 'notesnookSync',
-  taskTitle: 'Notesnook Sync',
-  taskDesc: 'Syncing your notes.',
+  taskName: "notesnookSync",
+  taskTitle: "Notesnook Sync",
+  taskDesc: "Syncing your notes.",
   taskIcon: {
-    name: 'ic_stat_name',
-    type: 'drawable'
+    name: "ic_stat_name",
+    type: "drawable"
   },
-  color: '#ffffff',
-  linkingURI: 'com.streetwriters.notesnook://launch'
+  color: "#ffffff",
+  linkingURI: "com.streetwriters.notesnook://launch"
 };

@@ -1,6 +1,6 @@
 import {
   getCurrencySymbol as _getSymbol,
-  ICurrencySymbols,
+  ICurrencySymbols
 } from "@brixtol/currency-symbols";
 
 export function getCurrencySymbol(currency: string) {

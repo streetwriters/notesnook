@@ -1,23 +1,30 @@
-import * as React from 'react';
-import { View } from 'react-native';
-import { DraxDragWithReceiverEventData, DraxView } from 'react-native-drax';
-import Animated, { Layout } from 'react-native-reanimated';
-import { presentDialog } from '../../../components/dialog/functions';
-import { IconButton } from '../../../components/ui/icon-button';
-import Paragraph from '../../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { getElevation } from '../../../utils';
-import { SIZE } from '../../../utils/size';
-import { renderTool } from './common';
-import { DraggableItem, useDragState } from './state';
-import ToolSheet from './tool-sheet';
+import * as React from "react";
+import { View } from "react-native";
+import { DraxDragWithReceiverEventData, DraxView } from "react-native-drax";
+import Animated, { Layout } from "react-native-reanimated";
+import { presentDialog } from "../../../components/dialog/functions";
+import { IconButton } from "../../../components/ui/icon-button";
+import Paragraph from "../../../components/ui/typography/paragraph";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { getElevation } from "../../../utils";
+import { SIZE } from "../../../utils/size";
+import { renderTool } from "./common";
+import { DraggableItem, useDragState } from "./state";
+import ToolSheet from "./tool-sheet";
 
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) => {
-  const setData = useDragState(state => state.setData);
-  const [dragged, setDragged] = useDragState(state => [state.dragged, state.setDragged]);
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+export const Group = ({
+  item,
+  index: groupIndex,
+  parentIndex
+}: DraggableItem) => {
+  const setData = useDragState((state) => state.setData);
+  const [dragged, setDragged] = useDragState((state) => [
+    state.dragged,
+    state.setDragged
+  ]);
   const [recieving, setRecieving] = React.useState(false);
-  const [recievePosition, setRecievePosition] = React.useState('above');
+  const [recievePosition, setRecievePosition] = React.useState("above");
   const isDragged =
     dragged &&
     Array.isArray(dragged?.item) &&
@@ -29,7 +36,7 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
     height: 0,
     width: 0
   });
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   if (isDragged) {
     console.log(dimensions.current.height, dimensions.current.width);
@@ -41,31 +48,39 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
     const reciever = data.receiver.payload;
     let _data = useDragState.getState().data.slice();
 
-    if (dragged.type === 'group') {
+    if (dragged.type === "group") {
       const fromIndex = dragged.index;
-      const toIndex = isDroppedAbove ? Math.max(0, reciever.index) : reciever.index + 1;
+      const toIndex = isDroppedAbove
+        ? Math.max(0, reciever.index)
+        : reciever.index + 1;
 
-      _data.splice(toIndex > fromIndex ? toIndex - 1 : toIndex, 0, _data.splice(fromIndex, 1)[0]);
+      _data.splice(
+        toIndex > fromIndex ? toIndex - 1 : toIndex,
+        0,
+        _data.splice(fromIndex, 1)[0]
+      );
     }
 
     // Always insert sub group at the end of the group.
-    if (dragged.type === 'subgroup') {
+    if (dragged.type === "subgroup") {
       const fromIndex = dragged.index;
-      const toIndex = isDroppedAbove ? Math.max(0, reciever.index) : reciever.index + 1;
+      const toIndex = isDroppedAbove
+        ? Math.max(0, reciever.index)
+        : reciever.index + 1;
 
       const insertAt = _data[reciever.index] as string[];
       const insertFrom = _data[dragged.groupIndex] as string[];
 
-      if (typeof insertAt[insertAt.length - 1] !== 'string') {
+      if (typeof insertAt[insertAt.length - 1] !== "string") {
         setRecieving(false);
         return data.dragAbsolutePosition;
       }
       insertAt.push(insertFrom.splice(fromIndex, 1)[0]);
     }
 
-    if (dragged.type === 'tool') {
+    if (dragged.type === "tool") {
       const insertFrom =
-        typeof dragged.parentIndex === 'number'
+        typeof dragged.parentIndex === "number"
           ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
           : (_data[dragged.groupIndex] as string[]);
       //@ts-ignore
@@ -79,23 +94,24 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
 
   const onRecieveData = (data: DraxDragWithReceiverEventData) => {
     setRecieving(true);
-    if (data.dragged.payload.type !== 'group') return setRecievePosition('below');
+    if (data.dragged.payload.type !== "group")
+      return setRecievePosition("below");
     if (data.receiver.receiveOffsetRatio.y < 0.5) {
-      setRecievePosition('above');
+      setRecievePosition("above");
     } else {
-      setRecievePosition('below');
+      setRecievePosition("below");
     }
   };
 
   const buttons = [
     {
-      name: 'minus',
+      name: "minus",
       onPress: () => {
         presentDialog({
-          context: 'global',
-          title: 'Delete group?',
-          positiveText: 'Delete',
-          paragraph: 'All tools in the collapsed section will also be removed.',
+          context: "global",
+          title: "Delete group?",
+          positiveText: "Delete",
+          paragraph: "All tools in the collapsed section will also be removed.",
           positivePress: () => {
             if (groupIndex === undefined) return;
             const _data = useDragState.getState().data.slice();
@@ -108,7 +124,7 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
       }
     },
     {
-      name: 'plus',
+      name: "plus",
       onPress: () => {
         ToolSheet.present({
           item,
@@ -123,13 +139,13 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
 
     return (
       <View
-        onLayout={event => {
+        onLayout={(event) => {
           if (hover) return;
           if (!isDragged) dimensions.current = event.nativeEvent.layout;
         }}
         style={[
           {
-            width: isDragged ? dimensions.current?.width : '100%',
+            width: isDragged ? dimensions.current?.width : "100%",
             backgroundColor: colors.bg,
             borderRadius: 10,
             ...getElevation(hover ? 5 : 0),
@@ -140,17 +156,17 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
         {isSubgroup ? null : (
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
               height: 40,
               marginBottom: 5
             }}
           >
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center'
+                flexDirection: "row",
+                alignItems: "center"
               }}
             >
               <Icon size={SIZE.md} name="drag" color={colors.icon} />
@@ -167,11 +183,11 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
 
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center'
+                flexDirection: "row",
+                alignItems: "center"
               }}
             >
-              {buttons.map(item => (
+              {buttons.map((item) => (
                 <IconButton
                   top={0}
                   left={0}
@@ -193,7 +209,12 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
 
         {isDragged && hover
           ? null
-          : renderTool({ item, index: groupIndex, groupIndex, parentIndex: parentIndex })}
+          : renderTool({
+              item,
+              index: groupIndex,
+              groupIndex,
+              parentIndex: parentIndex
+            })}
       </View>
     );
   };
@@ -203,11 +224,13 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
       <DraxView
         longPressDelay={500}
         receptive={
-          (dragged.type === 'subgroup' && dragged.groupIndex === groupIndex) ||
-          (dragged.type === 'tool' && item.length > 0) ||
-          (dragged.type === 'group' && isSubgroup) ||
-          (dragged.type === 'subgroup' && isSubgroup) ||
-          (dragged.type === 'subgroup' && dragged.item && dragged.item[0] === item[0])
+          (dragged.type === "subgroup" && dragged.groupIndex === groupIndex) ||
+          (dragged.type === "tool" && item.length > 0) ||
+          (dragged.type === "group" && isSubgroup) ||
+          (dragged.type === "subgroup" && isSubgroup) ||
+          (dragged.type === "subgroup" &&
+            dragged.item &&
+            dragged.item[0] === item[0])
             ? false
             : true
         }
@@ -215,30 +238,30 @@ export const Group = ({ item, index: groupIndex, parentIndex }: DraggableItem) =
           item,
           index: groupIndex,
           parentIndex,
-          type: 'group'
+          type: "group"
         }}
         onDragStart={() => {
           setDragged({
             item,
-            type: 'group',
+            type: "group",
             ...dimensions.current
           });
         }}
-        onDragDrop={data => {
+        onDragDrop={(data) => {
           setDragged({});
         }}
-        onDragEnd={data => {
+        onDragEnd={(data) => {
           setDragged({});
         }}
         hoverDragReleasedStyle={{
           opacity: 0
         }}
         receivingStyle={{
-          paddingBottom: recievePosition === 'below' ? 50 : 0,
-          paddingTop: recievePosition === 'above' ? 50 : 0,
-          backgroundColor: dragged.type === 'subgroup' ? colors.nav : undefined,
-          marginTop: recievePosition === 'above' ? 10 : 0,
-          marginBottom: recievePosition === 'below' ? 10 : 0,
+          paddingBottom: recievePosition === "below" ? 50 : 0,
+          paddingTop: recievePosition === "above" ? 50 : 0,
+          backgroundColor: dragged.type === "subgroup" ? colors.nav : undefined,
+          marginTop: recievePosition === "above" ? 10 : 0,
+          marginBottom: recievePosition === "below" ? 10 : 0,
           borderRadius: 10
         }}
         renderHoverContent={({ dimensions: { width } }) => renderGroup(true)}

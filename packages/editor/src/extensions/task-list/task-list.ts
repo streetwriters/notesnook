@@ -16,8 +16,8 @@ export const TaskListNode = TaskList.extend({
         keepOnSplit: false,
         parseHTML: (element) => element.dataset.collapsed === "true",
         renderHTML: (attributes) => ({
-          "data-collapsed": attributes.collapsed === true,
-        }),
+          "data-collapsed": attributes.collapsed === true
+        })
       },
       title: {
         default: null,
@@ -29,10 +29,10 @@ export const TaskListNode = TaskList.extend({
           }
 
           return {
-            "data-title": attributes.title,
+            "data-title": attributes.title
           };
-        },
-      },
+        }
+      }
     };
   },
 
@@ -46,8 +46,8 @@ export const TaskListNode = TaskList.extend({
           }
           return false;
         },
-        priority: 51,
-      },
+        priority: 51
+      }
     ];
   },
 
@@ -55,9 +55,9 @@ export const TaskListNode = TaskList.extend({
     return [
       "ul",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        class: "checklist",
+        class: "checklist"
       }),
-      0,
+      0
     ];
   },
 
@@ -70,7 +70,7 @@ export const TaskListNode = TaskList.extend({
           commands.toggleList(this.name, this.options.itemTypeName);
           const position = {
             from: tr.mapping.map($from.pos),
-            to: tr.mapping.map($to.pos),
+            to: tr.mapping.map($to.pos)
           };
           // There is a minor bug in Prosemirror or Tiptap where creating
           // nested node view causes the editor selection to act weird.
@@ -80,7 +80,7 @@ export const TaskListNode = TaskList.extend({
           // directly or else it won't run.
           setTimeout(() => editor.commands.setTextSelection(position), 0);
           return true;
-        },
+        }
     };
   },
 
@@ -91,7 +91,7 @@ export const TaskListNode = TaskList.extend({
         content.classList.add(`${this.name.toLowerCase()}-content-wrapper`);
         content.style.whiteSpace = "inherit";
         return { dom: content };
-      },
+      }
     });
-  },
+  }
 });

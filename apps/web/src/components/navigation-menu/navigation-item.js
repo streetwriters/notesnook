@@ -13,7 +13,7 @@ function NavigationItem(props) {
     isShortcut,
     isNew,
     children,
-    isTablet,
+    isTablet
   } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const { openMenu } = useMenuTrigger();
@@ -32,8 +32,8 @@ function NavigationItem(props) {
         ":last-of-type": { mb: 1 },
         ":hover:not(:disabled)": {
           bg: "bgSecondaryHover",
-          filter: "brightness(100%)",
-        },
+          filter: "brightness(100%)"
+        }
       }}
     >
       <Button
@@ -41,7 +41,7 @@ function NavigationItem(props) {
         bg={"transparent"}
         sx={{
           px: 2,
-          flex: 1,
+          flex: 1
         }}
         label={title}
         title={title}
@@ -86,7 +86,7 @@ function NavigationItem(props) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            fontWeight: props.selected ? "bold" : "normal",
+            fontWeight: props.selected ? "bold" : "normal"
           }}
           ml={1}
         >

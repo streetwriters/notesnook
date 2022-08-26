@@ -15,7 +15,7 @@ const extensionToMimeType = {
   js: "application/javascript",
   css: "text/css",
   svg: "image/svg+xml",
-  png: "image/png",
+  png: "image/png"
 };
 
 function registerProtocol() {
@@ -45,7 +45,7 @@ function registerProtocol() {
         const data = fs.createReadStream(filePath);
         callback({
           data,
-          mimeType: extensionToMimeType[fileExtension],
+          mimeType: extensionToMimeType[fileExtension]
         });
       } else {
         var response;
@@ -56,9 +56,9 @@ function registerProtocol() {
             body,
             headers: {
               ...request.headers,
-              origin: `${PROTOCOL}://${HOSTNAME}/`,
+              origin: `${PROTOCOL}://${HOSTNAME}/`
             },
-            redirect: "manual",
+            redirect: "manual"
           });
         } catch (e) {
           console.error(e);
@@ -70,7 +70,7 @@ function registerProtocol() {
           statusCode: response.status,
           data: response.body,
           headers: Object.fromEntries(response.headers.entries()),
-          mimeType: response.headers.get("Content-Type"),
+          mimeType: response.headers.get("Content-Type")
         });
       }
     }

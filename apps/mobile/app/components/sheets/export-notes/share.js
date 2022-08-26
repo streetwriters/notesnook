@@ -1,10 +1,10 @@
-import React from 'react';
-import { View } from 'react-native';
-import FileViewer from 'react-native-file-viewer';
-import Share from 'react-native-share';
-import { ToastEvent } from '../../../services/event-manager';
-import { SIZE } from '../../../utils/size';
-import { Button } from '../../ui/button';
+import React from "react";
+import { View } from "react-native";
+import FileViewer from "react-native-file-viewer";
+import Share from "react-native-share";
+import { ToastEvent } from "../../../services/event-manager";
+import { SIZE } from "../../../utils/size";
+import { Button } from "../../ui/button";
 
 export const ShareComponent = ({ uri, name, padding }) => {
   return (
@@ -22,12 +22,12 @@ export const ShareComponent = ({ uri, name, padding }) => {
           FileViewer.open(uri, {
             showOpenWithDialog: true,
             showAppsSuggestions: true
-          }).catch(e => {
+          }).catch((e) => {
             ToastEvent.show({
-              heading: 'Cannot open',
+              heading: "Cannot open",
               message: `No application found to open ${name} file.`,
-              type: 'success',
-              context: 'local'
+              type: "success",
+              context: "local"
             });
           });
         }}

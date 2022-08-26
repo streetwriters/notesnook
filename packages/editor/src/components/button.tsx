@@ -14,12 +14,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
       buttonRef.current.addEventListener("mousedown", onMouseDown, {
         passive: false,
-        capture: true,
+        capture: true
       });
 
       return () => {
         buttonRef.current?.removeEventListener("mousedown", onMouseDown, {
-          capture: true,
+          capture: true
         });
       };
     }, []);
@@ -34,7 +34,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         sx={{
           ...sx,
           ":hover": { bg: [bg, hoverBg] },
-          ":active": { bg: hoverBg },
+          ":active": { bg: hoverBg }
         }}
         ref={(ref) => {
           buttonRef.current = ref;

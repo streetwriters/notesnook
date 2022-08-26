@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
-import { useEditorStore } from '../stores/use-editor-store';
-import { useTagStore } from '../stores/use-tag-store';
-import { db } from '../common/database';
+import { useEffect, useState } from "react";
+import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
+import { useEditorStore } from "../stores/use-editor-store";
+import { useTagStore } from "../stores/use-tag-store";
+import { db } from "../common/database";
 
 /**
  * A hook that injects/removes tags from tags bar in editor
  */
 const useEditorTags = () => {
-  const currentEditingNote = useEditorStore(state => state.currentEditingNote);
-  const tags = useTagStore(state => state.tags);
+  const currentEditingNote = useEditorStore(
+    (state) => state.currentEditingNote
+  );
+  const tags = useTagStore((state) => state.tags);
   const [note, setNote] = useState<any>(null);
   const [noteTags, setNoteTags] = useState([]);
 
@@ -35,9 +37,9 @@ const useEditorTags = () => {
   }
 
   useEffect(() => {
-    eSubscribeEvent('updateTags', load);
+    eSubscribeEvent("updateTags", load);
     return () => {
-      eUnSubscribeEvent('updateTags', load);
+      eUnSubscribeEvent("updateTags", load);
     };
   }, [noteTags]);
 

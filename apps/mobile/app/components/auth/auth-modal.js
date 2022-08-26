@@ -1,18 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { eCloseLoginDialog, eOpenLoginDialog } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import BaseDialog from '../dialog/base-dialog';
-import { Toast } from '../toast';
-import { Button } from '../ui/button';
-import { IconButton } from '../ui/icon-button';
-import { hideAuth, initialAuthMode } from './common';
-import { Login } from './login';
-import { Signup } from './signup';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Platform, View } from 'react-native';
+import React, { useEffect, useRef, useState } from "react";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { eCloseLoginDialog, eOpenLoginDialog } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import BaseDialog from "../dialog/base-dialog";
+import { Toast } from "../toast";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import { hideAuth, initialAuthMode } from "./common";
+import { Login } from "./login";
+import { Signup } from "./signup";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Platform, View } from "react-native";
 
 export const AuthMode = {
   login: 0,
@@ -22,7 +25,7 @@ export const AuthMode = {
 };
 
 const AuthModal = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();
@@ -66,29 +69,31 @@ const AuthModal = () => {
     >
       {currentAuthMode !== AuthMode.login ? (
         <Signup
-          changeMode={mode => setCurrentAuthMode(mode)}
+          changeMode={(mode) => setCurrentAuthMode(mode)}
           trial={AuthMode.trialSignup === currentAuthMode}
           welcome={initialAuthMode.current === AuthMode.welcomeSignup}
         />
       ) : (
         <Login
           welcome={initialAuthMode.current === AuthMode.welcomeSignup}
-          changeMode={mode => setCurrentAuthMode(mode)}
+          changeMode={(mode) => setCurrentAuthMode(mode)}
         />
       )}
 
       <View
         style={{
-          position: 'absolute',
-          top: Platform.OS === 'ios' ? insets.top : 0,
+          position: "absolute",
+          top: Platform.OS === "ios" ? insets.top : 0,
           zIndex: 999,
-          flexDirection: 'row',
-          alignItems: 'center',
+          flexDirection: "row",
+          alignItems: "center",
           paddingHorizontal: 12,
-          width: '100%',
+          width: "100%",
           height: 50,
           justifyContent:
-            initialAuthMode.current !== AuthMode.welcomeSignup ? 'space-between' : 'flex-end'
+            initialAuthMode.current !== AuthMode.welcomeSignup
+              ? "space-between"
+              : "flex-end"
         }}
       >
         {initialAuthMode.current === AuthMode.welcomeSignup ? null : (

@@ -1,37 +1,37 @@
-import React from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { SIZE } from '../../utils/size';
-import { timeConverter } from '../../utils/time';
-import Paragraph from '../ui/typography/paragraph';
+import React from "react";
+import { View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { SIZE } from "../../utils/size";
+import { timeConverter } from "../../utils/time";
+import Paragraph from "../ui/typography/paragraph";
 
 export const DateMeta = ({ item }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
-  const getNameFromKey = key => {
+  const getNameFromKey = (key) => {
     switch (key) {
-      case 'dateCreated':
-        return 'Created at:';
-      case 'dateEdited':
-        return 'Last edited at:';
-      case 'dateModified':
-        return 'Last modified at:';
-      case 'dateDeleted':
-        return 'Deleted at:';
-      case 'dateUploaded':
-        return 'Uploaded at:';
+      case "dateCreated":
+        return "Created at:";
+      case "dateEdited":
+        return "Last edited at:";
+      case "dateModified":
+        return "Last modified at:";
+      case "dateDeleted":
+        return "Deleted at:";
+      case "dateUploaded":
+        return "Uploaded at:";
       default:
         return key;
     }
   };
 
-  const renderItem = key =>
-    key.startsWith('date') ? (
+  const renderItem = (key) =>
+    key.startsWith("date") ? (
       <View
         key={key}
         style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
+          flexDirection: "row",
+          justifyContent: "space-between",
           paddingVertical: 3
         }}
       >

@@ -26,7 +26,7 @@ export const Paragraph = Node.create<ParagraphOptions>({
   addOptions() {
     return {
       HTMLAttributes: {},
-      doubleSpaced: true,
+      doubleSpaced: true
     };
   },
 
@@ -44,10 +44,10 @@ export const Paragraph = Node.create<ParagraphOptions>({
           if (!attributes.spacing) return;
 
           return {
-            "data-spacing": attributes.spacing,
+            "data-spacing": attributes.spacing
           };
-        },
-      },
+        }
+      }
     };
   },
 
@@ -59,7 +59,7 @@ export const Paragraph = Node.create<ParagraphOptions>({
     return [
       "p",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      0,
+      0
     ];
   },
 
@@ -69,7 +69,7 @@ export const Paragraph = Node.create<ParagraphOptions>({
         () =>
         ({ commands }) => {
           return commands.setNode(this.name);
-        },
+        }
     };
   },
 
@@ -99,9 +99,9 @@ export const Paragraph = Node.create<ParagraphOptions>({
         createParagraph(editor, this.type, false, true),
       "Shift-Enter": ({ editor }) =>
         createParagraph(editor, this.type, false, true),
-      "Mod-Alt-0": () => this.editor.commands.setParagraph(),
+      "Mod-Alt-0": () => this.editor.commands.setParagraph()
     };
-  },
+  }
 });
 
 function getSpacing(doubleSpaced: boolean): "single" | "double" {
@@ -128,7 +128,7 @@ function createParagraph(
     })
     .splitBlock({ keepMarks: true })
     .updateAttributes(type, {
-      spacing: getSpacing(doubleSpaced),
+      spacing: getSpacing(doubleSpaced)
     })
     .run();
 }

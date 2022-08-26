@@ -49,7 +49,7 @@ export class TaskManager {
             key: statusTask.id,
             status: progress.text,
             progress: percentage,
-            icon: null,
+            icon: null
           });
         });
         removeStatus(statusTask.id);
@@ -58,7 +58,7 @@ export class TaskManager {
         return await showProgressDialog<T>({
           title: task.title,
           subtitle: task.subtitle,
-          action: task.action,
+          action: task.action
         });
     }
   }

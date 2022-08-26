@@ -20,7 +20,7 @@ function Notebooks() {
         placeholder={NotebooksPlaceholder}
         button={{
           content: "Create a notebook",
-          onClick: () => hashNavigate("/notebooks/create"),
+          onClick: () => hashNavigate("/notebooks/create")
         }}
       />
     </>

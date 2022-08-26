@@ -37,8 +37,8 @@ export function ColorTool(props: ColorToolProps) {
         mr: 0,
         bg: activeColor || "transparent",
         ":hover": {
-          bg: activeColor ? tColor.darken(5).toRgbString() : "transparent",
-        },
+          bg: activeColor ? tColor.darken(5).toRgbString() : "transparent"
+        }
       }}
       onOpen={() => setIsOpen((s) => !s)}
       toggled={isOpen}
@@ -53,7 +53,7 @@ export function ColorTool(props: ColorToolProps) {
           target: getToolbarElement(),
           align: isBottom ? "center" : "end",
           location: isBottom ? "top" : "below",
-          yOffset: 10,
+          yOffset: 10
         }}
         focusOnRender={false}
         blocking={false}

@@ -3,7 +3,7 @@ const selectDirectory = require("./selectDirectory");
 
 const calls = {
   getZoomFactor,
-  selectDirectory,
+  selectDirectory
 };
 
 module.exports.getCall = function getAction(callName) {

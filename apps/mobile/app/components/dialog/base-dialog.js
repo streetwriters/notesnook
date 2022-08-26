@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -7,17 +7,17 @@ import {
   StyleSheet,
   TouchableOpacity,
   View
-} from 'react-native';
-import { useSettingStore } from '../../stores/use-setting-store';
-import useIsFloatingKeyboard from '../../hooks/use-is-floating-keyboard';
-import { BouncingView } from '../ui/transitions/bouncing-view';
+} from "react-native";
+import { useSettingStore } from "../../stores/use-setting-store";
+import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
+import { BouncingView } from "../ui/transitions/bouncing-view";
 
 const BaseDialog = ({
   visible,
   onRequestClose,
   children,
   onShow,
-  animation = 'fade',
+  animation = "fade",
   premium,
   statusBarTranslucent = true,
   transparent,
@@ -46,11 +46,11 @@ const BaseDialog = ({
       animated
       statusBarTranslucent={statusBarTranslucent}
       supportedOrientations={[
-        'portrait',
-        'portrait-upside-down',
-        'landscape',
-        'landscape-left',
-        'landscape-right'
+        "portrait",
+        "portrait-upside-down",
+        "landscape",
+        "landscape-left",
+        "landscape-right"
       ]}
       onShow={() => {
         if (onShow) {
@@ -67,10 +67,17 @@ const BaseDialog = ({
     >
       <Wrapper
         style={{
-          backgroundColor: background ? background : transparent ? 'transparent' : 'rgba(0,0,0,0.3)'
+          backgroundColor: background
+            ? background
+            : transparent
+            ? "transparent"
+            : "rgba(0,0,0,0.3)"
         }}
       >
-        <KeyboardAvoidingView enabled={!floating && Platform.OS === 'ios'} behavior="padding">
+        <KeyboardAvoidingView
+          enabled={!floating && Platform.OS === "ios"}
+          behavior="padding"
+        >
           <BouncingView
             duration={400}
             animated={animated}
@@ -78,7 +85,11 @@ const BaseDialog = ({
             style={[
               styles.backdrop,
               {
-                justifyContent: centered ? 'center' : bottom ? 'flex-end' : 'flex-start'
+                justifyContent: centered
+                  ? "center"
+                  : bottom
+                  ? "flex-end"
+                  : "flex-start"
               }
             ]}
           >
@@ -97,15 +108,15 @@ const BaseDialog = ({
 
 const styles = StyleSheet.create({
   backdrop: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center"
   },
   overlayButton: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute'
+    width: "100%",
+    height: "100%",
+    position: "absolute"
   }
 });
 

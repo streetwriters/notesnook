@@ -3,12 +3,12 @@ import {
   Button,
   Flex,
   Image as RebassImage,
-  Text as RebassText,
+  Text as RebassText
 } from "rebass";
 import { allowedPlatforms } from "../../hooks/use-announcements";
 import {
   closeOpenedDialog,
-  showBuyDialog,
+  showBuyDialog
 } from "../../common/dialog-controller";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import * as Icon from "../icons";
@@ -26,13 +26,13 @@ const features = [
   { icon: Icon.Backup, title: "Encrypted backups" },
   { icon: Icon.Vault, title: "Secure private vault" },
   { icon: Icon.PDF, title: "Export to PDF" },
-  { icon: Icon.Edit, title: "Rich text editor" },
+  { icon: Icon.Edit, title: "Rich text editor" }
 ];
 
 export default function AnnouncementBody({
   removeAnnouncement,
   components,
-  type,
+  type
 }) {
   return components
     .filter((item) =>
@@ -58,7 +58,7 @@ export default function AnnouncementBody({
               <Description
                 item={{
                   ...item,
-                  style: { ...item.style, textAlign: "left", marginTop: 1 },
+                  style: { ...item.style, textAlign: "left", marginTop: 1 }
                 }}
                 fontSize="body"
                 color="icon"
@@ -125,7 +125,7 @@ function Image({ item }) {
       maxHeight="150px"
       sx={{
         objectFit: "cover",
-        ...mapStyle(style),
+        ...mapStyle(style)
       }}
     />
   );
@@ -220,8 +220,8 @@ function CalltoActions({ item, removeAnnouncement }) {
             }
             sx={{
               ":first-of-type": {
-                mr: 1,
-              },
+                mr: 1
+              }
             }}
             removeAnnouncement={removeAnnouncement}
           />
@@ -253,8 +253,8 @@ function InlineCalltoActions({ item }) {
               color: index === 0 ? "primary" : "fontTertiary",
               fontWeight: "bold",
               ":first-of-type": {
-                mr: 1,
-              },
+                mr: 1
+              }
             }}
           />
         ))}
@@ -308,7 +308,7 @@ export function Features({ item }) {
         columnGap: 1,
         rowGap: 1,
         mx: HORIZONTAL_MARGIN,
-        ...mapStyle(style),
+        ...mapStyle(style)
       }}
     >
       {features.map((feature) => (
@@ -317,7 +317,7 @@ export function Features({ item }) {
           p={1}
           sx={{
             borderRadius: "default",
-            border: "1px solid var(--border)",
+            border: "1px solid var(--border)"
           }}
         >
           <feature.icon size={16} sx={{ alignSelf: "start" }} />
@@ -334,6 +334,6 @@ function mapStyle(style) {
   return {
     mt: margins[style.marginTop],
     mb: margins[style.marginBottom],
-    textAlign: style.textAlign,
+    textAlign: style.textAlign
   };
 }

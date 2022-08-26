@@ -1,7 +1,7 @@
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import {
   useStore as useUserStore,
-  store as userstore,
+  store as userstore
 } from "../stores/user-store";
 
 export function useIsUserPremium() {

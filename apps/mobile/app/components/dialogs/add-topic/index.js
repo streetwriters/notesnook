@@ -1,19 +1,30 @@
-import React, { createRef } from 'react';
-import { Keyboard, LayoutAnimation, UIManager, View } from 'react-native';
-import { Transition, Transitioning, TransitioningView } from 'react-native-reanimated';
-import { useMenuStore } from '../../../stores/use-menu-store';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import { db } from '../../../common/database';
-import { eCloseAddTopicDialog, eOpenAddTopicDialog } from '../../../utils/events';
-import { sleep } from '../../../utils/time';
-import BaseDialog from '../../dialog/base-dialog';
-import DialogButtons from '../../dialog/dialog-buttons';
-import DialogContainer from '../../dialog/dialog-container';
-import DialogHeader from '../../dialog/dialog-header';
-import Input from '../../ui/input';
-import Seperator from '../../ui/seperator';
-import { Toast } from '../../toast';
+import React, { createRef } from "react";
+import { Keyboard, LayoutAnimation, UIManager, View } from "react-native";
+import {
+  Transition,
+  Transitioning,
+  TransitioningView
+} from "react-native-reanimated";
+import { useMenuStore } from "../../../stores/use-menu-store";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { db } from "../../../common/database";
+import {
+  eCloseAddTopicDialog,
+  eOpenAddTopicDialog
+} from "../../../utils/events";
+import { sleep } from "../../../utils/time";
+import BaseDialog from "../../dialog/base-dialog";
+import DialogButtons from "../../dialog/dialog-buttons";
+import DialogContainer from "../../dialog/dialog-container";
+import DialogHeader from "../../dialog/dialog-header";
+import Input from "../../ui/input";
+import Seperator from "../../ui/seperator";
+import { Toast } from "../../toast";
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -34,11 +45,11 @@ export class AddTopicDialog extends React.Component {
   addNewTopic = async () => {
     try {
       this.setState({ loading: true });
-      if (!this.title || this.title?.trim() === '') {
+      if (!this.title || this.title?.trim() === "") {
         ToastEvent.show({
-          heading: 'Topic title is required',
-          type: 'error',
-          context: 'local'
+          heading: "Topic title is required",
+          type: "error",
+          context: "local"
         });
         this.setState({ loading: false });
         return;
@@ -54,7 +65,7 @@ export class AddTopicDialog extends React.Component {
       }
       this.setState({ loading: false });
       this.close();
-      Navigation.queueRoutesForUpdate('Notebooks', 'Notebook', 'TopicNotes');
+      Navigation.queueRoutesForUpdate("Notebooks", "Notebook", "TopicNotes");
       useMenuStore.getState().setMenuPins();
     } catch (e) {}
   };
@@ -116,9 +127,11 @@ export class AddTopicDialog extends React.Component {
         <DialogContainer>
           <DialogHeader
             icon="book-outline"
-            title={this.toEdit ? 'Edit topic' : 'New topic'}
+            title={this.toEdit ? "Edit topic" : "New topic"}
             paragraph={
-              this.toEdit ? 'Edit title of the topic' : 'Add a new topic in ' + this.notebook.title
+              this.toEdit
+                ? "Edit title of the topic"
+                : "Add a new topic in " + this.notebook.title
             }
             padding={12}
           />
@@ -132,7 +145,7 @@ export class AddTopicDialog extends React.Component {
             <Input
               fwdRef={this.titleRef}
               testID="input-title"
-              onChangeText={value => {
+              onChangeText={(value) => {
                 this.title = value;
               }}
               blurOnSubmit={false}
@@ -144,7 +157,7 @@ export class AddTopicDialog extends React.Component {
           </View>
 
           <DialogButtons
-            positiveTitle={this.toEdit ? 'Save' : 'Add'}
+            positiveTitle={this.toEdit ? "Save" : "Add"}
             onPressNegative={() => this.close()}
             onPressPositive={() => this.addNewTopic()}
             loading={this.state.loading}

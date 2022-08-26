@@ -1,6 +1,6 @@
-import React from 'react';
-import { View } from 'react-native';
-import { SvgXml } from './lazy';
+import React from "react";
+import { View } from "react-native";
+import { SvgXml } from "./lazy";
 
 export const SvgView = ({
   width = 250,

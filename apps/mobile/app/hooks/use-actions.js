@@ -1,12 +1,12 @@
-import Clipboard from '@react-native-clipboard/clipboard';
-import React, { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
-import Share from 'react-native-share';
-import { editing, toTXT } from '../utils';
-import { notesnook } from '../../e2e/test.ids';
-import { presentDialog } from '../components/dialog/functions';
-import NoteHistory from '../components/note-history';
-import { MoveNotes } from '../components/sheets/move-notes/movenote';
+import Clipboard from "@react-native-clipboard/clipboard";
+import React, { useEffect, useState } from "react";
+import { Platform } from "react-native";
+import Share from "react-native-share";
+import { editing, toTXT } from "../utils";
+import { notesnook } from "../../e2e/test.ids";
+import { presentDialog } from "../components/dialog/functions";
+import NoteHistory from "../components/note-history";
+import { MoveNotes } from "../components/sheets/move-notes/movenote";
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -14,17 +14,17 @@ import {
   openVault,
   presentSheet,
   ToastEvent
-} from '../services/event-manager';
-import Navigation from '../services/navigation';
-import Notifications from '../services/notifications';
-import { useEditorStore } from '../stores/use-editor-store';
-import { useMenuStore } from '../stores/use-menu-store';
-import { useSelectionStore } from '../stores/use-selection-store';
-import { useTagStore } from '../stores/use-tag-store';
-import { useThemeStore } from '../stores/use-theme-store';
-import { useUserStore } from '../stores/use-user-store';
-import { toggleDarkMode } from '../utils/color-scheme/utils';
-import { db } from '../common/database';
+} from "../services/event-manager";
+import Navigation from "../services/navigation";
+import Notifications from "../services/notifications";
+import { useEditorStore } from "../stores/use-editor-store";
+import { useMenuStore } from "../stores/use-menu-store";
+import { useSelectionStore } from "../stores/use-selection-store";
+import { useTagStore } from "../stores/use-tag-store";
+import { useThemeStore } from "../stores/use-theme-store";
+import { useUserStore } from "../stores/use-user-store";
+import { toggleDarkMode } from "../utils/color-scheme/utils";
+import { db } from "../common/database";
 import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
@@ -33,28 +33,31 @@ import {
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
-} from '../utils/events';
-import { deleteItems } from '../utils/functions';
-import { sleep } from '../utils/time';
-import useNavigationStore from '../stores/use-navigation-store';
+} from "../utils/events";
+import { deleteItems } from "../utils/functions";
+import { sleep } from "../utils/time";
+import useNavigationStore from "../stores/use-navigation-store";
 
 export const useActions = ({ close = () => null, item }) => {
-  const colors = useThemeStore(state => state.colors);
-  const clearSelection = useSelectionStore(state => state.clearSelection);
-  const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
-  const setMenuPins = useMenuStore(state => state.setMenuPins);
-  const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(item.id));
-  console.log(item.readonly, 'readonly');
-  const user = useUserStore(state => state.user);
+  const colors = useThemeStore((state) => state.colors);
+  const clearSelection = useSelectionStore((state) => state.clearSelection);
+  const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
+  const setMenuPins = useMenuStore((state) => state.setMenuPins);
+  const [isPinnedToMenu, setIsPinnedToMenu] = useState(
+    db.settings.isPinned(item.id)
+  );
+  console.log(item.readonly, "readonly");
+  const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
   const alias = item.alias || item.title;
 
-  const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
+  const isPublished =
+    item.type === "note" && db.monographs.isPublished(item.id);
 
   useEffect(() => {
     if (item.id === null) return;
     checkNotifPinned();
-    if (item.type !== 'note') {
+    if (item.type !== "note") {
       setIsPinnedToMenu(db.settings.isPinned(item.id));
     }
   }, [item]);
@@ -66,7 +69,7 @@ export const useActions = ({ close = () => null, item }) => {
       return;
     }
 
-    let index = pinned.findIndex(notif => notif.tag === item.id);
+    let index = pinned.findIndex((notif) => notif.tag === item.id);
     if (index !== -1) {
       setNotifPinned(pinned[index]);
     } else {
@@ -76,15 +79,15 @@ export const useActions = ({ close = () => null, item }) => {
 
   const isNoteInTopic = () => {
     const currentScreen = useNavigationStore.getState().currentScreen;
-    if (item.type !== 'note' || currentScreen.name !== 'TopicNotes') return;
+    if (item.type !== "note" || currentScreen.name !== "TopicNotes") return;
     return db.notebooks
       .notebook(currentScreen.notebookId)
       .topics.topic(currentScreen.id)
       .has(item.id);
   };
 
-  const onUpdate = async type => {
-    if (type === 'unpin') {
+  const onUpdate = async (type) => {
+    if (type === "unpin") {
       await sleep(1000);
       await Notifications.get();
       checkNotifPinned();
@@ -92,10 +95,10 @@ export const useActions = ({ close = () => null, item }) => {
   };
 
   useEffect(() => {
-    eSubscribeEvent('onUpdate', onUpdate);
+    eSubscribeEvent("onUpdate", onUpdate);
 
     return () => {
-      eUnSubscribeEvent('onUpdate', onUpdate);
+      eUnSubscribeEvent("onUpdate", onUpdate);
     };
   }, [item]);
 
@@ -117,11 +120,11 @@ export const useActions = ({ close = () => null, item }) => {
     close();
     await db.notes.note(item.id).favorite();
     Navigation.queueRoutesForUpdate(
-      'TaggedNotes',
-      'ColoredNotes',
-      'TopicNotes',
-      'Favorites',
-      'Notes'
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes"
     );
   }
 
@@ -132,25 +135,25 @@ export const useActions = ({ close = () => null, item }) => {
     if (db[`${type}s`].pinned.length === 3 && !item.pinned) {
       ToastEvent.show({
         heading: `Cannot pin more than 3 ${type}s`,
-        type: 'error'
+        type: "error"
       });
       return;
     }
     await db[`${type}s`][type](item.id).pin();
     Navigation.queueRoutesForUpdate(
-      'TaggedNotes',
-      'ColoredNotes',
-      'TopicNotes',
-      'Favorites',
-      'Notes',
-      'Notebooks'
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes",
+      "Notebooks"
     );
   }
 
   async function pinToNotifications() {
     if (!checkNoteSynced()) return;
-    console.log('pinToNotifications');
-    if (Platform.OS === 'ios') return;
+    console.log("pinToNotifications");
+    if (Platform.OS === "ios") return;
 
     if (notifPinned !== null) {
       Notifications.remove(item.id, notifPinned.identifier);
@@ -168,7 +171,7 @@ export const useActions = ({ close = () => null, item }) => {
       subtitle: item.headline || text,
       bigText: html,
       ongoing: true,
-      actions: ['UNPIN'],
+      actions: ["UNPIN"],
       tag: item.id
     });
     await sleep(1000);
@@ -181,18 +184,21 @@ export const useActions = ({ close = () => null, item }) => {
     close();
     await db.trash.restore(item.id);
     Navigation.queueRoutesForUpdate(
-      'TaggedNotes',
-      'ColoredNotes',
-      'TopicNotes',
-      'Favorites',
-      'Notes',
-      'Notebooks',
-      'Trash'
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes",
+      "Notebooks",
+      "Trash"
     );
-    let type = item.type === 'trash' ? item.itemType : item.type;
+    let type = item.type === "trash" ? item.itemType : item.type;
     ToastEvent.show({
-      heading: type === 'note' ? 'Note restored from trash' : 'Notebook restored from trash',
-      type: 'success'
+      heading:
+        type === "note"
+          ? "Note restored from trash"
+          : "Notebook restored from trash",
+      type: "success"
     });
   }
 
@@ -206,15 +212,15 @@ export const useActions = ({ close = () => null, item }) => {
         novault: true,
         locked: true,
         item: item,
-        title: 'Copy note',
-        description: 'Unlock note to copy to clipboard.'
+        title: "Copy note",
+        description: "Unlock note to copy to clipboard."
       });
     } else {
       Clipboard.setString(await toTXT(item));
       ToastEvent.show({
-        heading: 'Note copied to clipboard',
-        type: 'success',
-        context: 'local'
+        heading: "Note copied to clipboard",
+        type: "success",
+        context: "local"
       });
     }
   }
@@ -223,30 +229,30 @@ export const useActions = ({ close = () => null, item }) => {
     if (!checkNoteSynced()) return;
     if (!user) {
       ToastEvent.show({
-        heading: 'Login required',
-        message: 'Login to publish note',
-        context: 'local',
+        heading: "Login required",
+        message: "Login to publish note",
+        context: "local",
         func: () => {
           eSendEvent(eOpenLoginDialog);
         },
-        actionText: 'Login'
+        actionText: "Login"
       });
       return;
     }
 
     if (!user?.isEmailConfirmed) {
       ToastEvent.show({
-        heading: 'Email is not verified',
-        message: 'Please verify your email first.',
-        context: 'local'
+        heading: "Email is not verified",
+        message: "Please verify your email first.",
+        context: "local"
       });
       return;
     }
     if (item.locked) {
       ToastEvent.show({
-        heading: 'Locked notes cannot be published',
-        type: 'error',
-        context: 'local'
+        heading: "Locked notes cannot be published",
+        type: "error",
+        context: "local"
       });
       return;
     }
@@ -256,24 +262,24 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   const checkNoteSynced = () => {
-    if (item.type !== 'note' || item.itemType !== 'note') return true;
-    let isTrash = item.itemType === 'note';
+    if (item.type !== "note" || item.itemType !== "note") return true;
+    let isTrash = item.itemType === "note";
     if (!isTrash && !db.notes.note(item.id).synced()) {
       ToastEvent.show({
-        context: 'local',
-        heading: 'Note not synced',
-        message: 'Please run sync before making changes',
-        type: 'error'
+        context: "local",
+        heading: "Note not synced",
+        message: "Please run sync before making changes",
+        type: "error"
       });
       return false;
     }
 
     if (isTrash && !db.trash.synced(item.id)) {
       ToastEvent.show({
-        context: 'local',
-        heading: 'Note not synced',
-        message: 'Please run sync before making changes',
-        type: 'error'
+        context: "local",
+        heading: "Note not synced",
+        message: "Please run sync before making changes",
+        type: "error"
       });
       return false;
     }
@@ -292,8 +298,8 @@ export const useActions = ({ close = () => null, item }) => {
         novault: true,
         locked: true,
         permanant: true,
-        title: 'Unlock note',
-        description: 'Remove note from the vault.'
+        title: "Unlock note",
+        description: "Remove note from the vault."
       });
       return;
     }
@@ -303,11 +309,11 @@ export const useActions = ({ close = () => null, item }) => {
       if (note.locked) {
         close();
         Navigation.queueRoutesForUpdate(
-          'TaggedNotes',
-          'ColoredNotes',
-          'TopicNotes',
-          'Favorites',
-          'Notes'
+          "TaggedNotes",
+          "ColoredNotes",
+          "TopicNotes",
+          "Favorites",
+          "Notes"
         );
       }
     } catch (e) {
@@ -318,8 +324,8 @@ export const useActions = ({ close = () => null, item }) => {
           openVault({
             item: item,
             novault: false,
-            title: 'Create vault',
-            description: 'Set a password to create a vault and lock note.'
+            title: "Create vault",
+            description: "Set a password to create a vault and lock note."
           });
           break;
         case db.vault.ERRORS.vaultLocked:
@@ -327,8 +333,8 @@ export const useActions = ({ close = () => null, item }) => {
             item: item,
             novault: true,
             locked: true,
-            title: 'Lock note',
-            description: 'Give access to vault to lock this note.'
+            title: "Lock note",
+            description: "Give access to vault to lock this note."
           });
           break;
       }
@@ -341,7 +347,7 @@ export const useActions = ({ close = () => null, item }) => {
       if (isPinnedToMenu) {
         await db.settings.unpin(item.id);
       } else {
-        if (item.type === 'topic') {
+        if (item.type === "topic") {
           await db.settings.pin(item.type, {
             id: item.id,
             notebookId: item.notebookId
@@ -359,26 +365,26 @@ export const useActions = ({ close = () => null, item }) => {
     close();
     await sleep(300);
     presentDialog({
-      title: 'Rename tag',
-      paragraph: 'Change the title of the tag ' + alias,
-      positivePress: async value => {
-        if (!value || value === '' || value.trimStart().length == 0) return;
+      title: "Rename tag",
+      paragraph: "Change the title of the tag " + alias,
+      positivePress: async (value) => {
+        if (!value || value === "" || value.trimStart().length == 0) return;
         await db.tags.rename(item.id, db.tags.sanitize(value));
         useTagStore.getState().setTags();
         useMenuStore.getState().setMenuPins();
         Navigation.queueRoutesForUpdate(
-          'TaggedNotes',
-          'ColoredNotes',
-          'TopicNotes',
-          'Favorites',
-          'Notes',
-          'Tags'
+          "TaggedNotes",
+          "ColoredNotes",
+          "TopicNotes",
+          "Favorites",
+          "Notes",
+          "Tags"
         );
       },
       input: true,
       defaultValue: alias,
-      inputPlaceholder: 'Enter title of tag',
-      positiveText: 'Save'
+      inputPlaceholder: "Enter title of tag",
+      positiveText: "Save"
     });
   }
 
@@ -392,12 +398,12 @@ export const useActions = ({ close = () => null, item }) => {
         novault: true,
         locked: true,
         share: true,
-        title: 'Share note',
-        description: 'Unlock note to share it.'
+        title: "Share note",
+        description: "Unlock note to share it."
       });
     } else {
       Share.open({
-        title: 'Share note to',
+        title: "Share note to",
         failOnCancel: false,
         message: await toTXT(item)
       });
@@ -407,25 +413,25 @@ export const useActions = ({ close = () => null, item }) => {
   async function deleteItem() {
     if (!checkNoteSynced()) return;
     close();
-    if (item.type === 'tag') {
+    if (item.type === "tag") {
       await sleep(300);
       presentDialog({
-        title: 'Delete tag',
-        paragraph: 'This tag will be removed from all notes.',
-        positivePress: async value => {
+        title: "Delete tag",
+        paragraph: "This tag will be removed from all notes.",
+        positivePress: async (value) => {
           await db.tags.remove(item.id);
           useTagStore.getState().setTags();
           Navigation.queueRoutesForUpdate(
-            'TaggedNotes',
-            'ColoredNotes',
-            'TopicNotes',
-            'Favorites',
-            'Notes',
-            'Tags'
+            "TaggedNotes",
+            "ColoredNotes",
+            "TopicNotes",
+            "Favorites",
+            "Notes",
+            "Tags"
           );
         },
-        positiveText: 'Delete',
-        positiveType: 'errorShade'
+        positiveText: "Delete",
+        positiveType: "errorShade"
       });
       return;
     }
@@ -436,32 +442,32 @@ export const useActions = ({ close = () => null, item }) => {
         novault: true,
         locked: true,
         item: item,
-        title: 'Delete note',
-        description: 'Unlock note to delete it.'
+        title: "Delete note",
+        description: "Unlock note to delete it."
       });
     } else {
       try {
         close();
-        console.log('moving note to trash');
+        console.log("moving note to trash");
         await deleteItems(item);
       } catch (e) {}
     }
   }
   async function removeNoteFromTopic() {
     const currentScreen = useNavigationStore.getState().currentScreen;
-    if (currentScreen.name !== 'TopicNotes') return;
+    if (currentScreen.name !== "TopicNotes") return;
     await db.notebooks
       .notebook(currentScreen.notebookId)
       .topics.topic(currentScreen.id)
       .delete(item.id);
     Navigation.queueRoutesForUpdate(
-      'TaggedNotes',
-      'ColoredNotes',
-      'TopicNotes',
-      'Favorites',
-      'Notes',
-      'Notebook',
-      'Notebooks'
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes",
+      "Notebook",
+      "Notebooks"
     );
     close();
   }
@@ -473,19 +479,19 @@ export const useActions = ({ close = () => null, item }) => {
     presentDialog({
       title: `Permanent delete`,
       paragraph: `Are you sure you want to delete this ${item.itemType} permanantly from trash?`,
-      positiveText: 'Delete',
-      negativeText: 'Cancel',
+      positiveText: "Delete",
+      negativeText: "Cancel",
       positivePress: async () => {
         await db.trash.delete(item.id);
-        Navigation.queueRoutesForUpdate('Trash');
+        Navigation.queueRoutesForUpdate("Trash");
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
-          heading: 'Permanantly deleted items',
-          type: 'success',
-          context: 'local'
+          heading: "Permanantly deleted items",
+          type: "success",
+          context: "local"
         });
       },
-      positiveType: 'errorShade'
+      positiveType: "errorShade"
     });
   }
 
@@ -493,7 +499,7 @@ export const useActions = ({ close = () => null, item }) => {
     close();
     await sleep(300);
     presentSheet({
-      component: ref => <NoteHistory fwdRef={ref} note={item} />
+      component: (ref) => <NoteHistory fwdRef={ref} note={item} />
     });
   }
 
@@ -513,11 +519,11 @@ export const useActions = ({ close = () => null, item }) => {
     if (!checkNoteSynced() || !user) return;
     db.notes.note(item.id).localOnly();
     Navigation.queueRoutesForUpdate(
-      'TaggedNotes',
-      'ColoredNotes',
-      'TopicNotes',
-      'Favorites',
-      'Notes'
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes"
     );
     close();
   }
@@ -530,11 +536,11 @@ export const useActions = ({ close = () => null, item }) => {
       //  tiny.call(EditorWebView, tiny.toogleReadMode(current ? 'readonly' : 'design'));
     }
     Navigation.queueRoutesForUpdate(
-      'TaggedNotes',
-      'ColoredNotes',
-      'TopicNotes',
-      'Favorites',
-      'Notes'
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes"
     );
     close();
   };
@@ -543,26 +549,26 @@ export const useActions = ({ close = () => null, item }) => {
     if (!checkNoteSynced()) return;
     await db.notes.note(item.id).duplicate();
     Navigation.queueRoutesForUpdate(
-      'TaggedNotes',
-      'ColoredNotes',
-      'TopicNotes',
-      'Favorites',
-      'Notes'
+      "TaggedNotes",
+      "ColoredNotes",
+      "TopicNotes",
+      "Favorites",
+      "Notes"
     );
     close();
   };
-  console.log('isNoteInTopic', isNoteInTopic());
+  console.log("isNoteInTopic", isNoteInTopic());
   const actions = [
     {
-      name: 'Add to notebook',
-      title: 'Add to notebook',
-      icon: 'book-outline',
+      name: "Add to notebook",
+      title: "Add to notebook",
+      icon: "book-outline",
       func: addTo
     },
     {
-      name: 'Move notes',
-      title: 'Add notes',
-      icon: 'plus',
+      name: "Move notes",
+      title: "Add notes",
+      icon: "plus",
       func: async () => {
         close();
         await sleep(500);
@@ -571,9 +577,9 @@ export const useActions = ({ close = () => null, item }) => {
     },
 
     {
-      name: 'Pin',
-      title: item.pinned ? 'Unpin' : 'Pin to top',
-      icon: item.pinned ? 'pin-off-outline' : 'pin-outline',
+      name: "Pin",
+      title: item.pinned ? "Unpin" : "Pin to top",
+      icon: item.pinned ? "pin-off-outline" : "pin-outline",
       func: pinItem,
       close: false,
       check: true,
@@ -582,29 +588,32 @@ export const useActions = ({ close = () => null, item }) => {
       id: notesnook.ids.dialogs.actionsheet.pin
     },
     {
-      name: 'Favorite',
-      title: !item.favorite ? 'Favorite' : 'Unfavorite',
-      icon: item.favorite ? 'star-off' : 'star-outline',
+      name: "Favorite",
+      title: !item.favorite ? "Favorite" : "Unfavorite",
+      icon: item.favorite ? "star-off" : "star-outline",
       func: addToFavorites,
       close: false,
       check: true,
       on: item.favorite,
       nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.favorite,
-      color: 'orange'
+      color: "orange"
     },
     {
-      name: 'PinToNotif',
-      title: notifPinned !== null ? 'Unpin from Notifications' : 'Pin to Notifications',
-      icon: 'bell',
+      name: "PinToNotif",
+      title:
+        notifPinned !== null
+          ? "Unpin from Notifications"
+          : "Pin to Notifications",
+      icon: "bell",
       on: notifPinned !== null,
       func: pinToNotifications
     },
 
     {
-      name: 'Edit Notebook',
-      title: 'Edit notebook',
-      icon: 'square-edit-outline',
+      name: "Edit Notebook",
+      title: "Edit notebook",
+      icon: "square-edit-outline",
       func: async () => {
         close();
         await sleep(300);
@@ -612,9 +621,9 @@ export const useActions = ({ close = () => null, item }) => {
       }
     },
     {
-      name: 'Edit Topic',
-      title: 'Edit topic',
-      icon: 'square-edit-outline',
+      name: "Edit Topic",
+      title: "Edit topic",
+      icon: "square-edit-outline",
       func: async () => {
         close();
         await sleep(300);
@@ -625,37 +634,37 @@ export const useActions = ({ close = () => null, item }) => {
       }
     },
     {
-      name: 'Copy',
-      title: 'Copy',
-      icon: 'content-copy',
+      name: "Copy",
+      title: "Copy",
+      icon: "content-copy",
       func: copyContent
     },
     {
-      name: 'Restore',
-      title: 'Restore ' + item.itemType,
-      icon: 'delete-restore',
+      name: "Restore",
+      title: "Restore " + item.itemType,
+      icon: "delete-restore",
       func: restoreTrashItem
     },
 
     {
-      name: 'Publish',
-      title: isPublished ? 'Published' : 'Publish',
-      icon: 'cloud-upload-outline',
+      name: "Publish",
+      title: isPublished ? "Published" : "Publish",
+      icon: "cloud-upload-outline",
       on: isPublished,
       func: publishNote
     },
     {
-      name: 'Vault',
-      title: item.locked ? 'Remove from vault' : 'Add to vault',
-      icon: item.locked ? 'shield-off-outline' : 'shield-outline',
+      name: "Vault",
+      title: item.locked ? "Remove from vault" : "Add to vault",
+      icon: item.locked ? "shield-off-outline" : "shield-outline",
       func: addToVault,
       on: item.locked
     },
 
     {
-      name: 'Add Shortcut',
-      title: isPinnedToMenu ? 'Remove Shortcut' : 'Add Shortcut',
-      icon: isPinnedToMenu ? 'link-variant-remove' : 'link-variant',
+      name: "Add Shortcut",
+      title: isPinnedToMenu ? "Remove Shortcut" : "Add Shortcut",
+      icon: isPinnedToMenu ? "link-variant-remove" : "link-variant",
       func: createMenuShortcut,
       close: false,
       check: true,
@@ -664,81 +673,83 @@ export const useActions = ({ close = () => null, item }) => {
       id: notesnook.ids.dialogs.actionsheet.pinMenu
     },
     {
-      name: 'Rename Tag',
-      title: 'Rename tag',
-      icon: 'square-edit-outline',
+      name: "Rename Tag",
+      title: "Rename tag",
+      icon: "square-edit-outline",
       func: renameTag
     },
     {
-      name: 'Share',
-      title: 'Share',
-      icon: 'share-variant',
+      name: "Share",
+      title: "Share",
+      icon: "share-variant",
       func: shareNote
     },
     {
-      name: 'Attachments',
-      title: 'Attachments',
-      icon: 'attachment',
+      name: "Attachments",
+      title: "Attachments",
+      icon: "attachment",
       func: showAttachments
     },
     {
-      name: 'Export',
-      title: 'Export',
-      icon: 'export',
+      name: "Export",
+      title: "Export",
+      icon: "export",
       func: exportNote
     },
     {
-      name: 'RemoveTopic',
-      title: 'Remove from topic',
+      name: "RemoveTopic",
+      title: "Remove from topic",
       hidden: !isNoteInTopic(),
-      icon: 'minus-circle-outline',
+      icon: "minus-circle-outline",
       func: removeNoteFromTopic
     },
     {
-      name: 'Delete',
+      name: "Delete",
       title:
-        item.type !== 'notebook' && item.type !== 'note' ? 'Delete ' + item.type : 'Move to trash',
-      icon: 'delete-outline',
-      type: 'error',
+        item.type !== "notebook" && item.type !== "note"
+          ? "Delete " + item.type
+          : "Move to trash",
+      icon: "delete-outline",
+      type: "error",
       func: deleteItem
     },
     {
-      name: 'PermDelete',
-      title: 'Delete ' + item.itemType,
-      icon: 'delete',
+      name: "PermDelete",
+      title: "Delete " + item.itemType,
+      icon: "delete",
       func: deleteTrashItem
     },
     {
-      name: 'ReadOnly',
-      title: 'Read only',
-      icon: 'pencil-lock',
+      name: "ReadOnly",
+      title: "Read only",
+      icon: "pencil-lock",
       func: toggleReadyOnlyMode,
       on: item.readonly
     },
     {
-      name: 'Local only',
-      title: 'Local only',
-      icon: 'sync-off',
+      name: "Local only",
+      title: "Local only",
+      icon: "sync-off",
       func: toggleLocalOnly,
       on: item.localOnly
     },
 
     {
-      name: 'History',
-      title: 'History',
-      icon: 'history',
+      name: "History",
+      title: "History",
+      icon: "history",
       func: openHistory
     },
     {
-      name: 'Duplicate',
-      title: 'Duplicate',
-      icon: 'content-duplicate',
+      name: "Duplicate",
+      title: "Duplicate",
+      icon: "content-duplicate",
       func: duplicateNote
     },
     {
-      name: 'Dark Mode',
-      title: 'Dark mode',
-      icon: 'theme-light-dark',
+      name: "Dark Mode",
+      title: "Dark mode",
+      icon: "theme-light-dark",
       func: switchTheme,
       switch: true,
       on: colors.night ? true : false,

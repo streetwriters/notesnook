@@ -9,7 +9,7 @@ import { useCallback, useEffect } from "react";
 import { TaskItemNode, TaskItemAttributes } from "./task-item";
 import {
   useIsKeyboardOpen,
-  useIsMobile,
+  useIsMobile
 } from "../../toolbar/stores/toolbar-store";
 import { isiOS } from "../../utils/platform";
 
@@ -61,8 +61,8 @@ export function TaskItemComponent(
           bg: "background",
           borderRadius: "default",
           ":hover > .dragHandle": {
-            opacity: editor.isEditable ? 1 : 0,
-          },
+            opacity: editor.isEditable ? 1 : 0
+          }
         }}
       >
         {editor.isEditable && (
@@ -81,8 +81,8 @@ export function TaskItemComponent(
               bg: "transparent",
               cursor: "grab",
               ".icon:hover path": {
-                fill: "var(--checked) !important",
-              },
+                fill: "var(--checked) !important"
+              }
             }}
             size={isMobile ? 24 : 20}
           />
@@ -101,11 +101,11 @@ export function TaskItemComponent(
             p: "1px",
             cursor: editor.isEditable ? "pointer" : "unset",
             ":hover": {
-              borderColor: "checked",
+              borderColor: "checked"
             },
             ":hover .icon path": {
-              fill: "var(--checked) !important",
-            },
+              fill: "var(--checked) !important"
+            }
           }}
           onMouseDown={(e) => {
             if (useIsKeyboardOpen.current) {
@@ -129,9 +129,9 @@ export function TaskItemComponent(
           sx={{
             "> .taskitem-content-wrapper > p": {
               textDecorationLine: checked ? "line-through" : "none",
-              opacity: checked ? 0.8 : 1,
+              opacity: checked ? 0.8 : 1
             },
-            flex: 1,
+            flex: 1
           }}
         />
       </Flex>
@@ -154,7 +154,7 @@ function toggleChildren(
     // need to add 1 to get inside the node
     const actualPos = pos + parentPos + 1;
     tr.setNodeMarkup(actualPos, undefined, {
-      checked: toggleState,
+      checked: toggleState
     });
   }
   return tr;

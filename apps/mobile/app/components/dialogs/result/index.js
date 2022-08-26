@@ -1,25 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { DDS } from '../../../services/device-detection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
-import { getElevation } from '../../../utils';
-import { eCloseResultDialog, eOpenResultDialog } from '../../../utils/events';
-import { SIZE } from '../../../utils/size';
-import { Button } from '../../ui/button';
-import BaseDialog from '../../dialog/base-dialog';
-import Seperator from '../../ui/seperator';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
-import { ProFeatures } from './pro-features';
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { DDS } from "../../../services/device-detection";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../../services/event-manager";
+import { getElevation } from "../../../utils";
+import { eCloseResultDialog, eOpenResultDialog } from "../../../utils/events";
+import { SIZE } from "../../../utils/size";
+import { Button } from "../../ui/button";
+import BaseDialog from "../../dialog/base-dialog";
+import Seperator from "../../ui/seperator";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
+import { ProFeatures } from "./pro-features";
 
 const ResultDialog = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
-    title: 'Thank you for signing up!',
-    paragraph: 'Try out all features of Notesnook free for 7 days. No limitations. No commitments.',
-    button: 'Start taking notes'
+    title: "Thank you for signing up!",
+    paragraph:
+      "Try out all features of Notesnook free for 7 days. No limitations. No commitments.",
+    button: "Start taking notes"
   });
   useEffect(() => {
     eSubscribeEvent(eOpenResultDialog, open);
@@ -30,7 +34,7 @@ const ResultDialog = () => {
     };
   }, []);
 
-  const open = data => {
+  const open = (data) => {
     if (data) {
       setDialogData(data);
     }
@@ -46,23 +50,23 @@ const ResultDialog = () => {
       <View
         style={{
           ...getElevation(5),
-          width: DDS.isTab ? 350 : '85%',
+          width: DDS.isTab ? 350 : "85%",
           maxHeight: 500,
           borderRadius: 10,
           backgroundColor: colors.bg,
           paddingTop: 20,
-          justifyContent: 'center',
-          alignItems: 'center'
+          justifyContent: "center",
+          alignItems: "center"
         }}
       >
         <Heading
           size={SIZE.lg}
           textBreakStrategy="balanced"
           style={{
-            alignSelf: 'center',
-            textAlign: 'center',
+            alignSelf: "center",
+            textAlign: "center",
             marginTop: 10,
-            maxWidth: '100%',
+            maxWidth: "100%",
             marginBottom: 10,
             paddingHorizontal: 12
           }}
@@ -74,9 +78,9 @@ const ResultDialog = () => {
           color={colors.icon}
           size={SIZE.md}
           style={{
-            alignSelf: 'center',
-            textAlign: 'center',
-            maxWidth: '80%',
+            alignSelf: "center",
+            textAlign: "center",
+            maxWidth: "80%",
             lineHeight: SIZE.sm + 5
           }}
         >
@@ -88,8 +92,8 @@ const ResultDialog = () => {
         <View
           style={{
             paddingHorizontal: 12,
-            alignItems: 'center',
-            width: '100%'
+            alignItems: "center",
+            width: "100%"
           }}
         >
           <ProFeatures count={4} />
@@ -99,7 +103,7 @@ const ResultDialog = () => {
         <View
           style={{
             backgroundColor: colors.nav,
-            width: '100%',
+            width: "100%",
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
             paddingVertical: 10

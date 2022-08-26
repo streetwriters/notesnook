@@ -3,7 +3,7 @@ import { inputRules } from "prosemirror-inputrules";
 import {
   insertMathNode,
   makeBlockMathInputRule,
-  REGEX_BLOCK_MATH_DOLLARS,
+  REGEX_BLOCK_MATH_DOLLARS
 } from "./plugin";
 
 declare module "@tiptap/core" {
@@ -24,8 +24,8 @@ export const MathBlock = Node.create({
   parseHTML() {
     return [
       {
-        tag: `div[class*='math-block']`, // important!
-      },
+        tag: `div[class*='math-block']` // important!
+      }
     ];
   },
 
@@ -33,7 +33,7 @@ export const MathBlock = Node.create({
     return [
       "div",
       mergeAttributes({ class: "math-block math-node" }, HTMLAttributes),
-      0,
+      0
     ];
   },
 
@@ -43,15 +43,15 @@ export const MathBlock = Node.create({
         () =>
         ({ state, dispatch, view }) => {
           return insertMathNode(this.type)(state, dispatch, view);
-        },
+        }
     };
   },
 
   addProseMirrorPlugins() {
     const inputRulePlugin = inputRules({
-      rules: [makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, this.type)],
+      rules: [makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, this.type)]
     });
 
     return [inputRulePlugin];
-  },
+  }
 });

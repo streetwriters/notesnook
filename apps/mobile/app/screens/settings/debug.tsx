@@ -1,19 +1,23 @@
-import Clipboard from '@react-native-clipboard/clipboard';
-import { format, LogLevel, logManager } from '@streetwriters/notesnook-core/logger';
-import React, { useEffect, useState } from 'react';
-import { FlatList, Platform, TouchableOpacity, View } from 'react-native';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import RNFetchBlob from 'rn-fetch-blob';
-import { presentDialog } from '../../components/dialog/functions';
-import { IconButton } from '../../components/ui/icon-button';
-import { Notice } from '../../components/ui/notice';
-import Paragraph from '../../components/ui/typography/paragraph';
-import { ToastEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { hexToRGBA } from '../../utils/color-scheme/utils';
-import Storage from '../../common/database/storage';
-import useTimer from '../../hooks/use-timer';
-import { sanitizeFilename } from '../../utils/sanitizer';
+import Clipboard from "@react-native-clipboard/clipboard";
+import {
+  format,
+  LogLevel,
+  logManager
+} from "@streetwriters/notesnook-core/logger";
+import React, { useEffect, useState } from "react";
+import { FlatList, Platform, TouchableOpacity, View } from "react-native";
+import * as ScopedStorage from "react-native-scoped-storage";
+import RNFetchBlob from "rn-fetch-blob";
+import { presentDialog } from "../../components/dialog/functions";
+import { IconButton } from "../../components/ui/icon-button";
+import { Notice } from "../../components/ui/notice";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { ToastEvent } from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { hexToRGBA } from "../../utils/color-scheme/utils";
+import Storage from "../../common/database/storage";
+import useTimer from "../../hooks/use-timer";
+import { sanitizeFilename } from "../../utils/sanitizer";
 
 // function getLevelString(level: number) {
 //   switch (level) {
@@ -33,8 +37,8 @@ import { sanitizeFilename } from '../../utils/sanitizer';
 // }
 
 export default function DebugLogs() {
-  const colors = useThemeStore(state => state.colors);
-  const { seconds, start } = useTimer('debug_logs_timer');
+  const colors = useThemeStore((state) => state.colors);
+  const { seconds, start } = useTimer("debug_logs_timer");
   const [logs, setLogs] = useState<
     {
       key: string;
@@ -49,13 +53,13 @@ export default function DebugLogs() {
   useEffect(() => {
     (async () => {
       if (seconds === 0) {
-        start(5, 'debug_logs_timer');
+        start(5, "debug_logs_timer");
         let logs = await logManager?.get();
         if (!logs) return;
         if (logs.length > 0 && !currentLog) {
           setCurrentLog(logs[0]);
         } else {
-          setCurrentLog(logs[logs.findIndex(l => l.key === currentLog?.key)]);
+          setCurrentLog(logs[logs.findIndex((l) => l.key === currentLog?.key)]);
         }
         setLogs(logs);
       }
@@ -68,7 +72,7 @@ export default function DebugLogs() {
         ? hexToRGBA(colors.red, 0.2)
         : item.level === LogLevel.Warn
         ? hexToRGBA(colors.orange, 0.2)
-        : 'transparent';
+        : "transparent";
 
     const color =
       item.level === LogLevel.Error || item.level === LogLevel.Fatal
@@ -83,9 +87,9 @@ export default function DebugLogs() {
         onLongPress={() => {
           Clipboard.setString(format(item));
           ToastEvent.show({
-            heading: 'Debug log copied!',
-            context: 'global',
-            type: 'success'
+            heading: "Debug log copied!",
+            context: "global",
+            type: "success"
           });
         }}
         style={{
@@ -100,8 +104,8 @@ export default function DebugLogs() {
         <Paragraph
           style={{
             flexShrink: 1,
-            flexWrap: 'wrap',
-            fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace'
+            flexWrap: "wrap",
+            fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace"
           }}
           size={12}
           color={color}
@@ -117,31 +121,31 @@ export default function DebugLogs() {
       let path = null;
       const fileName = sanitizeFilename(`notesnook_logs_${Date.now()}`);
       const data = currentLog?.logs
-        .map(log => {
-          return !log ? '' : format(log);
+        .map((log) => {
+          return !log ? "" : format(log);
         })
         .join(`\n`);
       if (!data) return;
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         let file = await ScopedStorage.createDocument(
-          fileName + '.txt',
-          'text/plain',
+          fileName + ".txt",
+          "text/plain",
           data,
-          'utf8'
+          "utf8"
         );
         if (!file) return;
         path = file.uri;
       } else {
-        path = await Storage.checkAndCreateDir('/');
-        await RNFetchBlob.fs.writeFile(path + fileName + '.txt', data, 'utf8');
+        path = await Storage.checkAndCreateDir("/");
+        await RNFetchBlob.fs.writeFile(path + fileName + ".txt", data, "utf8");
         path = path + fileName;
       }
 
       if (path) {
         ToastEvent.show({
-          heading: 'Debug logs downloaded',
-          context: 'global',
-          type: 'success'
+          heading: "Debug logs downloaded",
+          context: "global",
+          type: "success"
         });
       }
     } catch (e) {
@@ -151,28 +155,28 @@ export default function DebugLogs() {
 
   const copyLogs = () => {
     const data = currentLog?.logs
-      .map(log => {
-        return !log ? '' : format(log);
+      .map((log) => {
+        return !log ? "" : format(log);
       })
       .join(`\n`);
     if (!data) return;
     Clipboard.setString(data);
     ToastEvent.show({
-      heading: 'Debug log copied!',
-      context: 'global',
-      type: 'success'
+      heading: "Debug log copied!",
+      context: "global",
+      type: "success"
     });
   };
 
   const clearLogs = () => {
     if (!currentLog) return;
     presentDialog({
-      title: 'Clear logs',
+      title: "Clear logs",
       paragraph: `Are you sure you want to delete all logs from ${currentLog.key}?`,
-      negativeText: 'Cancel',
-      positiveText: 'Clear',
+      negativeText: "Cancel",
+      positiveText: "Clear",
       positivePress: () => {
-        let index = logs.findIndex(l => (l.key = currentLog.key));
+        let index = logs.findIndex((l) => (l.key = currentLog.key));
         logManager?.delete(currentLog.key);
         if (logs.length > 1) {
           if (logs.length - 1 === index) {
@@ -211,16 +215,16 @@ export default function DebugLogs() {
               style={{
                 paddingHorizontal: 12,
                 marginBottom: 10,
-                flexDirection: 'row',
-                alignItems: 'center',
+                flexDirection: "row",
+                alignItems: "center",
                 backgroundColor: colors.bg,
-                justifyContent: 'space-between'
+                justifyContent: "space-between"
               }}
             >
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center'
+                  flexDirection: "row",
+                  alignItems: "center"
                 }}
               >
                 <Paragraph>{currentLog.key}</Paragraph>
@@ -232,7 +236,7 @@ export default function DebugLogs() {
                     marginHorizontal: 5
                   }}
                   onPress={() => {
-                    let index = logs.findIndex(l => l.key === currentLog.key);
+                    let index = logs.findIndex((l) => l.key === currentLog.key);
                     if (index === 0) return;
                     setCurrentLog(logs[index - 1]);
                   }}
@@ -247,7 +251,7 @@ export default function DebugLogs() {
                     height: 30
                   }}
                   onPress={() => {
-                    let index = logs.findIndex(l => l.key === currentLog.key);
+                    let index = logs.findIndex((l) => l.key === currentLog.key);
                     if (index === logs.length - 1) return;
                     setCurrentLog(logs[index + 1]);
                   }}
@@ -259,7 +263,7 @@ export default function DebugLogs() {
 
               <View
                 style={{
-                  flexDirection: 'row'
+                  flexDirection: "row"
                 }}
               >
                 <IconButton
@@ -301,7 +305,7 @@ export default function DebugLogs() {
           }
           style={{
             flex: 1,
-            width: '100%'
+            width: "100%"
           }}
           stickyHeaderIndices={[0]}
           ListFooterComponent={

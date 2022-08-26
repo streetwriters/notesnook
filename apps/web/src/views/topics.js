@@ -34,7 +34,7 @@ function Topics() {
         }
         button={{
           content: "Add a new topic",
-          onClick: () => hashNavigate(`/topics/create`),
+          onClick: () => hashNavigate(`/topics/create`)
         }}
       />
     </>

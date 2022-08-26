@@ -1,30 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Notebook from '../../screens/notebook';
-import { TaggedNotes } from '../../screens/notes/tagged';
-import { TopicNotes } from '../../screens/notes/topic-notes';
-import Navigation from '../../services/navigation';
-import { useMenuStore } from '../../stores/use-menu-store';
-import useNavigationStore from '../../stores/use-navigation-store';
-import { useNoteStore } from '../../stores/use-notes-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { db } from '../../common/database';
-import { normalize, SIZE } from '../../utils/size';
-import { Properties } from '../properties';
-import { Button } from '../ui/button';
-import { Notice } from '../ui/notice';
-import { PressableButton } from '../ui/pressable';
-import Seperator from '../ui/seperator';
-import SheetWrapper from '../ui/sheet';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import React, { useEffect, useRef, useState } from "react";
+import { FlatList, View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Notebook from "../../screens/notebook";
+import { TaggedNotes } from "../../screens/notes/tagged";
+import { TopicNotes } from "../../screens/notes/topic-notes";
+import Navigation from "../../services/navigation";
+import { useMenuStore } from "../../stores/use-menu-store";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useNoteStore } from "../../stores/use-notes-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { db } from "../../common/database";
+import { normalize, SIZE } from "../../utils/size";
+import { Properties } from "../properties";
+import { Button } from "../ui/button";
+import { Notice } from "../ui/notice";
+import { PressableButton } from "../ui/pressable";
+import Seperator from "../ui/seperator";
+import SheetWrapper from "../ui/sheet";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 
 export const TagsSection = React.memo(
   () => {
-    const menuPins = useMenuStore(state => state.menuPins);
-    const loading = useNoteStore(state => state.loading);
-    const setMenuPins = useMenuStore(state => state.setMenuPins);
+    const menuPins = useMenuStore((state) => state.menuPins);
+    const loading = useNoteStore((state) => state.loading);
+    const setMenuPins = useMenuStore((state) => state.setMenuPins);
 
     useEffect(() => {
       if (!loading) {
@@ -32,10 +32,10 @@ export const TagsSection = React.memo(
       }
     }, [loading]);
 
-    const onPress = item => {
-      if (item.type === 'notebook') {
+    const onPress = (item) => {
+      if (item.type === "notebook") {
         Notebook.navigate(item);
-      } else if (item.type === 'tag') {
+      } else if (item.type === "tag") {
         TaggedNotes.navigate(item);
       } else {
         TopicNotes.navigate(item);
@@ -46,7 +46,9 @@ export const TagsSection = React.memo(
     };
     const renderItem = ({ item, index }) => {
       let alias = item.alias || item.title;
-      return <PinItem item={item} index={index} alias={alias} onPress={onPress} />;
+      return (
+        <PinItem item={item} index={index} alias={alias} onPress={onPress} />
+      );
     };
 
     return (
@@ -81,15 +83,15 @@ export const TagsSection = React.memo(
 
 export const PinItem = React.memo(
   ({ item, index, onPress, placeholder, alias }) => {
-    const colors = useThemeStore(state => state.colors);
-    const setMenuPins = useMenuStore(state => state.setMenuPins);
+    const colors = useThemeStore((state) => state.colors);
+    const setMenuPins = useMenuStore((state) => state.setMenuPins);
     alias = item?.alias || item?.title;
     const [visible, setVisible] = useState(false);
     const [headerTextState, setHeaderTextState] = useState(null);
     const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
     const fwdRef = useRef();
 
-    const onHeaderStateChange = state => {
+    const onHeaderStateChange = (state) => {
       setTimeout(() => {
         let id = state.currentScreen?.id;
         if (id === item.id) {
@@ -112,9 +114,9 @@ export const PinItem = React.memo(
     }, [headerTextState]);
 
     const icons = {
-      topic: 'bookmark',
-      notebook: 'book-outline',
-      tag: 'pound'
+      topic: "bookmark",
+      notebook: "book-outline",
+      tag: "pound"
     };
 
     return (
@@ -147,28 +149,28 @@ export const PinItem = React.memo(
           </SheetWrapper>
         )}
         <PressableButton
-          type={headerTextState?.id === item.id ? 'grayBg' : 'gray'}
+          type={headerTextState?.id === item.id ? "grayBg" : "gray"}
           onLongPress={() => {
             if (placeholder) return;
             Properties.present(item);
           }}
           onPress={() => onPress(item)}
           customStyle={{
-            width: '100%',
-            alignSelf: 'center',
+            width: "100%",
+            alignSelf: "center",
             borderRadius: 5,
-            flexDirection: 'row',
+            flexDirection: "row",
             paddingHorizontal: 8,
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            justifyContent: "space-between",
+            alignItems: "center",
             height: normalize(50),
             marginBottom: 5
           }}
         >
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+              flexDirection: "row",
+              alignItems: "center",
               flexGrow: 1,
               flex: 1
             }}
@@ -176,13 +178,13 @@ export const PinItem = React.memo(
             <View
               style={{
                 width: 30,
-                justifyContent: 'center'
+                justifyContent: "center"
               }}
             >
               <Icon color={color} size={SIZE.lg - 2} name={icons[item.type]} />
               <Icon
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   bottom: -6,
                   left: -6
                 }}
@@ -193,7 +195,7 @@ export const PinItem = React.memo(
             </View>
             <View
               style={{
-                alignItems: 'flex-start',
+                alignItems: "flex-start",
                 flexGrow: 1,
                 flex: 1
               }}
@@ -201,7 +203,7 @@ export const PinItem = React.memo(
               {headerTextState?.id === item.id ? (
                 <Heading
                   style={{
-                    flexWrap: 'wrap'
+                    flexWrap: "wrap"
                   }}
                   color={colors.heading}
                   size={SIZE.md}

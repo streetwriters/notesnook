@@ -10,7 +10,7 @@ import {
   OutputFormat,
   Plaintext,
   SerializedKey,
-  Chunk,
+  Chunk
 } from "./src/types";
 
 export class NNCrypto implements INNCrypto {
@@ -70,7 +70,7 @@ export class NNCrypto implements INNCrypto {
 
       const encryptedChunk: Chunk = {
         data: encryptionStream.write(data, final),
-        final,
+        final
       };
       await stream.write(encryptedChunk);
 
@@ -95,7 +95,7 @@ export class NNCrypto implements INNCrypto {
 
       const decryptedChunk: Chunk = {
         data: decryptionStream.read(data),
-        final,
+        final
       };
       await stream.write(decryptedChunk);
 

@@ -1,12 +1,12 @@
-import { Platform } from 'react-native';
-import { MMKV } from '../database/mmkv';
-import { useSettingStore } from '../../stores/use-setting-store';
+import { Platform } from "react-native";
+import { MMKV } from "../database/mmkv";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const WEBSITE_ID = `3c6890ce-8410-49d5-8831-15fb2eb28a21`;
 const baseUrl = `https://analytics.streetwriters.co/api/collect`;
 
 const UA =
-  Platform.OS === 'ios'
+  Platform.OS === "ios"
     ? `Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1`
     : `
 Mozilla/5.0 (Linux; Android 8.0.0; SM-G960F Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.84 Mobile Safari/537.36`;
@@ -19,37 +19,37 @@ Mozilla/5.0 (Linux; Android 8.0.0; SM-G960F Build/R16NW) AppleWebKit/537.36 (KHT
  */
 async function canUpdateAnalytics(route, conditions = []) {
   if (!useSettingStore?.getState()?.settings?.telemetry) return false;
-  let eventsList = MMKV.getString('notesnookUserEvents');
+  let eventsList = MMKV.getString("notesnookUserEvents");
 
   if (eventsList) {
     eventsList = JSON.parse(eventsList);
   }
 
   if (eventsList && eventsList[route]) {
-    console.log('analytics: event already sent', route);
+    console.log("analytics: event already sent", route);
     return false;
   }
-  if (route !== '/welcome') {
+  if (route !== "/welcome") {
     for (let cond of conditions) {
       if (!eventsList || !eventsList[cond]) {
-        console.log('analytics: conditions not met for event', route, cond);
+        console.log("analytics: conditions not met for event", route, cond);
         return false;
       }
     }
   }
-  console.log('analytics: will send event', route);
+  console.log("analytics: will send event", route);
   return true;
 }
 
 async function saveAnalytics(route, value = true) {
-  let eventsList = MMKV.getString('notesnookUserEvents');
+  let eventsList = MMKV.getString("notesnookUserEvents");
   if (eventsList) {
     eventsList = JSON.parse(eventsList);
   } else {
     eventsList = {};
   }
   eventsList[route] = value;
-  MMKV.setString('notesnookUserEvents', JSON.stringify(eventsList));
+  MMKV.setString("notesnookUserEvents", JSON.stringify(eventsList));
 }
 
 /**
@@ -61,7 +61,12 @@ async function saveAnalytics(route, value = true) {
  * @returns
  */
 
-async function pageView(route, prevRoute = '', conditions = ['/welcome'], once = true) {
+async function pageView(
+  route,
+  prevRoute = "",
+  conditions = ["/welcome"],
+  once = true
+) {
   if (__DEV__) return;
   if (!(await canUpdateAnalytics(route, conditions)) && once) return;
   let body = {
@@ -70,22 +75,22 @@ async function pageView(route, prevRoute = '', conditions = ['/welcome'], once =
       url: `notesnook-${Platform.OS}${prevRoute}${route}`,
       referrer: `https://notesnook.com/notesnook-${Platform.OS}${prevRoute}`,
       hostname: `notesnook-${Platform.OS}`,
-      language: 'en-US',
-      screen: '1920x1080'
+      language: "en-US",
+      screen: "1920x1080"
     },
-    type: 'pageview'
+    type: "pageview"
   };
 
   try {
     let response = await fetch(baseUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': UA
+        "Content-Type": "application/json",
+        "User-Agent": UA
       },
       body: JSON.stringify(body)
     });
-    console.log('analytics: event sent', route);
+    console.log("analytics: event sent", route);
     await saveAnalytics(route);
     return await response.text();
   } catch (e) {
@@ -99,22 +104,22 @@ async function sendEvent(type, value, once = true) {
   let body = {
     payload: {
       website: WEBSITE_ID,
-      url: '/',
+      url: "/",
       event_type: type,
       event_value: value,
-      hostname: 'notesnook-android-app',
-      language: 'en-US',
-      screen: '1920x1080'
+      hostname: "notesnook-android-app",
+      language: "en-US",
+      screen: "1920x1080"
     },
-    type: 'event'
+    type: "event"
   };
 
   try {
     let response = await fetch(baseUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': UA
+        "Content-Type": "application/json",
+        "User-Agent": UA
       },
       body: JSON.stringify(body)
     });

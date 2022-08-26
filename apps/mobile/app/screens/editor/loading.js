@@ -1,23 +1,31 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button } from '../../components/ui/button';
-import { IconButton } from '../../components/ui/icon-button';
-import Paragraph from '../../components/ui/typography/paragraph';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { eClearEditor, eOnLoadNote } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { editorState } from './tiptap/utils';
+import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button } from "../../components/ui/button";
+import { IconButton } from "../../components/ui/icon-button";
+import Paragraph from "../../components/ui/typography/paragraph";
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { eClearEditor, eOnLoadNote } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { editorState } from "./tiptap/utils";
 
-const EditorOverlay = ({ editorId = '', editor }) => {
-  const colors = useThemeStore(state => state.colors);
+const EditorOverlay = ({ editorId = "", editor }) => {
+  const colors = useThemeStore((state) => state.colors);
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
   const translateValue = useSharedValue(6000);
   const insets = useSafeAreaInsets();
-  const isDefaultEditor = editorId === '';
+  const isDefaultEditor = editorId === "";
   const timers = useRef({
     loading: 0,
     error: 0,
@@ -30,7 +38,7 @@ const EditorOverlay = ({ editorId = '', editor }) => {
     clearTimeout(timers.current.closing);
   };
 
-  const load = async _loading => {
+  const load = async (_loading) => {
     editorState().overlay = true;
     clearTimers();
     if (_loading) {
@@ -60,10 +68,10 @@ const EditorOverlay = ({ editorId = '', editor }) => {
   };
 
   useEffect(() => {
-    eSubscribeEvent('loadingNote' + editorId, load);
+    eSubscribeEvent("loadingNote" + editorId, load);
     return () => {
       clearTimers();
-      eUnSubscribeEvent('loadingNote' + editorId, load);
+      eUnSubscribeEvent("loadingNote" + editorId, load);
     };
   }, [editorId]);
 
@@ -82,12 +90,12 @@ const EditorOverlay = ({ editorId = '', editor }) => {
     <Animated.View
       style={[
         {
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
+          position: "absolute",
+          width: "100%",
+          height: "100%",
           backgroundColor: colors.bg,
-          justifyContent: 'center',
-          alignItems: 'center',
+          justifyContent: "center",
+          alignItems: "center",
           zIndex: 100
         },
         animatedStyle
@@ -95,22 +103,22 @@ const EditorOverlay = ({ editorId = '', editor }) => {
     >
       <View
         style={{
-          width: '100%',
+          width: "100%",
           backgroundColor: colors.bg,
           borderRadius: 5,
-          height: '100%',
-          alignItems: 'flex-start',
+          height: "100%",
+          alignItems: "flex-start",
           paddingTop: insets.top
         }}
       >
         {isDefaultEditor ? (
           <View
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               height: 50,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%',
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
               paddingLeft: 6,
               paddingRight: 12
             }}
@@ -127,9 +135,9 @@ const EditorOverlay = ({ editorId = '', editor }) => {
 
             <View
               style={{
-                flexDirection: 'row',
+                flexDirection: "row",
                 height: 50,
-                alignItems: 'center'
+                alignItems: "center"
               }}
             >
               <IconButton name="dots-horizontal" color={colors.pri} />
@@ -140,8 +148,8 @@ const EditorOverlay = ({ editorId = '', editor }) => {
         <View
           style={{
             paddingHorizontal: 12,
-            width: '100%',
-            alignItems: 'flex-start'
+            width: "100%",
+            alignItems: "flex-start"
           }}
         >
           {isDefaultEditor ? (
@@ -151,9 +159,9 @@ const EditorOverlay = ({ editorId = '', editor }) => {
                 backgroundColor: colors.nav,
                 borderRadius: 100,
                 marginBottom: 10,
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexDirection: 'row',
+                justifyContent: "flex-start",
+                alignItems: "center",
+                flexDirection: "row",
                 paddingHorizontal: 10,
                 marginTop: 10
               }}
@@ -176,7 +184,7 @@ const EditorOverlay = ({ editorId = '', editor }) => {
           <View
             style={{
               height: 25,
-              width: '100%',
+              width: "100%",
               backgroundColor: colors.nav,
               borderRadius: 5
             }}
@@ -185,9 +193,9 @@ const EditorOverlay = ({ editorId = '', editor }) => {
           <View
             style={{
               height: 12,
-              width: '100%',
+              width: "100%",
               marginTop: 10,
-              flexDirection: 'row'
+              flexDirection: "row"
             }}
           >
             <View
@@ -222,7 +230,7 @@ const EditorOverlay = ({ editorId = '', editor }) => {
           <View
             style={{
               height: 16,
-              width: '100%',
+              width: "100%",
               backgroundColor: colors.nav,
               borderRadius: 5,
               marginTop: 10
@@ -232,7 +240,7 @@ const EditorOverlay = ({ editorId = '', editor }) => {
           <View
             style={{
               height: 16,
-              width: '100%',
+              width: "100%",
               backgroundColor: colors.nav,
               borderRadius: 5,
               marginTop: 10
@@ -255,7 +263,7 @@ const EditorOverlay = ({ editorId = '', editor }) => {
                 type="error"
                 style={{
                   marginTop: 20,
-                  alignSelf: 'flex-start',
+                  alignSelf: "flex-start",
                   borderRadius: 100,
                   height: 40
                 }}
@@ -271,11 +279,12 @@ const EditorOverlay = ({ editorId = '', editor }) => {
                 size={SIZE.xs}
                 color={colors.icon}
                 style={{
-                  maxWidth: '100%',
+                  maxWidth: "100%",
                   marginTop: 5
                 }}
               >
-                If the editor fails to load even after reloading. Try restarting the app.
+                If the editor fails to load even after reloading. Try restarting
+                the app.
               </Paragraph>
             </>
           ) : null}

@@ -1,16 +1,20 @@
-import { ToolId } from '@streetwriters/editor/dist/es/toolbar';
-import React, { RefObject } from 'react';
-import { View } from 'react-native';
-import ActionSheet from 'react-native-actions-sheet';
-import { ScrollView } from 'react-native-gesture-handler';
-import { PressableButton } from '../../../components/ui/pressable';
-import { SvgView } from '../../../components/ui/svg';
-import Paragraph from '../../../components/ui/typography/paragraph';
-import { presentSheet } from '../../../services/event-manager';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { SIZE } from '../../../utils/size';
-import { DraggableItem, useDragState } from './state';
-import { findToolById, getToolIcon, getUngroupedTools } from './toolbar-definition';
+import { ToolId } from "@streetwriters/editor/dist/es/toolbar";
+import React, { RefObject } from "react";
+import { View } from "react-native";
+import ActionSheet from "react-native-actions-sheet";
+import { ScrollView } from "react-native-gesture-handler";
+import { PressableButton } from "../../../components/ui/pressable";
+import { SvgView } from "../../../components/ui/svg";
+import Paragraph from "../../../components/ui/typography/paragraph";
+import { presentSheet } from "../../../services/event-manager";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { SIZE } from "../../../utils/size";
+import { DraggableItem, useDragState } from "./state";
+import {
+  findToolById,
+  getToolIcon,
+  getUngroupedTools
+} from "./toolbar-definition";
 
 export default function ToolSheet({
   group,
@@ -19,8 +23,8 @@ export default function ToolSheet({
   group: DraggableItem;
   fwdRef: RefObject<ActionSheet>;
 }) {
-  const colors = useThemeStore(state => state.colors);
-  const data = useDragState(state => state.data);
+  const colors = useThemeStore((state) => state.colors);
+  const data = useDragState((state) => state.data);
   const ungrouped = getUngroupedTools(data) as ToolId[];
 
   const renderTool = React.useCallback((item: ToolId) => {
@@ -44,23 +48,25 @@ export default function ToolSheet({
         }}
         customStyle={{
           marginBottom: 10,
-          width: '100%',
+          width: "100%",
           height: 50,
           paddingHorizontal: 12,
           paddingRight: 0,
           borderRadius: 5,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-start'
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start"
         }}
       >
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center'
+            flexDirection: "row",
+            alignItems: "center"
           }}
         >
-          {iconSvgString ? <SvgView width={23} height={23} src={iconSvgString} /> : null}
+          {iconSvgString ? (
+            <SvgView width={23} height={23} src={iconSvgString} />
+          ) : null}
           <Paragraph
             style={{
               marginLeft: iconSvgString ? 10 : 0
@@ -78,7 +84,7 @@ export default function ToolSheet({
   return (
     <View
       style={{
-        maxHeight: '100%',
+        maxHeight: "100%",
         padding: 12
       }}
     >
@@ -91,7 +97,7 @@ export default function ToolSheet({
         {!ungrouped || ungrouped.length === 0 ? (
           <Paragraph
             style={{
-              alignSelf: 'center'
+              alignSelf: "center"
             }}
             color={colors.icon}
           >
@@ -112,6 +118,6 @@ export default function ToolSheet({
 
 ToolSheet.present = (payload: DraggableItem) => {
   presentSheet({
-    component: ref => <ToolSheet fwdRef={ref} group={payload} />
+    component: (ref) => <ToolSheet fwdRef={ref} group={payload} />
   });
 };

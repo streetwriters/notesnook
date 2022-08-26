@@ -16,14 +16,14 @@ const menuItems = [
     icon: Icon.Edit,
     onClick: ({ tag }) => {
       hashNavigate(`/tags/${tag.id}/edit`);
-    },
+    }
   },
   {
     key: "shortcut",
     title: ({ tag }) =>
       db.settings.isPinned(tag.id) ? "Remove shortcut" : "Create shortcut",
     icon: Icon.Shortcut,
-    onClick: ({ tag }) => appStore.pinItemToMenu(tag),
+    onClick: ({ tag }) => appStore.pinItemToMenu(tag)
   },
   {
     key: "delete",
@@ -40,8 +40,8 @@ const menuItems = [
       showToast("success", `${items.length} tags deleted`);
       tagStore.refresh();
     },
-    multiSelect: true,
-  },
+    multiSelect: true
+  }
 ];
 
 function Tag({ item, index }) {

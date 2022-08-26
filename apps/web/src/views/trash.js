@@ -46,7 +46,7 @@ function Trash() {
                   not be able to recover any of these items.
                 </Text>
               </>
-            ),
+            )
           }).then(async (res) => {
             if (res) {
               try {
@@ -60,7 +60,7 @@ function Trash() {
               }
             }
           });
-        },
+        }
       }}
     />
   );

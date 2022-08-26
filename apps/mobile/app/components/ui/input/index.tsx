@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from 'react';
+import React, { RefObject, useState } from "react";
 import {
   TouchableOpacity,
   TextInput,
@@ -7,26 +7,33 @@ import {
   TextInputSubmitEditingEventData,
   ColorValue,
   ViewStyle
-} from 'react-native';
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/use-theme-store';
+} from "react-native";
+import { View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import {
   ERRORS_LIST,
   validateEmail,
   validatePass,
   validateUsername
-} from '../../../services/validation';
-import { getElevation } from '../../../utils';
-import { SIZE } from '../../../utils/size';
-import { IconButton } from '../icon-button';
-import Paragraph from '../typography/paragraph';
+} from "../../../services/validation";
+import { getElevation } from "../../../utils";
+import { SIZE } from "../../../utils/size";
+import { IconButton } from "../icon-button";
+import Paragraph from "../typography/paragraph";
 
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<any>;
-  validationType?: 'password' | 'email' | 'confirmPassword' | 'username' | 'phonenumber';
+  validationType?:
+    | "password"
+    | "email"
+    | "confirmPassword"
+    | "username"
+    | "phonenumber";
   loading?: boolean;
-  onSubmit?: (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void | undefined;
+  onSubmit?: (
+    event: NativeSyntheticEvent<TextInputSubmitEditingEventData>
+  ) => void | undefined;
   onErrorCheck?: (error: boolean) => void;
   errorMessage?: string;
   customColor?: ColorValue;
@@ -46,7 +53,7 @@ interface InputProps extends TextInputProps {
   onFocusInput?: () => void;
   marginRight?: number;
   buttonLeft?: React.ReactNode;
-  inputStyle?: TextInputProps['style'];
+  inputStyle?: TextInputProps["style"];
   containerStyle?: ViewStyle;
 }
 
@@ -75,7 +82,7 @@ const Input = ({
   containerStyle = {},
   ...restProps
 }: InputProps) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [error, setError] = useState(false);
   const [focus, setFocus] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
@@ -88,7 +95,11 @@ const Input = ({
     //  SPECIAL: true,
   });
 
-  const color = error ? colors.red : focus ? customColor || colors.accent : colors.nav;
+  const color = error
+    ? colors.red
+    : focus
+    ? customColor || colors.accent
+    : colors.nav;
 
   const validate = async (value: string) => {
     if (!validationType) return;
@@ -103,21 +114,21 @@ const Input = ({
     let isError: any = null;
 
     switch (validationType) {
-      case 'password':
+      case "password":
         isError = validatePass(value);
         break;
-      case 'email':
+      case "email":
         isError = validateEmail(value);
         break;
-      case 'username':
+      case "username":
         isError = validateUsername(value);
         break;
-      case 'confirmPassword':
+      case "confirmPassword":
         isError = customValidator && value === customValidator();
         break;
-      case 'phonenumber':
+      case "phonenumber":
         // eslint-disable-next-line no-case-declarations
-        const phone = require('phone').default;
+        const phone = require("phone").default;
         // eslint-disable-next-line no-case-declarations
         let result = phone(value, {
           strictDetection: true,
@@ -132,10 +143,10 @@ const Input = ({
         break;
     }
 
-    if (validationType === 'password') {
+    if (validationType === "password") {
       let hasError = false;
 
-      Object.keys(isError).forEach(e => {
+      Object.keys(isError).forEach((e) => {
         if (isError[e] === true) {
           hasError = true;
         }
@@ -173,9 +184,9 @@ const Input = ({
     borderWidth: 1,
     borderRadius: 5,
     borderColor: color,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     flexGrow: 1,
     height: height || 50,
     paddingHorizontal: 12,
@@ -183,7 +194,7 @@ const Input = ({
     ...containerStyle
   };
 
-  const textStyle: TextInputProps['style'] = {
+  const textStyle: TextInputProps["style"] = {
     paddingHorizontal: 0,
     fontSize: fontSize,
     color: onPress && loading ? colors.accent : colors.pri,
@@ -192,7 +203,7 @@ const Input = ({
     flexGrow: 1,
     height: height || 50,
     flexShrink: 1,
-    fontFamily: 'OpenSans-Regular',
+    fontFamily: "OpenSans-Regular",
     //@ts-ignore
     ...inputStyle
   };
@@ -209,7 +220,12 @@ const Input = ({
           marginRight: marginRight
         }}
       >
-        <TouchableOpacity disabled={!loading} onPress={onPress} activeOpacity={1} style={style}>
+        <TouchableOpacity
+          disabled={!loading}
+          onPress={onPress}
+          activeOpacity={1}
+          style={style}
+        >
           {buttonLeft && buttonLeft}
 
           <TextInput
@@ -218,10 +234,14 @@ const Input = ({
             editable={!loading}
             onChangeText={onChange}
             onBlur={onBlur}
-            keyboardType={validationType === 'email' ? 'email-address' : restProps.keyboardType}
+            keyboardType={
+              validationType === "email"
+                ? "email-address"
+                : restProps.keyboardType
+            }
             importantForAutofill="yes"
             importantForAccessibility="yes"
-            keyboardAppearance={colors.night ? 'dark' : 'light'}
+            keyboardAppearance={colors.night ? "dark" : "light"}
             onFocus={onFocus}
             onSubmitEditing={onSubmit}
             style={textStyle}
@@ -231,10 +251,10 @@ const Input = ({
 
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
+              flexDirection: "row",
+              justifyContent: "center",
               height: 35 > height ? height : 35,
-              alignItems: 'center'
+              alignItems: "center"
             }}
           >
             {secureTextEntry && (
@@ -290,7 +310,7 @@ const Input = ({
           {error && showError && errorMessage ? (
             <View
               style={{
-                position: 'absolute',
+                position: "absolute",
                 backgroundColor: colors.nav,
                 paddingVertical: 3,
                 paddingHorizontal: 5,
@@ -302,11 +322,15 @@ const Input = ({
               <Paragraph
                 size={SIZE.xs}
                 style={{
-                  textAlign: 'right',
-                  textAlignVertical: 'bottom'
+                  textAlign: "right",
+                  textAlignVertical: "bottom"
                 }}
               >
-                <Icon name="alert-circle-outline" size={SIZE.xs} color={colors.errorText} />{' '}
+                <Icon
+                  name="alert-circle-outline"
+                  size={SIZE.xs}
+                  color={colors.errorText}
+                />{" "}
                 {errorMessage}
               </Paragraph>
             </View>
@@ -314,7 +338,7 @@ const Input = ({
         </TouchableOpacity>
       </View>
 
-      {validationType === 'password' && focus && (
+      {validationType === "password" && focus && (
         <View
           style={{
             marginTop: -5,
@@ -323,21 +347,22 @@ const Input = ({
         >
           {
             //@ts-ignore
-            Object.keys(errorList).filter(k => errorList[k] === true).length !== 0
-              ? Object.keys(ERRORS_LIST).map(error => (
+            Object.keys(errorList).filter((k) => errorList[k] === true)
+              .length !== 0
+              ? Object.keys(ERRORS_LIST).map((error) => (
                   <View
                     //@ts-ignore
                     key={ERRORS_LIST[error]}
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center'
+                      flexDirection: "row",
+                      alignItems: "center"
                     }}
                   >
                     <Icon
                       //@ts-ignore
-                      name={errorList[error] ? 'close' : 'check'}
+                      name={errorList[error] ? "close" : "check"}
                       //@ts-ignore
-                      color={errorList[error] ? 'red' : 'green'}
+                      color={errorList[error] ? "red" : "green"}
                     />
 
                     <Paragraph style={{ marginLeft: 5 }} size={SIZE.xs}>

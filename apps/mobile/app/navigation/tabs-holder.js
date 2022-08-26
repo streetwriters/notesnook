@@ -1,58 +1,71 @@
-import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
-import React, { useEffect, useRef, useState } from 'react';
-import { Platform, View, StatusBar } from 'react-native';
+import {
+  activateKeepAwake,
+  deactivateKeepAwake
+} from "@sayem314/react-native-keep-awake";
+import React, { useEffect, useRef, useState } from "react";
+import { Platform, View, StatusBar } from "react-native";
 import {
   addSpecificOrientationListener,
   getInitialOrientation,
   getSpecificOrientation,
   removeSpecificOrientationListener
-} from 'react-native-orientation';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../e2e/test.ids';
-import { SideMenu } from '../components/side-menu';
-import { FluidTabs } from '../components/tabs';
-import { editorController, editorState } from '../screens/editor/tiptap/utils';
-import { EditorWrapper } from '../screens/editor/wrapper';
-import { DDS } from '../services/device-detection';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
-import { useEditorStore } from '../stores/use-editor-store';
-import { useSettingStore } from '../stores/use-setting-store';
-import { useThemeStore } from '../stores/use-theme-store';
-import { setWidthHeight } from '../utils';
-import { db } from '../common/database';
+} from "react-native-orientation";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { notesnook } from "../../e2e/test.ids";
+import { SideMenu } from "../components/side-menu";
+import { FluidTabs } from "../components/tabs";
+import { editorController, editorState } from "../screens/editor/tiptap/utils";
+import { EditorWrapper } from "../screens/editor/wrapper";
+import { DDS } from "../services/device-detection";
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../services/event-manager";
+import { useEditorStore } from "../stores/use-editor-store";
+import { useSettingStore } from "../stores/use-setting-store";
+import { useThemeStore } from "../stores/use-theme-store";
+import { setWidthHeight } from "../utils";
+import { db } from "../common/database";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor
-} from '../utils/events';
-import { editorRef, tabBarRef } from '../utils/global-refs';
-import { hideAllTooltips } from '../hooks/use-tooltip';
-import { NavigationStack } from './navigation-stack';
+} from "../utils/events";
+import { editorRef, tabBarRef } from "../utils/global-refs";
+import { hideAllTooltips } from "../hooks/use-tooltip";
+import { NavigationStack } from "./navigation-stack";
 export const TabsHolder = React.memo(
   () => {
-    const colors = useThemeStore(state => state.colors);
+    const colors = useThemeStore((state) => state.colors);
 
-    const deviceMode = useSettingStore(state => state.deviceMode);
-    const setFullscreen = useSettingStore(state => state.setFullscreen);
-    const fullscreen = useSettingStore(state => state.fullscreen);
-    const setDeviceModeState = useSettingStore(state => state.setDeviceMode);
-    const dimensions = useSettingStore(state => state.dimensions);
-    const setDimensions = useSettingStore(state => state.setDimensions);
+    const deviceMode = useSettingStore((state) => state.deviceMode);
+    const setFullscreen = useSettingStore((state) => state.setFullscreen);
+    const fullscreen = useSettingStore((state) => state.fullscreen);
+    const setDeviceModeState = useSettingStore((state) => state.setDeviceMode);
+    const dimensions = useSettingStore((state) => state.dimensions);
+    const setDimensions = useSettingStore((state) => state.setDimensions);
     const insets = useSafeAreaInsets();
     const animatedOpacity = useSharedValue(0);
     const animatedTranslateY = useSharedValue(-9999);
     const overlayRef = useRef();
     const [orientation, setOrientation] = useState(getInitialOrientation());
-    const introCompleted = useSettingStore(state => state.settings.introCompleted);
+    const introCompleted = useSettingStore(
+      (state) => state.settings.introCompleted
+    );
 
     const onOrientationChange = (o, o2) => {
       setOrientation(o || o2);
     };
 
     useEffect(() => {
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === "ios") {
         addSpecificOrientationListener(onOrientationChange);
         getSpecificOrientation && getSpecificOrientation(onOrientationChange);
       }
@@ -63,7 +76,7 @@ export const TabsHolder = React.memo(
 
     const showFullScreenEditor = () => {
       setFullscreen(true);
-      if (deviceMode === 'smallTablet') {
+      if (deviceMode === "smallTablet") {
         tabBarRef.current?.openDrawer();
       }
       editorRef.current?.setNativeProps({
@@ -71,13 +84,15 @@ export const TabsHolder = React.memo(
           width: dimensions.width,
           zIndex: 999,
           paddingHorizontal:
-            deviceMode === 'smallTablet' ? dimensions.width * 0 : dimensions.width * 0.15
+            deviceMode === "smallTablet"
+              ? dimensions.width * 0
+              : dimensions.width * 0.15
         }
       });
     };
 
     const closeFullScreenEditor = () => {
-      if (deviceMode === 'smallTablet') {
+      if (deviceMode === "smallTablet") {
         tabBarRef.current?.closeDrawer();
       }
       setFullscreen(false);
@@ -87,14 +102,15 @@ export const TabsHolder = React.memo(
       editorRef.current?.setNativeProps({
         style: {
           width:
-            deviceMode === 'smallTablet'
-              ? dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
+            deviceMode === "smallTablet"
+              ? dimensions.width -
+                valueLimiter(dimensions.width * 0.4, 300, 450)
               : dimensions.width * 0.55,
           zIndex: null,
           paddingHorizontal: 0
         }
       });
-      if (deviceMode === 'smallTablet') {
+      if (deviceMode === "smallTablet") {
         setTimeout(() => {
           tabBarRef.current?.goToIndex(1);
         }, 100);
@@ -114,8 +130,8 @@ export const TabsHolder = React.memo(
       };
     }, [deviceMode, dimensions, colors]);
 
-    const _onLayout = async event => {
-      console.log('layout called here');
+    const _onLayout = async (event) => {
+      console.log("layout called here");
       if (layoutTimer) {
         clearTimeout(layoutTimer);
         layoutTimer = null;
@@ -138,17 +154,17 @@ export const TabsHolder = React.memo(
         width: size.width,
         height: size.height
       });
-      console.log('height change', size.width, size.height);
+      console.log("height change", size.width, size.height);
       setWidthHeight(size);
       DDS.setSize(size);
 
       if (DDS.isLargeTablet()) {
-        setDeviceMode('tablet', size);
+        setDeviceMode("tablet", size);
         setTimeout(() => {
           introCompleted && tabBarRef.current?.goToIndex(0);
         }, 500);
       } else if (DDS.isSmallTab) {
-        setDeviceMode('smallTablet', size);
+        setDeviceMode("smallTablet", size);
         if (!fullscreen) {
           setTimeout(() => {
             introCompleted && tabBarRef.current?.closeDrawer();
@@ -159,7 +175,7 @@ export const TabsHolder = React.memo(
           }, 500);
         }
       } else {
-        setDeviceMode('mobile', size);
+        setDeviceMode("mobile", size);
       }
     }
 
@@ -172,17 +188,18 @@ export const TabsHolder = React.memo(
           style: {
             width: size.width,
             zIndex: 999,
-            paddingHorizontal: current === 'smallTablet' ? size.width * 0 : size.width * 0.15
+            paddingHorizontal:
+              current === "smallTablet" ? size.width * 0 : size.width * 0.15
           }
         });
       } else {
         editorRef.current?.setNativeProps({
           style: {
-            position: 'relative',
+            position: "relative",
             width:
-              current === 'tablet'
+              current === "tablet"
                 ? size.width * 0.55
-                : current === 'smallTablet'
+                : current === "smallTablet"
                 ? size.width - valueLimiter(size.width * 0.4, 300, 450)
                 : size.width,
             zIndex: null,
@@ -194,20 +211,20 @@ export const TabsHolder = React.memo(
         return;
       }
       setTimeout(() => {
-        if (current === 'tablet') {
+        if (current === "tablet") {
           tabBarRef.current?.goToIndex(0);
         } else {
           if (!editorState().movedAway) {
             tabBarRef.current?.goToIndex(2);
           } else {
-            console.log('index one', editorState().movedAway);
+            console.log("index one", editorState().movedAway);
             tabBarRef.current?.goToIndex(1);
           }
         }
       }, 1);
     }
 
-    const onScroll = scrollOffset => {
+    const onScroll = (scrollOffset) => {
       hideAllTooltips();
       if (scrollOffset > offsets[deviceMode].a - 10) {
         animatedOpacity.value = 0;
@@ -225,7 +242,7 @@ export const TabsHolder = React.memo(
       }
     };
 
-    const toggleView = show => {
+    const toggleView = (show) => {
       animatedTranslateY.value = show ? 0 : -9999;
     };
 
@@ -249,8 +266,12 @@ export const TabsHolder = React.memo(
       },
       smallTablet: {
         a: fullscreen ? 0 : valueLimiter(dimensions.width * 0.3, 300, 350),
-        b: fullscreen ? 0 : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350),
-        c: fullscreen ? 0 : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350)
+        b: fullscreen
+          ? 0
+          : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350),
+        c: fullscreen
+          ? 0
+          : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350)
       },
       tablet: {
         a: 0,
@@ -295,14 +316,19 @@ export const TabsHolder = React.memo(
         style={{
           flex: 1,
           backgroundColor: colors.bg,
-          paddingBottom: Platform.OS === 'android' ? insets?.bottom : 0,
+          paddingBottom: Platform.OS === "android" ? insets?.bottom : 0,
           marginRight:
-            orientation === 'LANDSCAPE-RIGHT' && Platform.OS === 'ios' ? insets.right : 0,
-          marginLeft: orientation === 'LANDSCAPE-LEFT' && Platform.OS === 'ios' ? insets.left : 0
+            orientation === "LANDSCAPE-RIGHT" && Platform.OS === "ios"
+              ? insets.right
+              : 0,
+          marginLeft:
+            orientation === "LANDSCAPE-LEFT" && Platform.OS === "ios"
+              ? insets.left
+              : 0
         }}
       >
         <StatusBar
-          barStyle={colors.night ? 'light-content' : 'dark-content'}
+          barStyle={colors.night ? "light-content" : "dark-content"}
           translucent={true}
           backgroundColor="transparent"
         />
@@ -311,17 +337,19 @@ export const TabsHolder = React.memo(
           <FluidTabs
             ref={tabBarRef}
             dimensions={dimensions}
-            widths={!introCompleted ? widths['mobile'] : widths[deviceMode]}
-            enabled={deviceMode !== 'tablet' && !fullscreen}
+            widths={!introCompleted ? widths["mobile"] : widths[deviceMode]}
+            enabled={deviceMode !== "tablet" && !fullscreen}
             onScroll={onScroll}
             onChangeTab={onChangeTab}
-            onDrawerStateChange={state => true}
+            onDrawerStateChange={(state) => true}
           >
             <View
               key="1"
               style={{
-                height: '100%',
-                width: fullscreen ? 0 : widths[!introCompleted ? 'mobile' : deviceMode]?.a
+                height: "100%",
+                width: fullscreen
+                  ? 0
+                  : widths[!introCompleted ? "mobile" : deviceMode]?.a
               }}
             >
               <SideMenu />
@@ -330,11 +358,13 @@ export const TabsHolder = React.memo(
             <View
               key="2"
               style={{
-                height: '100%',
-                width: fullscreen ? 0 : widths[!introCompleted ? 'mobile' : deviceMode]?.b
+                height: "100%",
+                width: fullscreen
+                  ? 0
+                  : widths[!introCompleted ? "mobile" : deviceMode]?.b
               }}
             >
-              {deviceMode === 'mobile' ? (
+              {deviceMode === "mobile" ? (
                 <Animated.View
                   onTouchEnd={() => {
                     tabBarRef.current?.closeDrawer();
@@ -343,11 +373,11 @@ export const TabsHolder = React.memo(
                   }}
                   style={[
                     {
-                      position: 'absolute',
-                      width: '100%',
-                      height: '100%',
+                      position: "absolute",
+                      width: "100%",
+                      height: "100%",
                       zIndex: 999,
-                      backgroundColor: 'rgba(0,0,0,0.2)'
+                      backgroundColor: "rgba(0,0,0,0.2)"
                     },
                     animatedStyle
                   ]}
@@ -368,20 +398,20 @@ export const TabsHolder = React.memo(
 
 let layoutTimer = null;
 
-const onChangeTab = async obj => {
+const onChangeTab = async (obj) => {
   if (obj.i === 2) {
     editorState().movedAway = false;
     editorState().isFocused = true;
     activateKeepAwake();
     if (!editorState().currentlyEditing) {
-      eSendEvent(eOnLoadNote, { type: 'new' });
+      eSendEvent(eOnLoadNote, { type: "new" });
     }
   } else {
     if (obj.from === 2) {
       deactivateKeepAwake();
       editorState().movedAway = true;
       editorState().isFocused = false;
-      eSendEvent(eClearEditor, 'removeHandler');
+      eSendEvent(eClearEditor, "removeHandler");
       setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
       let id = useEditorStore.getState().currentEditingNote;
       let note = db.notes.note(id);

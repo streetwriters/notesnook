@@ -1,29 +1,34 @@
-import React from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { SIZE } from '../../../utils/size';
-import { IconButton } from '../icon-button';
-import Paragraph from '../typography/paragraph';
+import React from "react";
+import { View } from "react-native";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { SIZE } from "../../../utils/size";
+import { IconButton } from "../icon-button";
+import Paragraph from "../typography/paragraph";
 
 export interface NoticeProps {
-  type?: 'alert' | 'information';
+  type?: "alert" | "information";
   text: string;
-  size?: 'small' | 'large';
+  size?: "small" | "large";
   selectable?: boolean;
 }
 
-export const Notice = ({ type = 'alert', text, size = 'large', selectable }: NoticeProps) => {
-  const colors = useThemeStore(state => state.colors);
-  const isSmall = size === 'small';
+export const Notice = ({
+  type = "alert",
+  text,
+  size = "large",
+  selectable
+}: NoticeProps) => {
+  const colors = useThemeStore((state) => state.colors);
+  const isSmall = size === "small";
 
   return (
     <View
       style={{
         padding: 12,
-        flexDirection: 'row',
+        flexDirection: "row",
         backgroundColor: colors.nav,
         borderRadius: isSmall ? 5 : 10,
-        alignItems: 'flex-start'
+        alignItems: "flex-start"
       }}
     >
       <IconButton
@@ -32,9 +37,9 @@ export const Notice = ({ type = 'alert', text, size = 'large', selectable }: Not
         customStyle={{
           width: isSmall ? undefined : 40,
           height: isSmall ? undefined : 40,
-          alignSelf: 'flex-start'
+          alignSelf: "flex-start"
         }}
-        color={type === 'alert' ? colors.errorText : colors.accent}
+        color={type === "alert" ? colors.errorText : colors.accent}
       />
       <Paragraph
         style={{

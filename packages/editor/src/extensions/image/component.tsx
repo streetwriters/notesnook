@@ -14,7 +14,7 @@ import {
   downloadImage,
   isDataUrl,
   toBlobURL,
-  toDataURL,
+  toDataURL
 } from "../../utils/downloader";
 
 export function ImageComponent(
@@ -68,8 +68,8 @@ export function ImageComponent(
             ? "start"
             : "end",
           ":hover .drag-handle, :active .drag-handle": {
-            opacity: 1,
-          },
+            opacity: 1
+          }
         }}
       >
         {!source || error ? (
@@ -86,7 +86,7 @@ export function ImageComponent(
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              py: 50,
+              py: 50
             }}
           >
             <Icon
@@ -109,7 +109,7 @@ export function ImageComponent(
                 textDecoration: "none",
                 textAlign: "center",
                 mx: 2,
-                mt: 2,
+                mt: 2
               }}
             >
               {error
@@ -149,7 +149,7 @@ export function ImageComponent(
                       position: "absolute",
                       top: -40,
                       mb: 2,
-                      alignItems: "end",
+                      alignItems: "end"
                     }}
                   >
                     <ToolbarGroup
@@ -159,19 +159,19 @@ export function ImageComponent(
                           ? [
                               "imageAlignLeft",
                               "imageAlignRight",
-                              "imageProperties",
+                              "imageProperties"
                             ]
                           : [
                               "imageAlignLeft",
                               "imageAlignCenter",
                               "imageAlignRight",
-                              "imageProperties",
+                              "imageProperties"
                             ]
                       }
                       sx={{
                         boxShadow: "menu",
                         borderRadius: "default",
-                        bg: "background",
+                        bg: "background"
                       }}
                     />
                   </Flex>
@@ -189,7 +189,7 @@ export function ImageComponent(
                   position: "absolute",
                   top: 2,
                   left: 2,
-                  zIndex: 999,
+                  zIndex: 999
                 }}
               />
             )}
@@ -206,7 +206,7 @@ export function ImageComponent(
                 border: selected
                   ? "2px solid var(--primary)"
                   : "2px solid transparent",
-                borderRadius: "default",
+                borderRadius: "default"
               }}
               {...props}
             />

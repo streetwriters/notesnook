@@ -1,12 +1,12 @@
 //@ts-ignore
-import { Platform } from 'react-native';
-import create, { State } from 'zustand';
-import { APP_VERSION } from '../version';
-import PremiumService from '../services/premium';
-import { SUBSCRIPTION_STATUS } from '../utils/constants';
-import { db } from '../common/database';
-import { MMKV } from '../common/database/mmkv';
-import layoutmanager from '../utils/layout-manager';
+import { Platform } from "react-native";
+import create, { State } from "zustand";
+import { APP_VERSION } from "../version";
+import PremiumService from "../services/premium";
+import { SUBSCRIPTION_STATUS } from "../utils/constants";
+import { db } from "../common/database";
+import { MMKV } from "../common/database/mmkv";
+import layoutmanager from "../utils/layout-manager";
 export interface MessageStore extends State {
   message: Message;
   setMessage: (message: Message) => void;
@@ -34,19 +34,19 @@ export type Action = {
 export type Style = {
   marginTop?: number;
   marginBottom?: number;
-  textAlign?: 'center' | 'left' | 'right';
+  textAlign?: "center" | "left" | "right";
 };
 export type BodyItem = {
   type:
-    | 'image'
-    | 'title'
-    | 'description'
-    | 'body'
-    | 'list'
-    | 'features'
-    | 'poll'
-    | 'subheading'
-    | 'shapes';
+    | "image"
+    | "title"
+    | "description"
+    | "body"
+    | "list"
+    | "features"
+    | "poll"
+    | "subheading"
+    | "shapes";
   src?: string;
   caption?: string;
   text?: string;
@@ -57,7 +57,7 @@ export type BodyItem = {
 };
 
 export type Announcement = {
-  type: 'dialog' | 'inline';
+  type: "dialog" | "inline";
   body: BodyItem[];
   id: string;
   callToActions: Action[];
@@ -75,10 +75,10 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     actionText: null,
     onPress: () => null,
     data: {},
-    icon: 'account-outline'
+    icon: "account-outline"
   },
-  setMessage: message => {
-    console.log('setting message');
+  setMessage: (message) => {
+    console.log("setting message");
     setTimeout(() => {
       if (get().message.visible || message.visible) {
         layoutmanager.withAnimation();
@@ -88,13 +88,15 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     }, 1);
   },
   announcements: [],
-  remove: async id => {
-    MMKV.setItem(id, 'removed');
+  remove: async (id) => {
+    MMKV.setItem(id, "removed");
 
     const inlineCopy = get().announcements.slice();
     const dialogsCopy = get().dialogs.slice();
-    const index = inlineCopy.findIndex(announcement => announcement.id === id);
-    const dialogIndex = dialogsCopy.findIndex(dialog => dialog.id === id);
+    const index = inlineCopy.findIndex(
+      (announcement) => announcement.id === id
+    );
+    const dialogIndex = dialogsCopy.findIndex((dialog) => dialog.id === id);
 
     if (index >= -1) {
       dialogsCopy.splice(dialogIndex, 1);
@@ -111,19 +113,19 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
         announcements = [];
       }
     } catch (e) {
-      console.log('ERROR', e);
+      console.log("ERROR", e);
       set({ announcements: [] });
     } finally {
       let all = await getFiltered(announcements);
 
       setTimeout(() => {
-        if (all.filter(a => a.type === 'inline').length !== 0) {
-          console.log('with setAnnouncement ');
+        if (all.filter((a) => a.type === "inline").length !== 0) {
+          console.log("with setAnnouncement ");
           layoutmanager.withAnimation();
         }
         set({
-          announcements: all.filter(a => a.type === 'inline'),
-          dialogs: all.filter(a => a.type === 'dialog')
+          announcements: all.filter((a) => a.type === "inline"),
+          dialogs: all.filter((a) => a.type === "dialog")
         });
       }, 1);
     }
@@ -141,13 +143,15 @@ const getFiltered = async (announcements: Announcement[]) => {
   return filtered;
 };
 
-export const allowedPlatforms = ['all', 'mobile', Platform.OS];
+export const allowedPlatforms = ["all", "mobile", Platform.OS];
 
 async function shouldShowAnnouncement(announcement: Announcement) {
   if (!announcement) return false;
-  let removed = (await MMKV.getStringAsync(announcement.id)) === 'removed';
+  let removed = (await MMKV.getStringAsync(announcement.id)) === "removed";
   if (removed) return false;
-  let show = announcement.platforms.some(platform => allowedPlatforms.indexOf(platform) > -1);
+  let show = announcement.platforms.some(
+    (platform) => allowedPlatforms.indexOf(platform) > -1
+  );
 
   if (announcement.appVersion) {
     return announcement.appVersion === APP_VERSION;
@@ -157,28 +161,28 @@ async function shouldShowAnnouncement(announcement: Announcement) {
   if (!show) return false;
   const user = (await db.user?.getUser()) as User;
   const subStatus = user?.subscription?.type || SUBSCRIPTION_STATUS.BASIC;
-  show = announcement.userTypes.some(userType => {
+  show = announcement.userTypes.some((userType) => {
     switch (userType) {
-      case 'pro':
+      case "pro":
         return PremiumService.get();
-      case 'trial':
+      case "trial":
         return subStatus === SUBSCRIPTION_STATUS.TRIAL;
-      case 'trialExpired':
+      case "trialExpired":
         return subStatus === SUBSCRIPTION_STATUS.BASIC;
-      case 'loggedOut':
+      case "loggedOut":
         return !user;
-      case 'verified':
+      case "verified":
         return user?.isEmailConfirmed;
-      case 'loggedIn':
+      case "loggedIn":
         return !!user;
-      case 'unverified':
+      case "unverified":
         return !user?.isEmailConfirmed;
-      case 'proExpired':
+      case "proExpired":
         return (
           subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
           subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
         );
-      case 'any':
+      case "any":
       default:
         return false;
     }

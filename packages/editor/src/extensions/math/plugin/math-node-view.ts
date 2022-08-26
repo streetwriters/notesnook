@@ -9,20 +9,20 @@ import {
   EditorState,
   Transaction,
   TextSelection,
-  PluginKey,
+  PluginKey
 } from "prosemirror-state";
 import {
   NodeView,
   EditorView,
   Decoration,
-  DecorationSource,
+  DecorationSource
 } from "prosemirror-view";
 import { StepMap } from "prosemirror-transform";
 import { keymap } from "prosemirror-keymap";
 import {
   newlineInCode,
   chainCommands,
-  deleteSelection,
+  deleteSelection
 } from "prosemirror-commands";
 
 import { collapseMathNode } from "./commands/collapse-math-node";
@@ -347,11 +347,11 @@ export class MathView implements NodeView, ICursorPosObserver {
             ArrowLeft: collapseMathNode(this._outerView, -1, true),
             ArrowRight: collapseMathNode(this._outerView, +1, true),
             ArrowUp: collapseMathNode(this._outerView, -1, true),
-            ArrowDown: collapseMathNode(this._outerView, +1, true),
-          }),
-        ],
+            ArrowDown: collapseMathNode(this._outerView, +1, true)
+          })
+        ]
       }),
-      dispatchTransaction: this.dispatchInner.bind(this),
+      dispatchTransaction: this.dispatchInner.bind(this)
     });
 
     // focus element

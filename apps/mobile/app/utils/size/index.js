@@ -1,10 +1,10 @@
-import { Dimensions, PixelRatio, Platform } from 'react-native';
-import { DDS } from '../../services/device-detection';
+import { Dimensions, PixelRatio, Platform } from "react-native";
+import { DDS } from "../../services/device-detection";
 
 export const scale = {
   fontScale: 1
 };
-let windowSize = Dimensions.get('window');
+let windowSize = Dimensions.get("window");
 let adjustedWidth = windowSize.width * PixelRatio.get();
 let adjustedHeight = windowSize.height * PixelRatio.get();
 const pixelDensity = PixelRatio.get();
@@ -18,7 +18,7 @@ export const getDeviceSize = () => {
   return Platform.isPad ? diagonalSize + 2 : diagonalSize;
 };
 
-const getDpi = pd => {
+const getDpi = (pd) => {
   return 160 * pd;
 };
 const correction = (size, multiplier) => {
@@ -26,7 +26,7 @@ const correction = (size, multiplier) => {
   if (dSize >= 4 && dSize <= 5.3 && pixelDensity <= 3) {
     return size * 0.93;
   } else if (dSize > 5.3 && dSize < 7 && pixelDensity < 3 && !DDS.isTab) {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       return size;
     }
     return size * 0.97;
@@ -46,7 +46,7 @@ const correction = (size, multiplier) => {
     return size;
   }
 };
-export const normalize = size => {
+export const normalize = (size) => {
   let pd = pixelDensity;
   if (pd === 1 || pd < 1) {
     return correction(size, 0.82);

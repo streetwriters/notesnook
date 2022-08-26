@@ -1,6 +1,6 @@
-import { useEditor } from './use-editor';
-import type { ToolbarGroupDefinition } from '@streetwriters/editor/dist/es/toolbar/types';
-import { ThemeStore } from '../../../stores/use-theme-store';
+import { useEditor } from "./use-editor";
+import type { ToolbarGroupDefinition } from "@streetwriters/editor/dist/es/toolbar/types";
+import { ThemeStore } from "../../../stores/use-theme-store";
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -8,7 +8,7 @@ export type EditorState = {
   isFullscreen: boolean;
   onNoteCreated?: ((id: string) => void) | null;
   isFocused: boolean;
-  focusType: 'title' | 'editor' | null;
+  focusType: "title" | "editor" | null;
   movedAway: boolean;
   tooltip: boolean;
   isRestoringState: boolean;
@@ -37,7 +37,7 @@ export type EditorProps = {
   editorId?: string;
   onLoad?: () => void;
   onChange?: (html: string) => void;
-  theme?: ThemeStore['colors'];
+  theme?: ThemeStore["colors"];
 };
 
 export type EditorMessage = {
@@ -66,8 +66,8 @@ export type Content = {
 export type SavePayload = {
   title?: string;
   id?: string | null;
-  data?: Content['data'];
-  type?: Content['type'];
+  data?: Content["data"];
+  type?: Content["type"];
   sessionId?: string | null;
   sessionHistoryId?: number;
 };

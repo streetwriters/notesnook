@@ -3,7 +3,7 @@ import { AppEventManager } from "../common/app-events";
 import { EVENTS } from "@notesnook/desktop/events";
 import {
   showUpdateAvailableNotice,
-  showUpdateReadyNotice,
+  showUpdateReadyNotice
 } from "../common/dialog-controller";
 import checkForUpdate from "../commands/check-for-update";
 import { isDesktop } from "../utils/platform";
@@ -29,11 +29,11 @@ export default function useAutoUpdater() {
       changeStatus({
         type: "available",
         version: info.version,
-        changelog: info.releaseNotes,
+        changelog: info.releaseNotes
       });
       showUpdateAvailableNotice({
         changelog: info.releaseNotes,
-        version: info.version,
+        version: info.version
       });
     }
 

@@ -63,7 +63,7 @@ function binaryToJson(binary, def) {
 async function importAttachments(attachments) {
   for (let attachment of attachments) {
     const file = new File([attachment.data.buffer], attachment.filename, {
-      type: attachment.mime,
+      type: attachment.mime
     });
     if (db.attachments.exists(attachment.hash)) continue;
 
@@ -75,7 +75,7 @@ async function importAttachments(attachments) {
       hash: attachment.hash,
       hashType: attachment.hashType,
       filename: attachment.filename,
-      type: attachment.mime,
+      type: attachment.mime
     });
   }
 }
@@ -85,7 +85,7 @@ async function importNotebook(notebook) {
   if (!nb) {
     const nbId = await db.notebooks.add({
       title: notebook.notebook,
-      topics: [notebook.topic],
+      topics: [notebook.topic]
     });
     nb = db.notebooks.notebook(nbId).data;
   }

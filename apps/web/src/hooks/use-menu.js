@@ -23,8 +23,8 @@ const useMenuStore = create((set) => ({
       isOpen: false,
       items: [],
       data: undefined,
-      title: undefined,
-    })),
+      title: undefined
+    }))
 }));
 
 export function useMenuTrigger() {
@@ -39,7 +39,7 @@ export function useMenuTrigger() {
     openMenu: open,
     closeMenu: close,
     isOpen,
-    target,
+    target
   };
 }
 
@@ -60,7 +60,7 @@ export function getPosition(element, positionOptions) {
     relativeTo = "mouse",
     absolute = false,
     location = undefined,
-    yOffset = 0,
+    yOffset = 0
   } = positionOptions || {};
 
   const { x, y, width, height, actualX, actualY } =
@@ -130,7 +130,7 @@ function getMousePosition(e) {
     x: posx,
     y: posy,
     actualY: posy,
-    actualX: posx,
+    actualX: posx
   };
 }
 
@@ -146,7 +146,7 @@ function getElementPosition(element, absolute) {
     width: rect.width,
     height: rect.height,
     actualY: rect.y,
-    actualX: rect.x,
+    actualX: rect.x
   };
   if (absolute) {
     position.x = position.actualX;
@@ -168,7 +168,7 @@ function mapMenuItems(items, data) {
       isNew,
       type,
       iconColor,
-      modifier,
+      modifier
     } = item;
 
     const isHidden = hidden && hidden(data, item);
@@ -210,7 +210,7 @@ function mapMenuItems(items, data) {
       color,
       iconColor,
 
-      modifier: modifier?.join("+"),
+      modifier: modifier?.join("+")
     };
 
     if (hasSubmenu)

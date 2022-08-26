@@ -56,7 +56,7 @@ export function selectionToOffset(state: EditorState): NodeWithOffset {
   return {
     node: state.doc.nodeAt(from) || undefined,
     from,
-    to: from + $from.node().nodeSize,
+    to: from + $from.node().nodeSize
   };
 }
 

@@ -3,7 +3,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
-  useMemo,
+  useMemo
 } from "react";
 import { Flex, Text, Button } from "rebass";
 import * as Icon from "../icons";

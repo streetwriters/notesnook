@@ -1,29 +1,30 @@
-import dayjs from 'dayjs';
-import React from 'react';
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { TimeSince } from '../../components/ui/time-since';
-import Heading from '../../components/ui/typography/heading';
-import Paragraph from '../../components/ui/typography/paragraph';
-import { useUserStore } from '../../stores/use-user-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { SUBSCRIPTION_STATUS_STRINGS } from '../../utils/constants';
-import { SIZE } from '../../utils/size';
-import { SectionItem } from './section-item';
+import dayjs from "dayjs";
+import React from "react";
+import { View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { TimeSince } from "../../components/ui/time-since";
+import Heading from "../../components/ui/typography/heading";
+import Paragraph from "../../components/ui/typography/paragraph";
+import { useUserStore } from "../../stores/use-user-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
+import { SIZE } from "../../utils/size";
+import { SectionItem } from "./section-item";
 
-export const getTimeLeft = t2 => {
-  let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
+export const getTimeLeft = (t2) => {
+  let daysRemaining = dayjs(t2).diff(dayjs(), "days");
   return {
-    time: dayjs(t2).diff(dayjs(), daysRemaining === 0 ? 'hours' : 'days'),
+    time: dayjs(t2).diff(dayjs(), daysRemaining === 0 ? "hours" : "days"),
     isHour: daysRemaining === 0
   };
 };
 
 const SettingsUserSection = ({ item }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
-  const user = useUserStore(state => state.user);
-  const subscriptionDaysLeft = user && getTimeLeft(parseInt(user.subscription?.expiry));
+  const user = useUserStore((state) => state.user);
+  const subscriptionDaysLeft =
+    user && getTimeLeft(parseInt(user.subscription?.expiry));
   // const isExpired = user && subscriptionDaysLeft.time < 0;
   // const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   // const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
@@ -35,7 +36,7 @@ const SettingsUserSection = ({ item }) => {
   //   user?.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
   //   user?.subscription?.type !== SUBSCRIPTION_STATUS.BETA;
 
-  const lastSynced = useUserStore(state => state.lastSynced);
+  const lastSynced = useUserStore((state) => state.lastSynced);
 
   return (
     <>
@@ -49,8 +50,8 @@ const SettingsUserSection = ({ item }) => {
           >
             <View
               style={{
-                alignSelf: 'center',
-                width: '100%',
+                alignSelf: "center",
+                width: "100%",
                 paddingVertical: 12,
                 backgroundColor: colors.bg,
                 borderRadius: 5
@@ -58,26 +59,26 @@ const SettingsUserSection = ({ item }) => {
             >
               <View
                 style={{
-                  justifyContent: 'space-between',
-                  flexDirection: 'row',
+                  justifyContent: "space-between",
+                  flexDirection: "row",
                   paddingBottom: 4
                 }}
               >
                 <View
                   style={{
-                    flexDirection: 'row',
-                    width: '100%',
-                    justifyContent: 'space-between'
+                    flexDirection: "row",
+                    width: "100%",
+                    justifyContent: "space-between"
                   }}
                 >
                   <View
                     style={{
-                      flexDirection: 'row'
+                      flexDirection: "row"
                     }}
                   >
                     <View
                       style={{
-                        alignItems: 'center'
+                        alignItems: "center"
                       }}
                     >
                       <View
@@ -86,11 +87,15 @@ const SettingsUserSection = ({ item }) => {
                           borderRadius: 100,
                           width: 50,
                           height: 50,
-                          alignItems: 'center',
-                          justifyContent: 'center'
+                          alignItems: "center",
+                          justifyContent: "center"
                         }}
                       >
-                        <Icon size={SIZE.xl} color={colors.accent} name="account-outline" />
+                        <Icon
+                          size={SIZE.xl}
+                          color={colors.accent}
+                          name="account-outline"
+                        />
                       </View>
                     </View>
 
@@ -101,14 +106,16 @@ const SettingsUserSection = ({ item }) => {
                       }}
                     >
                       <Heading color={colors.accent} size={SIZE.xs + 1}>
-                        {SUBSCRIPTION_STATUS_STRINGS[user.subscription?.type].toUpperCase()}
+                        {SUBSCRIPTION_STATUS_STRINGS[
+                          user.subscription?.type
+                        ].toUpperCase()}
                       </Heading>
 
                       <Paragraph color={colors.heading} size={SIZE.sm}>
                         {user?.email}
                       </Paragraph>
                       <Paragraph color={colors.icon} size={SIZE.xs}>
-                        Last synced{' '}
+                        Last synced{" "}
                         <TimeSince
                           style={{ fontSize: SIZE.xs, color: colors.icon }}
                           time={lastSynced}
@@ -207,7 +214,7 @@ const SettingsUserSection = ({ item }) => {
             </View>
           </View>
 
-          {item.sections.map(item => (
+          {item.sections.map((item) => (
             <SectionItem key={item.name} item={item} />
           ))}
         </>

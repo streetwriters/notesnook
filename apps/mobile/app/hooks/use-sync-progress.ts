@@ -1,10 +1,10 @@
 //@ts-ignore
-import { EVENTS } from '@streetwriters/notesnook-core/common';
-import { createRef, useCallback, useEffect, useRef, useState } from 'react';
-import { db } from '../common/database';
+import { EVENTS } from "@streetwriters/notesnook-core/common";
+import { createRef, useCallback, useEffect, useRef, useState } from "react";
+import { db } from "../common/database";
 
 export type SyncProgressEventType = {
-  type: 'upload' | 'download';
+  type: "upload" | "download";
   total: number;
   current: number;
 };
@@ -13,11 +13,14 @@ const useSyncProgress = () => {
   const [progress, setProgress] = useState<SyncProgressEventType>();
   const EV = db.eventManager;
 
-  const onProgress = useCallback(({ type, current, total }: SyncProgressEventType) => {
-    //@ts-ignore
+  const onProgress = useCallback(
+    ({ type, current, total }: SyncProgressEventType) => {
+      //@ts-ignore
 
-    setProgress({ type, current, total });
-  }, []);
+      setProgress({ type, current, total });
+    },
+    []
+  );
 
   const onSyncComplete = () => {
     setProgress(undefined);

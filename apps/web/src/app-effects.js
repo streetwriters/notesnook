@@ -18,7 +18,7 @@ import {
   showBuyDialog,
   showFeatureDialog,
   showInvalidSystemTimeDialog,
-  showOnboardingDialog,
+  showOnboardingDialog
 } from "./common/dialog-controller";
 import useSystemTheme from "./hooks/use-system-theme";
 import { isTesting } from "./utils/platform";
@@ -101,7 +101,7 @@ export default function AppEffects({ setShow }) {
       initUser,
       initNotes,
       addReminder,
-      setIsVaultCreated,
+      setIsVaultCreated
     ]
   );
 
@@ -124,7 +124,7 @@ export default function AppEffects({ setShow }) {
           updateStatus({
             key,
             status: `${status} attachments (${current}/${total})`,
-            progress: 0,
+            progress: 0
           });
         }
       }
@@ -145,7 +145,7 @@ export default function AppEffects({ setShow }) {
           updateStatus({
             key,
             status: text,
-            progress: loaded === total ? 100 : percent,
+            progress: loaded === total ? 100 : percent
           });
         }
       }

@@ -1,22 +1,22 @@
-import React from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
-import Paragraph from '../ui/typography/paragraph';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
+import React from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
+import Paragraph from "../ui/typography/paragraph";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { notesnook } from "../../../e2e/test.ids";
 
 const DialogButtons = ({
   onPressPositive,
   onPressNegative,
   positiveTitle,
-  negativeTitle = 'Cancel',
+  negativeTitle = "Cancel",
   loading,
   doneText,
   positiveType
 }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return (
     <View
@@ -36,12 +36,16 @@ const DialogButtons = ({
       ) : doneText ? (
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center'
+            flexDirection: "row",
+            alignItems: "center"
           }}
         >
-          <Icon color={colors.accent} name="check-circle-outline" size={SIZE.md} />
-          <Paragraph color={colors.accent}>{' ' + doneText}</Paragraph>
+          <Icon
+            color={colors.accent}
+            name="check-circle-outline"
+            size={SIZE.md}
+          />
+          <Paragraph color={colors.accent}>{" " + doneText}</Paragraph>
         </View>
       ) : (
         <View />
@@ -49,8 +53,8 @@ const DialogButtons = ({
 
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center'
+          flexDirection: "row",
+          alignItems: "center"
         }}
       >
         <Button
@@ -70,7 +74,7 @@ const DialogButtons = ({
               marginLeft: 10
             }}
             bold
-            type={positiveType || 'transparent'}
+            type={positiveType || "transparent"}
             title={positiveTitle}
           />
         ) : null}
@@ -83,9 +87,9 @@ export default DialogButtons;
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
     marginTop: 10
   }
 });

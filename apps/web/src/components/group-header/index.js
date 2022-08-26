@@ -14,7 +14,7 @@ const groupByToTitleMap = {
   abc: "A - Z",
   year: "Year",
   week: "Week",
-  month: "Month",
+  month: "Month"
 };
 
 const menuItems = [
@@ -33,14 +33,14 @@ const menuItems = [
       {
         key: "asc",
         title: ({ groupOptions }) =>
-          groupOptions.sortBy === "title" ? "A - Z" : "Oldest - newest",
+          groupOptions.sortBy === "title" ? "A - Z" : "Oldest - newest"
       },
       {
         key: "desc",
         title: ({ groupOptions }) =>
-          groupOptions.sortBy === "title" ? "Z - A" : "Newest - oldest",
-      },
-    ]),
+          groupOptions.sortBy === "title" ? "Z - A" : "Newest - oldest"
+      }
+    ])
   },
   {
     key: "sortBy",
@@ -50,22 +50,22 @@ const menuItems = [
       {
         key: "dateCreated",
         title: "Date created",
-        hidden: ({ type }) => type === "trash",
+        hidden: ({ type }) => type === "trash"
       },
       {
         key: "dateEdited",
         title: "Date edited",
-        hidden: ({ type }) => type === "trash" || type === "tags",
+        hidden: ({ type }) => type === "trash" || type === "tags"
       },
       {
         key: "dateDeleted",
         title: "Date deleted",
-        hidden: ({ type }) => type !== "trash",
+        hidden: ({ type }) => type !== "trash"
       },
       {
         key: "dateModified",
         title: "Date modified",
-        hidden: ({ type }) => type !== "tags",
+        hidden: ({ type }) => type !== "tags"
       },
       {
         key: "title",
@@ -77,9 +77,9 @@ const menuItems = [
             groupOptions.groupBy !== "abc" &&
             groupOptions.groupBy !== "none"
           );
-        },
-      },
-    ]),
+        }
+      }
+    ])
   },
   {
     key: "groupBy",
@@ -91,9 +91,9 @@ const menuItems = [
       { key: "year", title: "Year" },
       { key: "month", title: "Month" },
       { key: "week", title: "Week" },
-      { key: "abc", title: "A - Z" },
-    ]),
-  },
+      { key: "abc", title: "A - Z" }
+    ])
+  }
 ];
 
 function changeGroupOptions({ groupOptions, type, refresh, parent }, item) {
@@ -139,7 +139,7 @@ function GroupHeader(props) {
     type,
     refresh,
     onSelectGroup,
-    isFocused,
+    isFocused
   } = props;
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(type)
@@ -167,7 +167,7 @@ function GroupHeader(props) {
     notesViewMode,
     notebooksViewMode,
     setNotesViewMode,
-    setNotebooksViewMode,
+    setNotebooksViewMode
   ]);
   const isCompact = useMemo(() => viewMode === "compact", [viewMode]);
 
@@ -189,12 +189,12 @@ function GroupHeader(props) {
             key: groupTitle,
             title: () => groupTitle,
             onClick: () => onJump(groupTitle),
-            checked: group.title === title,
+            checked: group.title === title
           };
         });
         openMenu(items, {
           title: "Jump to group",
-          target: groupHeaderRef.current,
+          target: groupHeaderRef.current
         });
       }}
       mx={1}
@@ -211,8 +211,8 @@ function GroupHeader(props) {
         border: isMenuTarget ? "1px solid var(--primary)" : "none",
         ":focus": {
           border: "1px solid var(--primary)",
-          outline: "none",
-        },
+          outline: "none"
+        }
       }}
       tabIndex={0}
     >
@@ -241,7 +241,7 @@ function GroupHeader(props) {
                 title: "Group & sort",
                 groupOptions,
                 refresh,
-                type,
+                type
               });
             }}
           />

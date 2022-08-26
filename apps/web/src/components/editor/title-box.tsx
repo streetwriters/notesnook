@@ -29,7 +29,7 @@ function TitleBox(props: TitleBoxProps) {
         p: 0,
         fontFamily: "heading",
         fontSize: ["1.625em", "1.625em", "2.625em"],
-        fontWeight: "heading",
+        fontWeight: "heading"
       }}
       onChange={(e) => {
         setCurrentTitle(e.target.value);

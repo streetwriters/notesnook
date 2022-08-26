@@ -2,7 +2,7 @@ import { Box, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import {
   store as selectionStore,
-  useStore as useSelectionStore,
+  useStore as useSelectionStore
 } from "../../stores/selection-store";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import Config from "../../utils/config";
@@ -20,16 +20,16 @@ function debugMenuItems(type) {
       onClick: async ({ [type]: item }) => {
         if (type === "note" && item.contentId) {
           item.additionalData = {
-            content: db.debug.strip(await db.content.raw(item.contentId)),
+            content: db.debug.strip(await db.content.raw(item.contentId))
           };
         }
         item.additionalData = {
           ...item.additionalData,
-          lastSynced: await db.lastSynced(),
+          lastSynced: await db.lastSynced()
         };
         await clipboard.writeText(db.debug.strip(item));
-      },
-    },
+      }
+    }
   ];
 }
 
@@ -38,10 +38,10 @@ function ListItem(props) {
     colors: { text, background, primary } = {
       primary: "primary",
       text: "text",
-      background: "background",
+      background: "background"
     },
     isFocused,
-    isCompact,
+    isCompact
   } = props;
 
   const listItemRef = useRef();
@@ -89,7 +89,7 @@ function ListItem(props) {
           title,
           items: selectedItems,
           target: listItemRef.current,
-          ...props.menu?.extraData,
+          ...props.menu?.extraData
         });
       }}
       pr={2}
@@ -106,15 +106,15 @@ function ListItem(props) {
         outline: isMenuTarget ? `1px solid var(--${primary})` : "none",
         // borderBottom: isMenuTarget ? `1px solid var(--${primary})` : "none",
         ":hover": {
-          backgroundColor: isSelected ? "shade" : "hover",
+          backgroundColor: isSelected ? "shade" : "hover"
         },
         ":focus,:focus-visible": {
           // outline: "none",
-          outline: `1px solid var(--${primary})`,
+          outline: `1px solid var(--${primary})`
           // outline: `1px solid var(--${primary})`,
         },
         overflow: "hidden",
-        maxWidth: "100%",
+        maxWidth: "100%"
       }}
       onKeyPress={(e) => {
         if (e.key === "Enter") {
@@ -152,7 +152,7 @@ function ListItem(props) {
         sx={{
           whiteSpace: "nowrap",
           overflow: "hidden",
-          textOverflow: "ellipsis",
+          textOverflow: "ellipsis"
         }}
       >
         {props.title}
@@ -170,7 +170,7 @@ function ListItem(props) {
             position: "relative",
             display: "-webkit-box",
             WebkitLineClamp: 4,
-            WebkitBoxOrient: "vertical",
+            WebkitBoxOrient: "vertical"
           }}
         >
           {props.body}

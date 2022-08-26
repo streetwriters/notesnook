@@ -28,7 +28,7 @@ export function dropCursor(options: DropcursorOptions = {}) {
   return new Plugin({
     view(editorView) {
       return new DropCursorView(editorView, options);
-    },
+    }
   });
 }
 
@@ -109,7 +109,7 @@ class DropCursorView {
           left: nodeRect.left,
           right: nodeRect.right,
           top: top - this.width / 2,
-          bottom: top + this.width / 2,
+          bottom: top + this.width / 2
         };
       }
     }
@@ -119,7 +119,7 @@ class DropCursorView {
         left: coords.left - this.width / 2,
         right: coords.left + this.width / 2,
         top: coords.top,
-        bottom: coords.bottom,
+        bottom: coords.bottom
       };
     }
 
@@ -162,7 +162,7 @@ class DropCursorView {
     if (!this.editorView.editable) return;
     let pos = this.editorView.posAtCoords({
       left: event.clientX,
-      top: event.clientY,
+      top: event.clientY
     });
 
     let node =

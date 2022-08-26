@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { presentSheet } from '../../../services/event-manager';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import useSyncProgress from '../../../hooks/use-sync-progress';
-import { SIZE } from '../../../utils/size';
-import Seperator from '../../ui/seperator';
-import { ProgressBarComponent } from '../../ui/svg/lazy';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
+import React, { useEffect, useState } from "react";
+import { View } from "react-native";
+import { presentSheet } from "../../../services/event-manager";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import useSyncProgress from "../../../hooks/use-sync-progress";
+import { SIZE } from "../../../utils/size";
+import Seperator from "../../ui/seperator";
+import { ProgressBarComponent } from "../../ui/svg/lazy";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 
 export const Progress = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const { progress } = useSyncProgress();
   const [currentProgress, setCurrentProgress] = useState(0.1);
 
   useEffect(() => {
     let nextProgress = progress ? progress?.current / progress?.total : 0.1;
 
-    setCurrentProgress(currentProgress => {
+    setCurrentProgress((currentProgress) => {
       if (currentProgress > nextProgress) return currentProgress;
       return progress ? progress?.current / progress?.total : 0.1;
     });
@@ -26,9 +26,9 @@ export const Progress = () => {
   return (
     <View
       style={{
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
         paddingTop: 25,
         paddingBottom: 15
       }}
@@ -55,8 +55,8 @@ export const Progress = () => {
 
       {progress ? (
         <Paragraph color={colors.icon}>
-          {progress.type?.slice(0, 1).toUpperCase() + progress.type?.slice(1)}ing{' '}
-          {progress?.current}/{progress?.total}
+          {progress.type?.slice(0, 1).toUpperCase() + progress.type?.slice(1)}
+          ing {progress?.current}/{progress?.total}
         </Paragraph>
       ) : null}
     </View>
@@ -67,6 +67,6 @@ Progress.present = () => {
   presentSheet({
     component: <Progress />,
     disableClosing: true,
-    context: 'sync_progress'
+    context: "sync_progress"
   });
 };

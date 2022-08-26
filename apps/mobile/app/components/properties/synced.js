@@ -1,30 +1,30 @@
-import React from 'react';
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useUserStore } from '../../stores/use-user-store';
-import { openLinkInBrowser } from '../../utils/functions';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { Button } from '../ui/button';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import React from "react";
+import { View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
+import { openLinkInBrowser } from "../../utils/functions";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { Button } from "../ui/button";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 
 export const Synced = ({ item, close }) => {
-  const colors = useThemeStore(state => state.colors);
-  const user = useUserStore(state => state.user);
-  const lastSynced = useUserStore(state => state.lastSynced);
+  const colors = useThemeStore((state) => state.colors);
+  const user = useUserStore((state) => state.user);
+  const lastSynced = useUserStore((state) => state.lastSynced);
 
   return user && lastSynced >= item.dateModified ? (
     <View
       style={{
         paddingVertical: 0,
-        width: '100%',
+        width: "100%",
         paddingHorizontal: 12,
-        alignItems: 'center',
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignSelf: 'center',
+        alignItems: "center",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignSelf: "center",
         paddingTop: 10,
         marginTop: 10,
         borderTopWidth: 1,
@@ -44,14 +44,14 @@ export const Synced = ({ item, close }) => {
           color={colors.heading}
           size={SIZE.xs}
           style={{
-            flexWrap: 'wrap'
+            flexWrap: "wrap"
           }}
         >
           Encrypted and synced
         </Heading>
         <Paragraph
           style={{
-            flexWrap: 'wrap'
+            flexWrap: "wrap"
           }}
           size={SIZE.xs}
           color={colors.pri}
@@ -65,7 +65,10 @@ export const Synced = ({ item, close }) => {
           try {
             close();
             await sleep(300);
-            await openLinkInBrowser('https://docs.notesnook.com/how-is-my-data-encrypted/', colors);
+            await openLinkInBrowser(
+              "https://docs.notesnook.com/how-is-my-data-encrypted/",
+              colors
+            );
           } catch (e) {}
         }}
         fontSize={SIZE.xs + 1}

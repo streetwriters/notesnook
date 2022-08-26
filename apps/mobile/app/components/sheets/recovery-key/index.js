@@ -1,25 +1,29 @@
-import Clipboard from '@react-native-clipboard/clipboard';
-import React, { createRef } from 'react';
-import { Platform, View } from 'react-native';
-import FileViewer from 'react-native-file-viewer';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import Share from 'react-native-share';
+import Clipboard from "@react-native-clipboard/clipboard";
+import React, { createRef } from "react";
+import { Platform, View } from "react-native";
+import FileViewer from "react-native-file-viewer";
+import * as ScopedStorage from "react-native-scoped-storage";
+import Share from "react-native-share";
 //import { LOGO_BASE64 } from '../../../assets/images/assets';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
-import { clearMessage } from '../../../services/message';
-import SettingsService from '../../../services/settings';
-import { db } from '../../../common/database';
-import Storage from '../../../common/database/storage';
-import { eOpenRecoveryKeyDialog } from '../../../utils/events';
-import { sanitizeFilename } from '../../../utils/sanitizer';
-import { SIZE } from '../../../utils/size';
-import { sleep } from '../../../utils/time';
-import DialogHeader from '../../dialog/dialog-header';
-import { Button } from '../../ui/button';
-import Seperator from '../../ui/seperator';
-import SheetWrapper from '../../ui/sheet';
-import { QRCode } from '../../ui/svg/lazy';
-import Paragraph from '../../ui/typography/paragraph';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from "../../../services/event-manager";
+import { clearMessage } from "../../../services/message";
+import SettingsService from "../../../services/settings";
+import { db } from "../../../common/database";
+import Storage from "../../../common/database/storage";
+import { eOpenRecoveryKeyDialog } from "../../../utils/events";
+import { sanitizeFilename } from "../../../utils/sanitizer";
+import { SIZE } from "../../../utils/size";
+import { sleep } from "../../../utils/time";
+import DialogHeader from "../../dialog/dialog-header";
+import { Button } from "../../ui/button";
+import Seperator from "../../ui/seperator";
+import SheetWrapper from "../../ui/sheet";
+import { QRCode } from "../../ui/svg/lazy";
+import Paragraph from "../../ui/typography/paragraph";
 
 let RNFetchBlob;
 
@@ -37,7 +41,7 @@ class RecoveryKeySheet extends React.Component {
     this.tapCount = 0;
   }
 
-  open = signup => {
+  open = (signup) => {
     if (signup) {
       this.signup = true;
     }
@@ -54,10 +58,10 @@ class RecoveryKeySheet extends React.Component {
   close = () => {
     if (this.tapCount === 0) {
       ToastEvent.show({
-        heading: 'Did you save recovery key?',
-        message: 'Tap one more time to confirm.',
-        type: 'success',
-        context: 'local'
+        heading: "Did you save recovery key?",
+        message: "Tap one more time to confirm.",
+        type: "success",
+        context: "local"
       });
       this.tapCount++;
       return;
@@ -89,25 +93,31 @@ class RecoveryKeySheet extends React.Component {
   }
 
   saveQRCODE = async () => {
-    this.svg.current?.toDataURL(async data => {
+    this.svg.current?.toDataURL(async (data) => {
       try {
         let path;
-        RNFetchBlob = require('rn-fetch-blob').default;
-        let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode';
-        fileName = sanitizeFilename(fileName, { replacement: '_' });
-        fileName = fileName + '.png';
+        RNFetchBlob = require("rn-fetch-blob").default;
+        let fileName = "nn_" + this.user.email + "_recovery_key_qrcode";
+        fileName = sanitizeFilename(fileName, { replacement: "_" });
+        fileName = fileName + ".png";
 
-        if (Platform.OS === 'android') {
-          await ScopedStorage.createDocument(fileName, 'image/png', data, 'base64');
+        if (Platform.OS === "android") {
+          await ScopedStorage.createDocument(
+            fileName,
+            "image/png",
+            data,
+            "base64"
+          );
         } else {
-          path = await Storage.checkAndCreateDir('/');
-          await RNFetchBlob.fs.writeFile(path + fileName, data, 'base64');
+          path = await Storage.checkAndCreateDir("/");
+          await RNFetchBlob.fs.writeFile(path + fileName, data, "base64");
         }
         ToastEvent.show({
-          heading: 'Recovery key QR-Code saved',
-          message: 'QR-Code image has been saved to Gallery at ' + path + fileName,
-          type: 'success',
-          context: 'local'
+          heading: "Recovery key QR-Code saved",
+          message:
+            "QR-Code image has been saved to Gallery at " + path + fileName,
+          type: "success",
+          context: "local"
         });
       } catch (e) {}
     });
@@ -116,31 +126,31 @@ class RecoveryKeySheet extends React.Component {
   saveToTextFile = async () => {
     try {
       let path;
-      let fileName = 'nn_' + this.user?.email + '_recovery_key';
-      fileName = sanitizeFilename(fileName, { replacement: '_' });
-      fileName = fileName + '.txt';
+      let fileName = "nn_" + this.user?.email + "_recovery_key";
+      fileName = sanitizeFilename(fileName, { replacement: "_" });
+      fileName = fileName + ".txt";
 
-      RNFetchBlob = require('rn-fetch-blob').default;
-      if (Platform.OS === 'android') {
+      RNFetchBlob = require("rn-fetch-blob").default;
+      if (Platform.OS === "android") {
         let file = await ScopedStorage.createDocument(
           fileName,
-          'text/plain',
+          "text/plain",
           this.state.key,
-          'utf8'
+          "utf8"
         );
         if (!file) return;
         path = file.uri;
       } else {
-        path = await Storage.checkAndCreateDir('/');
-        await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
+        path = await Storage.checkAndCreateDir("/");
+        await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, "utf8");
         path = path + fileName;
       }
 
       ToastEvent.show({
-        heading: 'Recovery key text file saved',
-        message: 'Recovery key saved in text file.',
-        type: 'success',
-        context: 'local'
+        heading: "Recovery key text file saved",
+        message: "Recovery key saved in text file.",
+        type: "success",
+        context: "local"
       });
       return path;
     } catch (e) {
@@ -162,9 +172,9 @@ class RecoveryKeySheet extends React.Component {
     let path = await this.saveToTextFile();
     if (!path) return;
     try {
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === "ios") {
         Share.open({
-          url: 'file:/' + path,
+          url: "file:/" + path,
           failOnCancel: false
         }).catch(console.log);
       } else {
@@ -189,9 +199,9 @@ class RecoveryKeySheet extends React.Component {
       >
         <View
           style={{
-            width: '100%',
+            width: "100%",
             backgroundColor: colors.bg,
-            justifyContent: 'space-between',
+            justifyContent: "space-between",
             paddingHorizontal: 12,
             borderRadius: 10,
             paddingTop: 10
@@ -216,11 +226,11 @@ class RecoveryKeySheet extends React.Component {
               numberOfLines={2}
               selectable
               style={{
-                width: '100%',
-                maxWidth: '100%',
+                width: "100%",
+                maxWidth: "100%",
                 paddingRight: 10,
-                textAlign: 'center',
-                textDecorationLine: 'underline'
+                textAlign: "center",
+                textDecorationLine: "underline"
               }}
             >
               {this.state.key}
@@ -230,12 +240,12 @@ class RecoveryKeySheet extends React.Component {
 
           <View
             style={{
-              alignSelf: 'center',
+              alignSelf: "center",
               marginBottom: 15,
-              flexDirection: 'row',
-              width: '100%',
-              justifyContent: 'center',
-              position: 'absolute',
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "center",
+              position: "absolute",
               opacity: 0,
               zIndex: -1
             }}
@@ -255,9 +265,9 @@ class RecoveryKeySheet extends React.Component {
             onPress={() => {
               Clipboard.setString(this.state.key);
               ToastEvent.show({
-                heading: 'Recovery key copied!',
-                type: 'success',
-                context: 'local'
+                heading: "Recovery key copied!",
+                type: "success",
+                context: "local"
               });
             }}
             icon="content-copy"
@@ -305,10 +315,10 @@ class RecoveryKeySheet extends React.Component {
             size={SIZE.sm}
             numberOfLines={2}
             style={{
-              width: '100%',
-              maxWidth: '100%',
+              width: "100%",
+              maxWidth: "100%",
               marginBottom: 5,
-              textAlign: 'center'
+              textAlign: "center"
             }}
           >
             Tap twice to confirm you have saved the recovery key.

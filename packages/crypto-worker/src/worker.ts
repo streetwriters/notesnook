@@ -2,7 +2,7 @@ import {
   Cipher,
   OutputFormat,
   Plaintext,
-  SerializedKey,
+  SerializedKey
 } from "@notesnook/crypto/dist/src/types";
 import { expose } from "comlink";
 import WorkerStream from "./workerstream";
@@ -55,7 +55,7 @@ const module = {
   ) {
     const crypto = await loadNNCrypto();
     return crypto.createDecryptionStream(iv, key, new WorkerStream(id));
-  },
+  }
 };
 
 export type NNCryptoWorkerModule = typeof module;

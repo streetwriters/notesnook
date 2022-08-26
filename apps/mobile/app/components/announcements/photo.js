@@ -1,6 +1,6 @@
-import React from 'react';
-import { Image } from 'react-native';
-import { getStyle } from './functions';
+import React from "react";
+import { Image } from "react-native";
+import { getStyle } from "./functions";
 
 export const Photo = ({ src, style = {} }) => {
   return src ? (
@@ -8,9 +8,9 @@ export const Photo = ({ src, style = {} }) => {
       source={{ uri: src }}
       resizeMode="cover"
       style={{
-        width: '100%',
+        width: "100%",
         height: 200,
-        alignSelf: 'center',
+        alignSelf: "center",
         ...getStyle(style)
       }}
     />

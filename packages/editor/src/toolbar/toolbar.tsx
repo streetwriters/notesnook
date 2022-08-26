@@ -8,13 +8,13 @@ import { useEffect, useMemo } from "react";
 import {
   ToolbarLocation,
   useIsMobile,
-  useToolbarStore,
+  useToolbarStore
 } from "./stores/toolbar-store";
 import { ToolbarDefinition } from "./types";
 import { ToolbarGroup } from "./components/toolbar-group";
 import {
   EditorContext,
-  PopupRenderer,
+  PopupRenderer
 } from "../components/popup-presenter/popuprenderer";
 
 type ToolbarProps = FlexProps & {
@@ -59,7 +59,7 @@ export function Toolbar(props: ToolbarProps) {
             sx={{
               ...sx,
               flexWrap: isMobile ? "nowrap" : "wrap",
-              overflowX: isMobile ? "auto" : "hidden",
+              overflowX: isMobile ? "auto" : "hidden"
             }}
             {...flexProps}
           >
@@ -74,7 +74,7 @@ export function Toolbar(props: ToolbarProps) {
                     pr: 2,
                     mr: 2,
                     borderRight: "1px solid var(--border)",
-                    ":last-of-type": { mr: 0, pr: 0, borderRight: "none" },
+                    ":last-of-type": { mr: 0, pr: 0, borderRight: "none" }
                   }}
                 />
               );

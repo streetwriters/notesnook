@@ -31,8 +31,8 @@ function showToast(
     position: "bottom-right",
     style: {
       maxWidth: "auto",
-      backgroundColor: "var(--background)",
-    },
+      backgroundColor: "var(--background)"
+    }
   });
   return { hide: () => toast.dismiss(id) };
 }
@@ -73,7 +73,7 @@ function ToastContainer(props: ToastContainerProps) {
             sx={{
               py: "7px",
               ":hover": { bg: "bgSecondary" },
-              m: 0,
+              m: 0
             }}
             key={action.text}
             onClick={action.onClick}

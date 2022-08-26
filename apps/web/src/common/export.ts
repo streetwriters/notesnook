@@ -19,7 +19,7 @@ export async function exportToPDF(
       onPrintDialogClose: () => {
         resolve(false);
       },
-      onError: () => resolve(false),
+      onError: () => resolve(false)
     });
     resolve(true);
   });
@@ -46,7 +46,7 @@ export async function exportNotes(
         report({
           current: ++index,
           total: noteIds.length,
-          text: `Exporting "${note.title}"...`,
+          text: `Exporting "${note.title}"...`
         });
         console.log("Exporting", note.title);
         const content: string = await note.export(format, null).catch((e) => {
@@ -67,6 +67,6 @@ export async function exportNotes(
         saveAs(new Blob([zipped.buffer]), "notes.zip");
       }
       return true;
-    },
+    }
   });
 }

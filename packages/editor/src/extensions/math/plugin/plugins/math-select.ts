@@ -9,7 +9,7 @@ import {
   Transaction,
   Selection as ProseSelection,
   Plugin as ProsePlugin,
-  EditorStateConfig,
+  EditorStateConfig
 } from "prosemirror-state";
 import { DecorationSet, Decoration } from "prosemirror-view";
 import { Fragment, Node as ProseNode } from "prosemirror-model";
@@ -36,7 +36,7 @@ const checkSelection = (arg: { selection: ProseSelection; doc: ProseNode }) => {
       if (node.type.name.startsWith("math_")) {
         result.push({
           start: Math.max(from + pos - 1, 0),
-          end: from + pos + node.nodeSize - 1,
+          end: from + pos + node.nodeSize - 1
         });
         return false;
       }
@@ -78,11 +78,11 @@ export const mathSelectPlugin: ProsePlugin = new ProsePlugin({
       }
       let sel = checkSelection(tr);
       return sel;
-    },
+    }
   },
   props: {
     decorations: (state: EditorState) => {
       return mathSelectPlugin.getState(state);
-    },
-  },
+    }
+  }
 });

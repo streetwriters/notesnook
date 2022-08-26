@@ -13,7 +13,7 @@ function Toggle(props) {
       px={2}
       sx={{
         borderBottom: "1px solid var(--border)",
-        cursor: "pointer",
+        cursor: "pointer"
       }}
       onClick={() => onToggle(!isOn)}
       data-test-id={props.testId}

@@ -19,7 +19,7 @@ export async function insertAttachment(type: MimeType = "*/*") {
   }
 
   const selectedFile = await showFilePicker({
-    acceptedFileTypes: type || "*/*",
+    acceptedFileTypes: type || "*/*"
   });
   if (!selectedFile) return;
 
@@ -43,14 +43,14 @@ export async function reuploadAttachment(
   expectedFileHash: string
 ) {
   const selectedFile = await showFilePicker({
-    acceptedFileTypes: type || "*/*",
+    acceptedFileTypes: type || "*/*"
   });
   if (!selectedFile) return;
 
   const options: AddAttachmentOptions = {
     expectedFileHash,
     showProgress: false,
-    forceWrite: true,
+    forceWrite: true
   };
 
   if (selectedFile.type.startsWith("image/")) {
@@ -104,7 +104,7 @@ async function getEncryptionKey(): Promise<SerializedKey> {
 type FilePickerOptions = { acceptedFileTypes: MimeType };
 
 export function showFilePicker({
-  acceptedFileTypes,
+  acceptedFileTypes
 }: FilePickerOptions): Promise<File | undefined> {
   return new Promise((resolve) => {
     const input = document.createElement("input");
@@ -180,7 +180,7 @@ async function addAttachment(
         hashType,
         filename: file.name,
         type: file.type,
-        key,
+        key
       });
     }
 
@@ -189,7 +189,7 @@ async function addAttachment(
       filename: file.name,
       type: file.type,
       size: file.size,
-      dataurl,
+      dataurl
     };
   };
 
@@ -214,12 +214,12 @@ function withProgress<T>(file: File, action: () => Promise<T>): Promise<T> {
           report({
             current: loaded,
             total: total,
-            text: file.name,
+            text: file.name
           });
         }
       );
       event.unsubscribe();
       return action();
-    },
+    }
   });
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import module_svg from './module-svg';
+import React from "react";
+import module_svg from "./module-svg";
 
 export const QRCode = module_svg.QRCode;
 

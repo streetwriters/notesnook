@@ -22,7 +22,7 @@ export class Logger implements ILogger {
   constructor(
     private readonly config: LoggerConfig = {
       reporter: consoleReporter,
-      lastTime: Date.now(),
+      lastTime: Date.now()
     }
   ) {}
 
@@ -74,7 +74,7 @@ function logLevelFactory(level: LogLevel, config: LoggerConfig) {
       timestamp: now,
       extras,
       scope: config.scope,
-      elapsed: now - config.lastTime,
+      elapsed: now - config.lastTime
     });
     config.lastTime = now;
   };
@@ -97,7 +97,7 @@ function errorLogLevelFactory(level: LogLevel, config: LoggerConfig) {
       timestamp: now,
       extras,
       scope: config.scope,
-      elapsed: now - config.lastTime,
+      elapsed: now - config.lastTime
     });
     config.lastTime = now;
   };
@@ -109,6 +109,6 @@ export function combineReporters(reporters: ILogReporter[]): ILogReporter {
       for (const reporter of reporters) {
         reporter.write(log);
       }
-    },
+    }
   };
 }

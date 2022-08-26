@@ -31,7 +31,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
             borderRadius: "default",
             // border: "1px solid var(--border)",
             boxShadow: "menu",
-            minWidth: 200,
+            minWidth: 200
           }}
         >
           {title && (
@@ -40,7 +40,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
               sx={{
                 justifyContent: "space-between",
                 alignItems: "center",
-                p: 2,
+                p: 2
               }}
             >
               <Text variant={"title"}>{title}</Text>
@@ -90,7 +90,7 @@ export function Popup(props: PropsWithChildren<PopupProps>) {
               mb: 1,
               mt: 2,
               mx: 1,
-              py: 2,
+              py: 2
             }}
             onClick={action.disabled ? undefined : action?.onClick}
             disabled={action.disabled}

@@ -4,7 +4,7 @@ import * as Icon from "../icons";
 import { Virtuoso } from "react-virtuoso";
 import {
   useStore as useSelectionStore,
-  store as selectionStore,
+  store as selectionStore
 } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
@@ -79,7 +79,7 @@ function ListContainer(props) {
                   if (isNaN(endIndex)) return;
                   setSelectedItems([
                     ...selectionStore.get().selectedItems,
-                    ...items.slice(focusedItemIndex.current + 1, endIndex + 1),
+                    ...items.slice(focusedItemIndex.current + 1, endIndex + 1)
                   ]);
                   listItem.firstElementChild.focus();
                 }
@@ -134,7 +134,7 @@ function ListContainer(props) {
                       const listItem = document.querySelector(query);
                       if (!listItem) return;
                       listItem.firstElementChild.focus();
-                    },
+                    }
                   });
                   selectionStore.toggleSelectionMode(false);
                   // if (isShiftKey) {
@@ -175,7 +175,7 @@ function ListContainer(props) {
                     />
                   ) : (
                     <ReminderBar />
-                  ),
+                  )
               }}
               itemContent={(index, item) => {
                 if (!item) return null;
@@ -202,7 +202,7 @@ function ListContainer(props) {
                             ...props.items.slice(
                               index,
                               endIndex || props.items.length
-                            ),
+                            )
                           ]);
                         }}
                         groups={groups}
@@ -214,7 +214,7 @@ function ListContainer(props) {
                           listRef.current.scrollToIndex({
                             index,
                             align: "center",
-                            behavior: "auto",
+                            behavior: "auto"
                           });
                           setFocusedGroupIndex(index);
                         }}
@@ -244,7 +244,7 @@ function ListContainer(props) {
             mb: 2,
             mr: 2,
             width: 45,
-            height: 45,
+            height: 45
           }}
         >
           <Icon.Plus color="static" />

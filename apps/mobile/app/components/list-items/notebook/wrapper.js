@@ -1,18 +1,18 @@
-import React from 'react';
-import { NotebookItem } from '.';
-import Notebook from '../../../screens/notebook';
-import { TopicNotes } from '../../../screens/notes/topic-notes';
-import { ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import { useSelectionStore } from '../../../stores/use-selection-store';
-import { useTrashStore } from '../../../stores/use-trash-store';
-import { history } from '../../../utils';
-import { db } from '../../../common/database';
-import { presentDialog } from '../../dialog/functions';
-import SelectionWrapper from '../selection-wrapper';
+import React from "react";
+import { NotebookItem } from ".";
+import Notebook from "../../../screens/notebook";
+import { TopicNotes } from "../../../screens/notes/topic-notes";
+import { ToastEvent } from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import { useTrashStore } from "../../../stores/use-trash-store";
+import { history } from "../../../utils";
+import { db } from "../../../common/database";
+import { presentDialog } from "../../dialog/functions";
+import SelectionWrapper from "../selection-wrapper";
 
-export const openNotebookTopic = item => {
-  const isTrash = item.type === 'trash';
+export const openNotebookTopic = (item) => {
+  const isTrash = item.type === "trash";
   if (history.selectedItemsList.length > 0 && history.selectionMode) {
     useSelectionStore.getState().setSelectedItem(item);
     return;
@@ -24,24 +24,24 @@ export const openNotebookTopic = item => {
     presentDialog({
       title: `Restore ${item.itemType}`,
       paragraph: `Restore or delete ${item.itemType} forever`,
-      positiveText: 'Restore',
-      negativeText: 'Delete',
+      positiveText: "Restore",
+      negativeText: "Delete",
       positivePress: async () => {
         await db.trash.restore(item.id);
         Navigation.queueRoutesForUpdate(
-          'Tags',
-          'Notes',
-          'Notebooks',
-          'Favorites',
-          'Trash',
-          'TaggedNotes',
-          'ColoredNotes',
-          'TopicNotes'
+          "Tags",
+          "Notes",
+          "Notebooks",
+          "Favorites",
+          "Trash",
+          "TaggedNotes",
+          "ColoredNotes",
+          "TopicNotes"
         );
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
-          heading: 'Restore successful',
-          type: 'success'
+          heading: "Restore successful",
+          type: "success"
         });
       },
       onClose: async () => {
@@ -49,15 +49,15 @@ export const openNotebookTopic = item => {
         useTrashStore.getState().setTrash();
         useSelectionStore.getState().setSelectionMode(false);
         ToastEvent.show({
-          heading: 'Permanantly deleted items',
-          type: 'success',
-          context: 'local'
+          heading: "Permanantly deleted items",
+          type: "success",
+          context: "local"
         });
       }
     });
     return;
   }
-  if (item.type === 'topic') {
+  if (item.type === "topic") {
     TopicNotes.navigate(item, true);
   } else {
     Notebook.navigate(item, true);
@@ -66,18 +66,18 @@ export const openNotebookTopic = item => {
 
 export const NotebookWrapper = React.memo(
   ({ item, index, dateBy }) => {
-    const isTrash = item.type === 'trash';
+    const isTrash = item.type === "trash";
 
     return (
       <SelectionWrapper
         pinned={item.pinned}
         index={index}
         onPress={() => openNotebookTopic(item)}
-        height={item.type === 'topic' ? 80 : 110}
+        height={item.type === "topic" ? 80 : 110}
         item={item}
       >
         <NotebookItem
-          isTopic={item.type === 'topic'}
+          isTopic={item.type === "topic"}
           item={item}
           dateBy={dateBy}
           index={index}

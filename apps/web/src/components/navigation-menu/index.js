@@ -14,7 +14,7 @@ import {
   DarkMode,
   LightMode,
   Login,
-  Circle,
+  Circle
 } from "../icons";
 import { AnimatedFlex } from "../animated";
 import NavigationItem from "./navigation-item";
@@ -44,26 +44,26 @@ const routes = [
   {
     title: "Notebooks",
     path: "/notebooks",
-    icon: Notebook,
+    icon: Notebook
   },
   {
     title: "Favorites",
     path: "/favorites",
-    icon: StarOutline,
+    icon: StarOutline
   },
   { title: "Tags", path: "/tags", icon: Tag },
   {
     title: "Monographs",
     path: "/monographs",
-    icon: Monographs,
+    icon: Monographs
   },
-  { title: "Trash", path: "/trash", icon: Trash },
+  { title: "Trash", path: "/trash", icon: Trash }
 ];
 
 const settings = {
   title: "Settings",
   path: "/settings",
-  icon: Settings,
+  icon: Settings
 };
 
 const NAVIGATION_MENU_WIDTH = "10em";
@@ -105,18 +105,18 @@ function NavigationMenu(props) {
       flexDirection="column"
       justifyContent="space-between"
       initial={{
-        opacity: 1,
+        opacity: 1
       }}
       animate={{
         opacity: isFocusMode ? 0 : 1,
-        visibility: isFocusMode ? "collapse" : "visible",
+        visibility: isFocusMode ? "collapse" : "visible"
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       sx={{
         zIndex: 1,
         height: "auto",
         position: "relative",
-        flex: 1,
+        flex: 1
       }}
       bg={"bgSecondary"}
       px={0}
@@ -160,10 +160,10 @@ function NavigationMenu(props) {
                     title: () => "Rename color",
                     onClick: async ({ color }) => {
                       await showRenameColorDialog(color.id);
-                    },
-                  },
+                    }
+                  }
                 ],
-                extraData: { color },
+                extraData: { color }
               }}
             />
           ))}
@@ -187,10 +187,10 @@ function NavigationMenu(props) {
                     onClick: async ({ pin }) => {
                       await db.settings.unpin(pin.id);
                       refreshNavItems();
-                    },
-                  },
+                    }
+                  }
                 ],
-                extraData: { pin },
+                extraData: { pin }
               }}
               icon={
                 pin.type === "notebook"
@@ -243,8 +243,8 @@ function NavigationMenu(props) {
                 borderRadius: "default",
                 ":hover:not(disabled)": {
                   bg: "bgSecondaryHover",
-                  filter: "brightness(100%)",
-                },
+                  filter: "brightness(100%)"
+                }
               }}
               onClick={(e) => {
                 setFollowSystemTheme(false);

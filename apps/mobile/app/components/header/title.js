@@ -1,40 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { Platform, View } from 'react-native';
-import Notebook from '../../screens/notebook';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import useNavigationStore from '../../stores/use-navigation-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { db } from '../../common/database';
-import { eScrollEvent } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import React, { useEffect, useState } from "react";
+import { Platform, View } from "react-native";
+import Notebook from "../../screens/notebook";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../services/event-manager";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { db } from "../../common/database";
+import { eScrollEvent } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 
 const titleState = {};
 
 export const Title = () => {
-  const colors = useThemeStore(state => state.colors);
-  const currentScreen = useNavigationStore(state => state.currentScreen);
-  const isNotebook = currentScreen.name === 'Notebook';
-  const isTopic = currentScreen?.name === 'TopicNotes';
+  const colors = useThemeStore((state) => state.colors);
+  const currentScreen = useNavigationStore((state) => state.currentScreen);
+  const isNotebook = currentScreen.name === "Notebook";
+  const isTopic = currentScreen?.name === "TopicNotes";
   const [hide, setHide] = useState(
     isNotebook
-      ? typeof titleState[currentScreen.id] === 'boolean'
+      ? typeof titleState[currentScreen.id] === "boolean"
         ? titleState[currentScreen.id]
         : true
       : false
   );
   const isHidden = titleState[currentScreen.id];
-  console.log(currentScreen, 'header');
+  console.log(currentScreen, "header");
   const notebook =
     isTopic && currentScreen.notebookId
       ? db.notebooks?.notebook(currentScreen.notebookId)?.data
       : null;
   const title = currentScreen.title;
-  const isTag = currentScreen?.name === 'TaggedNotes';
+  const isTag = currentScreen?.name === "TaggedNotes";
 
-  const onScroll = data => {
-    if (currentScreen.name !== 'Notebook') {
+  const onScroll = (data) => {
+    if (currentScreen.name !== "Notebook") {
       setHide(false);
       return;
     }
@@ -48,9 +51,11 @@ export const Title = () => {
   };
 
   useEffect(() => {
-    if (currentScreen.name === 'Notebook') {
+    if (currentScreen.name === "Notebook") {
       let value =
-        typeof titleState[currentScreen.id] === 'boolean' ? titleState[currentScreen.id] : true;
+        typeof titleState[currentScreen.id] === "boolean"
+          ? titleState[currentScreen.id]
+          : true;
       setHide(value);
     } else {
       setHide(titleState[currentScreen.id]);
@@ -77,7 +82,7 @@ export const Title = () => {
       style={{
         opacity: 1,
         flexShrink: 1,
-        flexDirection: 'row'
+        flexDirection: "row"
       }}
     >
       {!hide && !isHidden ? (
@@ -86,19 +91,22 @@ export const Title = () => {
           numberOfLines={isTopic ? 2 : 1}
           size={isTopic ? SIZE.md + 2 : SIZE.xl}
           style={{
-            flexWrap: 'wrap',
-            marginTop: Platform.OS === 'ios' ? -1 : 0
+            flexWrap: "wrap",
+            marginTop: Platform.OS === "ios" ? -1 : 0
           }}
           color={currentScreen.color || colors.heading}
         >
           {isTopic ? (
             <Paragraph numberOfLines={1} size={SIZE.xs + 1}>
               {notebook?.title}
-              {'\n'}
+              {"\n"}
             </Paragraph>
           ) : null}
           {isTag ? (
-            <Heading size={isTopic ? SIZE.md + 2 : SIZE.xl} color={colors.accent}>
+            <Heading
+              size={isTopic ? SIZE.md + 2 : SIZE.xl}
+              color={colors.accent}
+            >
               #
             </Heading>
           ) : null}

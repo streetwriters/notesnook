@@ -30,7 +30,7 @@ export function Alignment(props: ToolProps) {
   const { editor } = props;
   const { textAlign } = {
     ...editor.getAttributes("paragraph"),
-    ...editor.getAttributes("heading"),
+    ...editor.getAttributes("heading")
   } as { textAlign: Alignment };
 
   const newAlignment: Alignment =

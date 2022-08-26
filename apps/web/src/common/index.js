@@ -2,7 +2,7 @@ import {
   showFeatureDialog,
   showLoadingDialog,
   showPasswordDialog,
-  showReminderDialog,
+  showReminderDialog
 } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
@@ -20,20 +20,20 @@ export const CREATE_BUTTON_MAP = {
   notes: {
     title: "Make a note",
     onClick: () =>
-      hashNavigate("/notes/create", { addNonce: true, replace: true }),
+      hashNavigate("/notes/create", { addNonce: true, replace: true })
   },
   notebooks: {
     title: "Create a notebook",
-    onClick: () => hashNavigate("/notebooks/create"),
+    onClick: () => hashNavigate("/notebooks/create")
   },
   topics: {
     title: "Create a topic",
-    onClick: () => hashNavigate(`/topics/create`),
+    onClick: () => hashNavigate(`/topics/create`)
   },
   tags: {
     title: "Create a tag",
-    onClick: () => hashNavigate(`/tags/create`),
-  },
+    onClick: () => hashNavigate(`/tags/create`)
+  }
 };
 
 export async function introduceFeatures() {
@@ -56,7 +56,7 @@ export async function createBackup(save = true) {
     subtitle: "We are creating a backup of your data. Please wait...",
     action: async () => {
       return await db.backup.export("web", encryptBackups);
-    },
+    }
   });
   if (!data) {
     showToast("error", "Could not create a backup of your data.");
@@ -77,7 +77,7 @@ export async function createBackup(save = true) {
 
 export async function selectBackupFile() {
   const file = await showFilePicker({
-    acceptedFileTypes: ".nnbackup,application/json",
+    acceptedFileTypes: ".nnbackup,application/json"
   });
   if (!file) return;
 
@@ -117,7 +117,7 @@ export async function restoreBackupFile(backup) {
       title: "Restoring backup",
       subtitle:
         "Please do NOT close your browser or shut down your PC until the process completes.",
-      action: () => restore(backup),
+      action: () => restore(backup)
     });
   }
 }

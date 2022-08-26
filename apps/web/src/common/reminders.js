@@ -6,7 +6,7 @@ import * as Icon from "../components/icons";
 import dayjs from "dayjs";
 import {
   showBackupDialog,
-  showRecoveryKeyDialog,
+  showRecoveryKeyDialog
 } from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { isDesktop, isTesting } from "../utils/platform";
@@ -60,21 +60,21 @@ export const Reminders = {
     action: async () => {
       if (await verifyAccount()) await createBackup();
     },
-    icon: Icon.Backup,
+    icon: Icon.Backup
   },
   login: {
     key: "login",
     title: "Login to sync your notes",
     subtitle: "You are not logged in",
     action: () => hardNavigate("/login"),
-    icon: Icon.User,
+    icon: Icon.User
   },
   email: {
     key: "email",
     title: "Your email is not confirmed",
     subtitle: "Please confirm your email to sync your notes",
     action: () => hashNavigate("/email/verify"),
-    icon: Icon.Email,
+    icon: Icon.Email
   },
   recoverykey: {
     key: "recoverykey",
@@ -84,8 +84,8 @@ export const Reminders = {
     action: async () => {
       if (await verifyAccount()) await showRecoveryKeyDialog();
     },
-    icon: Icon.Warn,
-  },
+    icon: Icon.Warn
+  }
 };
 
 var openedToast = null;
@@ -115,13 +115,13 @@ export async function resetReminders() {
               openedToast?.hide();
               openedToast = null;
             },
-            type: "text",
+            type: "text"
           },
           {
             text: "Download",
             onClick: () => createBackup(true),
-            type: "primary",
-          },
+            type: "primary"
+          }
         ],
         0
       );

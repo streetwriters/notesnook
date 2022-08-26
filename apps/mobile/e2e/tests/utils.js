@@ -1,14 +1,14 @@
-const { notesnook } = require('../test.ids');
-const fs = require('fs');
-const { expect: jestExpect } = require('@jest/globals');
-const { toMatchImageSnapshot } = require('jest-image-snapshot');
-const detox = require('detox');
+const { notesnook } = require("../test.ids");
+const fs = require("fs");
+const { expect: jestExpect } = require("@jest/globals");
+const { toMatchImageSnapshot } = require("jest-image-snapshot");
+const detox = require("detox");
 jestExpect.extend({ toMatchImageSnapshot });
 
-const sleep = duration =>
-  new Promise(resolve =>
+const sleep = (duration) =>
+  new Promise((resolve) =>
     setTimeout(() => {
-      console.log('Sleeping for ' + duration / 1000 + ' secs');
+      console.log("Sleeping for " + duration / 1000 + " secs");
       resolve();
     }, duration)
   );
@@ -56,14 +56,16 @@ async function exitEditor() {
 }
 
 async function createNote(_title, _body) {
-  let title = _title || 'Test note description that ';
-  let body = _body || 'Test note description that is very long and should not fit in text.';
+  let title = _title || "Test note description that ";
+  let body =
+    _body ||
+    "Test note description that is very long and should not fit in text.";
 
   await tapById(notesnook.buttons.add);
   let webview = web(by.id(notesnook.editor.id));
-  await expect(webview.element(by.web.className('ProseMirror'))).toExist();
-  await webview.element(by.web.className('ProseMirror')).tap();
-  await webview.element(by.web.className('ProseMirror')).typeText(body, true);
+  await expect(webview.element(by.web.className("ProseMirror"))).toExist();
+  await webview.element(by.web.className("ProseMirror")).tap();
+  await webview.element(by.web.className("ProseMirror")).typeText(body, true);
   await exitEditor();
   await expect(element(by.text(body))).toBeVisible();
 
@@ -90,7 +92,7 @@ const testvars = {
 
 async function prepare() {
   if (testvars.isFirstTest) {
-    console.log('Launching App Directly without reset');
+    console.log("Launching App Directly without reset");
     testvars.isFirstTest = false;
     return await LaunchApp();
   }

@@ -1,12 +1,12 @@
-import React from 'react';
-import { Text } from 'react-native';
-import { View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
-import { PressableButtonProps } from '../ui/pressable';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import React from "react";
+import { Text } from "react-native";
+import { View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
+import { PressableButtonProps } from "../ui/pressable";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 
 type DialogHeaderProps = {
   icon?: string;
@@ -16,7 +16,7 @@ type DialogHeaderProps = {
     onPress?: () => void;
     loading?: boolean;
     title?: string;
-    type?: PressableButtonProps['type'];
+    type?: PressableButtonProps["type"];
   };
   paragraphColor?: string;
   padding?: number;
@@ -34,33 +34,39 @@ const DialogHeader = ({
   centered,
   titlePart
 }: DialogHeaderProps) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return (
     <>
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
           minHeight: 50,
           paddingHorizontal: padding
         }}
       >
         <View
           style={{
-            width: '100%'
+            width: "100%"
           }}
         >
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: centered ? 'center' : 'space-between',
-              alignItems: 'center'
+              flexDirection: "row",
+              justifyContent: centered ? "center" : "space-between",
+              alignItems: "center"
             }}
           >
-            <Heading style={{ textAlign: centered ? 'center' : 'left' }} size={SIZE.lg}>
-              {title} {titlePart ? <Text style={{ color: colors.accent }}>{titlePart}</Text> : null}
+            <Heading
+              style={{ textAlign: centered ? "center" : "left" }}
+              size={SIZE.lg}
+            >
+              {title}{" "}
+              {titlePart ? (
+                <Text style={{ color: colors.accent }}>{titlePart}</Text>
+              ) : null}
             </Heading>
 
             {button ? (
@@ -73,7 +79,7 @@ const DialogHeader = ({
                 loading={button.loading}
                 fontSize={13}
                 title={button.title}
-                type={button.type || 'grayBg'}
+                type={button.type || "grayBg"}
                 height={25}
               />
             ) : null}
@@ -82,9 +88,9 @@ const DialogHeader = ({
           {paragraph ? (
             <Paragraph
               style={{
-                textAlign: centered ? 'center' : 'left',
-                maxWidth: centered ? '90%' : '100%',
-                alignSelf: centered ? 'center' : 'flex-start'
+                textAlign: centered ? "center" : "left",
+                maxWidth: centered ? "90%" : "100%",
+                alignSelf: centered ? "center" : "flex-start"
               }}
               color={paragraphColor || colors.icon}
             >

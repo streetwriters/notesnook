@@ -1,16 +1,18 @@
-import React from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
-import { useSettingStore } from '../../stores/use-setting-store';
-import useIsFloatingKeyboard from '../../hooks/use-is-floating-keyboard';
-import { Header } from '../header';
-import SelectionHeader from '../selection-header';
+import React from "react";
+import { KeyboardAvoidingView, Platform, SafeAreaView } from "react-native";
+import { useSettingStore } from "../../stores/use-setting-store";
+import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
+import { Header } from "../header";
+import SelectionHeader from "../selection-header";
 export const Container = ({ children }) => {
   const floating = useIsFloatingKeyboard();
-  const introCompleted = useSettingStore(state => state.settings.introCompleted);
+  const introCompleted = useSettingStore(
+    (state) => state.settings.introCompleted
+  );
   return (
     <KeyboardAvoidingView
       behavior="padding"
-      enabled={Platform.OS === 'ios' && !floating}
+      enabled={Platform.OS === "ios" && !floating}
       style={{
         flex: 1
       }}
@@ -18,7 +20,7 @@ export const Container = ({ children }) => {
       <SafeAreaView
         style={{
           flex: 1,
-          overflow: 'hidden'
+          overflow: "hidden"
         }}
       >
         {!introCompleted ? null : (

@@ -46,7 +46,7 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
     set((state) => {
       state.openedPopups = {
         ...state.openedPopups,
-        [id]: false,
+        [id]: false
       };
     }),
   isPopupOpen: (id) => !!get().openedPopups[id],
@@ -54,7 +54,7 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
     set((state) => {
       state.openedPopups = {
         ...state.openedPopups,
-        [ref.id]: ref,
+        [ref.id]: ref
       };
     }),
   closePopupGroup: (group, excluded) =>
@@ -65,7 +65,7 @@ export const useToolbarStore = create<ToolbarState>((set, get) => ({
           state.openedPopups[key] = false;
         }
       }
-    }),
+    })
 }));
 
 export function useToolbarLocation() {
@@ -82,7 +82,7 @@ export const useTheme = Object.defineProperty(
   },
   "current",
   {
-    get: () => useToolbarStore.getState().theme,
+    get: () => useToolbarStore.getState().theme
   }
 ) as (() => Theme | undefined) & { current: Theme | undefined };
 
@@ -92,6 +92,6 @@ export const useIsKeyboardOpen = Object.defineProperty(
   },
   "current",
   {
-    get: () => useToolbarStore.getState().isKeyboardOpen,
+    get: () => useToolbarStore.getState().isKeyboardOpen
   }
 ) as (() => boolean) & { current: boolean };

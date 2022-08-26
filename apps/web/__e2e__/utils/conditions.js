@@ -72,5 +72,5 @@ module.exports = {
   isToastPresent,
   checkNotePresence,
   createNoteAndCheckPresence,
-  checkMenuItemText,
+  checkMenuItemText
 };

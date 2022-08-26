@@ -15,7 +15,7 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
     isChecked,
     hasSubmenu,
     isPremium,
-    modifier,
+    modifier
   } = item;
   const itemRef = useRef();
   if (type === "seperator")
@@ -53,7 +53,7 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
         disabled={isDisabled}
         onClick={onClick}
         sx={{
-          bg: isFocused ? "hover" : "transparent",
+          bg: isFocused ? "hover" : "transparent"
         }}
       >
         <Flex>

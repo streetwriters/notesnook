@@ -2,7 +2,7 @@ import {
   Extension,
   InputRule,
   InputRuleFinder,
-  ExtendedRegExpMatchArray,
+  ExtendedRegExpMatchArray
 } from "@tiptap/core";
 
 declare module "@tiptap/core" {
@@ -31,7 +31,7 @@ export const DateTime = Extension.create({
     return {
       "Alt-t": ({ editor }) => editor.commands.insertTime(),
       "Alt-d": ({ editor }) => editor.commands.insertDate(),
-      "Mod-Alt-d": ({ editor }) => editor.commands.insertDateTime(),
+      "Mod-Alt-d": ({ editor }) => editor.commands.insertDateTime()
     };
   },
 
@@ -48,7 +48,7 @@ export const DateTime = Extension.create({
       insertDateTime:
         () =>
         ({ commands }) =>
-          commands.insertContent(currentDateTime()),
+          commands.insertContent(currentDateTime())
     };
   },
 
@@ -58,22 +58,22 @@ export const DateTime = Extension.create({
         shortcut: "/time",
         replace: () => {
           return currentTime();
-        },
+        }
       }),
       shortcutInputRule({
         shortcut: "/date",
         replace: () => {
           return currentDate();
-        },
+        }
       }),
       shortcutInputRule({
         shortcut: "/now",
         replace: () => {
           return currentDateTime();
-        },
-      }),
+        }
+      })
     ];
-  },
+  }
 });
 
 function currentTime() {
@@ -81,7 +81,7 @@ function currentTime() {
     second: undefined,
     minute: "2-digit",
     hour12: true,
-    hour: "2-digit",
+    hour: "2-digit"
   });
 }
 
@@ -114,7 +114,7 @@ function shortcutInputRule(config: {
     after: ({ match, state, range }) => {
       const newlineRequested = match[2] === "\n";
       if (newlineRequested) state.tr.split(state.tr.mapping.map(range.to));
-    },
+    }
   });
 }
 
@@ -134,6 +134,6 @@ function textInputRule(config: {
       state.tr.insertText(insert, start, end);
 
       if (config.after) config.after(props);
-    },
+    }
   });
 }

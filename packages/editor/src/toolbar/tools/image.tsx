@@ -8,7 +8,7 @@ import { useToolbarLocation } from "../stores/toolbar-store";
 import { ImageProperties as ImagePropertiesPopup } from "../popups/image-properties";
 import {
   ImageAlignmentOptions,
-  ImageSizeOptions,
+  ImageSizeOptions
 } from "../../extensions/image";
 import { findSelectedNode } from "../utils/prosemirror";
 
@@ -30,7 +30,7 @@ export function ImageSettings(props: ToolProps) {
               "imageAlignLeft",
               "imageAlignCenter",
               "imageAlignRight",
-              "imageProperties",
+              "imageProperties"
             ]
       }
     />
@@ -119,7 +119,7 @@ export function ImageProperties(props: ToolProps) {
           align: "start",
           location: "below",
           yOffset: 10,
-          isTargetAbsolute: true,
+          isTargetAbsolute: true
         }}
       >
         <ImagePropertiesPopup

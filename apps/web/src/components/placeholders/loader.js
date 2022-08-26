@@ -17,7 +17,7 @@ const Placeholders = {
   tag: Tag,
   trash: Trash,
   favorites: Fav,
-  attachments: Attachment,
+  attachments: Attachment
 };
 
 export default function PlaceholderLoader({ name, onLoad, ...restProps }) {

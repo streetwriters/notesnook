@@ -48,7 +48,7 @@ test("logout user", async () => {
 
 test("login user and change password repeatedly", async ({
   page,
-  browserName,
+  browserName
 }) => {
   test.setTimeout(2 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");
@@ -58,47 +58,44 @@ test("login user and change password repeatedly", async ({
   let email = USER.email;
 
   for (let i = 0; i < 3; i++) {
-    await test.step(
-      `login user using password ${currentPassword} (${i})`,
-      async () => {
-        await loginUser({
-          email,
-          password: currentPassword,
-        });
+    await test.step(`login user using password ${currentPassword} (${i})`, async () => {
+      await loginUser({
+        email,
+        password: currentPassword
+      });
 
-        await page.waitForSelector(getTestId("sync-status-synced"));
+      await page.waitForSelector(getTestId("sync-status-synced"));
 
-        await page.click(getTestId("navitem-settings"));
+      await page.click(getTestId("navitem-settings"));
 
-        await page.click(getTestId("settings-change-password"));
+      await page.click(getTestId("settings-change-password"));
 
-        await page.waitForSelector(getTestId("dialog-yes"));
+      await page.waitForSelector(getTestId("dialog-yes"));
 
-        await page.fill(getTestId("dialog-password"), currentPassword);
+      await page.fill(getTestId("dialog-password"), currentPassword);
 
-        await page.fill(getTestId("dialog-new-password"), newPassword);
+      await page.fill(getTestId("dialog-new-password"), newPassword);
 
-        await page.click(getTestId("dialog-yes"));
+      await page.click(getTestId("dialog-yes"));
 
-        expect(await isAbsent(getTestId("dialog-yes"), 60 * 1000)).toBe(true);
+      expect(await isAbsent(getTestId("dialog-yes"), 60 * 1000)).toBe(true);
 
-        await logoutUser();
+      await logoutUser();
 
-        await page.reload();
+      await page.reload();
 
-        await page.waitForTimeout(2000);
+      await page.waitForTimeout(2000);
 
-        const cPassword = currentPassword;
-        currentPassword = newPassword;
-        newPassword = cPassword;
-      }
-    );
+      const cPassword = currentPassword;
+      currentPassword = newPassword;
+      newPassword = cPassword;
+    });
   }
 });
 
 test("reset user password using recovery key", async ({
   page,
-  browserName,
+  browserName
 }) => {
   test.setTimeout(2 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");
@@ -116,7 +113,7 @@ test("reset user password using recovery key", async ({
 
 test("reset user password after session expiry", async ({
   page,
-  browserName,
+  browserName
 }) => {
   test.setTimeout(2 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");
@@ -173,7 +170,7 @@ test("reset user password after session expiry", async ({
 
 test("reset user password using old password", async ({
   page,
-  browserName,
+  browserName
 }) => {
   test.setTimeout(2 * 60 * 1000);
   test.skip(browserName !== "chromium", "Cannot run in parallel.");

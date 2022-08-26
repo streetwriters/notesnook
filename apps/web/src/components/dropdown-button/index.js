@@ -19,7 +19,7 @@ export default function DropdownButton({ title, options }) {
           px={1}
           sx={{
             borderBottomLeftRadius: 0,
-            borderTopLeftRadius: 0,
+            borderTopLeftRadius: 0
           }}
           onClick={() => openMenu(options.slice(1), { title })}
         >

@@ -1,28 +1,32 @@
-import React, { createRef, useEffect, useState } from 'react';
-import { Keyboard, TouchableOpacity, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
-import { notesnook } from '../../../../e2e/test.ids';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import SearchService from '../../../services/search';
-import { useSelectionStore } from '../../../stores/use-selection-store';
-import { useNotebookStore } from '../../../stores/use-notebook-store';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { getTotalNotes } from '../../../utils';
-import { db } from '../../../common/database';
-import { eOpenMoveNoteDialog } from '../../../utils/events';
-import layoutmanager from '../../../utils/layout-manager';
-import { SIZE } from '../../../utils/size';
-import { Dialog } from '../../dialog';
-import DialogHeader from '../../dialog/dialog-header';
-import { presentDialog } from '../../dialog/functions';
-import { Button } from '../../ui/button';
-import { IconButton } from '../../ui/icon-button';
-import Input from '../../ui/input';
-import { PressableButton } from '../../ui/pressable';
-import SheetWrapper from '../../ui/sheet';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
+import React, { createRef, useEffect, useState } from "react";
+import { Keyboard, TouchableOpacity, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import { notesnook } from "../../../../e2e/test.ids";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import SearchService from "../../../services/search";
+import { useSelectionStore } from "../../../stores/use-selection-store";
+import { useNotebookStore } from "../../../stores/use-notebook-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { getTotalNotes } from "../../../utils";
+import { db } from "../../../common/database";
+import { eOpenMoveNoteDialog } from "../../../utils/events";
+import layoutmanager from "../../../utils/layout-manager";
+import { SIZE } from "../../../utils/size";
+import { Dialog } from "../../dialog";
+import DialogHeader from "../../dialog/dialog-header";
+import { presentDialog } from "../../dialog/functions";
+import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
+import Input from "../../ui/input";
+import { PressableButton } from "../../ui/pressable";
+import SheetWrapper from "../../ui/sheet";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 
 let newNotebookTitle = null;
 const notebookInput = createRef();
@@ -52,13 +56,13 @@ const AddToNotebookSheet = () => {
     newNotebookTitle = null;
     setNote(null);
     Navigation.queueRoutesForUpdate(
-      'Notes',
-      'Favorites',
-      'ColoredNotes',
-      'TaggedNotes',
-      'TopicNotes',
-      'Notebooks',
-      'Notebook'
+      "Notes",
+      "Favorites",
+      "ColoredNotes",
+      "TaggedNotes",
+      "TopicNotes",
+      "Notebooks",
+      "Notebook"
     );
   };
 
@@ -72,21 +76,25 @@ const AddToNotebookSheet = () => {
 export default AddToNotebookSheet;
 
 const MoveNoteComponent = ({ note }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
-  const notebooks = useNotebookStore(state => state.notebooks.filter(n => n?.type === 'notebook'));
+  const notebooks = useNotebookStore((state) =>
+    state.notebooks.filter((n) => n?.type === "notebook")
+  );
 
-  const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
-  const setNotebooks = useNotebookStore(state => state.setNotebooks);
-  const [expanded, setExpanded] = useState('');
+  const selectedItemsList = useSelectionStore(
+    (state) => state.selectedItemsList
+  );
+  const setNotebooks = useNotebookStore((state) => state.setNotebooks);
+  const [expanded, setExpanded] = useState("");
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [noteExists, setNoteExists] = useState([]);
   const addNewNotebook = async () => {
     if (!newNotebookTitle || newNotebookTitle.trim().length === 0)
       return ToastEvent.show({
-        heading: 'Notebook title is required',
-        type: 'error',
-        context: 'local'
+        heading: "Notebook title is required",
+        type: "error",
+        context: "local"
       });
 
     let id = await db.notebooks.add({
@@ -95,7 +103,7 @@ const MoveNoteComponent = ({ note }) => {
       topics: [],
       id: null
     });
-    console.log('added notebook id', id);
+    console.log("added notebook id", id);
     setExpanded(id);
     openAddTopicDialog(db.notebooks.notebook(id).data);
     notebookInput.current?.clear();
@@ -107,9 +115,9 @@ const MoveNoteComponent = ({ note }) => {
   const addNewTopic = async (value, item) => {
     if (!value || value.trim().length === 0) {
       ToastEvent.show({
-        heading: 'Topic title is required',
-        type: 'error',
-        context: 'local'
+        heading: "Topic title is required",
+        type: "error",
+        context: "local"
       });
       return false;
     }
@@ -121,7 +129,10 @@ const MoveNoteComponent = ({ note }) => {
   };
 
   const handlePress = async (item, index) => {
-    let noteIds = selectedItemsList.length > 0 ? selectedItemsList.map(n => n.id) : [note?.id];
+    let noteIds =
+      selectedItemsList.length > 0
+        ? selectedItemsList.map((n) => n.id)
+        : [note?.id];
 
     if (getCount(item)) {
       await db.notebooks
@@ -139,11 +150,11 @@ const MoveNoteComponent = ({ note }) => {
     }
 
     Navigation.queueRoutesForUpdate(
-      'Notes',
-      'Favorites',
-      'ColoredNotes',
-      'TaggedNotes',
-      'TopicNotes'
+      "Notes",
+      "Favorites",
+      "ColoredNotes",
+      "TaggedNotes",
+      "TopicNotes"
     );
 
     setNotebooks();
@@ -158,17 +169,20 @@ const MoveNoteComponent = ({ note }) => {
   const updateNoteExists = () => {
     if (!note?.id && selectedItemsList?.length === 0) return;
 
-    let notes = selectedItemsList.length > 0 ? selectedItemsList.map(n => n.id) : [note?.id];
+    let notes =
+      selectedItemsList.length > 0
+        ? selectedItemsList.map((n) => n.id)
+        : [note?.id];
     let ids = [];
     let notebooks = db.notebooks.all;
     for (let i = 0; i < notebooks.length; i++) {
       if (notebooks[i].topics) {
         for (let t = 0; t < notebooks[i].topics.length; t++) {
           let topic = notebooks[i].topics[t];
-          if (topic.type !== 'topic') continue;
+          if (topic.type !== "topic") continue;
           for (let id of notes) {
             if (topic.notes.indexOf(id) > -1) {
-              console.log('found', ids.indexOf(notebooks[i].id));
+              console.log("found", ids.indexOf(notebooks[i].id));
               if (ids.indexOf(notebooks[i].id) === -1) {
                 ids.push(notebooks[i].id);
               }
@@ -178,27 +192,30 @@ const MoveNoteComponent = ({ note }) => {
         }
       }
     }
-    console.log('ids: ', ids);
+    console.log("ids: ", ids);
     setNoteExists(ids);
   };
 
-  const openAddTopicDialog = item => {
+  const openAddTopicDialog = (item) => {
     presentDialog({
-      context: 'move_note',
+      context: "move_note",
       input: true,
-      inputPlaceholder: 'Enter title',
-      title: 'New topic',
-      paragraph: 'Add a new topic in ' + item.title,
-      positiveText: 'Add',
-      positivePress: value => {
+      inputPlaceholder: "Enter title",
+      title: "New topic",
+      paragraph: "Add a new topic in " + item.title,
+      positiveText: "Add",
+      positivePress: (value) => {
         return addNewTopic(value, item);
       }
     });
   };
 
-  const getCount = topic => {
+  const getCount = (topic) => {
     if (!topic) return;
-    let notes = selectedItemsList.length > 0 ? selectedItemsList.map(n => n.id) : [note?.id];
+    let notes =
+      selectedItemsList.length > 0
+        ? selectedItemsList.map((n) => n.id)
+        : [note?.id];
     let count = 0;
     for (let id of notes) {
       if (topic.notes.indexOf(id) > -1) {
@@ -216,9 +233,9 @@ const MoveNoteComponent = ({ note }) => {
       <View>
         <TouchableOpacity
           style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute'
+            width: "100%",
+            height: "100%",
+            position: "absolute"
           }}
           onPress={() => {
             Keyboard.dismiss();
@@ -227,8 +244,8 @@ const MoveNoteComponent = ({ note }) => {
         <View
           style={{
             paddingHorizontal: 12,
-            flexDirection: 'row',
-            justifyContent: 'space-between'
+            flexDirection: "row",
+            justifyContent: "space-between"
           }}
         >
           <DialogHeader
@@ -255,13 +272,13 @@ const MoveNoteComponent = ({ note }) => {
           ListHeaderComponent={
             <View
               style={{
-                width: '100%',
+                width: "100%",
                 marginTop: 10
               }}
             >
               <Input
                 fwdRef={notebookInput}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   newNotebookTitle = value;
                 }}
                 testID={notesnook.ids.dialogs.addTo.addNotebook}
@@ -273,7 +290,7 @@ const MoveNoteComponent = ({ note }) => {
                   setNotebookInputFocused(false);
                 }}
                 button={{
-                  icon: 'check',
+                  icon: "check",
                   color: notebookInputFocused ? colors.accent : colors.icon,
                   onPress: addNewNotebook
                 }}
@@ -289,9 +306,9 @@ const MoveNoteComponent = ({ note }) => {
             <View
               style={{
                 borderWidth: 1,
-                borderColor: expanded ? colors.nav : 'transparent',
+                borderColor: expanded ? colors.nav : "transparent",
                 borderRadius: 6,
-                overflow: 'hidden',
+                overflow: "hidden",
                 marginBottom: 10
               }}
             >
@@ -309,40 +326,42 @@ const MoveNoteComponent = ({ note }) => {
                 type="grayBg"
                 customStyle={{
                   height: 50,
-                  width: '100%',
+                  width: "100%",
                   borderRadius: 5,
-                  alignItems: 'flex-start'
+                  alignItems: "flex-start"
                 }}
               >
                 <View
                   style={{
-                    width: '100%',
+                    width: "100%",
                     height: 50,
-                    justifyContent: 'space-between',
-                    flexDirection: 'row',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                    alignItems: "center",
                     paddingHorizontal: 12
                   }}
                 >
                   <View>
                     <Heading
-                      color={noteExists.indexOf(item.id) > -1 ? colors.accent : null}
+                      color={
+                        noteExists.indexOf(item.id) > -1 ? colors.accent : null
+                      }
                       size={SIZE.md}
                     >
                       {item.title}
                     </Heading>
                     {item.topics?.length > 0 ? (
                       <Paragraph size={SIZE.xs} color={colors.icon}>
-                        {getTotalNotes(item) + ' notes' + ' & '}
+                        {getTotalNotes(item) + " notes" + " & "}
                         {item.topics.length === 1
-                          ? item.topics.length + ' topic'
-                          : item.topics.length + ' topics'}
+                          ? item.topics.length + " topic"
+                          : item.topics.length + " topics"}
                       </Paragraph>
                     ) : null}
                   </View>
 
                   <IconButton
-                    name={expanded === item.id ? 'plus' : 'chevron-down'}
+                    name={expanded === item.id ? "plus" : "chevron-down"}
                     color={expanded === item.id ? colors.accent : colors.pri}
                     size={SIZE.xl}
                     onPress={() => {
@@ -361,15 +380,15 @@ const MoveNoteComponent = ({ note }) => {
               {expanded === item.id ? (
                 <FlatList
                   nestedScrollEnabled
-                  data={item.topics?.filter(t => t.type === 'topic')}
+                  data={item.topics?.filter((t) => t.type === "topic")}
                   keyboardShouldPersistTaps="always"
                   keyboardDismissMode="none"
                   onMomentumScrollEnd={() => {
                     actionSheetRef.current?.handleChildScrollEnd();
                   }}
                   style={{
-                    width: '100%',
-                    alignSelf: 'flex-end',
+                    width: "100%",
+                    alignSelf: "flex-end",
                     maxHeight: 500
                   }}
                   renderItem={({ item, index }) => (
@@ -380,19 +399,21 @@ const MoveNoteComponent = ({ note }) => {
                         minHeight: 50,
                         borderTopWidth: index === 0 ? 0 : 1,
                         borderTopColor: index === 0 ? null : colors.nav,
-                        width: '100%',
+                        width: "100%",
                         borderRadius: 0,
-                        alignItems: 'center',
-                        flexDirection: 'row',
+                        alignItems: "center",
+                        flexDirection: "row",
                         paddingHorizontal: 12,
-                        justifyContent: 'space-between',
+                        justifyContent: "space-between",
                         paddingVertical: 12
                       }}
                     >
                       <View>
-                        <Paragraph color={colors.heading}>{item.title}</Paragraph>
+                        <Paragraph color={colors.heading}>
+                          {item.title}
+                        </Paragraph>
                         <Paragraph color={colors.icon} size={SIZE.xs}>
-                          {item.notes.length + ' notes'}
+                          {item.notes.length + " notes"}
                         </Paragraph>
                         {getCount(item) ? (
                           <View

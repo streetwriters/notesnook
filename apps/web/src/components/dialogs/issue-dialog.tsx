@@ -19,7 +19,7 @@ For example things like:
     2. Things you have tried so far
     3. etc.
     
-This is all optional, of course.`,
+This is all optional, of course.`
 };
 
 type IssueDialogProps = {
@@ -37,10 +37,10 @@ function IssueDialog(props: IssueDialogProps) {
       positiveButton={{
         text: "Submit",
         props: {
-          form: "issueForm",
+          form: "issueForm"
         },
         loading: isSubmitting,
-        disabled: isSubmitting,
+        disabled: isSubmitting
       }}
       negativeButton={{ text: "Cancel", onClick: props.onClose }}
     >
@@ -64,7 +64,7 @@ function IssueDialog(props: IssueDialogProps) {
             const url = await db.debug?.report({
               title: requestData.title,
               body: requestData.body,
-              userId: userstore.get().user?.id,
+              userId: userstore.get().user?.id
             });
             if (!url) throw new Error("Could not submit bug report.");
 
@@ -96,8 +96,8 @@ function IssueDialog(props: IssueDialogProps) {
           sx={{ mt: 1 }}
           styles={{
             input: {
-              minHeight: 150,
-            },
+              minHeight: 150
+            }
           }}
         />
         <Text
@@ -167,7 +167,7 @@ function showIssueReportedDialog({ url }: { url: string }) {
           for one-to-one support.
         </p>
       </>
-    ),
+    )
   });
 }
 

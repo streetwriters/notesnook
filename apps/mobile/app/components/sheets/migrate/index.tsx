@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import BackupService from '../../../services/backup';
-import { eSendEvent, ToastEvent } from '../../../services/event-manager';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { db } from '../../../common/database';
-import { eCloseProgressDialog, eCloseSimpleDialog } from '../../../utils/events';
-import { sleep } from '../../../utils/time';
-import { Dialog } from '../../dialog';
-import DialogHeader from '../../dialog/dialog-header';
-import { Button } from '../../ui/button';
-import { Notice } from '../../ui/notice';
-import Seperator from '../../ui/seperator';
-import { ProgressBarComponent } from '../../ui/svg/lazy';
-import Paragraph from '../../ui/typography/paragraph';
-import { presentDialog } from '../../dialog/functions';
+import React, { useState } from "react";
+import { View } from "react-native";
+import BackupService from "../../../services/backup";
+import { eSendEvent, ToastEvent } from "../../../services/event-manager";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { db } from "../../../common/database";
+import {
+  eCloseProgressDialog,
+  eCloseSimpleDialog
+} from "../../../utils/events";
+import { sleep } from "../../../utils/time";
+import { Dialog } from "../../dialog";
+import DialogHeader from "../../dialog/dialog-header";
+import { Button } from "../../ui/button";
+import { Notice } from "../../ui/notice";
+import Seperator from "../../ui/seperator";
+import { ProgressBarComponent } from "../../ui/svg/lazy";
+import Paragraph from "../../ui/typography/paragraph";
+import { presentDialog } from "../../dialog/functions";
 
 export default function Migrate() {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [loading, setLoading] = useState(false);
 
   return (
@@ -29,7 +32,7 @@ export default function Migrate() {
       <DialogHeader
         title="Database migration required"
         paragraph={
-          'Due to new features we need to migrate your data to a newer version. This is NOT a destructive operation.'
+          "Due to new features we need to migrate your data to a newer version. This is NOT a destructive operation."
         }
       />
       <Seperator />
@@ -51,8 +54,8 @@ If you face any other issues or are unsure about what to do, feel free to reach 
             style={{
               width: 200,
               height: 100,
-              alignSelf: 'center',
-              justifyContent: 'center'
+              alignSelf: "center",
+              justifyContent: "center"
             }}
           >
             <ProgressBarComponent
@@ -69,7 +72,7 @@ If you face any other issues or are unsure about what to do, feel free to reach 
             <Paragraph
               style={{
                 marginTop: 5,
-                textAlign: 'center'
+                textAlign: "center"
               }}
             >
               Migration in progress... please wait
@@ -83,12 +86,13 @@ If you face any other issues or are unsure about what to do, feel free to reach 
           width={250}
           onPress={async () => {
             setLoading(true);
-            const backupSaved = await BackupService.run(false, 'local');
+            const backupSaved = await BackupService.run(false, "local");
             if (!backupSaved) {
               ToastEvent.show({
-                heading: 'Migration failed',
-                message: 'You must download a backup of your data before migrating.',
-                context: 'local'
+                heading: "Migration failed",
+                message:
+                  "You must download a backup of your data before migrating.",
+                context: "local"
               });
               setLoading(false);
             }
@@ -97,11 +101,11 @@ If you face any other issues or are unsure about what to do, feel free to reach 
             setLoading(false);
             await sleep(500);
             presentDialog({
-              title: 'Migration successful',
+              title: "Migration successful",
               paragraph:
-                'Your data has been migrated. If you face any issues after the migration please reach out to us via email or Discord.',
-              context: 'global',
-              negativeText: 'Ok'
+                "Your data has been migrated. If you face any issues after the migration please reach out to us via email or Discord.",
+              context: "global",
+              negativeText: "Ok"
             });
           }}
           style={{

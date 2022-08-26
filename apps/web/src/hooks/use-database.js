@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const memory = {
-  isAppLoaded: false,
+  isAppLoaded: false
 };
 export default function useDatabase(persistence) {
   const [isAppLoaded, setIsAppLoaded] = useState(memory.isAppLoaded);

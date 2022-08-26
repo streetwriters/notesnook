@@ -9,7 +9,7 @@ import {
   to_base64,
   from_base64,
   base64_variants,
-  StateAddress,
+  StateAddress
 } from "libsodium-wrappers";
 import KeyUtils from "./keyutils";
 import {
@@ -17,7 +17,7 @@ import {
   EncryptionKey,
   OutputFormat,
   Plaintext,
-  SerializedKey,
+  SerializedKey
 } from "./types";
 
 const encoder = new TextEncoder();
@@ -66,7 +66,7 @@ export default class Encryption {
       cipher: output,
       iv,
       salt: encryptionKey.salt,
-      length: data.length,
+      length: data.length
     };
   }
 

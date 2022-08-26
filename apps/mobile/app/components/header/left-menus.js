@@ -1,18 +1,18 @@
-import React from 'react';
-import { notesnook } from '../../../e2e/test.ids';
-import { DDS } from '../../services/device-detection';
-import Navigation from '../../services/navigation';
-import useNavigationStore from '../../stores/use-navigation-store';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { tabBarRef } from '../../utils/global-refs';
-import { IconButton } from '../ui/icon-button';
+import React from "react";
+import { notesnook } from "../../../e2e/test.ids";
+import { DDS } from "../../services/device-detection";
+import Navigation from "../../services/navigation";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { tabBarRef } from "../../utils/global-refs";
+import { IconButton } from "../ui/icon-button";
 
 export const LeftMenus = () => {
-  const colors = useThemeStore(state => state.colors);
-  const deviceMode = useSettingStore(state => state.deviceMode);
-  const canGoBack = useNavigationStore(state => state.canGoBack);
-  const isTablet = deviceMode === 'tablet';
+  const colors = useThemeStore((state) => state.colors);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const canGoBack = useNavigationStore((state) => state.canGoBack);
+  const isTablet = deviceMode === "tablet";
 
   const onLeftButtonPress = () => {
     if (!canGoBack) {
@@ -25,8 +25,8 @@ export const LeftMenus = () => {
     }
     Navigation.goBack();
     if (
-      useNavigationStore.getState().currentScreen.name === 'Signup' ||
-      useNavigationStore.getState().currentScreen.name === 'Login'
+      useNavigationStore.getState().currentScreen.name === "Signup" ||
+      useNavigationStore.getState().currentScreen.name === "Login"
     ) {
       tabBarRef.current.unlock();
     }
@@ -36,8 +36,8 @@ export const LeftMenus = () => {
     <IconButton
       testID={notesnook.ids.default.header.buttons.left}
       customStyle={{
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         height: 40,
         width: 40,
         borderRadius: 100,
@@ -51,7 +51,7 @@ export const LeftMenus = () => {
       onLongPress={() => {
         Navigation.popToTop();
       }}
-      name={canGoBack ? 'arrow-left' : 'menu'}
+      name={canGoBack ? "arrow-left" : "menu"}
       color={colors.pri}
       iconStyle={{
         marginLeft: canGoBack ? -5 : 0

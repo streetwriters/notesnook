@@ -7,7 +7,7 @@ async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
     provider: "generic",
     url: `https://notesnook.com/releases/${process.platform}/`,
-    useMultipleRangeRequest: false,
+    useMultipleRangeRequest: false
   });
 
   autoUpdater.autoDownload = false;

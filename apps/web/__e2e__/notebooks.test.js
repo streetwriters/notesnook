@@ -6,14 +6,14 @@ const {
   openContextMenu,
   useContextMenu,
   clickMenuItem,
-  confirmDialog,
+  confirmDialog
 } = require("./utils/actions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
 const {
   checkNotePresence,
   isPresent,
-  checkMenuItemText,
+  checkMenuItemText
 } = require("./utils/conditions");
 
 /**
@@ -136,7 +136,7 @@ test("edit a notebook", async () => {
   const notebook = {
     title: "An Edited Notebook",
     description: "A new edited description",
-    topics: ["Topic 1", "Topic 2", "Topic 3"],
+    topics: ["Topic 1", "Topic 2", "Topic 3"]
   };
 
   await page.fill(getTestId("and-name"), notebook.title);

@@ -1,29 +1,31 @@
-import React, { useEffect } from 'react';
-import { BackHandler, Platform, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useSelectionStore } from '../../stores/use-selection-store';
-import { eSendEvent, ToastEvent } from '../../services/event-manager';
-import Navigation from '../../services/navigation';
-import { db } from '../../common/database';
-import { eOpenMoveNoteDialog } from '../../utils/events';
-import { deleteItems } from '../../utils/functions';
-import { tabBarRef } from '../../utils/global-refs';
-import layoutmanager from '../../utils/layout-manager';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { presentDialog } from '../dialog/functions';
-import { IconButton } from '../ui/icon-button';
-import Heading from '../ui/typography/heading';
-import useNavigationStore from '../../stores/use-navigation-store';
+import React, { useEffect } from "react";
+import { BackHandler, Platform, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useSelectionStore } from "../../stores/use-selection-store";
+import { eSendEvent, ToastEvent } from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import { db } from "../../common/database";
+import { eOpenMoveNoteDialog } from "../../utils/events";
+import { deleteItems } from "../../utils/functions";
+import { tabBarRef } from "../../utils/global-refs";
+import layoutmanager from "../../utils/layout-manager";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { presentDialog } from "../dialog/functions";
+import { IconButton } from "../ui/icon-button";
+import Heading from "../ui/typography/heading";
+import useNavigationStore from "../../stores/use-navigation-store";
 
 export const SelectionHeader = React.memo(() => {
-  const colors = useThemeStore(state => state.colors);
-  const selectionMode = useSelectionStore(state => state.selectionMode);
-  const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
-  const setSelectionMode = useSelectionStore(state => state.setSelectionMode);
-  const clearSelection = useSelectionStore(state => state.clearSelection);
-  const currentScreen = useNavigationStore(state => state.currentScreen);
+  const colors = useThemeStore((state) => state.colors);
+  const selectionMode = useSelectionStore((state) => state.selectionMode);
+  const selectedItemsList = useSelectionStore(
+    (state) => state.selectedItemsList
+  );
+  const setSelectionMode = useSelectionStore((state) => state.setSelectionMode);
+  const clearSelection = useSelectionStore((state) => state.clearSelection);
+  const currentScreen = useNavigationStore((state) => state.currentScreen);
   const screen = currentScreen.name;
   const insets = useSafeAreaInsets();
 
@@ -37,15 +39,15 @@ export const SelectionHeader = React.memo(() => {
 
   const addToFavorite = async () => {
     if (selectedItemsList.length > 0) {
-      selectedItemsList.forEach(item => {
+      selectedItemsList.forEach((item) => {
         db.notes.note(item.id).favorite();
       });
       Navigation.queueRoutesForUpdate(
-        'Notes',
-        'Favorites',
-        'ColoredNotes',
-        'TaggedNotes',
-        'TopicNotes'
+        "Notes",
+        "Favorites",
+        "ColoredNotes",
+        "TaggedNotes",
+        "TopicNotes"
       );
       clearSelection();
     }
@@ -54,58 +56,60 @@ export const SelectionHeader = React.memo(() => {
   const restoreItem = async () => {
     if (selectedItemsList.length > 0) {
       let noteIds = [];
-      selectedItemsList.forEach(item => {
+      selectedItemsList.forEach((item) => {
         noteIds.push(item.id);
       });
       await db.trash.restore(...noteIds);
       Navigation.queueRoutesForUpdate(
-        'Notes',
-        'Favorites',
-        'ColoredNotes',
-        'TaggedNotes',
-        'TopicNotes',
-        'Trash',
-        'Notebooks',
-        'Tags'
+        "Notes",
+        "Favorites",
+        "ColoredNotes",
+        "TaggedNotes",
+        "TopicNotes",
+        "Trash",
+        "Notebooks",
+        "Tags"
       );
 
       clearSelection();
       ToastEvent.show({
-        heading: 'Restore successful',
-        type: 'success'
+        heading: "Restore successful",
+        type: "success"
       });
     }
   };
 
   const deleteItem = async () => {
     presentDialog({
-      title: `Delete ${selectedItemsList.length > 1 ? 'items' : 'item'}`,
+      title: `Delete ${selectedItemsList.length > 1 ? "items" : "item"}`,
       paragraph: `Are you sure you want to delete ${
-        selectedItemsList.length > 1 ? 'these items permanently?' : 'this item permanently?'
+        selectedItemsList.length > 1
+          ? "these items permanently?"
+          : "this item permanently?"
       }`,
-      positiveText: 'Delete',
-      negativeText: 'Cancel',
+      positiveText: "Delete",
+      negativeText: "Cancel",
       positivePress: async () => {
         if (selectedItemsList.length > 0) {
           let noteIds = [];
-          selectedItemsList.forEach(item => {
+          selectedItemsList.forEach((item) => {
             noteIds.push(item.id);
           });
           await db.trash.delete(...noteIds);
           Navigation.queueRoutesForUpdate(
-            'Notes',
-            'Favorites',
-            'ColoredNotes',
-            'TaggedNotes',
-            'TopicNotes',
-            'Trash',
-            'Notebooks',
-            'Tags'
+            "Notes",
+            "Favorites",
+            "ColoredNotes",
+            "TaggedNotes",
+            "TopicNotes",
+            "Trash",
+            "Notebooks",
+            "Tags"
           );
           clearSelection();
         }
       },
-      positiveType: 'errorShade'
+      positiveType: "errorShade"
     });
   };
 
@@ -117,38 +121,38 @@ export const SelectionHeader = React.memo(() => {
 
   useEffect(() => {
     if (selectionMode) {
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
     } else {
-      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+      BackHandler.removeEventListener("hardwareBackPress", onBackPress);
     }
   }, [selectionMode]);
 
   return !selectionMode ? null : (
     <View
       style={{
-        width: '100%',
+        width: "100%",
         height: 50 + insets.top,
-        paddingTop: Platform.OS === 'android' ? insets.top : null,
+        paddingTop: Platform.OS === "android" ? insets.top : null,
         backgroundColor: colors.bg,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexDirection: 'row',
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexDirection: "row",
         zIndex: 999,
         paddingHorizontal: 12
       }}
     >
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          alignItems: "center",
           borderRadius: 100
         }}
       >
         <IconButton
           customStyle={{
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: "center",
+            alignItems: "center",
             height: 40,
             width: 40,
             borderRadius: 100,
@@ -169,21 +173,21 @@ export const SelectionHeader = React.memo(() => {
             height: 40,
             borderRadius: 100,
             paddingHorizontal: 16,
-            justifyContent: 'center',
-            flexDirection: 'row',
-            alignItems: 'center'
+            justifyContent: "center",
+            flexDirection: "row",
+            alignItems: "center"
           }}
         >
           <Heading size={SIZE.md} color={colors.accent}>
-            {selectedItemsList.length + ' Selected'}
+            {selectedItemsList.length + " Selected"}
           </Heading>
         </View>
       </View>
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
-          alignItems: 'center'
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          alignItems: "center"
         }}
       >
         {/* <ActionIcon
@@ -201,7 +205,9 @@ export const SelectionHeader = React.memo(() => {
           size={SIZE.xl}
         /> */}
 
-        {screen === 'Trash' || screen === 'Notebooks' || screen === 'Notebook' ? null : (
+        {screen === "Trash" ||
+        screen === "Notebooks" ||
+        screen === "Notebook" ? null : (
           <IconButton
             onPress={async () => {
               //setSelectionMode(false);
@@ -217,23 +223,24 @@ export const SelectionHeader = React.memo(() => {
           />
         )}
 
-        {screen === 'TopicNotes' ? (
+        {screen === "TopicNotes" ? (
           <IconButton
             onPress={async () => {
               if (selectedItemsList.length > 0) {
-                const currentTopic = useNavigationStore.getState().currentScreen;
+                const currentTopic =
+                  useNavigationStore.getState().currentScreen;
                 await db.notebooks
                   .notebook(currentTopic.notebookId)
                   .topics.topic(currentTopic.id)
-                  .delete(...selectedItemsList.map(item => item.id));
+                  .delete(...selectedItemsList.map((item) => item.id));
                 Navigation.queueRoutesForUpdate(
-                  'Notes',
-                  'Favorites',
-                  'ColoredNotes',
-                  'TaggedNotes',
-                  'TopicNotes',
-                  'Notebooks',
-                  'Notebook'
+                  "Notes",
+                  "Favorites",
+                  "ColoredNotes",
+                  "TaggedNotes",
+                  "TopicNotes",
+                  "Notebooks",
+                  "Notebook"
                 );
                 clearSelection();
               }
@@ -248,7 +255,7 @@ export const SelectionHeader = React.memo(() => {
           />
         ) : null}
 
-        {screen === 'Favorites' ? (
+        {screen === "Favorites" ? (
           <IconButton
             onPress={addToFavorite}
             customStyle={{
@@ -260,23 +267,25 @@ export const SelectionHeader = React.memo(() => {
           />
         ) : null}
 
-        {screen === 'Trash' ? null : (
+        {screen === "Trash" ? null : (
           <IconButton
             customStyle={{
               marginLeft: 10
             }}
             onPress={async () => {
               presentDialog({
-                title: `Delete ${selectedItemsList.length > 1 ? 'items' : 'item'}`,
-                paragraph: `Are you sure you want to delete ${
-                  selectedItemsList.length > 1 ? 'these items?' : 'this item?'
+                title: `Delete ${
+                  selectedItemsList.length > 1 ? "items" : "item"
                 }`,
-                positiveText: 'Delete',
-                negativeText: 'Cancel',
+                paragraph: `Are you sure you want to delete ${
+                  selectedItemsList.length > 1 ? "these items?" : "this item?"
+                }`,
+                positiveText: "Delete",
+                negativeText: "Cancel",
                 positivePress: () => {
                   deleteItems();
                 },
-                positiveType: 'errorShade'
+                positiveType: "errorShade"
               });
 
               return;
@@ -287,7 +296,7 @@ export const SelectionHeader = React.memo(() => {
           />
         )}
 
-        {screen === 'Trash' ? (
+        {screen === "Trash" ? (
           <>
             <IconButton
               customStyle={{
@@ -315,6 +324,6 @@ export const SelectionHeader = React.memo(() => {
   );
 });
 
-SelectionHeader.displayName = 'SelectionHeader';
+SelectionHeader.displayName = "SelectionHeader";
 
 export default SelectionHeader;

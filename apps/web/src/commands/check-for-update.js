@@ -23,7 +23,7 @@ export default async function checkForUpdate() {
         }
 
         AppEventManager.publish(EVENTS.updateDownloadCompleted, {
-          version: workerVersion.formatted,
+          version: workerVersion.formatted
         });
         return;
       }

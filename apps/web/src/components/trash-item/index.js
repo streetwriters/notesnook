@@ -41,7 +41,7 @@ const menuItems = [
       store.restore(items.map((i) => i.id));
       showToast("success", `${items.length} items restored`);
     },
-    multiSelect: true,
+    multiSelect: true
   },
   {
     key: "delete",
@@ -59,6 +59,6 @@ const menuItems = [
         () => store.refresh()
       );
     },
-    multiSelect: true,
-  },
+    multiSelect: true
+  }
 ];

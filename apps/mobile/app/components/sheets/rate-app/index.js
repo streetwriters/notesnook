@@ -1,16 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Linking, View } from 'react-native';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
-import { clearMessage } from '../../../services/message';
-import SettingsService from '../../../services/settings';
-import { STORE_LINK } from '../../../utils/constants';
-import { eCloseRateDialog, eOpenRateDialog } from '../../../utils/events';
-import { SIZE } from '../../../utils/size';
-import { Button } from '../../ui/button';
-import Seperator from '../../ui/seperator';
-import SheetWrapper from '../../ui/sheet';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
+import React, { useEffect, useRef, useState } from "react";
+import { Linking, View } from "react-native";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../../services/event-manager";
+import { clearMessage } from "../../../services/message";
+import SettingsService from "../../../services/settings";
+import { STORE_LINK } from "../../../utils/constants";
+import { eCloseRateDialog, eOpenRateDialog } from "../../../utils/events";
+import { SIZE } from "../../../utils/size";
+import { Button } from "../../ui/button";
+import Seperator from "../../ui/seperator";
+import SheetWrapper from "../../ui/sheet";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 
 const RateAppSheet = () => {
   const [visible, setVisible] = useState(false);
@@ -59,15 +62,15 @@ const RateAppSheet = () => {
     <SheetWrapper centered={false} fwdRef={actionSheetRef} onClose={onClose}>
       <View
         style={{
-          width: '100%',
-          alignSelf: 'center',
+          width: "100%",
+          alignSelf: "center",
           paddingHorizontal: 12
         }}
       >
         <Heading>Do you enjoy using Notesnook?</Heading>
         <Paragraph size={SIZE.md}>
-          It took us a year to bring Notesnook to life. Share your experience and suggestions to
-          help us improve it.
+          It took us a year to bring Notesnook to life. Share your experience
+          and suggestions to help us improve it.
         </Paragraph>
 
         <Seperator half />
@@ -81,12 +84,12 @@ const RateAppSheet = () => {
         />
         <View
           style={{
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexDirection: 'row',
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row",
             paddingTop: 12,
-            width: '100%',
-            alignSelf: 'center'
+            width: "100%",
+            alignSelf: "center"
           }}
         >
           <Button

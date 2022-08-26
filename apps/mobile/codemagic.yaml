@@ -11,9 +11,9 @@ workflows:
         - github_token
 
       vars:
-        XCODE_WORKSPACE: 'Notesnook.xcworkspace' # <-- Put the name of your Xcode workspace here
-        XCODE_SCHEME: 'Notesnook' # <-- Put the name of your Xcode scheme here
-        BUNDLE_ID: 'org.streetwriters.notesnook' # <-- Put your Bundle Id here e.g com.domain.myapp
+        XCODE_WORKSPACE: "Notesnook.xcworkspace" # <-- Put the name of your Xcode workspace here
+        XCODE_SCHEME: "Notesnook" # <-- Put the name of your Xcode scheme here
+        BUNDLE_ID: "org.streetwriters.notesnook" # <-- Put your Bundle Id here e.g com.domain.myapp
         APP_STORE_APP_ID: 1544027013 # <-- Put the app id number here. This is found in App Store Connect > App > General > App Information
 
       node: 16.13.2
@@ -31,7 +31,7 @@ workflows:
 
       - name: Setup yarnrc
         script: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
-        
+
       - name: Install npm dependencies
         script: |
           yarn install --network-concurrency 1

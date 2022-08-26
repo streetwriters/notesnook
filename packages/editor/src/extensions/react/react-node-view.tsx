@@ -9,7 +9,7 @@ import {
   ReactNodeViewOptions,
   GetPosNode,
   ForwardRef,
-  ContentDOM,
+  ContentDOM
 } from "./types";
 import { NodeViewRendererProps } from "@tiptap/core";
 import { Theme } from "@streetwriters/theme";
@@ -54,7 +54,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
 
     const { dom: contentDOMWrapper, contentDOM } = this.getContentDOM() || {
       dom: undefined,
-      contentDOM: undefined,
+      contentDOM: undefined
     };
 
     if (this.domRef && contentDOMWrapper) {
@@ -160,7 +160,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     this.editor.commands.command(({ tr }) => {
       tr.setNodeMarkup(pos, undefined, {
         ...this.node.attrs,
-        ...attributes,
+        ...attributes
       });
       tr.setMeta("addToHistory", addToHistory);
       tr.setMeta("preventUpdate", preventUpdate);
@@ -381,7 +381,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     ) {
       const changedNodes = [
         ...Array.from(mutation.addedNodes),
-        ...Array.from(mutation.removedNodes),
+        ...Array.from(mutation.removedNodes)
       ] as HTMLElement[];
 
       // we’ll check if every changed node is contentEditable
@@ -446,7 +446,7 @@ export function createNodeView<TProps extends ReactNodeViewProps>(
 
     return new ReactNodeView<TProps>(node, editor as Editor, _getPos, {
       ...options,
-      component,
+      component
     }).init();
   };
 }

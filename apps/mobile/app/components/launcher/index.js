@@ -1,55 +1,61 @@
-import React, { useEffect, useRef } from 'react';
-import { Platform, View } from 'react-native';
-import RNBootSplash from 'react-native-bootsplash';
-import { checkVersion } from 'react-native-check-version';
-import { enabled } from 'react-native-privacy-snapshot';
-import { editorState } from '../../screens/editor/tiptap/utils';
-import BackupService from '../../services/backup';
-import BiometricService from '../../services/biometrics';
-import { DDS } from '../../services/device-detection';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/event-manager';
-import { setRateAppMessage } from '../../services/message';
-import PremiumService from '../../services/premium';
-import SettingsService from '../../services/settings';
-import { initialize } from '../../stores';
-import { useMessageStore } from '../../stores/use-message-store';
-import { useNoteStore } from '../../stores/use-notes-store';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useUserStore } from '../../stores/use-user-store';
-import { DatabaseLogger, db, loadDatabase } from '../../common/database';
-import { MMKV } from '../../common/database/mmkv';
-import { eOpenAnnouncementDialog } from '../../utils/events';
-import { tabBarRef } from '../../utils/global-refs';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { SVG } from '../auth/background';
-import Migrate from '../sheets/migrate';
-import NewFeature from '../sheets/new-feature/index';
-import { Update } from '../sheets/update';
-import { Button } from '../ui/button';
-import { IconButton } from '../ui/icon-button';
-import Input from '../ui/input';
-import Seperator from '../ui/seperator';
-import { SvgView } from '../ui/svg';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import { Walkthrough } from '../walkthroughs';
-import { useAppState } from '../../hooks/use-app-state';
+import React, { useEffect, useRef } from "react";
+import { Platform, View } from "react-native";
+import RNBootSplash from "react-native-bootsplash";
+import { checkVersion } from "react-native-check-version";
+import { enabled } from "react-native-privacy-snapshot";
+import { editorState } from "../../screens/editor/tiptap/utils";
+import BackupService from "../../services/backup";
+import BiometricService from "../../services/biometrics";
+import { DDS } from "../../services/device-detection";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from "../../services/event-manager";
+import { setRateAppMessage } from "../../services/message";
+import PremiumService from "../../services/premium";
+import SettingsService from "../../services/settings";
+import { initialize } from "../../stores";
+import { useMessageStore } from "../../stores/use-message-store";
+import { useNoteStore } from "../../stores/use-notes-store";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
+import { DatabaseLogger, db, loadDatabase } from "../../common/database";
+import { MMKV } from "../../common/database/mmkv";
+import { eOpenAnnouncementDialog } from "../../utils/events";
+import { tabBarRef } from "../../utils/global-refs";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { SVG } from "../auth/background";
+import Migrate from "../sheets/migrate";
+import NewFeature from "../sheets/new-feature/index";
+import { Update } from "../sheets/update";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import Input from "../ui/input";
+import Seperator from "../ui/seperator";
+import { SvgView } from "../ui/svg";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import { Walkthrough } from "../walkthroughs";
+import { useAppState } from "../../hooks/use-app-state";
 
 const Launcher = React.memo(
   () => {
-    const colors = useThemeStore(state => state.colors);
-    const setLoading = useNoteStore(state => state.setLoading);
-    const loading = useNoteStore(state => state.loading);
-    const user = useUserStore(state => state.user);
-    const verifyUser = useUserStore(state => state.verifyUser);
-    const setVerifyUser = useUserStore(state => state.setVerifyUser);
-    const deviceMode = useSettingStore(state => state.deviceMode);
+    const colors = useThemeStore((state) => state.colors);
+    const setLoading = useNoteStore((state) => state.setLoading);
+    const loading = useNoteStore((state) => state.loading);
+    const user = useUserStore((state) => state.user);
+    const verifyUser = useUserStore((state) => state.verifyUser);
+    const setVerifyUser = useUserStore((state) => state.setVerifyUser);
+    const deviceMode = useSettingStore((state) => state.deviceMode);
     const appState = useAppState();
     const passwordInputRef = useRef();
     const password = useRef();
-    const introCompleted = useSettingStore(state => state.settings.introCompleted);
+    const introCompleted = useSettingStore(
+      (state) => state.settings.introCompleted
+    );
     const dbInitCompleted = useRef(false);
     const loadNotes = async () => {
       if (verifyUser) {
@@ -76,7 +82,7 @@ const Launcher = React.memo(
       if (!dbInitCompleted.current) {
         await RNBootSplash.hide({ fade: true });
         await loadDatabase();
-        DatabaseLogger.info('Initializing database');
+        DatabaseLogger.info("Initializing database");
         await db.init();
         dbInitCompleted.current = true;
       }
@@ -115,16 +121,20 @@ const Launcher = React.memo(
     const doAppLoadActions = async () => {
       await sleep(500);
       if (SettingsService.get().sessionExpired) {
-        eSendEvent('session_expired');
+        eSendEvent("session_expired");
         return;
       }
       const user = await db.user.getUser();
       await useMessageStore.getState().setAnnouncement();
       if (PremiumService.get() && user) {
-        if (SettingsService.get().reminder === 'off') {
-          SettingsService.set({ reminder: 'daily' });
+        if (SettingsService.get().reminder === "off") {
+          SettingsService.set({ reminder: "daily" });
         }
-        if (await BackupService.checkBackupRequired(SettingsService.get().reminder)) {
+        if (
+          await BackupService.checkBackupRequired(
+            SettingsService.get().reminder
+          )
+        ) {
           sleep(2000).then(() => BackupService.run());
         }
       }
@@ -135,7 +145,7 @@ const Launcher = React.memo(
       if (await PremiumService.getRemainingTrialDaysStatus()) return;
 
       if (introCompleted) {
-        useMessageStore.subscribe(state => {
+        useMessageStore.subscribe((state) => {
           let dialogs = state.dialogs;
           if (dialogs.length > 0) {
             eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
@@ -150,7 +160,7 @@ const Launcher = React.memo(
         const version = await checkVersion();
         if (!version.needsUpdate) return false;
         presentSheet({
-          component: ref => <Update version={version} fwdRef={ref} />
+          component: (ref) => <Update version={version} fwdRef={ref} />
         });
         return true;
       } catch (e) {
@@ -159,7 +169,7 @@ const Launcher = React.memo(
     };
 
     const restoreEditorState = async () => {
-      let appState = MMKV.getString('appState');
+      let appState = MMKV.getString("appState");
       if (appState) {
         appState = JSON.parse(appState);
         if (
@@ -174,14 +184,18 @@ const Launcher = React.memo(
           if (!DDS.isTab) {
             tabBarRef.current?.goToPage(1);
           }
-          eSendEvent('loadingNote', appState.note);
+          eSendEvent("loadingNote", appState.note);
         }
       }
     };
 
     const checkForRateAppRequest = async () => {
       let rateApp = SettingsService.get().rateApp;
-      if (rateApp && rateApp < Date.now() && !useMessageStore.getState().message?.visible) {
+      if (
+        rateApp &&
+        rateApp < Date.now() &&
+        !useMessageStore.getState().message?.visible
+      ) {
         setRateAppMessage();
         return false;
       }
@@ -208,12 +222,15 @@ const Launcher = React.memo(
     const onUnlockBiometrics = async () => {
       if (!(await BiometricService.isBiometryAvailable())) {
         ToastEvent.show({
-          heading: 'Biometrics unavailable',
-          message: 'Try unlocking the app with your account password'
+          heading: "Biometrics unavailable",
+          message: "Try unlocking the app with your account password"
         });
         return;
       }
-      let verified = await BiometricService.validateUser('Unlock to access your notes', '');
+      let verified = await BiometricService.validateUser(
+        "Unlock to access your notes",
+        ""
+      );
       if (verified) {
         setVerifyUser(false);
         enabled(false);
@@ -226,7 +243,7 @@ const Launcher = React.memo(
     }, [verifyUser]);
 
     useEffect(() => {
-      if (verifyUser && appState === 'active') {
+      if (verifyUser && appState === "active") {
         onUnlockBiometrics();
       }
     }, [appState]);
@@ -247,30 +264,35 @@ const Launcher = React.memo(
       <View
         style={{
           backgroundColor: colors.bg,
-          width: '100%',
-          height: '100%',
-          position: 'absolute',
+          width: "100%",
+          height: "100%",
+          position: "absolute",
           zIndex: 999
         }}
       >
         <View
           style={{
             height: 250,
-            overflow: 'hidden'
+            overflow: "hidden"
           }}
         >
-          <SvgView src={SVG(colors.night ? 'white' : 'black')} height={700} />
+          <SvgView src={SVG(colors.night ? "white" : "black")} height={700} />
         </View>
 
         <View
           style={{
             flex: 1,
-            justifyContent: 'center',
-            width: deviceMode !== 'mobile' ? '50%' : Platform.OS == 'ios' ? '95%' : '100%',
+            justifyContent: "center",
+            width:
+              deviceMode !== "mobile"
+                ? "50%"
+                : Platform.OS == "ios"
+                ? "95%"
+                : "100%",
             paddingHorizontal: 12,
             marginBottom: 30,
             marginTop: 15,
-            alignSelf: 'center'
+            alignSelf: "center"
           }}
         >
           <IconButton
@@ -288,8 +310,8 @@ const Launcher = React.memo(
           <Heading
             color={colors.heading}
             style={{
-              alignSelf: 'center',
-              textAlign: 'center'
+              alignSelf: "center",
+              textAlign: "center"
             }}
           >
             Unlock to access your notes
@@ -297,10 +319,10 @@ const Launcher = React.memo(
 
           <Paragraph
             style={{
-              alignSelf: 'center',
-              textAlign: 'center',
+              alignSelf: "center",
+              textAlign: "center",
               fontSize: SIZE.md,
-              maxWidth: '90%'
+              maxWidth: "90%"
             }}
           >
             Please verify it's you
@@ -308,7 +330,7 @@ const Launcher = React.memo(
           <Seperator />
           <View
             style={{
-              width: '100%',
+              width: "100%",
               padding: 12,
               backgroundColor: colors.bg,
               flexGrow: 1
@@ -320,7 +342,7 @@ const Launcher = React.memo(
                   fwdRef={passwordInputRef}
                   secureTextEntry
                   placeholder="Enter account password"
-                  onChangeText={v => (password.current = v)}
+                  onChangeText={(v) => (password.current = v)}
                   onSubmit={onSubmit}
                 />
               </>
@@ -356,8 +378,8 @@ const Launcher = React.memo(
                   borderRadius: 100
                 }}
                 onPress={onUnlockBiometrics}
-                icon={'fingerprint'}
-                type={user ? 'grayAccent' : 'accent'}
+                icon={"fingerprint"}
+                type={user ? "grayAccent" : "accent"}
                 fontSize={SIZE.md}
               />
             </View>

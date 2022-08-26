@@ -1,7 +1,7 @@
 import {
   initalize,
   logger as _logger,
-  logManager,
+  logManager
 } from "@streetwriters/notesnook-core/logger";
 import FileSaver from "file-saver";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
@@ -18,7 +18,7 @@ async function downloadLogs() {
   const allLogs = await logManager.get();
   const files = allLogs.map((log) => ({
     filename: log.key,
-    content: (log.logs as any[]).map((line) => JSON.stringify(line)).join("\n"),
+    content: (log.logs as any[]).map((line) => JSON.stringify(line)).join("\n")
   }));
   const archive = await zip(files, "log");
   FileSaver.saveAs(new Blob([archive.buffer]), "notesnook-logs.zip");

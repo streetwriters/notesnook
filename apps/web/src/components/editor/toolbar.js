@@ -59,8 +59,8 @@ function Toolbar(props) {
         icon: isNotePublished ? Icon.Published : Icon.Publish,
         hidden: !sessionId,
         enabled: !isLocked,
-        onClick: () => showPublishView(store.get().session.id, "top"),
-      },
+        onClick: () => showPublishView(store.get().session.id, "top")
+      }
     ],
     [sessionId, isLocked, isNotePublished]
   );
@@ -72,7 +72,7 @@ function Toolbar(props) {
         icon: Icon.Theme,
         hidden: !isFocusMode,
         enabled: true,
-        onClick: () => toggleNightMode(),
+        onClick: () => toggleNightMode()
       },
       {
         title: isFocusMode ? "Normal mode" : "Focus mode",
@@ -86,7 +86,7 @@ function Toolbar(props) {
             setIsFullscreen(false);
           }
           if (editor) editor.current.focus();
-        },
+        }
       },
       {
         title: isFullscreen ? "Exit fullscreen" : "Enter fullscreen",
@@ -101,36 +101,36 @@ function Toolbar(props) {
             enterFullscreen(document.documentElement);
           }
           setIsFullscreen((s) => !s);
-        },
+        }
       },
       {
         title: "Search",
         icon: Icon.Search,
         enabled: true,
         hidden: !sessionId,
-        onClick: () => toggleSearch(),
+        onClick: () => toggleSearch()
       },
       {
         title: "Undo",
         icon: Icon.Undo,
         enabled: canUndo,
         hidden: !sessionId,
-        onClick: () => undo(),
+        onClick: () => undo()
       },
       {
         title: "Redo",
         icon: Icon.Redo,
         enabled: canRedo,
         hidden: !sessionId,
-        onClick: () => redo(),
+        onClick: () => redo()
       },
       {
         title: "Properties",
         icon: Icon.Properties,
         enabled: true,
         hidden: !sessionId || isFocusMode,
-        onClick: toggleProperties,
-      },
+        onClick: toggleProperties
+      }
     ],
     [
       editor,
@@ -145,7 +145,7 @@ function Toolbar(props) {
       theme,
       toggleNightMode,
       sessionId,
-      toggleSearch,
+      toggleSearch
     ]
   );
 
@@ -155,7 +155,7 @@ function Toolbar(props) {
         <Icon.ArrowLeft
           sx={{
             display: ["block", "none", "none"],
-            flexShrink: 0,
+            flexShrink: 0
           }}
           size={24}
           onClick={() => {
@@ -169,11 +169,11 @@ function Toolbar(props) {
           ml={[2, 2, 0]}
           initial={{
             opacity: isTitleVisible ? 1 : 0,
-            zIndex: isTitleVisible ? 1 : -1,
+            zIndex: isTitleVisible ? 1 : -1
           }}
           animate={{
             opacity: isTitleVisible ? 1 : 0,
-            zIndex: isTitleVisible ? 1 : -1,
+            zIndex: isTitleVisible ? 1 : -1
           }}
           transition={{ duration: 0.5 }}
           fontWeight="heading"
@@ -191,7 +191,7 @@ function Toolbar(props) {
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             overflow: "hidden",
-            ":focus": { bg: "bgSecondary" },
+            ":focus": { bg: "bgSecondary" }
           }}
         />
       </Flex>
@@ -208,10 +208,10 @@ function Toolbar(props) {
             sx={{
               display: [
                 tool.hideOnMobile ? "none" : "flex",
-                tool.hidden ? "none" : "flex",
+                tool.hidden ? "none" : "flex"
               ],
               color: tool.enabled ? "text" : "disabled",
-              cursor: tool.enabled ? "pointer" : "not-allowed",
+              cursor: tool.enabled ? "pointer" : "not-allowed"
             }}
             onClick={tool.onClick}
             flexDirection="row"
@@ -242,10 +242,10 @@ function Toolbar(props) {
                 borderRadius: 0,
                 display: [
                   tool.hideOnMobile ? "none" : "flex",
-                  tool.hidden ? "none" : "flex",
+                  tool.hidden ? "none" : "flex"
                 ],
                 color: tool.enabled ? "text" : "disabled",
-                cursor: tool.enabled ? "pointer" : "not-allowed",
+                cursor: tool.enabled ? "pointer" : "not-allowed"
               }}
               onClick={tool.onClick}
               flexDirection="row"

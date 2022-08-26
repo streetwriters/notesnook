@@ -1,5 +1,5 @@
-import React from 'react';
-import { ColorValue, GestureResponderEvent, ViewStyle } from 'react-native';
+import React from "react";
+import { ColorValue, GestureResponderEvent, ViewStyle } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -7,13 +7,13 @@ import Animated, {
   FlipInEasyY,
   FlipOutEasyY,
   Layout
-} from 'react-native-reanimated';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { showTooltip, TOOLTIP_POSITIONS } from '../../../utils';
-import { hexToRGBA, RGB_Linear_Shade } from '../../../utils/color-scheme/utils';
-import { SIZE } from '../../../utils/size';
-import { PressableButton, PressableButtonProps } from '../pressable';
+} from "react-native-reanimated";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
+import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
+import { SIZE } from "../../../utils/size";
+import { PressableButton, PressableButtonProps } from "../pressable";
 
 interface IconButtonProps extends PressableButtonProps {
   name: string;
@@ -43,12 +43,12 @@ export const IconButton = ({
   bottom = 10,
   onLongPress,
   tooltipText,
-  type = 'gray',
+  type = "gray",
   fwdRef,
   tooltipPosition = TOOLTIP_POSITIONS.TOP,
   ...restProps
 }: IconButtonProps) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   const _onLongPress = (event: GestureResponderEvent) => {
     if (onLongPress) {
@@ -71,8 +71,8 @@ export const IconButton = ({
       customStyle={{
         width: 40,
         height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: "center",
+        alignItems: "center",
         borderRadius: 100,
         ...customStyle
       }}

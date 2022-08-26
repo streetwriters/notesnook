@@ -7,11 +7,11 @@ const {
   getEditorTitle,
   getEditorContent,
   getEditorContentAsHTML,
-  editNote,
+  editNote
 } = require("./utils");
 const {
   checkNotePresence,
-  createNoteAndCheckPresence,
+  createNoteAndCheckPresence
 } = require("./utils/conditions");
 /**
  * @type {Page}
@@ -153,7 +153,7 @@ test("opening an empty titled note should empty out editor contents", async () =
   await createNoteAndCheckPresence();
 
   const onlyTitle = await createNoteAndCheckPresence({
-    title: "Only a title",
+    title: "Only a title"
   });
 
   await page.click(getTestId("notes-action-button"));
@@ -234,16 +234,16 @@ test.skip("last line doesn't get saved if it's font is different", async () => {
 });
 
 test("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
-  page,
+  page
 }, { setTimeout }) => {
   await createNoteAndCheckPresence({
     title: "Test note 1",
-    content: "53ad8e4e40ebebd0f400498d",
+    content: "53ad8e4e40ebebd0f400498d"
   });
 
   await createNoteAndCheckPresence({
     title: "Test note 2",
-    content: "f054d19e9a2f46eff7b9bb25",
+    content: "f054d19e9a2f46eff7b9bb25"
   });
 
   const selector1 = `[data-item-index="1"] div`;
@@ -273,17 +273,17 @@ test("editing a note and switching immediately to another note and making an edi
 });
 
 test("editing a note and switching immediately to another note and editing the title shouldn't overlap both notes", async ({
-  page,
+  page
 }, testInfo) => {
   testInfo.setTimeout(0);
   await createNoteAndCheckPresence({
     title: "Test note 1",
-    content: "53ad8e4e40ebebd0f400498d",
+    content: "53ad8e4e40ebebd0f400498d"
   });
 
   await createNoteAndCheckPresence({
     title: "Test note 2",
-    content: "f054d19e9a2f46eff7b9bb25",
+    content: "f054d19e9a2f46eff7b9bb25"
   });
 
   const selector1 = `[data-item-index="1"] div`;

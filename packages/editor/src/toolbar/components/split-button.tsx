@@ -6,7 +6,7 @@ import { ToolButton, ToolButtonProps } from "./tool-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import {
   PopupWrapper,
-  PopupWrapperProps,
+  PopupWrapperProps
 } from "../../components/popup-presenter";
 import { PositionOptions } from "../../utils/position";
 import { Button } from "../../components/button";
@@ -24,7 +24,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
       <Flex
         ref={ref}
         sx={{
-          borderRadius: "default",
+          borderRadius: "default"
         }}
       >
         <ToolButton
@@ -41,8 +41,8 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
             bg: "bgSecondary",
             ":hover": { bg: "hover" },
             ":last-of-type": {
-              mr: 0,
-            },
+              mr: 0
+            }
           }}
           onClick={onOpen}
         >

@@ -1,36 +1,39 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { DDS } from '../../services/device-detection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { getElevation } from '../../utils';
-import { eCloseSimpleDialog, eOpenSimpleDialog } from '../../utils/events';
-import { sleep } from '../../utils/time';
-import Input from '../ui/input';
-import Seperator from '../ui/seperator';
-import { Toast } from '../toast';
-import BaseDialog from './base-dialog';
-import DialogButtons from './dialog-buttons';
-import DialogHeader from './dialog-header';
+import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { DDS } from "../../services/device-detection";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../services/event-manager";
+import { getElevation } from "../../utils";
+import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
+import { sleep } from "../../utils/time";
+import Input from "../ui/input";
+import Seperator from "../ui/seperator";
+import { Toast } from "../toast";
+import BaseDialog from "./base-dialog";
+import DialogButtons from "./dialog-buttons";
+import DialogHeader from "./dialog-header";
 
-export const Dialog = ({ context = 'global' }) => {
-  const colors = useThemeStore(state => state.colors);
+export const Dialog = ({ context = "global" }) => {
+  const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
   const [inputValue, setInputValue] = useState(null);
   const inputRef = useRef();
   const [dialogInfo, setDialogInfo] = useState({
-    title: '',
-    paragraph: '',
-    positiveText: 'Done',
-    negativeText: 'Cancel',
+    title: "",
+    paragraph: "",
+    positiveText: "Done",
+    negativeText: "Cancel",
     positivePress: () => {},
     onClose: () => {},
-    positiveType: 'transparent',
+    positiveType: "transparent",
     icon: null,
     paragraphColor: colors.pri,
     input: false,
-    inputPlaceholder: 'Enter some text',
-    defaultValue: '',
+    inputPlaceholder: "Enter some text",
+    defaultValue: "",
     disableBackdropClosing: false
   });
 
@@ -47,7 +50,9 @@ export const Dialog = ({ context = 'global' }) => {
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
       inputRef.current?.blur();
-      let result = await dialogInfo.positivePress(inputValue || dialogInfo.defaultValue);
+      let result = await dialogInfo.positivePress(
+        inputValue || dialogInfo.defaultValue
+      );
       if (result === false) {
         return;
       }
@@ -56,8 +61,8 @@ export const Dialog = ({ context = 'global' }) => {
     hide();
   };
 
-  const show = data => {
-    if (!data.context) data.context = 'global';
+  const show = (data) => {
+    if (!data.context) data.context = "global";
     if (data.context !== context) return;
     setDialogInfo(data);
     setVisible(true);
@@ -78,7 +83,7 @@ export const Dialog = ({ context = 'global' }) => {
 
   const style = {
     ...getElevation(5),
-    width: DDS.isTab ? 400 : '85%',
+    width: DDS.isTab ? 400 : "85%",
     maxHeight: 450,
     borderRadius: 5,
     backgroundColor: colors.bg,
@@ -121,7 +126,7 @@ export const Dialog = ({ context = 'global' }) => {
             <Input
               fwdRef={inputRef}
               autoCapitalize="none"
-              onChangeText={value => {
+              onChangeText={(value) => {
                 setInputValue(value);
               }}
               testID="input-value"

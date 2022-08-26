@@ -23,7 +23,7 @@ export const consoleReporter: ILogReporter = {
         console.log(format(log));
         break;
     }
-  },
+  }
 };
 
 type Token = {
@@ -36,7 +36,7 @@ export function format(log: LogMessage) {
     { value: time, separator: " | " },
     { value: LogLevel[log.level].toUpperCase(), separator: " | " },
     { value: log.scope ? `[${log.scope}]` : "", separator: ": " },
-    { value: log.message },
+    { value: log.message }
   ];
 
   if (log.extras) tokens.push({ value: JSON.stringify(log.extras) });

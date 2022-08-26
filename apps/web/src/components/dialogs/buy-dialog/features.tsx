@@ -24,32 +24,32 @@ const sections: Section[] = [
     features: [
       {
         title: "Zero ads & zero trackers",
-        icon: Icon.Billboard,
+        icon: Icon.Billboard
       },
       {
         title: "On device encryption",
-        icon: Icon.Cellphone,
+        icon: Icon.Cellphone
       },
       {
         title: "Secure app lock for all",
-        icon: Icon.CellphoneLock,
+        icon: Icon.CellphoneLock
       },
       {
         title: "100% end-to-end encrypted",
-        icon: Icon.Lock,
+        icon: Icon.Lock
       },
       {
         title: "Private vault for notes",
         icon: Icon.ShieldLock,
-        pro: true,
-      },
-    ],
+        pro: true
+      }
+    ]
   },
   {
     title: "Instant syncing",
     detail:
       "Seemlessly work from anywhere. Every change is synced instantly everywhere.",
-    pro: true,
+    pro: true
   },
   {
     title: "100% cross platform",
@@ -57,30 +57,30 @@ const sections: Section[] = [
     columns: 8,
     features: [
       {
-        icon: Icon.iOS,
+        icon: Icon.iOS
       },
       {
-        icon: Icon.Android,
+        icon: Icon.Android
       },
       {
-        icon: Icon.Windows,
+        icon: Icon.Windows
       },
       {
-        icon: Icon.Linux,
+        icon: Icon.Linux
       },
       {
-        icon: Icon.MacOS,
+        icon: Icon.MacOS
       },
       {
-        icon: Icon.Chrome,
+        icon: Icon.Chrome
       },
       {
-        icon: Icon.Firefox,
+        icon: Icon.Firefox
       },
       {
-        icon: Icon.Safari,
-      },
-    ],
+        icon: Icon.Safari
+      }
+    ]
   },
   {
     title: "Attach files & images",
@@ -90,30 +90,30 @@ const sections: Section[] = [
     features: [
       {
         title: "Bulletproof encryption",
-        icon: Icon.Lock,
+        icon: Icon.Lock
       },
       {
         title: "High quality 4K images",
-        icon: Icon.ImageMultiple,
+        icon: Icon.ImageMultiple
       },
       {
         title: "Unlimited storage",
-        icon: Icon.Harddisk,
+        icon: Icon.Harddisk
       },
       {
         title: "Upto 500 MB per file",
-        icon: Icon.FileCabinet,
+        icon: Icon.FileCabinet
       },
       {
         title: "All file types supported",
-        icon: Icon.File,
-      },
-    ],
+        icon: Icon.File
+      }
+    ]
   },
   {
     title: "No limit on notes",
     detail:
-      "We don't have nonsense like blocks and whatnot. You can create as many notes as you want — no limits.",
+      "We don't have nonsense like blocks and whatnot. You can create as many notes as you want — no limits."
   },
   {
     title: "Safe publishing to the Internet",
@@ -122,17 +122,17 @@ const sections: Section[] = [
     features: [
       {
         title: "Anonymous publishing",
-        icon: Icon.Anonymous,
+        icon: Icon.Anonymous
       },
       {
         title: "Password protection",
-        icon: Icon.CloudLock,
+        icon: Icon.CloudLock
       },
       {
         title: "Self destructable notes",
-        icon: Icon.Timebomb,
-      },
-    ],
+        icon: Icon.Timebomb
+      }
+    ]
   },
   {
     title: "Organize yourself in the best way",
@@ -142,23 +142,23 @@ const sections: Section[] = [
       {
         title: "Unlimited notebooks*",
         icon: Icon.Notebook2,
-        pro: true,
+        pro: true
       },
       {
         title: "Colors & tags*",
         icon: Icon.Palette,
-        pro: true,
+        pro: true
       },
       {
         title: "Side menu shortcuts",
-        icon: Icon.Shortcut,
+        icon: Icon.Shortcut
       },
       {
         title: "Pins & favorites",
-        icon: Icon.Pin,
-      },
+        icon: Icon.Pin
+      }
     ],
-    info: "* Free users can only create 3 notebooks (no limit on topics) and 5 tags.",
+    info: "* Free users can only create 3 notebooks (no limit on topics) and 5 tags."
   },
 
   {
@@ -169,21 +169,21 @@ const sections: Section[] = [
     features: [
       {
         title: "Lists & tables",
-        icon: Icon.Table,
+        icon: Icon.Table
       },
       {
         title: "Images & embeds",
-        icon: Icon.Embed,
+        icon: Icon.Embed
       },
       {
         title: "Checklists",
-        icon: Icon.CheckCircleOutline,
+        icon: Icon.CheckCircleOutline
       },
       {
         title: "Markdown shortcuts",
-        icon: Icon.Markdown,
-      },
-    ],
+        icon: Icon.Markdown
+      }
+    ]
   },
   {
     title: "Export and take your notes anywhere",
@@ -194,27 +194,27 @@ const sections: Section[] = [
       {
         title: "Export as Markdown",
         icon: Icon.Markdown,
-        pro: true,
+        pro: true
       },
       {
         title: "Export as PDF",
         icon: Icon.PDF,
-        pro: true,
+        pro: true
       },
       {
         title: "Export as HTML",
         icon: Icon.HTML,
-        pro: true,
+        pro: true
       },
       {
         title: "Export as text",
-        icon: Icon.Text,
+        icon: Icon.Text
       },
       {
         title: "Bulk exports",
-        icon: Icon.Export,
-      },
-    ],
+        icon: Icon.Export
+      }
+    ]
   },
   {
     title: "Backup & keep your notes safe",
@@ -224,14 +224,14 @@ const sections: Section[] = [
       {
         title: "Automatic monthly, weekly & daily backups",
         icon: Icon.Backup,
-        pro: true,
+        pro: true
       },
       {
         title: "Backup encryption",
         icon: Icon.EncryptedBackup,
-        pro: true,
-      },
-    ],
+        pro: true
+      }
+    ]
   },
   {
     title: "Personalize & make Notesnook your own",
@@ -241,18 +241,18 @@ const sections: Section[] = [
     features: [
       {
         title: "10+ themes",
-        icon: Icon.Accent,
+        icon: Icon.Accent
       },
       {
         title: "Automatic dark mode",
-        icon: Icon.Theme,
+        icon: Icon.Theme
       },
       {
         title: "Change default home page",
-        icon: Icon.Home,
-      },
-    ],
-  },
+        icon: Icon.Home
+      }
+    ]
+  }
 ];
 
 export function Features() {
@@ -296,7 +296,7 @@ export function Features() {
                 gridTemplateColumns: section.columns
                   ? "1fr ".repeat(section.columns)
                   : "1fr 1fr 1fr",
-                gap: 3,
+                gap: 3
               }}
               mt={4}
             >

@@ -1,4 +1,4 @@
-import { eSendEvent } from '../../services/event-manager';
+import { eSendEvent } from "../../services/event-manager";
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -8,7 +8,7 @@ import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
   eOpenMoveNoteDialog
-} from '../../utils/events';
+} from "../../utils/events";
 
 export const ActionSheetEvent = (item, buttons) => {
   eSendEvent(eOpenActionSheet, {
@@ -27,15 +27,15 @@ export const moveNoteHideEvent = () => {
   eSendEvent(eCloseMoveNoteDialog);
 };
 
-export const AddNotebookEvent = notebook => {
+export const AddNotebookEvent = (notebook) => {
   eSendEvent(eOpenAddNotebookDialog, notebook);
 };
-export const HideAddNotebookEvent = notebook => {
+export const HideAddNotebookEvent = (notebook) => {
   eSendEvent(eCloseAddNotebookDialog, notebook);
 };
-export const AddTopicEvent = topic => {
+export const AddTopicEvent = (topic) => {
   eSendEvent(eOpenAddTopicDialog, topic);
 };
-export const HideAddTopicEvent = notebook => {
+export const HideAddTopicEvent = (notebook) => {
   eSendEvent(eCloseAddTopicDialog, notebook);
 };

@@ -49,14 +49,14 @@ function toMenuItems(
         .focus()
         .updateAttributes("textStyle", { fontSize: null, fontStyle: null })
         .setHeading({ level: level as any })
-        .run(),
+        .run()
   }));
   const paragraph: MenuItem = {
     key: "paragraph",
     type: "button",
     title: "Paragraph",
     isChecked: !currentHeadingLevel,
-    onClick: () => editor.current?.chain().focus().setParagraph().run(),
+    onClick: () => editor.current?.chain().focus().setParagraph().run()
   };
   return [paragraph, ...menuItems];
 }

@@ -28,11 +28,11 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
         bottomLeft: false,
         bottomRight: selected,
         topLeft: false,
-        topRight: false,
+        topRight: false
       }}
       size={{
         height: height || "auto",
-        width: width || "auto",
+        width: width || "auto"
       }}
       maxWidth="100%"
       minWidth={135}
@@ -45,13 +45,13 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
               marginLeft: -20,
               marginTop: -20,
               borderTopLeftRadius: "default",
-              borderBottomRightRadius: "default",
+              borderBottomRightRadius: "default"
             }}
             path={Icons.resize}
             size={25}
             color={handleColor || "icon"}
           />
-        ),
+        )
       }}
       onResizeStop={(e, direction, ref, d) => {
         try {

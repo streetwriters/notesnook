@@ -65,7 +65,7 @@ function PublishView(props) {
         borderColor: "border",
         borderRadius: "default",
         boxShadow: "0px 0px 15px 0px #00000011",
-        ...position,
+        ...position
       }}
       bg="background"
       // p={2}
@@ -107,7 +107,7 @@ function PublishView(props) {
                     p: 1,
                     borderRadius: "default",
                     alignItems: "center",
-                    justifyContent: "center",
+                    justifyContent: "center"
                   }}
                 >
                   <Text
@@ -120,7 +120,7 @@ function PublishView(props) {
                       whiteSpace: "nowrap",
                       textDecoration: "none",
                       overflow: "hidden",
-                      mr: 2,
+                      mr: 2
                     }}
                   >
                     {`https://monograph.notesnook.com/${publishId}`}
@@ -185,7 +185,7 @@ function PublishView(props) {
           fontWeight="bold"
           bg={"transparent"}
           sx={{
-            ":hover": { bg: "bgSecondary" },
+            ":hover": { bg: "bgSecondary" }
           }}
           onClick={async () => {
             try {
@@ -195,7 +195,7 @@ function PublishView(props) {
 
               const publishId = await publishNote(noteId, {
                 selfDestruct,
-                password,
+                password
               });
               setPublishId(publishId);
               showToast("success", "Note published.");
@@ -224,7 +224,7 @@ function PublishView(props) {
             fontWeight="bold"
             bg={"transparent"}
             sx={{
-              ":hover": { bg: "bgSecondary" },
+              ":hover": { bg: "bgSecondary" }
             }}
             onClick={async () => {
               try {
@@ -255,7 +255,7 @@ function PublishView(props) {
           fontWeight="bold"
           bg={"transparent"}
           sx={{
-            ":hover": { bg: "bgSecondary" },
+            ":hover": { bg: "bgSecondary" }
           }}
           onClick={() => {
             onClose(false);
@@ -287,7 +287,7 @@ export function showPublishView(noteId, location = "top") {
               top: location === "top" ? [0, 50, 60] : undefined,
               right: location === "top" ? [0, 20, 10] : undefined,
               bottom: location === "bottom" ? 0 : undefined,
-              left: location === "bottom" ? 0 : undefined,
+              left: location === "bottom" ? 0 : undefined
             }}
             onClose={perform}
           />

@@ -9,7 +9,7 @@ function ContentToggle(props) {
     sx,
     label,
     dateEdited,
-    resolveConflict,
+    resolveConflict
   } = props;
 
   return (

@@ -1,18 +1,18 @@
-import React, { Fragment } from 'react';
-import { View } from 'react-native';
-import { allowedPlatforms } from '../../stores/use-message-store';
-import { ProFeatures } from '../dialogs/result/pro-features';
-import { Body } from './body';
-import { Cta } from './cta';
-import { Description } from './description';
-import { List } from './list';
-import { Photo } from './photo';
-import { SubHeading } from './subheading';
-import { Title } from './title';
+import React, { Fragment } from "react";
+import { View } from "react-native";
+import { allowedPlatforms } from "../../stores/use-message-store";
+import { ProFeatures } from "../dialogs/result/pro-features";
+import { Body } from "./body";
+import { Cta } from "./cta";
+import { Description } from "./description";
+import { List } from "./list";
+import { Photo } from "./photo";
+import { SubHeading } from "./subheading";
+import { Title } from "./title";
 
 export function allowedOnPlatform(platforms) {
   if (!platforms) return true;
-  return platforms.some(platform => allowedPlatforms.indexOf(platform) > -1);
+  return platforms.some((platform) => allowedPlatforms.indexOf(platform) > -1);
 }
 
 export const margins = {
@@ -21,12 +21,12 @@ export const margins = {
   2: 20
 };
 
-export const getStyle = style => {
+export const getStyle = (style) => {
   if (!style) return {};
   return {
     marginTop: margins[style.marginTop] || 0,
     marginBottom: margins[style.marginBottom] || 0,
-    textAlign: style.textAlign || 'left'
+    textAlign: style.textAlign || "left"
   };
 };
 
@@ -35,8 +35,8 @@ const Features = () => {
     <View
       style={{
         paddingHorizontal: 12,
-        alignItems: 'center',
-        width: '100%'
+        alignItems: "center",
+        width: "100%"
       }}
     >
       <ProFeatures />

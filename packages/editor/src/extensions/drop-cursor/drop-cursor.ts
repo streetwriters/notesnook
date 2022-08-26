@@ -14,11 +14,11 @@ export const Dropcursor = Extension.create<DropcursorOptions>({
     return {
       color: "currentColor",
       width: 1,
-      class: null,
+      class: null
     };
   },
 
   addProseMirrorPlugins() {
     return [dropCursor(this.options)];
-  },
+  }
 });

@@ -1,12 +1,17 @@
-import Database from '@streetwriters/notesnook-core/api/index';
-import { initalize, logger as dbLogger } from '@streetwriters/notesnook-core/logger';
-import { Platform } from 'react-native';
-import { MMKVLoader } from 'react-native-mmkv-storage';
-import filesystem from '../filesystem';
-import EventSource from '../../utils/sse/even-source-ios';
-import AndroidEventSource from '../../utils/sse/event-source';
-import Storage, { KV } from './storage';
-const LoggerStorage = new MMKVLoader().withInstanceID('notesnook_logs').initialize();
+import Database from "@streetwriters/notesnook-core/api/index";
+import {
+  initalize,
+  logger as dbLogger
+} from "@streetwriters/notesnook-core/logger";
+import { Platform } from "react-native";
+import { MMKVLoader } from "react-native-mmkv-storage";
+import filesystem from "../filesystem";
+import EventSource from "../../utils/sse/even-source-ios";
+import AndroidEventSource from "../../utils/sse/event-source";
+import Storage, { KV } from "./storage";
+const LoggerStorage = new MMKVLoader()
+  .withInstanceID("notesnook_logs")
+  .initialize();
 console.log(LoggerStorage);
 initalize(new KV(LoggerStorage));
 export const DatabaseLogger = dbLogger;
@@ -16,18 +21,18 @@ export const DatabaseLogger = dbLogger;
  */
 export var db = new Database(
   Storage,
-  Platform.OS === 'ios' ? EventSource : AndroidEventSource,
+  Platform.OS === "ios" ? EventSource : AndroidEventSource,
   filesystem
 );
 
 db.host(
   __DEV__
     ? {
-        API_HOST: 'https://api.notesnook.com',
-        AUTH_HOST: 'https://auth.streetwriters.co',
-        SSE_HOST: 'https://events.streetwriters.co',
-        SUBSCRIPTIONS_HOST: 'https://subscriptions.streetwriters.co',
-        ISSUES_HOST: 'https://issues.streetwriters.co'
+        API_HOST: "https://api.notesnook.com",
+        AUTH_HOST: "https://auth.streetwriters.co",
+        SSE_HOST: "https://events.streetwriters.co",
+        SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+        ISSUES_HOST: "https://issues.streetwriters.co"
         // API_HOST: 'http://192.168.10.29:5264',
         // AUTH_HOST: 'http://192.168.10.29:8264',
         // SSE_HOST: 'http://192.168.10.29:7264',
@@ -35,11 +40,11 @@ db.host(
         // ISSUES_HOST: 'http://192.168.10.29:2624'
       }
     : {
-        API_HOST: 'https://api.notesnook.com',
-        AUTH_HOST: 'https://auth.streetwriters.co',
-        SSE_HOST: 'https://events.streetwriters.co',
-        SUBSCRIPTIONS_HOST: 'https://subscriptions.streetwriters.co',
-        ISSUES_HOST: 'https://issues.streetwriters.co'
+        API_HOST: "https://api.notesnook.com",
+        AUTH_HOST: "https://auth.streetwriters.co",
+        SSE_HOST: "https://events.streetwriters.co",
+        SUBSCRIPTIONS_HOST: "https://subscriptions.streetwriters.co",
+        ISSUES_HOST: "https://issues.streetwriters.co"
       }
 );
 

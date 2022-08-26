@@ -20,7 +20,7 @@ export default class FileStreamSource implements UnderlyingSource<Chunk> {
     if (data)
       controller.enqueue({
         data,
-        final: isFinalChunk,
+        final: isFinalChunk
       });
 
     if (isFinalChunk || !data) controller.close();

@@ -1,18 +1,18 @@
-import React from 'react';
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useThemeStore } from '../../stores/use-theme-store';
-import Paragraph from '../ui/typography/paragraph';
-import { getStyle } from './functions';
+import React from "react";
+import { View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useThemeStore } from "../../stores/use-theme-store";
+import Paragraph from "../ui/typography/paragraph";
+import { getStyle } from "./functions";
 
 export const List = ({ items, listType, style = {} }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return (
     <View
       style={{
         paddingHorizontal: 12,
-        paddingLeft: listType === 'ordered' ? 25 : 25,
+        paddingLeft: listType === "ordered" ? 25 : 25,
         ...getStyle(style)
       }}
     >
@@ -21,10 +21,10 @@ export const List = ({ items, listType, style = {} }) => {
           key={item.text}
           style={{
             paddingVertical: 6,
-            flexDirection: 'row'
+            flexDirection: "row"
           }}
         >
-          {listType === 'ordered' ? (
+          {listType === "ordered" ? (
             <Paragraph
               style={{
                 marginRight: 5

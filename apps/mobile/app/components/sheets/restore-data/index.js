@@ -1,26 +1,30 @@
-import React, { createRef, useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
-import DocumentPicker from 'react-native-document-picker';
-import { FlatList } from 'react-native-gesture-handler';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { initialize } from '../../../stores';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../../services/event-manager';
-import { db } from '../../../common/database';
-import { MMKV } from '../../../common/database/mmkv';
-import storage from '../../../common/database/storage';
-import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../../utils/events';
-import { SIZE } from '../../../utils/size';
-import { sleep, timeConverter } from '../../../utils/time';
-import { Dialog } from '../../dialog';
-import DialogHeader from '../../dialog/dialog-header';
-import { presentDialog } from '../../dialog/functions';
-import { Toast } from '../../toast';
-import { Button } from '../../ui/button';
-import Seperator from '../../ui/seperator';
-import SheetWrapper from '../../ui/sheet';
-import Paragraph from '../../ui/typography/paragraph';
-import SettingsService from '../../../services/settings';
+import React, { createRef, useEffect, useState } from "react";
+import { ActivityIndicator, Platform, View } from "react-native";
+import DocumentPicker from "react-native-document-picker";
+import { FlatList } from "react-native-gesture-handler";
+import * as ScopedStorage from "react-native-scoped-storage";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { initialize } from "../../../stores";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from "../../../services/event-manager";
+import { db } from "../../../common/database";
+import { MMKV } from "../../../common/database/mmkv";
+import storage from "../../../common/database/storage";
+import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
+import { SIZE } from "../../../utils/size";
+import { sleep, timeConverter } from "../../../utils/time";
+import { Dialog } from "../../dialog";
+import DialogHeader from "../../dialog/dialog-header";
+import { presentDialog } from "../../dialog/functions";
+import { Toast } from "../../toast";
+import { Button } from "../../ui/button";
+import Seperator from "../../ui/seperator";
+import SheetWrapper from "../../ui/sheet";
+import Paragraph from "../../ui/typography/paragraph";
+import SettingsService from "../../../services/settings";
 
 const actionSheetRef = createRef();
 let RNFetchBlob;
@@ -55,10 +59,10 @@ const RestoreDataSheet = () => {
 
   const showIsWorking = () => {
     ToastEvent.show({
-      heading: 'Restoring Backup',
-      message: 'Your backup data is being restored. please wait.',
-      type: 'error',
-      context: 'local'
+      heading: "Restoring Backup",
+      message: "Your backup data is being restored. please wait.",
+      type: "error",
+      context: "local"
     });
   };
 
@@ -69,7 +73,11 @@ const RestoreDataSheet = () => {
       closeOnTouchBackdrop={!restoring}
       onClose={close}
     >
-      <RestoreDataComponent close={close} restoring={restoring} setRestoring={setRestoring} />
+      <RestoreDataComponent
+        close={close}
+        restoring={restoring}
+        setRestoring={setRestoring}
+      />
       <Toast context="local" />
     </SheetWrapper>
   );
@@ -78,7 +86,7 @@ const RestoreDataSheet = () => {
 export default RestoreDataSheet;
 
 const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [backupDirectoryAndroid, setBackupDirectoryAndroid] = useState(false);
@@ -93,33 +101,33 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
     }
     try {
       setRestoring(true);
-      let prefix = Platform.OS === 'ios' ? '' : 'file:/';
+      let prefix = Platform.OS === "ios" ? "" : "file:/";
       let backup;
-      if (Platform.OS === 'android') {
-        backup = await ScopedStorage.readFile(item.uri, 'utf8');
+      if (Platform.OS === "android") {
+        backup = await ScopedStorage.readFile(item.uri, "utf8");
       } else {
-        backup = await RNFetchBlob.fs.readFile(prefix + item.path, 'utf8');
+        backup = await RNFetchBlob.fs.readFile(prefix + item.path, "utf8");
       }
       backup = JSON.parse(backup);
-      console.log('backup encrypted:', backup.data.iv && backup.data.salt);
+      console.log("backup encrypted:", backup.data.iv && backup.data.salt);
 
       if (backup.data.iv && backup.data.salt) {
         withPassword(
-          async value => {
+          async (value) => {
             try {
-              console.log('password for backup:', value);
+              console.log("password for backup:", value);
               await restoreBackup(backup, value);
               close();
               setRestoring(false);
               return true;
             } catch (e) {
               backupError(e);
-              console.log('return false');
+              console.log("return false");
               return false;
             }
           },
           () => {
-            console.log('closed');
+            console.log("closed");
             setRestoring(false);
           }
         );
@@ -135,24 +143,24 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
 
   const withPassword = (onsubmit, onclose = () => {}) => {
     presentDialog({
-      context: 'local',
-      title: 'Encrypted backup',
+      context: "local",
+      title: "Encrypted backup",
       input: true,
-      inputPlaceholder: 'Password',
-      paragraph: 'Please enter password of this backup file to restore it',
-      positiveText: 'Restore',
+      inputPlaceholder: "Password",
+      paragraph: "Please enter password of this backup file to restore it",
+      positiveText: "Restore",
       secureTextEntry: true,
       onClose: onclose,
-      negativeText: 'Cancel',
-      positivePress: async password => {
+      negativeText: "Cancel",
+      positivePress: async (password) => {
         try {
           return await onsubmit(password);
         } catch (e) {
           ToastEvent.show({
-            heading: 'Failed to backup data',
+            heading: "Failed to backup data",
             message: e.message,
-            type: 'error',
-            context: 'global'
+            type: "error",
+            context: "global"
           });
           return false;
         }
@@ -163,7 +171,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   const checkBackups = async () => {
     try {
       let files = [];
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         let backupDirectory = SettingsService.get().backupDirectoryAndroid;
         if (backupDirectory) {
           setBackupDirectoryAndroid(backupDirectory);
@@ -173,8 +181,8 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
           return;
         }
       } else {
-        RNFetchBlob = require('rn-fetch-blob').default;
-        let path = await storage.checkAndCreateDir('/backups/');
+        RNFetchBlob = require("rn-fetch-blob").default;
+        let path = await storage.checkAndCreateDir("/backups/");
         files = await RNFetchBlob.fs.lstat(path);
       }
       files = files.sort(function (a, b) {
@@ -196,25 +204,25 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
     <View
       style={{
         minHeight: 50,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
         borderRadius: 0,
-        flexDirection: 'row',
+        flexDirection: "row",
         borderBottomWidth: 0.5,
         borderBottomColor: colors.nav
       }}
     >
       <View
         style={{
-          maxWidth: '75%'
+          maxWidth: "75%"
         }}
       >
-        <Paragraph size={SIZE.sm} style={{ width: '100%', maxWidth: '100%' }}>
+        <Paragraph size={SIZE.sm} style={{ width: "100%", maxWidth: "100%" }}>
           {timeConverter(item?.lastModified * 1)}
         </Paragraph>
         <Paragraph size={SIZE.xs}>
-          {(item.filename || item.name).replace('.nnbackup', '')}
+          {(item.filename || item.name).replace(".nnbackup", "")}
         </Paragraph>
       </View>
       <Button
@@ -232,47 +240,50 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   );
 
   const restoreBackup = async (backup, password) => {
-    console.log(password, 'password');
+    console.log(password, "password");
     await db.backup.import(backup, password);
     setRestoring(false);
     initialize();
     ToastEvent.show({
-      heading: 'Backup restored successfully.',
-      type: 'success',
-      context: 'global'
+      heading: "Backup restored successfully.",
+      type: "success",
+      context: "global"
     });
   };
 
-  const backupError = e => {
+  const backupError = (e) => {
     ToastEvent.show({
-      heading: 'Restore failed',
+      heading: "Restore failed",
       message:
         e.message ||
-        'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
-      type: 'error',
-      context: 'local'
+        "The selected backup data file is invalid. You must select a *.nnbackup file to restore.",
+      type: "error",
+      context: "local"
     });
   };
 
   const button = {
-    title: 'Restore from files',
+    title: "Restore from files",
     onPress: () => {
       if (restoring) {
         return;
       }
 
       DocumentPicker.pickSingle()
-        .then(r => {
+        .then((r) => {
           setRestoring(true);
           console.log(r.uri);
           fetch(r.uri)
-            .then(async r => {
+            .then(async (r) => {
               try {
                 let backup = await r.json();
-                console.log('backup encrypted:', backup.data.iv && backup.data.salt);
+                console.log(
+                  "backup encrypted:",
+                  backup.data.iv && backup.data.salt
+                );
                 if (backup.data.iv && backup.data.salt) {
                   withPassword(
-                    async value => {
+                    async (value) => {
                       try {
                         await restoreBackup(backup, value);
                         setRestoring(false);
@@ -285,7 +296,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                       }
                     },
                     () => {
-                      console.log('closed');
+                      console.log("closed");
                       setRestoring(false);
                     }
                   );
@@ -310,18 +321,20 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         <Dialog context="local" />
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+            flexDirection: "row",
+            justifyContent: "space-between",
             paddingHorizontal: 8,
             paddingRight: 8,
-            alignItems: 'center',
+            alignItems: "center",
             paddingTop: restoring ? 8 : 0
           }}
         >
           <DialogHeader
             title="Backups"
             paragraph={`All the backups are stored in ${
-              Platform.OS === 'ios' ? 'File Manager/Notesnook/Backups' : 'selected backups folder.'
+              Platform.OS === "ios"
+                ? "File Manager/Notesnook/Backups"
+                : "selected backups folder."
             }`}
             button={button}
           />
@@ -337,8 +350,8 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
               loading ? (
                 <View
                   style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    justifyContent: "center",
+                    alignItems: "center",
                     height: 100
                   }}
                 >
@@ -347,23 +360,25 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
               ) : (
                 <View
                   style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    justifyContent: "center",
+                    alignItems: "center",
                     height: 100
                   }}
                 >
-                  {Platform.OS === 'android' && !backupDirectoryAndroid ? (
+                  {Platform.OS === "android" && !backupDirectoryAndroid ? (
                     <>
                       <Button
                         title="Select backups folder"
                         icon="folder"
                         onPress={async () => {
-                          let folder = await ScopedStorage.openDocumentTree(true);
+                          let folder = await ScopedStorage.openDocumentTree(
+                            true
+                          );
                           let subfolder;
-                          if (folder.name !== 'Notesnook backups') {
+                          if (folder.name !== "Notesnook backups") {
                             subfolder = await ScopedStorage.createDirectory(
                               folder.uri,
-                              'Notesnook backups'
+                              "Notesnook backups"
                             );
                           } else {
                             subfolder = folder;
@@ -386,14 +401,15 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
 
                       <Paragraph
                         style={{
-                          textAlign: 'center',
+                          textAlign: "center",
                           marginTop: 5
                         }}
                         size={SIZE.xs}
                         textBreakStrategy="balanced"
                         color={colors.icon}
                       >
-                        Select the folder that includes your backup files to list them here.
+                        Select the folder that includes your backup files to
+                        list them here.
                       </Paragraph>
                     </>
                   ) : (
@@ -404,17 +420,19 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
             ) : (
               <View
                 style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: "center",
+                  alignItems: "center",
                   height: 200
                 }}
               >
                 <ActivityIndicator color={colors.accent} />
-                <Paragraph color={colors.icon}>Restoring backup. Please wait.</Paragraph>
+                <Paragraph color={colors.icon}>
+                  Restoring backup. Please wait.
+                </Paragraph>
               </View>
             )
           }
-          keyExtractor={item => item.name || item.filename}
+          keyExtractor={(item) => item.name || item.filename}
           style={{
             paddingHorizontal: 12
           }}

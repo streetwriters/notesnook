@@ -4,7 +4,7 @@ import {
   OutputFormat,
   Plaintext,
   SerializedKey,
-  Chunk,
+  Chunk
 } from "./types";
 
 export interface IStreamable {

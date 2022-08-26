@@ -14,7 +14,7 @@ import {
   Fragment,
   ParseRule,
   Schema,
-  NodeType,
+  NodeType
 } from "prosemirror-model";
 
 ////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ function matchWikipedia(root: Element): false | string {
   let match: false | string = getFirstMatch(root, [
     texFromMediaWikiFallbackImage,
     texFromMathML_01,
-    texFromMathML_02,
+    texFromMathML_02
   ]);
   // TODO: if no tex string was found, but we have MathML, try to parse it
   return match;
@@ -147,7 +147,7 @@ export const wikipediaBlockMathParseRule: ParseRule = {
     // return a fragment representing the math node's children
     let texString: string = match || "\\text{\\color{red}(paste error)}";
     return makeTextFragment(texString, schema);
-  },
+  }
 };
 
 /**
@@ -185,7 +185,7 @@ export const wikipediaInlineMathParseRule: ParseRule = {
     // return a fragment representing the math node's children
     let texString: string = match || "\\text{\\color{red}(paste error)}";
     return makeTextFragment(texString, schema);
-  },
+  }
 };
 
 // -- MathJax ------------------------------------------- //
@@ -193,9 +193,9 @@ export const wikipediaInlineMathParseRule: ParseRule = {
 ////////////////////////////////////////////////////////////
 
 export const defaultInlineMathParseRules: ParseRule[] = [
-  wikipediaInlineMathParseRule,
+  wikipediaInlineMathParseRule
 ];
 
 export const defaultBlockMathParseRules: ParseRule[] = [
-  wikipediaBlockMathParseRule,
+  wikipediaBlockMathParseRule
 ];

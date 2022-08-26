@@ -11,10 +11,10 @@ console.log("App version:", APP_VERSION);
 console.log("Ip address:", ip.address());
 module.exports = {
   beta: {
-    REACT_APP_BETA: true,
+    REACT_APP_BETA: true
   },
   test: {
-    TEST_ALL: true,
+    TEST_ALL: true
   },
   all: {
     UV_THREADPOOL_SIZE: IS_CI ? NUM_CPUS : 2,
@@ -22,27 +22,27 @@ module.exports = {
     INLINE_RUNTIME_CHUNK: false,
     DISABLE_ESLINT_PLUGIN: true,
     REACT_APP_GIT_HASH: gitHash,
-    REACT_APP_VERSION: APP_VERSION,
+    REACT_APP_VERSION: APP_VERSION
   },
   dev: {
     REACT_APP_LOCALHOST: ip.address(),
-    REACT_APP_CI: "true",
+    REACT_APP_CI: "true"
   },
   web: {
-    REACT_APP_PLATFORM: "web",
+    REACT_APP_PLATFORM: "web"
   },
   debug: {
     PWDEBUG: 1,
-    DEBUG: "pw:api",
+    DEBUG: "pw:api"
   },
   silent: {
     REACT_APP_TEST: true,
     DISABLE_ESLINT_PLUGIN: "true",
     FAST_REFRESH: "false",
-    BROWSER: "none",
+    BROWSER: "none"
   },
   desktop: {
     BROWSER: "none",
-    REACT_APP_PLATFORM: "desktop",
-  },
+    REACT_APP_PLATFORM: "desktop"
+  }
 };

@@ -59,12 +59,12 @@ function EmailVerificationDialog(props) {
           }
         },
         loading: isSending,
-        disabled: isSending || !canSendAgain,
+        disabled: isSending || !canSendAgain
       }}
       negativeButton={{
         text: "Cancel",
         onClick: props.onCancel,
-        disabled: isSending,
+        disabled: isSending
       }}
     >
       <Flex flexDirection="column">

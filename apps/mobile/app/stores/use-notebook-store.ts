@@ -1,8 +1,8 @@
 //@ts-ignore
-import { groupArray } from '@streetwriters/notesnook-core/utils/grouping';
-import create, { State } from 'zustand';
-import { db } from '../common/database';
-import { NotebookType } from '../utils/types';
+import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import create, { State } from "zustand";
+import { db } from "../common/database";
+import { NotebookType } from "../utils/types";
 export interface NotebookStore extends State {
   notebooks: NotebookType[];
   setNotebooks: (items?: NotebookType[]) => void;
@@ -11,12 +11,12 @@ export interface NotebookStore extends State {
 
 export const useNotebookStore = create<NotebookStore>((set, get) => ({
   notebooks: [],
-  setNotebooks: items => {
+  setNotebooks: (items) => {
     if (!items) {
       set({
         notebooks: groupArray(
           (db?.notebooks?.all as NotebookType[]) || [],
-          db.settings?.getGroupOptions('notebooks')
+          db.settings?.getGroupOptions("notebooks")
         )
       });
       return;
@@ -24,7 +24,7 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
     let prev = get().notebooks;
     for (let i = 0; i < items.length; i++) {
       let item = items[i];
-      let index = prev.findIndex(v => v.id === item.id);
+      let index = prev.findIndex((v) => v.id === item.id);
       if (index !== -1) {
         prev[index] = item;
       }

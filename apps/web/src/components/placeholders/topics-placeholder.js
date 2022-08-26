@@ -10,7 +10,7 @@ function TopicsPlaceholder() {
       callToAction={{
         text: "Add a topic",
         icon: Plus,
-        onClick: () => hashNavigate("/topics/create"),
+        onClick: () => hashNavigate("/topics/create")
       }}
     />
   );

@@ -24,7 +24,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
 
   addOptions() {
     return {
-      HTMLAttributes: {},
+      HTMLAttributes: {}
     };
   },
 
@@ -35,8 +35,8 @@ export const OutlineListItem = Node.create<ListItemOptions>({
   parseHTML() {
     return [
       {
-        tag: `li[data-type="${this.name}"]`,
-      },
+        tag: `li[data-type="${this.name}"]`
+      }
     ];
   },
 
@@ -44,9 +44,9 @@ export const OutlineListItem = Node.create<ListItemOptions>({
     return [
       "li",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        "data-type": this.name,
+        "data-type": this.name
       }),
-      0,
+      0
     ];
   },
 
@@ -77,7 +77,7 @@ export const OutlineListItem = Node.create<ListItemOptions>({
       Tab: () => this.editor.commands.sinkListItem(this.name),
       "Shift-Tab": () => this.editor.commands.liftListItem(this.name),
       Backspace: ({ editor }) =>
-        onBackspacePressed(editor, this.name, this.type),
+        onBackspacePressed(editor, this.name, this.type)
     };
   },
 
@@ -87,19 +87,19 @@ export const OutlineListItem = Node.create<ListItemOptions>({
         (pos, state) =>
         ({ tr }) => {
           tr.setNodeMarkup(pos, undefined, {
-            collapsed: state,
+            collapsed: state
           });
           return true;
-        },
+        }
     };
   },
 
   addNodeView() {
     return createNodeView(OutlineListItemComponent, {
       contentDOMFactory: true,
-      wrapperFactory: () => document.createElement("li"),
+      wrapperFactory: () => document.createElement("li")
     });
-  },
+  }
 });
 
 function findSublist(editor: Editor, type: NodeType) {

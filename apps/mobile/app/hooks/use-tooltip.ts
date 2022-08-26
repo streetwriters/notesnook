@@ -1,11 +1,15 @@
-import { RefObject, useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
+import { RefObject, useEffect, useRef } from "react";
+import { Platform } from "react-native";
 //@ts-ignore
-import RNTooltips from 'react-native-tooltips';
-import { useThemeStore } from '../stores/use-theme-store';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/event-manager';
-import { Popup } from '../services/tip-manager';
-import useKeyboard from './use-keyboard';
+import RNTooltips from "react-native-tooltips";
+import { useThemeStore } from "../stores/use-theme-store";
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../services/event-manager";
+import { Popup } from "../services/tip-manager";
+import useKeyboard from "./use-keyboard";
 
 let currentTargets: number[] = [];
 let timers: NodeJS.Timeout[] = [];
@@ -14,10 +18,10 @@ let timers: NodeJS.Timeout[] = [];
  * A function to hide all native tooltips
  */
 export const hideAllTooltips = async () => {
-  timers.forEach(t => t && clearTimeout(t));
+  timers.forEach((t) => t && clearTimeout(t));
   for (let target of currentTargets) {
     if (target) {
-      console.log('dimissing targets', target);
+      console.log("dimissing targets", target);
       RNTooltips.Dismiss(target);
       target = -1;
     }
@@ -30,7 +34,7 @@ export const hideAllTooltips = async () => {
  * @returns
  */
 const useTooltip = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const parent = useRef();
   let keyboard = useKeyboard();
 
@@ -56,11 +60,11 @@ const useTooltip = () => {
     currentTargets.push(target.current._nativeTag);
     timers[timers.length] = setTimeout(() => {
       //TipManager.markPopupUsed(popup.id);
-      console.log('tooltip showing', popup.text);
+      console.log("tooltip showing", popup.text);
       RNTooltips.Show(target.current, parent.current, {
         text: popup.text,
-        tintColor: colors.night ? colors.nav : '#404040',
-        corner: Platform.OS === 'ios' ? 5 : 50,
+        tintColor: colors.night ? colors.nav : "#404040",
+        corner: Platform.OS === "ios" ? 5 : 50,
         textSize: 15,
         position: positions[position],
         duration: duration || 10000,
@@ -74,12 +78,18 @@ const useTooltip = () => {
   return { parent, show };
 };
 
-type TTooltipIdentifiers = 'sectionheader' | 'searchreplace' | 'notebookshortcut';
+type TTooltipIdentifiers =
+  | "sectionheader"
+  | "searchreplace"
+  | "notebookshortcut";
 
 /**
  * A hook that helps in listening to tooltip show/hide requests and respond.
  */
-export const useTooltipHandler = (id: TTooltipIdentifiers, callback: () => void) => {
+export const useTooltipHandler = (
+  id: TTooltipIdentifiers,
+  callback: () => void
+) => {
   useEffect(() => {
     if (!id) return;
     eSubscribeEvent(id, callback);

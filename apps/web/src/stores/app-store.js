@@ -24,7 +24,7 @@ class AppStore extends BaseStore {
   syncStatus = {
     key: "synced",
     progress: null,
-    type: null,
+    type: null
   };
   colors = [];
   globalMenu = { items: [], data: {} };
@@ -44,7 +44,7 @@ class AppStore extends BaseStore {
           state.syncStatus = {
             key: "syncing",
             progress: ((current / total) * 100).toFixed(),
-            type,
+            type
           };
         });
 
@@ -125,7 +125,7 @@ class AppStore extends BaseStore {
         const { priority, type } = reminder;
         state.reminders.push({
           type,
-          priority: priority === "high" ? 1 : priority === "medium" ? 2 : 1,
+          priority: priority === "high" ? 1 : priority === "medium" ? 2 : 1
         });
       }
     });
@@ -147,7 +147,7 @@ class AppStore extends BaseStore {
     } else {
       await db.settings.pin(item.type, {
         id: item.id,
-        notebookId: item.notebookId,
+        notebookId: item.notebookId
       });
       this.refreshNavItems();
       showToast("success", `Shortcut created!`);

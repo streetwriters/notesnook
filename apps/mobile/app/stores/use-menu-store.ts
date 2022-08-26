@@ -1,6 +1,6 @@
 //@ts-ignore
-import create, { State } from 'zustand';
-import { db } from '../common/database';
+import create, { State } from "zustand";
+import { db } from "../common/database";
 
 export interface MenuStore extends State {
   menuPins: object[];

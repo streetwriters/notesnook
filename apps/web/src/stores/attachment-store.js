@@ -24,7 +24,7 @@ class AttachmentStore extends BaseStore {
           if (!status) return this.refresh();
           state.attachments[index] = {
             ...state.attachments[index],
-            status,
+            status
           };
         });
       }
@@ -65,7 +65,7 @@ class AttachmentStore extends BaseStore {
   rename = async (hash, newName) => {
     await db.attachments.add({
       hash,
-      filename: newName,
+      filename: newName
     });
     this.get().refresh();
   };

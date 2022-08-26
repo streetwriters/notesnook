@@ -53,5 +53,5 @@ export const useCheckoutStore = create<ICheckoutStore>((set, get) => ({
         state.isApplyingCoupon = false;
       })
     );
-  },
+  }
 }));

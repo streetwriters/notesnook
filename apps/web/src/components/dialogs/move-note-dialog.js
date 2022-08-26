@@ -52,11 +52,11 @@ function MoveDialog({ onClose, noteIds }) {
             `Added ${noteIds.length} notes to ${selected.length} topics`
           );
           onClose();
-        },
+        }
       }}
       negativeButton={{
         text: "Cancel",
-        onClick: onClose,
+        onClick: onClose
       }}
     >
       <Flex flexDirection="column" mt={1} sx={{ overflowY: "hidden" }}>
@@ -64,13 +64,13 @@ function MoveDialog({ onClose, noteIds }) {
           testId="mnd-new-notebook-title"
           placeholders={{
             empty: "Add a new notebook",
-            filter: "Filter notebooks",
+            filter: "Filter notebooks"
           }}
           getAll={getAllNotebooks}
           filter={(notebooks, query) => db.lookup.notebooks(notebooks, query)}
           onCreateNewItem={(title) =>
             db.notebooks.add({
-              title,
+              title
             })
           }
           refreshItems={refreshNotebooks}
@@ -106,7 +106,7 @@ function MoveDialog({ onClose, noteIds }) {
                 <FilteredList
                   placeholders={{
                     empty: "Add a new topic",
-                    filter: "Filter topics",
+                    filter: "Filter topics"
                   }}
                   testId="mnd-new-topic-title"
                   itemName="topic"
@@ -139,7 +139,7 @@ function MoveDialog({ onClose, noteIds }) {
                               copy.push({
                                 id: notebook.id,
                                 topic: topic.id,
-                                type: opType,
+                                type: opType
                               });
                             else copy.splice(index, 1);
                             return copy;
@@ -203,7 +203,7 @@ function FilteredList({
   onCreateNewItem,
   renderItem,
   refreshItems,
-  itemName,
+  itemName
 }) {
   const [items, setItems] = useState([]);
   const [query, setQuery] = useState();
@@ -264,7 +264,7 @@ function FilteredList({
           items.length <= 0
             ? {
                 icon: Icon.Plus,
-                onClick: async () => await _createNewItem(query),
+                onClick: async () => await _createNewItem(query)
               }
             : { icon: Icon.Search, onClick: () => _filter(query) }
         }
@@ -277,7 +277,7 @@ function FilteredList({
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              py: 2,
+              py: 2
             }}
             onClick={async () => {
               await _createNewItem(query);

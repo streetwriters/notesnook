@@ -24,7 +24,7 @@ function EditorPlaceholder() {
         display="flex"
         sx={{
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "center"
         }}
         variant="tool"
         onClick={() =>

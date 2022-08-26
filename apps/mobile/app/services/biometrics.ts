@@ -1,10 +1,10 @@
-import { Platform } from 'react-native';
-import FingerprintScanner from 'react-native-fingerprint-scanner';
-import * as Keychain from 'react-native-keychain';
-import { useSettingStore } from '../stores/use-setting-store';
-import { MMKV } from '../common/database/mmkv';
-import Storage from '../common/database/storage';
-import { ShowToastEvent, ToastEvent } from './event-manager';
+import { Platform } from "react-native";
+import FingerprintScanner from "react-native-fingerprint-scanner";
+import * as Keychain from "react-native-keychain";
+import { useSettingStore } from "../stores/use-setting-store";
+import { MMKV } from "../common/database/mmkv";
+import Storage from "../common/database/storage";
+import { ShowToastEvent, ToastEvent } from "./event-manager";
 
 const KeychainConfig = Platform.select({
   ios: {
@@ -23,23 +23,28 @@ async function isBiometryAvailable() {
 
 async function enableFingerprintAuth() {
   if (!isBiometryAvailable()) return;
-  await Storage.write('fingerprintAuthEnabled', 'enabled');
+  await Storage.write("fingerprintAuthEnabled", "enabled");
 }
 
 async function isFingerprintAuthEnabled() {
-  return await MMKV.getStringAsync('fingerprintAuthEnabled');
+  return await MMKV.getStringAsync("fingerprintAuthEnabled");
 }
 
 async function storeCredentials(password: string) {
-  await Keychain.setInternetCredentials('nn_vault', 'notesnookvault', password, KeychainConfig);
+  await Keychain.setInternetCredentials(
+    "nn_vault",
+    "notesnookvault",
+    password,
+    KeychainConfig
+  );
 }
 
 async function resetCredentials() {
-  return await Keychain.resetInternetCredentials('nn_vault');
+  return await Keychain.resetInternetCredentials("nn_vault");
 }
 
 async function hasInternetCredentials() {
-  return await Keychain.hasInternetCredentials('nn_vault');
+  return await Keychain.hasInternetCredentials("nn_vault");
 }
 
 async function getCredentials(title?: string, description?: string) {
@@ -63,31 +68,31 @@ async function getCredentials(title?: string, description?: string) {
       useSettingStore.getState().setRequestBiometrics(false);
     }, 1000);
     FingerprintScanner.release();
-    return await Keychain.getInternetCredentials('nn_vault');
+    return await Keychain.getInternetCredentials("nn_vault");
   } catch (e) {
     useSettingStore.getState().setRequestBiometrics(false);
     FingerprintScanner.release();
     let message: ShowToastEvent = {
-      heading: 'Authentication with biometrics failed.',
+      heading: "Authentication with biometrics failed.",
       message: 'Tap "Biometric Unlock" to try again.',
-      type: 'error',
-      context: 'local'
+      type: "error",
+      context: "local"
     };
     //@ts-ignore
-    if (e.name === 'DeviceLocked') {
+    if (e.name === "DeviceLocked") {
       message = {
-        heading: 'Biometrics authentication failed.',
-        message: 'Wait 30 seconds to try again.',
-        type: 'error',
-        context: 'local'
+        heading: "Biometrics authentication failed.",
+        message: "Wait 30 seconds to try again.",
+        type: "error",
+        context: "local"
       };
       //@ts-ignore
-    } else if (e.name === 'UserFallback') {
+    } else if (e.name === "UserFallback") {
       message = {
-        heading: 'Authentication cancelled by user.',
+        heading: "Authentication cancelled by user.",
         message: 'Tap "Biometric Unlock" to try again.',
-        type: 'error',
-        context: 'local'
+        type: "error",
+        context: "local"
       };
     }
 
@@ -117,19 +122,19 @@ async function validateUser(title: string, description?: string) {
   } catch (e) {
     FingerprintScanner.release();
     //@ts-ignore
-    if (e.name === 'DeviceLocked') {
+    if (e.name === "DeviceLocked") {
       ToastEvent.show({
-        heading: 'Biometrics authentication failed.',
-        message: 'Wait 30 seconds to try again.',
-        type: 'error',
-        context: 'local'
+        heading: "Biometrics authentication failed.",
+        message: "Wait 30 seconds to try again.",
+        type: "error",
+        context: "local"
       });
     } else {
       ToastEvent.show({
-        heading: 'Authentication failed.',
-        message: 'Tap to try again.',
-        type: 'error',
-        context: 'local'
+        heading: "Authentication failed.",
+        message: "Tap to try again.",
+        type: "error",
+        context: "local"
       });
     }
     return false;

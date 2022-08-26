@@ -1,11 +1,11 @@
 import React, { PropsWithChildren } from "react";
 import {
   useIsMobile,
-  useToolbarStore,
+  useToolbarStore
 } from "../../toolbar/stores/toolbar-store";
 import {
   ActionSheetPresenter,
-  ActionSheetPresenterProps,
+  ActionSheetPresenterProps
 } from "../action-sheet";
 import { MenuPresenter, MenuPresenterProps } from "../menu";
 

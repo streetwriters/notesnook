@@ -13,7 +13,7 @@ function setupMenu(mainWindow) {
           label: "Undo",
           role: "undo",
           enabled: params.isEditable,
-          accelerator: "CommandOrControl+Z",
+          accelerator: "CommandOrControl+Z"
         })
       );
 
@@ -22,13 +22,13 @@ function setupMenu(mainWindow) {
           label: "Redo",
           role: "redo",
           enabled: params.isEditable,
-          accelerator: "CommandOrControl+Y",
+          accelerator: "CommandOrControl+Y"
         })
       );
 
       menu.append(
         new MenuItem({
-          type: "separator",
+          type: "separator"
         })
       );
     }
@@ -39,7 +39,7 @@ function setupMenu(mainWindow) {
           label: "Cut",
           role: "cut",
           enabled: params.selectionText.length > 0,
-          accelerator: "CommandOrControl+X",
+          accelerator: "CommandOrControl+X"
         })
       );
 
@@ -48,7 +48,7 @@ function setupMenu(mainWindow) {
         label: "Copy",
         role: "copy",
         enabled: params.selectionText.length > 0,
-        accelerator: "CommandOrControl+C",
+        accelerator: "CommandOrControl+C"
       })
     );
 
@@ -58,7 +58,7 @@ function setupMenu(mainWindow) {
           label: "Paste",
           role: "pasteAndMatchStyle",
           enabled: clipboard.readText("clipboard").length > 0,
-          accelerator: "CommandOrControl+V",
+          accelerator: "CommandOrControl+V"
         })
       );
 

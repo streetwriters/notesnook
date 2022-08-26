@@ -26,7 +26,7 @@ export function EmbedComponent(
           flexDirection: "column",
           justifyContent:
             align === "center" ? "center" : align === "left" ? "start" : "end",
-          position: "relative",
+          position: "relative"
         }}
       >
         <Resizer
@@ -39,7 +39,7 @@ export function EmbedComponent(
             updateAttributes(
               {
                 width,
-                height,
+                height
               },
               { addToHistory: true, preventUpdate: false }
             );
@@ -59,8 +59,8 @@ export function EmbedComponent(
               borderColor: selected ? "border" : "bgSecondary",
               cursor: "pointer",
               ":hover": {
-                borderColor: "border",
-              },
+                borderColor: "border"
+              }
             }}
           >
             <Icon path={Icons.dragHandle} size={"big"} />
@@ -72,7 +72,7 @@ export function EmbedComponent(
                       position: "absolute",
                       top: -10,
                       mb: 2,
-                      alignItems: "end",
+                      alignItems: "end"
                     }}
                   >
                     <ToolbarGroup
@@ -81,12 +81,12 @@ export function EmbedComponent(
                         "embedAlignLeft",
                         "embedAlignCenter",
                         "embedAlignRight",
-                        "embedProperties",
+                        "embedProperties"
                       ]}
                       sx={{
                         boxShadow: "menu",
                         borderRadius: "default",
-                        bg: "background",
+                        bg: "background"
                       }}
                     />
                   </Flex>
@@ -105,7 +105,7 @@ export function EmbedComponent(
               border: selected
                 ? "2px solid var(--primary)"
                 : "2px solid transparent",
-              borderRadius: "default",
+              borderRadius: "default"
             }}
             onLoad={() => setIsLoading(false)}
             {...props}
@@ -118,7 +118,7 @@ export function EmbedComponent(
                 width: "100%",
                 height: "calc(100% - 20px)",
                 alignItems: "center",
-                justifyContent: "center",
+                justifyContent: "center"
               }}
             >
               <Icon path={Icons.loading} rotate size={32} color="disabled" />

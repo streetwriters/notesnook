@@ -16,7 +16,7 @@ export const ListItem = TiptapListItem.extend({
         return this.parent?.()?.Tab(props) || false;
       },
       Backspace: ({ editor }) =>
-        onBackspacePressed(editor, this.name, this.type),
+        onBackspacePressed(editor, this.name, this.type)
     };
-  },
+  }
 });

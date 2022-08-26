@@ -12,6 +12,6 @@ export function useSessionState<T>(key: string, def: T) {
 
   return [
     value as T,
-    setValue as React.Dispatch<React.SetStateAction<T>>,
+    setValue as React.Dispatch<React.SetStateAction<T>>
   ] as const;
 }

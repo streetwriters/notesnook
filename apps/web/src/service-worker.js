@@ -66,8 +66,8 @@ registerRoute(
     plugins: [
       // Ensure that once this runtime cache reaches a maximum size the
       // least-recently used images are removed.
-      new ExpirationPlugin({ maxEntries: 50 }),
-    ],
+      new ExpirationPlugin({ maxEntries: 50 })
+    ]
   })
 );
 
@@ -87,7 +87,7 @@ self.addEventListener("message", (event) => {
       event.source.postMessage({
         type: data.type,
         version: VERSION,
-        hash: HASH,
+        hash: HASH
       });
       break;
     default:

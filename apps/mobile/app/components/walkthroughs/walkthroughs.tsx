@@ -1,27 +1,32 @@
-import React from 'react';
-import { Linking, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { COMMUNITY_SVG, LAUNCH_ROCKET, SUPPORT_SVG, WELCOME_SVG } from '../../assets/images/assets';
-import { ThemeStore, useThemeStore } from '../../stores/use-theme-store';
-import { eSendEvent } from '../../services/event-manager';
-import { getElevation } from '../../utils';
-import { eOpenAddNotebookDialog } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import useRotator from '../../hooks/use-rotator';
-import { AccentColorPicker } from '../../screens/settings/appearance';
-import { Button } from '../ui/button';
-import { SvgView } from '../ui/svg';
-import { PinItem } from '../side-menu/pinned-section';
-import Seperator from '../ui/seperator';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import React from "react";
+import { Linking, View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import {
+  COMMUNITY_SVG,
+  LAUNCH_ROCKET,
+  SUPPORT_SVG,
+  WELCOME_SVG
+} from "../../assets/images/assets";
+import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
+import { eSendEvent } from "../../services/event-manager";
+import { getElevation } from "../../utils";
+import { eOpenAddNotebookDialog } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import useRotator from "../../hooks/use-rotator";
+import { AccentColorPicker } from "../../screens/settings/appearance";
+import { Button } from "../ui/button";
+import { SvgView } from "../ui/svg";
+import { PinItem } from "../side-menu/pinned-section";
+import Seperator from "../ui/seperator";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 
 export type TStep = {
   text?: string;
-  walkthroughItem: (colors: ThemeStore['colors']) => React.ReactNode;
+  walkthroughItem: (colors: ThemeStore["colors"]) => React.ReactNode;
   title?: string;
   button?: {
-    type: 'next' | 'done';
+    type: "next" | "done";
     title: string;
     action?: () => void;
   };
@@ -32,21 +37,21 @@ export type TStep = {
 };
 
 const NotebookWelcome = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const data = useRotator([
     {
-      title: 'Work and office',
-      description: 'Everything related to my job',
+      title: "Work and office",
+      description: "Everything related to my job",
       count: 2
     },
     {
-      title: 'School work',
+      title: "School work",
       description: "I don't like doing this but I have to.",
       count: 5
     },
     {
-      title: 'Recipies',
-      description: 'I love cooking and collecting recipies',
+      title: "Recipies",
+      description: "I love cooking and collecting recipies",
       count: 10
     }
   ]);
@@ -54,7 +59,7 @@ const NotebookWelcome = () => {
   return (
     <View
       style={{
-        width: '100%',
+        width: "100%",
         padding: 12,
         backgroundColor: colors.nav,
         borderRadius: 10
@@ -63,7 +68,7 @@ const NotebookWelcome = () => {
       <View
         style={{
           padding: 12,
-          width: '100%',
+          width: "100%",
           backgroundColor: colors.bg,
           ...getElevation(3),
           borderRadius: 10,
@@ -90,24 +95,24 @@ const NotebookWelcome = () => {
 };
 
 const notebooks: { id: string; steps: TStep[] } = {
-  id: 'notebooks',
+  id: "notebooks",
   steps: [
     {
-      title: 'Notebooks',
-      text: 'Boost your productivity with Notebooks and organize your notes.',
+      title: "Notebooks",
+      text: "Boost your productivity with Notebooks and organize your notes.",
       walkthroughItem: () => <NotebookWelcome />,
       button: {
-        type: 'next',
-        title: 'Next'
+        type: "next",
+        title: "Next"
       }
     },
     {
-      title: 'Notebook > Topic > Notes',
-      text: 'Every Notebook has various topics which are like sections that hold all your notes.',
-      walkthroughItem: (colors: ThemeStore['colors']) => (
+      title: "Notebook > Topic > Notes",
+      text: "Every Notebook has various topics which are like sections that hold all your notes.",
+      walkthroughItem: (colors: ThemeStore["colors"]) => (
         <View
           style={{
-            width: '100%',
+            width: "100%",
             padding: 12,
             backgroundColor: colors.nav,
             borderRadius: 10
@@ -116,7 +121,7 @@ const notebooks: { id: string; steps: TStep[] } = {
           <View
             style={{
               padding: 12,
-              width: '100%',
+              width: "100%",
               backgroundColor: colors.bg,
               ...getElevation(3),
               borderRadius: 10,
@@ -141,71 +146,75 @@ const notebooks: { id: string; steps: TStep[] } = {
           <View
             style={{
               padding: 12,
-              width: '90%',
+              width: "90%",
               backgroundColor: colors.bg,
               borderRadius: 10,
-              alignSelf: 'flex-end',
+              alignSelf: "flex-end",
               marginBottom: 10
             }}
           >
             <Paragraph color={colors.accent}>
-              <Icon color={colors.accent} size={SIZE.sm} name="bookmark" /> Tasks
+              <Icon color={colors.accent} size={SIZE.sm} name="bookmark" />{" "}
+              Tasks
             </Paragraph>
           </View>
           <View
             style={{
               padding: 12,
               paddingVertical: 12,
-              width: '80%',
+              width: "80%",
               backgroundColor: colors.bg,
               borderRadius: 5,
-              alignSelf: 'flex-end',
+              alignSelf: "flex-end",
               marginBottom: 10
             }}
           >
             <Paragraph size={SIZE.xs}>
-              <Icon color={colors.icon} size={SIZE.sm} name="note" /> Feburary 2022 Week 2
+              <Icon color={colors.icon} size={SIZE.sm} name="note" /> Feburary
+              2022 Week 2
             </Paragraph>
           </View>
           <View
             style={{
               padding: 12,
-              width: '80%',
+              width: "80%",
               backgroundColor: colors.bg,
               borderRadius: 5,
               paddingVertical: 12,
-              alignSelf: 'flex-end',
+              alignSelf: "flex-end",
               marginBottom: 10
             }}
           >
             <Paragraph size={SIZE.xs}>
-              <Icon color={colors.icon} size={SIZE.sm} name="note" /> Feburary 2022 Week 1
+              <Icon color={colors.icon} size={SIZE.sm} name="note" /> Feburary
+              2022 Week 1
             </Paragraph>
           </View>
           <View
             style={{
               padding: 12,
-              width: '90%',
+              width: "90%",
               backgroundColor: colors.bg,
               borderRadius: 10,
-              alignSelf: 'flex-end',
+              alignSelf: "flex-end",
               marginBottom: 10
             }}
           >
             <Paragraph color={colors.accent}>
-              <Icon color={colors.accent} size={SIZE.sm} name="bookmark" /> Meetings
+              <Icon color={colors.accent} size={SIZE.sm} name="bookmark" />{" "}
+              Meetings
             </Paragraph>
           </View>
         </View>
       ),
       button: {
-        type: 'next',
-        title: 'Next'
+        type: "next",
+        title: "Next"
       }
     },
     {
-      title: 'Easy access',
-      text: 'You can create shortcuts of frequently accessed notebooks or topics in Side Menu',
+      title: "Easy access",
+      text: "You can create shortcuts of frequently accessed notebooks or topics in Side Menu",
       walkthroughItem: () => (
         <View
           style={{
@@ -217,8 +226,8 @@ const notebooks: { id: string; steps: TStep[] } = {
             index={0}
             placeholder={true}
             item={{
-              title: 'Tasks',
-              type: 'topic'
+              title: "Tasks",
+              type: "topic"
             }}
             onPress={() => {}}
           />
@@ -227,16 +236,16 @@ const notebooks: { id: string; steps: TStep[] } = {
             index={1}
             placeholder={true}
             item={{
-              title: 'Work and office',
-              type: 'notebook'
+              title: "Work and office",
+              type: "notebook"
             }}
             onPress={() => {}}
           />
         </View>
       ),
       button: {
-        type: 'done',
-        title: 'Add your first notebook',
+        type: "done",
+        title: "Add your first notebook",
         action: () => {
           eSendEvent(eOpenAddNotebookDialog);
         }
@@ -246,13 +255,13 @@ const notebooks: { id: string; steps: TStep[] } = {
 };
 
 const ChooseTheme = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return (
     <View
       style={{
         maxHeight: 170,
-        alignItems: 'center',
+        alignItems: "center",
         marginTop: 20
       }}
     >
@@ -260,9 +269,9 @@ const ChooseTheme = () => {
 
       <Paragraph
         style={{
-          textAlign: 'center',
-          alignSelf: 'center',
-          maxWidth: '80%'
+          textAlign: "center",
+          alignSelf: "center",
+          maxWidth: "80%"
         }}
         size={SIZE.md}
       >
@@ -276,37 +285,37 @@ const ChooseTheme = () => {
 };
 
 const trialstarted: { id: string; steps: TStep[] } = {
-  id: 'trialstarted',
+  id: "trialstarted",
   steps: [
     {
-      title: 'Your trial is activated',
-      text: 'You can use all permium features for free for the next 14 days',
-      walkthroughItem: colors => <SvgView src={LAUNCH_ROCKET(colors.pri)} />,
+      title: "Your trial is activated",
+      text: "You can use all permium features for free for the next 14 days",
+      walkthroughItem: (colors) => <SvgView src={LAUNCH_ROCKET(colors.pri)} />,
       button: {
-        type: 'next',
-        title: 'Next'
+        type: "next",
+        title: "Next"
       }
     },
 
     {
       walkthroughItem: () => <ChooseTheme />,
       button: {
-        type: 'next',
-        title: 'Next'
+        type: "next",
+        title: "Next"
       }
     },
     {
-      title: 'Join the cause',
-      text: 'Meet other privacy-minded people and talk to us directly about your concerns, issues and suggestions.',
-      walkthroughItem: colors => <SvgView src={COMMUNITY_SVG(colors.pri)} />,
+      title: "Join the cause",
+      text: "Meet other privacy-minded people and talk to us directly about your concerns, issues and suggestions.",
+      walkthroughItem: (colors) => <SvgView src={COMMUNITY_SVG(colors.pri)} />,
       button: {
-        type: 'done',
-        title: 'Continue'
+        type: "done",
+        title: "Continue"
       },
       actionButton: {
-        text: 'Join Discord Community',
+        text: "Join Discord Community",
         action: () => {
-          Linking.openURL('https://discord.gg/zQBK97EE22').catch(console.log);
+          Linking.openURL("https://discord.gg/zQBK97EE22").catch(console.log);
         }
       }
     }
@@ -314,50 +323,51 @@ const trialstarted: { id: string; steps: TStep[] } = {
 };
 
 const emailconfirmed: { id: string; steps: TStep[] } = {
-  id: 'emailconfirmed',
+  id: "emailconfirmed",
   steps: [
     {
-      title: 'Email confirmed',
-      text: 'Your email was confirmed successfully. Thank you for choosing end-to-end encrypted note taking.',
-      walkthroughItem: colors => <SvgView src={WELCOME_SVG(colors.pri)} />,
+      title: "Email confirmed",
+      text: "Your email was confirmed successfully. Thank you for choosing end-to-end encrypted note taking.",
+      walkthroughItem: (colors) => <SvgView src={WELCOME_SVG(colors.pri)} />,
       button: {
-        type: 'done',
-        title: 'Continue'
+        type: "done",
+        title: "Continue"
       }
     }
   ]
 };
 
 const Support = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return (
     <View
       style={{
-        width: '100%',
-        alignItems: 'center'
+        width: "100%",
+        alignItems: "center"
       }}
     >
       <SvgView src={SUPPORT_SVG()} />
       <Heading>Get Priority Support</Heading>
       <Paragraph
         style={{
-          textAlign: 'center'
+          textAlign: "center"
         }}
         size={SIZE.md}
       >
-        You can reach out to us via multiple channels if you face an issue or want to just talk.
+        You can reach out to us via multiple channels if you face an issue or
+        want to just talk.
       </Paragraph>
       <Seperator />
 
       <Button
         style={{
-          justifyContent: 'flex-start',
+          justifyContent: "flex-start",
           marginBottom: 10,
-          width: '90%'
+          width: "90%"
         }}
         onPress={() => {
-          Linking.openURL('https://discord.gg/zQBK97EE22').catch(console.log);
+          Linking.openURL("https://discord.gg/zQBK97EE22").catch(console.log);
         }}
         icon="discord"
         type="grayBg"
@@ -366,12 +376,12 @@ const Support = () => {
 
       <Button
         style={{
-          justifyContent: 'flex-start',
+          justifyContent: "flex-start",
           marginBottom: 10,
-          width: '90%'
+          width: "90%"
         }}
         onPress={() => {
-          Linking.openURL('https://t.me/notesnook').catch(console.log);
+          Linking.openURL("https://t.me/notesnook").catch(console.log);
         }}
         icon="telegram"
         type="grayBg"
@@ -379,9 +389,9 @@ const Support = () => {
       />
       <Button
         style={{
-          justifyContent: 'flex-start',
+          justifyContent: "flex-start",
           marginBottom: 10,
-          width: '90%'
+          width: "90%"
         }}
         icon="bug"
         type="grayBg"
@@ -389,9 +399,9 @@ const Support = () => {
       />
       <Button
         style={{
-          justifyContent: 'flex-start',
+          justifyContent: "flex-start",
           marginBottom: 10,
-          width: '90%'
+          width: "90%"
         }}
         icon="mail"
         type="grayBg"
@@ -402,22 +412,22 @@ const Support = () => {
 };
 
 const prouser: { id: string; steps: TStep[] } = {
-  id: 'prouser',
+  id: "prouser",
   steps: [
     {
-      title: 'Welcome to Notesnook Pro',
-      text: 'Thank you for reaffirming our idea that privacy comes first',
-      walkthroughItem: colors => <SvgView src={LAUNCH_ROCKET(colors.pri)} />,
+      title: "Welcome to Notesnook Pro",
+      text: "Thank you for reaffirming our idea that privacy comes first",
+      walkthroughItem: (colors) => <SvgView src={LAUNCH_ROCKET(colors.pri)} />,
       button: {
-        type: 'next',
-        title: 'Next'
+        type: "next",
+        title: "Next"
       }
     },
     {
       walkthroughItem: () => <Support />,
       button: {
-        type: 'done',
-        title: 'Continue'
+        type: "done",
+        title: "Continue"
       }
     }
   ]

@@ -14,7 +14,7 @@ const {
   editNote,
   getEditorTitle,
   getEditorContent,
-  isTestAll,
+  isTestAll
 } = require("./utils");
 const {
   navigateTo,
@@ -22,7 +22,7 @@ const {
   openContextMenu,
   confirmDialog,
   closeContextMenu,
-  useContextMenu,
+  useContextMenu
 } = require("./utils/actions");
 const {
   isToastPresent,
@@ -30,7 +30,7 @@ const {
   isAbsent,
   checkNotePresence,
   createNoteAndCheckPresence,
-  checkMenuItemText,
+  checkMenuItemText
 } = require("./utils/conditions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");

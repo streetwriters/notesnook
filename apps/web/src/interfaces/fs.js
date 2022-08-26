@@ -50,7 +50,7 @@ async function writeEncryptedFile(file, key, hash) {
         const isFinal = offset === file.size;
         return {
           final: isFinal,
-          data: chunk,
+          data: chunk
         };
       },
       write: async (chunk) => {
@@ -60,7 +60,7 @@ async function writeEncryptedFile(file, key, hash) {
           { type: "encrypt", hash }
         );
         await fileHandle.write(chunk.data);
-      },
+      }
     },
     file.name
   );
@@ -72,7 +72,7 @@ async function writeEncryptedFile(file, key, hash) {
     iv: iv,
     length: file.size,
     salt: key.salt,
-    alg: "xcha-stream",
+    alg: "xcha-stream"
   };
 }
 
@@ -90,14 +90,14 @@ async function writeEncrypted(filename, { data, type, key }) {
   if (!filename) filename = hash;
 
   const file = new File([data.buffer], filename, {
-    type: "application/octet-stream",
+    type: "application/octet-stream"
   });
 
   const result = await writeEncryptedFile(file, key, hash);
   return {
     ...result,
     hash,
-    hashType,
+    hashType
   };
 }
 
@@ -109,7 +109,7 @@ async function writeEncrypted(filename, { data, type, key }) {
 async function hashBuffer(data) {
   return {
     hash: await xxhash64(data),
-    type: "xxh64",
+    type: "xxh64"
   };
 }
 
@@ -154,7 +154,7 @@ async function readEncrypted(filename, key, cipherData) {
       write: async (chunk) => {
         plainText.set(chunk.data, offset);
         offset += chunk.data.length;
-      },
+      }
     },
     filename
   );
@@ -176,7 +176,7 @@ async function uploadFile(filename, requestOptions) {
     uploadedChunks = [],
     uploadedBytes = 0,
     uploaded = false,
-    uploadId = "",
+    uploadId = ""
   } = fileHandle.file.additionalData || {};
 
   try {
@@ -192,7 +192,7 @@ async function uploadFile(filename, requestOptions) {
         `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${TOTAL_PARTS}&uploadId=${uploadId}`,
         {
           headers,
-          cancelToken: cancellationToken,
+          cancelToken: cancellationToken
         }
       )
       .catch((e) => {
@@ -208,11 +208,11 @@ async function uploadFile(filename, requestOptions) {
       reportProgress(
         {
           total: fileHandle.file.size + ABYTES,
-          loaded: uploadedBytes + ev.loaded,
+          loaded: uploadedBytes + ev.loaded
         },
         {
           type: "upload",
-          hash: filename,
+          hash: filename
         }
       );
     }
@@ -231,7 +231,7 @@ async function uploadFile(filename, requestOptions) {
           headers: { "Content-Type": "" },
           cancelToken: cancellationToken,
           data,
-          onUploadProgress,
+          onUploadProgress
         })
         .catch((e) => {
           throw new S3Error(`Failed to upload part at offset ${i}`, e);
@@ -243,7 +243,7 @@ async function uploadFile(filename, requestOptions) {
       uploadedBytes += blob.size;
       uploadedChunks.push({
         PartNumber: i + 1,
-        ETag: JSON.parse(response.headers.etag),
+        ETag: JSON.parse(response.headers.etag)
       });
       await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
       await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
@@ -255,11 +255,11 @@ async function uploadFile(filename, requestOptions) {
         {
           Key: filename,
           UploadId: uploadId,
-          PartETags: uploadedChunks,
+          PartETags: uploadedChunks
         },
         {
           headers,
-          cancelToken: cancellationToken,
+          cancelToken: cancellationToken
         }
       )
       .catch((e) => {
@@ -294,7 +294,7 @@ function reportProgress(ev, { type, hash }) {
     type,
     hash,
     total: ev?.total || 1,
-    loaded: ev?.loaded || 1,
+    loaded: ev?.loaded || 1
   });
 }
 
@@ -310,7 +310,7 @@ async function downloadFile(filename, requestOptions) {
 
     const signedUrlResponse = await axios.get(url, {
       headers,
-      responseType: "text",
+      responseType: "text"
     });
 
     const signedUrl = signedUrlResponse.data;
@@ -318,7 +318,7 @@ async function downloadFile(filename, requestOptions) {
       responseType: "arraybuffer",
       cancelToken: cancellationToken,
       onDownloadProgress: (ev) =>
-        reportProgress(ev, { type: "download", hash: filename }),
+        reportProgress(ev, { type: "download", hash: filename })
     });
 
     const contentType = response.headers["content-type"];
@@ -384,7 +384,7 @@ async function saveFile(filename, fileMetadata) {
       },
       write: async (chunk) => {
         blobParts.push(chunk.data);
-      },
+      }
     },
     filename
   );
@@ -400,7 +400,7 @@ async function deleteFile(filename, requestOptions) {
   try {
     const { url, headers } = requestOptions;
     const response = await axios.delete(url, {
-      headers: headers,
+      headers: headers
     });
 
     const result = isSuccessStatusCode(response.status);
@@ -418,7 +418,7 @@ async function getUploadedFileSize(filename) {
     const token = await db.user.tokenManager.getAccessToken();
 
     const attachmentInfo = await axios.head(url, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${token}` }
     });
 
     const contentLength = parseInt(attachmentInfo.headers["content-length"]);
@@ -445,7 +445,7 @@ const FS = {
   hashStream,
   writeEncryptedFile,
   clearFileStorage,
-  getUploadedFileSize,
+  getUploadedFileSize
 };
 export default FS;
 
@@ -461,7 +461,7 @@ function cancellable(operation) {
       execute: () => operation(filename, requestOptions),
       cancel: (message) => {
         source.cancel(message);
-      },
+      }
     };
   };
 }

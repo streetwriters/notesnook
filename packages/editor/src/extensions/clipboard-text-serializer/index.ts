@@ -12,14 +12,14 @@ export const ClipboardTextSerializer = Extension.create({
         props: {
           clipboardTextSerializer: (content) => {
             const {
-              editor: { schema },
+              editor: { schema }
             } = this;
             return getTextBetween(content, schema);
-          },
-        },
-      }),
+          }
+        }
+      })
     ];
-  },
+  }
 });
 
 function getTextBetween(slice: Slice, schema: Schema): string {
@@ -45,7 +45,7 @@ function getTextBetween(slice: Slice, schema: Schema): string {
           pos,
           parent,
           index,
-          range,
+          range
         });
       }
     } else if (node.isText) {

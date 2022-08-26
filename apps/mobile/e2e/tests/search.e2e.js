@@ -1,4 +1,4 @@
-const { notesnook } = require('../test.ids');
+const { notesnook } = require("../test.ids");
 const {
   navigate,
   tapById,
@@ -10,16 +10,16 @@ const {
   elementById,
   tapByText,
   notVisibleByText
-} = require('./utils');
-const { sleep } = require('./utils');
+} = require("./utils");
+const { sleep } = require("./utils");
 
-describe('Search', () => {
-  it('Search for a note', async () => {
+describe("Search", () => {
+  it("Search for a note", async () => {
     await prepare();
     let note = await createNote();
-    await tapById('icon-search');
+    await tapById("icon-search");
     await sleep(300);
-    await elementById('search-input').typeText('n');
+    await elementById("search-input").typeText("n");
     await sleep(1000);
     await visibleByText(note.body);
   });

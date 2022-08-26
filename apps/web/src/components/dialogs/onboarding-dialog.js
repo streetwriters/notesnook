@@ -28,14 +28,14 @@ const newUserSteps = [
     subtitle: "Write with freedom. Never compromise on privacy again.",
     buttonText: "Get started",
     image: <Note width={120} />,
-    component: TrackingConsent,
+    component: TrackingConsent
   },
   {
     title: "Choose your style",
     subtitle:
       "You can change the theme at any time from Settings or the side menu.",
     buttonText: "Next",
-    component: ThemeSelector,
+    component: ThemeSelector
   },
   {
     image: <E2E width={180} />,
@@ -43,21 +43,21 @@ const newUserSteps = [
     subtitle:
       "Notesnook encrypts everything offline before syncing to your other devices. This means that no one can read your notes except you. Not even us.",
     component: CrossPlatform,
-    buttonText: "Next",
+    buttonText: "Next"
   },
   {
     title: "Join the cause",
     subtitle:
       "Meet other privacy-minded people & talk to us directly about your concerns, issues and suggestions.",
     component: JoinCause,
-    image: <Friends width={140} />,
+    image: <Friends width={140} />
   },
   {
     image: <Icon.Pro size={60} color="primary" />,
     title: "Notesnook Pro",
     subtitle: "Experience the next level of private note taking",
-    component: TrialOffer,
-  },
+    component: TrialOffer
+  }
 ];
 
 const proUserSteps = [
@@ -65,25 +65,25 @@ const proUserSteps = [
     title: "Welcome to Notesnook Pro",
     subtitle: "Thank you. You are the proof that privacy always comes first.",
     buttonText: "Next",
-    image: <Nomad width={120} />,
+    image: <Nomad width={120} />
   },
   {
     title: "Style your 'nook",
     subtitle: "Let's make Notesnook your new note taking home",
     buttonText: "Next",
-    component: AccentSelector,
+    component: AccentSelector
   },
   {
     title: "We are always listening",
     subtitle: "If you face any issue, you can reach out to us anytime.",
     buttonText: "Next",
-    component: Support,
+    component: Support
   },
   {
     title: "Import your notes",
     subtitle: "You can import your notes from most other note taking apps.",
-    component: Importer,
-  },
+    component: Importer
+  }
 ];
 
 const trialUserSteps = [
@@ -91,14 +91,14 @@ const trialUserSteps = [
     title: "Congratulations!",
     subtitle: "You 14-day free trial has been activated.",
     buttonText: "Continue",
-    image: <WorkAnywhere width={160} />,
-  },
+    image: <WorkAnywhere width={160} />
+  }
 ];
 
 const onboarding = {
   new: newUserSteps,
   pro: proUserSteps,
-  trial: trialUserSteps,
+  trial: trialUserSteps
 };
 
 export function interruptedOnboarding() {
@@ -132,7 +132,7 @@ function OnboardingDialog({ onClose: _onClose, type }) {
     subtitle,
     image,
     component: Component,
-    buttonText,
+    buttonText
   } = steps[step];
 
   return (
@@ -197,7 +197,7 @@ const importers = [
   { title: "HTML" },
   { title: "Markdown" },
   { title: "Google Keep" },
-  { title: "Standard Notes" },
+  { title: "Standard Notes" }
 ];
 function Importer({ onClose }) {
   return (
@@ -212,7 +212,7 @@ function Importer({ onClose }) {
               border: "1px solid var(--border)",
               alignItems: "center",
               justifyContent: "center",
-              p: 1,
+              p: 1
             }}
           >
             <Text variant={"body"} textAlign="center" ml={1}>
@@ -250,7 +250,7 @@ function AccentSelector() {
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr",
+          gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr 1fr"
         }}
       >
         {getAllAccents().map((color) => (
@@ -266,26 +266,26 @@ const supportChannels = [
     key: "email",
     url: "mailto:support@streetwriters.co",
     title: "Email us",
-    icon: Icon.Email,
+    icon: Icon.Email
   },
   {
     key: "discord",
     url: "https://discord.com/invite/zQBK97EE22",
     title: "Join the community",
-    icon: Icon.Discord,
+    icon: Icon.Discord
   },
   {
     key: "twitter",
     url: "https://twitter.com/notesnook",
     title: "Follow us @notesnook",
-    icon: Icon.Twitter,
+    icon: Icon.Twitter
   },
   {
     key: "github",
     url: "https://github.com/streetwriters/notesnook",
     title: "Create an issue",
-    icon: Icon.Github,
-  },
+    icon: Icon.Github
+  }
 ];
 
 function Support() {
@@ -300,7 +300,7 @@ function Support() {
             display: "flex",
             flexDirection: "row",
             borderRadius: "default",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
           <channel.icon size={16} />
@@ -315,7 +315,7 @@ function Support() {
 
 const themes = [
   { key: "light", name: "Light", image: LightUI },
-  { key: "dark", name: "Dark", image: DarkUI },
+  { key: "dark", name: "Dark", image: DarkUI }
 ];
 
 function ThemeSelector() {
@@ -340,11 +340,11 @@ function ThemeSelector() {
               bg: isSelected ? "bgSecondary" : "transparent",
               cursor: "pointer",
               ":last-of-type": {
-                borderRight: "0px",
+                borderRight: "0px"
               },
               ":hover": {
-                bg: "hover",
-              },
+                bg: "hover"
+              }
             }}
             onClick={() => {
               setTheme(theme.key);
@@ -355,7 +355,7 @@ function ThemeSelector() {
               sx={{
                 borderRadius: "default",
                 border: isSelected ? "2px solid var(--primary)" : "none",
-                boxShadow: isSelected ? "0px 0px 10px 1px #00000016" : "none",
+                boxShadow: isSelected ? "0px 0px 10px 1px #00000016" : "none"
               }}
             />
             <Text variant={"subtitle"} color="icon" mt={2}>
@@ -455,10 +455,10 @@ function TrialOffer({ onClose }) {
                 id: "trialActivation",
                 action: (report) => {
                   report({
-                    text: "Activating trial",
+                    text: "Activating trial"
                   });
                   return db.user.activateTrial();
-                },
+                }
               });
               if (result) onClose();
             } catch (e) {

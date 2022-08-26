@@ -27,7 +27,7 @@ function AccentItem(props) {
           sx={{
             position: "absolute",
             zIndex: 1,
-            cursor: "pointer",
+            cursor: "pointer"
           }}
           color="static"
           size={20}

@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 export const BouncingView = ({
   children,
@@ -34,5 +34,7 @@ export const BouncingView = ({
     });
   }, []);
 
-  return <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>;
+  return (
+    <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>
+  );
 };

@@ -2,7 +2,7 @@ import { Node, mergeAttributes } from "@tiptap/core";
 import {
   createNodeView,
   createSelectionBasedNodeView,
-  NodeViewSelectionNotifierPlugin,
+  NodeViewSelectionNotifierPlugin
 } from "../react";
 import { EmbedComponent } from "./component";
 
@@ -47,7 +47,7 @@ export const EmbedNode = Node.create<EmbedOptions>({
 
   addOptions() {
     return {
-      HTMLAttributes: {},
+      HTMLAttributes: {}
     };
   },
 
@@ -58,26 +58,26 @@ export const EmbedNode = Node.create<EmbedOptions>({
   addAttributes() {
     return {
       src: {
-        default: null,
+        default: null
       },
       width: { default: null },
       height: { default: null },
-      align: { default: "left" },
+      align: { default: "left" }
     };
   },
 
   parseHTML() {
     return [
       {
-        tag: "iframe[src]",
-      },
+        tag: "iframe[src]"
+      }
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
     return [
       "iframe",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)
     ];
   },
 
@@ -92,7 +92,7 @@ export const EmbedNode = Node.create<EmbedOptions>({
         ({ commands }) => {
           return commands.insertContent({
             type: this.name,
-            attrs: options,
+            attrs: options
           });
         },
       setEmbedAlignment:
@@ -109,7 +109,7 @@ export const EmbedNode = Node.create<EmbedOptions>({
         (src) =>
         ({ commands }) => {
           return commands.updateAttributes(this.name, { src });
-        },
+        }
     };
-  },
+  }
 });

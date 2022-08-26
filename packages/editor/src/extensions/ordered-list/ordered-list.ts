@@ -12,10 +12,10 @@ export const OrderedList = TiptapOrderedList.extend({
           }
 
           return {
-            style: `list-style-type: ${attributes.listType}`,
+            style: `list-style-type: ${attributes.listType}`
           };
-        },
-      },
+        }
+      }
     };
-  },
+  }
 });

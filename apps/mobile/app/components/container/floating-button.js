@@ -1,25 +1,30 @@
-import React, { useEffect } from 'react';
-import { Keyboard, Platform, View } from 'react-native';
+import React, { useEffect } from "react";
+import { Keyboard, Platform, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming
-} from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { editorState } from '../../screens/editor/tiptap/utils';
-import { useSelectionStore } from '../../stores/use-selection-store';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { getElevation, showTooltip, TOOLTIP_POSITIONS } from '../../utils';
-import { normalize, SIZE } from '../../utils/size';
-import { PressableButton } from '../ui/pressable';
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { notesnook } from "../../../e2e/test.ids";
+import { editorState } from "../../screens/editor/tiptap/utils";
+import { useSelectionStore } from "../../stores/use-selection-store";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { getElevation, showTooltip, TOOLTIP_POSITIONS } from "../../utils";
+import { normalize, SIZE } from "../../utils/size";
+import { PressableButton } from "../ui/pressable";
 
-export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = false }) => {
+export const FloatingButton = ({
+  title,
+  onPress,
+  color = "accent",
+  shouldShow = false
+}) => {
   const insets = useSafeAreaInsets();
-  const deviceMode = useSettingStore(state => state.deviceMode);
-  const selectionMode = useSelectionStore(state => state.selectionMode);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const selectionMode = useSelectionStore((state) => state.selectionMode);
   const translate = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -48,19 +53,19 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
 
   const onKeyboardHide = async () => {
     editorState().keyboardState = false;
-    if (deviceMode !== 'mobile') return;
+    if (deviceMode !== "mobile") return;
     animate(0);
   };
 
   const onKeyboardShow = async () => {
     editorState().keyboardState = true;
-    if (deviceMode !== 'mobile') return;
+    if (deviceMode !== "mobile") return;
     animate(150);
   };
 
   useEffect(() => {
-    let sub1 = Keyboard.addListener('keyboardDidShow', onKeyboardShow);
-    let sub2 = Keyboard.addListener('keyboardDidHide', onKeyboardHide);
+    let sub1 = Keyboard.addListener("keyboardDidShow", onKeyboardShow);
+    let sub2 = Keyboard.addListener("keyboardDidHide", onKeyboardHide);
     return () => {
       sub1?.remove();
       sub2?.remove();
@@ -72,13 +77,13 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
     iPad: 20
   };
 
-  return deviceMode !== 'mobile' && !shouldShow ? null : (
+  return deviceMode !== "mobile" && !shouldShow ? null : (
     <Animated.View
       style={[
         {
-          position: 'absolute',
+          position: "absolute",
           right: 12,
-          bottom: paddings[Platform.isPad ? 'iPad' : Platform.OS],
+          bottom: paddings[Platform.isPad ? "iPad" : Platform.OS],
           zIndex: 10
         },
         animatedStyle
@@ -87,27 +92,27 @@ export const FloatingButton = ({ title, onPress, color = 'accent', shouldShow = 
       <PressableButton
         testID={notesnook.buttons.add}
         type="accent"
-        accentColor={color || 'accent'}
+        accentColor={color || "accent"}
         accentText="light"
         customStyle={{
           ...getElevation(5),
           borderRadius: 100
         }}
-        onLongPress={event => {
+        onLongPress={(event) => {
           showTooltip(event, title, TOOLTIP_POSITIONS.LEFT);
         }}
         onPress={onPress}
       >
         <View
           style={{
-            alignItems: 'center',
-            justifyContent: 'center',
+            alignItems: "center",
+            justifyContent: "center",
             height: normalize(60),
             width: normalize(60)
           }}
         >
           <Icon
-            name={title === 'Clear all trash' ? 'delete' : 'plus'}
+            name={title === "Clear all trash" ? "delete" : "plus"}
             color="white"
             size={SIZE.xxl}
           />

@@ -3,7 +3,7 @@ import {
   useCallback,
   useState,
   useRef,
-  PropsWithChildren,
+  PropsWithChildren
 } from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import Properties from "../properties";
@@ -36,7 +36,7 @@ function onEditorChange(noteId: string, sessionId: string, content: string) {
 
   editorstore.get().saveSessionContent(noteId, sessionId, {
     type: "tiptap",
-    data: content,
+    data: content
   });
 }
 
@@ -51,7 +51,7 @@ const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);
 
 export default function EditorManager({
   noteId,
-  nonce,
+  nonce
 }: {
   noteId: string | number;
   nonce?: string;
@@ -125,7 +125,7 @@ export default function EditorManager({
       sx={{
         position: "relative",
         alignSelf: "stretch",
-        overflow: "hidden",
+        overflow: "hidden"
       }}
     >
       {previewSession.current && (
@@ -141,7 +141,7 @@ export default function EditorManager({
         options={{
           readonly: isReadonly || isPreviewSession,
           onRequestFocus: () => toggleProperties(false),
-          onLoadMedia: loadMedia,
+          onLoadMedia: loadMedia
         }}
       />
       {arePropertiesVisible && (
@@ -177,7 +177,7 @@ export function Editor(props: EditorProps) {
   const { readonly, headless, onLoadMedia } = options || {
     headless: false,
     readonly: false,
-    focusMode: false,
+    focusMode: false
   };
 
   const editor = useEditorInstance();
@@ -199,7 +199,7 @@ export function Editor(props: EditorProps) {
       ({
         groupId,
         hash,
-        src,
+        src
       }: {
         groupId?: string;
         hash: string;
@@ -255,7 +255,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
   const { readonly, focusMode, headless, onRequestFocus } = options || {
     headless: false,
     readonly: false,
-    focusMode: false,
+    focusMode: false
   };
   const isMobile: boolean | null = useMobile();
 
@@ -273,7 +273,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           variant="columnFill"
           className="editor"
           sx={{
-            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
+            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"]
           }}
           maxWidth={
             focusMode ? "min(100%, 850px)" : "max(calc(100% - 200px), 850px)"
@@ -292,7 +292,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
                 position: "sticky",
                 top: 0,
                 mb: 1,
-                zIndex: 2,
+                zIndex: 2
               }}
             />
           )}
@@ -322,7 +322,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
             top: 0,
             mb: 1,
             zIndex: 2,
-            px: [2, 2, 35],
+            px: [2, 2, 35]
           }}
         />
       )}
@@ -404,7 +404,7 @@ function DropZone(props: DropZoneProps) {
         zIndex: 3,
         alignItems: "center",
         justifyContent: "center",
-        display: "none",
+        display: "none"
       }}
       onDrop={async (e) => {
         if (!editor || !e.dataTransfer.files?.length) return;
@@ -423,7 +423,7 @@ function DropZone(props: DropZoneProps) {
           borderRadius: "default",
           p: 70,
           flexDirection: "column",
-          pointerEvents: "none",
+          pointerEvents: "none"
         }}
       >
         <Attachment size={72} />

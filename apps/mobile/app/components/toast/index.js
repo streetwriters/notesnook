@@ -1,33 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Keyboard, View } from 'react-native';
-import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { DDS } from '../../services/device-detection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { getElevation } from '../../utils';
-import { eHideToast, eShowToast } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import React, { useEffect, useRef, useState } from "react";
+import { Keyboard, View } from "react-native";
+import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { notesnook } from "../../../e2e/test.ids";
+import { DDS } from "../../services/device-detection";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { getElevation } from "../../utils";
+import { eHideToast, eShowToast } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 let toastMessages = [];
-export const Toast = ({ context = 'global' }) => {
-  const colors = useThemeStore(state => state.colors);
+export const Toast = ({ context = "global" }) => {
+  const colors = useThemeStore((state) => state.colors);
   const [keyboard, setKeyboard] = useState(false);
   const [data, setData] = useState({});
   const insets = useSafeAreaInsets();
   const hideTimeout = useRef();
   const [visible, setVisible] = useState(false);
 
-  const showToastFunc = async data => {
-    console.log('toast show', data.message, toastMessages.length);
+  const showToastFunc = async (data) => {
+    console.log("toast show", data.message, toastMessages.length);
     if (!data) return;
     if (data.context !== context) return;
-    if (toastMessages.findIndex(m => m.message === data.message) >= 0) {
-      console.log('returning from here');
+    if (toastMessages.findIndex((m) => m.message === data.message) >= 0) {
+      console.log("returning from here");
       return;
     }
     toastMessages.push(data);
@@ -43,7 +46,7 @@ export const Toast = ({ context = 'global' }) => {
     }, data.duration);
   };
 
-  const showNext = data => {
+  const showNext = (data) => {
     if (!data) {
       hideToastFunc();
       return;
@@ -91,8 +94,8 @@ export const Toast = ({ context = 'global' }) => {
 
   useEffect(() => {
     toastMessages = [];
-    let sub1 = Keyboard.addListener('keyboardDidShow', _onKeyboardShow);
-    let sub2 = Keyboard.addListener('keyboardDidHide', _onKeyboardHide);
+    let sub1 = Keyboard.addListener("keyboardDidShow", _onKeyboardShow);
+    let sub2 = Keyboard.addListener("keyboardDidHide", _onKeyboardHide);
     eSubscribeEvent(eShowToast, showToastFunc);
     eSubscribeEvent(eHideToast, hideToastFunc);
     return () => {
@@ -120,12 +123,12 @@ export const Toast = ({ context = 'global' }) => {
           }
         }}
         style={{
-          width: DDS.isTab ? 400 : '100%',
-          alignItems: 'center',
-          alignSelf: 'center',
+          width: DDS.isTab ? 400 : "100%",
+          alignItems: "center",
+          alignSelf: "center",
           minHeight: 30,
           top: insets.top + 10,
-          position: 'absolute',
+          position: "absolute",
           zIndex: 999,
           elevation: 15
         }}
@@ -135,25 +138,25 @@ export const Toast = ({ context = 'global' }) => {
           exiting={FadeOutUp}
           style={{
             ...getElevation(5),
-            maxWidth: '95%',
+            maxWidth: "95%",
             backgroundColor: colors.nav,
-            minWidth: data?.func ? '95%' : '50%',
-            alignSelf: 'center',
+            minWidth: data?.func ? "95%" : "50%",
+            alignSelf: "center",
             borderRadius: 5,
             minHeight: 30,
             paddingVertical: 10,
             paddingLeft: 12,
             paddingRight: 5,
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-            alignItems: 'center',
-            width: '95%'
+            justifyContent: "space-between",
+            flexDirection: "row",
+            alignItems: "center",
+            width: "95%"
           }}
         >
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+              flexDirection: "row",
+              alignItems: "center",
               flexGrow: 1,
               flex: 1
             }}
@@ -162,15 +165,17 @@ export const Toast = ({ context = 'global' }) => {
               style={{
                 height: 30,
                 borderRadius: 100,
-                justifyContent: 'center',
-                alignItems: 'center',
+                justifyContent: "center",
+                alignItems: "center",
                 marginRight: 10
               }}
             >
               <Icon
-                name={data?.type === 'success' ? 'check' : 'close'}
+                name={data?.type === "success" ? "check" : "close"}
                 size={SIZE.lg}
-                color={data?.type === 'error' ? colors.errorText : colors.accent}
+                color={
+                  data?.type === "error" ? colors.errorText : colors.accent
+                }
               />
             </View>
 
@@ -196,7 +201,7 @@ export const Toast = ({ context = 'global' }) => {
                 <Paragraph
                   color={colors.pri}
                   style={{
-                    maxWidth: '100%',
+                    maxWidth: "100%",
                     paddingRight: 10
                   }}
                   onPress={() => {
@@ -213,7 +218,7 @@ export const Toast = ({ context = 'global' }) => {
             <Button
               testID={notesnook.toast.button}
               fontSize={SIZE.md}
-              type={data.type === 'error' ? 'errorShade' : 'transparent'}
+              type={data.type === "error" ? "errorShade" : "transparent"}
               onPress={data.func}
               title={data.actionText}
               height={30}

@@ -1,7 +1,7 @@
-import { Platform } from 'react-native';
-import Sodium from 'react-native-sodium';
-import RNFetchBlob from 'rn-fetch-blob';
-import { cacheDir, getRandomId } from './utils';
+import { Platform } from "react-native";
+import Sodium from "react-native-sodium";
+import RNFetchBlob from "rn-fetch-blob";
+import { cacheDir, getRandomId } from "./utils";
 
 export async function readEncrypted(filename, key, cipherData) {
   let path = `${cacheDir}/${filename}`;
@@ -19,28 +19,28 @@ export async function readEncrypted(filename, key, cipherData) {
       },
       true
     );
-    console.log('output length: ', output?.length);
+    console.log("output length: ", output?.length);
     return output;
   } catch (e) {
     RNFetchBlob.fs.unlink(path).catch(console.log);
     console.log(e);
-    console.log('error');
+    console.log("error");
     return false;
   }
 }
 
 export async function writeEncrypted(filename, { data, type, key }) {
-  console.log('file input: ', { type, key });
-  let filepath = cacheDir + `/${getRandomId('imagecache_')}`;
+  console.log("file input: ", { type, key });
+  let filepath = cacheDir + `/${getRandomId("imagecache_")}`;
   console.log(filepath);
-  await RNFetchBlob.fs.writeFile(filepath, data, 'base64');
+  await RNFetchBlob.fs.writeFile(filepath, data, "base64");
   let output = await Sodium.encryptFile(key, {
-    uri: Platform.OS === 'ios' ? filepath : `file://` + filepath,
-    type: 'url'
+    uri: Platform.OS === "ios" ? filepath : `file://` + filepath,
+    type: "url"
   });
   RNFetchBlob.fs.unlink(filepath).catch(console.log);
 
-  console.log('encrypted file output: ', output);
+  console.log("encrypted file output: ", output);
   return {
     ...output,
     alg: `xcha-stream`
@@ -57,7 +57,7 @@ export async function deleteFile(filename, data) {
 
   let { url, headers } = data;
   try {
-    let response = await RNFetchBlob.fetch('DELETE', url, headers);
+    let response = await RNFetchBlob.fetch("DELETE", url, headers);
     let status = response.info().status;
     let ok = status >= 200 && status < 300;
     if (ok) {
@@ -65,7 +65,7 @@ export async function deleteFile(filename, data) {
     }
     return ok;
   } catch (e) {
-    console.log('delete file: ', e, url, headers);
+    console.log("delete file: ", e, url, headers);
     return false;
   }
 }

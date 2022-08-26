@@ -1,40 +1,48 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { useSettingStore } from '../../../stores/use-setting-store';
+import React, { useEffect, useRef, useState } from "react";
+import { TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { useSettingStore } from "../../../stores/use-setting-store";
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet
-} from '../../../services/event-manager';
-import SettingsService from '../../../services/settings';
-import { GROUP } from '../../../utils/constants';
-import { COLORS_NOTE } from '../../../utils/color-scheme';
-import { db } from '../../../common/database';
-import { eOpenJumpToDialog } from '../../../utils/events';
-import { SIZE } from '../../../utils/size';
-import { IconButton } from '../../ui/icon-button';
-import { Button } from '../../ui/button';
-import Sort from '../../sheets/sort';
-import Heading from '../../ui/typography/heading';
+} from "../../../services/event-manager";
+import SettingsService from "../../../services/settings";
+import { GROUP } from "../../../utils/constants";
+import { COLORS_NOTE } from "../../../utils/color-scheme";
+import { db } from "../../../common/database";
+import { eOpenJumpToDialog } from "../../../utils/events";
+import { SIZE } from "../../../utils/size";
+import { IconButton } from "../../ui/icon-button";
+import { Button } from "../../ui/button";
+import Sort from "../../sheets/sort";
+import Heading from "../../ui/typography/heading";
 
 export const SectionHeader = React.memo(
   ({ item, index, type, color, screen }) => {
-    const colors = useThemeStore(state => state.colors);
+    const colors = useThemeStore((state) => state.colors);
     const { fontScale } = useWindowDimensions();
-    const [groupOptions, setGroupOptions] = useState(db.settings?.getGroupOptions(type));
-    let groupBy = Object.keys(GROUP).find(key => GROUP[key] === groupOptions.groupBy);
+    const [groupOptions, setGroupOptions] = useState(
+      db.settings?.getGroupOptions(type)
+    );
+    let groupBy = Object.keys(GROUP).find(
+      (key) => GROUP[key] === groupOptions.groupBy
+    );
     const jumpToRef = useRef();
     const sortRef = useRef();
     const compactModeRef = useRef();
 
-    const notebooksListMode = useSettingStore(state => state.settings.notebooksListMode);
-    const notesListMode = useSettingStore(state => state.settings.notesListMode);
-    const listMode = type === 'notebooks' ? notebooksListMode : notesListMode;
+    const notebooksListMode = useSettingStore(
+      (state) => state.settings.notebooksListMode
+    );
+    const notesListMode = useSettingStore(
+      (state) => state.settings.notesListMode
+    );
+    const listMode = type === "notebooks" ? notebooksListMode : notesListMode;
 
     groupBy = !groupBy
-      ? 'Default'
+      ? "Default"
       : groupBy.slice(0, 1).toUpperCase() + groupBy.slice(1, groupBy.length);
 
     const onUpdate = () => {
@@ -42,23 +50,23 @@ export const SectionHeader = React.memo(
     };
 
     useEffect(() => {
-      eSubscribeEvent('groupOptionsUpdate', onUpdate);
+      eSubscribeEvent("groupOptionsUpdate", onUpdate);
       return () => {
-        eUnSubscribeEvent('groupOptionsUpdate', onUpdate);
+        eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
       };
     }, []);
 
     return (
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          width: '95%',
-          justifyContent: 'space-between',
+          flexDirection: "row",
+          alignItems: "center",
+          width: "95%",
+          justifyContent: "space-between",
           paddingHorizontal: 12,
           height: 35 * fontScale,
           backgroundColor: colors.nav,
-          alignSelf: 'center',
+          alignSelf: "center",
           borderRadius: 5,
           marginVertical: 5
         }}
@@ -71,8 +79,8 @@ export const SectionHeader = React.memo(
           activeOpacity={0.9}
           hitSlop={{ top: 10, left: 10, right: 30, bottom: 15 }}
           style={{
-            height: '100%',
-            justifyContent: 'center'
+            height: "100%",
+            justifyContent: "center"
           }}
         >
           <Heading
@@ -80,18 +88,18 @@ export const SectionHeader = React.memo(
             size={SIZE.sm}
             style={{
               minWidth: 60,
-              alignSelf: 'center',
-              textAlignVertical: 'center'
+              alignSelf: "center",
+              textAlignVertical: "center"
             }}
           >
-            {!item.title || item.title === '' ? 'Pinned' : item.title}
+            {!item.title || item.title === "" ? "Pinned" : item.title}
           </Heading>
         </TouchableOpacity>
 
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center'
+            flexDirection: "row",
+            alignItems: "center"
           }}
         >
           {index === 0 ? (
@@ -105,19 +113,26 @@ export const SectionHeader = React.memo(
                 tooltipText="Change sorting of items in list"
                 fwdRef={sortRef}
                 title={groupBy}
-                icon={groupOptions.sortDirection === 'asc' ? 'sort-ascending' : 'sort-descending'}
+                icon={
+                  groupOptions.sortDirection === "asc"
+                    ? "sort-ascending"
+                    : "sort-descending"
+                }
                 height={25}
                 style={{
                   borderRadius: 100,
                   paddingHorizontal: 0,
-                  backgroundColor: 'transparent',
-                  marginRight: type === 'notes' || type === 'home' || type === 'notebooks' ? 10 : 0
+                  backgroundColor: "transparent",
+                  marginRight:
+                    type === "notes" || type === "home" || type === "notebooks"
+                      ? 10
+                      : 0
                 }}
                 type="gray"
                 iconPosition="right"
               />
 
-              {type === 'notes' || type === 'notebooks' || type === 'home' ? (
+              {type === "notes" || type === "notebooks" || type === "home" ? (
                 <IconButton
                   customStyle={{
                     width: 25,
@@ -125,15 +140,22 @@ export const SectionHeader = React.memo(
                   }}
                   testID="icon-compact-mode"
                   tooltipText={
-                    listMode == 'compact' ? 'Switch to normal mode' : 'Switch to compact mode'
+                    listMode == "compact"
+                      ? "Switch to normal mode"
+                      : "Switch to compact mode"
                   }
                   fwdRef={compactModeRef}
                   color={colors.icon}
-                  name={listMode == 'compact' ? 'view-list' : 'view-list-outline'}
+                  name={
+                    listMode == "compact" ? "view-list" : "view-list-outline"
+                  }
                   onPress={() => {
                     let settings = {};
-                    settings[type !== 'notebooks' ? 'notesListMode' : 'notebooksListMode'] =
-                      listMode === 'normal' ? 'compact' : 'normal';
+                    settings[
+                      type !== "notebooks"
+                        ? "notesListMode"
+                        : "notebooksListMode"
+                    ] = listMode === "normal" ? "compact" : "normal";
 
                     SettingsService.set(settings);
                   }}

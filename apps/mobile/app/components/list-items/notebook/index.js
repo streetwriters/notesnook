@@ -1,31 +1,39 @@
-import React from 'react';
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../../e2e/test.ids';
-import { TopicNotes } from '../../../screens/notes/topic-notes';
-import { useSettingStore } from '../../../stores/use-setting-store';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { getTotalNotes, history } from '../../../utils';
-import { SIZE } from '../../../utils/size';
-import { Properties } from '../../properties';
-import { Button } from '../../ui/button';
-import { IconButton } from '../../ui/icon-button';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
+import React from "react";
+import { View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { notesnook } from "../../../../e2e/test.ids";
+import { TopicNotes } from "../../../screens/notes/topic-notes";
+import { useSettingStore } from "../../../stores/use-setting-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { getTotalNotes, history } from "../../../utils";
+import { SIZE } from "../../../utils/size";
+import { Properties } from "../../properties";
+import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 
-const showActionSheet = item => {
+const showActionSheet = (item) => {
   Properties.present(item);
 };
 
-const navigateToTopic = topic => {
+const navigateToTopic = (topic) => {
   if (history.selectedItemsList.length > 0) return;
   TopicNotes.navigate(topic, true);
 };
 
-export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateBy }) => {
-  const colors = useThemeStore(state => state.colors);
-  const notebooksListMode = useSettingStore(state => state.settings.notebooksListMode);
-  const compactMode = notebooksListMode === 'compact';
+export const NotebookItem = ({
+  item,
+  isTopic = false,
+  notebookID,
+  isTrash,
+  dateBy
+}) => {
+  const colors = useThemeStore((state) => state.colors);
+  const notebooksListMode = useSettingStore(
+    (state) => state.settings.notebooksListMode
+  );
+  const compactMode = notebooksListMode === "compact";
   const topics = item.topics?.slice(0, 3) || [];
   const totalNotes = getTotalNotes(item);
 
@@ -41,7 +49,7 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
           size={SIZE.md}
           numberOfLines={1}
           style={{
-            flexWrap: 'wrap'
+            flexWrap: "wrap"
           }}
         >
           {item.title}
@@ -51,7 +59,7 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
             size={SIZE.sm}
             numberOfLines={2}
             style={{
-              flexWrap: 'wrap'
+              flexWrap: "wrap"
             }}
           >
             {item.description}
@@ -61,18 +69,18 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
         {isTopic || compactMode ? null : (
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              flexWrap: 'wrap'
+              flexDirection: "row",
+              alignItems: "center",
+              flexWrap: "wrap"
             }}
           >
-            {topics.map(topic => (
+            {topics.map((topic) => (
               <Button
                 title={topic.title}
                 key={topic.id}
                 height={null}
                 textStyle={{
-                  fontWeight: 'normal',
+                  fontWeight: "normal",
                   fontFamily: null,
                   marginRight: 0
                 }}
@@ -98,9 +106,9 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
 
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
             marginTop: 5,
             height: SIZE.md + 2
           }}
@@ -112,7 +120,7 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
               marginRight: 6
             }}
           >
-            {isTopic ? 'Topic' : 'Notebook'}
+            {isTopic ? "Topic" : "Notebook"}
           </Paragraph>
 
           {isTrash ? (
@@ -121,17 +129,18 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
                 color={colors.icon}
                 size={SIZE.xs}
                 style={{
-                  textAlignVertical: 'center',
+                  textAlignVertical: "center",
                   marginRight: 6
                 }}
               >
-                {'Deleted on ' + new Date(item.dateDeleted).toISOString().slice(0, 10)}
+                {"Deleted on " +
+                  new Date(item.dateDeleted).toISOString().slice(0, 10)}
               </Paragraph>
               <Paragraph
                 color={colors.accent}
                 size={SIZE.xs}
                 style={{
-                  textAlignVertical: 'center',
+                  textAlignVertical: "center",
                   marginRight: 6
                 }}
               >
@@ -157,10 +166,10 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
             }}
           >
             {item && totalNotes > 1
-              ? totalNotes + ' notes'
+              ? totalNotes + " notes"
               : totalNotes === 1
-              ? totalNotes + ' note'
-              : '0 notes'}
+              ? totalNotes + " note"
+              : "0 notes"}
           </Paragraph>
 
           {item.pinned ? (
@@ -183,11 +192,11 @@ export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateB
         size={SIZE.xl}
         onPress={() => showActionSheet(item)}
         customStyle={{
-          justifyContent: 'center',
+          justifyContent: "center",
           height: 35,
           width: 35,
           borderRadius: 100,
-          alignItems: 'center'
+          alignItems: "center"
         }}
       />
     </>

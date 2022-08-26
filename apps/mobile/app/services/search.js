@@ -1,12 +1,12 @@
-import { useSearchStore } from '../stores/use-search-store';
-import { db } from '../common/database';
+import { useSearchStore } from "../stores/use-search-store";
+import { db } from "../common/database";
 
 let prepareSearch = () => {};
 
 let searchInformation = {
-  placeholder: 'Search in all notes',
+  placeholder: "Search in all notes",
   data: [],
-  type: 'notes',
+  type: "notes",
   get: () => null
 };
 
@@ -29,7 +29,10 @@ async function search(silent) {
     return;
   }
   if (!silent) {
-    searchstore.setSearchStatus(true, `Searching for "${term}" in ${searchInformation.title}`);
+    searchstore.setSearchStatus(
+      true,
+      `Searching for "${term}" in ${searchInformation.title}`
+    );
   }
 
   let results;
@@ -54,7 +57,7 @@ function getSearchInformation() {
 }
 
 function updateAndSearch() {
-  if (!keyword || keyword === '') return;
+  if (!keyword || keyword === "") return;
   search(true);
 }
 

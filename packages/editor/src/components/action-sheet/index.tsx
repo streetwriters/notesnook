@@ -3,7 +3,7 @@ import React, {
   useCallback,
   useRef,
   useState,
-  useEffect,
+  useEffect
 } from "react";
 import { MenuItem } from "../menu/types";
 import { Box, Button, Flex, Text } from "rebass";
@@ -18,7 +18,7 @@ import {
   useMotionValue,
   animate,
   useTransform,
-  useAnimation,
+  useAnimation
 } from "framer-motion";
 import { useTheme } from "../../toolbar/stores/toolbar-store";
 
@@ -32,7 +32,7 @@ const TRANSITION = {
   stiffness: 300,
   damping: 30,
   mass: 0.2,
-  duration: 300,
+  duration: 300
 };
 
 function useHistory<T>(initial: T) {
@@ -81,7 +81,7 @@ export function ActionSheetPresenter(
     blocking = true,
     focusOnRender = true,
     draggable = true,
-    children,
+    children
   } = props;
   const theme = useTheme();
   const contentRef = useRef<HTMLDivElement>();
@@ -101,7 +101,7 @@ export function ActionSheetPresenter(
     }, TRANSITION.duration - 50);
     animation.start({
       transition: TRANSITION,
-      y: height + 100,
+      y: height + 100
     });
   }, [animation, onClose, contentRef.current]);
 
@@ -152,7 +152,7 @@ export function ActionSheetPresenter(
               ...props.style,
               position: blocking ? "fixed" : "sticky",
               zIndex: 1000,
-              backgroundColor: !blocking ? "transparent" : "unset",
+              backgroundColor: !blocking ? "transparent" : "unset"
             }}
             tabIndex={-1}
           >
@@ -164,7 +164,7 @@ export function ActionSheetPresenter(
                   width: "100%",
                   opacity,
                   position: "absolute",
-                  backgroundColor: "var(--overlay)",
+                  backgroundColor: "var(--overlay)"
                 }}
                 tabIndex={-1}
               />
@@ -190,7 +190,7 @@ export function ActionSheetPresenter(
             padding: 0,
             zIndex: 0,
             outline: 0,
-            isolation: "isolate",
+            isolation: "isolate"
           }}
         >
           {children}
@@ -207,7 +207,7 @@ export function ActionSheetPresenter(
           borderTopRightRadius: 15,
           boxShadow: theme?.shadows.menu || "none",
           flex: 1,
-          flexDirection: "column",
+          flexDirection: "column"
         }}
       >
         {draggable && (
@@ -241,7 +241,7 @@ export function ActionSheetPresenter(
               bg: "transparent",
               alignItems: "center",
               justifyContent: "center",
-              p: 2,
+              p: 2
             }}
           >
             <Box
@@ -250,7 +250,7 @@ export function ActionSheetPresenter(
                 backgroundColor: "hover",
                 width: 60,
                 height: 8,
-                borderRadius: 100,
+                borderRadius: 100
               }}
             />
           </AnimatedFlex>
@@ -274,7 +274,7 @@ function ContentContainer(props: PropsWithChildren<ContentContainerProps>) {
   const { current, goBack, canGoBack, navigate } =
     useHistory<ActionSheetHistoryItem>({
       title,
-      items,
+      items
     });
 
   return (

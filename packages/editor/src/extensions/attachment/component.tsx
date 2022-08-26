@@ -39,8 +39,8 @@ export function AttachmentComponent(
           maxWidth: 250,
           borderColor: selected ? "primary" : "border",
           ":hover": {
-            bg: "hover",
-          },
+            bg: "hover"
+          }
         }}
         title={filename}
       >
@@ -52,7 +52,7 @@ export function AttachmentComponent(
             fontSize: "body",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
-            overflow: "hidden",
+            overflow: "hidden"
           }}
         >
           {filename}
@@ -63,7 +63,7 @@ export function AttachmentComponent(
             ml: 1,
             fontSize: "0.65rem",
             color: "fontTertiary",
-            flexShrink: 0,
+            flexShrink: 0
           }}
         >
           {progress ? `${progress}%` : formatBytes(size)}
@@ -78,7 +78,7 @@ export function AttachmentComponent(
                 borderRadius: "default",
                 bg: "background",
                 position: "absolute",
-                top: -35,
+                top: -35
               }}
             />
           )}

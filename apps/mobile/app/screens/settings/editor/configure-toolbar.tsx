@@ -1,27 +1,33 @@
-import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { DraxProvider, DraxScrollView } from 'react-native-drax';
-import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
-import { Button } from '../../../components/ui/button';
-import { Notice } from '../../../components/ui/notice';
-import Paragraph from '../../../components/ui/typography/paragraph';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { SIZE } from '../../../utils/size';
-import { Group } from './group';
-import { useDragState } from './state';
+import * as React from "react";
+import { StyleSheet, View } from "react-native";
+import { DraxProvider, DraxScrollView } from "react-native-drax";
+import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
+import { Button } from "../../../components/ui/button";
+import { Notice } from "../../../components/ui/notice";
+import Paragraph from "../../../components/ui/typography/paragraph";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { SIZE } from "../../../utils/size";
+import { Group } from "./group";
+import { useDragState } from "./state";
 
 export const ConfigureToolbar = () => {
-  const data = useDragState(state => state.data);
-  const preset = useDragState(state => state.preset);
-  const colors = useThemeStore(state => state.colors);
+  const data = useDragState((state) => state.data);
+  const preset = useDragState((state) => state.preset);
+  const colors = useThemeStore((state) => state.colors);
 
   const renderGroups = () => {
-    return data.map((item, index) => <Group key={`group-${index}`} item={item} index={index} />);
+    return data.map((item, index) => (
+      <Group key={`group-${index}`} item={item} index={index} />
+    ));
   };
 
   return (
     <DraxProvider>
-      <Animated.View entering={FadeInDown} exiting={FadeOutDown} style={styles.container}>
+      <Animated.View
+        entering={FadeInDown}
+        exiting={FadeOutDown}
+        style={styles.container}
+      >
         <View
           style={{
             paddingVertical: 12
@@ -44,28 +50,28 @@ export const ConfigureToolbar = () => {
 
           <View
             style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              width: '100%',
+              flexDirection: "row",
+              flexWrap: "wrap",
+              width: "100%",
               marginTop: 10
             }}
           >
             {[
               {
-                id: 'default',
-                name: 'Default'
+                id: "default",
+                name: "Default"
               },
               {
-                id: 'minimal',
-                name: 'Minimal'
+                id: "minimal",
+                name: "Minimal"
               },
               {
-                id: 'custom',
-                name: 'Custom'
+                id: "custom",
+                name: "Custom"
               }
-            ].map(item => (
+            ].map((item) => (
               <Button
-                type={preset === item.id ? 'accent' : 'grayAccent'}
+                type={preset === item.id ? "accent" : "grayAccent"}
                 style={{
                   borderRadius: 100,
                   height: 35,
@@ -100,7 +106,7 @@ export const ConfigureToolbar = () => {
               type="grayAccent"
               icon="plus"
               style={{
-                width: '100%'
+                width: "100%"
               }}
               onPress={() => {
                 const _data = data.slice();
@@ -119,7 +125,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 12,
-    width: '100%'
+    width: "100%"
   }
 });
 

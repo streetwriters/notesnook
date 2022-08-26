@@ -9,7 +9,7 @@ async function navigateTo(pageId) {
 async function clickMenuItem(itemId) {
   await page.click(Menu.new("menuitem").item(itemId).build(), {
     button: "left",
-    force: true,
+    force: true
   });
 }
 
@@ -39,5 +39,5 @@ module.exports = {
   openContextMenu,
   confirmDialog,
   closeContextMenu,
-  useContextMenu,
+  useContextMenu
 };

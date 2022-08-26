@@ -12,7 +12,7 @@ export const NavigationLoader = memo(function NavigationLoader() {
       sx={{
         height: "100%",
         zIndex: 1,
-        position: "relative",
+        position: "relative"
       }}
       bg={"bgSecondary"}
     >
@@ -26,7 +26,7 @@ export const NavigationLoader = memo(function NavigationLoader() {
           sx={{
             position: "relative",
             ":first-of-type": { mt: 1 },
-            ":last-of-type": { mb: 1 },
+            ":last-of-type": { mb: 1 }
           }}
         >
           <Skeleton

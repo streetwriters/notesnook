@@ -1,25 +1,32 @@
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useEffect } from 'react';
-import { FlatList, View } from 'react-native';
-import Animated, { FadeInDown, FadeOut, FadeOutDown } from 'react-native-reanimated';
-import DelayLayout from '../../components/delay-layout';
-import useNavigationStore from '../../stores/use-navigation-store';
-import { tabBarRef } from '../../utils/global-refs';
-import { useNavigationFocus } from '../../hooks/use-navigation-focus';
-import { components } from './components';
-import { SectionItem } from './section-item';
-import { RouteParams, SettingSection } from './types';
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import React, { useEffect } from "react";
+import { FlatList, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeOut,
+  FadeOutDown
+} from "react-native-reanimated";
+import DelayLayout from "../../components/delay-layout";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { tabBarRef } from "../../utils/global-refs";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
+import { components } from "./components";
+import { SectionItem } from "./section-item";
+import { RouteParams, SettingSection } from "./types";
 
 const keyExtractor = (item: SettingSection, index: number) => item.id;
 
-const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'SettingsGroup'>) => {
+const Group = ({
+  navigation,
+  route
+}: NativeStackScreenProps<RouteParams, "SettingsGroup">) => {
   useNavigationFocus(navigation, {
     onFocus: () => {
       tabBarRef.current?.lock();
-      console.log('called');
+      console.log("called");
       useNavigationStore.getState().update(
         {
-          name: 'SettingsGroup',
+          name: "SettingsGroup",
           //@ts-ignore
           title: route.params.name
         },
@@ -33,9 +40,13 @@ const Group = ({ navigation, route }: NativeStackScreenProps<RouteParams, 'Setti
       tabBarRef.current?.unlock();
     };
   }, []);
-  const renderItem = ({ item, index }: { item: SettingSection; index: number }) => (
-    <SectionItem item={item} />
-  );
+  const renderItem = ({
+    item,
+    index
+  }: {
+    item: SettingSection;
+    index: number;
+  }) => <SectionItem item={item} />;
 
   return (
     <DelayLayout type="settings" delay={300}>

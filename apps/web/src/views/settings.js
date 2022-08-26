@@ -21,7 +21,7 @@ import {
   showMultifactorDialog,
   showAttachmentsDialog,
   show2FARecoveryCodesDialog,
-  showToolbarConfigDialog,
+  showToolbarConfigDialog
 } from "../common/dialog-controller";
 import { SUBSCRIPTION_STATUS } from "../common/constants";
 import { createBackup, importBackup, verifyAccount } from "../common";
@@ -64,40 +64,40 @@ const otherItems = [
   {
     title: "Terms of service",
     description: "Read our terms of service.",
-    link: "https://notesnook.com/tos",
+    link: "https://notesnook.com/tos"
   },
   {
     title: "Privacy policy",
     description:
       "We do not share, sell, read, or use your data. Read our privacy policy.",
-    link: "https://notesnook.com/privacy",
+    link: "https://notesnook.com/privacy"
   },
   {
     title: "Report an issue",
     description: "Facing an issue? Click here to create a bug report.",
-    onClick: () => showIssueDialog(),
+    onClick: () => showIssueDialog()
   },
   {
     title: "Join our Discord community",
     description:
       "We are not ghosts. Come chat with us and share your experience.",
-    link: "https://discord.com/invite/zQBK97EE22",
+    link: "https://discord.com/invite/zQBK97EE22"
   },
   {
     title: "Download for iOS & Android",
     description: "Notesnook is available on Android & iOS",
-    link: "https://notesnook.com/",
+    link: "https://notesnook.com/"
   },
   {
     title: "Documentation",
     description: "Learn about every feature in Notesnook and how it works",
-    link: "https://docs.notesnook.com/",
+    link: "https://docs.notesnook.com/"
   },
   {
     title: "Roadmap",
     description: "See what the future of Notesnook is going to be like!",
-    link: "https://notesnook.com/roadmap",
-  },
+    link: "https://notesnook.com/roadmap"
+  }
 ];
 
 function Settings(props) {
@@ -109,7 +109,7 @@ function Settings(props) {
     importer: false,
     privacy: false,
     developer: false,
-    other: true,
+    other: true
   });
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
   const setIsVaultCreated = useAppStore((store) => store.setIsVaultCreated);
@@ -175,7 +175,7 @@ function Settings(props) {
                   mr={2}
                   size={35}
                   sx={{
-                    borderRadius: 80,
+                    borderRadius: 80
                   }}
                 >
                   <Icon.User size={20} color="primary" />
@@ -247,7 +247,7 @@ function Settings(props) {
                 if (await showLogoutConfirmation()) {
                   await showLoadingDialog({
                     title: "You are being logged out",
-                    action: () => db.user.logout(true),
+                    action: () => db.user.logout(true)
                   });
                   showToast("success", "You have been logged out.");
                 }
@@ -370,7 +370,7 @@ function Settings(props) {
               flexWrap="wrap"
               justifyContent="left"
               sx={{
-                borderRadius: "default",
+                borderRadius: "default"
               }}
             >
               {getAllAccents().map((color) => (
@@ -526,7 +526,7 @@ function Settings(props) {
                       const location = await window.native.selectDirectory({
                         title: "Select where Notesnook should save backups",
                         defaultPath:
-                          backupStorageLocation || PATHS.backupsDirectory,
+                          backupStorageLocation || PATHS.backupsDirectory
                       });
                       if (!location) return;
                       setBackupStorageLocation(location);
@@ -792,7 +792,7 @@ function OptionsItem(props) {
     selectedOption,
     onSelectionChanged,
     onlyIf,
-    premium,
+    premium
   } = props;
 
   if (onlyIf === false) return null;
@@ -805,7 +805,7 @@ function OptionsItem(props) {
         cursor: "pointer",
         borderBottom: "1px solid",
         borderBottomColor: "border",
-        ":hover": { borderBottomColor: "primary" },
+        ":hover": { borderBottomColor: "primary" }
       }}
     >
       <Tip text={title} tip={tip} />
@@ -833,7 +833,7 @@ function OptionsItem(props) {
               }
             }}
             sx={{
-              ":hover": { color: selectedOption === index ? "static" : "text" },
+              ":hover": { color: selectedOption === index ? "static" : "text" }
             }}
           >
             {option}
@@ -853,7 +853,7 @@ function AccountStatus(props) {
     isBasic,
     isProCancelled,
     isProExpired,
-    remainingDays,
+    remainingDays
   } = useMemo(() => {
     const type = user?.subscription?.type;
     const expiry = user?.subscription?.expiry;
@@ -865,7 +865,7 @@ function AccountStatus(props) {
       isBeta: type === SUBSCRIPTION_STATUS.BETA,
       isPro: type === SUBSCRIPTION_STATUS.PREMIUM,
       isProCancelled: type === SUBSCRIPTION_STATUS.PREMIUM_CANCELED,
-      isProExpired: type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED,
+      isProExpired: type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
     };
   }, [user]);
 

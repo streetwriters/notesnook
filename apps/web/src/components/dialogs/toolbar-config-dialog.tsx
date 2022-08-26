@@ -8,7 +8,7 @@ import {
   Icons,
   ToolbarGroupDefinition,
   ToolDefinition,
-  ToolId,
+  ToolId
 } from "@streetwriters/editor";
 import {
   closestCenter,
@@ -18,14 +18,14 @@ import {
   KeyboardSensor,
   PointerSensor,
   DragOverlay,
-  MeasuringStrategy,
+  MeasuringStrategy
 } from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
+  verticalListSortingStrategy
 } from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
@@ -40,7 +40,7 @@ import {
   getPreset,
   getPresetTools,
   Preset,
-  PresetId,
+  PresetId
 } from "../../common/toolbar-config";
 import { showToast } from "../../utils/toast";
 export type ToolbarConfigDialogProps = {
@@ -51,7 +51,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+      coordinateGetter: sortableKeyboardCoordinates
     })
   );
   const [items, setItems] = useState<TreeNode[]>([]);
@@ -82,12 +82,12 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
 
           await db.settings?.setToolbarConfig("desktop", {
             preset: currentPreset.id,
-            config: currentPreset.id === "custom" ? tools : undefined,
+            config: currentPreset.id === "custom" ? tools : undefined
           });
 
           setToolbarConfig(tools);
           props.onClose(true);
-        },
+        }
       }}
       negativeButton={{ text: "Cancel", onClick: props.onClose }}
     >
@@ -123,7 +123,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
                 display: "flex",
                 flexShrink: 0,
                 alignItems: "center",
-                p: 1,
+                p: 1
               }}
               title="Add group"
               onClick={() => {
@@ -143,7 +143,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
             if (currentPreset.id !== "custom") {
               setCurrentPreset((c) => ({
                 ...getPreset("custom"),
-                tools: getPresetTools(c),
+                tools: getPresetTools(c)
               }));
             }
 
@@ -169,7 +169,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
             setActiveItem(undefined);
           }}
           measuring={{
-            droppable: { strategy: MeasuringStrategy.Always },
+            droppable: { strategy: MeasuringStrategy.Always }
           }}
         >
           <SortableContext items={items} strategy={verticalListSortingStrategy}>
@@ -265,7 +265,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
           p: 1,
           mb: 1,
           ml: item.depth * 15,
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         {isDraggable ? (
@@ -292,7 +292,7 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
         borderRadius: "default",
         mb: 1,
         ml: item.depth * 15,
-        ":last-of-type": { mb: 0 },
+        ":last-of-type": { mb: 0 }
       }}
     >
       {item.icon && (
@@ -338,7 +338,7 @@ function SortableWrapper(props: SortableWrapperProps) {
         transition,
         justifyContent: "space-between",
         ":hover #remove-item, :hover #add-item": { opacity: 1 },
-        ...sx,
+        ...sx
       }}
     >
       <Flex
@@ -447,7 +447,7 @@ function createGroup(config: Partial<Group>): Group {
     id: id(),
     depth: 0,
     title: "Group",
-    ...config,
+    ...config
   };
 }
 
@@ -459,7 +459,7 @@ function createItem(config: Partial<Item>): Item {
     title: "",
     icon: "",
     toolId: "",
-    ...config,
+    ...config
   };
 }
 
@@ -467,7 +467,7 @@ function createTrash() {
   return createGroup({
     id: "trash",
     depth: 0,
-    title: "Disabled items",
+    title: "Disabled items"
   });
 }
 
@@ -645,7 +645,7 @@ function getGroup(items: TreeNode[], groupId: string): ResolvedGroup | null {
     items: items.slice(
       index,
       nextGroupIndex < 0 ? items.length : nextGroupIndex
-    ),
+    )
   };
 }
 

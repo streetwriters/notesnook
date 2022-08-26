@@ -4,7 +4,7 @@ import { SearchReplacePopup } from "../popups/search-replace";
 import {
   DesktopOnly,
   MobileOnly,
-  ResponsivePresenter,
+  ResponsivePresenter
 } from "../../components/responsive";
 import { getToolbarElement } from "../utils/dom";
 
@@ -23,7 +23,7 @@ export function SearchReplaceFloatingMenu(props: FloatingMenuProps) {
         isTargetAbsolute: true,
         location: "below",
         align: "end",
-        yOffset: 5,
+        yOffset: 5
       }}
       blocking={false}
       focusOnRender={false}

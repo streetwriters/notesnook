@@ -1,19 +1,19 @@
-import React from 'react';
-import { View } from 'react-native';
-import { notesnook } from '../../../../e2e/test.ids';
-import { TaggedNotes } from '../../../screens/notes/tagged';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { db } from '../../../common/database';
-import { SIZE } from '../../../utils/size';
-import { Properties } from '../../properties';
-import { IconButton } from '../../ui/icon-button';
-import { PressableButton } from '../../ui/pressable';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
+import React from "react";
+import { View } from "react-native";
+import { notesnook } from "../../../../e2e/test.ids";
+import { TaggedNotes } from "../../../screens/notes/tagged";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { db } from "../../../common/database";
+import { SIZE } from "../../../utils/size";
+import { Properties } from "../../properties";
+import { IconButton } from "../../ui/icon-button";
+import { PressableButton } from "../../ui/pressable";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 
 const TagItem = React.memo(
   ({ item, index }) => {
-    const colors = useThemeStore(state => state.colors);
+    const colors = useThemeStore((state) => state.colors);
     const onPress = () => {
       TaggedNotes.navigate(item, true);
     };
@@ -27,16 +27,16 @@ const TagItem = React.memo(
         opacity={1}
         customStyle={{
           paddingHorizontal: 12,
-          flexDirection: 'row',
+          flexDirection: "row",
           paddingVertical: 12,
-          alignItems: 'center',
-          width: '100%',
-          justifyContent: 'space-between'
+          alignItems: "center",
+          width: "100%",
+          justifyContent: "space-between"
         }}
       >
         <View
           style={{
-            maxWidth: '92%'
+            maxWidth: "92%"
           }}
         >
           <Heading size={SIZE.md}>
@@ -58,9 +58,9 @@ const TagItem = React.memo(
             }}
           >
             {item && item.noteIds.length && item.noteIds.length > 1
-              ? item.noteIds.length + ' notes'
+              ? item.noteIds.length + " notes"
               : item.noteIds.length === 1
-              ? item.noteIds.length + ' note'
+              ? item.noteIds.length + " note"
               : null}
           </Paragraph>
         </View>
@@ -74,11 +74,11 @@ const TagItem = React.memo(
           }}
           testID={notesnook.ids.tag.menu}
           customStyle={{
-            justifyContent: 'center',
+            justifyContent: "center",
             height: 35,
             width: 35,
             borderRadius: 100,
-            alignItems: 'center'
+            alignItems: "center"
           }}
         />
       </PressableButton>
@@ -96,6 +96,6 @@ const TagItem = React.memo(
   }
 );
 
-TagItem.displayName = 'TagItem';
+TagItem.displayName = "TagItem";
 
 export default TagItem;

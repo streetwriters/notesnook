@@ -53,7 +53,7 @@ function _ListTool<TListStyleTypes extends string>(
           target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
           align: "center",
           location: isBottom ? "top" : "below",
-          yOffset: 10,
+          yOffset: 10
         }}
         onClosed={() => setIsOpen(false)}
         renderPopup={() => (
@@ -62,7 +62,7 @@ function _ListTool<TListStyleTypes extends string>(
               bg: "background",
               display: "grid",
               gridTemplateColumns: "1fr 1fr 1fr",
-              p: 1,
+              p: 1
             }}
           >
             {subTypes.map((item) => (
@@ -127,14 +127,14 @@ export function NumberedList(props: ToolProps) {
         {
           type: "upper-roman",
           title: "Upper Roman",
-          items: ["I", "II", "III"],
+          items: ["I", "II", "III"]
         },
         {
           type: "lower-roman",
           title: "Lower Roman",
-          items: ["i", "ii", "iii"],
+          items: ["i", "ii", "iii"]
         },
-        { type: "lower-greek", title: "Lower Greek", items: ["α", "β", "γ"] },
+        { type: "lower-greek", title: "Lower Greek", items: ["α", "β", "γ"] }
       ]}
     />
   );
@@ -157,7 +157,7 @@ export function BulletList(props: ToolProps) {
       subTypes={[
         { type: "disc", title: "Decimal", items: ["1", "2", "3"] },
         { type: "circle", title: "Upper alpha", items: ["A", "B", "C"] },
-        { type: "square", title: "Lower alpha", items: ["a", "b", "c"] },
+        { type: "square", title: "Lower alpha", items: ["a", "b", "c"] }
       ]}
     />
   );
@@ -209,7 +209,7 @@ function ListThumbnail(props: ListThumbnailProps) {
         flexDirection: "column",
         flex: 1,
         p: 0,
-        listStyleType,
+        listStyleType
       }}
       onMouseDown={(e) => e.preventDefault()}
     >
@@ -221,12 +221,12 @@ function ListThumbnail(props: ListThumbnailProps) {
             display: "list-item",
             color: "text",
             fontSize: 8,
-            mb: "1px",
+            mb: "1px"
           }}
         >
           <Flex
             sx={{
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Box
@@ -235,7 +235,7 @@ function ListThumbnail(props: ListThumbnailProps) {
                 flexShrink: 0,
                 height: 4,
                 bg: "#cbcbcb",
-                borderRadius: "small",
+                borderRadius: "small"
               }}
             />
           </Flex>

@@ -1,8 +1,8 @@
-import { Appearance } from 'react-native';
-import create, { State } from 'zustand';
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../utils/color-scheme';
+import { Appearance } from "react-native";
+import create, { State } from "zustand";
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from "../utils/color-scheme";
 
-const darkScheme = Appearance.getColorScheme() === 'dark';
+const darkScheme = Appearance.getColorScheme() === "dark";
 export interface ThemeStore extends State {
   colors: typeof COLOR_SCHEME_LIGHT;
   setColors: (colors: typeof COLOR_SCHEME_LIGHT) => void;
@@ -10,7 +10,7 @@ export interface ThemeStore extends State {
 
 export const useThemeStore = create<ThemeStore>((set, get) => ({
   colors: darkScheme ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT,
-  setColors: colors => {
+  setColors: (colors) => {
     set({ colors });
   }
 }));

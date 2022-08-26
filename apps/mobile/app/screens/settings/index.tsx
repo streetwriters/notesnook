@@ -1,19 +1,22 @@
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
-import React from 'react';
-import DelayLayout from '../../components/delay-layout';
-import { Header } from '../../components/header';
-import useNavigationStore from '../../stores/use-navigation-store';
-import { useThemeStore } from '../../stores/use-theme-store';
-import Group from './group';
-import Home from './home';
-import { RouteParams } from './types';
+import {
+  createNativeStackNavigator,
+  NativeStackScreenProps
+} from "@react-navigation/native-stack";
+import React from "react";
+import DelayLayout from "../../components/delay-layout";
+import { Header } from "../../components/header";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import Group from "./group";
+import Home from "./home";
+import { RouteParams } from "./types";
 
 const SettingsStack = createNativeStackNavigator();
 const screenListeners = {
   //@ts-ignore
-  beforeRemove: e => {
-    if (e.target?.startsWith('SettingsGroup')) {
-      useNavigationStore.getState().update({ name: 'Settings' }, false);
+  beforeRemove: (e) => {
+    if (e.target?.startsWith("SettingsGroup")) {
+      useNavigationStore.getState().update({ name: "Settings" }, false);
     }
   }
 };
@@ -47,13 +50,13 @@ const screenListeners = {
 // };
 
 export const Settings = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   return (
     <SettingsStack.Navigator
       initialRouteName="SettingsHome"
       screenListeners={screenListeners}
       screenOptions={{
-        animation: 'none',
+        animation: "none",
         headerShown: false,
         contentStyle: {
           backgroundColor: colors.bg

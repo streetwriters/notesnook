@@ -5,7 +5,7 @@ import config from "../utils/config";
 import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import {
   showAccountLoggedOutNotice,
-  showOnboardingDialog,
+  showOnboardingDialog
 } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";

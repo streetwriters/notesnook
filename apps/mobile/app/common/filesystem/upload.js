@@ -1,36 +1,38 @@
-import RNFetchBlob from 'rn-fetch-blob';
-import { useAttachmentStore } from '../../stores/use-attachment-store';
-import { db } from '../database';
-import { cacheDir } from './utils';
+import RNFetchBlob from "rn-fetch-blob";
+import { useAttachmentStore } from "../../stores/use-attachment-store";
+import { db } from "../database";
+import { cacheDir } from "./utils";
 
 export async function uploadFile(filename, data, cancelToken) {
   if (!data) return false;
   let { url, headers } = data;
 
-  console.log('uploading file: ', filename, headers);
+  console.log("uploading file: ", filename, headers);
   try {
     let res = await fetch(url, {
-      method: 'PUT',
+      method: "PUT",
       headers
     });
     if (!res.ok) throw new Error(`${res.status}: Unable to resolve upload url`);
     const uploadUrl = await res.text();
-    if (!uploadUrl) throw new Error('Unable to resolve upload url');
+    if (!uploadUrl) throw new Error("Unable to resolve upload url");
 
     let request = RNFetchBlob.config({
       IOSBackgroundTask: true
     })
       .fetch(
-        'PUT',
+        "PUT",
         uploadUrl,
         {
-          'content-type': ''
+          "content-type": ""
         },
         RNFetchBlob.wrap(`${cacheDir}/${filename}`)
       )
       .uploadProgress((sent, total) => {
-        useAttachmentStore.getState().setProgress(sent, total, filename, 0, 'upload');
-        console.log('uploading: ', sent, total);
+        useAttachmentStore
+          .getState()
+          .setProgress(sent, total, filename, 0, "upload");
+        console.log("uploading: ", sent, total);
       });
     cancelToken.cancel = request.cancel;
     let response = await request;
@@ -42,7 +44,7 @@ export async function uploadFile(filename, data, cancelToken) {
     if (result) {
       let attachment = db.attachments.attachment(filename);
       if (!attachment) return result;
-      if (!attachment.metadata.type.startsWith('image/')) {
+      if (!attachment.metadata.type.startsWith("image/")) {
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
     }
@@ -50,7 +52,7 @@ export async function uploadFile(filename, data, cancelToken) {
     return result;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
-    console.log('upload file: ', e, url, headers);
+    console.log("upload file: ", e, url, headers);
     return false;
   }
 }

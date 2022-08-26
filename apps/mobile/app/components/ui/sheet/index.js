@@ -1,12 +1,12 @@
-import React from 'react';
-import { Platform, View } from 'react-native';
-import ActionSheet from 'react-native-actions-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useSettingStore } from '../../../stores/use-setting-store';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { PremiumToast } from '../../premium/premium-toast';
-import { Toast } from '../../toast';
-import { BouncingView } from '../transitions/bouncing-view';
+import React from "react";
+import { Platform, View } from "react-native";
+import ActionSheet from "react-native-actions-sheet";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSettingStore } from "../../../stores/use-setting-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { PremiumToast } from "../../premium/premium-toast";
+import { Toast } from "../../toast";
+import { BouncingView } from "../transitions/bouncing-view";
 
 const SheetWrapper = ({
   children,
@@ -20,13 +20,15 @@ const SheetWrapper = ({
   overlay,
   overlayOpacity = 0.3
 }) => {
-  const colors = useThemeStore(state => state.colors);
-  const deviceMode = useSettingStore(state => state.deviceMode);
-  const sheetKeyboardHandler = useSettingStore(state => state.sheetKeyboardHandler);
-  const largeTablet = deviceMode === 'tablet';
-  const smallTablet = deviceMode === 'smallTablet';
-  const dimensions = useSettingStore(state => state.dimensions);
-  const pitchBlack = useSettingStore(state => state.settings.pitchBlack);
+  const colors = useThemeStore((state) => state.colors);
+  const deviceMode = useSettingStore((state) => state.deviceMode);
+  const sheetKeyboardHandler = useSettingStore(
+    (state) => state.sheetKeyboardHandler
+  );
+  const largeTablet = deviceMode === "tablet";
+  const smallTablet = deviceMode === "smallTablet";
+  const dimensions = useSettingStore((state) => state.dimensions);
+  const pitchBlack = useSettingStore((state) => state.settings.pitchBlack);
 
   const insets = useSafeAreaInsets();
 
@@ -34,14 +36,14 @@ const SheetWrapper = ({
 
   const style = React.useMemo(() => {
     return {
-      width: largeTablet || smallTablet ? width : '100%',
+      width: largeTablet || smallTablet ? width : "100%",
       backgroundColor: colors.bg,
       zIndex: 10,
       paddingTop: 5,
       paddingBottom: 0,
       borderTopRightRadius: 10,
       borderTopLeftRadius: 10,
-      alignSelf: 'center',
+      alignSelf: "center",
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0
     };
@@ -61,7 +63,7 @@ const SheetWrapper = ({
     <ActionSheet
       ref={fwdRef}
       testIDs={{
-        backdrop: 'sheet-backdrop'
+        backdrop: "sheet-backdrop"
       }}
       drawUnderStatusBar={false}
       containerStyle={style}
@@ -76,13 +78,17 @@ const SheetWrapper = ({
       onOpen={_onOpen}
       keyboardDismissMode="none"
       defaultOverlayOpacity={overlayOpacity}
-      overlayColor={pitchBlack ? '#585858' : '#000000'}
+      overlayColor={pitchBlack ? "#585858" : "#000000"}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>
           {overlay}
           <Toast context="local" />
-          <PremiumToast context="sheet" close={() => fwdRef?.current?.hide()} offset={50} />
+          <PremiumToast
+            context="sheet"
+            close={() => fwdRef?.current?.hide()}
+            offset={50}
+          />
         </>
       }
       onClose={_onClose}
@@ -91,7 +97,10 @@ const SheetWrapper = ({
         {children}
         <View
           style={{
-            height: Platform.OS === 'ios' && insets.bottom !== 0 ? insets.bottom + 5 : 20
+            height:
+              Platform.OS === "ios" && insets.bottom !== 0
+                ? insets.bottom + 5
+                : 20
           }}
         />
       </BouncingView>

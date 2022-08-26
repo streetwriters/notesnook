@@ -1,23 +1,29 @@
-import { useMessageStore } from '../stores/use-message-store';
-import { eOpenLoginDialog, eOpenRateDialog, eOpenRecoveryKeyDialog } from '../utils/events';
-import { eSendEvent } from './event-manager';
-import PremiumService from './premium';
-import { verifyUser } from '../screens/settings/functions';
-import { MMKV } from '../common/database/mmkv';
-import { Platform } from 'react-native';
-import umami from '../common/analytics';
-import SettingsService from './settings';
+import { useMessageStore } from "../stores/use-message-store";
+import {
+  eOpenLoginDialog,
+  eOpenRateDialog,
+  eOpenRecoveryKeyDialog
+} from "../utils/events";
+import { eSendEvent } from "./event-manager";
+import PremiumService from "./premium";
+import { verifyUser } from "../screens/settings/functions";
+import { MMKV } from "../common/database/mmkv";
+import { Platform } from "react-native";
+import umami from "../common/analytics";
+import SettingsService from "./settings";
 
 const rateAppMessage = {
   visible: true,
-  message: 'We would love to know what you think',
-  actionText: 'Rate Notesnook on ' + `${Platform.OS === 'ios' ? 'App store' : 'Play store'}`,
+  message: "We would love to know what you think",
+  actionText:
+    "Rate Notesnook on " +
+    `${Platform.OS === "ios" ? "App store" : "Play store"}`,
   onPress: () => {
     eSendEvent(eOpenRateDialog);
   },
   data: {},
-  icon: 'star',
-  type: 'normal'
+  icon: "star",
+  type: "normal"
 };
 
 export function setRateAppMessage() {
@@ -26,8 +32,8 @@ export function setRateAppMessage() {
 
 const recoveryKeyMessage = {
   visible: true,
-  message: 'Keep your data safe if you lose password',
-  actionText: 'Save your account recovery key',
+  message: "Keep your data safe if you lose password",
+  actionText: "Save your account recovery key",
   onPress: () => {
     verifyUser(
       null,
@@ -41,12 +47,12 @@ const recoveryKeyMessage = {
         });
         clearMessage();
       },
-      'I have saved my key already'
+      "I have saved my key already"
     );
   },
   data: {},
-  icon: 'key',
-  type: 'normal'
+  icon: "key",
+  type: "normal"
 };
 
 export function setRecoveryKeyMessage() {
@@ -55,15 +61,15 @@ export function setRecoveryKeyMessage() {
 
 const loginMessage = {
   visible: true,
-  message: 'You are not logged in',
-  actionText: 'Login to encrypt and sync notes',
+  message: "You are not logged in",
+  actionText: "Login to encrypt and sync notes",
   onPress: () => {
-    umami.pageView('/signup', '/welcome/home');
+    umami.pageView("/signup", "/welcome/home");
     eSendEvent(eOpenLoginDialog);
   },
   data: {},
-  icon: 'account-outline',
-  type: 'normal'
+  icon: "account-outline",
+  type: "normal"
 };
 
 export function setLoginMessage() {
@@ -72,14 +78,14 @@ export function setLoginMessage() {
 
 const emailMessage = {
   visible: true,
-  message: 'Email not confirmed',
-  actionText: 'Please confirm your email to sync notes.',
+  message: "Email not confirmed",
+  actionText: "Please confirm your email to sync notes.",
   onPress: () => {
     PremiumService.showVerifyEmailDialog();
   },
   data: {},
-  icon: 'email',
-  type: 'error'
+  icon: "email",
+  type: "error"
 };
 
 export function setEmailVerifyMessage() {
@@ -88,11 +94,11 @@ export function setEmailVerifyMessage() {
 
 const noMessage = {
   visible: false,
-  message: '',
-  actionText: '',
+  message: "",
+  actionText: "",
   onPress: null,
   data: {},
-  icon: 'account-outline'
+  icon: "account-outline"
 };
 
 export function clearMessage() {

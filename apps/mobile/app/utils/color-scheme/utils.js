@@ -1,4 +1,4 @@
-import { Appearance } from 'react-native';
+import { Appearance } from "react-native";
 import {
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
@@ -6,17 +6,19 @@ import {
   COLOR_SCHEME_PITCH_BLACK,
   setAccentColor,
   setColorScheme
-} from '.';
-import SettingsService from '../../services/settings';
+} from ".";
+import SettingsService from "../../services/settings";
 
-const isValidHex = hex => /^#([A-Fa-f0-9]{3,4}){1,2}$/.test(hex);
-const getChunksFromString = (st, chunkSize) => st.match(new RegExp(`.{${chunkSize}}`, 'g'));
-const convertHexUnitTo256 = hexStr => parseInt(hexStr.repeat(2 / hexStr.length), 16);
+const isValidHex = (hex) => /^#([A-Fa-f0-9]{3,4}){1,2}$/.test(hex);
+const getChunksFromString = (st, chunkSize) =>
+  st.match(new RegExp(`.{${chunkSize}}`, "g"));
+const convertHexUnitTo256 = (hexStr) =>
+  parseInt(hexStr.repeat(2 / hexStr.length), 16);
 const getAlphaFloat = (a, alpha) => {
-  if (typeof a !== 'undefined') {
+  if (typeof a !== "undefined") {
     return a / 256;
   }
-  if (typeof alpha !== 'undefined') {
+  if (typeof alpha !== "undefined") {
     if (1 < alpha && alpha <= 100) {
       return alpha / 100;
     }
@@ -27,8 +29,8 @@ const getAlphaFloat = (a, alpha) => {
   return 1;
 };
 const rgbRes = {
-  color: '',
-  result: ''
+  color: "",
+  result: ""
 };
 export const hexToRGBA = (hex, alpha) => {
   if (rgbRes.color === hex) return rgbRes.result;
@@ -41,9 +43,9 @@ export const hexToRGBA = (hex, alpha) => {
   return `rgba(${r}, ${g}, ${b}, ${getAlphaFloat(a, alpha)})`;
 };
 const shadeRes = {
-  color: '',
+  color: "",
   alpha: 0,
-  result: ''
+  result: ""
 };
 export const RGB_Linear_Shade = (p, rgba) => {
   if (shadeRes.color === rgba && shadeRes.alpha === p) return shadeRes.result;
@@ -51,17 +53,17 @@ export const RGB_Linear_Shade = (p, rgba) => {
     r = Math.round,
     P = p < 0,
     t = P ? 0 : 255 * p,
-    [a, b, c, d] = rgba.split(',');
+    [a, b, c, d] = rgba.split(",");
   P = P ? 1 + p : 1 - p;
   return (
-    'rgb' +
-    (d ? 'a(' : '(') +
-    r(i(a[3] === 'a' ? a.slice(5) : a.slice(4)) * P + t) +
-    ',' +
+    "rgb" +
+    (d ? "a(" : "(") +
+    r(i(a[3] === "a" ? a.slice(5) : a.slice(4)) * P + t) +
+    "," +
     r(i(b) * P + t) +
-    ',' +
+    "," +
     r(i(c) * P + t) +
-    (d ? ',' + d : ')')
+    (d ? "," + d : ")")
   );
 };
 
@@ -71,24 +73,24 @@ export function getColorScheme(overrideSystemTheme) {
 
   if (useSystemTheme && !overrideSystemTheme) {
     setAccentColor(theme.accent);
-    Appearance.getColorScheme() === 'dark'
+    Appearance.getColorScheme() === "dark"
       ? setColorScheme(darkTheme)
       : setColorScheme(COLOR_SCHEME_LIGHT);
     SettingsService.set({
       theme: {
         ...theme,
-        dark: Appearance.getColorScheme() === 'dark'
+        dark: Appearance.getColorScheme() === "dark"
       }
     });
     return COLOR_SCHEME;
   }
-  console.log('override system theme');
+  console.log("override system theme");
   setAccentColor(theme.accent);
   setColorScheme(theme.dark ? darkTheme : COLOR_SCHEME_LIGHT);
   return COLOR_SCHEME;
 }
 
-export const switchAccentColor = async color => {
+export const switchAccentColor = async (color) => {
   setAccentColor(color);
   let settings = SettingsService.get();
   SettingsService.set({

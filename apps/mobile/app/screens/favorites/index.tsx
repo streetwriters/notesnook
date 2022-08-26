@@ -1,38 +1,44 @@
-import React from 'react';
-import DelayLayout from '../../components/delay-layout';
-import List from '../../components/list';
-import Navigation, { NavigationProps } from '../../services/navigation';
-import SearchService from '../../services/search';
-import SettingsService from '../../services/settings';
-import { useFavoriteStore } from '../../stores/use-favorite-store';
-import useNavigationStore from '../../stores/use-navigation-store';
-import { useNoteStore } from '../../stores/use-notes-store';
-import { db } from '../../common/database';
-import { useNavigationFocus } from '../../hooks/use-navigation-focus';
+import React from "react";
+import DelayLayout from "../../components/delay-layout";
+import List from "../../components/list";
+import Navigation, { NavigationProps } from "../../services/navigation";
+import SearchService from "../../services/search";
+import SettingsService from "../../services/settings";
+import { useFavoriteStore } from "../../stores/use-favorite-store";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useNoteStore } from "../../stores/use-notes-store";
+import { db } from "../../common/database";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 
 const prepareSearch = () => {
   SearchService.update({
-    placeholder: 'Search in favorites',
-    type: 'notes',
-    title: 'Favorites',
+    placeholder: "Search in favorites",
+    type: "notes",
+    title: "Favorites",
     get: () => db.notes?.favorites
   });
 };
 
 const PLACEHOLDER_DATA = {
-  heading: 'Your favorites',
-  paragraph: 'You have not added any notes to favorites yet.',
+  heading: "Your favorites",
+  paragraph: "You have not added any notes to favorites yet.",
   button: null,
-  loading: 'Loading your favorites'
+  loading: "Loading your favorites"
 };
 
-export const Favorites = ({ navigation, route }: NavigationProps<'Favorites'>) => {
-  const favorites = useFavoriteStore(state => state.favorites);
-  const setFavorites = useFavoriteStore(state => state.setFavorites);
-  const loading = useNoteStore(state => state.loading);
+export const Favorites = ({
+  navigation,
+  route
+}: NavigationProps<"Favorites">) => {
+  const favorites = useFavoriteStore((state) => state.favorites);
+  const setFavorites = useFavoriteStore((state) => state.setFavorites);
+  const loading = useNoteStore((state) => state.loading);
   const isFocused = useNavigationFocus(navigation, {
-    onFocus: prev => {
-      Navigation.routeNeedsUpdate(route.name, Navigation.routeUpdateFunctions[route.name]);
+    onFocus: (prev) => {
+      Navigation.routeNeedsUpdate(
+        route.name,
+        Navigation.routeUpdateFunctions[route.name]
+      );
       useNavigationStore.getState().update({
         name: route.name
       });
@@ -55,7 +61,7 @@ export const Favorites = ({ navigation, route }: NavigationProps<'Favorites'>) =
         loading={loading || !isFocused}
         placeholderData={PLACEHOLDER_DATA}
         headerProps={{
-          heading: 'Favorites'
+          heading: "Favorites"
         }}
       />
     </DelayLayout>

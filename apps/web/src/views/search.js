@@ -36,7 +36,7 @@ async function typeToItems(type, context) {
 function Search({ type }) {
   const [searchState, setSearchState] = useState({
     isSearching: false,
-    totalItems: 0,
+    totalItems: 0
   });
   const [results, setResults] = useState([]);
   const context = useNoteStore((store) => store.context);

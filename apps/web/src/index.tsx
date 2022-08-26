@@ -36,43 +36,43 @@ type Routes =
 const routes: Record<Routes, Route> = {
   "/account/recovery": {
     component: () => import("./views/recovery"),
-    props: { route: "methods" },
+    props: { route: "methods" }
   },
   "/account/verified": {
     component: () => import("./views/email-confirmed"),
-    props: {},
+    props: {}
   },
   "/signup": {
     component: () => import("./views/auth"),
-    props: { route: "signup" },
+    props: { route: "signup" }
   },
   "/sessionexpired": {
     component: () => import("./views/auth"),
-    props: { route: "sessionExpiry" },
+    props: { route: "sessionExpiry" }
   },
   "/login": {
     component: () => import("./views/auth"),
-    props: { route: "login" },
+    props: { route: "login" }
   },
   "/recover": {
     component: () => import("./views/auth"),
-    props: { route: "recover" },
+    props: { route: "recover" }
   },
   "/mfa/code": {
     component: () => import("./views/auth"),
-    props: { route: "login" },
+    props: { route: "login" }
   },
   "/mfa/select": {
     component: () => import("./views/auth"),
-    props: { route: "login" },
+    props: { route: "login" }
   },
-  default: { component: () => import("./app"), props: {} },
+  default: { component: () => import("./app"), props: {} }
 };
 
 const sessionExpiryExceptions: Routes[] = [
   "/recover",
   "/account/recovery",
-  "/sessionexpired",
+  "/sessionexpired"
 ];
 
 const serviceWorkerWhitelist: Routes[] = ["default"];
@@ -131,7 +131,7 @@ if (process.env.NODE_ENV === "development") {
 async function renderApp() {
   const {
     path,
-    route: { component, props },
+    route: { component, props }
   } = getRoute();
 
   if (serviceWorkerWhitelist.includes(path)) await initializeServiceWorker();
@@ -162,9 +162,9 @@ async function initializeServiceWorker() {
           registration.waiting
         );
         AppEventManager.publish(EVENTS.updateDownloadCompleted, {
-          version: formatted,
+          version: formatted
         });
-      },
+      }
     });
     // window.addEventListener("beforeinstallprompt", () => showInstallNotice());
   } else serviceWorker.unregister();

@@ -25,7 +25,7 @@ function Toggle(props) {
         cursor: "pointer",
         borderBottom: "1px solid",
         borderBottomColor: "border",
-        ":hover": { borderBottomColor: "primary" },
+        ":hover": { borderBottomColor: "primary" }
       }}
     >
       <Tip text={title} tip={isToggled ? onTip : offTip} sx={{ mr: 2 }} />

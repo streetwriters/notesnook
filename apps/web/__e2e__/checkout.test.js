@@ -16,7 +16,7 @@ test.beforeEach(async ({ page: _page, baseURL }) => {
 
 const plans = [
   { key: "monthly", title: "Monthly", coupon: "INTRO50" },
-  { key: "yearly", title: "Yearly", coupon: "YEAR15" },
+  { key: "yearly", title: "Yearly", coupon: "YEAR15" }
 ];
 const pricingItems = ["subtotal", "tax", "discount", "total"];
 
@@ -159,7 +159,7 @@ test("changing locale should show localized prices", async ({ page }, info) => {
 });
 
 test("applying coupon should change discount & total price", async ({
-  page,
+  page
 }, info) => {
   info.setTimeout(0);
 
@@ -180,7 +180,7 @@ test("applying coupon should change discount & total price", async ({
     await getPaddleFrame();
 
     await page.waitForSelector(getTestId(`checkout-plan-coupon-applied`), {
-      state: "attached",
+      state: "attached"
     });
 
     const prices = roundOffPrices((await getPrices()).join("\n"));
@@ -201,7 +201,7 @@ test("apply coupon through url", async ({ page }, info) => {
     await getPaddleFrame();
 
     await page.waitForSelector(getTestId(`checkout-plan-coupon-applied`), {
-      state: "attached",
+      state: "attached"
     });
 
     const prices = roundOffPrices((await getPrices()).join("\n"));
@@ -233,7 +233,7 @@ test("apply coupon after changing country", async ({ page }, info) => {
     await getPaddleFrame();
 
     await page.waitForSelector(getTestId(`checkout-plan-coupon-applied`), {
-      state: "attached",
+      state: "attached"
     });
 
     const prices = roundOffPrices((await getPrices()).join("\n"));

@@ -21,7 +21,7 @@ export default function Prompt(props: PromptDialogProps) {
       onClose={props.onClose}
       positiveButton={{
         text: "Done",
-        onClick: () => props.onSave(inputRef.current?.value || ""),
+        onClick: () => props.onSave(inputRef.current?.value || "")
       }}
       negativeButton={{ text: "Cancel", onClick: props.onClose }}
     >

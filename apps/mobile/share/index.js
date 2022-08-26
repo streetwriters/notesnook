@@ -1,11 +1,11 @@
-import React, { Fragment } from 'react';
-import { Modal, Platform } from 'react-native';
-import ShareView from './share';
-const Wrapper = Platform.OS === 'android' ? Modal : Fragment;
+import React, { Fragment } from "react";
+import { Modal, Platform } from "react-native";
+import ShareView from "./share";
+const Wrapper = Platform.OS === "android" ? Modal : Fragment;
 const outerProps =
-  Platform.OS === 'android'
+  Platform.OS === "android"
     ? {
-        animationType: 'fade',
+        animationType: "fade",
         transparent: true,
         visible: true
       }

@@ -1,26 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { useMessageStore } from '../../../stores/use-message-store';
-import { DDS } from '../../../services/device-detection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../services/event-manager';
-import { getElevation } from '../../../utils';
-import { eCloseJumpToDialog, eOpenJumpToDialog, eScrollEvent } from '../../../utils/events';
-import { SIZE } from '../../../utils/size';
-import BaseDialog from '../../dialog/base-dialog';
-import { PressableButton } from '../../ui/pressable';
-import Paragraph from '../../ui/typography/paragraph';
+import React, { useEffect, useState } from "react";
+import { ScrollView, View } from "react-native";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { useMessageStore } from "../../../stores/use-message-store";
+import { DDS } from "../../../services/device-detection";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../../services/event-manager";
+import { getElevation } from "../../../utils";
+import {
+  eCloseJumpToDialog,
+  eOpenJumpToDialog,
+  eScrollEvent
+} from "../../../utils/events";
+import { SIZE } from "../../../utils/size";
+import BaseDialog from "../../dialog/base-dialog";
+import { PressableButton } from "../../ui/pressable";
+import Paragraph from "../../ui/typography/paragraph";
 
 const offsets = [];
 let timeout = null;
 const JumpToSectionDialog = ({ scrollRef, data, type, screen }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const notes = data;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
 
   const onPress = (item, index) => {
-    let ind = notes.findIndex(i => i.title === item.title && i.type === 'header');
+    let ind = notes.findIndex(
+      (i) => i.title === item.title && i.type === "header"
+    );
     console.log(scrollRef.current);
     scrollRef.current?.scrollToIndex({
       index: ind,
@@ -41,7 +50,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type, screen }) => {
     };
   }, []);
 
-  const onScroll = data => {
+  const onScroll = (data) => {
     let y = data.y;
     if (timeout) {
       clearTimeout(timeout);
@@ -53,7 +62,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type, screen }) => {
     }, 200);
   };
 
-  const open = _type => {
+  const open = (_type) => {
     if (_type !== type) return;
     setVisible(true);
   };
@@ -68,10 +77,12 @@ const JumpToSectionDialog = ({ scrollRef, data, type, screen }) => {
 
   const loadOffsets = () => {
     notes
-      .filter(i => i.type === 'header')
+      .filter((i) => i.type === "header")
       .map((item, index) => {
         let offset = 35 * index;
-        let ind = notes.findIndex(i => i.title === item.title && i.type === 'header');
+        let ind = notes.findIndex(
+          (i) => i.title === item.title && i.type === "header"
+        );
         let messageState = useMessageStore.getState().message;
         let msgOffset = messageState?.visible ? 60 : 10;
         ind = ind + 1;
@@ -92,41 +103,41 @@ const JumpToSectionDialog = ({ scrollRef, data, type, screen }) => {
       <View
         style={{
           ...getElevation(5),
-          width: DDS.isTab ? 500 : '85%',
+          width: DDS.isTab ? 500 : "85%",
           backgroundColor: colors.bg,
           zIndex: 100,
           bottom: 20,
-          maxHeight: '65%',
+          maxHeight: "65%",
           borderRadius: 10,
-          alignSelf: 'center',
+          alignSelf: "center",
           padding: 10,
           paddingTop: 30
         }}
       >
         <ScrollView
           style={{
-            maxHeight: '100%'
+            maxHeight: "100%"
           }}
         >
           <View
             style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              alignSelf: 'center',
-              justifyContent: 'center',
+              flexDirection: "row",
+              flexWrap: "wrap",
+              alignSelf: "center",
+              justifyContent: "center",
               paddingBottom: 20
             }}
           >
             {notes
-              .filter(i => i.type === 'header')
+              .filter((i) => i.type === "header")
               .map((item, index) => {
                 return item.title ? (
                   <PressableButton
                     key={item.title}
                     onPress={() => onPress(item, index)}
-                    type={currentIndex === index ? 'accent' : 'transparent'}
+                    type={currentIndex === index ? "accent" : "transparent"}
                     customStyle={{
-                      minWidth: '20%',
+                      minWidth: "20%",
                       width: null,
                       paddingHorizontal: 12,
                       margin: 5,
@@ -137,9 +148,11 @@ const JumpToSectionDialog = ({ scrollRef, data, type, screen }) => {
                   >
                     <Paragraph
                       size={SIZE.sm}
-                      color={currentIndex === index ? colors.light : colors.accent}
+                      color={
+                        currentIndex === index ? colors.light : colors.accent
+                      }
                       style={{
-                        textAlign: 'center'
+                        textAlign: "center"
                       }}
                     >
                       {item.title}

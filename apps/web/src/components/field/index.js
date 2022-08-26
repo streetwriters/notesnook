@@ -6,8 +6,8 @@ import * as Icon from "../icons";
 const passwordValidationRules = [
   {
     title: "8 characters",
-    validate: (password) => password.length >= 8,
-  },
+    validate: (password) => password.length >= 8
+  }
   // {
   //   title: "1 lowercase letter",
   //   validate: (password) => /[a-z]/.test(password),
@@ -51,7 +51,7 @@ function Field(props) {
     inputMode,
     pattern,
     variant = "input",
-    as = "input",
+    as = "input"
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [rules, setRules] = useState(passwordValidationRules);
@@ -65,7 +65,7 @@ function Field(props) {
           fontWeight: "bold",
           color: "icon",
           flexDirection: "column",
-          ...styles.label,
+          ...styles.label
         }}
       >
         {label}{" "}
@@ -76,7 +76,7 @@ function Field(props) {
               fontSize: "subBody",
               fontWeight: "normal",
               color: "fontTertiary",
-              ...styles.helpText,
+              ...styles.helpText
             }}
           >
             {helpText}
@@ -104,8 +104,8 @@ function Field(props) {
           sx={{
             ...styles.input,
             ":disabled": {
-              bg: "bgSecondary",
-            },
+              bg: "bgSecondary"
+            }
           }}
           onChange={(e) => {
             if (validatePassword) {
@@ -141,7 +141,7 @@ function Field(props) {
               cursor: "pointer",
               borderTopRightRadius: "default",
               borderBottomRightRadius: "default",
-              ":hover": { bg: "border" },
+              ":hover": { bg: "border" }
             }}
           >
             {isPasswordVisible ? (
@@ -165,7 +165,7 @@ function Field(props) {
               bottom: "2px",
               px: 1,
               borderRadius: "default",
-              ":hover": { bg: "border" },
+              ":hover": { bg: "border" }
             }}
             disabled={action.disabled}
           >

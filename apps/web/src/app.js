@@ -106,7 +106,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
       <Flex
         variant="rowFill"
         sx={{
-          overflow: "hidden",
+          overflow: "hidden"
         }}
       >
         <Allotment
@@ -131,7 +131,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
                   toggleNavigationContainer: (state) => {
                     setShow(state || !show);
                   },
-                  isTablet: isNarrow,
+                  isTablet: isNarrow
                 }}
                 fallback={<NavigationLoader />}
               />
@@ -156,7 +156,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             <Flex
               sx={{
                 overflow: "hidden",
-                flex: 1,
+                flex: 1
               }}
               flexDirection="column"
             >
@@ -191,7 +191,7 @@ function MobileAppContents({ isAppLoaded }) {
         scrollBehavior: "smooth",
         WebkitOverflowScrolling: "touch",
         scrollSnapStop: "always",
-        overscrollBehavior: "contain",
+        overscrollBehavior: "contain"
       }}
     >
       <Flex
@@ -199,14 +199,14 @@ function MobileAppContents({ isAppLoaded }) {
         sx={{
           scrollSnapAlign: "start",
           scrollSnapStop: "always",
-          width: [300, 60],
+          width: [300, 60]
         }}
       >
         <SuspenseLoader
           condition={isAppLoaded}
           component={NavigationMenu}
           props={{
-            toggleNavigationContainer: () => {},
+            toggleNavigationContainer: () => {}
           }}
           fallback={<NavigationLoader />}
         />
@@ -218,7 +218,7 @@ function MobileAppContents({ isAppLoaded }) {
         sx={{
           position: "relative",
           scrollSnapAlign: "start",
-          scrollSnapStop: "always",
+          scrollSnapStop: "always"
         }}
         flexShrink={0}
       >
@@ -238,7 +238,7 @@ function MobileAppContents({ isAppLoaded }) {
             zIndex: 999,
             opacity: 0,
             visibility: "visible",
-            pointerEvents: "none",
+            pointerEvents: "none"
           }}
           bg="black"
         />
@@ -248,7 +248,7 @@ function MobileAppContents({ isAppLoaded }) {
         flexShrink={0}
         sx={{
           scrollSnapAlign: "start",
-          scrollSnapStop: "always",
+          scrollSnapStop: "always"
         }}
         flexDirection="column"
       >

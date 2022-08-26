@@ -1,17 +1,17 @@
 import type {
   Attachment,
   AttachmentProgress
-} from '@streetwriters/editor/dist/es/extensions/attachment/index';
-import type { ImageAttributes } from '@streetwriters/editor/dist/es/extensions/image/index';
-import { createRef, RefObject } from 'react';
-import { Platform } from 'react-native';
-import { EdgeInsets } from 'react-native-safe-area-context';
-import WebView from 'react-native-webview';
-import { db } from '../../../common/database';
-import { sleep } from '../../../utils/time';
-import { NoteType } from '../../../utils/types';
-import { Settings } from './types';
-import { getResponse, randId, textInput } from './utils';
+} from "@streetwriters/editor/dist/es/extensions/attachment/index";
+import type { ImageAttributes } from "@streetwriters/editor/dist/es/extensions/image/index";
+import { createRef, RefObject } from "react";
+import { Platform } from "react-native";
+import { EdgeInsets } from "react-native-safe-area-context";
+import WebView from "react-native-webview";
+import { db } from "../../../common/database";
+import { sleep } from "../../../utils/time";
+import { NoteType } from "../../../utils/types";
+import { Settings } from "./types";
+import { getResponse, randId, textInput } from "./utils";
 
 type Action = { job: string; id: string };
 
@@ -19,15 +19,15 @@ async function call(webview: RefObject<WebView | undefined>, action?: Action) {
   if (!webview.current || !action) return;
   setImmediate(() => webview.current?.injectJavaScript(action.job));
   let response = await getResponse(action.id);
-  console.log('webview job: ', action.id, response ? response.value : response);
+  console.log("webview job: ", action.id, response ? response.value : response);
   if (!response) {
-    console.warn('webview job failed', action.id);
+    console.warn("webview job failed", action.id);
   }
   return response ? response.value : response;
 }
 
 const fn = (fn: string) => {
-  let id = randId('fn_');
+  let id = randId("fn_");
   return {
     job: `(async () => {
       try {
@@ -59,7 +59,7 @@ class Commands {
 
   focus = async () => {
     if (!this.ref.current) return;
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       //this.ref.current?.requestFocus();
       setTimeout(async () => {
         if (!this.ref) return;
@@ -92,7 +92,8 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     );
   };
 
-  setSessionId = async (id: string | null) => await this.doAsync(`globalThis.sessionId = "${id}"`);
+  setSessionId = async (id: string | null) =>
+    await this.doAsync(`globalThis.sessionId = "${id}"`);
 
   setStatus = async (date: string | undefined, saved: string) =>
     await this.doAsync(
@@ -109,7 +110,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   };
 
   setInsets = async (insets: EdgeInsets) => {
-    logger.info('setInsets', insets);
+    logger.info("setInsets", insets);
     await this.doAsync(`
       if (typeof safeAreaController !== "undefined") {
         safeAreaController.update(${JSON.stringify(insets)}) 
@@ -125,7 +126,9 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
     };
     await this.doAsync(`
       if (typeof globalThis.settingsController !== "undefined") {
-        globalThis.settingsController.update(${JSON.stringify(this.previousSettings)}) 
+        globalThis.settingsController.update(${JSON.stringify(
+          this.previousSettings
+        )}) 
       }
     `);
   };
@@ -140,7 +143,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
         return;
       }
     }
-    console.log('setSettings', JSON.stringify(settings));
+    console.log("setSettings", JSON.stringify(settings));
     await this.doAsync(`
       if (typeof globalThis.settingsController !== "undefined") {
         globalThis.settingsController.update(${JSON.stringify(settings)}) 
@@ -154,7 +157,9 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
       ? []
       : note.tags
           .map((t: any) =>
-            db.tags?.tag(t) ? { title: db.tags.tag(t).title, alias: db.tags.tag(t).alias } : null
+            db.tags?.tag(t)
+              ? { title: db.tags.tag(t).title, alias: db.tags.tag(t).alias }
+              : null
           )
           .filter((t: any) => t !== null);
     await this.doAsync(`
@@ -173,18 +178,26 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   };
 
   insertAttachment = async (attachment: Attachment) => {
-    await this.doAsync(`editor && editor.commands.insertAttachment(${JSON.stringify(attachment)})`);
+    await this.doAsync(
+      `editor && editor.commands.insertAttachment(${JSON.stringify(
+        attachment
+      )})`
+    );
   };
 
   setAttachmentProgress = async (attachmentProgress: AttachmentProgress) => {
     await this.doAsync(
-      `editor && editor.commands.setAttachmentProgress(${JSON.stringify(attachmentProgress)})`
+      `editor && editor.commands.setAttachmentProgress(${JSON.stringify(
+        attachmentProgress
+      )})`
     );
   };
 
   insertImage = async (image: ImageAttributes) => {
-    console.log('image data', image);
-    await this.doAsync(`editor && editor.commands.insertImage(${JSON.stringify(image)})`);
+    console.log("image data", image);
+    await this.doAsync(
+      `editor && editor.commands.insertImage(${JSON.stringify(image)})`
+    );
   };
 
   updateImage = async ({ src, hash }: ImageAttributes) => {

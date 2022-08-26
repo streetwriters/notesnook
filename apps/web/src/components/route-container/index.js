@@ -16,7 +16,7 @@ function RouteContainer(props) {
     onChange,
     subtitle,
     buttons,
-    component,
+    component
   } = props;
   return (
     <>
@@ -63,7 +63,7 @@ function Header(props) {
                 ml: 0,
                 mr: 4,
                 mt: 1,
-                display: ["block", "none", "none"],
+                display: ["block", "none", "none"]
               }}
               size={30}
             />
@@ -96,7 +96,7 @@ function Header(props) {
                 ml: 2,
                 borderRadius: 100,
                 size: 28,
-                ":hover": { boxShadow: "0px 0px 5px 0px var(--dimPrimary)" },
+                ":hover": { boxShadow: "0px 0px 5px 0px var(--dimPrimary)" }
               }}
               title={createButtonData.title}
               onClick={createButtonData.onClick}
@@ -137,7 +137,7 @@ function RouteTitle({ title, subtitle, isEditable, onChange }) {
           border: "none",
           bg: isEditing ? "bgSecondary" : "transparent",
 
-          ":focus-visible": { outline: "none" },
+          ":focus-visible": { outline: "none" }
         }}
         onDoubleClick={(e) => {
           setIsEditing(isEditable && true);

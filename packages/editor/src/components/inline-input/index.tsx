@@ -19,8 +19,8 @@ export function InlineInput(props: LabelInputProps) {
         borderRadius: "default",
         ":focus-within": {
           outlineColor: "primary",
-          outlineWidth: "1.8px",
-        },
+          outlineWidth: "1.8px"
+        }
       }}
     >
       <Input variant={"clean"} sx={{ ...sx, p: 0 }} {...inputProps} />
@@ -30,7 +30,7 @@ export function InlineInput(props: LabelInputProps) {
           flexShrink: 0,
           color: "fontTertiary",
           borderLeft: "1px solid var(--border)",
-          pl: 1,
+          pl: 1
         }}
       >
         {label}

@@ -87,7 +87,7 @@ import {
   mdiResizeBottomRight,
   mdiImageOutline,
   mdiProgressDownload,
-  mdiProgressAlert,
+  mdiProgressAlert
 } from "@mdi/js";
 
 export const Icons = {
@@ -198,7 +198,7 @@ export const Icons = {
   circle: mdiCircle,
   arrowLeft: mdiArrowLeft,
   resize: mdiResizeBottomRight,
-  none: "",
+  none: ""
 };
 
 export type IconNames = keyof typeof Icons;

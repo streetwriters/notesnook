@@ -46,7 +46,7 @@ export const useEditor = (
 
     if (!editor.current) {
       Object.defineProperty(editor, "current", {
-        get: () => editorRef.current,
+        get: () => editorRef.current
       });
     }
     // if (!editor.executor) {

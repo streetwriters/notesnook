@@ -1,31 +1,35 @@
-import KeepAwake from '@sayem314/react-native-keep-awake';
-import React, { useEffect, useRef, useState } from 'react';
-import { Modal, SafeAreaView, Text, View } from 'react-native';
-import Animated from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Editor from '../../screens/editor';
-import { editorController } from '../../screens/editor/tiptap/utils';
-import { DDS } from '../../services/device-detection';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import Navigation from '../../services/navigation';
-import Sync from '../../services/sync';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { dHeight } from '../../utils';
-import { db } from '../../common/database';
-import { eOnLoadNote, eShowMergeDialog } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { timeConverter } from '../../utils/time';
-import BaseDialog from '../dialog/base-dialog';
-import DialogButtons from '../dialog/dialog-buttons';
-import DialogContainer from '../dialog/dialog-container';
-import DialogHeader from '../dialog/dialog-header';
-import { Button } from '../ui/button';
-import { IconButton } from '../ui/icon-button';
-import Seperator from '../ui/seperator';
-import Paragraph from '../ui/typography/paragraph';
+import KeepAwake from "@sayem314/react-native-keep-awake";
+import React, { useEffect, useRef, useState } from "react";
+import { Modal, SafeAreaView, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Editor from "../../screens/editor";
+import { editorController } from "../../screens/editor/tiptap/utils";
+import { DDS } from "../../services/device-detection";
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import Sync from "../../services/sync";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { dHeight } from "../../utils";
+import { db } from "../../common/database";
+import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { timeConverter } from "../../utils/time";
+import BaseDialog from "../dialog/base-dialog";
+import DialogButtons from "../dialog/dialog-buttons";
+import DialogContainer from "../dialog/dialog-container";
+import DialogHeader from "../dialog/dialog-header";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import Seperator from "../ui/seperator";
+import Paragraph from "../ui/typography/paragraph";
 
 const MergeConflicts = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
   const [keep, setKeep] = useState(null);
   const [copy, setCopy] = useState(null);
@@ -55,7 +59,7 @@ const MergeConflicts = () => {
 
     if (copy) {
       await db.notes.add({
-        title: note.title + ' (Copy)',
+        title: note.title + " (Copy)",
         content: {
           data: copy.data,
           type: copy.type
@@ -63,21 +67,24 @@ const MergeConflicts = () => {
       });
     }
     Navigation.queueRoutesForUpdate(
-      'Notes',
-      'Favorites',
-      'ColoredNotes',
-      'TaggedNotes',
-      'TopicNotes'
+      "Notes",
+      "Favorites",
+      "ColoredNotes",
+      "TaggedNotes",
+      "TopicNotes"
     );
     if (editorController.current?.note?.id === note.id) {
       // reload the note in editor
-      eSendEvent(eOnLoadNote, { ...editorController.current?.note, forced: true });
+      eSendEvent(eOnLoadNote, {
+        ...editorController.current?.note,
+        forced: true
+      });
     }
     close();
     Sync.run();
   };
 
-  const show = async item => {
+  const show = async (item) => {
     let noteContent = await db.content.raw(item.contentId);
     content.current = { ...noteContent };
     if (__DEV__) {
@@ -102,42 +109,59 @@ const MergeConflicts = () => {
     setDialogVisible(false);
   };
 
-  const ConfigBar = ({ isDiscarded, keeping, back, isCurrent, contentToKeep }) => {
+  const ConfigBar = ({
+    isDiscarded,
+    keeping,
+    back,
+    isCurrent,
+    contentToKeep
+  }) => {
     return (
       <View
         style={{
-          width: '100%',
+          width: "100%",
           height: 50,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
           paddingHorizontal: 12,
           paddingLeft: 6
         }}
       >
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
             flexShrink: 1
           }}
         >
-          {back && <IconButton onPress={close} color={colors.pri} name="arrow-left" />}
-          <Paragraph style={{ flexWrap: 'wrap' }} color={colors.icon} size={SIZE.xs}>
-            <Text style={{ color: isCurrent ? colors.accent : colors.red, fontWeight: 'bold' }}>
-              {isCurrent ? '(This Device)' : '(Incoming)'}
+          {back && (
+            <IconButton onPress={close} color={colors.pri} name="arrow-left" />
+          )}
+          <Paragraph
+            style={{ flexWrap: "wrap" }}
+            color={colors.icon}
+            size={SIZE.xs}
+          >
+            <Text
+              style={{
+                color: isCurrent ? colors.accent : colors.red,
+                fontWeight: "bold"
+              }}
+            >
+              {isCurrent ? "(This Device)" : "(Incoming)"}
             </Text>
-            {'\n'}
+            {"\n"}
             {timeConverter(contentToKeep?.dateEdited)}
           </Paragraph>
         </View>
 
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-end'
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "flex-end"
           }}
         >
           {isDiscarded ? (
@@ -187,7 +211,7 @@ const MergeConflicts = () => {
                 }}
                 type="accent"
                 fontSize={SIZE.xs}
-                title={keeping && !isDiscarded ? 'Undo' : 'Keep'}
+                title={keeping && !isDiscarded ? "Undo" : "Keep"}
                 onPress={() => {
                   setKeep(keeping && !isDiscarded ? null : contentToKeep);
                 }}
@@ -208,11 +232,11 @@ const MergeConflicts = () => {
         close();
       }}
       supportedOrientations={[
-        'portrait',
-        'portrait-upside-down',
-        'landscape',
-        'landscape-left',
-        'landscape-right'
+        "portrait",
+        "portrait-upside-down",
+        "landscape",
+        "landscape-left",
+        "landscape-right"
       ]}
       visible={true}
     >
@@ -244,9 +268,9 @@ const MergeConflicts = () => {
 
         <View
           style={{
-            height: '100%',
-            width: '100%',
-            backgroundColor: DDS.isLargeTablet() ? 'rgba(0,0,0,0.3)' : null
+            height: "100%",
+            width: "100%",
+            backgroundColor: DDS.isLargeTablet() ? "rgba(0,0,0,0.3)" : null
           }}
         >
           <ConfigBar
@@ -273,7 +297,7 @@ const MergeConflicts = () => {
               onLoad={() => {
                 const note = db.notes.note(content.current?.noteId)?.data;
                 if (!note) return;
-                eSendEvent(eOnLoadNote + ':conflictPrimary', {
+                eSendEvent(eOnLoadNote + ":conflictPrimary", {
                   ...note,
                   content: {
                     ...content.current,
@@ -307,7 +331,7 @@ const MergeConflicts = () => {
               onLoad={() => {
                 const note = db.notes.note(content.current?.noteId)?.data;
                 if (!note) return;
-                eSendEvent(eOnLoadNote + ':conflictSecondary', {
+                eSendEvent(eOnLoadNote + ":conflictSecondary", {
                   ...note,
                   content: { ...content.current.conflicted, isPreview: true }
                 });

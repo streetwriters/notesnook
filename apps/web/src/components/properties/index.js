@@ -24,24 +24,24 @@ const tools = [
   {
     key: "favorite",
     icon: Icon.StarOutline,
-    label: "Favorite",
+    label: "Favorite"
   },
   { key: "locked", icon: Icon.Unlock, label: "Lock" },
   { key: "readonly", icon: Icon.Readonly, label: "Readonly" },
-  { key: "localOnly", icon: Icon.SyncOff, label: "Disable sync" },
+  { key: "localOnly", icon: Icon.SyncOff, label: "Disable sync" }
 ];
 
 const metadataItems = [
   {
     key: "dateCreated",
     label: "Created at",
-    value: (date) => formatDate(date || Date.now()),
+    value: (date) => formatDate(date || Date.now())
   },
   {
     key: "dateEdited",
     label: "Last edited at",
-    value: (date) => (date ? formatDate(date) : "never"),
-  },
+    value: (date) => (date ? formatDate(date) : "never")
+  }
 ];
 
 function Properties(props) {
@@ -94,13 +94,13 @@ function Properties(props) {
     <>
       <AnimatedFlex
         animate={{
-          x: 0,
+          x: 0
         }}
         transition={{
           duration: 0.3,
           bounceDamping: 1,
           bounceStiffness: 1,
-          ease: "easeOut",
+          ease: "easeOut"
         }}
         initial={{ x: 800 }}
         sx={{
@@ -113,7 +113,7 @@ function Properties(props) {
           borderLeft: "1px solid",
           borderLeftColor: "border",
           overflowY: "hidden",
-          overflowX: "hidden",
+          overflowX: "hidden"
         }}
         flexDirection="column"
         bg="background"
@@ -152,7 +152,7 @@ function Properties(props) {
                 py={2}
                 px={2}
                 sx={{
-                  borderBottom: "1px solid var(--border)",
+                  borderBottom: "1px solid var(--border)"
                 }}
               >
                 <Text variant="body" color="fontTertiary">
@@ -173,7 +173,7 @@ function Properties(props) {
                   py={2}
                   px={2}
                   sx={{
-                    cursor: "pointer",
+                    cursor: "pointer"
                   }}
                   justifyContent="center"
                 >
@@ -185,7 +185,7 @@ function Properties(props) {
                       onClick={() => noteStore.get().setColor(sessionId, label)}
                       sx={{
                         cursor: "pointer",
-                        position: "relative",
+                        position: "relative"
                       }}
                       data-test-id={`properties-${label}`}
                     >
@@ -225,8 +225,8 @@ function Properties(props) {
                       ":last-of-type": { borderBottom: "none" },
                       cursor: "pointer",
                       ":hover": {
-                        bg: "hover",
-                      },
+                        bg: "hover"
+                      }
                     }}
                     flexDirection="column"
                     onClick={() => {
@@ -240,7 +240,7 @@ function Properties(props) {
 
                     <Flex
                       sx={{
-                        flexWrap: "wrap",
+                        flexWrap: "wrap"
                       }}
                       mt={1}
                     >
@@ -287,16 +287,16 @@ function Properties(props) {
           >
             {versionHistory.map((session, index) => {
               const fromDate = formatDate(session.dateCreated, {
-                dateStyle: "short",
+                dateStyle: "short"
               });
               const toDate = formatDate(session.dateModified, {
-                dateStyle: "short",
+                dateStyle: "short"
               });
               const fromTime = formatDate(session.dateCreated, {
-                timeStyle: "short",
+                timeStyle: "short"
               });
               const toTime = formatDate(session.dateModified, {
-                timeStyle: "short",
+                timeStyle: "short"
               });
               const label = `${fromDate}, ${fromTime} — ${
                 fromDate !== toDate ? `${toDate}, ` : ""
@@ -314,8 +314,8 @@ function Properties(props) {
                     cursor: "pointer",
                     bg: isSelected ? "bgSecondary" : "transparent",
                     ":hover": {
-                      bg: "hover",
-                    },
+                      bg: "hover"
+                    }
                   }}
                   justifyContent={"space-between"}
                   alignItems={"center"}
@@ -332,7 +332,7 @@ function Properties(props) {
                           onOpenPreviewSession({
                             content: decryptedContent,
                             dateCreated: session.dateCreated,
-                            dateEdited: session.dateModified,
+                            dateEdited: session.dateModified
                           });
                           return true;
                         } catch (e) {
@@ -343,7 +343,7 @@ function Properties(props) {
                       onOpenPreviewSession({
                         content,
                         dateCreated: session.dateCreated,
-                        dateEdited: session.dateModified,
+                        dateEdited: session.dateModified
                       });
                     }
                   }}
@@ -373,7 +373,7 @@ function Card({ title, subtitle, button, children }) {
     <Flex
       flexDirection="column"
       sx={{
-        borderRadius: "default",
+        borderRadius: "default"
       }}
     >
       <Flex mx={2} mt={2} alignItems="center">

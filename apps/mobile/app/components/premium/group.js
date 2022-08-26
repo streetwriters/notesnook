@@ -1,14 +1,14 @@
-import React from 'react';
-import { ScrollView, View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { SIZE } from '../../utils/size';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import { FeatureBlock } from './feature';
-import { ProTag } from './pro-tag';
+import React from "react";
+import { ScrollView, View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { SIZE } from "../../utils/size";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import { FeatureBlock } from "./feature";
+import { ProTag } from "./pro-tag";
 
 export const Group = ({ item, index }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
 
   return (
     <View
@@ -19,7 +19,10 @@ export const Group = ({ item, index }) => {
       }}
     >
       {item?.pro ? (
-        <ProTag size={SIZE.sm} background={index % 2 === 0 ? colors.bg : colors.nav} />
+        <ProTag
+          size={SIZE.sm}
+          background={index % 2 === 0 ? colors.bg : colors.nav}
+        />
       ) : null}
       <Heading>{item.title}</Heading>
       <Paragraph size={SIZE.md}>{item.detail}</Paragraph>
@@ -32,7 +35,7 @@ export const Group = ({ item, index }) => {
           horizontal
           showsHorizontalScrollIndicator={false}
         >
-          {item.features?.map(item => (
+          {item.features?.map((item) => (
             <FeatureBlock
               key={item.detail}
               {...item}

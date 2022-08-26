@@ -1,5 +1,5 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 
 type NavigationFocus = {
   onFocus?: (prev: RefObject<boolean>) => boolean;
@@ -19,7 +19,7 @@ export const useNavigationFocus = (
   const _onFocus = useCallback(() => {
     setTimeout(
       () => {
-        console.log('on focus', prev);
+        console.log("on focus", prev);
         let shouldFocus = onFocus ? onFocus(prev) : true;
         if (shouldFocus) {
           setFocused(true);
@@ -45,11 +45,11 @@ export const useNavigationFocus = (
   useEffect(() => {
     if (!navigation) return;
     const subs = [
-      navigation.addListener('focus', _onFocus),
-      navigation.addListener('blur', _onBlur)
+      navigation.addListener("focus", _onFocus),
+      navigation.addListener("blur", _onBlur)
     ];
     return () => {
-      subs.forEach(sub => sub());
+      subs.forEach((sub) => sub());
     };
   }, [navigation]);
 

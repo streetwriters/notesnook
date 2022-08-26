@@ -6,7 +6,7 @@ import ListItem from "../list-item";
 import {
   confirm,
   showError,
-  showMoveNoteDialog,
+  showMoveNoteDialog
 } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
@@ -61,11 +61,11 @@ function Note(props) {
       colors={{
         primary,
         text: note.color ? primary : "text",
-        background: isOpened ? "bgSecondary" : "background",
+        background: isOpened ? "bgSecondary" : "background"
       }}
       menu={{
         items: context?.type === "topic" ? topicNoteMenuItems : menuItems,
-        extraData: { note, context },
+        extraData: { note, context }
       }}
       onClick={() => {
         if (note.conflicted) {
@@ -83,8 +83,8 @@ function Note(props) {
               container: {
                 alignSelf: "flex-start",
                 justifySelf: "flex-start",
-                mb: 1,
-              },
+                mb: 1
+              }
             }}
             onClick={() => {
               navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
@@ -99,7 +99,7 @@ function Note(props) {
           alignItems="center"
           sx={{
             fontSize: "subBody",
-            color: isOpened ? "bgSecondaryText" : "fontTertiary",
+            color: isOpened ? "bgSecondaryText" : "fontTertiary"
           }}
         >
           {isCompact ? (
@@ -184,7 +184,7 @@ function Note(props) {
                     sx={{
                       maxWidth: `calc(100% / ${tags.length})`,
                       overflow: "hidden",
-                      textOverflow: "ellipsis",
+                      textOverflow: "ellipsis"
                     }}
                   >
                     #{tag.alias}
@@ -233,26 +233,26 @@ const formats = [
     title: "PDF",
     icon: Icon.PDF,
     subtitle:
-      "Can be opened in any PDF reader like Adobe Acrobat or Foxit Reader.",
+      "Can be opened in any PDF reader like Adobe Acrobat or Foxit Reader."
   },
   {
     type: "md",
     title: "Markdown",
     icon: Icon.Markdown,
-    subtitle: "Can be opened in any plain-text or markdown editor.",
+    subtitle: "Can be opened in any plain-text or markdown editor."
   },
   {
     type: "html",
     title: "HTML",
     icon: Icon.HTML,
-    subtitle: "Can be opened in any web browser like Google Chrome.",
+    subtitle: "Can be opened in any web browser like Google Chrome."
   },
   {
     type: "txt",
     title: "Text",
     icon: Icon.Text,
-    subtitle: "Can be opened in any plain-text editor.",
-  },
+    subtitle: "Can be opened in any plain-text editor."
+  }
 ];
 
 const notFullySyncedText =
@@ -264,13 +264,13 @@ const menuItems = [
     icon: Icon.Pin,
     onClick: async ({ note }) => {
       await pin(note);
-    },
+    }
   },
   {
     key: "favorite",
     title: ({ note }) => (note.favorite ? "Unfavorite" : "Favorite"),
     icon: Icon.StarOutline,
-    onClick: ({ note }) => store.favorite(note.id),
+    onClick: ({ note }) => store.favorite(note.id)
   },
   {
     key: "addtonotebook",
@@ -279,13 +279,13 @@ const menuItems = [
     onClick: async ({ items }) => {
       await showMoveNoteDialog(items.map((i) => i.id));
     },
-    multiSelect: true,
+    multiSelect: true
   },
   {
     key: "colors",
     title: "Assign color",
     icon: Icon.Colors,
-    items: colorsToMenuItems(),
+    items: colorsToMenuItems()
   },
   {
     key: "publish",
@@ -301,7 +301,7 @@ const menuItems = [
       const isPublished = db.monographs.isPublished(note.id);
       if (isPublished) await db.monographs.unpublish(note.id);
       else await showPublishView(note.id, "bottom");
-    },
+    }
   },
   {
     key: "export",
@@ -325,10 +325,10 @@ const menuItems = [
           format.type,
           items.map((i) => i.id)
         );
-      },
+      }
     })),
     multiSelect: true,
-    isPro: true,
+    isPro: true
   },
   {
     key: "duplicate",
@@ -345,12 +345,12 @@ const menuItems = [
           title: "Open duplicated note?",
           message: "Do you want to open the duplicated note?",
           noText: "No",
-          yesText: "Yes",
+          yesText: "Yes"
         })
       ) {
         hashNavigate(`/notes/${id}/edit`, { replace: true });
       }
-    },
+    }
   },
   {
     key: "lock",
@@ -368,7 +368,7 @@ const menuItems = [
           showToast("success", "Note unlocked successfully!");
       }
     },
-    isPro: true,
+    isPro: true
   },
   {
     key: "sync-disable",
@@ -385,11 +385,11 @@ const menuItems = [
           message:
             "Turning sync off for this item will automatically delete it from all other devices. Are you sure you want to continue?",
           yesText: "Yes",
-          noText: "No",
+          noText: "No"
         }))
       )
         await store.get().localOnly(note.id);
-    },
+    }
   },
   {
     key: "movetotrash",
@@ -412,8 +412,8 @@ const menuItems = [
     onClick: async ({ items }) => {
       await Multiselect.moveNotesToTrash(items, items.length > 1);
     },
-    multiSelect: true,
-  },
+    multiSelect: true
+  }
 ];
 
 const topicNoteMenuItems = [
@@ -442,8 +442,8 @@ const topicNoteMenuItems = [
         showToast("error", `Failed to remove note from topic: ${e.message}.`);
       }
     },
-    multiSelect: true,
-  },
+    multiSelect: true
+  }
 ];
 
 function colorsToMenuItems() {
@@ -460,7 +460,7 @@ function colorsToMenuItems() {
       onClick: ({ note }) => {
         const { id } = note;
         store.setColor(id, lowercase);
-      },
+      }
     };
   });
 }

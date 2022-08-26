@@ -19,7 +19,7 @@ export async function downloadImage(url: string) {
     blob,
     url: URL.createObjectURL(blob),
     type: contentType,
-    size,
+    size
   };
 }
 

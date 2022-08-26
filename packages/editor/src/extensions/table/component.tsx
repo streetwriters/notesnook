@@ -1,7 +1,7 @@
 import { Flex } from "rebass";
 import {
   SelectionBasedNodeView,
-  SelectionBasedReactNodeViewProps,
+  SelectionBasedReactNodeViewProps
 } from "../react";
 import { Node as ProsemirrorNode } from "prosemirror-model";
 import { Editor } from "../../types";
@@ -12,7 +12,7 @@ import {
   InsertColumnRight,
   InsertRowBelow,
   RowProperties,
-  TableProperties,
+  TableProperties
 } from "../../toolbar/tools/table";
 import { getToolDefinition } from "../../toolbar/tool-definitions";
 import { getPosition } from "../../utils/position";
@@ -79,7 +79,7 @@ export function TableNodeView(editor: Editor) {
             const dom = document.createElement("div");
             dom.style.position = "relative";
             return dom;
-          },
+          }
         }
       );
       super.init();
@@ -110,7 +110,7 @@ function TableRowToolbar(props: TableToolbarProps) {
       target: currentRow,
       align: "start",
       xOffset: -5,
-      yOffset: -3,
+      yOffset: -3
     });
     rowToolsRef.current.style.top = `${pos.top}px`;
     rowToolsRef.current.style.left = `${pos.left}px`;
@@ -129,8 +129,8 @@ function TableRowToolbar(props: TableToolbarProps) {
         borderRadius: "default",
         opacity: 0.3,
         ":hover": {
-          opacity: 1,
-        },
+          opacity: 1
+        }
       }}
     >
       <RowProperties
@@ -158,7 +158,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
 
     const currentCell = findSelectedDOMNode(editor, [
       "tableCell",
-      "tableHeader",
+      "tableHeader"
     ]);
     if (!currentCell) return;
 
@@ -168,7 +168,7 @@ function TableColumnToolbar(props: TableToolbarProps) {
       align: "center",
       target: currentCell as HTMLElement,
       yAnchor: table,
-      yOffset: 2,
+      yOffset: 2
     });
 
     columnToolsRef.current.style.left = `${pos.left}px`;
@@ -188,8 +188,8 @@ function TableColumnToolbar(props: TableToolbarProps) {
         borderRadius: "default",
         opacity: 0.3,
         ":hover": {
-          opacity: 1,
-        },
+          opacity: 1
+        }
       }}
     >
       <TableProperties

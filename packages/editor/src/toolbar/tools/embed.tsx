@@ -106,7 +106,7 @@ export function EmbedProperties(props: ToolProps) {
           align: "start",
           location: "below",
           yOffset: 10,
-          isTargetAbsolute: true,
+          isTargetAbsolute: true
         }}
       >
         <EmbedPopup

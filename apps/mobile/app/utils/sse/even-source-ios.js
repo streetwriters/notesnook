@@ -22,9 +22,9 @@
  * @format
  *
  */
-'use strict';
-import _reactNative from 'react-native';
-import _eventTargetShim from 'event-target-shim';
+"use strict";
+import _reactNative from "react-native";
+import _eventTargetShim from "event-target-shim";
 
 function _defineProperty(obj, key, value) {
   if (key in obj) {
@@ -40,7 +40,7 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-const EVENT_SOURCE_EVENTS = ['error', 'message', 'open', 'connection-error']; // char codes
+const EVENT_SOURCE_EVENTS = ["error", "message", "open", "connection-error"]; // char codes
 
 const bom = [239, 187, 191]; // byte order mark
 
@@ -55,7 +55,9 @@ const reTrim = /^(\s|\u00A0)+|(\s|\u00A0)+$/g;
  *     https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events
  */
 
-class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) {
+class EventSource extends (0, _eventTargetShim.default)(
+  ...EVENT_SOURCE_EVENTS
+) {
   // Properties
   // Default, retry over a minute per 2.5s.
   // Buffers for event stream parsing
@@ -76,55 +78,55 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
   constructor(url, eventSourceInitDict) {
     super();
 
-    _defineProperty(this, 'readyState', EventSource.CONNECTING);
+    _defineProperty(this, "readyState", EventSource.CONNECTING);
 
-    _defineProperty(this, 'withCredentials', false);
+    _defineProperty(this, "withCredentials", false);
 
-    _defineProperty(this, 'maxRetryEvents', 24);
+    _defineProperty(this, "maxRetryEvents", 24);
 
-    _defineProperty(this, 'reconnectIntervalMs', 2500);
+    _defineProperty(this, "reconnectIntervalMs", 2500);
 
-    _defineProperty(this, '_isFirstChunk', false);
+    _defineProperty(this, "_isFirstChunk", false);
 
-    _defineProperty(this, '_discardNextLineFeed', false);
+    _defineProperty(this, "_discardNextLineFeed", false);
 
-    _defineProperty(this, '_lineBuf', '');
+    _defineProperty(this, "_lineBuf", "");
 
-    _defineProperty(this, '_dataBuf', '');
+    _defineProperty(this, "_dataBuf", "");
 
-    _defineProperty(this, '_eventTypeBuf', '');
+    _defineProperty(this, "_eventTypeBuf", "");
 
-    _defineProperty(this, '_lastEventIdBuf', '');
+    _defineProperty(this, "_lastEventIdBuf", "");
 
-    _defineProperty(this, '_headers', {});
+    _defineProperty(this, "_headers", {});
 
-    _defineProperty(this, '_lastEventId', '');
+    _defineProperty(this, "_lastEventId", "");
 
-    _defineProperty(this, '_trackingName', 'unknown');
+    _defineProperty(this, "_trackingName", "unknown");
 
-    _defineProperty(this, '_retryAttempts', 0);
+    _defineProperty(this, "_retryAttempts", 0);
 
     if (!url) {
-      throw new Error('Cannot open an SSE stream on an empty url');
+      throw new Error("Cannot open an SSE stream on an empty url");
     }
 
     this.url = url;
-    this._headers['Cache-Control'] = 'no-cache';
-    this._headers.Accept = 'text/event-stream';
+    this._headers["Cache-Control"] = "no-cache";
+    this._headers.Accept = "text/event-stream";
 
     if (this._lastEventId) {
-      this._headers['Last-Event-ID'] = this._lastEventId;
+      this._headers["Last-Event-ID"] = this._lastEventId;
     } // This is an upsetting hack that appears to only show on Android even though it is HIGHLY not recommended.
 
-    if (_reactNative.Platform.OS === 'android') {
-      this._headers['X-Requested-With'] = 'XMLHttpRequest';
+    if (_reactNative.Platform.OS === "android") {
+      this._headers["X-Requested-With"] = "XMLHttpRequest";
     }
 
     if (eventSourceInitDict) {
       if (eventSourceInitDict.headers) {
-        if (eventSourceInitDict.headers['Last-Event-ID']) {
-          this._lastEventId = eventSourceInitDict.headers['Last-Event-ID'];
-          delete eventSourceInitDict.headers['Last-Event-ID'];
+        if (eventSourceInitDict.headers["Last-Event-ID"]) {
+          this._lastEventId = eventSourceInitDict.headers["Last-Event-ID"];
+          delete eventSourceInitDict.headers["Last-Event-ID"];
         }
 
         for (var headerKey in eventSourceInitDict.headers) {
@@ -137,8 +139,8 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
       }
 
       if (eventSourceInitDict.disableAndroidXRequestedWith) {
-        if (_reactNative.Platform.OS === 'android') {
-          delete this._headers['X-Requested-With'];
+        if (_reactNative.Platform.OS === "android") {
+          delete this._headers["X-Requested-With"];
         }
       }
 
@@ -148,11 +150,13 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
 
       if (eventSourceInitDict.reconnectOptions) {
         if (eventSourceInitDict.reconnectOptions.reconnectIntervalMs) {
-          this.reconnectIntervalMs = eventSourceInitDict.reconnectOptions.reconnectIntervalMs;
+          this.reconnectIntervalMs =
+            eventSourceInitDict.reconnectOptions.reconnectIntervalMs;
         }
 
         if (eventSourceInitDict.reconnectOptions.maxRetryEvents) {
-          this.maxRetryEvents = eventSourceInitDict.reconnectOptions.maxRetryEvents;
+          this.maxRetryEvents =
+            eventSourceInitDict.reconnectOptions.maxRetryEvents;
         }
       }
     }
@@ -160,20 +164,22 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
     this._subscriptions = [];
 
     this._subscriptions.push(
-      _reactNative.Networking.addListener('didReceiveNetworkResponse', args =>
+      _reactNative.Networking.addListener("didReceiveNetworkResponse", (args) =>
         this.__didReceiveResponse(...args)
       )
     );
 
     this._subscriptions.push(
-      _reactNative.Networking.addListener('didReceiveNetworkIncrementalData', args =>
-        this.__didReceiveIncrementalData(...args)
+      _reactNative.Networking.addListener(
+        "didReceiveNetworkIncrementalData",
+        (args) => this.__didReceiveIncrementalData(...args)
       )
     );
 
     this._subscriptions.push(
-      _reactNative.Networking.addListener('didCompleteNetworkResponse', args =>
-        this.__didCompleteResponse(...args)
+      _reactNative.Networking.addListener(
+        "didCompleteNetworkResponse",
+        (args) => this.__didCompleteResponse(...args)
       )
     );
 
@@ -185,7 +191,7 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
       _reactNative.Networking.abortRequest(this._requestId);
     } // clean up Networking subscriptions
 
-    (this._subscriptions || []).forEach(sub => {
+    (this._subscriptions || []).forEach((sub) => {
       if (sub) {
         sub.remove();
       }
@@ -193,7 +199,7 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
     this._subscriptions = [];
     this.readyState = EventSource.CLOSED;
     this.dispatchEvent({
-      type: 'close'
+      type: "close"
     });
   }
 
@@ -204,16 +210,16 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
     }
 
     if (this._lastEventId) {
-      this._headers['Last-Event-ID'] = this._lastEventId;
+      this._headers["Last-Event-ID"] = this._lastEventId;
     }
 
     _reactNative.Networking.sendRequest(
-      'GET', // EventSource always GETs the resource
+      "GET", // EventSource always GETs the resource
       this._trackingName,
       this.url,
       this._headers,
-      '', // body for EventSource request is always empty
-      'text', // SSE is a text protocol
+      "", // body for EventSource request is always empty
+      "text", // SSE is a text protocol
       true, // we want incremental events
       0, // there is no timeout defined in the WHATWG spec for EventSource
       this.__didCreateRequest.bind(this),
@@ -223,14 +229,14 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
 
   __reconnect(reason) {
     this.readyState = EventSource.CONNECTING;
-    let errorEventMessage = 'reestablishing connection';
+    let errorEventMessage = "reestablishing connection";
 
     if (reason) {
-      errorEventMessage += ': ' + reason;
+      errorEventMessage += ": " + reason;
     }
 
     this.dispatchEvent({
-      type: 'error',
+      type: "error",
       data: errorEventMessage
     });
 
@@ -286,15 +292,15 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
   __processEventStreamLine() {
     const line = this._lineBuf; // clear the line buffer
 
-    this._lineBuf = ''; // Dispatch the buffered event if this is an empty line
+    this._lineBuf = ""; // Dispatch the buffered event if this is an empty line
 
-    if (line === '') {
+    if (line === "") {
       this.__dispatchBufferedEvent();
 
       return;
     }
 
-    const colonPos = line.indexOf(':');
+    const colonPos = line.indexOf(":");
     let field;
     let value;
 
@@ -302,7 +308,7 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
       // this is a comment line and should be ignored
       return;
     } else if (colonPos > 0) {
-      if (line[colonPos + 1] === ' ') {
+      if (line[colonPos + 1] === " ") {
         field = line.slice(0, colonPos);
         value = line.slice(colonPos + 2); // ignores the first space from the value
       } else {
@@ -311,27 +317,27 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
       }
     } else {
       field = line;
-      value = '';
+      value = "";
     }
 
     switch (field) {
-      case 'event':
+      case "event":
         // Set the type of this event
         this._eventTypeBuf = value;
         break;
 
-      case 'data':
+      case "data":
         // Append the line to the data buffer along with an LF (U+000A)
         this._dataBuf += value;
         this._dataBuf += String.fromCodePoint(lf);
         break;
 
-      case 'id':
+      case "id":
         // Update the last seen event id
         this._lastEventIdBuf = value;
         break;
 
-      case 'retry':
+      case "retry":
         // Set a new reconnect interval value
         // But I don't like this.
 
@@ -352,12 +358,12 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
     this._lastEventId = this._lastEventIdBuf; // If the data buffer is an empty string, set the event type buffer to
     // empty string and return
 
-    if (this._dataBuf === '') {
-      this._eventTypeBuf = '';
+    if (this._dataBuf === "") {
+      this._eventTypeBuf = "";
       return;
     } // Dispatch the event
 
-    const eventType = this._eventTypeBuf || 'message';
+    const eventType = this._eventTypeBuf || "message";
     this.dispatchEvent({
       type: eventType,
       data: this._dataBuf.slice(0, -1),
@@ -366,8 +372,8 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
       lastEventId: this._lastEventId
     }); // Reset the data and event type buffers
 
-    this._dataBuf = '';
-    this._eventTypeBuf = '';
+    this._dataBuf = "";
+    this._eventTypeBuf = "";
   } // Networking callbacks, exposed for testing
 
   __didCreateRequest(requestId) {
@@ -401,8 +407,8 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
         return;
       } else {
         this.dispatchEvent({
-          type: 'error',
-          data: 'got redirect with no location'
+          type: "error",
+          data: "got redirect with no location"
         });
         return this.close();
       }
@@ -410,22 +416,27 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
 
     if (status !== 200) {
       this.dispatchEvent({
-        type: 'error',
-        data: 'unexpected HTTP status ' + status
+        type: "error",
+        data: "unexpected HTTP status " + status
       });
       return this.close();
     }
 
-    if (responseHeaders && responseHeaders['content-type'] !== 'text/event-stream') {
+    if (
+      responseHeaders &&
+      responseHeaders["content-type"] !== "text/event-stream"
+    ) {
       this.dispatchEvent({
-        type: 'error',
-        data: 'unsupported MIME type in response: ' + responseHeaders['content-type']
+        type: "error",
+        data:
+          "unsupported MIME type in response: " +
+          responseHeaders["content-type"]
       });
       return this.close();
     } else if (!responseHeaders) {
       this.dispatchEvent({
-        type: 'error',
-        data: 'no MIME type in response'
+        type: "error",
+        data: "no MIME type in response"
       });
       return this.close();
     } // reset the connection retry attempt counter
@@ -434,13 +445,13 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
 
     this._isFirstChunk = false;
     this._discardNextLineFeed = false;
-    this._lineBuf = '';
-    this._dataBuf = '';
-    this._eventTypeBuf = '';
-    this._lastEventIdBuf = '';
+    this._lineBuf = "";
+    this._dataBuf = "";
+    this._eventTypeBuf = "";
+    this._lastEventIdBuf = "";
     this.readyState = EventSource.OPEN;
     this.dispatchEvent({
-      type: 'open'
+      type: "open"
     });
   }
 
@@ -473,22 +484,22 @@ class EventSource extends (0, _eventTargetShim.default)(...EVENT_SOURCE_EVENTS) 
       this.__reconnect(error);
     } else {
       this.dispatchEvent({
-        type: 'error',
-        data: 'could not reconnect after ' + this.maxRetryAttempts + ' attempts'
+        type: "error",
+        data: "could not reconnect after " + this.maxRetryAttempts + " attempts"
       });
       this.close();
     }
   }
 }
 
-_defineProperty(EventSource, 'CONNECTING', 0);
+_defineProperty(EventSource, "CONNECTING", 0);
 
-_defineProperty(EventSource, 'OPEN', 1);
+_defineProperty(EventSource, "OPEN", 1);
 
-_defineProperty(EventSource, 'CLOSED', 2);
+_defineProperty(EventSource, "CLOSED", 2);
 
-_defineProperty(EventSource, 'XMLHTTP_LOADING', 3);
+_defineProperty(EventSource, "XMLHTTP_LOADING", 3);
 
-_defineProperty(EventSource, 'XMLHTTP_DONE', 4);
+_defineProperty(EventSource, "XMLHTTP_DONE", 4);
 
 export default EventSource;

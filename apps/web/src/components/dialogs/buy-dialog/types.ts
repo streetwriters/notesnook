@@ -50,7 +50,7 @@ export enum PaddleEvents {
   /**  User has selected "Change Payment Method" when on the payment screen  **/
   "Checkout.PaymentMethodChange" = "Checkout.PaymentMethodChange",
   /**  User has selected "Change Payment Method" when on the Wire Transfer screen  **/
-  "Checkout.WireTransfer.PaymentMethodChange" = "Checkout.WireTransfer.PaymentMethodChange",
+  "Checkout.WireTransfer.PaymentMethodChange" = "Checkout.WireTransfer.PaymentMethodChange"
 }
 
 export interface CallbackData {

@@ -1,19 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { editorState } from '../../screens/editor/tiptap/utils';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import { Button } from '../ui/button';
-import SheetWrapper from '../ui/sheet';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
+import React, { useEffect, useRef, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { editorState } from "../../screens/editor/tiptap/utils";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { eCloseProgressDialog, eOpenProgressDialog } from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import { Button } from "../ui/button";
+import SheetWrapper from "../ui/sheet";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
 
-const SheetProvider = ({ context = 'global' }) => {
-  const colors = useThemeStore(state => state.colors);
+const SheetProvider = ({ context = "global" }) => {
+  const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState(null);
   const actionSheetRef = useRef();
@@ -30,8 +33,8 @@ const SheetProvider = ({ context = 'global' }) => {
     };
   }, [visible]);
 
-  const open = async data => {
-    if (!data.context) data.context = 'global';
+  const open = async (data) => {
+    if (!data.context) data.context = "global";
     if (data.context !== context) return;
     if (visible || dialogData) {
       setDialogData(null);
@@ -65,8 +68,8 @@ const SheetProvider = ({ context = 'global' }) => {
     })();
   }, [visible, dialogData]);
 
-  const close = ctx => {
-    if (!ctx) ctx = 'global';
+  const close = (ctx) => {
+    if (!ctx) ctx = "global";
     if (ctx !== context) return;
     actionSheetRef.current?.setModalVisible(false);
   };
@@ -75,7 +78,9 @@ const SheetProvider = ({ context = 'global' }) => {
     <SheetWrapper
       fwdRef={actionSheetRef}
       gestureEnabled={!dialogData?.progress && !dialogData?.disableClosing}
-      closeOnTouchBackdrop={!dialogData?.progress && !dialogData?.disableClosing}
+      closeOnTouchBackdrop={
+        !dialogData?.progress && !dialogData?.disableClosing
+      }
       onClose={() => {
         dialogData.onClose && dialogData.onClose();
         setVisible(false);
@@ -84,10 +89,13 @@ const SheetProvider = ({ context = 'global' }) => {
     >
       <View
         style={{
-          justifyContent: 'center',
-          alignItems: 'center',
+          justifyContent: "center",
+          alignItems: "center",
           marginBottom:
-            !dialogData.progress && !dialogData.icon && !dialogData.title && !dialogData.paragraph
+            !dialogData.progress &&
+            !dialogData.icon &&
+            !dialogData.title &&
+            !dialogData.paragraph
               ? 0
               : 10,
           paddingHorizontal: 12
@@ -114,11 +122,13 @@ const SheetProvider = ({ context = 'global' }) => {
         {dialogData?.title ? <Heading> {dialogData?.title}</Heading> : null}
 
         {dialogData?.paragraph ? (
-          <Paragraph style={{ textAlign: 'center' }}>{dialogData?.paragraph}</Paragraph>
+          <Paragraph style={{ textAlign: "center" }}>
+            {dialogData?.paragraph}
+          </Paragraph>
         ) : null}
       </View>
 
-      {typeof dialogData.component === 'function'
+      {typeof dialogData.component === "function"
         ? dialogData.component(actionSheetRef, close)
         : dialogData.component}
 
@@ -129,18 +139,18 @@ const SheetProvider = ({ context = 'global' }) => {
         }}
       >
         {dialogData.valueArray &&
-          dialogData.valueArray.map(v => (
+          dialogData.valueArray.map((v) => (
             <Button
               title={v}
               type="gray"
               key={v}
-              textStyle={{ fontWeight: 'normal' }}
+              textStyle={{ fontWeight: "normal" }}
               fontSize={SIZE.sm}
               icon="check"
               width="100%"
               style={{
-                justifyContent: 'flex-start',
-                backgroundColor: 'transparent'
+                justifyContent: "flex-start",
+                backgroundColor: "transparent"
               }}
             />
           ))}
@@ -156,7 +166,7 @@ const SheetProvider = ({ context = 'global' }) => {
             onPress={dialogData.action}
             key={dialogData.actionText}
             title={dialogData.actionText}
-            accentColor={dialogData.iconColor || 'accent'}
+            accentColor={dialogData.iconColor || "accent"}
             accentText="light"
             type="accent"
             height={50}
@@ -172,7 +182,7 @@ const SheetProvider = ({ context = 'global' }) => {
               key={item.accentText}
               title={item.actionText}
               icon={item.icon && item.icon}
-              type={item.type || 'accent'}
+              type={item.type || "accent"}
               height={50}
               style={{
                 marginBottom: 10
@@ -185,15 +195,19 @@ const SheetProvider = ({ context = 'global' }) => {
         {dialogData?.learnMore ? (
           <Paragraph
             style={{
-              alignSelf: 'center',
+              alignSelf: "center",
               marginTop: 10,
-              textDecorationLine: 'underline'
+              textDecorationLine: "underline"
             }}
             size={SIZE.xs}
             onPress={dialogData.learnMorePress}
             color={colors.icon}
           >
-            <Icon color={colors.icon} name="information-outline" size={SIZE.xs} />{' '}
+            <Icon
+              color={colors.icon}
+              name="information-outline"
+              size={SIZE.xs}
+            />{" "}
             {dialogData.learnMore}
           </Paragraph>
         ) : null}

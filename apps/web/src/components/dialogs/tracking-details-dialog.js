@@ -16,7 +16,7 @@ function TrackingDetailsDialog(props) {
       onClose={props.onClose}
       positiveButton={{
         text: "Okay",
-        onClick: props.onClose,
+        onClick: props.onClose
       }}
     >
       <Box overflowY="auto">

@@ -9,7 +9,7 @@ import {
   MFAEmail,
   MFARecoveryCode,
   ArrowRight,
-  Logout,
+  Logout
 } from "../components/icons";
 import Field from "../components/field";
 import { getQueryParams, hardNavigate, makeURL } from "../navigation";
@@ -121,7 +121,7 @@ const routePaths: Record<AuthRoutes, string> = {
   sessionExpiry: "/sessionexpired",
   signup: "/signup",
   "mfa:code": "/mfa/code",
-  "mfa:select": "/mfa/select",
+  "mfa:select": "/mfa/select"
 };
 
 function Auth(props: AuthProps) {
@@ -141,7 +141,7 @@ function Auth(props: AuthProps) {
         sx={{
           zIndex: 1,
           flex: 1,
-          overflowY: "auto",
+          overflowY: "auto"
         }}
       >
         {route === "login" || route === "signup" || route === "recover" ? (
@@ -151,7 +151,7 @@ function Auth(props: AuthProps) {
               mt: 2,
               mr: 2,
               alignSelf: "end",
-              alignItems: "center",
+              alignItems: "center"
             }}
             variant={"secondary"}
             onClick={() => {
@@ -171,7 +171,7 @@ function Auth(props: AuthProps) {
                 mt: 2,
                 mr: 2,
                 alignSelf: "end",
-                alignItems: "center",
+                alignItems: "center"
               }}
               onClick={async () => {
                 await db.user?.logout();
@@ -216,7 +216,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
       }
       loading={{
         title: "Logging you in",
-        subtitle: "Please wait while you are authenticated.",
+        subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={(form) => login(form, navigate)}
     >
@@ -275,7 +275,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
       }
       loading={{
         title: "Creating your account",
-        subtitle: "Please wait while we finalize your account.",
+        subtitle: "Please wait while we finalize your account."
       }}
       onSubmit={async (form) => {
         if (form.password !== form["confirm-password"]) {
@@ -379,7 +379,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       }
       loading={{
         title: "Logging you in",
-        subtitle: "Please wait while you are authenticated.",
+        subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
         if (!user) return;
@@ -438,7 +438,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
       }
       loading={{
         title: "Sending recovery email",
-        subtitle: "Please wait while we send you recovery instructions.",
+        subtitle: "Please wait while we send you recovery instructions."
       }}
       onSubmit={async (form) => {
         if (!form.email) {
@@ -500,14 +500,14 @@ function getTexts(formData: MFAFormData) {
         "Please confirm your identity by entering the authentication code from your authenticator app.",
       instructions: `Open the two-factor authentication (TOTP) app to view your authentication code.`,
       selector: `Don't have access to your authenticator app?`,
-      label: "Enter 6-digit code",
+      label: "Enter 6-digit code"
     },
     email: {
       subtitle:
         "Please confirm your identity by entering the authentication code sent to your email address.",
       instructions: `It may take a minute to receive your code.`,
       selector: `Don't have access to your email address?`,
-      label: "Enter 6-digit code",
+      label: "Enter 6-digit code"
     },
     sms: {
       subtitle: `Please confirm your identity by entering the authentication code sent to ${
@@ -515,14 +515,14 @@ function getTexts(formData: MFAFormData) {
       }.`,
       instructions: `It may take a minute to receive your code.`,
       selector: `Don't have access to your phone number?`,
-      label: "Enter 6-digit code",
+      label: "Enter 6-digit code"
     },
     recoveryCode: {
       subtitle: `Please confirm your identity by entering a recovery code.`,
       instructions: "",
       selector: `Don't have your recovery codes?`,
-      label: "Enter recovery code",
-    },
+      label: "Enter recovery code"
+    }
   };
 }
 
@@ -580,14 +580,14 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       subtitle={texts.subtitle}
       loading={{
         title: "Logging you in",
-        subtitle: "Please wait while you are authenticated.",
+        subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
         const loginForm: MFALoginFormData = {
           email: formData.email,
           password: formData.password,
           code: form.code,
-          method: formData.selectedMethod,
+          method: formData.selectedMethod
         };
         await login(loginForm, navigate);
       }}
@@ -618,7 +618,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
                 ),
                 onClick: async () => {
                   await sendCode(selectedMethod, token);
-                },
+                }
               }
             : undefined
         }
@@ -651,7 +651,7 @@ const MFAMethods: MFAMethod[] = [
   { type: "app", title: "Use an authenticator app", icon: MFAAuthenticator },
   { type: "sms", title: "Send code to your phone number", icon: MFASMS },
   { type: "email", title: "Send code to your email address", icon: MFAEmail },
-  { type: "recoveryCode", title: "Use a recovery code", icon: MFARecoveryCode },
+  { type: "recoveryCode", title: "Use a recovery code", icon: MFARecoveryCode }
 ];
 function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
   const { navigate, formData } = props;
@@ -678,7 +678,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
       subtitle={`Where should we send you the authentication code?`}
       loading={{
         title: "Logging you in",
-        subtitle: "Please wait while you are authenticated.",
+        subtitle: "Please wait while you are authenticated."
       }}
       onSubmit={async (form) => {
         const selectedType = MFAMethods[selected];
@@ -700,7 +700,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
                 alignSelf: "stretch",
                 alignItems: "center",
                 textAlign: "left",
-                px: 2,
+                px: 2
               }}
               onClick={() => setSelected(index)}
             >
@@ -710,7 +710,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
                   borderRadius: 100,
                   width: 35,
                   height: 35,
-                  mr: 2,
+                  mr: 2
                 }}
                 size={16}
                 color={selected === index ? "primary" : "text"}
@@ -826,7 +826,7 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
         sx={{
           textDecoration: "underline",
           ":hover": { color: "dimPrimary" },
-          cursor: "pointer",
+          cursor: "pointer"
         }}
         as="b"
         color="text"
@@ -881,8 +881,8 @@ export function AuthField(props: AuthFieldProps) {
           p: "12px",
           borderRadius: "default",
           bg: "background",
-          boxShadow: "0px 0px 5px 0px #00000019",
-        },
+          boxShadow: "0px 0px 5px 0px #00000019"
+        }
       }}
     />
   );
@@ -938,7 +938,7 @@ async function login(
         selectedMethod: primaryMethod,
         primaryMethod,
         phoneNumber,
-        secondaryMethod,
+        secondaryMethod
       });
     } else throw e;
   }

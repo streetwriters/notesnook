@@ -16,13 +16,13 @@ export const Table = TiptapTable.extend<TableOptions>({
               View: TableNodeView(this.editor as Editor),
               // TODO: PR for @types/prosemirror-tables
               // @ts-ignore (incorrect type)
-              lastColumnResizable: this.options.lastColumnResizable,
-            }),
+              lastColumnResizable: this.options.lastColumnResizable
+            })
           ]
         : []),
       tableEditing({
-        allowTableNodeSelection: this.options.allowTableNodeSelection,
-      }),
+        allowTableNodeSelection: this.options.allowTableNodeSelection
+      })
     ];
-  },
+  }
 });

@@ -12,7 +12,7 @@ function NotebooksPlaceholder() {
       callToAction={{
         text: "Make your first notebook",
         icon: Plus,
-        onClick: () => hashNavigate("/notebooks/create"),
+        onClick: () => hashNavigate("/notebooks/create")
       }}
     />
   );

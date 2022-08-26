@@ -28,7 +28,7 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
     <Flex sx={{ flexDirection: "column" }}>
       <Flex
         sx={{
-          mb: 1,
+          mb: 1
         }}
       >
         {tabs?.map((tab, index) => (
@@ -49,8 +49,8 @@ export function Tabs(props: PropsWithChildren<TabsProps>) {
               borderBottomColor:
                 activeTab === index ? "primary" : "transparent",
               ":hover": {
-                bg: "hover",
-              },
+                bg: "hover"
+              }
             }}
             onClick={() => {
               setActiveTab(index);

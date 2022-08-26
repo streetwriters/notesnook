@@ -24,7 +24,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
       editor.commands.search(term, {
         matchCase,
         enableRegex,
-        matchWholeWord,
+        matchWholeWord
       });
     },
     [matchCase, enableRegex, matchWholeWord]
@@ -55,7 +55,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
         bg: "background",
         flexDirection: "column",
         boxShadow: ["none", "menu"],
-        borderRadius: [0, "default"],
+        borderRadius: [0, "default"]
       }}
     >
       <Flex>
@@ -73,11 +73,11 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               py: 0,
               ":focus-within": {
                 outlineColor: "primary",
-                outlineWidth: "1.8px",
+                outlineWidth: "1.8px"
               },
               ":hover": {
-                outlineColor: "primary",
-              },
+                outlineColor: "primary"
+              }
             }}
           >
             <Input
@@ -100,12 +100,12 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
               sx={{
                 flexShrink: 0,
                 mr: 0,
-                alignItems: "center",
+                alignItems: "center"
               }}
             >
               <ToolButton
                 sx={{
-                  mr: 0,
+                  mr: 0
                 }}
                 toggled={isExpanded}
                 title="Expand"
@@ -118,7 +118,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                 <>
                   <ToolButton
                     sx={{
-                      mr: 0,
+                      mr: 0
                     }}
                     toggled={matchCase}
                     title="Match case"
@@ -129,7 +129,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                   />
                   <ToolButton
                     sx={{
-                      mr: 0,
+                      mr: 0
                     }}
                     toggled={matchWholeWord}
                     title="Match whole word"
@@ -140,7 +140,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                   />
                   <ToolButton
                     sx={{
-                      mr: 0,
+                      mr: 0
                     }}
                     toggled={enableRegex}
                     title="Enable regex"
@@ -157,7 +157,7 @@ export function SearchReplacePopup(props: SearchReplacePopupProps) {
                   flexShrink: 0,
                   borderLeft: "1px solid var(--border)",
                   color: "fontTertiary",
-                  px: 1,
+                  px: 1
                 }}
               >
                 {results ? `${selectedIndex + 1}/${results.length}` : ""}

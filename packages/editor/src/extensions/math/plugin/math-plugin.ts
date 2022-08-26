@@ -8,7 +8,7 @@ import { Schema, Node as ProseNode } from "prosemirror-model";
 import {
   Plugin as ProsePlugin,
   PluginKey,
-  PluginSpec,
+  PluginSpec
 } from "prosemirror-state";
 import { MathView } from "./math-node-view";
 import { EditorView } from "prosemirror-view";
@@ -60,7 +60,7 @@ export function createMathView(inline: boolean) {
       {
         className: inline ? "math-inline" : "math-block",
         renderer: inline ? KatexRenderer.inline : KatexRenderer.block,
-        tagName: inline ? "span" : "div",
+        tagName: inline ? "span" : "div"
       },
       MATH_PLUGIN_KEY,
       () => {
@@ -80,7 +80,7 @@ let mathPluginSpec: PluginSpec<IMathPluginState> = {
       return {
         macros: {},
         activeNodeViews: [],
-        prevCursorPos: 0,
+        prevCursorPos: 0
       };
     },
     apply(tr, value, oldState, newState) {
@@ -93,9 +93,9 @@ let mathPluginSpec: PluginSpec<IMathPluginState> = {
         activeNodeViews: value.activeNodeViews,
         macros: value.macros,
         // update with the second-most recent cursor pos
-        prevCursorPos: oldPos !== newPos ? oldPos : value.prevCursorPos,
+        prevCursorPos: oldPos !== newPos ? oldPos : value.prevCursorPos
       };
-    },
+    }
     /** @todo (8/21/20) implement serialization for math plugin */
     // toJSON(value) { },
     // fromJSON(config, value, state){ return {}; }
@@ -103,9 +103,9 @@ let mathPluginSpec: PluginSpec<IMathPluginState> = {
   props: {
     nodeViews: {
       mathInline: createMathView(true),
-      mathBlock: createMathView(false),
-    },
-  },
+      mathBlock: createMathView(false)
+    }
+  }
 };
 
 export const mathPlugin = new ProsePlugin(mathPluginSpec);

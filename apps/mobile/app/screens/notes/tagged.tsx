@@ -1,12 +1,18 @@
-import { groupArray } from '@streetwriters/notesnook-core/utils/grouping';
-import React from 'react';
-import NotesPage, { PLACEHOLDER_DATA } from '.';
-import Navigation, { NavigationProps, NotesScreenParams } from '../../services/navigation';
-import { db } from '../../common/database';
-import { TagType } from '../../utils/types';
-import { getAlias, openEditor } from './common';
+import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import React from "react";
+import NotesPage, { PLACEHOLDER_DATA } from ".";
+import Navigation, {
+  NavigationProps,
+  NotesScreenParams
+} from "../../services/navigation";
+import { db } from "../../common/database";
+import { TagType } from "../../utils/types";
+import { getAlias, openEditor } from "./common";
 
-export const TaggedNotes = ({ navigation, route }: NavigationProps<'TaggedNotes'>) => {
+export const TaggedNotes = ({
+  navigation,
+  route
+}: NavigationProps<"TaggedNotes">) => {
   return (
     <NotesPage
       navigation={navigation}
@@ -22,20 +28,22 @@ export const TaggedNotes = ({ navigation, route }: NavigationProps<'TaggedNotes'
 
 TaggedNotes.get = (params: NotesScreenParams, grouped = true) => {
   let notes = db.notes?.tagged(params.item.id) || [];
-  return grouped ? groupArray(notes, db.settings?.getGroupOptions('notes')) : notes;
+  return grouped
+    ? groupArray(notes, db.settings?.getGroupOptions("notes"))
+    : notes;
 };
 
 TaggedNotes.navigate = (item: TagType, canGoBack: boolean) => {
   if (!item) return;
   //@ts-ignore TODO
   let alias = getAlias({ item: item });
-  Navigation.navigate<'TaggedNotes'>(
+  Navigation.navigate<"TaggedNotes">(
     {
-      name: 'TaggedNotes',
+      name: "TaggedNotes",
       alias: alias,
       title: item.title,
       id: item.id,
-      type: 'tag'
+      type: "tag"
     },
     {
       item: item,

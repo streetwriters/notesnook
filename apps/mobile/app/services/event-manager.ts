@@ -1,23 +1,29 @@
-import Clipboard from '@react-native-clipboard/clipboard';
-import EventManager from '@streetwriters/notesnook-core/utils/event-manager';
-import { RefObject } from 'react';
-import ActionSheet from 'react-native-actions-sheet';
-import { Config } from 'react-native-config';
+import Clipboard from "@react-native-clipboard/clipboard";
+import EventManager from "@streetwriters/notesnook-core/utils/event-manager";
+import { RefObject } from "react";
+import ActionSheet from "react-native-actions-sheet";
+import { Config } from "react-native-config";
 import {
   eHideToast,
   eOnNoteEdited,
   eOpenProgressDialog,
   eOpenVaultDialog,
   eShowToast
-} from '../utils/events';
+} from "../utils/events";
 
 const eventManager = new EventManager();
 
-export const eSubscribeEvent = (eventName: string, action?: (data: any) => void) => {
+export const eSubscribeEvent = (
+  eventName: string,
+  action?: (data: any) => void
+) => {
   eventManager.subscribe(eventName, action);
 };
 
-export const eUnSubscribeEvent = (eventName: string, action?: (data: any) => void) => {
+export const eUnSubscribeEvent = (
+  eventName: string,
+  action?: (data: any) => void
+) => {
   eventManager.unsubscribe(eventName, action);
 };
 
@@ -70,7 +76,9 @@ type SheetAction = {
 
 export type PresentSheetOptions = {
   context: string;
-  component: JSX.Element | ((ref: RefObject<ActionSheet>, close?: () => void) => JSX.Element);
+  component:
+    | JSX.Element
+    | ((ref: RefObject<ActionSheet>, close?: () => void) => JSX.Element);
   disableClosing: boolean;
   onClose: () => void;
   progress: boolean;
@@ -93,8 +101,8 @@ export function presentSheet(data: Partial<PresentSheetOptions>) {
 export type ShowToastEvent = {
   heading?: string;
   message?: string;
-  context?: 'global' | 'local';
-  type?: 'error' | 'success';
+  context?: "global" | "local";
+  type?: "error" | "success";
   duration?: number;
   func?: () => void;
   actionText?: string;
@@ -104,8 +112,8 @@ export const ToastEvent = {
   show: ({
     heading,
     message,
-    type = 'error',
-    context = 'global',
+    type = "error",
+    context = "global",
     duration = 3000,
     func,
     actionText
@@ -122,20 +130,20 @@ export const ToastEvent = {
     });
   },
   hide: () => eSendEvent(eHideToast),
-  error: (e: Error, title?: string, context?: 'global' | 'local') => {
+  error: (e: Error, title?: string, context?: "global" | "local") => {
     ToastEvent.show({
       heading: title,
-      message: e?.message || '',
-      type: 'error',
-      context: context || 'global',
-      actionText: 'Copy logs',
+      message: e?.message || "",
+      type: "error",
+      context: context || "global",
+      actionText: "Copy logs",
       duration: 6000,
       func: () => {
-        Clipboard.setString(e?.stack || '');
+        Clipboard.setString(e?.stack || "");
         ToastEvent.show({
-          heading: 'Logs copied!',
-          type: 'success',
-          context: 'global',
+          heading: "Logs copied!",
+          type: "success",
+          context: "global",
           duration: 5000
         });
       }

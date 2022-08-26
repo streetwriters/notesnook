@@ -14,7 +14,7 @@ export const DEFAULT_PLANS: Plan[] = [
     currency: "USD",
     discount: 0,
     id: "648884",
-    price: { gross: 4.49, net: 0, tax: 0 },
+    price: { gross: 4.49, net: 0, tax: 0 }
   },
   {
     period: "yearly",
@@ -22,13 +22,13 @@ export const DEFAULT_PLANS: Plan[] = [
     currency: "USD",
     discount: 0,
     id: "658759",
-    price: { gross: 49.99, net: 0, tax: 0 },
-  },
+    price: { gross: 49.99, net: 0, tax: 0 }
+  }
 ];
 
 export const PLAN_METADATA: Record<Period, PlanMetadata> = {
   monthly: { title: "Monthly", subtitle: `Pay once a month.` },
-  yearly: { title: "Yearly", subtitle: `Pay once a year.` },
+  yearly: { title: "Yearly", subtitle: `Pay once a year.` }
 };
 
 var CACHED_PLANS: Plan[];

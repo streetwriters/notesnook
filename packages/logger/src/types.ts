@@ -8,7 +8,7 @@ export enum LogLevel {
   Warn,
   Info,
   Debug,
-  Log,
+  Log
 }
 
 export type LogMessage = {

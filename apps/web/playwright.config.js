@@ -4,20 +4,20 @@ const projects = IS_CI
   ? [
       {
         name: "Firefox",
-        use: { browserName: "firefox" },
+        use: { browserName: "firefox" }
       },
       {
         name: "WebKit",
-        use: { browserName: "webkit" },
-      },
+        use: { browserName: "webkit" }
+      }
     ]
   : [
       {
         name: "Chromium",
         use: {
-          browserName: "chromium",
-        },
-      },
+          browserName: "chromium"
+        }
+      }
       // {
       //   name: "Firefox",
       //   use: { browserName: "firefox" },
@@ -33,7 +33,7 @@ module.exports = {
     command: "npm run debug",
     port: 3000,
     timeout: 60 * 1000,
-    reuseExistingServer: true, //!IS_CI,
+    reuseExistingServer: true //!IS_CI,
   },
   // Look for test files in thcleare "tests" directory, relative to this configuration file
   testDir: "__e2e__",
@@ -54,12 +54,12 @@ module.exports = {
 
     viewport: {
       width: 1280,
-      height: 720,
+      height: 720
     },
     screen: {
       width: 1280,
-      height: 720,
-    },
+      height: 720
+    }
   },
-  projects,
+  projects
 };

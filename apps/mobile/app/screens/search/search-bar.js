@@ -1,23 +1,27 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Platform, View } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { IconButton } from '../../components/ui/icon-button';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useSearchStore } from '../../stores/use-search-store';
-import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/event-manager';
-import Navigation from '../../services/navigation';
-import SearchService from '../../services/search';
-import { eScrollEvent } from '../../utils/events';
-import { normalize, SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
+import React, { useEffect, useRef, useState } from "react";
+import { Platform, View } from "react-native";
+import { TextInput } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { IconButton } from "../../components/ui/icon-button";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useSearchStore } from "../../stores/use-search-store";
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from "../../services/event-manager";
+import Navigation from "../../services/navigation";
+import SearchService from "../../services/search";
+import { eScrollEvent } from "../../utils/events";
+import { normalize, SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
 
 export const SearchBar = () => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [value, setValue] = useState(null);
   const inputRef = useRef();
-  const setSearchResults = useSearchStore(state => state.setSearchResults);
-  const setSearchStatus = useSearchStore(state => state.setSearchStatus);
+  const setSearchResults = useSearchStore((state) => state.setSearchResults);
+  const setSearchStatus = useSearchStore((state) => state.setSearchStatus);
   const searchingRef = useRef(0);
   const insets = useSafeAreaInsets();
   const onClear = () => {
@@ -35,7 +39,7 @@ export const SearchBar = () => {
     });
   }, []);
 
-  const onScroll = event => {
+  const onScroll = (event) => {
     console.log(event);
   };
   useEffect(() => {
@@ -45,16 +49,16 @@ export const SearchBar = () => {
     };
   }, []);
 
-  const onChangeText = value => {
+  const onChangeText = (value) => {
     setValue(value);
     search(value);
   };
 
-  const search = value => {
+  const search = (value) => {
     clearTimeout(searchingRef.current);
     searchingRef.current = setTimeout(async () => {
       try {
-        if (value === '' || !value) {
+        if (value === "" || !value) {
           setSearchResults([]);
           setSearchStatus(false, null);
           return;
@@ -66,9 +70,9 @@ export const SearchBar = () => {
       } catch (e) {
         console.log(e);
         ToastEvent.show({
-          heading: 'Error occured while searching',
+          heading: "Error occured while searching",
           message: e.message,
-          type: 'error'
+          type: "error"
         });
       }
     }, 300);
@@ -78,10 +82,10 @@ export const SearchBar = () => {
     <View
       style={{
         height: 50,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         flexShrink: 1,
-        width: '100%'
+        width: "100%"
       }}
     >
       <IconButton
@@ -107,9 +111,9 @@ export const SearchBar = () => {
         testID="search-input"
         style={{
           fontSize: SIZE.md + 1,
-          fontFamily: 'OpenSans-Regular',
+          fontFamily: "OpenSans-Regular",
           flexGrow: 1,
-          height: '100%',
+          height: "100%",
           color: colors.pri
         }}
         onChangeText={onChangeText}

@@ -24,7 +24,7 @@ export function LinkPopup(props: LinkPopupProps) {
         onClick: () => {
           if (!link.current) return;
           onDone(link.current);
-        },
+        }
       }}
     >
       <Flex sx={{ p: 1, flexDirection: "column", width: ["auto", 250] }}>

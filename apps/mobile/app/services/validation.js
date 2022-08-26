@@ -1,4 +1,4 @@
-import isEmail from 'validator/lib/isEmail';
+import isEmail from "validator/lib/isEmail";
 
 export function validateEmail(email) {
   if (email && email.length > 0) {
@@ -9,7 +9,7 @@ export function validateEmail(email) {
 }
 
 export const ERRORS_LIST = {
-  SHORT_PASS: 'Atleast 8 characters'
+  SHORT_PASS: "Atleast 8 characters"
 };
 
 export function validatePass(password) {

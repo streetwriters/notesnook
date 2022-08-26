@@ -16,7 +16,7 @@ function useMenuFocus(items, onAction, onClose) {
       const element = document.getElementById(item.key);
       if (!element) return;
       element.scrollIntoView({
-        behavior: "auto",
+        behavior: "auto"
       });
     },
     [items]
@@ -128,7 +128,7 @@ function Menu({ items, data, title, closeMenu }) {
     const { top, left } = getPosition(subMenuRef.current, {
       yOffset: document.getElementById(item.key).offsetHeight,
       relativeTo: document.getElementById(item.key),
-      location: "right",
+      location: "right"
     });
 
     subMenuRef.current.style.visibility = "visible";
@@ -177,7 +177,7 @@ function Menu({ items, data, title, closeMenu }) {
           ref={subMenuRef}
           style={{ visibility: "hidden" }}
           sx={{
-            position: "absolute",
+            position: "absolute"
           }}
         >
           <Menu
@@ -209,7 +209,7 @@ function MenuContainer({ title, children }) {
         borderRadius: "default",
         boxShadow: "0px 0px 10px 0px #00000022",
         border: "1px solid var(--border)",
-        width: 220,
+        width: 220
       }}
     >
       {title && (
@@ -222,7 +222,7 @@ function MenuContainer({ title, children }) {
           sx={{
             borderBottom: "1px solid",
             borderBottomColor: "border",
-            wordWrap: "break-word",
+            wordWrap: "break-word"
           }}
         >
           {title}

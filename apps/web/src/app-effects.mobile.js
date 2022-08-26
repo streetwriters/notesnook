@@ -34,7 +34,7 @@ export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
       toggleSideMenu(slide?.index === 0 ? true : false);
       console.log("Setting editor", slide?.index === 2 ? true : false);
       setIsEditorOpen(slide?.index === 2 ? true : false);
-    },
+    }
   });
 
   useEffect(() => {

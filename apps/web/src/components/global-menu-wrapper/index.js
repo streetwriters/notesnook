@@ -29,7 +29,7 @@ function GlobalMenuWrapper() {
             style={{
               ...props.style,
               zIndex: 1000,
-              backgroundColor: isAutocomplete ? "transparent" : "unset",
+              backgroundColor: isAutocomplete ? "transparent" : "unset"
             }}
             onClick={(e) => {
               if (e.target.closest(".menuContainer")) return;
@@ -67,7 +67,7 @@ function GlobalMenuWrapper() {
             padding: 0,
             zIndex: 0,
             outline: 0,
-            isolation: "isolate",
+            isolation: "isolate"
           }}
         >
           {children}
@@ -77,8 +77,8 @@ function GlobalMenuWrapper() {
         content: {},
         overlay: {
           zIndex: 999,
-          background: "transparent",
-        },
+          background: "transparent"
+        }
       }}
     >
       <Menu

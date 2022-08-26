@@ -12,9 +12,9 @@ function ItemDialog(props) {
       positiveButton={{
         props: {
           form: "itemForm",
-          type: "submit",
+          type: "submit"
         },
-        text: props.title,
+        text: props.title
       }}
       onClose={props.onClose}
       negativeButton={{ text: "Cancel", onClick: props.onClose }}

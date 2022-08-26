@@ -1,19 +1,19 @@
-import Clipboard from '@react-native-clipboard/clipboard';
-import React from 'react';
-import { View } from 'react-native';
-import { useSettingStore } from '../../stores/use-setting-store';
-import { ToastEvent } from '../../services/event-manager';
-import { db } from '../../common/database';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
+import Clipboard from "@react-native-clipboard/clipboard";
+import React from "react";
+import { View } from "react-native";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { ToastEvent } from "../../services/event-manager";
+import { db } from "../../common/database";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
 
 export const DevMode = ({ item }) => {
-  const devMode = useSettingStore(state => state.settings.devMode);
+  const devMode = useSettingStore((state) => state.settings.devMode);
 
   return devMode ? (
     <View
       style={{
-        width: '100%',
+        width: "100%",
         paddingHorizontal: 12,
         marginTop: 10
       }}
@@ -21,7 +21,7 @@ export const DevMode = ({ item }) => {
       <Button
         onPress={async () => {
           let additionalData = {};
-          if (item.type === 'note') {
+          if (item.type === "note") {
             let content = await db.content.raw(item.contentId);
             if (content) {
               content = db.debug.strip(content);
@@ -34,9 +34,9 @@ export const DevMode = ({ item }) => {
           Clipboard.setString(db.debug.strip(_note));
 
           ToastEvent.show({
-            heading: 'Debug data copied!',
-            type: 'success',
-            context: 'local'
+            heading: "Debug data copied!",
+            type: "success",
+            context: "local"
           });
         }}
         fontSize={SIZE.sm}
@@ -45,7 +45,7 @@ export const DevMode = ({ item }) => {
         height={30}
         type="warn"
         style={{
-          alignSelf: 'flex-end'
+          alignSelf: "flex-end"
         }}
       />
     </View>

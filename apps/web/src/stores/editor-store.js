@@ -14,7 +14,7 @@ const SESSION_STATES = {
   new: "new",
   locked: "locked",
   unlocked: "unlocked",
-  opening: "opening",
+  opening: "opening"
 };
 
 export const getDefaultSession = (sessionId = Date.now()) => {
@@ -36,7 +36,7 @@ export const getDefaultSession = (sessionId = Date.now()) => {
     context: undefined,
     color: undefined,
     dateEdited: 0,
-    attachmentsLength: 0,
+    attachmentsLength: 0
   };
 };
 
@@ -73,7 +73,7 @@ class EditorStore extends BaseStore {
         ...note,
         sessionType: "locked",
         id: undefined, // NOTE: we give a session id only after the note is opened.
-        state: SESSION_STATES.unlocked,
+        state: SESSION_STATES.unlocked
       };
     });
     appStore.setIsEditorOpen(true);
@@ -113,7 +113,7 @@ class EditorStore extends BaseStore {
         ...defaultSession,
         ...note,
         state: SESSION_STATES.new,
-        attachmentsLength: db.attachments.ofNote(note.id, "all")?.length || 0,
+        attachmentsLength: db.attachments.ofNote(note.id, "all")?.length || 0
       };
     });
     appStore.setIsEditorOpen(true);
@@ -196,7 +196,7 @@ class EditorStore extends BaseStore {
         ...getDefaultSession(),
         context,
         nonce,
-        state: SESSION_STATES.new,
+        state: SESSION_STATES.new
       };
     });
     noteStore.setSelectedNote(0);
@@ -210,7 +210,7 @@ class EditorStore extends BaseStore {
     this.set((state) => {
       state.session = {
         ...getDefaultSession(),
-        state: SESSION_STATES.new,
+        state: SESSION_STATES.new
       };
     });
     noteStore.setSelectedNote(0);

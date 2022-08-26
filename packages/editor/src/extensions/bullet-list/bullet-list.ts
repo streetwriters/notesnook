@@ -12,10 +12,10 @@ export const BulletList = TiptapBulletList.extend({
           }
 
           return {
-            style: `list-style-type: ${attributes.listType}`,
+            style: `list-style-type: ${attributes.listType}`
           };
-        },
-      },
+        }
+      }
     };
-  },
+  }
 });

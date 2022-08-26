@@ -1,5 +1,5 @@
-import { eSendEvent } from '../../services/event-manager';
-import { eCloseSimpleDialog, eOpenSimpleDialog } from '../../utils/events';
+import { eSendEvent } from "../../services/event-manager";
+import { eCloseSimpleDialog, eOpenSimpleDialog } from "../../utils/events";
 
 type DialogInfo = {
   title?: string;
@@ -9,20 +9,20 @@ type DialogInfo = {
   positivePress?: (value: any) => void;
   onClose?: () => void;
   positiveType?:
-    | 'transparent'
-    | 'gray'
-    | 'grayBg'
-    | 'accent'
-    | 'inverted'
-    | 'shade'
-    | 'error'
-    | 'errorShade';
+    | "transparent"
+    | "gray"
+    | "grayBg"
+    | "accent"
+    | "inverted"
+    | "shade"
+    | "error"
+    | "errorShade";
   icon?: string;
   paragraphColor: string;
   input: boolean;
   inputPlaceholder: string;
   defaultValue: string;
-  context: 'global' | 'local';
+  context: "global" | "local";
 };
 
 export function presentDialog(data: Partial<DialogInfo>): void {

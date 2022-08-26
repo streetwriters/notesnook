@@ -1,26 +1,31 @@
-import React from 'react';
-import { Platform, View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { DDS } from '../../services/device-detection';
-import { presentSheet } from '../../services/event-manager';
-import { db } from '../../common/database';
-import { SIZE } from '../../utils/size';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import { ColorTags } from './color-tags';
-import { DateMeta } from './date-meta';
-import { DevMode } from './dev-mode';
-import { Items } from './items';
-import Notebooks from './notebooks';
-import { Synced } from './synced';
-import { Tags } from './tags';
-import { Topics } from './topics';
-import SearchService from '../../services/search';
-import { COLORS_NOTE } from '../../utils/color-scheme';
-import { ScrollView } from 'react-native-gesture-handler';
+import React from "react";
+import { Platform, View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { DDS } from "../../services/device-detection";
+import { presentSheet } from "../../services/event-manager";
+import { db } from "../../common/database";
+import { SIZE } from "../../utils/size";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import { ColorTags } from "./color-tags";
+import { DateMeta } from "./date-meta";
+import { DevMode } from "./dev-mode";
+import { Items } from "./items";
+import Notebooks from "./notebooks";
+import { Synced } from "./synced";
+import { Tags } from "./tags";
+import { Topics } from "./topics";
+import SearchService from "../../services/search";
+import { COLORS_NOTE } from "../../utils/color-scheme";
+import { ScrollView } from "react-native-gesture-handler";
 
-export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => {
-  const colors = useThemeStore(state => state.colors);
+export const Properties = ({
+  close = () => {},
+  item,
+  buttons = [],
+  getRef
+}) => {
+  const colors = useThemeStore((state) => state.colors);
   const alias = item.alias || item.title;
   const isColor = !!COLORS_NOTE[item.title];
 
@@ -39,11 +44,11 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
         paddingHorizontal: 0,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
-        maxHeight: '95%'
+        maxHeight: "95%"
       }}
     >
       {!item || !item.id ? (
-        <Paragraph style={{ marginVertical: 10, alignSelf: 'center' }}>
+        <Paragraph style={{ marginVertical: 10, alignSelf: "center" }}>
           Start writing to save your note.
         </Paragraph>
       ) : (
@@ -59,7 +64,7 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
             }}
           >
             <Heading size={SIZE.lg}>
-              {item.type === 'tag' && !isColor ? (
+              {item.type === "tag" && !isColor ? (
                 <Heading size={SIZE.xl} color={colors.accent}>
                   #
                 </Heading>
@@ -75,21 +80,25 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
                 numberOfLines={2}
                 color={colors.icon}
               >
-                {(item.type === 'notebook' || item.itemType === 'notebook') && item?.description
+                {(item.type === "notebook" || item.itemType === "notebook") &&
+                item?.description
                   ? item.description
                   : null}
-                {(item.type === 'note' || item.itemType === 'note') && item?.headline
+                {(item.type === "note" || item.itemType === "note") &&
+                item?.headline
                   ? item.headline
                   : null}
               </Paragraph>
             ) : null}
 
-            {item.type === 'note' ? <Tags close={close} item={item} /> : null}
+            {item.type === "note" ? <Tags close={close} item={item} /> : null}
 
             <Topics item={item} close={close} />
           </View>
 
-          {item.type === 'note' ? <Notebooks note={item} close={close} /> : null}
+          {item.type === "note" ? (
+            <Notebooks note={item} close={close} />
+          ) : null}
 
           <DateMeta item={item} />
         </View>
@@ -102,7 +111,7 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
         }}
       />
 
-      {item.type === 'note' ? <ColorTags close={close} item={item} /> : null}
+      {item.type === "note" ? <ColorTags close={close} item={item} /> : null}
 
       <Items
         item={item}
@@ -134,44 +143,46 @@ Properties.present = (item, buttons = []) => {
   let props = [];
   let android = [];
   switch (type) {
-    case 'trash':
+    case "trash":
       props[0] = item;
-      props.push(['PermDelete', 'Restore']);
+      props.push(["PermDelete", "Restore"]);
       break;
-    case 'note':
-      android = Platform.OS === 'android' ? ['PinToNotif'] : [];
+    case "note":
+      android = Platform.OS === "android" ? ["PinToNotif"] : [];
       props[0] = db.notes.note(item.id).data;
       props.push([
-        'Add to notebook',
-        'Share',
-        'Export',
-        'Copy',
-        'Publish',
-        'Pin',
-        'Favorite',
-        'Attachments',
-        'Vault',
-        'Delete',
-        'RemoveTopic',
-        'History',
-        'ReadOnly',
-        'Local only',
-        'Duplicate',
+        "Add to notebook",
+        "Share",
+        "Export",
+        "Copy",
+        "Publish",
+        "Pin",
+        "Favorite",
+        "Attachments",
+        "Vault",
+        "Delete",
+        "RemoveTopic",
+        "History",
+        "ReadOnly",
+        "Local only",
+        "Duplicate",
         ...android,
         ...buttons
       ]);
       break;
-    case 'notebook':
+    case "notebook":
       props[0] = db.notebooks.notebook(item.id).data;
-      props.push(['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete']);
+      props.push(["Edit Notebook", "Pin", "Add Shortcut", "Delete"]);
       break;
-    case 'topic':
-      props[0] = db.notebooks.notebook(item.notebookId).topics.topic(item.id)._topic;
-      props.push(['Move notes', 'Edit Topic', 'Add Shortcut', 'Delete']);
+    case "topic":
+      props[0] = db.notebooks
+        .notebook(item.notebookId)
+        .topics.topic(item.id)._topic;
+      props.push(["Move notes", "Edit Topic", "Add Shortcut", "Delete"]);
       break;
-    case 'tag':
+    case "tag":
       props[0] = db.tags.tag(item.id);
-      props.push(['Add Shortcut', 'Delete', 'Rename Tag']);
+      props.push(["Add Shortcut", "Delete", "Rename Tag"]);
       break;
   }
   if (!props[0]) return;

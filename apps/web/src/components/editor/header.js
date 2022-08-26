@@ -56,7 +56,7 @@ function Autosuggest({
   onRemove,
   onSelect,
   onAdd,
-  defaultItems,
+  defaultItems
 }) {
   const [filtered, setFiltered] = useState([]);
   const inputRef = useRef();
@@ -93,7 +93,7 @@ function Autosuggest({
         key: "new",
         title: () => `Create "${filterText}" tag`,
         icon: Icon.Plus,
-        onClick: () => onAction("add", filterText),
+        onClick: () => onAction("add", filterText)
       });
     } else {
       items.push(
@@ -101,7 +101,7 @@ function Autosuggest({
           key: tag.id,
           title: () => tag.title,
           icon: Icon.Tag,
-          onClick: () => onAction("select", tag),
+          onClick: () => onAction("select", tag)
         }))
       );
     }
@@ -111,8 +111,8 @@ function Autosuggest({
       positionOptions: {
         relativeTo: inputRef.current,
         absolute: true,
-        location: "below",
-      },
+        location: "below"
+      }
     });
   }, [filtered, getInputValue, closeMenu, openMenu, onAction]);
 

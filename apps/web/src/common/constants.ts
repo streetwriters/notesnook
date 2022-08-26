@@ -5,7 +5,7 @@ export const COLORS = [
   "green",
   "blue",
   "purple",
-  "gray",
+  "gray"
 ] as const;
 
 export const SUBSCRIPTION_STATUS = {
@@ -14,5 +14,5 @@ export const SUBSCRIPTION_STATUS = {
   BETA: 2,
   PREMIUM: 5,
   PREMIUM_EXPIRED: 6,
-  PREMIUM_CANCELED: 7,
+  PREMIUM_CANCELED: 7
 } as const;

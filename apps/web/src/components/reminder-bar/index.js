@@ -24,7 +24,7 @@ function ReminderBar() {
       sx={{
         cursor: "pointer",
         borderRadius: "default",
-        ":hover": { bg: "hover" },
+        ":hover": { bg: "hover" }
       }}
       p={1}
       onClick={reminder?.action}
@@ -62,7 +62,7 @@ function ReminderBar() {
             p: 1,
             mr: 1,
             bg: "transparent",
-            ":hover": { backgroundColor: "shade" },
+            ":hover": { backgroundColor: "shade" }
           }}
           variant="tool"
         >

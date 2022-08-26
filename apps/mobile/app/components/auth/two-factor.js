@@ -1,22 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
-import { eSendEvent, presentSheet } from '../../services/event-manager';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { eCloseProgressDialog } from '../../utils/events';
-import useTimer from '../../hooks/use-timer';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
-import { IconButton } from '../ui/icon-button';
-import Input from '../ui/input';
-import { PressableButton } from '../ui/pressable';
-import Seperator from '../ui/seperator';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import { db } from '../../common/database/index';
-import { ToastEvent } from '../../services/event-manager';
+import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { eCloseProgressDialog } from "../../utils/events";
+import useTimer from "../../hooks/use-timer";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import Input from "../ui/input";
+import { PressableButton } from "../ui/pressable";
+import Seperator from "../ui/seperator";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import { db } from "../../common/database/index";
+import { ToastEvent } from "../../services/event-manager";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const code = useRef();
   const [currentMethod, setCurrentMethod] = useState({
     method: mfaInfo?.primaryMethod,
@@ -28,10 +28,10 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const [sending, setSending] = useState(false);
 
   const codeHelpText = {
-    app: 'Enter the 6 digit code from your authenticator app to continue logging in',
-    sms: 'Enter the 6 digit code sent to your phone number to continue logging in',
-    email: 'Enter the 6 digit code sent to your email to continue logging in',
-    recoveryCode: 'Enter the 8 digit recovery code to continue logging in'
+    app: "Enter the 6 digit code from your authenticator app to continue logging in",
+    sms: "Enter the 6 digit code sent to your phone number to continue logging in",
+    email: "Enter the 6 digit code sent to your email to continue logging in",
+    recoveryCode: "Enter the 8 digit recovery code to continue logging in"
   };
 
   const secondaryMethodsText = {
@@ -42,7 +42,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   };
 
   const onNext = async () => {
-    const length = currentMethod.method === 'recoveryCode' ? 8 : 6;
+    const length = currentMethod.method === "recoveryCode" ? 8 : 6;
 
     if (!code.current || code.current.length !== length) return;
     console.log(currentMethod.method, code.current);
@@ -53,10 +53,10 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
         method: currentMethod.method,
         code: code.current
       },
-      result => {
-        console.log('result recieved');
+      (result) => {
+        console.log("result recieved");
         if (result) {
-          eSendEvent(eCloseProgressDialog, 'two_factor_verify');
+          eSendEvent(eCloseProgressDialog, "two_factor_verify");
         }
         setLoading(false);
       }
@@ -73,38 +73,38 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
 
   const methods = [
     {
-      id: 'sms',
-      title: 'Send code via SMS',
-      icon: 'message-plus-outline'
+      id: "sms",
+      title: "Send code via SMS",
+      icon: "message-plus-outline"
     },
     {
-      id: 'email',
-      title: 'Send code via email',
-      icon: 'email-outline'
+      id: "email",
+      title: "Send code via email",
+      icon: "email-outline"
     },
     {
-      id: 'app',
-      title: 'Enter code from authenticator app',
-      icon: 'cellphone-key'
+      id: "app",
+      title: "Enter code from authenticator app",
+      icon: "cellphone-key"
     },
     {
-      id: 'recoveryCode',
-      title: 'I have a recovery code',
-      icon: 'key'
+      id: "recoveryCode",
+      title: "I have a recovery code",
+      icon: "key"
     }
   ];
 
   const getMethods = () => {
     return methods.filter(
-      m =>
+      (m) =>
         m.id === mfaInfo?.primaryMethod ||
         m.id === mfaInfo?.secondaryMethod ||
-        m.id === 'recoveryCode'
+        m.id === "recoveryCode"
     );
   };
 
   useEffect(() => {
-    if (currentMethod.method === 'sms' || currentMethod.method === 'email') {
+    if (currentMethod.method === "sms" || currentMethod.method === "email") {
       onSendCode();
     }
   }, [currentMethod.method]);
@@ -114,13 +114,13 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     // TODO
     setSending(true);
     try {
-      console.log('sending code', currentMethod.method, mfaInfo.token);
+      console.log("sending code", currentMethod.method, mfaInfo.token);
       await db.mfa.sendCode(currentMethod.method, mfaInfo.token);
       start(60);
       setSending(false);
     } catch (e) {
       setSending(false);
-      ToastEvent.error(e, 'Error sending 2FA Code', 'local');
+      ToastEvent.error(e, "Error sending 2FA Code", "local");
     }
   };
 
@@ -128,7 +128,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     <View>
       <View
         style={{
-          alignItems: 'center',
+          alignItems: "center",
           paddingHorizontal: currentMethod.method ? 12 : 0
         }}
       >
@@ -143,29 +143,34 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
         />
         <Heading
           style={{
-            textAlign: 'center'
+            textAlign: "center"
           }}
         >
           {currentMethod.method
-            ? 'Two factor authentication'
-            : 'Select methods for two-factor authentication'}
+            ? "Two factor authentication"
+            : "Select methods for two-factor authentication"}
         </Heading>
         <Paragraph
           style={{
-            width: '80%',
-            textAlign: 'center'
+            width: "80%",
+            textAlign: "center"
           }}
         >
-          {codeHelpText[currentMethod.method] || `Select how you would like to recieve the code`}
+          {codeHelpText[currentMethod.method] ||
+            `Select how you would like to recieve the code`}
         </Paragraph>
 
         <Seperator />
 
-        {currentMethod.method === 'sms' || currentMethod.method === 'email' ? (
+        {currentMethod.method === "sms" || currentMethod.method === "email" ? (
           <Button
             onPress={onSendCode}
-            type={seconds ? 'gray' : 'transparent'}
-            title={sending ? '' : `${seconds ? `Resend code in (${seconds})` : 'Send code'}`}
+            type={seconds ? "gray" : "transparent"}
+            title={
+              sending
+                ? ""
+                : `${seconds ? `Resend code in (${seconds})` : "Send code"}`
+            }
             loading={sending}
             height={30}
           />
@@ -176,11 +181,13 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
         {currentMethod.method ? (
           <>
             <Input
-              placeholder={currentMethod.method === 'recoveryCode' ? 'xxxxxxxx' : 'xxxxxx'}
-              maxLength={currentMethod.method === 'recoveryCode' ? 8 : 6}
+              placeholder={
+                currentMethod.method === "recoveryCode" ? "xxxxxxxx" : "xxxxxx"
+              }
+              maxLength={currentMethod.method === "recoveryCode" ? 8 : 6}
               fwdRef={inputRef}
               textAlign="center"
-              onChangeText={value => {
+              onChangeText={(value) => {
                 code.current = value;
                 onNext();
               }}
@@ -188,22 +195,24 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               inputStyle={{
                 fontSize: SIZE.lg,
                 height: 60,
-                textAlign: 'center',
+                textAlign: "center",
                 letterSpacing: 10,
                 width: null
               }}
-              keyboardType={currentMethod.method === 'recoveryCode' ? 'default' : 'numeric'}
+              keyboardType={
+                currentMethod.method === "recoveryCode" ? "default" : "numeric"
+              }
               containerStyle={{
                 height: 60,
                 borderWidth: 0,
                 //@ts-ignore
                 width: null,
-                minWidth: '50%'
+                minWidth: "50%"
               }}
             />
             <Seperator />
             <Button
-              title={loading ? null : 'Next'}
+              title={loading ? null : "Next"}
               type="accent"
               width={250}
               loading={loading}
@@ -223,7 +232,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
           </>
         ) : (
           <>
-            {getMethods().map(item => (
+            {getMethods().map((item) => (
               <PressableButton
                 key={item.title}
                 onPress={() => {
@@ -236,11 +245,11 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                   paddingHorizontal: 12,
                   paddingVertical: 12,
                   marginTop: 0,
-                  flexDirection: 'row',
+                  flexDirection: "row",
                   borderRadius: 0,
-                  alignItems: 'center',
-                  width: '100%',
-                  justifyContent: 'flex-start'
+                  alignItems: "center",
+                  width: "100%",
+                  justifyContent: "flex-start"
                 }}
               >
                 <IconButton
@@ -271,12 +280,12 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
 };
 
 TwoFactorVerification.present = (onMfaLogin, data, context) => {
-  console.log('presenting sheet');
+  console.log("presenting sheet");
   presentSheet({
     component: <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />,
-    context: context || 'two_factor_verify',
+    context: context || "two_factor_verify",
     onClose: () => {
-      console.log('on close called');
+      console.log("on close called");
       onMfaLogin();
     },
     disableClosing: true

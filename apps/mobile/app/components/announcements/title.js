@@ -1,22 +1,22 @@
-import React from 'react';
-import { View } from 'react-native';
-import { useMessageStore } from '../../stores/use-message-store';
-import { SIZE } from '../../utils/size';
-import { Button } from '../ui/button';
-import Heading from '../ui/typography/heading';
-import { getStyle } from './functions';
+import React from "react";
+import { View } from "react-native";
+import { useMessageStore } from "../../stores/use-message-store";
+import { SIZE } from "../../utils/size";
+import { Button } from "../ui/button";
+import Heading from "../ui/typography/heading";
+import { getStyle } from "./functions";
 
 export const Title = ({ text, style = {}, inline }) => {
-  const announcements = useMessageStore(state => state.announcements);
+  const announcements = useMessageStore((state) => state.announcements);
   let announcement = announcements.length > 0 ? announcements[0] : null;
-  const remove = useMessageStore(state => state.remove);
+  const remove = useMessageStore((state) => state.remove);
 
   return inline ? (
     <View
       style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         marginBottom: inline ? 5 : 0
       }}
     >
@@ -25,7 +25,7 @@ export const Title = ({ text, style = {}, inline }) => {
           marginHorizontal: 12,
           marginTop: 12,
           ...getStyle(style),
-          textAlign: inline ? 'left' : style?.textAlign,
+          textAlign: inline ? "left" : style?.textAlign,
           flexShrink: 1
         }}
         numberOfLines={1}

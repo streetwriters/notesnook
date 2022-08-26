@@ -1,23 +1,27 @@
-import React, { RefObject, useState } from 'react';
-import { Platform, View } from 'react-native';
-import ActionSheet from 'react-native-actions-sheet';
-import { FlatList } from 'react-native-gesture-handler';
-import { useThemeStore } from '../../../stores/use-theme-store';
-import { eSendEvent, presentSheet, ToastEvent } from '../../../services/event-manager';
-import Navigation from '../../../services/navigation';
-import { db } from '../../../common/database';
-import { eCloseProgressDialog } from '../../../utils/events';
-import { SIZE } from '../../../utils/size';
-import { IconButton } from '../../ui/icon-button';
-import { Button } from '../../ui/button';
-import { Dialog } from '../../dialog';
-import DialogHeader from '../../dialog/dialog-header';
-import { presentDialog } from '../../dialog/functions';
-import { PressableButton } from '../../ui/pressable';
-import Seperator from '../../ui/seperator';
-import Heading from '../../ui/typography/heading';
-import Paragraph from '../../ui/typography/paragraph';
-import SearchService from '../../../services/search';
+import React, { RefObject, useState } from "react";
+import { Platform, View } from "react-native";
+import ActionSheet from "react-native-actions-sheet";
+import { FlatList } from "react-native-gesture-handler";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from "../../../services/event-manager";
+import Navigation from "../../../services/navigation";
+import { db } from "../../../common/database";
+import { eCloseProgressDialog } from "../../../utils/events";
+import { SIZE } from "../../../utils/size";
+import { IconButton } from "../../ui/icon-button";
+import { Button } from "../../ui/button";
+import { Dialog } from "../../dialog";
+import DialogHeader from "../../dialog/dialog-header";
+import { presentDialog } from "../../dialog/functions";
+import { PressableButton } from "../../ui/pressable";
+import Seperator from "../../ui/seperator";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
+import SearchService from "../../../services/search";
 
 export const MoveNotes = ({
   notebook,
@@ -28,7 +32,7 @@ export const MoveNotes = ({
   selectedTopic?: any;
   fwdRef: RefObject<ActionSheet>;
 }) => {
-  const colors = useThemeStore(state => state.colors);
+  const colors = useThemeStore((state) => state.colors);
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
 
   let notes = db.notes?.all;
@@ -36,18 +40,18 @@ export const MoveNotes = ({
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [topic, setTopic] = useState(selectedTopic);
   //@ts-ignore
-  notes = notes.filter(note => topic?.notes.indexOf(note.id) === -1);
+  notes = notes.filter((note) => topic?.notes.indexOf(note.id) === -1);
 
   const select = (id: string) => {
     let index = selectedNoteIds.indexOf(id);
     if (index > -1) {
-      setSelectedNoteIds(selectedNoteIds => {
+      setSelectedNoteIds((selectedNoteIds) => {
         let next = [...selectedNoteIds];
         next.splice(index, 1);
         return next;
       });
     } else {
-      setSelectedNoteIds(selectedNoteIds => {
+      setSelectedNoteIds((selectedNoteIds) => {
         let next = [...selectedNoteIds];
         next.push(id);
         return next;
@@ -58,13 +62,13 @@ export const MoveNotes = ({
   const openAddTopicDialog = () => {
     presentDialog({
       //@ts-ignore
-      context: 'local',
+      context: "local",
       input: true,
-      inputPlaceholder: 'Enter title',
-      title: 'New topic',
-      paragraph: 'Add a new topic in ' + currentNotebook.title,
-      positiveText: 'Add',
-      positivePress: value => {
+      inputPlaceholder: "Enter title",
+      title: "New topic",
+      paragraph: "Add a new topic in " + currentNotebook.title,
+      positiveText: "Add",
+      positivePress: (value) => {
         return addNewTopic(value);
       }
     });
@@ -74,9 +78,9 @@ export const MoveNotes = ({
     if (!value || value.trim().length === 0) {
       //@ts-ignore
       ToastEvent.show({
-        heading: 'Topic title is required',
-        type: 'error',
-        context: 'local'
+        heading: "Topic title is required",
+        type: "error",
+        context: "local"
       });
       return false;
     }
@@ -84,13 +88,13 @@ export const MoveNotes = ({
     setCurrentNotebook(db.notebooks?.notebook(currentNotebook.id).data);
 
     Navigation.queueRoutesForUpdate(
-      'Notes',
-      'Favorites',
-      'ColoredNotes',
-      'TaggedNotes',
-      'TopicNotes',
-      'Notebook',
-      'Notebooks'
+      "Notes",
+      "Favorites",
+      "ColoredNotes",
+      "TaggedNotes",
+      "TopicNotes",
+      "Notebook",
+      "Notebooks"
     );
     return true;
   };
@@ -100,18 +104,18 @@ export const MoveNotes = ({
       <PressableButton
         testID="listitem.select"
         onPress={() => {
-          if (item.type == 'topic') {
+          if (item.type == "topic") {
             setTopic(topic ? null : item);
           } else {
             select(item.id);
           }
         }}
-        type={'transparent'}
+        type={"transparent"}
         customStyle={{
           paddingVertical: 12,
-          justifyContent: 'space-between',
+          justifyContent: "space-between",
           paddingHorizontal: 12,
-          flexDirection: 'row'
+          flexDirection: "row"
         }}
       >
         <View
@@ -119,17 +123,20 @@ export const MoveNotes = ({
             flexShrink: 1
           }}
         >
-          <Paragraph numberOfLines={1} color={item?.id === topic?.id ? colors.accent : colors.pri}>
+          <Paragraph
+            numberOfLines={1}
+            color={item?.id === topic?.id ? colors.accent : colors.pri}
+          >
             {item.title}
           </Paragraph>
-          {item.type == 'note' && item.headline ? (
+          {item.type == "note" && item.headline ? (
             <Paragraph numberOfLines={1} color={colors.icon} size={SIZE.xs + 1}>
               {item.headline}
             </Paragraph>
           ) : null}
         </View>
 
-        {item.type === 'topic' ? (
+        {item.type === "topic" ? (
           <Paragraph
             style={{
               fontSize: SIZE.xs
@@ -145,7 +152,7 @@ export const MoveNotes = ({
             customStyle={{
               width: null,
               height: null,
-              backgroundColor: 'transparent'
+              backgroundColor: "transparent"
             }}
             name="check"
             type="grayAccent"
@@ -163,7 +170,7 @@ export const MoveNotes = ({
     <View
       style={{
         paddingHorizontal: 12,
-        maxHeight: Platform.OS === 'ios' ? '96%' : '97%'
+        maxHeight: Platform.OS === "ios" ? "96%" : "97%"
       }}
     >
       <Dialog context="local" />
@@ -174,30 +181,32 @@ export const MoveNotes = ({
           }}
           customStyle={{
             paddingVertical: 12,
-            justifyContent: 'space-between',
+            justifyContent: "space-between",
             paddingHorizontal: 12,
             marginBottom: 10,
-            alignItems: 'flex-start'
+            alignItems: "flex-start"
           }}
           type="grayBg"
         >
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%'
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%"
             }}
           >
-            <Heading size={SIZE.md}>Adding notes to {currentNotebook.title}</Heading>
+            <Heading size={SIZE.md}>
+              Adding notes to {currentNotebook.title}
+            </Heading>
           </View>
 
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "100%",
               marginTop: 5
             }}
           >
@@ -219,7 +228,7 @@ export const MoveNotes = ({
             paragraph={
               topic
                 ? `Select notes you would like to move to ${topic.title}.`
-                : 'Select the topic in which you would like to move notes.'
+                : "Select the topic in which you would like to move notes."
             }
           />
           <Seperator />
@@ -235,12 +244,12 @@ export const MoveNotes = ({
           <View
             style={{
               minHeight: 100,
-              justifyContent: 'center',
-              alignItems: 'center'
+              justifyContent: "center",
+              alignItems: "center"
             }}
           >
             <Paragraph color={colors.icon}>
-              {topic ? 'No notes to show' : 'No topics in this notebook'}
+              {topic ? "No notes to show" : "No topics in this notebook"}
             </Paragraph>
 
             {!topic && (
@@ -273,13 +282,13 @@ export const MoveNotes = ({
               ...selectedNoteIds
             );
             Navigation.queueRoutesForUpdate(
-              'Notes',
-              'Favorites',
-              'ColoredNotes',
-              'TaggedNotes',
-              'TopicNotes',
-              'Notebook',
-              'Notebooks'
+              "Notes",
+              "Favorites",
+              "ColoredNotes",
+              "TaggedNotes",
+              "TopicNotes",
+              "Notebook",
+              "Notebooks"
             );
             SearchService.updateAndSearch();
             eSendEvent(eCloseProgressDialog);

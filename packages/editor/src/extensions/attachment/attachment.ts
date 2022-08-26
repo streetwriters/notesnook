@@ -48,7 +48,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       HTMLAttributes: {},
       onDownloadAttachment: () => false,
-      onOpenAttachmentPicker: () => false,
+      onOpenAttachmentPicker: () => false
     };
   },
 
@@ -62,27 +62,27 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return {
       progress: {
         default: 0,
-        rendered: false,
+        rendered: false
       },
       hash: getDataAttribute("hash"),
       filename: getDataAttribute("filename"),
       type: getDataAttribute("mime"),
-      size: getDataAttribute("size"),
+      size: getDataAttribute("size")
     };
   },
 
   parseHTML() {
     return [
       {
-        tag: "span[data-hash]",
-      },
+        tag: "span[data-hash]"
+      }
     ];
   },
 
   renderHTML({ HTMLAttributes }) {
     return [
       "span",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)
     ];
   },
 
@@ -90,7 +90,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
     return createSelectionBasedNodeView(AttachmentComponent, {
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {
         return prev.progress !== next.progress;
-      },
+      }
     });
   },
 
@@ -101,7 +101,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
         ({ commands }) => {
           return commands.insertContent({
             type: this.name,
-            attrs: attachment,
+            attrs: attachment
           });
         },
       removeAttachment:
@@ -132,16 +132,16 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
           for (const attachment of attachments) {
             tr.setNodeMarkup(attachment.pos, attachment.node.type, {
               ...attachment.node.attrs,
-              progress: progress === 100 ? null : progress,
+              progress: progress === 100 ? null : progress
             });
           }
           tr.setMeta("preventUpdate", true);
           tr.setMeta("addToHistory", false);
           if (dispatch) dispatch(tr);
           return true;
-        },
+        }
     };
-  },
+  }
 
   //   addInputRules() {
   //     return [
@@ -171,8 +171,8 @@ export function getDataAttribute(
       }
 
       return {
-        [`data-${name}`]: attributes[name],
+        [`data-${name}`]: attributes[name]
       };
-    },
+    }
   };
 }

@@ -4,7 +4,7 @@ const { getTestId, createNote, NOTE } = require("./utils");
 const {
   navigateTo,
   useContextMenu,
-  clickMenuItem,
+  clickMenuItem
 } = require("./utils/actions");
 const { checkNotePresence } = require("./utils/conditions");
 const List = require("./utils/listitemidbuilder");
@@ -108,7 +108,7 @@ test("create a note inside a tag", async ({ page }) => {
 });
 
 test("edit a tag and make sure all its references on note are updated", async ({
-  page,
+  page
 }) => {
   let tagSelector = await createTagAndCheckPresence("helloworld");
 
@@ -135,7 +135,7 @@ test("edit a tag and make sure all its references on note are updated", async ({
 });
 
 test("delete a tag and make sure all associated notes are untagged", async ({
-  page,
+  page
 }) => {
   const tagSelector = await createTagAndCheckPresence("helloworld");
 
@@ -207,7 +207,7 @@ test("delete a shortcut of a tag", async ({ page }) => {
 });
 
 test("delete the last note of a tag that is also a shortcut", async ({
-  page,
+  page
 }) => {
   const tagSelector = await createTagAndCheckPresence("helloworld");
 

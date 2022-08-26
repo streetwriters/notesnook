@@ -1,8 +1,8 @@
 //@ts-ignore
-import { groupArray } from '@streetwriters/notesnook-core/utils/grouping';
-import create, { State } from 'zustand';
-import { db } from '../common/database';
-import { NoteType } from '../utils/types';
+import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import create, { State } from "zustand";
+import { db } from "../common/database";
+import { NoteType } from "../utils/types";
 
 export interface NoteStore extends State {
   notes: NoteType[];
@@ -15,19 +15,22 @@ export interface NoteStore extends State {
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
   loading: true,
-  setLoading: loading => set({ loading: loading }),
+  setLoading: (loading) => set({ loading: loading }),
 
-  setNotes: items => {
+  setNotes: (items) => {
     if (!items) {
       set({
-        notes: groupArray((db.notes?.all as NoteType[]) || [], db.settings?.getGroupOptions('home'))
+        notes: groupArray(
+          (db.notes?.all as NoteType[]) || [],
+          db.settings?.getGroupOptions("home")
+        )
       });
       return;
     }
     let prev = get().notes;
     for (let i = 0; i < items.length; i++) {
       let item = items[i];
-      let index = prev.findIndex(v => v.id === item.id);
+      let index = prev.findIndex((v) => v.id === item.id);
       if (index !== -1) {
         prev[index] = item;
       }

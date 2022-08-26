@@ -1,8 +1,8 @@
 //@ts-ignore
-import { groupArray } from '@streetwriters/notesnook-core/utils/grouping';
-import create, { State } from 'zustand';
-import { db } from '../common/database';
-import { TrashType } from '../utils/types';
+import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import create, { State } from "zustand";
+import { db } from "../common/database";
+import { TrashType } from "../utils/types";
 
 export interface TrashStore extends State {
   trash: Array<TrashType>;
@@ -12,17 +12,20 @@ export interface TrashStore extends State {
 
 export const useTrashStore = create<TrashStore>((set, get) => ({
   trash: [],
-  setTrash: items => {
+  setTrash: (items) => {
     if (!items) {
       set({
-        trash: groupArray(db?.trash?.all || [], db.settings?.getGroupOptions('trash'))
+        trash: groupArray(
+          db?.trash?.all || [],
+          db.settings?.getGroupOptions("trash")
+        )
       });
       return;
     }
     let prev = get().trash;
     for (let i = 0; i < items.length; i++) {
       let item = items[i];
-      let index = prev.findIndex(v => v.id === item.id);
+      let index = prev.findIndex((v) => v.id === item.id);
       if (index !== -1) {
         prev[index] = item;
       }

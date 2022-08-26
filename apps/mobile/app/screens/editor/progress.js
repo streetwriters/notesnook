@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View } from 'react-native';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useAttachmentStore } from '../../stores/use-attachment-store';
-import { SIZE } from '../../utils/size';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ProgressBarComponent } from '../../components/ui/svg/lazy';
+import React, { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useAttachmentStore } from "../../stores/use-attachment-store";
+import { SIZE } from "../../utils/size";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ProgressBarComponent } from "../../components/ui/svg/lazy";
 
 export const ProgressBar = () => {
-  const colors = useThemeStore(state => state.colors);
-  const loading = useAttachmentStore(state => state.loading);
+  const colors = useThemeStore((state) => state.colors);
+  const loading = useAttachmentStore((state) => state.loading);
   const [prog, setProg] = useState(0);
   const [visible, setVisible] = useState(false);
   const timer = useRef();
@@ -43,13 +43,13 @@ export const ProgressBar = () => {
   return visible ? (
     <View
       style={{
-        justifyContent: 'center',
-        position: 'absolute',
+        justifyContent: "center",
+        position: "absolute",
         zIndex: 1,
         marginTop: insets.top + 45,
-        width: '100%'
+        width: "100%"
       }}
-      onLayout={event => setWidth(event.nativeEvent.layout.width)}
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
     >
       <ProgressBarComponent
         size={SIZE.xxl}

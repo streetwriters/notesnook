@@ -1,62 +1,64 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, ScrollView, View } from 'react-native';
-import { LAUNCH_ROCKET } from '../../assets/images/assets';
-import { useThemeStore } from '../../stores/use-theme-store';
-import { useUserStore } from '../../stores/use-user-store';
-import { DDS } from '../../services/device-detection';
-import { eSendEvent, presentSheet } from '../../services/event-manager';
-import PremiumService from '../../services/premium';
-import { getElevation } from '../../utils';
-import { db } from '../../common/database';
+import React, { useState } from "react";
+import { ActivityIndicator, ScrollView, View } from "react-native";
+import { LAUNCH_ROCKET } from "../../assets/images/assets";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
+import { DDS } from "../../services/device-detection";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
+import PremiumService from "../../services/premium";
+import { getElevation } from "../../utils";
+import { db } from "../../common/database";
 import {
   eClosePremiumDialog,
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenResultDialog
-} from '../../utils/events';
-import { SIZE } from '../../utils/size';
-import { sleep } from '../../utils/time';
-import umami from '../../common/analytics';
-import { IconButton } from '../ui/icon-button';
-import { AuthMode } from '../auth';
-import { Button } from '../ui/button';
-import SheetProvider from '../sheet-provider';
-import { SvgView } from '../ui/svg';
-import Seperator from '../ui/seperator';
-import { Toast } from '../toast';
-import Heading from '../ui/typography/heading';
-import Paragraph from '../ui/typography/paragraph';
-import { Walkthrough } from '../walkthroughs';
-import { features } from './features';
-import { Group } from './group';
-import { PricingPlans } from './pricing-plans';
-import { usePricing } from '../../hooks/use-pricing';
+} from "../../utils/events";
+import { SIZE } from "../../utils/size";
+import { sleep } from "../../utils/time";
+import umami from "../../common/analytics";
+import { IconButton } from "../ui/icon-button";
+import { AuthMode } from "../auth";
+import { Button } from "../ui/button";
+import SheetProvider from "../sheet-provider";
+import { SvgView } from "../ui/svg";
+import Seperator from "../ui/seperator";
+import { Toast } from "../toast";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import { Walkthrough } from "../walkthroughs";
+import { features } from "./features";
+import { Group } from "./group";
+import { PricingPlans } from "./pricing-plans";
+import { usePricing } from "../../hooks/use-pricing";
 
 export const Component = ({ close, promo, getRef }) => {
-  const colors = useThemeStore(state => state.colors);
-  const user = useUserStore(state => state.user);
+  const colors = useThemeStore((state) => state.colors);
+  const user = useUserStore((state) => state.user);
   const userCanRequestTrial =
     user && (!user.subscription || !user.subscription.expiry) ? true : false;
   const [floatingButton, setFloatingButton] = useState(false);
-  const pricing = usePricing('monthly');
+  const pricing = usePricing("monthly");
 
   const onPress = async () => {
     if (user) {
-      umami.pageView('/pro-plans', `/pro-screen`);
+      umami.pageView("/pro-plans", `/pro-screen`);
       presentSheet({
-        context: 'pricing_plans',
-        component: <PricingPlans showTrialOption={false} marginTop={1} promo={promo} />
+        context: "pricing_plans",
+        component: (
+          <PricingPlans showTrialOption={false} marginTop={1} promo={promo} />
+        )
       });
     } else {
       close();
-      umami.pageView('/signup', `/pro-screen`);
+      umami.pageView("/signup", `/pro-screen`);
       setTimeout(() => {
         eSendEvent(eOpenLoginDialog, AuthMode.trialSignup);
       }, 400);
     }
   };
 
-  const onScroll = event => {
+  const onScroll = (event) => {
     let contentSize = event.nativeEvent.contentSize.height;
     contentSize = contentSize - event.nativeEvent.layoutMeasurement.height;
     let yOffset = event.nativeEvent.contentOffset.y;
@@ -70,11 +72,11 @@ export const Component = ({ close, promo, getRef }) => {
   return (
     <View
       style={{
-        width: '100%',
+        width: "100%",
         backgroundColor: colors.bg,
-        justifyContent: 'space-between',
+        justifyContent: "space-between",
         borderRadius: 10,
-        maxHeight: '100%'
+        maxHeight: "100%"
       }}
     >
       <SheetProvider context="pricing_plans" />
@@ -83,7 +85,7 @@ export const Component = ({ close, promo, getRef }) => {
           close();
         }}
         customStyle={{
-          position: 'absolute',
+          position: "absolute",
           right: DDS.isTab ? 30 : 15,
           top: 30,
           zIndex: 10,
@@ -106,24 +108,28 @@ export const Component = ({ close, promo, getRef }) => {
         <View
           key="top-banner"
           style={{
-            width: '100%',
-            alignItems: 'center',
+            width: "100%",
+            alignItems: "center",
             height: 400,
-            justifyContent: 'center'
+            justifyContent: "center"
           }}
         >
-          <SvgView width={350} height={350} src={LAUNCH_ROCKET(colors.accent)} />
+          <SvgView
+            width={350}
+            height={350}
+            src={LAUNCH_ROCKET(colors.accent)}
+          />
         </View>
 
         <Heading
           key="heading"
           size={SIZE.lg}
           style={{
-            alignSelf: 'center',
+            alignSelf: "center",
             paddingTop: 20
           }}
         >
-          Notesnook{' '}
+          Notesnook{" "}
           <Heading size={SIZE.lg} color={colors.accent}>
             Pro
           </Heading>
@@ -140,7 +146,7 @@ export const Component = ({ close, promo, getRef }) => {
         ) : (
           <Paragraph
             style={{
-              alignSelf: 'center',
+              alignSelf: "center",
               marginBottom: 20
             }}
             size={SIZE.md}
@@ -154,10 +160,10 @@ export const Component = ({ close, promo, getRef }) => {
           size={SIZE.md}
           style={{
             paddingHorizontal: 12,
-            textAlign: 'center',
-            alignSelf: 'center',
+            textAlign: "center",
+            alignSelf: "center",
             paddingBottom: 20,
-            width: '90%'
+            width: "90%"
           }}
         >
           Ready to take the next step on your private note taking journey?
@@ -172,7 +178,7 @@ export const Component = ({ close, promo, getRef }) => {
                 eSendEvent(eClosePremiumDialog);
                 eSendEvent(eCloseProgressDialog);
                 await sleep(300);
-                Walkthrough.present('trialstarted', false, true);
+                Walkthrough.present("trialstarted", false, true);
               } catch (e) {}
             }}
             title="Try free for 14 days"
@@ -189,8 +195,10 @@ export const Component = ({ close, promo, getRef }) => {
         <Button
           key="calltoaction"
           onPress={onPress}
-          title={promo ? promo.text : user ? `See all plans` : `Sign up for free`}
-          type={userCanRequestTrial ? 'grayAccent' : 'accent'}
+          title={
+            promo ? promo.text : user ? `See all plans` : `Sign up for free`
+          }
+          type={userCanRequestTrial ? "grayAccent" : "accent"}
           width={250}
           style={{
             paddingHorizontal: 12,
@@ -204,16 +212,16 @@ export const Component = ({ close, promo, getRef }) => {
             color={colors.icon}
             size={SIZE.xs}
             style={{
-              alignSelf: 'center',
-              textAlign: 'center',
+              alignSelf: "center",
+              textAlign: "center",
               marginTop: 10,
-              maxWidth: '80%'
+              maxWidth: "80%"
             }}
           >
             {user
               ? `On clicking "Try free for 14 days", your free trial will be activated.`
-              : `After sign up you will be asked to activate your free trial.`}{' '}
-            <Paragraph size={SIZE.xs} style={{ fontWeight: 'bold' }}>
+              : `After sign up you will be asked to activate your free trial.`}{" "}
+            <Paragraph size={SIZE.xs} style={{ fontWeight: "bold" }}>
               No credit card is required.
             </Paragraph>
           </Paragraph>
@@ -238,11 +246,13 @@ export const Component = ({ close, promo, getRef }) => {
       {floatingButton ? (
         <Button
           onPress={onPress}
-          title={promo ? promo.text : user ? `See all plans` : 'Sign up for free'}
+          title={
+            promo ? promo.text : user ? `See all plans` : "Sign up for free"
+          }
           type="accent"
           style={{
             paddingHorizontal: 24,
-            position: 'absolute',
+            position: "absolute",
             borderRadius: 100,
             bottom: 30,
             ...getElevation(10)
