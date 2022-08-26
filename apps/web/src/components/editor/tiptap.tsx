@@ -1,6 +1,6 @@
 import "@streetwriters/editor/styles/styles.css";
 import "@streetwriters/editor/styles/katex.min.css";
-import "@streetwriters/editor/styles/katexfonts.css";
+import "@streetwriters/editor/styles/katex-fonts.css";
 import "@streetwriters/editor/styles/fonts.css";
 import "@streetwriters/editor/styles/prism-theme.css";
 import { Theme } from "@streetwriters/theme";

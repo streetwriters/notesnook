@@ -2,3 +2,5 @@ build
 coverage
 node_modules
 dist
+native/
+public/an.js

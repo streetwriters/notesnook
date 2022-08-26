@@ -1,0 +1,14 @@
+{
+  "name": "notesnook",
+  "private": true,
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "build": "nx run-many --target=build --all",
+    "start:web": "nx start @notesnook/web"
+  },
+  "devDependencies": {
+    "lerna": "^5.4.0",
+    "nx": "^14.5.4",
+    "prettier": "^2.7.1"
+  }
+}

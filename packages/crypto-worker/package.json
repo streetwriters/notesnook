@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@notesnook/crypto": "^1.0.0",
+    "@notesnook/crypto": "*",
     "comlink": "^4.3.1"
   },
   "devDependencies": {

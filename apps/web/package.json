@@ -1,5 +1,5 @@
 {
-  "name": "notesnook",
+  "name": "@notesnook/web",
   "description": "Your private note taking space",
   "version": "2.1.6",
   "private": true,
@@ -13,10 +13,10 @@
     "@dnd-kit/sortable": "^7.0.1",
     "@mdi/js": "^6.5.95",
     "@mdi/react": "^1.4.0",
-    "@notesnook/crypto": "^1.0.0",
+    "@notesnook/crypto": "*",
     "@notesnook/desktop": "file:desktop",
     "@rebass/forms": "^4.0.6",
-    "@streetwriters/editor": "^1.3.1",
+    "@streetwriters/editor": "*",
     "@streetwriters/notesnook-core": "^7.3.6",
     "@streetwriters/theme": "^1.0.1",
     "allotment": "^1.12.1",
@@ -35,7 +35,7 @@
     "localforage": "^1.10.0",
     "localforage-driver-memory": "^1.0.5",
     "localforage-getitems": "https://github.com/thecodrr/localForage-getItems.git",
-    "@notesnook/crypto-worker": "file:../../packages/crypto-worker",
+    "@notesnook/crypto-worker": "*",
     "phone": "^3.1.14",
     "platform": "^1.3.6",
     "print-js": "^1.6.0",
@@ -54,7 +54,7 @@
     "react-virtuoso": "^2.4.0",
     "rebass": "^4.0.7",
     "showdown": "github:thecodrr/showdown",
-    "@notesnook/streamable-fs": "file:../../packages/streamable-fs",
+    "@notesnook/streamable-fs": "*",
     "timeago.js": "^4.0.2",
     "web-streams-polyfill": "^3.1.1",
     "wouter": "^2.7.3",
@@ -136,5 +136,14 @@
   },
   "volta": {
     "node": "16.15.1"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/build"
+        ]
+      }
+    }
   }
 }
