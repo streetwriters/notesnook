@@ -1,10 +1,6 @@
 import React, { createRef } from "react";
-import { Keyboard, LayoutAnimation, UIManager, View } from "react-native";
-import {
-  Transition,
-  Transitioning,
-  TransitioningView
-} from "react-native-reanimated";
+import { View } from "react-native";
+
 import { useMenuStore } from "../../../stores/use-menu-store";
 import {
   eSubscribeEvent,
@@ -67,7 +63,9 @@ export class AddTopicDialog extends React.Component {
       this.close();
       Navigation.queueRoutesForUpdate("Notebooks", "Notebook", "TopicNotes");
       useMenuStore.getState().setMenuPins();
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   componentDidMount() {

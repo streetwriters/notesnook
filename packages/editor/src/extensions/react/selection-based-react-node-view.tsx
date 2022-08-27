@@ -2,14 +2,11 @@ import React from "react";
 import { DecorationSet } from "prosemirror-view";
 import { Node as PMNode } from "prosemirror-model";
 import { Selection, NodeSelection } from "prosemirror-state";
-import { PortalProviderAPI } from "./react-portal-provider";
 import {
   stateKey as SelectionChangePluginKey,
   ReactNodeViewState
 } from "./plugin";
-import { EventDispatcher } from "./event-dispatcher";
 import {
-  ReactNodeViewProps,
   ReactNodeViewOptions,
   GetPosNode,
   SelectionBasedReactNodeViewProps,
@@ -17,7 +14,6 @@ import {
 } from "./types";
 import { ReactNodeView } from "./react-node-view";
 import { NodeViewRendererProps } from "@tiptap/core";
-import { Theme } from "@streetwriters/theme";
 import { Editor } from "../../types";
 import { ThemeProvider } from "../../components/theme-provider";
 
@@ -51,7 +47,7 @@ export class SelectionBasedNodeView<
   private oldSelection: Selection;
   private selectionChangeState: ReactNodeViewState;
 
-  pos: number = -1;
+  pos = -1;
   posEnd: number | undefined;
 
   constructor(
@@ -74,7 +70,7 @@ export class SelectionBasedNodeView<
   render(
     props: P = {} as P,
     forwardRef?: ForwardRef
-  ): React.ReactElement<any> | null {
+  ): React.ReactElement<unknown> | null {
     if (!this.options.component) return null;
     const isSelected =
       this.editor.isEditable &&

@@ -1,4 +1,4 @@
-import { Text, Flex, Box, Button } from "rebass";
+import { Text, Flex, Box } from "rebass";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { showBuyDialog } from "../../common/dialog-controller";

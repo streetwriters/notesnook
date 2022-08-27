@@ -26,7 +26,7 @@ export const Tool = ({
     state.dragged,
     state.setDragged
   ]);
-  const [recieving, setRecieving] = React.useState(false);
+  const [_recieving, setRecieving] = React.useState(false);
   const [recievePosition, setRecievePosition] = React.useState("above");
   const colors = useThemeStore((state) => state.colors);
   const isSubgroup = typeof item === "object";
@@ -91,7 +91,7 @@ export const Tool = ({
             } else {
               //@ts-ignore
               const index = _data[parentIndex][groupIndex].findIndex(
-                (tool) => tool === item
+                (tool: string) => tool === item
               );
               //@ts-ignore
               _data[parentIndex][groupIndex].splice(index, 1);
@@ -226,7 +226,7 @@ export const Tool = ({
     const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
     const dragged = data.dragged.payload;
     const reciever = data.receiver.payload;
-    let _data = useDragState.getState().data.slice();
+    const _data = useDragState.getState().data.slice();
 
     const isFromSubgroup = typeof dragged.parentIndex === "number";
     const isDroppedAtSubgroup = typeof reciever.parentIndex === "number";
@@ -314,10 +314,10 @@ export const Tool = ({
         }}
         renderHoverContent={() => renderChild(true)}
         draggable={item !== "dummy"}
-        onDragDrop={(data) => {
+        onDragDrop={() => {
           setDragged({});
         }}
-        onDragEnd={(data) => {
+        onDragEnd={() => {
           setDragged({});
         }}
         hoverDragReleasedStyle={{

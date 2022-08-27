@@ -23,7 +23,7 @@ export const SelectionPersist = Extension.create({
           init() {
             return DecorationSet.empty;
           },
-          apply(tr, value, oldState, newState) {
+          apply(tr, _value, oldState) {
             const { isSearching } = (editor.storage.searchreplace ||
               {}) as Partial<SearchStorage>;
             if (isSearching) return DecorationSet.empty;
@@ -48,7 +48,7 @@ export const SelectionPersist = Extension.create({
             if (isBlurred) {
               return DecorationSet.create(tr.doc, [
                 Decoration.inline(from, to, {
-                  style: `background-color: var(--dimPrimary)`
+                  style: "background-color: var(--dimPrimary)"
                 })
               ]);
             } else if (isFocused) {

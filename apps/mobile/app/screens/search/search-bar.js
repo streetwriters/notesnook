@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Platform, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { IconButton } from "../../components/ui/icon-button";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useSearchStore } from "../../stores/use-search-store";
@@ -13,7 +12,7 @@ import {
 import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
 import { eScrollEvent } from "../../utils/events";
-import { normalize, SIZE } from "../../utils/size";
+import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 
 export const SearchBar = () => {
@@ -23,7 +22,6 @@ export const SearchBar = () => {
   const setSearchResults = useSearchStore((state) => state.setSearchResults);
   const setSearchStatus = useSearchStore((state) => state.setSearchStatus);
   const searchingRef = useRef(0);
-  const insets = useSafeAreaInsets();
   const onClear = () => {
     //inputRef.current?.blur();
     inputRef.current?.clear();

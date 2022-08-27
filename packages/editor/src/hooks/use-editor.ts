@@ -63,7 +63,7 @@ export const useEditor = (
     // this is required for the drag/drop to work properly
     // in the editor.
     function onDragEnter(event: DragEvent) {
-      if (!!editor?.view.dragging) {
+      if (editor?.view.dragging) {
         event.preventDefault();
         return true;
       }

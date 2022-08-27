@@ -82,7 +82,7 @@ export class AddNotebookSheet extends React.Component {
 
     if (notebook) {
       let topicsList = [];
-      notebook.topics.forEach((item, index) => {
+      notebook.topics.forEach((item) => {
         topicsList.push(item.title);
       });
       this.id = notebook.id;
@@ -100,7 +100,7 @@ export class AddNotebookSheet extends React.Component {
         notebook: null
       });
     }
-    sleep(100).then((r) => {
+    sleep(100).then(() => {
       this.actionSheetRef.current?.show();
     });
   };

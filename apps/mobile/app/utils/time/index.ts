@@ -2,7 +2,7 @@ export const sleep = (duration: number) =>
   new Promise((resolve) => setTimeout(() => resolve(true), duration));
 
 export function timeSince(date: number) {
-  let seconds = Math.floor((Date.now() - date) / 1000);
+  const seconds = Math.floor((Date.now() - date) / 1000);
   let interval = Math.floor(seconds / 31536000);
 
   if (interval > 0.9) {
@@ -36,18 +36,16 @@ export function timeSince(date: number) {
 
 export const timeConverter = (timestamp: number | undefined | null) => {
   if (!timestamp) return;
-  let d = new Date(timestamp), // Convert the passed timestamp to milliseconds
-    yyyy = d.getFullYear(),
-    mm = ("0" + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
-    dd = ("0" + d.getDate()).slice(-2), // Add leading 0.
-    currentDay = d.getDay(),
-    hh = d.getHours(),
-    h = hh,
-    min = ("0" + d.getMinutes()).slice(-2), // Add leading 0.
-    ampm = "AM",
-    time;
-  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  let months = [
+  const d = new Date(timestamp); // Convert the passed timestamp to milliseconds
+  const yyyy = d.getFullYear();
+  const dd = ("0" + d.getDate()).slice(-2); // Add leading 0.
+  const currentDay = d.getDay();
+  const hh = d.getHours();
+  let h = hh;
+  const min = ("0" + d.getMinutes()).slice(-2); // Add leading 0.
+  let ampm = "AM";
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const months = [
     "Jan",
     "Feb",
     "Mar",
@@ -73,7 +71,7 @@ export const timeConverter = (timestamp: number | undefined | null) => {
   }
 
   // ie: 2013-02-18, 8:35 AM
-  time =
+  const time =
     days[currentDay] +
     " " +
     dd +

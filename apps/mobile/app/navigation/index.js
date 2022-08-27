@@ -9,37 +9,35 @@ import { useSettingStore } from "../stores/use-setting-store";
 import { useThemeStore } from "../stores/use-theme-store";
 import { TabsHolder } from "./tabs-holder";
 
-export const ApplicationHolder = React.memo(
-  () => {
-    const loading = useNoteStore((state) => state.loading);
-    const introCompleted = useSettingStore(
-      (state) => state.settings.introCompleted
-    );
-    const colors = useThemeStore((state) => state.colors);
+const _ApplicationHolder = () => {
+  const loading = useNoteStore((state) => state.loading);
+  const introCompleted = useSettingStore(
+    (state) => state.settings.introCompleted
+  );
+  const colors = useThemeStore((state) => state.colors);
 
-    return (
-      <>
-        {loading && introCompleted ? (
-          <>
-            <SafeAreaView
-              style={{
-                flex: 1,
-                backgroundColor: colors.bg
-              }}
-            >
-              <Header />
-              <DelayLayout animated={false} wait={loading} />
-            </SafeAreaView>
-          </>
-        ) : (
-          <>
-            <TabsHolder />
-            <Toast />
-          </>
-        )}
-        <DialogProvider />
-      </>
-    );
-  },
-  () => true
-);
+  return (
+    <>
+      {loading && introCompleted ? (
+        <>
+          <SafeAreaView
+            style={{
+              flex: 1,
+              backgroundColor: colors.bg
+            }}
+          >
+            <Header />
+            <DelayLayout animated={false} wait={loading} />
+          </SafeAreaView>
+        </>
+      ) : (
+        <>
+          <TabsHolder />
+          <Toast />
+        </>
+      )}
+      <DialogProvider />
+    </>
+  );
+};
+export const ApplicationHolder = React.memo(_ApplicationHolder, () => true);

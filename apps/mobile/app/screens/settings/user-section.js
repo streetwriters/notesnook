@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TimeSince } from "../../components/ui/time-since";
@@ -23,8 +22,8 @@ const SettingsUserSection = ({ item }) => {
   const colors = useThemeStore((state) => state.colors);
 
   const user = useUserStore((state) => state.user);
-  const subscriptionDaysLeft =
-    user && getTimeLeft(parseInt(user.subscription?.expiry));
+  // const subscriptionDaysLeft =
+  //   user && getTimeLeft(parseInt(user.subscription?.expiry));
   // const isExpired = user && subscriptionDaysLeft.time < 0;
   // const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   // const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');

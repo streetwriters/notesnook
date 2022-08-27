@@ -1,15 +1,10 @@
 import {
-  createNativeStackNavigator,
-  NativeStackScreenProps
+  createNativeStackNavigator
 } from "@react-navigation/native-stack";
-import React from "react";
-import DelayLayout from "../../components/delay-layout";
-import { Header } from "../../components/header";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import Group from "./group";
 import Home from "./home";
-import { RouteParams } from "./types";
 
 const SettingsStack = createNativeStackNavigator();
 const screenListeners = {

@@ -61,7 +61,7 @@ export function AddLink(props: ToolProps) {
       onClick={() => {
         if (!editor.current) return;
         const { state } = editor.current;
-        let { from, to } = state.selection;
+        const { from, to } = state.selection;
 
         const isImage = state.doc.nodeAt(from)?.type.name === ImageNode.name;
         if (isImage) return { isImage };

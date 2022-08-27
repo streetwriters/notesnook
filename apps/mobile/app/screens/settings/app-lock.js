@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Dimensions, LayoutAnimation, Platform, View } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -22,7 +22,7 @@ import { SIZE } from "../../utils/size";
 import BiometicService from "../../services/biometrics";
 import { useUserStore } from "../../stores/use-user-store";
 
-const AppLock = ({ navigation, route }) => {
+const AppLock = ({ route }) => {
   const colors = useThemeStore((state) => state.colors);
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);
   const [step, setStep] = useState(0);

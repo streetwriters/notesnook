@@ -87,7 +87,7 @@ async function presentBackupCompleteSheet(backupFilePath) {
     icon: "cloud-upload",
     paragraph: `${
       Platform.OS === "android"
-        ? 'Backup file saved in "Notesnook backups" folder on your phone'
+        ? "Backup file saved in \"Notesnook backups\" folder on your phone"
         : "Backup file is saved in File Manager/Notesnook folder"
     }. Share your backup to your cloud so you do not lose it.`,
     actionText: "Share backup",
@@ -151,7 +151,7 @@ async function run(progress, context) {
       "mobile",
       SettingsService.get().encryptedBackup
     );
-    if (!backup) throw new Error(`Backup returned empty.`);
+    if (!backup) throw new Error("Backup returned empty.");
   } catch (e) {
     await sleep(300);
     eSendEvent(eCloseProgressDialog);

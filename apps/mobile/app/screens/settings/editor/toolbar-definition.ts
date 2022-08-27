@@ -36,11 +36,11 @@ export function getToolIcon(id: keyof typeof tools) {
 export function getUngroupedTools(
   toolDefinition: (string | string[])[][]
 ): string[] {
-  let keys = Object.keys(tools);
+  const keys = Object.keys(tools);
   console.log(keys);
   const ungrouped = [];
-  let toolString = JSON.stringify(toolDefinition);
-  for (let key of keys) {
+  const toolString = JSON.stringify(toolDefinition);
+  for (const key of keys) {
     if (tools[key as ToolId].conditional) continue;
     if (!toolString.includes(key)) ungrouped.push(key);
   }

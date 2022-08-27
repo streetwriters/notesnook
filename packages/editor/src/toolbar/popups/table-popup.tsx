@@ -1,9 +1,6 @@
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import { useEffect, useState } from "react";
 import { Popup } from "../components/popup";
-import { Input } from "@rebass/forms";
-import { Icon } from "../components/icon";
-import { Icons } from "../icons";
 import { useIsMobile } from "../stores/toolbar-store";
 import { InlineInput } from "../../components/inline-input";
 
@@ -39,10 +36,10 @@ export function TablePopup(props: TablePopupProps) {
       const { columns, rows } = old;
       const { column, row } = cellLocation;
 
-      let isDecrease = row === rows - 2 || column === columns - 2;
+      const isDecrease = row === rows - 2 || column === columns - 2;
 
-      let rowFactor = Number(row === rows || row === rows - 2);
-      let columnFactor = Number(column === columns || column === columns - 2);
+      const rowFactor = Number(row === rows || row === rows - 2);
+      const columnFactor = Number(column === columns || column === columns - 2);
 
       return {
         columns: isDecrease

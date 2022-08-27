@@ -1,4 +1,3 @@
-import React from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -23,7 +22,7 @@ export const Items = ({ item, buttons, close }) => {
     ? (width - 24) / columnItemsCount
     : (width - 24) / columnItemsCount;
 
-  const _renderRowItem = ({ item, index }) => (
+  const _renderRowItem = ({ item }) => (
     <View
       onPress={item.func}
       key={item.name}
@@ -67,7 +66,7 @@ export const Items = ({ item, buttons, close }) => {
     </View>
   );
 
-  const renderColumnItem = ({ item, index }) => (
+  const renderColumnItem = ({ item }) => (
     <Button
       buttonType={{
         text: item.on

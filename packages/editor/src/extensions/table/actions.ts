@@ -1,6 +1,12 @@
 import { Editor } from "@tiptap/core";
 import { selectedRect, TableRect } from "@_ueberdosis/prosemirror-tables";
 import { Transaction } from "prosemirror-state";
+import { Node } from "prosemirror-model";
+
+type TableCell = {
+  cell: Node;
+  pos: number;
+};
 
 function moveColumnRight(editor: Editor) {
   const { tr } = editor.state;
@@ -52,21 +58,21 @@ function moveColumn(
   from: number,
   to: number
 ) {
-  let fromCells = getColumnCells(rect, from);
-  let toCells = getColumnCells(rect, to);
+  const fromCells = getColumnCells(rect, from);
+  const toCells = getColumnCells(rect, to);
 
   return moveCells(tr, rect, fromCells, toCells);
 }
 
-function getColumnCells({ map, table }: TableRect, col: number) {
-  let cells = [];
+function getColumnCells({ map, table }: TableRect, col: number): TableCell[] {
+  const cells: TableCell[] = [];
   for (let row = 0; row < map.height; ) {
-    let index = row * map.width + col;
+    const index = row * map.width + col;
     if (index >= map.map.length) break;
 
-    let pos = map.map[index];
+    const pos = map.map[index];
 
-    let cell = table.nodeAt(pos);
+    const cell = table.nodeAt(pos);
     if (!cell) continue;
     cells.push({ cell, pos });
 
@@ -77,18 +83,18 @@ function getColumnCells({ map, table }: TableRect, col: number) {
 }
 
 function moveRow(tr: Transaction, rect: TableRect, from: number, to: number) {
-  let fromCells = getRowCells(rect, from);
-  let toCells = getRowCells(rect, to);
+  const fromCells = getRowCells(rect, from);
+  const toCells = getRowCells(rect, to);
   return moveCells(tr, rect, fromCells, toCells);
 }
 
-function getRowCells({ map, table }: TableRect, row: number) {
-  let cells = [];
+function getRowCells({ map, table }: TableRect, row: number): TableCell[] {
+  const cells: TableCell[] = [];
   for (let col = 0, index = row * map.width; col < map.width; col++, index++) {
     if (index >= map.map.length) break;
 
-    let pos = map.map[index];
-    let cell = table.nodeAt(pos);
+    const pos = map.map[index];
+    const cell = table.nodeAt(pos);
 
     if (!cell) continue;
     cells.push({ cell, pos });
@@ -102,11 +108,11 @@ function getRowCells({ map, table }: TableRect, row: number) {
 function moveCells(
   tr: Transaction,
   rect: TableRect,
-  fromCells: any[],
-  toCells: any[]
+  fromCells: TableCell[],
+  toCells: TableCell[]
 ) {
   if (fromCells.length !== toCells.length) return;
-  let mapStart = tr.mapping.maps.length;
+  const mapStart = tr.mapping.maps.length;
 
   for (let i = 0; i < toCells.length; ++i) {
     const fromCell = fromCells[i];

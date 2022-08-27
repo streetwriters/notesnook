@@ -1,4 +1,3 @@
-import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";

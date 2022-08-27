@@ -48,7 +48,7 @@ export function format(log: LogMessage) {
     if (token.value) {
       line += token.value;
       if (token.separator) line += token.separator;
-      else line += ` `;
+      else line += " ";
     }
   }
   return line;

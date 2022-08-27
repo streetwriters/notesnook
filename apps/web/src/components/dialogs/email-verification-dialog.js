@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Flex, Button, Text } from "rebass";
+import { useEffect } from "react";
+import { Flex, Text } from "rebass";
 import Dialog from "./dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";

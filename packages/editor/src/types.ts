@@ -1,7 +1,6 @@
 import { UnionCommands, Editor as TiptapEditor } from "@tiptap/core";
 
-export interface PermissionRequestEvent
-  extends CustomEvent<{ id: keyof UnionCommands }> {}
+export type PermissionRequestEvent = CustomEvent<{ id: keyof UnionCommands }>
 
 export class Editor extends TiptapEditor {
   /**

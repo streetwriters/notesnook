@@ -1,15 +1,10 @@
-import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 export const PricingItem = ({ product, onPress, compact }) => {
-  const colors = useThemeStore((state) => state.colors);
-
   return (
     <PressableButton
       onPress={onPress}

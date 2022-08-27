@@ -1,5 +1,4 @@
-const { Page, test, expect } = require("@playwright/test");
-const List = require("./utils/listitemidbuilder");
+const { test, expect } = require("@playwright/test");
 const {
   createNote,
   NOTE,
@@ -14,7 +13,7 @@ const {
   createNoteAndCheckPresence
 } = require("./utils/conditions");
 /**
- * @type {Page}
+ * @type {import("@playwright/test").Page}
  */
 var page = null;
 global.page = null;

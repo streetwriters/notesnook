@@ -1,4 +1,3 @@
-import React from "react";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { presentDialog } from "../../components/dialog/functions";
@@ -6,7 +5,6 @@ import List from "../../components/list";
 import { ToastEvent } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SearchService from "../../services/search";
-import SettingsService from "../../services/settings";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
@@ -54,7 +52,7 @@ const PLACEHOLDER_DATA = {
 export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
   const trash = useTrashStore((state) => state.trash);
   const isFocused = useNavigationFocus(navigation, {
-    onFocus: (prev) => {
+    onFocus: () => {
       Navigation.routeNeedsUpdate(
         route.name,
         Navigation.routeUpdateFunctions[route.name]
@@ -80,8 +78,13 @@ export const Trash = ({ navigation, route }: NavigationProps<"Trash">) => {
         loading={!isFocused}
         placeholderData={PLACEHOLDER_DATA}
         headerProps={{
-          heading: "Trash"
+          heading: "Trash",
+          color: null
         }}
+        // TODO: remove these once we have full typings everywhere
+        ListHeader={undefined}
+        refreshCallback={undefined}
+        warning={undefined}
       />
 
       {trash && trash.length !== 0 ? (

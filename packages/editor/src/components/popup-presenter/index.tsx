@@ -1,27 +1,15 @@
-import {
-  useCallback,
-  useRef,
-  useEffect,
-  PropsWithChildren,
-  ReactNode
-} from "react";
+import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
 import { Box } from "rebass";
 import { getPosition, PositionOptions } from "../../utils/position";
 import Modal from "react-modal";
 import ReactDOM from "react-dom";
-import { Editor } from "@tiptap/core";
 import { getPopupContainer, getToolbarElement } from "../../toolbar/utils/dom";
-import { Theme } from "@streetwriters/theme";
 import {
   useIsMobile,
   useToolbarStore
 } from "../../toolbar/stores/toolbar-store";
 import React from "react";
-import {
-  EditorContext,
-  PopupRenderer,
-  usePopupRenderer
-} from "./popuprenderer";
+import { EditorContext, usePopupRenderer } from "./popuprenderer";
 import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
 import { ThemeProvider } from "../theme-provider";
 
@@ -79,7 +67,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     if (!movableBar) return;
     const popup = contentRef.current;
 
-    var offset = { x: 0, y: 0 };
+    const offset = { x: 0, y: 0 };
     function mouseDown(e: MouseEvent) {
       offset.x = e.clientX - popup.offsetLeft;
       offset.y = e.clientY - popup.offsetTop;
@@ -88,8 +76,8 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
 
     function mouseMove(e: MouseEvent) {
       if (!e.buttons) mouseUp();
-      var top = e.clientY - offset.y;
-      var left = e.clientX - offset.x;
+      const top = e.clientY - offset.y;
+      const left = e.clientX - offset.x;
       requestAnimationFrame(() => {
         popup.style.top = top + "px";
         popup.style.left = left + "px";
@@ -109,7 +97,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     if (!popup) return;
 
     let oldHeight: number = popup.offsetHeight;
-    observerRef.current = new ResizeObserver((e) => {
+    observerRef.current = new ResizeObserver(() => {
       if (isMobile) {
         repositionPopup();
       } else {
@@ -158,7 +146,6 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
         return (
           <Box
             {...props}
-            //@ts-ignore
             style={{
               ...props.style,
               position: !blocking ? "initial" : "fixed",
@@ -234,16 +221,8 @@ export type PopupWrapperProps = UsePopupHandlerOptions & {
   renderPopup: (closePopup: () => void) => React.ReactNode;
 } & Partial<Omit<PopupPresenterProps, "onClose">>;
 export function PopupWrapper(props: PopupWrapperProps) {
-  let {
-    id,
-    group,
-    position,
-    renderPopup,
-    isOpen,
-    onClosed,
-    autoCloseOnUnmount,
-    ...presenterProps
-  } = props;
+  const { id, position, renderPopup, autoCloseOnUnmount, ...presenterProps } =
+    props;
   const PopupRenderer = usePopupRenderer();
   const { closePopup, isPopupOpen } = usePopupHandler(props);
 
@@ -270,12 +249,12 @@ export function PopupWrapper(props: PopupWrapperProps) {
         return (
           <PopupPresenter
             key={id}
-            isOpen={isPopupOpen}
             onClose={() => closePopup(id)}
             position={position}
             blocking
             focusOnRender
             {...presenterProps}
+            isOpen={isPopupOpen}
           >
             <Box
               sx={{
@@ -307,18 +286,15 @@ type UsePopupHandlerOptions = {
   onClosed?: () => void;
 };
 export function usePopupHandler(options: UsePopupHandlerOptions) {
-  let { group, isOpen, id, onClosed } = options;
-
+  const { isOpen, id, onClosed } = options;
+  const isBottom = useToolbarStore(
+    (store) => store.toolbarLocation === "bottom"
+  );
   const isPopupOpen = useToolbarStore((store) => !!store.openedPopups[id]);
   const openPopup = useToolbarStore((store) => store.openPopup);
   const closePopup = useToolbarStore((store) => store.closePopup);
   const closePopupGroup = useToolbarStore((store) => store.closePopupGroup);
-
-  const isBottom = useToolbarStore(
-    (store) => store.toolbarLocation === "bottom"
-  );
-
-  if (isBottom) group = "popup";
+  const group = isBottom ? "popup" : options.group;
 
   useEffect(() => {
     if (isOpen) openPopup({ id, group });

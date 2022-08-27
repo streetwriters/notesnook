@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import {
@@ -132,7 +132,7 @@ export const Expiring = () => {
                     marginTop: 10
                   }}
                 >
-                  See what's included in Basic & Pro plans
+                  {"See what's included in Basic & Pro plans"}
                 </Paragraph>
 
                 <Seperator />

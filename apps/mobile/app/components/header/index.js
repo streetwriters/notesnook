@@ -14,65 +14,63 @@ import { LeftMenus } from "./left-menus";
 import { RightMenus } from "./right-menus";
 import { Title } from "./title";
 
-export const Header = React.memo(
-  () => {
-    const colors = useThemeStore((state) => state.colors);
-    const insets = useSafeAreaInsets();
-    const [hide, setHide] = useState(true);
-    const selectionMode = useSelectionStore((state) => state.selectionMode);
-    const currentScreen = useNavigationStore(
-      (state) => state.currentScreen?.name
-    );
+const _Header = () => {
+  const colors = useThemeStore((state) => state.colors);
+  const insets = useSafeAreaInsets();
+  const [hide, setHide] = useState(true);
+  const selectionMode = useSelectionStore((state) => state.selectionMode);
+  const currentScreen = useNavigationStore(
+    (state) => state.currentScreen?.name
+  );
 
-    const onScroll = (data) => {
-      if (data.y > 150) {
-        if (!hide) return;
-        setHide(false);
-      } else {
-        if (hide) return;
-        setHide(true);
-      }
+  const onScroll = (data) => {
+    if (data.y > 150) {
+      if (!hide) return;
+      setHide(false);
+    } else {
+      if (hide) return;
+      setHide(true);
+    }
+  };
+
+  useEffect(() => {
+    eSubscribeEvent(eScrollEvent, onScroll);
+    return () => {
+      eUnSubscribeEvent(eScrollEvent, onScroll);
     };
+  }, [hide]);
 
-    useEffect(() => {
-      eSubscribeEvent(eScrollEvent, onScroll);
-      return () => {
-        eUnSubscribeEvent(eScrollEvent, onScroll);
-      };
-    }, [hide]);
-
-    return selectionMode ? null : (
-      <>
-        <View
-          style={[
-            styles.container,
-            {
-              marginTop: Platform.OS === "android" ? insets.top : null,
-              backgroundColor: colors.bg,
-              overflow: "hidden",
-              borderBottomWidth: 1,
-              borderBottomColor: hide ? "transparent" : colors.nav,
-              justifyContent: "space-between"
-            }
-          ]}
-        >
-          {currentScreen === "Search" ? (
-            <SearchBar />
-          ) : (
-            <>
-              <View style={styles.leftBtnContainer}>
-                <LeftMenus />
-                <Title />
-              </View>
-              <RightMenus />
-            </>
-          )}
-        </View>
-      </>
-    );
-  },
-  () => true
-);
+  return selectionMode ? null : (
+    <>
+      <View
+        style={[
+          styles.container,
+          {
+            marginTop: Platform.OS === "android" ? insets.top : null,
+            backgroundColor: colors.bg,
+            overflow: "hidden",
+            borderBottomWidth: 1,
+            borderBottomColor: hide ? "transparent" : colors.nav,
+            justifyContent: "space-between"
+          }
+        ]}
+      >
+        {currentScreen === "Search" ? (
+          <SearchBar />
+        ) : (
+          <>
+            <View style={styles.leftBtnContainer}>
+              <LeftMenus />
+              <Title />
+            </View>
+            <RightMenus />
+          </>
+        )}
+      </View>
+    </>
+  );
+};
+export const Header = React.memo(_Header, () => true);
 
 const styles = StyleSheet.create({
   container: {

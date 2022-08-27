@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -17,7 +17,7 @@ import NotePreview from "./preview";
 
 export default function NoteHistory({ note, fwdRef }) {
   const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
   const colors = useThemeStore((state) => state.colors);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export default function NoteHistory({ note, fwdRef }) {
   };
 
   const renderItem = useCallback(
-    ({ item, index }) => (
+    ({ item }) => (
       <PressableButton
         type="grayBg"
         onPress={() => preview(item)}

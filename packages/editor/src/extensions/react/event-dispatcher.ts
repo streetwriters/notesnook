@@ -1,16 +1,16 @@
 import { PluginKey } from "prosemirror-state";
 
-export interface Listeners {
-  [name: string]: Set<Listener>;
+export interface Listeners<T> {
+  [name: string]: Set<Listener<T>>;
 }
-export type Listener<T = any> = (data: T) => void;
-export type Dispatch<T = any> = (
+export type Listener<T = unknown> = (data: T) => void;
+export type Dispatch<T = unknown> = (
   eventName: PluginKey | string,
   data: T
 ) => void;
 
-export class EventDispatcher<T = any> {
-  private listeners: Listeners = {};
+export class EventDispatcher<T = unknown> {
+  private listeners: Listeners<T> = {};
 
   on(event: string, cb: Listener<T>): void {
     if (!this.listeners[event]) {

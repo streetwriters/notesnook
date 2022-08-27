@@ -1,4 +1,4 @@
-const { navigate, tapByText, prepare, sleep } = require("./utils");
+import { navigate, tapByText, prepare, sleep } from "./utils";
 
 describe("APP LAUNCH AND NAVIGATION", () => {
   it("App should launch successfully & hide welcome screen", async () => {

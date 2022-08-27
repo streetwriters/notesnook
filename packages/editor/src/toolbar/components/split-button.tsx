@@ -1,20 +1,16 @@
-import { PropsWithChildren, useRef, useState } from "react";
+import { PropsWithChildren, useRef } from "react";
 import { Flex } from "rebass";
 import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton, ToolButtonProps } from "./tool-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
-import {
-  PopupWrapper,
-  PopupWrapperProps
-} from "../../components/popup-presenter";
-import { PositionOptions } from "../../utils/position";
+
 import { Button } from "../../components/button";
 import React from "react";
 
 export type SplitButtonProps = ToolButtonProps & { onOpen: () => void };
 function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
-  const { children, toggled, onOpen, sx, ...toolButtonProps } = props;
+  const { children, onOpen, sx, ...toolButtonProps } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const toolbarLocation = useToolbarLocation();

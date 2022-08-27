@@ -134,7 +134,7 @@ export const deleteItems = async (item) => {
   SearchService.updateAndSearch();
 };
 
-export const openLinkInBrowser = async (link, colors) => {
+export const openLinkInBrowser = async (link) => {
   try {
     const url = link;
     Linking.openURL(url);

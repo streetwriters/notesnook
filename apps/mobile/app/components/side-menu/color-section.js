@@ -15,7 +15,7 @@ import Paragraph from "../ui/typography/paragraph";
 import { ColoredNotes } from "../../screens/notes/colored";
 
 export const ColorSection = React.memo(
-  () => {
+  function ColorSection() {
     const colorNotes = useMenuStore((state) => state.colorNotes);
     const loading = useNoteStore((state) => state.loading);
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
@@ -37,7 +37,7 @@ export const ColorSection = React.memo(
 );
 
 const ColorItem = React.memo(
-  ({ item, index, alias }) => {
+  function ColorItem({ item, alias }) {
     const colors = useThemeStore((state) => state.colors);
     const setColorNotes = useMenuStore((state) => state.setColorNotes);
     const [headerTextState, setHeaderTextState] = useState(null);

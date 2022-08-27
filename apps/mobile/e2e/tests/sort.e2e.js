@@ -1,17 +1,14 @@
-const { notesnook } = require("../test.ids");
-const {
-  navigate,
+import { notesnook } from "../test.ids";
+import {
   tapById,
   visibleByText,
   createNote,
   prepare,
-  visibleById,
-  notVisibleById,
-  elementById,
   tapByText,
-  notVisibleByText
-} = require("./utils");
-const { sleep } = require("./utils");
+  notVisibleByText,
+  sleep
+} from "./utils";
+import { web } from "detox";
 
 async function sortBy(sorting, elementText = "Default") {
   await tapByText(elementText);
@@ -22,8 +19,8 @@ async function sortBy(sorting, elementText = "Default") {
 describe("Sort & filter", () => {
   it("Sort by date-edited/date-created", async () => {
     await prepare();
-    let note1 = await createNote("Note 1", "Note 1");
-    let note2 = await createNote("Note 2", "Note 2");
+    await createNote("Note 1", "Note 1");
+    await createNote("Note 2", "Note 2");
     await sleep(300);
     await tapByText("Note 1");
     await sleep(500);
@@ -47,7 +44,7 @@ describe("Sort & filter", () => {
 
   it("Disable grouping", async () => {
     await prepare();
-    let note1 = await createNote("Note 1", "Note 1");
+    await createNote("Note 1", "Note 1");
     await sleep(300);
     await sortBy("None");
     await sleep(300);
@@ -56,7 +53,7 @@ describe("Sort & filter", () => {
 
   it("Group by Abc", async () => {
     await prepare();
-    let note1 = await createNote("Note 1", "Note 1");
+    await createNote("Note 1", "Note 1");
     await sleep(300);
     await sortBy("Abc");
     await visibleByText("N");
@@ -64,7 +61,7 @@ describe("Sort & filter", () => {
 
   it("Group by Year", async () => {
     await prepare();
-    let note1 = await createNote("Note 1", "Note 1");
+    await createNote("Note 1", "Note 1");
     await sleep(300);
     await sortBy("Year");
     await sleep(300);
@@ -73,7 +70,7 @@ describe("Sort & filter", () => {
 
   it("Group by Week", async () => {
     await prepare();
-    let note1 = await createNote("Note 1", "Note 1");
+    await createNote("Note 1", "Note 1");
     await sleep(300);
     await sortBy("Week");
     await sleep(300);
@@ -82,7 +79,7 @@ describe("Sort & filter", () => {
 
   it("Group by Month", async () => {
     await prepare();
-    let note1 = await createNote("Note 1", "Note 1");
+    await createNote("Note 1", "Note 1");
     await sleep(300);
     await sortBy("Month");
     await sleep(300);
@@ -91,7 +88,7 @@ describe("Sort & filter", () => {
 
   it("Compact mode", async () => {
     await prepare();
-    let note1 = await createNote("Note 1", "Note 1");
+    await createNote("Note 1", "Note 1");
     await sleep(300);
     await tapById("icon-compact-mode");
     await sleep(300);

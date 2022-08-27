@@ -1,6 +1,6 @@
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
 import { qclone } from "qclone";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
@@ -60,7 +60,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
     if (data) params.current = data;
     params.current.title = params.current.item.title;
     try {
-      let notebook = db.notebooks?.notebook(params?.current?.item?.id)
+      const notebook = db.notebooks?.notebook(params?.current?.item?.id)
         ?.data as NotebookType;
       if (notebook) {
         params.current.item = notebook;
@@ -72,7 +72,9 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
         );
         syncWithNavigation();
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {
@@ -88,7 +90,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
       type: "topics",
       title: params.current.title,
       get: () => {
-        let notebook = db.notebooks?.notebook(params?.current?.item?.id)
+        const notebook = db.notebooks?.notebook(params?.current?.item?.id)
           ?.data as NotebookType;
         return notebook?.topics;
       }
@@ -96,7 +98,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
   };
 
   const onPressFloatingButton = () => {
-    let n = params.current.item;
+    const n = params.current.item;
     eSendEvent(eOpenAddTopicDialog, { notebookId: n.id });
   };
 

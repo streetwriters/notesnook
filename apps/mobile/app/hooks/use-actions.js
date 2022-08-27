@@ -1,8 +1,8 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Share from "react-native-share";
-import { editing, toTXT } from "../utils";
+import { toTXT } from "../utils";
 import { notesnook } from "../../e2e/test.ids";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
@@ -358,7 +358,9 @@ export const useActions = ({ close = () => null, item }) => {
       }
       setIsPinnedToMenu(db.settings.isPinned(item.id));
       setMenuPins();
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function renameTag() {
@@ -418,7 +420,7 @@ export const useActions = ({ close = () => null, item }) => {
       presentDialog({
         title: "Delete tag",
         paragraph: "This tag will be removed from all notes.",
-        positivePress: async (value) => {
+        positivePress: async () => {
           await db.tags.remove(item.id);
           useTagStore.getState().setTags();
           Navigation.queueRoutesForUpdate(
@@ -450,7 +452,9 @@ export const useActions = ({ close = () => null, item }) => {
         close();
         console.log("moving note to trash");
         await deleteItems(item);
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
   async function removeNoteFromTopic() {
@@ -477,7 +481,7 @@ export const useActions = ({ close = () => null, item }) => {
     close();
     await sleep(300);
     presentDialog({
-      title: `Permanent delete`,
+      title: "Permanent delete",
       paragraph: `Are you sure you want to delete this ${item.itemType} permanantly from trash?`,
       positiveText: "Delete",
       negativeText: "Cancel",

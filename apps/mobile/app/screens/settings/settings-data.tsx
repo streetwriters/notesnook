@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-import React from "react";
 import { Linking, Platform } from "react-native";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
@@ -48,7 +47,7 @@ import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 const format = (ver: number) => {
-  let parts = ver.toString().split("");
+  const parts = ver.toString().split("");
   return `v${parts[0]}.${parts[1]}.${
     parts[2]?.startsWith("0") ? "" : parts[2]
   }${!parts[3] ? "" : parts[3]} `;
@@ -212,7 +211,7 @@ export const settingsGroups: SettingSection[] = [
                 modifer: () => {
                   verifyUser("global", async () => {
                     await db.mfa?.disable();
-                    let user = await db.user?.fetchUser();
+                    const user = await db.user?.fetchUser();
                     useUserStore.getState().setUser(user);
                   });
                 },
@@ -233,13 +232,13 @@ export const settingsGroups: SettingSection[] = [
               if (Platform.OS === "android") return;
               presentSheet({
                 title: "Loading subscriptions",
-                paragraph: `Please wait while we fetch your subscriptions.`
+                paragraph: "Please wait while we fetch your subscriptions."
               });
-              let subscriptions = await RNIap.getPurchaseHistory();
+              const subscriptions = await RNIap.getPurchaseHistory();
               subscriptions.sort(
                 (a, b) => b.transactionDate - a.transactionDate
               );
-              let currentSubscription = subscriptions[0];
+              const currentSubscription = subscriptions[0];
               presentSheet({
                 title: "Notesnook Pro",
                 paragraph: `You subscribed to Notesnook Pro on ${new Date(
@@ -248,7 +247,7 @@ export const settingsGroups: SettingSection[] = [
                 action: async () => {
                   presentSheet({
                     title: "Verifying subscription",
-                    paragraph: `Please wait while we verify your subscription.`
+                    paragraph: "Please wait while we verify your subscription."
                   });
                   await PremiumService.subscriptions.verify(
                     currentSubscription
@@ -309,7 +308,8 @@ export const settingsGroups: SettingSection[] = [
             type: "danger",
             name: "Delete account",
             icon: "alert",
-            description: `All your data will be removed permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.`,
+            description:
+              "All your data will be removed permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE.",
             modifer: () => {
               presentDialog({
                 title: "Delete account",
@@ -322,7 +322,7 @@ export const settingsGroups: SettingSection[] = [
                 positiveText: "Delete",
                 positivePress: async (value) => {
                   try {
-                    let verified = await db.user?.verifyPassword(value);
+                    const verified = await db.user?.verifyPassword(value);
                     if (verified) {
                       eSendEvent("settings-loading", true);
                       await db.user?.deleteUser(value);
@@ -364,7 +364,8 @@ export const settingsGroups: SettingSection[] = [
         modifer: async () => {
           presentDialog({
             title: "Force sync",
-            paragraph: `If your data on two devices is out of sync even after trying to sync normally. You can run force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on this device is reuploaded to the server.`,
+            paragraph:
+              "If your data on two devices is out of sync even after trying to sync normally. You can run force sync to solve such problems. Usually you should never need to run this otherwise. Force sync means that all your data on this device is reuploaded to the server.",
             negativeText: "Cancel",
             positiveText: "Start",
             positivePress: async () => {
@@ -570,7 +571,8 @@ export const settingsGroups: SettingSection[] = [
         type: "switch",
         icon: "eye-off-outline",
         name: "Privacy mode",
-        description: `Hide app contents when you switch to other apps. This will also disable screenshot taking in the app.`,
+        description:
+          "Hide app contents when you switch to other apps. This will also disable screenshot taking in the app.",
         modifer: () => {
           const settings = SettingsService.get();
           Platform.OS === "android"
@@ -638,6 +640,7 @@ export const settingsGroups: SettingSection[] = [
               try {
                 dir = await BackupService.checkBackupDirExists(true);
               } catch (e) {
+                console.error(e);
               } finally {
                 if (!dir) {
                   ToastEvent.show({
@@ -663,6 +666,7 @@ export const settingsGroups: SettingSection[] = [
               try {
                 dir = await BackupService.checkBackupDirExists(true);
               } catch (e) {
+                console.error(e);
               } finally {
                 if (!dir) {
                   ToastEvent.show({
@@ -704,7 +708,7 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "restore-backup",
         name: "Restore backup",
-        description: `Restore backup from phone storage.`,
+        description: "Restore backup from phone storage.",
         modifer: () => {
           const user = useUserStore.getState().user;
           if (!user || !user?.email) {
@@ -730,7 +734,8 @@ export const settingsGroups: SettingSection[] = [
         id: "notification-notes",
         type: "switch",
         name: "Notes in notifications",
-        description: `Add quick notes from notifications without opening the app.`,
+        description:
+          "Add quick notes from notifications without opening the app.",
         property: "notifNotes",
         icon: "form-textbox",
         modifer: () => {
@@ -756,13 +761,13 @@ export const settingsGroups: SettingSection[] = [
         id: "configure-toolbar",
         type: "screen",
         name: "Configure toolbar",
-        description: `Make the toolbar adaptable to your needs.`,
+        description: "Make the toolbar adaptable to your needs.",
         component: "configuretoolbar"
       },
       {
         id: "reset-toolbar",
         name: "Reset toolbar",
-        description: `Reset toolbar configuration to default`,
+        description: "Reset toolbar configuration to default",
         modifer: () => {
           useDragState.getState().setPreset("default");
         }
@@ -770,11 +775,12 @@ export const settingsGroups: SettingSection[] = [
       {
         id: "double-spaced-lines",
         name: "Use double spaced lines",
-        description: `New lines will be double spaced (old ones won't be affected).`,
+        description:
+          "New lines will be double spaced (old ones won't be affected).",
         type: "switch",
         property: "doubleSpacedLines",
         icon: "format-line-spacing",
-        onChange: (property) => {
+        onChange: () => {
           ToastEvent.show({
             heading: "Line spacing changed",
             type: "success",
@@ -881,7 +887,9 @@ export const settingsGroups: SettingSection[] = [
                 Linking.openURL("https://discord.gg/zQBK97EE22").catch(
                   console.log
                 );
-              } catch (e) {}
+              } catch (e) {
+                console.error(e);
+              }
             },
             actionText: "Join Now"
           });
@@ -901,7 +909,9 @@ export const settingsGroups: SettingSection[] = [
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/tos");
-          } catch (e) {}
+          } catch (e) {
+            console.error(e);
+          }
         },
         description: "Read our terms of service"
       },
@@ -911,7 +921,9 @@ export const settingsGroups: SettingSection[] = [
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/privacy");
-          } catch (e) {}
+          } catch (e) {
+            console.error(e);
+          }
         },
         description: "Read our privacy policy"
       }
@@ -928,7 +940,9 @@ export const settingsGroups: SettingSection[] = [
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/downloads");
-          } catch (e) {}
+          } catch (e) {
+            console.error(e);
+          }
         },
         description: "Get Notesnook app on your desktop and access all notes"
       },
@@ -939,7 +953,9 @@ export const settingsGroups: SettingSection[] = [
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com/roadmap/");
-          } catch (e) {}
+          } catch (e) {
+            console.error(e);
+          }
         },
         description: "See what the future of Notesnook is going to be like."
       },
@@ -962,7 +978,9 @@ export const settingsGroups: SettingSection[] = [
         modifer: async () => {
           try {
             await Linking.openURL("https://notesnook.com");
-          } catch (e) {}
+          } catch (e) {
+            console.error(e);
+          }
         },
         description: format(APP_VERSION)
       }

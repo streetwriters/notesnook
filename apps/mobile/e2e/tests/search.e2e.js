@@ -1,17 +1,11 @@
-const { notesnook } = require("../test.ids");
-const {
-  navigate,
+import {
   tapById,
   visibleByText,
   createNote,
   prepare,
-  visibleById,
-  notVisibleById,
   elementById,
-  tapByText,
-  notVisibleByText
-} = require("./utils");
-const { sleep } = require("./utils");
+  sleep
+} from "./utils";
 
 describe("Search", () => {
   it("Search for a note", async () => {

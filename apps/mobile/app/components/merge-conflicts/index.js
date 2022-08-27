@@ -1,5 +1,5 @@
 import KeepAwake from "@sayem314/react-native-keep-awake";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal, SafeAreaView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

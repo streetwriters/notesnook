@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { FlatList } from "react-native-gesture-handler";
@@ -11,7 +11,6 @@ import {
   ToastEvent
 } from "../../../services/event-manager";
 import { db } from "../../../common/database";
-import { MMKV } from "../../../common/database/mmkv";
 import storage from "../../../common/database/storage";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
@@ -95,7 +94,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
     checkBackups();
   }, []);
 
-  const restore = async (item, index) => {
+  const restore = async (item) => {
     if (restoring) {
       return;
     }
@@ -181,7 +180,7 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
           return;
         }
       } else {
-        RNFetchBlob = require("rn-fetch-blob").default;
+        RNFetchBlob = (await import("rn-fetch-blob")).default;
         let path = await storage.checkAndCreateDir("/backups/");
         files = await RNFetchBlob.fs.lstat(path);
       }

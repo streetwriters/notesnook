@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Platform, TextProps } from "react-native";
 import { Text } from "react-native";
 import Animated, {

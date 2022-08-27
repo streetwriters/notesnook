@@ -19,7 +19,7 @@ export function collapseMathNode(
   outerView: EditorView,
   dir: 1 | -1,
   requireOnBorder: boolean,
-  requireEmptySelection: boolean = true
+  requireEmptySelection = true
 ): Command {
   // create a new ProseMirror command based on the input conditions
   return (
@@ -27,21 +27,21 @@ export function collapseMathNode(
     dispatch: ((tr: Transaction) => void) | undefined
   ) => {
     // get selection info
-    let outerState: EditorState = outerView.state;
-    let { to: outerTo, from: outerFrom } = outerState.selection;
-    let { to: innerTo, from: innerFrom } = innerState.selection;
+    const outerState: EditorState = outerView.state;
+    const { to: outerTo, from: outerFrom } = outerState.selection;
+    const { to: innerTo, from: innerFrom } = innerState.selection;
 
     // only exit math node when selection is empty
     if (requireEmptySelection && innerTo !== innerFrom) {
       return false;
     }
-    let currentPos: number = dir > 0 ? innerTo : innerFrom;
+    const currentPos: number = dir > 0 ? innerTo : innerFrom;
 
     // when requireOnBorder is TRUE, collapse only when cursor
     // is about to leave the bounds of the math node
     if (requireOnBorder) {
       // (subtract two from nodeSize to account for start and end tokens)
-      let nodeSize = innerState.doc.nodeSize - 2;
+      const nodeSize = innerState.doc.nodeSize - 2;
 
       // early return if exit conditions not met
       if (dir > 0 && currentPos < nodeSize) {
@@ -55,7 +55,7 @@ export function collapseMathNode(
     // all exit conditions met, so close the math node by moving the cursor outside
     if (dispatch) {
       // set outer selection to be outside of the nodeview
-      let targetPos: number = dir > 0 ? outerTo : outerFrom;
+      const targetPos: number = dir > 0 ? outerTo : outerFrom;
 
       outerView.dispatch(
         outerState.tr.setSelection(

@@ -1,8 +1,8 @@
-function withAnimation(duration = 300) {
+function withAnimation(_duration = 300) {
   return;
 }
 
-function withSpringAnimation(duration = 300) {
+function withSpringAnimation(_duration = 300) {
   return;
 }
 

@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect, useRef, useState } from "react";
-import { FlatList, View } from "react-native";
+import { useEffect, useState } from "react";
+import { View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import DelayLayout from "../../components/delay-layout";
 import BaseDialog from "../../components/dialog/base-dialog";
@@ -20,11 +20,10 @@ import { settingsGroups } from "./settings-data";
 import { RouteParams, SettingSection } from "./types";
 import SettingsUserSection from "./user-section";
 
-const keyExtractor = (item: SettingSection, index: number) => item.id;
+const keyExtractor = (item: SettingSection) => item.id;
 
 const Home = ({
-  navigation,
-  route
+  navigation
 }: NativeStackScreenProps<RouteParams, "SettingsHome">) => {
   const colors = useThemeStore((state) => state.colors);
   const [loading, setLoading] = useState(false);
@@ -39,13 +38,7 @@ const Home = ({
     focusOnInit: true
   });
 
-  const renderItem = ({
-    item,
-    index
-  }: {
-    item: SettingSection;
-    index: number;
-  }) =>
+  const renderItem = ({ item }: { item: SettingSection; index: number }) =>
     item.name === "account" ? (
       <SettingsUserSection item={item} />
     ) : (
@@ -53,9 +46,12 @@ const Home = ({
     );
 
   useEffect(() => {
-    eSubscribeEvent("settings-loading", setLoading);
+    function settingsLoading(state: boolean) {
+      setLoading(state || true);
+    }
+    eSubscribeEvent("settings-loading", settingsLoading);
     return () => {
-      eUnSubscribeEvent("settings-loading", setLoading);
+      eUnSubscribeEvent("settings-loading", settingsLoading);
     };
   }, []);
 

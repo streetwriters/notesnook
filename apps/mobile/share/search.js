@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StatusBar } from "react-native";
 import {
   ActivityIndicator,
@@ -22,7 +22,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote }) => {
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const searchKeyword = useRef(null);
-  const { width, height } = useWindowDimensions();
+  const { height } = useWindowDimensions();
   const notes = useRef(null);
   const timer = useRef(null);
   const inputRef = useRef();
@@ -73,7 +73,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote }) => {
     }, 300);
   }, []);
 
-  const renderItem = ({ item, index }) =>
+  const renderItem = ({ item }) =>
     !item.locked ? (
       <TouchableOpacity
         activeOpacity={0.7}
@@ -193,7 +193,7 @@ export const Search = ({ close, getKeyboardHeight, quicknote }) => {
             >
               {searchKeyword.current
                 ? `No results found for "${searchKeyword.current}"`
-                : `Search for a note to append to it.`}
+                : "Search for a note to append to it."}
             </Text>
           </View>
         }

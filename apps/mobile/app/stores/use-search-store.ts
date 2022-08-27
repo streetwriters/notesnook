@@ -1,5 +1,5 @@
-//@ts-ignore
 import create, { State } from "zustand";
+
 export interface SearchStore extends State {
   searchResults: object[];
   searching: boolean;
@@ -8,7 +8,7 @@ export interface SearchStore extends State {
   setSearchStatus: (searching: boolean, status: string | null) => void;
 }
 
-export const useSearchStore = create<SearchStore>((set, get) => ({
+export const useSearchStore = create<SearchStore>((set) => ({
   searchResults: [],
   searching: false,
   searchStatus: null,

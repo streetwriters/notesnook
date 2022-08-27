@@ -2,7 +2,7 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { Extension } from "@tiptap/core";
 
-export type StateChangeHandler = (fromPos: number, toPos: number) => any;
+export type StateChangeHandler = (fromPos: number, toPos: number) => void;
 
 export class ReactNodeViewState {
   private changeHandlers: StateChangeHandler[] = [];

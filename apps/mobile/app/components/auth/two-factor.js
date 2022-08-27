@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
@@ -157,7 +157,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
           }}
         >
           {codeHelpText[currentMethod.method] ||
-            `Select how you would like to recieve the code`}
+            "Select how you would like to recieve the code"}
         </Paragraph>
 
         <Seperator />

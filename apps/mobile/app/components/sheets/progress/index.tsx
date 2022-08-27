@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { presentSheet } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
@@ -15,7 +15,7 @@ export const Progress = () => {
   const [currentProgress, setCurrentProgress] = useState(0.1);
 
   useEffect(() => {
-    let nextProgress = progress ? progress?.current / progress?.total : 0.1;
+    const nextProgress = progress ? progress?.current / progress?.total : 0.1;
 
     setCurrentProgress((currentProgress) => {
       if (currentProgress > nextProgress) return currentProgress;

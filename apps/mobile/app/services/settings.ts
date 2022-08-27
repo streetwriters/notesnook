@@ -13,7 +13,7 @@ import { DDS } from "./device-detection";
 function migrate(settings: SettingStore["settings"]) {
   if (settings.migrated) return true;
 
-  let introCompleted = MMKV.getString("introCompleted");
+  const introCompleted = MMKV.getString("introCompleted");
 
   if (!introCompleted) {
     console.log("no need to migrate");
@@ -48,24 +48,24 @@ function migrate(settings: SettingStore["settings"]) {
     console.log("migrated askForBackup", askForBackup);
   }
 
-  let lastBackupDate = MMKV.getString("backupDate");
+  const lastBackupDate = MMKV.getString("backupDate");
   if (lastBackupDate) settings.lastBackupDate = parseInt(lastBackupDate);
   MMKV.removeItem("backupDate");
   console.log("migrated backupDate", lastBackupDate);
 
-  let isUserEmailConfirmed = MMKV.getString("isUserEmailConfirmed");
+  const isUserEmailConfirmed = MMKV.getString("isUserEmailConfirmed");
   if (isUserEmailConfirmed === "yes") settings.userEmailConfirmed = true;
   if (isUserEmailConfirmed === "no") settings.userEmailConfirmed = false;
   console.log("migrated useEmailConfirmed", isUserEmailConfirmed);
 
   MMKV.removeItem("isUserEmailConfirmed");
 
-  let userHasSavedRecoveryKey = MMKV.getString("userHasSavedRecoveryKey");
+  const userHasSavedRecoveryKey = MMKV.getString("userHasSavedRecoveryKey");
   if (userHasSavedRecoveryKey) settings.recoveryKeySaved = true;
   MMKV.removeItem("userHasSavedRecoveryKey");
   console.log("migrated userHasSavedRecoveryKey", userHasSavedRecoveryKey);
 
-  let accentColor = MMKV.getString("accentColor");
+  const accentColor = MMKV.getString("accentColor");
   if (accentColor) settings.theme.accent = accentColor;
   MMKV.removeItem("accentColor");
   console.log("migrated accentColor", accentColor);
@@ -80,13 +80,13 @@ function migrate(settings: SettingStore["settings"]) {
 
   console.log("migrated theme", theme);
 
-  let backupStorageDir = MMKV.getString("backupStorageDir");
+  const backupStorageDir = MMKV.getString("backupStorageDir");
   if (backupStorageDir)
     settings.backupDirectoryAndroid = JSON.parse(backupStorageDir);
   MMKV.removeItem("backupStorageDir");
   console.log("migrated backupStorageDir", backupStorageDir);
 
-  let dontShowCompleteSheet = MMKV.getString("dontShowCompleteSheet");
+  const dontShowCompleteSheet = MMKV.getString("dontShowCompleteSheet");
   if (dontShowCompleteSheet) settings.showBackupCompleteSheet = false;
   MMKV.removeItem("dontShowCompleteSheet");
   console.log("migrated dontShowCompleteSheet", dontShowCompleteSheet);
@@ -100,7 +100,7 @@ function migrate(settings: SettingStore["settings"]) {
 
 function init() {
   scale.fontScale = 1;
-  let settingsJson = MMKV.getString("appSettings");
+  const settingsJson = MMKV.getString("appSettings");
   let settings = get();
   if (!settingsJson) {
     MMKV.setString("appSettings", JSON.stringify(settings));
@@ -149,10 +149,7 @@ function set(next: Partial<SettingStore["settings"]>) {
   };
 
   useSettingStore.getState().setSettings(settings);
-  setTimeout(
-    async () => MMKV.setString("appSettings", JSON.stringify(settings)),
-    1
-  );
+  setTimeout(() => MMKV.setString("appSettings", JSON.stringify(settings)), 1);
 }
 
 function toggle(id: keyof SettingStore["settings"]) {
@@ -172,7 +169,7 @@ function get() {
 }
 
 function onFirstLaunch() {
-  let introCompleted = get().introCompleted;
+  const introCompleted = get().introCompleted;
   if (!introCompleted) {
     set({
       rateApp: Date.now() + 86400000 * 2,

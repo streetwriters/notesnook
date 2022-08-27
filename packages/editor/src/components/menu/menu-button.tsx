@@ -4,15 +4,14 @@ import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useToolbarLocation } from "../../toolbar/stores/toolbar-store";
 import { Button } from "../button";
-import { MenuButton } from "./types";
+import { MenuButton, MenuItemComponentProps } from "./types";
 
 type MenuButtonProps = {
   item: MenuButton;
   isFocused?: boolean;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
-  onClick: (e?: any) => void;
-};
+} & MenuItemComponentProps;
 
 export function MenuButton(props: MenuButtonProps) {
   const { item, isFocused, onMouseEnter, onMouseLeave, onClick } = props;
@@ -47,7 +46,7 @@ export function MenuButton(props: MenuButtonProps) {
         variant="menuitem"
         title={tooltip}
         disabled={isDisabled}
-        onClick={onClick}
+        onClick={(e) => onClick?.(e.nativeEvent)}
         sx={{
           ...styles,
           bg: isFocused && !isBottom ? "hover" : "transparent",

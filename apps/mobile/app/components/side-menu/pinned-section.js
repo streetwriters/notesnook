@@ -21,7 +21,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 export const TagsSection = React.memo(
-  () => {
+  function TagsSection() {
     const menuPins = useMenuStore((state) => state.menuPins);
     const loading = useNoteStore((state) => state.loading);
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
@@ -72,7 +72,7 @@ export const TagsSection = React.memo(
           contentContainerStyle={{
             flexGrow: 1
           }}
-          keyExtractor={(item, index) => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={renderItem}
         />
       </View>
@@ -82,7 +82,7 @@ export const TagsSection = React.memo(
 );
 
 export const PinItem = React.memo(
-  ({ item, index, onPress, placeholder, alias }) => {
+  function PinItem({ item, onPress, placeholder, alias }) {
     const colors = useThemeStore((state) => state.colors);
     const setMenuPins = useMenuStore((state) => state.setMenuPins);
     alias = item?.alias || item?.title;

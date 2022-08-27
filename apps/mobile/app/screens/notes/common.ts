@@ -23,7 +23,9 @@ export function getAlias(params: NotesScreenParams) {
 export function openMonographsWebpage() {
   try {
     openLinkInBrowser("https://docs.notesnook.com/monographs/");
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 export function openEditor() {
@@ -65,7 +67,7 @@ export const setOnFirstSave = (
 export function isSynced(params: NotesScreenParams) {
   if (params.item.type === "topic") {
     console.log(params.item.type);
-    let topic = db.notebooks
+    const topic = db.notebooks
       ?.notebook(params.item.notebookId)
       ?.topics.topic(params.item.id);
     console.log(topic?.synced(), "sycned");

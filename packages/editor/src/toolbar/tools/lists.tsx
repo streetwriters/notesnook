@@ -1,7 +1,7 @@
 import { ToolProps } from "../types";
 import { Box, Button, Flex } from "rebass";
 import { IconNames } from "../icons";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { SplitButton } from "../components/split-button";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { getToolbarElement } from "../utils/dom";
@@ -27,7 +27,7 @@ type ListToolProps<TListStyleTypes> = ToolProps & {
 function _ListTool<TListStyleTypes extends string>(
   props: ListToolProps<TListStyleTypes>
 ) {
-  const { editor, onClick, isActive, subTypes, type, ...toolProps } = props;
+  const { editor, onClick, subTypes, type, ...toolProps } = props;
   const toolbarLocation = useToolbarLocation();
   const isBottom = toolbarLocation === "bottom";
   const [isOpen, setIsOpen] = useState(false);
@@ -98,14 +98,6 @@ const ListTool = React.memo(_ListTool, (prev, next) => {
   return prev.isActive === next.isActive;
 });
 
-type NumberedListStyleTypes =
-  | "lower-roman"
-  | "upper-roman"
-  | "lower-greek"
-  | "lower-alpha"
-  | "upper-alpha"
-  | "decimal";
-
 export function NumberedList(props: ToolProps) {
   const { editor } = props;
 
@@ -140,7 +132,6 @@ export function NumberedList(props: ToolProps) {
   );
 }
 
-type BulletListStyleTypes = "circle" | "square" | "disc";
 export function BulletList(props: ToolProps) {
   const { editor } = props;
   const onClick = useCallback(

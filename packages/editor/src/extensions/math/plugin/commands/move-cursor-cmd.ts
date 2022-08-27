@@ -14,14 +14,14 @@ export function nudgeCursorCmd(dir: -1 | 0 | 1): Command {
     innerState: EditorState,
     dispatch: ((tr: Transaction) => void) | undefined
   ) => {
-    let { to, from } = innerState.selection;
+    const { to, from } = innerState.selection;
 
     // compute target position
-    let emptySelection: boolean = to === from;
-    let currentPos: number = dir < 0 ? from : to;
-    let increment: number = emptySelection ? dir : 0;
-    let nodeSize: number = innerState.doc.nodeSize;
-    let targetPos: number = Math.max(
+    const emptySelection: boolean = to === from;
+    const currentPos: number = dir < 0 ? from : to;
+    const increment: number = emptySelection ? dir : 0;
+    const nodeSize: number = innerState.doc.nodeSize;
+    const targetPos: number = Math.max(
       0,
       Math.min(nodeSize, currentPos + increment)
     );

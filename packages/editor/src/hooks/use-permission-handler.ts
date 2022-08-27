@@ -1,4 +1,4 @@
-import { ChainedCommands, UnionCommands } from "@tiptap/core";
+import { UnionCommands } from "@tiptap/core";
 import { useEffect } from "react";
 import { PermissionRequestEvent } from "../types";
 

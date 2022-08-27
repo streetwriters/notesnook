@@ -6,7 +6,7 @@ type DialogInfo = {
   paragraph?: string;
   positiveText?: string;
   negativeText?: string;
-  positivePress?: (value: any) => void;
+  positivePress?: (value: unknown) => void;
   onClose?: () => void;
   positiveType?:
     | "transparent"

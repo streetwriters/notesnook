@@ -1,4 +1,3 @@
-import React from "react";
 import { Platform, View } from "react-native";
 import { APP_VERSION } from "../../../version";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
@@ -78,7 +77,7 @@ NewFeature.present = () => {
   SettingsService.set({
     version: APP_VERSION
   });
-  let _features = features?.filter(
+  const _features = features?.filter(
     (feature) => !feature.platform || feature.platform === Platform.OS
   );
   if (_features.length === 0) return;

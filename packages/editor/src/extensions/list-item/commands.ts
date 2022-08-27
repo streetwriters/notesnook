@@ -1,4 +1,3 @@
-import { ListItem as TiptapListItem } from "@tiptap/extension-list-item";
 import { EditorState } from "prosemirror-state";
 import { NodeType } from "prosemirror-model";
 import { findParentNodeOfType, hasParentNodeOfType } from "prosemirror-utils";
@@ -48,7 +47,7 @@ export function onBackspacePressed(
 function isInside(name: string, type: NodeType, state: EditorState) {
   const { $from } = state.selection;
 
-  let node = type || state.schema.nodes[name];
+  const node = type || state.schema.nodes[name];
   const { paragraph } = state.schema.nodes;
 
   return (

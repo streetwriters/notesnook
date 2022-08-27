@@ -1,6 +1,6 @@
 //@ts-ignore
 import { EVENTS } from "@streetwriters/notesnook-core/common";
-import { createRef, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { db } from "../common/database";
 
 export type SyncProgressEventType = {

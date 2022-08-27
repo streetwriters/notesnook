@@ -18,146 +18,144 @@ import { SIZE } from "../../utils/size";
 import { components } from "./components";
 import { RouteParams, SettingSection } from "./types";
 
-export const SectionItem = React.memo(
-  ({ item }: { item: SettingSection }) => {
-    const colors = useThemeStore((state) => state.colors);
-    const settings = useSettingStore((state) => state.settings);
-    const navigation = useNavigation<NavigationProp<RouteParams>>();
-    const current = item.useHook && item.useHook(item);
-    const isHidden = item.hidden && item.hidden(item.property || current);
-    const onChangeSettings = () => {
-      if (item.modifer) {
-        item.modifer(item.property || current);
-        return;
-      }
-      if (!item.property) return;
-      SettingsService.set({
-        //@ts-ignore
-        [item.property]: !settings[item.property]
-      });
+const _SectionItem = ({ item }: { item: SettingSection }) => {
+  const colors = useThemeStore((state) => state.colors);
+  const settings = useSettingStore((state) => state.settings);
+  const navigation = useNavigation<NavigationProp<RouteParams>>();
+  const current = item.useHook && item.useHook(item);
+  const isHidden = item.hidden && item.hidden(item.property || current);
+  const onChangeSettings = () => {
+    if (item.modifer) {
+      item.modifer(item.property || current);
+      return;
+    }
+    if (!item.property) return;
+    SettingsService.set({
       //@ts-ignore
-      item.onChange?.(!settings[item.property]);
-    };
+      [item.property]: !settings[item.property]
+    });
+    //@ts-ignore
+    item.onChange?.(!settings[item.property]);
+  };
 
-    const styles =
-      item.type === "danger"
-        ? {
-            backgroundColor: colors.errorBg
-          }
-        : {};
+  const styles =
+    item.type === "danger"
+      ? {
+          backgroundColor: colors.errorBg
+        }
+      : {};
 
-    return isHidden ? null : (
-      <PressableButton
-        disabled={item.type === "component"}
-        customStyle={{
-          width: "100%",
-          alignItems: "center",
-          padding: 12,
+  return isHidden ? null : (
+    <PressableButton
+      disabled={item.type === "component"}
+      customStyle={{
+        width: "100%",
+        alignItems: "center",
+        padding: 12,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingVertical: 20,
+        ...styles
+      }}
+      onPress={() => {
+        switch (item.type) {
+          case "screen":
+            navigation.dispatch(StackActions.push("SettingsGroup", item));
+            useNavigationStore.getState().update(
+              {
+                name: "SettingsGroup",
+                title:
+                  typeof item.name === "function"
+                    ? item.name(current)
+                    : item.name
+              },
+              true
+            );
+            break;
+          case "switch":
+            onChangeSettings();
+            break;
+          default:
+            item.modifer && item.modifer(current);
+            break;
+        }
+      }}
+    >
+      <View
+        style={{
           flexDirection: "row",
-          justifyContent: "space-between",
-          paddingVertical: 20,
-          ...styles
-        }}
-        onPress={() => {
-          switch (item.type) {
-            case "screen":
-              navigation.dispatch(StackActions.push("SettingsGroup", item));
-              useNavigationStore.getState().update(
-                {
-                  name: "SettingsGroup",
-                  title:
-                    typeof item.name === "function"
-                      ? item.name(current)
-                      : item.name
-                },
-                true
-              );
-              break;
-            case "switch":
-              onChangeSettings();
-              break;
-            default:
-              item.modifer && item.modifer(current);
-              break;
-          }
+          flexShrink: 1
         }}
       >
         <View
           style={{
-            flexDirection: "row",
-            flexShrink: 1
+            width: 40,
+            height: 40,
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: 12,
+            backgroundColor:
+              item.component === "colorpicker" ? colors.accent : undefined,
+            borderRadius: 100
           }}
         >
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight: 12,
-              backgroundColor:
-                item.component === "colorpicker" ? colors.accent : undefined,
-              borderRadius: 100
-            }}
-          >
-            {!!item.icon && (
-              <Icon
-                color={item.type === "danger" ? colors.errorText : colors.icon}
-                name={item.icon}
-                size={30}
-              />
-            )}
-          </View>
-
-          <View
-            style={{
-              flexShrink: 1,
-              paddingRight: item.type === "switch" ? 10 : 0
-            }}
-          >
-            <Paragraph
-              color={item.type === "danger" ? colors.errorText : colors.heading}
-              size={SIZE.md + 1}
-            >
-              {typeof item.name === "function" ? item.name(current) : item.name}
-            </Paragraph>
-            {!!item.description && (
-              <Paragraph
-                color={item.type === "danger" ? colors.errorText : colors.pri}
-                size={SIZE.sm}
-              >
-                {typeof item.description === "function"
-                  ? item.description(current)
-                  : item.description}
-              </Paragraph>
-            )}
-
-            {!!item.component && item.type !== "screen" && (
-              <>
-                <Seperator half />
-                {components[item.component]}
-              </>
-            )}
-          </View>
+          {!!item.icon && (
+            <Icon
+              color={item.type === "danger" ? colors.errorText : colors.icon}
+              name={item.icon}
+              size={30}
+            />
+          )}
         </View>
 
-        {item.type === "switch" && item.property && (
-          <ToggleSwitch
-            //@ts-ignore
-            isOn={
-              item.getter
-                ? item.getter(item.property || current)
-                : settings[item.property]
-            }
-            onColor={colors.accent}
-            offColor={colors.icon}
-            size="small"
-            animationSpeed={150}
-            onToggle={onChangeSettings}
-          />
-        )}
-      </PressableButton>
-    );
-  },
-  () => true
-);
+        <View
+          style={{
+            flexShrink: 1,
+            paddingRight: item.type === "switch" ? 10 : 0
+          }}
+        >
+          <Paragraph
+            color={item.type === "danger" ? colors.errorText : colors.heading}
+            size={SIZE.md + 1}
+          >
+            {typeof item.name === "function" ? item.name(current) : item.name}
+          </Paragraph>
+          {!!item.description && (
+            <Paragraph
+              color={item.type === "danger" ? colors.errorText : colors.pri}
+              size={SIZE.sm}
+            >
+              {typeof item.description === "function"
+                ? item.description(current)
+                : item.description}
+            </Paragraph>
+          )}
+
+          {!!item.component && item.type !== "screen" && (
+            <>
+              <Seperator half />
+              {components[item.component]}
+            </>
+          )}
+        </View>
+      </View>
+
+      {item.type === "switch" && item.property && (
+        <ToggleSwitch
+          //@ts-ignore
+          isOn={
+            item.getter
+              ? item.getter(item.property || current)
+              : settings[item.property]
+          }
+          onColor={colors.accent}
+          offColor={colors.icon}
+          size="small"
+          animationSpeed={150}
+          onToggle={onChangeSettings}
+        />
+      )}
+    </PressableButton>
+  );
+};
+export const SectionItem = React.memo(_SectionItem, () => true);

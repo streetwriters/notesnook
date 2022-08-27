@@ -3,8 +3,7 @@ import { inputRules } from "prosemirror-inputrules";
 import {
   makeInlineMathInputRule,
   REGEX_INLINE_MATH_DOLLARS,
-  mathPlugin,
-  insertMathNode
+  mathPlugin
 } from "./plugin";
 
 declare module "@tiptap/core" {

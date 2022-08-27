@@ -3,7 +3,6 @@ import { useNoteStore } from "../../stores/use-notes-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { AnnouncementDialog } from "../announcements";
 import { AttachmentDialog } from "../attachments";
-import Auth from "../auth";
 import AuthModal from "../auth/auth-modal";
 import { SessionExpired } from "../auth/session-expired";
 import { Dialog } from "../dialog";
@@ -24,39 +23,36 @@ import RateAppSheet from "../sheets/rate-app";
 import RecoveryKeySheet from "../sheets/recovery-key";
 import RestoreDataSheet from "../sheets/restore-data";
 
-const DialogProvider = React.memo(
-  () => {
-    const colors = useThemeStore((state) => state.colors);
-    const loading = useNoteStore((state) => state.loading);
+const DialogProvider = () => {
+  const colors = useThemeStore((state) => state.colors);
+  const loading = useNoteStore((state) => state.loading);
 
-    return (
-      <>
-        <Dialog context="global" />
-        <AddTopicDialog colors={colors} />
-        <AddNotebookSheet colors={colors} />
-        <PremiumDialog colors={colors} />
-        <AuthModal colors={colors} />
-        <MergeConflicts />
-        <ExportNotesSheet />
-        <RecoveryKeySheet colors={colors} />
-        <SheetProvider />
-        <SheetProvider context="sync_progress" />
-        <RestoreDataSheet />
-        <ResultDialog />
-        <VaultDialog colors={colors} />
-        <AddToNotebookSheet colors={colors} />
-        <RateAppSheet />
-        <ImagePreview />
-        <PublishNoteSheet />
-        <ManageTagsSheet />
-        <AttachmentDialog />
-        {loading ? null : <Expiring />}
-        <AnnouncementDialog />
-        <SessionExpired />
-      </>
-    );
-  },
-  () => true
-);
+  return (
+    <>
+      <Dialog context="global" />
+      <AddTopicDialog colors={colors} />
+      <AddNotebookSheet colors={colors} />
+      <PremiumDialog colors={colors} />
+      <AuthModal colors={colors} />
+      <MergeConflicts />
+      <ExportNotesSheet />
+      <RecoveryKeySheet colors={colors} />
+      <SheetProvider />
+      <SheetProvider context="sync_progress" />
+      <RestoreDataSheet />
+      <ResultDialog />
+      <VaultDialog colors={colors} />
+      <AddToNotebookSheet colors={colors} />
+      <RateAppSheet />
+      <ImagePreview />
+      <PublishNoteSheet />
+      <ManageTagsSheet />
+      <AttachmentDialog />
+      {loading ? null : <Expiring />}
+      <AnnouncementDialog />
+      <SessionExpired />
+    </>
+  );
+};
 
-export default DialogProvider;
+export default React.memo(DialogProvider, () => true);

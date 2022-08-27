@@ -169,9 +169,6 @@ function GroupHeader(props) {
     setNotesViewMode,
     setNotebooksViewMode
   ]);
-  const isCompact = useMemo(() => viewMode === "compact", [viewMode]);
-
-  // if (!title) return null;
 
   return (
     <Flex

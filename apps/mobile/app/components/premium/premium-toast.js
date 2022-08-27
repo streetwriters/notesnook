@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 import { editorState } from "../../screens/editor/tiptap/utils";
@@ -21,7 +21,7 @@ import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
-export const PremiumToast = ({ close, context = "global", offset = 0 }) => {
+export const PremiumToast = ({ context = "global", offset = 0 }) => {
   const colors = useThemeStore((state) => state.colors);
   const [msg, setMsg] = useState(null);
   const timer = useRef();

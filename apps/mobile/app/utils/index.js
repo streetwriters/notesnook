@@ -92,7 +92,7 @@ export async function doInBackground(cb) {
     }
   } else {
     // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (res, rej) => {
+    return new Promise(async (res) => {
       try {
         console.log("APP STATE AT SYNC: ", AppState.currentState);
         let result = await cb();

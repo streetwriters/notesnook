@@ -4,8 +4,8 @@ import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { Node } from "prosemirror-model";
 import { Transaction } from "prosemirror-state";
-import { findChildren, findChildrenInRange, NodeWithPos } from "@tiptap/core";
-import { useCallback, useEffect } from "react";
+import { findChildren, findChildrenInRange } from "@tiptap/core";
+import { useCallback } from "react";
 import { TaskItemNode, TaskItemAttributes } from "./task-item";
 import {
   useIsKeyboardOpen,

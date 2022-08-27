@@ -2,8 +2,6 @@ import { SearchStorage } from "../../extensions/search-replace";
 import { FloatingMenuProps } from "./types";
 import { SearchReplacePopup } from "../popups/search-replace";
 import {
-  DesktopOnly,
-  MobileOnly,
   ResponsivePresenter
 } from "../../components/responsive";
 import { getToolbarElement } from "../utils/dom";

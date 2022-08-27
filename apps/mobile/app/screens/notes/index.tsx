@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
@@ -51,7 +51,7 @@ export const MONOGRAPH_PLACEHOLDER_DATA = {
 
 export interface RouteProps<T extends RouteName> extends NavigationProps<T> {
   get: (params: NotesScreenParams, grouped?: boolean) => NoteType[];
-  placeholderData: any;
+  placeholderData: unknown;
   onPressFloatingButton: () => void;
   focusControl?: boolean;
   canGoBack?: boolean;
@@ -73,7 +73,6 @@ const NotesPage = ({
   placeholderData,
   onPressFloatingButton,
   focusControl = true,
-  canGoBack,
   rightButtons
 }: RouteProps<
   "NotesPage" | "TaggedNotes" | "Monographs" | "ColoredNotes" | "TopicNotes"
@@ -104,7 +103,7 @@ const NotesPage = ({
   const syncWithNavigation = () => {
     const { item, title } = params.current;
     //@ts-ignore
-    let alias = getAlias(params.current);
+    const alias = getAlias(params.current);
     console.log(alias, title, "syncWithNavigation", params.current);
     useNavigationStore.getState().update(
       {
@@ -142,7 +141,7 @@ const NotesPage = ({
     const { item } = params.current;
     try {
       if (isNew) setLoadingNotes(true);
-      let notes = get(params.current, true) as NoteType[];
+      const notes = get(params.current, true) as NoteType[];
       if (
         (item.type === "tag" || item.type === "color") &&
         (!notes || notes.length === 0)
@@ -152,7 +151,9 @@ const NotesPage = ({
       if (item.type === "topic") setWarning(!isSynced(params.current));
       setNotes(notes);
       syncWithNavigation();
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {

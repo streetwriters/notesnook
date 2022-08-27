@@ -2,7 +2,6 @@ import NetInfo from "@react-native-community/netinfo";
 import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import { useEffect, useRef } from "react";
 import {
-  Alert,
   Appearance,
   AppState,
   Linking,
@@ -13,8 +12,7 @@ import {
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { Walkthrough } from "../components/walkthroughs";
-import { editorController, editorState } from "../screens/editor/tiptap/utils";
-import BiometricService from "../services/biometrics";
+import { editorState } from "../screens/editor/tiptap/utils";
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -32,7 +30,7 @@ import {
   refreshNotesPage
 } from "../utils/events";
 import Sync from "../services/sync";
-import { clearAllStores, initAfterSync, initialize } from "../stores";
+import { initAfterSync } from "../stores";
 import { useUserStore } from "../stores/use-user-store";
 import { useMessageStore } from "../stores/use-message-store";
 import { useSettingStore } from "../stores/use-setting-store";
@@ -46,7 +44,6 @@ import {
 } from "../services/event-manager";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useDragState } from "../screens/settings/editor/state";
-import { sleep } from "../utils/time";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -163,7 +160,9 @@ export const useAppEvents = () => {
             await onEmailVerified();
           }
           await onUserUpdated();
-        } catch (e) {}
+        } catch (e) {
+          console.error(e);
+        }
       })();
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(
         onInternetStateChanged
@@ -202,7 +201,9 @@ export const useAppEvents = () => {
       } else {
         return;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const onEmailVerified = async () => {
@@ -221,7 +222,7 @@ export const useAppEvents = () => {
 
   const attachIAPListeners = async () => {
     await RNIap.initConnection()
-      .catch((e) => null)
+      .catch(() => null)
       .then(async () => {
         refValues.current.subsriptionSuccessListener =
           RNIap.purchaseUpdatedListener(onSuccessfulSubscription);
@@ -357,7 +358,9 @@ export const useAppEvents = () => {
           if (user?.isEmailConfirmed) {
             onEmailVerified();
           }
-        } catch (e) {}
+        } catch (e) {
+          console.error(e);
+        }
       }
     } else {
       let id = useEditorStore.getState().currentEditingNote;

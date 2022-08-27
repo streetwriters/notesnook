@@ -1,4 +1,3 @@
-import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeStore } from "../../stores/use-theme-store";
@@ -69,7 +68,9 @@ export const Synced = ({ item, close }) => {
               "https://docs.notesnook.com/how-is-my-data-encrypted/",
               colors
             );
-          } catch (e) {}
+          } catch (e) {
+            console.error(e);
+          }
         }}
         fontSize={SIZE.xs + 1}
         title="Learn more"

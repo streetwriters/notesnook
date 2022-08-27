@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
@@ -122,7 +122,7 @@ const Sort = ({ type, screen }) => {
             iconSize={SIZE.md}
           />
         ) : (
-          Object.keys(SORT).map((item, index) =>
+          Object.keys(SORT).map((item) =>
             item === "title" && groupOptions.groupBy !== "none" ? null : (
               <Button
                 key={item}
@@ -173,7 +173,7 @@ const Sort = ({ type, screen }) => {
           paddingHorizontal: 12
         }}
       >
-        {Object.keys(GROUP).map((item, index) => (
+        {Object.keys(GROUP).map((item) => (
           <Button
             key={item}
             testID={"btn-" + item}

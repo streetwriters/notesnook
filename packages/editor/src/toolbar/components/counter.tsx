@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Text } from "rebass";
+import { Flex } from "rebass";
 import { Button } from "../../components/button";
 import { ToolButton } from "./tool-button";
 

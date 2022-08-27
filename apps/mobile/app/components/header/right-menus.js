@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import Menu from "react-native-reanimated-material-menu";
 import { notesnook } from "../../../e2e/test.ids";
@@ -84,7 +84,7 @@ export const RightMenus = () => {
             />
           }
         >
-          {rightButtons.map((item, index) => (
+          {rightButtons.map((item) => (
             <Button
               style={{
                 width: 150,

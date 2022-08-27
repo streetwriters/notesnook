@@ -1,5 +1,4 @@
 import { CHECK_IDS } from "@streetwriters/notesnook-core/common";
-import React from "react";
 import { Platform } from "react-native";
 import * as RNIap from "react-native-iap";
 import DialogHeader from "../components/dialog/dialog-header";
@@ -91,7 +90,9 @@ async function verify(callback, error) {
     }
     if (!callback) console.warn("You must provide a callback function");
     await callback();
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 const onUserStatusCheck = async (type) => {

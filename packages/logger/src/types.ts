@@ -16,7 +16,7 @@ export type LogMessage = {
   message: string;
   level: LogLevel;
   scope?: string;
-  extras?: Record<string, any>;
+  extras?: Record<string, unknown>;
   elapsed?: number;
 };
 

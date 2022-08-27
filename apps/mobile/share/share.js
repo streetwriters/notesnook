@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
 import { parseHTML } from "@streetwriters/notesnook-core/utils/htmlparser";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -179,7 +178,6 @@ const ShareView = ({ quicknote = false }) => {
   const [loadingIntent, setLoadingIntent] = useState(true);
   const [loading, setLoading] = useState(false);
   const [loadingExtension, setLoadingExtension] = useState(true);
-  const [floating, setFloating] = useState(false);
   const [rawData, setRawData] = useState({
     type: null,
     value: null
@@ -210,10 +208,6 @@ const ShareView = ({ quicknote = false }) => {
 
   useEffect(() => {
     useShareStore.getState().setAccent();
-    let keyboardWillChangeFrame = Keyboard.addListener(
-      "keyboardWillChangeFrame",
-      onKeyboardWillChangeFrame
-    );
     let keyboardDidShow = Keyboard.addListener(
       "keyboardDidShow",
       onKeyboardDidShow
@@ -223,15 +217,10 @@ const ShareView = ({ quicknote = false }) => {
       onKeyboardDidHide
     );
     return () => {
-      keyboardWillChangeFrame?.remove();
       keyboardDidShow?.remove();
       keyboardDidHide?.remove();
     };
   }, []);
-
-  const onKeyboardWillChangeFrame = (event) => {
-    setFloating(event.endCoordinates.width !== width);
-  };
 
   const showLinkPreview = async (note, link) => {
     let _note = note;
@@ -272,7 +261,9 @@ const ShareView = ({ quicknote = false }) => {
       setNote({ ...note });
       console.log(data, "share data");
       onLoad();
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
     setLoadingIntent(false);
   };
 
@@ -373,6 +364,7 @@ const ShareView = ({ quicknote = false }) => {
         });
       }
     } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -625,9 +617,9 @@ const ShareView = ({ quicknote = false }) => {
                       fontFamily: "OpenSans-SemiBold"
                     }}
                   >
-                    "{appendNote.title}"
+                    {`"${appendNote.title}"`}
                   </Text>{" "}
-                  . Click on "New note" to create a new note.
+                  . Click on {'"New note"'} to create a new note.
                 </Text>
               ) : null}
 

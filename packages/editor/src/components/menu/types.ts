@@ -1,8 +1,8 @@
 import { SxStyleProp } from "rebass";
 import { IconNames } from "../../toolbar/icons";
 
-type MenuItemComponentProps = {
-  onClick?: (e?: any) => void;
+export type MenuItemComponentProps = {
+  onClick?: (e?: Event) => void;
 };
 
 export type MenuItemTypes = "button" | "separator" | "popup";

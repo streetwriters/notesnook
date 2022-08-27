@@ -1,6 +1,5 @@
 import { Input } from "@rebass/forms";
-import { useState } from "react";
-import { Flex, Button } from "rebass";
+import { Flex } from "rebass";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { Popup } from "../components/popup";
 import { LinkDefinition } from "../tools/link";

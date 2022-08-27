@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Linking, Platform, Text, TextInput, View } from "react-native";
 import { APP_VERSION } from "../../../version";
 import { eSendEvent, ToastEvent } from "../../../services/event-manager";
@@ -211,7 +211,9 @@ For example:
           onPress={async () => {
             try {
               await openLinkInBrowser("https://discord.gg/zQBK97EE22", colors);
-            } catch (e) {}
+            } catch (e) {
+              console.error(e);
+            }
           }}
         >
           join our community on Discord.

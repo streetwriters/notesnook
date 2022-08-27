@@ -23,10 +23,10 @@ export const useTagStore = create<TagStore>((set, get) => ({
       });
       return;
     }
-    let prev = get().tags;
+    const prev = get().tags;
     for (let i = 0; i < items.length; i++) {
-      let item = items[i];
-      let index = prev.findIndex((v) => v.id === item.id);
+      const item = items[i];
+      const index = prev.findIndex((v) => v.id === item.id);
       if (index !== -1) {
         prev[index] = item;
       }

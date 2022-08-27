@@ -1,18 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { LAUNCH_ROCKET } from "../../assets/images/assets";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
-import PremiumService from "../../services/premium";
 import { getElevation } from "../../utils";
 import { db } from "../../common/database";
 import {
   eClosePremiumDialog,
   eCloseProgressDialog,
-  eOpenLoginDialog,
-  eOpenResultDialog
+  eOpenLoginDialog
 } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -32,7 +30,7 @@ import { Group } from "./group";
 import { PricingPlans } from "./pricing-plans";
 import { usePricing } from "../../hooks/use-pricing";
 
-export const Component = ({ close, promo, getRef }) => {
+export const Component = ({ close, promo }) => {
   const colors = useThemeStore((state) => state.colors);
   const user = useUserStore((state) => state.user);
   const userCanRequestTrial =
@@ -42,7 +40,7 @@ export const Component = ({ close, promo, getRef }) => {
 
   const onPress = async () => {
     if (user) {
-      umami.pageView("/pro-plans", `/pro-screen`);
+      umami.pageView("/pro-plans", "/pro-screen");
       presentSheet({
         context: "pricing_plans",
         component: (
@@ -51,7 +49,7 @@ export const Component = ({ close, promo, getRef }) => {
       });
     } else {
       close();
-      umami.pageView("/signup", `/pro-screen`);
+      umami.pageView("/signup", "/pro-screen");
       setTimeout(() => {
         eSendEvent(eOpenLoginDialog, AuthMode.trialSignup);
       }, 400);
@@ -179,7 +177,9 @@ export const Component = ({ close, promo, getRef }) => {
                 eSendEvent(eCloseProgressDialog);
                 await sleep(300);
                 Walkthrough.present("trialstarted", false, true);
-              } catch (e) {}
+              } catch (e) {
+                console.error(e);
+              }
             }}
             title="Try free for 14 days"
             type="accent"
@@ -196,7 +196,7 @@ export const Component = ({ close, promo, getRef }) => {
           key="calltoaction"
           onPress={onPress}
           title={
-            promo ? promo.text : user ? `See all plans` : `Sign up for free`
+            promo ? promo.text : user ? "See all plans" : "Sign up for free"
           }
           type={userCanRequestTrial ? "grayAccent" : "accent"}
           width={250}
@@ -219,8 +219,8 @@ export const Component = ({ close, promo, getRef }) => {
             }}
           >
             {user
-              ? `On clicking "Try free for 14 days", your free trial will be activated.`
-              : `After sign up you will be asked to activate your free trial.`}{" "}
+              ? 'On clicking "Try free for 14 days", your free trial will be activated.'
+              : "After sign up you will be asked to activate your free trial."}{" "}
             <Paragraph size={SIZE.xs} style={{ fontWeight: "bold" }}>
               No credit card is required.
             </Paragraph>
@@ -247,7 +247,7 @@ export const Component = ({ close, promo, getRef }) => {
         <Button
           onPress={onPress}
           title={
-            promo ? promo.text : user ? `See all plans` : "Sign up for free"
+            promo ? promo.text : user ? "See all plans" : "Sign up for free"
           }
           type="accent"
           style={{

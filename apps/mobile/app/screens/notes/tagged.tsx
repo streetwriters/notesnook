@@ -1,5 +1,4 @@
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
-import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import Navigation, {
   NavigationProps,
@@ -27,7 +26,7 @@ export const TaggedNotes = ({
 };
 
 TaggedNotes.get = (params: NotesScreenParams, grouped = true) => {
-  let notes = db.notes?.tagged(params.item.id) || [];
+  const notes = db.notes?.tagged(params.item.id) || [];
   return grouped
     ? groupArray(notes, db.settings?.getGroupOptions("notes"))
     : notes;
@@ -36,7 +35,7 @@ TaggedNotes.get = (params: NotesScreenParams, grouped = true) => {
 TaggedNotes.navigate = (item: TagType, canGoBack: boolean) => {
   if (!item) return;
   //@ts-ignore TODO
-  let alias = getAlias({ item: item });
+  const alias = getAlias({ item: item });
   Navigation.navigate<"TaggedNotes">(
     {
       name: "TaggedNotes",

@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import EventManager from "@streetwriters/notesnook-core/utils/event-manager";
+import EventManager from "@streetwriters/notesnook-core/utils/eventmanager";
 import { RefObject } from "react";
 import ActionSheet from "react-native-actions-sheet";
 import { Config } from "react-native-config";
@@ -11,58 +11,56 @@ import {
   eShowToast
 } from "../utils/events";
 
+type Vault = {
+  item: unknown;
+  novault: boolean;
+  title: string;
+  description: string;
+  locked: boolean;
+  permanant: boolean;
+  goToEditor: boolean;
+  share: boolean;
+  deleteNote: boolean;
+  fingerprintAccess: boolean;
+  revokeFingerprintAccess: boolean;
+  changePassword: boolean;
+  clearVault: boolean;
+  deleteVault: boolean;
+  copyNote: boolean;
+};
+
+type NoteEdit = {
+  id: string;
+  closed: boolean;
+  noEdit: boolean;
+  forced: boolean;
+};
+
 const eventManager = new EventManager();
 
-export const eSubscribeEvent = (
+export const eSubscribeEvent = <T = unknown>(
   eventName: string,
-  action?: (data: any) => void
+  action?: (data: T) => void
 ) => {
   eventManager.subscribe(eventName, action);
 };
 
-export const eUnSubscribeEvent = (
+export const eUnSubscribeEvent = <T = unknown>(
   eventName: string,
-  action?: (data: any) => void
+  action?: (data: T) => void
 ) => {
   eventManager.unsubscribe(eventName, action);
 };
 
-export const eSendEvent = (eventName: string, data?: any) => {
+export const eSendEvent = (eventName: string, data?: unknown) => {
   eventManager.publish(eventName, data);
 };
 
-/**
- * @typedef {Object} vaultType
- * @property {Object} item
- * @property {boolean} novault
- * @property {string} title
- * @property {string} description
- * @property {boolean} locked
- * @property {boolean} permanant
- * @property {boolean} goToEditor
- * @property {boolean} share
- * @property {boolean} deleteNote
- * @property {boolean} fingerprintAccess
- * @property {boolean} revokeFingerprintAccess
- * @property {boolean} changePassword
- * @property {boolean} clearVault
- * @property {boolean} deleteVault
- * @property {boolean} copyNote
- * @param {vaultType} data
- */
-export const openVault = (data: any) => {
+export const openVault = (data: Vault) => {
   eSendEvent(eOpenVaultDialog, data);
 };
 
-/**
- * @typedef {Object} noteEdit
- * @property {string} id
- * @property {boolean} closed
- * @property {boolean} noEdit
- * @property {boolean} forced
- * @param {noteEdit} data
- */
-export function sendNoteEditedEvent(data: any) {
+export function sendNoteEditedEvent(data: NoteEdit) {
   eSendEvent(eOnNoteEdited, data);
 }
 
@@ -114,7 +112,6 @@ export const ToastEvent = {
     message,
     type = "error",
     context = "global",
-    duration = 3000,
     func,
     actionText
   }: ShowToastEvent) => {

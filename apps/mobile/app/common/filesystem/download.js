@@ -1,4 +1,3 @@
-import React from "react";
 import { Platform } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
 import Sodium from "react-native-sodium";
@@ -138,7 +137,7 @@ export async function downloadAttachment(hash, global = true) {
     console.log("saved file uri: ", fileUri);
 
     presentSheet({
-      title: `File downloaded`,
+      title: "File downloaded",
       paragraph: `${attachment.metadata.filename} saved to ${
         Platform.OS === "android"
           ? "selected path"

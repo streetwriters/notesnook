@@ -3,11 +3,7 @@ import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
-import {
-  confirm,
-  showError,
-  showMoveNoteDialog
-} from "../../common/dialog-controller";
+import { confirm, showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { store as userstore } from "../../stores/user-store";
 import { useStore as useAttachmentStore } from "../../stores/attachment-store";

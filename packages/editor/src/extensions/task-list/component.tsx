@@ -2,7 +2,6 @@ import { Box, Flex, Text } from "rebass";
 import { ReactNodeViewProps } from "../react";
 import { Node } from "prosemirror-model";
 import {
-  findParentNodeClosestToPos,
   findChildren,
   getNodeType
 } from "@tiptap/core";

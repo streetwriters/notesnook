@@ -6,7 +6,7 @@ export const useDelayLayout = (delay: number) => {
 
   useEffect(() => {
     let cancel: () => void;
-    let timeout = setTimeout(() => {
+    const timeout = setTimeout(() => {
       cancel = InteractionManager.runAfterInteractions(() => {
         setLoading(false);
       }).cancel;

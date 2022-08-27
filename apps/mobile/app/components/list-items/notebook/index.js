@@ -1,4 +1,3 @@
-import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
@@ -22,13 +21,7 @@ const navigateToTopic = (topic) => {
   TopicNotes.navigate(topic, true);
 };
 
-export const NotebookItem = ({
-  item,
-  isTopic = false,
-  notebookID,
-  isTrash,
-  dateBy
-}) => {
+export const NotebookItem = ({ item, isTopic = false, isTrash, dateBy }) => {
   const colors = useThemeStore((state) => state.colors);
   const notebooksListMode = useSettingStore(
     (state) => state.settings.notebooksListMode

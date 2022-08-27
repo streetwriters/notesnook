@@ -35,7 +35,7 @@ class WorkerStreamSource implements UnderlyingSource<Chunk> {
     this.id = streamId;
   }
 
-  start(controller: ReadableStreamController<Chunk>) {}
+  start() {}
 
   async pull(controller: ReadableStreamController<Chunk>) {
     const chunk = await sendEventWithResult<Chunk>(`${this.id}:read`);

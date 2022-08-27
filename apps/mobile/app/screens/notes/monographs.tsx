@@ -1,5 +1,4 @@
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
-import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import Navigation, {
   NavigationProps,
@@ -27,7 +26,7 @@ export const Monographs = ({
 };
 
 Monographs.get = (params: NotesScreenParams, grouped = true) => {
-  let notes = db.monographs?.all || [];
+  const notes = db.monographs?.all || [];
   return grouped
     ? groupArray(notes, db.settings?.getGroupOptions("notes"))
     : notes;

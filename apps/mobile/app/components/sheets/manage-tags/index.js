@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeStore } from "../../../stores/use-theme-store";
@@ -189,7 +189,7 @@ const ManageTagsSheet = () => {
               type="accent"
             >
               <Heading size={SIZE.sm} color={colors.light}>
-                Add {`"` + "#" + query + `"`}
+                Add {'"' + "#" + query + '"'}
               </Heading>
               <Icon name="plus" color={colors.light} size={SIZE.lg} />
             </PressableButton>
@@ -243,7 +243,9 @@ const TagItem = ({ tag, note, setNote }) => {
       }
       useTagStore.getState().setTags();
       setNote(db.notes.note(note.id).data);
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
     setTimeout(() => {
       Navigation.queueRoutesForUpdate(
         "Notes",

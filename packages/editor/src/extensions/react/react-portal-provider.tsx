@@ -6,7 +6,7 @@ import {
 } from "react-dom";
 import { EventDispatcher } from "./event-dispatcher";
 
-export type BasePortalProviderProps = PropsWithChildren<{}>;
+export type BasePortalProviderProps = PropsWithChildren<unknown>;
 
 export type Portals = Map<HTMLElement, React.ReactChild>;
 
@@ -20,13 +20,13 @@ type MountedPortal = {
 
 export class PortalProviderAPI extends EventDispatcher {
   portals: Map<HTMLElement, MountedPortal> = new Map();
-  context: any;
+  context?: PortalRenderer;
 
   constructor() {
     super();
   }
 
-  setContext = (context: any) => {
+  setContext = (context: PortalRenderer) => {
     this.context = context;
   };
 
@@ -34,10 +34,12 @@ export class PortalProviderAPI extends EventDispatcher {
     children: () => React.ReactChild | JSX.Element | null,
     container: HTMLElement
   ) {
+    if (!this.context) return;
+
     this.portals.set(container, {
       children
     });
-    let wrappedChildren = children() as JSX.Element;
+    const wrappedChildren = children() as JSX.Element;
 
     unstable_renderSubtreeIntoContainer(
       this.context,

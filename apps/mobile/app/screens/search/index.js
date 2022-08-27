@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
 import SearchService from "../../services/search";
@@ -40,7 +40,7 @@ export const Search = ({ navigation, route }) => {
         type="search"
         screen="Search"
         focused={() => navigation.isFocused()}
-        placeholderText={`Notes you write appear here`}
+        placeholderText={"Notes you write appear here"}
         jumpToDialog={true}
         loading={searching}
         CustomHeader={true}

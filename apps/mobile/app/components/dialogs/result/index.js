@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { DDS } from "../../../services/device-detection";

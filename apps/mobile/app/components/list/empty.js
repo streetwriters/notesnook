@@ -14,7 +14,13 @@ import Paragraph from "../ui/typography/paragraph";
 import { notesnook } from "../../../e2e/test.ids";
 
 export const Empty = React.memo(
-  ({ loading = true, placeholderData, headerProps, type, screen }) => {
+  function Empty({
+    loading = true,
+    placeholderData,
+    headerProps,
+    type,
+    screen
+  }) {
     const colors = useThemeStore((state) => state.colors);
     const insets = useSafeAreaInsets();
     const { height } = useWindowDimensions();
@@ -28,12 +34,7 @@ export const Empty = React.memo(
         : placeholderData.type || type,
       screen === "Notes" ? "notes" : null
     );
-    const color =
-      colors[
-        COLORS_NOTE[headerProps.color?.toLowerCase()]
-          ? headerProps.color
-          : "accent"
-      ];
+
     return (
       <View
         style={[

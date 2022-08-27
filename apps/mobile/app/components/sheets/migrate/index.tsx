@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import BackupService from "../../../services/backup";
 import { eSendEvent, ToastEvent } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { db } from "../../../common/database";
 import {
-  eCloseProgressDialog,
-  eCloseSimpleDialog
+  eCloseProgressDialog
 } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";

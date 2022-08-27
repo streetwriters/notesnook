@@ -345,28 +345,32 @@ function SelectedPlan(props: SelectedPlanProps) {
     onApplyCoupon(undefined);
   }, [onApplyCoupon, setIsApplyingCoupon]);
 
-  useEffect(() => {
-    if (!couponInputRef.current) return;
-    setIsApplyingCoupon(false);
+  useEffect(
+    () => {
+      if (!couponInputRef.current) return;
+      setIsApplyingCoupon(false);
 
-    const couponValue = couponInputRef.current.value;
+      const couponValue = couponInputRef.current.value;
 
-    const isInvalidCoupon =
-      (!!couponValue && couponValue !== pricingInfo?.coupon) ||
-      (!!couponCode && couponCode !== pricingInfo?.coupon);
+      const isInvalidCoupon =
+        (!!couponValue && couponValue !== pricingInfo?.coupon) ||
+        (!!couponCode && couponCode !== pricingInfo?.coupon);
 
-    setIsInvalidCoupon(isInvalidCoupon);
-    if (isInvalidCoupon) {
-      if (couponCode) couponInputRef.current.value = couponCode;
-      return;
-    }
+      setIsInvalidCoupon(isInvalidCoupon);
+      if (isInvalidCoupon) {
+        if (couponCode) couponInputRef.current.value = couponCode;
+        return;
+      }
 
-    const pricingInfoCoupon = pricingInfo?.coupon || "";
-    if (couponValue !== pricingInfoCoupon) {
-      couponInputRef.current.value = pricingInfoCoupon;
-      onApplyCoupon(pricingInfo?.coupon);
-    }
-  }, [pricingInfo, onApplyCoupon, setIsApplyingCoupon]);
+      const pricingInfoCoupon = pricingInfo?.coupon || "";
+      if (couponValue !== pricingInfoCoupon) {
+        couponInputRef.current.value = pricingInfoCoupon;
+        onApplyCoupon(pricingInfo?.coupon);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pricingInfo, onApplyCoupon, setIsApplyingCoupon]
+  );
 
   return (
     <>

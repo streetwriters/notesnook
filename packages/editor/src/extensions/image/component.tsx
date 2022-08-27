@@ -1,7 +1,6 @@
 import { Box, Button, Flex, Image, Text } from "rebass";
 import { ImageAlignmentOptions, ImageAttributes } from "./image";
-import { Resizable } from "re-resizable";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
 import { DesktopOnly } from "../../components/responsive";
 import { Icon } from "../../toolbar/components/icon";
@@ -9,7 +8,6 @@ import { Icons } from "../../toolbar/icons";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import { Resizer } from "../../components/resizer";
-import { Editor } from "../../types";
 import {
   downloadImage,
   isDataUrl,
@@ -24,7 +22,9 @@ export function ImageComponent(
 ) {
   const { editor, node, selected } = props;
   const isMobile = useIsMobile();
-  let { src, alt, title, width, height, align, float } = node.attrs;
+  const { src, alt, title, width, height, align } = node.attrs;
+  const float = isMobile ? false : node.attrs.float;
+
   const imageRef = useRef<HTMLImageElement>();
   const [error, setError] = useState<string>();
   const [source, setSource] = useState<string>();
@@ -49,8 +49,6 @@ export function ImageComponent(
       }
     })();
   }, [src, imageRef]);
-
-  if (isMobile) float = false;
 
   return (
     <>

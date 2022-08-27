@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { editorState } from "../../screens/editor/tiptap/utils";
@@ -176,7 +176,7 @@ const SheetProvider = ({ context = "global" }) => {
         ) : null}
 
         {dialogData?.actionsArray &&
-          dialogData?.actionsArray.map((item, index) => (
+          dialogData?.actionsArray.map((item) => (
             <Button
               onPress={item.action}
               key={item.accentText}

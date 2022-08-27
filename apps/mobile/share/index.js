@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { Modal, Platform } from "react-native";
 import ShareView from "./share";
 const Wrapper = Platform.OS === "android" ? Modal : Fragment;

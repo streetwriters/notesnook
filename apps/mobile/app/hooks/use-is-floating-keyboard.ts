@@ -15,7 +15,7 @@ const useIsFloatingKeyboard = () => {
   };
 
   useEffect(() => {
-    let sub1 = Keyboard.addListener(
+    const sub1 = Keyboard.addListener(
       "keyboardWillChangeFrame",
       onKeyboardWillChangeFrame
     );

@@ -9,7 +9,7 @@ type NavigationFocus = {
 };
 
 export const useNavigationFocus = (
-  navigation: NativeStackNavigationProp<any>,
+  navigation: NativeStackNavigationProp<Record<string, object | undefined>>,
   { onFocus, onBlur, delay, focusOnInit = true }: NavigationFocus
 ) => {
   const [isFocused, setFocused] = useState(focusOnInit);
@@ -20,7 +20,7 @@ export const useNavigationFocus = (
     setTimeout(
       () => {
         console.log("on focus", prev);
-        let shouldFocus = onFocus ? onFocus(prev) : true;
+        const shouldFocus = onFocus ? onFocus(prev) : true;
         if (shouldFocus) {
           setFocused(true);
           prev.current = true;
@@ -34,7 +34,7 @@ export const useNavigationFocus = (
   const _onBlur = useCallback(() => {
     isBlurred.current = true;
     setTimeout(() => {
-      let shouldBlur = onBlur ? onBlur(prev) : true;
+      const shouldBlur = onBlur ? onBlur(prev) : true;
       if (shouldBlur) {
         prev.current = false;
         setFocused(false);

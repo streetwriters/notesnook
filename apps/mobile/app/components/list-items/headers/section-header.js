@@ -20,7 +20,7 @@ import Sort from "../../sheets/sort";
 import Heading from "../../ui/typography/heading";
 
 export const SectionHeader = React.memo(
-  ({ item, index, type, color, screen }) => {
+  function SectionHeader({ item, index, type, color, screen }) {
     const colors = useThemeStore((state) => state.colors);
     const { fontScale } = useWindowDimensions();
     const [groupOptions, setGroupOptions] = useState(

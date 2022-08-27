@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeStore } from "../../../stores/use-theme-store";
@@ -25,7 +25,6 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import SearchService from "../../../services/search";
 
 let passwordValue = null;
 const PublishNoteSheet = () => {
@@ -205,7 +204,9 @@ const PublishNoteSheet = () => {
                     onPress={async () => {
                       try {
                         await openLinkInBrowser(publishUrl, colors.accent);
-                      } catch (e) {}
+                      } catch (e) {
+                        console.error(e);
+                      }
                     }}
                     size={SIZE.xs}
                     style={{
@@ -376,7 +377,9 @@ const PublishNoteSheet = () => {
                 "https://docs.notesnook.com/monographs/",
                 colors.accent
               );
-            } catch (e) {}
+            } catch (e) {
+              console.error(e);
+            }
           }}
         >
           Learn more about Notesnook Monograph

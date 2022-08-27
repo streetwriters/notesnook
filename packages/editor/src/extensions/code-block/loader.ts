@@ -14,7 +14,7 @@ export async function loadLanguage(shortName: string) {
 }
 
 async function loadScript(id: string, url: string) {
-  return new Promise<Syntax>((resolve, reject) => {
+  return new Promise<Syntax>((resolve) => {
     const callbackName = `on${id}Loaded`;
     const script = document.createElement("script");
     script.type = "module";
@@ -24,9 +24,11 @@ async function loadScript(id: string, url: string) {
       window["${callbackName}"](LanguageDefinition)
     }
 `;
-    (window as any)[callbackName] = (lang: Syntax) => {
+    (window as unknown as Record<string, unknown>)[callbackName] = (
+      lang: Syntax
+    ) => {
       script.remove();
-      (window as any)[callbackName] = null;
+      (window as unknown as Record<string, unknown>)[callbackName] = null;
 
       resolve(lang);
     };

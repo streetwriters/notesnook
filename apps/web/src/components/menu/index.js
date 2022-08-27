@@ -77,7 +77,7 @@ function useMenuFocus(items, onAction, onClose) {
         return nextIndex;
       });
     },
-    [items, isSubmenuOpen, moveItemIntoView, onAction]
+    [items, isSubmenuOpen, moveItemIntoView, onAction, onClose]
   );
 
   useEffect(() => {

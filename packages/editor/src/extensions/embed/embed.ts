@@ -1,13 +1,9 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import {
-  createNodeView,
-  createSelectionBasedNodeView,
-  NodeViewSelectionNotifierPlugin
-} from "../react";
+import { createSelectionBasedNodeView } from "../react";
 import { EmbedComponent } from "./component";
 
 export interface EmbedOptions {
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
 }
 
 export type EmbedAttributes = Partial<EmbedSizeOptions> & {

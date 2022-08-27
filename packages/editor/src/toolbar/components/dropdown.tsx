@@ -1,14 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import { Flex, Text } from "rebass";
+import { useRef, useState } from "react";
+import { Text } from "rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
 // import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";
 import { MenuItem } from "../../components/menu/types";
-import {
-  useIsMobile,
-  useToolbarLocation,
-  useToolbarStore
-} from "../stores/toolbar-store";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { MenuPresenter } from "../../components/menu";
 import { getToolbarElement } from "../utils/dom";
 import { Button } from "../../components/button";
@@ -23,8 +19,8 @@ type DropdownProps = {
   menuWidth?: number;
 };
 export function Dropdown(props: DropdownProps) {
-  let { id, group, items, selectedItem, buttonRef, menuWidth } = props;
-  const internalRef = useRef<any>();
+  const { id, group, items, selectedItem, buttonRef, menuWidth } = props;
+  const internalRef = useRef<HTMLButtonElement>();
   const [isOpen, setIsOpen] = useState(false);
   const toolbarLocation = useToolbarLocation();
   const isMobile = useIsMobile();
@@ -41,7 +37,7 @@ export function Dropdown(props: DropdownProps) {
     <>
       <Button
         ref={(ref) => {
-          internalRef.current = ref;
+          internalRef.current = ref || undefined;
           if (buttonRef) buttonRef.current = ref || undefined;
         }}
         sx={{

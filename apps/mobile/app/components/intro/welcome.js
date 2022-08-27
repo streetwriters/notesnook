@@ -1,4 +1,3 @@
-import React from "react";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";

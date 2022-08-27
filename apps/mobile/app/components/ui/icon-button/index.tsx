@@ -1,11 +1,5 @@
-import React from "react";
 import { ColorValue, GestureResponderEvent, ViewStyle } from "react-native";
 import Animated, {
-  FadeIn,
-  FadeOut,
-  FlipInEasyX,
-  FlipInEasyY,
-  FlipOutEasyY,
   Layout
 } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";

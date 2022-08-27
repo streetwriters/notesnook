@@ -12,7 +12,7 @@ import { Popup } from "../services/tip-manager";
 import useKeyboard from "./use-keyboard";
 
 let currentTargets: number[] = [];
-let timers: NodeJS.Timeout[] = [];
+const timers: NodeJS.Timeout[] = [];
 
 /**
  * A function to hide all native tooltips
@@ -36,7 +36,7 @@ export const hideAllTooltips = async () => {
 const useTooltip = () => {
   const colors = useThemeStore((state) => state.colors);
   const parent = useRef();
-  let keyboard = useKeyboard();
+  const keyboard = useKeyboard();
 
   useEffect(() => {
     hideAllTooltips();
@@ -50,7 +50,7 @@ const useTooltip = () => {
   };
 
   function show(
-    target: RefObject<any>,
+    target: RefObject<{ _nativeTag: number }>,
     popup: Popup,
     position: keyof typeof positions,
     duration: number

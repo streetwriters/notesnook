@@ -3,7 +3,7 @@ import CharacterCount from "@tiptap/extension-character-count";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
@@ -60,8 +60,8 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
   .map(([, extension]) => extension);
 
 EditorView.prototype.updateState = function updateState(state) {
-  if (!(this as any).docView) return; // This prevents the matchesNode error on hot reloads
-  (this as any).updateStateInner(state, this.state.plugins != state.plugins);
+  if (!this.docView) return; // This prevents the matchesNode error on hot reloads
+  this.updateStateInner(state, this.state.plugins != state.plugins);
 };
 
 type TiptapOptions = EditorOptions &

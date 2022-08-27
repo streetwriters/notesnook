@@ -30,7 +30,8 @@ class ExceptionHandler extends React.Component<{
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error: error };
   }
-  componentDidCatch(error: Error, errorInfo: any) {
+
+  componentDidCatch(_error: Error) {
     // A custom error logging function
   }
 
@@ -65,7 +66,7 @@ class ExceptionHandler extends React.Component<{
 }
 
 export const withErrorBoundry = (Element: React.ElementType, name: string) => {
-  return () => {
+  return function ErrorBoundary() {
     return (
       <ExceptionHandler component={name}>
         <Element />

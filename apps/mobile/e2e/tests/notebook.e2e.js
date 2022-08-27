@@ -1,6 +1,5 @@
-const detox = require("detox");
-const { notesnook } = require("../test.ids");
-const {
+import { notesnook } from "../test.ids";
+import {
   tapById,
   elementById,
   visibleByText,
@@ -8,13 +7,11 @@ const {
   createNote,
   prepare,
   visibleById,
-  expectBitmapsToBeEqual,
-  matchSnapshot,
   notVisibleById,
   navigate,
-  elementByText
-} = require("./utils");
-const { sleep } = require("./utils");
+  elementByText,
+  sleep
+} from "./utils";
 
 async function createNotebook(
   title = "Notebook 1",
@@ -40,12 +37,12 @@ async function createNotebook(
   await sleep(500);
 }
 
-async function addTopic(title = "Topic") {
-  await tapById(notesnook.buttons.add);
-  await elementById("input-title").typeText(title);
-  await tapByText("Add");
-  await sleep(500);
-}
+// async function addTopic(title = "Topic") {
+//   await tapById(notesnook.buttons.add);
+//   await elementById("input-title").typeText(title);
+//   await tapByText("Add");
+//   await sleep(500);
+// }
 
 describe("NOTEBOOKS", () => {
   it("Create a notebook with title only", async () => {
@@ -178,7 +175,7 @@ describe("NOTEBOOKS", () => {
     await device.pressBack();
     await sleep(500);
     await navigate("Notes");
-    let note = await createNote();
+    await createNote();
     await tapById(notesnook.listitem.menu);
     await tapById("icon-Add to notebook");
     await sleep(500);

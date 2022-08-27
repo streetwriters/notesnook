@@ -1,9 +1,8 @@
-import React from "react";
+import React, { SyntheticEvent } from "react";
 import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
 import { Node as PMNode } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
 import { PortalProviderAPI } from "./react-portal-provider";
-import { EventDispatcher } from "./event-dispatcher";
 import {
   ReactNodeViewProps,
   ReactNodeViewOptions,
@@ -12,8 +11,6 @@ import {
   ContentDOM
 } from "./types";
 import { NodeViewRendererProps } from "@tiptap/core";
-import { Theme } from "@streetwriters/theme";
-// @ts-ignore
 import { __serializeForClipboard } from "prosemirror-view";
 import { Editor } from "../../types";
 import { ThemeProvider } from "../../components/theme-provider";
@@ -77,14 +74,14 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   }
 
   private renderReactComponent(
-    component: () => React.ReactElement<any> | null
+    component: () => React.ReactElement<unknown> | null
   ) {
     if (!this.domRef || !component || !this.portalProviderAPI) {
       console.warn("Cannot render node view", this.editor.storage);
       return;
     }
 
-    this.portalProviderAPI.render(component, this.domRef!);
+    this.portalProviderAPI.render(component, this.domRef);
   }
 
   createDomRef(): HTMLElement {
@@ -107,7 +104,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       );
       content.style.whiteSpace = "inherit";
       // caret is not visible if content element width is 0px
-      content.style.minWidth = `20px`;
+      content.style.minWidth = "20px";
       return { dom: content };
     }
     return this.options.contentDOMFactory?.();
@@ -127,7 +124,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   render(
     props: P = {} as P,
     forwardRef?: ForwardRef
-  ): React.ReactElement<any> | null {
+  ): React.ReactElement<unknown> | null {
     if (!this.options.component) return null;
 
     return (
@@ -152,10 +149,10 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   }
 
   updateAttributes(
-    attributes: any,
+    attributes: object,
     pos: number,
-    addToHistory: boolean = false,
-    preventUpdate: boolean = false
+    addToHistory = false,
+    preventUpdate = false
   ) {
     this.editor.commands.command(({ tr }) => {
       tr.setNodeMarkup(pos, undefined, {
@@ -227,8 +224,14 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       const handleBox = dragHandle.getBoundingClientRect();
 
       // In React, we have to go through nativeEvent to reach offsetX/offsetY.
-      const offsetX = event.offsetX ?? (event as any).nativeEvent?.offsetX;
-      const offsetY = event.offsetY ?? (event as any).nativeEvent?.offsetY;
+      const offsetX =
+        event.offsetX ??
+        (event as unknown as SyntheticEvent<HTMLElement, DragEvent>).nativeEvent
+          ?.offsetX;
+      const offsetY =
+        event.offsetY ??
+        (event as unknown as SyntheticEvent<HTMLElement, DragEvent>).nativeEvent
+          ?.offsetY;
 
       x = handleBox.x - domBox.x + offsetX;
       y = handleBox.y - domBox.y + offsetY;
@@ -431,8 +434,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     }
 
     this.portalProviderAPI.remove(this.domRef);
-    // @ts-ignore NEW PM API
-    this.domRef = undefined;
+    // this.domRef = undefined;
     this.contentDOM = undefined;
   }
 }

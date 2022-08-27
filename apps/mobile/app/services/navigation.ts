@@ -43,7 +43,7 @@ const routeNames = {
   Signup: "Signup"
 };
 
-type GenericRouteParam = { [name: string]: never };
+type GenericRouteParam = { [name: string]: unknown };
 
 export type NotebookScreenParams = {
   item: NotebookType;
@@ -91,20 +91,20 @@ export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
 /**
  * Functions to update each route when required.
  */
-const routeUpdateFunctions: { [name: string]: (...args: any[]) => void } = {
+const routeUpdateFunctions: {
+  [name: string]: (...params: GenericRouteParam[]) => void;
+} = {
   Notes: () => useNoteStore.getState().setNotes(),
   Notebooks: () => useNotebookStore.getState().setNotebooks(),
   Tags: () => useTagStore.getState().setTags(),
   Favorites: () => useFavoriteStore.getState().setFavorites(),
   Trash: () => useTrashStore.getState().setTrash(),
-  Notebook: (params: NotebookScreenParams) =>
-    eSendEvent(eOnNewTopicAdded, params),
-  NotesPage: (params: NotesScreenParams) => eSendEvent("NotesPage", params),
-  TaggedNotes: (params: NotesScreenParams) => eSendEvent("TaggedNotes", params),
-  ColoredNotes: (params: NotesScreenParams) =>
-    eSendEvent("ColoredNotes", params),
-  TopicNotes: (params: NotesScreenParams) => eSendEvent("TopicNotes", params),
-  Monographs: (params: NotesScreenParams) => eSendEvent("Monographs", params)
+  Notebook: (params) => eSendEvent(eOnNewTopicAdded, params),
+  NotesPage: (params) => eSendEvent("NotesPage", params),
+  TaggedNotes: (params) => eSendEvent("TaggedNotes", params),
+  ColoredNotes: (params) => eSendEvent("ColoredNotes", params),
+  TopicNotes: (params) => eSendEvent("TopicNotes", params),
+  Monographs: (params) => eSendEvent("Monographs", params)
 };
 
 function clearRouteFromQueue(routeName: Route) {
@@ -161,11 +161,11 @@ function navigate<T extends RouteName>(
   screen: CurrentScreen,
   params: RouteParams[T]
 ) {
-  useNavigationStore.getState().update(screen, params?.canGoBack);
+  useNavigationStore.getState().update(screen, !!params?.canGoBack);
   if (screen.name === "Notebook") routeUpdateFunctions["Notebook"](params);
   if (screen.name.endsWith("Notes") && screen.name !== "Notes")
     routeUpdateFunctions[screen.name](params);
-  //@ts-ignore
+  // @ts-ignore
   rootNavigatorRef.current?.navigate(screen.name, params);
 }
 
@@ -173,18 +173,19 @@ function goBack() {
   rootNavigatorRef.current?.goBack();
 }
 
-function push(screen: CurrentScreen, params: { [name: string]: any }) {
-  useNavigationStore.getState().update(screen, !params.menu);
-  //@ts-ignore
-  rootNavigatorRef.current?.dispatch(StackActions.push(name, params));
+function push<T extends RouteName>(
+  screen: CurrentScreen,
+  params: RouteParams[T]
+) {
+  useNavigationStore.getState().update(screen, !!params.canGoBack);
+  rootNavigatorRef.current?.dispatch(StackActions.push(screen.name, params));
 }
 
 function replace<T extends RouteName>(
   screen: CurrentScreen,
   params: RouteParams[T]
 ) {
-  useNavigationStore.getState().update(screen, params?.canGoBack);
-  //@ts-ignore
+  useNavigationStore.getState().update(screen, !!params?.canGoBack);
   rootNavigatorRef.current?.dispatch(StackActions.replace(screen.name, params));
 }
 

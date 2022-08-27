@@ -1,11 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Linking, Platform, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
@@ -65,7 +59,7 @@ type MFAMethod = {
 
 type MFAStep = {
   id: string;
-  props: { [name: string]: any };
+  props: { [name: string]: unknown };
 };
 
 type MFAStepProps = {
@@ -108,17 +102,19 @@ export const MFAMethodsPickerStep = ({ recovery, onSuccess }: MFAStepProps) => {
             alignItems: "flex-start"
           }}
         >
-          <IconButton
-            type="grayBg"
-            customStyle={{
-              width: 50,
-              height: 50,
-              marginRight: 10
-            }}
-            size={20}
-            color={item.recommended ? colors.accent : colors.icon}
-            name={item.icon}
-          />
+          {item.icon && (
+            <IconButton
+              type="grayBg"
+              customStyle={{
+                width: 50,
+                height: 50,
+                marginRight: 10
+              }}
+              size={20}
+              color={item.recommended ? colors.accent : colors.icon}
+              name={item.icon}
+            />
+          )}
           <View
             style={{
               flexShrink: 1
@@ -183,7 +179,7 @@ export const MFASetup = ({
         await db.mfa?.enable(method.id, code.current);
       }
 
-      let user = await db.user?.fetchUser();
+      const user = await db.user?.fetchUser();
       useUserStore.getState().setUser(user);
       onSuccess && onSuccess(method);
       setEnabling(false);
@@ -208,7 +204,7 @@ export const MFASetup = ({
       }
 
       ToastEvent.show({
-        heading: `Code copied!`,
+        heading: "Code copied!",
         type: "success",
         context: "local"
       });
@@ -386,7 +382,6 @@ export const MFASetup = ({
 
 export const MFARecoveryCodes = ({
   method,
-  recovery,
   onSuccess,
   isSetup = true
 }: MFAStepProps) => {
@@ -449,7 +444,7 @@ export const MFARecoveryCodes = ({
               alignItems: "center"
             }}
             numColumns={2}
-            renderItem={({ item, index }) => (
+            renderItem={({ item }) => (
               <Heading
                 style={{
                   marginHorizontal: 15,
@@ -475,7 +470,7 @@ export const MFARecoveryCodes = ({
               title="Copy codes"
               fontSize={SIZE.md}
               onPress={() => {
-                let codeString = codes.join("\n");
+                const codeString = codes.join("\n");
                 Clipboard.setString(codeString);
                 ToastEvent.show({
                   heading: "Recovery codes copied!",
@@ -499,7 +494,7 @@ export const MFARecoveryCodes = ({
                   fileName = fileName + ".txt";
                   const codeString = codes.join("\n");
                   if (Platform.OS === "android") {
-                    let file = await ScopedStorage.createDocument(
+                    const file = await ScopedStorage.createDocument(
                       fileName,
                       "text/plain",
                       codeString,
@@ -523,7 +518,9 @@ export const MFARecoveryCodes = ({
                     context: "local"
                   });
                   return path;
-                } catch (e) {}
+                } catch (e) {
+                  console.error(e);
+                }
               }}
             />
           </View>

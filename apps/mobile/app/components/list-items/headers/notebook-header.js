@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { useMenuStore } from "../../../stores/use-menu-store";
@@ -32,7 +32,9 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
       }
       setIsPinnedToMenu(db.settings.isPinned(notebook.id));
       setMenuPins();
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (

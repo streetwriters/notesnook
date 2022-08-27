@@ -109,7 +109,7 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
 };
 
 export const NoteWrapper = React.memo(
-  ({ item, index, tags, dateBy }) => {
+  function NoteWrapper({ item, index, tags, dateBy }) {
     const isTrash = item.type === "trash";
     const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
 

@@ -23,26 +23,24 @@ import { Fragment, Node as ProseNode } from "prosemirror-model";
  *     although any object with `selection` and `doc` will work.
  */
 const checkSelection = (arg: { selection: ProseSelection; doc: ProseNode }) => {
-  let { from, to } = arg.selection;
-  let content: Fragment = arg.selection.content().content;
+  const { from } = arg.selection;
+  const content: Fragment = arg.selection.content().content;
 
-  let result: { start: number; end: number }[] = [];
+  const result: { start: number; end: number }[] = [];
 
-  content.descendants(
-    (node: ProseNode, pos: number, parent: ProseNode | null) => {
-      if (node.type.name == "text") {
-        return false;
-      }
-      if (node.type.name.startsWith("math_")) {
-        result.push({
-          start: Math.max(from + pos - 1, 0),
-          end: from + pos + node.nodeSize - 1
-        });
-        return false;
-      }
-      return true;
+  content.descendants((node: ProseNode, pos: number) => {
+    if (node.type.name == "text") {
+      return false;
     }
-  );
+    if (node.type.name.startsWith("math_")) {
+      result.push({
+        start: Math.max(from + pos - 1, 0),
+        end: from + pos + node.nodeSize - 1
+      });
+      return false;
+    }
+    return true;
+  });
 
   return DecorationSet.create(
     arg.doc,
@@ -64,19 +62,14 @@ const checkSelection = (arg: { selection: ProseSelection; doc: ProseNode }) => {
  */
 export const mathSelectPlugin: ProsePlugin = new ProsePlugin({
   state: {
-    init(config: EditorStateConfig, partialState: EditorState) {
+    init(_config: EditorStateConfig, partialState: EditorState) {
       return checkSelection(partialState);
     },
-    apply(
-      tr: Transaction,
-      value: any,
-      oldState: EditorState,
-      newState: EditorState
-    ) {
+    apply(tr: Transaction, _value: unknown, oldState: EditorState) {
       if (!tr.selection || !tr.selectionSet) {
         return oldState;
       }
-      let sel = checkSelection(tr);
+      const sel = checkSelection(tr);
       return sel;
     }
   },

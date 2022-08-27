@@ -6,7 +6,7 @@ import { ToolProps } from "../types";
 export function menuButtonToTool(
   constructItem: (editor: Editor) => MenuButton
 ) {
-  return function (props: ToolProps) {
+  return function Tool(props: ToolProps) {
     const item = constructItem(props.editor);
     return (
       <ToolButton

@@ -1,12 +1,11 @@
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
-import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import Navigation, {
   NavigationProps,
   NotesScreenParams
 } from "../../services/navigation";
 import { db } from "../../common/database";
-import { ColorType, TagType } from "../../utils/types";
+import { ColorType } from "../../utils/types";
 import { getAlias, openEditor, toCamelCase } from "./common";
 
 export const ColoredNotes = ({
@@ -27,7 +26,7 @@ export const ColoredNotes = ({
 };
 
 ColoredNotes.get = (params: NotesScreenParams, grouped = true) => {
-  let notes = db.notes?.colored(params.item.id) || [];
+  const notes = db.notes?.colored(params.item.id) || [];
   return grouped
     ? groupArray(notes, db.settings?.getGroupOptions("notes"))
     : notes;
@@ -36,7 +35,7 @@ ColoredNotes.get = (params: NotesScreenParams, grouped = true) => {
 ColoredNotes.navigate = (item: ColorType, canGoBack: boolean) => {
   if (!item) return;
   //@ts-ignore TODO
-  let alias = getAlias({ item: item });
+  const alias = getAlias({ item: item });
   Navigation.navigate<"ColoredNotes">(
     {
       name: "ColoredNotes",

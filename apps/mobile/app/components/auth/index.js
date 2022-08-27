@@ -1,8 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { tabBarRef } from "../../utils/global-refs";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { Toast } from "../toast";
 import { initialAuthMode } from "./common";
@@ -17,11 +14,9 @@ export const AuthMode = {
 };
 
 const Auth = ({ navigation, route }) => {
-  const colors = useThemeStore((state) => state.colors);
   const [currentAuthMode, setCurrentAuthMode] = useState(
     route?.params?.mode || AuthMode.login
   );
-  const insets = useSafeAreaInsets();
   initialAuthMode.current = route?.params.mode || AuthMode.login;
   useNavigationFocus(navigation, {
     onFocus: () => {

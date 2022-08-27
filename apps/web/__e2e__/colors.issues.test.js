@@ -1,4 +1,4 @@
-const { test, expect } = require("@playwright/test");
+const { test } = require("@playwright/test");
 const { getTestId } = require("./utils");
 const { useContextMenu, clickMenuItem } = require("./utils/actions");
 const { createNoteAndCheckPresence } = require("./utils/conditions");
@@ -9,7 +9,7 @@ const Menu = require("./utils/menuitemidbuilder");
 // );
 
 /**
- * @type {Page}
+ * @type {import("@playwright/test").Page}
  */
 var page = null;
 global.page = null;

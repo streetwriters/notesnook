@@ -3,16 +3,16 @@ import { Command as ProseCommand } from "prosemirror-state";
 
 export const mathBackspaceCmd: ProseCommand = (state, dispatch) => {
   // check node before
-  let { $from } = state.selection;
-  let nodeBefore = $from.nodeBefore;
+  const { $from } = state.selection;
+  const nodeBefore = $from.nodeBefore;
   if (!nodeBefore) {
     return false;
   }
 
   if (nodeBefore.type.name == "math_inline") {
     // select math node
-    let index = $from.index($from.depth);
-    let $beforePos = state.doc.resolve($from.posAtIndex(index - 1));
+    const index = $from.index($from.depth);
+    const $beforePos = state.doc.resolve($from.posAtIndex(index - 1));
     if (dispatch) {
       dispatch(state.tr.setSelection(new NodeSelection($beforePos)));
     }

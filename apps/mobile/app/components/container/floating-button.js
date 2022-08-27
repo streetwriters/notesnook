@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Keyboard, Platform, View } from "react-native";
 import Animated, {
   Easing,
@@ -6,7 +6,6 @@ import Animated, {
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import { editorState } from "../../screens/editor/tiptap/utils";
@@ -22,7 +21,6 @@ export const FloatingButton = ({
   color = "accent",
   shouldShow = false
 }) => {
-  const insets = useSafeAreaInsets();
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const translate = useSharedValue(0);

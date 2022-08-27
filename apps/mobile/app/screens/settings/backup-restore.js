@@ -1,10 +1,8 @@
-import React from "react";
 import { Platform, TouchableOpacity, View } from "react-native";
 import Paragraph from "../../components/ui/typography/paragraph";
 import Backup from "../../services/backup";
 import PremiumService from "../../services/premium";
 import SettingsService from "../../services/settings";
-import { useUserStore } from "../../stores/use-user-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
@@ -12,7 +10,6 @@ import { SIZE } from "../../utils/size";
 export const AutomaticBackupsSelector = () => {
   const colors = useThemeStore((state) => state.colors);
   const settings = useSettingStore((state) => state.settings);
-  const user = useUserStore((state) => state.user);
   const updateAskForBackup = async () => {
     SettingsService.set({
       nextBackupRequestTime: Date.now() + 86400000 * 3

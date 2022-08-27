@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList, View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useMessageStore } from "../../stores/use-message-store";

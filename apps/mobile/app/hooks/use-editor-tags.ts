@@ -3,6 +3,7 @@ import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { db } from "../common/database";
+import { NoteType } from "app/utils/types";
 
 /**
  * A hook that injects/removes tags from tags bar in editor
@@ -12,17 +13,17 @@ const useEditorTags = () => {
     (state) => state.currentEditingNote
   );
   const tags = useTagStore((state) => state.tags);
-  const [note, setNote] = useState<any>(null);
-  const [noteTags, setNoteTags] = useState([]);
+  const [note, setNote] = useState<NoteType | null>(null);
+  const [noteTags, setNoteTags] = useState<string[]>([]);
 
   async function refreshNote() {
-    let current = useEditorStore.getState().currentEditingNote;
+    const current = useEditorStore.getState().currentEditingNote;
     if (!current) {
       setNote(null);
       setNoteTags([]);
       return;
     }
-    let note = db.notes?.note(current)?.data;
+    const note = db.notes?.note(current)?.data as NoteType;
     setNote(note ? { ...note } : null);
     getTags(note);
   }
@@ -43,11 +44,11 @@ const useEditorTags = () => {
     };
   }, [noteTags]);
 
-  function getTags(note: any) {
+  function getTags(note: NoteType) {
     if (!note || !note.tags) return [];
-    let tags = note.tags
-      .map((t: any) => (db.tags?.tag(t) ? { ...db.tags.tag(t) } : null))
-      .filter((t: any) => t !== null);
+    const tags = note.tags
+      .map((t) => (db.tags?.tag(t) ? { ...db.tags.tag(t) } : null))
+      .filter((t) => t !== null);
     setNoteTags(tags);
   }
 

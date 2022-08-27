@@ -1,8 +1,8 @@
-const { BrowserWindow, Menu, MenuItem, clipboard } = require("electron");
+const { Menu, MenuItem, clipboard } = require("electron");
 
 /**
  *
- * @param {BrowserWindow} mainWindow
+ * @param {import("@playwright/test").BrowserWindow} mainWindow
  */
 function setupMenu(mainWindow) {
   mainWindow.webContents.on("context-menu", (event, params) => {

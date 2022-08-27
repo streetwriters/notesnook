@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { ToolButton } from "../components/tool-button";
 import { useToolbarLocation } from "../stores/toolbar-store";

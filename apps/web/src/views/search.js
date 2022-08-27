@@ -8,7 +8,7 @@ import { useStore as useNoteStore } from "../stores/note-store";
 import { Flex, Text } from "rebass";
 import { showToast } from "../utils/toast";
 import { store as notebookstore } from "../stores/notebook-store";
-import { hardNavigate, navigate } from "../navigation";
+import { hardNavigate } from "../navigation";
 
 async function typeToItems(type, context) {
   switch (type) {

@@ -12,7 +12,7 @@ import { NodeSelection } from "prosemirror-state";
 // ---- Inline Input Rules ------------------------------ //
 
 // simple input rule for inline math
-export const REGEX_INLINE_MATH_DOLLARS: RegExp = /\$\$(.+)\$\$/; //new RegExp("\$(.+)\$", "i");
+export const REGEX_INLINE_MATH_DOLLARS = /\$\$(.+)\$\$/; //new RegExp("\$(.+)\$", "i");
 
 // negative lookbehind regex notation allows for escaped \$ delimiters
 // (requires browser supporting ECMA2018 standard -- currently only Chrome / FF)
@@ -29,21 +29,21 @@ export const REGEX_INLINE_MATH_DOLLARS_ESCAPED: RegExp = (() => {
 // ---- Block Input Rules ------------------------------- //
 
 // simple inputrule for block math
-export const REGEX_BLOCK_MATH_DOLLARS: RegExp = /\$\$\$\s+$/; //new RegExp("\$\$\s+$", "i");
+export const REGEX_BLOCK_MATH_DOLLARS = /\$\$\$\s+$/; //new RegExp("\$\$\s+$", "i");
 
 ////////////////////////////////////////////////////////////
 
 export function makeInlineMathInputRule(
   pattern: RegExp,
   nodeType: NodeType,
-  getAttrs?: (match: string[]) => any
+  getAttrs?: (match: string[]) => Record<string, unknown>
 ) {
   return new InputRule(pattern, (state, match, start, end) => {
-    let $start = state.doc.resolve(start);
-    let index = $start.index();
-    let $end = state.doc.resolve(end);
+    const $start = state.doc.resolve(start);
+    const index = $start.index();
+    const $end = state.doc.resolve(end);
     // get attrs
-    let attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
+    const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
     // check if replacement valid
     if (!$start.parent.canReplaceWith(index, $end.index(), nodeType)) {
       return null;
@@ -61,18 +61,18 @@ export function makeInlineMathInputRule(
 export function makeBlockMathInputRule(
   pattern: RegExp,
   nodeType: NodeType,
-  getAttrs?: (match: string[]) => any
+  getAttrs?: (match: string[]) => Record<string, unknown>
 ) {
   return new InputRule(pattern, (state, match, start, end) => {
-    let $start = state.doc.resolve(start);
-    let attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
+    const $start = state.doc.resolve(start);
+    const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
     if (
       !$start
         .node(-1)
         .canReplaceWith($start.index(-1), $start.indexAfter(-1), nodeType)
     )
       return null;
-    let tr = state.tr
+    const tr = state.tr
       .delete(start, end)
       .setBlockType(start, start, nodeType, attrs);
 

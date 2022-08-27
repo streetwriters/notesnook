@@ -1,17 +1,15 @@
-const { notesnook } = require("../test.ids");
-const {
+import { notesnook } from "../test.ids";
+import {
   navigate,
   tapById,
   visibleByText,
   createNote,
   prepare,
-  visibleById,
-  notVisibleById,
   elementById,
   tapByText,
-  notVisibleByText
-} = require("./utils");
-const { sleep } = require("./utils");
+  notVisibleByText,
+  sleep
+} from "./utils";
 
 describe("Tags", () => {
   it("Tag a note", async () => {
@@ -20,7 +18,7 @@ describe("Tags", () => {
     await tapById(notesnook.listitem.menu);
     await tapByText("Add tags");
     await elementById("tag-input").typeText("testtag");
-    await tapByText(`Add "#testtag"`);
+    await tapByText('Add "#testtag"');
     await visibleByText("#testtag");
     await device.pressBack();
     await device.pressBack();
@@ -31,11 +29,11 @@ describe("Tags", () => {
 
   it("Untag a note", async () => {
     await prepare();
-    let note = await createNote();
+    await createNote();
     await tapById(notesnook.listitem.menu);
     await tapByText("Add tags");
     await elementById("tag-input").typeText("testtag");
-    await tapByText(`Add "#testtag"`);
+    await tapByText('Add "#testtag"');
     await visibleByText("#testtag");
     await tapByText("#testtag");
     await device.pressBack();
@@ -47,11 +45,11 @@ describe("Tags", () => {
 
   it("Creat shortcut of a tag", async () => {
     await prepare();
-    let note = await createNote();
+    await createNote();
     await tapById(notesnook.listitem.menu);
     await tapByText("Add tags");
     await elementById("tag-input").typeText("testtag");
-    await tapByText(`Add "#testtag"`);
+    await tapByText('Add "#testtag"');
     await visibleByText("#testtag");
     await device.pressBack();
     await device.pressBack();
@@ -65,11 +63,11 @@ describe("Tags", () => {
 
   it("Rename a tag", async () => {
     await prepare();
-    let note = await createNote();
+    await createNote();
     await tapById(notesnook.listitem.menu);
     await tapByText("Add tags");
     await elementById("tag-input").typeText("testtag");
-    await tapByText(`Add "#testtag"`);
+    await tapByText('Add "#testtag"');
     await visibleByText("#testtag");
     await device.pressBack();
     await device.pressBack();

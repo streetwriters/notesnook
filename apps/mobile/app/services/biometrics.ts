@@ -51,7 +51,7 @@ async function getCredentials(title?: string, description?: string) {
   try {
     useSettingStore.getState().setRequestBiometrics(true);
 
-    let options = Platform.select({
+    const options = Platform.select({
       ios: {
         fallbackEnabled: true,
         description: description
@@ -74,7 +74,7 @@ async function getCredentials(title?: string, description?: string) {
     FingerprintScanner.release();
     let message: ShowToastEvent = {
       heading: "Authentication with biometrics failed.",
-      message: 'Tap "Biometric Unlock" to try again.',
+      message: "Tap \"Biometric Unlock\" to try again.",
       type: "error",
       context: "local"
     };
@@ -90,7 +90,7 @@ async function getCredentials(title?: string, description?: string) {
     } else if (e.name === "UserFallback") {
       message = {
         heading: "Authentication cancelled by user.",
-        message: 'Tap "Biometric Unlock" to try again.',
+        message: "Tap \"Biometric Unlock\" to try again.",
         type: "error",
         context: "local"
       };

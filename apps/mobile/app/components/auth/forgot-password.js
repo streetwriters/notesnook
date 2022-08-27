@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import { DDS } from "../../services/device-detection";
@@ -45,7 +45,7 @@ export const ForgotPassword = () => {
         lastRecoveryEmailTime: Date.now()
       });
       ToastEvent.show({
-        heading: `Check your email to reset password`,
+        heading: "Check your email to reset password",
         message: `Recovery email has been sent to ${email.current.toLowerCase()}`,
         type: "success",
         context: "local",

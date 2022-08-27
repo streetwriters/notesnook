@@ -47,39 +47,39 @@ export async function isEditorLoaded(
   return await post(ref, sessionId, EditorEvents.status);
 }
 
-export async function post(
+export async function post<T>(
   ref: RefObject<WebView>,
   sessionId: string,
   type: string,
-  value = null
+  value: T | null = null
 ) {
   if (!sessionId) {
     console.warn("post called without sessionId of type:", type);
     return;
   }
-  let message = {
+  const message = {
     type,
     value,
     sessionId: sessionId
   };
   setImmediate(() => ref.current?.postMessage(JSON.stringify(message)));
-  let response = await getResponse(type);
+  const response = await getResponse(type);
   console.log("post: ", type, sessionId, "result:", !!response);
   return response;
 }
 
 type WebviewResponseData = {
-  [name: string]: any;
+  [name: string]: unknown;
   sessionId: string | null;
   type: string;
-  value: any;
+  value: unknown;
 };
 
 export const getResponse = async (
   type: string
 ): Promise<WebviewResponseData | false> => {
   return new Promise((resolve) => {
-    let callback = (data: WebviewResponseData) => {
+    const callback = (data: WebviewResponseData) => {
       eUnSubscribeEvent(type, callback);
       resolve(data);
     };

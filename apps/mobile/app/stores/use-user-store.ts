@@ -1,4 +1,3 @@
-//@ts-ignore
 import create, { State } from "zustand";
 
 export interface UserStore extends State {
@@ -14,7 +13,7 @@ export interface UserStore extends State {
   setVerifyUser: (verified: boolean) => void;
 }
 
-export const useUserStore = create<UserStore>((set, get) => ({
+export const useUserStore = create<UserStore>((set) => ({
   user: null,
   premium: false,
   lastSynced: "Never",

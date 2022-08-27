@@ -1,4 +1,3 @@
-import React from "react";
 import { Linking, View } from "react-native";
 //import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { eSendEvent, presentSheet } from "../../services/event-manager";
@@ -83,7 +82,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
             ))}
 
           {buttons.length > 1 &&
-            buttons.slice(1, 2).map((item, index) => (
+            buttons.slice(1, 2).map((item) => (
               <Button
                 key={item.title}
                 title={item.title}
@@ -128,7 +127,7 @@ export const Cta = ({ actions, style = {}, color, inline }) => {
             ))}
 
           {buttons.length > 1 &&
-            buttons.slice(1, 2).map((item, index) => (
+            buttons.slice(1, 2).map((item) => (
               <Button
                 key={item.title}
                 title={item.title}

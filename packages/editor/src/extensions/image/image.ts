@@ -5,17 +5,13 @@ import {
   findChildren
 } from "@tiptap/core";
 import { Attachment, getDataAttribute } from "../attachment";
-import {
-  createNodeView,
-  createSelectionBasedNodeView,
-  NodeViewSelectionNotifierPlugin
-} from "../react";
+import { createSelectionBasedNodeView } from "../react";
 import { ImageComponent } from "./component";
 
 export interface ImageOptions {
   inline: boolean;
   allowBase64: boolean;
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
 }
 
 export type ImageAttributes = Partial<ImageSizeOptions> &
@@ -103,7 +99,7 @@ export const ImageNode = Node.create<ImageOptions>({
   parseHTML() {
     return [
       {
-        tag: this.options.allowBase64 ? "img" : 'img:not([src^="data:"])'
+        tag: this.options.allowBase64 ? "img" : "img:not([src^=\"data:\"])"
       }
     ];
   },

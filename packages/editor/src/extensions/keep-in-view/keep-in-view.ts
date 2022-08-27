@@ -1,6 +1,7 @@
 import { Editor, Extension, posToDOMRect } from "@tiptap/core";
 
-let onWindowResize: any = undefined;
+let onWindowResize: ((this: Window, ev: UIEvent) => void) | undefined =
+  undefined;
 export const KeepInView = Extension.create({
   name: "keepinview",
 

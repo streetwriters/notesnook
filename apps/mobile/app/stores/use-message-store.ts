@@ -116,7 +116,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
       console.log("ERROR", e);
       set({ announcements: [] });
     } finally {
-      let all = await getFiltered(announcements);
+      const all = await getFiltered(announcements);
 
       setTimeout(() => {
         if (all.filter((a) => a.type === "inline").length !== 0) {
@@ -134,8 +134,8 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
 const getFiltered = async (announcements: Announcement[]) => {
   if (!announcements) return [];
-  let filtered: Announcement[] = [];
-  for (let announcement of announcements) {
+  const filtered: Announcement[] = [];
+  for (const announcement of announcements) {
     if (await shouldShowAnnouncement(announcement)) {
       filtered.push(announcement);
     }
@@ -147,7 +147,7 @@ export const allowedPlatforms = ["all", "mobile", Platform.OS];
 
 async function shouldShowAnnouncement(announcement: Announcement) {
   if (!announcement) return false;
-  let removed = (await MMKV.getStringAsync(announcement.id)) === "removed";
+  const removed = (await MMKV.getStringAsync(announcement.id)) === "removed";
   if (removed) return false;
   let show = announcement.platforms.some(
     (platform) => allowedPlatforms.indexOf(platform) > -1

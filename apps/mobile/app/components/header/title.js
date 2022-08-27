@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import Notebook from "../../screens/notebook";
 import {

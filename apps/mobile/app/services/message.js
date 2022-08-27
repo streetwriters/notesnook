@@ -7,7 +7,6 @@ import {
 import { eSendEvent } from "./event-manager";
 import PremiumService from "./premium";
 import { verifyUser } from "../screens/settings/functions";
-import { MMKV } from "../common/database/mmkv";
 import { Platform } from "react-native";
 import umami from "../common/analytics";
 import SettingsService from "./settings";

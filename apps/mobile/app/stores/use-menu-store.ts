@@ -10,7 +10,7 @@ export interface MenuStore extends State {
   clearAll: () => void;
 }
 
-export const useMenuStore = create<MenuStore>((set, get) => ({
+export const useMenuStore = create<MenuStore>((set) => ({
   menuPins: [],
   colorNotes: [],
   setMenuPins: () => {
@@ -20,7 +20,9 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
       setTimeout(() => {
         try {
           set({ menuPins: db.settings?.pins || [] });
-        } catch (e) {}
+        } catch (e) {
+          console.error(e);
+        }
       }, 1000);
     }
   },

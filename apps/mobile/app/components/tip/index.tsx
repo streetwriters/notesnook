@@ -1,4 +1,3 @@
-import React from "react";
 import { Image, TextStyle, View, ViewStyle } from "react-native";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { TTip } from "../../services/tip-manager";
@@ -140,7 +139,7 @@ export const Tip = ({
 
 Tip.present = async (tip: TTip) => {
   if (!tip) return;
-  let dontShow = MMKV.getString("neverShowSheetTips");
+  const dontShow = MMKV.getString("neverShowSheetTips");
   if (dontShow) return;
   presentSheet({
     component: (

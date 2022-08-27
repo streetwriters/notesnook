@@ -4,10 +4,7 @@ import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
-import {
-  showBackupDialog,
-  showRecoveryKeyDialog
-} from "../common/dialog-controller";
+import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { isDesktop, isTesting } from "../utils/platform";
 import saveFile from "../commands/save-file";

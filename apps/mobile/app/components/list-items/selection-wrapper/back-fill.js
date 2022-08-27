@@ -1,10 +1,9 @@
-import React from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { useEditorStore } from "../../../stores/use-editor-store";
 import { hexToRGBA } from "../../../utils/color-scheme/utils";
 
-export const Filler = ({ item, background }) => {
+export const Filler = ({ item }) => {
   const colors = useThemeStore((state) => state.colors);
 
   const currentEditingNote = useEditorStore(

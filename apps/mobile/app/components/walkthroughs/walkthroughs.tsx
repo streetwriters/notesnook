@@ -255,8 +255,6 @@ const notebooks: { id: string; steps: TStep[] } = {
 };
 
 const ChooseTheme = () => {
-  const colors = useThemeStore((state) => state.colors);
-
   return (
     <View
       style={{
@@ -338,8 +336,6 @@ const emailconfirmed: { id: string; steps: TStep[] } = {
 };
 
 const Support = () => {
-  const colors = useThemeStore((state) => state.colors);
-
   return (
     <View
       style={{

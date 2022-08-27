@@ -1,12 +1,11 @@
 import { ToolProps } from "../types";
 import { Editor } from "../../types";
-import { ToolId } from ".";
 import { Dropdown } from "../components/dropdown";
 import { MenuItem } from "../../components/menu/types";
 import { ToolbarLocation, useToolbarLocation } from "../stores/toolbar-store";
 import { useMemo } from "react";
 
-const defaultLevels = [1, 2, 3, 4, 5, 6];
+const defaultLevels = [1, 2, 3, 4, 5, 6] as const;
 
 export function Headings(props: ToolProps) {
   const { editor } = props;
@@ -48,7 +47,7 @@ function toMenuItems(
         ?.chain()
         .focus()
         .updateAttributes("textStyle", { fontSize: null, fontStyle: null })
-        .setHeading({ level: level as any })
+        .setHeading({ level })
         .run()
   }));
   const paragraph: MenuItem = {

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Text, TextProps } from "react-native";
 import Animated, {
   ComplexAnimationBuilder,

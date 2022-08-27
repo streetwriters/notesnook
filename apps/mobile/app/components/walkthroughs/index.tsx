@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { LayoutAnimation, View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
@@ -22,7 +22,7 @@ export const Walkthrough = ({
   const [step, setStep] = useState<TStep>(steps && steps[0]);
 
   const next = () => {
-    let index = steps.findIndex((s) => s.text === step.text);
+    const index = steps.findIndex((s) => s.text === step.text);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setStep(steps[index + 1]);
   };
@@ -125,7 +125,7 @@ Walkthrough.update = async (
 };
 
 Walkthrough.init = async () => {
-  let json = MMKV.getString("walkthroughState");
+  const json = MMKV.getString("walkthroughState");
   if (json) {
     walkthroughState = JSON.parse(json);
     console.log(walkthroughState);
@@ -148,7 +148,7 @@ Walkthrough.present = async (
   }
 
   //@ts-ignore
-  let walkthrough = walkthroughs[id];
+  const walkthrough = walkthroughs[id];
   if (!walkthrough) return;
   presentSheet({
     component: <Walkthrough canSkip={canSkip} steps={walkthrough.steps} />,

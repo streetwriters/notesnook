@@ -1,8 +1,5 @@
-import React, { PropsWithChildren } from "react";
-import {
-  useIsMobile,
-  useToolbarStore
-} from "../../toolbar/stores/toolbar-store";
+import { PropsWithChildren } from "react";
+import { useIsMobile } from "../../toolbar/stores/toolbar-store";
 import {
   ActionSheetPresenter,
   ActionSheetPresenterProps
@@ -20,11 +17,11 @@ export function ResponsiveContainer(props: ResponsiveContainerProps) {
   else return props.desktop || null;
 }
 
-export function DesktopOnly(props: PropsWithChildren<{}>) {
+export function DesktopOnly(props: PropsWithChildren<unknown>) {
   return <ResponsiveContainer desktop={<>{props.children}</>} />;
 }
 
-export function MobileOnly(props: PropsWithChildren<{}>) {
+export function MobileOnly(props: PropsWithChildren<unknown>) {
   return <ResponsiveContainer mobile={<>{props.children}</>} />;
 }
 

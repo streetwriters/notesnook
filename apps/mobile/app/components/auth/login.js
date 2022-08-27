@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Platform, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent, ToastEvent } from "../../services/event-manager";
 import { clearMessage } from "../../services/message";
@@ -10,30 +9,22 @@ import SettingsService from "../../services/settings";
 import { useUserStore } from "../../stores/use-user-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { db } from "../../common/database";
-import { eCloseLoginDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import SheetProvider from "../sheet-provider";
 import { Progress } from "../sheets/progress";
 import { Button } from "../ui/button";
-import { IconButton } from "../ui/icon-button";
 import Input from "../ui/input";
 import { SvgView } from "../ui/svg";
-import { BouncingView } from "../ui/transitions/bouncing-view";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { SVG } from "./background";
 import { ForgotPassword } from "./forgot-password";
 import TwoFactorVerification from "./two-factor";
-import Animated, {
-  FadeInDown,
-  FadeOutDown,
-  FadeOutUp
-} from "react-native-reanimated";
-import Navigation from "../../services/navigation";
+import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { hideAuth } from "./common";
-export const Login = ({ changeMode, welcome }) => {
+export const Login = ({ changeMode }) => {
   const colors = useThemeStore((state) => state.colors);
   const email = useRef();
   const emailInputRef = useRef();
@@ -42,7 +33,6 @@ export const Login = ({ changeMode, welcome }) => {
   const [focused, setFocused] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const insets = useSafeAreaInsets();
 
   const setUser = useUserStore((state) => state.setUser);
 
@@ -188,7 +178,7 @@ export const Login = ({ changeMode, welcome }) => {
             }}
             size={SIZE.md}
           >
-            Don't have an account? Sign up
+            {"Don't have an account? Sign up"}
           </Paragraph>
         </View>
         <View

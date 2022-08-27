@@ -1,9 +1,9 @@
-const { Page, test, expect } = require("@playwright/test");
+const { test, expect } = require("@playwright/test");
 const { getTestId, isTestAll, loginUser, USER } = require("./utils");
 const { isAbsent, isPresent } = require("./utils/conditions");
 
 /**
- * @type {Page}
+ * @type {import("@playwright/test").Page}
  */
 var page = null;
 global.page = null;
@@ -58,6 +58,7 @@ test("login user and change password repeatedly", async ({
   let email = USER.email;
 
   for (let i = 0; i < 3; i++) {
+    // eslint-disable-next-line no-loop-func
     await test.step(`login user using password ${currentPassword} (${i})`, async () => {
       await loginUser({
         email,

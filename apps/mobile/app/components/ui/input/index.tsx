@@ -23,7 +23,7 @@ import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
 
 interface InputProps extends TextInputProps {
-  fwdRef?: RefObject<any>;
+  fwdRef?: RefObject<TextInput>;
   validationType?:
     | "password"
     | "email"
@@ -111,7 +111,11 @@ const Input = ({
       });
       return;
     }
-    let isError: any = null;
+    let isError:
+      | boolean
+      | string
+      | { SHORT_PASS?: boolean; isValid?: boolean }
+      | undefined = undefined;
 
     switch (validationType) {
       case "password":
@@ -126,11 +130,9 @@ const Input = ({
       case "confirmPassword":
         isError = customValidator && value === customValidator();
         break;
-      case "phonenumber":
-        // eslint-disable-next-line no-case-declarations
-        const phone = require("phone").default;
-        // eslint-disable-next-line no-case-declarations
-        let result = phone(value, {
+      case "phonenumber": {
+        const { default: phone } = await import("phone");
+        const result = phone(value, {
           strictDetection: true,
           validateMobilePrefix: true
         });
@@ -141,6 +143,7 @@ const Input = ({
         }
 
         break;
+      }
     }
 
     if (validationType === "password") {

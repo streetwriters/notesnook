@@ -1,13 +1,9 @@
-import { Box, Flex, Text } from "rebass";
-import { Attachment, AttachmentWithProgress } from "./attachment";
-import { ToolButton } from "../../toolbar/components/tool-button";
-import { Editor } from "@tiptap/core";
+import { Box, Text } from "rebass";
+import { AttachmentWithProgress } from "./attachment";
 import { useRef } from "react";
-// import { MenuPresenter } from "../../components/menu/menu";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { SelectionBasedReactNodeViewProps } from "../react";
-import { PopupPresenter } from "../../components/popup-presenter";
 import { ToolbarGroup } from "../../toolbar/components/toolbar-group";
 import { DesktopOnly } from "../../components/responsive";
 
@@ -15,7 +11,7 @@ export function AttachmentComponent(
   props: SelectionBasedReactNodeViewProps<AttachmentWithProgress>
 ) {
   const { editor, node, selected } = props;
-  const { hash, filename, size, progress } = node.attrs;
+  const { filename, size, progress } = node.attrs;
   const elementRef = useRef<HTMLSpanElement>();
 
   return (

@@ -1,15 +1,11 @@
-import { Button, Flex, Text } from "rebass";
-import { useCallback, useEffect, useState } from "react";
+import { Flex, Text } from "rebass";
+import { useCallback, useState } from "react";
 import { Popup } from "../components/popup";
 import { Input, Textarea } from "@rebass/forms";
 import {
   Embed,
-  EmbedAlignmentOptions,
-  EmbedAttributes,
   EmbedSizeOptions
 } from "../../extensions/embed";
-import { IconNames } from "../icons";
-import { ToolButton } from "../components/tool-button";
 import { convertUrlToEmbedUrl } from "@social-embed/lib";
 import { InlineInput } from "../../components/inline-input";
 import { Tabs, Tab } from "../../components/tabs";
@@ -87,7 +83,7 @@ export function EmbedPopup(props: EmbedPopupProps) {
               _height = parseInt(heightValue);
           }
           const convertedUrl = convertUrlToEmbedUrl(_src);
-          if (!!convertedUrl) _src = convertedUrl;
+          if (convertedUrl) _src = convertedUrl;
           onClose({
             height: _height,
             width: _width,

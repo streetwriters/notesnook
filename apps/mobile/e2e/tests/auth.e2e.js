@@ -1,13 +1,11 @@
-const { notesnook } = require("../test.ids");
-const {
-  navigate,
+import {
   tapByText,
   prepare,
   openSideMenu,
   elementById,
-  visibleByText
-} = require("./utils");
-const { sleep } = require("./utils");
+  visibleByText,
+  sleep
+} from "./utils";
 
 const credentials = {
   username: "testaccount1@notesnook.com",
@@ -33,7 +31,7 @@ async function deleteAccount() {
 async function signup() {
   await tapByText("Login to sync your notes.");
   await sleep(500);
-  await tapByText(`Don't have an account? Sign up`);
+  await tapByText("Don't have an account? Sign up");
   await elementById("input.email").typeText(credentials.username);
   await elementById("input.password").typeText(credentials.password);
   await elementById("input.confirmPassword").typeText(credentials.password);

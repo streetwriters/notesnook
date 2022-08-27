@@ -8,7 +8,7 @@ export interface ThemeStore extends State {
   setColors: (colors: typeof COLOR_SCHEME_LIGHT) => void;
 }
 
-export const useThemeStore = create<ThemeStore>((set, get) => ({
+export const useThemeStore = create<ThemeStore>((set) => ({
   colors: darkScheme ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT,
   setColors: (colors) => {
     set({ colors });

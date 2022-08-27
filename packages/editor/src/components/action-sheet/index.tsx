@@ -6,7 +6,7 @@ import React, {
   useEffect
 } from "react";
 import { MenuItem } from "../menu/types";
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Button, Flex, Text, FlexProps } from "rebass";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { MenuButton } from "../menu/menu-button";
@@ -16,13 +16,15 @@ import {
   motion,
   PanInfo,
   useMotionValue,
-  animate,
   useTransform,
   useAnimation
 } from "framer-motion";
 import { useTheme } from "../../toolbar/stores/toolbar-store";
 
-const AnimatedFlex = motion(Flex);
+const AnimatedFlex = motion(
+  Flex as React.FunctionComponent<Omit<FlexProps, "onDrag" | "onDragEnd">>
+);
+
 type ActionSheetHistoryItem = {
   title?: string;
   items?: MenuItem[];
@@ -143,13 +145,12 @@ export function ActionSheetPresenter(
         console.log("OPEGN!");
         animation.start({ transition: TRANSITION, y: 0 });
       }}
-      overlayElement={(props, contentEl) => {
+      overlayElement={(overlayElementProps, contentEl) => {
         return (
           <Box
-            {...props}
-            //@ts-ignore
+            {...overlayElementProps}
             style={{
-              ...props.style,
+              ...overlayElementProps.style,
               position: blocking ? "fixed" : "sticky",
               zIndex: 1000,
               backgroundColor: !blocking ? "transparent" : "unset"
@@ -213,11 +214,9 @@ export function ActionSheetPresenter(
         {draggable && (
           <AnimatedFlex
             drag="y"
-            // @ts-ignore
             onDrag={(_, { delta }: PanInfo) => {
               y.set(Math.max(y.get() + delta.y, 0));
             }}
-            // @ts-ignore
             onDragEnd={(_, { velocity }: PanInfo) => {
               if (velocity.y >= 500) {
                 onClose?.();
@@ -306,7 +305,7 @@ function ContentContainer(props: PropsWithChildren<ContentContainerProps>) {
                   <MenuButton
                     key={item.key}
                     item={item}
-                    onClick={(e) => {
+                    onClick={() => {
                       if (item.menu) {
                         navigate(item.menu);
                       } else if (item.onClick) {

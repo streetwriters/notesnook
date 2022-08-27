@@ -1,4 +1,3 @@
-import React from "react";
 import { Group } from "./group";
 import { DraggableItem } from "./state";
 import { Tool } from "./tool";

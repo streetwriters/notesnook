@@ -35,7 +35,7 @@ export async function writeEncrypted(filename, { data, type, key }) {
   console.log(filepath);
   await RNFetchBlob.fs.writeFile(filepath, data, "base64");
   let output = await Sodium.encryptFile(key, {
-    uri: Platform.OS === "ios" ? filepath : `file://` + filepath,
+    uri: Platform.OS === "ios" ? filepath : "file://" + filepath,
     type: "url"
   });
   RNFetchBlob.fs.unlink(filepath).catch(console.log);
@@ -43,7 +43,7 @@ export async function writeEncrypted(filename, { data, type, key }) {
   console.log("encrypted file output: ", output);
   return {
     ...output,
-    alg: `xcha-stream`
+    alg: "xcha-stream"
   };
 }
 

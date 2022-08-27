@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal, View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
@@ -7,14 +7,12 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  presentSheet,
   ToastEvent
 } from "../../services/event-manager";
 import { clearMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import Sync from "../../services/sync";
 import { db } from "../../common/database";
-import { MMKV } from "../../common/database/mmkv";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { IconButton } from "../ui/icon-button";
@@ -43,7 +41,6 @@ function getEmail(email) {
 export const SessionExpired = () => {
   const colors = useThemeStore((state) => state.colors);
   const email = useRef();
-  const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const password = useRef();
   const [visible, setVisible] = useState(false);
@@ -51,14 +48,13 @@ export const SessionExpired = () => {
 
   const setUser = useUserStore((state) => state.setUser);
 
-  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const logout = async () => {
     try {
       await db.user.logout();
       await BiometricService.resetCredentials();
-      await SettingsService.set({
+      SettingsService.set({
         introCompleted: true
       });
       setVisible(false);
@@ -109,7 +105,6 @@ export const SessionExpired = () => {
   };
 
   const login = async (mfa, callback) => {
-    if (error) return;
     setLoading(true);
     let user;
     try {

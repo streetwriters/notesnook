@@ -53,7 +53,7 @@ export function Resizer(props: PropsWithChildren<ResizerProps>) {
           />
         )
       }}
-      onResizeStop={(e, direction, ref, d) => {
+      onResizeStop={(_e, _direction, ref) => {
         try {
           onResize(ref.clientWidth, ref.clientHeight);
         } catch {

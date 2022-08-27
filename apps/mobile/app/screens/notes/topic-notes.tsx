@@ -1,5 +1,4 @@
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
-import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { MoveNotes } from "../../components/sheets/move-notes/movenote";
 import { eSendEvent } from "../../services/event-manager";
@@ -55,7 +54,7 @@ export const TopicNotes = ({
 TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
   //@ts-ignore
   const { id, notebookId } = params.item;
-  let notes = db.notebooks?.notebook(notebookId)?.topics.topic(id)?.all || [];
+  const notes = db.notebooks?.notebook(notebookId)?.topics.topic(id)?.all || [];
   return grouped
     ? groupArray(notes, db.settings?.getGroupOptions("notes"))
     : notes;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { useMessageStore } from "../../../stores/use-message-store";
@@ -20,13 +20,13 @@ import Paragraph from "../../ui/typography/paragraph";
 
 const offsets = [];
 let timeout = null;
-const JumpToSectionDialog = ({ scrollRef, data, type, screen }) => {
+const JumpToSectionDialog = ({ scrollRef, data, type }) => {
   const colors = useThemeStore((state) => state.colors);
   const notes = data;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
 
-  const onPress = (item, index) => {
+  const onPress = (item) => {
     let ind = notes.findIndex(
       (i) => i.title === item.title && i.type === "header"
     );

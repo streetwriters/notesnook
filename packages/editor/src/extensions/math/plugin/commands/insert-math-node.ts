@@ -26,13 +26,13 @@ export function insertMathNode(
     state: EditorState,
     dispatch: ((tr: Transaction) => void) | undefined
   ) {
-    let { $from, empty } = state.selection,
+    const { $from, empty } = state.selection,
       index = $from.index();
     if (!empty && !$from.parent.canReplaceWith(index, index, mathNodeType)) {
       return false;
     }
     if (dispatch) {
-      let mathNode = mathNodeType.create(
+      const mathNode = mathNodeType.create(
         {},
         initialText ? state.schema.text(initialText) : null
       );

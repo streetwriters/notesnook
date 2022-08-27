@@ -52,7 +52,7 @@ export const useEditor = (
   const saveCount = useRef(0);
 
   const postMessage = useCallback(
-    async (type: string, data: any) =>
+    async <T>(type: string, data: T) =>
       await post(editorRef, sessionIdRef.current, type, data),
     [sessionIdRef]
   );
@@ -73,7 +73,7 @@ export const useEditor = (
 
   useEffect(() => {
     if (theme) return;
-    let unsub = useThemeStore.subscribe((state) => {
+    const unsub = useThemeStore.subscribe((state) => {
       postMessage(EditorEvents.theme, state.colors);
     });
 
@@ -169,7 +169,7 @@ export const useEditor = (
           return;
         }
         let note = id ? (db.notes?.note(id)?.data as Note) : null;
-        let locked = note?.locked;
+        const locked = note?.locked;
         if (note?.conflicted) return;
 
         if (isContentInvalid(data)) {
@@ -179,7 +179,7 @@ export const useEditor = (
           currentSessionHistoryId = sessionHistoryId.current;
         }
 
-        let noteData: Partial<Note> = {
+        const noteData: Partial<Note> = {
           id,
           sessionId: isContentInvalid(data) ? null : currentSessionHistoryId
         };
@@ -273,7 +273,7 @@ export const useEditor = (
       //@ts-ignore todo
       if (item && item.type === "new") {
         currentNote.current && (await reset());
-        let nextSessionId = makeSessionId(item);
+        const nextSessionId = makeSessionId(item);
         setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
         sessionHistoryId.current = Date.now();
@@ -287,7 +287,7 @@ export const useEditor = (
         overlay(true, item);
         currentNote.current && (await reset(false));
         await loadContent(item);
-        let nextSessionId = makeSessionId(item);
+        const nextSessionId = makeSessionId(item);
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
@@ -352,7 +352,7 @@ export const useEditor = (
           type: "tiptap"
         };
       }
-      let params = {
+      const params = {
         title,
         data: content,
         type: "tiptap",
@@ -403,9 +403,9 @@ export const useEditor = (
   }, [state, currentNote, loadNote]);
 
   async function restoreEditorState() {
-    let json = await MMKV.getItem("appState");
+    const json = await MMKV.getItem("appState");
     if (json) {
-      let appState = JSON.parse(json) as AppState;
+      const appState = JSON.parse(json) as AppState;
       if (
         appState.editing &&
         !appState.note?.locked &&

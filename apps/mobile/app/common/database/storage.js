@@ -99,7 +99,6 @@ async function checkAndCreateDir(path) {
     }
   } catch (e) {
     await RNFetchBlob.fs.mkdir(dir);
-  } finally {
   }
   return dir;
 }

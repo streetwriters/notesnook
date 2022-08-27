@@ -1,14 +1,10 @@
-import { Slider } from "@rebass/forms";
 import { Editor } from "../../types";
-import { useRef, useState } from "react";
-import { Box, Flex, Text } from "rebass";
+import { Box } from "rebass";
 import { Tab, Tabs } from "../../components/tabs";
-import { Counter } from "../components/counter";
 import { Icon } from "../components/icon";
 // import { MenuPresenter } from "../../components/menu/menu";
 import { Popup } from "../components/popup";
-import { ToolButton } from "../components/tool-button";
-import { IconNames, Icons } from "../icons";
+import { Icons } from "../icons";
 import { ColorPicker } from "./color-picker";
 
 type CellPropertiesProps = { editor: Editor; onClose: () => void };

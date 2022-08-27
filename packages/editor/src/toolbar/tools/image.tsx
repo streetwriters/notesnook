@@ -1,7 +1,6 @@
 import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
-import { useMemo, useRef, useState } from "react";
-import { Popup } from "../components/popup";
+import { useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MoreTools } from "../components/more-tools";
 import { useToolbarLocation } from "../stores/toolbar-store";

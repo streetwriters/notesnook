@@ -1,8 +1,5 @@
 import { Platform } from "react-native";
 import { Monographs } from "../screens/notes/monographs";
-import { eSendEvent } from "../services/event-manager";
-import Navigation from "../services/navigation";
-import { refreshNotesPage } from "./events";
 
 export const STORE_LINK =
   Platform.OS === "ios"

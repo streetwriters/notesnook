@@ -1,9 +1,9 @@
-const { Page, test, expect } = require("@playwright/test");
+const { test, expect } = require("@playwright/test");
 const { getTestId, isTestAll, loginUser } = require("./utils");
 const path = require("path");
 
 /**
- * @type {Page}
+ * @type {import("@playwright/test").Page}
  */
 var page = null;
 global.page = null;

@@ -29,7 +29,7 @@ interface AttachmentStore {
 export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   progress: {},
   remove: (hash) => {
-    let progress = get().progress;
+    const progress = get().progress;
     if (!progress) return;
     editorController.current?.commands.setAttachmentProgress({
       hash: hash,
@@ -40,7 +40,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     set({ progress: { ...progress } });
   },
   setProgress: (sent, total, hash, recieved, type) => {
-    let progress = get().progress;
+    const progress = get().progress;
     if (!progress) return;
     progress[hash] = { sent, total, hash, recieved, type };
     const progressPercentage =

@@ -10,7 +10,6 @@ export {
   createMathView,
   type IMathPluginState
 } from "./math-plugin";
-export { mathSchemaSpec, createMathSchema } from "./math-schema";
 
 // recommended plugins
 export { mathBackspaceCmd } from "./plugins/math-backspace";

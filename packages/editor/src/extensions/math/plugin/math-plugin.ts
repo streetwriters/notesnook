@@ -4,7 +4,7 @@
  *--------------------------------------------------------*/
 
 // prosemirror imports
-import { Schema, Node as ProseNode } from "prosemirror-model";
+import { Node as ProseNode } from "prosemirror-model";
 import {
   Plugin as ProsePlugin,
   PluginKey,
@@ -46,14 +46,14 @@ export function createMathView(inline: boolean) {
      * Docs says that for any function proprs, the current plugin instance
      * will be bound to `this`.  However, the typings don't reflect this.
      */
-    let pluginState = MATH_PLUGIN_KEY.getState(view.state);
+    const pluginState = MATH_PLUGIN_KEY.getState(view.state);
     if (!pluginState) {
       throw new Error("no math plugin!");
     }
-    let nodeViews = pluginState.activeNodeViews;
+    const nodeViews = pluginState.activeNodeViews;
 
     // set up NodeView
-    let nodeView = new MathView(
+    const nodeView = new MathView(
       node,
       view,
       getPos as () => number,
@@ -62,10 +62,7 @@ export function createMathView(inline: boolean) {
         renderer: inline ? KatexRenderer.inline : KatexRenderer.block,
         tagName: inline ? "span" : "div"
       },
-      MATH_PLUGIN_KEY,
-      () => {
-        nodeViews.splice(nodeViews.indexOf(nodeView));
-      }
+      MATH_PLUGIN_KEY
     );
 
     nodeViews.push(nodeView);
@@ -73,17 +70,17 @@ export function createMathView(inline: boolean) {
   };
 }
 
-let mathPluginSpec: PluginSpec<IMathPluginState> = {
+const mathPluginSpec: PluginSpec<IMathPluginState> = {
   key: MATH_PLUGIN_KEY,
   state: {
-    init(config, instance) {
+    init() {
       return {
         macros: {},
         activeNodeViews: [],
         prevCursorPos: 0
       };
     },
-    apply(tr, value, oldState, newState) {
+    apply(_tr, value, oldState, newState) {
       // produce updated state field for this plugin
       const newPos = newState.selection.from;
       const oldPos = oldState.selection.from;

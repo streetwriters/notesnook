@@ -1,11 +1,7 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect } from "react";
-import { FlatList, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeOut,
-  FadeOutDown
-} from "react-native-reanimated";
+import { useEffect } from "react";
+import { View } from "react-native";
+import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import DelayLayout from "../../components/delay-layout";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { tabBarRef } from "../../utils/global-refs";
@@ -14,7 +10,7 @@ import { components } from "./components";
 import { SectionItem } from "./section-item";
 import { RouteParams, SettingSection } from "./types";
 
-const keyExtractor = (item: SettingSection, index: number) => item.id;
+const keyExtractor = (item: SettingSection) => item.id;
 
 const Group = ({
   navigation,
@@ -40,13 +36,9 @@ const Group = ({
       tabBarRef.current?.unlock();
     };
   }, []);
-  const renderItem = ({
-    item,
-    index
-  }: {
-    item: SettingSection;
-    index: number;
-  }) => <SectionItem item={item} />;
+  const renderItem = ({ item }: { item: SettingSection; index: number }) => (
+    <SectionItem item={item} />
+  );
 
   return (
     <DelayLayout type="settings" delay={300}>

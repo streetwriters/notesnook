@@ -1,4 +1,4 @@
-import { mergeAttributes, nodeInputRule } from "@tiptap/core";
+import { mergeAttributes } from "@tiptap/core";
 import { onBackspacePressed } from "../list-item/commands";
 import { TaskItem } from "@tiptap/extension-task-item";
 import { TaskItemComponent } from "./component";
@@ -24,7 +24,7 @@ export const TaskItemNode = TaskItem.extend({
     };
   },
 
-  renderHTML({ node, HTMLAttributes }) {
+  renderHTML({ HTMLAttributes }) {
     return [
       "li",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
@@ -37,7 +37,7 @@ export const TaskItemNode = TaskItem.extend({
   parseHTML() {
     return [
       {
-        tag: `li`,
+        tag: "li",
         getAttrs: (node) => {
           if (node instanceof Node && node instanceof HTMLElement) {
             return node.classList.contains("checklist--item") ||

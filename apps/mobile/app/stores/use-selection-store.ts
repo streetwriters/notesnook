@@ -37,7 +37,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   },
   setSelectedItem: (item) => {
     let selectedItems = get().selectedItemsList;
-    let index = selectedItems.findIndex((i: any) => i.id === item.id);
+    const index = selectedItems.findIndex((i) => i.id === item.id);
     if (index !== -1) {
       selectedItems.splice(index, 1);
     } else {
@@ -53,7 +53,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       selectionMode: history.selectionMode
     });
   },
-  clearSelection: (noanimation) => {
+  clearSelection: () => {
     history.selectedItemsList = [];
     history.selectionMode = false;
     set({ selectionMode: false, selectedItemsList: [] });

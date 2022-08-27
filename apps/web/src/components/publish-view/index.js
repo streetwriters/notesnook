@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
-import { Flex, Text, Button, Box } from "rebass";
+import { Flex, Text, Button } from "rebass";
 import * as Icon from "../icons";
 import Toggle from "../toggle";
 import Field from "../field";

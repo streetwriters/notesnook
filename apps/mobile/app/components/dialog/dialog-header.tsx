@@ -1,4 +1,3 @@
-import React from "react";
 import { Text } from "react-native";
 import { View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
@@ -25,7 +24,6 @@ type DialogHeaderProps = {
 };
 
 const DialogHeader = ({
-  icon,
   title,
   paragraph,
   button,

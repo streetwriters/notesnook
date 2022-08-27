@@ -3,5 +3,5 @@ export type File = {
   size: number;
   type: string;
   chunks: number;
-  additionalData?: { [key: string]: any };
+  additionalData?: { [key: string]: unknown };
 };

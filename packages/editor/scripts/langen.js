@@ -6,7 +6,7 @@ require("isomorphic-fetch");
 
 async function main() {
   const response = await fetch(
-    `https://github.com/PrismJS/prism/raw/master/components.json`
+    "https://github.com/PrismJS/prism/raw/master/components.json"
   );
   if (!response.ok) return;
   const json = await response.json();

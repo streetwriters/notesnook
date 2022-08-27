@@ -16,7 +16,7 @@ export function CodeblockComponent(
   props: ReactNodeViewProps<CodeBlockAttributes>
 ) {
   const { editor, updateAttributes, node, forwardRef } = props;
-  const { language, indentLength, indentType, caretPosition } = node?.attrs;
+  const { language, indentLength, indentType, caretPosition } = node.attrs;
 
   const [isOpen, setIsOpen] = useState(false);
   // const [caretPosition, setCaretPosition] = useState<CaretPosition>();

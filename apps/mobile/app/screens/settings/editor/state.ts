@@ -33,7 +33,7 @@ export interface DragState extends State {
   init: () => Promise<void>;
 }
 
-function clone(value: any[]) {
+function clone<T>(value: T[]) {
   return JSON.parse(JSON.stringify(value));
 }
 

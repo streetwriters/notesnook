@@ -1,4 +1,3 @@
-import React from "react";
 import { KeyboardAvoidingView, Platform, SafeAreaView } from "react-native";
 import { useSettingStore } from "../../stores/use-setting-store";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";

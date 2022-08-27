@@ -83,7 +83,7 @@ const publishNote = async (editor: useEditorType) => {
   }
   const currentNote = editor?.note?.current;
   if (currentNote?.id) {
-    let note = db.notes?.note(currentNote.id)?.data as NoteType;
+    const note = db.notes?.note(currentNote.id)?.data as NoteType;
     if (note?.locked) {
       ToastEvent.show({
         heading: "Locked notes cannot be published",
@@ -102,7 +102,7 @@ const publishNote = async (editor: useEditorType) => {
 const showActionsheet = async (editor: useEditorType) => {
   const currentNote = editor?.note?.current;
   if (currentNote?.id) {
-    let note = db.notes?.note(currentNote.id)?.data as NoteType;
+    const note = db.notes?.note(currentNote.id)?.data as NoteType;
 
     if (editorState().isFocused || editorState().isFocused) {
       editorState().isFocused = true;
@@ -260,7 +260,7 @@ export const useEditorEvents = (
 
   const onMessage = (event: WebViewMessageEvent) => {
     const data = event.nativeEvent.data;
-    let editorMessage = JSON.parse(data) as EditorMessage;
+    const editorMessage = JSON.parse(data) as EditorMessage;
 
     logger.info("editor", editorMessage.type);
     if (

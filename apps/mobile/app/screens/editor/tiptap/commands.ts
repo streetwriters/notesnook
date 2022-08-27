@@ -18,7 +18,7 @@ type Action = { job: string; id: string };
 async function call(webview: RefObject<WebView | undefined>, action?: Action) {
   if (!webview.current || !action) return;
   setImmediate(() => webview.current?.injectJavaScript(action.job));
-  let response = await getResponse(action.id);
+  const response = await getResponse(action.id);
   console.log("webview job: ", action.id, response ? response.value : response);
   if (!response) {
     console.warn("webview job failed", action.id);
@@ -27,7 +27,7 @@ async function call(webview: RefObject<WebView | undefined>, action?: Action) {
 }
 
 const fn = (fn: string) => {
-  let id = randId("fn_");
+  const id = randId("fn_");
   return {
     job: `(async () => {
       try {
@@ -64,12 +64,12 @@ class Commands {
       setTimeout(async () => {
         if (!this.ref) return;
         textInput.current?.focus();
-        await this.doAsync(`editor.commands.focus()`);
+        await this.doAsync("editor.commands.focus()");
         this.ref?.current?.requestFocus();
       }, 1);
     } else {
       await sleep(200);
-      await this.doAsync(`editor.commands.focus()`);
+      await this.doAsync("editor.commands.focus()");
     }
   };
 
@@ -153,15 +153,15 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
 
   setTags = async (note: NoteType | null | undefined) => {
     if (!note) return;
-    let tags = !note.tags
+    const tags = !note.tags
       ? []
       : note.tags
-          .map((t: any) =>
+          .map((t: string) =>
             db.tags?.tag(t)
               ? { title: db.tags.tag(t).title, alias: db.tags.tag(t).alias }
               : null
           )
-          .filter((t: any) => t !== null);
+          .filter((t) => t !== null);
     await this.doAsync(`
     if (typeof editorTags !== "undefined" && editorTags.current) {
       editorTags.current.setTags(${JSON.stringify(tags)});
@@ -210,7 +210,7 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
 
   handleBack = async () => {
     return this.doAsync<boolean>(
-      `response = window.dispatchEvent(new Event("handleBackPress",{cancelable:true}));`
+      'response = window.dispatchEvent(new Event("handleBackPress",{cancelable:true}));'
     );
   };
   //todo add replace image function

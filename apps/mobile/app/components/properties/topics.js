@@ -1,4 +1,3 @@
-import React from "react";
 import { View } from "react-native";
 import { TopicNotes } from "../../screens/notes/topic-notes";
 import { SIZE } from "../../utils/size";

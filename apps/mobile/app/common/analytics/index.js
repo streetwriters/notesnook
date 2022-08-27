@@ -2,12 +2,12 @@ import { Platform } from "react-native";
 import { MMKV } from "../database/mmkv";
 import { useSettingStore } from "../../stores/use-setting-store";
 
-const WEBSITE_ID = `3c6890ce-8410-49d5-8831-15fb2eb28a21`;
-const baseUrl = `https://analytics.streetwriters.co/api/collect`;
+const WEBSITE_ID = "3c6890ce-8410-49d5-8831-15fb2eb28a21";
+const baseUrl = "https://analytics.streetwriters.co/api/collect";
 
 const UA =
   Platform.OS === "ios"
-    ? `Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1`
+    ? "Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1"
     : `
 Mozilla/5.0 (Linux; Android 8.0.0; SM-G960F Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.84 Mobile Safari/537.36`;
 

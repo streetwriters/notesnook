@@ -9,7 +9,6 @@ import Paragraph from "../../ui/typography/paragraph";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { SIZE } from "../../../utils/size";
 import { useSelectionStore } from "../../../stores/use-selection-store";
-import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
 export const Header = React.memo(
   ({
     type,

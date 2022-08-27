@@ -2,7 +2,6 @@
 import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
 import React, {
   forwardRef,
-  ReactElement,
   useEffect,
   useImperativeHandle,
   useState

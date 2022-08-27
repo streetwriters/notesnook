@@ -4,7 +4,7 @@
 /**
  * TODO: We are still not checking if toast appears on delete/restore or not.
  */
-const { Page, test, expect } = require("@playwright/test");
+const { test, expect } = require("@playwright/test");
 
 const {
   getTestId,
@@ -13,8 +13,7 @@ const {
   PASSWORD,
   editNote,
   getEditorTitle,
-  getEditorContent,
-  isTestAll
+  getEditorContent
 } = require("./utils");
 const {
   navigateTo,
@@ -34,10 +33,9 @@ const {
 } = require("./utils/conditions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
-const { LoremIpsum } = require("lorem-ipsum");
 
 /**
- * @type {Page}
+ * @type {import("@playwright/test").Page}
  */
 var page = null;
 

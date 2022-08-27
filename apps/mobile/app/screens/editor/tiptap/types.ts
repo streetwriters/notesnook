@@ -42,12 +42,12 @@ export type EditorProps = {
 
 export type EditorMessage = {
   sessionId: string;
-  value: any;
+  value: unknown;
   type: string;
 };
 
 export type Note = {
-  [name: string]: any;
+  [name: string]: unknown;
   id: string | null;
   type: string;
   contentId: string;

@@ -1,8 +1,8 @@
-const { notesnook } = require("../test.ids");
-const fs = require("fs");
-const { expect: jestExpect } = require("@jest/globals");
-const { toMatchImageSnapshot } = require("jest-image-snapshot");
-const detox = require("detox");
+import { notesnook } from "../test.ids";
+import { readFileSync } from "fs";
+import { expect as jestExpect } from "@jest/globals";
+import { toMatchImageSnapshot } from "jest-image-snapshot";
+import { device as _device, web } from "detox";
 jestExpect.extend({ toMatchImageSnapshot });
 
 const sleep = (duration) =>
@@ -51,8 +51,8 @@ async function notVisibleByText(text) {
 }
 
 async function exitEditor() {
-  await detox.device.pressBack();
-  await detox.device.pressBack();
+  await _device.pressBack();
+  await _device.pressBack();
 }
 
 async function createNote(_title, _body) {
@@ -105,11 +105,11 @@ async function prepare() {
 
 async function matchSnapshot(element, name) {
   let path = await element.takeScreenshot(name);
-  const bitmapBuffer = fs.readFileSync(path);
+  const bitmapBuffer = readFileSync(path);
   jestExpect(bitmapBuffer).toMatchImageSnapshot();
 }
 
-module.exports = {
+export {
   matchSnapshot,
   prepare,
   LaunchApp,

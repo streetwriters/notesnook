@@ -1,10 +1,8 @@
-import React, { useState } from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { eSendEvent } from "../../services/event-manager";
-import Navigation from "../../services/navigation";
 import { db } from "../../common/database";
-import { eOpenTagsDialog, refreshNotesPage } from "../../utils/events";
+import { eOpenTagsDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
@@ -48,7 +46,7 @@ export const Tags = ({ item, close }) => {
             paddingHorizontal: 8
           }}
         />
-        {item.tags.map((item, index) =>
+        {item.tags.map((item) =>
           item ? <TagItem key={item} tag={item} close={close} /> : null
         )}
       </View>

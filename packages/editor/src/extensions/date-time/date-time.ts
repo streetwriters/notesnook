@@ -127,8 +127,8 @@ function textInputRule(config: {
     find: config.find,
     handler: (props) => {
       const { state, range, match } = props;
-      let insert = config.replace(match);
-      let start = range.from;
+      const insert = config.replace(match);
+      const start = range.from;
       const end = range.to;
 
       state.tr.insertText(insert, start, end);

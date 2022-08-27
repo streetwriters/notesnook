@@ -4,7 +4,7 @@
  *--------------------------------------------------------*/
 
 // prosemirror imports
-import { Node as ProseNode } from "prosemirror-model";
+import { Node as ProseNode, Fragment } from "prosemirror-model";
 import {
   EditorState,
   Transaction,
@@ -27,7 +27,9 @@ import {
 
 import { collapseMathNode } from "./commands/collapse-math-node";
 import { IMathPluginState } from "./math-plugin";
-import { MathRenderer, MathRenderFn } from "./renderers/types";
+import { MathRenderFn } from "./renderers/types";
+
+type FragmentWithContent = Fragment & { content: ProseNode[] };
 
 //// INLINE MATH NODEVIEW //////////////////////////////////
 export interface ICursorPosObserver {
@@ -83,8 +85,7 @@ export class MathView implements NodeView, ICursorPosObserver {
     view: EditorView,
     getPos: () => number,
     options: IMathViewOptions,
-    mathPluginKey: PluginKey<IMathPluginState>,
-    onDestroy?: () => void
+    mathPluginKey: PluginKey<IMathPluginState>
   ) {
     // store arguments
     this.options = options;
@@ -159,14 +160,14 @@ export class MathView implements NodeView, ICursorPosObserver {
     this._node = node;
 
     if (this._innerView) {
-      let state = this._innerView.state;
+      const state = this._innerView.state;
 
-      let start = node.content.findDiffStart(state.doc.content);
+      const start = node.content.findDiffStart(state.doc.content);
       if (start != null) {
-        let diff = node.content.findDiffEnd(state.doc.content as any);
+        const diff = node.content.findDiffEnd(state.doc.content);
         if (diff) {
           let { a: endA, b: endB } = diff;
-          let overlap = start - Math.min(endA, endB);
+          const overlap = start - Math.min(endA, endB);
           if (overlap > 0) {
             endA += overlap;
             endB += overlap;
@@ -237,7 +238,7 @@ export class MathView implements NodeView, ICursorPosObserver {
     }
 
     // get tex string to render
-    let content = this._node.content.content;
+    const content = (this._node.content as FragmentWithContent).content;
     let texString = "";
     if (content.length > 0 && content[0].textContent !== null) {
       texString = content[0].textContent.trim();
@@ -276,16 +277,16 @@ export class MathView implements NodeView, ICursorPosObserver {
     if (!this._innerView) {
       return;
     }
-    let { state, transactions } = this._innerView.state.applyTransaction(tr);
+    const { state, transactions } = this._innerView.state.applyTransaction(tr);
     this._innerView.updateState(state);
 
     if (!tr.getMeta("fromOutside")) {
-      let outerTr = this._outerView.state.tr,
+      const outerTr = this._outerView.state.tr,
         offsetMap = StepMap.offset(this._getPos() + 1);
       for (let i = 0; i < transactions.length; i++) {
-        let steps = transactions[i].steps;
+        const steps = transactions[i].steps;
         for (let j = 0; j < steps.length; j++) {
-          let mapped = steps[j].map(offsetMap);
+          const mapped = steps[j].map(offsetMap);
           if (!mapped) {
             throw Error("step discarded!");
           }
@@ -314,25 +315,20 @@ export class MathView implements NodeView, ICursorPosObserver {
               }
               return true;
             },
-            Backspace: chainCommands(
-              deleteSelection,
-              (state, dispatch, tr_inner) => {
-                // default backspace behavior for non-empty selections
-                if (!state.selection.empty) {
-                  return false;
-                }
-                // default backspace behavior when math node is non-empty
-                if (this._node.textContent.length > 0) {
-                  return false;
-                }
-                // otherwise, we want to delete the empty math node and focus the outer view
-                this._outerView.dispatch(
-                  this._outerView.state.tr.insertText("")
-                );
-                this._outerView.focus();
-                return true;
+            Backspace: chainCommands(deleteSelection, (state) => {
+              // default backspace behavior for non-empty selections
+              if (!state.selection.empty) {
+                return false;
               }
-            ),
+              // default backspace behavior when math node is non-empty
+              if (this._node.textContent.length > 0) {
+                return false;
+              }
+              // otherwise, we want to delete the empty math node and focus the outer view
+              this._outerView.dispatch(this._outerView.state.tr.insertText(""));
+              this._outerView.focus();
+              return true;
+            }),
             // "Ctrl-Backspace": (state, dispatch, tr_inner) => {
             //   // delete math node and focus the outer view
             //   this._outerView.dispatch(this._outerView.state.tr.insertText(""));
@@ -355,11 +351,11 @@ export class MathView implements NodeView, ICursorPosObserver {
     });
 
     // focus element
-    let innerState = this._innerView.state;
+    const innerState = this._innerView.state;
     this._innerView.focus();
 
     // request outer cursor position before math node was selected
-    let maybePos = this._mathPluginKey.getState(
+    const maybePos = this._mathPluginKey.getState(
       this._outerView.state
     )?.prevCursorPos;
     if (maybePos === null || maybePos === undefined) {
@@ -367,10 +363,10 @@ export class MathView implements NodeView, ICursorPosObserver {
         "[prosemirror-math] Error:  Unable to fetch math plugin state from key."
       );
     }
-    let prevCursorPos: number = maybePos ?? 0;
+    const prevCursorPos: number = maybePos ?? 0;
 
     // compute position that cursor should appear within the expanded math node
-    let innerPos =
+    const innerPos =
       prevCursorPos <= this._getPos() ? 0 : this._node.nodeSize - 2;
 
     setTimeout(() => {
@@ -393,7 +389,7 @@ export class MathView implements NodeView, ICursorPosObserver {
    * @param render Optionally update the rendered math after closing. (which
    *    is generally what we want to do, since the user is done editing!)
    */
-  closeEditor(render: boolean = true) {
+  closeEditor(render = true) {
     if (this._innerView) {
       this._innerView.destroy();
       this._innerView = undefined;

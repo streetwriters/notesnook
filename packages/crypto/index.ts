@@ -14,7 +14,7 @@ import {
 } from "./src/types";
 
 export class NNCrypto implements INNCrypto {
-  private isReady: boolean = false;
+  private isReady = false;
 
   private async init() {
     if (this.isReady) return;
@@ -61,6 +61,8 @@ export class NNCrypto implements INNCrypto {
   ): Promise<string> {
     await this.init();
     const encryptionStream = Encryption.createStream(key);
+
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const chunk = await stream.read();
       if (!chunk) break;
@@ -86,6 +88,7 @@ export class NNCrypto implements INNCrypto {
   ) {
     await this.init();
     const decryptionStream = Decryption.createStream(iv, key);
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const chunk = await stream.read();
       if (!chunk) break;

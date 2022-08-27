@@ -65,7 +65,7 @@ export const openNotebookTopic = (item) => {
 };
 
 export const NotebookWrapper = React.memo(
-  ({ item, index, dateBy }) => {
+  function NotebookWrapper({ item, index, dateBy }) {
     const isTrash = item.type === "trash";
 
     return (

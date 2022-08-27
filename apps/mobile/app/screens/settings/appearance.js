@@ -1,6 +1,5 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { PressableButton } from "../../components/ui/pressable";
@@ -17,7 +16,7 @@ import {
   switchAccentColor
 } from "../../utils/color-scheme/utils";
 import { MenuItemsList } from "../../utils/constants";
-import { pv, SIZE } from "../../utils/size";
+import { SIZE } from "../../utils/size";
 
 export const HomagePageSelector = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -102,7 +101,7 @@ export const HomagePageSelector = () => {
   );
 };
 
-export const AccentColorPicker = ({ settings = true, wrap = true }) => {
+export const AccentColorPicker = () => {
   const colors = useThemeStore((state) => state.colors);
   function changeAccentColor(color) {
     switchAccentColor(color);

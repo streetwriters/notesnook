@@ -1,6 +1,6 @@
-import { Editor, findParentNode, posToDOMRect } from "@tiptap/core";
+import { Editor, findParentNode } from "@tiptap/core";
 import { Node as ProsemirrorNode, Mark } from "prosemirror-model";
-import { Selection, EditorState } from "prosemirror-state";
+import { EditorState } from "prosemirror-state";
 
 export type NodeWithOffset = {
   node?: ProsemirrorNode;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, Text, View } from "react-native";
 import * as RNIap from "react-native-iap";
 import { useThemeStore } from "../../stores/use-theme-store";
@@ -139,7 +139,8 @@ export const PricingPlans = ({
       await sleep(500);
       presentSheet({
         title: "Thank you for subscribing!",
-        paragraph: `Your Notesnook Pro subscription will be activated soon. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co`,
+        paragraph:
+          "Your Notesnook Pro subscription will be activated soon. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co",
         action: async () => {
           eSendEvent(eCloseProgressDialog);
         },
@@ -189,7 +190,7 @@ export const PricingPlans = ({
             onPress={() => {
               setUpgrade(true);
             }}
-            title={`Upgrade now`}
+            title={"Upgrade now"}
             type="accent"
             width={250}
             style={{
@@ -208,9 +209,11 @@ export const PricingPlans = ({
                 eSendEvent(eCloseProgressDialog);
                 await sleep(300);
                 Walkthrough.present("trialstarted", false, true);
-              } catch (e) {}
+              } catch (e) {
+                console.error(e);
+              }
             }}
-            title={`Try free for 14 days`}
+            title={"Try free for 14 days"}
             type="grayAccent"
             width={250}
             style={{
@@ -376,7 +379,7 @@ export const PricingPlans = ({
                         eSendEvent(eOpenLoginDialog, 1);
                       }, 400);
                     }}
-                    title={`Sign up for free`}
+                    title={"Sign up for free"}
                     type="accent"
                     width={250}
                     style={{
@@ -451,8 +454,8 @@ export const PricingPlans = ({
           }}
         >
           {user
-            ? `On clicking "Try free for 14 days", your free trial will be activated.`
-            : `After sign up you will be asked to activate your free trial.`}{" "}
+            ? 'On clicking "Try free for 14 days", your free trial will be activated.'
+            : "After sign up you will be asked to activate your free trial."}{" "}
           <Paragraph size={SIZE.xs} style={{ fontWeight: "bold" }}>
             No credit card is required.
           </Paragraph>
@@ -510,8 +513,8 @@ export const PricingPlans = ({
                 size={SIZE.xs}
                 onPress={() => {
                   openLinkInBrowser("https://notesnook.com/tos", colors)
-                    .catch((e) => {})
-                    .then((r) => {
+                    .catch(() => {})
+                    .then(() => {
                       console.log("closed");
                     });
                 }}
@@ -527,8 +530,8 @@ export const PricingPlans = ({
                 size={SIZE.xs}
                 onPress={() => {
                   openLinkInBrowser("https://notesnook.com/privacy", colors)
-                    .catch((e) => {})
-                    .then((r) => {
+                    .catch(() => {})
+                    .then(() => {
                       console.log("closed");
                     });
                 }}

@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import Share from "react-native-share";
@@ -31,7 +31,6 @@ const ExportNotesSheet = () => {
   const [notes, setNotes] = useState([]);
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);
-  const [doneText, setDoneText] = useState(null);
   const [result, setResult] = useState({});
   useEffect(() => {
     eSubscribeEvent(eOpenExportDialog, open);
@@ -48,14 +47,14 @@ const ExportNotesSheet = () => {
     setNotes(data);
   };
 
-  const close = (data) => {
+  const close = () => {
     setComplete(false);
     setExporting(false);
     setVisible(false);
     setNotes([]);
   };
 
-  const save = async (func, name) => {
+  const save = async (func) => {
     if (exporting) return;
     setExporting(true);
     setComplete(false);
@@ -68,13 +67,6 @@ const ExportNotesSheet = () => {
         return;
       }
     }
-    setDoneText(
-      `Note exported successfully! You can find the exported note in ${
-        Platform.OS === "ios"
-          ? "Files Manager/Notesnook"
-          : `Storage/Notesnook/exported/${name}`
-      }.`
-    );
 
     setResult(res);
     setExporting(false);
@@ -217,7 +209,7 @@ const ExportNotesSheet = () => {
                     FileViewer.open(result.filePath, {
                       showOpenWithDialog: true,
                       showAppsSuggestions: true
-                    }).catch((e) => {
+                    }).catch(() => {
                       ToastEvent.show({
                         heading: "Cannot open",
                         message: `No application found to open ${result.name} file.`,

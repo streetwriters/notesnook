@@ -2,12 +2,22 @@
   "name": "notesnook",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap -- --legacy-peer-deps",
     "build": "nx run-many --target=build --all",
     "start:web": "nx start @notesnook/web",
     "prettier": "npx prettier . --write"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
+    "eslint": "^8.22.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-config-react-hooks": "^1.0.0",
+    "eslint-plugin-detox": "^1.0.0",
+    "eslint-plugin-jest": "^26.8.7",
+    "eslint-plugin-react": "^7.31.0",
+    "eslint-plugin-react-native": "^4.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "lerna": "^5.4.0",
     "nx": "^14.5.4",
     "prettier": "^2.7.1"

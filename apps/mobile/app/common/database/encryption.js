@@ -21,10 +21,12 @@ export async function deriveCryptoKey(name, data) {
       KEYSTORE_CONFIG
     );
     return credentials.key;
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 }
 
-export async function getCryptoKey(name) {
+export async function getCryptoKey(_name) {
   try {
     if (await Keychain.hasInternetCredentials("notesnook")) {
       let credentials = await Keychain.getInternetCredentials(
@@ -35,14 +37,18 @@ export async function getCryptoKey(name) {
     } else {
       return null;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 }
 
-export async function removeCryptoKey(name) {
+export async function removeCryptoKey(_name) {
   try {
     let result = await Keychain.resetInternetCredentials("notesnook");
     return result;
-  } catch (e) {}
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 export async function getRandomBytes(length) {

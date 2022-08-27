@@ -46,7 +46,6 @@ const bom = [239, 187, 191]; // byte order mark
 
 const lf = 10;
 const cr = 13;
-const reTrim = /^(\s|\u00A0)+|(\s|\u00A0)+$/g;
 /**
  * An RCTNetworking-based implementation of the EventSource web standard.
  *
@@ -380,7 +379,7 @@ class EventSource extends (0, _eventTargetShim.default)(
     this._requestId = requestId;
   }
 
-  __didReceiveResponse(requestId, status, responseHeaders, responseURL) {
+  __didReceiveResponse(requestId, status, responseHeaders) {
     if (requestId !== this._requestId) {
       return;
     }
@@ -455,7 +454,7 @@ class EventSource extends (0, _eventTargetShim.default)(
     });
   }
 
-  __didReceiveIncrementalData(requestId, responseText, progress, total) {
+  __didReceiveIncrementalData(requestId, responseText) {
     if (requestId !== this._requestId) {
       return;
     }
@@ -463,7 +462,7 @@ class EventSource extends (0, _eventTargetShim.default)(
     this.__processEventStreamChunk(responseText);
   }
 
-  __didCompleteResponse(requestId, error, timeOutError) {
+  __didCompleteResponse(requestId, error) {
     if (requestId !== this._requestId) {
       return;
     } // The spec states: 'Network errors that prevents the connection from being

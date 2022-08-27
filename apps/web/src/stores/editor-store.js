@@ -304,7 +304,3 @@ class EditorStore extends BaseStore {
  */
 const [useStore, store] = createStore(EditorStore);
 export { useStore, store, SESSION_STATES };
-
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

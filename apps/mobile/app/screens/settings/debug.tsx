@@ -4,7 +4,7 @@ import {
   LogLevel,
   logManager
 } from "@streetwriters/notesnook-core/logger";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "rn-fetch-blob";
@@ -18,6 +18,7 @@ import { hexToRGBA } from "../../utils/color-scheme/utils";
 import Storage from "../../common/database/storage";
 import useTimer from "../../hooks/use-timer";
 import { sanitizeFilename } from "../../utils/sanitizer";
+import { LogMessage } from "@streetwriters/logger";
 
 // function getLevelString(level: number) {
 //   switch (level) {
@@ -42,19 +43,19 @@ export default function DebugLogs() {
   const [logs, setLogs] = useState<
     {
       key: string;
-      logs: any[];
+      logs: LogMessage[];
     }[]
   >([]);
   const [currentLog, setCurrentLog] = useState<{
     key: string;
-    logs: any[];
+    logs: LogMessage[];
   }>();
 
   useEffect(() => {
     (async () => {
       if (seconds === 0) {
         start(5, "debug_logs_timer");
-        let logs = await logManager?.get();
+        const logs = await logManager?.get();
         if (!logs) return;
         if (logs.length > 0 && !currentLog) {
           setCurrentLog(logs[0]);
@@ -66,7 +67,7 @@ export default function DebugLogs() {
     })();
   }, [seconds]);
 
-  const renderItem = ({ item, index }: { item: any; index: number }) => {
+  const renderItem = ({ item }: { item: LogMessage; index: number }) => {
     const background =
       item.level === LogLevel.Error || item.level === LogLevel.Fatal
         ? hexToRGBA(colors.red, 0.2)
@@ -124,10 +125,10 @@ export default function DebugLogs() {
         .map((log) => {
           return !log ? "" : format(log);
         })
-        .join(`\n`);
+        .join("\n");
       if (!data) return;
       if (Platform.OS === "android") {
-        let file = await ScopedStorage.createDocument(
+        const file = await ScopedStorage.createDocument(
           fileName + ".txt",
           "text/plain",
           data,
@@ -158,7 +159,7 @@ export default function DebugLogs() {
       .map((log) => {
         return !log ? "" : format(log);
       })
-      .join(`\n`);
+      .join("\n");
     if (!data) return;
     Clipboard.setString(data);
     ToastEvent.show({
@@ -176,7 +177,7 @@ export default function DebugLogs() {
       negativeText: "Cancel",
       positiveText: "Clear",
       positivePress: () => {
-        let index = logs.findIndex((l) => (l.key = currentLog.key));
+        const index = logs.findIndex((l) => (l.key = currentLog.key));
         logManager?.delete(currentLog.key);
         if (logs.length > 1) {
           if (logs.length - 1 === index) {
@@ -236,7 +237,9 @@ export default function DebugLogs() {
                     marginHorizontal: 5
                   }}
                   onPress={() => {
-                    let index = logs.findIndex((l) => l.key === currentLog.key);
+                    const index = logs.findIndex(
+                      (l) => l.key === currentLog.key
+                    );
                     if (index === 0) return;
                     setCurrentLog(logs[index - 1]);
                   }}
@@ -251,7 +254,9 @@ export default function DebugLogs() {
                     height: 30
                   }}
                   onPress={() => {
-                    let index = logs.findIndex((l) => l.key === currentLog.key);
+                    const index = logs.findIndex(
+                      (l) => l.key === currentLog.key
+                    );
                     if (index === logs.length - 1) return;
                     setCurrentLog(logs[index + 1]);
                   }}

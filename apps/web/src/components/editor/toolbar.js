@@ -32,6 +32,7 @@ function Toolbar(props) {
 
   const isNotePublished = useMemo(
     () => sessionId && db.monographs.isPublished(sessionId),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [sessionId, monographs]
   );
 

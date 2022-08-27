@@ -12,9 +12,13 @@ function TitleBox(props: TitleBoxProps) {
   const { readonly, setTitle, title, nonce } = props;
   const [currentTitle, setCurrentTitle] = useState<string>("");
 
-  useEffect(() => {
-    setCurrentTitle(title);
-  }, [nonce]);
+  useEffect(
+    () => {
+      setCurrentTitle(title);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [nonce]
+  );
 
   return (
     <Input

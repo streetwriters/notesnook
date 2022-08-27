@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback } from "react";
+import { RefObject, useCallback } from "react";
 import {
   ColorValue,
   Pressable,
@@ -23,7 +23,7 @@ export interface PressableButtonProps extends PressableProps {
   customSelectedColor?: ColorValue;
   customAlpha?: number;
   customOpacity?: number;
-  fwdRef?: RefObject<any>;
+  fwdRef?: RefObject<View>;
   animatedViewProps?: Animated.AnimateProps<View>;
 }
 
@@ -43,8 +43,7 @@ export const PressableButton = ({
   customSelectedColor,
   customAlpha,
   customOpacity,
-  fwdRef,
-  animatedViewProps
+  fwdRef
 }: PressableButtonProps) => {
   const colors = useThemeStore((state) => state.colors);
 

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-const { test, expect, Page } = require("@playwright/test");
+const { test, expect } = require("@playwright/test");
 const { getTestId, createNote, NOTE } = require("./utils");
 const {
   navigateTo,
@@ -11,7 +11,7 @@ const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
 
 /**
- * @type {Page}
+ * @type {import("@playwright/test").Page}
  */
 var page = null;
 global.page = null;

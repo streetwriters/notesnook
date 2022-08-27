@@ -7,7 +7,7 @@ import {
 } from "../app/utils/color-scheme";
 import { MMKV } from "../app/common/database/mmkv";
 
-export const useShareStore = create((set, get) => ({
+export const useShareStore = create((set) => ({
   colors:
     Appearance.getColorScheme() === "dark"
       ? COLOR_SCHEME_DARK

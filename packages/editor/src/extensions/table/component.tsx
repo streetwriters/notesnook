@@ -58,10 +58,10 @@ export function TableComponent(props: SelectionBasedReactNodeViewProps) {
 
 export function TableNodeView(editor: Editor) {
   class TableNode
-    extends SelectionBasedNodeView<SelectionBasedReactNodeViewProps<{}>>
+    extends SelectionBasedNodeView<SelectionBasedReactNodeViewProps<unknown>>
     implements NodeView
   {
-    constructor(node: ProsemirrorNode, cellMinWidth: number) {
+    constructor(node: ProsemirrorNode) {
       super(
         node,
         editor,

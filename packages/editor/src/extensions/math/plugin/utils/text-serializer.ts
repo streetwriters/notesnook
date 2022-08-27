@@ -38,20 +38,20 @@ class ProseMirrorTextSerializer {
   serializeFragment(fragment: Fragment): string {
     // adapted from the undocumented `Fragment.textBetween` function
     // https://github.com/ProseMirror/prosemirror-model/blob/eef20c8c6dbf841b1d70859df5d59c21b5108a4f/src/fragment.js#L46
-    let blockSeparator = "\n\n";
-    let leafText: string | undefined = undefined;
-    let text: string = "";
-    let separated: boolean = true;
+    const blockSeparator = "\n\n";
+    const leafText: string | undefined = undefined;
+    let text = "";
+    let separated = true;
 
-    let from = 0;
-    let to = fragment.size;
+    const from = 0;
+    const to = fragment.size;
 
     fragment.nodesBetween(
       from,
       to,
       (node, pos) => {
         // check if one of our custom serializers handles this node
-        let serialized: string | null = this.serializeNode(node);
+        const serialized: string | null = this.serializeNode(node);
         if (serialized !== null) {
           text += serialized;
           return false;
@@ -80,7 +80,7 @@ class ProseMirrorTextSerializer {
 
   serializeNode(node: ProseNode): string | null {
     // check if one of our custom serializers handles this node
-    let nodeSerializer = this.nodes[node.type.name];
+    const nodeSerializer = this.nodes[node.type.name];
     if (nodeSerializer !== undefined) {
       return nodeSerializer(node);
     } else {

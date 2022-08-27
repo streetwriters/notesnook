@@ -1,4 +1,3 @@
-import React from "react";
 import { Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
@@ -262,7 +261,7 @@ async function attachFile(uri, hash, type, filename, options) {
       });
       encryptionInfo.type = type;
       encryptionInfo.filename = filename;
-      encryptionInfo.alg = `xcha-stream`;
+      encryptionInfo.alg = "xcha-stream";
       encryptionInfo.size = encryptionInfo.length;
       encryptionInfo.key = key;
       if (options?.reupload && exists) await db.attachments.reset(hash);

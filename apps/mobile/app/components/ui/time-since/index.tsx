@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TextProps } from "react-native";
 import { timeSince } from "../../../utils/time";
 import Paragraph from "../typography/paragraph";

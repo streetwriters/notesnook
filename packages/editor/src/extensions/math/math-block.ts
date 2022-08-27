@@ -24,7 +24,7 @@ export const MathBlock = Node.create({
   parseHTML() {
     return [
       {
-        tag: `div[class*='math-block']` // important!
+        tag: "div[class*='math-block']" // important!
       }
     ];
   },

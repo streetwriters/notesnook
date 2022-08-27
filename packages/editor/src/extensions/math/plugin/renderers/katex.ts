@@ -1,10 +1,8 @@
 import { MathRenderer } from "./types";
 
 async function loadKatex() {
-  // @ts-ignore
   const { default: katex } = await import("katex");
   // Chemistry formulas support
-  // @ts-ignore
   await import("katex/contrib/mhchem/mhchem");
   return katex;
 }

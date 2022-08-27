@@ -35,7 +35,7 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
             }
             sx={{
               cursor: "pointer",
-              transition: `all .2s ease-in-out`,
+              transition: "all .2s ease-in-out",
               ":hover": {
                 transform: ["unset", "scale(1.3)"]
               },
@@ -74,7 +74,7 @@ export function OutlineListItemComponent(props: ReactNodeViewProps) {
               borderRadius: 50,
               flexShrink: 0,
               cursor: "pointer",
-              transition: `all .2s ease-in-out`,
+              transition: "all .2s ease-in-out",
               ":hover": {
                 backgroundColor: "fontTertiary",
                 width: 4

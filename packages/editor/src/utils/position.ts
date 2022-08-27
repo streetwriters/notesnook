@@ -52,7 +52,7 @@ export function getPosition(
   const windowWidth = parent.clientWidth;
   const windowHeight = parent.clientHeight;
 
-  let position = { top: 0, left: 0 };
+  const position = { top: 0, left: 0 };
 
   if (windowWidth - actualX < elementWidth) {
     const xDiff = actualX - x;
@@ -107,8 +107,8 @@ export function getPosition(
 }
 
 function getMousePosition(e: MouseEvent) {
-  var posx = 0;
-  var posy = 0;
+  let posx = 0;
+  let posy = 0;
 
   if (!e && window.event) e = window.event as MouseEvent;
 

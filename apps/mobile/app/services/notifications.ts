@@ -3,7 +3,6 @@ import PushNotification, {
   Importance,
   PushNotificationDeliveredObject
 } from "react-native-push-notification";
-import { editing } from "../utils";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import { eOnLoadNote } from "../utils/events";
@@ -20,7 +19,7 @@ let pinned: PushNotificationDeliveredObject[] = [];
 
 function loadNote(id: string, jump: boolean) {
   if (!id || id === "notesnook_note_input") return;
-  let note = db.notes?.note(id).data;
+  const note = db.notes?.note(id).data;
   if (!DDS.isTab && jump) {
     tabBarRef.current?.goToPage(1);
   }
@@ -49,7 +48,7 @@ function init() {
         return;
       }
 
-      let unsub = useNoteStore.subscribe(
+      const unsub = useNoteStore.subscribe(
         (loading) => {
           if (loading === false) {
             //@ts-ignore
@@ -74,7 +73,7 @@ function init() {
           console.log("texto", notification);
           present({
             title: "Quick note",
-            message: 'Tap on "Take note" to add a note.',
+            message: "Tap on \"Take note\" to add a note.",
             ongoing: true,
             actions: ["ReplyInput", "Hide"],
             tag: "notesnook_note_input",
@@ -128,14 +127,14 @@ function remove(tag: string, id: string) {
 
 function pinQuickNote(launch: boolean) {
   get().then((items) => {
-    let notif = items.filter((i) => i.tag === "notesnook_note_input");
+    const notif = items.filter((i) => i.tag === "notesnook_note_input");
     if (notif && launch) {
       return;
     }
     console.log("showing");
     present({
       title: "Quick note",
-      message: 'Tap on "Take note" to add a note.',
+      message: "Tap on \"Take note\" to add a note.",
       ongoing: true,
       actions: ["ReplyInput", "Hide"],
       tag: "notesnook_note_input",

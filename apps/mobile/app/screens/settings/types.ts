@@ -1,18 +1,18 @@
-import { Settings } from "../../stores/interfaces";
+import { Settings } from "../../stores/use-setting-store";
 
 export type SettingSection = {
   id: string;
   type?: "screen" | "switch" | "component" | "danger";
-  name?: string | ((current?: any) => string);
-  description?: string | ((current: any) => string);
+  name?: string | ((current?: unknown) => string);
+  description?: string | ((current: unknown) => string);
   icon?: string;
   property?: keyof Settings;
   sections?: SettingSection[];
   component?: string;
-  modifer?: (...args: any[]) => void;
-  getter?: (...args: any[]) => any;
-  useHook?: (...args: any[]) => unknown;
-  hidden?: (current: any) => boolean;
+  modifer?: (...args: unknown[]) => void;
+  getter?: (...args: unknown[]) => unknown;
+  useHook?: (...args: unknown[]) => unknown;
+  hidden?: (current: unknown) => boolean;
   onChange?: (property: boolean) => void;
 };
 

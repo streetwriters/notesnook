@@ -52,7 +52,7 @@ export interface CodeBlockOptions {
   /**
    * Custom HTML attributes that should be added to the rendered HTML tag.
    */
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
 }
 
 declare module "@tiptap/core" {
@@ -77,7 +77,6 @@ declare module "@tiptap/core" {
 
 export const backtickInputRegex = /^```([a-z]+)?[\s\n]$/;
 export const tildeInputRegex = /^~~~([a-z]+)?[\s\n]$/;
-const ZERO_WIDTH_SPACE = "\u200b";
 const NEWLINE = "\n";
 export const CodeBlock = Node.create<CodeBlockOptions>({
   name: "codeblock",
@@ -316,13 +315,13 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           return false;
         }
 
-        const indentation = parseIndentation($from.parent)!;
+        if (this.options.exitOnTripleEnter && exitOnTripleEnter(editor, $from))
+          return true;
 
-        return (
-          (this.options.exitOnTripleEnter &&
-            exitOnTripleEnter(editor, $from)) ||
-          indentOnEnter(editor, $from, indentation)
-        );
+        const indentation = parseIndentation($from.parent);
+
+        if (indentation) return indentOnEnter(editor, $from, indentation);
+        return false;
       },
 
       // exit node on arrow up
@@ -390,7 +389,9 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
           return false;
         }
 
-        const indentation = parseIndentation($from.parent)!;
+        const indentation = parseIndentation($from.parent);
+        if (!indentation) return false;
+
         const indentToken = indent(indentation);
 
         const { lines } = $from.parent.attrs as CodeBlockAttributes;
@@ -420,14 +421,16 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         if ($from.parent.type !== this.type) {
           return false;
         }
+        const indentation = parseIndentation($from.parent);
+        if (!indentation) return false;
+
         const { lines } = $from.parent.attrs as CodeBlockAttributes;
         const selectedLines = getSelectedLines(lines, selection);
-
         return editor
           .chain()
           .command(({ tr }) =>
             withSelection(tr, (tr) => {
-              const indentToken = indent(parseIndentation($from.parent)!);
+              const indentToken = indent(indentation);
 
               if (selectedLines.length === 1)
                 return tr.insertText(indentToken, $from.pos);
@@ -534,7 +537,7 @@ export const CodeBlock = Node.create<CodeBlockOptions>({
         content.classList.add("node-content-wrapper");
         content.style.whiteSpace = "inherit";
         // caret is not visible if content element width is 0px
-        content.style.minWidth = `20px`;
+        content.style.minWidth = "20px";
         return { dom: content };
       },
       shouldUpdate: ({ attrs: prev }, { attrs: next }) => {

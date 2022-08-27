@@ -7,7 +7,7 @@ export type OutlineListAttributes = {
 };
 
 export interface OutlineListOptions {
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
 }
 
 declare module "@tiptap/core" {
@@ -22,7 +22,7 @@ declare module "@tiptap/core" {
 }
 
 export const inputRegex = /^\s*(-o)\s$/;
-const outlineListItemName = `outlineListItem`;
+const outlineListItemName = "outlineListItem";
 export const OutlineList = Node.create<OutlineListOptions>({
   name: "outlineList",
 

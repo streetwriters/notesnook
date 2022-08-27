@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -85,7 +85,7 @@ export const AttachmentDialog = () => {
     }, 300);
   };
 
-  const renderItem = ({ item, index }) => (
+  const renderItem = ({ item }) => (
     <AttachmentItem setAttachments={setAttachments} attachment={item} />
   );
 
@@ -162,7 +162,7 @@ export const AttachmentDialog = () => {
             >
               <Icon name="attachment" size={60} color={colors.icon} />
               <Paragraph>
-                {note ? `No attachments on this note` : `No attachments`}
+                {note ? "No attachments on this note" : "No attachments"}
               </Paragraph>
             </View>
           }

@@ -66,9 +66,6 @@ const settings = {
   icon: Settings
 };
 
-const NAVIGATION_MENU_WIDTH = "10em";
-const NAVIGATION_MENU_TABLET_WIDTH = "4em";
-
 function NavigationMenu(props) {
   const { toggleNavigationContainer, isTablet } = props;
   const [location, previousLocation, state] = useLocation();

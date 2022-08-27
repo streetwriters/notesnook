@@ -3,7 +3,7 @@ type Message<T> = {
   data?: T;
 };
 
-export function sendEventWithResult<T>(type: string, data?: any): Promise<T> {
+export function sendEventWithResult<T>(type: string): Promise<T> {
   return new Promise<T>((resolve) => {
     // eslint-disable-next-line no-restricted-globals
     addEventListener(
@@ -16,6 +16,6 @@ export function sendEventWithResult<T>(type: string, data?: any): Promise<T> {
       },
       { once: true }
     );
-    postMessage({ type, data });
+    postMessage({ type });
   });
 }

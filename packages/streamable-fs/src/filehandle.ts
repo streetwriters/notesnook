@@ -21,7 +21,7 @@ export default class FileHandle extends ReadableStream {
     await this.storage.setItem(this.file.filename, this.file);
   }
 
-  async addAdditionalData(key: string, value: any) {
+  async addAdditionalData<T>(key: string, value: T) {
     this.file.additionalData = this.file.additionalData || {};
     this.file.additionalData[key] = value;
     await this.storage.setItem(this.file.filename, this.file);
@@ -46,7 +46,7 @@ export default class FileHandle extends ReadableStream {
   }
 
   async readChunks(from: number, length: number): Promise<Blob> {
-    let blobParts: BlobPart[] = [];
+    const blobParts: BlobPart[] = [];
     for (let i = from; i < from + length; ++i) {
       const array = await this.readChunk(i);
       if (!array) continue;
@@ -56,7 +56,7 @@ export default class FileHandle extends ReadableStream {
   }
 
   async toBlob() {
-    let blobParts: BlobPart[] = [];
+    const blobParts: BlobPart[] = [];
     for (let i = 0; i < this.file.chunks; ++i) {
       const array = await this.readChunk(i);
       if (!array) continue;

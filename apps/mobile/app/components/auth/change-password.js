@@ -1,6 +1,5 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import {
   eSendEvent,
@@ -16,7 +15,6 @@ import { Notice } from "../ui/notice";
 import Seperator from "../ui/seperator";
 
 export const ChangePassword = () => {
-  const colors = useThemeStore((state) => state.colors);
   const passwordInputRef = useRef();
   const password = useRef();
   const oldPasswordInputRef = useRef();
@@ -50,7 +48,7 @@ export const ChangePassword = () => {
       await db.user.clearSessions();
       await db.user.changePassword(oldPassword.current, password.current);
       ToastEvent.show({
-        heading: `Account password updated`,
+        heading: "Account password updated",
         type: "success",
         context: "global"
       });

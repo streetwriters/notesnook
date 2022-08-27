@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 const timers: { [name: string]: number } = {};
 
 function getSecondsLeft(id?: string) {
-  let endTime = timers[id || ""];
+  const endTime = timers[id || ""];
   if (!endTime) return 0;
   if (endTime < Date.now()) return 0;
   console.log((endTime - Date.now()) / 1000);
@@ -26,7 +26,7 @@ const useTimer = (initialId?: string) => {
   useEffect(() => {
     console.log(seconds);
     interval.current = setInterval(() => {
-      let timeLeft = getSecondsLeft(id);
+      const timeLeft = getSecondsLeft(id);
       setSeconds(timeLeft);
       if (timeLeft === 0) interval.current && clearInterval(interval.current);
     }, 1000);

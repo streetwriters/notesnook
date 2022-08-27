@@ -28,14 +28,14 @@ export const usePricing = (period: "monthly" | "yearly") => {
 
   useEffect(() => {
     (async () => {
-      let skuInfo =
+      const skuInfo =
         skuInfos[period] ||
         (await db.pricing?.sku(
           Platform.OS === "android" ? "android" : "ios",
           period
         ));
       skuInfos[period] = skuInfo;
-      let products = (await PremiumService.getProducts()) as Subscription[];
+      const products = (await PremiumService.getProducts()) as Subscription[];
       let product = products.find((p) => p.productId === skuInfo?.sku);
       if (!product)
         product = products.find((p) => p.productId === getDefaultSku(period));

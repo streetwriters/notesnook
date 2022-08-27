@@ -1,4 +1,3 @@
-import React from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -13,9 +12,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { TimeSince } from "../ui/time-since";
 import useSyncProgress from "../../hooks/use-sync-progress";
-import Navigation from "../../services/navigation";
 import { tabBarRef } from "../../utils/global-refs";
-import { ProgressCircleComponent } from "../ui/svg/lazy";
 
 export const UserStatus = () => {
   const colors = useThemeStore((state) => state.colors);

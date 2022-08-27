@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { Component, createRef } from "react";
+import { Component, createRef } from "react";
 import { InteractionManager, View } from "react-native";
 import Share from "react-native-share";
 import { notesnook } from "../../../../e2e/test.ids";
@@ -262,7 +262,7 @@ export class VaultDialog extends Component {
 
       db.vault
         .changePassword(this.password, this.newPassword)
-        .then((result) => {
+        .then(() => {
           this.setState({
             loading: false
           });
@@ -348,7 +348,9 @@ export class VaultDialog extends Component {
           context: "local"
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
     this.setState({
       loading: false
     });
@@ -526,7 +528,7 @@ export class VaultDialog extends Component {
   _permanantUnlock() {
     db.vault
       .remove(this.state.note.id, this.password)
-      .then((r) => {
+      .then(() => {
         ToastEvent.show({
           heading: "Note permanantly unlocked.",
           type: "success",
@@ -568,7 +570,9 @@ export class VaultDialog extends Component {
         failOnCancel: false,
         message: await toTXT(note)
       });
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   _takeErrorAction(e) {
@@ -628,7 +632,9 @@ export class VaultDialog extends Component {
           visible: true
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   render() {
@@ -636,18 +642,12 @@ export class VaultDialog extends Component {
     const {
       note,
       visible,
-      wrongPassword,
-      passwordsDontMatch,
       novault,
-      locked,
-      permanant,
-      biometricUnlock,
       deleteNote,
       share,
       goToEditor,
       fingerprintAccess,
       changePassword,
-      copyNote,
       loading,
       deleteVault,
       clearVault
@@ -806,7 +806,7 @@ export class VaultDialog extends Component {
                   validationType="confirmPassword"
                   customValidator={() => this.password}
                   errorMessage="Passwords do not match."
-                  onErrorCheck={(e) => null}
+                  onErrorCheck={() => null}
                   marginBottom={0}
                   autoComplete="password"
                   returnKeyLabel="Create"

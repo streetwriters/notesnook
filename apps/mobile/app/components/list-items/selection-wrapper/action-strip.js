@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import Animated, { SlideInUp, SlideOutDown } from "react-native-reanimated";
 import { openVault, ToastEvent } from "../../../services/event-manager";
@@ -121,7 +121,9 @@ export const ActionStrip = ({ note, setActionStrip }) => {
           setMenuPins();
 
           setActionStrip(false);
-        } catch (e) {}
+        } catch (e) {
+          console.error(e);
+        }
       },
       visible: note.type !== "note"
     },
@@ -184,7 +186,7 @@ export const ActionStrip = ({ note, setActionStrip }) => {
       visible: note.type === "trash",
       onPress: () => {
         presentDialog({
-          title: `Permanent delete`,
+          title: "Permanent delete",
           paragraph: `Are you sure you want to delete this ${note.itemType} permanantly from trash?`,
           positiveText: "Delete",
           negativeText: "Cancel",
@@ -210,7 +212,9 @@ export const ActionStrip = ({ note, setActionStrip }) => {
       onPress: async () => {
         try {
           await deleteItems(note);
-        } catch (e) {}
+        } catch (e) {
+          console.error(e);
+        }
         setActionStrip(false);
       }
     },
@@ -246,7 +250,7 @@ export const ActionStrip = ({ note, setActionStrip }) => {
         title="Select"
         icon="check"
         tooltipText="Select Item"
-        onPress={(event) => {
+        onPress={() => {
           if (!selectionMode) {
             setSelectionMode(true);
           }

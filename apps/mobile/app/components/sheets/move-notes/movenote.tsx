@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from "react";
+import { RefObject, useState } from "react";
 import { Platform, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import { FlatList } from "react-native-gesture-handler";
@@ -22,37 +22,37 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import SearchService from "../../../services/search";
+import { NotebookType, NoteType, TopicType } from "app/utils/types";
 
 export const MoveNotes = ({
   notebook,
   selectedTopic,
   fwdRef
 }: {
-  notebook: any;
-  selectedTopic?: any;
+  notebook: NotebookType;
+  selectedTopic?: TopicType;
   fwdRef: RefObject<ActionSheet>;
 }) => {
   const colors = useThemeStore((state) => state.colors);
   const [currentNotebook, setCurrentNotebook] = useState(notebook);
 
-  let notes = db.notes?.all;
+  let notes = db.notes?.all as NoteType[];
 
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [topic, setTopic] = useState(selectedTopic);
-  //@ts-ignore
   notes = notes.filter((note) => topic?.notes.indexOf(note.id) === -1);
 
   const select = (id: string) => {
-    let index = selectedNoteIds.indexOf(id);
+    const index = selectedNoteIds.indexOf(id);
     if (index > -1) {
       setSelectedNoteIds((selectedNoteIds) => {
-        let next = [...selectedNoteIds];
+        const next = [...selectedNoteIds];
         next.splice(index, 1);
         return next;
       });
     } else {
       setSelectedNoteIds((selectedNoteIds) => {
-        let next = [...selectedNoteIds];
+        const next = [...selectedNoteIds];
         next.push(id);
         return next;
       });
@@ -61,7 +61,6 @@ export const MoveNotes = ({
 
   const openAddTopicDialog = () => {
     presentDialog({
-      //@ts-ignore
       context: "local",
       input: true,
       inputPlaceholder: "Enter title",
@@ -69,7 +68,7 @@ export const MoveNotes = ({
       paragraph: "Add a new topic in " + currentNotebook.title,
       positiveText: "Add",
       positivePress: (value) => {
-        return addNewTopic(value);
+        return addNewTopic(value as string);
       }
     });
   };
@@ -85,7 +84,9 @@ export const MoveNotes = ({
       return false;
     }
     await db.notebooks?.notebook(currentNotebook.id).topics.add(value);
-    setCurrentNotebook(db.notebooks?.notebook(currentNotebook.id).data);
+    setCurrentNotebook(
+      db.notebooks?.notebook(currentNotebook.id).data as NotebookType
+    );
 
     Navigation.queueRoutesForUpdate(
       "Notes",
@@ -99,13 +100,13 @@ export const MoveNotes = ({
     return true;
   };
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({ item }: { item: TopicType | NoteType }) => {
     return (
       <PressableButton
         testID="listitem.select"
         onPress={() => {
           if (item.type == "topic") {
-            setTopic(topic ? null : item);
+            setTopic(topic || item);
           } else {
             select(item.id);
           }
@@ -150,8 +151,8 @@ export const MoveNotes = ({
         {selectedNoteIds.indexOf(item.id) > -1 ? (
           <IconButton
             customStyle={{
-              width: null,
-              height: null,
+              width: undefined,
+              height: undefined,
               backgroundColor: "transparent"
             }}
             name="check"
@@ -177,7 +178,7 @@ export const MoveNotes = ({
       {topic ? (
         <PressableButton
           onPress={() => {
-            setTopic(null);
+            setTopic(undefined);
           }}
           customStyle={{
             paddingVertical: 12,
@@ -226,9 +227,7 @@ export const MoveNotes = ({
           <DialogHeader
             title={`Add notes to ${currentNotebook.title}`}
             paragraph={
-              topic
-                ? `Select notes you would like to move to ${topic.title}.`
-                : "Select the topic in which you would like to move notes."
+              "Select the topic in which you would like to move notes."
             }
           />
           <Seperator />
@@ -272,12 +271,11 @@ export const MoveNotes = ({
       />
       {selectedNoteIds.length > 0 ? (
         <Button
-          //@ts-ignore
           onPress={async () => {
             await db.notes?.move(
               {
-                topic: topic.id,
-                id: topic.notebookId
+                topic: topic?.id,
+                id: topic?.notebookId
               },
               ...selectedNoteIds
             );
@@ -302,7 +300,7 @@ export const MoveNotes = ({
   );
 };
 
-MoveNotes.present = (notebook: any, topic: any) => {
+MoveNotes.present = (notebook: NotebookType, topic: TopicType) => {
   presentSheet({
     component: (ref: RefObject<ActionSheet>) => (
       <MoveNotes fwdRef={ref} notebook={notebook} selectedTopic={topic} />

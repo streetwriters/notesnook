@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import picker from "../../screens/editor/tiptap/picker";
@@ -35,8 +35,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
   const colors = useThemeStore((state) => state.colors);
   const contextId = attachment.metadata.hash;
   const [filename, setFilename] = useState(attachment.metadata.filename);
-  const [currentProgress, setCurrentProgress] =
-    useAttachmentProgress(attachment);
+  const [currentProgress] = useAttachmentProgress(attachment);
   const [failed, setFailed] = useState(attachment.failed);
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState({

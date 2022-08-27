@@ -1,8 +1,8 @@
-function info(context: string, ...logs: any[]) {
+function info(context: string, ...logs: unknown[]) {
   console.log(`${new Date().toLocaleDateString()}::info::${context}:`, ...logs);
 }
 
-function error(context: string, ...logs: any[]) {
+function error(context: string, ...logs: unknown[]) {
   console.log(
     `${new Date().toLocaleDateString()}::error::${context}: `,
     ...logs
@@ -10,8 +10,8 @@ function error(context: string, ...logs: any[]) {
 }
 
 type Logger = {
-  info: (context: string, ...logs: any[]) => void;
-  error: (context: string, ...logs: any[]) => void;
+  info: (context: string, ...logs: unknown[]) => void;
+  error: (context: string, ...logs: unknown[]) => void;
 };
 
 declare global {

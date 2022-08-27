@@ -120,7 +120,7 @@ function OnboardingDialog({ onClose: _onClose, type }) {
   const onNext = useCallback(() => {
     if (step === steps.length - 1) onClose();
     else setStep((s) => ++s);
-  }, []);
+  }, [onClose, setStep, step, steps.length]);
 
   if (!steps || !steps[step] || !type) {
     onClose();

@@ -1,4 +1,3 @@
-import React from "react";
 import { View } from "react-native";
 import { useMessageStore } from "../../stores/use-message-store";
 import { useThemeStore } from "../../stores/use-theme-store";

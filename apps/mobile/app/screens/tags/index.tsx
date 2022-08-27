@@ -1,4 +1,3 @@
-import React from "react";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
 import Navigation, { NavigationProps } from "../../services/navigation";

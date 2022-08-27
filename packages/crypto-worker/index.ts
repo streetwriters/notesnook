@@ -13,7 +13,7 @@ import { wrap } from "comlink";
 export class NNCryptoWorker implements INNCrypto {
   private worker?: Worker;
   private workermodule?: NNCryptoWorkerModule;
-  private isReady: boolean = false;
+  private isReady = false;
   private path?: string;
 
   constructor(path?: string) {

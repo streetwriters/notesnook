@@ -27,10 +27,10 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
       });
       return;
     }
-    let prev = get().notes;
+    const prev = get().notes;
     for (let i = 0; i < items.length; i++) {
-      let item = items[i];
-      let index = prev.findIndex((v) => v.id === item.id);
+      const item = items[i];
+      const index = prev.findIndex((v) => v.id === item.id);
       if (index !== -1) {
         prev[index] = item;
       }

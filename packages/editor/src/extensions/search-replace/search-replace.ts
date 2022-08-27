@@ -8,6 +8,7 @@ import {
   Transaction
 } from "prosemirror-state";
 
+type DispatchFn = (tr: Transaction) => void;
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     searchreplace: {
@@ -50,7 +51,7 @@ interface TextNodesWithPosition {
   pos: number;
 }
 
-const updateView = (state: EditorState, dispatch: any) => {
+const updateView = (state: EditorState, dispatch: DispatchFn) => {
   if (!state.tr) return;
 
   state.tr.setMeta("forceUpdate", true);
@@ -156,8 +157,6 @@ const replaceAll = (
   results: Result[],
   tr: Transaction
 ) => {
-  let offset = 0;
-
   if (!results.length) return;
 
   const map = tr.mapping;
@@ -207,7 +206,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           this.storage.selectedText = undefined;
           this.storage.searchTerm = "";
           editor.commands.focus();
-          updateView(state, dispatch);
+          if (dispatch) updateView(state, dispatch);
           return true;
         },
       search:
@@ -220,7 +219,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           this.storage.matchWholeWord = options?.matchWholeWord || false;
           this.storage.results = [];
 
-          updateView(state, dispatch);
+          if (dispatch) updateView(state, dispatch);
           return true;
         },
       moveToNextResult:
@@ -237,7 +236,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           scrollIntoView(this.editor, from);
 
           this.storage.selectedIndex = nextIndex;
-          updateView(state, dispatch);
+          if (dispatch) updateView(state, dispatch);
           return true;
         },
       moveToPreviousResult:
@@ -254,7 +253,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
           scrollIntoView(this.editor, from);
 
           this.storage.selectedIndex = prevIndex;
-          updateView(state, dispatch);
+          if (dispatch) updateView(state, dispatch);
 
           return true;
         },
@@ -291,7 +290,7 @@ export const SearchReplace = Extension.create<SearchOptions, SearchStorage>({
         },
       replaceAll:
         (term) =>
-        ({ state, tr, dispatch }) => {
+        ({ tr, dispatch }) => {
           if (!dispatch) return false;
           const { results } = this.storage;
           if (!dispatch || !results || results.length <= 0) return false;

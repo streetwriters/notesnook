@@ -1,10 +1,10 @@
-const { Page, test, expect } = require("@playwright/test");
+const { test, expect } = require("@playwright/test");
 const { NOTE, getTestId, getEditorContent, editNote } = require("./utils");
 const { createNoteAndCheckPresence, isPresent } = require("./utils/conditions");
 const List = require("./utils/listitemidbuilder");
 
 /**
- * @type {Page}
+ * @type {import("@playwright/test").Page}
  */
 var page = null;
 global.page = null;

@@ -1,5 +1,4 @@
 import { Box, Flex } from "rebass";
-import { Resizable } from "re-resizable";
 import { useRef, useState } from "react";
 import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { SelectionBasedReactNodeViewProps } from "../react";

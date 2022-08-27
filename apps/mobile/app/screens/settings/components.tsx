@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import { AccentColorPicker, HomagePageSelector } from "./appearance";
 import { AutomaticBackupsSelector } from "./backup-restore";
 import DebugLogs from "./debug";

@@ -1,5 +1,5 @@
-const { notesnook } = require("../test.ids");
-const {
+import { notesnook } from "../test.ids";
+import {
   navigate,
   tapById,
   visibleByText,
@@ -10,7 +10,7 @@ const {
   sleep,
   exitEditor,
   tapByText
-} = require("./utils");
+} from "./utils";
 
 describe("NOTE TESTS", () => {
   it("Create a note in editor", async () => {

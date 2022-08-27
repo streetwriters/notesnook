@@ -96,7 +96,7 @@ class RecoveryKeySheet extends React.Component {
     this.svg.current?.toDataURL(async (data) => {
       try {
         let path;
-        RNFetchBlob = require("rn-fetch-blob").default;
+        RNFetchBlob = (await import("rn-fetch-blob")).default;
         let fileName = "nn_" + this.user.email + "_recovery_key_qrcode";
         fileName = sanitizeFilename(fileName, { replacement: "_" });
         fileName = fileName + ".png";
@@ -119,7 +119,9 @@ class RecoveryKeySheet extends React.Component {
           type: "success",
           context: "local"
         });
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
     });
   };
 
@@ -130,7 +132,7 @@ class RecoveryKeySheet extends React.Component {
       fileName = sanitizeFilename(fileName, { replacement: "_" });
       fileName = fileName + ".txt";
 
-      RNFetchBlob = require("rn-fetch-blob").default;
+      RNFetchBlob = (await import("rn-fetch-blob")).default;
       if (Platform.OS === "android") {
         let file = await ScopedStorage.createDocument(
           fileName,
@@ -184,7 +186,9 @@ class RecoveryKeySheet extends React.Component {
           shareFile: true
         }).catch(console.log);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   render() {

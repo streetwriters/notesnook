@@ -3,7 +3,7 @@ import { Extension } from "@tiptap/core";
 
 export interface HighlightOptions {
   types: string[];
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
 }
 
 declare module "@tiptap/core" {

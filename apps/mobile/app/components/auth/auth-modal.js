@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { eCloseLoginDialog, eOpenLoginDialog } from "../../utils/events";
-import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import { Toast } from "../toast";

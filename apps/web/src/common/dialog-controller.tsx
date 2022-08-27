@@ -22,7 +22,6 @@ import { Period } from "../components/dialogs/buy-dialog/types";
 import { FeatureKeys } from "../components/dialogs/feature-dialog";
 import { AuthenticatorType } from "../components/dialogs/mfa/types";
 import { Suspense } from "react";
-import DialogLoader from "../components/dialogs/dialog-loader";
 
 type DialogTypes = typeof Dialogs;
 type DialogIds = keyof DialogTypes;

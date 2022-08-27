@@ -1,5 +1,5 @@
-import { Flex, Text } from "rebass";
-import { useCallback, useState } from "react";
+import { Flex } from "rebass";
+import { useCallback } from "react";
 import { Popup } from "../components/popup";
 import { Checkbox, Label } from "@rebass/forms";
 import {

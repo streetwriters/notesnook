@@ -1,11 +1,11 @@
 import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
 import { Attribute } from "@tiptap/core";
-import { createNodeView, createSelectionBasedNodeView } from "../react";
+import { createSelectionBasedNodeView } from "../react";
 import { AttachmentComponent } from "./component";
 
 export type AttachmentType = "image" | "file" | "camera";
 export interface AttachmentOptions {
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
   onDownloadAttachment: (editor: Editor, attachment: Attachment) => boolean;
   onOpenAttachmentPicker: (editor: Editor, type: AttachmentType) => boolean;
 }
@@ -106,7 +106,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
         },
       removeAttachment:
         () =>
-        ({ commands, tr }) => {
+        ({ commands }) => {
           return commands.deleteSelection();
         },
       downloadAttachment:
@@ -122,7 +122,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
       setAttachmentProgress:
         (options) =>
         ({ state, tr, dispatch }) => {
-          const { hash, progress, type } = options;
+          const { hash, progress } = options;
           const attachments = findChildren(
             state.doc,
             (node) =>
@@ -160,7 +160,7 @@ export const AttachmentNode = Node.create<AttachmentOptions>({
 
 export function getDataAttribute(
   name: string,
-  def?: any | null
+  def?: unknown | null
 ): Partial<Attribute> {
   return {
     default: def,

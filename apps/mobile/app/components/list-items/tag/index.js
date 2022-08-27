@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { notesnook } from "../../../../e2e/test.ids";
 import { TaggedNotes } from "../../../screens/notes/tagged";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { db } from "../../../common/database";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { IconButton } from "../../ui/icon-button";

@@ -1,9 +1,8 @@
 import { Editor, mergeAttributes, Node } from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
-import { HardBreak } from "@tiptap/extension-hard-break";
 
 export interface ParagraphOptions {
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
   doubleSpaced: boolean;
 }
 
@@ -112,7 +111,7 @@ function createParagraph(
   editor: Editor,
   type: NodeType,
   doubleSpaced: boolean,
-  skipEmpty: boolean = true
+  skipEmpty = true
 ) {
   return editor
     .chain()

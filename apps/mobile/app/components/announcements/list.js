@@ -1,13 +1,9 @@
-import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../stores/use-theme-store";
 import Paragraph from "../ui/typography/paragraph";
 import { getStyle } from "./functions";
 
 export const List = ({ items, listType, style = {} }) => {
-  const colors = useThemeStore((state) => state.colors);
-
   return (
     <View
       style={{

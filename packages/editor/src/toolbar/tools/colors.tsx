@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { config } from "../../utils/config";
@@ -17,7 +17,6 @@ type ColorToolProps = ToolProps & {
 
 export function ColorTool(props: ColorToolProps) {
   const {
-    editor,
     onColorChange,
     activeColor: _activeColor,
     title,

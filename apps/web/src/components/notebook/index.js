@@ -3,7 +3,7 @@ import { Flex, Text } from "rebass";
 import ListItem from "../list-item";
 import { useStore, store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
-import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
+import { showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
 import { hashNavigate, navigate } from "../../navigation";

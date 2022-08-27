@@ -23,7 +23,7 @@ export const Group = ({
     state.dragged,
     state.setDragged
   ]);
-  const [recieving, setRecieving] = React.useState(false);
+  const [_recieving, setRecieving] = React.useState(false);
   const [recievePosition, setRecievePosition] = React.useState("above");
   const isDragged =
     dragged &&
@@ -46,7 +46,7 @@ export const Group = ({
     const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
     const dragged = data.dragged.payload;
     const reciever = data.receiver.payload;
-    let _data = useDragState.getState().data.slice();
+    const _data = useDragState.getState().data.slice();
 
     if (dragged.type === "group") {
       const fromIndex = dragged.index;
@@ -64,9 +64,6 @@ export const Group = ({
     // Always insert sub group at the end of the group.
     if (dragged.type === "subgroup") {
       const fromIndex = dragged.index;
-      const toIndex = isDroppedAbove
-        ? Math.max(0, reciever.index)
-        : reciever.index + 1;
 
       const insertAt = _data[reciever.index] as string[];
       const insertFrom = _data[dragged.groupIndex] as string[];
@@ -247,10 +244,10 @@ export const Group = ({
             ...dimensions.current
           });
         }}
-        onDragDrop={(data) => {
+        onDragDrop={() => {
           setDragged({});
         }}
-        onDragEnd={(data) => {
+        onDragEnd={() => {
           setDragged({});
         }}
         hoverDragReleasedStyle={{
@@ -264,7 +261,7 @@ export const Group = ({
           marginBottom: recievePosition === "below" ? 10 : 0,
           borderRadius: 10
         }}
-        renderHoverContent={({ dimensions: { width } }) => renderGroup(true)}
+        renderHoverContent={() => renderGroup(true)}
         onReceiveDragDrop={onDrop}
         onReceiveDragOver={onRecieveData}
         onReceiveDragExit={() => {

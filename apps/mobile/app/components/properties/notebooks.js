@@ -1,11 +1,7 @@
-import React from "react";
 import { ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eSendEvent } from "../../services/event-manager";
-import Navigation from "../../services/navigation";
 import { db } from "../../common/database";
-import { eOnNewTopicAdded, refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";

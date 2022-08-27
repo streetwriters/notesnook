@@ -1,5 +1,5 @@
-const { notesnook } = require("../test.ids");
-const {
+import { notesnook } from "../test.ids";
+import {
   tapById,
   elementById,
   visibleByText,
@@ -7,13 +7,11 @@ const {
   createNote,
   prepare,
   visibleById,
-  expectBitmapsToBeEqual,
   matchSnapshot,
   notVisibleById,
-  navigate,
-  openSideMenu
-} = require("./utils");
-const { sleep } = require("./utils");
+  navigate
+} from "./utils";
+import { sleep } from "./utils";
 
 async function lockNote() {
   await tapById(notesnook.listitem.menu);
@@ -44,7 +42,7 @@ async function openLockedNote(pwd) {
   await elementById(notesnook.ids.dialogs.vault.pwd).typeText(pwd || "1234");
   await tapByText("Open");
   await sleep(1000);
-  await matchSnapshot(elementById("editor-wrapper"), `note-after-vault-unlock`);
+  await matchSnapshot(elementById("editor-wrapper"), "note-after-vault-unlock");
 }
 
 async function goToPrivacySecuritySettings() {

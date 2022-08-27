@@ -1,0 +1,14 @@
+# all
+build
+coverage
+node_modules
+dist
+
+# mobile
+apps/mobile/native/
+
+# web
+apps/web/public/an.js
+
+# editor
+packages/editor/styles/

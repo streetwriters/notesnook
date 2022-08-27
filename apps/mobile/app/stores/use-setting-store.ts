@@ -68,9 +68,9 @@ export interface SettingStore extends State {
   setRequestBiometrics: (requestBiometrics: boolean) => void;
 }
 
-let { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
-export const useSettingStore = create<SettingStore>((set, get) => ({
+export const useSettingStore = create<SettingStore>((set) => ({
   settings: {
     showToolbarOnTop: false,
     showKeyboardOnOpen: false,

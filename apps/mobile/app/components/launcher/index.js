@@ -42,7 +42,7 @@ import { Walkthrough } from "../walkthroughs";
 import { useAppState } from "../../hooks/use-app-state";
 
 const Launcher = React.memo(
-  () => {
+  function Launcher() {
     const colors = useThemeStore((state) => state.colors);
     const setLoading = useNoteStore((state) => state.setLoading);
     const loading = useNoteStore((state) => state.loading);
@@ -257,7 +257,9 @@ const Launcher = React.memo(
           enabled(false);
           password.current = null;
         }
-      } catch (e) {}
+      } catch (e) {
+        console.error(e);
+      }
     };
 
     return verifyUser ? (
@@ -325,7 +327,7 @@ const Launcher = React.memo(
               maxWidth: "90%"
             }}
           >
-            Please verify it's you
+            {"Please verify it's you"}
           </Paragraph>
           <Seperator />
           <View

@@ -1,7 +1,5 @@
-import React, { PropsWithChildren, useContext } from "react";
+import React, { PropsWithChildren } from "react";
 import { Editor } from "@tiptap/core";
-import ReactDOM from "react-dom";
-import { PopupPresenter } from ".";
 
 export const PopupRendererContext = React.createContext<PopupRenderer | null>(
   null
@@ -44,7 +42,7 @@ export class PopupRenderer extends React.Component<
     });
   };
 
-  render(): React.ReactNode {
+  render() {
     return (
       <PopupRendererContext.Provider value={this}>
         {this.props.children}
@@ -57,11 +55,4 @@ export class PopupRenderer extends React.Component<
       </PopupRendererContext.Provider>
     );
   }
-}
-
-export function usePopupRenderer() {
-  return useContext(PopupRendererContext);
-}
-export function useEditorContext() {
-  return useContext(EditorContext)!;
 }

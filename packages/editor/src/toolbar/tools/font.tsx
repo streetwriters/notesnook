@@ -2,7 +2,7 @@ import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { Dropdown } from "../components/dropdown";
 import { MenuItem } from "../../components/menu/types";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 import { Counter } from "../components/counter";
 import { useRefValue } from "../../hooks/use-ref-value";
 
@@ -37,7 +37,7 @@ export function FontSize(props: ToolProps) {
           .setFontSize(`${increaseFontSize()}px`)
           .run();
       }}
-      onReset={() => editor.current?.chain().focus().setFontSize(`16px`).run()}
+      onReset={() => editor.current?.chain().focus().setFontSize("16px").run()}
       value={fontSize}
     />
   );
@@ -53,7 +53,7 @@ export function FontFamily(props: ToolProps) {
 
   const currentFontFamily =
     Object.entries(fontFamilies)
-      .find(([key, value]) =>
+      .find(([_key, value]) =>
         editor.isActive("textStyle", { fontFamily: value })
       )
       ?.map((a) => a)

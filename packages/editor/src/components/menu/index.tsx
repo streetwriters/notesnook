@@ -1,14 +1,8 @@
-import React, {
-  useCallback,
-  useRef,
-  useEffect,
-  PropsWithChildren
-} from "react";
+import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
 import { Box, Flex, FlexProps, Text } from "rebass";
 import { getPosition } from "../../utils/position";
 import {
   MenuButton as MenuButtonType,
-  MenuItem,
   MenuItem as MenuItemType
 } from "./types";
 import { useFocus } from "./use-focus";
@@ -22,10 +16,10 @@ type MenuProps = MenuContainerProps & {
 };
 
 export function Menu(props: MenuProps) {
-  const { items = [], title, onClose, ...containerProps } = props;
+  const { items = [], onClose, ...containerProps } = props;
   const hoverTimeout = useRef<NodeJS.Timeout>();
   const onAction = useCallback(
-    (e: Event, item?: MenuButtonType) => {
+    (e?: Event, item?: MenuButtonType) => {
       e?.stopPropagation();
 
       if (item?.onClick) {

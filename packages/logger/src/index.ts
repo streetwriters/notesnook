@@ -1,11 +1,11 @@
 import { consoleReporter } from "./reporters/console";
 import { ILogReporter, LoggerConfig, LogLevel } from "./types";
 
-type LogLevelFunc = (message: string, extras?: Record<string, any>) => void;
+type LogLevelFunc = (message: string, extras?: Record<string, unknown>) => void;
 type ErrorLogLevelFunc = (
   error: Error,
   fallbackMessage?: string,
-  extras?: Record<string, any>
+  extras?: Record<string, unknown>
 ) => void;
 export interface ILogger {
   fatal: ErrorLogLevelFunc;
@@ -56,8 +56,8 @@ export class NoopLogger implements ILogger {
   error() {}
   info() {}
   log() {}
-  measure(_tag: string) {}
-  scope(_scope: string) {
+  measure() {}
+  scope() {
     return this;
   }
 }
@@ -66,7 +66,7 @@ export * from "./types";
 export * from "./reporters";
 
 function logLevelFactory(level: LogLevel, config: LoggerConfig) {
-  return (message: string, extras?: Record<string, any>) => {
+  return (message: string, extras?: Record<string, unknown>) => {
     const now = Date.now();
     config.reporter.write({
       level,
@@ -84,7 +84,7 @@ function errorLogLevelFactory(level: LogLevel, config: LoggerConfig) {
   return (
     error: Error,
     fallbackMessage?: string,
-    extras?: Record<string, any>
+    extras?: Record<string, unknown>
   ) => {
     const now = Date.now();
     config.reporter.write({

@@ -1,4 +1,3 @@
-import React from "react";
 import { Linking, Platform, View } from "react-native";
 import { Button } from "../../components/ui/button";
 import {
@@ -79,7 +78,7 @@ export const Subscription = () => {
               : user.subscription?.type ===
                   SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
                 Platform.OS === "android"
-              ? `Resubscribe from Google Playstore`
+              ? "Resubscribe from Google Playstore"
               : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
               ? `Resubscribe to Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
               : `Get Pro (${monthlyPlan?.product?.localizedPrice} / mo)`

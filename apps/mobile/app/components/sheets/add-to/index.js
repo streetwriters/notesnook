@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { notesnook } from "../../../../e2e/test.ids";
@@ -40,9 +40,6 @@ const AddToNotebookSheet = () => {
     setVisible(true);
     actionSheetRef.current?.setModalVisible(true);
   }
-  const close = () => {
-    actionSheetRef.current?.setModalVisible(false);
-  };
 
   useEffect(() => {
     eSubscribeEvent(eOpenMoveNoteDialog, open);
@@ -128,7 +125,7 @@ const MoveNoteComponent = ({ note }) => {
     return true;
   };
 
-  const handlePress = async (item, index) => {
+  const handlePress = async (item) => {
     let noteIds =
       selectedItemsList.length > 0
         ? selectedItemsList.map((n) => n.id)
@@ -250,7 +247,7 @@ const MoveNoteComponent = ({ note }) => {
         >
           <DialogHeader
             title="Add to notebook"
-            paragraph={`Add your notes to notebooks to find them easily.`}
+            paragraph={"Add your notes to notebooks to find them easily."}
           />
         </View>
 
@@ -302,7 +299,7 @@ const MoveNoteComponent = ({ note }) => {
           style={{
             paddingHorizontal: 12
           }}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <View
               style={{
                 borderWidth: 1,

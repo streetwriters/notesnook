@@ -12,7 +12,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 
 export const MenuItem = React.memo(
-  ({ item, index, testID, rightBtn }) => {
+  function MenuItem({ item, index, testID, rightBtn }) {
     const colors = useThemeStore((state) => state.colors);
     const [headerTextState, setHeaderTextState] = useState(
       useNavigationStore.getState().currentScreen

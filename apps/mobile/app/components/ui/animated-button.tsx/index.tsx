@@ -1,5 +1,4 @@
-import React from "react";
-import { ActivityIndicator, ColorValue, TextStyle } from "react-native";
+import { ActivityIndicator } from "react-native";
 import Animated, {
   FadeIn,
   FadeOut,
@@ -12,7 +11,7 @@ import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { BUTTON_TYPES } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
 import { ButtonProps } from "../button";
-import { PressableButton, PressableButtonProps } from "../pressable";
+import { PressableButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
 

@@ -1,21 +1,14 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeOutDown,
-  FadeOutUp
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import { DDS } from "../../services/device-detection";
-import { eSendEvent, ToastEvent } from "../../services/event-manager";
+import { ToastEvent } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
-import Navigation from "../../services/navigation";
 import PremiumService from "../../services/premium";
-import SettingsService from "../../services/settings";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
 import umami from "../../common/analytics";
 import { db } from "../../common/database";
-import { eCloseLoginDialog } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
@@ -23,13 +16,12 @@ import BaseDialog from "../dialog/base-dialog";
 import { Button } from "../ui/button";
 import Input from "../ui/input";
 import { SvgView } from "../ui/svg";
-import { BouncingView } from "../ui/transitions/bouncing-view";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { SVG } from "./background";
 import { hideAuth } from "./common";
 
-export const Signup = ({ changeMode, welcome, trial }) => {
+export const Signup = ({ changeMode, trial }) => {
   const colors = useThemeStore((state) => state.colors);
   const email = useRef();
   const emailInputRef = useRef();

@@ -7,7 +7,7 @@ import { OutlineListItem } from "../outline-list-item";
 export function OutlineListComponent(
   props: ReactNodeViewProps<OutlineListAttributes>
 ) {
-  const { editor, getPos, node, updateAttributes, forwardRef } = props;
+  const { editor, getPos, node, forwardRef } = props;
   const { collapsed } = node.attrs;
 
   const isNested = useMemo(() => {

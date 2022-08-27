@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Linking, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Linking, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { STORE_LINK } from "../../../utils/constants";
@@ -153,7 +153,7 @@ export const Update = ({ version: appVersion, fwdRef }) => {
           </ScrollView>
           <Seperator />
           <Button
-            title={isGithubRelease ? `Download update` : `Update now`}
+            title={isGithubRelease ? "Download update" : "Update now"}
             onPress={() => {
               Linking.openURL(isGithubRelease ? GITHUB_URL : STORE_LINK).catch(
                 console.log

@@ -8,7 +8,7 @@ import { useMenuTrigger } from "../../hooks/use-menu";
 import Config from "../../utils/config";
 import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 function debugMenuItems(type) {
   if (!type) return [];
