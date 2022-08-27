@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "./App.js",
   "dependencies": {
     "@flyerhq/react-native-link-preview": "^1.6.0",
