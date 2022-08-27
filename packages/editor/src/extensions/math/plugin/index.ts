@@ -13,13 +13,6 @@ export {
 
 // recommended plugins
 export { mathBackspaceCmd } from "./plugins/math-backspace";
-export {
-  makeBlockMathInputRule,
-  makeInlineMathInputRule,
-  REGEX_BLOCK_MATH_DOLLARS,
-  REGEX_INLINE_MATH_DOLLARS,
-  REGEX_INLINE_MATH_DOLLARS_ESCAPED
-} from "./plugins/math-input-rules";
 
 // optional / experimental plugins
 export { mathSelectPlugin } from "./plugins/math-select";

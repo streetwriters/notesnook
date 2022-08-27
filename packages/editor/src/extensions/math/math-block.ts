@@ -1,10 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import { inputRules } from "prosemirror-inputrules";
-import {
-  insertMathNode,
-  makeBlockMathInputRule,
-  REGEX_BLOCK_MATH_DOLLARS
-} from "./plugin";
+import { insertMathNode } from "./plugin";
+import { NodeSelection } from "prosemirror-state";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -14,6 +10,8 @@ declare module "@tiptap/core" {
   }
 }
 
+// simple inputrule for block math
+const REGEX_BLOCK_MATH_DOLLARS = /\$\$\$\s+$/; //new RegExp("\$\$\s+$", "i");
 export const MathBlock = Node.create({
   name: "mathBlock",
   group: "block math",
@@ -47,11 +45,32 @@ export const MathBlock = Node.create({
     };
   },
 
-  addProseMirrorPlugins() {
-    const inputRulePlugin = inputRules({
-      rules: [makeBlockMathInputRule(REGEX_BLOCK_MATH_DOLLARS, this.type)]
-    });
+  addInputRules() {
+    return [
+      {
+        find: REGEX_BLOCK_MATH_DOLLARS,
+        handler: ({ state, range }) => {
+          const { from: start, to: end } = range;
+          const $start = state.doc.resolve(start);
+          if (
+            !$start
+              .node(-1)
+              .canReplaceWith(
+                $start.index(-1),
+                $start.indexAfter(-1),
+                this.type
+              )
+          )
+            return null;
+          const tr = state.tr
+            .delete(start, end)
+            .setBlockType(start, start, this.type, null);
 
-    return [inputRulePlugin];
+          tr.setSelection(
+            NodeSelection.create(tr.doc, tr.mapping.map($start.pos - 1))
+          );
+        }
+      }
+    ];
   }
 });

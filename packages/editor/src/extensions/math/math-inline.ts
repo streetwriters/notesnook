@@ -1,10 +1,5 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import { inputRules } from "prosemirror-inputrules";
-import {
-  makeInlineMathInputRule,
-  REGEX_INLINE_MATH_DOLLARS,
-  mathPlugin
-} from "./plugin";
+import { mathPlugin } from "./plugin";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
@@ -13,6 +8,19 @@ declare module "@tiptap/core" {
     };
   }
 }
+// simple input rule for inline math
+const REGEX_INLINE_MATH_DOLLARS = /\$\$(.+)\$\$/; //new RegExp("\$(.+)\$", "i");
+// negative lookbehind regex notation allows for escaped \$ delimiters
+// (requires browser supporting ECMA2018 standard -- currently only Chrome / FF)
+// (see https://javascript.info/regexp-lookahead-lookbehind)
+// const REGEX_INLINE_MATH_DOLLARS_ESCAPED: RegExp = (() => {
+//   // attempt to create regex with negative lookbehind
+//   try {
+//     return new RegExp("(?<!\\\\)\\$(.+)(?<!\\\\)\\$");
+//   } catch (e) {
+//     return REGEX_INLINE_MATH_DOLLARS;
+//   }
+// })();
 
 export const MathInline = Node.create({
   name: "mathInline",
@@ -53,10 +61,32 @@ export const MathInline = Node.create({
   },
 
   addProseMirrorPlugins() {
-    const inputRulePlugin = inputRules({
-      rules: [makeInlineMathInputRule(REGEX_INLINE_MATH_DOLLARS, this.type)]
-    });
+    return [mathPlugin];
+  },
 
-    return [mathPlugin, inputRulePlugin];
+  addInputRules() {
+    return [
+      {
+        find: REGEX_INLINE_MATH_DOLLARS,
+        handler: ({ state, match, range }) => {
+          const { from: start, to: end } = range;
+          const $start = state.doc.resolve(start);
+          const index = $start.index();
+          const $end = state.doc.resolve(end);
+
+          // check if replacement valid
+          if (!$start.parent.canReplaceWith(index, $end.index(), this.type)) {
+            return null;
+          }
+
+          // perform replacement
+          state.tr.replaceRangeWith(
+            start,
+            end,
+            this.type.create(null, this.type.schema.text(match[1]))
+          );
+        }
+      }
+    ];
   }
 });

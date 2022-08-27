@@ -1,6 +1,6 @@
 import React, { SyntheticEvent } from "react";
 import { NodeView, Decoration, DecorationSource } from "prosemirror-view";
-import { Node as PMNode } from "prosemirror-model";
+import { Node as PMNode, Slice } from "prosemirror-model";
 import { NodeSelection } from "prosemirror-state";
 import { PortalProviderAPI } from "./react-portal-provider";
 import {
@@ -11,9 +11,18 @@ import {
   ContentDOM
 } from "./types";
 import { NodeViewRendererProps } from "@tiptap/core";
-import { __serializeForClipboard } from "prosemirror-view";
+import { __serializeForClipboard, EditorView } from "prosemirror-view";
 import { Editor } from "../../types";
 import { ThemeProvider } from "../../components/theme-provider";
+
+// This is hacky workaround to manually handle serialization when
+// drag/dropping on mobile devices.
+declare module "prosemirror-view" {
+  export function __serializeForClipboard(
+    view: EditorView,
+    slice: Slice
+  ): { dom: HTMLElement; text: string };
+}
 
 export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
   private domRef!: HTMLElement;

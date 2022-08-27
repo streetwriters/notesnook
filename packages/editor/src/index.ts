@@ -4,7 +4,6 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import StarterKit from "@tiptap/starter-kit";
 import { useEffect, useMemo } from "react";
-import { EditorView } from "prosemirror-view";
 import Toolbar from "./toolbar";
 import TextAlign from "@tiptap/extension-text-align";
 import Subscript from "@tiptap/extension-subscript";
@@ -24,7 +23,6 @@ import { Theme } from "@streetwriters/theme";
 import { AttachmentNode, AttachmentOptions } from "./extensions/attachment";
 import { TaskListNode } from "./extensions/task-list";
 import { TaskItemNode } from "./extensions/task-item";
-import { Dropcursor } from "./extensions/drop-cursor";
 import { SearchReplace } from "./extensions/search-replace";
 import { EmbedNode } from "./extensions/embed";
 import { CodeBlock } from "./extensions/code-block";
@@ -58,11 +56,6 @@ const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
   .filter(([name]) => name !== "ClipboardTextSerializer")
   .map(([, extension]) => extension);
-
-EditorView.prototype.updateState = function updateState(state) {
-  if (!this.docView) return; // This prevents the matchesNode error on hot reloads
-  this.updateStateInner(state, this.state.plugins != state.plugins);
-};
 
 type TiptapOptions = EditorOptions &
   AttachmentOptions & {
@@ -111,7 +104,6 @@ const useTiptap = (
         }),
         StarterKit.configure({
           code: false,
-          dropcursor: false,
           codeBlock: false,
           listItem: false,
           orderedList: false,
@@ -121,10 +113,10 @@ const useTiptap = (
           history: {
             depth: 200,
             newGroupDelay: 1000
+          },
+          dropcursor: {
+            class: "drop-cursor"
           }
-        }),
-        Dropcursor.configure({
-          class: "drop-cursor"
         }),
         CharacterCount,
         Underline,

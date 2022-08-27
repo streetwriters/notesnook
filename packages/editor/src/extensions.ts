@@ -19,7 +19,6 @@ import "./extensions/image";
 import "./extensions/attachment";
 import "./extensions/task-list";
 import "./extensions/task-item";
-import "./extensions/drop-cursor";
 import "./extensions/search-replace";
 import "./extensions/embed";
 import "./extensions/code-block";

@@ -8,8 +8,10 @@ const _Button = (
 ) => {
   const { sx, ...buttonProps } = props;
 
-  const hoverBg = sx?.[":hover"]?.["bg"] || "hover";
-  const bg = sx?.["bg"] || "unset";
+  const hoverBg =
+    (sx as unknown as Record<string, never>)?.[":hover"]?.["bg"] || "hover";
+  const bg = (sx as unknown as Record<string, never>)?.["bg"] || "unset";
+
   const buttonRef = useRef<HTMLButtonElement>();
 
   useEffect(() => {

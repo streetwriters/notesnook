@@ -2,7 +2,10 @@ import { MathRenderer } from "./types";
 
 async function loadKatex() {
   const { default: katex } = await import("katex");
+
   // Chemistry formulas support
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore TODO: maybe rewrite this in typescript?
   await import("katex/contrib/mhchem/mhchem");
   return katex;
 }

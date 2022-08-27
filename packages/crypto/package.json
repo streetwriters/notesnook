@@ -15,7 +15,8 @@
     "libsodium-wrappers": "0.7.9"
   },
   "devDependencies": {
-    "@types/libsodium-wrappers": "0.7.9"
+    "@types/libsodium-wrappers": "0.7.9",
+    "typescript": "^4.8.2"
   },
   "repository": {
     "type": "git",

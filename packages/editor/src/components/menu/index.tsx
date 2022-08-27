@@ -17,7 +17,7 @@ type MenuProps = MenuContainerProps & {
 
 export function Menu(props: MenuProps) {
   const { items = [], onClose, ...containerProps } = props;
-  const hoverTimeout = useRef<NodeJS.Timeout>();
+  const hoverTimeout = useRef<number>();
   const onAction = useCallback(
     (e?: Event, item?: MenuButtonType) => {
       e?.stopPropagation();

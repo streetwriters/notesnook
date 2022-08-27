@@ -3,13 +3,13 @@ import { PluginKey } from "prosemirror-state";
 export interface Listeners<T> {
   [name: string]: Set<Listener<T>>;
 }
-export type Listener<T = unknown> = (data: T) => void;
-export type Dispatch<T = unknown> = (
+export type Listener<T = never> = (data: T) => void;
+export type Dispatch<T = never> = (
   eventName: PluginKey | string,
   data: T
 ) => void;
 
-export class EventDispatcher<T = unknown> {
+export class EventDispatcher<T = never> {
   private listeners: Listeners<T> = {};
 
   on(event: string, cb: Listener<T>): void {

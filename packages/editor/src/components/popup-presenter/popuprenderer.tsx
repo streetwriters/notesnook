@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, useContext } from "react";
 import { Editor } from "@tiptap/core";
 
 export const PopupRendererContext = React.createContext<PopupRenderer | null>(
@@ -55,4 +55,8 @@ export class PopupRenderer extends React.Component<
       </PopupRendererContext.Provider>
     );
   }
+}
+
+export function usePopupRenderer() {
+  return useContext(PopupRendererContext);
 }
