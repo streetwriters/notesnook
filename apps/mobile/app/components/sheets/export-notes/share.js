@@ -1,9 +1,9 @@
+import React from "react";
 import { View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import { ToastEvent } from "../../../services/event-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
-
 export const ShareComponent = ({ uri, name, padding }) => {
   return (
     <View

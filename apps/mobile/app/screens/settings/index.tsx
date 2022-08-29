@@ -1,11 +1,9 @@
-import {
-  createNativeStackNavigator
-} from "@react-navigation/native-stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from "react";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import Group from "./group";
 import Home from "./home";
-
 const SettingsStack = createNativeStackNavigator();
 const screenListeners = {
   //@ts-ignore

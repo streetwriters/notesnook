@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Modal, View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useUserStore } from "../../stores/use-user-store";
+import { db } from "../../common/database";
 import BiometricService from "../../services/biometrics";
 import {
   eSendEvent,
@@ -11,22 +10,23 @@ import {
 } from "../../services/event-manager";
 import { clearMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
+import SettingsService from "../../services/settings";
 import Sync from "../../services/sync";
-import { db } from "../../common/database";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import { IconButton } from "../ui/icon-button";
-import { Button } from "../ui/button";
 import { Dialog } from "../dialog";
 import { presentDialog } from "../dialog/functions";
-import Input from "../ui/input";
-import { Toast } from "../toast";
-import Heading from "../ui/typography/heading";
-import Paragraph from "../ui/typography/paragraph";
-import SettingsService from "../../services/settings";
-import TwoFactorVerification from "./two-factor";
 import SheetProvider from "../sheet-provider";
 import { Progress } from "../sheets/progress";
+import { Toast } from "../toast";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import Input from "../ui/input";
+import Heading from "../ui/typography/heading";
+import Paragraph from "../ui/typography/paragraph";
+import TwoFactorVerification from "./two-factor";
 
 function getEmail(email) {
   if (!email) return null;

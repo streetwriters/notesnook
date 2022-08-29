@@ -1,10 +1,11 @@
+import React from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { notesnook } from "../../../e2e/test.ids";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { notesnook } from "../../../e2e/test.ids";
 
 const DialogButtons = ({
   onPressPositive,

@@ -1,3 +1,4 @@
+import React from "react";
 import { ActivityIndicator, ColorValue, TextStyle } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeStore } from "../../../stores/use-theme-store";
@@ -7,7 +8,6 @@ import { SIZE } from "../../../utils/size";
 import { PressableButton, PressableButtonProps } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
-
 export interface ButtonProps extends PressableButtonProps {
   height?: number;
   icon?: string;

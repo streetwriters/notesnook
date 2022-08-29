@@ -10,6 +10,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 import { features } from "../../../features";
+import React from "react";
 export type FeatureType = {
   title: string;
   body: string;

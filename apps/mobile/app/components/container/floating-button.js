@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Keyboard, Platform, View } from "react-native";
 import Animated, {
   Easing,

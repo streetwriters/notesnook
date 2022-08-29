@@ -1,15 +1,15 @@
 import dayjs from "dayjs";
+import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { TimeSince } from "../../components/ui/time-since";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
-import { useUserStore } from "../../stores/use-user-store";
 import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
 import { SUBSCRIPTION_STATUS_STRINGS } from "../../utils/constants";
 import { SIZE } from "../../utils/size";
 import { SectionItem } from "./section-item";
-
 export const getTimeLeft = (t2) => {
   let daysRemaining = dayjs(t2).diff(dayjs(), "days");
   return {

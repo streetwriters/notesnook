@@ -1,12 +1,14 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 import { LAUNCH_ROCKET } from "../../assets/images/assets";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useUserStore } from "../../stores/use-user-store";
+import umami from "../../common/analytics";
+import { db } from "../../common/database";
+import { usePricing } from "../../hooks/use-pricing";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
 import { getElevation } from "../../utils";
-import { db } from "../../common/database";
 import {
   eClosePremiumDialog,
   eCloseProgressDialog,
@@ -14,21 +16,19 @@ import {
 } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import umami from "../../common/analytics";
-import { IconButton } from "../ui/icon-button";
 import { AuthMode } from "../auth";
-import { Button } from "../ui/button";
 import SheetProvider from "../sheet-provider";
-import { SvgView } from "../ui/svg";
-import Seperator from "../ui/seperator";
 import { Toast } from "../toast";
+import { Button } from "../ui/button";
+import { IconButton } from "../ui/icon-button";
+import Seperator from "../ui/seperator";
+import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { features } from "./features";
 import { Group } from "./group";
 import { PricingPlans } from "./pricing-plans";
-import { usePricing } from "../../hooks/use-pricing";
 
 export const Component = ({ close, promo }) => {
   const colors = useThemeStore((state) => state.colors);

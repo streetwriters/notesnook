@@ -1,3 +1,4 @@
+import React from "react";
 import { notesnook } from "../../../e2e/test.ids";
 import { DDS } from "../../services/device-detection";
 import Navigation from "../../services/navigation";

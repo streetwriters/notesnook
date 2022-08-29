@@ -1,6 +1,7 @@
+import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
 import { useEditorStore } from "../../../stores/use-editor-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import { hexToRGBA } from "../../../utils/color-scheme/utils";
 
 export const Filler = ({ item }) => {

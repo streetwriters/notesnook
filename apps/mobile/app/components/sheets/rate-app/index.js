@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Linking, View } from "react-native";
 import {
   eSubscribeEvent,
@@ -14,7 +14,6 @@ import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-
 const RateAppSheet = () => {
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();

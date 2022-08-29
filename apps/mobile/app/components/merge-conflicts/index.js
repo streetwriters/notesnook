@@ -1,8 +1,9 @@
 import KeepAwake from "@sayem314/react-native-keep-awake";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Modal, SafeAreaView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { db } from "../../common/database";
 import Editor from "../../screens/editor";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { DDS } from "../../services/device-detection";
@@ -15,7 +16,6 @@ import Navigation from "../../services/navigation";
 import Sync from "../../services/sync";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { dHeight } from "../../utils";
-import { db } from "../../common/database";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { timeConverter } from "../../utils/time";

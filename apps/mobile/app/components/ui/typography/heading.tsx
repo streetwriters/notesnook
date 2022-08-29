@@ -1,13 +1,11 @@
-import { useMemo } from "react";
-import { Platform, TextProps } from "react-native";
-import { Text } from "react-native";
+import React, { useMemo } from "react";
+import { Platform, Text, TextProps } from "react-native";
 import Animated, {
   ComplexAnimationBuilder,
   Layout
 } from "react-native-reanimated";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
-
 interface HeadingProps extends TextProps {
   color?: string;
   size?: number;

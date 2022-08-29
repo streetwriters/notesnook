@@ -1,3 +1,4 @@
+import React from "react";
 import { Text } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";

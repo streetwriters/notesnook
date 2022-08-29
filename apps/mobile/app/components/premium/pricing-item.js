@@ -1,3 +1,4 @@
+import React from "react";
 import { View } from "react-native";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";

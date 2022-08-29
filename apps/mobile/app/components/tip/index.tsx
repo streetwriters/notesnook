@@ -1,14 +1,14 @@
+import React from "react";
 import { Image, TextStyle, View, ViewStyle } from "react-native";
+import { MMKV } from "../../common/database/mmkv";
 import { eSendEvent, presentSheet } from "../../services/event-manager";
 import { TTip } from "../../services/tip-manager";
 import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
-import { MMKV } from "../../common/database/mmkv";
 import { eCloseProgressDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Paragraph from "../ui/typography/paragraph";
-
 export const Tip = ({
   tip,
   style,

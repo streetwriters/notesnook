@@ -1,3 +1,4 @@
+import React from "react";
 import { ActivityIndicator } from "react-native";
 import Animated, {
   FadeIn,
@@ -14,7 +15,6 @@ import { ButtonProps } from "../button";
 import { PressableButton } from "../pressable";
 import Heading from "../typography/heading";
 import Paragraph from "../typography/paragraph";
-
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 
 export const AnimatedButton = ({
@@ -111,7 +111,7 @@ export const AnimatedButton = ({
 
         {!title ? null : (
           <Component
-            layout={Layout}
+            layout={Layout.springify()}
             animated={true}
             color={textColor}
             size={fontSize}

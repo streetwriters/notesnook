@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, Text, View } from "react-native";
 import * as RNIap from "react-native-iap";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useUserStore } from "../../stores/use-user-store";
+import umami from "../../common/analytics";
+import { db } from "../../common/database";
+import { usePricing } from "../../hooks/use-pricing";
 import {
   eSendEvent,
   presentSheet,
   ToastEvent
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
-import { db } from "../../common/database";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
 import {
   eClosePremiumDialog,
   eCloseProgressDialog,
@@ -19,16 +21,14 @@ import {
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import umami from "../../common/analytics";
-import { Button } from "../ui/button";
 import { Dialog } from "../dialog";
 import BaseDialog from "../dialog/base-dialog";
 import { presentDialog } from "../dialog/functions";
+import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
-import { usePricing } from "../../hooks/use-pricing";
 
 const promoCyclesMonthly = {
   1: "first month",

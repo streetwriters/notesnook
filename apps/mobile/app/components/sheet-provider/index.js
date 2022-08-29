@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { editorState } from "../../screens/editor/tiptap/utils";
@@ -14,7 +14,6 @@ import { Button } from "../ui/button";
 import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-
 const SheetProvider = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);

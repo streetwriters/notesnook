@@ -22,7 +22,7 @@ module.exports = (env) => {
   const {
     mode = "development",
     context = __dirname,
-    entry = "./native/index.js",
+    entry = "./index.js",
     platform,
     minimize = mode === "production",
     devServer = undefined,
@@ -79,9 +79,12 @@ module.exports = (env) => {
        * dependency. You might need it when using workspaces/monorepos or unconventional project
        * structure. For simple/typical project you won't need it.
        */
-      // alias: {
-      //   'react-native': reactNativePath,
-      // },
+      alias: {
+        //'react-native': reactNativePath,
+        "react": path.join(__dirname, "../node_modules/react"),
+        "react-dom": path.join(__dirname, "../node_modules/react-dom"),
+        "@streetwriters/editor": path.join(__dirname, "../../../packages/editor"),
+      },
     },
     /**
      * Configures output.

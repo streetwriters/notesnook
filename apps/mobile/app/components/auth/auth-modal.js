@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Platform, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
@@ -13,8 +15,6 @@ import { IconButton } from "../ui/icon-button";
 import { hideAuth, initialAuthMode } from "./common";
 import { Login } from "./login";
 import { Signup } from "./signup";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Platform, View } from "react-native";
 
 export const AuthMode = {
   login: 0,

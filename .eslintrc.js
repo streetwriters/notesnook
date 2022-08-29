@@ -67,7 +67,9 @@ module.exports = {
       },
       rules: {
         // TODO: remove this gradually
-        "@typescript-eslint/ban-ts-comment": "off"
+        "@typescript-eslint/ban-ts-comment": "off",
+        "react/react-in-jsx-scope": 2,
+        "react/jsx-uses-react": 2
       }
     }
   ]

@@ -1,3 +1,4 @@
+import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeStore } from "../../stores/use-theme-store";
@@ -8,7 +9,6 @@ import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-
 export const Synced = ({ item, close }) => {
   const colors = useThemeStore((state) => state.colors);
   const user = useUserStore((state) => state.user);

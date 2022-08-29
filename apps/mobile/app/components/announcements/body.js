@@ -1,3 +1,4 @@
+import React from "react";
 import Paragraph from "../ui/typography/paragraph";
 import { getStyle } from "./functions";
 

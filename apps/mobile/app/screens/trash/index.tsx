@@ -1,16 +1,16 @@
+import React from "react";
+import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import { presentDialog } from "../../components/dialog/functions";
 import List from "../../components/list";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { ToastEvent } from "../../services/event-manager";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSelectionStore } from "../../stores/use-selection-store";
 import { useTrashStore } from "../../stores/use-trash-store";
-import { db } from "../../common/database";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-
 const prepareSearch = () => {
   SearchService.update({
     placeholder: "Search in trash",

@@ -1,13 +1,16 @@
 import dayjs from "dayjs";
+import React from "react";
 import { Linking, Platform } from "react-native";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
-import { APP_VERSION } from "../../version";
+import { db } from "../../common/database";
+import { MMKV } from "../../common/database/mmkv";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
 import { Update } from "../../components/sheets/update";
+import { useVaultStatus } from "../../hooks/use-vault-status";
 import BackupService from "../../services/backup";
 import BiometicService from "../../services/biometrics";
 import {
@@ -28,8 +31,6 @@ import { useUserStore } from "../../stores/use-user-store";
 import { AndroidModule } from "../../utils";
 import { getColorScheme, toggleDarkMode } from "../../utils/color-scheme/utils";
 import { SUBSCRIPTION_STATUS } from "../../utils/constants";
-import { db } from "../../common/database";
-import { MMKV } from "../../common/database/mmkv";
 import {
   eCloseProgressDialog,
   eCloseSimpleDialog,
@@ -38,8 +39,8 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog
 } from "../../utils/events";
-import { useVaultStatus } from "../../hooks/use-vault-status";
 import { sleep } from "../../utils/time";
+import { APP_VERSION } from "../../version";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
 import AppLock from "./app-lock";
 import { useDragState } from "./editor/state";
@@ -65,7 +66,7 @@ export const settingsGroups: SettingSection[] = [
         useHook: () => useUserStore((state) => state.user),
         hidden: (current) => !current,
         name: (current) => {
-          const user = current;
+          const user = current as User;
           const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
           const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
           return isBasic
@@ -78,7 +79,7 @@ export const settingsGroups: SettingSection[] = [
         component: "subscription",
         icon: "crown",
         description: (current) => {
-          const user = current;
+          const user = current as User;
           const subscriptionDaysLeft =
             user && getTimeLeft(parseInt(user.subscription?.expiry));
           const expiryDate = dayjs(user?.subscription?.expiry).format(

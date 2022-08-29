@@ -1,16 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { LayoutAnimation, View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { eSendEvent, presentSheet } from "../../services/event-manager";
-import { eCloseProgressDialog } from "../../utils/events";
 import { MMKV } from "../../common/database/mmkv";
+import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { eCloseProgressDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import walkthroughs, { TStep } from "./walkthroughs";
-
 export const Walkthrough = ({
   steps,
   canSkip = true

@@ -12,18 +12,15 @@ module.exports = {
     path.join(__dirname, '../app'),
     path.join(__dirname, '../share'),
     path.join(__dirname, '../node_modules'),
-    path.join(__dirname, '../e2e')
+    path.join(__dirname, '../e2e'),
+    path.join(__dirname, "../../../packages/editor")
   ],
   resolver: {
     sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs'],
-    extraNodeModules: new Proxy(
-      {},
-      {
-        get: (target, name) => {
-          return path.join(__dirname, `node_modules/${name}`);
-        }
-      }
-    )
+    extraNodeModules: {
+      "react": path.join(__dirname, "../node_modules/react"),
+      "react-dom": path.join(__dirname, "../node_modules/react-dom")
+    }
   },
   transformer: {
     getTransformOptions: async () => ({

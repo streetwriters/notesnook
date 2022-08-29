@@ -1,3 +1,4 @@
+import React from "react";
 import { Platform, TouchableOpacity, View } from "react-native";
 import Paragraph from "../../components/ui/typography/paragraph";
 import Backup from "../../services/backup";
@@ -6,7 +7,6 @@ import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
-
 export const AutomaticBackupsSelector = () => {
   const colors = useThemeStore((state) => state.colors);
   const settings = useSettingStore((state) => state.settings);

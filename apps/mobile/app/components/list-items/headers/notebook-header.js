@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import React from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { useMenuStore } from "../../../stores/use-menu-store";

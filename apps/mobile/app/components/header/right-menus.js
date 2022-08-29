@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import Menu from "react-native-reanimated-material-menu";
 import { notesnook } from "../../../e2e/test.ids";

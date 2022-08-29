@@ -1,7 +1,8 @@
+import React from "react";
 import { ViewProps } from "react-native";
 import Animated, { FadeOutUp } from "react-native-reanimated";
-import { useThemeStore } from "../../stores/use-theme-store";
 import { useDelayLayout } from "../../hooks/use-delay-layout";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { DefaultPlaceholder } from "./default-placeholder";
 import { SettingsPlaceholder } from "./settings-placeholder";
 

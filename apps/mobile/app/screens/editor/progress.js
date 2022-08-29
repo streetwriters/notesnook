@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useAttachmentStore } from "../../stores/use-attachment-store";
-import { SIZE } from "../../utils/size";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ProgressBarComponent } from "../../components/ui/svg/lazy";
-
+import { useAttachmentStore } from "../../stores/use-attachment-store";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { SIZE } from "../../utils/size";
 export const ProgressBar = () => {
   const colors = useThemeStore((state) => state.colors);
   const loading = useAttachmentStore((state) => state.loading);

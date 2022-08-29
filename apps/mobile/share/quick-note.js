@@ -1,4 +1,4 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import { Appearance, SafeAreaView } from "react-native";
 import RNBootSplash from "react-native-bootsplash";
 import {

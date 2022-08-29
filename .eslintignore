@@ -6,6 +6,7 @@ dist
 
 # mobile
 apps/mobile/native/
+apps/mobile/__tests__/
 
 # web
 apps/web/public/an.js

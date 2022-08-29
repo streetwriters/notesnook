@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
 import DelayLayout from "../../components/delay-layout";
@@ -7,19 +7,18 @@ import BaseDialog from "../../components/dialog/base-dialog";
 import { ProgressBarComponent } from "../../components/ui/svg/lazy";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { SIZE } from "../../utils/size";
 import { SectionGroup } from "./section-group";
 import { settingsGroups } from "./settings-data";
 import { RouteParams, SettingSection } from "./types";
 import SettingsUserSection from "./user-section";
-
 const keyExtractor = (item: SettingSection) => item.id;
 
 const Home = ({

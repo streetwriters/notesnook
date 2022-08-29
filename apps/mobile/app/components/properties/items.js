@@ -1,15 +1,15 @@
+import React from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useSettingStore } from "../../stores/use-setting-store";
+import { useActions } from "../../hooks/use-actions";
 import { DDS } from "../../services/device-detection";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";
 import Paragraph from "../ui/typography/paragraph";
-import { useActions } from "../../hooks/use-actions";
-
 export const Items = ({ item, buttons, close }) => {
   const colors = useThemeStore((state) => state.colors);
   const dimensions = useSettingStore((state) => state.dimensions);

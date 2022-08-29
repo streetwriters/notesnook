@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import { View } from "react-native";
 import { allowedPlatforms } from "../../stores/use-message-store";
 import { ProFeatures } from "../dialogs/result/pro-features";

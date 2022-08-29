@@ -1,14 +1,14 @@
+import React from "react";
 import { ScrollView, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../stores/use-theme-store";
 import { db } from "../../common/database";
+import Notebook from "../../screens/notebook";
+import { TopicNotes } from "../../screens/notes/topic-notes";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
-import { TopicNotes } from "../../screens/notes/topic-notes";
-import Notebook from "../../screens/notebook";
-
 export default function Notebooks({ note, close }) {
   const colors = useThemeStore((state) => state.colors);
 

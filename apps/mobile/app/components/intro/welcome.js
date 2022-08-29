@@ -1,11 +1,12 @@
+import React from "react";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import umami from "../../common/analytics";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import SettingsService from "../../services/settings";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { getElevation } from "../../utils";
-import umami from "../../common/analytics";
 import { eOpenLoginDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { AuthMode } from "../auth";

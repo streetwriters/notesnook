@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
 import { DDS } from "../../../services/device-detection";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import { getElevation } from "../../../utils";
 import { eCloseResultDialog, eOpenResultDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { Button } from "../../ui/button";
 import BaseDialog from "../../dialog/base-dialog";
+import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";

@@ -1,11 +1,10 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-
 export const BouncingView = ({
   children,
   style,

@@ -1,22 +1,21 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Linking, Platform, Text, TextInput, View } from "react-native";
-import { APP_VERSION } from "../../../version";
+import { db } from "../../../common/database";
 import { eSendEvent, ToastEvent } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import { db } from "../../../common/database";
 import { eCloseProgressDialog } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
+import { APP_VERSION } from "../../../version";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Paragraph from "../../ui/typography/paragraph";
-
 export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
   const colors = useThemeStore((state) => state.colors);
   const body = useRef(defaultBody);

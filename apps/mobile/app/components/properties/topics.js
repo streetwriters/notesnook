@@ -1,8 +1,8 @@
+import React from "react";
 import { View } from "react-native";
 import { TopicNotes } from "../../screens/notes/topic-notes";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
-
 export const Topics = ({ item, close }) => {
   const open = (topic) => {
     close();

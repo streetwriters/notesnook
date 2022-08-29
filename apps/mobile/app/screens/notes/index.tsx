@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
@@ -26,7 +26,6 @@ import {
   setOnFirstSave,
   toCamelCase
 } from "./common";
-
 export const WARNING_DATA = {
   title: "Some notes in this topic are not synced"
 };

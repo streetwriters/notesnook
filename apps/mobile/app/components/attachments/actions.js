@@ -1,7 +1,10 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+import { db } from "../../common/database";
+import filesystem from "../../common/filesystem";
+import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import picker from "../../screens/editor/tiptap/picker";
 import {
   eSendEvent,
@@ -12,13 +15,10 @@ import PremiumService from "../../services/premium";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { formatBytes } from "../../utils";
-import { db } from "../../common/database";
 import {
   eCloseAttachmentDialog,
   eCloseProgressDialog
 } from "../../utils/events";
-import filesystem from "../../common/filesystem";
-import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Dialog } from "../dialog";

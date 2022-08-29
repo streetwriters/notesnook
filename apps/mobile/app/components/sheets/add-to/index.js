@@ -1,7 +1,8 @@
-import { createRef, useEffect, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import { Keyboard, TouchableOpacity, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { notesnook } from "../../../../e2e/test.ids";
+import { db } from "../../../common/database";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -9,11 +10,10 @@ import {
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import SearchService from "../../../services/search";
-import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useNotebookStore } from "../../../stores/use-notebook-store";
+import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { getTotalNotes } from "../../../utils";
-import { db } from "../../../common/database";
 import { eOpenMoveNoteDialog } from "../../../utils/events";
 import layoutmanager from "../../../utils/layout-manager";
 import { SIZE } from "../../../utils/size";
@@ -27,7 +27,6 @@ import { PressableButton } from "../../ui/pressable";
 import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-
 let newNotebookTitle = null;
 const notebookInput = createRef();
 const actionSheetRef = createRef();

@@ -1,25 +1,24 @@
 import Clipboard from "@react-native-clipboard/clipboard";
+import { LogMessage } from "@streetwriters/logger";
 import {
   format,
   LogLevel,
   logManager
 } from "@streetwriters/notesnook-core/logger";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "rn-fetch-blob";
+import Storage from "../../common/database/storage";
 import { presentDialog } from "../../components/dialog/functions";
 import { IconButton } from "../../components/ui/icon-button";
 import { Notice } from "../../components/ui/notice";
 import Paragraph from "../../components/ui/typography/paragraph";
+import useTimer from "../../hooks/use-timer";
 import { ToastEvent } from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { hexToRGBA } from "../../utils/color-scheme/utils";
-import Storage from "../../common/database/storage";
-import useTimer from "../../hooks/use-timer";
 import { sanitizeFilename } from "../../utils/sanitizer";
-import { LogMessage } from "@streetwriters/logger";
-
 // function getLevelString(level: number) {
 //   switch (level) {
 //     case LogLevel.Debug:

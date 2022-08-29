@@ -12,7 +12,6 @@ import Storage, { KV } from "./storage";
 const LoggerStorage = new MMKVLoader()
   .withInstanceID("notesnook_logs")
   .initialize();
-console.log(LoggerStorage);
 initalize(new KV(LoggerStorage));
 export const DatabaseLogger = dbLogger;
 

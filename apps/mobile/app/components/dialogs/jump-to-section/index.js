@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { useMessageStore } from "../../../stores/use-message-store";
 import { DDS } from "../../../services/device-detection";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
+import { useMessageStore } from "../../../stores/use-message-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import { getElevation } from "../../../utils";
 import {
   eCloseJumpToDialog,

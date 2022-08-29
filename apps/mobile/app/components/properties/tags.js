@@ -1,13 +1,13 @@
+import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { eSendEvent } from "../../services/event-manager";
 import { db } from "../../common/database";
+import { TaggedNotes } from "../../screens/notes/tagged";
+import { eSendEvent } from "../../services/event-manager";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { eOpenTagsDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
-import { TaggedNotes } from "../../screens/notes/tagged";
-
 export const Tags = ({ item, close }) => {
   const colors = useThemeStore((state) => state.colors);
 

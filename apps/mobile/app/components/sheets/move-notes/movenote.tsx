@@ -1,29 +1,28 @@
-import { RefObject, useState } from "react";
+import { NotebookType, NoteType, TopicType } from "app/utils/types";
+import React, { RefObject, useState } from "react";
 import { Platform, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
 import { FlatList } from "react-native-gesture-handler";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { db } from "../../../common/database";
 import {
   eSendEvent,
   presentSheet,
   ToastEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import { db } from "../../../common/database";
+import SearchService from "../../../services/search";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import { eCloseProgressDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
-import { IconButton } from "../../ui/icon-button";
-import { Button } from "../../ui/button";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
+import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import SearchService from "../../../services/search";
-import { NotebookType, NoteType, TopicType } from "app/utils/types";
-
 export const MoveNotes = ({
   notebook,
   selectedTopic,

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import { useSettingStore } from "../../stores/use-setting-store";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { BouncingView } from "../ui/transitions/bouncing-view";
 
 const BaseDialog = ({

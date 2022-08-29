@@ -1,9 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { IconButton } from "../../components/ui/icon-button";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useSearchStore } from "../../stores/use-search-store";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -11,10 +9,11 @@ import {
 } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
+import { useSearchStore } from "../../stores/use-search-store";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-
 export const SearchBar = () => {
   const colors = useThemeStore((state) => state.colors);
   const [value, setValue] = useState(null);

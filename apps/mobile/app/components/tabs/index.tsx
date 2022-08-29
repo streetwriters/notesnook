@@ -1,4 +1,4 @@
-import {
+import React, {
   forwardRef,
   RefObject,
   useEffect,
@@ -17,8 +17,8 @@ import Animated, {
   WithSpringConfig,
   withTiming
 } from "react-native-reanimated";
-import { useSettingStore } from "../../stores/use-setting-store";
 import { eSendEvent } from "../../services/event-manager";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
 
 interface TabProps extends ViewProps {

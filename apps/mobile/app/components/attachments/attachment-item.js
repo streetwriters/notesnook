@@ -1,10 +1,11 @@
+import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { db } from "../../common/database";
+import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { formatBytes } from "../../utils";
-import { db } from "../../common/database";
-import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import { SIZE } from "../../utils/size";
 import SheetProvider from "../sheet-provider";
 import { IconButton } from "../ui/icon-button";

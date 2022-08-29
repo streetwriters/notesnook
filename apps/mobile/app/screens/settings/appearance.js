@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import Menu, { MenuItem } from "react-native-reanimated-material-menu";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -17,7 +17,6 @@ import {
 } from "../../utils/color-scheme/utils";
 import { MenuItemsList } from "../../utils/constants";
 import { SIZE } from "../../utils/size";
-
 export const HomagePageSelector = () => {
   const colors = useThemeStore((state) => state.colors);
   const settings = useSettingStore((state) => state.settings);

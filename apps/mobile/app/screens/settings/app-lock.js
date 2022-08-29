@@ -1,7 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Dimensions, LayoutAnimation, Platform, View } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import umami from "../../common/analytics";
 import { SVG_Z } from "../../components/intro";
 import { WelcomeNotice } from "../../components/intro/welcome";
 import { Button } from "../../components/ui/button";
@@ -11,17 +12,15 @@ import { SvgView } from "../../components/ui/svg";
 import { BouncingView } from "../../components/ui/transitions/bouncing-view";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
+import BiometicService from "../../services/biometrics";
 import { DDS } from "../../services/device-detection";
 import { presentSheet, ToastEvent } from "../../services/event-manager";
 import SettingsService from "../../services/settings";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { getElevation } from "../../utils";
-import umami from "../../common/analytics";
-import { SIZE } from "../../utils/size";
-import BiometicService from "../../services/biometrics";
 import { useUserStore } from "../../stores/use-user-store";
-
+import { getElevation } from "../../utils";
+import { SIZE } from "../../utils/size";
 const AppLock = ({ route }) => {
   const colors = useThemeStore((state) => state.colors);
   const appLockMode = useSettingStore((state) => state.settings.appLockMode);

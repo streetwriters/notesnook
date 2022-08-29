@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   AppState,
   KeyboardAvoidingView,
@@ -9,16 +9,15 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Editor from ".";
 import { PremiumToast } from "../../components/premium/premium-toast";
+import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
+import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
 import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { editorRef } from "../../utils/global-refs";
-import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
-import useKeyboard from "../../hooks/use-keyboard";
 import { ProgressBar } from "./progress";
 import { editorController, editorState, textInput } from "./tiptap/utils";
-
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);

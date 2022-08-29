@@ -350,7 +350,7 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 task copyFiles(type: Copy) {
-    from '../../../web.bundle'
+    from '../../web.bundle'
     into './src/main/assets'
 }
 

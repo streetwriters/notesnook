@@ -1,14 +1,14 @@
+import React from "react";
+import { db } from "../../common/database";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import Navigation, { NavigationProps } from "../../services/navigation";
 import SearchService from "../../services/search";
 import SettingsService from "../../services/settings";
 import { useFavoriteStore } from "../../stores/use-favorite-store";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { db } from "../../common/database";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
-
 const prepareSearch = () => {
   SearchService.update({
     placeholder: "Search in favorites",

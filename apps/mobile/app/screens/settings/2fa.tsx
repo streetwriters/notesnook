@@ -1,9 +1,17 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import { ActivityIndicator, Linking, Platform, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "rn-fetch-blob";
+import { db } from "../../common/database";
+import Storage from "../../common/database/storage";
 import DialogHeader from "../../components/dialog/dialog-header";
 import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
@@ -13,21 +21,18 @@ import Seperator from "../../components/ui/seperator";
 import { SvgView } from "../../components/ui/svg";
 import Heading from "../../components/ui/typography/heading";
 import Paragraph from "../../components/ui/typography/paragraph";
+import useTimer from "../../hooks/use-timer";
 import {
   eSendEvent,
   presentSheet,
   ToastEvent
 } from "../../services/event-manager";
-import { useUserStore } from "../../stores/use-user-store";
 import { ThemeStore, useThemeStore } from "../../stores/use-theme-store";
-import { db } from "../../common/database";
-import Storage from "../../common/database/storage";
+import { useUserStore } from "../../stores/use-user-store";
 import { eCloseProgressDialog } from "../../utils/events";
-import useTimer from "../../hooks/use-timer";
 import { sanitizeFilename } from "../../utils/sanitizer";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-
 const mfaMethods: MFAMethod[] = [
   {
     id: "app",

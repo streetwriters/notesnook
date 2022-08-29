@@ -1,3 +1,4 @@
+import React from "react";
 import { Linking, View } from "react-native";
 //import SettingsBackupAndRestore from '../../screens/settings/backup-restore';
 import { eSendEvent, presentSheet } from "../../services/event-manager";

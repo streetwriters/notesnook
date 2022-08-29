@@ -1,14 +1,14 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
 import Animated, { FadeInDown, FadeOutUp } from "react-native-reanimated";
+import umami from "../../common/analytics";
+import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { ToastEvent } from "../../services/event-manager";
 import { clearMessage, setEmailVerifyMessage } from "../../services/message";
 import PremiumService from "../../services/premium";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import umami from "../../common/analytics";
-import { db } from "../../common/database";
 import { openLinkInBrowser } from "../../utils/functions";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";

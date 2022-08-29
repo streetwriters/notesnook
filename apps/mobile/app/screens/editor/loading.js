@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -18,7 +18,6 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { eClearEditor, eOnLoadNote } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { editorState } from "./tiptap/utils";
-
 const EditorOverlay = ({ editorId = "", editor }) => {
   const colors = useThemeStore((state) => state.colors);
   const [error, setError] = useState(false);

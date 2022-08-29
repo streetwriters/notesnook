@@ -1,17 +1,16 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
+import { db } from "../../../common/database";
 import { eSendEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { GROUP, SORT } from "../../../utils/constants";
-import { db } from "../../../common/database";
 import { refreshNotesPage } from "../../../utils/events";
 import layoutmanager from "../../../utils/layout-manager";
 import { SIZE } from "../../../utils/size";
 import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
-
 const Sort = ({ type, screen }) => {
   const colors = useThemeStore((state) => state.colors);
   const [groupOptions, setGroupOptions] = useState(

@@ -7,7 +7,7 @@ import { Toast } from "../components/toast";
 import { useNoteStore } from "../stores/use-notes-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useThemeStore } from "../stores/use-theme-store";
-import { TabsHolder } from "./tabs-holder";
+import { TabHolder } from "./tabs-holder";
 
 const _ApplicationHolder = () => {
   const loading = useNoteStore((state) => state.loading);
@@ -32,7 +32,7 @@ const _ApplicationHolder = () => {
         </>
       ) : (
         <>
-          <TabsHolder />
+          <TabHolder />
           <Toast />
         </>
       )}

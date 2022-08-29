@@ -1,16 +1,16 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { useAttachmentStore } from "../../../stores/use-attachment-store";
+import { db } from "../../../common/database";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
-import { db } from "../../../common/database";
+import { useAttachmentStore } from "../../../stores/use-attachment-store";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import {
   eClosePublishNoteDialog,
   eOpenPublishNoteDialog

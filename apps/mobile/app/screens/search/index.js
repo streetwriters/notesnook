@@ -1,13 +1,12 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import DelayLayout from "../../components/delay-layout";
 import List from "../../components/list";
+import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import SearchService from "../../services/search";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useSearchStore } from "../../stores/use-search-store";
 import { inputRef } from "../../utils/global-refs";
-import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { sleep } from "../../utils/time";
-
 export const Search = ({ navigation, route }) => {
   const searchResults = useSearchStore((state) => state.searchResults);
   const searching = useSearchStore((state) => state.searching);

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
+import { db } from "../../common/database";
 import Notebook from "../../screens/notebook";
 import {
   eSubscribeEvent,
@@ -7,7 +8,6 @@ import {
 } from "../../services/event-manager";
 import useNavigationStore from "../../stores/use-navigation-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { db } from "../../common/database";
 import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import Heading from "../ui/typography/heading";

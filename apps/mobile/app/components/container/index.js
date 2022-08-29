@@ -1,6 +1,7 @@
+import React from "react";
 import { KeyboardAvoidingView, Platform, SafeAreaView } from "react-native";
-import { useSettingStore } from "../../stores/use-setting-store";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { Header } from "../header";
 import SelectionHeader from "../selection-header";
 export const Container = ({ children }) => {

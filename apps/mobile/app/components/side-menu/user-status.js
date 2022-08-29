@@ -1,19 +1,19 @@
+import React from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useUserStore } from "../../stores/use-user-store";
+import useSyncProgress from "../../hooks/use-sync-progress";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { useUserStore } from "../../stores/use-user-store";
 import { eOpenLoginDialog } from "../../utils/events";
+import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
+import { TimeSince } from "../ui/time-since";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { TimeSince } from "../ui/time-since";
-import useSyncProgress from "../../hooks/use-sync-progress";
-import { tabBarRef } from "../../utils/global-refs";
-
 export const UserStatus = () => {
   const colors = useThemeStore((state) => state.colors);
   const user = useUserStore((state) => state.user);

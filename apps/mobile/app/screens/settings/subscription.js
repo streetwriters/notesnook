@@ -1,5 +1,7 @@
+import React from "react";
 import { Linking, Platform, View } from "react-native";
 import { Button } from "../../components/ui/button";
+import { usePricing } from "../../hooks/use-pricing";
 import {
   eSendEvent,
   presentSheet,
@@ -12,9 +14,7 @@ import {
   SUBSCRIPTION_STATUS
 } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
-import { usePricing } from "../../hooks/use-pricing";
 import { SIZE } from "../../utils/size";
-
 export const Subscription = () => {
   const user = useUserStore((state) => state.user);
   const monthlyPlan = usePricing("monthly");

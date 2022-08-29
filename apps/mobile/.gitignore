@@ -4,6 +4,8 @@ artifacts/
 #
 .DS_Store
 
+native/android/app/src/main/assets/
+
 *Issues.md
 build_cache/
 #

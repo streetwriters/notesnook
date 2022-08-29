@@ -56,7 +56,7 @@ export const eSendEvent = (eventName: string, data?: unknown) => {
   eventManager.publish(eventName, data);
 };
 
-export const openVault = (data: Vault) => {
+export const openVault = (data: Partial<Vault>) => {
   eSendEvent(eOpenVaultDialog, data);
 };
 

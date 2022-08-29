@@ -1,3 +1,4 @@
+import React from "react";
 import { View } from "react-native";
 import { useMessageStore } from "../../stores/use-message-store";
 import { SIZE } from "../../utils/size";

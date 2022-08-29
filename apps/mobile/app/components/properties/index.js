@@ -1,8 +1,12 @@
+import React from "react";
 import { Platform, View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { ScrollView } from "react-native-gesture-handler";
+import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { presentSheet } from "../../services/event-manager";
-import { db } from "../../common/database";
+import SearchService from "../../services/search";
+import { useThemeStore } from "../../stores/use-theme-store";
+import { COLORS_NOTE } from "../../utils/color-scheme";
 import { SIZE } from "../../utils/size";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
@@ -14,10 +18,6 @@ import Notebooks from "./notebooks";
 import { Synced } from "./synced";
 import { Tags } from "./tags";
 import { Topics } from "./topics";
-import SearchService from "../../services/search";
-import { COLORS_NOTE } from "../../utils/color-scheme";
-import { ScrollView } from "react-native-gesture-handler";
-
 export const Properties = ({
   close = () => {},
   item,

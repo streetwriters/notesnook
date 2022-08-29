@@ -1,11 +1,11 @@
 import Clipboard from "@react-native-clipboard/clipboard";
+import React from "react";
 import { View } from "react-native";
-import { useSettingStore } from "../../stores/use-setting-store";
-import { ToastEvent } from "../../services/event-manager";
 import { db } from "../../common/database";
+import { ToastEvent } from "../../services/event-manager";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
-
 export const DevMode = ({ item }) => {
   const devMode = useSettingStore((state) => state.settings.devMode);
 

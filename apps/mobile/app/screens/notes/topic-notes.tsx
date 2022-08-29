@@ -1,16 +1,16 @@
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
+import { db } from "../../common/database";
 import { MoveNotes } from "../../components/sheets/move-notes/movenote";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation, {
   NavigationProps,
   NotesScreenParams
 } from "../../services/navigation";
-import { db } from "../../common/database";
 import { eOpenAddTopicDialog } from "../../utils/events";
 import { TopicType } from "../../utils/types";
 import { openEditor } from "./common";
-
 const headerRightButtons = (params: NotesScreenParams) => [
   {
     title: "Edit topic",

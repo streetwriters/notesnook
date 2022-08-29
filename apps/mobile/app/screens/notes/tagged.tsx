@@ -1,13 +1,13 @@
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
+import { db } from "../../common/database";
 import Navigation, {
   NavigationProps,
   NotesScreenParams
 } from "../../services/navigation";
-import { db } from "../../common/database";
 import { TagType } from "../../utils/types";
 import { getAlias, openEditor } from "./common";
-
 export const TaggedNotes = ({
   navigation,
   route

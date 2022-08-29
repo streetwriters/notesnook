@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
+import { usePricing } from "../../hooks/use-pricing";
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import PremiumService from "../../services/premium";
+import { useThemeStore } from "../../stores/use-theme-store";
 import {
   eOpenPremiumDialog,
   eOpenResultDialog,
@@ -14,15 +15,14 @@ import {
 } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
-import { Button } from "../ui/button";
 import BaseDialog from "../dialog/base-dialog";
 import DialogContainer from "../dialog/dialog-container";
+import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { CompactFeatures } from "./compact-features";
 import { Offer } from "./offer";
-import { usePricing } from "../../hooks/use-pricing";
 
 export const Expiring = () => {
   const colors = useThemeStore((state) => state.colors);

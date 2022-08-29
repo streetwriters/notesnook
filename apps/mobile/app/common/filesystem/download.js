@@ -1,15 +1,16 @@
+import NetInfo from "@react-native-community/netinfo";
+import hosts from "@streetwriters/notesnook-core/utils/constants";
+import React from "react";
 import { Platform } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";
 import Sodium from "react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
 import { ShareComponent } from "../../components/sheets/export-notes/share";
-import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { presentSheet, ToastEvent } from "../../services/event-manager";
+import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { db } from "../database";
 import Storage from "../database/storage";
 import { cacheDir, fileCheck } from "./utils";
-import hosts from "@streetwriters/notesnook-core/utils/constants";
-import NetInfo from "@react-native-community/netinfo";
 
 export async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;

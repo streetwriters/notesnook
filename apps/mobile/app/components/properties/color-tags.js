@@ -1,19 +1,18 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
-import { useMenuStore } from "../../stores/use-menu-store";
-import { useSettingStore } from "../../stores/use-setting-store";
+import { db } from "../../common/database";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
+import { useMenuStore } from "../../stores/use-menu-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { dWidth } from "../../utils";
 import { COLORS_NOTE } from "../../utils/color-scheme";
-import { db } from "../../common/database";
 import { refreshNotesPage } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
-
 export const ColorTags = ({ item }) => {
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore((state) => state.setColorNotes);

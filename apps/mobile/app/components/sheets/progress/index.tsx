@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
+import useSyncProgress from "../../../hooks/use-sync-progress";
 import { presentSheet } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import useSyncProgress from "../../../hooks/use-sync-progress";
 import { SIZE } from "../../../utils/size";
 import Seperator from "../../ui/seperator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-
 export const Progress = () => {
   const colors = useThemeStore((state) => state.colors);
   const { progress } = useSyncProgress();

@@ -1,14 +1,12 @@
+import React from "react";
 import { ColorValue, GestureResponderEvent, ViewStyle } from "react-native";
-import Animated, {
-  Layout
-} from "react-native-reanimated";
+import Animated, { Layout } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
 import { SIZE } from "../../../utils/size";
 import { PressableButton, PressableButtonProps } from "../pressable";
-
 interface IconButtonProps extends PressableButtonProps {
   name: string;
   color?: ColorValue;

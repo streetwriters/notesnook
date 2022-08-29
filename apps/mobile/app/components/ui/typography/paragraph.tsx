@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { Text, TextProps } from "react-native";
 import Animated, {
   ComplexAnimationBuilder,
@@ -13,7 +13,6 @@ interface ParagraphProps extends TextProps {
   animated?: boolean;
 }
 const AnimatedText = Animated.createAnimatedComponent(Text);
-
 const Paragraph = ({
   color,
   size = SIZE.sm,

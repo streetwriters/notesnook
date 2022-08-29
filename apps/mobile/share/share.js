@@ -1,6 +1,6 @@
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
 import { parseHTML } from "@streetwriters/notesnook-core/utils/htmlparser";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -21,11 +21,11 @@ import {
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ShareExtension from "rn-extensions-share";
 import isURL from "validator/lib/isURL";
+import { db } from "../app/common/database";
+import Storage from "../app/common/database/storage";
 import Editor from "../app/screens/editor";
 import { eSendEvent } from "../app/services/event-manager";
 import { getElevation } from "../app/utils";
-import { db } from "../app/common/database";
-import Storage from "../app/common/database/storage";
 import { eOnLoadNote } from "../app/utils/events";
 import { Search } from "./search";
 import { useShareStore } from "./store";

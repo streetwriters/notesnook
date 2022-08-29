@@ -13,13 +13,14 @@ export const ERRORS_LIST = {
 };
 
 export function validatePass(password) {
-  if (password?.length <= 0) {
-    return false;
-  }
-
   let errors = {
-    SHORT_PASS: true
+    SHORT_PASS: false
   };
+
+  if (password?.length <= 0) {
+    errors.SHORT_PASS = true;
+    return errors;
+  }
 
   if (password.length >= 8) {
     errors.SHORT_PASS = false;

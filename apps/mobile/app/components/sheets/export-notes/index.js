@@ -1,28 +1,27 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import Share from "react-native-share";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { ToastEvent } from "../../../services/event-manager";
-import Exporter from "../../../services/exporter";
-import { getElevation } from "../../../utils";
-import { ph, pv, SIZE } from "../../../utils/size";
-import { sleep } from "../../../utils/time";
-import SheetWrapper from "../../ui/sheet";
-import { Button } from "../../ui/button";
-import DialogHeader from "../../dialog/dialog-header";
-import { PressableButton } from "../../ui/pressable";
-import Seperator from "../../ui/seperator";
-import Heading from "../../ui/typography/heading";
-import Paragraph from "../../ui/typography/paragraph";
 import {
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  ToastEvent
 } from "../../../services/event-manager";
-import { eOpenExportDialog, eCloseExportDialog } from "../../../utils/events";
-
+import Exporter from "../../../services/exporter";
+import { useThemeStore } from "../../../stores/use-theme-store";
+import { getElevation } from "../../../utils";
+import { eCloseExportDialog, eOpenExportDialog } from "../../../utils/events";
+import { ph, pv, SIZE } from "../../../utils/size";
+import { sleep } from "../../../utils/time";
+import DialogHeader from "../../dialog/dialog-header";
+import { Button } from "../../ui/button";
+import { PressableButton } from "../../ui/pressable";
+import Seperator from "../../ui/seperator";
+import SheetWrapper from "../../ui/sheet";
+import Heading from "../../ui/typography/heading";
+import Paragraph from "../../ui/typography/paragraph";
 const ExportNotesSheet = () => {
   const colors = useThemeStore((state) => state.colors);
 

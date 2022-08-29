@@ -1,9 +1,9 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Share from "react-native-share";
-import { toTXT } from "../utils";
 import { notesnook } from "../../e2e/test.ids";
+import { db } from "../common/database";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
 import { MoveNotes } from "../components/sheets/move-notes/movenote";
@@ -19,12 +19,13 @@ import Navigation from "../services/navigation";
 import Notifications from "../services/notifications";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useMenuStore } from "../stores/use-menu-store";
+import useNavigationStore from "../stores/use-navigation-store";
 import { useSelectionStore } from "../stores/use-selection-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { useThemeStore } from "../stores/use-theme-store";
 import { useUserStore } from "../stores/use-user-store";
+import { toTXT } from "../utils";
 import { toggleDarkMode } from "../utils/color-scheme/utils";
-import { db } from "../common/database";
 import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
@@ -36,7 +37,6 @@ import {
 } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
-import useNavigationStore from "../stores/use-navigation-store";
 
 export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore((state) => state.colors);

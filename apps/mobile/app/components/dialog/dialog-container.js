@@ -1,6 +1,7 @@
+import React from "react";
 import { View } from "react-native";
-import { useThemeStore } from "../../stores/use-theme-store";
 import { DDS } from "../../services/device-detection";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { getElevation } from "../../utils";
 
 const DialogContainer = ({ width, height, ...restProps }) => {

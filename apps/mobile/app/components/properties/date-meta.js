@@ -1,9 +1,9 @@
+import React from "react";
 import { View } from "react-native";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
 import { timeConverter } from "../../utils/time";
 import Paragraph from "../ui/typography/paragraph";
-
 export const DateMeta = ({ item }) => {
   const colors = useThemeStore((state) => state.colors);
 

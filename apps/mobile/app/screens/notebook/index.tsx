@@ -1,6 +1,6 @@
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
 import { qclone } from "qclone";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";
 import DelayLayout from "../../components/delay-layout";
@@ -24,7 +24,6 @@ import {
   eOpenAddTopicDialog
 } from "../../utils/events";
 import { NotebookType } from "../../utils/types";
-
 const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
   const [topics, setTopics] = useState(
     groupArray(

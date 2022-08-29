@@ -10,11 +10,17 @@
     "postinstall": "yarn patch-package",
     "patch-lib": "./scripts/patch-package.sh",
     "run-android": "cd native && REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ react-native run-android --active-arch-only",
-    "run-ios": "cd native && react-native run-ios"
+    "run-ios": "cd native && react-native run-ios",
+    "start": "cd native && react-native start",
+    "repack": "cd native && react-native webpack-start",
+    "install-pods": "cd native/ios && pod install"
   },
   "devDependencies": {
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
     "typescript": "^4.8.2"
+  },
+  "dependencies": {
+    "@streetwriters/editor": "*"
   }
 }

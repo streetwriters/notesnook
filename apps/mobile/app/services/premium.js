@@ -1,22 +1,22 @@
 import { CHECK_IDS } from "@streetwriters/notesnook-core/common";
+import React from "react";
 import { Platform } from "react-native";
 import * as RNIap from "react-native-iap";
+import { db } from "../common/database";
+import { MMKV } from "../common/database/mmkv";
 import DialogHeader from "../components/dialog/dialog-header";
 import { CompactFeatures } from "../components/premium/compact-features";
 import { PricingPlans } from "../components/premium/pricing-plans";
 import Seperator from "../components/ui/seperator";
 import { useUserStore } from "../stores/use-user-store";
 import { itemSkus, SUBSCRIPTION_STATUS } from "../utils/constants";
-import { db } from "../common/database";
 import {
   eOpenPremiumDialog,
   eOpenTrialEndingDialog,
   eShowGetPremium
 } from "../utils/events";
-import { MMKV } from "../common/database/mmkv";
 import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
 import SettingsService from "./settings";
-
 let premiumStatus = 0;
 let products = [];
 let user = null;

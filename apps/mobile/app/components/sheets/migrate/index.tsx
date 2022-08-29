@@ -1,22 +1,19 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
+import { db } from "../../../common/database";
 import BackupService from "../../../services/backup";
 import { eSendEvent, ToastEvent } from "../../../services/event-manager";
 import { useThemeStore } from "../../../stores/use-theme-store";
-import { db } from "../../../common/database";
-import {
-  eCloseProgressDialog
-} from "../../../utils/events";
+import { eCloseProgressDialog } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
+import { presentDialog } from "../../dialog/functions";
 import { Button } from "../../ui/button";
 import { Notice } from "../../ui/notice";
 import Seperator from "../../ui/seperator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
-import { presentDialog } from "../../dialog/functions";
-
 export default function Migrate() {
   const colors = useThemeStore((state) => state.colors);
   const [loading, setLoading] = useState(false);

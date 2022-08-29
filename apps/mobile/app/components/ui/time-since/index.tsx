@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { TextProps } from "react-native";
 import { timeSince } from "../../../utils/time";
 import Paragraph from "../typography/paragraph";
-
 interface TimeSinceProps extends TextProps {
   updateFrequency: number;
   time: number;

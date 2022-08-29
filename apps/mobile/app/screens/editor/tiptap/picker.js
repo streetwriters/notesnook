@@ -1,8 +1,10 @@
+import React from "react";
 import { Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import Sodium from "react-native-sodium";
 import RNFetchBlob from "rn-fetch-blob";
+import { db } from "../../../common/database";
 import { AttachmentItem } from "../../../components/attachments/attachment-item";
 import {
   eSendEvent,
@@ -10,11 +12,9 @@ import {
   ToastEvent
 } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
-import { db } from "../../../common/database";
 import { eCloseProgressDialog } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { editorController, editorState } from "./utils";
-
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 

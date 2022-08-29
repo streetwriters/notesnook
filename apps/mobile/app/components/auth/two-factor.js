@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import { eSendEvent, presentSheet } from "../../services/event-manager";
+import { db } from "../../common/database/index";
+import useTimer from "../../hooks/use-timer";
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from "../../services/event-manager";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { eCloseProgressDialog } from "../../utils/events";
-import useTimer from "../../hooks/use-timer";
 import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import { IconButton } from "../ui/icon-button";
@@ -12,8 +17,6 @@ import { PressableButton } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { db } from "../../common/database/index";
-import { ToastEvent } from "../../services/event-manager";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const colors = useThemeStore((state) => state.colors);

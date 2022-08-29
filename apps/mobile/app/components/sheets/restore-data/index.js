@@ -1,17 +1,18 @@
-import { createRef, useEffect, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { FlatList } from "react-native-gesture-handler";
 import * as ScopedStorage from "react-native-scoped-storage";
-import { useThemeStore } from "../../../stores/use-theme-store";
-import { initialize } from "../../../stores";
+import { db } from "../../../common/database";
+import storage from "../../../common/database/storage";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
 } from "../../../services/event-manager";
-import { db } from "../../../common/database";
-import storage from "../../../common/database/storage";
+import SettingsService from "../../../services/settings";
+import { initialize } from "../../../stores";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import { eCloseRestoreDialog, eOpenRestoreDialog } from "../../../utils/events";
 import { SIZE } from "../../../utils/size";
 import { sleep, timeConverter } from "../../../utils/time";
@@ -23,8 +24,6 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import SheetWrapper from "../../ui/sheet";
 import Paragraph from "../../ui/typography/paragraph";
-import SettingsService from "../../../services/settings";
-
 const actionSheetRef = createRef();
 let RNFetchBlob;
 const RestoreDataSheet = () => {

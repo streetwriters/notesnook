@@ -185,7 +185,10 @@ function checkOrientation() {
     //@ts-ignore
     useSettingStore
       .getState()
-      .setDimensions({ width: DDS.width, height: DDS.height });
+      .setDimensions({
+        width: DDS.width as number,
+        height: DDS.height as number
+      });
     useSettingStore
       .getState()
       .setDeviceMode(

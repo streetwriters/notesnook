@@ -1,3 +1,4 @@
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import { DraxProvider, DraxScrollView } from "react-native-drax";
 import Animated, { FadeInDown, FadeOutDown } from "react-native-reanimated";
@@ -8,7 +9,6 @@ import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 import { Group } from "./group";
 import { useDragState } from "./state";
-
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);

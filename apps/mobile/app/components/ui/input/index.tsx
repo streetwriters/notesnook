@@ -1,27 +1,26 @@
 import React, { RefObject, useState } from "react";
 import {
-  TouchableOpacity,
+  ColorValue,
+  NativeSyntheticEvent,
   TextInput,
   TextInputProps,
-  NativeSyntheticEvent,
   TextInputSubmitEditingEventData,
-  ColorValue,
+  TouchableOpacity,
+  View,
   ViewStyle
 } from "react-native";
-import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../../stores/use-theme-store";
 import {
   ERRORS_LIST,
   validateEmail,
   validatePass,
   validateUsername
 } from "../../../services/validation";
+import { useThemeStore } from "../../../stores/use-theme-store";
 import { getElevation } from "../../../utils";
 import { SIZE } from "../../../utils/size";
 import { IconButton } from "../icon-button";
 import Paragraph from "../typography/paragraph";
-
 interface InputProps extends TextInputProps {
   fwdRef?: RefObject<TextInput>;
   validationType?:
@@ -149,14 +148,16 @@ const Input = ({
     if (validationType === "password") {
       let hasError = false;
 
-      Object.keys(isError).forEach((e) => {
-        if (isError[e] === true) {
+      const errors = isError as { [name: string]: boolean };
+      Object.keys(errors).forEach((e) => {
+        //ts-ignore
+        if (errors[e] === true) {
           hasError = true;
         }
       });
       setError(hasError);
       onErrorCheck && onErrorCheck(hasError);
-      setErrorList(isError);
+      setErrorList(errors as { SHORT_PASS: boolean });
     } else {
       setError(!isError);
       onErrorCheck && onErrorCheck(!isError);

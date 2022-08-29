@@ -1,4 +1,6 @@
+import React from "react";
 import { View } from "react-native";
+import { db } from "../../common/database";
 import Editor from "../../screens/editor";
 import EditorOverlay from "../../screens/editor/loading";
 import { editorController } from "../../screens/editor/tiptap/utils";
@@ -6,7 +8,6 @@ import { eSendEvent, ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { db } from "../../common/database";
 import { eCloseProgressDialog, eOnLoadNote } from "../../utils/events";
 import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";

@@ -5,7 +5,7 @@
   "dependencies": {
     "@flyerhq/react-native-link-preview": "^1.6.0",
     "@mdi/js": "^6.7.96",
-    "@streetwriters/editor": "^1.2.3",
+    "@streetwriters/editor": "*",
     "@streetwriters/notesnook-core": "^7.3.5",
     "absolutify": "^0.1.0",
     "buffer": "^6.0.3",
