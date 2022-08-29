@@ -2,13 +2,16 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    node: true
+    node: true,
+    jest: true,
+    "jest/globals": true
   },
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:react/jsx-runtime"
+    "plugin:react/jsx-runtime",
+    "plugin:jest/style"
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -40,6 +43,8 @@ module.exports = {
       }
     ],
     "linebreak-style": ["error", "unix"],
+    "jest/no-mocks-import": 0,
+    "@typescript-eslint/no-var-requires": 0,
     quotes: [
       "error",
       "double",
@@ -61,8 +66,6 @@ module.exports = {
         "react-native/react-native": true,
         es2021: true,
         browser: true,
-        jest: true,
-        "jest/globals": true,
         "detox/detox": true
       },
       rules: {

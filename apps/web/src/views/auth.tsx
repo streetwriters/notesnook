@@ -536,7 +536,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   );
 
   const sendCode = useCallback(
-    async (selectedMethod, token) => {
+    async (selectedMethod: "sms" | "email", token: string) => {
       setIsSending(true);
       try {
         await db.mfa!.sendCode(selectedMethod, token);
@@ -561,7 +561,10 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
       return;
 
     (async function () {
-      await sendCode(formData.selectedMethod, formData.token);
+      await sendCode(
+        formData.selectedMethod as "sms" | "email",
+        formData.token
+      );
     })();
   }, [formData, sendCode]);
 

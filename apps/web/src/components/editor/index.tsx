@@ -11,7 +11,7 @@ import { useStore, store as editorstore } from "../../stores/editor-store";
 import Toolbar from "./toolbar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
-import { formatDate } from "@streetwriters/notesnook-core/utils/date";
+import { formatDate } from "@notesnook/core/utils/date";
 import { debounceWithId } from "../../utils/debounce";
 import Tiptap from "./tiptap";
 import Header from "./header";
@@ -20,7 +20,7 @@ import { useEditorInstance } from "./context";
 import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
 import { DropEvent } from "react-dropzone";
 import { downloadAttachment } from "../../common/attachments";
-import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
+import { EV, EVENTS } from "@notesnook/core/common";
 import { db } from "../../common/db";
 import useMobile from "../../hooks/use-mobile";
 import Titlebox from "./title-box";
@@ -74,7 +74,7 @@ export default function EditorManager({
   const isReadonly = useStore((store) => store.session.readonly);
   const isPreviewSession = !!previewSession.current;
 
-  const openSession = useCallback(async (noteId) => {
+  const openSession = useCallback(async (noteId: string | number) => {
     await editorstore.get().openSession(noteId);
 
     const { getSessionContent, session } = editorstore.get();
@@ -336,7 +336,7 @@ type PreviewModeNoticeProps = PreviewSession & {
 function PreviewModeNotice(props: PreviewModeNoticeProps) {
   const { dateCreated, dateEdited, content, onDiscard } = props;
   const disablePreviewMode = useCallback(
-    async (cancelled) => {
+    async (cancelled: boolean) => {
       const { id, sessionId } = editorstore.get().session;
       if (!cancelled) {
         await editorstore.saveSessionContent(id, sessionId, content);

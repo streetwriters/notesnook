@@ -3,15 +3,13 @@ import { NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
 
 /**
- * @type {import("@streetwriters/notesnook-core/api").default}
+ * @type {import("@notesnook/core/api").default}
  */
 var db;
 async function initializeDatabase(persistence) {
   logger.measure("Database initialization");
 
-  const { default: Database } = await import(
-    "@streetwriters/notesnook-core/api"
-  );
+  const { default: Database } = await import("@notesnook/core/api");
   const { default: FS } = await import("../interfaces/fs");
   db = new Database(new NNStorage("Notesnook", persistence), EventSource, FS);
 

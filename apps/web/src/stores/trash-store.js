@@ -3,7 +3,7 @@ import createStore from "../common/store";
 import BaseStore from "./index";
 import { store as appStore } from "./app-store";
 import { store as notestore } from "./note-store";
-import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import { groupArray } from "@notesnook/core/utils/grouping";
 
 class TrashStore extends BaseStore {
   trash = [];

@@ -8,7 +8,7 @@ import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
 import ThemeProvider from "../theme-provider";
 import { showToast } from "../../utils/toast";
-import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
+import { EV, EVENTS } from "@notesnook/core/common";
 import { useStore } from "../../stores/monograph-store";
 import { closeOpenedDialog } from "../../common/dialog-controller";
 

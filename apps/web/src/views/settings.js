@@ -32,7 +32,7 @@ import ScrollContainer from "../components/scroll-container";
 import { showToast } from "../utils/toast";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
-import { CHECK_IDS } from "@streetwriters/notesnook-core/common";
+import { CHECK_IDS } from "@notesnook/core/common";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
 import { isDesktop } from "../utils/platform";

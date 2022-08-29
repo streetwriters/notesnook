@@ -4,8 +4,8 @@ import {
   consoleReporter,
   format,
   LogLevel,
-  NoopLogger,
-} from "@streetwriters/logger";
+  NoopLogger
+} from "@notesnook/logger";
 
 // Database logger reporter:
 // 1. Log to new key on every instance
@@ -26,7 +26,7 @@ class DatabaseLogReporter {
 
   /**
    *
-   * @param {import("@streetwriters/logger").LogMessage} log
+   * @param {import("@notesnook/logger").LogMessage} log
    */
   write(log) {
     this.writer.push(log);
@@ -127,14 +127,14 @@ function initalize(storage) {
     if (process.env.NODE_ENV !== "production") reporters.push(consoleReporter);
     logger = new Logger({
       reporter: combineReporters(reporters),
-      lastTime: Date.now(),
+      lastTime: Date.now()
     });
     logManager = new DatabaseLogManager(storage);
   }
 }
 
 /**
- * @type {import("@streetwriters/logger").ILogger}
+ * @type {import("@notesnook/logger").ILogger}
  */
 var logger = new NoopLogger();
 

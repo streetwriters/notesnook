@@ -10,7 +10,7 @@ import { store as monographStore } from "./monograph-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
-import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
+import { EV, EVENTS } from "@notesnook/core/common";
 import { logger } from "../utils/logger";
 
 var syncStatusTimeout = 0;

@@ -1,4 +1,4 @@
-import { formatDate } from "@streetwriters/notesnook-core/utils/date";
+import { formatDate } from "@notesnook/core/utils/date";
 import React, { useEffect, useRef } from "react";
 import { Text } from "@streetwriters/rebass";
 import { register, format, cancel, render } from "timeago.js";

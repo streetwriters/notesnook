@@ -1,4 +1,4 @@
-import EventManager from "@streetwriters/notesnook-core/utils/event-manager";
+import EventManager from "@notesnook/core/utils/event-manager";
 
 const GlobalKeyboard = {};
 

@@ -2,7 +2,7 @@ import {
   initalize,
   logger as _logger,
   logManager
-} from "@streetwriters/notesnook-core/logger";
+} from "@notesnook/core/logger";
 import FileSaver from "file-saver";
 import { DatabasePersistence, NNStorage } from "../interfaces/storage";
 import { zip } from "./zip";

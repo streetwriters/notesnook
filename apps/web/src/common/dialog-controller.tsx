@@ -13,7 +13,7 @@ import { showToast } from "../utils/toast";
 import { Box, Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
-import { formatDate } from "@streetwriters/notesnook-core/utils/date";
+import { formatDate } from "@notesnook/core/utils/date";
 import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
 import { AppVersion, getChangelog } from "../utils/version";

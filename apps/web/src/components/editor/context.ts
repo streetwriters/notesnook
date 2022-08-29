@@ -4,7 +4,7 @@ import createStore from "../../common/store";
 import BaseStore from "../../stores";
 import { UseBoundStore } from "zustand";
 import shallow from "zustand/shallow";
-import type { ToolbarDefinition } from "@streetwriters/editor";
+import type { ToolbarDefinition } from "@notesnook/editor";
 
 type EditorSubState = {
   editor?: IEditor;

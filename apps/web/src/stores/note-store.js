@@ -5,10 +5,10 @@ import { store as appStore } from "./app-store";
 import { store as selectionStore } from "./selection-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
-import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
+import { EV, EVENTS } from "@notesnook/core/common";
 import Config from "../utils/config";
 import { hashNavigate } from "../navigation";
-import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import { groupArray } from "@notesnook/core/utils/grouping";
 
 class NoteStore extends BaseStore {
   notes = [];

@@ -1,4 +1,4 @@
-import { formatDate } from "@streetwriters/notesnook-core/utils/date";
+import { formatDate } from "@notesnook/core/utils/date";
 import { Flex, Button } from "@streetwriters/rebass";
 
 function ContentToggle(props) {

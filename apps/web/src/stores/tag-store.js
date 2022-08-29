@@ -1,7 +1,7 @@
 import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
-import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import { groupArray } from "@notesnook/core/utils/grouping";
 
 class TagStore extends BaseStore {
   tags = [];

@@ -2,7 +2,7 @@ import createStore from "../common/store";
 import { db } from "../common/db";
 import BaseStore from "./index";
 import config from "../utils/config";
-import { EV, EVENTS } from "@streetwriters/notesnook-core/common";
+import { EV, EVENTS } from "@notesnook/core/common";
 import {
   showAccountLoggedOutNotice,
   showOnboardingDialog

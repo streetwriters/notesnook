@@ -19,10 +19,12 @@ const SCOPES = [
   "editor",
   "logger",
   "theme",
+  "core",
   "config",
   "ci",
   "setup",
-  "docs"
+  "docs",
+  "refactor"
 ];
 
 module.exports = {

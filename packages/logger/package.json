@@ -1,10 +1,11 @@
 {
-  "name": "@streetwriters/logger",
+  "name": "@notesnook/logger",
   "version": "1.0.3",
   "description": "A really simple logger with a pluggable interface.",
   "main": "dist/index.js",
   "scripts": {
-    "pub": "tsc && np"
+    "pub": "tsc && np",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

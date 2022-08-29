@@ -1,13 +1,4 @@
-import { groupArray } from "../utils/grouping";
-import {
-  StorageInterface,
-  databaseTest,
-  noteTest,
-  groupedTest,
-  TEST_NOTE,
-  TEST_NOTEBOOK,
-  IMG_CONTENT,
-} from "./utils";
+import { StorageInterface, databaseTest } from "./utils";
 
 beforeEach(() => {
   StorageInterface.clear();
@@ -21,7 +12,7 @@ test("adding a deleted content should not throw", () =>
         deleted: true,
         dateEdited: new Date(),
         id: "hello",
-        data: "YOYO!",
+        data: "YOYO!"
       })
     ).resolves.toBeUndefined();
   }));

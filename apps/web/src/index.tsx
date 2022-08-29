@@ -1,4 +1,4 @@
-import "@streetwriters/notesnook-core/types";
+import "@notesnook/core/types";
 import { EVENTS } from "@notesnook/desktop/events";
 import { AppEventManager } from "./common/app-events";
 import { render } from "react-dom";
