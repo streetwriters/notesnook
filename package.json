@@ -2,6 +2,7 @@
   "name": "notesnook",
   "private": true,
   "scripts": {
+    "prepare": "husky install",
     "bootstrap": "lerna bootstrap -- --legacy-peer-deps",
     "build": "nx run-many --target=build --all --exclude=@notesnook/mobile,@notesnook/web",
     "build:web": "nx build @notesnook/web",
@@ -16,6 +17,8 @@
     "linc": "npx eslint ./apps/ ./packages/ --cache"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.1.1",
+    "@types/node": "^18.7.13",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
     "eslint": "^8.22.0",
@@ -26,6 +29,7 @@
     "eslint-plugin-react": "^7.31.0",
     "eslint-plugin-react-native": "^4.0.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "husky": "^8.0.1",
     "lerna": "^5.4.0",
     "nx": "^14.5.4",
     "prettier": "^2.7.1"

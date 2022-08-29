@@ -1,0 +1,8 @@
+*
+!{api,collections,contenttypes,database,models,utils}/**/*
+!common.js
+!migrations.js
+!types.js
+!logger.js
+!package.json
+**/*/__tests__/**/*
