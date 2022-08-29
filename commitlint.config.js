@@ -10,22 +10,18 @@ const authors = readFileSync("AUTHORS", "utf-8");
 const isAuthor = authors.includes(`<${authorEmail}>`);
 
 const SCOPES = [
-  // apps
+  // for full list of scopes + details see: https://github.com/streetwriters/notesnook-private/blob/master/CONTRIBUTING.md#commit-guidelines
+
   "mobile",
   "web",
-
-  // packages
+  "desktop",
   "crypto",
-  "crypto-worker",
   "editor",
   "logger",
-  "streamable-fs",
-
-  // repo maintenance
-  "config", // changing configuration of already installed tools in the repo
-  "ci", // changes related to CI
-  "setup", // setting up someting new in the repo (e.g. eslint, commitlint)
-  "docs" // changes related to documentation (README etc.)
+  "config",
+  "ci",
+  "setup",
+  "docs"
 ];
 
 module.exports = {
