@@ -3,7 +3,7 @@
 const { execSync } = require("child_process");
 const { readFileSync } = require("fs");
 
-const authorEmail = execSync(`git show -s --format='%ae' HEAD`)
+const authorEmail = execSync(`git config --global --get user.email`)
   .toString("utf-8")
   .trim();
 const authors = readFileSync("AUTHORS", "utf-8");
