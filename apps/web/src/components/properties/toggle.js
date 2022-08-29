@@ -1,4 +1,4 @@
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { useStore } from "../../stores/editor-store";
 import Switch from "../switch";
 

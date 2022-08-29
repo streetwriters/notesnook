@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "rebass";
+import { Box } from "@streetwriters/rebass";
 import Dialog from "./dialog";
 import Field from "../field";
 

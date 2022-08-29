@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { isLanguageLoaded, loadLanguage } from "./loader";
 import { refractor } from "refractor/lib/core";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import Languages from "./languages.json";
-import { Input } from "@rebass/forms";
+import { Input } from "@streetwriters/rebass-forms";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { CodeBlockAttributes } from "./code-block";

@@ -1,4 +1,4 @@
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 import {
   SelectionBasedNodeView,
   SelectionBasedReactNodeViewProps

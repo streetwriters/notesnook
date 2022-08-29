@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, Flex, Button } from "rebass";
+import { Text, Flex, Button } from "@streetwriters/rebass";
 import Dialog from "./dialog";
 import { db } from "../../common/db";
 import Logo from "../../assets/notesnook-logo.png";

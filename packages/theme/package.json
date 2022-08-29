@@ -1,5 +1,5 @@
 {
-  "name": "@streetwriters/theme",
+  "name": "@notesnook/theme",
   "version": "1.0.1",
   "main": "./dist/index.js",
   "license": "GPL-3.0",
@@ -8,25 +8,14 @@
     "url": "git://github.com/streetwriters/themeprovider.git"
   },
   "dependencies": {
-    "@rebass/forms": "^4.0.6",
-    "@types/rebass": "^4.0.10",
-    "@types/rebass__forms": "^4.0.6",
-    "emotion-theming": "^10.0.19",
-    "rebass": "^4.0.7",
+    "@streetwriters/rebass": "^5.0.0",
+    "@streetwriters/rebass-forms": "^5.0.0",
     "tinycolor2": "^1.4.2"
   },
   "devDependencies": {
-    "@types/node": "^16.11.11",
-    "@types/react": "^17.0.37",
-    "@types/react-color": "^3.0.6",
-    "@types/react-dom": "^17.0.11",
-    "@types/react-modal": "^3.13.1",
+    "@types/styled-components": "^5.1.26",
     "@types/tinycolor2": "^1.4.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "4.0.3",
-    "typescript": "^4.5.2",
-    "web-vitals": "^1.1.2"
+    "typescript": "^4.8.2"
   },
   "scripts": {
     "build": "tsc",

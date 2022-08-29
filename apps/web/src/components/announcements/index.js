@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import AnnouncementBody from "./body";

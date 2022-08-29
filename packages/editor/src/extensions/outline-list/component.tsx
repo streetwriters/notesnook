@@ -1,4 +1,4 @@
-import { Text } from "rebass";
+import { Text } from "@streetwriters/rebass";
 import { ReactNodeViewProps } from "../react";
 import { useMemo } from "react";
 import { OutlineListAttributes } from "./outline-list";

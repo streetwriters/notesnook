@@ -1,6 +1,6 @@
-import { Input } from "@rebass/forms";
+import { Input } from "@streetwriters/rebass-forms";
 import { useState } from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { ImageAttributes } from "../../extensions/image";
 import { Popup } from "../components/popup";
 import { downloadImage, toDataURL } from "../../utils/downloader";

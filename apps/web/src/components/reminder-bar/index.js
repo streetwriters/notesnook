@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { Reminders } from "../../common/reminders";
 import * as Icon from "../icons";

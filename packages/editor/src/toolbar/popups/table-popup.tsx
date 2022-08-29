@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "@streetwriters/rebass";
 import { useEffect, useState } from "react";
 import { Popup } from "../components/popup";
 import { useIsMobile } from "../stores/toolbar-store";

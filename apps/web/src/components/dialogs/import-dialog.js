@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import Dialog from "./dialog";
 import { db } from "../../common/db";
 import { useDropzone } from "react-dropzone";
-import { Input } from "@rebass/forms";
+import { Input } from "@streetwriters/rebass-forms";
 import Accordion from "../accordion";
 import { store as appStore } from "../../stores/app-store";
 import { Importer } from "../../utils/importer";

@@ -1,5 +1,5 @@
-import { Input, InputProps } from "@rebass/forms";
-import { Flex, FlexProps, Text } from "rebass";
+import { Input, InputProps } from "@streetwriters/rebass-forms";
+import { Flex, FlexProps, Text } from "@streetwriters/rebass";
 
 type LabelInputProps = InputProps & {
   label: string;

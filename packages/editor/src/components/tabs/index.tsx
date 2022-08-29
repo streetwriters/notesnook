@@ -1,5 +1,5 @@
 import React, { Children, PropsWithChildren, useMemo, useState } from "react";
-import { Button, Flex, FlexProps } from "rebass";
+import { Button, Flex, FlexProps } from "@streetwriters/rebass";
 
 export type TabProps = { title: string | React.ReactElement };
 export function Tab(props: PropsWithChildren<TabProps>) {

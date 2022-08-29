@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Text } from "rebass";
+import { Text } from "@streetwriters/rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
 // import { MenuPresenter, MenuPresenterProps } from "../../components/menu/menu";

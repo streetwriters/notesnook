@@ -1,4 +1,4 @@
-import { Theme } from "@streetwriters/theme";
+import { Theme } from "@notesnook/theme";
 import create from "zustand";
 
 export type ToolbarLocation = "top" | "bottom";

@@ -1,4 +1,4 @@
-import { Box } from "rebass";
+import { Box } from "@streetwriters/rebass";
 
 export function MenuSeparator() {
   return (

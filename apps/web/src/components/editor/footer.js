@@ -1,5 +1,5 @@
 import { formatDate } from "@streetwriters/notesnook-core/utils/date";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { useStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useNoteStatistics } from "./context";

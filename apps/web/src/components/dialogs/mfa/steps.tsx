@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { Text, Flex, Button, Box } from "rebass";
+import { Text, Flex, Button, Box } from "@streetwriters/rebass";
 import { useSessionState } from "../../../hooks/use-session-state";
 import {
   Loading,

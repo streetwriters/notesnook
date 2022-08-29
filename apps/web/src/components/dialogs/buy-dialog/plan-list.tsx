@@ -1,4 +1,4 @@
-import { Text, Flex, Button } from "rebass";
+import { Text, Flex, Button } from "@streetwriters/rebass";
 import * as Icon from "../../icons";
 import { ReactComponent as Nomad } from "../../../assets/nomad.svg";
 import { Period, Plan } from "./types";

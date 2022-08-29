@@ -158,7 +158,7 @@ import {
   mdiFormatLineSpacing,
   mdiCalendarClockOutline
 } from "@mdi/js";
-import { useTheme } from "emotion-theming";
+import { useTheme } from "@emotion/react";
 import { AnimatedFlex } from "../animated";
 
 function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {

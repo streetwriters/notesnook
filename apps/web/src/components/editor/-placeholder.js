@@ -1,7 +1,7 @@
 import React from "react";
 import Logo from "../../assets/logo.svg";
 import LogoDark from "../../assets/logo-dark.svg";
-import { Button, Flex, Image, Text } from "rebass";
+import { Button, Flex, Image, Text } from "@streetwriters/rebass";
 import { hashNavigate } from "../../navigation";
 import * as Icon from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";

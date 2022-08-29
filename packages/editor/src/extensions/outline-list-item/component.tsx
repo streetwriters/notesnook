@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "@streetwriters/rebass";
 import { ReactNodeViewProps } from "../react";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";

@@ -8,7 +8,7 @@ import { MoreTools } from "../components/more-tools";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { findMark, selectionToOffset } from "../utils/prosemirror";
 import { TextSelection } from "prosemirror-state";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { ImageNode } from "../../extensions/image";
 
 export function LinkSettings(props: ToolProps) {

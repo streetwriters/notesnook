@@ -1,4 +1,4 @@
-import { SxStyleProp } from "rebass";
+import { SxStyleProp } from "@streetwriters/rebass";
 
 const defaultVariant: SxStyleProp = {
   borderRadius: "default",

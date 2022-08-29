@@ -1,4 +1,4 @@
-import { SxStyleProp } from "rebass";
+import { SxStyleProp } from "@streetwriters/rebass";
 
 const defaultVariant: SxStyleProp = {
   bg: "transparent",
@@ -11,26 +11,26 @@ const defaultVariant: SxStyleProp = {
   py: "7.5px",
   transition: "filter 200ms ease-in, box-shadow 200ms ease-out",
   ":hover:not(:disabled)": {
-    filter: "brightness(90%)",
+    filter: "brightness(90%)"
   },
   ":active": {
-    filter: "brightness(98%)",
+    filter: "brightness(98%)"
   },
   outline: "none",
   ":focus-visible:not(:active)": {
     filter: "brightness(90%)",
-    bg: "bgSecondary",
+    bg: "bgSecondary"
   },
   ":disabled": {
     opacity: 0.5,
-    cursor: "not-allowed",
-  },
+    cursor: "not-allowed"
+  }
 };
 
 const primary: SxStyleProp = {
   variant: "buttons.default",
   color: "static",
-  bg: "primary",
+  bg: "primary"
 };
 
 const dialog: SxStyleProp = {
@@ -42,18 +42,18 @@ const dialog: SxStyleProp = {
   ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
     {
       bg: "hover",
-      filter: "brightness(90%)",
+      filter: "brightness(90%)"
     },
   ":disabled": {
     opacity: 0.7,
-    cursor: "not-allowed",
-  },
+    cursor: "not-allowed"
+  }
 };
 
 const secondary: SxStyleProp = {
   variant: "buttons.default",
   color: "text",
-  bg: "border",
+  bg: "border"
 };
 
 const tertiary: SxStyleProp = {
@@ -63,8 +63,8 @@ const tertiary: SxStyleProp = {
   border: "2px solid",
   borderColor: "border",
   ":hover": {
-    borderColor: "primary",
-  },
+    borderColor: "primary"
+  }
 };
 
 const list: SxStyleProp = {
@@ -78,8 +78,8 @@ const list: SxStyleProp = {
   px: 0,
   cursor: "pointer",
   ":hover": {
-    borderBottomColor: "primary",
-  },
+    borderBottomColor: "primary"
+  }
 };
 
 const anchor: SxStyleProp = {
@@ -91,8 +91,8 @@ const anchor: SxStyleProp = {
   px: 0,
   py: 0,
   ":hover": {
-    textDecoration: "underline",
-  },
+    textDecoration: "underline"
+  }
 };
 
 const icon: SxStyleProp = {
@@ -101,8 +101,8 @@ const icon: SxStyleProp = {
   borderRadius: "none",
   ":hover": {
     backgroundColor: "hover",
-    filter: "brightness(90%)",
-  },
+    filter: "brightness(90%)"
+  }
 };
 
 const tool: SxStyleProp = {
@@ -111,15 +111,15 @@ const tool: SxStyleProp = {
   backgroundColor: "bgSecondary",
   borderRadius: "default",
   ":hover": {
-    backgroundColor: "hover",
-  },
+    backgroundColor: "hover"
+  }
 };
 
 const statusItem: SxStyleProp = {
   variant: "buttons.icon",
   p: 0,
   py: 1,
-  px: 1,
+  px: 1
 };
 
 const menuItem: SxStyleProp = {
@@ -132,11 +132,11 @@ const menuItem: SxStyleProp = {
   cursor: "pointer",
   ":hover:not(:disabled),:focus:not(:disabled)": {
     backgroundColor: "hover",
-    boxShadow: "none",
+    boxShadow: "none"
   },
   ":active:not(:disabled)": {
-    backgroundColor: "border",
-  },
+    backgroundColor: "border"
+  }
 };
 
 export const buttonVariants = {
@@ -150,5 +150,5 @@ export const buttonVariants = {
   icon,
   dialog,
   statusitem: statusItem,
-  menuitem: menuItem,
+  menuitem: menuItem
 };

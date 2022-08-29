@@ -1,5 +1,5 @@
 import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
-import { Box } from "rebass";
+import { Box } from "@streetwriters/rebass";
 import { getPosition, PositionOptions } from "../../utils/position";
 import Modal from "react-modal";
 import ReactDOM from "react-dom";

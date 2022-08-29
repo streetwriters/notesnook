@@ -1,6 +1,6 @@
 import * as Icon from "../icons";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 import { db } from "../../common/db";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import { useStore as useNoteStore } from "../../stores/note-store";

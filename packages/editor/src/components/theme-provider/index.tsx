@@ -1,4 +1,4 @@
-import { ThemeProvider as EmotionThemeProvider } from "emotion-theming";
+import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { PropsWithChildren } from "react";
 import { useTheme } from "../../toolbar/stores/toolbar-store";
 

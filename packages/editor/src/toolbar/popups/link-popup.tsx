@@ -1,5 +1,5 @@
-import { Input } from "@rebass/forms";
-import { Flex } from "rebass";
+import { Input } from "@streetwriters/rebass-forms";
+import { Flex } from "@streetwriters/rebass";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { Popup } from "../components/popup";
 import { LinkDefinition } from "../tools/link";

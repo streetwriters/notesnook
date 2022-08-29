@@ -1,27 +1,27 @@
-import { SxStyleProp } from "rebass";
+import { SxStyleProp } from "@streetwriters/rebass";
 
 const defaultVariant: SxStyleProp = {
   color: "text",
-  fontFamily: "body",
+  fontFamily: "body"
 };
 
 const heading: SxStyleProp = {
   variant: "text.default",
   fontFamily: "heading",
   fontWeight: "bold",
-  fontSize: "heading",
+  fontSize: "heading"
 };
 
 const title: SxStyleProp = {
   variant: "text.heading",
   fontSize: "title",
-  fontWeight: "bold",
+  fontWeight: "bold"
 };
 
 const subtitle: SxStyleProp = {
   variant: "text.heading",
   fontSize: "subtitle",
-  fontWeight: "bold",
+  fontWeight: "bold"
 };
 
 const body: SxStyleProp = { variant: "text.default", fontSize: "body" };
@@ -29,13 +29,13 @@ const body: SxStyleProp = { variant: "text.default", fontSize: "body" };
 const subBody: SxStyleProp = {
   variant: "text.default",
   fontSize: "subBody",
-  color: "fontTertiary",
+  color: "fontTertiary"
 };
 
 const error: SxStyleProp = {
   variant: "text.default",
   fontSize: "subBody",
-  color: "error",
+  color: "error"
 };
 
 export const textVariants = {
@@ -45,5 +45,5 @@ export const textVariants = {
   subtitle,
   body,
   subBody,
-  error,
+  error
 };

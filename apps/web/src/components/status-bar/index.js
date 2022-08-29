@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Button, Flex, Text } from "@streetwriters/rebass";
 import EditorFooter from "../editor/footer";
 import {
   Circle,

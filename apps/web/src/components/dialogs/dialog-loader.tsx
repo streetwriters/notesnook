@@ -1,7 +1,7 @@
 import Dialog from "./dialog";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 
 export default function DialogLoader() {
   return (

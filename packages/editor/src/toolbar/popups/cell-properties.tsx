@@ -1,5 +1,5 @@
 import { Editor } from "../../types";
-import { Box } from "rebass";
+import { Box } from "@streetwriters/rebass";
 import { Tab, Tabs } from "../../components/tabs";
 import { Icon } from "../components/icon";
 // import { MenuPresenter } from "../../components/menu/menu";

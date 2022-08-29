@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 import { Error as ErrorIcon } from "../components/icons";
 import { makeURL, useQueryParams } from "../navigation";
 import { db } from "../common/db";

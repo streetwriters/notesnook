@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useNoteStore } from "../stores/note-store";
@@ -38,11 +38,11 @@ import Toggle from "../components/toggle";
 import { isDesktop } from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import { Slider } from "@rebass/forms";
+import { Slider } from "@streetwriters/rebass-forms";
 import useZoomFactor from "../hooks/use-zoom-factor";
 import { PATHS } from "@notesnook/desktop/paths";
 import { openPath } from "../commands/open";
-import { getAllAccents } from "@streetwriters/theme";
+import { getAllAccents } from "@notesnook/theme";
 import { debounce } from "../utils/debounce";
 import { clearLogs, downloadLogs } from "../utils/logger";
 

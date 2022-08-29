@@ -1,6 +1,6 @@
 import { Check, ChevronRight, Pro } from "../icons";
 import { useRef } from "react";
-import { Flex, Box, Text, Button } from "rebass";
+import { Flex, Box, Text, Button } from "@streetwriters/rebass";
 
 function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
   const {

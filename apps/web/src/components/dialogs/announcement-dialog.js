@@ -1,6 +1,6 @@
 import Modal from "react-modal";
-import { useTheme } from "emotion-theming";
-import { Flex } from "rebass";
+import { useTheme } from "@emotion/react";
+import { Flex } from "@streetwriters/rebass";
 import AnnouncementBody from "../announcements/body";
 
 function AnnouncementDialog(props) {

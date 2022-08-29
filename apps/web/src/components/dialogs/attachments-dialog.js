@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 import { getTotalSize } from "../../common/attachments";
 import { useStore } from "../../stores/attachment-store";
 import { formatBytes } from "../../utils/filename";

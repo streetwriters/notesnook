@@ -3,7 +3,7 @@ import ListItem from "../list-item";
 import { db } from "../../common/db";
 import { store as appStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "../../utils/string";

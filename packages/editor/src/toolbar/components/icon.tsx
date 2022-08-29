@@ -1,8 +1,8 @@
 import MDIIcon from "@mdi/react";
-import { Theme } from "@streetwriters/theme";
-import { SchemeColors } from "@streetwriters/theme/dist/theme/colorscheme";
-import { Flex, FlexProps } from "rebass";
-import { useTheme } from "emotion-theming";
+import { Theme } from "@notesnook/theme";
+import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
+import { Flex, FlexProps } from "@streetwriters/rebass";
+import { useTheme } from "@emotion/react";
 
 type IconProps = {
   title?: string;
@@ -20,7 +20,7 @@ function MDIIconWrapper({
   stroke,
   rotate
 }: IconProps) {
-  const theme: Theme = useTheme();
+  const theme = useTheme() as Theme;
 
   const themedColor: string = theme?.colors
     ? (theme.colors[color] as string)

@@ -1,4 +1,4 @@
-import { BoxProps } from "rebass";
+import { BoxProps } from "@streetwriters/rebass";
 import { Perform } from "../../../common/dialog-controller";
 
 export type AuthenticatorType = "app" | "sms" | "email";

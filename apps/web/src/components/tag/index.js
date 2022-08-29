@@ -1,7 +1,7 @@
 import React from "react";
 import ListItem from "../list-item";
 import { hashNavigate, navigate } from "../../navigation";
-import { Text } from "rebass";
+import { Text } from "@streetwriters/rebass";
 import { store as appStore } from "../../stores/app-store";
 import { store as tagStore } from "../../stores/tag-store";
 import { store as editorStore } from "../../stores/editor-store";

@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import Tip from "../tip";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 import Switch from "../switch";
 
 function Toggle(props) {

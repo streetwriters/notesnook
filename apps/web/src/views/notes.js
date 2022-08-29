@@ -6,7 +6,7 @@ import { hashNavigate, navigate } from "../navigation";
 import FavoritesPlaceholder from "../components/placeholders/favorites-placeholder";
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
 import { db } from "../common/db";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { SyncError } from "../components/icons";
 
 function Notes() {

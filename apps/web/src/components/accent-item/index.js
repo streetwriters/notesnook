@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { showBuyDialog } from "../../common/dialog-controller";

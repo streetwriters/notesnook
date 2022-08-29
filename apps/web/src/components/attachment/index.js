@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "@streetwriters/rebass";
 import { formatBytes } from "../../utils/filename";
 import ListItem from "../list-item";
 import * as Icon from "../icons";

@@ -1,4 +1,4 @@
-import { Button, Flex } from "rebass";
+import { Button, Flex } from "@streetwriters/rebass";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import { ChevronDown } from "../icons";
 

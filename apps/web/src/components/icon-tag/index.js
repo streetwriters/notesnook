@@ -1,4 +1,4 @@
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 
 function IconTag({ text, title, icon: Icon, onClick, styles, testId }) {
   return (

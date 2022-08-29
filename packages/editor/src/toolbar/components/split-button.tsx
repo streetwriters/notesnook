@@ -1,5 +1,5 @@
 import { PropsWithChildren, useRef } from "react";
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 import { Icons } from "../icons";
 import { Icon } from "./icon";
 import { ToolButton, ToolButtonProps } from "./tool-button";

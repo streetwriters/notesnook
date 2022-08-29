@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useEffect, useState } from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { getPosition } from "../../hooks/use-menu";
 import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";

@@ -2,7 +2,7 @@ import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MenuButton, MenuItem } from "../../components/menu/types";
 import {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Box, Button, Flex } from "rebass";
+import { Box, Button, Flex } from "@streetwriters/rebass";
 import {
   Note,
   Notebook,

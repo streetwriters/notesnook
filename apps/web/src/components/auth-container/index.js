@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Box, Flex, Image, Text } from "rebass";
+import { Box, Flex, Image, Text } from "@streetwriters/rebass";
 import ThemeProvider from "../theme-provider";
 import Logo from "../../assets/logo.svg";
 import LogoDark from "../../assets/logo-dark.svg";

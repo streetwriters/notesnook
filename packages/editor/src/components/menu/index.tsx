@@ -1,5 +1,5 @@
 import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
-import { Box, Flex, FlexProps, Text } from "rebass";
+import { Box, Flex, FlexProps, Text } from "@streetwriters/rebass";
 import { getPosition } from "../../utils/position";
 import {
   MenuButton as MenuButtonType,
@@ -99,7 +99,7 @@ export function Menu(props: MenuProps) {
                     if (item.menu) {
                       hoverTimeout.current = setTimeout(() => {
                         setIsSubmenuOpen(true);
-                      }, 500);
+                      }, 500) as unknown as number;
                     }
                   }}
                   onMouseLeave={() => {

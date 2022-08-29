@@ -3,8 +3,8 @@ import "@streetwriters/editor/styles/katex.min.css";
 import "@streetwriters/editor/styles/katex-fonts.css";
 import "@streetwriters/editor/styles/fonts.css";
 import "@streetwriters/editor/styles/prism-theme.css";
-import { Theme } from "@streetwriters/theme";
-import { useTheme } from "emotion-theming";
+import { Theme } from "@notesnook/theme";
+import { useTheme } from "@emotion/react";
 import {
   Toolbar,
   useTiptap,
@@ -13,7 +13,7 @@ import {
   AttachmentType,
   usePermissionHandler
 } from "@streetwriters/editor";
-import { Box, Flex } from "rebass";
+import { Box, Flex } from "@streetwriters/rebass";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import useMobile from "../../hooks/use-mobile";
 import { Attachment } from "./picker";
@@ -223,7 +223,7 @@ function TipTap(props: TipTapProps) {
 }
 
 function TiptapWrapper(props: Omit<TipTapProps, "editorContainer" | "theme">) {
-  const theme: Theme = useTheme();
+  const theme = useTheme() as Theme;
   const [isReady, setIsReady] = useState(false);
   const editorContainerRef = useRef<HTMLDivElement>();
   useEffect(() => {

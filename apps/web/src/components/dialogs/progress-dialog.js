@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "@streetwriters/rebass";
 import Dialog from "./dialog";
 
 function ProgressDialog(props) {

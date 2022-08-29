@@ -1,4 +1,4 @@
-import { Button, Flex, FlexProps, Text } from "rebass";
+import { Button, Flex, FlexProps, Text } from "@streetwriters/rebass";
 import { Perform } from "../../common/dialog-controller";
 import Dialog from "./dialog";
 import {
@@ -31,7 +31,7 @@ import { useEffect, useState } from "react";
 import { CSS } from "@dnd-kit/utilities";
 import { createPortal } from "react-dom";
 import id from "@streetwriters/notesnook-core/utils/id";
-import { Label, Radio } from "@rebass/forms";
+import { Label, Radio } from "@streetwriters/rebass-forms";
 import { db } from "../../common/db";
 import { useToolbarConfig } from "../editor/context";
 import {

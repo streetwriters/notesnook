@@ -5,7 +5,7 @@ import { db } from "../common/db";
 import SearchBox from "../components/search";
 import ProgressBar from "../components/progress-bar";
 import { useStore as useNoteStore } from "../stores/note-store";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { showToast } from "../utils/toast";
 import { store as notebookstore } from "../stores/notebook-store";
 import { hardNavigate } from "../navigation";

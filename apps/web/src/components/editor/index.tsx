@@ -5,7 +5,7 @@ import {
   useRef,
   PropsWithChildren
 } from "react";
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Button, Flex, Text } from "@streetwriters/rebass";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
 import Toolbar from "./toolbar";

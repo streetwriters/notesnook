@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 import { Icon } from "./icon";
 import { Icons } from "../icons";
 import { PropsWithChildren } from "react";

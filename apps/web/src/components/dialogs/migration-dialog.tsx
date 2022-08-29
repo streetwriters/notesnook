@@ -1,4 +1,4 @@
-import { Text } from "rebass";
+import { Text } from "@streetwriters/rebass";
 import { createBackup } from "../../common";
 import { db } from "../../common/db";
 import { Perform } from "../../common/dialog-controller";

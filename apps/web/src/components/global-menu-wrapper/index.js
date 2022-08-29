@@ -1,7 +1,7 @@
 import Menu from "../menu";
 import { useMenuTrigger, useMenu, getPosition } from "../../hooks/use-menu";
 import Modal from "react-modal";
-import { Box } from "rebass";
+import { Box } from "@streetwriters/rebass";
 
 function GlobalMenuWrapper() {
   const { isOpen, closeMenu } = useMenuTrigger();

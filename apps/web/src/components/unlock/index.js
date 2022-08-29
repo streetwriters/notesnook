@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useMemo
 } from "react";
-import { Flex, Text, Button } from "rebass";
+import { Flex, Text, Button } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import { db } from "../../common/db";
 import { useStore as useEditorStore } from "../../stores/editor-store";

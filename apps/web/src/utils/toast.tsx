@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 import ThemeProvider from "../components/theme-provider";
 import { Error, Warn, Success } from "../components/icons";
 import { store as appstore } from "../stores/app-store";

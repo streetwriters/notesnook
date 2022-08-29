@@ -1,6 +1,6 @@
-import { Input } from "@rebass/forms";
+import { Input } from "@streetwriters/rebass-forms";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { SearchStorage } from "../../extensions/search-replace";
 import { ToolButton } from "../components/tool-button";
 import { Editor } from "../../types";

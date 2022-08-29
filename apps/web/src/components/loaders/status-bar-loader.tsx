@@ -1,6 +1,6 @@
 import { memo } from "react";
 import Skeleton from "react-loading-skeleton";
-import { Box } from "rebass";
+import { Box } from "@streetwriters/rebass";
 import "react-loading-skeleton/dist/skeleton.css";
 
 export const StatusBarLoader = memo(function StatusBarLoader() {

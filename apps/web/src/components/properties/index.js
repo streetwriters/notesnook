@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import * as Icon from "../icons";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { useStore, store } from "../../stores/editor-store";
 import { COLORS } from "../../common/constants";
 import { db } from "../../common/db";

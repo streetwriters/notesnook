@@ -3,7 +3,7 @@ import ListItem from "../list-item";
 import { showMultiPermanentDeleteConfirmation } from "../../common/dialog-controller";
 import * as Icon from "../icons";
 import { store } from "../../stores/trash-store";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import TimeAgo from "../time-ago";
 import { toTitleCase } from "../../utils/string";
 import { showUndoableToast } from "../../common/toasts";

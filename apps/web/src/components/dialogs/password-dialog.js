@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { Box, Text } from "rebass";
+import { Box, Text } from "@streetwriters/rebass";
 import Dialog from "./dialog";
 import Field from "../field";
-import { Checkbox, Label } from "@rebass/forms";
+import { Checkbox, Label } from "@streetwriters/rebass-forms";
 
 function PasswordDialog(props) {
   const { type, checks } = props;

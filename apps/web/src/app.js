@@ -1,5 +1,5 @@
 import React, { useState, Suspense, useMemo, useRef, useEffect } from "react";
-import { Box, Flex } from "rebass";
+import { Box, Flex } from "@streetwriters/rebass";
 import ThemeProvider from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";

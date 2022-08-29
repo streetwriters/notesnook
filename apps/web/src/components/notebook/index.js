@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import ListItem from "../list-item";
 import { useStore, store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";

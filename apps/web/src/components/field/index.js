@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button, Flex, Text } from "rebass";
-import { Input, Label } from "@rebass/forms";
+import { Button, Flex, Text } from "@streetwriters/rebass";
+import { Input, Label } from "@streetwriters/rebass-forms";
 import * as Icon from "../icons";
 
 const passwordValidationRules = [

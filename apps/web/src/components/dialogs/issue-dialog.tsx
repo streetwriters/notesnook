@@ -1,4 +1,4 @@
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { appVersion } from "../../utils/version";
 import Field from "../field";
 import Dialog from "./dialog";

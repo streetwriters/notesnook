@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import {
   store as selectionStore,

@@ -1,4 +1,4 @@
-import { SxStyleProp } from "rebass";
+import { SxStyleProp } from "@streetwriters/rebass";
 
 type FlexDirection = "row" | "column";
 export type FlexVariants<T extends FlexDirection> = T extends "row"
@@ -19,7 +19,7 @@ export function createFlexVariants<T extends FlexDirection>(
   const variants = {
     Center: createCenterVariant(direction),
     Fill: createFillVariant(direction),
-    CenterFill: createCenterFillVariant(direction),
+    CenterFill: createCenterFillVariant(direction)
   };
   return Object.fromEntries(
     Object.entries(variants).map(([key, value]) => {
@@ -32,14 +32,14 @@ function createCenterVariant(direction: FlexDirection): SxStyleProp {
   return {
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: direction,
+    flexDirection: direction
   };
 }
 
 function createFillVariant(direction: FlexDirection): SxStyleProp {
   return {
     flex: "1 1 auto",
-    flexDirection: direction,
+    flexDirection: direction
   };
 }
 
@@ -47,6 +47,6 @@ function createCenterFillVariant(direction: FlexDirection): SxStyleProp {
   return {
     variant: `variants.${direction}Center`,
     flex: "1 1 auto",
-    flexDirection: direction,
+    flexDirection: direction
   };
 }

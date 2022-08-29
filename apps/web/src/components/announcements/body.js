@@ -4,7 +4,7 @@ import {
   Flex,
   Image as RebassImage,
   Text as RebassText
-} from "rebass";
+} from "@streetwriters/rebass";
 import { allowedPlatforms } from "../../hooks/use-announcements";
 import {
   closeOpenedDialog,

@@ -4,13 +4,13 @@ import { injectCss } from "./css";
 
 const factory = new ThemeFactory();
 
-export function useTheme(config: ThemeConfig, inject: boolean = true) {
+export function useTheme(config: ThemeConfig, inject = true) {
   const { theme, accent, scale = 1 } = config;
 
   const themeProperties = factory.construct({
     theme,
     accent,
-    scale,
+    scale
   });
   if (inject) injectCss(factory.transform("css", themeProperties));
 

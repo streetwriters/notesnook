@@ -18,6 +18,7 @@ const SCOPES = [
   "crypto",
   "editor",
   "logger",
+  "theme",
   "config",
   "ci",
   "setup",

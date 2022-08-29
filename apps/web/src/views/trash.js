@@ -5,7 +5,7 @@ import { confirm } from "../common/dialog-controller";
 import { useStore, store } from "../stores/trash-store";
 import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
-import { Text } from "rebass";
+import { Text } from "@streetwriters/rebass";
 import useNavigate from "../hooks/use-navigate";
 import { db } from "../common/db";
 

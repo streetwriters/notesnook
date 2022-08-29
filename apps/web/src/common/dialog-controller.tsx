@@ -10,7 +10,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import { formatDate } from "@streetwriters/notesnook-core/utils/date";

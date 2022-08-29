@@ -1,7 +1,7 @@
-import { Flex, Text, Button as RebassButton } from "rebass";
+import { Flex, Text, Button as RebassButton } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import Modal from "react-modal";
-import { useTheme } from "emotion-theming";
+import { useTheme } from "@emotion/react";
 import { FlexScrollContainer } from "../scroll-container";
 
 Modal.setAppElement("#root");

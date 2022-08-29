@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Image, Text } from "rebass";
+import { Box, Button, Flex, Image, Text } from "@streetwriters/rebass";
 import { ImageAlignmentOptions, ImageAttributes } from "./image";
 import { useEffect, useRef, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";

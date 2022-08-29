@@ -1,5 +1,5 @@
 import { ToolProps } from "../types";
-import { Box, Button, Flex } from "rebass";
+import { Box, Button, Flex } from "@streetwriters/rebass";
 import { IconNames } from "../icons";
 import { useCallback, useRef, useState } from "react";
 import { SplitButton } from "../components/split-button";

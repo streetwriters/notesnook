@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import Dialog from "./dialog";
 import { qclone } from "qclone";

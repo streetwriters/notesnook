@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Flex, Text, Button } from "rebass";
+import { Flex, Text, Button } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import ContentToggle from "./content-toggle";
 import { store as notesStore } from "../../stores/note-store";

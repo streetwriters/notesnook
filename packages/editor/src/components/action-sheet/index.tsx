@@ -6,7 +6,7 @@ import React, {
   useEffect
 } from "react";
 import { MenuItem } from "../menu/types";
-import { Box, Button, Flex, Text, FlexProps } from "rebass";
+import { Box, Button, Flex, Text, FlexProps } from "@streetwriters/rebass";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { MenuButton } from "../menu/menu-button";

@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useRef, ForwardedRef } from "react";
 import { useEffect } from "react";
-import { Button as RebassButton, ButtonProps } from "rebass";
+import { Button as RebassButton, ButtonProps } from "@streetwriters/rebass";
 
 const _Button = (
   props: ButtonProps,

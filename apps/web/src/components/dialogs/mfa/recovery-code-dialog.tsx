@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Text } from "rebass";
+import { Text } from "@streetwriters/rebass";
 import { Perform } from "../../../common/dialog-controller";
 import Dialog from "../dialog";
 import { steps } from "./steps";

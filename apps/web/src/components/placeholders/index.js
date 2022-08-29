@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 
 const PlaceholderLoader = React.lazy(() => import("./loader"));
 function Placeholder(props) {

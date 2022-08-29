@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Flex, Button } from "rebass";
+import { Flex, Button } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import { Virtuoso } from "react-virtuoso";
 import {

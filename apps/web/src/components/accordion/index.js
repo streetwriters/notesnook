@@ -1,4 +1,4 @@
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "../icons";
 

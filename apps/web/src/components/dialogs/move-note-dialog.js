@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 import { db } from "../../common/db";
 import Dialog from "./dialog";

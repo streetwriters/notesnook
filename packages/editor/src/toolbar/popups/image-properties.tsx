@@ -1,7 +1,7 @@
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 import { useCallback } from "react";
 import { Popup } from "../components/popup";
-import { Checkbox, Label } from "@rebass/forms";
+import { Checkbox, Label } from "@streetwriters/rebass-forms";
 import {
   ImageAlignmentOptions,
   ImageSizeOptions

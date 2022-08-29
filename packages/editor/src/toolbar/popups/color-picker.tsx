@@ -1,5 +1,5 @@
-import { Box, Flex, Text } from "rebass";
-import { Input } from "@rebass/forms";
+import { Box, Flex, Text } from "@streetwriters/rebass";
+import { Input } from "@streetwriters/rebass-forms";
 import { Icon } from "../components/icon";
 import { Icons } from "../icons";
 import { useCallback, useEffect, useRef, useState } from "react";

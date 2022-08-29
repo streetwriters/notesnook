@@ -1,4 +1,4 @@
-import { Box, Text } from "rebass";
+import { Box, Text } from "@streetwriters/rebass";
 import { AttachmentWithProgress } from "./attachment";
 import { useRef } from "react";
 import { Icon } from "../../toolbar/components/icon";

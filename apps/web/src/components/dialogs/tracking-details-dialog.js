@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text } from "rebass";
+import { Box, Text } from "@streetwriters/rebass";
 import { ANALYTICS_EVENTS } from "../../utils/analytics";
 import Dialog from "./dialog";
 

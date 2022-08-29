@@ -6,7 +6,7 @@ export function debounce<F extends (...args: never[]) => void>(
 
   const debounced = (...args: Parameters<F>) => {
     if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), waitFor);
+    timeout = setTimeout(() => func(...args), waitFor) as unknown as number;
   };
 
   return debounced;

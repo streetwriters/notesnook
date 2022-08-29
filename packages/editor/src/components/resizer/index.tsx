@@ -1,4 +1,4 @@
-import { SchemeColors } from "@streetwriters/theme/dist/theme/colorscheme";
+import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import { Resizable } from "re-resizable";
 import { PropsWithChildren } from "react";
 import { Icon, Icons } from "../../toolbar";

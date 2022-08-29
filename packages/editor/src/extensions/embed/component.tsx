@@ -1,4 +1,4 @@
-import { Box, Flex } from "rebass";
+import { Box, Flex } from "@streetwriters/rebass";
 import { useRef, useState } from "react";
 import { EmbedAlignmentOptions, EmbedAttributes } from "./embed";
 import { SelectionBasedReactNodeViewProps } from "../react";

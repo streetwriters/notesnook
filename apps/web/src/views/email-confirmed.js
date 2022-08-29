@@ -1,6 +1,6 @@
 import "../app.css";
 import { useEffect } from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import ThemeProvider from "../components/theme-provider";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";

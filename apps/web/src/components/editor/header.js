@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "../../stores/editor-store";
-import { Input } from "@rebass/forms";
+import { Input } from "@streetwriters/rebass-forms";
 import * as Icon from "../icons";
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 import IconTag from "../icon-tag";
 import { db } from "../../common/db";
 import { useMenuTrigger } from "../../hooks/use-menu";

@@ -1,4 +1,4 @@
-import { Text, Flex, Button, Image, Box } from "rebass";
+import { Text, Flex, Button, Image, Box } from "@streetwriters/rebass";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { ReactComponent as E2E } from "../../assets/e2e.svg";
@@ -11,7 +11,7 @@ import DarkUI from "../../assets/dark1.png";
 import GooglePlay from "../../assets/play.png";
 import AppleStore from "../../assets/apple.png";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { Checkbox, Label } from "@rebass/forms";
+import { Checkbox, Label } from "@streetwriters/rebass-forms";
 import { Features } from "../announcements/body";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { TaskManager } from "../../common/task-manager";
@@ -20,7 +20,7 @@ import { usePersistentState } from "../../hooks/use-persistent-state";
 import AccentItem from "../accent-item";
 import { useCallback, useState } from "react";
 import Config from "../../utils/config";
-import { getAllAccents } from "@streetwriters/theme";
+import { getAllAccents } from "@notesnook/theme";
 
 const newUserSteps = [
   {

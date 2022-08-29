@@ -1,6 +1,6 @@
 import { useAnimation } from "framer-motion";
 import React, { useEffect } from "react";
-import { Flex } from "rebass";
+import { Flex } from "@streetwriters/rebass";
 import { AnimatedBox } from "../animated";
 
 function ProgressBar(props) {

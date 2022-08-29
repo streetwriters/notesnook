@@ -1,7 +1,7 @@
-import { Theme } from "@streetwriters/theme";
+import { Theme } from "@notesnook/theme";
 import { Editor } from "../types";
-import { Flex, FlexProps } from "rebass";
-import { ThemeProvider } from "emotion-theming";
+import { Flex, FlexProps } from "@streetwriters/rebass";
+import { ThemeProvider } from "@emotion/react";
 import { EditorFloatingMenus } from "./floating-menus";
 import { getDefaultPresets, STATIC_TOOLBAR_GROUPS } from "./tool-definitions";
 import { useEffect, useMemo } from "react";

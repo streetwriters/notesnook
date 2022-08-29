@@ -1,4 +1,4 @@
-import { Text, Flex, Box } from "rebass";
+import { Text, Flex, Box } from "@streetwriters/rebass";
 import * as Icon from "../../icons";
 
 type Feature = {

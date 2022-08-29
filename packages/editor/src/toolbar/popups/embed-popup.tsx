@@ -1,11 +1,8 @@
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { useCallback, useState } from "react";
 import { Popup } from "../components/popup";
-import { Input, Textarea } from "@rebass/forms";
-import {
-  Embed,
-  EmbedSizeOptions
-} from "../../extensions/embed";
+import { Input, Textarea } from "@streetwriters/rebass-forms";
+import { Embed, EmbedSizeOptions } from "../../extensions/embed";
 import { convertUrlToEmbedUrl } from "@social-embed/lib";
 import { InlineInput } from "../../components/inline-input";
 import { Tabs, Tab } from "../../components/tabs";

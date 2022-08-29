@@ -1,4 +1,4 @@
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import * as Icon from "../icons";
 
 function EditorLoading({ text }: { text?: string }) {

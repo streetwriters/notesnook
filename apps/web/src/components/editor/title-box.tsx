@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input } from "@rebass/forms";
+import { Input } from "@streetwriters/rebass-forms";
 
 type TitleBoxProps = {
   nonce?: number;

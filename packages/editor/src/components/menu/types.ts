@@ -1,4 +1,4 @@
-import { SxStyleProp } from "rebass";
+import { SxStyleProp } from "@streetwriters/rebass";
 import { IconNames } from "../../toolbar/icons";
 
 export type MenuItemComponentProps = {

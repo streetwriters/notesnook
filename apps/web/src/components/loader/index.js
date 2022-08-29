@@ -1,4 +1,4 @@
-import { Flex, Text } from "rebass";
+import { Flex, Text } from "@streetwriters/rebass";
 import { Loading } from "../icons";
 
 export default function Loader({ title, text }) {

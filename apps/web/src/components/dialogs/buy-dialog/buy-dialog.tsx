@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Text, Flex, Button } from "rebass";
+import { Text, Flex, Button } from "@streetwriters/rebass";
 import * as Icon from "../../icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { useStore as useThemeStore } from "../../../stores/theme-store";
 import Modal from "react-modal";
-import { useTheme } from "emotion-theming";
+import { useTheme } from "@emotion/react";
 import { ReactComponent as Rocket } from "../../../assets/rocket.svg";
 import { ReactComponent as WorkAnywhere } from "../../../assets/workanywhere.svg";
 import { ReactComponent as WorkLate } from "../../../assets/worklate.svg";

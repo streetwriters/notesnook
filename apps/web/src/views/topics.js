@@ -4,7 +4,7 @@ import { useStore as useNbStore } from "../stores/notebook-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import { hashNavigate } from "../navigation";
 import TopicsPlaceholder from "../components/placeholders/topics-placeholder";
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "@streetwriters/rebass";
 import { Edit, RemoveShortcutLink, ShortcutLink } from "../components/icons";
 import { getTotalNotes } from "../common";
 import { formatDate } from "@streetwriters/notesnook-core/utils/date";

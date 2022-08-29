@@ -1,4 +1,4 @@
-import { Text, Flex } from "rebass";
+import { Text, Flex } from "@streetwriters/rebass";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { getHomeRoute, hardNavigate } from "../../navigation";

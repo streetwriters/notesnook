@@ -1,4 +1,4 @@
-import { Text } from "rebass";
+import { Text } from "@streetwriters/rebass";
 
 function TextWithTip({ text, tip, sx, color }) {
   return (

@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom";
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Button, Flex, Text } from "@streetwriters/rebass";
 import Config from "../../utils/config";
 import { getDownloadLink, getPlatform } from "../../utils/platform";
 import DropdownButton from "../dropdown-button";

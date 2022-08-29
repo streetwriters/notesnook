@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Box, Flex } from "rebass";
+import { Box, Flex } from "@streetwriters/rebass";
 import Loader from "../../loader";
 import {
   CheckoutData,
