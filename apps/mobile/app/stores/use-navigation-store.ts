@@ -25,7 +25,6 @@ import {
   TagType,
   TopicType
 } from "../utils/types";
-import { ColorKey } from "./use-theme-store";
 
 export type GenericRouteParam = { [name: string]: unknown };
 
