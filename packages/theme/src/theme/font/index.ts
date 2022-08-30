@@ -29,7 +29,7 @@ const SANS_FONT_STACK = [
   "Helvetica",
   "-apple-system",
   "BlinkMacSystemFont",
-  "sans-serif",
+  "sans-serif"
 ];
 const MONOSPACE_FONT_STACK = [
   "Hack",
@@ -39,7 +39,7 @@ const MONOSPACE_FONT_STACK = [
   '"Liberation Mono"',
   '"Courier New"',
   "Courier",
-  "monospace",
+  "monospace"
 ];
 
 export type FontConfig = {
@@ -52,19 +52,19 @@ export type FontConfig = {
   };
   fonts: { body: string; monospace: string; heading: string };
 };
-export function getFontConfig(scale?: number): FontConfig {
+export function getFontConfig(): FontConfig {
   return {
-    fontSizes: getFontSizes(scale),
+    fontSizes: getFontSizes(),
     fontWeights: {
       normal: 400,
       body: 400,
       heading: 600,
-      bold: 600,
+      bold: 600
     },
     fonts: {
       body: SANS_FONT_STACK.join(","),
       monospace: MONOSPACE_FONT_STACK.join(","),
-      heading: SANS_FONT_STACK.join(","),
-    },
+      heading: SANS_FONT_STACK.join(",")
+    }
   };
 }

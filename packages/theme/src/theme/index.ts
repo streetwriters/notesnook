@@ -64,7 +64,7 @@ class ThemeFactory {
           : {
               menu: "0px 0px 10px 0px #00000022"
             },
-      ...getFontConfig(config.scale),
+      ...getFontConfig(),
       ...variants
     };
     theme.space.small = 3;
