@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { getDefaultPresets } from "@streetwriters/editor/dist/toolbar/tool-definitions";
-import type { Attachment } from "@streetwriters/editor/dist/extensions/attachment/index";
+import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
+import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
 import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,

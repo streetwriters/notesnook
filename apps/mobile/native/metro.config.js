@@ -6,6 +6,7 @@
  */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
+const nodeModulesPaths = [path.resolve(path.join(__dirname, '../node_modules'))];
 module.exports = {
   projectRoot: __dirname,
   watchFolders: [
@@ -13,13 +14,15 @@ module.exports = {
     path.join(__dirname, '../share'),
     path.join(__dirname, '../node_modules'),
     path.join(__dirname, '../e2e'),
-    path.join(__dirname, "../../../packages/editor")
+    path.join(__dirname, "../../../packages"),
   ],
   resolver: {
     sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs'],
+    nodeModulesPaths,
     extraNodeModules: {
       "react": path.join(__dirname, "../node_modules/react"),
-      "react-dom": path.join(__dirname, "../node_modules/react-dom")
+      "react-dom": path.join(__dirname, "../node_modules/react-dom"),
+      "@notesnook":  path.join(__dirname, "../../../packages"),
     }
   },
   transformer: {

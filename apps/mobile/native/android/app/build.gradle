@@ -349,11 +349,16 @@ task copyDownloadableDepsToLibs(type: Copy) {
     into 'libs'
 }
 
-task copyFiles(type: Copy) {
-    from '../../web.bundle'
-    into './src/main/assets'
+
+task deleteFiles(type: Delete) {
+  delete './src/main/assets/static'
 }
 
+task copyFiles(type: Copy) {
+    from '../../../../../packages/editor-mobile/build.bundle'
+    into './src/main/assets'
+}
+copyFiles.dependsOn(deleteFiles)
 preBuild.dependsOn(copyFiles)
 
 

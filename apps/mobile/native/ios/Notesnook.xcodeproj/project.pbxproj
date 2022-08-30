@@ -18,8 +18,8 @@
 		6510627527042893009661C3 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012F27019F7700A43C51 /* OpenSans-Regular.ttf */; };
 		6510627627042895009661C3 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */; };
 		6510627727042896009661C3 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */; };
-		6510E6D72877215700DACAA9 /* web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* web.bundle */; };
-		6510E6D82877215700DACAA9 /* web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* web.bundle */; };
+		6510E6D72877215700DACAA9 /* build.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* build.bundle */; };
+		6510E6D82877215700DACAA9 /* build.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6510E6D62877215700DACAA9 /* build.bundle */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
 		6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */; };
 		6593E4A3281C345400492C50 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6593E4A2281C345400492C50 /* AppDelegate.mm */; };
@@ -107,7 +107,7 @@
 		41D57E9831C724F59F18FBAE /* libPods-Notesnook-Add to Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-Add to Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47AE097A087A651BD60CAD7B /* Pods-Notesnook-Make Note.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-Make Note.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note.release.xcconfig"; sourceTree = "<group>"; };
 		4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6510E6D62877215700DACAA9 /* web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = web.bundle; path = ../web.bundle; sourceTree = "<group>"; };
+		6510E6D62877215700DACAA9 /* build.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = build.bundle; path = "../../../../packages/editor-mobile/build.bundle"; sourceTree = "<group>"; };
 		6515C42E2580AA2F00E83E39 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		6529A13D279BC4C70048D4A8 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = Notesnook/BootSplash.storyboard; sourceTree = "<group>"; };
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
@@ -288,7 +288,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				6510E6D62877215700DACAA9 /* web.bundle */,
+				6510E6D62877215700DACAA9 /* build.bundle */,
 				65EC5B71272A7EE200FB3748 /* NotesWidgetExtensionDebug.entitlements */,
 				6552012F27019F7700A43C51 /* OpenSans-Regular.ttf */,
 				6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */,
@@ -535,7 +535,7 @@
 				6510626F27042891009661C3 /* OpenSans-Regular.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				6529A13E279BC4C70048D4A8 /* BootSplash.storyboard in Resources */,
-				6510E6D72877215700DACAA9 /* web.bundle in Resources */,
+				6510E6D72877215700DACAA9 /* build.bundle in Resources */,
 				6510627627042895009661C3 /* OpenSans-SemiBold.ttf in Resources */,
 				659BE46725E11A5100E05671 /* notesnook-text.png in Resources */,
 			);
@@ -568,7 +568,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6510E6D82877215700DACAA9 /* web.bundle in Resources */,
+				6510E6D82877215700DACAA9 /* build.bundle in Resources */,
 				6510627727042896009661C3 /* OpenSans-SemiBold.ttf in Resources */,
 				6510627527042893009661C3 /* OpenSans-Regular.ttf in Resources */,
 				65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */,

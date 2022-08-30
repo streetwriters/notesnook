@@ -21,6 +21,8 @@
     "typescript": "^4.8.2"
   },
   "dependencies": {
-    "@notesnook/editor": "*"
+    "@notesnook/editor": "*",
+    "@notesnook/editor-mobile": "*",
+    "@notesnook/core": "*"
   }
 }
