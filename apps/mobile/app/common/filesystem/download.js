@@ -1,5 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
-import hosts from "@streetwriters/notesnook-core/utils/constants";
+import hosts from "@notesnook/core/utils/constants";
 import React from "react";
 import { Platform } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";

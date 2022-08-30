@@ -5,8 +5,8 @@
   "dependencies": {
     "@flyerhq/react-native-link-preview": "^1.6.0",
     "@mdi/js": "^6.7.96",
-    "@streetwriters/editor": "*",
-    "@streetwriters/notesnook-core": "^7.3.5",
+    "@notesnook/editor": "*",
+    "@notesnook/core": "*",
     "absolutify": "^0.1.0",
     "buffer": "^6.0.3",
     "dayjs": "^1.10.4",
@@ -22,7 +22,6 @@
     "react-native-reanimated-material-menu": "github:ammarahm-ed/react-native-reanimated-material-menu",
     "react-native-reanimated-progress-bar": "1.0.1",
     "showdown": "github:thecodrr/showdown",
-    "showndown": "github:thecodrr/showdown",
     "toggle-switch-react-native": "3.2.0",
     "url": "^0.11.0",
     "validator": "^13.5.2",

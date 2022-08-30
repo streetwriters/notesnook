@@ -1,4 +1,4 @@
-import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import { groupArray } from "@notesnook/core/utils/grouping";
 import { qclone } from "qclone";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";

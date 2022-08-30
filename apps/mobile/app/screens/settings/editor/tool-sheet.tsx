@@ -1,4 +1,4 @@
-import { ToolId } from "@streetwriters/editor/dist/toolbar";
+import { ToolId } from "@notesnook/editor/dist/toolbar";
 import React, { RefObject } from "react";
 import { View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";

@@ -6,7 +6,7 @@ import { ThemeConfig } from "./types";
 
 export type Theme = {
   breakpoints: string[];
-  space: number[] & { small?: number };
+  space: number[] & { small?: number | string };
   sizes: { full: "100%"; half: "50%" };
   radii: {
     none: number;
@@ -41,13 +41,13 @@ class ThemeFactory {
       shadows:
         config.theme === "dark"
           ? {
-              menu: "0px 0px 10px 0px #00000078",
+              menu: "0px 0px 10px 0px #00000078"
             }
           : {
-              menu: "0px 0px 10px 0px #00000022",
+              menu: "0px 0px 10px 0px #00000022"
             },
       ...getFontConfig(config.scale),
-      ...variants,
+      ...variants
     };
     theme.space.small = 3;
     return theme;

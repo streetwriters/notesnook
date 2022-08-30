@@ -13,3 +13,6 @@ apps/web/public/an.js
 
 # editor
 packages/editor/styles/
+
+# editor mobile
+packages/editor-mobile/build.bundle
