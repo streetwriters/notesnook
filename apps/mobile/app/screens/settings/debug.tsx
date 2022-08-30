@@ -1,10 +1,6 @@
 import Clipboard from "@react-native-clipboard/clipboard";
 import { LogMessage } from "@streetwriters/logger";
-import {
-  format,
-  LogLevel,
-  logManager
-} from "@streetwriters/notesnook-core/logger";
+import { format, LogLevel, logManager } from "@notesnook/core/logger";
 import React, { useEffect, useState } from "react";
 import { FlatList, Platform, TouchableOpacity, View } from "react-native";
 import * as ScopedStorage from "react-native-scoped-storage";

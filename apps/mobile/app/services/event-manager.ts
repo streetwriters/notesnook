@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import EventManager from "@streetwriters/notesnook-core/utils/eventmanager";
+import EventManager from "@notesnook/core/utils/eventmanager";
 import { RefObject } from "react";
 import ActionSheet from "react-native-actions-sheet";
 import { Config } from "react-native-config";

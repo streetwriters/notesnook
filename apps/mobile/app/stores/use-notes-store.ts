@@ -1,5 +1,5 @@
 //@ts-ignore
-import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
+import { groupArray } from "@notesnook/core/utils/grouping";
 import create, { State } from "zustand";
 import { db } from "../common/database";
 import { NoteType } from "../utils/types";

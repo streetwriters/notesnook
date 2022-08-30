@@ -1,5 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
-import { EVENTS } from "@streetwriters/notesnook-core/common";
+import { EVENTS } from "@notesnook/core/common";
 import { initAfterSync } from "../stores/index";
 import { useUserStore } from "../stores/use-user-store";
 import { doInBackground } from "../utils";

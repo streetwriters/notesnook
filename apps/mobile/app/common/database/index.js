@@ -1,8 +1,5 @@
-import Database from "@streetwriters/notesnook-core/api/index";
-import {
-  initalize,
-  logger as dbLogger
-} from "@streetwriters/notesnook-core/logger";
+import Database from "@notesnook/core/api/index";
+import { initalize, logger as dbLogger } from "@notesnook/core/logger";
 import { Platform } from "react-native";
 import { MMKVLoader } from "react-native-mmkv-storage";
 import filesystem from "../filesystem";
@@ -16,7 +13,7 @@ initalize(new KV(LoggerStorage));
 export const DatabaseLogger = dbLogger;
 
 /**
- * @type {import("@streetwriters/notesnook-core/api/index").default}
+ * @type {import("@notesnook/core/api/index").default}
  */
 export var db = new Database(
   Storage,

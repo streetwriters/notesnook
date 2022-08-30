@@ -1,5 +1,5 @@
 //@ts-ignore
-import { EVENTS } from "@streetwriters/notesnook-core/common";
+import { EVENTS } from "@notesnook/core/common";
 import { useCallback, useEffect, useState } from "react";
 import { db } from "../common/database";
 

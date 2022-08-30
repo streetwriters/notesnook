@@ -1,5 +1,5 @@
 import { getPreviewData } from "@flyerhq/react-native-link-preview";
-import { parseHTML } from "@streetwriters/notesnook-core/utils/htmlparser";
+import { parseHTML } from "@notesnook/core/utils/htmlparser";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,

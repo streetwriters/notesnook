@@ -12,7 +12,6 @@
     "test": "jest --forceExit",
     "lint": "eslint .",
     "build-detox-android": "REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ ENVFILE=.env.test detox build -c android.emu.debug",
-    "update": "yarn add @streetwriters/notesnook-core",
     "test-android": "adb reverse tcp:8081 tcp:8081 && yarn detox test --configuration android.emu.debug --detectOpenHandles",
     "test-android-release": "detox test --configuration android.emu.release",
     "bump": "npx react-native bump-version --skip-semver-for android",
