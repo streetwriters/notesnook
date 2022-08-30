@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
+index 26c2a65..c534178 100644
+--- a/node_modules/react-scripts/config/webpack.config.js
++++ b/node_modules/react-scripts/config/webpack.config.js
+@@ -343,6 +343,8 @@ module.exports = function (webpackEnv) {
+           'react-dom$': 'react-dom/profiling',
+           'scheduler/tracing': 'scheduler/tracing-profiling',
+         }),
++        react: path.resolve(__dirname, '../../react'),
++        'react-dom': path.resolve(__dirname, '../../react-dom'),
+         ...(modules.webpackAliases || {}),
+       },
+       plugins: [

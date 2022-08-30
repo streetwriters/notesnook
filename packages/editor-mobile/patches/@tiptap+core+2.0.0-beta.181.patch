@@ -1,0 +1,28 @@
+diff --git a/node_modules/@tiptap/core/dist/tiptap-core.esm.js b/node_modules/@tiptap/core/dist/tiptap-core.esm.js
+index 3739b80..173171c 100644
+--- a/node_modules/@tiptap/core/dist/tiptap-core.esm.js
++++ b/node_modules/@tiptap/core/dist/tiptap-core.esm.js
+@@ -2768,8 +2768,7 @@ const Keymap = Extension.create({
+             new Plugin({
+                 key: new PluginKey('clearDocument'),
+                 appendTransaction: (transactions, oldState, newState) => {
+-                    const docChanges = transactions.some(transaction => transaction.docChanged)
+-                        && !oldState.doc.eq(newState.doc);
++                    const docChanges = transactions.some(transaction => transaction.docChanged);
+                     if (!docChanges) {
+                         return;
+                     }
+@@ -2777,10 +2776,11 @@ const Keymap = Extension.create({
+                     const allFrom = Selection.atStart(oldState.doc).from;
+                     const allEnd = Selection.atEnd(oldState.doc).to;
+                     const allWasSelected = from === allFrom && to === allEnd;
+-                    const isEmpty = newState.doc.textBetween(0, newState.doc.content.size, ' ', ' ').length === 0;
+-                    if (empty || !allWasSelected || !isEmpty) {
++                    if (empty || !allWasSelected) {
+                         return;
+                     }
++                    const isEmpty = newState.doc.textBetween(0, newState.doc.content.size, ' ', ' ').length === 0;
++                    if (!isEmpty) return;
+                     const tr = newState.tr;
+                     const state = createChainableState({
+                         state: newState,
