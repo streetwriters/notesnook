@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { SerializedKey } from "@notesnook/crypto/dist/src/types";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { db } from "../../common/db";
@@ -96,7 +114,7 @@ async function pickImage(selectedImage: File, options?: AddAttachmentOptions) {
 }
 
 async function getEncryptionKey(): Promise<SerializedKey> {
-  const key = await db.attachments!.generateKey();
+  const key = await db.attachments?.generateKey();
   if (!key) throw new Error("Could not generate a new encryption key.");
   return key;
 }
@@ -113,7 +131,7 @@ export function showFilePicker({
     input.dispatchEvent(new MouseEvent("click"));
     input.onchange = async function () {
       if (!input.files) return resolve(undefined);
-      var file = input.files[0];
+      const file = input.files[0];
       if (!file) return resolve(undefined);
       resolve(file);
     };
@@ -166,15 +184,15 @@ async function addAttachment(
       throw new Error(
         `Please select the same file for reuploading. Expected hash ${expectedFileHash} but got ${hash}.`
       );
-    const exists = db.attachments!.exists(hash);
+    const exists = db.attachments?.exists(hash);
     if (forceWrite || !exists) {
-      let key: SerializedKey = await getEncryptionKey();
+      const key: SerializedKey = await getEncryptionKey();
 
       const output = await fs.writeEncryptedFile(file, key, hash);
       if (!output) throw new Error("Could not encrypt file.");
 
       if (forceWrite && exists) await db.attachments?.reset(hash);
-      await db.attachments!.add({
+      await db.attachments?.add({
         ...output,
         hash,
         hashType,

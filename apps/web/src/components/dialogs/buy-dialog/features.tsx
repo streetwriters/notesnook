@@ -1,9 +1,28 @@
-import { Text, Flex, Box } from "@streetwriters/rebass";
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { Text, Flex, Box, BoxProps } from "@streetwriters/rebass";
 import * as Icon from "../../icons";
 
 type Feature = {
+  id: string;
   title?: string;
-  icon?: (props: any) => JSX.Element;
+  icon?: (props: BoxProps) => JSX.Element;
   pro?: boolean;
 };
 
@@ -23,22 +42,27 @@ const sections: Section[] = [
       "Everything you do in Notesnook stays private. We use XChaCha20-Poly1305-IETF and Argon2 to encrypt your notes.",
     features: [
       {
+        id: "zero-ads",
         title: "Zero ads & zero trackers",
         icon: Icon.Billboard
       },
       {
+        id: "on-device-encryption",
         title: "On device encryption",
         icon: Icon.Cellphone
       },
       {
+        id: "secure-app-lock",
         title: "Secure app lock for all",
         icon: Icon.CellphoneLock
       },
       {
+        id: "end-to-end-encrypted",
         title: "100% end-to-end encrypted",
         icon: Icon.Lock
       },
       {
+        id: "private-vault",
         title: "Private vault for notes",
         icon: Icon.ShieldLock,
         pro: true
@@ -57,27 +81,35 @@ const sections: Section[] = [
     columns: 8,
     features: [
       {
+        id: "ios",
         icon: Icon.iOS
       },
       {
+        id: "android",
         icon: Icon.Android
       },
       {
+        id: "windows",
         icon: Icon.Windows
       },
       {
+        id: "linux",
         icon: Icon.Linux
       },
       {
+        id: "macos",
         icon: Icon.MacOS
       },
       {
+        id: "chrome",
         icon: Icon.Chrome
       },
       {
+        id: "firefox",
         icon: Icon.Firefox
       },
       {
+        id: "safari",
         icon: Icon.Safari
       }
     ]
@@ -89,22 +121,27 @@ const sections: Section[] = [
     pro: true,
     features: [
       {
+        id: "bulletproof-encryption",
         title: "Bulletproof encryption",
         icon: Icon.Lock
       },
       {
+        id: "4k-images",
         title: "High quality 4K images",
         icon: Icon.ImageMultiple
       },
       {
+        id: "unlimited-storage",
         title: "Unlimited storage",
         icon: Icon.Harddisk
       },
       {
+        id: "500-mb-files",
         title: "Upto 500 MB per file",
         icon: Icon.FileCabinet
       },
       {
+        id: "file-types",
         title: "All file types supported",
         icon: Icon.File
       }
@@ -121,14 +158,17 @@ const sections: Section[] = [
       "Publishing is nothing new but we offer fully encrypted, anonymous publishing. Take any note & share it with the world.",
     features: [
       {
+        id: "anon-publishing",
         title: "Anonymous publishing",
         icon: Icon.Anonymous
       },
       {
+        id: "password-protected-publishing",
         title: "Password protection",
         icon: Icon.CloudLock
       },
       {
+        id: "self-destructive-notes",
         title: "Self destructable notes",
         icon: Icon.Timebomb
       }
@@ -140,20 +180,24 @@ const sections: Section[] = [
       "We offer multiple ways to keep you organized. The only limit is your imagination.",
     features: [
       {
+        id: "unlimited-notebooks",
         title: "Unlimited notebooks*",
         icon: Icon.Notebook2,
         pro: true
       },
       {
+        id: "colors-tags",
         title: "Colors & tags*",
         icon: Icon.Palette,
         pro: true
       },
       {
+        id: "side-menu-shortcuts",
         title: "Side menu shortcuts",
         icon: Icon.Shortcut
       },
       {
+        id: "pins-favorites",
         title: "Pins & favorites",
         icon: Icon.Pin
       }
@@ -168,18 +212,22 @@ const sections: Section[] = [
     pro: true,
     features: [
       {
+        id: "lists-tables",
         title: "Lists & tables",
         icon: Icon.Table
       },
       {
+        id: "image-embeds",
         title: "Images & embeds",
         icon: Icon.Embed
       },
       {
+        id: "checklists",
         title: "Checklists",
         icon: Icon.CheckCircleOutline
       },
       {
+        id: "md-shortcuts",
         title: "Markdown shortcuts",
         icon: Icon.Markdown
       }
@@ -192,25 +240,30 @@ const sections: Section[] = [
     // info: "* Free users can export notes in well formatted plain text.",
     features: [
       {
+        id: "export-markdown",
         title: "Export as Markdown",
         icon: Icon.Markdown,
         pro: true
       },
       {
+        id: "export-pdf",
         title: "Export as PDF",
         icon: Icon.PDF,
         pro: true
       },
       {
+        id: "export-html",
         title: "Export as HTML",
         icon: Icon.HTML,
         pro: true
       },
       {
+        id: "export-txt",
         title: "Export as text",
         icon: Icon.Text
       },
       {
+        id: "bulk-exports",
         title: "Bulk exports",
         icon: Icon.Export
       }
@@ -222,11 +275,13 @@ const sections: Section[] = [
       "Do not worry about losing your data. Turn on automatic backups on weekly or daily basis.",
     features: [
       {
+        id: "auto-backups",
         title: "Automatic monthly, weekly & daily backups",
         icon: Icon.Backup,
         pro: true
       },
       {
+        id: "backup-encryption",
         title: "Backup encryption",
         icon: Icon.EncryptedBackup,
         pro: true
@@ -240,14 +295,17 @@ const sections: Section[] = [
     pro: true,
     features: [
       {
+        id: "10-themes",
         title: "10+ themes",
         icon: Icon.Accent
       },
       {
+        id: "dark-mode",
         title: "Automatic dark mode",
         icon: Icon.Theme
       },
       {
+        id: "default-home-page",
         title: "Change default home page",
         icon: Icon.Home
       }
@@ -267,7 +325,7 @@ export function Features() {
       bg="background"
     >
       {sections.map((section) => (
-        <Flex flexDirection="column" px={6} pb={50}>
+        <Flex key={section.title} flexDirection="column" px={6} pb={50}>
           {section.pro && (
             <Flex
               bg="bgSecondary"
@@ -301,7 +359,11 @@ export function Features() {
               mt={4}
             >
               {section.features.map((feature) => (
-                <Flex alignItems="start" flexDirection="column">
+                <Flex
+                  key={feature.id}
+                  alignItems="start"
+                  flexDirection="column"
+                >
                   {feature.icon && (
                     <feature.icon size={20} color="text" sx={{ mb: 1 }} />
                   )}

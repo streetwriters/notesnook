@@ -1,5 +1,23 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button, Flex, Text } from "@streetwriters/rebass";
+import { BoxProps, Button, Flex, Text } from "@streetwriters/rebass";
 import {
   CheckCircle,
   Loading,
@@ -89,7 +107,7 @@ type AuthRoutes =
   | "recover"
   | "mfa:code"
   | "mfa:select";
-type AuthProps = { route: AuthRoutes };
+export type AuthProps = { route: AuthRoutes };
 
 type AuthComponent<TRoute extends AuthRoutes> = (
   props: BaseAuthComponentProps<TRoute>
@@ -316,7 +334,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             loading={!isAppLoaded}
           />
           <Text mt={4} variant="subBody" fontSize={13} textAlign="center">
-            By pressing "Create account" button, you agree to our{" "}
+            By pressing {`"Create account" button, you agree to our`}{" "}
             <Text
               as="a"
               color="primary"
@@ -408,7 +426,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         mt={2}
         variant="anchor"
         color="text"
-        onClick={() => navigate("recover", { email: user!.email })}
+        onClick={() => user && navigate("recover", { email: user.email })}
       >
         Forgot password?
       </Button>
@@ -539,7 +557,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
     async (selectedMethod: "sms" | "email", token: string) => {
       setIsSending(true);
       try {
-        await db.mfa!.sendCode(selectedMethod, token);
+        await db.mfa?.sendCode(selectedMethod, token);
         setEnabled(false);
       } catch (e) {
         const error = e as Error;
@@ -648,7 +666,7 @@ type MFAMethodType = AuthenticatorType | "recoveryCode";
 type MFAMethod = {
   type: MFAMethodType;
   title: string;
-  icon: (props: any) => JSX.Element;
+  icon: (props: BoxProps) => JSX.Element;
 };
 const MFAMethods: MFAMethod[] = [
   { type: "app", title: "Use an authenticator app", icon: MFAAuthenticator },
@@ -683,7 +701,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         title: "Logging you in",
         subtitle: "Please wait while you are authenticated."
       }}
-      onSubmit={async (form) => {
+      onSubmit={async () => {
         const selectedType = MFAMethods[selected];
         formData.selectedMethod = selectedType.type;
         navigate("mfa:code", formData);
@@ -925,7 +943,7 @@ async function login(
     Config.set("sessionExpired", false);
     openURL("/");
   } catch (e) {
-    const error = e as any;
+    const error = e as Error & { code?: string; data?: unknown };
     if (error.code === "mfa_required") {
       const { primaryMethod, phoneNumber, secondaryMethod, token } =
         error.data as MFAErrorData;

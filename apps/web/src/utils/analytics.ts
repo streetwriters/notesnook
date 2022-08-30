@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import Config from "./config";
 import { getPlatform } from "./platform";
 import { appVersion } from "./version";
@@ -18,7 +36,7 @@ declare global {
 
 export function loadTrackerScript() {
   if (Config.get("telemetry") === "false") return;
-  var script = document.createElement("script");
+  const script = document.createElement("script");
   script.src = "/an.js";
   script.async = true;
   script.dataset.websiteId = "f16c07d9-c77b-4781-bfbd-f58e95640002";
@@ -28,7 +46,7 @@ export function loadTrackerScript() {
   script.dataset.autoTrack = "false";
   script.dataset.doNotTrack = "true";
   script.dataset.hostUrl = "https://analytics.streetwriters.co";
-  var firstScriptElement = document.getElementsByTagName("script")[0];
+  const firstScriptElement = document.getElementsByTagName("script")[0];
   script.onload = function () {
     trackVisit();
   };
@@ -92,7 +110,7 @@ export function trackEvent(event: TrackerEvent, eventMessage?: string) {
   else if (eventMessage) window.umami.trackEvent(eventMessage, event.name);
 }
 
-export function trackVisit(url: string = "/") {
+export function trackVisit(url = "/") {
   if (Config.get("telemetry") === "false") return;
   const platform = getPlatform();
   if (!window.umami || !platform) return;

@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import {
   useEffect,
   useCallback,
@@ -18,7 +36,6 @@ import Header from "./header";
 import { Attachment } from "../icons";
 import { useEditorInstance } from "./context";
 import { attachFile, AttachmentProgress, insertAttachment } from "./picker";
-import { DropEvent } from "react-dropzone";
 import { downloadAttachment } from "../../common/attachments";
 import { EV, EVENTS } from "@notesnook/core/common";
 import { db } from "../../common/db";
@@ -410,7 +427,7 @@ function DropZone(props: DropZoneProps) {
         if (!editor || !e.dataTransfer.files?.length) return;
         e.preventDefault();
 
-        for (let file of e.dataTransfer.files) {
+        for (const file of e.dataTransfer.files) {
           const result = await attachFile(file);
           if (!result) continue;
           editor.current?.attachFile(result);
@@ -451,7 +468,7 @@ function useDragOverlay() {
       overlay.style.display = "flex";
     }
 
-    function hideOverlay(e: DragEvent | DropEvent) {
+    function hideOverlay() {
       if (!overlay) return;
       overlay.style.display = "none";
     }

@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Flex, Text } from "@streetwriters/rebass";
 import { Error as ErrorIcon } from "../components/icons";
@@ -13,7 +31,7 @@ import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
 
 type RecoveryMethodType = "key" | "backup" | "reset";
-type RecoveryMethodsFormData = {};
+type RecoveryMethodsFormData = Record<string, unknown>;
 
 type RecoveryKeyFormData = {
   recoveryKey: string;
@@ -22,7 +40,7 @@ type RecoveryKeyFormData = {
 type BackupFileFormData = {
   backupFile: {
     file: File;
-    backup: any;
+    backup: Record<string, unknown>;
   };
 };
 
@@ -264,6 +282,7 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
     >
       {recoveryMethods.map((method, index) => (
         <Button
+          key={method.testId}
           data-test-id={method.testId}
           type="submit"
           variant={"secondary"}
@@ -333,7 +352,7 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         color="text"
         onClick={() => navigate("methods")}
       >
-        Don't have your recovery key?
+        {`Don't have your recovery key?`}
       </Button>
     </RecoveryForm>
   );
@@ -392,7 +411,7 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
         color="text"
         onClick={() => navigate("methods")}
       >
-        Don't have a backup file?
+        {`Don't have a backup file?`}
       </Button>
     </RecoveryForm>
   );

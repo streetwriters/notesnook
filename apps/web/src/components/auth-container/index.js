@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { useMemo } from "react";
 import { Box, Flex, Image, Text } from "@streetwriters/rebass";
 import ThemeProvider from "../theme-provider";
@@ -91,27 +109,27 @@ function AuthContainer(props) {
               <path
                 d="M1184.21-85.14C1033.8-60.27 964.89 302.42 717.38 307.22 469.87 312.02 483.97 244.72 250.55 244.72 17.13 244.72-98.53 307.08-216.28 307.22"
                 stroke="var(--text)"
-                stroke-width="2"
+                strokeWidth="2"
               ></path>
               <path
                 d="M641.38-10.43C534.57 43 590.55 387.5 384.53 392.38 178.52 397.26 2.17 282.99-129.16 282.38"
                 stroke="var(--text)"
-                stroke-width="2"
+                strokeWidth="2"
               ></path>
               <path
                 d="M1136.18-29.24C957.53-5.77 852.26 404.49 561.01 405.07 269.76 405.65 142.54 160.4-14.16 155.07"
                 stroke="var(--text)"
-                stroke-width="2"
+                strokeWidth="2"
               ></path>
               <path
                 d="M508.47-71.88C398.16-66.29 333.42 117.75 114.38 127.84-104.65 137.93-170.96 308.31-279.7 312.84"
                 stroke="var(--text)"
-                stroke-width="2"
+                strokeWidth="2"
               ></path>
               <path
                 d="M1104.88-26.74C976.63-19.04 883.5 217.2 653.03 218.11 422.55 219.02 427.1 155.61 201.17 155.61-24.75 155.61-136.64 217.96-250.68 218.11"
                 stroke="var(--text)"
-                stroke-width="2"
+                strokeWidth="2"
               ></path>
             </g>
             <defs>

@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { showMultiDeleteConfirmation } from "./dialog-controller";
 import { store as noteStore } from "../stores/note-store";
 import { store as notebookStore } from "../stores/notebook-store";
@@ -8,7 +26,13 @@ import Vault from "./vault";
 import { showItemDeletedToast } from "./toasts";
 import { TaskManager } from "./task-manager";
 
-async function moveNotesToTrash(notes: any[], confirm = true) {
+type Item = {
+  id: string;
+  locked?: boolean;
+  metadata?: Record<string, unknown>;
+};
+
+async function moveNotesToTrash(notes: Item[], confirm = true) {
   const item = notes[0];
   if (confirm && !(await showMultiDeleteConfirmation(notes.length))) return;
 
@@ -22,7 +46,7 @@ async function moveNotesToTrash(notes: any[], confirm = true) {
   }
 
   const items = notes.map((item) => {
-    if (item.locked || db.monographs!.isPublished(item.id)) return 0;
+    if (item.locked || db.monographs?.isPublished(item.id)) return 0;
     return item.id;
   });
 
@@ -40,7 +64,7 @@ async function moveNotesToTrash(notes: any[], confirm = true) {
   showToast("success", `${items.length} notes moved to trash`);
 }
 
-async function moveNotebooksToTrash(notebooks: any[]) {
+async function moveNotebooksToTrash(notebooks: Item[]) {
   const item = notebooks[0];
   const isMultiselect = notebooks.length > 1;
   if (isMultiselect) {
@@ -67,7 +91,7 @@ async function moveNotebooksToTrash(notebooks: any[]) {
   }
 }
 
-async function deleteTopics(notebookId: string, topics: any[]) {
+async function deleteTopics(notebookId: string, topics: Item[]) {
   await TaskManager.startTask({
     type: "status",
     id: "deleteTopics",
@@ -75,8 +99,8 @@ async function deleteTopics(notebookId: string, topics: any[]) {
       report({
         text: `Deleting ${topics.length} topics...`
       });
-      await db
-        .notebooks!.notebook(notebookId)
+      await db.notebooks
+        ?.notebook(notebookId)
         .topics.delete(...topics.map((t) => t.id));
       notebookStore.setSelectedNotebook(notebookId);
     }
@@ -84,7 +108,7 @@ async function deleteTopics(notebookId: string, topics: any[]) {
   showToast("success", `${topics.length} topics deleted`);
 }
 
-async function deleteAttachments(attachments: any[]) {
+async function deleteAttachments(attachments: Item[]) {
   if (
     !window.confirm(
       "Are you sure you want to permanently delete these attachments? This action is IRREVERSIBLE."
@@ -103,7 +127,7 @@ async function deleteAttachments(attachments: any[]) {
           current: i,
           total: attachments.length
         });
-        await attachmentStore.permanentDelete(attachment.metadata.hash);
+        await attachmentStore.permanentDelete(attachment.metadata?.hash);
       }
     }
   });

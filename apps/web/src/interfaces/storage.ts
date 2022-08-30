@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import * as MemoryDriver from "localforage-driver-memory";
@@ -58,13 +76,15 @@ export class NNStorage {
     const crypto = await getNNCrypto();
     const keyData = await crypto.exportKey(password, salt);
 
-    if (this.isIndexedDBSupported() && window?.crypto?.subtle) {
+    if (this.isIndexedDBSupported() && window?.crypto?.subtle && keyData.key) {
       const pbkdfKey = await derivePBKDF2Key(password);
       await this.write(name, pbkdfKey);
-      const cipheredKey = await aesEncrypt(pbkdfKey, keyData.key!);
+      const cipheredKey = await aesEncrypt(pbkdfKey, keyData.key);
       await this.write(`${name}@_k`, cipheredKey);
-    } else {
+    } else if (keyData.key) {
       await this.write(`${name}@_k`, keyData.key);
+    } else {
+      throw new Error(`Invalid key.`);
     }
   }
 
@@ -121,8 +141,8 @@ export class NNStorage {
   }
 }
 
-let enc = new TextEncoder();
-let dec = new TextDecoder();
+const enc = new TextEncoder();
+const dec = new TextDecoder();
 
 async function derivePBKDF2Key(password: string): Promise<CryptoKey> {
   const key = await window.crypto.subtle.importKey(
@@ -133,7 +153,7 @@ async function derivePBKDF2Key(password: string): Promise<CryptoKey> {
     ["deriveKey"]
   );
 
-  let salt = window.crypto.getRandomValues(new Uint8Array(16));
+  const salt = window.crypto.getRandomValues(new Uint8Array(16));
   return await window.crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
@@ -152,7 +172,7 @@ async function aesEncrypt(
   cryptoKey: CryptoKey,
   data: string
 ): Promise<EncryptedKey> {
-  let iv = window.crypto.getRandomValues(new Uint8Array(12));
+  const iv = window.crypto.getRandomValues(new Uint8Array(12));
 
   const cipher = await window.crypto.subtle.encrypt(
     {

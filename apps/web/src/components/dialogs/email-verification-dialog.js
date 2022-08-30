@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { useEffect } from "react";
 import { Flex, Text } from "@streetwriters/rebass";
 import Dialog from "./dialog";
@@ -85,8 +103,8 @@ function EmailVerificationDialog(props) {
           sx={{ mt: 2, bg: "bgSecondary", borderRadius: "default" }}
         >
           <Text variant={"body"} px={1} pb={1}>
-            If you didn't get an email from us or the confirmation link isn't
-            working,{" "}
+            {`If you didn't get an email from us or the confirmation link isn't
+            working,`}{" "}
             <b>please send us an email from your registered email address</b>{" "}
             and we will manually confirm your account.
           </Text>

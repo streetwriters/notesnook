@@ -1,11 +1,29 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 export function removeCss(id: string) {
-  var link = document.getElementById(id);
+  const link = document.getElementById(id);
   if (link) link.remove();
 }
 
 export function injectCssSrc(id: string, src: string) {
-  var head = document.head;
-  var link = document.createElement("link");
+  const head = document.head;
+  const link = document.createElement("link");
 
   link.id = id;
   link.type = "text/css";
@@ -16,24 +34,22 @@ export function injectCssSrc(id: string, src: string) {
 }
 
 export function injectCss(rules: string) {
-  let variableCss = document.getElementById("variables");
-  let head = document.getElementsByTagName("head")[0];
+  const variableCss = document.getElementById("variables");
+  const head = document.getElementsByTagName("head")[0];
   if (variableCss) {
     head.removeChild(variableCss);
   }
-  let css = document.createElement("style");
+  const css = document.createElement("style");
   css.type = "text/css";
   css.id = "variables";
-  // Support for IE
-  if ("styleSheet" in css) (css as any).styleSheet.cssText = rules;
   // Support for the rest
-  else css.appendChild(document.createTextNode(rules));
+  css.appendChild(document.createTextNode(rules));
 
   head.insertBefore(css, getRootStylesheet());
 }
 
 function getRootStylesheet() {
-  for (let sty of document.getElementsByTagName("style")) {
+  for (const sty of document.getElementsByTagName("style")) {
     if (sty.innerHTML.includes("#root")) {
       return sty;
     }
@@ -42,7 +58,7 @@ function getRootStylesheet() {
 }
 
 export function changeSvgTheme(newAccent: string) {
-  var nodes = document.querySelectorAll('*[fill="#0560ff"]');
-  for (var n = 0; n < nodes.length; ++n)
+  const nodes = document.querySelectorAll('*[fill="#0560ff"]');
+  for (let n = 0; n < nodes.length; ++n)
     nodes[n].setAttribute("fill", newAccent);
 }
