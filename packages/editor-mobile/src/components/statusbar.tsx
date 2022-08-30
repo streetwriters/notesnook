@@ -3,7 +3,7 @@ import React, { RefObject, useEffect, useRef, useState } from "react";
 function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const [status, setStatus] = useState({
     date: "",
-    saved: "",
+    saved: ""
   });
   const [sticky, setSticky] = useState(false);
   const stickyRef = useRef(false);
@@ -13,13 +13,11 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
   const currentWords = useRef(words);
   const interval = useRef(0);
   const statusBar = useRef({
-    set: setStatus,
+    set: setStatus
   });
-  //@ts-ignore
   globalThis.statusBar = statusBar;
 
   const onScroll = React.useCallback((event) => {
-    //@ts-ignore
     const currentOffset = event.target.scrollTop;
     if (currentOffset < 200) {
       if (stickyRef.current) {
@@ -48,12 +46,11 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
 
   useEffect(() => {
     clearInterval(interval.current);
-    //@ts-ignore
     interval.current = setInterval(() => {
       const words = editor?.storage?.characterCount?.words() + " words";
       if (currentWords.current === words) return;
       setWords(words);
-    }, 3000);
+    }, 3000) as unknown as number;
     return () => {
       clearInterval(interval.current);
     };
@@ -73,7 +70,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
     fontSize: "12px",
     color: "var(--nn_icon)",
     marginRight: 8,
-    paddingBottom: 0,
+    paddingBottom: 0
   };
 
   return (
@@ -89,7 +86,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
         zIndex: 1,
         justifyContent: sticky ? "center" : "flex-start",
         paddingTop: 2,
-        paddingBottom: 2,
+        paddingBottom: 2
       }}
     >
       <p style={paragraphStyle}>{words}</p>

@@ -21,6 +21,6 @@
     "typescript": "^4.8.2"
   },
   "dependencies": {
-    "@streetwriters/editor": "*"
+    "@notesnook/editor": "*"
   }
 }

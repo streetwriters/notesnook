@@ -1,5 +1,5 @@
 import { useEditor } from "./use-editor";
-import type { ToolbarGroupDefinition } from "@streetwriters/editor/dist/toolbar/types";
+import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
 import { ThemeStore } from "../../../stores/use-theme-store";
 export type useEditorType = ReturnType<typeof useEditor>;
 

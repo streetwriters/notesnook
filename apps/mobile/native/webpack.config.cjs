@@ -83,7 +83,7 @@ module.exports = (env) => {
         //'react-native': reactNativePath,
         "react": path.join(__dirname, "../node_modules/react"),
         "react-dom": path.join(__dirname, "../node_modules/react-dom"),
-        "@streetwriters/editor": path.join(__dirname, "../../../packages/editor"),
+        "@notesnook/editor": path.join(__dirname, "../../../packages/editor"),
       },
     },
     /**

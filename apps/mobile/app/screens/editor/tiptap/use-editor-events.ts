@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { getDefaultPresets } from "@streetwriters/editor/dist/toolbar/tool-definitions";
+import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,

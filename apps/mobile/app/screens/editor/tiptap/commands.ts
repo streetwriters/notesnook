@@ -1,8 +1,8 @@
 import type {
   Attachment,
   AttachmentProgress
-} from "@streetwriters/editor/dist/extensions/attachment/index";
-import type { ImageAttributes } from "@streetwriters/editor/dist/extensions/image/index";
+} from "@notesnook/editor/dist/extensions/attachment/index";
+import type { ImageAttributes } from "@notesnook/editor/dist/extensions/image/index";
 import { createRef, RefObject } from "react";
 import { Platform } from "react-native";
 import { EdgeInsets } from "react-native-safe-area-context";

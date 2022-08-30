@@ -1,26 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "tiptap editor",
+  "extends": "../../tsconfig",
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
-    "target": "es5",
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "jsx": "react-jsx",
-    "moduleResolution": "node",
     "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "outDir": "../notesnook-mobile/web.bundle",
     "downlevelIteration": true,
-    "maxNodeModuleJsDepth": 5
+    "maxNodeModuleJsDepth": 5,
+    "allowJs": true
   },
-  "include": ["src/"],
-  "exclude": ["src/notesnook-editor/"]
+  "include": [
+    "src/"
+  ]
 }

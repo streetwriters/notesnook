@@ -63,7 +63,7 @@ const DefaultColors = {
   input: "transparent",
   heading: "#212121",
   border: "#E8E8E8",
-  placeholder: "#a9a9a9",
+  placeholder: "#a9a9a9"
 };
 
 injectCss(transform(DefaultColors));
@@ -72,10 +72,10 @@ interface ThemeState extends State {
   setColors: (colors: Colors) => void;
 }
 
-export const useEditorThemeStore = create<ThemeState>((set, get) => ({
+export const useEditorThemeStore = create<ThemeState>((set) => ({
   colors: DefaultColors,
   setColors: (colors) => {
     injectCss(transform(colors));
     set({ colors: colors });
-  },
+  }
 }));

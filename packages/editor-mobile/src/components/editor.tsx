@@ -3,16 +3,16 @@ import {
   PortalProvider,
   Toolbar,
   usePermissionHandler,
-  useTiptap,
-} from "@streetwriters/editor";
-import { Theme, useTheme } from "@streetwriters/theme";
+  useTiptap
+} from "@notesnook/editor";
+import { Theme, useTheme } from "@notesnook/theme";
 import {
   forwardRef,
   memo,
   useCallback,
   useLayoutEffect,
   useRef,
-  useState,
+  useState
 } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 import { useSettings } from "../hooks/useSettings";
@@ -26,7 +26,7 @@ import Title from "./title";
 const Tiptap = ({
   editorTheme,
   toolbarTheme,
-  settings,
+  settings
 }: {
   editorTheme: Theme;
   toolbarTheme: Theme;
@@ -38,11 +38,11 @@ const Tiptap = ({
   const [layout, setLayout] = useState(false);
   usePermissionHandler({
     claims: {
-      premium: settings.premium,
+      premium: settings.premium
     },
     onPermissionDenied: () => {
       post(EventTypes.pro);
-    },
+    }
   });
   const _editor = useTiptap(
     {
@@ -64,12 +64,12 @@ const Tiptap = ({
       element: !layout ? undefined : contentRef.current || undefined,
       editable: !settings.readonly,
       editorProps: {
-        editable: () => !settings.readonly,
+        editable: () => !settings.readonly
       },
       content: global.editorController?.content?.current,
       isMobile: true,
       isKeyboardOpen: settings.keyboardShown,
-      doubleSpacedLines: settings.doubleSpacedLines,
+      doubleSpacedLines: settings.doubleSpacedLines
     },
     [layout, settings.readonly, tick]
   );
@@ -97,7 +97,7 @@ const Tiptap = ({
           flex: 1,
           flexDirection: "column",
           maxWidth: "100vw",
-          marginBottom: "5px",
+          marginBottom: "5px"
         }}
       >
         <Header
@@ -115,7 +115,7 @@ const Tiptap = ({
             height: "100%",
             flexGrow: 1,
             flexShrink: 1,
-            display: "flex",
+            display: "flex"
           }}
         >
           {settings.noHeader ? null : (
@@ -143,7 +143,7 @@ const Tiptap = ({
               globalThis.editor
                 ?.chain()
                 .insertContentAt(lastPosition - 1, "<p></p>", {
-                  updateSelection: true,
+                  updateSelection: true
                 })
                 .run();
               setTimeout(() => {
@@ -153,7 +153,7 @@ const Tiptap = ({
             style={{
               flexShrink: 0,
               height: 150,
-              width: "100%",
+              width: "100%"
             }}
           />
         </div>
@@ -184,7 +184,7 @@ const ContentDiv = memo(
           flex: 1,
           color: theme.pri,
           marginTop: -12,
-          caretColor: theme.accent,
+          caretColor: theme.accent
         }}
       />
     );
@@ -194,36 +194,35 @@ const ContentDiv = memo(
 
 const modifyToolbarTheme = (toolbarTheme: Theme) => {
   toolbarTheme.space = [0, 10, 12, 18];
-  //@ts-ignore
   toolbarTheme.space.small = "10px";
 
   toolbarTheme.buttons.menuitem = {
     ...toolbarTheme.buttons.menuitem,
     height: "50px",
     paddingX: "20px",
-    borderBottomWidth: 0,
+    borderBottomWidth: 0
   };
 
   toolbarTheme.iconSizes = {
     big: 20,
     medium: 18,
-    small: 18,
+    small: 18
   };
   toolbarTheme.fontSizes = {
     ...toolbarTheme.fontSizes,
     subBody: "0.8rem",
-    body: "0.9rem",
+    body: "0.9rem"
   };
 
   toolbarTheme.radii = {
     ...toolbarTheme.radii,
-    small: 5,
+    small: 5
   };
 
   toolbarTheme.buttons.menuitem = {
     ...toolbarTheme.buttons.menuitem,
     px: 5,
-    height: "45px",
+    height: "45px"
   };
 };
 
@@ -234,14 +233,14 @@ const TiptapProvider = () => {
     //todo
     accent: theme?.accent,
     scale: 1,
-    theme: theme?.night ? "dark" : "light",
+    theme: theme?.night ? "dark" : "light"
   });
   modifyToolbarTheme(toolbarTheme);
   const editorTheme = useTheme({
     //todo
     accent: theme?.accent,
     scale: 1,
-    theme: theme?.night ? "dark" : "light",
+    theme: theme?.night ? "dark" : "light"
   });
   editorTheme.colors.background = theme?.bg || "#f0f0f0";
   editorTheme.space = [0, 10, 12, 20];

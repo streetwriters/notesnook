@@ -1,10 +1,10 @@
-import { Editor } from "@streetwriters/editor";
+import { Editor } from "@notesnook/editor";
 import {
   MutableRefObject,
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from "react";
 import { useEditorThemeStore } from "../state/theme";
 import { EventTypes, isReactNative, post } from "../utils";
@@ -20,7 +20,7 @@ export type Selection = {
   [name: string]: {
     text?: string;
     length?: number;
-    attributes?: Record<string, any>;
+    attributes?: Record<string, unknown>;
     type?: "mark" | "node";
   };
 };
@@ -51,10 +51,10 @@ export function useEditorController(update: () => void): EditorController {
   const htmlContentRef = useRef<string | null>(null);
   const timers = useRef<Timers>({
     selectionChange: null,
-    change: null,
+    change: null
   });
 
-  const selectionChange = useCallback((editor: Editor) => {}, []);
+  const selectionChange = useCallback((_editor: Editor) => {}, []);
 
   const titleChange = useCallback((title: string) => {
     post(EventTypes.title, title);
@@ -72,10 +72,7 @@ export function useEditorController(update: () => void): EditorController {
   }, []);
 
   const scroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
-      //@ts-ignore
-      //post(EventTypes.scroll, event.target.scrollTop);
-    },
+    (_event: React.UIEvent<HTMLDivElement, UIEvent>) => {},
     []
   );
 
@@ -84,13 +81,12 @@ export function useEditorController(update: () => void): EditorController {
   }, [update]);
 
   const onMessage = useCallback(
-    (data: Event) => {
-      //@ts-ignore
-      if (data?.data[0] !== "{") return;
-      //@ts-ignore
-      let message = JSON.parse(data.data);
-      let type = message.type;
-      let value = message.value;
+    (event: Event & { data?: string }) => {
+      if (event?.data?.[0] !== "{") return;
+
+      const message = JSON.parse(event.data);
+      const type = message.type;
+      const value = message.value;
       global.sessionId = message.sessionId;
       switch (type) {
         case "native:html":
@@ -118,10 +114,9 @@ export function useEditorController(update: () => void): EditorController {
 
   useEffect(() => {
     if (!isReactNative()) return; // Subscribe only in react native webview.
-    let isSafari = navigator.vendor.match(/apple/i);
-    let root = document;
+    const isSafari = navigator.vendor.match(/apple/i);
+    let root: Document | Window = document;
     if (isSafari) {
-      //@ts-ignore
       root = window;
     }
     console.log("recreating messaging");
@@ -152,6 +147,6 @@ export function useEditorController(update: () => void): EditorController {
     openFilePicker,
     downloadAttachment,
     content: htmlContentRef,
-    onUpdate: onUpdate,
+    onUpdate: onUpdate
   };
 }

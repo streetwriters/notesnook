@@ -1,4 +1,4 @@
-import type { ToolbarGroupDefinition } from "@streetwriters/editor/dist/toolbar/types";
+import type { ToolbarGroupDefinition } from "@notesnook/editor/dist/toolbar/types";
 import create, { State } from "zustand";
 import { persist } from "zustand/middleware";
 import { useNoteStore } from "../../../stores/use-notes-store";

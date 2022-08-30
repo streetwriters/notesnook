@@ -104,9 +104,6 @@
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "postinstall": "patch-package"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "browserslist": {
     "production": [
       ">0.2%",

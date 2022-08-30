@@ -1,5 +1,5 @@
-import { ToolbarGroupDefinition } from "@streetwriters/editor";
-import { Editor } from "@streetwriters/editor";
+import { ToolbarGroupDefinition } from "@notesnook/editor";
+import { Editor } from "@notesnook/editor";
 import { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import { useEditorController } from "../hooks/useEditorController";
 
@@ -22,7 +22,16 @@ export type Settings = {
   doubleSpacedLines?: boolean;
 };
 
+/* eslint-disable no-var */
 declare global {
+  var statusBar: React.MutableRefObject<{
+    set: React.Dispatch<
+      React.SetStateAction<{
+        date: string;
+        saved: string;
+      }>
+    >;
+  }>;
   var readonly: boolean;
   var noToolbar: boolean;
   var noHeader: boolean;
@@ -76,14 +85,17 @@ declare global {
     >;
   }>;
 
-  function logger(type: "info" | "warn" | "error", ...logs: any[]): void;
+  function logger(type: "info" | "warn" | "error", ...logs: never[]): void;
   /**
    * Function to post message to react native
    * @param type
    * @param value
    */
 
-  function post(type: string, value?: unknown): void;
+  function post<T extends keyof typeof EventTypes>(
+    type: typeof EventTypes[T],
+    value?: unknown
+  ): void;
   interface Window {
     /**
      * React Native WebView
@@ -93,11 +105,7 @@ declare global {
     };
   }
 }
-
-export const timerFn = (callback: () => void, duration: number) => {
-  // timer = setTimeout(callback, duration);
-  // return timer;
-};
+/* eslint-enable no-var */
 
 export const EventTypes = {
   selection: "editor-event:selection",
@@ -114,15 +122,15 @@ export const EventTypes = {
   pro: "editor-event:pro",
   monograph: "editor-event:monograph",
   properties: "editor-event:properties",
-  fullscreen: "editor-event:fullscreen",
-};
+  fullscreen: "editor-event:fullscreen"
+} as const;
 
 export function isReactNative(): boolean {
   return !!window.ReactNativeWebView;
 }
 
-export function logger(type: "info" | "warn" | "error", ...logs: any[]) {
-  let logString = logs
+export function logger(type: "info" | "warn" | "error", ...logs: never[]) {
+  const logString = logs
     .map((log) => {
       return typeof log !== "string" ? JSON.stringify(log) : log;
     })
@@ -131,19 +139,22 @@ export function logger(type: "info" | "warn" | "error", ...logs: any[]) {
   post(EventTypes.logger, `[${type}]: ` + logString);
 }
 
-export function post(type: string, value?: unknown) {
+export function post<T extends keyof typeof EventTypes>(
+  type: typeof EventTypes[T],
+  value?: unknown
+) {
   if (isReactNative()) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
-        //@ts-ignore
-        type: EventTypes[type] || type,
+        type,
         value: value,
-        sessionId: global.sessionId,
+        sessionId: globalThis.sessionId
       })
     );
   } else {
     console.log(type, value);
   }
 }
+
 globalThis.logger = logger;
 globalThis.post = post;

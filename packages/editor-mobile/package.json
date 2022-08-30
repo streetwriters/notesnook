@@ -1,19 +1,15 @@
 {
-  "name": "tiptap",
+  "name": "@notesnook/editor-mobile",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@streetwriters/editor": "^1.3.1",
-    "@streetwriters/theme": "^1.0.1",
+    "@notesnook/editor": "*",
+    "@notesnook/theme": "*",
     "framer-motion": "^4.1.17",
     "mdi-react": "^8.4.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "zustand": "^3.6.8"
-  },
-  "resolutions": {
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.11"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.0",
@@ -21,8 +17,8 @@
     "@testing-library/user-event": "^12.8.3",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.11",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.11",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.2",
     "patch-package": "^6.4.7",
     "react-error-overlay": "6.0.9",
     "react-scripts": "^4.0.3",
@@ -31,16 +27,9 @@
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build && rm -rf ../clean/notesnook-mobile/web.bundle/ && mkdir ../clean/notesnook-mobile/web.bundle && cp -R ./build/* ../clean/notesnook-mobile/web.bundle/",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build && mv build build.bundle",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "postinstall": "patch-package"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "eject": "react-scripts eject"
   },
   "homepage": ".",
   "browserslist": {
@@ -54,5 +43,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/build.bundle"
+        ]
+      }
+    }
   }
 }

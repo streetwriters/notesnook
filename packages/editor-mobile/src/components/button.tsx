@@ -1,4 +1,4 @@
-import { Editor } from "@streetwriters/editor";
+import { Editor } from "@notesnook/editor";
 
 type ButtonType = {
   editor: Editor | null;
@@ -13,7 +13,7 @@ export default function Button({
   title,
   onPress,
   marginRight = 10,
-  activeKey,
+  activeKey
 }: ButtonType) {
   const active = editor?.isActive(activeKey);
 
@@ -29,7 +29,7 @@ export default function Button({
         userSelect: "none",
         color: active ? "var(--nn_accent)" : "var(--nn_pri)",
         marginRight: marginRight,
-        fontSize: 18,
+        fontSize: 18
       }}
       onMouseUp={(e) => {
         e.preventDefault();

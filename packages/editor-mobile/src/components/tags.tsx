@@ -5,7 +5,7 @@ import styles from "./styles.module.css";
 export default function Tags() {
   const [tags, setTags] = useState<{ title: string; alias: string }[]>([]);
   const editorTags = useRef({
-    setTags: setTags,
+    setTags: setTags
   });
 
   global.editorTags = editorTags;
@@ -24,7 +24,7 @@ export default function Tags() {
         padding: "0px 12px",
         display: "flex",
         alignItems: "center",
-        marginTop: 10,
+        marginTop: 10
       }}
     >
       <button
@@ -47,7 +47,7 @@ export default function Tags() {
           fontFamily: "Open Sans",
           display: "flex",
           alignItems: "center",
-          height: "30px",
+          height: "30px"
         }}
       >
         {tags.length === 0 ? (
@@ -56,7 +56,7 @@ export default function Tags() {
               marginRight: 4,
               fontSize: 13,
               color: "var(--nn_icon)",
-              userSelect: "none",
+              userSelect: "none"
             }}
           >
             Add a tag
@@ -78,6 +78,7 @@ export default function Tags() {
 
       {tags.map((tag) => (
         <button
+          key={tag.title}
           className={styles.btn}
           style={{
             borderWidth: 0,
@@ -88,7 +89,7 @@ export default function Tags() {
             height: "30px",
             fontFamily: "Open Sans",
             fontSize: 13,
-            color: "var(--nn_icon)",
+            color: "var(--nn_icon)"
           }}
           onMouseUp={(e) => {
             e.preventDefault();
