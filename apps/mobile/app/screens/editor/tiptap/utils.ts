@@ -1,4 +1,4 @@
-import { createRef, RefObject } from "react";
+import { createRef, MutableRefObject, RefObject } from "react";
 import { TextInput } from "react-native";
 import WebView from "react-native-webview";
 import {
@@ -8,7 +8,8 @@ import {
 import { NoteType } from "../../../utils/types";
 import { EditorState, useEditorType } from "./types";
 export const textInput = createRef<TextInput>();
-export const editorController = createRef<useEditorType>();
+export const editorController =
+  createRef<useEditorType>() as MutableRefObject<useEditorType>;
 
 export const defaultState: Partial<EditorState> = {
   movedAway: true

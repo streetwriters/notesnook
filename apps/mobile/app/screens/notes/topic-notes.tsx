@@ -9,7 +9,7 @@ import Navigation, {
   NotesScreenParams
 } from "../../services/navigation";
 import { eOpenAddTopicDialog } from "../../utils/events";
-import { TopicType } from "../../utils/types";
+import { NotebookType, TopicType } from "../../utils/types";
 import { openEditor } from "./common";
 const headerRightButtons = (params: NotesScreenParams) => [
   {
@@ -28,7 +28,10 @@ const headerRightButtons = (params: NotesScreenParams) => [
     onPress: () => {
       const { item } = params;
       if (item?.type !== "topic") return;
-      MoveNotes.present(db.notebooks?.notebook(item.notebookId).data, item);
+      MoveNotes.present(
+        db.notebooks?.notebook(item.notebookId).data as NotebookType,
+        item
+      );
     }
   }
 ];
@@ -52,8 +55,7 @@ export const TopicNotes = ({
 };
 
 TopicNotes.get = (params: NotesScreenParams, grouped = true) => {
-  //@ts-ignore
-  const { id, notebookId } = params.item;
+  const { id, notebookId } = params.item as TopicType;
   const notes = db.notebooks?.notebook(notebookId)?.topics.topic(id)?.all || [];
   return grouped
     ? groupArray(notes, db.settings?.getGroupOptions("notes"))

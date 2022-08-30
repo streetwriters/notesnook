@@ -8,7 +8,7 @@ import Paragraph from "../../../components/ui/typography/paragraph";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 import { Group } from "./group";
-import { useDragState } from "./state";
+import { DragState, useDragState } from "./state";
 export const ConfigureToolbar = () => {
   const data = useDragState((state) => state.data);
   const preset = useDragState((state) => state.preset);
@@ -77,8 +77,9 @@ export const ConfigureToolbar = () => {
                   marginRight: 10
                 }}
                 onPress={() => {
-                  //@ts-ignore
-                  useDragState.getState().setPreset(item.id);
+                  useDragState
+                    .getState()
+                    .setPreset(item.id as DragState["preset"]);
                 }}
                 fontSize={SIZE.sm - 1}
                 key={item.name}

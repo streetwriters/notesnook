@@ -23,6 +23,15 @@ import { PressableButton } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+
+type CommonItemType = {
+  id: string;
+  title: string;
+  headline?: string;
+  type: string;
+  notes?: string[];
+};
+
 export const MoveNotes = ({
   notebook,
   selectedTopic,
@@ -74,7 +83,6 @@ export const MoveNotes = ({
 
   const addNewTopic = async (value: string) => {
     if (!value || value.trim().length === 0) {
-      //@ts-ignore
       ToastEvent.show({
         heading: "Topic title is required",
         type: "error",
@@ -99,13 +107,13 @@ export const MoveNotes = ({
     return true;
   };
 
-  const renderItem = ({ item }: { item: TopicType | NoteType }) => {
+  const renderItem = ({ item }: { item: CommonItemType }) => {
     return (
       <PressableButton
         testID="listitem.select"
         onPress={() => {
           if (item.type == "topic") {
-            setTopic(topic || item);
+            setTopic(topic || (item as TopicType));
           } else {
             select(item.id);
           }
@@ -143,7 +151,7 @@ export const MoveNotes = ({
             }}
             color={colors.icon}
           >
-            {item.notes.length} Notes
+            {item.notes?.length} Notes
           </Paragraph>
         ) : null}
 

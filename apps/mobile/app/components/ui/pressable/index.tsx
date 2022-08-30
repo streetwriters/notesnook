@@ -8,7 +8,11 @@ import {
   ViewStyle
 } from "react-native";
 import Animated from "react-native-reanimated";
-import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
+import {
+  ColorKey,
+  ThemeStore,
+  useThemeStore
+} from "../../../stores/use-theme-store";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
 import { BUTTON_TYPES } from "../../../utils/constants";
 import { br } from "../../../utils/size";
@@ -48,19 +52,17 @@ export const PressableButton = ({
 
   const selectedColor =
     customSelectedColor ||
-    //@ts-ignore
     colors[
       type === "accent"
-        ? BUTTON_TYPES[type](accentColor, accentText).selected
-        : BUTTON_TYPES[type].selected
+        ? (BUTTON_TYPES[type](accentColor, accentText).selected as ColorKey)
+        : (BUTTON_TYPES[type].selected as ColorKey)
     ];
   const primaryColor =
     customColor ||
-    //@ts-ignore
     colors[
       type === "accent"
-        ? BUTTON_TYPES[type](accentColor, accentText).primary
-        : BUTTON_TYPES[type].primary
+        ? (BUTTON_TYPES[type](accentColor, accentText).primary as ColorKey)
+        : (BUTTON_TYPES[type].primary as ColorKey)
     ];
   const opacity = customOpacity
     ? customOpacity

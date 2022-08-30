@@ -47,27 +47,23 @@ export const Tip = ({
         }}
       >
         <Button
-          //@ts-ignore
           title="TIP"
           icon="information"
           fontSize={SIZE.xs}
           iconSize={SIZE.xs}
-          //@ts-ignore
           style={{
-            width: null,
+            width: undefined,
             height: 22,
             paddingHorizontal: 4,
             alignSelf: "flex-start",
             borderRadius: 100,
             borderWidth: 1,
-            //@ts-ignore
-            borderColor: colors[color]
+            borderColor: colors[color as keyof typeof colors] as string
           }}
         />
 
         {neverShowAgain && (
           <Button
-            //@ts-ignore
             title="Never show again"
             type="grayBg"
             icon="close"
@@ -77,9 +73,8 @@ export const Tip = ({
               MMKV.setItem("neverShowSheetTips", "true");
               eSendEvent(eCloseProgressDialog);
             }}
-            //@ts-ignore
             style={{
-              width: null,
+              width: undefined,
               height: 25,
               paddingHorizontal: 4,
               alignSelf: "flex-start",
@@ -116,7 +111,6 @@ export const Tip = ({
 
       {tip.button && (
         <Button
-          //@ts-ignore
           title={tip.button.title}
           type="accent"
           icon={tip.button.icon}

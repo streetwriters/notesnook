@@ -1,4 +1,3 @@
-//@ts-ignore
 import { Dimensions } from "react-native";
 import Config from "react-native-config";
 import { FileType } from "react-native-scoped-storage";
@@ -46,7 +45,7 @@ export type Settings = {
   doubleSpacedLines?: boolean;
 };
 
-type Dimensions = {
+type DimensionsType = {
   width: number;
   height: number;
 };
@@ -55,11 +54,11 @@ export interface SettingStore extends State {
   settings: Settings;
   fullscreen: boolean;
   deviceMode: string | null;
-  dimensions: Dimensions;
+  dimensions: DimensionsType;
   setSettings: (settings: Settings) => void;
   setFullscreen: (fullscreen: boolean) => void;
   setDeviceMode: (mode: string) => void;
-  setDimensions: (dimensions: Dimensions) => void;
+  setDimensions: (dimensions: DimensionsType) => void;
   appLoading: boolean;
   setAppLoading: (appLoading: boolean) => void;
   setSheetKeyboardHandler: (sheetKeyboardHandler: boolean) => void;

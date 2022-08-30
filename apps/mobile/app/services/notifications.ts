@@ -1,7 +1,8 @@
 import { Platform } from "react-native";
 import PushNotification, {
   Importance,
-  PushNotificationDeliveredObject
+  PushNotificationDeliveredObject,
+  PushNotificationObject
 } from "react-native-push-notification";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
@@ -39,20 +40,22 @@ function init() {
       editorState().movedAway = false;
       MMKV.removeItem("appState");
       if (useNoteStore?.getState()?.loading === false) {
-        //@ts-ignore
         await db.init();
-        //@ts-ignore
-        await db.notes.init();
-        //@ts-ignore
-        loadNote(notification.tag, false);
+        await db.notes?.init();
+        loadNote(
+          (notification as unknown as PushNotificationDeliveredObject).tag,
+          false
+        );
         return;
       }
 
       const unsub = useNoteStore.subscribe(
         (loading) => {
           if (loading === false) {
-            //@ts-ignore
-            loadNote(notification.tag, true);
+            loadNote(
+              (notification as unknown as PushNotificationDeliveredObject).tag,
+              true
+            );
           }
           unsub();
         },
@@ -63,8 +66,10 @@ function init() {
       console.log("ACTION: ", notification.action);
       switch (notification.action) {
         case "UNPIN":
-          //@ts-ignore
-          remove(notification.tag, notification.id);
+          remove(
+            (notification as unknown as PushNotificationDeliveredObject).tag,
+            notification.id
+          );
           break;
         case "Hide":
           unpinQuickNote();
@@ -73,7 +78,7 @@ function init() {
           console.log("texto", notification);
           present({
             title: "Quick note",
-            message: "Tap on \"Take note\" to add a note.",
+            message: 'Tap on "Take note" to add a note.',
             ongoing: true,
             actions: ["ReplyInput", "Hide"],
             tag: "notesnook_note_input",
@@ -85,21 +90,23 @@ function init() {
           await db.notes?.add({
             content: {
               type: "tiptap",
-              //@ts-ignore
-              data: `<p>${notification.reply_text} </p>`
+              data: `<p>${
+                (
+                  notification as unknown as PushNotificationDeliveredObject & {
+                    reply_text: string;
+                  }
+                ).reply_text
+              } </p>`
             }
           });
-          //@ts-ignore
-          await db.notes.init();
+          await db.notes?.init();
           useNoteStore.getState().setNotes();
-          //@ts-ignore/////
 
           break;
       }
     },
     popInitialNotification: true,
-    //@ts-ignore
-    requestPermissions: Platform.OS === "ios"
+    requestPermissions: false
   });
 
   PushNotification.createChannel(
@@ -134,7 +141,7 @@ function pinQuickNote(launch: boolean) {
     console.log("showing");
     present({
       title: "Quick note",
-      message: "Tap on \"Take note\" to add a note.",
+      message: 'Tap on "Take note" to add a note.',
       ongoing: true,
       actions: ["ReplyInput", "Hide"],
       tag: "notesnook_note_input",
@@ -188,9 +195,10 @@ function present({
     invokeApp: false,
     autoCancel: false,
     smallIcon: "ic_stat_name",
-    //@ts-ignore
     reply_placeholder_text,
     reply_button_text
+  } as PushNotificationObject & {
+    reply_placeholder_text: string;
   });
 }
 

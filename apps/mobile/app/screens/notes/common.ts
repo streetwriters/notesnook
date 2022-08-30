@@ -13,11 +13,10 @@ export function toCamelCase(title: string) {
   return title.slice(0, 1).toUpperCase() + title.slice(1);
 }
 
-export function getAlias(params: NotesScreenParams) {
+export function getAlias(params: Partial<NotesScreenParams>) {
   if (!params) return "";
   const { item } = params;
-  //@ts-ignore
-  return item.alias || item.title;
+  return item?.alias || item?.title;
 }
 
 export function openMonographsWebpage() {
@@ -60,7 +59,6 @@ export const setOnFirstSave = (
     editorState().onNoteCreated = null;
     return;
   }
-  //@ts-ignore
   editorState().onNoteCreated = (id) => onNoteCreated(id, data);
 };
 

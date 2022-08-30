@@ -10,9 +10,11 @@ export const DefaultPlaceholder = ({ color }: { color: string }) => {
   const message = useMessageStore((state) => state.message);
   const annoucements = useMessageStore((state) => state.announcements);
   const hasAnnoucements = annoucements.length > 0;
-  //@ts-ignore
   const shadeColor = color
-    ? hexToRGBA(COLORS_NOTE[color?.toLowerCase()], 0.15)
+    ? hexToRGBA(
+        COLORS_NOTE[color?.toLowerCase() as keyof typeof COLORS_NOTE],
+        0.15
+      )
     : colors.shade;
 
   return (

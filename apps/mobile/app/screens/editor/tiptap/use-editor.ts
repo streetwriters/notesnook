@@ -217,10 +217,8 @@ export const useEditor = (
             });
           }
         } else {
-          //@ts-ignore
-          noteData.contentId = note.contentId;
-          //@ts-ignore
-          await db.vault?.save(noteData);
+          noteData.contentId = note?.contentId;
+          await db.vault?.save(noteData as any);
         }
         console.log(id, sessionIdRef.current, currentSessionId);
         if (id && sessionIdRef.current === currentSessionId) {
@@ -265,15 +263,19 @@ export const useEditor = (
   }, []);
 
   const loadNote = useCallback(
-    async (item: NoteType) => {
+    async (
+      item: Omit<NoteType, "type"> & {
+        type: "note" | "new";
+        forced?: boolean;
+      }
+    ) => {
       console.log("loading note", item.type, eOnLoadNote + editorId);
       state.current.currentlyEditing = true;
       const editorState = useEditorStore.getState();
 
-      //@ts-ignore todo
       if (item && item.type === "new") {
         currentNote.current && (await reset());
-        const nextSessionId = makeSessionId(item);
+        const nextSessionId = makeSessionId(item as NoteType);
         setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
         sessionHistoryId.current = Date.now();
@@ -281,18 +283,17 @@ export const useEditor = (
         await commands.focus();
         useEditorStore.getState().setReadonly(false);
       } else {
-        //@ts-ignore todo
         if (!item.forced && currentNote.current?.id === item.id) return;
         isDefaultEditor && editorState.setCurrentlyEditingNote(item.id);
         overlay(true, item);
         currentNote.current && (await reset(false));
-        await loadContent(item);
-        const nextSessionId = makeSessionId(item);
+        await loadContent(item as NoteType);
+        const nextSessionId = makeSessionId(item as NoteType);
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
         sessionIdRef.current = nextSessionId;
         await commands.setSessionId(nextSessionId);
-        currentNote.current = item;
+        currentNote.current = item as NoteType;
         await commands.setStatus(timeConverter(item.dateEdited), "Saved");
         await postMessage(EditorEvents.title, item.title);
         await postMessage(EditorEvents.html, currentContent.current?.data);
@@ -310,7 +311,6 @@ export const useEditor = (
     if (!currentNote.current?.id) return;
     setTimeout(() => {
       if (!currentNote.current?.id) return;
-      //@ts-ignore
       if (currentNote.current?.content?.isPreview) {
         db.content?.downloadMedia(
           currentNote.current?.id,
@@ -393,7 +393,6 @@ export const useEditor = (
     );
     if (currentNote.current) {
       console.log("force reload note");
-      //@ts-ignore
       loadNote({ ...currentNote.current, forced: true });
     } else {
       await commands.setPlaceholder(placeholderTip.current);
@@ -421,7 +420,6 @@ export const useEditor = (
         setTimeout(() => {
           console.log("restoring app state here");
           if (appState.note) {
-            //@ts-ignore
             loadNote(appState.note);
           }
         }, 1);

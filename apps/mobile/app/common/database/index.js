@@ -53,9 +53,7 @@ export async function loadDatabase() {
   //   DB = module.default;
   // }
   // db = new DB(Storage, Platform.OS === 'ios' ? EventSource : AndroidEventSource, filesystem);
-  // //@ts-ignore
   // if (DOMParser) {
-  //   //@ts-ignore
   //   await DOMParser.prepare();
   // }
 }

@@ -1,6 +1,5 @@
 import { RefObject, useEffect, useRef } from "react";
 import { Platform } from "react-native";
-//@ts-ignore
 import RNTooltips from "react-native-tooltips";
 import { useThemeStore } from "../stores/use-theme-store";
 import {

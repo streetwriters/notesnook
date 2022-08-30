@@ -15,6 +15,7 @@ import { findToolById, getToolIcon } from "./toolbar-definition";
 import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { ToolId } from "@streetwriters/editor/dist/toolbar/tools";
 export const Tool = ({
   item,
   index,
@@ -40,10 +41,10 @@ export const Tool = ({
     height: 0,
     width: 0
   });
-  //@ts-ignore
-  const tool = isSubgroup || item === "dummy" ? null : findToolById(item);
-  //@ts-ignore
-  const iconSvgString = isSubgroup || !tool ? null : getToolIcon(tool.icon);
+  const tool =
+    isSubgroup || item === "dummy" ? null : findToolById(item as ToolId);
+  const iconSvgString =
+    isSubgroup || !tool ? null : getToolIcon(tool.icon as ToolId);
 
   const buttons = isSubgroup
     ? [
@@ -89,12 +90,10 @@ export const Tool = ({
               );
               _data[groupIndex].splice(index, 1);
             } else {
-              //@ts-ignore
-              const index = _data[parentIndex][groupIndex].findIndex(
-                (tool: string) => tool === item
-              );
-              //@ts-ignore
-              _data[parentIndex][groupIndex].splice(index, 1);
+              const index = (
+                _data[parentIndex][groupIndex] as ToolId[]
+              ).findIndex((tool: string) => tool === item);
+              (_data[parentIndex][groupIndex] as ToolId[]).splice(index, 1);
             }
             console.log(_data[groupIndex]);
             setData(_data);
@@ -115,13 +114,13 @@ export const Tool = ({
         if (hasSubGroup) {
           const subgroup = _data[groupIndex][
             _data[groupIndex].length - 1
-          ] as string[];
-          //@ts-ignore
-          subgroup.unshift(_item);
+          ] as ToolId[];
+          subgroup.unshift(_item as ToolId);
         } else {
           _data[groupIndex].push([]);
-          //@ts-ignore
-          _data[groupIndex][_data[groupIndex].length - 1].unshift(_item);
+          (_data[groupIndex][_data[groupIndex].length - 1] as ToolId[]).unshift(
+            _item as ToolId
+          );
         }
 
         setData(_data);

@@ -1,30 +1,65 @@
 import create, { State } from "zustand";
 import { COLORS_NOTE } from "../utils/color-scheme";
-import { LiteralUnion } from "../utils/types";
+import {
+  ColorType,
+  MonographType,
+  NotebookType,
+  TagType,
+  TopicType
+} from "../utils/types";
+import { ColorKey } from "./use-theme-store";
 
-export type RouteName =
-  | "Notes"
-  | "Notebooks"
-  | "Notebook"
-  | "NotesPage"
-  | "Tags"
-  | "Favorites"
-  | "Trash"
-  | "Search"
-  | "Settings"
-  | "TaggedNotes"
-  | "ColoredNotes"
-  | "TopicNotes"
-  | "Monographs";
+export type GenericRouteParam = { [name: string]: unknown };
 
-export type Route = LiteralUnion<RouteName>;
+export type NotebookScreenParams = {
+  item: NotebookType;
+  title: string;
+  canGoBack: boolean;
+};
+
+export type NotesScreenParams = {
+  item: TopicType | TagType | ColorType | MonographType;
+  title: string;
+  canGoBack: boolean;
+};
+
+export type AppLockRouteParams = {
+  welcome: boolean;
+  canGoBack: boolean;
+};
+
+export type AuthParams = {
+  mode: number;
+  title: string;
+  canGoBack: boolean;
+};
+
+export type RouteParams = {
+  Notes: GenericRouteParam;
+  Notebooks: GenericRouteParam;
+  Notebook: NotebookScreenParams;
+  NotesPage: NotesScreenParams;
+  Tags: GenericRouteParam;
+  Favorites: GenericRouteParam;
+  Trash: GenericRouteParam;
+  Search: GenericRouteParam;
+  Settings: GenericRouteParam;
+  TaggedNotes: NotesScreenParams;
+  ColoredNotes: NotesScreenParams;
+  TopicNotes: NotesScreenParams;
+  Monographs: NotesScreenParams;
+  AppLock: AppLockRouteParams;
+  Auth: AuthParams;
+};
+
+export type RouteName = keyof RouteParams;
 
 export type CurrentScreen = {
-  name: Route;
+  name: RouteName;
   id?: string;
   title?: string;
   type?: string;
-  color?: null;
+  color?: string | null;
   alias?: string;
   notebookId?: string;
 };
@@ -55,11 +90,13 @@ const useNavigationStore = create<NavigationStore>((set, get) => ({
     title: "Notes",
     type: "notes"
   },
-  currentScreenRaw: { name: "notes" },
+  currentScreenRaw: { name: "Notes" },
   canGoBack: false,
   update: (currentScreen, canGoBack, headerRightButtons) => {
-    //@ts-ignore
-    const color = COLORS_NOTE[currentScreen.color?.toLowerCase()];
+    const color =
+      COLORS_NOTE[
+        currentScreen.color?.toLowerCase() as keyof typeof COLORS_NOTE
+      ];
     if (
       JSON.stringify(currentScreen) === JSON.stringify(get().currentScreenRaw)
     )

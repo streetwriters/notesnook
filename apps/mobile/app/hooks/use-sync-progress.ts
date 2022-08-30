@@ -1,4 +1,3 @@
-//@ts-ignore
 import { EVENTS } from "@streetwriters/notesnook-core/common";
 import { useCallback, useEffect, useState } from "react";
 import { db } from "../common/database";
@@ -15,8 +14,6 @@ const useSyncProgress = () => {
 
   const onProgress = useCallback(
     ({ type, current, total }: SyncProgressEventType) => {
-      //@ts-ignore
-
       setProgress({ type, current, total });
     },
     []

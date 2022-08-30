@@ -1,4 +1,3 @@
-//@ts-ignore
 import create, { State } from "zustand";
 import { eSubscribeEvent, eUnSubscribeEvent } from "../services/event-manager";
 

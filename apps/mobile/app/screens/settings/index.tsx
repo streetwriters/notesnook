@@ -4,10 +4,10 @@ import useNavigationStore from "../../stores/use-navigation-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import Group from "./group";
 import Home from "./home";
-const SettingsStack = createNativeStackNavigator();
+import { RouteParams } from "./types";
+const SettingsStack = createNativeStackNavigator<RouteParams>();
 const screenListeners = {
-  //@ts-ignore
-  beforeRemove: (e) => {
+  beforeRemove: (e: any) => {
     if (e.target?.startsWith("SettingsGroup")) {
       useNavigationStore.getState().update({ name: "Settings" }, false);
     }

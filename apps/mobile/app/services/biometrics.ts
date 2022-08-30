@@ -1,9 +1,11 @@
 import { Platform } from "react-native";
-import FingerprintScanner from "react-native-fingerprint-scanner";
+import FingerprintScanner, {
+  AuthenticateIOS
+} from "react-native-fingerprint-scanner";
 import * as Keychain from "react-native-keychain";
-import { useSettingStore } from "../stores/use-setting-store";
 import { MMKV } from "../common/database/mmkv";
 import Storage from "../common/database/storage";
+import { useSettingStore } from "../stores/use-setting-store";
 import { ShowToastEvent, ToastEvent } from "./event-manager";
 
 const KeychainConfig = Platform.select({
@@ -62,23 +64,22 @@ async function getCredentials(title?: string, description?: string) {
         deviceCredentialAllowed: true
       }
     });
-    //@ts-ignore
-    await FingerprintScanner.authenticate(options);
+    await FingerprintScanner.authenticate(options as AuthenticateIOS);
     setTimeout(() => {
       useSettingStore.getState().setRequestBiometrics(false);
     }, 1000);
     FingerprintScanner.release();
     return await Keychain.getInternetCredentials("nn_vault");
-  } catch (e) {
+  } catch (error) {
+    const e = error as { name: string };
     useSettingStore.getState().setRequestBiometrics(false);
     FingerprintScanner.release();
     let message: ShowToastEvent = {
       heading: "Authentication with biometrics failed.",
-      message: "Tap \"Biometric Unlock\" to try again.",
+      message: 'Tap "Biometric Unlock" to try again.',
       type: "error",
       context: "local"
     };
-    //@ts-ignore
     if (e.name === "DeviceLocked") {
       message = {
         heading: "Biometrics authentication failed.",
@@ -86,11 +87,10 @@ async function getCredentials(title?: string, description?: string) {
         type: "error",
         context: "local"
       };
-      //@ts-ignore
     } else if (e.name === "UserFallback") {
       message = {
         heading: "Authentication cancelled by user.",
-        message: "Tap \"Biometric Unlock\" to try again.",
+        message: 'Tap "Biometric Unlock" to try again.',
         type: "error",
         context: "local"
       };
@@ -104,7 +104,6 @@ async function getCredentials(title?: string, description?: string) {
 async function validateUser(title: string, description?: string) {
   try {
     await FingerprintScanner.authenticate(
-      //@ts-ignore
       Platform.select({
         ios: {
           fallbackEnabled: true,
@@ -115,13 +114,13 @@ async function validateUser(title: string, description?: string) {
           description: description,
           deviceCredentialAllowed: true
         }
-      })
+      }) as AuthenticateIOS
     );
     FingerprintScanner.release();
     return true;
-  } catch (e) {
+  } catch (error) {
+    const e = error as { name: string };
     FingerprintScanner.release();
-    //@ts-ignore
     if (e.name === "DeviceLocked") {
       ToastEvent.show({
         heading: "Biometrics authentication failed.",

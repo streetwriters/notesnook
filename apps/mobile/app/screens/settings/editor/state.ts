@@ -1,6 +1,6 @@
 import type { ToolbarGroupDefinition } from "@streetwriters/editor/dist/toolbar/types";
 import create, { State } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, StateStorage } from "zustand/middleware";
 import { useNoteStore } from "../../../stores/use-notes-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { db } from "../../../common/database";
@@ -93,7 +93,6 @@ export const useDragState = create<DragState>(
           toolbarConfig?.config
         );
         set({
-          //@ts-ignore
           preset: preset,
           data:
             preset === "custom"
@@ -108,8 +107,7 @@ export const useDragState = create<DragState>(
     }),
     {
       name: "drag-state-storage", // unique name
-      //@ts-ignore
-      getStorage: () => MMKV,
+      getStorage: () => MMKV as StateStorage,
       onRehydrateStorage: () => {
         return () => {
           logger.info(

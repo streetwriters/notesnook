@@ -34,22 +34,20 @@ ColoredNotes.get = (params: NotesScreenParams, grouped = true) => {
 
 ColoredNotes.navigate = (item: ColorType, canGoBack: boolean) => {
   if (!item) return;
-  //@ts-ignore TODO
   const alias = getAlias({ item: item });
   Navigation.navigate<"ColoredNotes">(
     {
       name: "ColoredNotes",
-      alias: toCamelCase(alias),
+      alias: toCamelCase(alias as string),
       title: toCamelCase(item.title),
       id: item.id,
       type: "color",
-      //@ts-ignore
       color: item.title?.toLowerCase()
     },
     {
       item: item,
       canGoBack,
-      title: toCamelCase(alias)
+      title: toCamelCase(alias as string)
     }
   );
 };

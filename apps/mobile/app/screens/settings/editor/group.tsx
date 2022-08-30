@@ -13,6 +13,7 @@ import { DraggableItem, useDragState } from "./state";
 import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { ToolId } from "@streetwriters/editor/dist/toolbar/tools";
 export const Group = ({
   item,
   index: groupIndex,
@@ -80,8 +81,7 @@ export const Group = ({
         typeof dragged.parentIndex === "number"
           ? (_data[dragged.parentIndex][dragged.groupIndex] as string[])
           : (_data[dragged.groupIndex] as string[]);
-      //@ts-ignore
-      _data[groupIndex].push(insertFrom.splice(dragged.index, 1)[0]);
+      _data[groupIndex].push(insertFrom.splice(dragged.index, 1)[0] as ToolId);
     }
 
     setData(_data);

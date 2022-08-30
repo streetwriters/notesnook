@@ -1,6 +1,7 @@
 import { useEditor } from "./use-editor";
 import type { ToolbarGroupDefinition } from "@streetwriters/editor/dist/toolbar/types";
 import { ThemeStore } from "../../../stores/use-theme-store";
+import { NoteType } from "../../../utils/types";
 export type useEditorType = ReturnType<typeof useEditor>;
 
 export type EditorState = {
@@ -73,7 +74,7 @@ export type SavePayload = {
 };
 
 export type AppState = {
-  note?: Note;
+  note?: NoteType;
   editing: boolean;
   movedAway: boolean;
   timestamp: number;

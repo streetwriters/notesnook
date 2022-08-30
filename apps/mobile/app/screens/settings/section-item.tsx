@@ -31,10 +31,8 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
     }
     if (!item.property) return;
     SettingsService.set({
-      //@ts-ignore
       [item.property]: !settings[item.property]
     });
-    //@ts-ignore
     item.onChange?.(!settings[item.property]);
   };
 
@@ -142,7 +140,6 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
 
       {item.type === "switch" && item.property && (
         <ToggleSwitch
-          //@ts-ignore
           isOn={
             item.getter
               ? item.getter(item.property || current)

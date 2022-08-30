@@ -2,7 +2,7 @@ import React from "react";
 import { ColorValue, GestureResponderEvent, ViewStyle } from "react-native";
 import Animated, { Layout } from "react-native-reanimated";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
 import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { hexToRGBA, RGB_Linear_Shade } from "../../../utils/color-scheme/utils";
 import { SIZE } from "../../../utils/size";
@@ -76,8 +76,7 @@ export const IconButton = ({
         color={
           restProps.disabled
             ? RGB_Linear_Shade(-0.05, hexToRGBA(colors.nav))
-            : //@ts-ignore
-              colors[color] || color
+            : (colors[color as ColorKey] as ColorValue) || color
         }
         size={size}
       />

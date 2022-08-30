@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { MMKV } from "../common/database/mmkv";
 
-//@ts-ignore
+declare global {
+  interface Array<T> {
+    sample(): T;
+  }
+}
+
 Array.prototype.sample = function () {
   return this[Math.floor(Math.random() * this.length)];
 };
@@ -51,7 +56,6 @@ export class TipManager {
     if (tipStateJson) {
       tipState = JSON.parse(tipStateJson);
     } else {
-      //@ts-ignore
       tipState = {};
     }
 
@@ -59,42 +63,33 @@ export class TipManager {
     if (popStateJson) {
       popState = JSON.parse(popStateJson);
     } else {
-      //@ts-ignore
       popState = {};
     }
   }
 
   static tip(context: Context) {
     if (destructiveContexts.indexOf(context) > -1) {
-      //@ts-ignore
       if (tipState[context]) return;
-      //@ts-ignore
       tipState[context] = true;
       MMKV.setString("tipState", JSON.stringify(tipState));
     }
 
     const tipsForCtx = tips.filter((tip) => tip.contexts.indexOf(context) > -1);
-
-    //@ts-ignore
     return tipsForCtx.sample();
   }
 
   static popup(id: string) {
     const pop = popups.find((p) => p.id === id);
-    //@ts-ignore
-    //  if (popState[id]) return null;
 
     return pop;
   }
 
   static markPopupUsed(id: string) {
-    //@ts-ignore
     popState[id] = true;
     MMKV.setString("popupState", JSON.stringify(popState));
   }
 
   static placeholderTip() {
-    //@ts-ignore
     return placeholderTips.sample();
   }
 }

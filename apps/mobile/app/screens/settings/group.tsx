@@ -22,8 +22,7 @@ const Group = ({
       useNavigationStore.getState().update(
         {
           name: "SettingsGroup",
-          //@ts-ignore
-          title: route.params.name
+          title: route.params.name as string
         },
         true
       );

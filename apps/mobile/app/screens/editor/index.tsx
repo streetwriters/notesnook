@@ -102,7 +102,6 @@ const Editor = React.memo(
       }, []);
 
       if (withController) {
-        //@ts-ignore
         editorController.current = editor;
       }
 
@@ -165,17 +164,18 @@ const Editor = React.memo(
 
 export default Editor;
 
-//@ts-ignore
 let EditorOverlay: React.ElementType;
-//@ts-ignore
 let IconButton: React.ElementType;
-//@ts-ignore
-const AppSection = ({ editor, editorId }) => {
+const AppSection = ({
+  editor,
+  editorId
+}: {
+  editor: useEditorType;
+  editorId: string;
+}) => {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    //@ts-ignore
     EditorOverlay = require("./loading.js").default;
-    //@ts-ignore
     IconButton =
       require("../../components/ui/icon-button/index.tsx").IconButton;
     setLoaded(true);
@@ -218,5 +218,3 @@ const ReadonlyButton = ({ editor }: { editor: useEditorType }) => {
     />
   ) : null;
 };
-
-// test uri "http://192.168.10.8:3000/index.html"

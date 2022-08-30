@@ -1,4 +1,3 @@
-//@ts-ignore
 import create, { State } from "zustand";
 import { history } from "../utils";
 
@@ -19,8 +18,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   selectedItemsList: [],
   selectionMode: false,
   setAll: (all) => {
-    //@ts-ignore
-    history.selectedItemsList = all;
+    history.selectedItemsList = all as never[];
     set({ selectedItemsList: all });
   },
   setSelectionMode: (mode) => {
@@ -36,16 +34,15 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     });
   },
   setSelectedItem: (item) => {
-    let selectedItems = get().selectedItemsList;
-    const index = selectedItems.findIndex((i) => i.id === item.id);
+    let selectedItems = get().selectedItemsList as Item[];
+    const index = selectedItems.findIndex((i) => (i as Item).id === item.id);
     if (index !== -1) {
       selectedItems.splice(index, 1);
     } else {
       selectedItems.push(item);
     }
     selectedItems = [...new Set(selectedItems)];
-    //@ts-ignore
-    history.selectedItemsList = selectedItems;
+    history.selectedItemsList = selectedItems as never[];
     history.selectionMode =
       selectedItems.length > 0 ? get().selectionMode : false;
     set({

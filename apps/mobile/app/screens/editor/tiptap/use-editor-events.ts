@@ -1,6 +1,7 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { getDefaultPresets } from "@streetwriters/editor/dist/toolbar/tool-definitions";
+import type { Attachment } from "@streetwriters/editor/dist/extensions/attachment/index";
 import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
@@ -284,7 +285,7 @@ export const useEditorEvents = (
       case EventTypes.content:
         editor.saveContent({
           type: editorMessage.type,
-          content: editorMessage.value
+          content: editorMessage.value as string
         });
         break;
       case EventTypes.selection:
@@ -292,7 +293,7 @@ export const useEditorEvents = (
       case EventTypes.title:
         editor.saveContent({
           type: editorMessage.type,
-          title: editorMessage.value
+          title: editorMessage.value as string
         });
         break;
       case EventTypes.newtag:
@@ -303,7 +304,6 @@ export const useEditorEvents = (
         if (editorMessage.value) {
           if (!editor.note.current) return;
           db.notes
-            //@ts-ignore
             ?.note(editor.note.current?.id)
             .untag(editorMessage.value)
             .then(async () => {
@@ -325,7 +325,8 @@ export const useEditorEvents = (
         break;
       case EventTypes.download:
         console.log("download attachment request", editorMessage.value);
-        filesystem.downloadAttachment(editorMessage.value?.hash, true);
+        const attachmentInfo = editorMessage.value as Attachment;
+        filesystem.downloadAttachment(attachmentInfo?.hash, true);
         break;
       case EventTypes.pro:
         if (editor.state.current?.isFocused) {

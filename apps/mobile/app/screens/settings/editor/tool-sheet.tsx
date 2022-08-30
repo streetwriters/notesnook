@@ -28,10 +28,8 @@ export default function ToolSheet({
   const ungrouped = getUngroupedTools(data) as ToolId[];
 
   const renderTool = React.useCallback((item: ToolId) => {
-    //@ts-ignore
     const tool = findToolById(item);
-    //@ts-ignore
-    const iconSvgString = tool ? getToolIcon(tool.icon) : null;
+    const iconSvgString = tool ? getToolIcon(tool.icon as ToolId) : null;
     return (
       <PressableButton
         key={item}
@@ -39,8 +37,9 @@ export default function ToolSheet({
         onPress={() => {
           const _data = useDragState.getState().data.slice();
           if (group.groupIndex !== undefined) {
-            //@ts-ignore
-            _data[group.groupIndex][group.index].unshift(item);
+            (_data[group.groupIndex][group.index] as ToolId[]).unshift(
+              item as ToolId
+            );
           } else {
             _data[group.index].unshift(item);
           }

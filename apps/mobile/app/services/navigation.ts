@@ -3,8 +3,9 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useFavoriteStore } from "../stores/use-favorite-store";
 import useNavigationStore, {
   CurrentScreen,
-  Route,
-  RouteName
+  GenericRouteParam,
+  RouteName,
+  RouteParams
 } from "../stores/use-navigation-store";
 import { useNotebookStore } from "../stores/use-notebook-store";
 import { useNoteStore } from "../stores/use-notes-store";
@@ -12,14 +13,13 @@ import { useTagStore } from "../stores/use-tag-store";
 import { useTrashStore } from "../stores/use-trash-store";
 import { eOnNewTopicAdded } from "../utils/events";
 import { rootNavigatorRef, tabBarRef } from "../utils/global-refs";
-import { ColorType, NotebookType, TagType, TopicType } from "../utils/types";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
 
 /**
  * Routes that should be updated on focus
  */
-let routesUpdateQueue: Route[] = [];
+let routesUpdateQueue: RouteName[] = [];
 
 const routeNames = {
   Notes: "Notes",
@@ -41,46 +41,6 @@ const routeNames = {
   AppLock: "AppLock",
   Login: "Login",
   Signup: "Signup"
-};
-
-type GenericRouteParam = { [name: string]: unknown };
-
-export type NotebookScreenParams = {
-  item: NotebookType;
-  title: string;
-  canGoBack: boolean;
-};
-
-export type NotesScreenParams = {
-  item: TopicType | TagType | ColorType;
-  title: string;
-  canGoBack: boolean;
-};
-
-export type AppLockRouteParams = {
-  welcome: boolean;
-};
-
-export type AuthParams = {
-  mode: number;
-};
-
-export type RouteParams = {
-  Notes: GenericRouteParam;
-  Notebooks: GenericRouteParam;
-  Notebook: NotebookScreenParams;
-  NotesPage: NotesScreenParams;
-  Tags: GenericRouteParam;
-  Favorites: GenericRouteParam;
-  Trash: GenericRouteParam;
-  Search: GenericRouteParam;
-  Settings: GenericRouteParam;
-  TaggedNotes: NotesScreenParams;
-  ColoredNotes: NotesScreenParams;
-  TopicNotes: NotesScreenParams;
-  Monographs: NotesScreenParams;
-  AppLock: AppLockRouteParams;
-  Auth: AuthParams;
 };
 
 export type NavigationProps<T extends RouteName> = NativeStackScreenProps<
@@ -107,7 +67,7 @@ const routeUpdateFunctions: {
   Monographs: (params) => eSendEvent("Monographs", params)
 };
 
-function clearRouteFromQueue(routeName: Route) {
+function clearRouteFromQueue(routeName: RouteName) {
   if (routesUpdateQueue.indexOf(routeName) !== -1) {
     routesUpdateQueue = [...new Set(routesUpdateQueue)];
     routesUpdateQueue.splice(routesUpdateQueue.indexOf(routeName), 1);
@@ -117,7 +77,7 @@ function clearRouteFromQueue(routeName: Route) {
 /**
  * Check if a route needs update
  */
-function routeNeedsUpdate(routeName: Route, callback: () => void) {
+function routeNeedsUpdate(routeName: RouteName, callback: () => void) {
   console.log(
     "routeNeedsUpdate",
     routesUpdateQueue,
@@ -130,7 +90,7 @@ function routeNeedsUpdate(routeName: Route, callback: () => void) {
   }
 }
 
-function queueRoutesForUpdate(...routes: Route[]) {
+function queueRoutesForUpdate(...routes: RouteName[]) {
   console.log("updating routes", routes);
   const currentScreen = useNavigationStore.getState().currentScreen;
   // const routeHistory = rootNavigatorRef.current?.getRootState()?.routes || [
@@ -139,7 +99,6 @@ function queueRoutesForUpdate(...routes: Route[]) {
 
   // filter out routes that are not rendered to prevent unnecessary updates
   // routes = routes.filter(
-  //   //@ts-ignore
   //   routeName => routeHistory?.findIndex(route => route.key?.startsWith(routeName)) > -1
   // );
 
@@ -165,8 +124,8 @@ function navigate<T extends RouteName>(
   if (screen.name === "Notebook") routeUpdateFunctions["Notebook"](params);
   if (screen.name.endsWith("Notes") && screen.name !== "Notes")
     routeUpdateFunctions[screen.name](params);
-  // @ts-ignore
-  rootNavigatorRef.current?.navigate(screen.name, params);
+  //@ts-ignore Not sure how to fix this for now ignore it.
+  rootNavigatorRef.current?.navigate<RouteName>(screen.name, params);
 }
 
 function goBack() {
@@ -192,7 +151,7 @@ function replace<T extends RouteName>(
 function popToTop() {
   rootNavigatorRef.current?.dispatch(StackActions.popToTop());
   useNavigationStore.getState().update({
-    name: SettingsService.get().homepage || "Notes"
+    name: (SettingsService.get().homepage as RouteName) || "Notes"
   });
 }
 

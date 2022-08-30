@@ -14,3 +14,5 @@ export const useThemeStore = create<ThemeStore>((set) => ({
     set({ colors });
   }
 }));
+
+export type ColorKey = keyof ThemeStore["colors"];

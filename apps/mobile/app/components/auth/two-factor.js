@@ -194,7 +194,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
                 code.current = value;
                 onNext();
               }}
-              //@ts-ignore
               inputStyle={{
                 fontSize: SIZE.lg,
                 height: 60,
@@ -208,8 +207,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
               containerStyle={{
                 height: 60,
                 borderWidth: 0,
-                //@ts-ignore
-                width: null,
+                width: undefined,
                 minWidth: "50%"
               }}
             />

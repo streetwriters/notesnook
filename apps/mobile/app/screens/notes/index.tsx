@@ -17,7 +17,7 @@ import useNavigationStore, {
   RouteName
 } from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
-import { NoteType } from "../../utils/types";
+import { NoteType, TopicType } from "../../utils/types";
 import {
   getAlias,
   isSynced,
@@ -101,7 +101,6 @@ const NotesPage = ({
 
   const syncWithNavigation = () => {
     const { item, title } = params.current;
-    //@ts-ignore
     const alias = getAlias(params.current);
     console.log(alias, title, "syncWithNavigation", params.current);
     useNavigationStore.getState().update(
@@ -110,10 +109,9 @@ const NotesPage = ({
         title: alias || title,
         id: item?.id,
         type: "notes",
-        //@ts-ignore
-        notebookId: item?.notebookId,
-        alias: route.name === "ColoredNotes" ? toCamelCase(alias) : alias,
-        //@ts-ignore
+        notebookId: (item as TopicType).notebookId,
+        alias:
+          route.name === "ColoredNotes" ? toCamelCase(alias as string) : alias,
         color:
           route.name === "ColoredNotes" ? item.title?.toLowerCase() : undefined
       },
@@ -128,8 +126,7 @@ const NotesPage = ({
         type: getItemType(route.name),
         id: item.id,
         color: item.title,
-        //@ts-ignore
-        notebook: item.notebookId
+        notebook: (item as TopicType).notebookId
       });
   };
 

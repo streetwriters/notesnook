@@ -1,18 +1,18 @@
-//@ts-ignore
 import { db } from "../common/database";
-import { useNoteStore } from "./use-notes-store";
+import Navigation from "../services/navigation";
 import { useFavoriteStore } from "./use-favorite-store";
 import { useMenuStore } from "./use-menu-store";
+import { RouteName } from "./use-navigation-store";
 import { useNotebookStore } from "./use-notebook-store";
+import { useNoteStore } from "./use-notes-store";
 import { useTagStore } from "./use-tag-store";
 import { useTrashStore } from "./use-trash-store";
-import Navigation from "../services/navigation";
 
 export function initAfterSync() {
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
   Navigation.queueRoutesForUpdate(
-    ...Object.keys(Navigation.routeUpdateFunctions)
+    ...(Object.keys(Navigation.routeUpdateFunctions) as unknown as RouteName[])
   );
 }
 

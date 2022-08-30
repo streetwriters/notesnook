@@ -88,12 +88,8 @@ const Input = ({
   const [showError, setShowError] = useState(false);
   const [errorList, setErrorList] = useState({
     SHORT_PASS: true
-    //  NO_ABC: true,
-    //  NO_CAPS_ABC: true,
-    //  NO_NUM: true,
-    //  SPECIAL: true,
   });
-
+  type ErrorKey = keyof typeof errorList;
   const color = error
     ? colors.red
     : focus
@@ -208,8 +204,7 @@ const Input = ({
     height: height || 50,
     flexShrink: 1,
     fontFamily: "OpenSans-Regular",
-    //@ts-ignore
-    ...inputStyle
+    ...(inputStyle as ViewStyle)
   };
 
   return (
@@ -349,36 +344,28 @@ const Input = ({
             marginBottom: 5
           }}
         >
-          {
-            //@ts-ignore
-            Object.keys(errorList).filter((k) => errorList[k] === true)
-              .length !== 0
-              ? Object.keys(ERRORS_LIST).map((error) => (
-                  <View
-                    //@ts-ignore
-                    key={ERRORS_LIST[error]}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center"
-                    }}
-                  >
-                    <Icon
-                      //@ts-ignore
-                      name={errorList[error] ? "close" : "check"}
-                      //@ts-ignore
-                      color={errorList[error] ? "red" : "green"}
-                    />
+          {Object.keys(errorList).filter(
+            (k) => errorList[k as ErrorKey] === true
+          ).length !== 0
+            ? Object.keys(ERRORS_LIST).map((error) => (
+                <View
+                  key={ERRORS_LIST[error as ErrorKey]}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center"
+                  }}
+                >
+                  <Icon
+                    name={errorList[error as ErrorKey] ? "close" : "check"}
+                    color={errorList[error as ErrorKey] ? "red" : "green"}
+                  />
 
-                    <Paragraph style={{ marginLeft: 5 }} size={SIZE.xs}>
-                      {
-                        //@ts-ignore
-                        ERRORS_LIST[error]
-                      }
-                    </Paragraph>
-                  </View>
-                ))
-              : null
-          }
+                  <Paragraph style={{ marginLeft: 5 }} size={SIZE.xs}>
+                    {ERRORS_LIST[error as ErrorKey]}
+                  </Paragraph>
+                </View>
+              ))
+            : null}
         </View>
       )}
     </>

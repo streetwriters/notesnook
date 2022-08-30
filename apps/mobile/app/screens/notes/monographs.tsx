@@ -39,7 +39,6 @@ Monographs.navigate = (item: MonographType, canGoBack: boolean) => {
       type: "monograph"
     },
     {
-      //@ts-ignore
       item: { type: "monograph" },
       canGoBack,
       title: "Monographs"

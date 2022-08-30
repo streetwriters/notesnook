@@ -79,6 +79,7 @@ export interface NoteType extends Entity<"note"> {
   content?: {
     data: string;
     type: string;
+    isPreview?: boolean;
   };
 }
 
@@ -97,6 +98,7 @@ export interface TopicType extends Entity<"topic"> {
   notes: string[];
   dateCreated: number;
   dateEdited: number;
+  alias?: string;
 }
 
 export interface AttachmentType extends Entity<"attachment"> {

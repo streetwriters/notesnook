@@ -1,4 +1,3 @@
-//@ts-ignore
 import create from "zustand";
 import { editorController } from "../screens/editor/tiptap/utils";
 

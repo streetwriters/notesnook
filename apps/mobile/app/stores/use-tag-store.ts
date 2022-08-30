@@ -1,4 +1,3 @@
-//@ts-ignore
 import "@streetwriters/notesnook-core/types";
 import { groupArray } from "@streetwriters/notesnook-core/utils/grouping";
 import create, { State } from "zustand";

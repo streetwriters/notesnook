@@ -10,7 +10,7 @@ import { presentDialog } from "../../components/dialog/functions";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
 import { Update } from "../../components/sheets/update";
-import { useVaultStatus } from "../../hooks/use-vault-status";
+import { useVaultStatus, VaultStatusType } from "../../hooks/use-vault-status";
 import BackupService from "../../services/backup";
 import BiometicService from "../../services/biometrics";
 import {
@@ -81,7 +81,10 @@ export const settingsGroups: SettingSection[] = [
         description: (current) => {
           const user = current as User;
           const subscriptionDaysLeft =
-            user && getTimeLeft(parseInt(user.subscription?.expiry));
+            user &&
+            getTimeLeft(
+              parseInt(user.subscription?.expiry as unknown as string)
+            );
           const expiryDate = dayjs(user?.subscription?.expiry).format(
             "MMMM D, YYYY"
           );
@@ -157,7 +160,7 @@ export const settingsGroups: SettingSection[] = [
                 },
                 useHook: () => useUserStore((state) => state.user),
                 hidden: (user) => {
-                  return !!user?.mfa?.isEnabled;
+                  return !!(user as User)?.mfa?.isEnabled;
                 },
                 description: "Increased security for your account"
               },
@@ -166,7 +169,10 @@ export const settingsGroups: SettingSection[] = [
                 name: "Add fallback 2FA method",
                 useHook: () => useUserStore((state) => state.user),
                 hidden: (user) => {
-                  return !!user?.mfa?.secondaryMethod || !user?.mfa?.isEnabled;
+                  return (
+                    !!(user as User)?.mfa?.secondaryMethod ||
+                    !(user as User)?.mfa?.isEnabled
+                  );
                 },
                 modifer: () => {
                   verifyUser("global", async () => {
@@ -181,7 +187,10 @@ export const settingsGroups: SettingSection[] = [
                 name: "Reconfigure fallback 2FA method",
                 useHook: () => useUserStore((state) => state.user),
                 hidden: (user) => {
-                  return !user?.mfa?.secondaryMethod || !user?.mfa?.isEnabled;
+                  return (
+                    !(user as User)?.mfa?.secondaryMethod ||
+                    !(user as User)?.mfa?.isEnabled
+                  );
                 },
                 modifer: () => {
                   verifyUser("global", async () => {
@@ -201,7 +210,7 @@ export const settingsGroups: SettingSection[] = [
                 },
                 useHook: () => useUserStore((state) => state.user),
                 hidden: (user) => {
-                  return !user?.mfa?.isEnabled;
+                  return !(user as User)?.mfa?.isEnabled;
                 },
                 description:
                   "View and save recovery codes for to recover your account"
@@ -219,7 +228,7 @@ export const settingsGroups: SettingSection[] = [
 
                 useHook: () => useUserStore((state) => state.user),
                 hidden: (user) => {
-                  return !user?.mfa?.isEnabled;
+                  return !(user as User)?.mfa?.isEnabled;
                 },
                 description: "Decreased security for your account"
               }
@@ -480,7 +489,7 @@ export const settingsGroups: SettingSection[] = [
             description: "Set a password to create vault and lock notes.",
             icon: "key",
             useHook: useVaultStatus,
-            hidden: (current) => current?.exists,
+            hidden: (current) => (current as VaultStatusType)?.exists,
             modifer: () => {
               PremiumService.verify(() => {
                 openVault({
@@ -497,7 +506,7 @@ export const settingsGroups: SettingSection[] = [
             useHook: useVaultStatus,
             name: "Change vault password",
             description: "Setup a new password for your vault.",
-            hidden: (current) => !current?.exists,
+            hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () =>
               openVault({
                 item: {},
@@ -512,7 +521,7 @@ export const settingsGroups: SettingSection[] = [
             useHook: useVaultStatus,
             name: "Clear vault",
             description: "Unlock all locked notes",
-            hidden: (current) => !current?.exists,
+            hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
                 item: {},
@@ -529,7 +538,7 @@ export const settingsGroups: SettingSection[] = [
             name: "Delete vault",
             description: "Delete vault (and optionally remove all notes).",
             useHook: useVaultStatus,
-            hidden: (current) => !current?.exists,
+            hidden: (current) => !(current as VaultStatusType)?.exists,
             modifer: () => {
               openVault({
                 item: {},
@@ -547,19 +556,22 @@ export const settingsGroups: SettingSection[] = [
             icon: "fingerprint",
             useHook: useVaultStatus,
             description: "Access notes in vault using biometrics",
-            hidden: (current) =>
-              !current?.exists || !current?.isBiometryAvailable,
-            getter: (current) => current?.biometryEnrolled,
+            hidden: (current) => {
+              const _current = current as VaultStatusType;
+              return !_current?.exists || !_current?.isBiometryAvailable;
+            },
+            getter: (current) => (current as VaultStatusType)?.biometryEnrolled,
             modifer: (current) => {
+              const _current = current as VaultStatusType;
               openVault({
                 item: {},
-                fingerprintAccess: !current.biometryEnrolled,
-                revokeFingerprintAccess: current.biometryEnrolled,
+                fingerprintAccess: !_current.biometryEnrolled,
+                revokeFingerprintAccess: _current.biometryEnrolled,
                 novault: true,
-                title: current.biometryEnrolled
+                title: _current.biometryEnrolled
                   ? "Revoke biometric unlocking"
                   : "Enable biometery unlock",
-                description: current.biometryEnrolled
+                description: _current.biometryEnrolled
                   ? "Disable biometric unlocking for notes in vault"
                   : "Enable biometric unlocking for notes in vault"
               });
@@ -802,6 +814,7 @@ export const settingsGroups: SettingSection[] = [
         icon: "bug",
         modifer: () => {
           presentSheet({
+            //@ts-ignore Migrate to TS
             component: <Issue />
           });
         },
@@ -967,7 +980,7 @@ export const settingsGroups: SettingSection[] = [
         description: "Check for new version of Notesnook",
         modifer: async () => {
           presentSheet({
-            //@ts-ignore
+            //@ts-ignore // Migrate to ts
             component: (ref) => <Update fwdRef={ref} />
           });
         }

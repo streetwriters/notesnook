@@ -21,12 +21,10 @@ export function findToolById(id: keyof typeof tools): {
   return tools[id];
 }
 
-export function getToolIcon(id: keyof typeof tools) {
-  //@ts-ignore
-  const icon = Icons[id];
+export function getToolIcon(id: ToolId) {
+  const icon = Icons[id as keyof typeof Icons];
   const colors = useThemeStore.getState().colors;
-  //@ts-ignore
-  return id === "none"
+  return (id as "none") === "none"
     ? null
     : `<svg width="20" height="20"  >
   <path d="${icon}" fill="${colors.icon}" />

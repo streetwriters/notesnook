@@ -9,6 +9,7 @@ import { scale, updateSize } from "../utils/size";
 import Notifications from "./notifications";
 import Orientation from "react-native-orientation";
 import { DDS } from "./device-detection";
+import { ThemeStore } from "../stores/use-theme-store";
 
 function migrate(settings: SettingStore["settings"]) {
   if (settings.migrated) return true;
@@ -32,8 +33,9 @@ function migrate(settings: SettingStore["settings"]) {
       settings.rateApp = false;
     } else {
       askForRating = JSON.parse(askForRating);
-      //@ts-ignore
-      settings.rateApp = askForRating.timestamp;
+      settings.rateApp = (
+        askForRating as unknown as { timestamp: number }
+      ).timestamp;
     }
     console.log("migrated askForRating", askForRating);
     MMKV.removeItem("askForRating");
@@ -42,8 +44,9 @@ function migrate(settings: SettingStore["settings"]) {
   let askForBackup = MMKV.getString("askForBackup");
   if (askForBackup) {
     askForBackup = JSON.parse(askForBackup);
-    //@ts-ignore
-    settings.rateApp = askForBackup.timestamp;
+    settings.rateApp = (
+      askForBackup as unknown as { timestamp: number }
+    ).timestamp;
     MMKV.removeItem("askForBackup");
     console.log("migrated askForBackup", askForBackup);
   }
@@ -73,13 +76,10 @@ function migrate(settings: SettingStore["settings"]) {
   let theme = MMKV.getString("theme");
   if (theme) {
     theme = JSON.parse(theme);
-    //@ts-ignore
-    if (theme.night) settings.theme.dark = true;
+    if ((theme as unknown as ThemeStore["colors"]).night)
+      settings.theme.dark = true;
     MMKV.removeItem("theme");
   }
-
-  console.log("migrated theme", theme);
-
   const backupStorageDir = MMKV.getString("backupStorageDir");
   if (backupStorageDir)
     settings.backupDirectoryAndroid = JSON.parse(backupStorageDir);
@@ -160,6 +160,7 @@ function toggle(id: keyof SettingStore["settings"]) {
   };
   //@ts-ignore
   settings[id] = !settings[id];
+
   useSettingStore.getState().setSettings(settings);
   MMKV.setString("appSettings", JSON.stringify(settings));
 }
@@ -179,16 +180,12 @@ function onFirstLaunch() {
 }
 
 function checkOrientation() {
-  //@ts-ignore
-  Orientation.getOrientation((e, r) => {
-    DDS.checkSmallTab(r);
-    //@ts-ignore
-    useSettingStore
-      .getState()
-      .setDimensions({
-        width: DDS.width as number,
-        height: DDS.height as number
-      });
+  Orientation.getOrientation((e: Error, orientation: string) => {
+    DDS.checkSmallTab(orientation);
+    useSettingStore.getState().setDimensions({
+      width: DDS.width as number,
+      height: DDS.height as number
+    });
     useSettingStore
       .getState()
       .setDeviceMode(

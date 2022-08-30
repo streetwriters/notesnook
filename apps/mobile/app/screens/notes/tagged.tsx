@@ -6,7 +6,7 @@ import Navigation, {
   NavigationProps,
   NotesScreenParams
 } from "../../services/navigation";
-import { TagType } from "../../utils/types";
+import { NoteType, TagType } from "../../utils/types";
 import { getAlias, openEditor } from "./common";
 export const TaggedNotes = ({
   navigation,
@@ -26,7 +26,7 @@ export const TaggedNotes = ({
 };
 
 TaggedNotes.get = (params: NotesScreenParams, grouped = true) => {
-  const notes = db.notes?.tagged(params.item.id) || [];
+  const notes = db.notes?.tagged((params.item as unknown as NoteType).id) || [];
   return grouped
     ? groupArray(notes, db.settings?.getGroupOptions("notes"))
     : notes;
@@ -34,7 +34,6 @@ TaggedNotes.get = (params: NotesScreenParams, grouped = true) => {
 
 TaggedNotes.navigate = (item: TagType, canGoBack: boolean) => {
   if (!item) return;
-  //@ts-ignore TODO
   const alias = getAlias({ item: item });
   Navigation.navigate<"TaggedNotes">(
     {

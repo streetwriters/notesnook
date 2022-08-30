@@ -52,7 +52,6 @@ export const Walkthrough = ({
       ) : null}
       {step.actionButton && (
         <Button
-          //@ts-ignore
           style={{
             height: 30,
             marginTop: 10
@@ -69,7 +68,6 @@ export const Walkthrough = ({
       )}
 
       <Button
-        //@ts-ignore
         style={{
           borderRadius: 100,
           height: 40,
@@ -94,7 +92,6 @@ export const Walkthrough = ({
 
       {canSkip ? (
         <Button
-          //@ts-ignore
           style={{
             height: 30,
             marginTop: 10
@@ -142,11 +139,8 @@ Walkthrough.present = async (
       await Walkthrough.init();
     }
     if (walkthroughState[id]) return;
-    //@ts-ignore
     Walkthrough.update(id);
   }
-
-  //@ts-ignore
   const walkthrough = walkthroughs[id];
   if (!walkthrough) return;
   presentSheet({

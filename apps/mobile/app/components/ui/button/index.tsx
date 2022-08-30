@@ -1,7 +1,12 @@
 import React from "react";
-import { ActivityIndicator, ColorValue, TextStyle } from "react-native";
+import {
+  ActivityIndicator,
+  ColorValue,
+  TextStyle,
+  ViewStyle
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useThemeStore } from "../../../stores/use-theme-store";
+import { ColorKey, useThemeStore } from "../../../stores/use-theme-store";
 import { showTooltip, TOOLTIP_POSITIONS } from "../../../utils";
 import { BUTTON_TYPES } from "../../../utils/constants";
 import { SIZE } from "../../../utils/size";
@@ -58,12 +63,11 @@ export const Button = ({
 
   const textColor = buttonType?.text
     ? buttonType.text
-    : //@ts-ignore
-      colors[
+    : (colors[
         type === "accent"
-          ? BUTTON_TYPES[type](accentColor, accentText).text
-          : BUTTON_TYPES[type].text
-      ];
+          ? (BUTTON_TYPES[type](accentColor, accentText).text as ColorKey)
+          : (BUTTON_TYPES[type].text as ColorKey)
+      ] as ColorValue);
   const Component = bold ? Heading : Paragraph;
 
   return (
@@ -90,15 +94,14 @@ export const Button = ({
       customAlpha={buttonType?.alpha}
       customStyle={{
         height: height,
-        width: width || null,
+        width: width || undefined,
         paddingHorizontal: 12,
         borderRadius: 5,
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        //@ts-ignore
-        ...style
+        ...(style as ViewStyle)
       }}
     >
       {loading ? (
@@ -116,7 +119,7 @@ export const Button = ({
       {!title ? null : (
         <Component
           animated={false}
-          color={textColor}
+          color={textColor as string}
           size={fontSize}
           numberOfLines={1}
           style={[

@@ -1,4 +1,3 @@
-//@ts-ignore
 import { Platform } from "react-native";
 import create, { State } from "zustand";
 import { APP_VERSION } from "../version";

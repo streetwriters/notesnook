@@ -58,7 +58,7 @@ const Home = ({
     <DelayLayout delay={300} type="settings">
       <View>
         {loading && (
-          //@ts-ignore
+          //@ts-ignore // Migrate to typescript required.
           <BaseDialog animated={false} bounce={false} visible={true}>
             <View
               style={{

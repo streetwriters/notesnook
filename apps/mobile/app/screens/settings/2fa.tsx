@@ -285,8 +285,7 @@ export const MFASetup = ({
               loading={method?.id !== "sms" ? true : false}
               value={
                 method?.id === "email"
-                  ? //@ts-ignore
-                    user.email
+                  ? user?.email
                   : method?.id === "app"
                   ? authenticatorDetails?.sharedKey || ""
                   : undefined
@@ -336,19 +335,17 @@ export const MFASetup = ({
               textAlign="center"
               keyboardType="numeric"
               onChangeText={(value) => (code.current = value)}
-              //@ts-ignore
               inputStyle={{
                 fontSize: SIZE.lg,
                 height: 60,
                 textAlign: "center",
                 letterSpacing: 10,
-                width: null
+                width: undefined
               }}
               containerStyle={{
                 height: 60,
                 borderWidth: 0,
-                //@ts-ignore
-                width: null
+                width: undefined
               }}
             />
             <Seperator />
@@ -397,7 +394,7 @@ export const MFARecoveryCodes = ({
   useEffect(() => {
     (async () => {
       try {
-        const codes = await db.mfa?.codes(true);
+        const codes = await db.mfa?.codes();
         if (codes) setCodes(codes);
         setLoading(false);
       } catch (e) {
