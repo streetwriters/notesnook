@@ -60,7 +60,7 @@ export const useVaultStatus = () => {
     return () => {
       eUnSubscribeEvent("vaultUpdated", () => checkVaultStatus());
     };
-  }, []);
+  }, [checkVaultStatus]);
 
   return vaultStatus;
 };

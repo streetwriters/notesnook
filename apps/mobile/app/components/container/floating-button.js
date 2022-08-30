@@ -32,6 +32,7 @@ import { useSettingStore } from "../../stores/use-setting-store";
 import { getElevation, showTooltip, TOOLTIP_POSITIONS } from "../../utils";
 import { normalize, SIZE } from "../../utils/size";
 import { PressableButton } from "../ui/pressable";
+import { useCallback } from "react";
 
 export const FloatingButton = ({
   title,
@@ -58,26 +59,29 @@ export const FloatingButton = ({
 
   useEffect(() => {
     animate(selectionMode ? 150 : 0);
-  }, [selectionMode]);
+  }, [animate, selectionMode]);
 
-  function animate(toValue) {
-    translate.value = withTiming(toValue, {
-      duration: 250,
-      easing: Easing.elastic(1)
-    });
-  }
+  const animate = useCallback(
+    (toValue) => {
+      translate.value = withTiming(toValue, {
+        duration: 250,
+        easing: Easing.elastic(1)
+      });
+    },
+    [translate]
+  );
 
-  const onKeyboardHide = async () => {
+  const onKeyboardHide = useCallback(async () => {
     editorState().keyboardState = false;
     if (deviceMode !== "mobile") return;
     animate(0);
-  };
+  }, [animate, deviceMode]);
 
-  const onKeyboardShow = async () => {
+  const onKeyboardShow = useCallback(async () => {
     editorState().keyboardState = true;
     if (deviceMode !== "mobile") return;
     animate(150);
-  };
+  }, [animate, deviceMode]);
 
   useEffect(() => {
     let sub1 = Keyboard.addListener("keyboardDidShow", onKeyboardShow);
@@ -86,7 +90,7 @@ export const FloatingButton = ({
       sub1?.remove();
       sub2?.remove();
     };
-  }, [deviceMode]);
+  }, [deviceMode, onKeyboardHide, onKeyboardShow]);
   const paddings = {
     ios: 20,
     android: 20,

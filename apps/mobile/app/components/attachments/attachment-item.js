@@ -42,9 +42,9 @@ export const AttachmentItem = ({ attachment, encryption, setAttachments }) => {
     attachment,
     encryption
   );
-  const encryptionProgress = encryption
-    ? useAttachmentStore((state) => state.encryptionProgress)
-    : null;
+  const encryptionProgress = useAttachmentStore(
+    (state) => state.encryptionProgress
+  );
 
   const onPress = () => {
     Actions.present(attachment, setAttachments, attachment.metadata.hash);

@@ -48,6 +48,7 @@ import { Notice } from "../ui/notice";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useCallback } from "react";
 
 const Actions = ({ attachment, setAttachments, fwdRef }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -154,7 +155,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
     }
   ];
 
-  const getNotes = () => {
+  const getNotes = useCallback(() => {
     let allNotes = db.notes.all;
     let attachmentNotes = attachment.noteIds?.map((id) => {
       let index = allNotes?.findIndex((note) => id === note.id);
@@ -169,11 +170,11 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
       }
     });
     return attachmentNotes;
-  };
+  }, [attachment.noteIds]);
 
   useEffect(() => {
     setNotes(getNotes());
-  }, [attachment]);
+  }, [attachment, getNotes]);
 
   return (
     <ScrollView

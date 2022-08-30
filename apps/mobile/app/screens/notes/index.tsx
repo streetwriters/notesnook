@@ -25,13 +25,11 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import Navigation, {
-  NavigationProps,
-  NotesScreenParams
-} from "../../services/navigation";
+import Navigation, { NavigationProps } from "../../services/navigation";
 import SearchService from "../../services/search";
 import useNavigationStore, {
   HeaderRightButton,
+  NotesScreenParams,
   RouteName
 } from "../../stores/use-navigation-store";
 import { useNoteStore } from "../../stores/use-notes-store";
@@ -117,10 +115,21 @@ const NotesPage = ({
     focusOnInit: !focusControl
   });
 
-  const syncWithNavigation = () => {
+  const prepareSearch = React.useCallback(() => {
+    const { item } = params.current;
+    SearchService.update({
+      placeholder: `Search in ${alias}`,
+      type: "notes",
+      title: item.type === "tag" ? "#" + alias : toCamelCase(item.title),
+      get: () => {
+        return get(params.current, false);
+      }
+    });
+  }, [alias, get]);
+
+  const syncWithNavigation = React.useCallback(() => {
     const { item, title } = params.current;
     const alias = getAlias(params.current);
-    console.log(alias, title, "syncWithNavigation", params.current);
     useNavigationStore.getState().update(
       {
         name: route.name,
@@ -146,35 +155,44 @@ const NotesPage = ({
         color: item.title,
         notebook: (item as TopicType).notebookId
       });
-  };
+  }, [
+    isMonograph,
+    onPressFloatingButton,
+    prepareSearch,
+    rightButtons,
+    route.name
+  ]);
 
-  const onRequestUpdate = (data?: NotesScreenParams) => {
-    const isNew = data && data?.item?.id !== params.current?.item?.id;
-    if (data) params.current = data;
-    params.current.title = params.current.title || params.current.item.title;
-    const { item } = params.current;
-    try {
-      if (isNew) setLoadingNotes(true);
-      const notes = get(params.current, true) as NoteType[];
-      if (
-        (item.type === "tag" || item.type === "color") &&
-        (!notes || notes.length === 0)
-      ) {
-        return Navigation.goBack();
+  const onRequestUpdate = React.useCallback(
+    (data?: NotesScreenParams) => {
+      const isNew = data && data?.item?.id !== params.current?.item?.id;
+      if (data) params.current = data;
+      params.current.title = params.current.title || params.current.item.title;
+      const { item } = params.current;
+      try {
+        if (isNew) setLoadingNotes(true);
+        const notes = get(params.current, true) as NoteType[];
+        if (
+          (item.type === "tag" || item.type === "color") &&
+          (!notes || notes.length === 0)
+        ) {
+          return Navigation.goBack();
+        }
+        if (item.type === "topic") setWarning(!isSynced(params.current));
+        setNotes(notes);
+        syncWithNavigation();
+      } catch (e) {
+        console.error(e);
       }
-      if (item.type === "topic") setWarning(!isSynced(params.current));
-      setNotes(notes);
-      syncWithNavigation();
-    } catch (e) {
-      console.error(e);
-    }
-  };
+    },
+    [get, syncWithNavigation]
+  );
 
   useEffect(() => {
     if (loadingNotes) {
       setTimeout(() => setLoadingNotes(false), 300);
     }
-  }, [notes]);
+  }, [loadingNotes, notes]);
 
   useEffect(() => {
     eSubscribeEvent(route.name, onRequestUpdate);
@@ -182,19 +200,7 @@ const NotesPage = ({
       setOnFirstSave(null);
       eUnSubscribeEvent(route.name, onRequestUpdate);
     };
-  }, []);
-
-  const prepareSearch = () => {
-    const { item } = params.current;
-    SearchService.update({
-      placeholder: `Search in ${alias}`,
-      type: "notes",
-      title: item.type === "tag" ? "#" + alias : toCamelCase(item.title),
-      get: () => {
-        return get(params.current, false);
-      }
-    });
-  };
+  }, [onRequestUpdate, route.name]);
 
   return (
     <DelayLayout

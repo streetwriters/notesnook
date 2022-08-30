@@ -79,7 +79,7 @@ export const useEditor = (
     commands.setInsets(
       isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
     );
-  }, [insets]);
+  }, [commands, insets, isDefaultEditor]);
 
   useEffect(() => {
     sessionIdRef.current = sessionId;
@@ -87,7 +87,7 @@ export const useEditor = (
 
   useEffect(() => {
     commands.setTags(currentNote.current);
-  }, [tags]);
+  }, [commands, tags]);
 
   useEffect(() => {
     if (theme) return;
@@ -98,28 +98,17 @@ export const useEditor = (
     return () => {
       unsub();
     };
-  }, []);
+  }, [postMessage, theme]);
 
-  useEffect(() => {
-    console.log("sessionId:", sessionId);
-    async () => {
-      await commands.setSessionId(sessionIdRef.current);
-      if (sessionIdRef.current) {
-        if (!state.current?.ready) return;
-        await onReady();
-      }
-    };
-    return () => {
-      state.current.saveCount = 0;
-    };
-  }, [sessionId, loading]);
-
-  const overlay = (show: boolean, data = { type: "new" }) => {
-    eSendEvent(
-      "loadingNote" + editorId,
-      show ? currentNote.current || data : false
-    );
-  };
+  const overlay = useCallback(
+    (show: boolean, data = { type: "new" }) => {
+      eSendEvent(
+        "loadingNote" + editorId,
+        show ? currentNote.current || data : false
+      );
+    },
+    [editorId]
+  );
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
@@ -127,7 +116,19 @@ export const useEditor = (
       overlay(true);
       setLoading(true);
     }
-  }, []);
+  }, [overlay]);
+
+  useEffect(() => {
+    console.log("sessionId:", sessionId);
+    state.current.saveCount = 0;
+    async () => {
+      await commands.setSessionId(sessionIdRef.current);
+      if (sessionIdRef.current) {
+        if (!state.current?.ready) return;
+        await onReady();
+      }
+    };
+  }, [sessionId, loading, commands, onReady]);
 
   useEffect(() => {
     if (loading) {
@@ -143,24 +144,27 @@ export const useEditor = (
     []
   );
 
-  const reset = useCallback(async (resetState = true) => {
-    currentNote.current?.id && db.fs.cancel(currentNote.current.id);
-    currentNote.current = null;
-    currentContent.current = null;
-    sessionHistoryId.current = undefined;
-    saveCount.current = 0;
-    useEditorStore.getState().setReadonly(false);
-    postMessage(EditorEvents.title, "");
-    await commands.clearContent();
-    await commands.clearTags();
-    console.log("reset state: ", resetState);
-    if (resetState) {
-      isDefaultEditor &&
-        useEditorStore.getState().setCurrentlyEditingNote(null);
-      placeholderTip.current = TipManager.placeholderTip();
-      await commands.setPlaceholder(placeholderTip.current);
-    }
-  }, []);
+  const reset = useCallback(
+    async (resetState = true) => {
+      currentNote.current?.id && db.fs.cancel(currentNote.current.id);
+      currentNote.current = null;
+      currentContent.current = null;
+      sessionHistoryId.current = undefined;
+      saveCount.current = 0;
+      useEditorStore.getState().setReadonly(false);
+      postMessage(EditorEvents.title, "");
+      await commands.clearContent();
+      await commands.clearTags();
+      console.log("reset state: ", resetState);
+      if (resetState) {
+        isDefaultEditor &&
+          useEditorStore.getState().setCurrentlyEditingNote(null);
+        placeholderTip.current = TipManager.placeholderTip();
+        await commands.setPlaceholder(placeholderTip.current);
+      }
+    },
+    [commands, isDefaultEditor, postMessage]
+  );
 
   const saveNote = useCallback(
     async ({
@@ -236,6 +240,7 @@ export const useEditor = (
           }
         } else {
           noteData.contentId = note?.contentId;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await db.vault?.save(noteData as any);
         }
         console.log(id, sessionIdRef.current, currentSessionId);
@@ -265,7 +270,7 @@ export const useEditor = (
         console.log("error saving: ", e);
       }
     },
-    [commands, reset]
+    [commands, isDefaultEditor, postMessage, readonly, reset]
   );
 
   const loadContent = useCallback(async (note: NoteType) => {
@@ -322,7 +327,15 @@ export const useEditor = (
         loadImages();
       }
     },
-    [setSessionId]
+    [
+      commands,
+      editorId,
+      isDefaultEditor,
+      loadContent,
+      overlay,
+      postMessage,
+      reset
+    ]
   );
 
   const loadImages = () => {
@@ -352,7 +365,7 @@ export const useEditor = (
     return () => {
       eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
     };
-  }, [editorId]);
+  }, [editorId, loadNote]);
 
   const saveContent = useCallback(
     ({
@@ -398,28 +411,10 @@ export const useEditor = (
         500
       );
     },
-    [sessionIdRef, sessionId]
+    [sessionId, withTimer, onChange, saveNote]
   );
 
-  const onLoad = useCallback(async () => {
-    console.log("on editor load");
-    state.current.ready = true;
-    onReady();
-    postMessage(EditorEvents.theme, theme || useThemeStore.getState().colors);
-    commands.setInsets(
-      isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
-    );
-    if (currentNote.current) {
-      console.log("force reload note");
-      loadNote({ ...currentNote.current, forced: true });
-    } else {
-      await commands.setPlaceholder(placeholderTip.current);
-      isDefaultEditor && restoreEditorState();
-    }
-    commands.setSettings();
-  }, [state, currentNote, loadNote]);
-
-  async function restoreEditorState() {
+  const restoreEditorState = useCallback(async () => {
     const json = await MMKV.getItem("appState");
     if (json) {
       const appState = JSON.parse(json) as AppState;
@@ -451,7 +446,34 @@ export const useEditor = (
       return;
     }
     state.current.isRestoringState = false;
-  }
+  }, [loadNote, overlay]);
+
+  const onLoad = useCallback(async () => {
+    console.log("on editor load");
+    state.current.ready = true;
+    onReady();
+    postMessage(EditorEvents.theme, theme || useThemeStore.getState().colors);
+    commands.setInsets(
+      isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
+    );
+    if (currentNote.current) {
+      console.log("force reload note");
+      loadNote({ ...currentNote.current, forced: true });
+    } else {
+      await commands.setPlaceholder(placeholderTip.current);
+      isDefaultEditor && restoreEditorState();
+    }
+    commands.setSettings();
+  }, [
+    onReady,
+    postMessage,
+    theme,
+    commands,
+    isDefaultEditor,
+    insets,
+    loadNote,
+    restoreEditorState
+  ]);
 
   return {
     ref: editorRef,

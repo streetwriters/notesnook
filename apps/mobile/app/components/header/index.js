@@ -31,6 +31,7 @@ import { eScrollEvent } from "../../utils/events";
 import { LeftMenus } from "./left-menus";
 import { RightMenus } from "./right-menus";
 import { Title } from "./title";
+import { useCallback } from "react";
 
 const _Header = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -41,22 +42,25 @@ const _Header = () => {
     (state) => state.currentScreen?.name
   );
 
-  const onScroll = (data) => {
-    if (data.y > 150) {
-      if (!hide) return;
-      setHide(false);
-    } else {
-      if (hide) return;
-      setHide(true);
-    }
-  };
+  const onScroll = useCallback(
+    (data) => {
+      if (data.y > 150) {
+        if (!hide) return;
+        setHide(false);
+      } else {
+        if (hide) return;
+        setHide(true);
+      }
+    },
+    [hide]
+  );
 
   useEffect(() => {
     eSubscribeEvent(eScrollEvent, onScroll);
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, [hide]);
+  }, [hide, onScroll]);
 
   return selectionMode ? null : (
     <>

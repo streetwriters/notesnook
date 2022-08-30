@@ -28,6 +28,7 @@ import { Button } from "../ui/button";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useCallback } from "react";
 
 export const MenuItem = React.memo(
   function MenuItem({ item, index, testID, rightBtn }) {
@@ -51,25 +52,28 @@ export const MenuItem = React.memo(
       }
     };
 
-    const onHeaderStateChange = (state) => {
-      setTimeout(() => {
-        let id = state.currentScreen?.id;
-        if (id === screenId) {
-          setHeaderTextState({ id: state.currentScreen.id });
-        } else {
-          if (headerTextState !== null) {
-            setHeaderTextState(null);
+    const onHeaderStateChange = useCallback(
+      (state) => {
+        setTimeout(() => {
+          let id = state.currentScreen?.id;
+          if (id === screenId) {
+            setHeaderTextState({ id: state.currentScreen.id });
+          } else {
+            if (headerTextState !== null) {
+              setHeaderTextState(null);
+            }
           }
-        }
-      }, 300);
-    };
+        }, 300);
+      },
+      [headerTextState, screenId]
+    );
 
     useEffect(() => {
       let unsub = useNavigationStore.subscribe(onHeaderStateChange);
       return () => {
         unsub();
       };
-    }, [headerTextState]);
+    }, [headerTextState, onHeaderStateChange]);
 
     return (
       <PressableButton

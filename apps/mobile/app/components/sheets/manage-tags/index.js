@@ -36,6 +36,7 @@ import { PressableButton } from "../../ui/pressable";
 import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { useCallback } from "react";
 const ManageTagsSheet = () => {
   const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
@@ -53,16 +54,16 @@ const ManageTagsSheet = () => {
       eUnSubscribeEvent(eOpenTagsDialog, open);
       eUnSubscribeEvent(eCloseTagsDialog, close);
     };
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     if (visible) {
       console.log("sorting tags");
       sortTags();
     }
-  }, [allTags, note, query, visible]);
+  }, [allTags, note, query, sortTags, visible]);
 
-  const sortTags = () => {
+  const sortTags = useCallback(() => {
     let _tags = [...allTags];
     _tags = _tags.filter((t) => t.type === "tag");
     _tags = _tags.sort((a, b) => a.title.localeCompare(b.title));
@@ -85,14 +86,17 @@ const ManageTagsSheet = () => {
     noteTags = noteTags.sort((a, b) => a.title.localeCompare(b.title));
     let combinedTags = [...noteTags, ..._tags];
     setTags(combinedTags);
-  };
+  }, [allTags, note, query]);
 
-  const open = (item) => {
-    setNote(item);
-    useTagStore.getState().setTags();
-    sortTags();
-    setVisible(true);
-  };
+  const open = useCallback(
+    (item) => {
+      setNote(item);
+      useTagStore.getState().setTags();
+      sortTags();
+      setVisible(true);
+    },
+    [sortTags]
+  );
 
   useEffect(() => {
     if (visible) {

@@ -59,6 +59,7 @@ import {
 import { editorRef, tabBarRef } from "../utils/global-refs";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import { NavigationStack } from "./navigation-stack";
+import { useCallback } from "react";
 
 const _TabsHolder = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -92,7 +93,7 @@ const _TabsHolder = () => {
     };
   }, []);
 
-  const showFullScreenEditor = () => {
+  const showFullScreenEditor = useCallback(() => {
     setFullscreen(true);
     if (deviceMode === "smallTablet") {
       tabBarRef.current?.openDrawer();
@@ -107,9 +108,9 @@ const _TabsHolder = () => {
             : dimensions.width * 0.15
       }
     });
-  };
+  }, [deviceMode, dimensions.width, setFullscreen]);
 
-  const closeFullScreenEditor = () => {
+  const closeFullScreenEditor = useCallback(() => {
     if (deviceMode === "smallTablet") {
       tabBarRef.current?.closeDrawer();
     }
@@ -132,7 +133,7 @@ const _TabsHolder = () => {
         tabBarRef.current?.goToIndex(1);
       }, 100);
     }
-  };
+  }, [deviceMode, dimensions.width, setFullscreen]);
 
   useEffect(() => {
     if (!tabBarRef.current?.isDrawerOpen()) {
@@ -145,7 +146,14 @@ const _TabsHolder = () => {
       eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
       eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
     };
-  }, [deviceMode, dimensions, colors]);
+  }, [
+    deviceMode,
+    dimensions,
+    colors,
+    showFullScreenEditor,
+    closeFullScreenEditor,
+    toggleView
+  ]);
 
   const _onLayout = async (event) => {
     console.log("layout called here");
@@ -259,9 +267,12 @@ const _TabsHolder = () => {
     }
   };
 
-  const toggleView = (show) => {
-    animatedTranslateY.value = show ? 0 : -9999;
-  };
+  const toggleView = useCallback(
+    (show) => {
+      animatedTranslateY.value = show ? 0 : -9999;
+    },
+    [animatedTranslateY]
+  );
 
   const valueLimiter = (value, min, max) => {
     if (value < min) {

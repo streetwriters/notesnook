@@ -47,7 +47,7 @@ const useSyncProgress = () => {
       EV?.unsubscribe(EVENTS.syncProgress, onProgress);
       EV?.unsubscribe(EVENTS.syncCompleted, onSyncComplete);
     };
-  }, []);
+  }, [EV, onProgress]);
 
   return {
     progress

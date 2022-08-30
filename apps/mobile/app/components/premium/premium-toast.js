@@ -38,31 +38,35 @@ import { sleep } from "../../utils/time";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useCallback } from "react";
 
 export const PremiumToast = ({ context = "global", offset = 0 }) => {
   const colors = useThemeStore((state) => state.colors);
   const [msg, setMsg] = useState(null);
   const timer = useRef();
 
-  const open = (event) => {
-    if (!event) {
-      clearTimeout(timer);
-      timer.current = null;
-      setMsg(null);
-      return;
-    }
-
-    if (event.context === context && msg?.desc !== event.desc) {
-      if (timer.current !== null) {
-        clearTimeout(timer.current);
+  const open = useCallback(
+    (event) => {
+      if (!event) {
+        clearTimeout(timer);
         timer.current = null;
-      }
-      setMsg(event);
-      timer.current = setTimeout(async () => {
         setMsg(null);
-      }, 3000);
-    }
-  };
+        return;
+      }
+
+      if (event.context === context && msg?.desc !== event.desc) {
+        if (timer.current !== null) {
+          clearTimeout(timer.current);
+          timer.current = null;
+        }
+        setMsg(event);
+        timer.current = setTimeout(async () => {
+          setMsg(null);
+        }, 3000);
+      }
+    },
+    [context, msg?.desc]
+  );
 
   useEffect(() => {
     eSubscribeEvent(eShowGetPremium, open);
@@ -70,7 +74,7 @@ export const PremiumToast = ({ context = "global", offset = 0 }) => {
       clearTimeout(timer.current);
       eUnSubscribeEvent(eShowGetPremium, open);
     };
-  }, []);
+  }, [open]);
 
   const onPress = async () => {
     open(null);

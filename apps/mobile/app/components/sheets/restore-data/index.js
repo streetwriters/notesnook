@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { createRef, useEffect, useState } from "react";
+import React, { createRef, useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
 import { FlatList } from "react-native-gesture-handler";
@@ -54,7 +54,7 @@ const RestoreDataSheet = () => {
       eUnSubscribeEvent(eOpenRestoreDialog, open);
       eUnSubscribeEvent(eCloseRestoreDialog, close);
     };
-  }, []);
+  }, [close]);
 
   const open = async () => {
     setVisible(true);
@@ -62,7 +62,7 @@ const RestoreDataSheet = () => {
     actionSheetRef.current?.setModalVisible(true);
   };
 
-  const close = () => {
+  const close = useCallback(() => {
     if (restoring) {
       showIsWorking();
       return;
@@ -71,7 +71,7 @@ const RestoreDataSheet = () => {
     setTimeout(() => {
       setVisible(false);
     }, 300);
-  };
+  }, [restoring]);
 
   const showIsWorking = () => {
     ToastEvent.show({

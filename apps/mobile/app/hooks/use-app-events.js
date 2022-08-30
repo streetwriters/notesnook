@@ -62,6 +62,7 @@ import {
 } from "../services/event-manager";
 import { useEditorStore } from "../stores/use-editor-store";
 import { useDragState } from "../screens/settings/editor/state";
+import { useCallback } from "react";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -121,7 +122,7 @@ export const useAppEvents = () => {
         onRequestPartialSync
       );
     };
-  }, [loading]);
+  }, [loading, onSyncComplete]);
 
   useEffect(() => {
     let subs = [
@@ -156,10 +157,10 @@ export const useAppEvents = () => {
 
       subs.forEach((sub) => sub?.remove());
     };
-  }, []);
+  }, [onEmailVerified, onSyncComplete, onUrlRecieved, onUserUpdated]);
 
   const onSessionExpired = async () => {
-    await SettingsService.set({
+    SettingsService.set({
       sessionExpired: true
     });
     eSendEvent("session_expired");
@@ -188,18 +189,26 @@ export const useAppEvents = () => {
     }
     return () => {
       refValues.current?.removeInternetStateListener &&
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         refValues.current?.removeInternetStateListener();
       sub?.remove();
       unsubIAP();
     };
-  }, [loading, verify]);
+  }, [
+    loading,
+    onAppStateChanged,
+    onEmailVerified,
+    onInternetStateChanged,
+    onUserUpdated,
+    verify
+  ]);
 
-  const onInternetStateChanged = async (state) => {
+  const onInternetStateChanged = useCallback(async (state) => {
     if (!syncedOnLaunch.current) return;
     reconnectSSE(state);
-  };
+  }, []);
 
-  const onSyncComplete = async () => {
+  const onSyncComplete = useCallback(async () => {
     console.log("sync complete");
     initAfterSync();
     setLastSynced(await db.lastSynced());
@@ -209,22 +218,25 @@ export const useAppEvents = () => {
     if (note) {
       //await updateNoteInEditor();
     }
-  };
+  }, [setLastSynced]);
 
-  const onUrlRecieved = async (res) => {
-    let url = res ? res.url : "";
-    try {
-      if (url.startsWith("https://app.notesnook.com/account/verified")) {
-        await onEmailVerified();
-      } else {
-        return;
+  const onUrlRecieved = useCallback(
+    async (res) => {
+      let url = res ? res.url : "";
+      try {
+        if (url.startsWith("https://app.notesnook.com/account/verified")) {
+          await onEmailVerified();
+        } else {
+          return;
+        }
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+    },
+    [onEmailVerified]
+  );
 
-  const onEmailVerified = async () => {
+  const onEmailVerified = useCallback(async () => {
     let user = await db.user.getUser();
     setUser(user);
     if (!user) return;
@@ -236,9 +248,9 @@ export const useAppEvents = () => {
     if (user?.isEmailConfirmed) {
       clearMessage();
     }
-  };
+  }, [setUser]);
 
-  const attachIAPListeners = async () => {
+  const attachIAPListeners = useCallback(async () => {
     await RNIap.initConnection()
       .catch(() => null)
       .then(async () => {
@@ -247,7 +259,7 @@ export const useAppEvents = () => {
         refValues.current.subsriptionErrorListener =
           RNIap.purchaseErrorListener(onSubscriptionError);
       });
-  };
+  }, []);
 
   const onAccountStatusChange = async (userStatus) => {
     if (!PremiumService.get() && userStatus.type === 5) {
@@ -281,59 +293,62 @@ export const useAppEvents = () => {
     }
   };
 
-  const onUserUpdated = async (login) => {
-    console.log(`onUserUpdated: ${login}`);
-    let user;
-    try {
-      user = await db.user.getUser();
-      await PremiumService.setPremiumStatus();
-      setLastSynced(await db.lastSynced());
-      await useDragState.getState().init();
-      if (!user) {
-        return setLoginMessage();
-      }
+  const onUserUpdated = useCallback(
+    async (login) => {
+      console.log(`onUserUpdated: ${login}`);
+      let user;
+      try {
+        user = await db.user.getUser();
+        await PremiumService.setPremiumStatus();
+        setLastSynced(await db.lastSynced());
+        await useDragState.getState().init();
+        if (!user) {
+          return setLoginMessage();
+        }
 
-      let userEmailConfirmed = SettingsService.get().userEmailConfirmed;
-      setUser(user);
-      if (SettingsService.get().sessionExpired) {
-        syncedOnLaunch.current = true;
-        return;
-      }
-
-      clearMessage();
-      attachIAPListeners();
-
-      if (!login) {
-        user = await db.user.fetchUser();
+        let userEmailConfirmed = SettingsService.get().userEmailConfirmed;
         setUser(user);
+        if (SettingsService.get().sessionExpired) {
+          syncedOnLaunch.current = true;
+          return;
+        }
+
+        clearMessage();
+        attachIAPListeners();
+
+        if (!login) {
+          user = await db.user.fetchUser();
+          setUser(user);
+        }
+
+        await PremiumService.setPremiumStatus();
+        if (user?.isEmailConfirmed && !userEmailConfirmed) {
+          setTimeout(() => {
+            onEmailVerified();
+          }, 1000);
+          SettingsService.set({
+            userEmailConfirmed: true
+          });
+        }
+      } catch (e) {
+        ToastEvent.error(e, "An error occured", "global");
       }
 
-      await PremiumService.setPremiumStatus();
-      if (user?.isEmailConfirmed && !userEmailConfirmed) {
-        setTimeout(() => {
-          onEmailVerified();
-        }, 1000);
-        SettingsService.set({
-          userEmailConfirmed: true
-        });
+      user = await db.user.getUser();
+      if (
+        user?.isEmailConfirmed &&
+        !SettingsService.get().recoveryKeySaved &&
+        !useMessageStore.getState().message?.visible
+      ) {
+        setRecoveryKeyMessage();
       }
-    } catch (e) {
-      ToastEvent.error(e, "An error occured", "global");
-    }
+      if (!user?.isEmailConfirmed) setEmailVerifyMessage();
+      refValues.current.isUserReady = true;
 
-    user = await db.user.getUser();
-    if (
-      user?.isEmailConfirmed &&
-      !SettingsService.get().recoveryKeySaved &&
-      !useMessageStore.getState().message?.visible
-    ) {
-      setRecoveryKeyMessage();
-    }
-    if (!user?.isEmailConfirmed) setEmailVerifyMessage();
-    refValues.current.isUserReady = true;
-
-    syncedOnLaunch.current = true;
-  };
+      syncedOnLaunch.current = true;
+    },
+    [attachIAPListeners, onEmailVerified, setLastSynced, setUser]
+  );
 
   const onSuccessfulSubscription = async (subscription) => {
     await PremiumService.subscriptions.set(subscription);
@@ -349,59 +364,65 @@ export const useAppEvents = () => {
     });
   };
 
-  const onAppStateChanged = async (state) => {
-    console.log("onAppStateChanged");
-    if (state === "active") {
-      updateStatusBarColor();
-      if (
-        SettingsService.get().appLockMode !== "background" &&
-        !SettingsService.get().privacyScreen
-      ) {
-        enabled(false);
-      }
-      if (SettingsService.get().appLockMode === "background") {
-        if (useSettingStore.getState().requestBiometrics) {
-          useSettingStore.getState().setRequestBiometrics(false);
-          return;
+  const onAppStateChanged = useCallback(
+    async (state) => {
+      console.log("onAppStateChanged");
+      if (state === "active") {
+        updateStatusBarColor();
+        if (
+          SettingsService.get().appLockMode !== "background" &&
+          !SettingsService.get().privacyScreen
+        ) {
+          enabled(false);
         }
-      }
-
-      await reconnectSSE();
-      await checkIntentState();
-      MMKV.removeItem("appState");
-      let user = await db.user.getUser();
-      if (user && !user?.isEmailConfirmed) {
-        try {
-          let user = await db.user.fetchUser();
-          if (user?.isEmailConfirmed) {
-            onEmailVerified();
+        if (SettingsService.get().appLockMode === "background") {
+          if (useSettingStore.getState().requestBiometrics) {
+            useSettingStore.getState().setRequestBiometrics(false);
+            return;
           }
-        } catch (e) {
-          console.error(e);
+        }
+
+        await reconnectSSE();
+        await checkIntentState();
+        MMKV.removeItem("appState");
+        let user = await db.user.getUser();
+        if (user && !user?.isEmailConfirmed) {
+          try {
+            let user = await db.user.fetchUser();
+            if (user?.isEmailConfirmed) {
+              onEmailVerified();
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      } else {
+        let id = useEditorStore.getState().currentEditingNote;
+        let note = id && db.notes.note(id).data;
+        if (
+          note?.locked &&
+          SettingsService.get().appLockMode === "background"
+        ) {
+          eSendEvent(eClearEditor);
+        }
+        await storeAppState();
+        if (
+          SettingsService.get().appLockMode === "background" &&
+          !useSettingStore.getState().requestBiometrics &&
+          !useUserStore.getState().verifyUser
+        ) {
+          useUserStore.getState().setVerifyUser(true);
+        }
+        if (
+          SettingsService.get().privacyScreen ||
+          SettingsService.get().appLockMode === "background"
+        ) {
+          !useSettingStore.getState().requestBiometrics ? enabled(true) : null;
         }
       }
-    } else {
-      let id = useEditorStore.getState().currentEditingNote;
-      let note = id && db.notes.note(id).data;
-      if (note?.locked && SettingsService.get().appLockMode === "background") {
-        eSendEvent(eClearEditor);
-      }
-      await storeAppState();
-      if (
-        SettingsService.get().appLockMode === "background" &&
-        !useSettingStore.getState().requestBiometrics &&
-        !useUserStore.getState().verifyUser
-      ) {
-        useUserStore.getState().setVerifyUser(true);
-      }
-      if (
-        SettingsService.get().privacyScreen ||
-        SettingsService.get().appLockMode === "background"
-      ) {
-        !useSettingStore.getState().requestBiometrics ? enabled(true) : null;
-      }
-    }
-  };
+    },
+    [onEmailVerified]
+  );
 
   async function reconnectSSE(connection) {
     if (refValues.current?.isReconnecting) return;

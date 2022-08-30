@@ -45,58 +45,61 @@ export default function ToolSheet({
   const data = useDragState((state) => state.data);
   const ungrouped = getUngroupedTools(data) as ToolId[];
 
-  const renderTool = React.useCallback((item: ToolId) => {
-    const tool = findToolById(item);
-    const iconSvgString = tool ? getToolIcon(tool.icon as ToolId) : null;
-    return (
-      <PressableButton
-        key={item}
-        type="grayBg"
-        onPress={() => {
-          const _data = useDragState.getState().data.slice();
-          if (group.groupIndex !== undefined) {
-            (_data[group.groupIndex][group.index] as ToolId[]).unshift(
-              item as ToolId
-            );
-          } else {
-            _data[group.index].unshift(item);
-          }
-          useDragState.getState().setData(_data);
-        }}
-        customStyle={{
-          marginBottom: 10,
-          width: "100%",
-          height: 50,
-          paddingHorizontal: 12,
-          paddingRight: 0,
-          borderRadius: 5,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "flex-start"
-        }}
-      >
-        <View
-          style={{
+  const renderTool = React.useCallback(
+    (item: ToolId) => {
+      const tool = findToolById(item);
+      const iconSvgString = tool ? getToolIcon(tool.icon as ToolId) : null;
+      return (
+        <PressableButton
+          key={item}
+          type="grayBg"
+          onPress={() => {
+            const _data = useDragState.getState().data.slice();
+            if (group.groupIndex !== undefined) {
+              (_data[group.groupIndex][group.index] as ToolId[]).unshift(
+                item as ToolId
+              );
+            } else {
+              _data[group.index].unshift(item);
+            }
+            useDragState.getState().setData(_data);
+          }}
+          customStyle={{
+            marginBottom: 10,
+            width: "100%",
+            height: 50,
+            paddingHorizontal: 12,
+            paddingRight: 0,
+            borderRadius: 5,
             flexDirection: "row",
-            alignItems: "center"
+            alignItems: "center",
+            justifyContent: "flex-start"
           }}
         >
-          {iconSvgString ? (
-            <SvgView width={23} height={23} src={iconSvgString} />
-          ) : null}
-          <Paragraph
+          <View
             style={{
-              marginLeft: iconSvgString ? 10 : 0
+              flexDirection: "row",
+              alignItems: "center"
             }}
-            color={colors.pri}
-            size={SIZE.sm}
           >
-            {tool?.title}
-          </Paragraph>
-        </View>
-      </PressableButton>
-    );
-  }, []);
+            {iconSvgString ? (
+              <SvgView width={23} height={23} src={iconSvgString} />
+            ) : null}
+            <Paragraph
+              style={{
+                marginLeft: iconSvgString ? 10 : 0
+              }}
+              color={colors.pri}
+              size={SIZE.sm}
+            >
+              {tool?.title}
+            </Paragraph>
+          </View>
+        </PressableButton>
+      );
+    },
+    [colors.pri, group.groupIndex, group.index]
+  );
 
   return (
     <View

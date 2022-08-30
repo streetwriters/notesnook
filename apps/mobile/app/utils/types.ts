@@ -58,6 +58,10 @@ export type Item =
 
 export type MonographType = {
   type: "monograph";
+  id: string;
+  title: string;
+  dateModified: number;
+  dateCreated: number;
 };
 
 export interface Entity<TType extends EntityTypes> {

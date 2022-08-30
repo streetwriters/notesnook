@@ -47,6 +47,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { PricingItem } from "./pricing-item";
+import { useCallback } from "react";
 
 const promoCyclesMonthly = {
   1: "first month",
@@ -77,7 +78,7 @@ export const PricingPlans = ({
   const yearlyPlan = usePricing("yearly");
   const monthlyPlan = usePricing("monthly");
 
-  const getSkus = async () => {
+  const getSkus = useCallback(async () => {
     try {
       setLoading(true);
       if (promo?.promoCode) {
@@ -88,7 +89,7 @@ export const PricingPlans = ({
       setLoading(false);
       console.log("error getting sku", e);
     }
-  };
+  }, [promo?.promoCode]);
 
   const getPromo = async (code) => {
     try {
@@ -129,7 +130,7 @@ export const PricingPlans = ({
 
   useEffect(() => {
     getSkus();
-  }, []);
+  }, [getSkus]);
 
   const buySubscription = async (product) => {
     if (buying) return;

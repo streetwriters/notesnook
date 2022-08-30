@@ -46,7 +46,7 @@ export const useAttachmentProgress = (attachment, encryption) => {
     } else {
       setCurrentProgress(null);
     }
-  }, [progress]);
+  }, [attachment.metadata.hash, progress]);
 
   return [currentProgress, setCurrentProgress];
 };

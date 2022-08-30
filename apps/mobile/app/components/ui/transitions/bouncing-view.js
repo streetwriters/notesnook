@@ -49,7 +49,7 @@ export const BouncingView = ({
       duration: duration,
       easing: Easing.elastic(1)
     });
-  }, []);
+  }, [animated, duration, initialScale, scale]);
 
   return (
     <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>

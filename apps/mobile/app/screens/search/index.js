@@ -48,7 +48,7 @@ export const Search = ({ navigation, route }) => {
       setSearchResults([]);
       setSearchStatus(false, null);
     };
-  }, []);
+  }, [setSearchResults, setSearchStatus]);
 
   return (
     <DelayLayout wait={searching}>

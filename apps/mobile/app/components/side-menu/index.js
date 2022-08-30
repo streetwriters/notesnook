@@ -96,7 +96,7 @@ export const SideMenu = React.memo(
           <TagsSection />
         </>
       ),
-      []
+      [noTextMode]
     );
 
     return !loading && introCompleted ? (

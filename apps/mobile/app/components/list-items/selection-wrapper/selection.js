@@ -50,7 +50,14 @@ export const SelectionIcon = ({ setActionStrip, item, compactMode }) => {
         }
       }
     }
-  }, [selectedItemsList, item.id]);
+  }, [
+    selectedItemsList,
+    item.id,
+    selectionMode,
+    setActionStrip,
+    item.dateCreated,
+    selected
+  ]);
 
   const onPress = () => {
     setSelectedItem(item);

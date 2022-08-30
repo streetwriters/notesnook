@@ -37,6 +37,7 @@ import Seperator from "../ui/seperator";
 import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useCallback } from "react";
 
 export const TagsSection = React.memo(
   function TagsSection() {
@@ -48,7 +49,7 @@ export const TagsSection = React.memo(
       if (!loading) {
         setMenuPins();
       }
-    }, [loading]);
+    }, [loading, setMenuPins]);
 
     const onPress = (item) => {
       if (item.type === "notebook") {
@@ -109,27 +110,30 @@ export const PinItem = React.memo(
     const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
     const fwdRef = useRef();
 
-    const onHeaderStateChange = (state) => {
-      setTimeout(() => {
-        let id = state.currentScreen?.id;
-        if (id === item.id) {
-          setHeaderTextState({
-            id: state.currentScreen.id
-          });
-        } else {
-          if (headerTextState !== null) {
-            setHeaderTextState(null);
+    const onHeaderStateChange = useCallback(
+      (state) => {
+        setTimeout(() => {
+          let id = state.currentScreen?.id;
+          if (id === item.id) {
+            setHeaderTextState({
+              id: state.currentScreen.id
+            });
+          } else {
+            if (headerTextState !== null) {
+              setHeaderTextState(null);
+            }
           }
-        }
-      }, 300);
-    };
+        }, 300);
+      },
+      [headerTextState, item.id]
+    );
 
     useEffect(() => {
       let unsub = useNavigationStore.subscribe(onHeaderStateChange);
       return () => {
         unsub();
       };
-    }, [headerTextState]);
+    }, [headerTextState, onHeaderStateChange]);
 
     const icons = {
       topic: "bookmark",

@@ -64,60 +64,64 @@ export const Tool = ({
   const iconSvgString =
     isSubgroup || !tool ? null : getToolIcon(tool.icon as ToolId);
 
-  const buttons = isSubgroup
-    ? [
-        {
-          name: "minus",
-          onPress: () => {
-            presentDialog({
-              context: "global",
-              title: "Delete collapsed section?",
-              positiveText: "Delete",
-              paragraph:
-                "All tools in the collapsed section will also be removed.",
-              positivePress: () => {
+  const buttons = React.useMemo(
+    () =>
+      isSubgroup
+        ? [
+            {
+              name: "minus",
+              onPress: () => {
+                presentDialog({
+                  context: "global",
+                  title: "Delete collapsed section?",
+                  positiveText: "Delete",
+                  paragraph:
+                    "All tools in the collapsed section will also be removed.",
+                  positivePress: () => {
+                    if (typeof groupIndex !== "number") return;
+                    const _data = useDragState.getState().data.slice();
+                    _data[groupIndex].splice(index, 1);
+                    setData(_data);
+                  }
+                });
+              }
+            },
+            {
+              name: "plus",
+              onPress: () => {
+                ToolSheet.present({
+                  item,
+                  index,
+                  groupIndex,
+                  parentIndex
+                });
+              }
+            }
+          ]
+        : [
+            {
+              name: "minus",
+              onPress: () => {
                 if (typeof groupIndex !== "number") return;
                 const _data = useDragState.getState().data.slice();
-                _data[groupIndex].splice(index, 1);
+                if (typeof parentIndex !== "number") {
+                  const index = _data[groupIndex].findIndex(
+                    (tool) => tool === item
+                  );
+                  _data[groupIndex].splice(index, 1);
+                } else {
+                  const index = (
+                    _data[parentIndex][groupIndex] as ToolId[]
+                  ).findIndex((tool: string) => tool === item);
+                  (_data[parentIndex][groupIndex] as ToolId[]).splice(index, 1);
+                }
+                console.log(_data[groupIndex]);
                 setData(_data);
               }
-            });
-          }
-        },
-        {
-          name: "plus",
-          onPress: () => {
-            ToolSheet.present({
-              item,
-              index,
-              groupIndex,
-              parentIndex
-            });
-          }
-        }
-      ]
-    : [
-        {
-          name: "minus",
-          onPress: () => {
-            if (typeof groupIndex !== "number") return;
-            const _data = useDragState.getState().data.slice();
-            if (typeof parentIndex !== "number") {
-              const index = _data[groupIndex].findIndex(
-                (tool) => tool === item
-              );
-              _data[groupIndex].splice(index, 1);
-            } else {
-              const index = (
-                _data[parentIndex][groupIndex] as ToolId[]
-              ).findIndex((tool: string) => tool === item);
-              (_data[parentIndex][groupIndex] as ToolId[]).splice(index, 1);
             }
-            console.log(_data[groupIndex]);
-            setData(_data);
-          }
-        }
-      ];
+          ],
+    [groupIndex, index, isSubgroup, item, parentIndex, setData]
+  );
 
   if (parentIndex === undefined && !isSubgroup) {
     buttons.unshift({
@@ -236,7 +240,20 @@ export const Tool = ({
         ) : null}
       </>
     ),
-    []
+    [
+      buttons,
+      colors.bg,
+      colors.icon,
+      colors.nav,
+      colors.pri,
+      groupIndex,
+      iconSvgString,
+      index,
+      isDragged,
+      isSubgroup,
+      item,
+      tool?.title
+    ]
   );
 
   const onDrop = (data: DraxDragWithReceiverEventData) => {

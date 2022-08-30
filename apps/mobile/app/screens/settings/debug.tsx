@@ -78,59 +78,62 @@ export default function DebugLogs() {
         setLogs(logs);
       }
     })();
-  }, [seconds]);
+  }, [currentLog, seconds, start]);
 
-  const renderItem = ({ item }: { item: LogMessage; index: number }) => {
-    const background =
-      item.level === LogLevel.Error || item.level === LogLevel.Fatal
-        ? hexToRGBA(colors.red, 0.2)
-        : item.level === LogLevel.Warn
-        ? hexToRGBA(colors.orange, 0.2)
-        : "transparent";
+  const renderItem = React.useCallback(
+    ({ item }: { item: LogMessage; index: number }) => {
+      const background =
+        item.level === LogLevel.Error || item.level === LogLevel.Fatal
+          ? hexToRGBA(colors.red, 0.2)
+          : item.level === LogLevel.Warn
+          ? hexToRGBA(colors.orange, 0.2)
+          : "transparent";
 
-    const color =
-      item.level === LogLevel.Error || item.level === LogLevel.Fatal
-        ? colors.red
-        : item.level === LogLevel.Warn
-        ? colors.orange
-        : colors.pri;
+      const color =
+        item.level === LogLevel.Error || item.level === LogLevel.Fatal
+          ? colors.red
+          : item.level === LogLevel.Warn
+          ? colors.orange
+          : colors.pri;
 
-    return !item ? null : (
-      <TouchableOpacity
-        activeOpacity={1}
-        onLongPress={() => {
-          Clipboard.setString(format(item));
-          ToastEvent.show({
-            heading: "Debug log copied!",
-            context: "global",
-            type: "success"
-          });
-        }}
-        style={{
-          paddingHorizontal: 12,
-          paddingVertical: 12,
-          backgroundColor: background,
-          flexShrink: 1,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.nav
-        }}
-      >
-        <Paragraph
-          style={{
-            flexShrink: 1,
-            flexWrap: "wrap",
-            fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace"
+      return !item ? null : (
+        <TouchableOpacity
+          activeOpacity={1}
+          onLongPress={() => {
+            Clipboard.setString(format(item));
+            ToastEvent.show({
+              heading: "Debug log copied!",
+              context: "global",
+              type: "success"
+            });
           }}
-          size={12}
-          color={color}
+          style={{
+            paddingHorizontal: 12,
+            paddingVertical: 12,
+            backgroundColor: background,
+            flexShrink: 1,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.nav
+          }}
         >
-          {format(item)}
-        </Paragraph>
-      </TouchableOpacity>
-    );
-  };
+          <Paragraph
+            style={{
+              flexShrink: 1,
+              flexWrap: "wrap",
+              fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace"
+            }}
+            size={12}
+            color={color}
+          >
+            {format(item)}
+          </Paragraph>
+        </TouchableOpacity>
+      );
+    },
+    [colors.nav, colors.orange, colors.pri, colors.red]
+  );
 
-  const downloadLogs = async () => {
+  const downloadLogs = React.useCallback(async () => {
     try {
       let path = null;
       const fileName = sanitizeFilename(`notesnook_logs_${Date.now()}`);
@@ -165,9 +168,9 @@ export default function DebugLogs() {
     } catch (e) {
       console.log(e);
     }
-  };
+  }, [currentLog?.logs]);
 
-  const copyLogs = () => {
+  const copyLogs = React.useCallback(() => {
     const data = currentLog?.logs
       .map((log) => {
         return !log ? "" : format(log);
@@ -180,9 +183,9 @@ export default function DebugLogs() {
       context: "global",
       type: "success"
     });
-  };
+  }, [currentLog?.logs]);
 
-  const clearLogs = () => {
+  const clearLogs = React.useCallback(() => {
     if (!currentLog) return;
     presentDialog({
       title: "Clear logs",
@@ -203,7 +206,7 @@ export default function DebugLogs() {
         }
       }
     });
-  };
+  }, [currentLog, logs]);
 
   return (
     <View

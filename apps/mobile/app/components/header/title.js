@@ -30,6 +30,7 @@ import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useCallback } from "react";
 
 const titleState = {};
 
@@ -46,7 +47,6 @@ export const Title = () => {
       : false
   );
   const isHidden = titleState[currentScreen.id];
-  console.log(currentScreen, "header");
   const notebook =
     isTopic && currentScreen.notebookId
       ? db.notebooks?.notebook(currentScreen.notebookId)?.data
@@ -54,19 +54,22 @@ export const Title = () => {
   const title = currentScreen.title;
   const isTag = currentScreen?.name === "TaggedNotes";
 
-  const onScroll = (data) => {
-    if (currentScreen.name !== "Notebook") {
-      setHide(false);
-      return;
-    }
-    if (data.y > 150) {
-      if (!hide) return;
-      setHide(false);
-    } else {
-      if (hide) return;
-      setHide(true);
-    }
-  };
+  const onScroll = useCallback(
+    (data) => {
+      if (currentScreen.name !== "Notebook") {
+        setHide(false);
+        return;
+      }
+      if (data.y > 150) {
+        if (!hide) return;
+        setHide(false);
+      } else {
+        if (hide) return;
+        setHide(true);
+      }
+    },
+    [currentScreen.name, hide]
+  );
 
   useEffect(() => {
     if (currentScreen.name === "Notebook") {
@@ -78,18 +81,18 @@ export const Title = () => {
     } else {
       setHide(titleState[currentScreen.id]);
     }
-  }, [currentScreen.id]);
+  }, [currentScreen.id, currentScreen.name]);
 
   useEffect(() => {
     titleState[currentScreen.id] = hide;
-  }, [hide]);
+  }, [currentScreen.id, hide]);
 
   useEffect(() => {
     eSubscribeEvent(eScrollEvent, onScroll);
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, [hide]);
+  }, [hide, onScroll]);
 
   function navigateToNotebook() {
     if (!isTopic) return;

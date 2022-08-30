@@ -89,7 +89,7 @@ const _Tabs = () => {
     setTimeout(() => {
       useNavigationStore.getState().update({ name: homepage });
     }, 1000);
-  }, []);
+  }, [homepage]);
 
   return (
     <NativeStack.Navigator
@@ -169,7 +169,7 @@ const _NavigationStack = () => {
     }
     hideAllTooltips();
     eSendEvent("navigate");
-  });
+  }, [clearSelection]);
 
   return (
     <Container>

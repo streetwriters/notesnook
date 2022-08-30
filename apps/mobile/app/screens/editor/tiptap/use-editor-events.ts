@@ -151,10 +151,8 @@ export const useEditorEvents = (
   );
   const tools = useDragState((state) => state.data);
   const { keyboardShown } = useKeyboard();
-  if (!editor) return null;
 
   useEffect(() => {
-    console.log("keyboardShown", keyboardShown);
     editor.commands.setSettings({
       deviceMode: deviceMode || "mobile",
       fullscreen: fullscreen || false,
@@ -176,7 +174,10 @@ export const useEditorEvents = (
     tools,
     editor.commands,
     keyboardShown,
-    doubleSpacedLines
+    doubleSpacedLines,
+    editorPropReadonly,
+    noHeader,
+    noToolbar
   ]);
 
   const onBackPress = useCallback(async () => {
@@ -211,14 +212,14 @@ export const useEditorEvents = (
       editorState().currentlyEditing = false;
       editor.reset();
     }, 1);
-  }, [fullscreen, deviceMode]);
+  }, [editor, deviceMode, fullscreen]);
 
   const onHardwareBackPress = useCallback(() => {
     if (editorState().currentlyEditing) {
       onBackPress();
       return true;
     }
-  }, []);
+  }, [onBackPress]);
 
   const onLoadNote = useCallback(async () => {
     InteractionManager.runAfterInteractions(() => {
@@ -229,29 +230,32 @@ export const useEditorEvents = (
         );
       }
     });
-  }, []);
-  const onCallClear = useCallback(async (value: string) => {
-    if (value === "removeHandler") {
-      if (handleBack.current) {
-        handleBack.current.remove();
+  }, [onHardwareBackPress]);
+  const onCallClear = useCallback(
+    async (value: string) => {
+      if (value === "removeHandler") {
+        if (handleBack.current) {
+          handleBack.current.remove();
+        }
+        return;
       }
-      return;
-    }
-    if (value === "addHandler") {
-      if (handleBack.current) {
-        handleBack.current.remove();
-      }
+      if (value === "addHandler") {
+        if (handleBack.current) {
+          handleBack.current.remove();
+        }
 
-      handleBack.current = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onHardwareBackPress
-      );
-      return;
-    }
-    if (editorState().currentlyEditing) {
-      await onBackPress();
-    }
-  }, []);
+        handleBack.current = BackHandler.addEventListener(
+          "hardwareBackPress",
+          onHardwareBackPress
+        );
+        return;
+      }
+      if (editorState().currentlyEditing) {
+        await onBackPress();
+      }
+    },
+    [onBackPress, onHardwareBackPress]
+  );
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
@@ -266,7 +270,7 @@ export const useEditorEvents = (
         handleBack.current.remove();
       }
     };
-  }, [fullscreen]);
+  }, [fullscreen, onHardwareBackPress]);
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote + editor.editorId, onLoadNote);
@@ -275,107 +279,110 @@ export const useEditorEvents = (
       eUnSubscribeEvent(eClearEditor, onCallClear);
       eUnSubscribeEvent(eOnLoadNote, onLoadNote);
     };
-  }, []);
+  }, [editor.editorId, onCallClear, onLoadNote]);
 
-  const onMessage = (event: WebViewMessageEvent) => {
-    const data = event.nativeEvent.data;
-    const editorMessage = JSON.parse(data) as EditorMessage;
+  const onMessage = useCallback(
+    (event: WebViewMessageEvent) => {
+      const data = event.nativeEvent.data;
+      const editorMessage = JSON.parse(data) as EditorMessage;
 
-    logger.info("editor", editorMessage.type);
-    if (
-      editorMessage.sessionId !== editor.sessionId &&
-      editorMessage.type !== EditorEvents.status
-    ) {
-      logger.error(
-        "editor",
-        "invalid session",
-        editorMessage.type,
-        editor.sessionId,
-        editorMessage.sessionId
-      );
-
-      return;
-    }
-    switch (editorMessage.type) {
-      case EventTypes.logger:
-        logger.info("[WEBVIEW LOG]", editorMessage.value);
-        break;
-      case EventTypes.content:
-        editor.saveContent({
-          type: editorMessage.type,
-          content: editorMessage.value as string
-        });
-        break;
-      case EventTypes.selection:
-        break;
-      case EventTypes.title:
-        editor.saveContent({
-          type: editorMessage.type,
-          title: editorMessage.value as string
-        });
-        break;
-      case EventTypes.newtag:
-        if (!editor.note.current) return;
-        eSendEvent(eOpenTagsDialog, editor.note.current);
-        break;
-      case EventTypes.tag:
-        if (editorMessage.value) {
-          if (!editor.note.current) return;
-          db.notes
-            ?.note(editor.note.current?.id)
-            .untag(editorMessage.value)
-            .then(async () => {
-              useTagStore.getState().setTags();
-              await editor.commands.setTags(editor.note.current);
-              Navigation.queueRoutesForUpdate(
-                "ColoredNotes",
-                "Notes",
-                "TaggedNotes",
-                "TopicNotes",
-                "Tags"
-              );
-            });
-        }
-        break;
-      case EventTypes.filepicker:
-        const { pick } = require("./picker.js").default;
-        pick({ type: editorMessage.value });
-        break;
-      case EventTypes.download:
-        console.log("download attachment request", editorMessage.value);
-        const attachmentInfo = editorMessage.value as Attachment;
-        filesystem.downloadAttachment(attachmentInfo?.hash, true);
-        break;
-      case EventTypes.pro:
-        if (editor.state.current?.isFocused) {
-          editor.state.current.isFocused = true;
-        }
-        umami.pageView("/pro-screen", "/editor");
-        eSendEvent(eOpenPremiumDialog);
-        break;
-      case EventTypes.monograph:
-        publishNote(editor);
-        break;
-      case EventTypes.properties:
-        showActionsheet(editor);
-        break;
-      case EventTypes.fullscreen:
-        editorState().isFullscreen = true;
-        eSendEvent(eOpenFullscreenEditor);
-        break;
-      case EventTypes.back:
-        onBackPress();
-        break;
-      default:
-        console.log(
-          "unhandled event recieved from editor: ",
+      logger.info("editor", editorMessage.type);
+      if (
+        editorMessage.sessionId !== editor.sessionId &&
+        editorMessage.type !== EditorEvents.status
+      ) {
+        logger.error(
+          "editor",
+          "invalid session",
           editorMessage.type,
-          editorMessage.value
+          editor.sessionId,
+          editorMessage.sessionId
         );
-        break;
-    }
-    eSendEvent(editorMessage.type, editorMessage);
-  };
+
+        return;
+      }
+      switch (editorMessage.type) {
+        case EventTypes.logger:
+          logger.info("[WEBVIEW LOG]", editorMessage.value);
+          break;
+        case EventTypes.content:
+          editor.saveContent({
+            type: editorMessage.type,
+            content: editorMessage.value as string
+          });
+          break;
+        case EventTypes.selection:
+          break;
+        case EventTypes.title:
+          editor.saveContent({
+            type: editorMessage.type,
+            title: editorMessage.value as string
+          });
+          break;
+        case EventTypes.newtag:
+          if (!editor.note.current) return;
+          eSendEvent(eOpenTagsDialog, editor.note.current);
+          break;
+        case EventTypes.tag:
+          if (editorMessage.value) {
+            if (!editor.note.current) return;
+            db.notes
+              ?.note(editor.note.current?.id)
+              .untag(editorMessage.value)
+              .then(async () => {
+                useTagStore.getState().setTags();
+                await editor.commands.setTags(editor.note.current);
+                Navigation.queueRoutesForUpdate(
+                  "ColoredNotes",
+                  "Notes",
+                  "TaggedNotes",
+                  "TopicNotes",
+                  "Tags"
+                );
+              });
+          }
+          break;
+        case EventTypes.filepicker:
+          const { pick } = require("./picker.js").default;
+          pick({ type: editorMessage.value });
+          break;
+        case EventTypes.download:
+          console.log("download attachment request", editorMessage.value);
+          const attachmentInfo = editorMessage.value as Attachment;
+          filesystem.downloadAttachment(attachmentInfo?.hash, true);
+          break;
+        case EventTypes.pro:
+          if (editor.state.current?.isFocused) {
+            editor.state.current.isFocused = true;
+          }
+          umami.pageView("/pro-screen", "/editor");
+          eSendEvent(eOpenPremiumDialog);
+          break;
+        case EventTypes.monograph:
+          publishNote(editor);
+          break;
+        case EventTypes.properties:
+          showActionsheet(editor);
+          break;
+        case EventTypes.fullscreen:
+          editorState().isFullscreen = true;
+          eSendEvent(eOpenFullscreenEditor);
+          break;
+        case EventTypes.back:
+          onBackPress();
+          break;
+        default:
+          console.log(
+            "unhandled event recieved from editor: ",
+            editorMessage.type,
+            editorMessage.value
+          );
+          break;
+      }
+      eSendEvent(editorMessage.type, editorMessage);
+    },
+    [editor, onBackPress]
+  );
 
   return onMessage;
 };

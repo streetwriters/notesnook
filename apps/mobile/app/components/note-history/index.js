@@ -43,11 +43,10 @@ export default function NoteHistory({ note, fwdRef }) {
       setHistory([...(await db.noteHistory.get(note.id))]);
       setLoading(false);
     })();
-  }, []);
+  }, [note.id]);
 
-  async function preview(item) {
+  const preview = useCallback(async (item) => {
     let content = await db.noteHistory.content(item.id);
-
     presentSheet({
       component: (
         <NotePreview
@@ -60,7 +59,7 @@ export default function NoteHistory({ note, fwdRef }) {
       ),
       context: "note_history"
     });
-  }
+  }, []);
 
   const getDate = (start, end) => {
     let _start = timeConverter(start);
@@ -94,7 +93,7 @@ export default function NoteHistory({ note, fwdRef }) {
         </Paragraph>
       </PressableButton>
     ),
-    []
+    [colors.icon, preview]
   );
 
   return (

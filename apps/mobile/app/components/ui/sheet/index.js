@@ -65,7 +65,7 @@ const SheetWrapper = ({
       borderBottomRightRadius: 0,
       borderBottomLeftRadius: 0
     };
-  }, [colors.bg, gestureEnabled]);
+  }, [colors.bg, largeTablet, smallTablet, width]);
 
   const _onOpen = () => {
     onOpen && onOpen();

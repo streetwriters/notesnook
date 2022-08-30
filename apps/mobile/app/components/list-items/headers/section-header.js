@@ -36,6 +36,7 @@ import { IconButton } from "../../ui/icon-button";
 import { Button } from "../../ui/button";
 import Sort from "../../sheets/sort";
 import Heading from "../../ui/typography/heading";
+import { useCallback } from "react";
 
 export const SectionHeader = React.memo(
   function SectionHeader({ item, index, type, color, screen }) {
@@ -63,16 +64,16 @@ export const SectionHeader = React.memo(
       ? "Default"
       : groupBy.slice(0, 1).toUpperCase() + groupBy.slice(1, groupBy.length);
 
-    const onUpdate = () => {
+    const onUpdate = useCallback(() => {
       setGroupOptions({ ...db.settings?.getGroupOptions(type) });
-    };
+    }, [type]);
 
     useEffect(() => {
       eSubscribeEvent("groupOptionsUpdate", onUpdate);
       return () => {
         eUnSubscribeEvent("groupOptionsUpdate", onUpdate);
       };
-    }, []);
+    }, [onUpdate]);
 
     return (
       <View

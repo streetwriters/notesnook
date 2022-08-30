@@ -22,10 +22,8 @@ import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { db } from "../../common/database";
 import { MoveNotes } from "../../components/sheets/move-notes/movenote";
 import { eSendEvent } from "../../services/event-manager";
-import Navigation, {
-  NavigationProps,
-  NotesScreenParams
-} from "../../services/navigation";
+import Navigation, { NavigationProps } from "../../services/navigation";
+import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { eOpenAddTopicDialog } from "../../utils/events";
 import { NotebookType, TopicType } from "../../utils/types";
 import { openEditor } from "./common";

@@ -35,6 +35,7 @@ import { SIZE } from "../../../utils/size";
 import BaseDialog from "../../dialog/base-dialog";
 import { PressableButton } from "../../ui/pressable";
 import Paragraph from "../../ui/typography/paragraph";
+import { useCallback } from "react";
 
 const offsets = [];
 let timeout = null;
@@ -66,7 +67,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
       eUnSubscribeEvent(eCloseJumpToDialog, close);
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, []);
+  }, [open]);
 
   const onScroll = (data) => {
     let y = data.y;
@@ -80,10 +81,13 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
     }, 200);
   };
 
-  const open = (_type) => {
-    if (_type !== type) return;
-    setVisible(true);
-  };
+  const open = useCallback(
+    (_type) => {
+      if (_type !== type) return;
+      setVisible(true);
+    },
+    [type]
+  );
 
   const close = () => {
     setVisible(false);
@@ -91,9 +95,9 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
 
   useEffect(() => {
     loadOffsets();
-  }, [notes]);
+  }, [loadOffsets, notes]);
 
-  const loadOffsets = () => {
+  const loadOffsets = useCallback(() => {
     notes
       .filter((i) => i.type === "header")
       .map((item, index) => {
@@ -108,7 +112,7 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
         offset = offset + ind * 100 + msgOffset;
         offsets.push(offset);
       });
-  };
+  }, [notes]);
 
   return !visible ? null : (
     <BaseDialog

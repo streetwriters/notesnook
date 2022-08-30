@@ -25,7 +25,9 @@ const useImmediateEffect = (callback: EffectCallback, deps: DependencyList) => {
       cleanup = callback();
     });
     return cleanup;
-  }, deps);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callback, ...deps]);
 };
 
 export default useImmediateEffect;

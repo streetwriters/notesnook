@@ -31,6 +31,7 @@ import {
 } from "../../utils/events";
 import BaseDialog from "../dialog/base-dialog";
 import { allowedOnPlatform, renderItem } from "./functions";
+import { useCallback } from "react";
 
 export const AnnouncementDialog = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -45,20 +46,20 @@ export const AnnouncementDialog = () => {
       eUnSubscribeEvent(eOpenAnnouncementDialog, open);
       eUnSubscribeEvent(eCloseAnnouncementDialog, close);
     };
-  }, [visible]);
+  }, [close, visible]);
 
   const open = (data) => {
     setInfo(data);
     setVisible(true);
   };
 
-  const close = () => {
+  const close = useCallback(() => {
     if (visible) {
       remove(info.id);
       setInfo(null);
       setVisible(false);
     }
-  };
+  }, [info.id, remove, visible]);
 
   return (
     <BaseDialog

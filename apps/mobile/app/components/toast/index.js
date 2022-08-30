@@ -34,6 +34,7 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useCallback } from "react";
 let toastMessages = [];
 export const Toast = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -43,42 +44,46 @@ export const Toast = ({ context = "global" }) => {
   const hideTimeout = useRef();
   const [visible, setVisible] = useState(false);
 
-  const showToastFunc = async (data) => {
-    console.log("toast show", data.message, toastMessages.length);
-    if (!data) return;
-    if (data.context !== context) return;
-    if (toastMessages.findIndex((m) => m.message === data.message) >= 0) {
-      console.log("returning from here");
-      return;
-    }
-    toastMessages.push(data);
-    if (toastMessages?.length > 1) return;
-    setData(data);
+  const showToastFunc = useCallback(
+    async (data) => {
+      if (!data) return;
+      if (data.context !== context) return;
+      if (toastMessages.findIndex((m) => m.message === data.message) >= 0) {
+        return;
+      }
+      toastMessages.push(data);
+      if (toastMessages?.length > 1) return;
+      setData(data);
 
-    setVisible(true);
-    if (hideTimeout.current) {
-      clearTimeout(hideTimeout.current);
-    }
-    hideTimeout.current = setTimeout(() => {
-      hideToastFunc();
-    }, data.duration);
-  };
+      setVisible(true);
+      if (hideTimeout.current) {
+        clearTimeout(hideTimeout.current);
+      }
+      hideTimeout.current = setTimeout(() => {
+        hideToastFunc();
+      }, data.duration);
+    },
+    [context, hideToastFunc]
+  );
 
-  const showNext = (data) => {
-    if (!data) {
-      hideToastFunc();
-      return;
-    }
-    setData(data);
-    if (hideTimeout.current) {
-      clearTimeout(hideTimeout.current);
-    }
-    hideTimeout.current = setTimeout(() => {
-      hideToastFunc();
-    }, data?.duration);
-  };
+  const showNext = useCallback(
+    (data) => {
+      if (!data) {
+        hideToastFunc();
+        return;
+      }
+      setData(data);
+      if (hideTimeout.current) {
+        clearTimeout(hideTimeout.current);
+      }
+      hideTimeout.current = setTimeout(() => {
+        hideToastFunc();
+      }, data?.duration);
+    },
+    [hideToastFunc]
+  );
 
-  const hideToastFunc = () => {
+  const hideToastFunc = useCallback(() => {
     if (hideTimeout.current) {
       clearTimeout(hideTimeout.current);
     }
@@ -100,7 +105,7 @@ export const Toast = ({ context = "global" }) => {
         }
       }, 100);
     }
-  };
+  }, [showNext]);
 
   const _onKeyboardShow = () => {
     setKeyboard(true);
@@ -127,7 +132,7 @@ export const Toast = ({ context = "global" }) => {
       eUnSubscribeEvent(eShowToast, showToastFunc);
       eUnSubscribeEvent(eHideToast, hideToastFunc);
     };
-  }, [keyboard]);
+  }, [hideToastFunc, keyboard, showToastFunc]);
 
   return (
     visible && (

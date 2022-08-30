@@ -16,24 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { BackHandler, Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useSelectionStore } from "../../stores/use-selection-store";
+import { db } from "../../common/database";
 import { eSendEvent, ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
-import { db } from "../../common/database";
+import useNavigationStore from "../../stores/use-navigation-store";
+import { useSelectionStore } from "../../stores/use-selection-store";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { eOpenMoveNoteDialog } from "../../utils/events";
 import { deleteItems } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
-import layoutmanager from "../../utils/layout-manager";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
-import useNavigationStore from "../../stores/use-navigation-store";
 
 export const SelectionHeader = React.memo(() => {
   const colors = useThemeStore((state) => state.colors);
@@ -131,11 +130,10 @@ export const SelectionHeader = React.memo(() => {
     });
   };
 
-  const onBackPress = () => {
-    layoutmanager.withSpringAnimation(500);
+  const onBackPress = useCallback(() => {
     clearSelection();
     return true;
-  };
+  }, [clearSelection]);
 
   useEffect(() => {
     if (selectionMode) {
@@ -143,7 +141,7 @@ export const SelectionHeader = React.memo(() => {
     } else {
       BackHandler.removeEventListener("hardwareBackPress", onBackPress);
     }
-  }, [selectionMode]);
+  }, [onBackPress, selectionMode]);
 
   return !selectionMode ? null : (
     <View

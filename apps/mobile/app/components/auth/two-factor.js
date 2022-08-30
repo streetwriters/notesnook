@@ -35,6 +35,7 @@ import { PressableButton } from "../ui/pressable";
 import Seperator from "../ui/seperator";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useCallback } from "react";
 
 const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -128,9 +129,9 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     if (currentMethod.method === "sms" || currentMethod.method === "email") {
       onSendCode();
     }
-  }, [currentMethod.method]);
+  }, [currentMethod.method, onSendCode]);
 
-  const onSendCode = async () => {
+  const onSendCode = useCallback(async () => {
     if (seconds || sending) return;
     // TODO
     setSending(true);
@@ -143,7 +144,7 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
       setSending(false);
       ToastEvent.error(e, "Error sending 2FA Code", "local");
     }
-  };
+  }, [currentMethod.method, mfaInfo.token, seconds, sending, start]);
 
   return (
     <View>

@@ -126,7 +126,16 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
     return () => {
       sub && sub.remove();
     };
-  }, [introCompleted, deviceMode, widths]);
+  }, [
+    introCompleted,
+    deviceMode,
+    widths,
+    fullscreen,
+    translateX,
+    isDrawerOpen,
+    homePosition,
+    onDrawerStateChange
+  ]);
 
   useImperativeHandle(
     ref,
@@ -193,7 +202,16 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       setScrollEnabled: () => true,
       node: node
     }),
-    [deviceMode, homePosition, editorPosition]
+    [
+      currentTab,
+      deviceMode,
+      translateX,
+      onDrawerStateChange,
+      homePosition,
+      editorPosition,
+      forcedLock,
+      isDrawerOpen
+    ]
   );
 
   useAnimatedReaction(

@@ -76,7 +76,7 @@ export const Update = ({ version: appVersion, fwdRef }) => {
         }
       })();
     }
-  }, []);
+  }, [version]);
 
   return (
     <View

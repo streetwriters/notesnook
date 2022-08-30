@@ -47,7 +47,7 @@ export const useNavigationFocus = (
       },
       isBlurred.current ? 0 : delay || 300
     );
-  }, [onFocus, prev]);
+  }, [delay, onFocus]);
 
   const _onBlur = useCallback(() => {
     isBlurred.current = true;
@@ -58,7 +58,7 @@ export const useNavigationFocus = (
         setFocused(false);
       }
     }, delay || 300);
-  }, [onBlur, prev]);
+  }, [delay, onBlur]);
 
   useEffect(() => {
     if (!navigation) return;
@@ -69,7 +69,7 @@ export const useNavigationFocus = (
     return () => {
       subs.forEach((sub) => sub());
     };
-  }, [navigation]);
+  }, [_onBlur, _onFocus, navigation]);
 
   return isFocused;
 };

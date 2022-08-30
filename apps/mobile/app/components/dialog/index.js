@@ -33,6 +33,7 @@ import Seperator from "../ui/seperator";
 import BaseDialog from "./base-dialog";
 import DialogButtons from "./dialog-buttons";
 import DialogHeader from "./dialog-header";
+import { useCallback } from "react";
 
 export const Dialog = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -63,7 +64,7 @@ export const Dialog = ({ context = "global" }) => {
       eUnSubscribeEvent(eOpenSimpleDialog, show);
       eUnSubscribeEvent(eCloseSimpleDialog, hide);
     };
-  }, []);
+  }, [show]);
 
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
@@ -79,12 +80,15 @@ export const Dialog = ({ context = "global" }) => {
     hide();
   };
 
-  const show = (data) => {
-    if (!data.context) data.context = "global";
-    if (data.context !== context) return;
-    setDialogInfo(data);
-    setVisible(true);
-  };
+  const show = useCallback(
+    (data) => {
+      if (!data.context) data.context = "global";
+      if (data.context !== context) return;
+      setDialogInfo(data);
+      setVisible(true);
+    },
+    [context]
+  );
 
   const hide = () => {
     setInputValue(null);

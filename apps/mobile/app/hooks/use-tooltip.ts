@@ -113,7 +113,7 @@ export const useTooltipHandler = (
     return () => {
       eUnSubscribeEvent(id, callback);
     };
-  }, []);
+  }, [callback, id]);
   return null;
 };
 

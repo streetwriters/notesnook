@@ -105,7 +105,7 @@ export const PressableButton = ({
       },
       customStyle
     ],
-    [customStyle, noborder, type, colors]
+    [alpha, selectedColor, opacity, primaryColor, noborder, customStyle]
   );
 
   return (

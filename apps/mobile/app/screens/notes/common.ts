@@ -18,7 +18,7 @@
 
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
-import Navigation, { NotesScreenParams } from "../../services/navigation";
+import Navigation from "../../services/navigation";
 import { useMenuStore } from "../../stores/use-menu-store";
 import { useTagStore } from "../../stores/use-tag-store";
 import { db } from "../../common/database";
@@ -26,6 +26,8 @@ import { eOnLoadNote } from "../../utils/events";
 import { openLinkInBrowser } from "../../utils/functions";
 import { tabBarRef } from "../../utils/global-refs";
 import { editorController, editorState } from "../editor/tiptap/utils";
+import { NotesScreenParams } from "../../stores/use-navigation-store";
+import { TopicType } from "../../utils/types";
 
 export function toCamelCase(title: string) {
   return title.slice(0, 1).toUpperCase() + title.slice(1);
@@ -34,7 +36,7 @@ export function toCamelCase(title: string) {
 export function getAlias(params: Partial<NotesScreenParams>) {
   if (!params) return "";
   const { item } = params;
-  return item?.alias || item?.title;
+  return (item as TopicType)?.alias || item?.title;
 }
 
 export function openMonographsWebpage() {

@@ -24,13 +24,6 @@ import Group from "./group";
 import Home from "./home";
 import { RouteParams } from "./types";
 const SettingsStack = createNativeStackNavigator<RouteParams>();
-const screenListeners = {
-  beforeRemove: (e: any) => {
-    if (e.target?.startsWith("SettingsGroup")) {
-      useNavigationStore.getState().update({ name: "Settings" }, false);
-    }
-  }
-};
 
 // const Home = React.lazy(() => import(/* webpackChunkName: "settings-home" */ './home'));
 // const Group = React.lazy(() => import(/* webpackChunkName: "settings-group" */ './group'));
@@ -65,7 +58,13 @@ export const Settings = () => {
   return (
     <SettingsStack.Navigator
       initialRouteName="SettingsHome"
-      screenListeners={screenListeners}
+      screenListeners={{
+        beforeRemove: (e) => {
+          if (e.target?.startsWith("SettingsGroup")) {
+            useNavigationStore.getState().update({ name: "Settings" }, false);
+          }
+        }
+      }}
       screenOptions={{
         animation: "none",
         headerShown: false,

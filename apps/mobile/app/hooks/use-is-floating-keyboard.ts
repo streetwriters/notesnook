@@ -18,6 +18,7 @@
 
 import { useEffect, useState } from "react";
 import { Keyboard, KeyboardEvent, useWindowDimensions } from "react-native";
+import { useCallback } from "react";
 
 /**
  * A hook that detects floating keyboard on iPad
@@ -28,9 +29,12 @@ const useIsFloatingKeyboard = () => {
 
   const [floating, setFloating] = useState<boolean>(false);
 
-  const onKeyboardWillChangeFrame = (event: KeyboardEvent) => {
-    setFloating(event.endCoordinates.width !== width);
-  };
+  const onKeyboardWillChangeFrame = useCallback(
+    (event: KeyboardEvent) => {
+      setFloating(event.endCoordinates.width !== width);
+    },
+    [width]
+  );
 
   useEffect(() => {
     const sub1 = Keyboard.addListener(
@@ -40,7 +44,7 @@ const useIsFloatingKeyboard = () => {
     return () => {
       sub1?.remove();
     };
-  }, [width]);
+  }, [onKeyboardWillChangeFrame, width]);
 
   return floating;
 };

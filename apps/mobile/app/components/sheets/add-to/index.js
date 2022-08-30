@@ -45,6 +45,7 @@ import { PressableButton } from "../../ui/pressable";
 import SheetWrapper from "../../ui/sheet";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
+import { useCallback } from "react";
 let newNotebookTitle = null;
 const notebookInput = createRef();
 const actionSheetRef = createRef();
@@ -178,9 +179,9 @@ const MoveNoteComponent = ({ note }) => {
 
   useEffect(() => {
     updateNoteExists();
-  }, []);
+  }, [updateNoteExists]);
 
-  const updateNoteExists = () => {
+  const updateNoteExists = useCallback(() => {
     if (!note?.id && selectedItemsList?.length === 0) return;
 
     let notes =
@@ -208,7 +209,7 @@ const MoveNoteComponent = ({ note }) => {
     }
     console.log("ids: ", ids);
     setNoteExists(ids);
-  };
+  }, [note?.id, selectedItemsList]);
 
   const openAddTopicDialog = (item) => {
     presentDialog({

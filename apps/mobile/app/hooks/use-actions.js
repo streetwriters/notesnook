@@ -55,6 +55,7 @@ import {
 } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
+import { useCallback } from "react";
 
 export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -78,9 +79,9 @@ export const useActions = ({ close = () => null, item }) => {
     if (item.type !== "note") {
       setIsPinnedToMenu(db.settings.isPinned(item.id));
     }
-  }, [item]);
+  }, [checkNotifPinned, item]);
 
-  function checkNotifPinned() {
+  const checkNotifPinned = useCallback(() => {
     let pinned = Notifications.getPinnedNotes();
     if (!pinned) {
       setNotifPinned(null);
@@ -93,7 +94,7 @@ export const useActions = ({ close = () => null, item }) => {
     } else {
       setNotifPinned(null);
     }
-  }
+  }, [item.id]);
 
   const isNoteInTopic = () => {
     const currentScreen = useNavigationStore.getState().currentScreen;
@@ -104,13 +105,16 @@ export const useActions = ({ close = () => null, item }) => {
       .has(item.id);
   };
 
-  const onUpdate = async (type) => {
-    if (type === "unpin") {
-      await sleep(1000);
-      await Notifications.get();
-      checkNotifPinned();
-    }
-  };
+  const onUpdate = useCallback(
+    async (type) => {
+      if (type === "unpin") {
+        await sleep(1000);
+        await Notifications.get();
+        checkNotifPinned();
+      }
+    },
+    [checkNotifPinned]
+  );
 
   useEffect(() => {
     eSubscribeEvent("onUpdate", onUpdate);
@@ -118,7 +122,7 @@ export const useActions = ({ close = () => null, item }) => {
     return () => {
       eUnSubscribeEvent("onUpdate", onUpdate);
     };
-  }, [item]);
+  }, [item, onUpdate]);
 
   function switchTheme() {
     toggleDarkMode();

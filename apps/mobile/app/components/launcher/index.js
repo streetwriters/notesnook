@@ -58,6 +58,7 @@ import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
 import { useAppState } from "../../hooks/use-app-state";
+import { useCallback } from "react";
 
 const Launcher = React.memo(
   function Launcher() {
@@ -75,7 +76,7 @@ const Launcher = React.memo(
       (state) => state.settings.introCompleted
     );
     const dbInitCompleted = useRef(false);
-    const loadNotes = async () => {
+    const loadNotes = useCallback(async () => {
       if (verifyUser) {
         return;
       }
@@ -94,9 +95,9 @@ const Launcher = React.memo(
           });
         });
       });
-    };
+    }, [doAppLoadActions, setLoading, verifyUser]);
 
-    const init = async () => {
+    const init = useCallback(async () => {
       if (!dbInitCompleted.current) {
         await RNBootSplash.hide({ fade: true });
         await loadDatabase();
@@ -121,7 +122,7 @@ const Launcher = React.memo(
       } else {
         useUserStore.getState().setUser(await db.user?.getUser());
       }
-    };
+    }, [loadNotes, verifyUser]);
 
     // useEffect(() => {
     //   hideSplashScreen();
@@ -134,9 +135,9 @@ const Launcher = React.memo(
       return () => {
         dbInitCompleted.current = false;
       };
-    }, [loading]);
+    }, [doAppLoadActions, loading]);
 
-    const doAppLoadActions = async () => {
+    const doAppLoadActions = useCallback(async () => {
       await sleep(500);
       if (SettingsService.get().sessionExpired) {
         eSendEvent("session_expired");
@@ -170,7 +171,7 @@ const Launcher = React.memo(
           }
         });
       }
-    };
+    }, [introCompleted]);
 
     const checkAppUpdateAvailable = async () => {
       if (__DEV__) return;
@@ -237,7 +238,7 @@ const Launcher = React.memo(
       // return false;
     };
 
-    const onUnlockBiometrics = async () => {
+    const onUnlockBiometrics = useCallback(async () => {
       if (!(await BiometricService.isBiometryAvailable())) {
         ToastEvent.show({
           heading: "Biometrics unavailable",
@@ -254,17 +255,17 @@ const Launcher = React.memo(
         enabled(false);
         password.current = null;
       }
-    };
+    }, [setVerifyUser]);
 
     useEffect(() => {
       init();
-    }, [verifyUser]);
+    }, [init, verifyUser]);
 
     useEffect(() => {
       if (verifyUser && appState === "active") {
         onUnlockBiometrics();
       }
-    }, [appState]);
+    }, [appState, onUnlockBiometrics, verifyUser]);
 
     const onSubmit = async () => {
       if (!password.current) return;

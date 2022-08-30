@@ -20,10 +20,8 @@ import { groupArray } from "@notesnook/core/utils/grouping";
 import React from "react";
 import NotesPage, { PLACEHOLDER_DATA } from ".";
 import { db } from "../../common/database";
-import Navigation, {
-  NavigationProps,
-  NotesScreenParams
-} from "../../services/navigation";
+import Navigation, { NavigationProps } from "../../services/navigation";
+import { NotesScreenParams } from "../../stores/use-navigation-store";
 import { NoteType, TagType } from "../../utils/types";
 import { getAlias, openEditor } from "./common";
 export const TaggedNotes = ({

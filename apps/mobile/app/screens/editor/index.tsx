@@ -42,6 +42,7 @@ import { EditorProps, useEditorType } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
+import { useCallback } from "react";
 
 const style: ViewStyle = {
   height: "100%",
@@ -91,23 +92,32 @@ const Editor = React.memo(
         get: () => editor
       }));
 
-      const onMediaDownloaded = ({
-        hash,
-        groupId,
-        src
-      }: {
-        hash: string;
-        groupId: string;
-        src: string;
-      }) => {
-        console.log("onMediaDownoaded", groupId);
+      const onMediaDownloaded = useCallback(
+        ({
+          hash,
+          groupId,
+          src
+        }: {
+          hash: string;
+          groupId: string;
+          src: string;
+        }) => {
+          console.log("onMediaDownoaded", groupId);
 
-        if (groupId !== editor.note.current?.id) return;
-        editor.commands.updateImage({
-          hash: hash,
-          src: src
-        });
-      };
+          if (groupId !== editor.note.current?.id) return;
+          editor.commands.updateImage({
+            hash: hash,
+            src: src
+          });
+        },
+        [editor.commands, editor.note]
+      );
+
+      const onError = useCallback(() => {
+        console.log("RENDER PROCESS GONE!!!");
+        editor.setLoading(true);
+        setTimeout(() => editor.setLoading(false), 10);
+      }, [editor]);
 
       useEffect(() => {
         onLoad && onLoad();
@@ -117,17 +127,12 @@ const Editor = React.memo(
           eUnSubscribeEvent("webview_reset", onError);
           EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
         };
-      }, []);
+      }, [onError, onLoad, onMediaDownloaded]);
 
       if (withController) {
         editorController.current = editor;
       }
 
-      const onError = () => {
-        console.log("RENDER PROCESS GONE!!!");
-        editor.setLoading(true);
-        setTimeout(() => editor.setLoading(false), 10);
-      };
       console.log(editor.loading, "loading editor");
       return editor.loading ? null : (
         <>

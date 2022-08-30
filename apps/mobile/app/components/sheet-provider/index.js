@@ -32,6 +32,7 @@ import { Button } from "../ui/button";
 import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
+import { useCallback } from "react";
 const SheetProvider = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
@@ -48,26 +49,29 @@ const SheetProvider = ({ context = "global" }) => {
       eUnSubscribeEvent(eOpenProgressDialog, open);
       eUnSubscribeEvent(eCloseProgressDialog, close);
     };
-  }, [visible]);
+  }, [close, open, visible]);
 
-  const open = async (data) => {
-    if (!data.context) data.context = "global";
-    if (data.context !== context) return;
-    if (visible || dialogData) {
-      setDialogData(null);
-      setVisible(false);
-      await sleep(500);
-    }
-    setDialogData(data);
-    setVisible(true);
-    if (data.editor) {
-      editor.current.refocus = false;
-      if (editorState().keyboardState) {
-        // tiny.call(EditorWebView, tiny.cacheRange + tiny.blur);
-        editor.current.refocus = true;
+  const open = useCallback(
+    async (data) => {
+      if (!data.context) data.context = "global";
+      if (data.context !== context) return;
+      if (visible || dialogData) {
+        setDialogData(null);
+        setVisible(false);
+        await sleep(500);
       }
-    }
-  };
+      setDialogData(data);
+      setVisible(true);
+      if (data.editor) {
+        editor.current.refocus = false;
+        if (editorState().keyboardState) {
+          // tiny.call(EditorWebView, tiny.cacheRange + tiny.blur);
+          editor.current.refocus = true;
+        }
+      }
+    },
+    [context, dialogData, visible]
+  );
 
   useEffect(() => {
     (async () => {
@@ -85,11 +89,14 @@ const SheetProvider = ({ context = "global" }) => {
     })();
   }, [visible, dialogData]);
 
-  const close = (ctx) => {
-    if (!ctx) ctx = "global";
-    if (ctx !== context) return;
-    actionSheetRef.current?.setModalVisible(false);
-  };
+  const close = useCallback(
+    (ctx) => {
+      if (!ctx) ctx = "global";
+      if (ctx !== context) return;
+      actionSheetRef.current?.setModalVisible(false);
+    },
+    [context]
+  );
 
   return !visible || !dialogData ? null : (
     <SheetWrapper

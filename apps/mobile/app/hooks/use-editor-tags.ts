@@ -22,6 +22,7 @@ import { useEditorStore } from "../stores/use-editor-store";
 import { useTagStore } from "../stores/use-tag-store";
 import { db } from "../common/database";
 import { NoteType } from "app/utils/types";
+import { useCallback } from "react";
 
 /**
  * A hook that injects/removes tags from tags bar in editor
@@ -34,7 +35,7 @@ const useEditorTags = () => {
   const [note, setNote] = useState<NoteType | null>(null);
   const [noteTags, setNoteTags] = useState<string[]>([]);
 
-  async function refreshNote() {
+  const refreshNote = useCallback(() => {
     const current = useEditorStore.getState().currentEditingNote;
     if (!current) {
       setNote(null);
@@ -44,23 +45,23 @@ const useEditorTags = () => {
     const note = db.notes?.note(current)?.data as NoteType;
     setNote(note ? { ...note } : null);
     getTags(note);
-  }
+  }, []);
 
   useEffect(() => {
     refreshNote();
-  }, [currentEditingNote, tags]);
+  }, [currentEditingNote, refreshNote, tags]);
 
-  function load() {
+  const load = useCallback(() => {
     if (!note) return;
     //  tiny.call(EditorWebView, renderTags(noteTags));
-  }
+  }, [note]);
 
   useEffect(() => {
     eSubscribeEvent("updateTags", load);
     return () => {
       eUnSubscribeEvent("updateTags", load);
     };
-  }, [noteTags]);
+  }, [load, noteTags]);
 
   function getTags(note: NoteType) {
     if (!note || !note.tags) return [];
@@ -72,7 +73,7 @@ const useEditorTags = () => {
 
   useEffect(() => {
     load();
-  }, [noteTags]);
+  }, [load, noteTags]);
 
   return [];
 };

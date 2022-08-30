@@ -30,12 +30,11 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
-import Navigation, {
-  NavigationProps,
-  NotebookScreenParams
-} from "../../services/navigation";
+import Navigation, { NavigationProps } from "../../services/navigation";
 import SearchService from "../../services/search";
-import useNavigationStore from "../../stores/use-navigation-store";
+import useNavigationStore, {
+  NotebookScreenParams
+} from "../../stores/use-navigation-store";
 import {
   eOnNewTopicAdded,
   eOpenAddNotebookDialog,
@@ -60,7 +59,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
     onBlur: () => false
   });
 
-  const syncWithNavigation = () => {
+  const syncWithNavigation = React.useCallback(() => {
     useNavigationStore.getState().update(
       {
         name: route.name,
@@ -71,35 +70,38 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
       params.current?.canGoBack
     );
     SearchService.prepareSearch = prepareSearch;
-  };
+  }, [route.name]);
 
-  const onRequestUpdate = (data?: NotebookScreenParams) => {
-    if (data) params.current = data;
-    params.current.title = params.current.item.title;
-    try {
-      const notebook = db.notebooks?.notebook(params?.current?.item?.id)
-        ?.data as NotebookType;
-      if (notebook) {
-        params.current.item = notebook;
-        setTopics(
-          groupArray(
-            qclone(notebook.topics),
-            db.settings?.getGroupOptions("topics")
-          )
-        );
-        syncWithNavigation();
+  const onRequestUpdate = React.useCallback(
+    (data?: NotebookScreenParams) => {
+      if (data) params.current = data;
+      params.current.title = params.current.item.title;
+      try {
+        const notebook = db.notebooks?.notebook(params?.current?.item?.id)
+          ?.data as NotebookType;
+        if (notebook) {
+          params.current.item = notebook;
+          setTopics(
+            groupArray(
+              qclone(notebook.topics),
+              db.settings?.getGroupOptions("topics")
+            )
+          );
+          syncWithNavigation();
+        }
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+    },
+    [syncWithNavigation]
+  );
 
   useEffect(() => {
     eSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
     return () => {
       eUnSubscribeEvent(eOnNewTopicAdded, onRequestUpdate);
     };
-  }, [topics]);
+  }, [onRequestUpdate, topics]);
 
   const prepareSearch = () => {
     SearchService.update({

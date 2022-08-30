@@ -105,7 +105,7 @@ const List = ({
         screen={screen}
       />
     ),
-    []
+    [headerProps.color, headerProps.heading, screen, type]
   );
 
   const _onRefresh = async () => {

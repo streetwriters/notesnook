@@ -31,6 +31,7 @@ import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { ColoredNotes } from "../../screens/notes/colored";
+import { useCallback } from "react";
 
 export const ColorSection = React.memo(
   function ColorSection() {
@@ -42,7 +43,7 @@ export const ColorSection = React.memo(
       if (!loading) {
         setColorNotes();
       }
-    }, [loading]);
+    }, [loading, setColorNotes]);
 
     return colorNotes.map((item, index) => {
       let alias = db.colors.alias(item.id);
@@ -61,25 +62,28 @@ const ColorItem = React.memo(
     const [headerTextState, setHeaderTextState] = useState(null);
     alias = db.colors.alias(item.id) || "";
 
-    const onHeaderStateChange = (state) => {
-      setTimeout(() => {
-        let id = state.currentScreen?.id;
-        if (id === item.id) {
-          setHeaderTextState({ id: state.currentScreen.id });
-        } else {
-          if (headerTextState !== null) {
-            setHeaderTextState(null);
+    const onHeaderStateChange = useCallback(
+      (state) => {
+        setTimeout(() => {
+          let id = state.currentScreen?.id;
+          if (id === item.id) {
+            setHeaderTextState({ id: state.currentScreen.id });
+          } else {
+            if (headerTextState !== null) {
+              setHeaderTextState(null);
+            }
           }
-        }
-      }, 300);
-    };
+        }, 300);
+      },
+      [headerTextState, item.id]
+    );
 
     useEffect(() => {
       let unsub = useNavigationStore.subscribe(onHeaderStateChange);
       return () => {
         unsub();
       };
-    }, [headerTextState]);
+    }, [headerTextState, onHeaderStateChange]);
 
     const onPress = (item) => {
       ColoredNotes.navigate(item, false);

@@ -180,7 +180,7 @@ export const MFASetup = ({
         setLoading(false);
       });
     }
-  }, []);
+  }, [method?.id]);
 
   const codeHelpText = {
     app: "After putting the above code in authenticator app, the app will display a code that you can enter below.",

@@ -36,6 +36,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { eClearEditor, eOnLoadNote } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { editorState } from "./tiptap/utils";
+import { useCallback } from "react";
 const EditorOverlay = ({ editorId = "", editor }) => {
   const colors = useThemeStore((state) => state.colors);
   const [error, setError] = useState(false);
@@ -55,34 +56,37 @@ const EditorOverlay = ({ editorId = "", editor }) => {
     clearTimeout(timers.current.closing);
   };
 
-  const load = async (_loading) => {
-    editorState().overlay = true;
-    clearTimers();
-    if (_loading) {
-      opacity.value = 1;
-      translateValue.value = 0;
-      timers.current.error = setTimeout(() => {
-        if (_loading) {
-          let note = _loading;
-          note.forced = true;
-          eSendEvent(eOnLoadNote + editorId, note);
-        }
-        setError(true);
-      }, 4000);
-    } else {
+  const load = useCallback(
+    async (_loading) => {
+      editorState().overlay = true;
       clearTimers();
-      setTimeout(() => {
-        setError(false);
-        editorState().overlay = false;
-        opacity.value = withTiming(0, {
-          duration: 500
-        });
+      if (_loading) {
+        opacity.value = 1;
+        translateValue.value = 0;
+        timers.current.error = setTimeout(() => {
+          if (_loading) {
+            let note = _loading;
+            note.forced = true;
+            eSendEvent(eOnLoadNote + editorId, note);
+          }
+          setError(true);
+        }, 4000);
+      } else {
+        clearTimers();
         setTimeout(() => {
-          translateValue.value = 6000;
-        }, 500);
-      }, 100);
-    }
-  };
+          setError(false);
+          editorState().overlay = false;
+          opacity.value = withTiming(0, {
+            duration: 500
+          });
+          setTimeout(() => {
+            translateValue.value = 6000;
+          }, 500);
+        }, 100);
+      }
+    },
+    [editorId, opacity, translateValue]
+  );
 
   useEffect(() => {
     eSubscribeEvent("loadingNote" + editorId, load);
@@ -90,7 +94,7 @@ const EditorOverlay = ({ editorId = "", editor }) => {
       clearTimers();
       eUnSubscribeEvent("loadingNote" + editorId, load);
     };
-  }, [editorId]);
+  }, [editorId, load]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

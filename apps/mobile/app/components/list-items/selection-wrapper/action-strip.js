@@ -47,7 +47,7 @@ export const ActionStrip = ({ note, setActionStrip }) => {
   useEffect(() => {
     if (note.type === "note") return;
     setIsPinnedToMenu(db.settings.isPinned(note.id));
-  }, []);
+  }, [note.id, note.type]);
 
   const updateNotes = () => {
     Navigation.queueRoutesForUpdate(
