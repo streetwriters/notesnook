@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import "../app.css";
 import { useEffect } from "react";
 import { Flex, Text } from "@streetwriters/rebass";
@@ -96,7 +114,7 @@ const social = [
     link: "https://reddit.com/r/Notesnook"
   }
 ];
-function BlogPromoBanner(props) {
+function BlogPromoBanner() {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center">
       <Text variant="heading" fontSize="1.2em" textAlign="center">
@@ -110,11 +128,12 @@ function BlogPromoBanner(props) {
         mt={2}
         sx={{ wordWrap: "break-word" }}
       >
-        Because where's the fun in nookin' alone?
+        {`Because where's the fun in nookin' alone?`}
       </Text>
       <Flex mt={5}>
         {social.map((account) => (
           <account.icon
+            key={account.title}
             hoverColor={account.hoverColor}
             title={account.title}
             onClick={() => {

@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { useCallback, useRef, useEffect, PropsWithChildren } from "react";
 import { Box } from "@streetwriters/rebass";
 import { getPosition, PositionOptions } from "../../utils/position";
@@ -36,27 +54,27 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
   const contentRef = useRef<HTMLDivElement>();
   const observerRef = useRef<ResizeObserver>();
 
-  const repositionPopup = useCallback(() => {
+  const repositionPopup = useCallback((position: PositionOptions) => {
     if (!contentRef.current || !position) return;
     const popup = contentRef.current;
     const popupPosition = getPosition(popup, position);
     popup.style.top = popupPosition.top + "px";
     popup.style.left = popupPosition.left + "px";
-  }, [position]);
+  }, []);
 
   useEffect(() => {
-    repositionPopup();
-  }, [position]);
+    repositionPopup(position);
+  }, [repositionPopup, position]);
 
   useEffect(() => {
     function onWindowResize() {
-      repositionPopup();
+      repositionPopup(position);
     }
     window.addEventListener("resize", onWindowResize);
     return () => {
       window.removeEventListener("resize", onWindowResize);
     };
-  }, []);
+  }, [repositionPopup, position]);
 
   const attachMoveHandlers = useCallback(() => {
     if (!contentRef.current || !isOpen) return;
@@ -99,7 +117,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
     let oldHeight: number = popup.offsetHeight;
     observerRef.current = new ResizeObserver(() => {
       if (isMobile) {
-        repositionPopup();
+        repositionPopup(position);
       } else {
         const { height, y } = popup.getBoundingClientRect();
         const delta = height - oldHeight;
@@ -117,7 +135,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       }
     });
     observerRef.current.observe(popup, { box: "border-box" });
-  }, [isMobile]);
+  }, [repositionPopup, position, isMobile]);
 
   return (
     <Modal
@@ -136,7 +154,7 @@ function _PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
       portalClassName={"popup-presenter-portal"}
       onAfterOpen={(obj) => {
         if (!obj || !position) return;
-        repositionPopup();
+        repositionPopup(position);
 
         handleResize();
         attachMoveHandlers();
@@ -244,7 +262,7 @@ export function PopupWrapper(props: PopupWrapperProps) {
           if (!isPopupOpen) {
             PopupRenderer.closePopup(id);
           }
-        }, [isPopupOpen]);
+        }, [id, isPopupOpen]);
 
         return (
           <PopupPresenter
@@ -274,7 +292,15 @@ export function PopupWrapper(props: PopupWrapperProps) {
         );
       });
     }
-  }, [PopupRenderer, isPopupOpen]);
+  }, [
+    PopupRenderer,
+    isPopupOpen,
+    closePopup,
+    id,
+    position,
+    presenterProps,
+    renderPopup
+  ]);
 
   return null;
 }
@@ -303,7 +329,7 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
 
   useEffect(() => {
     if (!isPopupOpen) onClosed?.();
-  }, [isPopupOpen]);
+  }, [isPopupOpen, onClosed]);
 
   useEffect(() => {
     if (isPopupOpen) {

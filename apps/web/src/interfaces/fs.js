@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import "web-streams-polyfill/dist/ponyfill";
 import localforage from "localforage";
 import { xxhash64, createXXHash64 } from "hash-wasm";
@@ -122,6 +140,7 @@ async function hashStream(reader) {
   const hasher = await createXXHash64();
   hasher.init();
 
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const { value } = await reader.read();
     if (!value) break;
@@ -204,7 +223,7 @@ async function uploadFile(filename, requestOptions) {
 
     await fileHandle.addAdditionalData("uploadId", uploadId);
 
-    function onUploadProgress(ev) {
+    const onUploadProgress = (ev) => {
       reportProgress(
         {
           total: fileHandle.file.size + ABYTES,
@@ -215,7 +234,7 @@ async function uploadFile(filename, requestOptions) {
           hash: filename
         }
       );
-    }
+    };
 
     for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
       const blob = await fileHandle.readChunks(

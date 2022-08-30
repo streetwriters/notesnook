@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import {
   Box,
   Button,
@@ -141,7 +159,7 @@ function List({ item }) {
       flexDirection="column"
     >
       {items.map((item) => (
-        <ListItem item={item} />
+        <ListItem key={item.text} item={item} />
       ))}
     </Flex>
   );
@@ -207,6 +225,7 @@ function CalltoActions({ item, removeAnnouncement }) {
         )
         .map((action, index) => (
           <CalltoAction
+            key={index}
             action={action}
             index={index}
             variant={
@@ -272,24 +291,29 @@ function CalltoAction({ action, variant, sx, removeAnnouncement }) {
         closeOpenedDialog();
         trackEvent(ANALYTICS_EVENTS.announcementCta, action.data);
         switch (action.type) {
-          case "link":
+          case "link": {
             const url = new URL(action.data);
             const target =
               url.origin === window.location.origin ? "_self" : "_blank";
             window.open(action.data, target, "noopener noreferrer");
             break;
-          case "promo":
+          }
+          case "promo": {
             const [coupon, plan] = action.data.split(":");
             await showBuyDialog(plan, coupon);
             break;
-          case "force-sync":
+          }
+          case "force-sync": {
             await appStore.sync(true, true);
             break;
-          case "backup":
+          }
+          case "backup": {
             await createBackup(true);
             break;
-          default:
+          }
+          default: {
             return;
+          }
         }
       }}
     >

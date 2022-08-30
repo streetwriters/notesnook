@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { db } from "./db";
 import { TaskManager } from "./task-manager";
 import { zip } from "../utils/zip";
@@ -10,7 +28,7 @@ export async function exportToPDF(
 ): Promise<boolean> {
   if (!content) return false;
   const { default: printjs } = await import("print-js");
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     printjs({
       printable: content,
       type: "raw-html",
@@ -35,14 +53,16 @@ export async function exportNotes(
     subtitle: "Please wait while your notes are exported.",
     action: async (report) => {
       if (format === "pdf") {
-        const note = db.notes!.note(noteIds[0]);
+        const note = db.notes?.note(noteIds[0]);
+        if (!note) return false;
         return await exportToPDF(note.title, await note.export("html", null));
       }
 
-      var files = [];
+      const files = [];
       let index = 0;
-      for (var noteId of noteIds) {
-        const note = db.notes!.note(noteId);
+      for (const noteId of noteIds) {
+        const note = db.notes?.note(noteId);
+        if (!note) continue;
         report({
           current: ++index,
           total: noteIds.length,

@@ -27,9 +27,13 @@ module.exports = {
     "unused-imports",
     "detox",
     "jest",
-    "react-native"
+    "react-native",
+    "license-header",
+    "react-hooks"
   ],
   rules: {
+    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+    "react-hooks/exhaustive-deps": "warn", // Checks effect dependencies
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "off",
     "unused-imports/no-unused-imports": "error",
@@ -52,7 +56,8 @@ module.exports = {
     ],
     semi: ["error", "always"],
     "@typescript-eslint/no-empty-function": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "license-header/header": ["error", "./resources/license-header.js"]
   },
   settings: {
     react: {
@@ -60,6 +65,10 @@ module.exports = {
     }
   },
   overrides: [
+    {
+      files: ["apps/web/__e2e__/**/**/*.{jsx,tsx,ts,js}"],
+      rules: { "react-hooks/rules-of-hooks": "off" }
+    },
     {
       files: ["apps/mobile/**/**/*.{jsx,tsx,ts,js}"],
       env: {

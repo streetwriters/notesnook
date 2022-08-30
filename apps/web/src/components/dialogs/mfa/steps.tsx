@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React, {
   PropsWithChildren,
   Suspense,
@@ -34,7 +52,8 @@ import {
   AuthenticatorType,
   StepComponent,
   SubmitCodeFunction,
-  StepComponentProps
+  StepComponentProps,
+  OnNextFunction
 } from "./types";
 import { showMultifactorDialog } from "../../../common/dialog-controller";
 const QRCode = React.lazy(
@@ -44,23 +63,31 @@ const QRCode = React.lazy(
 export type Steps = typeof steps;
 export type FallbackSteps = typeof fallbackSteps;
 export type StepKeys = keyof Steps; // "choose" | "setup" | "recoveryCodes" | "finish";
-export type FallbackStepKeys = keyof FallbackSteps;
+export type FallbackStepKeys = "choose" | "setup" | "finish";
 
-export type Step = {
+export type Step<
+  T extends OnNextFunction = AuthenticatorTypeOnNext | AuthenticatorOnNext
+> = {
   title?: string;
   description?: string;
-  component?: StepComponent;
+  component?: StepComponent<T>;
   next?: StepKeys;
   cancellable?: boolean;
 };
-export type FallbackStep = Step & {
+export type FallbackStep<
+  T extends OnNextFunction =
+    | AuthenticatorTypeOnNext
+    | AuthenticatorOnNext
+    | OnNextFunction
+> = Step<T> & {
   next?: FallbackStepKeys;
 };
 
-type AuthenticatorSelectorProps = StepComponentProps & {
-  authenticator: AuthenticatorType;
-  isFallback?: boolean;
-};
+type AuthenticatorSelectorProps =
+  StepComponentProps<AuthenticatorTypeOnNext> & {
+    authenticator: AuthenticatorType;
+    isFallback?: boolean;
+  };
 
 type VerifyAuthenticatorFormProps = PropsWithChildren<{
   codeHelpText: string;
@@ -92,9 +119,11 @@ const Authenticators: Authenticator[] = [
     icon: MFAEmail
   }
 ];
+export type AuthenticatorOnNext = (authenticator: Authenticator) => void;
+export type AuthenticatorTypeOnNext = (type: AuthenticatorType) => void;
 
 export const steps = {
-  choose: (): Step => ({
+  choose: (): Step<AuthenticatorOnNext> => ({
     title: "Protect your notes by enabling 2FA",
     description: "Choose how you want to receive your authentication codes.",
     component: ({ onNext }) => (
@@ -106,7 +135,7 @@ export const steps = {
     next: "setup",
     cancellable: true
   }),
-  setup: (authenticator: Authenticator): Step => ({
+  setup: (authenticator: Authenticator): Step<AuthenticatorTypeOnNext> => ({
     title: authenticator.title,
     description: authenticator.subtitle,
     next: "recoveryCodes",
@@ -118,7 +147,9 @@ export const steps = {
     ),
     cancellable: true
   }),
-  recoveryCodes: (authenticatorType: AuthenticatorType): Step => ({
+  recoveryCodes: (
+    authenticatorType: AuthenticatorType
+  ): Step<AuthenticatorTypeOnNext> => ({
     title: "Save your recovery codes",
     description: `If you lose access to your ${
       authenticatorType === "email"
@@ -137,7 +168,9 @@ export const steps = {
     ),
     next: "finish"
   }),
-  finish: (authenticatorType: AuthenticatorType): Step => ({
+  finish: (
+    authenticatorType: AuthenticatorType
+  ): Step<AuthenticatorTypeOnNext> => ({
     component: ({ onNext, onClose, onError }) => (
       <TwoFactorEnabled
         onClose={onClose}
@@ -150,7 +183,9 @@ export const steps = {
 } as const;
 
 export const fallbackSteps = {
-  choose: (primaryMethod: AuthenticatorType): FallbackStep => ({
+  choose: (
+    primaryMethod: AuthenticatorType
+  ): FallbackStep<AuthenticatorOnNext> => ({
     title: "Add a fallback 2FA method",
     description:
       "A fallback method helps you get your 2FA codes on an alternative device in case you lose your primary device.",
@@ -165,7 +200,9 @@ export const fallbackSteps = {
     next: "setup",
     cancellable: true
   }),
-  setup: (authenticator: Authenticator): FallbackStep => ({
+  setup: (
+    authenticator: Authenticator
+  ): FallbackStep<AuthenticatorTypeOnNext> => ({
     title: authenticator.title,
     description: authenticator.subtitle,
     next: "finish",
@@ -181,7 +218,7 @@ export const fallbackSteps = {
   finish: (
     fallbackMethod: AuthenticatorType,
     primaryMethod: AuthenticatorType
-  ): FallbackStep => ({
+  ): FallbackStep<OnNextFunction> => ({
     component: ({ onNext, onClose }) => (
       <Fallback2FAEnabled
         onNext={onNext}
@@ -193,16 +230,17 @@ export const fallbackSteps = {
   })
 } as const;
 
-type ChooseAuthenticatorProps = StepComponentProps & {
+type ChooseAuthenticatorProps = StepComponentProps<AuthenticatorOnNext> & {
   authenticators: AuthenticatorType[];
 };
 
 function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
   const [selected, setSelected] = useSessionState("selectedAuthenticator", 0);
   const { authenticators, onNext } = props;
-  const filteredAuthenticators = authenticators.map(
-    (a) => Authenticators.find((auth) => auth.type === a)!
-  );
+  const filteredAuthenticators = authenticators
+    .map((a) => Authenticators.find((auth) => auth.type === a))
+    .filter((a) => !!a) as Authenticator[];
+
   return (
     <Flex
       as="form"
@@ -218,6 +256,7 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
     >
       {filteredAuthenticators.map((auth, index) => (
         <Button
+          key={auth.type}
           type="button"
           variant={"secondary"}
           mt={2}
@@ -276,7 +315,7 @@ function AuthenticatorSelector(props: AuthenticatorSelectorProps) {
     async (code) => {
       try {
         if (isFallback) await db.mfa?.enableFallback(authenticator, code);
-        else await db.mfa!.enable(authenticator, code);
+        else await db.mfa?.enable(authenticator, code);
         onNext(authenticator);
       } catch (e) {
         const error = e as Error;
@@ -305,7 +344,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
 
   useEffect(() => {
     (async function () {
-      setAuthenticatorDetails(await db.mfa!.setup("app"));
+      setAuthenticatorDetails(await db.mfa?.setup("app"));
     })();
   }, []);
 
@@ -333,8 +372,8 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
         )}
       </Box>
       <Text variant={"subBody"}>
-        If you can't scan the QR code above, enter this text instead (spaces
-        don't matter):
+        {`If you can't scan the QR code above, enter this text instead (spaces
+        don't matter):`}
       </Text>
       <Flex
         bg="bgSecondary"
@@ -388,7 +427,8 @@ function SetupEmail(props: SetupAuthenticatorProps) {
 
   useEffect(() => {
     (async () => {
-      const { email } = await db.user!.getUser();
+      if (!db.user) return;
+      const { email } = await db.user.getUser();
       setEmail(email);
     })();
   }, []);
@@ -418,7 +458,7 @@ function SetupEmail(props: SetupAuthenticatorProps) {
           onClick={async () => {
             setIsSending(true);
             try {
-              await db.mfa!.setup("email");
+              await db.mfa?.setup("email");
               setEnabled(false);
             } catch (e) {
               const error = e as Error;
@@ -515,7 +555,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
 
             setIsSending(true);
             try {
-              await db.mfa!.setup("sms", phoneNumber);
+              await db.mfa?.setup("sms", phoneNumber);
               setEnabled(false);
             } catch (e) {
               const error = e as Error;
@@ -631,6 +671,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
       >
         {codes.map((code) => (
           <Text
+            key={code}
             className="selectable"
             as="code"
             variant={"subheading"}
@@ -646,6 +687,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
       <Flex sx={{ justifyContent: "start", alignItems: "center", mt: 2 }}>
         {actions.map((action) => (
           <Button
+            key={action.title}
             id={`btn-${action.title.toLowerCase()}`}
             type="button"
             variant="secondary"
@@ -663,7 +705,7 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
   );
 }
 
-type TwoFactorEnabledProps = StepComponentProps & {
+type TwoFactorEnabledProps = StepComponentProps<AuthenticatorTypeOnNext> & {
   authenticatorType: AuthenticatorType;
 };
 function TwoFactorEnabled(props: TwoFactorEnabledProps) {
@@ -705,7 +747,7 @@ function TwoFactorEnabled(props: TwoFactorEnabledProps) {
   );
 }
 
-type Fallback2FAEnabledProps = StepComponentProps & {
+type Fallback2FAEnabledProps = StepComponentProps<OnNextFunction> & {
   fallbackMethod: AuthenticatorType;
   primaryMethod: AuthenticatorType;
 };

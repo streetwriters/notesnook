@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { Button, Flex, FlexProps, Text } from "@streetwriters/rebass";
 import { Perform } from "../../common/dialog-controller";
 import Dialog from "./dialog";
@@ -6,8 +24,8 @@ import {
   getToolDefinition,
   Icon,
   Icons,
+  ToolbarDefinition,
   ToolbarGroupDefinition,
-  ToolDefinition,
   ToolId
 } from "@notesnook/editor";
 import {
@@ -173,7 +191,7 @@ export default function ToolbarConfigDialog(props: ToolbarConfigDialogProps) {
           }}
         >
           <SortableContext items={items} strategy={verticalListSortingStrategy}>
-            {items?.map((item, index) => {
+            {items?.map((item) => {
               const deleted = isDeleted(items, item);
               const hasSubGroup =
                 isGroup(item) &&
@@ -296,7 +314,11 @@ function TreeNodeComponent(props: TreeNodeComponentProps) {
       }}
     >
       {item.icon && (
-        <Icon path={(Icons as any)[item.icon]} size={16} color="icon" />
+        <Icon
+          path={(Icons as Record<string, string>)[item.icon]}
+          size={16}
+          color="icon"
+        />
       )}
       <Text variant={"body"} sx={{ ml: 1 }}>
         {item.title}
@@ -354,9 +376,7 @@ function SortableWrapper(props: SortableWrapperProps) {
             id="add-item"
             variant={"tool"}
             sx={{ p: "small", opacity: 0, mr: 1 }}
-            onClick={(e) => {
-              onAdd();
-            }}
+            onClick={() => onAdd()}
           >
             <Icon path={Icons.plus} size={16} color="icon" />
           </Button>
@@ -366,9 +386,7 @@ function SortableWrapper(props: SortableWrapperProps) {
             id="remove-item"
             variant={"tool"}
             sx={{ p: "small", opacity: 0 }}
-            onClick={(e) => {
-              onRemove(item);
-            }}
+            onClick={() => onRemove(item)}
           >
             <Icon path={Icons.delete} size={16} color="icon" />
           </Button>
@@ -393,18 +411,15 @@ type Subgroup = BaseTreeNode<"group"> & {
 type Group = BaseTreeNode<"group">;
 
 type Item = BaseTreeNode<"item"> & {
-  toolId: string;
+  toolId: ToolId;
   icon: string;
   collapsed?: boolean;
 };
 
 type TreeNode = Group | Item | Subgroup;
 
-function flatten(
-  tools: ToolbarGroupDefinition[],
-  depth: number = 0
-): TreeNode[] {
-  let nodes: TreeNode[] = [];
+function flatten(tools: ToolbarGroupDefinition[], depth = 0): TreeNode[] {
+  const nodes: TreeNode[] = [];
   let groupCount = 1;
   for (const tool of tools) {
     if (Array.isArray(tool)) {
@@ -415,27 +430,27 @@ function flatten(
       nodes.push(...flatten(tool as ToolbarGroupDefinition[], depth + 1));
       ++groupCount;
     } else {
-      const { icon, title } = getToolDefinition(tool as any);
+      const { icon, title } = getToolDefinition(tool);
       nodes.push(createItem({ toolId: tool, depth, title, icon }));
     }
   }
   return nodes;
 }
 
-function unflatten(items: TreeNode[]): ToolbarGroupDefinition[] {
-  let tools: ToolbarGroupDefinition[] = [];
+function unflatten(items: TreeNode[]): ToolbarDefinition {
+  const tools: ToolbarDefinition = [];
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
     if (isGroup(item) || isSubgroup(item)) {
       const group = getGroup(items, item.id);
       console.log(group?.items);
       if (!group) continue;
-      tools.push(unflatten(group.items.slice(1)) as any);
+      tools.push(unflatten(group.items.slice(1)) as ToolbarGroupDefinition);
 
       // skip all the group's items
       i += group.items.length - 1;
     } else {
-      tools.push(item.toolId as any);
+      (tools as ToolbarGroupDefinition).push(item.toolId);
     }
   }
   return tools;
@@ -451,14 +466,13 @@ function createGroup(config: Partial<Group>): Group {
   };
 }
 
-function createItem(config: Partial<Item>): Item {
+function createItem(config: Partial<Item> & { toolId: ToolId }): Item {
   return {
     type: "item",
     id: id(),
     depth: 0,
     title: "",
     icon: "",
-    toolId: "",
     ...config
   };
 }
@@ -674,11 +688,11 @@ function addGroup(items: TreeNode[]) {
 }
 
 export function getDisabledTools(tools: TreeNode[]) {
-  const allTools = getAllTools() as Record<string, ToolDefinition>;
+  const allTools = getAllTools();
   const disabled: ToolbarGroupDefinition = [];
   const items: Item[] = tools.filter((t) => isItem(t)) as Item[];
   for (const key in allTools) {
-    const tool = allTools[key];
+    const tool = allTools[key as ToolId];
     if (tool.conditional) continue;
     if (items.findIndex((t) => t.toolId === key) <= -1)
       disabled.push(key as ToolId);

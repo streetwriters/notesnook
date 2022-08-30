@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import "@notesnook/editor/styles/styles.css";
 import "@notesnook/editor/styles/katex.min.css";
 import "@notesnook/editor/styles/katex-fonts.css";
@@ -26,7 +44,7 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
 
 const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 0 : 300;
-var saveTimeout = 0;
+let saveTimeout = 0;
 type TipTapProps = {
   editorContainer: HTMLElement;
   onLoad?: () => void;
@@ -83,7 +101,7 @@ function TipTap(props: TipTapProps) {
           if (event.clipboardData?.files?.length && onAttachFile) {
             event.preventDefault();
             event.stopPropagation();
-            for (let file of event.clipboardData.files) {
+            for (const file of event.clipboardData.files) {
               onAttachFile(file);
             }
             return true;
@@ -284,7 +302,7 @@ function toIEditor(editor: Editor): IEditor {
     sendAttachmentProgress: (hash, type, progress) =>
       editor.current?.commands.setAttachmentProgress({
         hash,
-        type: type as any,
+        type,
         progress
       })
   };
@@ -314,7 +332,7 @@ function countWords(str: string) {
   let count = 0;
   let shouldCount = false;
 
-  for (var i = 0; i < str.length; ++i) {
+  for (let i = 0; i < str.length; ++i) {
     const s = str[i];
 
     if (

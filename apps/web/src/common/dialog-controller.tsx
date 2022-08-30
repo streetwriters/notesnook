@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import ReactDOM from "react-dom";
 import { Dialogs } from "../components/dialogs";
 import { hardNavigate } from "../navigation";
@@ -36,7 +54,7 @@ function showDialog<TId extends DialogIds, TReturnType>(
   id: TId,
   render: RenderDialog<TId, TReturnType>
 ): Promise<TReturnType> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (openDialogs[id]) return false;
 
     const container = document.createElement("div");
@@ -73,7 +91,7 @@ export function showAddNotebookDialog() {
   return showDialog("AddNotebookDialog", (Dialog, perform) => (
     <Dialog
       isOpen={true}
-      onDone={async (nb: any) => {
+      onDone={async (nb: Record<string, unknown>) => {
         // add the notebook to db
         await db.notebooks?.add({ ...nb });
         notebookStore.refresh();
@@ -96,13 +114,13 @@ export function showEditNotebookDialog(notebookId: string) {
       isOpen={true}
       notebook={notebook}
       edit={true}
-      onDone={async (nb: any, deletedTopics: string[]) => {
+      onDone={async (nb: Record<string, unknown>, deletedTopics: string[]) => {
         // we remove the topics from notebook
         // beforehand so we can add them manually, later
         const topics = qclone(nb.topics);
         nb.topics = [];
 
-        let notebookId = await db.notebooks?.add(nb);
+        const notebookId = await db.notebooks?.add(nb);
 
         // add or delete topics as required
         const notebookTopics = db.notebooks?.notebook(notebookId).topics;
@@ -311,7 +329,7 @@ export function showLoadingDialog(dialogData: LoadingDialogProps) {
 type ProgressDialogProps = {
   title: string;
   subtitle: string;
-  action: any;
+  action: (...args: never[]) => void;
 };
 export function showProgressDialog<T>(dialogData: ProgressDialogProps) {
   const { title, subtitle, action } = dialogData;
@@ -473,7 +491,7 @@ export function showCreateTopicDialog() {
       onClose={() => {
         perform(false);
       }}
-      onAction={async (topic: any) => {
+      onAction={async (topic: Record<string, unknown>) => {
         if (!topic) return;
         const notebookId = notebookStore.get().selectedNotebookId;
         await db.notebooks?.notebook(notebookId).topics.add(topic);
@@ -486,9 +504,8 @@ export function showCreateTopicDialog() {
 }
 
 export function showEditTopicDialog(notebookId: string, topicId: string) {
-  const topic: any = db.notebooks
-    ?.notebook(notebookId)
-    ?.topics?.topic(topicId)?._topic;
+  const topic = db.notebooks?.notebook(notebookId)?.topics?.topic(topicId)
+    ?._topic as Record<string, unknown> | undefined;
   if (!topic) return;
   return showDialog("ItemDialog", (Dialog, perform) => (
     <Dialog
@@ -500,7 +517,7 @@ export function showEditTopicDialog(notebookId: string, topicId: string) {
       onClose={() => perform(false)}
       onAction={async (t: string) => {
         await db.notebooks
-          ?.notebook(topic.notebookId)
+          ?.notebook(topic.notebookId as string)
           .topics.add({ ...topic, title: t });
         notebookStore.setSelectedNotebook(topic.notebookId);
         appStore.refreshNavItems();
@@ -606,7 +623,7 @@ export function showTrackingDetailsDialog() {
 }
 
 export function showAnnouncementDialog(
-  announcement: any,
+  announcement: { id: string },
   remove: (id: string) => void
 ) {
   return showDialog("AnnouncementDialog", (Dialog, perform) => (

@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ListContainer from "../components/list-container";
 import SearchPlaceholder from "../components/placeholders/search-placeholder";
@@ -12,18 +30,20 @@ import { hardNavigate } from "../navigation";
 
 async function typeToItems(type, context) {
   switch (type) {
-    case "notes":
+    case "notes": {
       await db.notes.init();
       if (!context) return ["notes", db.notes.all];
       const notes = context.notes;
       return ["notes", notes];
+    }
     case "notebooks":
       return ["notebooks", db.notebooks.all];
-    case "topics":
+    case "topics": {
       const notebookId = notebookstore.get().selectedNotebookId;
       if (!notebookId) return ["topics", []];
       const topics = db.notebooks.notebook(notebookId).topics.all;
       return ["topics", topics];
+    }
     case "tags":
       return ["tags", db.tags.all];
     case "trash":
@@ -68,28 +88,32 @@ function Search({ type }) {
       case "notes":
         if (!context) return "all notes";
         switch (context.type) {
-          case "topic":
+          case "topic": {
             const notebook = db.notebooks.notebook(context.value.id);
             const topic = notebook.topics.topic(context.value.topic);
             return `notes of ${topic._topic.title} in ${notebook.title}`;
-          case "tag":
+          }
+          case "tag": {
             const tag = db.tags.all.find((tag) => tag.id === context.value);
             return `notes in #${tag.title}`;
+          }
           case "favorite":
             return "favorite notes";
-          case "color":
+          case "color": {
             const color = db.colors.all.find((tag) => tag.id === context.value);
             return `notes in color ${color.title}`;
+          }
           default:
             return;
         }
       case "notebooks":
         return "all notebooks";
-      case "topics":
+      case "topics": {
         const notebookId = notebookstore.get().selectedNotebookId;
         if (!notebookId) return "";
         const notebook = db.notebooks.notebook(notebookId);
         return `topics in ${notebook.title} notebook`;
+      }
       case "tags":
         return "all tags";
       case "trash":

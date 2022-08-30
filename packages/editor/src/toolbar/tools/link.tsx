@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { ToolProps } from "../types";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
@@ -31,27 +49,31 @@ export function AddLink(props: ToolProps) {
 
   const isActive = props.editor.isActive("link");
 
-  const onDone = useCallback((link: LinkDefinition) => {
-    const { href, text, isImage } = link;
-    if (!href) return;
+  const onDone = useCallback(
+    (link: LinkDefinition) => {
+      const { href, text, isImage } = link;
+      if (!href) return;
 
-    let commandChain = editor.current?.chain().focus();
-    if (!commandChain) return;
+      let commandChain = editor.current?.chain().focus();
+      if (!commandChain) return;
 
-    const isSelection = !editor.current?.state.selection.empty;
+      const isSelection = !editor.current?.state.selection.empty;
 
-    commandChain = commandChain
-      .extendMarkRange("link")
-      .toggleLink({ href, target: "_blank" });
-    if (!isImage) commandChain = commandChain.insertContent(text || href);
+      commandChain = commandChain
+        .extendMarkRange("link")
+        .toggleLink({ href, target: "_blank" });
+      if (!isImage) commandChain = commandChain.insertContent(text || href);
 
-    commandChain = commandChain.focus();
+      commandChain = commandChain.focus();
 
-    if (!isSelection && !isImage)
-      commandChain = commandChain.unsetMark("link").insertContent(" ");
+      if (!isSelection && !isImage)
+        commandChain = commandChain.unsetMark("link").insertContent(" ");
 
-    commandChain.run();
-  }, []);
+      commandChain.run();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   if (isActive) return <EditLink {...props} icon={"linkEdit"} />;
   return (
@@ -79,49 +101,57 @@ export function EditLink(props: ToolProps) {
     _selectedNode || selectionToOffset(editor.state)
   );
 
-  const onDone = useCallback((link: LinkDefinition) => {
-    const { href, text, isImage } = link;
-    const { from, node, to } = selectedNode.current;
-    if (!href || !editor.current || !node) return;
+  const onDone = useCallback(
+    (link: LinkDefinition) => {
+      const { href, text, isImage } = link;
+      const { from, node, to } = selectedNode.current;
+      if (!href || !editor.current || !node) return;
 
-    const mark = findMark(node, "link");
-    if (!mark) return;
+      const mark = findMark(node, "link");
+      if (!mark) return;
 
-    const selection = editor.current.state.selection;
+      const selection = editor.current.state.selection;
 
-    let commandChain = editor.current.chain();
+      let commandChain = editor.current.chain();
 
-    if (!isImage) {
-      commandChain = commandChain.command(({ tr }) => {
-        tr.removeMark(from, to, mark.type);
-        tr.insertText(
-          text || node.textContent,
-          tr.mapping.map(from),
-          tr.mapping.map(to)
-        );
-        tr.setSelection(
-          TextSelection.create(tr.doc, tr.mapping.map(from), tr.mapping.map(to))
-        );
-        return true;
-      });
-    }
+      if (!isImage) {
+        commandChain = commandChain.command(({ tr }) => {
+          tr.removeMark(from, to, mark.type);
+          tr.insertText(
+            text || node.textContent,
+            tr.mapping.map(from),
+            tr.mapping.map(to)
+          );
+          tr.setSelection(
+            TextSelection.create(
+              tr.doc,
+              tr.mapping.map(from),
+              tr.mapping.map(to)
+            )
+          );
+          return true;
+        });
+      }
 
-    commandChain
-      .extendMarkRange("link")
-      .toggleLink({ href, target: "_blank" })
-      .command(({ tr }) => {
-        tr.setSelection(
-          TextSelection.create(
-            tr.doc,
-            tr.mapping.map(selection.from),
-            tr.mapping.map(selection.to)
-          )
-        );
-        return true;
-      })
-      .focus(undefined, { scrollIntoView: true })
-      .run();
-  }, []);
+      commandChain
+        .extendMarkRange("link")
+        .toggleLink({ href, target: "_blank" })
+        .command(({ tr }) => {
+          tr.setSelection(
+            TextSelection.create(
+              tr.doc,
+              tr.mapping.map(selection.from),
+              tr.mapping.map(selection.to)
+            )
+          );
+          return true;
+        })
+        .focus(undefined, { scrollIntoView: true })
+        .run();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   return (
     <LinkTool

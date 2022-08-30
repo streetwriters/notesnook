@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { Flex } from "@streetwriters/rebass";
 import {
   SelectionBasedNodeView,
@@ -97,24 +115,28 @@ function TableRowToolbar(props: TableToolbarProps) {
   const { editor } = props;
   const rowToolsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!rowToolsRef.current) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (!rowToolsRef.current) {
+        return;
+      }
 
-    const currentRow = findSelectedDOMNode(editor, ["tableRow"]);
-    if (!currentRow) return;
+      const currentRow = findSelectedDOMNode(editor, ["tableRow"]);
+      if (!currentRow) return;
 
-    const pos = getPosition(rowToolsRef.current, {
-      location: "left",
-      target: currentRow,
-      align: "start",
-      xOffset: -5,
-      yOffset: -3
-    });
-    rowToolsRef.current.style.top = `${pos.top}px`;
-    rowToolsRef.current.style.left = `${pos.left}px`;
-  }, [editor.state.selection, rowToolsRef.current]);
+      const pos = getPosition(rowToolsRef.current, {
+        location: "left",
+        target: currentRow,
+        align: "start",
+        xOffset: -5,
+        yOffset: -3
+      });
+      rowToolsRef.current.style.top = `${pos.top}px`;
+      rowToolsRef.current.style.left = `${pos.left}px`;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [editor.state.selection]
+  );
 
   return (
     <Flex
@@ -151,29 +173,33 @@ function TableRowToolbar(props: TableToolbarProps) {
 function TableColumnToolbar(props: TableToolbarProps) {
   const { editor, table } = props;
   const columnToolsRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!columnToolsRef.current || !table) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (!columnToolsRef.current || !table) {
+        return;
+      }
 
-    const currentCell = findSelectedDOMNode(editor, [
-      "tableCell",
-      "tableHeader"
-    ]);
-    if (!currentCell) return;
+      const currentCell = findSelectedDOMNode(editor, [
+        "tableCell",
+        "tableHeader"
+      ]);
+      if (!currentCell) return;
 
-    // tableRef.current
-    const pos = getPosition(columnToolsRef.current, {
-      location: "top",
-      align: "center",
-      target: currentCell as HTMLElement,
-      yAnchor: table,
-      yOffset: 2
-    });
+      // tableRef.current
+      const pos = getPosition(columnToolsRef.current, {
+        location: "top",
+        align: "center",
+        target: currentCell as HTMLElement,
+        yAnchor: table,
+        yOffset: 2
+      });
 
-    columnToolsRef.current.style.left = `${pos.left}px`;
-    columnToolsRef.current.style.top = `${pos.top}px`;
-  }, [editor.state.selection, columnToolsRef.current, table]);
+      columnToolsRef.current.style.left = `${pos.left}px`;
+      columnToolsRef.current.style.top = `${pos.top}px`;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [editor.state.selection, table]
+  );
 
   return (
     <Flex

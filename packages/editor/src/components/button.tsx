@@ -1,4 +1,22 @@
-import { forwardRef, useCallback, useRef, ForwardedRef } from "react";
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import { forwardRef, useRef, ForwardedRef } from "react";
 import { useEffect } from "react";
 import { Button as RebassButton, ButtonProps } from "@streetwriters/rebass";
 
@@ -17,6 +35,10 @@ const _Button = (
   useEffect(() => {
     if (!buttonRef.current) return;
 
+    function onMouseDown(e: MouseEvent) {
+      e.preventDefault();
+    }
+
     buttonRef.current.addEventListener("mousedown", onMouseDown, {
       passive: false,
       capture: true
@@ -27,10 +49,6 @@ const _Button = (
         capture: true
       });
     };
-  }, []);
-
-  const onMouseDown = useCallback((e: MouseEvent) => {
-    e.preventDefault();
   }, []);
 
   return (

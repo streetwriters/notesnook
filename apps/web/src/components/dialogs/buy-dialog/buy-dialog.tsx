@@ -1,3 +1,21 @@
+/* This file is part of the Notesnook project (https://notesnook.com/)
+ *
+ * Copyright (C) 2022 Streetwriters (Private) Limited
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Text, Flex, Button } from "@streetwriters/rebass";
 import * as Icon from "../../icons";
@@ -20,6 +38,7 @@ import { TaskManager } from "../../../common/task-manager";
 import { db } from "../../../common/db";
 import { useCheckoutStore } from "./store";
 import { getCurrencySymbol } from "./helpers";
+import { Theme } from "@notesnook/theme";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -29,7 +48,7 @@ type BuyDialogProps = {
 
 export function BuyDialog(props: BuyDialogProps) {
   const { onClose, couponCode, plan } = props;
-  const theme: any = useTheme();
+  const theme = useTheme() as Theme;
 
   useEffect(() => {
     return () => {
@@ -44,11 +63,13 @@ export function BuyDialog(props: BuyDialogProps) {
       shouldCloseOnEsc
       shouldReturnFocusAfterClose
       shouldFocusAfterRender
-      onAfterOpen={(e: any) => {
-        if (!onClose) return;
+      onAfterOpen={(e) => {
+        if (!e || !onClose) return;
         // we need this work around because ReactModal content spreads over the overlay
         const child = e.contentEl.firstElementChild;
-        e.contentEl.onmousedown = function (e: any) {
+        if (!child || !(child instanceof HTMLElement)) return;
+
+        e.contentEl.onmousedown = function (e) {
           if (!e.screenX && !e.screenY) return;
           if (
             e.x < child.offsetLeft ||
@@ -209,7 +230,6 @@ function Details(props: DetailsProps) {
     return (
       <PaddleCheckout
         plan={selectedPlan}
-        // @ts-ignore TODO
         theme={theme}
         user={user}
         coupon={couponCode}
@@ -345,32 +365,29 @@ function SelectedPlan(props: SelectedPlanProps) {
     onApplyCoupon(undefined);
   }, [onApplyCoupon, setIsApplyingCoupon]);
 
-  useEffect(
-    () => {
-      if (!couponInputRef.current) return;
-      setIsApplyingCoupon(false);
+  useEffect(() => {
+    if (!couponInputRef.current) return;
+    setIsApplyingCoupon(false);
 
-      const couponValue = couponInputRef.current.value;
+    const couponValue = couponInputRef.current.value;
 
-      const isInvalidCoupon =
-        (!!couponValue && couponValue !== pricingInfo?.coupon) ||
-        (!!couponCode && couponCode !== pricingInfo?.coupon);
+    const isInvalidCoupon =
+      (!!couponValue && couponValue !== pricingInfo?.coupon) ||
+      (!!couponCode && couponCode !== pricingInfo?.coupon);
 
-      setIsInvalidCoupon(isInvalidCoupon);
-      if (isInvalidCoupon) {
-        if (couponCode) couponInputRef.current.value = couponCode;
-        return;
-      }
+    setIsInvalidCoupon(isInvalidCoupon);
+    if (isInvalidCoupon) {
+      if (couponCode) couponInputRef.current.value = couponCode;
+      return;
+    }
 
-      const pricingInfoCoupon = pricingInfo?.coupon || "";
-      if (couponValue !== pricingInfoCoupon) {
-        couponInputRef.current.value = pricingInfoCoupon;
-        onApplyCoupon(pricingInfo?.coupon);
-      }
-    },
+    const pricingInfoCoupon = pricingInfo?.coupon || "";
+    if (couponValue !== pricingInfoCoupon) {
+      couponInputRef.current.value = pricingInfoCoupon;
+      onApplyCoupon(pricingInfo?.coupon);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pricingInfo, onApplyCoupon, setIsApplyingCoupon]
-  );
+  }, [pricingInfo, onApplyCoupon, setIsApplyingCoupon]);
 
   return (
     <>
