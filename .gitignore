@@ -2,3 +2,4 @@ build
 coverage
 node_modules
 dist
+.DS_STORE
