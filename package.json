@@ -7,6 +7,7 @@
     "build": "nx run-many --target=build --all --exclude=@notesnook/mobile,@notesnook/web",
     "build:web": "nx build @notesnook/web",
     "start:web": "nx start @notesnook/web",
+    "install:web": "lerna add --scope=@notesnook/web ",
     "start:android": "nx run-android @notesnook/mobile",
     "start:ios": "nx run-ios @notesnook/mobile",
     "prepare:ios": "nx install-pods @notesnook/mobile",

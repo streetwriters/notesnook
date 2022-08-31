@@ -83,7 +83,7 @@ export function FlexScrollContainer({
         flex: "1 1 auto",
         ...style
       }}
-      renderView={({ _style, ...props }) => (
+      renderView={({ style: _style, ...props }) => (
         <Box
           {...props}
           className={className}

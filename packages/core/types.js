@@ -22,7 +22,7 @@ const _ignore = "";
 /**
  * @typedef {{
  *  groupBy: "abc" | "year" | "month" | "week" | "none" | undefined,
- *  sortBy: "dateCreated" | "dateDeleted" | "dateEdited" | "title",
+ *  sortBy: "dateCreated" | "dateDeleted" | "dateEdited" | "dateModified" | "title",
  *  sortDirection: "desc" | "asc"
  * }} GroupOptions
  */

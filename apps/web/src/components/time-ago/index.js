@@ -58,7 +58,7 @@ const enShortLocale = [
 register("short", (_n, index) => shortLocale[index]);
 register("en_short", (_n, index) => enShortLocale[index]);
 
-function TimeAgo({ datetime, live, locale, opts, ...restProps }) {
+function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
   const timeRef = useRef();
   useEffect(() => {
     const element = timeRef.current;
@@ -82,6 +82,10 @@ function TimeAgo({ datetime, live, locale, opts, ...restProps }) {
     <Text
       ref={timeRef}
       {...restProps}
+      sx={{
+        ...sx,
+        color: sx?.color || "inherit"
+      }}
       title={formatDate(datetime)}
       as="time"
       dateTime={toDate(datetime).toISOString()}

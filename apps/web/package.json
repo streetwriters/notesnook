@@ -22,6 +22,7 @@
     "@notesnook/logger": "*",
     "@notesnook/streamable-fs": "*",
     "@notesnook/theme": "*",
+    "@tanstack/react-virtual": "^3.0.0-beta.18",
     "@theme-ui/components": "^0.14.7",
     "@theme-ui/core": "^0.14.7",
     "allotment": "^1.12.1",
@@ -44,8 +45,6 @@
     "print-js": "^1.6.0",
     "qclone": "^1.0.4",
     "rc-scrollbars": "^1.1.3",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
     "react-dropzone": "^11.4.2",
     "react-hot-toast": "^2.2.0",
     "react-loading-skeleton": "^3.1.0",
@@ -54,7 +53,7 @@
     "react-scripts": "^5.0.1",
     "react-scroll-sync": "^0.9.0",
     "react-toggle": "^4.1.2",
-    "react-virtuoso": "^2.4.0",
+    "react-virtuoso": "2.4.0",
     "showdown": "github:thecodrr/showdown",
     "timeago.js": "^4.0.2",
     "web-streams-polyfill": "^3.1.1",
@@ -85,7 +84,15 @@
     "typescript": "^4.8.2",
     "webpack-bundle-analyzer": "^4.5.0",
     "worker-loader": "^3.0.8",
-    "zx": "^2.0.0"
+    "zx": "^2.0.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "overrides": {
+    "react@>17": "17.0.2",
+    "react-dom@>17": "17.0.2",
+    "@types/react@>17": "17.0.2",
+    "@types/react-dom@>17": "17.0.2"
   },
   "scripts": {
     "start": "env-cmd -e all,dev,web react-scripts start",

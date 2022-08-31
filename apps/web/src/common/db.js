@@ -22,7 +22,7 @@ import { NNStorage } from "../interfaces/storage";
 import { logger } from "../utils/logger";
 
 /**
- * @type {import("@notesnook/core/api").default}
+ * @type {import("@notesnook/core/api/index").default}
  */
 var db;
 async function initializeDatabase(persistence) {
