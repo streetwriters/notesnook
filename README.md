@@ -45,16 +45,16 @@ Notesnook is built using the following technologies:
 | `@notesnook/streamable-fs` | [/packages/streamable-fs][streamable-fs] | Streaming interface around an IndexedDB based file system         |
 | `@notesnook/theme`         | [/packages/theme][theme]                 | The core theme used in web & desktop clients                      |
 
-[web]: https://github.com/streetwriters/notesnook-private/tree/master/apps/web
-[mobile]: https://github.com/streetwriters/notesnook-private/tree/master/apps/mobile
-[core]: https://github.com/streetwriters/notesnook-private/tree/master/packages/core
-[crypto]: https://github.com/streetwriters/notesnook-private/tree/master/packages/crypto
-[editor]: https://github.com/streetwriters/notesnook-private/tree/master/packages/editor
-[editor-mobile]: https://github.com/streetwriters/notesnook-private/tree/master/packages/editor-mobile
-[logger]: https://github.com/streetwriters/notesnook-private/tree/master/packages/logger
-[crypto-worker]: https://github.com/streetwriters/notesnook-private/tree/master/packages/crypto-worker
-[streamable-fs]: https://github.com/streetwriters/notesnook-private/tree/master/packages/streamable-fs
-[theme]: https://github.com/streetwriters/notesnook-private/tree/master/packages/theme
+[web]: /apps/web
+[mobile]: /apps/mobile
+[core]: /packages/core
+[crypto]: /packages/crypto
+[editor]: /packages/editor
+[editor-mobile]: /packages/editor-mobile
+[logger]: /packages/logger
+[crypto-worker]: /packages/crypto-worker
+[streamable-fs]: /packages/streamable-fs
+[theme]: /packages/theme
 
 ### Contributing guidelines
 
