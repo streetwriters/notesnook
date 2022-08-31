@@ -19,6 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
+const IS_E2E = process.env.IS_E2E === "true";
+
+if (IS_E2E) console.log("Running e2e tests");
+else console.log("Running non-e2e tests");
 
 module.exports = {
   // All imported modules in your tests should be mocked automatically
@@ -158,12 +162,10 @@ module.exports = {
   // testLocationInResults: false,
 
   // The glob patterns Jest uses to detect test files
-  testMatch: ["**/**/**/*.test.[jt]s?(x)"]
+  testMatch: ["**/**/**/*.test.[jt]s?(x)"],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
-  // testPathIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  testPathIgnorePatterns: IS_E2E ? [] : ["/__e2e__/"]
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   // testRegex: [],
