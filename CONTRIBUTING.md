@@ -116,7 +116,7 @@ All commits must include valid scopes in the commit message. **Valid commit scop
 2. `ci`: changes related to CI
 3. `setup`: setting up someting new in the repo (e.g. eslint, commitlint)
 4. `docs`: changes related to documentation (README etc.)
-5. `refactor`: used for large scale refactoring (very rare)
+5. `misc`: miscellaneous changes like package-lock.json updates
 
 **Some example commits would look like this:**
 
