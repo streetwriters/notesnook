@@ -65,21 +65,15 @@ If you are interested in contributing to Notesnook, I highly recommend checking 
 You can reach out to us via:
 
 1. [Email](mailto:support@streetwriters.co)
-
 2. [Discord](https://discord.gg/5davZnhw3V)
-
 3. [Twitter](https://twitter.com/notesnook)
-
 4. [Create an issue](https://github.com/streetwriters/notesnook/issues/new)
 
 We take all queries, issues and bug reports that you might have. Feel free to ask.
 
 ## Additional Resources
 
-- Migrating & importing your data from other apps — Importer
-
-- Privacy policy & terms of service
-
-- Verify Notesnook encryption claims yourself — Vericrypt
-
-- Why Notesnook requires an email address?
+- [Migrating & importing your data from other apps — Importer](https://importer.notesnook.com/)
+- [Privacy policy](https://notesnook.com/privacy) & [terms of service](https://notesnook.com/terms)
+- [Verify Notesnook encryption claims yourself — Vericrypt](https://vericrypt.notesnook.com/)
+- [Why Notesnook requires an email address?](https://blog.notesnook.com/why-notesnook-requires-an-email-address/)
