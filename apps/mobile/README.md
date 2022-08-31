@@ -1,26 +1,97 @@
-# Notesnook for Android & iOS
+<p align="center">
+<img style="align:center; border-radius: 20px;" src="/resources/screenshots/mobile.jpg" alt="Notesnook mobile screenshot" width="250" />
+</p>
 
-The Notesnook mobile app is developed with React Native, helping us to keep a shared codebase for iOS and Android apps and provide great feature parity on both platforms.
+<h1 align="center">Notesnook Mobile</h1>
+<h3 align="center">The mobile app is built using React Native, Typescript & Javascript for both iOS & Android.</h3>
+<p align="center">
+<a href="#developer-guide">Developer guide</a> | <a href="#build-instructions">How to build?</a>
+</p>
 
-## Releases
+<p align="center">
+    <a href="https://play.google.com/store/apps/details?id=com.streetwriters.notesnook">
+    <img alt="Download on Google Play" src="https://play.google.com/intl/en_us/badges/images/badge_new.png" height=43>
+    </a>
+    <a href="https://apps.apple.com/us/app/notesnook-take-private-notes/id1544027013">
+    <img alt="Download on App Store" src="https://user-images.githubusercontent.com/7317008/43209852-4ca39622-904b-11e8-8ce1-cdc3aee76ae9.png" height=43>
+    </a>
+</p>
 
-Android and iOS apps can be downloaded from their respective appstores.
+## Build instructions
 
-<a href="https://play.google.com/store/apps/details?id=chat.rocket.android">
-  <img alt="Download on Google Play" src="https://play.google.com/intl/en_us/badges/images/badge_new.png" height=43>
-</a>
-<a href="https://apps.apple.com/us/app/notesnook-take-private-notes/id1544027013">
-  <img alt="Download on App Store" src="https://user-images.githubusercontent.com/7317008/43209852-4ca39622-904b-11e8-8ce1-cdc3aee76ae9.png" height=43>
-</a>
-<a href="https://f-droid.org/packages/YOUR.APP.ID">
-    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-    alt="Get it on F-Droid"
-    height="43">
-</a>
+> **Before you start it is recommended that you read [the contributing guidelines](/CONTRIBUTING.md).**
 
-Alternatively on android releases are also available on [Github Releases](https://github.com/streetwriters/notesnook/releases).
+### Setting up development environment
 
-## Architecture overview
+Requirements:
+
+1. [Node.js](https://nodejs.org/en/download/)
+2. [git](https://git-scm.com/downloads)
+3. NPM (not yarn or pnpm)
+4. [React Native](https://reactnative.dev/docs/environment-setup)
+
+To run the app locally, you will need to setup React Native on your system:
+
+1. Open the official [environment setup guide here](https://reactnative.dev/docs/environment-setup)
+2. Select `React Native CLI Quickstart`
+3. Select your OS & the platform to run the app on (iOS or Android)
+4. Follow the steps listed.
+
+> Please keep in mind that **Expo is not supported**.
+
+Once you have completed the setup, the first step is to `clone` the monorepo:
+
+```bash
+git clone https://github.com/streetwriters/notesnook.git
+
+# change directory
+cd notesnook
+```
+
+Once you are inside the `./notesnook` directory, run the preparation step:
+
+```bash
+# this might take a while to complete
+npm install
+```
+
+### Running the app on Android
+
+[Setup an Android emulator from Android Studio](https://developer.android.com/studio/run/managing-avds) if you haven't already and then run the following command to start the app in the Emulator:
+
+```bash
+npm run start:android
+```
+
+If you want to run the app on your phone, make sure to [enable USB debugging](https://developer.android.com/studio/debug/dev-options).
+
+### Running the app on iOS
+
+To run the app on iOS:
+
+```bash
+# this might take a while to complete
+npm run prepare:ios
+
+npm run start:ios
+```
+
+## Developer guide
+
+> This project is in a transition state between Javascript & Typescript. We are gradually porting everything over to Typescript so if you can help with that, it'd be great!
+
+### The tech stack
+
+We try to keep the stack as lean as possible
+
+1. React Native
+2. Typescript/Javascript
+3. Zustand: State management
+4. Detox: Runs all our e2e tests
+5. React Native MMKV: Database & persistence
+6. libsodium: Encryption
+
+### Project structure
 
 The app codebase is distributed over two primary directories. `native/` and `app/`.
 
@@ -42,62 +113,6 @@ There are several other folders at the root:
 - `e2e/`: Detox End to end tests
 - `patches/`: Patches for various react native dependencies.
 
-## Setting up development environment
+### Running the tests
 
-To run the app locally, you will first have to configure react native on your machine. Follow the [guide](https://reactnative.dev/docs/environment-setup) here and select React Native CLI Quickstart. Expo is not supported.
-
-Once you have completed the configuration, follow the steps below to run the app locally.
-
-Install yarn 2 in the project.
-
-```bash
-npm install -g yarn
-```
-
-and then run:
-
-```bash
-yarn set version berry
-```
-
-Open `.yarnrc.yml` and add the following line at the top:
-
-```yml
-nodeLinker: node-modules
-```
-
-Install the dependencies
-
-```bash
-yarn install
-```
-
-## Running the app on Android
-
-[Setup an android emulator from Android studio](https://developer.android.com/studio/run/managing-avds) if you haven't already and run the following command from `native/` folder.
-
-```
-cd native
-```
-
-and
-
-```
-yarn run-android
-```
-
-If you want to run the app on your phone, make sure to [enable USB debugging](https://developer.android.com/studio/debug/dev-options).
-
-## Running the app on iOS
-
-To run the app on iOS, simply run the following command from `native/` folder.
-
-```
-cd native
-```
-
-and
-
-```
-yarn run-ios
-```
+When you are done making the required changes, you will need to run the tests to make sure you didn't break anything. We use Detox as the testing framework & the tests can be started as follows:
