@@ -133,7 +133,6 @@ let walkthroughState: { [name: string]: boolean } = {};
 Walkthrough.update = async (
   id: "notebooks" | "trialstarted" | "emailconfirmed" | "prouser"
 ) => {
-  console.log("walkthrough state", walkthroughState);
   if (walkthroughState[id]) return;
   walkthroughState[id] = true;
   MMKV.setItem("walkthroughState", JSON.stringify(walkthroughState));
@@ -143,7 +142,6 @@ Walkthrough.init = async () => {
   const json = MMKV.getString("walkthroughState");
   if (json) {
     walkthroughState = JSON.parse(json);
-    console.log(walkthroughState);
   }
 };
 
@@ -154,7 +152,6 @@ Walkthrough.present = async (
 ) => {
   if (!nopersist) {
     if (!walkthroughState || Object.keys(walkthroughState).length === 0) {
-      console.log("late init of walkthrough state");
       await Walkthrough.init();
     }
     if (walkthroughState[id]) return;

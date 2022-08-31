@@ -119,7 +119,7 @@ function removeInvalidElements(document) {
 
 function replaceSrcWithAbsoluteUrls(document, baseUrl) {
   let images = document.querySelectorAll("img");
-  console.log(images.length);
+
   for (var i = 0; i < images.length; i++) {
     let img = images[i];
     let url = getBaseUrl(baseUrl);
@@ -137,7 +137,7 @@ function replaceSrcWithAbsoluteUrls(document, baseUrl) {
       img.setAttribute("src", src);
     }
   }
-  console.log("end");
+
   return document;
 }
 
@@ -216,13 +216,11 @@ const ShareView = ({ quicknote = false }) => {
     let kHeight = event.endCoordinates.height;
     keyboardHeight.current = kHeight;
     setKh(kHeight);
-    console.log("keyboard show/hide");
   };
 
   const onKeyboardDidHide = () => {
     keyboardHeight.current = 0;
     setKh(0);
-    console.log("keyboard hide");
   };
 
   useEffect(() => {
@@ -278,7 +276,7 @@ const ShareView = ({ quicknote = false }) => {
         }
       }
       setNote({ ...note });
-      console.log(data, "share data");
+
       onLoad();
     } catch (e) {
       console.error(e);
@@ -418,7 +416,6 @@ const ShareView = ({ quicknote = false }) => {
             iconColor={colors.pri}
             onPress={() => {
               if (showSearch) {
-                console.log("hide search");
                 setShowSearch(false);
               } else {
                 close();
@@ -460,7 +457,6 @@ const ShareView = ({ quicknote = false }) => {
           activeOpacity={1}
           onPress={() => {
             if (showSearch) {
-              console.log("hide search");
               setShowSearch(false);
             } else {
               close();

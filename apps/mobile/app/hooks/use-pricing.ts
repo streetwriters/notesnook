@@ -58,13 +58,6 @@ export const usePricing = (period: "monthly" | "yearly") => {
       let product = products.find((p) => p.productId === skuInfo?.sku);
       if (!product)
         product = products.find((p) => p.productId === getDefaultSku(period));
-      console.log(
-        "skuInfos: ",
-        skuInfos,
-        product?.productId,
-        product?.price,
-        products.length
-      );
       setCurrent({
         info: skuInfo,
         period,

@@ -85,11 +85,10 @@ export const setOnFirstSave = (
 
 export function isSynced(params: NotesScreenParams) {
   if (params.item.type === "topic") {
-    console.log(params.item.type);
     const topic = db.notebooks
       ?.notebook(params.item.notebookId)
       ?.topics.topic(params.item.id);
-    console.log(topic?.synced(), "sycned");
+
     return !topic ? true : topic?.synced();
   }
   return true;

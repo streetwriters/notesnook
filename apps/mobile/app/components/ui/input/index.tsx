@@ -150,7 +150,6 @@ const Input = ({
           strictDetection: true,
           validateMobilePrefix: true
         });
-        console.log(result);
         isError = result.isValid;
         if (result.isValid) {
           onChangeText && onChangeText(result.phoneNumber);

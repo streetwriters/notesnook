@@ -260,8 +260,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       };
     })
     .onStart((event) => {
-      console.log("gesture activated");
-
       let vx = event.velocityX;
       let vy = event.velocityY;
 
@@ -270,7 +268,6 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       // if vy is greater than vx, user is swiping vertically. lock swiping.
       if (vy > vx) locked.value = true;
       // if dividend of vx/vy is less than 4, user is swiping diagonally. lock swiping
-      console.log(vx / vy);
       if (vx / vy < 1.5) locked.value = true;
       startX.value = translateX.value;
     })

@@ -37,7 +37,6 @@ const Group = ({
   useNavigationFocus(navigation, {
     onFocus: () => {
       tabBarRef.current?.lock();
-      console.log("called");
       useNavigationStore.getState().update(
         {
           name: "SettingsGroup",

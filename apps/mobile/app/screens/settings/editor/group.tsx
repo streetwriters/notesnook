@@ -58,10 +58,6 @@ export const Group = ({
   });
   const colors = useThemeStore((state) => state.colors);
 
-  if (isDragged) {
-    console.log(dimensions.current.height, dimensions.current.width);
-  }
-
   const onDrop = (data: DraxDragWithReceiverEventData) => {
     const isDroppedAbove = data.receiver.receiveOffsetRatio.y < 0.5;
     const dragged = data.dragged.payload;
@@ -131,9 +127,9 @@ export const Group = ({
           positivePress: () => {
             if (groupIndex === undefined) return;
             const _data = useDragState.getState().data.slice();
-            console.log(groupIndex);
+
             _data.splice(groupIndex, 1);
-            console.log(_data);
+
             setData(_data);
           }
         });

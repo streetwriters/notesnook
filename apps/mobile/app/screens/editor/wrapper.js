@@ -64,7 +64,6 @@ export const EditorWrapper = ({ width }) => {
   }, [loading]);
 
   const getMarginBottom = () => {
-    console.log(insets.top);
     if (!keyboard.keyboardShown) return insets.bottom / 2;
     if (Platform.isPad && !floating) return 16;
     if (Platform.OS === "ios") return insets.bottom / 2;

@@ -38,10 +38,9 @@ async function call(webview: RefObject<WebView | undefined>, action?: Action) {
   if (!webview.current || !action) return;
   setImmediate(() => webview.current?.injectJavaScript(action.job));
   const response = await getResponse(action.id);
-  console.log("webview job: ", action.id, response ? response.value : response);
-  if (!response) {
-    console.warn("webview job failed", action.id);
-  }
+  // if (!response) {
+  //   console.warn("webview job failed", action.id);
+  // }
   return response ? response.value : response;
 }
 
@@ -162,7 +161,6 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
         return;
       }
     }
-    console.log("setSettings", JSON.stringify(settings));
     await this.doAsync(`
       if (typeof globalThis.settingsController !== "undefined") {
         globalThis.settingsController.update(${JSON.stringify(settings)}) 
@@ -213,7 +211,6 @@ typeof globalThis.statusBar !== "undefined" && statusBar.current.set({date:"",sa
   };
 
   insertImage = async (image: ImageAttributes) => {
-    console.log("image data", image);
     await this.doAsync(
       `editor && editor.commands.insertImage(${JSON.stringify(image)})`
     );

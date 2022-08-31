@@ -59,7 +59,6 @@ const ManageTagsSheet = () => {
 
   useEffect(() => {
     if (visible) {
-      console.log("sorting tags");
       sortTags();
     }
   }, [allTags, note, query, sortTags, visible]);

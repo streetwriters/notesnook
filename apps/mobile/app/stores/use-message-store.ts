@@ -96,7 +96,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     icon: "account-outline"
   },
   setMessage: (message) => {
-    console.log("setting message");
     setTimeout(() => {
       if (get().message.visible || message.visible) {
         layoutmanager.withAnimation();
@@ -131,16 +130,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
         announcements = [];
       }
     } catch (e) {
-      console.log("ERROR", e);
+      console.log(e);
       set({ announcements: [] });
     } finally {
       const all = await getFiltered(announcements);
 
       setTimeout(() => {
-        if (all.filter((a) => a.type === "inline").length !== 0) {
-          console.log("with setAnnouncement ");
-          layoutmanager.withAnimation();
-        }
         set({
           announcements: all.filter((a) => a.type === "inline"),
           dialogs: all.filter((a) => a.type === "dialog")

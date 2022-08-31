@@ -73,7 +73,6 @@ export const AutomaticBackupsSelector = () => {
                 if (Platform.OS === "android") {
                   let granted = await Backup.checkBackupDirExists();
                   if (!granted) {
-                    console.log("returning");
                     return;
                   }
                 }

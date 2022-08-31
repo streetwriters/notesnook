@@ -56,11 +56,11 @@ export const AnnouncementDialog = () => {
 
   const close = useCallback(() => {
     if (visible) {
-      remove(info.id);
+      remove(info?.id);
       setInfo(null);
       setVisible(false);
     }
-  }, [info.id, remove, visible]);
+  }, [info?.id, remove, visible]);
 
   return (
     <BaseDialog

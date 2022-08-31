@@ -103,7 +103,7 @@ export function getColorScheme(overrideSystemTheme) {
     });
     return COLOR_SCHEME;
   }
-  console.log("override system theme");
+
   setAccentColor(theme.accent);
   setColorScheme(theme.dark ? darkTheme : COLOR_SCHEME_LIGHT);
   return COLOR_SCHEME;

@@ -38,7 +38,6 @@ export const useNavigationFocus = (
   const _onFocus = useCallback(() => {
     setTimeout(
       () => {
-        console.log("on focus", prev);
         const shouldFocus = onFocus ? onFocus(prev) : true;
         if (shouldFocus) {
           setFocused(true);

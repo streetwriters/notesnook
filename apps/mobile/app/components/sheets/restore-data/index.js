@@ -126,25 +126,21 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
         backup = await RNFetchBlob.fs.readFile(prefix + item.path, "utf8");
       }
       backup = JSON.parse(backup);
-      console.log("backup encrypted:", backup.data.iv && backup.data.salt);
 
       if (backup.data.iv && backup.data.salt) {
         withPassword(
           async (value) => {
             try {
-              console.log("password for backup:", value);
               await restoreBackup(backup, value);
               close();
               setRestoring(false);
               return true;
             } catch (e) {
               backupError(e);
-              console.log("return false");
               return false;
             }
           },
           () => {
-            console.log("closed");
             setRestoring(false);
           }
         );
@@ -257,7 +253,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   );
 
   const restoreBackup = async (backup, password) => {
-    console.log(password, "password");
     await db.backup.import(backup, password);
     setRestoring(false);
     initialize();
@@ -289,15 +284,10 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
       DocumentPicker.pickSingle()
         .then((r) => {
           setRestoring(true);
-          console.log(r.uri);
           fetch(r.uri)
             .then(async (r) => {
               try {
                 let backup = await r.json();
-                console.log(
-                  "backup encrypted:",
-                  backup.data.iv && backup.data.salt
-                );
                 if (backup.data.iv && backup.data.salt) {
                   withPassword(
                     async (value) => {
@@ -313,7 +303,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                       }
                     },
                     () => {
-                      console.log("closed");
                       setRestoring(false);
                     }
                   );
@@ -400,7 +389,6 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                           } else {
                             subfolder = folder;
                           }
-                          console.log(subfolder, folder);
                           SettingsService.set({
                             backupDirectoryAndroid: subfolder
                           });

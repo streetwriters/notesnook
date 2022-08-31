@@ -35,12 +35,10 @@ export async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
   let { url, headers } = data;
 
-  console.log("downloading file: ", filename, url);
   let path = `${cacheDir}/${filename}`;
   try {
     let exists = await RNFetchBlob.fs.exists(path);
     if (exists) {
-      console.log("file is downloaded");
       return true;
     }
 
@@ -120,7 +118,6 @@ export async function downloadAttachment(hash, global = true) {
       return;
 
     let key = await db.attachments.decryptKey(attachment.key);
-    console.log("attachment key", key);
     let info = {
       iv: attachment.iv,
       salt: attachment.salt,
@@ -142,10 +139,6 @@ export async function downloadAttachment(hash, global = true) {
     });
 
     if (attachment.dateUploaded) {
-      console.log(
-        "Deleting attachment after download",
-        attachment.dateUploaded
-      );
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
         .catch(console.log);
@@ -177,7 +170,6 @@ export async function downloadAttachment(hash, global = true) {
   } catch (e) {
     console.log("download attachment error: ", e);
     if (attachment.dateUploaded) {
-      console.log("Deleting attachment on error", attachment.dateUploaded);
       RNFetchBlob.fs
         .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
         .catch(console.log);
@@ -196,8 +188,6 @@ export async function getUploadedFileSize(hash) {
   });
 
   const contentLength = parseInt(attachmentInfo.headers?.get("content-length"));
-  console.log("contentLength:", contentLength, attachmentInfo.headers);
-
   return isNaN(contentLength) ? 0 : contentLength;
 }
 

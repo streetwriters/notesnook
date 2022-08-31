@@ -27,7 +27,6 @@ jestExpect.extend({ toMatchImageSnapshot });
 const sleep = (duration) =>
   new Promise((resolve) =>
     setTimeout(() => {
-      console.log("Sleeping for " + duration / 1000 + " secs");
       resolve();
     }, duration)
   );
@@ -111,7 +110,6 @@ const testvars = {
 
 async function prepare() {
   if (testvars.isFirstTest) {
-    console.log("Launching App Directly without reset");
     testvars.isFirstTest = false;
     return await LaunchApp();
   }

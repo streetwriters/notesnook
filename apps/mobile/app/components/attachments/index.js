@@ -83,22 +83,18 @@ export const AttachmentDialog = () => {
 
   const onChangeText = (text) => {
     attachmentSearchValue.current = text;
-    console.log(attachmentSearchValue.current?.length);
     if (
       !attachmentSearchValue.current ||
       attachmentSearchValue.current === ""
     ) {
-      console.log("resetting all");
       setAttachments([...db.attachments.all]);
     }
-    console.log(attachments.length);
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => {
       let results = db.lookup.attachments(
         db.attachments.all,
         attachmentSearchValue.current
       );
-      console.log("results", results.length, attachments.length);
       if (results.length === 0) return;
       setAttachments(results);
     }, 300);

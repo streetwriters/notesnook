@@ -113,14 +113,12 @@ export const useEditor = (
 
   const onReady = useCallback(async () => {
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
-      console.log("ON READY CALLED");
       overlay(true);
       setLoading(true);
     }
   }, [overlay]);
 
   useEffect(() => {
-    console.log("sessionId:", sessionId);
     state.current.saveCount = 0;
     async () => {
       await commands.setSessionId(sessionIdRef.current);
@@ -156,7 +154,6 @@ export const useEditor = (
       postMessage(EditorEvents.title, "");
       await commands.clearContent();
       await commands.clearTags();
-      console.log("reset state: ", resetState);
       if (resetState) {
         isDefaultEditor &&
           useEditorStore.getState().setCurrentlyEditingNote(null);
@@ -182,8 +179,6 @@ export const useEditor = (
         currentNote.current?.readonly
       )
         return;
-
-      console.log("saving note", id);
       try {
         if (id && !db.notes?.note(id)) {
           isDefaultEditor &&
@@ -244,9 +239,7 @@ export const useEditor = (
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await db.vault?.save(noteData as any);
         }
-        console.log(id, sessionIdRef.current, currentSessionId);
         if (id && sessionIdRef.current === currentSessionId) {
-          console.log("updating state");
           note = db.notes?.note(id)?.data as Note;
           await commands.setStatus(timeConverter(note.dateEdited), "Saved");
 
@@ -268,7 +261,7 @@ export const useEditor = (
 
         return id;
       } catch (e) {
-        console.log("error saving: ", e);
+        console.log("Error saving note: ", e);
       }
     },
     [commands, isDefaultEditor, postMessage, readonly, reset]
@@ -293,7 +286,6 @@ export const useEditor = (
         forced?: boolean;
       }
     ) => {
-      console.log("loading note", item.type, eOnLoadNote + editorId);
       state.current.currentlyEditing = true;
       const editorState = useEditorStore.getState();
 
@@ -432,7 +424,6 @@ export const useEditor = (
           tabBarRef.current?.goToPage(1);
         }
         setTimeout(() => {
-          console.log("restoring app state here");
           if (appState.note) {
             loadNote(appState.note);
           }
@@ -450,7 +441,6 @@ export const useEditor = (
   }, [loadNote, overlay]);
 
   const onLoad = useCallback(async () => {
-    console.log("on editor load");
     state.current.ready = true;
     onReady();
     postMessage(EditorEvents.theme, theme || useThemeStore.getState().colors);
@@ -458,7 +448,6 @@ export const useEditor = (
       isDefaultEditor ? insets : { top: 0, left: 0, right: 0, bottom: 0 }
     );
     if (currentNote.current) {
-      console.log("force reload note");
       loadNote({ ...currentNote.current, forced: true });
     } else {
       await commands.setPlaceholder(placeholderTip.current);

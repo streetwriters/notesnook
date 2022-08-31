@@ -104,7 +104,7 @@ declare global {
     >;
   }>;
 
-  function logger(type: "info" | "warn" | "error", ...logs: never[]): void;
+  function logger(type: "info" | "warn" | "error", ...logs: unknown[]): void;
   /**
    * Function to post message to react native
    * @param type
@@ -148,7 +148,7 @@ export function isReactNative(): boolean {
   return !!window.ReactNativeWebView;
 }
 
-export function logger(type: "info" | "warn" | "error", ...logs: never[]) {
+export function logger(type: "info" | "warn" | "error", ...logs: unknown[]) {
   const logString = logs
     .map((log) => {
       return typeof log !== "string" ? JSON.stringify(log) : log;

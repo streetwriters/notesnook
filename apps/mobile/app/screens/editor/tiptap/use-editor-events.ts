@@ -286,20 +286,10 @@ export const useEditorEvents = (
     (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
       const editorMessage = JSON.parse(data) as EditorMessage;
-
-      logger.info("editor", editorMessage.type);
       if (
         editorMessage.sessionId !== editor.sessionId &&
         editorMessage.type !== EditorEvents.status
       ) {
-        logger.error(
-          "editor",
-          "invalid session",
-          editorMessage.type,
-          editor.sessionId,
-          editorMessage.sessionId
-        );
-
         return;
       }
       switch (editorMessage.type) {
@@ -348,9 +338,10 @@ export const useEditorEvents = (
           pick({ type: editorMessage.value });
           break;
         case EventTypes.download:
-          console.log("download attachment request", editorMessage.value);
-          const attachmentInfo = editorMessage.value as Attachment;
-          filesystem.downloadAttachment(attachmentInfo?.hash, true);
+          filesystem.downloadAttachment(
+            (editorMessage.value as Attachment)?.hash,
+            true
+          );
           break;
         case EventTypes.pro:
           if (editor.state.current?.isFocused) {
@@ -373,11 +364,6 @@ export const useEditorEvents = (
           onBackPress();
           break;
         default:
-          console.log(
-            "unhandled event recieved from editor: ",
-            editorMessage.type,
-            editorMessage.value
-          );
           break;
       }
       eSendEvent(editorMessage.type, editorMessage);

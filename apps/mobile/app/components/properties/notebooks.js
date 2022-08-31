@@ -36,7 +36,6 @@ export default function Notebooks({ note, close }) {
     let notebooks = [];
     for (let notebook of item.notebooks) {
       let item_notebook = db.notebooks.notebook(notebook.id);
-      console.log(notebook);
       if (item_notebook) {
         let data = {
           id: notebook.id,

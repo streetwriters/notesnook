@@ -18,17 +18,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform } from "react-native";
+import Orientation from "react-native-orientation";
 import { enabled } from "react-native-privacy-snapshot";
-import { SettingStore } from "../stores/use-setting-store";
-import { useSettingStore } from "../stores/use-setting-store";
+import { MMKV } from "../common/database/mmkv";
+import { SettingStore, useSettingStore } from "../stores/use-setting-store";
+import { ThemeStore } from "../stores/use-theme-store";
 import { AndroidModule } from "../utils";
 import { getColorScheme } from "../utils/color-scheme/utils";
-import { MMKV } from "../common/database/mmkv";
 import { scale, updateSize } from "../utils/size";
-import Notifications from "./notifications";
-import Orientation from "react-native-orientation";
 import { DDS } from "./device-detection";
-import { ThemeStore } from "../stores/use-theme-store";
 
 function migrate(settings: SettingStore["settings"]) {
   if (settings.migrated) return true;
@@ -36,7 +34,6 @@ function migrate(settings: SettingStore["settings"]) {
   const introCompleted = MMKV.getString("introCompleted");
 
   if (!introCompleted) {
-    console.log("no need to migrate");
     settings.migrated = true;
     set(settings);
     return;
@@ -44,7 +41,6 @@ function migrate(settings: SettingStore["settings"]) {
 
   settings.introCompleted = true;
   MMKV.removeItem("introCompleted");
-  console.log("migrated introCompleted", introCompleted);
 
   let askForRating = MMKV.getString("askForRating");
   if (askForRating) {
@@ -56,7 +52,7 @@ function migrate(settings: SettingStore["settings"]) {
         askForRating as unknown as { timestamp: number }
       ).timestamp;
     }
-    console.log("migrated askForRating", askForRating);
+
     MMKV.removeItem("askForRating");
   }
 
@@ -67,30 +63,25 @@ function migrate(settings: SettingStore["settings"]) {
       askForBackup as unknown as { timestamp: number }
     ).timestamp;
     MMKV.removeItem("askForBackup");
-    console.log("migrated askForBackup", askForBackup);
   }
 
   const lastBackupDate = MMKV.getString("backupDate");
   if (lastBackupDate) settings.lastBackupDate = parseInt(lastBackupDate);
   MMKV.removeItem("backupDate");
-  console.log("migrated backupDate", lastBackupDate);
 
   const isUserEmailConfirmed = MMKV.getString("isUserEmailConfirmed");
   if (isUserEmailConfirmed === "yes") settings.userEmailConfirmed = true;
   if (isUserEmailConfirmed === "no") settings.userEmailConfirmed = false;
-  console.log("migrated useEmailConfirmed", isUserEmailConfirmed);
 
   MMKV.removeItem("isUserEmailConfirmed");
 
   const userHasSavedRecoveryKey = MMKV.getString("userHasSavedRecoveryKey");
   if (userHasSavedRecoveryKey) settings.recoveryKeySaved = true;
   MMKV.removeItem("userHasSavedRecoveryKey");
-  console.log("migrated userHasSavedRecoveryKey", userHasSavedRecoveryKey);
 
   const accentColor = MMKV.getString("accentColor");
   if (accentColor) settings.theme.accent = accentColor;
   MMKV.removeItem("accentColor");
-  console.log("migrated accentColor", accentColor);
 
   let theme = MMKV.getString("theme");
   if (theme) {
@@ -103,16 +94,13 @@ function migrate(settings: SettingStore["settings"]) {
   if (backupStorageDir)
     settings.backupDirectoryAndroid = JSON.parse(backupStorageDir);
   MMKV.removeItem("backupStorageDir");
-  console.log("migrated backupStorageDir", backupStorageDir);
 
   const dontShowCompleteSheet = MMKV.getString("dontShowCompleteSheet");
   if (dontShowCompleteSheet) settings.showBackupCompleteSheet = false;
   MMKV.removeItem("dontShowCompleteSheet");
-  console.log("migrated dontShowCompleteSheet", dontShowCompleteSheet);
 
   settings.migrated = true;
   set(settings);
-  console.log("migrated completed");
 
   return true;
 }
@@ -128,9 +116,6 @@ function init() {
       ...settings,
       ...JSON.parse(settingsJson)
     };
-  }
-  if (settings.notifNotes) {
-    Notifications.pinQuickNote(true);
   }
 
   if (settings.fontScale) {

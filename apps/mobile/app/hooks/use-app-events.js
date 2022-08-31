@@ -41,7 +41,7 @@ import {
 import PremiumService from "../services/premium";
 import SettingsService from "../services/settings";
 import { updateStatusBarColor } from "../utils/color-scheme";
-import { db } from "../common/database";
+import { DatabaseLogger, db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import {
   eClearEditor,
@@ -83,20 +83,17 @@ export const useAppEvents = () => {
   });
 
   const onLoadingAttachmentProgress = (data) => {
-    console.log("loading", data);
     useAttachmentStore
       .getState()
       .setLoading(data.total === data.current ? null : data);
   };
 
   const onFileEncryptionProgress = ({ total, progress }) => {
-    console.log("encryption progress: ", (progress / total).toFixed(2));
     useAttachmentStore
       .getState()
       .setEncryptionProgress((progress / total).toFixed(2));
   };
   const onSyncProgress = ({ type, total, current }) => {
-    console.log(type, total, current);
     if (type !== "download") return;
     if (total < 10 || current % 10 === 0) {
       initAfterSync();
@@ -210,7 +207,6 @@ export const useAppEvents = () => {
   }, []);
 
   const onSyncComplete = useCallback(async () => {
-    console.log("sync complete");
     initAfterSync();
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseProgressDialog, "sync_progress");
@@ -271,7 +267,7 @@ export const useAppEvents = () => {
   };
 
   const onRequestPartialSync = async (full, force) => {
-    console.log("auto sync request", full, force);
+    DatabaseLogger.info(`onRequestPartialSync full:${full}, force:${force}`);
     if (full || force) {
       await Sync.run("global", force, full);
     } else {
@@ -280,7 +276,7 @@ export const useAppEvents = () => {
   };
 
   const onLogout = async (reason) => {
-    console.log("LOGOUT", reason);
+    console.log("Logged out", reason);
   };
 
   const unsubIAP = () => {
@@ -296,7 +292,6 @@ export const useAppEvents = () => {
 
   const onUserUpdated = useCallback(
     async (login) => {
-      console.log(`onUserUpdated: ${login}`);
       let user;
       try {
         user = await db.user.getUser();
@@ -367,7 +362,6 @@ export const useAppEvents = () => {
 
   const onAppStateChanged = useCallback(
     async (state) => {
-      console.log("onAppStateChanged");
       if (state === "active") {
         updateStatusBarColor();
         if (
@@ -436,7 +430,6 @@ export const useAppEvents = () => {
     }
     refValues.current.isReconnecting = true;
     let state = connection;
-    console.log("SSE:", "TRYING TO RECONNECT");
     try {
       if (!state) {
         state = await NetInfo.fetch();
@@ -482,10 +475,7 @@ export const useAppEvents = () => {
         initAfterSync();
         eSendEvent(refreshNotesPage);
       }
-      console.log(
-        "CHECK INTENT STATE",
-        notesAddedFromIntent || shareExtensionOpened
-      );
+
       if (notesAddedFromIntent || shareExtensionOpened) {
         let id = useEditorStore.getState().currentEditingNote;
         let note = id && db.notes.note(id).data;

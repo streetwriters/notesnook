@@ -37,7 +37,6 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setCurrentlyEditingNote: (note) => set({ currentEditingNote: note }),
   sessionId: null,
   setSessionId: (sessionId) => {
-    console.log(sessionId, "session id");
     // tiny.call(EditorWebView, `sessionId="${sessionId}";`);
     set({ sessionId });
   },
@@ -54,7 +53,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     }
     const func = (value: string) => {
       eUnSubscribeEvent("selectionvalue", func);
-      console.log("setSearchReplace:", value, value.length);
+
       if (!value && get().searchReplace) {
         //  endSearch();
         return;

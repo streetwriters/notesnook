@@ -103,8 +103,6 @@ const Editor = React.memo(
           groupId: string;
           src: string;
         }) => {
-          console.log("onMediaDownoaded", groupId);
-
           if (groupId !== editor.note.current?.id) return;
           editor.commands.updateImage({
             hash: hash,
@@ -115,7 +113,6 @@ const Editor = React.memo(
       );
 
       const onError = useCallback(() => {
-        console.log("RENDER PROCESS GONE!!!");
         editor.setLoading(true);
         setTimeout(() => editor.setLoading(false), 10);
       }, [editor]);
@@ -134,7 +131,6 @@ const Editor = React.memo(
         editorController.current = editor;
       }
 
-      console.log(editor.loading, "loading editor");
       return editor.loading ? null : (
         <>
           <WebView
@@ -170,7 +166,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={["*"]}
             source={{
-              uri: __DEV__ ? EDITOR_URI : EDITOR_URI
+              uri: EDITOR_URI
             }}
             style={style}
             autoManageStatusBarEnabled={false}

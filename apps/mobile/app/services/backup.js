@@ -23,7 +23,7 @@ import * as ScopedStorage from "react-native-scoped-storage";
 import Share from "react-native-share";
 import RNFetchBlob from "rn-fetch-blob";
 import { presentDialog } from "../components/dialog/functions";
-import { db } from "../common/database";
+import { DatabaseLogger, db } from "../common/database";
 import storage from "../common/database/storage";
 import { eCloseProgressDialog } from "../utils/events";
 import { sanitizeFilename } from "../utils/sanitizer";
@@ -43,7 +43,6 @@ async function getDirectoryAndroid() {
     let folderFiles = await ScopedStorage.listFiles(folder.uri);
     for (let f of folderFiles) {
       if (f.type === "directory" && f.name === "Notesnook backups") {
-        console.log("folder already exists. reusing");
         subfolder = f;
       }
     }
@@ -114,7 +113,6 @@ async function presentBackupCompleteSheet(backupFilePath) {
       {
         action: () => {
           if (Platform.OS === "ios") {
-            console.log(backupFilePath);
             Share.open({
               url: "file:/" + backupFilePath,
               failOnCancel: false
@@ -210,7 +208,7 @@ async function run(progress, context) {
     });
 
     let showBackupCompleteSheet = SettingsService.get().showBackupCompleteSheet;
-    console.log(backupFilePath);
+
     if (context) return backupFilePath;
     await sleep(300);
     if (showBackupCompleteSheet) {
@@ -239,16 +237,15 @@ async function checkBackupRequired(type) {
   }
   lastBackupDate = parseInt(lastBackupDate);
   if (type === "daily" && lastBackupDate + MS_DAY < now) {
-    console.log("daily backup started");
+    DatabaseLogger.info("Daily backup started");
     return true;
   } else if (type === "weekly" && lastBackupDate + MS_WEEK < now) {
-    console.log("weekly backup started");
+    DatabaseLogger.info("Weekly backup started");
     return true;
   } else if (type === "monthly" && lastBackupDate + MONTH < now) {
-    console.log("monthly backup started");
+    DatabaseLogger.info("Monthly backup started");
     return true;
   }
-  console.log("no need", lastBackupDate);
   return false;
 }
 

@@ -54,13 +54,13 @@ export function getUngroupedTools(
   toolDefinition: (string | string[])[][]
 ): string[] {
   const keys = Object.keys(tools);
-  console.log(keys);
+
   const ungrouped = [];
   const toolString = JSON.stringify(toolDefinition);
   for (const key of keys) {
     if (tools[key as ToolId].conditional) continue;
     if (!toolString.includes(key)) ungrouped.push(key);
   }
-  console.log(ungrouped);
+
   return ungrouped;
 }

@@ -52,7 +52,6 @@ export const Expiring = () => {
     extend: true
   });
   const pricing = usePricing("yearly");
-  console.log(pricing?.info?.discount);
 
   const promo = status.offer
     ? {

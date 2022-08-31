@@ -40,7 +40,6 @@ export const UserStatus = () => {
   const lastSynced = useUserStore((state) => state.lastSynced);
   const insets = useSafeAreaInsets();
   const { progress } = useSyncProgress();
-  console.log("SYNC PROGRESS", progress);
   return (
     <View
       style={{

@@ -772,7 +772,6 @@ export const settingsGroups: SettingSection[] = [
         icon: "form-textbox",
         modifer: () => {
           const settings = SettingsService.get();
-          console.log("called me now", settings.notifNotes);
           if (settings.notifNotes) {
             Notifications.unpinQuickNote();
           } else {

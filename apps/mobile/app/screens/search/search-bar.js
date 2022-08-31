@@ -55,9 +55,7 @@ export const SearchBar = () => {
     });
   }, []);
 
-  const onScroll = (event) => {
-    console.log(event);
-  };
+  const onScroll = (event) => {};
   useEffect(() => {
     eSubscribeEvent(eScrollEvent, onScroll);
     return () => {

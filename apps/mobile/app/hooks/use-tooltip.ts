@@ -39,7 +39,6 @@ export const hideAllTooltips = async () => {
   timers.forEach((t) => t && clearTimeout(t));
   for (let target of currentTargets) {
     if (target) {
-      console.log("dimissing targets", target);
       RNTooltips.Dismiss(target);
       target = -1;
     }
@@ -78,7 +77,6 @@ const useTooltip = () => {
     currentTargets.push(target.current._nativeTag);
     timers[timers.length] = setTimeout(() => {
       //TipManager.markPopupUsed(popup.id);
-      console.log("tooltip showing", popup.text);
       RNTooltips.Show(target.current, parent.current, {
         text: popup.text,
         tintColor: colors.night ? colors.nav : "#404040",

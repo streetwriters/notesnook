@@ -105,7 +105,6 @@ const ColorItem = React.memo(
           if (!value || value.trim().length === 0) return;
           await db.colors.rename(item.id, value);
           setColorNotes();
-          console.log("color updated");
         },
         positiveText: "Rename"
       });

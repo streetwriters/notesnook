@@ -16,6 +16,7 @@ UIManager.setLayoutAnimationEnabledExperimental &&
   UIManager.setLayoutAnimationEnabledExperimental(true);
 
 if (__DEV__) {
+  console.warn = () => null;
   LogBox.ignoreAllLogs();
 }
 let NotesnookShare;

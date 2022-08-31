@@ -82,7 +82,6 @@ function init() {
       );
     },
     onAction: async function (notification) {
-      console.log("ACTION: ", notification.action);
       switch (notification.action) {
         case "UNPIN":
           remove(
@@ -94,7 +93,6 @@ function init() {
           unpinQuickNote();
           break;
         case "ReplyInput":
-          console.log("texto", notification);
           present({
             title: "Quick note",
             message: 'Tap on "Take note" to add a note.',
@@ -137,7 +135,7 @@ function init() {
       importance: Importance.HIGH,
       vibrate: true
     },
-    (created) => console.log(`createChannel returned '${created}'`)
+    (created) => console.log(`Android Notification Channel Status: ${created}`)
   );
 }
 
@@ -157,7 +155,6 @@ function pinQuickNote(launch: boolean) {
     if (notif && launch) {
       return;
     }
-    console.log("showing");
     present({
       title: "Quick note",
       message: 'Tap on "Take note" to add a note.',

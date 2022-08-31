@@ -350,7 +350,6 @@ export const PricingPlans = ({
                       positiveText: "Apply",
                       positivePress: async (value) => {
                         if (!value) return;
-                        console.log(value);
                         eSendEvent(eCloseSimpleDialog);
                         setBuying(true);
                         try {
@@ -534,9 +533,7 @@ export const PricingPlans = ({
                 onPress={() => {
                   openLinkInBrowser("https://notesnook.com/tos", colors)
                     .catch(() => {})
-                    .then(() => {
-                      console.log("closed");
-                    });
+                    .then(() => {});
                 }}
                 style={{
                   textDecorationLine: "underline"
@@ -551,9 +548,7 @@ export const PricingPlans = ({
                 onPress={() => {
                   openLinkInBrowser("https://notesnook.com/privacy", colors)
                     .catch(() => {})
-                    .then(() => {
-                      console.log("closed");
-                    });
+                    .then(() => {});
                 }}
                 style={{
                   textDecorationLine: "underline"

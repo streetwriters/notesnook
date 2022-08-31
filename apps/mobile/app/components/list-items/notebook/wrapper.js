@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { NotebookItem } from ".";
-import Notebook from "../../../screens/notebook";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
 import { ToastEvent } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
@@ -29,6 +28,23 @@ import { history } from "../../../utils";
 import { db } from "../../../common/database";
 import { presentDialog } from "../../dialog/functions";
 import SelectionWrapper from "../selection-wrapper";
+
+const navigateToNotebook = (item, canGoBack) => {
+  if (!item) return;
+  Navigation.navigate <
+    "Notebook" >
+    ({
+      title: item.title,
+      name: "Notebook",
+      id: item.id,
+      type: "notebook"
+    },
+    {
+      title: item.title,
+      item: item,
+      canGoBack
+    });
+};
 
 export const openNotebookTopic = (item) => {
   const isTrash = item.type === "trash";
@@ -79,7 +95,7 @@ export const openNotebookTopic = (item) => {
   if (item.type === "topic") {
     TopicNotes.navigate(item, true);
   } else {
-    Notebook.navigate(item, true);
+    navigateToNotebook(item, true);
   }
 };
 

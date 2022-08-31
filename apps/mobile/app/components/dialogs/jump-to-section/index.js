@@ -50,7 +50,6 @@ const JumpToSectionDialog = ({ scrollRef, data, type }) => {
     let ind = notes.findIndex(
       (i) => i.title === item.title && i.type === "header"
     );
-    console.log(scrollRef.current);
     scrollRef.current?.scrollToIndex({
       index: ind,
       animated: true

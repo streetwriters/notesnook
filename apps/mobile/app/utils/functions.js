@@ -149,7 +149,7 @@ export const deleteItems = async (item) => {
   useSelectionStore.getState().clearSelection(true);
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
-  console.log("running search again");
+
   SearchService.updateAndSearch();
 };
 

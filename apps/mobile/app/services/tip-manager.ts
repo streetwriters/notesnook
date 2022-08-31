@@ -138,7 +138,7 @@ export const useTip = (
     return () => {
       clearInterval(intervalRef.current);
     };
-  }, [context, fallback, options.delay, options?.rotate]);
+  }, [context, fallback, options?.delay, options?.rotate]);
 
   return tip;
 };

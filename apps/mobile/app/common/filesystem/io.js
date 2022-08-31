@@ -38,7 +38,6 @@ export async function readEncrypted(filename, key, cipherData) {
       },
       true
     );
-    console.log("output length: ", output?.length);
     return output;
   } catch (e) {
     RNFetchBlob.fs.unlink(path).catch(console.log);

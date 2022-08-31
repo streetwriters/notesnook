@@ -157,7 +157,6 @@ const _TabsHolder = () => {
   ]);
 
   const _onLayout = async (event) => {
-    console.log("layout called here");
     if (layoutTimer) {
       clearTimeout(layoutTimer);
       layoutTimer = null;
@@ -180,7 +179,6 @@ const _TabsHolder = () => {
       width: size.width,
       height: size.height
     });
-    console.log("height change", size.width, size.height);
     setWidthHeight(size);
     DDS.setSize(size);
 
@@ -243,7 +241,6 @@ const _TabsHolder = () => {
         if (!editorState().movedAway) {
           tabBarRef.current?.goToIndex(2);
         } else {
-          console.log("index one", editorState().movedAway);
           tabBarRef.current?.goToIndex(1);
         }
       }

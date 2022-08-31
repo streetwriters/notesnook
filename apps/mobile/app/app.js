@@ -22,12 +22,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { withErrorBoundry } from "./components/exception-handler";
 import Launcher from "./components/launcher";
+import { useAppEvents } from "./hooks/use-app-events";
 import { ApplicationHolder } from "./navigation";
 import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useUserStore } from "./stores/use-user-store";
-import { useAppEvents } from "./hooks/use-app-events";
 
 SettingsService.init();
 SettingsService.checkOrientation();
@@ -38,9 +38,12 @@ const App = () => {
     if (appLockMode && appLockMode !== "none") {
       useUserStore.getState().setVerifyUser(true);
     }
-    setTimeout(() => {
+    setTimeout(async () => {
       SettingsService.onFirstLaunch();
-      Notifications.get();
+      await Notifications.get();
+      if (SettingsService.get().notifNotes) {
+        Notifications.pinQuickNote(true);
+      }
       TipManager.init();
     }, 100);
   }, []);

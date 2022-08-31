@@ -77,9 +77,8 @@ const file = async (fileOptions) => {
     if (Platform.OS == "ios") {
       options.copyTo = "cachesDirectory";
     }
-    console.log("generate key for attachment");
-    const key = await db.attachments.generateKey();
-    console.log("generated key for attachments: ", key);
+    await db.attachments.generateKey();
+
     let file;
     try {
       file = await DocumentPicker.pick(options);
@@ -205,7 +204,6 @@ const pick = async (options) => {
     }
     return;
   }
-  console.log("opening picker", options.type);
   if (options?.type.startsWith("image") || options?.type === "camera") {
     if (options.type === "image") {
       gallery(options);

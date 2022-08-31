@@ -107,7 +107,6 @@ const Tiptap = ({
   useLayoutEffect(() => {
     setLayout(true);
   }, []);
-
   return (
     <>
       <div

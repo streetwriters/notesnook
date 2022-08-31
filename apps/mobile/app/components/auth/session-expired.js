@@ -96,7 +96,6 @@ export const SessionExpired = () => {
 
   const open = async () => {
     try {
-      console.log("REQUESTING NEW TOKEN");
       let res = await db.user.tokenManager.getToken();
       if (!res) throw new Error("no token found");
       if (db.user.tokenManager._isTokenExpired(res))
@@ -162,7 +161,6 @@ export const SessionExpired = () => {
       if (e.message === "Multifactor authentication required.") {
         TwoFactorVerification.present(async (mfa) => {
           if (mfa) {
-            console.log(mfa);
             await login(mfa);
           } else {
             setLoading(false);

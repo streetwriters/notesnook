@@ -66,7 +66,6 @@ export const useActions = ({ close = () => null, item }) => {
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.settings.isPinned(item.id)
   );
-  console.log(item.readonly, "readonly");
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
   const alias = item.alias || item.title;
@@ -175,7 +174,6 @@ export const useActions = ({ close = () => null, item }) => {
 
   async function pinToNotifications() {
     if (!checkNoteSynced()) return;
-    console.log("pinToNotifications");
     if (Platform.OS === "ios") return;
 
     if (notifPinned !== null) {
@@ -473,7 +471,6 @@ export const useActions = ({ close = () => null, item }) => {
     } else {
       try {
         close();
-        console.log("moving note to trash");
         await deleteItems(item);
       } catch (e) {
         console.error(e);
@@ -584,7 +581,6 @@ export const useActions = ({ close = () => null, item }) => {
     );
     close();
   };
-  console.log("isNoteInTopic", isNoteInTopic());
   const actions = [
     {
       name: "Add to notebook",

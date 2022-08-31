@@ -119,7 +119,7 @@ const MoveNoteComponent = ({ note }) => {
       topics: [],
       id: null
     });
-    console.log("added notebook id", id);
+
     setExpanded(id);
     openAddTopicDialog(db.notebooks.notebook(id).data);
     notebookInput.current?.clear();
@@ -137,7 +137,7 @@ const MoveNoteComponent = ({ note }) => {
       });
       return false;
     }
-    console.log(item.id);
+
     await db.notebooks.notebook(item.id).topics.add(value);
     setNotebooks();
     updateNoteExists();
@@ -198,7 +198,6 @@ const MoveNoteComponent = ({ note }) => {
           if (topic.type !== "topic") continue;
           for (let id of notes) {
             if (topic.notes.indexOf(id) > -1) {
-              console.log("found", ids.indexOf(notebooks[i].id));
               if (ids.indexOf(notebooks[i].id) === -1) {
                 ids.push(notebooks[i].id);
               }
@@ -208,7 +207,7 @@ const MoveNoteComponent = ({ note }) => {
         }
       }
     }
-    console.log("ids: ", ids);
+
     setNoteExists(ids);
   }, [note?.id, selectedItemsList]);
 

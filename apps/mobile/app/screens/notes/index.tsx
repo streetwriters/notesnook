@@ -100,7 +100,6 @@ const NotesPage = ({
   const [loadingNotes, setLoadingNotes] = useState(false);
   const alias = getAlias(params.current);
   const isMonograph = route.name === "Monographs";
-  console.log(warning, "isWarning", isSynced(route.params));
 
   const isFocused = useNavigationFocus(navigation, {
     onFocus: (prev) => {

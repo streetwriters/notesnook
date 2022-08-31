@@ -68,7 +68,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     const length = currentMethod.method === "recoveryCode" ? 8 : 6;
 
     if (!code.current || code.current.length !== length) return;
-    console.log(currentMethod.method, code.current);
     setLoading(true);
     inputRef.current?.blur();
     await onMfaLogin(
@@ -77,7 +76,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
         code: code.current
       },
       (result) => {
-        console.log("result recieved");
         if (result) {
           eSendEvent(eCloseProgressDialog, "two_factor_verify");
         }
@@ -137,7 +135,6 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
     // TODO
     setSending(true);
     try {
-      console.log("sending code", currentMethod.method, mfaInfo.token);
       await db.mfa.sendCode(currentMethod.method, mfaInfo.token);
       start(60);
       setSending(false);
@@ -301,12 +298,10 @@ const TwoFactorVerification = ({ onMfaLogin, mfaInfo }) => {
 };
 
 TwoFactorVerification.present = (onMfaLogin, data, context) => {
-  console.log("presenting sheet");
   presentSheet({
     component: <TwoFactorVerification onMfaLogin={onMfaLogin} mfaInfo={data} />,
     context: context || "two_factor_verify",
     onClose: () => {
-      console.log("on close called");
       onMfaLogin();
     },
     disableClosing: true

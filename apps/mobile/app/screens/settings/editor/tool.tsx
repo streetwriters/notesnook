@@ -116,7 +116,7 @@ export const Tool = ({
                   ).findIndex((tool: string) => tool === item);
                   (_data[parentIndex][groupIndex] as ToolId[]).splice(index, 1);
                 }
-                console.log(_data[groupIndex]);
+
                 setData(_data);
               }
             }
@@ -271,8 +271,6 @@ export const Tool = ({
       const toIndex = isDroppedAbove
         ? Math.max(0, reciever.index)
         : reciever.index + 1;
-
-      console.log("indexes", reciever.parentIndex, reciever.groupIndex);
 
       const insertAt = isDroppedAtSubgroup
         ? (_data[reciever.parentIndex][reciever.groupIndex] as string[])

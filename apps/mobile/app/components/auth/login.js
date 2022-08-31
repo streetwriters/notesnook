@@ -120,7 +120,6 @@ export const Login = ({ changeMode }) => {
         await sleep(300);
         TwoFactorVerification.present(async (mfa) => {
           if (mfa) {
-            console.log(mfa);
             await login(mfa);
           } else {
             setLoading(false);

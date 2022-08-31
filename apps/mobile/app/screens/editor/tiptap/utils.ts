@@ -84,7 +84,6 @@ export async function post<T>(
   };
   setImmediate(() => ref.current?.postMessage(JSON.stringify(message)));
   const response = await getResponse(type);
-  console.log("post: ", type, sessionId, "result:", !!response);
   return response;
 }
 

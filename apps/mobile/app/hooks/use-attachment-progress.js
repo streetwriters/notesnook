@@ -37,8 +37,6 @@ export const useAttachmentProgress = (attachment, encryption) => {
       let loaded = prog.type === "download" ? prog.recieved : prog.sent;
       prog = loaded / prog.total;
       prog = (prog * 100).toFixed(0);
-      console.log("progress: ", prog);
-      console.log(prog);
       setCurrentProgress({
         value: prog,
         percent: prog + "%",

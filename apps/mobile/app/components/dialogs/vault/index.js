@@ -406,7 +406,6 @@ export class VaultDialog extends Component {
         type: "error",
         context: "local"
       });
-      console.log("returning from here");
       return;
     } else {
       await db.vault.add(this.state.note.id);
@@ -863,7 +862,6 @@ export class VaultDialog extends Component {
             ((!this.state.biometricUnlock && !changePassword) || !novault) ? (
               <Button
                 onPress={() => {
-                  console.log(this.state.biometricUnlock);
                   this.setState({
                     biometricUnlock: !this.state.biometricUnlock
                   });

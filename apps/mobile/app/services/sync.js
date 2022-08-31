@@ -62,12 +62,10 @@ const run = async (
     }
     userstore.setSyncing(true);
     let error = null;
-    console.log("Sync.run started");
+
     try {
-      console.log("DO IN BACKGROUND START");
       let res = await doInBackground(async () => {
         try {
-          console.log("DO IN BACKGROUND");
           await db.sync(full, forced);
           return true;
         } catch (e) {
@@ -89,7 +87,6 @@ const run = async (
         userstore.user
       ) {
         userstore.setSyncing(false);
-        console.log(status.isConnected, status.isInternetReachable);
         if (status.isConnected && status.isInternetReachable) {
           ToastEvent.error(e, "Sync failed", context);
         }

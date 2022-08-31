@@ -97,20 +97,13 @@ function clearRouteFromQueue(routeName: RouteName) {
  * Check if a route needs update
  */
 function routeNeedsUpdate(routeName: RouteName, callback: () => void) {
-  console.log(
-    "routeNeedsUpdate",
-    routesUpdateQueue,
-    routesUpdateQueue.indexOf(routeName)
-  );
   if (routesUpdateQueue.indexOf(routeName) > -1) {
     clearRouteFromQueue(routeName);
-    console.log("CALL ROUTE UPDATE");
     callback();
   }
 }
 
 function queueRoutesForUpdate(...routes: RouteName[]) {
-  console.log("updating routes", routes);
   const currentScreen = useNavigationStore.getState().currentScreen;
   // const routeHistory = rootNavigatorRef.current?.getRootState()?.routes || [
   //   { key: currentScreen.name }
@@ -122,7 +115,6 @@ function queueRoutesForUpdate(...routes: RouteName[]) {
   // );
 
   if (routes.indexOf(currentScreen.name) > -1) {
-    console.log("updating current route");
     routeUpdateFunctions[currentScreen.name]();
     clearRouteFromQueue(currentScreen.name);
     // Remove focused screen from queue
@@ -132,7 +124,6 @@ function queueRoutesForUpdate(...routes: RouteName[]) {
 
   routesUpdateQueue = routesUpdateQueue.concat(routes);
   routesUpdateQueue = [...new Set(routesUpdateQueue)];
-  //console.log(routesUpdateQueue);
 }
 
 function navigate<T extends RouteName>(

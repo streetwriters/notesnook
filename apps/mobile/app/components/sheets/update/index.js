@@ -67,7 +67,6 @@ export const Update = ({ version: appVersion, fwdRef }) => {
     if (!version) {
       (async () => {
         try {
-          console.log("checking for new version");
           let v = await checkVersion();
           setVersion(v);
         } catch (e) {

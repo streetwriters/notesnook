@@ -196,10 +196,8 @@ export const MFASetup = ({
       if (!method) return;
       setEnabling(true);
       if (recovery) {
-        console.log("enabling secondary method for 2FA");
         await db.mfa?.enableFallback(method.id, code.current);
       } else {
-        console.log("enabling primary method for 2FA");
         await db.mfa?.enable(method.id, code.current);
       }
 
@@ -209,14 +207,12 @@ export const MFASetup = ({
       setEnabling(false);
     } catch (e) {
       const error = e as Error;
-      console.log("2fa submit code:", error.message);
       ToastEvent.error(error, "Error submitting 2fa code");
       setEnabling(false);
     }
   };
 
   const onSendCode = async () => {
-    console.log("send code");
     if (error) return;
     if (!method || sending) return;
     if (method.id === "app" && authenticatorDetails.sharedKey) {
@@ -236,7 +232,6 @@ export const MFASetup = ({
     }
 
     try {
-      console.log("seconds", seconds);
       if (seconds)
         throw new Error("Please wait a few seconds before resending code");
       if (method.id === "sms" && !phoneNumber.current)
@@ -245,7 +240,6 @@ export const MFASetup = ({
       await db.mfa?.setup(method?.id, phoneNumber.current);
 
       if (method.id === "sms") {
-        console.log(phoneNumber.current);
         setId(method.id + phoneNumber.current);
       }
       await sleep(300);
@@ -262,7 +256,6 @@ export const MFASetup = ({
     } catch (e) {
       setSending(false);
       const error = e as Error;
-      console.log("Send code:", error.message);
       ToastEvent.error(error, "Error sending 2FA code");
     }
   };

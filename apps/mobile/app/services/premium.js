@@ -80,7 +80,7 @@ function getMontlySub() {
       localizedPrice: "$4.49"
     };
   }
-  console.log(_product.localizedPrice);
+
   return _product;
 }
 
@@ -121,7 +121,6 @@ const onUserStatusCheck = async (type) => {
   if (userstore?.premium !== get()) {
     userstore.setPremium(get());
   }
-  console.log("status check: ", type, get());
 
   let status = get();
   let message = null;
@@ -189,7 +188,7 @@ const showVerifyEmailDialog = () => {
             type: "error",
             context: "local"
           });
-          console.log("error");
+
           return;
         }
         await db.user.sendVerificationEmail();
@@ -260,10 +259,6 @@ const subscriptions = {
   },
   verify: async (subscription) => {
     if (Platform.OS === "android") return;
-    console.log(
-      "verifying: ",
-      new Date(subscription.transactionDate).toLocaleString()
-    );
 
     if (subscription.transactionReceipt) {
       if (Platform.OS === "ios") {
@@ -286,11 +281,10 @@ const subscriptions = {
           );
 
           let text = await result.text();
-          console.log(text);
+
           if (!result.ok) {
             if (text === "Receipt already expired.") {
               await subscriptions.clear(subscription);
-              console.log("clearing because expired");
             }
             return;
           }
@@ -306,7 +300,6 @@ const subscriptions = {
     let subscription = null;
     if (_subscription) {
       subscription = _subscription;
-      console.log("got id to clear");
     } else {
       subscription = _subscriptions.length > 0 ? _subscriptions[0] : null;
     }
@@ -314,7 +307,6 @@ const subscriptions = {
       await RNIap.finishTransactionIOS(subscription.transactionId);
       await RNIap.clearTransactionIOS();
       await subscriptions.remove(subscription.transactionId);
-      console.log("clearing subscriptions");
     }
   }
 };
@@ -327,7 +319,7 @@ async function getRemainingTrialDaysStatus() {
   let total = user.subscription.expiry - user.subscription.start;
   let current = Date.now() - user.subscription.start;
   current = (current / total) * 100;
-  console.log(current);
+
   let lastTrialDialogShownAt = MMKV.getString("lastTrialDialogShownAt");
 
   if (current > 75 && isTrial && lastTrialDialogShownAt !== "ending") {
