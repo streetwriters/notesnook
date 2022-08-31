@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Flex, Text } from "@streetwriters/rebass";
+import { Button, Flex, Text } from "@theme-ui/components";
 import { Error as ErrorIcon } from "../components/icons";
 import { makeURL, useQueryParams } from "../navigation";
 import { db } from "../common/db";
@@ -170,11 +171,11 @@ function Recovery(props: RecoveryProps) {
   return (
     <AuthContainer>
       <Flex
-        flexDirection={"column"}
         sx={{
           zIndex: 1,
           flex: 1,
-          overflowY: "auto"
+          overflowY: "auto",
+          flexDirection: "column"
         }}
       >
         {isAuthenticating ? (
@@ -184,7 +185,10 @@ function Recovery(props: RecoveryProps) {
           />
         ) : (
           <>
-            <Flex justifyContent={"space-between"} alignItems="start" m={2}>
+            <Flex
+              m={2}
+              sx={{ alignItems: "start", justifyContent: "space-between" }}
+            >
               <Text
                 sx={{
                   display: "flex",
@@ -299,12 +303,15 @@ function RecoveryMethods(props: BaseRecoveryComponentProps<"methods">) {
           }}
           onClick={() => setSelected(index)}
         >
-          <Text variant={"title"} color={method.isDangerous ? "error" : "text"}>
+          <Text
+            variant={"title"}
+            sx={{ color: method.isDangerous ? "error" : "text" }}
+          >
             {method.title}
           </Text>
           <Text
             variant={"body"}
-            color={method.isDangerous ? "error" : "fontTertiary"}
+            sx={{ color: method.isDangerous ? "error" : "fontTertiary" }}
           >
             {method.description}
           </Text>
@@ -349,8 +356,8 @@ function RecoveryKeyMethod(props: BaseRecoveryComponentProps<"method:key">) {
         type="button"
         mt={4}
         variant={"anchor"}
-        color="text"
         onClick={() => navigate("methods")}
+        sx={{ color: "text" }}
       >
         {`Don't have your recovery key?`}
       </Button>
@@ -374,8 +381,7 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
           bg="background"
           p={2}
           mt={2}
-          sx={{ borderRadius: "default" }}
-          color="error"
+          sx={{ borderRadius: "default", color: "error" }}
           ml={2}
         >
           All the data in your account will be overwritten with the data in the
@@ -408,8 +414,8 @@ function BackupFileMethod(props: BaseRecoveryComponentProps<"method:backup">) {
         type="button"
         mt={4}
         variant={"anchor"}
-        color="text"
         onClick={() => navigate("methods")}
+        sx={{ color: "text" }}
       >
         {`Don't have a backup file?`}
       </Button>
@@ -554,7 +560,7 @@ export function RecoveryForm<T extends RecoveryRoutes>(
   const { title, subtitle, children, testId } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
-  const formRef = useRef<HTMLFormElement>();
+  const formRef = useRef<HTMLFormElement>(null);
   const [form, setForm] = useState<RecoveryFormData[T] | undefined>();
 
   if (isSubmitting && props.loading)
@@ -566,13 +572,9 @@ export function RecoveryForm<T extends RecoveryRoutes>(
       data-test-id={testId}
       as="form"
       id="authForm"
-      flexDirection="column"
-      alignSelf="center"
-      justifyContent={"center"}
-      alignItems="center"
-      width={["95%", 420]}
-      flex={1}
       onSubmit={async (e) => {
+        if (!formRef.current) return;
+
         e.preventDefault();
 
         setError("");
@@ -592,17 +594,23 @@ export function RecoveryForm<T extends RecoveryRoutes>(
           setIsSubmitting(false);
         }
       }}
+      sx={{
+        flex: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        width: ["95%", 420],
+        alignSelf: "center"
+      }}
     >
-      <Text variant={"heading"} fontSize={32} textAlign="center">
+      <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
         {title}
       </Text>
       <Text
         variant="body"
-        fontSize={"title"}
-        textAlign="center"
         mt={2}
         mb={35}
-        color="fontTertiary"
+        sx={{ fontSize: "title", textAlign: "center", color: "fontTertiary" }}
       >
         {subtitle}
       </Text>

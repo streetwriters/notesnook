@@ -1,24 +1,26 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { forwardRef, useRef, ForwardedRef } from "react";
 import { useEffect } from "react";
-import { Button as RebassButton, ButtonProps } from "@streetwriters/rebass";
+import { Button as RebassButton, ButtonProps } from "@theme-ui/components";
+import { ThemeUICSSObject } from "@theme-ui/core";
 
 const _Button = (
   props: ButtonProps,
@@ -27,8 +29,9 @@ const _Button = (
   const { sx, ...buttonProps } = props;
 
   const hoverBg =
-    (sx as unknown as Record<string, never>)?.[":hover"]?.["bg"] || "hover";
-  const bg = (sx as unknown as Record<string, never>)?.["bg"] || "unset";
+    (((sx as ThemeUICSSObject)?.[":hover"] as ThemeUICSSObject)
+      ?.bg as string) || "hover";
+  const bg = ((sx as ThemeUICSSObject)?.bg as string) || "unset";
 
   const buttonRef = useRef<HTMLButtonElement>();
 
@@ -60,7 +63,7 @@ const _Button = (
         ":active": { bg: hoverBg }
       }}
       ref={(ref) => {
-        buttonRef.current = ref;
+        buttonRef.current = ref || undefined;
         if (typeof forwardedRef === "function") forwardedRef(ref);
         else if (forwardedRef) forwardedRef.current = ref;
       }}

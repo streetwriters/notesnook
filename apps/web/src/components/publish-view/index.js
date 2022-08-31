@@ -1,24 +1,25 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
-import { Flex, Text, Button } from "@streetwriters/rebass";
+import { Flex, Text, Button } from "@theme-ui/components";
 import * as Icon from "../icons";
 import Toggle from "../toggle";
 import Field from "../field";
@@ -83,25 +84,31 @@ function PublishView(props) {
         borderColor: "border",
         borderRadius: "default",
         boxShadow: "0px 0px 15px 0px #00000011",
-        ...position
+        ...position,
+        flexDirection: "column"
       }}
       bg="background"
       // p={2}
-      flexDirection="column"
+
       onClick={(e) => {
         e.stopPropagation();
       }}
     >
-      <Flex flexDirection={"column"} p={2}>
-        <Text variant="body" fontSize="title" fontWeight="bold" color="primary">
+      <Flex p={2} sx={{ flexDirection: "column" }}>
+        <Text
+          variant="body"
+          sx={{ fontSize: "title", fontWeight: "bold", color: "primary" }}
+        >
           {noteTitle}
         </Text>
         {isPublishing ? (
           <Flex
-            flexDirection="column"
-            alignItems="center"
             my={50}
-            justifyContent="center"
+            sx={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
           >
             <Text>Please wait...</Text>
             {processingStatus && (
@@ -114,8 +121,11 @@ function PublishView(props) {
         ) : (
           <>
             {publishId ? (
-              <Flex mt={1} flexDirection="column" overflow="hidden">
-                <Text variant="body" color="fontTertiary" fontWeight="bold">
+              <Flex mt={1} sx={{ flexDirection: "column", overflow: "hidden" }}>
+                <Text
+                  variant="body"
+                  sx={{ fontWeight: "bold", color: "fontTertiary" }}
+                >
                   Published at
                 </Text>
                 <Flex
@@ -158,7 +168,7 @@ function PublishView(props) {
               </Flex>
             ) : (
               <>
-                <Text variant="body" color="fontTertiary">
+                <Text variant="body" sx={{ color: "fontTertiary" }}>
                   This note will be published to a public URL.
                 </Text>
               </>
@@ -191,19 +201,18 @@ function PublishView(props) {
       </Flex>
 
       <Flex
-        alignItems="center"
-        justifyContent={"end"}
         bg="bgSecondary"
         p={1}
         px={2}
+        sx={{ alignItems: "center", justifyContent: "end" }}
       >
         <Button
           variant="primary"
-          color="primary"
-          fontWeight="bold"
           bg={"transparent"}
           sx={{
-            ":hover": { bg: "bgSecondary" }
+            ":hover": { bg: "bgSecondary" },
+            fontWeight: "bold",
+            color: "primary"
           }}
           onClick={async () => {
             try {
@@ -238,11 +247,11 @@ function PublishView(props) {
         {publishId && (
           <Button
             variant="primary"
-            color="error"
-            fontWeight="bold"
             bg={"transparent"}
             sx={{
-              ":hover": { bg: "bgSecondary" }
+              ":hover": { bg: "bgSecondary" },
+              fontWeight: "bold",
+              color: "error"
             }}
             onClick={async () => {
               try {
@@ -269,11 +278,11 @@ function PublishView(props) {
         <Button
           variant="primary"
           data-test-id="dialog-no"
-          color="text"
-          fontWeight="bold"
           bg={"transparent"}
           sx={{
-            ":hover": { bg: "bgSecondary" }
+            ":hover": { bg: "bgSecondary" },
+            fontWeight: "bold",
+            color: "text"
           }}
           onClick={() => {
             onClose(false);

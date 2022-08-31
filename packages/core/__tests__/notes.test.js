@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { groupArray } from "../utils/grouping";
 import {
@@ -24,7 +25,7 @@ import {
   groupedTest,
   TEST_NOTE,
   TEST_NOTEBOOK,
-  IMG_CONTENT,
+  IMG_CONTENT
 } from "./utils";
 
 beforeEach(async () => {
@@ -87,8 +88,8 @@ test("note should get headline from content", () =>
     ...TEST_NOTE,
     content: {
       type: TEST_NOTE.content.type,
-      data: "<p>This is a very colorful existence.</p>",
-    },
+      data: "<p>This is a very colorful existence.</p>"
+    }
   }).then(async ({ db, id }) => {
     let note = db.notes.note(id);
     expect(note.headline).toBe("This is a very colorful existence.");
@@ -99,8 +100,8 @@ test("note should not get headline if there is no p tag", () =>
     ...TEST_NOTE,
     content: {
       type: TEST_NOTE.content.type,
-      data: `<ol style="list-style-type: decimal;" data-mce-style="list-style-type: decimal;"><li>Hello I won't be a headline :(</li><li>Me too.</li><li>Gold.</li></ol>`,
-    },
+      data: `<ol style="list-style-type: decimal;" data-mce-style="list-style-type: decimal;"><li>Hello I won't be a headline :(</li><li>Me too.</li><li>Gold.</li></ol>`
+    }
   }).then(async ({ db, id }) => {
     let note = db.notes.note(id);
     expect(note.headline).toBeUndefined();
@@ -129,10 +130,10 @@ test("update note", () =>
       title: "I am a new title",
       content: {
         type: TEST_NOTE.content.type,
-        data: "<p><br></p>",
+        data: "<p><br></p>"
       },
       pinned: true,
-      favorite: true,
+      favorite: true
       // colors: ["red", "blue"]
     };
     id = await db.notes.add(noteData);
@@ -146,7 +147,7 @@ test("update note", () =>
 test("get favorite notes", () =>
   noteTest({
     ...TEST_NOTE,
-    favorite: true,
+    favorite: true
   }).then(({ db }) => {
     expect(db.notes.favorites.length).toBeGreaterThan(0);
   }));
@@ -154,7 +155,7 @@ test("get favorite notes", () =>
 test("get pinned notes", () =>
   noteTest({
     ...TEST_NOTE,
-    pinned: true,
+    pinned: true
   }).then(({ db }) => {
     expect(db.notes.pinned.length).toBeGreaterThan(0);
   }));
@@ -297,7 +298,7 @@ test("grouping items where item.title is empty or undefined shouldn't throw", ()
     groupArray([{ title: "" }], {
       groupBy: "abc",
       sortBy: "title",
-      sortDirection: "asc",
+      sortDirection: "asc"
     })
   ).toBeTruthy();
 });
@@ -305,7 +306,7 @@ test("grouping items where item.title is empty or undefined shouldn't throw", ()
 test("note content should not contain image base64 data after save", () =>
   noteTest().then(async ({ db, id }) => {
     StorageInterface.write(`_uk_@email@email.com`, {
-      key: { password: "password" },
+      key: { password: "password" }
     });
 
     await db.user.setUser({
@@ -315,8 +316,8 @@ test("note content should not contain image base64 data after save", () =>
         iv: "iv",
         salt: "salt",
         length: 100,
-        key: { password: "password" },
-      },
+        key: { password: "password" }
+      }
     });
 
     await db.attachments.add(
@@ -330,7 +331,7 @@ test("note content should not contain image base64 data after save", () =>
         chunkSize: 512,
         filename: "hello",
         key: {},
-        salt: "hellowrold",
+        salt: "hellowrold"
       },
       id
     );
@@ -345,7 +346,7 @@ test("note content should not contain image base64 data after save", () =>
 test("repairing notebook references should delete non-existent notebooks", () =>
   noteTest({
     ...TEST_NOTE,
-    notebooks: [{ id: "hello", topics: ["helloworld"] }],
+    notebooks: [{ id: "hello", topics: ["helloworld"] }]
   }).then(async ({ db, id }) => {
     await db.notes.repairReferences();
     let note = db.notes.note(id);
@@ -358,7 +359,7 @@ test("adding a note with an invalid tag should clean the tag array", () =>
       db.notes.add({
         ...TEST_NOTE,
         id: "helloworld",
-        tags: ["    "],
+        tags: ["    "]
       })
     ).resolves.toBe("helloworld");
 

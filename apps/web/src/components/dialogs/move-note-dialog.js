@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Flex, Text } from "@streetwriters/rebass";
+import { Button, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import { db } from "../../common/db";
 import Dialog from "./dialog";
@@ -77,7 +78,7 @@ function MoveDialog({ onClose, noteIds }) {
         onClick: onClose
       }}
     >
-      <Flex flexDirection="column" mt={1} sx={{ overflowY: "hidden" }}>
+      <Flex mt={1} sx={{ overflowY: "hidden", flexDirection: "column" }}>
         <FilteredList
           testId="mnd-new-notebook-title"
           placeholders={{
@@ -103,14 +104,14 @@ function MoveDialog({ onClose, noteIds }) {
                 key={notebook.id}
                 testId={`notebook-${index}`}
                 title={
-                  <Flex flexDirection={"column"} sx={{ px: 1 }}>
+                  <Flex sx={{ px: 1, flexDirection: "column" }}>
                     <Text
                       variant={"body"}
                       sx={{ color: hasNotes ? "primary" : "text" }}
                     >
                       {notebook.title}
                     </Text>
-                    <Text variant={"subBody"} fontWeight="normal">
+                    <Text variant={"subBody"} sx={{ fontWeight: "normal" }}>
                       {getTotalNotes(notebook)} notes &amp;{" "}
                       {notebook.topics.length} topics{" "}
                       {selectedTopics.length
@@ -287,7 +288,7 @@ function FilteredList({
             : { icon: Icon.Search, onClick: () => _filter(query) }
         }
       />
-      <Flex flexDirection="column" mt={1} sx={{ overflowY: "hidden" }}>
+      <Flex mt={1} sx={{ overflowY: "hidden", flexDirection: "column" }}>
         {noItemsFound && (
           <Button
             variant={"secondary"}
@@ -319,13 +320,15 @@ function Item(props) {
       variant={"list"}
       data-test-id={props["data-test-id"]}
       p={1}
-      justifyContent="space-between"
-      alignItems="center"
       pl={!indent ? 2 : indent * 15}
       onClick={onClick}
-      sx={{ display: "flex" }}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between"
+      }}
     >
-      <Flex flexDirection="column">
+      <Flex sx={{ flexDirection: "column" }}>
         <Text variant="body">{title}</Text>
         <Text variant="subBody">{pluralize(totalNotes, "note", "notes")}</Text>
       </Flex>

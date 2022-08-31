@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useEffect } from "react";
-import { Flex, Text } from "@streetwriters/rebass";
+import { Flex, Text } from "@theme-ui/components";
 import Dialog from "./dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
@@ -85,15 +86,14 @@ function EmailVerificationDialog(props) {
         disabled: isSending
       }}
     >
-      <Flex flexDirection="column">
+      <Flex sx={{ flexDirection: "column" }}>
         <Text
           as="span"
           variant="body"
-          alignSelf="stretch"
-          sx={{ borderRadius: "default" }}
+          sx={{ borderRadius: "default", alignSelf: "stretch" }}
         >
           We have sent the email confirmation link at{" "}
-          <Text as="b" fontWeight="bold">
+          <Text as="b" sx={{ fontWeight: "bold" }}>
             {user.email}
           </Text>
           .

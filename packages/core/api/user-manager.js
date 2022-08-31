@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import "../types";
 import http from "../utils/http";
@@ -32,7 +33,7 @@ const ENDPOINTS = {
   revoke: "/connect/revocation",
   recoverAccount: "/account/recover",
   resetUser: "/users/reset",
-  activateTrial: "/subscriptions/trial",
+  activateTrial: "/subscriptions/trial"
 };
 
 class UserManager {
@@ -69,7 +70,7 @@ class UserManager {
     await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
       email,
       password: hashedPassword,
-      client_id: "notesnook",
+      client_id: "notesnook"
     });
     EV.publish(EVENTS.userSignedUp);
     return await this._login({ email, password, hashedPassword });
@@ -99,14 +100,14 @@ class UserManager {
         scope: "notesnook.sync offline_access openid IdentityServerApi",
         client_id: "notesnook",
         "mfa:code": code,
-        "mfa:method": method,
+        "mfa:method": method
       })
     );
 
     const user = await this.fetchUser();
     await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
       password,
-      salt: user.salt,
+      salt: user.salt
     });
 
     EV.publish(EVENTS.userLoggedIn, user);
@@ -230,13 +231,13 @@ class UserManager {
   changePassword(oldPassword, newPassword) {
     return this._updatePassword("change_password", {
       old_password: oldPassword,
-      new_password: newPassword,
+      new_password: newPassword
     });
   }
 
   resetPassword(newPassword) {
     return this._updatePassword("reset_password", {
-      new_password: newPassword,
+      new_password: newPassword
     });
   }
 
@@ -298,7 +299,7 @@ class UserManager {
   recoverAccount(email) {
     return http.post(`${constants.AUTH_HOST}${ENDPOINTS.recoverAccount}`, {
       email,
-      client_id: "notesnook",
+      client_id: "notesnook"
     });
   }
 
@@ -335,7 +336,7 @@ class UserManager {
 
       await this._storage.deriveCryptoKey(`_uk_@${email}`, {
         password: new_password,
-        salt,
+        salt
       });
 
       if (!(await this.resetUser(false))) return;
@@ -362,7 +363,7 @@ class UserManager {
         {
           type,
           old_password,
-          new_password,
+          new_password
         },
         token
       );

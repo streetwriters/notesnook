@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { delay, noteTest, StorageInterface, TEST_NOTE } from "./utils";
 
@@ -46,13 +47,13 @@ test("editing the same note should create multiple history sessions", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
-      type: "tiptap",
+      type: "tiptap"
     };
 
     await db.notes.add({
       id: id,
       content: editedContent,
-      sessionId: Date.now() + 10000,
+      sessionId: Date.now() + 10000
     });
 
     const sessions = await db.noteHistory.get(id);
@@ -70,13 +71,13 @@ test("restoring an old session should replace note's content", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
-      type: "tiptap",
+      type: "tiptap"
     };
 
     await db.notes.add({
       id: id,
       content: editedContent,
-      sessionId: Date.now() + 10000,
+      sessionId: Date.now() + 10000
     });
 
     const [, firstVersion] = await db.noteHistory.get(id);
@@ -93,7 +94,7 @@ test("date created of session should not change on edit", () =>
 
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
-      type: "tiptap",
+      type: "tiptap"
     };
 
     await delay(1000);
@@ -101,7 +102,7 @@ test("date created of session should not change on edit", () =>
     await db.notes.add({
       id: id,
       content: editedContent,
-      sessionId: "session",
+      sessionId: "session"
     });
 
     const [{ dateCreated: newDateCreated, dateModified: newDateModified }] =
@@ -159,13 +160,13 @@ test("auto clear sessions if they exceed the limit", () =>
   noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
     let editedContent = {
       data: TEST_NOTE.content.data + "<p>Some new content</p>",
-      type: "tiptap",
+      type: "tiptap"
     };
 
     await db.notes.add({
       id: id,
       content: editedContent,
-      sessionId: Date.now() + 10000,
+      sessionId: Date.now() + 10000
     });
 
     let sessions = await db.noteHistory.get(id);
@@ -190,7 +191,7 @@ test("save a locked note should add a locked session to note history", () =>
     await db.vault.save({
       ...note,
       content: editedContent,
-      sessionId: "lockedsession",
+      sessionId: "lockedsession"
     });
 
     const sessions = await db.noteHistory.get(id);

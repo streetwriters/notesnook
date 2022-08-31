@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import {
   Box,
@@ -22,7 +23,7 @@ import {
   Flex,
   Image as RebassImage,
   Text as RebassText
-} from "@streetwriters/rebass";
+} from "@theme-ui/components";
 import { allowedPlatforms } from "../../hooks/use-announcements";
 import {
   closeOpenedDialog,
@@ -155,8 +156,7 @@ function List({ item }) {
     <Flex
       as={listType || "ul"}
       mt={1}
-      sx={mapStyle(style)}
-      flexDirection="column"
+      sx={{ ...mapStyle(style), flexDirection: "column" }}
     >
       {items.map((item) => (
         <ListItem key={item.text} item={item} />
@@ -177,8 +177,7 @@ function Title({ item, fontSize }) {
       value={text.toUpperCase()}
       variant="heading"
       mx={HORIZONTAL_MARGIN}
-      fontSize={fontSize}
-      sx={mapStyle(style)}
+      sx={{ ...mapStyle(style), fontSize }}
     />
   );
 }
@@ -189,11 +188,13 @@ function Description({ item, fontSize, color }) {
     <Text
       value={text}
       variant="body"
-      fontWeight="normal"
-      fontSize={fontSize}
-      color={color || "fontTertiary"}
       mx={HORIZONTAL_MARGIN}
-      sx={mapStyle(style)}
+      sx={{
+        ...mapStyle(style),
+        fontSize: fontSize,
+        fontWeight: "normal",
+        color: color || "fontTertiary"
+      }}
     />
   );
 }
@@ -210,12 +211,14 @@ function CalltoActions({ item, removeAnnouncement }) {
   const { actions, style } = item;
   return (
     <Flex
-      justifyContent="center"
-      alignItems="center"
       // bg="bgSecondary"
       px={2}
       pb={2}
-      sx={mapStyle(style)}
+      sx={{
+        ...mapStyle(style),
+        alignItems: "center",
+        justifyContent: "center"
+      }}
     >
       {actions
         ?.filter((cta) =>

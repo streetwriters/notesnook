@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { migrations } from "../../migrations";
 import SparkMD5 from "spark-md5";
@@ -36,17 +37,17 @@ class Merger {
         threshold: 1000,
         get: () => this._db.settings.raw,
         set: (item) => this._db.settings.merge(item),
-        conflict: (_local, remote) => this._db.settings.merge(remote),
+        conflict: (_local, remote) => this._db.settings.merge(remote)
       },
       note: {
         get: (id) => this._db.notes.note(id),
-        set: (item) => this._db.notes.merge(item),
+        set: (item) => this._db.notes.merge(item)
       },
       notebook: {
         threshold: 1000,
         get: (id) => this._db.notebooks.notebook(id),
         set: (item) => this._db.notebooks.merge(item),
-        conflict: (_local, remote) => this._db.notebooks.merge(remote),
+        conflict: (_local, remote) => this._db.notebooks.merge(remote)
       },
       content: {
         threshold: process.env.NODE_ENV === "test" ? 6 * 1000 : 60 * 1000,
@@ -79,7 +80,7 @@ class Merger {
             await this._db.notes.add({ id: local.noteId, conflicted: true });
             await this._db.storage.write("hasConflicts", true);
           }
-        },
+        }
       },
       attachment: {
         set: async (item) => {
@@ -111,12 +112,12 @@ class Merger {
             );
           }
           await this._db.attachments.merge(remoteAttachment);
-        },
+        }
       },
       vaultKey: {
         set: async (vaultKey) =>
-          this._db.vault._setKey(await this._deserialize(vaultKey, false)),
-      },
+          this._db.vault._setKey(await this._deserialize(vaultKey, false))
+      }
     };
   }
 
@@ -203,7 +204,7 @@ class Merger {
           isModified,
           timeDiff,
           remote: remoteItem.dateModified,
-          local: localItem.dateModified,
+          local: localItem.dateModified
         });
 
         await markAsConflicted(localItem, remoteItem);

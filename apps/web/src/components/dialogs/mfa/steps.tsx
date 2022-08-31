@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import React, {
   PropsWithChildren,
@@ -25,7 +26,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { Text, Flex, Button, Box } from "@streetwriters/rebass";
+import { Text, Flex, Button, Box } from "@theme-ui/components";
 import { useSessionState } from "../../../hooks/use-session-state";
 import {
   Loading,
@@ -245,9 +246,7 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
     <Flex
       as="form"
       id="2faForm"
-      flexDirection="column"
-      flex={1}
-      sx={{ overflow: "hidden" }}
+      sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}
       onSubmit={(e) => {
         e.preventDefault();
         const authenticator = filteredAuthenticators[selected];
@@ -283,23 +282,22 @@ function ChooseAuthenticator(props: ChooseAuthenticatorProps) {
             size={16}
             color={selected === index ? "primary" : "text"}
           />
-          <Text variant={"title"} fontWeight="body">
+          <Text variant={"title"} sx={{ fontWeight: "body" }}>
             {auth.title}{" "}
             {auth.recommended ? (
               <Text
                 as="span"
                 variant={"subBody"}
-                color="primary"
                 bg="shade"
                 px={1}
-                sx={{ borderRadius: "default" }}
+                sx={{ borderRadius: "default", color: "primary" }}
               >
                 Recommended
               </Text>
             ) : (
               false
             )}
-            <Text variant="body" fontWeight="normal" mt={1}>
+            <Text variant="body" mt={1} sx={{ fontWeight: "normal" }}>
               {auth.subtitle}
             </Text>
           </Text>
@@ -358,7 +356,7 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
       <Text variant={"body"}>
         Scan the QR code below with your authenticator app.
       </Text>
-      <Box alignSelf={"center"}>
+      <Box sx={{ alignSelf: "center" }}>
         {authenticatorDetails.authenticatorUri ? (
           <Suspense fallback={<Loading />}>
             <QRCode
@@ -383,13 +381,13 @@ function SetupAuthenticatorApp(props: SetupAuthenticatorProps) {
       >
         <Text
           className="selectable"
-          fontFamily="monospace"
-          fontSize="body"
           ml={1}
           sx={{
             flex: 1,
             overflowWrap: "anywhere",
-            color: "text"
+            color: "text",
+            fontSize: "body",
+            fontFamily: "monospace"
           }}
         >
           {authenticatorDetails.sharedKey ? (
@@ -443,17 +441,22 @@ function SetupEmail(props: SetupAuthenticatorProps) {
       <Flex
         mt={2}
         bg="bgSecondary"
-        alignItems={"center"}
-        sx={{ borderRadius: "default", overflowWrap: "anywhere" }}
+        sx={{
+          borderRadius: "default",
+          overflowWrap: "anywhere",
+          alignItems: "center"
+        }}
       >
-        <Text ml={2} fontFamily="monospace" fontSize="subtitle" flex={1}>
+        <Text
+          ml={2}
+          sx={{ flex: 1, fontSize: "subtitle", fontFamily: "monospace" }}
+        >
           {email}
         </Text>
         <Button
           type="button"
           variant={"secondary"}
-          alignSelf={"center"}
-          sx={{ p: 2, m: 0 }}
+          sx={{ p: 2, m: 0, alignSelf: "center" }}
           disabled={isSending || !enabled}
           onClick={async () => {
             setIsSending(true);
@@ -499,7 +502,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
   const [error, setError] = useState<string>();
   const [phoneNumber, setPhoneNumber] = useState<string>();
   const { elapsed, enabled, setEnabled } = useTimer(`2fa.sms`, 60);
-  const inputRef = useRef<HTMLInputElement>();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   return (
     <VerifyAuthenticatorForm
@@ -585,7 +588,7 @@ function SetupSMS(props: SetupAuthenticatorProps) {
 function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
   const { onNext, onError } = props;
   const [codes, setCodes] = useState<string[]>([]);
-  const recoveryCodesRef = useRef<HTMLDivElement>();
+  const recoveryCodesRef = useRef<HTMLDivElement>(null);
   const generate = useCallback(async () => {
     onError && onError("");
     try {
@@ -650,13 +653,13 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
 
   return (
     <Flex
-      flexDirection={"column"}
       as="form"
       id="2faForm"
       onSubmit={(e) => {
         e.preventDefault();
         onNext(props.authenticatorType);
       }}
+      sx={{ flexDirection: "column" }}
     >
       <Box
         className="selectable"
@@ -675,10 +678,12 @@ function BackupRecoveryCodes(props: TwoFactorEnabledProps) {
             className="selectable"
             as="code"
             variant={"subheading"}
-            textAlign="center"
-            fontWeight="body"
-            fontFamily={"monospace"}
-            color="text"
+            sx={{
+              fontFamily: "monospace",
+              textAlign: "center",
+              fontWeight: "body",
+              color: "text"
+            }}
           >
             {code}
           </Text>
@@ -711,16 +716,26 @@ type TwoFactorEnabledProps = StepComponentProps<AuthenticatorTypeOnNext> & {
 function TwoFactorEnabled(props: TwoFactorEnabledProps) {
   return (
     <Flex
-      flexDirection={"column"}
-      justifyContent="center"
-      alignItems={"center"}
       mb={2}
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
     >
       <MFA width={120} />
-      <Text variant={"heading"} fontSize="subheading" mt={2} textAlign="center">
+      <Text
+        variant={"heading"}
+        mt={2}
+        sx={{ fontSize: "subheading", textAlign: "center" }}
+      >
         Two-factor authentication enabled!
       </Text>
-      <Text variant={"body"} color="fontTertiary" mt={1} textAlign="center">
+      <Text
+        variant={"body"}
+        mt={1}
+        sx={{ textAlign: "center", color: "fontTertiary" }}
+      >
         Your account is now 100% secure against unauthorized logins.
       </Text>
       <Button
@@ -755,16 +770,26 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
   const { fallbackMethod, primaryMethod, onClose } = props;
   return (
     <Flex
-      flexDirection={"column"}
-      justifyContent="center"
-      alignItems={"center"}
       mb={2}
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
     >
       <Fallback2FA width={200} />
-      <Text variant={"heading"} fontSize="subheading" mt={2} textAlign="center">
+      <Text
+        variant={"heading"}
+        mt={2}
+        sx={{ fontSize: "subheading", textAlign: "center" }}
+      >
         Fallback 2FA method enabled!
       </Text>
-      <Text variant={"body"} color="fontTertiary" mt={1} textAlign="center">
+      <Text
+        variant={"body"}
+        mt={1}
+        sx={{ textAlign: "center", color: "fontTertiary" }}
+      >
         You will now receive your 2FA codes on your{" "}
         {mfaMethodToPhrase(fallbackMethod)} in case you lose access to your{" "}
         {mfaMethodToPhrase(primaryMethod)}.
@@ -782,16 +807,15 @@ function Fallback2FAEnabled(props: Fallback2FAEnabledProps) {
 
 function VerifyAuthenticatorForm(props: VerifyAuthenticatorFormProps) {
   const { codeHelpText, onSubmitCode, children } = props;
-  const formRef = useRef<HTMLFormElement>();
+  const formRef = useRef<HTMLFormElement>(null);
   return (
     <Flex
       ref={formRef}
       as="form"
       id="2faForm"
-      flexDirection="column"
-      flex={1}
-      sx={{ overflow: "hidden" }}
+      sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}
       onSubmit={async (e) => {
+        if (!formRef.current) return;
         e.preventDefault();
         const form = new FormData(formRef.current);
         const code = form.get("code");

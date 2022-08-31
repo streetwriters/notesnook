@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import React from "react";
-import { Flex, Text } from "@streetwriters/rebass";
+import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import Dialog from "./dialog";
 import { qclone } from "qclone";
@@ -139,7 +140,7 @@ class AddNotebookDialog extends React.Component {
         onClose={props.onClose}
         negativeButton={{ text: "Cancel", onClick: props.onClose }}
       >
-        <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
+        <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
           <Field
             defaultValue={this.title}
             data-test-id="and-name"
@@ -235,47 +236,53 @@ function TopicItem(props) {
     <Flex
       p={2}
       pl={0}
-      justifyContent="space-between"
-      alignItems="center"
       sx={{
         borderWidth: 1,
         borderBottomColor: isEditing ? "primary" : "border",
         borderBottomStyle: "solid",
         cursor: "pointer",
-        ":hover": { borderBottomColor: "primary" }
+        ":hover": { borderBottomColor: "primary" },
+        alignItems: "center",
+        justifyContent: "space-between"
       }}
       onClick={isEditing ? onDoneEditing : onEdit}
     >
-      <Flex alignItems="center" justifyContent="center">
+      <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
         <Icon.Topic />
-        <Text as="span" ml={1} fontSize="body" color="text">
+        <Text as="span" ml={1} sx={{ fontSize: "body", color: "text" }}>
           {title}
         </Text>
       </Flex>
       {!hideActions && (
-        <Flex justifyContent="center" alignItems="center">
+        <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
           <Text
-            display="flex"
             variant="subBody"
-            color="primary"
-            sx={{ alignItems: "center", ":hover": { opacity: 0.8 } }}
+            sx={{
+              alignItems: "center",
+              ":hover": { opacity: 0.8 },
+              height: "25px",
+              color: "primary",
+              display: "flex"
+            }}
             onClick={isEditing ? onDoneEditing : onEdit}
             data-test-id={`and-topic-${index}-actions-edit`}
-            height="25px"
           >
             {isEditing ? "Done" : "Edit"}
           </Text>
           <Text
-            display="flex"
             variant="subBody"
-            color="error"
             ml={2}
-            height="25px"
             onClick={(e) => {
               e.stopPropagation();
               onDelete();
             }}
-            sx={{ alignItems: "center", ":hover": { opacity: 0.8 } }}
+            sx={{
+              alignItems: "center",
+              ":hover": { opacity: 0.8 },
+              height: "25px",
+              color: "error",
+              display: "flex"
+            }}
           >
             Delete
           </Text>

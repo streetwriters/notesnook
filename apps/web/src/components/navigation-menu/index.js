@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useCallback, useEffect } from "react";
-import { Box, Button, Flex } from "@streetwriters/rebass";
+import { Box, Button, Flex } from "@theme-ui/components";
 import {
   Note,
   Notebook,
@@ -117,8 +118,6 @@ function NavigationMenu(props) {
   return (
     <AnimatedFlex
       id="navigationmenu"
-      flexDirection="column"
-      justifyContent="space-between"
       initial={{
         opacity: 1
       }}
@@ -131,13 +130,15 @@ function NavigationMenu(props) {
         zIndex: 1,
         height: "auto",
         position: "relative",
-        flex: 1
+        flex: 1,
+        flexDirection: "column",
+        justifyContent: "space-between"
       }}
       bg={"bgSecondary"}
       px={0}
     >
       <FlexScrollContainer>
-        <Flex flexDirection="column">
+        <Flex sx={{ flexDirection: "column" }}>
           {routes.map((item) => (
             <NavigationItem
               isTablet={isTablet}
@@ -183,11 +184,9 @@ function NavigationMenu(props) {
             />
           ))}
           <Box
-            width="85%"
-            height="0.8px"
             bg="border"
-            alignSelf="center"
             my={1}
+            sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
           />
           {pins.map((pin) => (
             <NavigationItem
@@ -229,7 +228,7 @@ function NavigationMenu(props) {
           ))}
         </Flex>
       </FlexScrollContainer>
-      <Flex flexDirection="column">
+      <Flex sx={{ flexDirection: "column" }}>
         {!isLoggedIn && (
           <NavigationItem
             isTablet={isTablet}

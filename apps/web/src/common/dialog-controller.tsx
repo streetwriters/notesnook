@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import ReactDOM from "react-dom";
 import { Dialogs } from "../components/dialogs";
@@ -28,7 +29,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { Box, Flex, Text } from "@streetwriters/rebass";
+import { Box, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import { formatDate } from "@notesnook/core/utils/date";
@@ -208,7 +209,7 @@ export function showMultiDeleteConfirmation(length: number) {
     message: (
       <Text as="span">
         These items will be{" "}
-        <Text as="span" color="primary">
+        <Text as="span" sx={{ color: "primary" }}>
           kept in your Trash for 7 days
         </Text>{" "}
         after which they will be permanently removed.
@@ -225,7 +226,7 @@ export function showMultiPermanentDeleteConfirmation(length: number) {
     message: (
       <Text as="span">
         These items will be{" "}
-        <Text as="span" color="primary">
+        <Text as="span" sx={{ color: "primary" }}>
           permanently deleted
         </Text>
         {". "}
@@ -274,18 +275,16 @@ export function showAppUpdatedNotice(
     title: `Welcome to v${version.formatted}`,
     message: (
       <Flex
-        flexDirection="column"
         bg="bgSecondary"
         p={1}
-        sx={{ borderRadius: "default" }}
+        sx={{ borderRadius: "default", flexDirection: "column" }}
       >
         <Text variant="title">Changelog:</Text>
         <Text
           as="pre"
-          overflow="auto"
-          fontFamily="monospace"
           variant="body"
           mt={1}
+          sx={{ fontFamily: "monospace", overflow: "auto" }}
         >
           {version.changelog || "No change log."}
         </Text>
@@ -420,7 +419,7 @@ function getDialogData(type: string) {
         subtitle: (
           <>
             All your data will be re-encrypted and synced with the new password.
-            <Box mt={1} p={1} bg="errorBg" color="error">
+            <Box mt={1} p={1} bg="errorBg" sx={{ color: "error" }}>
               <Text as="p" my={0}>
                 It is recommended that you <b>log out from all other devices</b>{" "}
                 before continuing.
@@ -446,7 +445,7 @@ function getDialogData(type: string) {
       return {
         title: "Delete your account",
         subtitle: (
-          <Text as="span" color="error">
+          <Text as="span" sx={{ color: "error" }}>
             All your data will be permanently deleted with{" "}
             <b>no way of recovery</b>. Proceed with caution.
           </Text>
@@ -754,10 +753,9 @@ function showUpdateDialog({
     title,
     subtitle,
     message: changelog && (
-      <Flex flexDirection="column" sx={{ borderRadius: "default" }}>
+      <Flex sx={{ borderRadius: "default", flexDirection: "column" }}>
         <Text
           as="div"
-          overflow="auto"
           variant="body"
           sx={{ overflow: "auto", fontFamily: "body" }}
           css={`

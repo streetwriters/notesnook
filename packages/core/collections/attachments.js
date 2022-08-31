@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import Collection from "./collection";
 import getId from "../utils/id";
@@ -79,7 +80,7 @@ export default class Attachments extends Collection {
       ...oldAttachment,
       ...oldAttachment.metadata,
       ...attachmentArg,
-      noteIds,
+      noteIds
     };
 
     const {
@@ -92,7 +93,7 @@ export default class Attachments extends Collection {
       salt,
       type,
       chunkSize,
-      key,
+      key
     } = attachment;
 
     if (
@@ -131,13 +132,13 @@ export default class Attachments extends Collection {
         hash,
         hashType,
         filename,
-        type: type || "application/octet-stream",
+        type: type || "application/octet-stream"
       },
       dateCreated: attachment.dateCreated || Date.now(),
       dateModified: attachment.dateModified,
       dateUploaded: attachment.dateUploaded,
       dateDeleted: undefined,
-      failed: attachment.failed,
+      failed: attachment.failed
     };
     return this._collection.addItem(attachmentItem);
   }
@@ -187,7 +188,7 @@ export default class Attachments extends Collection {
       if (!note) continue;
       const contentId = note.data.contentId;
       await this._db.content.removeAttachments(contentId, [
-        attachment.metadata.hash,
+        attachment.metadata.hash
       ]);
     }
   }
@@ -243,7 +244,7 @@ export default class Attachments extends Collection {
         salt: attachment.salt,
         length: attachment.length,
         alg: attachment.alg,
-        outputType: "base64",
+        outputType: "base64"
       }
     );
     return dataurl.fromObject({ type: attachment.metadata.type, data });
@@ -293,7 +294,7 @@ export default class Attachments extends Collection {
         await this._downloadMedia(attachment, {
           total: attachments.length,
           current: i,
-          groupId: noteId,
+          groupId: noteId
         });
       }
     } finally {
@@ -321,7 +322,7 @@ export default class Attachments extends Collection {
       EV.publish(EVENTS.mediaAttachmentDownloaded, {
         groupId,
         hash: metadata.hash,
-        src,
+        src
       });
 
     return src;

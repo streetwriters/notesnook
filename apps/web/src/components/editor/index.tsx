@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import {
   useEffect,
@@ -23,7 +24,7 @@ import {
   useRef,
   PropsWithChildren
 } from "react";
-import { Box, Button, Flex, Text } from "@streetwriters/rebass";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
 import Toolbar from "./toolbar";
@@ -136,13 +137,13 @@ export default function EditorManager({
   return (
     <Flex
       ref={dropRef}
-      flexDirection="column"
       id="editorContainer"
-      flex={1}
       sx={{
         position: "relative",
         alignSelf: "stretch",
-        overflow: "hidden"
+        overflow: "hidden",
+        flex: 1,
+        flexDirection: "column"
       }}
     >
       {previewSession.current && (
@@ -290,12 +291,12 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           variant="columnFill"
           className="editor"
           sx={{
-            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"]
+            alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
+            width: "100%",
+            maxWidth: focusMode
+              ? "min(100%, 850px)"
+              : "max(calc(100% - 200px), 850px)"
           }}
-          maxWidth={
-            focusMode ? "min(100%, 850px)" : "max(calc(100% - 200px), 850px)"
-          }
-          width="100%"
           px={2}
           onClick={onRequestFocus}
           // mt={[2, 2, 25]}
@@ -367,10 +368,9 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
     <Flex
       bg="bgSecondary"
       p={2}
-      justifyContent={"space-between"}
-      alignItems={"center"}
+      sx={{ alignItems: "center", justifyContent: "space-between" }}
     >
-      <Flex flexDirection={"column"} mr={4}>
+      <Flex mr={4} sx={{ flexDirection: "column" }}>
         <Text variant={"subtitle"}>Preview</Text>
         <Text variant={"body"}>
           You are previewing note version edited from {formatDate(dateCreated)}{" "}
@@ -453,7 +453,7 @@ function DropZone(props: DropZoneProps) {
 }
 
 function useDragOverlay() {
-  const dropElementRef = useRef<HTMLElement>();
+  const dropElementRef = useRef<HTMLElement>(null);
   const overlayRef = useRef<HTMLElement>();
 
   useEffect(() => {

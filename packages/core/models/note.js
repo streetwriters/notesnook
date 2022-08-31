@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import MarkdownBuilder from "../utils/templates/markdown/builder";
 import HTMLBuilder from "../utils/templates/html/builder";
@@ -88,7 +89,7 @@ export default class Note {
       title: this.title,
       editedOn: this.dateEdited,
       headline: this.headline,
-      createdOn: this.data.dateCreated,
+      createdOn: this.data.dateCreated
     };
     const contentItem = await this._db.content.raw(this._note.contentId);
     if (!contentItem) return false;
@@ -126,7 +127,7 @@ export default class Note {
       id: undefined,
       content: {
         type: content.type,
-        data: content.data,
+        data: content.data
       },
       readonly: false,
       favorite: false,
@@ -135,7 +136,7 @@ export default class Note {
       title: this._note.title + " (Copy)",
       dateEdited: null,
       dateCreated: null,
-      dateModified: null,
+      dateModified: null
     });
   }
 
@@ -145,7 +146,7 @@ export default class Note {
       await this._db.colors.untag(this._note.color, this._note.id);
     await this._db.notes.add({
       id: this.id,
-      color: this._db.colors.sanitize(color),
+      color: this._db.colors.sanitize(color)
     });
   }
 
@@ -154,7 +155,7 @@ export default class Note {
     await this._db.colors.untag(this._note.color, this._note.id);
     await this._db.notes.add({
       id: this.id,
-      color: undefined,
+      color: undefined
     });
   }
 

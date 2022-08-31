@@ -1,22 +1,23 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Flex, Text, Button as RebassButton } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Flex, Text, Button as RebassButton } from "@theme-ui/components";
 import * as Icon from "../icons";
 import Modal from "react-modal";
 import { useTheme } from "@emotion/react";
@@ -71,19 +72,19 @@ function Dialog(props) {
       }}
     >
       <Flex
-        flexDirection="column"
-        width={["100%", "90%", props.width || "380px"]}
-        maxHeight={["100%", "80%", "70%"]}
-        height={["100%", "auto", "auto"]}
         bg="background"
-        alignSelf={"center"}
-        overflowY={"hidden"}
         sx={{
           justifyContent: "stretch",
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "dialog"
+          borderRadius: "dialog",
+          flexDirection: "column",
+          width: ["100%", "90%", props.width || "380px"],
+          height: ["100%", "auto", "auto"],
+          maxHeight: ["100%", "80%", "70%"],
+          alignSelf: "center",
+          overflowY: "hidden"
         }}
       >
         {props.showClose && (
@@ -100,20 +101,24 @@ function Dialog(props) {
             onClick={props.onClose}
           />
         )}
-        <Flex flexDirection="column" p={4} pb={0}>
+        <Flex p={4} pb={0} sx={{ flexDirection: "column" }}>
           <Text
             variant="heading"
-            fontSize="subheading"
-            textAlign={props.alignment || "left"}
-            color="text"
+            sx={{
+              fontSize: "subheading",
+              textAlign: props.alignment || "left",
+              color: "text"
+            }}
           >
             {props.title}
           </Text>
           {props.description && (
             <Text
               variant="body"
-              textAlign={props.alignment || "left"}
-              color="fontTertiary"
+              sx={{
+                textAlign: props.alignment || "left",
+                color: "fontTertiary"
+              }}
             >
               {props.description}
             </Text>

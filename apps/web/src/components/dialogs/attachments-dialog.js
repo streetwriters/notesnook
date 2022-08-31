@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useEffect } from "react";
-import { Flex } from "@streetwriters/rebass";
+import { Flex } from "@theme-ui/components";
 import { getTotalSize } from "../../common/attachments";
 import { useStore } from "../../stores/attachment-store";
 import { formatBytes } from "../../utils/filename";
@@ -46,7 +47,7 @@ function AttachmentsDialog({ onClose }) {
       noScroll
       negativeButton={{ text: "Close", onClick: onClose }}
     >
-      <Flex flexDirection={"column"} height={500} px={2}>
+      <Flex px={2} sx={{ flexDirection: "column", height: 500 }}>
         <Field
           placeholder="Filter attachments by filename, type or hash"
           sx={{ mb: 1, px: 1 }}

@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import React, { useEffect, useState } from "react";
-import { Text, Flex, Button } from "@streetwriters/rebass";
+import { Text, Flex, Button } from "@theme-ui/components";
 import Dialog from "./dialog";
 import { db } from "../../common/db";
 import Logo from "../../assets/notesnook-logo.png";
@@ -54,14 +55,16 @@ function RecoveryKeyDialog(props) {
         }
       }}
     >
-      <Flex flexDirection="column" flex={1} sx={{ overflow: "hidden" }}>
-        <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
+      <Flex sx={{ overflow: "hidden", flex: 1, flexDirection: "column" }}>
+        <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
           <Text
-            color="error"
             bg="errorBg"
             p={2}
-            sx={{ borderRadius: "default" }}
-            fontSize="subBody"
+            sx={{
+              borderRadius: "default",
+              fontSize: "subBody",
+              color: "error"
+            }}
           >
             In case you forget your password, your recovery key is the only way
             to recover your data.
@@ -72,14 +75,20 @@ function RecoveryKeyDialog(props) {
             mt={2}
             bg="bgSecondary"
             p={2}
-            fontFamily="monospace"
-            fontSize="body"
-            color="text"
-            sx={{ borderRadius: "default", overflowWrap: "anywhere" }}
+            sx={{
+              borderRadius: "default",
+              overflowWrap: "anywhere",
+              fontSize: "body",
+              fontFamily: "monospace",
+              color: "text"
+            }}
           >
             {key}
           </Text>
-          <Flex justifyContent="space-around" alignItems="center" mt={4}>
+          <Flex
+            mt={4}
+            sx={{ alignItems: "center", justifyContent: "space-around" }}
+          >
             <Suspense fallback={<div />}>
               <QRCode
                 value={key}
@@ -90,12 +99,11 @@ function RecoveryKeyDialog(props) {
               />
             </Suspense>
 
-            <Flex flexDirection="column">
+            <Flex sx={{ flexDirection: "column" }}>
               <Button
                 variant="secondary"
                 mt={1}
                 className="copyKey"
-                fontSize="body"
                 onClick={async () => {
                   clipboard
                     .writeText(key)
@@ -109,13 +117,13 @@ function RecoveryKeyDialog(props) {
                       console.error("Error while copying text.", e);
                     });
                 }}
+                sx={{ fontSize: "body" }}
               >
                 {copyText}
               </Button>
               <Button
                 variant="secondary"
                 mt={1}
-                fontSize="body"
                 onClick={async () => {
                   const qrcode = document.getElementById("react-qrcode-logo");
                   qrcode.toBlob((blob) => {
@@ -125,19 +133,20 @@ function RecoveryKeyDialog(props) {
                     );
                   });
                 }}
+                sx={{ fontSize: "body" }}
               >
                 Download QR Code
               </Button>
               <Button
                 variant="secondary"
                 mt={1}
-                fontSize="body"
                 onClick={() => {
                   FileSaver.saveAs(
                     new Blob([Buffer.from(key)]),
                     `${email}-notesnook-recoverykey.txt`
                   );
                 }}
+                sx={{ fontSize: "body" }}
               >
                 Download file
               </Button>

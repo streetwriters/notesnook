@@ -1,22 +1,23 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Button, Flex, Text } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import useMobile from "../../hooks/use-mobile";
@@ -59,7 +60,10 @@ function NavigationItem(props) {
         bg={"transparent"}
         sx={{
           px: 2,
-          flex: 1
+          flex: 1,
+          alignItems: "center",
+          justifyContent: isTablet ? "center" : "flex-start",
+          display: "flex"
         }}
         label={title}
         title={title}
@@ -72,9 +76,6 @@ function NavigationItem(props) {
           if (isMobile) toggleSideMenu(false);
           props.onClick();
         }}
-        display="flex"
-        justifyContent={isTablet ? "center" : "flex-start"}
-        alignItems="center"
       >
         <Icon
           size={isTablet ? 18 : 15}
@@ -97,14 +98,14 @@ function NavigationItem(props) {
         )}
 
         <Text
-          display={isTablet ? "none" : "block"}
           variant="body"
-          fontSize="subtitle"
           sx={{
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            fontWeight: props.selected ? "bold" : "normal"
+            fontWeight: props.selected ? "bold" : "normal",
+            fontSize: "subtitle",
+            display: isTablet ? "none" : "block"
           }}
           ml={1}
         >

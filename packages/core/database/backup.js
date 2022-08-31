@@ -1,26 +1,27 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import Migrator from "./migrator.js";
 import {
   CHECK_IDS,
   checkIsUserPremium,
-  CURRENT_DATABASE_VERSION,
+  CURRENT_DATABASE_VERSION
 } from "../common.js";
 import SparkMD5 from "spark-md5";
 
@@ -77,7 +78,7 @@ export default class Backup {
       type,
       date: Date.now(),
       data,
-      ...hash,
+      ...hash
     });
   }
 
@@ -158,25 +159,25 @@ export default class Backup {
     const collections = [
       {
         index: data["attachments"],
-        dbCollection: this._db.attachments,
+        dbCollection: this._db.attachments
       },
       {
         index: data["notebooks"],
-        dbCollection: this._db.notebooks,
+        dbCollection: this._db.notebooks
       },
       {
         index: data["content"],
-        dbCollection: this._db.content,
+        dbCollection: this._db.content
       },
       {
         index: data["notes"],
-        dbCollection: this._db.notes,
+        dbCollection: this._db.notes
       },
       {
         index: ["settings"],
         dbCollection: this._db.settings,
-        type: "settings",
-      },
+        type: "settings"
+      }
     ];
 
     await this._db.syncer.acquireLock(async () => {

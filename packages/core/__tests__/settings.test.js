@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { databaseTest, notebookTest, StorageInterface } from "./utils";
 
@@ -46,8 +47,8 @@ test("tag alias should update if aliases in settings update", () =>
       pins: [],
       groupOptions: {},
       aliases: {
-        [tag.id]: "hello232",
-      },
+        [tag.id]: "hello232"
+      }
     });
     expect(db.tags.tag(tag.id).alias).toBe("hello232");
   }));
@@ -57,7 +58,7 @@ test("save group options", () =>
     const groupOptions = {
       groupBy: "abc",
       sortBy: "dateCreated",
-      sortDirection: "asc",
+      sortDirection: "asc"
     };
     await db.settings.setGroupOptions("home", groupOptions);
     expect(db.settings.getGroupOptions("home")).toMatchObject(groupOptions);
@@ -67,7 +68,7 @@ test("save toolbar config", () =>
   databaseTest().then(async (db) => {
     const toolbarConfig = {
       preset: "custom",
-      config: ["bold", "italic"],
+      config: ["bold", "italic"]
     };
     await db.settings.setToolbarConfig("mobile", toolbarConfig);
     expect(db.settings.getToolbarConfig("mobile")).toMatchObject(toolbarConfig);

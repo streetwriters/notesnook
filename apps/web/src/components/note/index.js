@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import React, { useMemo } from "react";
-import { Button, Flex, Text } from "@streetwriters/rebass";
+import { Button, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
@@ -110,10 +111,10 @@ function Note(props) {
       }
       footer={
         <Flex
-          alignItems="center"
           sx={{
             fontSize: "subBody",
-            color: isOpened ? "bgSecondaryText" : "fontTertiary"
+            color: isOpened ? "bgSecondaryText" : "fontTertiary",
+            alignItems: "center"
           }}
         >
           {isCompact ? (
@@ -188,7 +189,6 @@ function Note(props) {
                     key={tag.id}
                     variant="anchor"
                     mr={1}
-                    color="fontTertiary"
                     title={`Go to #${tag.alias}`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -198,7 +198,8 @@ function Note(props) {
                     sx={{
                       maxWidth: `calc(100% / ${tags.length})`,
                       overflow: "hidden",
-                      textOverflow: "ellipsis"
+                      textOverflow: "ellipsis",
+                      color: "fontTertiary"
                     }}
                   >
                     #{tag.alias}

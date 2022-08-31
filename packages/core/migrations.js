@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { parseHTML } from "./utils/html-parser";
 import { decodeHTML5 } from "entities";
@@ -36,14 +37,14 @@ export const migrations = {
       item.data = removeToxClassFromChecklist(wrapTablesWithDiv(item.data));
       return migrations["5.3"].tiny(item);
     },
-    settings: replaceDateEditedWithDateModified(true),
+    settings: replaceDateEditedWithDateModified(true)
   },
   5.3: {
     tiny: (item) => {
       if (!item.data || item.data.iv) return migrations["5.4"].tiny(item);
       item.data = decodeWrappedTableHtml(item.data);
       return migrations["5.4"].tiny(item);
-    },
+    }
   },
   5.4: {
     tiny: (item) => {
@@ -51,7 +52,7 @@ export const migrations = {
       item.type = "tiptap";
       item.data = tinyToTiptap(item.data);
       return item;
-    },
+    }
   },
   5.5: {},
   5.6: {
@@ -62,8 +63,8 @@ export const migrations = {
     trash: false,
     tiny: false,
     tiptap: false,
-    settings: false,
-  },
+    settings: false
+  }
 };
 
 function replaceDateEditedWithDateModified(removeDateEditedProperty = false) {

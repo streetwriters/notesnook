@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import Collection from "./collection";
 import getId from "../utils/id";
@@ -44,7 +45,7 @@ export default class Content extends Collection {
       content = {
         ...oldContent,
         ...content,
-        dateEdited: content.dateEdited || Date.now(),
+        dateEdited: content.dateEdited || Date.now()
       };
     }
 
@@ -60,14 +61,14 @@ export default class Content extends Collection {
       dateModified: content.dateModified,
       localOnly: !!content.localOnly,
       conflicted: content.conflicted,
-      dateResolved: content.dateResolved,
+      dateResolved: content.dateResolved
     });
     await this._collection.addItem(contentItem);
 
     if (content.sessionId) {
       await this._db.noteHistory.add(contentItem.noteId, content.sessionId, {
         data: contentItem.data,
-        type: contentItem.type,
+        type: contentItem.type
       });
     }
     return id;
@@ -121,7 +122,7 @@ export default class Content extends Collection {
       const progressData = {
         total,
         current,
-        groupId,
+        groupId
       };
 
       return this._db.attachments._downloadMedia(

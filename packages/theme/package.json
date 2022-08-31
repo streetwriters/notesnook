@@ -8,8 +8,7 @@
     "url": "git://github.com/streetwriters/themeprovider.git"
   },
   "dependencies": {
-    "@streetwriters/rebass": "^5.0.0",
-    "@streetwriters/rebass-forms": "^5.0.0",
+    "@theme-ui/core": "^0.14.7",
     "tinycolor2": "^1.4.2"
   },
   "devDependencies": {

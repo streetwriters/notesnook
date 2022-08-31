@@ -1,24 +1,25 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import Modal from "react-modal";
 import { useTheme } from "@emotion/react";
-import { Flex } from "@streetwriters/rebass";
+import { Flex } from "@theme-ui/components";
 import AnnouncementBody from "../announcements/body";
 
 function AnnouncementDialog(props) {
@@ -70,17 +71,17 @@ function AnnouncementDialog(props) {
       }}
     >
       <Flex
-        flexDirection="column"
-        width={["100%", "80%", "30%"]}
-        maxHeight={["100%", "80%", "80%"]}
         bg="background"
-        alignSelf={"center"}
-        overflowY="auto"
         sx={{
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "dialog"
+          borderRadius: "dialog",
+          flexDirection: "column",
+          width: ["100%", "80%", "30%"],
+          maxHeight: ["100%", "80%", "80%"],
+          alignSelf: "center",
+          overflowY: "auto"
         }}
       >
         <AnnouncementBody

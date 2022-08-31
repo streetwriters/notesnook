@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import Collection from "./collection";
 import Notebook from "../models/notebook";
@@ -60,7 +61,7 @@ export default class Notebooks extends Collection {
           remoteNotebook.topics[newTopicIndex] = {
             ...oldTopic,
             notes: setManipulator.union(oldTopic.notes, newTopic.notes),
-            dateEdited: Date.now(),
+            dateEdited: Date.now()
           };
           isChanged = true;
         }
@@ -104,7 +105,7 @@ export default class Notebooks extends Collection {
 
     let notebook = {
       ...oldNotebook,
-      ...notebookArg,
+      ...notebookArg
     };
 
     if (!notebook.title) throw new Error("Notebook must contain a title.");
@@ -119,7 +120,7 @@ export default class Notebooks extends Collection {
 
       dateCreated: notebook.dateCreated,
       dateModified: notebook.dateModified,
-      dateEdited: Date.now(),
+      dateEdited: Date.now()
     };
 
     await this._collection.addItem(notebook);

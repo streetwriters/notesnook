@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import Database from "../../index";
 import { NodeStorageInterface } from "../../../__mocks__/node-storage.mock";
@@ -52,10 +53,10 @@ test("case 3: Device A & B have unsynced changes but server has nothing", async 
   const deviceB = await initializeDevice("deviceB");
 
   const note1Id = await deviceA.notes.add({
-    title: "Test note from device A",
+    title: "Test note from device A"
   });
   const note2Id = await deviceB.notes.add({
-    title: "Test note from device B",
+    title: "Test note from device B"
   });
 
   await syncAndWait(deviceA, deviceB);
@@ -218,8 +219,8 @@ test("issue: colors are not properly created if multiple notes are synced togeth
     const id = await deviceA.notes.add({
       content: {
         type: "tiptap",
-        data: `<p>deviceA=true</p>`,
-      },
+        data: `<p>deviceA=true</p>`
+      }
     });
     noteIds.push(id);
   }
@@ -287,7 +288,7 @@ test("issue: remove notebook reference from notes that are removed from topic du
 
   const id = await deviceA.notebooks.add({
     title: "Notebook 1",
-    topics: ["Topic 1"],
+    topics: ["Topic 1"]
   });
 
   await syncAndWait(deviceA, deviceB, false);
@@ -334,7 +335,7 @@ async function initializeDevice(id, capabilities = []) {
   EV.subscribe(EVENTS.userCheckStatus, async (type) => {
     return {
       type,
-      result: capabilities.indexOf(type) > -1,
+      result: capabilities.indexOf(type) > -1
     };
   });
 

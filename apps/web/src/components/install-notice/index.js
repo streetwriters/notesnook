@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import ReactDOM from "react-dom";
-import { Box, Button, Flex, Text } from "@streetwriters/rebass";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Config from "../../utils/config";
 import { getDownloadLink, getPlatform } from "../../utils/platform";
 import DropdownButton from "../dropdown-button";
@@ -51,7 +52,6 @@ function getOptions(onClose) {
 export default function InstallNotice({ onClose }) {
   return (
     <Flex
-      flexDirection={"column"}
       sx={{
         position: "absolute",
         top: ["initial", 2],
@@ -62,7 +62,8 @@ export default function InstallNotice({ onClose }) {
         bg: "background",
         borderRadius: "default",
         border: "1px solid var(--border)",
-        width: ["95%", 400]
+        width: ["95%", 400],
+        flexDirection: "column"
       }}
       p={2}
     >
@@ -97,16 +98,16 @@ export default function InstallNotice({ onClose }) {
         </Box>
       )}
 
-      <Flex mt={[4, 1]} alignItems={"center"}>
+      <Flex mt={[4, 1]} sx={{ alignItems: "center" }}>
         <DropdownButton title={"Options"} options={getOptions(onClose)} />
         <Button
           variant={"secondary"}
           ml={1}
-          alignSelf={"start"}
           onClick={() => {
             onClose();
             Config.set("installNotice", false);
           }}
+          sx={{ alignSelf: "start" }}
         >
           {`Don't show again`}
         </Button>

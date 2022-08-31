@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { CURRENT_DATABASE_VERSION } from "../common";
 import Migrator from "../database/migrator";
@@ -51,33 +52,33 @@ class Migrations {
       { index: this._db.attachments.all, dbCollection: this._db.attachments },
       {
         index: this._db.notebooks.raw,
-        dbCollection: this._db.notebooks,
+        dbCollection: this._db.notebooks
       },
       {
         index: this._db.tags.raw,
-        dbCollection: this._db.tags,
+        dbCollection: this._db.tags
       },
       {
         index: this._db.colors.raw,
-        dbCollection: this._db.colors,
+        dbCollection: this._db.colors
       },
       {
         index: this._db.trash.raw,
-        dbCollection: this._db.trash,
+        dbCollection: this._db.trash
       },
       {
         index: content,
-        dbCollection: this._db.content,
+        dbCollection: this._db.content
       },
       {
         index: [this._db.settings.raw],
         dbCollection: this._db.settings,
-        type: "settings",
+        type: "settings"
       },
       {
         index: this._db.notes.raw,
-        dbCollection: this._db.notes,
-      },
+        dbCollection: this._db.notes
+      }
     ];
     await this._migrator.migrate(collections, (item) => item, this.dbVersion);
     await this._db.storage.write("v", CURRENT_DATABASE_VERSION);

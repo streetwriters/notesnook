@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import React, { useState, Suspense, useMemo, useRef, useEffect } from "react";
-import { Box, Flex } from "@streetwriters/rebass";
+import { Box, Flex } from "@theme-ui/components";
 import ThemeProvider from "./components/theme-provider";
 import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
@@ -67,11 +68,9 @@ function App() {
           </Suspense>
         )}
         <Flex
-          flexDirection="column"
           id="app"
           bg="background"
-          height="100%"
-          sx={{ overflow: "hidden" }}
+          sx={{ overflow: "hidden", flexDirection: "column", height: "100%" }}
         >
           {isMobile ? (
             <MobileAppContents isAppLoaded={isAppLoaded} />
@@ -174,9 +173,9 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             <Flex
               sx={{
                 overflow: "hidden",
-                flex: 1
+                flex: 1,
+                flexDirection: "column"
               }}
-              flexDirection="column"
             >
               <SuspenseLoader
                 fallback={<EditorLoader />}
@@ -202,22 +201,22 @@ function MobileAppContents({ isAppLoaded }) {
     <Flex
       id="slider"
       variant="rowFill"
-      overflowX={"auto"}
       sx={{
         overflowY: "hidden",
         scrollSnapType: "x mandatory",
         scrollBehavior: "smooth",
         WebkitOverflowScrolling: "touch",
         scrollSnapStop: "always",
-        overscrollBehavior: "contain"
+        overscrollBehavior: "contain",
+        overflowX: "auto"
       }}
     >
       <Flex
-        flexShrink={0}
         sx={{
           scrollSnapAlign: "start",
           scrollSnapStop: "always",
-          width: [300, 60]
+          width: [300, 60],
+          flexShrink: 0
         }}
       >
         <SuspenseLoader
@@ -232,13 +231,13 @@ function MobileAppContents({ isAppLoaded }) {
       <Flex
         className="listMenu"
         variant="columnFill"
-        width={"100vw"}
         sx={{
           position: "relative",
           scrollSnapAlign: "start",
-          scrollSnapStop: "always"
+          scrollSnapStop: "always",
+          flexShrink: 0,
+          width: "100vw"
         }}
-        flexShrink={0}
       >
         <SuspenseLoader
           condition={isAppLoaded}
@@ -262,13 +261,13 @@ function MobileAppContents({ isAppLoaded }) {
         />
       </Flex>
       <Flex
-        width={"100vw"}
-        flexShrink={0}
         sx={{
           scrollSnapAlign: "start",
-          scrollSnapStop: "always"
+          scrollSnapStop: "always",
+          flexDirection: "column",
+          flexShrink: 0,
+          width: "100vw"
         }}
-        flexDirection="column"
       >
         <SuspenseLoader
           fallback={<EditorLoader />}

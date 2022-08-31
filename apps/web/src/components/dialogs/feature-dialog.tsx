@@ -1,22 +1,23 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Text, Flex, BoxProps } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Text, Flex, BoxProps } from "@theme-ui/components";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { getHomeRoute, hardNavigate } from "../../navigation";
@@ -27,12 +28,12 @@ import { useEffect } from "react";
 
 type CallToAction = {
   title: string;
-  icon?: (props: BoxProps) => JSX.Element;
+  icon?: (props: BoxProps & { size: number }) => JSX.Element;
   action?: () => void;
 };
 type SubFeature = {
   title: string;
-  icon?: (props: BoxProps) => JSX.Element;
+  icon?: (props: BoxProps & { size: number }) => JSX.Element;
   subtitle?: string | JSX.Element;
 };
 type Feature = {
@@ -163,24 +164,27 @@ function FeatureDialog(props: FeatureDialogProps) {
         }
       }}
     >
-      <Flex flexDirection="column" overflowY="auto" mt={2}>
+      <Flex mt={2} sx={{ flexDirection: "column", overflowY: "auto" }}>
         {feature.subFeatures?.map((feature) => (
           <Flex
             key={feature.title}
             mb={2}
             bg="bgSecondary"
             p={2}
-            sx={{ borderRadius: "default", ":hover": { bg: "hover" } }}
-            flexDirection="column"
+            sx={{
+              borderRadius: "default",
+              ":hover": { bg: "hover" },
+              flexDirection: "column"
+            }}
           >
-            <Flex alignItems={"center"} justifyContent="start">
+            <Flex sx={{ alignItems: "center", justifyContent: "start" }}>
               {feature.icon && <feature.icon size={14} color="primary" />}
-              <Text variant="subtitle" fontWeight="normal" ml={1}>
+              <Text variant="subtitle" ml={1} sx={{ fontWeight: "normal" }}>
                 {feature.title}
               </Text>
             </Flex>
             {feature.subtitle && (
-              <Text variant="body" color="icon">
+              <Text variant="body" sx={{ color: "icon" }}>
                 {feature.subtitle}
               </Text>
             )}

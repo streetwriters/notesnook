@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import EventManager from "./utils/event-manager";
 
@@ -33,7 +34,7 @@ export function sendAttachmentsProgressEvent(type, groupId, total, current) {
     type,
     groupId,
     total,
-    current: current === undefined ? total : current,
+    current: current === undefined ? total : current
   });
 }
 
@@ -41,7 +42,7 @@ export function sendSyncProgressEvent(EV, type, total, current) {
   EV.publish(EVENTS.syncProgress, {
     type,
     total,
-    current: current === undefined ? total : current,
+    current: current === undefined ? total : current
   });
 }
 
@@ -54,7 +55,7 @@ export const CHECK_IDS = {
   vaultAdd: "vault:add",
   notebookAdd: "notebook:add",
   backupEncrypt: "backup:encrypt",
-  databaseSync: "database:sync",
+  databaseSync: "database:sync"
 };
 
 export const EVENTS = {
@@ -79,7 +80,7 @@ export const EVENTS = {
   attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
   vaultLocked: "vault:locked",
-  systemTimeInvalid: "system:invalidTime",
+  systemTimeInvalid: "system:invalidTime"
 };
 
 export const CURRENT_DATABASE_VERSION = 5.6;

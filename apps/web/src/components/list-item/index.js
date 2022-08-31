@@ -1,22 +1,23 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Box, Flex, Text } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Box, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import {
   store as selectionStore,
@@ -132,7 +133,10 @@ function ListItem(props) {
           // outline: `1px solid var(--${primary})`,
         },
         overflow: "hidden",
-        maxWidth: "100%"
+        maxWidth: "100%",
+        flexDirection: isCompact ? "row" : "column",
+        justifyContent: isCompact ? "space-between" : "center",
+        alignItems: isCompact ? "center" : undefined
       }}
       onKeyPress={(e) => {
         if (e.key === "Enter") {
@@ -141,9 +145,6 @@ function ListItem(props) {
           if (props.onKeyPress) props.onKeyPress(e);
         }
       }}
-      flexDirection={isCompact ? "row" : "column"}
-      justifyContent={isCompact ? "space-between" : "center"}
-      alignItems={isCompact ? "center" : undefined}
       onClick={(e) => {
         if (e.shiftKey) {
           //ignore (handled by listcontainer)
@@ -164,13 +165,13 @@ function ListItem(props) {
       <Text
         data-test-id={`${props.item.type}-${props.index}-title`}
         variant={"subtitle"}
-        fontWeight={isCompact ? "body" : "bold"}
-        color={text}
-        display={"block"}
         sx={{
           whiteSpace: "nowrap",
           overflow: "hidden",
-          textOverflow: "ellipsis"
+          textOverflow: "ellipsis",
+          fontWeight: isCompact ? "body" : "bold",
+          color: text,
+          display: "block"
         }}
       >
         {props.title}
@@ -195,7 +196,11 @@ function ListItem(props) {
         </Text>
       )}
       {props.footer ? (
-        <Box flexShrink={0} ml={isCompact ? 1 : 0} mt={isCompact ? 0 : 1}>
+        <Box
+          ml={isCompact ? 1 : 0}
+          mt={isCompact ? 0 : 1}
+          sx={{ flexShrink: 0 }}
+        >
           {props.footer}
         </Box>
       ) : null}

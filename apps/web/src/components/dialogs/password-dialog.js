@@ -1,26 +1,27 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useState, useCallback, useMemo } from "react";
-import { Box, Text } from "@streetwriters/rebass";
+import { Box, Text } from "@theme-ui/components";
 import Dialog from "./dialog";
 import Field from "../field";
-import { Checkbox, Label } from "@streetwriters/rebass-forms";
+import { Checkbox, Label } from "@theme-ui/components";
 
 function PasswordDialog(props) {
   const { type, checks } = props;
@@ -103,7 +104,11 @@ function PasswordDialog(props) {
 
         {checks &&
           checks.map((check) => (
-            <Label key={check.key} alignItems="center" fontSize="title" mt={2}>
+            <Label
+              key={check.key}
+              mt={2}
+              sx={{ fontSize: "title", alignItems: "center" }}
+            >
               <Checkbox id={check.key} name={check.key} />
               {check.title}
             </Label>

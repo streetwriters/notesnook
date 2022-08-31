@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useState, useEffect, useCallback } from "react";
-import { Flex, Text, Button } from "@streetwriters/rebass";
+import { Flex, Text, Button } from "@theme-ui/components";
 import * as Icon from "../icons";
 import ContentToggle from "./content-toggle";
 import { store as notesStore } from "../../stores/note-store";
@@ -124,29 +125,28 @@ function DiffViewer(props) {
   return (
     <Flex
       className="diffviewer"
-      width="100%"
-      flex="1 1 auto"
-      flexDirection="column"
-      overflow="hidden"
+      sx={{
+        flex: "1 1 auto",
+        flexDirection: "column",
+        width: "100%",
+        overflow: "hidden"
+      }}
     >
       <Text
         mt={2}
         variant="heading"
-        textAlign="center"
         sx={{
           flexShrink: 0,
           whiteSpace: "nowrap",
           overflow: "hidden",
-          textOverflow: "ellipsis"
+          textOverflow: "ellipsis",
+          textAlign: "center"
         }}
       >
         {conflictedNote.title}
       </Text>
-      <Flex alignSelf="center" justifySelf="center" mt={1}>
+      <Flex mt={1} sx={{ alignSelf: "center", justifySelf: "center" }}>
         <Button
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
           variant="tool"
           onClick={async () => {
             setIsDownloadingImages(true);
@@ -167,29 +167,41 @@ function DiffViewer(props) {
           }}
           disabled={isDownloadingImages}
           mr={2}
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+            display: "flex"
+          }}
         >
           {isDownloadingImages ? (
             <Icon.Loading size={18} />
           ) : (
             <Icon.ImageDownload size={18} />
           )}
-          <Text display={["none", "block", "block"]} fontSize="body" ml={1}>
+          <Text
+            ml={1}
+            sx={{ fontSize: "body", display: ["none", "block", "block"] }}
+          >
             {isDownloadingImages ? "Downloading..." : "Load images"}
           </Text>
         </Button>
       </Flex>
       <ScrollSync>
         <Flex
-          flex="1 1 auto"
-          flexDirection={["column", "column", "row"]}
-          overflow="hidden"
+          sx={{
+            flex: "1 1 auto",
+            flexDirection: ["column", "column", "row"],
+            overflow: "hidden"
+          }}
         >
           <Flex
-            flexDirection="column"
             className="firstEditor"
-            height={["50%", "50%", "100%"]}
-            width={["100%", "100%", "50%"]}
-            flex="1 1 auto"
+            sx={{
+              flex: "1 1 auto",
+              flexDirection: "column",
+              width: ["100%", "100%", "50%"],
+              height: ["50%", "50%", "100%"]
+            }}
           >
             <ContentToggle
               label="Current note"
@@ -236,11 +248,13 @@ function DiffViewer(props) {
             </ScrollSyncPane>
           </Flex>
           <Flex
-            flexDirection="column"
             className="secondEditor"
-            flex="1 1 auto"
-            height={["50%", "50%", "100%"]}
-            width={["100%", "100%", "50%"]}
+            sx={{
+              flex: "1 1 auto",
+              flexDirection: "column",
+              width: ["100%", "100%", "50%"],
+              height: ["50%", "50%", "100%"]
+            }}
           >
             <ContentToggle
               resolveConflict={({ saveCopy }) => {

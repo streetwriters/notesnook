@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import "../types";
 import { getWeekGroupFromTimestamp, MONTHS_FULL } from "./date";
@@ -25,20 +26,20 @@ const MILLISECONDS_IN_WEEK = MILLISECONDS_IN_DAY * 7;
 const comparators = {
   dateEdited: {
     asc: (a, b) => a.dateEdited - b.dateEdited,
-    desc: (a, b) => b.dateEdited - a.dateEdited,
+    desc: (a, b) => b.dateEdited - a.dateEdited
   },
   dateCreated: {
     asc: (a, b) => a.dateCreated - b.dateCreated,
-    desc: (a, b) => b.dateCreated - a.dateCreated,
+    desc: (a, b) => b.dateCreated - a.dateCreated
   },
   dateDeleted: {
     asc: (a, b) => a.dateDeleted - b.dateDeleted,
-    desc: (a, b) => b.dateDeleted - a.dateDeleted,
+    desc: (a, b) => b.dateDeleted - a.dateDeleted
   },
   title: {
     asc: (a, b) => getTitle(a).localeCompare(getTitle(b)),
-    desc: (a, b) => getTitle(b).localeCompare(getTitle(a)),
-  },
+    desc: (a, b) => getTitle(b).localeCompare(getTitle(a))
+  }
 };
 
 function getTitle(item) {
@@ -63,7 +64,7 @@ const KEY_SELECTORS = {
       : date > dateNow.getTime() - MILLISECONDS_IN_WEEK * 2
       ? "Last week"
       : "Older";
-  },
+  }
 };
 
 /**
@@ -76,7 +77,7 @@ export function groupArray(
   options = {
     groupBy: "default",
     sortBy: "dateEdited",
-    sortDirection: "desc",
+    sortDirection: "desc"
   }
 ) {
   const cachedDate = new Date();
@@ -111,7 +112,7 @@ export function groupArray(
 
   const groups = new Map([
     ["Conflicted", []],
-    ["Pinned", []],
+    ["Pinned", []]
   ]);
 
   const keySelector = KEY_SELECTORS[options.groupBy || "default"];

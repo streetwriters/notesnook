@@ -1,24 +1,25 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useState } from "react";
-import { Button, Flex, Text } from "@streetwriters/rebass";
-import { Input, Label } from "@streetwriters/rebass-forms";
+import { Button, Flex, Text } from "@theme-ui/components";
+import { Input, Label } from "@theme-ui/components";
 import * as Icon from "../icons";
 
 const passwordValidationRules = [
@@ -75,7 +76,7 @@ function Field(props) {
   const [rules, setRules] = useState(passwordValidationRules);
 
   return (
-    <Flex sx={{ ...sx, ...styles.container }} flexDirection="column">
+    <Flex sx={{ ...sx, ...styles.container, flexDirection: "column" }}>
       <Label
         htmlFor={id}
         sx={{
@@ -192,7 +193,7 @@ function Field(props) {
         )}
       </Flex>
       {validatePassword && (
-        <Flex flexDirection="column" mt={1}>
+        <Flex mt={1} sx={{ flexDirection: "column" }}>
           {rules.map((rule) => (
             <Flex key={rule.title}>
               {rule.isValid ? (
@@ -200,7 +201,7 @@ function Field(props) {
               ) : (
                 <Icon.Cross color="error" size={14} />
               )}
-              <Text fontSize="body" color="text" ml={1}>
+              <Text ml={1} sx={{ fontSize: "body", color: "text" }}>
                 {rule.title}
               </Text>
             </Flex>

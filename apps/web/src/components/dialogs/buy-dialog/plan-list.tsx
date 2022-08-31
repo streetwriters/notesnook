@@ -1,22 +1,23 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Text, Flex, Button } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Text, Flex, Button } from "@theme-ui/components";
 import * as Icon from "../../icons";
 import { ReactComponent as Nomad } from "../../../assets/nomad.svg";
 import { Period, Plan } from "./types";
@@ -40,10 +41,10 @@ export function PlansList(props: PlansListProps) {
   return (
     <>
       <Nomad width={200} />
-      <Text variant="heading" textAlign="center" mt={4}>
+      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Choose a plan
       </Text>
-      <Text variant="body" textAlign="center" mt={1}>
+      <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
         {discount ? (
           <>
             We are giving a special <b>{discount}% discount</b> to all users
@@ -53,7 +54,7 @@ export function PlansList(props: PlansListProps) {
           "Notesnook profits when you purchase a subscription — not by selling your data."
         )}
       </Text>
-      <Flex flexDirection="column" alignSelf="stretch" mt={2}>
+      <Flex mt={2} sx={{ flexDirection: "column", alignSelf: "stretch" }}>
         {plans.map((plan) => {
           const metadata = PLAN_METADATA[plan.period];
           return (
@@ -62,11 +63,6 @@ export function PlansList(props: PlansListProps) {
               disabled={isLoading}
               data-test-id={`checkout-plan-${plan.period}`}
               variant="tool"
-              display="flex"
-              textAlign="start"
-              justifyContent="space-between"
-              alignItems="center"
-              flex={1}
               mt={1}
               bg="transparent"
               // sx={
@@ -77,10 +73,20 @@ export function PlansList(props: PlansListProps) {
               //   }
               // }
               onClick={() => onPlanSelected(plan)}
+              sx={{
+                flex: 1,
+                textAlign: "start",
+                alignItems: "center",
+                justifyContent: "space-between",
+                display: "flex"
+              }}
             >
-              <Text variant="subtitle" fontWeight="normal">
+              <Text variant="subtitle" sx={{ fontWeight: "normal" }}>
                 {metadata.title}
-                <Text variant="body" fontWeight="normal" color="fontTertiary">
+                <Text
+                  variant="body"
+                  sx={{ fontWeight: "normal", color: "fontTertiary" }}
+                >
                   {metadata.subtitle}
                 </Text>
               </Text>
@@ -100,23 +106,23 @@ function RecurringPricing(props: RecurringPricingProps) {
   const { plan } = props;
   return (
     <Text
-      sx={{ flexShrink: 0 }}
+      sx={{ flexShrink: 0, fontSize: "subBody", textAlign: "end" }}
       variant="body"
-      fontSize="subBody"
-      textAlign={"end"}
     >
       {plan.originalPrice && (
         <Text
-          color="fontTertiary"
-          fontSize={"body"}
-          sx={{ textDecorationLine: "line-through" }}
+          sx={{
+            textDecorationLine: "line-through",
+            fontSize: "body",
+            color: "fontTertiary"
+          }}
         >
           {getCurrencySymbol(plan.currency)}
           {plan.originalPrice.gross}
         </Text>
       )}
       <Text>
-        <Text as="span" fontSize="subtitle">
+        <Text as="span" sx={{ fontSize: "subtitle" }}>
           {getCurrencySymbol(plan.currency)}
           {plan.price.gross}
         </Text>

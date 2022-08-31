@@ -1,22 +1,23 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Text, Flex, Button, Image, Box } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Text, Flex, Button, Image, Box } from "@theme-ui/components";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { ReactComponent as E2E } from "../../assets/e2e.svg";
@@ -29,7 +30,7 @@ import DarkUI from "../../assets/dark1.png";
 import GooglePlay from "../../assets/play.png";
 import AppleStore from "../../assets/apple.png";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { Checkbox, Label } from "@streetwriters/rebass-forms";
+import { Checkbox, Label } from "@theme-ui/components";
 import { Features } from "../announcements/body";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { TaskManager } from "../../common/task-manager";
@@ -155,16 +156,20 @@ function OnboardingDialog({ onClose: _onClose, type }) {
 
   return (
     <Dialog isOpen={true} width={500}>
-      <Flex flexDirection="column" overflowY="auto" alignItems={"center"}>
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          overflowY: "auto"
+        }}
+      >
         {image}
         <Text variant={"heading"} mt={2}>
           {title}
         </Text>
         <Text
           variant={"body"}
-          color="fontTertiary"
-          textAlign={"center"}
-          maxWidth="70%"
+          sx={{ textAlign: "center", maxWidth: "70%", color: "fontTertiary" }}
         >
           {subtitle}
         </Text>
@@ -185,7 +190,7 @@ export default OnboardingDialog;
 
 function JoinCause({ onNext }) {
   return (
-    <Flex mb={4} flexDirection={"column"}>
+    <Flex mb={4} sx={{ flexDirection: "column" }}>
       <Button
         as="a"
         href="https://discord.com/invite/zQBK97EE22"
@@ -199,9 +204,9 @@ function JoinCause({ onNext }) {
       </Button>
       <Button
         variant={"anchor"}
-        color="fontTertiary"
         mt={2}
         onClick={() => onNext()}
+        sx={{ color: "fontTertiary" }}
       >
         Skip for now
       </Button>
@@ -219,7 +224,7 @@ const importers = [
 ];
 function Importer({ onClose }) {
   return (
-    <Flex my={4} flexDirection={"column"}>
+    <Flex my={4} sx={{ flexDirection: "column" }}>
       <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 1 }}>
         {importers.map((importer) => (
           <Flex
@@ -234,7 +239,7 @@ function Importer({ onClose }) {
               p: 1
             }}
           >
-            <Text variant={"body"} textAlign="center" ml={1}>
+            <Text variant={"body"} ml={1} sx={{ textAlign: "center" }}>
               {importer.title}
             </Text>
           </Flex>
@@ -253,9 +258,9 @@ function Importer({ onClose }) {
       </Button>
       <Button
         variant={"anchor"}
-        color="fontTertiary"
         mt={2}
         onClick={() => onClose()}
+        sx={{ color: "fontTertiary" }}
       >
         Skip for now
       </Button>
@@ -352,10 +357,7 @@ function ThemeSelector() {
         return (
           <Flex
             key={theme.key}
-            flexDirection={"column"}
             p={20}
-            alignItems="center"
-            justifyContent={"center"}
             sx={{
               borderRight: "1px solid var(--border)",
               bg: isSelected ? "bgSecondary" : "transparent",
@@ -365,7 +367,10 @@ function ThemeSelector() {
               },
               ":hover": {
                 bg: "hover"
-              }
+              },
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center"
             }}
             onClick={() => {
               setTheme(theme.key);
@@ -379,7 +384,7 @@ function ThemeSelector() {
                 boxShadow: isSelected ? "0px 0px 10px 1px #00000016" : "none"
               }}
             />
-            <Text variant={"subtitle"} color="icon" mt={2}>
+            <Text variant={"subtitle"} mt={2} sx={{ color: "icon" }}>
               {theme.name}
             </Text>
           </Flex>
@@ -395,13 +400,13 @@ function TrackingConsent() {
     true
   );
   return (
-    <Label variant="text.subBody" my={4} width="80%">
+    <Label variant="text.subBody" my={4} sx={{ width: "80%" }}>
       <Checkbox
-        width={14}
         checked={enableTelemetry}
         onChange={(e) => {
           setEnableTelemetry(e.target.checked);
         }}
+        sx={{ width: 14 }}
       />
       <Text>
         Help improve Notesnook by sending completely anonymized product
@@ -413,9 +418,9 @@ function TrackingConsent() {
 
 function CrossPlatform() {
   return (
-    <Flex my={4} alignItems="center">
-      <Image src={GooglePlay} flexShrink={0} width={135} />
-      <Image src={AppleStore} flexShrink={0} width={110} />
+    <Flex my={4} sx={{ alignItems: "center" }}>
+      <Image src={GooglePlay} sx={{ flexShrink: 0, width: 135 }} />
+      <Image src={AppleStore} sx={{ flexShrink: 0, width: 110 }} />
     </Flex>
   );
 }
@@ -426,9 +431,11 @@ function TrialOffer({ onClose }) {
   return (
     <Flex
       my={4}
-      flexDirection="column"
-      justifyContent={"center"}
-      alignItems="center"
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
     >
       <Features item={{ style: {} }} />
       {error ? (
@@ -436,9 +443,8 @@ function TrialOffer({ onClose }) {
           variant={"body"}
           mt={2}
           bg="errorBg"
-          color="error"
           p={1}
-          sx={{ borderRadius: "default" }}
+          sx={{ borderRadius: "default", color: "error" }}
         >
           {error}
         </Text>
@@ -447,15 +453,14 @@ function TrialOffer({ onClose }) {
           variant={"body"}
           mt={2}
           bg="bgSecondary"
-          color="icon"
           p={1}
-          sx={{ borderRadius: "default" }}
+          sx={{ borderRadius: "default", color: "icon" }}
         >
           <b>Note:</b> Upgrade now and get 50% discount on all plans.
         </Text>
       )}
 
-      <Flex mt={2} width="100%" justifyContent={"center"}>
+      <Flex mt={2} sx={{ justifyContent: "center", width: "100%" }}>
         <Button
           sx={{ borderRadius: 50, alignSelf: "center", mr: 2, width: "40%" }}
           onClick={() => {
@@ -496,9 +501,9 @@ function TrialOffer({ onClose }) {
       </Flex>
       <Button
         variant={"anchor"}
-        color="fontTertiary"
         mt={2}
         onClick={() => onClose()}
+        sx={{ color: "fontTertiary" }}
       >
         Skip for now
       </Button>

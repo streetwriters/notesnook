@@ -1,26 +1,27 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { ToolProps } from "../types";
 import { Editor } from "../../types";
 import { ToolButton } from "../components/tool-button";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Flex, Text } from "@streetwriters/rebass";
+import { Flex, Text } from "@theme-ui/components";
 import { ResponsivePresenter } from "../../components/responsive";
 import { MenuButton, MenuItem } from "../../components/menu/types";
 import {
@@ -65,7 +66,7 @@ export function TableSettings(props: ToolProps) {
 
 export function RowProperties(props: ToolProps) {
   const { editor } = props;
-  const buttonRef = useRef<HTMLButtonElement>();
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const items = useMemo(
     () => [
@@ -107,7 +108,7 @@ export function RowProperties(props: ToolProps) {
 
 export function ColumnProperties(props: ToolProps) {
   const { editor } = props;
-  const buttonRef = useRef<HTMLButtonElement>();
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const items = useMemo(
@@ -150,7 +151,7 @@ export function ColumnProperties(props: ToolProps) {
 
 export function TableProperties(props: ToolProps) {
   const { editor } = props;
-  const buttonRef = useRef<HTMLButtonElement>();
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const items = useMemo<MenuItem[]>(

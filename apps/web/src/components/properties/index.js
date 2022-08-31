@@ -1,24 +1,25 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import React, { useCallback, useEffect, useState } from "react";
 import * as Icon from "../icons";
-import { Flex, Text } from "@streetwriters/rebass";
+import { Flex, Text } from "@theme-ui/components";
 import { useStore, store } from "../../stores/editor-store";
 import { COLORS } from "../../common/constants";
 import { db } from "../../common/db";
@@ -131,9 +132,9 @@ function Properties(props) {
           borderLeft: "1px solid",
           borderLeftColor: "border",
           overflowY: "hidden",
-          overflowX: "hidden"
+          overflowX: "hidden",
+          flexDirection: "column"
         }}
-        flexDirection="column"
         bg="background"
         // px={2}
       >
@@ -165,21 +166,21 @@ function Properties(props) {
             {metadataItems.map((item) => (
               <Flex
                 key={item.key}
-                alignItems="center"
-                justifyContent="space-between"
                 py={2}
                 px={2}
                 sx={{
-                  borderBottom: "1px solid var(--border)"
+                  borderBottom: "1px solid var(--border)",
+                  alignItems: "center",
+                  justifyContent: "space-between"
                 }}
               >
-                <Text variant="body" color="fontTertiary">
+                <Text variant="body" sx={{ color: "fontTertiary" }}>
                   {item.label}
                 </Text>
                 <Text
                   className="selectable"
                   variant="body"
-                  color="fontTertiary"
+                  sx={{ color: "fontTertiary" }}
                 >
                   {item.value(session[item.key])}
                 </Text>
@@ -191,19 +192,19 @@ function Properties(props) {
                   py={2}
                   px={2}
                   sx={{
-                    cursor: "pointer"
+                    cursor: "pointer",
+                    justifyContent: "center"
                   }}
-                  justifyContent="center"
                 >
                   {COLORS.map((label) => (
                     <Flex
                       key={label}
-                      justifyContent="space-between"
-                      alignItems="center"
                       onClick={() => noteStore.get().setColor(sessionId, label)}
                       sx={{
                         cursor: "pointer",
-                        position: "relative"
+                        position: "relative",
+                        alignItems: "center",
+                        justifyContent: "space-between"
                       }}
                       data-test-id={`properties-${label}`}
                     >
@@ -244,14 +245,17 @@ function Properties(props) {
                       cursor: "pointer",
                       ":hover": {
                         bg: "hover"
-                      }
+                      },
+                      flexDirection: "column"
                     }}
-                    flexDirection="column"
                     onClick={() => {
                       navigate(`/notebooks/${notebook.data.id}`);
                     }}
                   >
-                    <Text variant="body" display="flex" alignItems="center">
+                    <Text
+                      variant="body"
+                      sx={{ alignItems: "center", display: "flex" }}
+                    >
                       <Icon.Notebook size={13} sx={{ flexShrink: 0, mr: 1 }} />
                       {notebook.title}
                     </Text>
@@ -333,10 +337,10 @@ function Properties(props) {
                     bg: isSelected ? "bgSecondary" : "transparent",
                     ":hover": {
                       bg: "hover"
-                    }
+                    },
+                    alignItems: "center",
+                    justifyContent: "space-between"
                   }}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
                   title="Click to preview"
                   onClick={async () => {
                     toggleProperties(false);
@@ -389,12 +393,12 @@ export default React.memo(Properties);
 function Card({ title, subtitle, button, children }) {
   return (
     <Flex
-      flexDirection="column"
       sx={{
-        borderRadius: "default"
+        borderRadius: "default",
+        flexDirection: "column"
       }}
     >
-      <Flex mx={2} mt={2} alignItems="center">
+      <Flex mx={2} mt={2} sx={{ alignItems: "center" }}>
         {button}
         <Text variant="subtitle">{title}</Text>
       </Flex>

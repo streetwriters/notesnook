@@ -1,22 +1,23 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Text, Flex, Box } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Text, Flex, Box } from "@theme-ui/components";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { showBuyDialog } from "../../common/dialog-controller";
@@ -40,7 +41,7 @@ const reminders = {
       title: (
         <>
           Subscribe now to{" "}
-          <Text as="span" fontWeight="bold" color="primary">
+          <Text as="span" sx={{ fontWeight: "bold", color: "primary" }}>
             get 30% off
           </Text>
           *
@@ -50,8 +51,8 @@ const reminders = {
     },
     features,
     // footer: (
-    //   <Flex bg="bgSecondary" pb={2} justifyContent="center">
-    //     <Button variant="anchor" color="text">
+    //   <Flex bg="bgSecondary" pb={2}  sx={{justifyContent: "center"}}>
+    //     <Button variant="anchor"  sx={{color: "text"}}>
     //       Can't decide yet? Extend your trial!
     //     </Button>
     //   </Flex>
@@ -112,19 +113,24 @@ function ReminderDialog(props) {
       footer={reminder.footer}
     >
       <Flex
-        flexDirection="column"
-        overflowY="auto"
-        justifyContent="center"
-        alignItems="center"
         mt={2}
-        overflow="hidden"
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          overflowY: "auto",
+          overflow: "hidden"
+        }}
       >
         {reminder.offer && (
           <>
-            <Text textAlign="center" variant="body" fontSize="title">
+            <Text
+              variant="body"
+              sx={{ fontSize: "title", textAlign: "center" }}
+            >
               {reminder.offer.title}
             </Text>
-            <Text textAlign="center" variant="body" opacity="0.8">
+            <Text variant="body" opacity="0.8" sx={{ textAlign: "center" }}>
               {reminder.offer.subtitle}
             </Text>
           </>

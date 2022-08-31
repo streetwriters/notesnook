@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useEffect, useMemo, useState } from "react";
-import { Button, Flex, Text } from "@streetwriters/rebass";
+import { Button, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -169,8 +170,8 @@ function Toolbar() {
   );
 
   return (
-    <Flex m={2} justifyContent={"space-between"}>
-      <Flex justifyContent="center" alignItems="center" flex={1}>
+    <Flex m={2} sx={{ justifyContent: "space-between" }}>
+      <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Icon.ArrowLeft
           sx={{
             display: ["block", "none", "none"],
@@ -220,7 +221,6 @@ function Toolbar() {
             data-test-id={tool.title.toLowerCase().replace(/ /g, "-")}
             disabled={!tool.enabled}
             variant="tool"
-            flexShrink={0}
             title={tool.title}
             key={tool.title}
             mr={1}
@@ -230,23 +230,31 @@ function Toolbar() {
                 tool.hidden ? "none" : "flex"
               ],
               color: tool.enabled ? "text" : "disabled",
-              cursor: tool.enabled ? "pointer" : "not-allowed"
+              cursor: tool.enabled ? "pointer" : "not-allowed",
+              flexDirection: "row",
+              flexShrink: 0,
+              alignItems: "center"
             }}
             onClick={tool.onClick}
-            flexDirection="row"
-            alignItems="center"
           >
             <tool.icon size={18} color={tool.enabled ? "text" : "disabled"} />
-            <Text display={["none", "none", "block"]} variant="body" ml={1}>
+            <Text
+              variant="body"
+              ml={1}
+              sx={{ display: ["none", "none", "block"] }}
+            >
               {tool.title}
             </Text>
           </Button>
         ))}
         <Flex
-          alignItems="center"
-          justifyContent="flex-end"
           bg="bgSecondary"
-          sx={{ borderRadius: "default", overflow: "hidden" }}
+          sx={{
+            borderRadius: "default",
+            overflow: "hidden",
+            alignItems: "center",
+            justifyContent: "flex-end"
+          }}
         >
           {inlineTools.map((tool) => (
             <Button
@@ -254,7 +262,6 @@ function Toolbar() {
               disabled={!tool.enabled}
               variant="tool"
               bg="transparent"
-              flexShrink={0}
               title={tool.title}
               key={tool.title}
               sx={{
@@ -264,23 +271,26 @@ function Toolbar() {
                   tool.hidden ? "none" : "flex"
                 ],
                 color: tool.enabled ? "text" : "disabled",
-                cursor: tool.enabled ? "pointer" : "not-allowed"
+                cursor: tool.enabled ? "pointer" : "not-allowed",
+                flexDirection: "row",
+                flexShrink: 0,
+                alignItems: "center"
               }}
               onClick={tool.onClick}
-              flexDirection="row"
-              alignItems="center"
             >
               <tool.icon size={18} color={tool.enabled ? "text" : "disabled"} />
               {tool.new && (
                 <Text
                   variant="subBody"
-                  fontSize={10}
                   ml={1}
                   bg="primary"
-                  color="static"
                   px={"3px"}
                   py="1px"
-                  sx={{ borderRadius: "default" }}
+                  sx={{
+                    borderRadius: "default",
+                    fontSize: 10,
+                    color: "static"
+                  }}
                 >
                   NEW
                 </Text>

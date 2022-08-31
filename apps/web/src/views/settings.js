@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useMemo, useState } from "react";
-import { Button, Flex, Text } from "@streetwriters/rebass";
+import { Button, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useNoteStore } from "../stores/note-store";
@@ -56,7 +57,7 @@ import Toggle from "../components/toggle";
 import { isDesktop } from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import { Slider } from "@streetwriters/rebass-forms";
+import { Slider } from "@theme-ui/components";
 import useZoomFactor from "../hooks/use-zoom-factor";
 import { PATHS } from "@notesnook/desktop/paths";
 import { openPath } from "../commands/open";
@@ -182,9 +183,11 @@ function Settings() {
             }}
           >
             <Flex
-              flex="1 1 auto"
-              justifyContent="space-between"
-              alignItems="center"
+              sx={{
+                flex: "1 1 auto",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
             >
               <Flex>
                 <Flex
@@ -198,9 +201,9 @@ function Settings() {
                 >
                   <Icon.User size={20} color="primary" />
                 </Flex>
-                <Flex variant="columnCenter" alignItems="flex-start">
+                <Flex variant="columnCenter" sx={{ alignItems: "flex-start" }}>
                   <Text variant="subBody">You are not logged in</Text>
-                  <Text variant="body" fontSize={"body"}>
+                  <Text variant="body" sx={{ fontSize: "body" }}>
                     Login to sync your notes
                   </Text>
                 </Flex>
@@ -386,9 +389,9 @@ function Settings() {
             />
             <Flex
               flexWrap="wrap"
-              justifyContent="left"
               sx={{
-                borderRadius: "default"
+                borderRadius: "default",
+                justifyContent: "left"
               }}
             >
               {getAllAccents().map((color) => (
@@ -751,12 +754,15 @@ function Settings() {
         )}
         {isLoggedIn && (
           <Flex
-            flexDirection={"column"}
-            sx={{ border: "2px solid var(--error)", borderRadius: "default" }}
+            sx={{
+              border: "2px solid var(--error)",
+              borderRadius: "default",
+              flexDirection: "column"
+            }}
             p={1}
             my={2}
           >
-            <Text variant={"body"} fontWeight={"bold"} color="error">
+            <Text variant={"body"} sx={{ fontWeight: "bold", color: "error" }}>
               DANGER ZONE
             </Text>
             <Button
@@ -816,30 +822,30 @@ function OptionsItem(props) {
   if (onlyIf === false) return null;
   return (
     <Flex
-      flexDirection="column"
-      justifyContent="center"
       py={2}
       sx={{
         cursor: "pointer",
         borderBottom: "1px solid",
         borderBottomColor: "border",
-        ":hover": { borderBottomColor: "primary" }
+        ":hover": { borderBottomColor: "primary" },
+        flexDirection: "column",
+        justifyContent: "center"
       }}
     >
       <Tip text={title} tip={tip} />
       <Flex
-        justifyContent="space-evenly"
         mt={2}
         bg="border"
-        sx={{ borderRadius: "default", overflow: "hidden" }}
+        sx={{
+          borderRadius: "default",
+          overflow: "hidden",
+          justifyContent: "space-evenly"
+        }}
       >
         {options.map((option, index) => (
           <Text
             key={option}
-            flex={1}
             bg={selectedOption === index ? "primary" : "transparent"}
-            color={selectedOption === index ? "static" : "gray"}
-            textAlign="center"
             variant="subBody"
             p={2}
             py={1}
@@ -851,7 +857,10 @@ function OptionsItem(props) {
               }
             }}
             sx={{
-              ":hover": { color: selectedOption === index ? "static" : "text" }
+              ":hover": { color: selectedOption === index ? "static" : "text" },
+              flex: 1,
+              textAlign: "center",
+              color: selectedOption === index ? "static" : "gray"
             }}
           >
             {option}
@@ -921,9 +930,11 @@ function AccountStatus(props) {
   return (
     <AccountStatusContainer user={user} color={"fontTertiary"}>
       <Text
-        color={remainingDays <= 5 ? "error" : "text"}
         variant="body"
-        fontSize={"heading"}
+        sx={{
+          fontSize: "heading",
+          color: remainingDays <= 5 ? "error" : "text"
+        }}
       >
         {remainingDays > 0 && isPro
           ? `Subscribed to Notesnook Pro`
@@ -968,9 +979,11 @@ function AccountStatus(props) {
             mt={1}
             px={"4px"}
             py={"2px"}
-            alignSelf="flex-end"
-            sx={{ borderRadius: "default" }}
-            color={"primary"}
+            sx={{
+              borderRadius: "default",
+              color: "primary",
+              alignSelf: "flex-end"
+            }}
           >
             Awarded by {provider}
           </Text>
@@ -1016,9 +1029,11 @@ function AccountStatus(props) {
             mt={1}
             px={"4px"}
             py={"2px"}
-            alignSelf="flex-end"
-            sx={{ borderRadius: "default" }}
-            color={"primary"}
+            sx={{
+              borderRadius: "default",
+              color: "primary",
+              alignSelf: "flex-end"
+            }}
           >
             Purchased on {provider}
           </Text>
@@ -1033,15 +1048,18 @@ function AccountStatusContainer(props) {
   return (
     <Flex
       bg={bg}
-      flexDirection="column"
       p={2}
       mt={1}
-      sx={{ borderRadius: "default", border: "1px solid var(--border)" }}
+      sx={{
+        borderRadius: "default",
+        border: "1px solid var(--border)",
+        flexDirection: "column"
+      }}
     >
-      <Flex flex="1" justifyContent="space-between">
+      <Flex sx={{ flex: "1", justifyContent: "space-between" }}>
         <Flex>
           <Icon.User size={15} color={color} />
-          <Text color={color} variant="body" ml={1}>
+          <Text variant="body" ml={1} sx={{ color: color }}>
             {user.email}
           </Text>
         </Flex>
@@ -1049,9 +1067,8 @@ function AccountStatusContainer(props) {
           variant="subBody"
           px={"2px"}
           py={"1px"}
-          sx={{ borderRadius: "default" }}
+          sx={{ borderRadius: "default", color: color }}
           bg={bg}
-          color={color}
         >
           {subscriptionStatusToString(user)}
         </Text>
@@ -1066,16 +1083,21 @@ function Header(props) {
   return (
     <Flex
       data-test-id={testId}
-      sx={{ borderBottom: "1px solid var(--border)", cursor: "pointer" }}
+      sx={{
+        borderBottom: "1px solid var(--border)",
+        cursor: "pointer",
+        justifyContent: "space-between"
+      }}
       // mt={2}
       py={2}
-      justifyContent="space-between"
       onClick={onClick}
     >
       <Text
         variant="subtitle"
-        fontWeight={isOpen ? "bold" : "body"}
-        color={isOpen ? "primary" : "fontTertiary"}
+        sx={{
+          fontWeight: isOpen ? "bold" : "body",
+          color: isOpen ? "primary" : "fontTertiary"
+        }}
       >
         {title}
       </Text>

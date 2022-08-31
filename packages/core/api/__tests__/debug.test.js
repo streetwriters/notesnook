@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import Debug from "../debug";
 import { noteTest, notebookTest, databaseTest } from "../../__tests__/utils";
@@ -49,7 +50,7 @@ test("strip note with content", () =>
 
     const content = await db.content.raw(note.contentId);
     note.additionalData = {
-      content: db.debug.strip(normalizeItem(content)),
+      content: db.debug.strip(normalizeItem(content))
     };
 
     expect(debug.strip(normalizeItem(note))).toMatchSnapshot(
@@ -91,7 +92,7 @@ test("reporting empty issue should return undefined", async () => {
 });
 
 const SUCCESS_REPORT_RESPONSE = {
-  url: "https://reported/",
+  url: "https://reported/"
 };
 
 test("reporting issue should return issue url", async () => {
@@ -100,14 +101,14 @@ test("reporting issue should return issue url", async () => {
   const debug = new Debug();
 
   fetch.mockResponseOnce(JSON.stringify(SUCCESS_REPORT_RESPONSE), {
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json" }
   });
 
   expect(
     await debug.report({
       title: "I am title",
       body: "I am body",
-      userId: "anything",
+      userId: "anything"
     })
   ).toBe(SUCCESS_REPORT_RESPONSE.url);
 
@@ -121,7 +122,7 @@ test("reporting invalid issue should return undefined", async () => {
 
   fetch.mockResponseOnce(
     JSON.stringify({
-      error_description: "Invalid issue.",
+      error_description: "Invalid issue."
     }),
     { status: 400, headers: { "Content-Type": "application/json" } }
   );

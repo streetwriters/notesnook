@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import http from "../utils/http";
 import constants from "../utils/constants";
@@ -26,7 +27,7 @@ const ENDPOINTS = {
   token: "/connect/token",
   revoke: "/connect/revocation",
   temporaryToken: "/account/token",
-  logout: "/account/logout",
+  logout: "/account/logout"
 };
 
 class TokenManager {
@@ -45,7 +46,7 @@ class TokenManager {
     if (!token) return;
 
     this.logger.info("Access token requested", {
-      accessToken: token.access_token.slice(0, 10),
+      accessToken: token.access_token.slice(0, 10)
     });
 
     if (forceRenew || (renew && this._isTokenExpired(token))) {
@@ -88,7 +89,7 @@ class TokenManager {
           refresh_token,
           grant_type: "refresh_token",
           scope: scope,
-          client_id: "notesnook",
+          client_id: "notesnook"
         }
       );
       await this.saveToken(refreshTokenResponse);
@@ -118,7 +119,7 @@ class TokenManager {
       await http.post(`${constants.AUTH_HOST}${ENDPOINTS.temporaryToken}`, {
         authorization_code: authCode,
         user_id: userId,
-        client_id: "notesnook",
+        client_id: "notesnook"
       })
     );
   }

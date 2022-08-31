@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Box, Flex } from "@streetwriters/rebass";
+import { Embed, Flex } from "@theme-ui/components";
 import Loader from "../../loader";
 import {
   CheckoutData,
@@ -55,7 +56,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [checkoutId, setCheckoutId] = useState<string>();
   const appliedCouponCode = useRef<string>();
-  const checkoutRef = useRef<HTMLIFrameElement>();
+  const checkoutRef = useRef<HTMLIFrameElement>(null);
 
   const reloadCheckout = useCallback(() => {
     if (!checkoutRef.current) return;
@@ -153,9 +154,8 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
           }
         />
       ) : null}
-      <Box
+      <Embed
         ref={checkoutRef}
-        as="iframe"
         src={sourceUrl}
         sx={{
           m: 6,

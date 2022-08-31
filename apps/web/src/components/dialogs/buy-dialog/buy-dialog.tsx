@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Text, Flex, Button } from "@streetwriters/rebass";
+import { Text, Flex, Button } from "@theme-ui/components";
 import * as Icon from "../../icons";
 import { useStore as useUserStore } from "../../../stores/user-store";
 import { useStore as useThemeStore } from "../../../stores/theme-store";
@@ -102,24 +103,20 @@ export function BuyDialog(props: BuyDialogProps) {
       }}
     >
       <Flex
-        flexDirection={["column", "column", "row"]}
-        width={["95%", "80%", "60%"]}
-        maxHeight={["95%", "80%", "80%"]}
         bg="transparent"
-        alignSelf={"center"}
-        overflowY={["scroll", "scroll", "hidden"]}
         sx={{
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "dialog"
+          borderRadius: "dialog",
+          flexDirection: ["column", "column", "row"],
+          width: ["95%", "80%", "60%"],
+          maxHeight: ["95%", "80%", "80%"],
+          alignSelf: "center",
+          overflowY: ["scroll", "scroll", "hidden"]
         }}
       >
         <Flex
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          flexShrink={0}
           sx={{
             borderTopLeftRadius: "dialog",
             borderBottomLeftRadius: [0, 0, "dialog"],
@@ -129,9 +126,13 @@ export function BuyDialog(props: BuyDialogProps) {
               {
                 bg: "bgTransparent",
                 backdropFilter: "blur(8px)"
-              }
+              },
+            flexDirection: "column",
+            flexShrink: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            width: ["100%", "100%", 350]
           }}
-          width={["100%", "100%", 350]}
           p={4}
           py={50}
         >
@@ -262,16 +263,16 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
   return (
     <>
       <Rocket width={200} />
-      <Text variant="heading" textAlign="center" mt={4}>
+      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
       </Text>
-      <Text variant="body" textAlign="center" mt={1}>
+      <Text variant="body" mt={1} sx={{ textAlign: "center" }}>
         Ready to take the next step in your private note taking journey?
       </Text>
       {isLoading || !plan ? (
         <Icon.Loading sx={{ mt: 4 }} />
       ) : (
-        <Text variant={"body"} fontSize="title" mt={4}>
+        <Text variant={"body"} mt={4} sx={{ fontSize: "title" }}>
           Starting from {getCurrencySymbol(plan.currency)}
           {plan.price.gross}
           {formatPeriod(plan.period)}
@@ -309,7 +310,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
           >
             Sign up for free
           </Button>
-          <Text variant={"subBody"} textAlign="center" mt={2}>
+          <Text variant={"subBody"} mt={2} sx={{ textAlign: "center" }}>
             After creating your account, you will be asked to activate your free
             trial. <b>No credit card is required.</b>
           </Text>
@@ -320,10 +321,9 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
         <Text
           variant="subBody"
           bg="shade"
-          color="primary"
           mt={4}
           p={1}
-          sx={{ borderRadius: "default" }}
+          sx={{ borderRadius: "default", color: "primary" }}
         >
           {user
             ? "Please select a plan to use your coupon:"
@@ -351,7 +351,7 @@ function SelectedPlan(props: SelectedPlanProps) {
 
   const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
   const couponCode = useCheckoutStore((store) => store.couponCode);
-  const couponInputRef = useRef<HTMLInputElement>();
+  const couponInputRef = useRef<HTMLInputElement>(null);
 
   const applyCoupon = useCallback(() => {
     const coupon = couponInputRef.current?.value;
@@ -396,15 +396,14 @@ function SelectedPlan(props: SelectedPlanProps) {
       ) : (
         <WorkLate width={180} />
       )}
-      <Text variant="heading" textAlign="center" mt={4}>
+      <Text variant="heading" mt={4} sx={{ textAlign: "center" }}>
         Notesnook Pro
       </Text>
       <Text
         data-test-id="checkout-plan-title"
         variant="body"
-        fontSize="subheading"
-        textAlign="center"
         mt={1}
+        sx={{ fontSize: "subheading", textAlign: "center" }}
       >
         {metadata.title}
       </Text>
@@ -509,37 +508,36 @@ function CheckoutPricing(props: CheckoutPricingProps) {
       {fields.map((field) => (
         <Flex
           key={field.key}
-          justifyContent="space-between"
-          alignSelf="stretch"
           mt={1}
+          sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
         >
-          <Text variant="body" fontSize="subtitle">
+          <Text variant="body" sx={{ fontSize: "subtitle" }}>
             {field.label}
           </Text>
           <Text
             data-test-id={`checkout-price-${field.key}`}
             variant="body"
-            fontSize="subtitle"
-            color={field.color || "text"}
+            sx={{ fontSize: "subtitle", color: field.color || "text" }}
           >
             {field.value}
           </Text>
         </Flex>
       ))}
-      <Flex justifyContent="space-between" alignSelf="stretch" mt={1}>
-        <Text variant="body" fontSize="heading">
+      <Flex
+        mt={1}
+        sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
+      >
+        <Text variant="body" sx={{ fontSize: "heading" }}>
           Total
         </Text>
         <Text
           data-test-id={`checkout-price-total`}
           variant="body"
-          fontSize="heading"
-          color={"text"}
-          textAlign="end"
+          sx={{ fontSize: "heading", textAlign: "end", color: "text" }}
         >
           {currentTotal}
           {isDiscounted ? null : (
-            <Text fontSize="body">{`then ${recurringTotal}`}</Text>
+            <Text sx={{ fontSize: "body" }}>{`then ${recurringTotal}`}</Text>
           )}
         </Text>
       </Flex>

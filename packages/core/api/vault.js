@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 import { tinyToTiptap } from "../migrations";
@@ -53,7 +54,7 @@ export default class Vault {
     this.ERRORS = {
       noVault: "ERR_NO_VAULT",
       vaultLocked: "ERR_VAULT_LOCKED",
-      wrongPassword: "ERR_WRONG_PASSWORD",
+      wrongPassword: "ERR_WRONG_PASSWORD"
     };
     EV.subscribe(EVENTS.userLoggedOut, () => {
       this._password = null;
@@ -113,7 +114,7 @@ export default class Vault {
           contentItems.push({
             ...content,
             id: note.contentId,
-            noteId: note.id,
+            noteId: note.id
           });
         } catch (e) {
           throw new Error(
@@ -237,7 +238,7 @@ export default class Vault {
       id: contentId,
       sessionId,
       data: encryptedContent,
-      type,
+      type
     });
   }
 
@@ -249,7 +250,7 @@ export default class Vault {
 
     const content = {
       type: encryptedContent.type,
-      data: JSON.parse(decryptedContent),
+      data: JSON.parse(decryptedContent)
     };
 
     // #MIGRATION: convert tiny to tiptap
@@ -281,7 +282,7 @@ export default class Vault {
       const content = await this._db.content.extractAttachments({
         data,
         type,
-        noteId: id,
+        noteId: id
       });
       data = content.data;
       type = content.type;
@@ -298,7 +299,7 @@ export default class Vault {
       favorite: note.favorite,
       localOnly: note.localOnly,
       readonly: note.readonly,
-      dateEdited: Date.now(),
+      dateEdited: Date.now()
     });
   }
 
@@ -313,7 +314,7 @@ export default class Vault {
         locked: false,
         headline: note.headline,
         contentId: note.contentId,
-        content,
+        content
       });
       // await this._db.content.add({ id: note.contentId, data: content });
       return;
@@ -321,7 +322,7 @@ export default class Vault {
 
     return {
       ...note,
-      content,
+      content
     };
   }
 

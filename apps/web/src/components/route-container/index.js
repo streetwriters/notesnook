@@ -1,29 +1,30 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useEffect, useRef, useState } from "react";
-import { Flex, Text } from "@streetwriters/rebass";
+import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import { useStore } from "../../stores/app-store";
 import { CREATE_BUTTON_MAP } from "../../common";
 import useMobile from "../../hooks/use-mobile";
 import { navigate } from "../../navigation";
-import { Input } from "@streetwriters/rebass-forms";
+import { Input } from "@theme-ui/components";
 
 function RouteContainer(props) {
   const {
@@ -46,7 +47,7 @@ function RouteContainer(props) {
         isEditable={isEditable}
         onChange={onChange}
       />
-      {component || <Flex id={id} flexDirection="column" flex={1} />}
+      {component || <Flex id={id} sx={{ flex: 1, flexDirection: "column" }} />}
     </>
   );
 }
@@ -61,9 +62,9 @@ function Header(props) {
 
   // if (!subtitle) return null;
   return (
-    <Flex mx={2} flexDirection="column" justifyContent="center">
-      <Flex alignItems="center" justifyContent="space-between">
-        <Flex justifyContent="center" alignItems="center" py={2}>
+    <Flex mx={2} sx={{ flexDirection: "column", justifyContent: "center" }}>
+      <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
+        <Flex py={2} sx={{ alignItems: "center", justifyContent: "center" }}>
           {buttons?.back ? (
             <Icon.ArrowLeft
               size={24}
@@ -95,7 +96,7 @@ function Header(props) {
             />
           )}
         </Flex>
-        <Flex flexShrink={0}>
+        <Flex sx={{ flexShrink: 0 }}>
           {buttons?.search && (
             <Icon.Search
               size={24}
@@ -134,13 +135,12 @@ function RouteTitle({ title, subtitle, isEditable, onChange }) {
   }, [title]);
 
   return (
-    <Flex flexDirection="column">
+    <Flex sx={{ flexDirection: "column" }}>
       {subtitle && <Text variant="subBody">{subtitle}</Text>}
       <Input
         ref={ref}
         variant="clean"
         data-test-id="routeHeader"
-        color={"text"}
         title={title}
         sx={{
           overflow: "hidden",
@@ -155,7 +155,8 @@ function RouteTitle({ title, subtitle, isEditable, onChange }) {
           border: "none",
           bg: isEditing ? "bgSecondary" : "transparent",
 
-          ":focus-visible": { outline: "none" }
+          ":focus-visible": { outline: "none" },
+          color: "text"
         }}
         onDoubleClick={(e) => {
           setIsEditing(isEditable && true);

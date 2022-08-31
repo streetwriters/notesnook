@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BoxProps, Button, Flex, Text } from "@streetwriters/rebass";
+import { BoxProps, Button, Flex, Link, Text } from "@theme-ui/components";
 import {
   CheckCircle,
   Loading,
@@ -155,11 +156,11 @@ function Auth(props: AuthProps) {
   return (
     <AuthContainer>
       <Flex
-        flexDirection={"column"}
         sx={{
           zIndex: 1,
           flex: 1,
-          overflowY: "auto"
+          overflowY: "auto",
+          flexDirection: "column"
         }}
       >
         {route === "login" || route === "signup" || route === "recover" ? (
@@ -189,13 +190,13 @@ function Auth(props: AuthProps) {
                 mt: 2,
                 mr: 2,
                 alignSelf: "end",
-                alignItems: "center"
+                alignItems: "center",
+                color: "error"
               }}
               onClick={async () => {
                 await db.user?.logout();
                 openURL("/login");
               }}
-              color="error"
             >
               <Logout size={16} sx={{ mr: 1 }} color="error" /> Logout
               permanently
@@ -258,11 +259,10 @@ function Login(props: BaseAuthComponentProps<"login">) {
           <Button
             data-test-id="auth-forgot-password"
             type="button"
-            alignSelf="end"
             mt={2}
             variant="anchor"
-            color="text"
             onClick={() => navigate("recover")}
+            sx={{ color: "text", alignSelf: "end" }}
           >
             Forgot password?
           </Button>
@@ -333,26 +333,28 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             disabled={!isAppLoaded}
             loading={!isAppLoaded}
           />
-          <Text mt={4} variant="subBody" fontSize={13} textAlign="center">
+          <Text
+            mt={4}
+            variant="subBody"
+            sx={{ fontSize: 13, textAlign: "center" }}
+          >
             By pressing {`"Create account" button, you agree to our`}{" "}
-            <Text
-              as="a"
-              color="primary"
+            <Link
               target="_blank"
               rel="noreferrer"
               href="https://notesnook.com/tos"
+              sx={{ color: "primary" }}
             >
               Terms of Service
-            </Text>{" "}
+            </Link>{" "}
             &amp;{" "}
-            <Text
-              as="a"
-              color="primary"
+            <Link
               rel="noreferrer"
               href="https://notesnook.com/privacy"
+              sx={{ color: "primary" }}
             >
               Privacy Policy
-            </Text>
+            </Link>
             .
           </Text>
         </>
@@ -386,7 +388,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       title="Your session has expired"
       subtitle={
         <Flex bg="shade" p={1} sx={{ borderRadius: "default" }}>
-          <Text as="span" fontSize="body" color="primary">
+          <Text as="span" sx={{ fontSize: "body", color: "primary" }}>
             <b>
               All your local changes are safe and will be synced after you
               login.
@@ -422,11 +424,10 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       <Button
         data-test-id="auth-forgot-password"
         type="button"
-        alignSelf="end"
         mt={2}
         variant="anchor"
-        color="text"
         onClick={() => user && navigate("recover", { email: user.email })}
+        sx={{ color: "text", alignSelf: "end" }}
       >
         Forgot password?
       </Button>
@@ -479,7 +480,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
         <>
           <Flex bg="background" p={2} mt={2} sx={{ borderRadius: "default" }}>
             <CheckCircle size={20} color="primary" />
-            <Text variant="body" color="primary" ml={2}>
+            <Text variant="body" ml={2} sx={{ color: "primary" }}>
               {success}
             </Text>
           </Flex>
@@ -653,8 +654,8 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
         type="button"
         mt={4}
         variant={"anchor"}
-        color="text"
         onClick={() => navigate("mfa:select", formData)}
+        sx={{ color: "text" }}
       >
         {texts.selector}
       </Button>
@@ -666,7 +667,7 @@ type MFAMethodType = AuthenticatorType | "recoveryCode";
 type MFAMethod = {
   type: MFAMethodType;
   title: string;
-  icon: (props: BoxProps) => JSX.Element;
+  icon: (props: BoxProps & { size: number }) => JSX.Element;
 };
 const MFAMethods: MFAMethod[] = [
   { type: "app", title: "Use an authenticator app", icon: MFAAuthenticator },
@@ -736,7 +737,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
                 size={16}
                 color={selected === index ? "primary" : "text"}
               />
-              <Text variant={"title"} fontWeight="body">
+              <Text variant={"title"} sx={{ fontWeight: "body" }}>
                 {method.title}
               </Text>
             </Button>
@@ -747,7 +748,7 @@ function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
         disabled={!isAppLoaded}
         loading={!isAppLoaded}
       /> */}
-      {/* <Button type="button" mt={4} variant={"anchor"} color="text">
+      {/* <Button type="button" mt={4} variant={"anchor"}  sx={{color: "text"}}>
         Don't have access to your {mfaMethodToPhrase(formData.primaryMethod)}?
       </Button> */}
     </AuthForm>
@@ -771,7 +772,7 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
   const { title, subtitle, children } = props;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string>();
-  const formRef = useRef<HTMLFormElement>();
+  const formRef = useRef<HTMLFormElement>(null);
   const [form, setForm] = useState<AuthFormData[T] | undefined>();
 
   if (isSubmitting)
@@ -782,13 +783,8 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
       ref={formRef}
       as="form"
       id="authForm"
-      flexDirection="column"
-      alignSelf="center"
-      justifyContent={"center"}
-      alignItems="center"
-      width={["95%", "45%"]}
-      flex={1}
       onSubmit={async (e) => {
+        if (!formRef.current) return;
         e.preventDefault();
 
         setError("");
@@ -805,17 +801,23 @@ export function AuthForm<T extends AuthRoutes>(props: AuthFormProps<T>) {
           setIsSubmitting(false);
         }
       }}
+      sx={{
+        flex: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        width: ["95%", "45%"],
+        alignSelf: "center"
+      }}
     >
-      <Text variant={"heading"} fontSize={32} textAlign="center">
+      <Text variant={"heading"} sx={{ fontSize: 32, textAlign: "center" }}>
         {title}
       </Text>
       <Text
         variant="body"
-        fontSize={"title"}
-        textAlign="center"
         mt={2}
         mb={35}
-        color="fontTertiary"
+        sx={{ fontSize: "title", textAlign: "center", color: "fontTertiary" }}
       >
         {subtitle}
       </Text>
@@ -847,10 +849,10 @@ function SubtitleWithAction(props: SubtitleWithActionProps) {
         sx={{
           textDecoration: "underline",
           ":hover": { color: "dimPrimary" },
-          cursor: "pointer"
+          cursor: "pointer",
+          color: "text"
         }}
         as="b"
-        color="text"
         onClick={props.action.onClick}
       >
         {props.action.text}
@@ -918,15 +920,17 @@ export function SubmitButton(props: SubmitButtonProps) {
   return (
     <Button
       data-test-id="submitButton"
-      display="flex"
       type="submit"
       mt={50}
       variant="primary"
-      alignSelf={"center"}
       px={50}
-      sx={{ borderRadius: 50 }}
-      justifyContent="center"
-      alignItems="center"
+      sx={{
+        borderRadius: 50,
+        alignItems: "center",
+        justifyContent: "center",
+        alignSelf: "center",
+        display: "flex"
+      }}
       disabled={props.disabled}
     >
       {props.loading ? <Loading color="static" /> : props.text}

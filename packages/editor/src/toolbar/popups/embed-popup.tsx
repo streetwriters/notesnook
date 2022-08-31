@@ -1,25 +1,26 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Flex, Text } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Flex, Text } from "@theme-ui/components";
 import { useCallback, useState } from "react";
 import { Popup } from "../components/popup";
-import { Input, Textarea } from "@streetwriters/rebass-forms";
+import { Input, Textarea } from "@theme-ui/components";
 import { Embed, EmbedSizeOptions } from "../../extensions/embed";
 import { convertUrlToEmbedUrl } from "@social-embed/lib";
 import { InlineInput } from "../../components/inline-input";
@@ -165,8 +166,11 @@ export function EmbedPopup(props: EmbedPopupProps) {
             <Textarea
               autoFocus
               variant={"forms.input"}
-              sx={{ fontSize: "subBody", fontFamily: "monospace" }}
-              minHeight={[200, 100]}
+              sx={{
+                fontSize: "subBody",
+                fontFamily: "monospace",
+                minHeight: [200, 100]
+              }}
               onChange={(e) => setSrc(e.target.value)}
               placeholder="Paste embed code here. Only iframes are supported."
             />

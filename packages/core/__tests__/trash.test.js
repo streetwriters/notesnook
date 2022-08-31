@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import dayjs from "dayjs";
 import {
@@ -23,7 +24,7 @@ import {
   notebookTest,
   TEST_NOTE,
   TEST_NOTEBOOK,
-  databaseTest,
+  databaseTest
 } from "./utils";
 
 beforeEach(() => StorageInterface.clear());
@@ -35,7 +36,7 @@ test("trash should be empty", () =>
 
 test("permanently delete a note", () =>
   databaseTest().then(async (db) => {
-    const noteId = await db.notes.add({...TEST_NOTE,sessionId:Date.now()});
+    const noteId = await db.notes.add({ ...TEST_NOTE, sessionId: Date.now() });
     const note = db.notes.note(noteId);
 
     let sessions = await db.noteHistory.get(noteId);
@@ -51,7 +52,7 @@ test("permanently delete a note", () =>
 
     sessions = await db.noteHistory.get(noteId);
     expect(sessions).toHaveLength(0);
-}));
+  }));
 
 test("restore a deleted note that was in a notebook", () =>
   noteTest().then(async ({ db, id }) => {
@@ -166,12 +167,12 @@ test("permanently delete items older than 7 days", () =>
 
     await db.notes._collection.updateItem({
       id: noteId,
-      dateDeleted: sevenDaysEarlier,
+      dateDeleted: sevenDaysEarlier
     });
 
     await db.notebooks._collection.updateItem({
       id: notebookId,
-      dateDeleted: sevenDaysEarlier,
+      dateDeleted: sevenDaysEarlier
     });
 
     expect(db.trash.all).toHaveLength(2);

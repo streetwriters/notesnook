@@ -1,20 +1,21 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 export function getWeekGroupFromTimestamp(timestamp) {
   const date = new Date(timestamp);
@@ -45,7 +46,7 @@ function getWeek(date) {
   const start = {
     month: date.getMonth(),
     year: date.getFullYear(),
-    day: date.getDate(),
+    day: date.getDate()
   };
 
   const hours = 24 * 6;
@@ -54,7 +55,7 @@ function getWeek(date) {
   const end = {
     month: date.getMonth(),
     year: date.getFullYear(),
-    day: date.getDate(),
+    day: date.getDate()
   };
 
   return { start, end };
@@ -70,7 +71,7 @@ export function formatDate(
   date,
   options = {
     dateStyle: "medium",
-    timeStyle: "short",
+    timeStyle: "short"
   }
 ) {
   return new Date(date).toLocaleString(undefined, options);
@@ -88,7 +89,7 @@ export const MONTHS_FULL = [
   "September",
   "October",
   "November",
-  "December",
+  "December"
 ];
 
 const MONTHS_SHORT = [
@@ -103,5 +104,5 @@ const MONTHS_SHORT = [
   "Sep",
   "Oct",
   "Nov",
-  "Dec",
+  "Dec"
 ];

@@ -1,25 +1,26 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { Theme } from "@notesnook/theme";
 import { SchemeColors } from "@notesnook/theme/dist/theme/colorscheme";
 import React from "react";
-import { ButtonProps } from "@streetwriters/rebass";
+import { ButtonProps } from "@theme-ui/components";
 import { IconNames, Icons } from "../icons";
 import { ToolButtonVariant } from "../types";
 import { Button } from "../../components/button";
@@ -30,7 +31,7 @@ export type ToolButtonProps = ButtonProps & {
   iconColor?: keyof SchemeColors;
   iconSize?: keyof Theme["iconSizes"] | number;
   toggled: boolean;
-  buttonRef?: React.MutableRefObject<HTMLButtonElement | null | undefined>;
+  buttonRef?: React.RefObject<HTMLButtonElement>;
   variant?: ToolButtonVariant;
 };
 export const ToolButton = React.memo(

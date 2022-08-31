@@ -1,22 +1,23 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { Box, Button, Flex, Image, Text } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { Box, Button, Flex, Image, Text } from "@theme-ui/components";
 import { ImageAlignmentOptions, ImageAttributes } from "./image";
 import { useEffect, useRef, useState } from "react";
 import { SelectionBasedReactNodeViewProps } from "../react";
@@ -43,7 +44,7 @@ export function ImageComponent(
   const { src, alt, title, width, height, align } = node.attrs;
   const float = isMobile ? false : node.attrs.float;
 
-  const imageRef = useRef<HTMLImageElement>();
+  const imageRef = useRef<HTMLImageElement>(null);
   const [error, setError] = useState<string>();
   const [source, setSource] = useState<string>();
 
@@ -94,10 +95,10 @@ export function ImageComponent(
       >
         {!source || error ? (
           <Flex
-            width={width}
-            maxWidth="100%"
-            minWidth={135}
             sx={{
+              width,
+              maxWidth: "100%",
+              minWidth: 135,
               bg: "bgSecondary",
               border: selected
                 ? "2px solid var(--primary)"

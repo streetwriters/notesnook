@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useMemo } from "react";
-import { Box, Flex, Image, Text } from "@streetwriters/rebass";
+import { Box, Flex, Image, Link, Text } from "@theme-ui/components";
 import ThemeProvider from "../theme-provider";
 import Logo from "../../assets/logo.svg";
 import LogoDark from "../../assets/logo-dark.svg";
@@ -84,12 +85,12 @@ function AuthContainer(props) {
     <ThemeProvider>
       <Flex sx={{ position: "relative", height: "100%", bg: "background" }}>
         <Box
-          flex={1}
           sx={{
             position: "relative",
             overflow: "hidden",
             flexDirection: "column",
-            display: ["none", "none", "flex"]
+            display: ["none", "none", "flex"],
+            flex: 1
           }}
         >
           <Box
@@ -140,47 +141,45 @@ function AuthContainer(props) {
           </Box>
 
           <Flex
-            flexDirection="column"
-            flex={1}
-            alignItems="start"
-            justifyContent={"end"}
             p={50}
-            sx={{ zIndex: 1 }}
+            sx={{
+              zIndex: 1,
+              flex: 1,
+              flexDirection: "column",
+              alignItems: "start",
+              justifyContent: "end"
+            }}
           >
             <Image
-              alignSelf="start"
               src={theme === "dark" ? LogoDark : Logo}
-              width={70}
-              sx={{ borderRadius: "default" }}
+              sx={{ borderRadius: "default", width: 70, alignSelf: "start" }}
               mb={4}
             />
-            <Text variant={"heading"} fontSize={48}>
+            <Text variant={"heading"} sx={{ fontSize: 48 }}>
               {title}
             </Text>
 
-            <Text variant="body" mt={10} fontSize={14} color="icon">
+            <Text variant="body" mt={10} sx={{ fontSize: 14, color: "icon" }}>
               {testimonial.text} —{" "}
-              <Text
-                as="a"
-                sx={{ fontStyle: "italic" }}
-                color="icon"
+              <Link
+                sx={{ fontStyle: "italic", color: "icon" }}
                 href={testimonial.link}
               >
                 source
-              </Text>
+              </Link>
             </Text>
-            <Flex alignItems={"center"} justifyContent="center" mt={2}>
+            <Flex
+              mt={2}
+              sx={{ alignItems: "center", justifyContent: "center" }}
+            >
               <Image
                 src={testimonial.image}
-                width={40}
-                sx={{ borderRadius: 50 }}
+                sx={{ borderRadius: 50, width: 40 }}
               />
-              <Flex flexDirection={"column"} ml={2}>
+              <Flex ml={2} sx={{ flexDirection: "column" }}>
                 <Text
                   variant="body"
-                  fontWeight={"bold"}
-                  fontSize={14}
-                  color="icon"
+                  sx={{ fontSize: 14, fontWeight: "bold", color: "icon" }}
                 >
                   {testimonial.name}
                 </Text>
@@ -190,11 +189,11 @@ function AuthContainer(props) {
           </Flex>
         </Box>
         <Flex
-          flex={1.5}
           sx={{
-            position: "relative"
+            position: "relative",
+            flex: 1.5,
+            flexDirection: "column"
           }}
-          flexDirection="column"
         >
           <Box
             as="svg"

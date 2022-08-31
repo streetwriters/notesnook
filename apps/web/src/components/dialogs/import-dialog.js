@@ -1,28 +1,29 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Flex, Text } from "@streetwriters/rebass";
+import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import Dialog from "./dialog";
 import { db } from "../../common/db";
 import { useDropzone } from "react-dropzone";
-import { Input } from "@streetwriters/rebass-forms";
+import { Input } from "@theme-ui/components";
 import Accordion from "../accordion";
 import { store as appStore } from "../../stores/app-store";
 import { Importer } from "../../utils/importer";
@@ -108,7 +109,7 @@ function ImportDialog(props) {
             }
       }
     >
-      <Flex flexDirection="column" justifyContent="center">
+      <Flex sx={{ flexDirection: "column", justifyContent: "center" }}>
         {progress.current > 0 ? (
           <>
             <Text variant="body" my={4} sx={{ textAlign: "center" }}>
@@ -122,7 +123,7 @@ function ImportDialog(props) {
               errors occured.
             </Text>
             {errors.length > 0 && (
-              <Flex flexDirection="column" my={1} bg="errorBg" p={1}>
+              <Flex my={1} bg="errorBg" p={1} sx={{ flexDirection: "column" }}>
                 {errors.map((error) => (
                   <Text
                     key={error.message}
@@ -145,7 +146,6 @@ function ImportDialog(props) {
             >
               <Flex
                 {...getRootProps()}
-                flexDirection="column"
                 data-test-id="import-dialog-select-files"
                 sx={{
                   justifyContent: "center",
@@ -154,7 +154,8 @@ function ImportDialog(props) {
                   width: "full",
                   border: "2px dashed var(--border)",
                   borderRadius: "default",
-                  mt: 1
+                  mt: 1,
+                  flexDirection: "column"
                 }}
               >
                 <Input {...getInputProps()} />
@@ -166,7 +167,7 @@ function ImportDialog(props) {
                   <Text variant="subBody">Only .zip files are supported.</Text>
                 </Text>
               </Flex>
-              <Flex flexDirection="column" mt={1}>
+              <Flex mt={1} sx={{ flexDirection: "column" }}>
                 {files.map((file, i) => (
                   <Text
                     key={file.name}
@@ -218,7 +219,7 @@ function ImportDialog(props) {
                 sx={{ mt: 1 }}
                 testId={"importer-dialog-notes"}
               >
-                <Flex flexDirection="column" mt={1}>
+                <Flex mt={1} sx={{ flexDirection: "column" }}>
                   {notes.map((note, i) => (
                     <Flex
                       key={note.title}

@@ -1,24 +1,25 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import "../app.css";
 import { useEffect } from "react";
-import { Flex, Text } from "@streetwriters/rebass";
+import { Flex, Text } from "@theme-ui/components";
 import ThemeProvider from "../components/theme-provider";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
@@ -34,16 +35,20 @@ function EmailConfirmed() {
     <ThemeProvider>
       <Flex
         bg="background"
-        height={"100%"}
-        overflowY="auto"
-        flexDirection={"column"}
-        fontSize={[14, 16, 18]}
+        sx={{
+          flexDirection: "column",
+          fontSize: [14, 16, 18],
+          height: "100%",
+          overflowY: "auto"
+        }}
       >
         <Flex
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          flex={1}
+          sx={{
+            flex: 1,
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
         >
           <Icon.MailCheck
             sx={{ bg: "shade", borderRadius: 100, p: 5 }}
@@ -51,40 +56,45 @@ function EmailConfirmed() {
             color="primary"
           />
           <Text
-            textAlign="center"
             variant="heading"
-            fontWeight="heading"
-            fontSize="2.5em"
             mt={5}
+            sx={{
+              fontSize: "2.5em",
+              textAlign: "center",
+              fontWeight: "heading"
+            }}
           >
             Huzzah!
           </Text>
           <Text
-            textAlign="center"
             variant="heading"
-            fontWeight="bold"
-            fontSize="1.5em"
-            color="icon"
             mt={2}
+            sx={{
+              fontSize: "1.5em",
+              textAlign: "center",
+              fontWeight: "bold",
+              color: "icon"
+            }}
           >
             Your email has been confirmed.
           </Text>
           <Text
-            textAlign="center"
             variant="body"
-            fontSize="1.2em"
-            color="fontTertiary"
             mt={2}
-            sx={{ wordWrap: "break-word" }}
+            sx={{
+              wordWrap: "break-word",
+              fontSize: "1.2em",
+              textAlign: "center",
+              color: "fontTertiary"
+            }}
           >
             Thank you for choosing end-to-end encrypted note taking.
           </Text>
         </Flex>
         <Flex
-          flexDirection="column"
           bg="bgSecondary"
-          justifyContent="center"
           p={5}
+          sx={{ flexDirection: "column", justifyContent: "center" }}
         >
           <BlogPromoBanner link="https://blog.notesnook.com/why-another-note-taking-app/" />
         </Flex>
@@ -116,17 +126,25 @@ const social = [
 ];
 function BlogPromoBanner() {
   return (
-    <Flex flexDirection="column" justifyContent="center" alignItems="center">
-      <Text variant="heading" fontSize="1.2em" textAlign="center">
+    <Flex
+      sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center"
+      }}
+    >
+      <Text variant="heading" sx={{ fontSize: "1.2em", textAlign: "center" }}>
         Share Notesnook with your friends!
       </Text>
       <Text
-        textAlign="center"
         variant="body"
-        fontSize="1em"
-        color="fontTertiary"
         mt={2}
-        sx={{ wordWrap: "break-word" }}
+        sx={{
+          wordWrap: "break-word",
+          fontSize: "1em",
+          textAlign: "center",
+          color: "fontTertiary"
+        }}
       >
         {`Because where's the fun in nookin' alone?`}
       </Text>
@@ -146,14 +164,16 @@ function BlogPromoBanner() {
         ))}
       </Flex>
       <Text
-        textAlign="center"
         variant="body"
-        color="fontTertiary"
         mt={2}
-        sx={{ wordWrap: "break-word" }}
+        sx={{
+          wordWrap: "break-word",
+          textAlign: "center",
+          color: "fontTertiary"
+        }}
       >
         Use{" "}
-        <Text as="span" fontWeight="bold" color="primary">
+        <Text as="span" sx={{ fontWeight: "bold", color: "primary" }}>
           #notesnook
         </Text>{" "}
         and get a chance to win free promo codes.
@@ -194,10 +214,10 @@ function BlogPromoBanner() {
         as="a"
         href={link}
         target="_blank"
-        fontSize="title"
-        width="100%"
-        fontWeight="bold"
-        sx={{ boxShadow: "2px 2px 15px 0px #00000044" }}
+        
+        
+        
+        sx={{ boxShadow: "2px 2px 15px 0px #00000044" ,fontSize: "title", fontWeight: "bold", width: "100%"}}
         onClick={() =>
           trackEvent(`Email verification blog promo`, "blog-promo")
         }
@@ -212,17 +232,17 @@ function BlogPromoBanner() {
 //   const { discount, coupon, userId } = props;
 
 //   return (
-//     <Flex flexDirection="column" p={4}>
+//     <Flex  p={4} sx={{flexDirection: "column"}}>
 //       <Text
 //         as="p"
 //         variant="body"
-//         fontSize="title"
+//
 //         lineHeight="22px"
-//         textAlign="center"
-//       >
+//
+//        sx={{fontSize: "title", textAlign: "center"}}>
 //         We started out building Notesnook in November 2019. Our mission was to
 //         make privacy simple. It is one thing to say,{" "}
-//         <Text as="span" color="primary">
+//         <Text as="span"  sx={{color: "primary"}}>
 //           "Privacy is our basic right"
 //         </Text>{" "}
 //         and quite another to actually prove it.
@@ -230,31 +250,31 @@ function BlogPromoBanner() {
 //         Almost 1 and a half year later, we are here with over 2000 users, 5000+
 //         downloads on Google Play Store, 10,000+ encrypted notes, and 100+
 //         members in our Discord community; all proof that{" "}
-//         <Text as="span" color="primary">
+//         <Text as="span"  sx={{color: "primary"}}>
 //           privacy matters.
 //         </Text>
 //         <br />
 //       </Text>
-//       <Text variant="title" mt={2} textAlign="center">
+//       <Text variant="title" mt={2}  sx={{textAlign: "center"}}>
 //         In celebration of this happy day, we are giving a special discount to
 //         all our new members.
 //       </Text>
 //       <Text
 //         variant="heading"
-//         fontSize={32}
-//         color="primary"
-//         textAlign="center"
-//         fontWeight="bold"
+//
+//
+//
+//
 //         mt={2}
-//       >
+//        sx={{fontSize: 32, textAlign: "center", fontWeight: "bold", color: "primary"}}>
 //         {discount}% OFF if you subscribe today!
 //       </Text>
 //       <Button
 //         mt={2}
-//         fontSize="title"
-//         width="100%"
-//         fontWeight="bold"
-//         sx={{ boxShadow: "2px 2px 15px 0px #00000044" }}
+//
+//
+//
+//         sx={{ boxShadow: "2px 2px 15px 0px #00000044" ,fontSize: "title", fontWeight: "bold", width: "100%"}}
 //         onClick={async () => {
 //           trackEvent(`Email verification offer`, "offers");
 //           let user = await db.user.getUser();
@@ -264,15 +284,15 @@ function BlogPromoBanner() {
 //       >
 //         Subscribe now and stand up for privacy!
 //       </Button>
-//       <Text variant="body" textAlign="center" mt={2} color="fontTertiary">
+//       <Text variant="body"  mt={2}  sx={{textAlign: "center", color: "fontTertiary"}}>
 //         Big companies say, "X feature won't be possible if we went
 //         zero-knowledge." We are here to call them out. Your contribution will
 //         help us prove that giving up on privacy is just an excuse to rip users
 //         off, sell their data and make money.
-//         <Text variant="body" fontSize="subBody" mt={1}>
+//         <Text variant="body"  mt={1} sx={{fontSize: "subBody"}}>
 //           *Use code <b>{coupon}</b> at checkout to get your discount.
 //         </Text>
-//         <Text variant="body" fontSize="subBody" mt={1}>
+//         <Text variant="body"  mt={1} sx={{fontSize: "subBody"}}>
 //           ** Only the first 10 people get to claim the discount. Be the first.
 //         </Text>
 //       </Text>

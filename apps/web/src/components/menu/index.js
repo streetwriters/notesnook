@@ -1,23 +1,24 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import React, { useCallback, useRef, useEffect, useState } from "react";
-import { Flex, Text } from "@streetwriters/rebass";
+import { Flex, Text } from "@theme-ui/components";
 import { getPosition } from "../../hooks/use-menu";
 import { FlexScrollContainer } from "../scroll-container";
 import MenuItem from "./menu-item";
@@ -218,7 +219,6 @@ function MenuContainer({ title, children }) {
       tabIndex={-1}
       bg="background"
       py={1}
-      flexDirection={"column"}
       sx={{
         position: "relative",
         listStyle: "none",
@@ -227,20 +227,21 @@ function MenuContainer({ title, children }) {
         borderRadius: "default",
         boxShadow: "0px 0px 10px 0px #00000022",
         border: "1px solid var(--border)",
-        width: 220
+        width: 220,
+        flexDirection: "column"
       }}
     >
       {title && (
         <Text
-          fontFamily="body"
-          fontSize="subtitle"
-          color="primary"
           py={"8px"}
           px={3}
           sx={{
             borderBottom: "1px solid",
             borderBottomColor: "border",
-            wordWrap: "break-word"
+            wordWrap: "break-word",
+            fontSize: "subtitle",
+            fontFamily: "body",
+            color: "primary"
           }}
         >
           {title}

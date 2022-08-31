@@ -1,24 +1,25 @@
-/* This file is part of the Notesnook project (https://notesnook.com/)
- *
- * Copyright (C) 2022 Streetwriters (Private) Limited
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
 
-import { SxStyleProp } from "@streetwriters/rebass";
+Copyright (C) 2022 Streetwriters (Private) Limited
 
-const defaultVariant: SxStyleProp = {
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import { ThemeUIStyleObject } from "@theme-ui/core";
+
+const defaultVariant: ThemeUIStyleObject = {
   bg: "transparent",
   fontFamily: "body",
   fontWeight: "body",
@@ -45,13 +46,13 @@ const defaultVariant: SxStyleProp = {
   }
 };
 
-const primary: SxStyleProp = {
+const primary: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "static",
   bg: "primary"
 };
 
-const dialog: SxStyleProp = {
+const dialog: ThemeUIStyleObject = {
   variant: "buttons.primary",
   color: "primary",
   fontWeight: "bold",
@@ -68,13 +69,13 @@ const dialog: SxStyleProp = {
   }
 };
 
-const secondary: SxStyleProp = {
+const secondary: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "text",
   bg: "border"
 };
 
-const tertiary: SxStyleProp = {
+const tertiary: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "text",
   bg: "transparent",
@@ -85,7 +86,7 @@ const tertiary: SxStyleProp = {
   }
 };
 
-const list: SxStyleProp = {
+const list: ThemeUIStyleObject = {
   variant: "buttons.tertiary",
   border: "0px solid",
   borderBottom: "1px solid",
@@ -100,7 +101,7 @@ const list: SxStyleProp = {
   }
 };
 
-const anchor: SxStyleProp = {
+const anchor: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "primary",
   fontSize: "subBody",
@@ -113,7 +114,7 @@ const anchor: SxStyleProp = {
   }
 };
 
-const icon: SxStyleProp = {
+const icon: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "text",
   borderRadius: "none",
@@ -123,7 +124,7 @@ const icon: SxStyleProp = {
   }
 };
 
-const tool: SxStyleProp = {
+const tool: ThemeUIStyleObject = {
   variant: "buttons.default",
   color: "text",
   backgroundColor: "bgSecondary",
@@ -133,14 +134,14 @@ const tool: SxStyleProp = {
   }
 };
 
-const statusItem: SxStyleProp = {
+const statusItem: ThemeUIStyleObject = {
   variant: "buttons.icon",
   p: 0,
   py: 1,
   px: 1
 };
 
-const menuItem: SxStyleProp = {
+const menuItem: ThemeUIStyleObject = {
   variant: "buttons.default",
   // bg: "transparent",
   py: "8px",
