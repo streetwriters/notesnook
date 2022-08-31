@@ -5,7 +5,7 @@
 <h1 align="center">Notesnook Web</h1>
 <h3 align="center">The web app is built using React, Typescript & Javascript.</h3>
 <p align="center">
-<a href="https://app.notesnook.com/">Try it out!</a> | <a href="#architecture">Architecture</a> | <a href="#build-instructions">How to build?</a> | <a href="./desktop/">Desktop app</a>
+<a href="https://app.notesnook.com/">Try it out!</a> | <a href="#developer-guide">Developer guide</a> | <a href="#build-instructions">How to build?</a> | <a href="./desktop/">Desktop app</a>
 </p>
 
 ## Getting started
@@ -23,13 +23,17 @@ You can find all the desktop related code in [the `desktop/` directory](./deskto
 
 **Before you start it is recommended that you read [the contributing guidelines](/CONTRIBUTING.md).**
 
-**Requirements:**
+### Setting up the development environment
 
-1. Node.js >= v16
-2. git
+Requirements:
+
+1. [Node.js](https://nodejs.org/en/download/)
+2. [git](https://git-scm.com/downloads)
 3. NPM (not yarn or pnpm)
 
-The first step is to `clone` the monorepo:
+Before you can do anything, you'll need to [install Node.js](https://nodejs.org/en/download/) on your system.
+
+Once you have completed the setup, the first step is to `clone` the monorepo:
 
 ```bash
 git clone https://github.com/streetwriters/notesnook.git
@@ -73,6 +77,8 @@ We try to keep the stack as lean as possible
 3. Theme UI: For components, themeing etc.
 4. Zustand: State management
 5. Playwright: Runs all our e2e tests
+6. localforage: Database & persistence
+7. libsodium: Encryption
 
 ### Project structure
 
