@@ -205,8 +205,6 @@ const useTiptap = (
       injectCSS: false
     }),
     [
-      doubleSpacedLines,
-      isMobile,
       onDownloadAttachment,
       onOpenAttachmentPicker,
       PortalProviderAPI,

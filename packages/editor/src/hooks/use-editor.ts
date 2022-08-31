@@ -59,7 +59,7 @@ export const useEditor = (
       };
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [...deps, forceUpdate, options]
+    deps
   );
 
   useEffect(() => {
