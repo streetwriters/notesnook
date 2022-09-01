@@ -48,7 +48,8 @@ export const Search = ({ close, getKeyboardHeight, quicknote }) => {
   const insets =
     Platform.OS === "android"
       ? { top: StatusBar.currentHeight }
-      : useSafeAreaInsets();
+      : // eslint-disable-next-line react-hooks/rules-of-hooks
+        useSafeAreaInsets();
 
   const onSelectItem = async (item) => {
     if (item.locked) {

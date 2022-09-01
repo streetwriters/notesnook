@@ -67,13 +67,6 @@ import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
 import { getVersion } from "react-native-device-info";
 
-const format = (ver: number) => {
-  const parts = ver.toString().split("");
-  return `v${parts[0]}.${parts[1]}.${
-    parts[2]?.startsWith("0") ? "" : parts[2]
-  }${!parts[3] ? "" : parts[3]} `;
-};
-
 export const settingsGroups: SettingSection[] = [
   {
     id: "account",

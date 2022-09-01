@@ -21,16 +21,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { IconButton } from "../../components/ui/icon-button";
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from "../../services/event-manager";
+import { ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import SearchService from "../../services/search";
 import { useSearchStore } from "../../stores/use-search-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import { eScrollEvent } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 export const SearchBar = () => {
@@ -53,14 +48,6 @@ export const SearchBar = () => {
     sleep(300).then(() => {
       inputRef.current?.focus();
     });
-  }, []);
-
-  const onScroll = (event) => {};
-  useEffect(() => {
-    eSubscribeEvent(eScrollEvent, onScroll);
-    return () => {
-      eUnSubscribeEvent(eScrollEvent, onScroll);
-    };
   }, []);
 
   const onChangeText = (value) => {

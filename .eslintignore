@@ -11,6 +11,7 @@ resources/
 # mobile
 apps/mobile/native/
 apps/mobile/__tests__/
+apps/mobile/e2e/
 
 # web
 apps/web/public/an.js

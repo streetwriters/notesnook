@@ -48,6 +48,7 @@ import { getElevation } from "../app/utils";
 import { eOnLoadNote } from "../app/utils/events";
 import { Search } from "./search";
 import { useShareStore } from "./store";
+import { useCallback } from "react";
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
@@ -207,7 +208,8 @@ const ShareView = ({ quicknote = false }) => {
   const insets =
     Platform.OS === "android"
       ? { top: StatusBar.currentHeight }
-      : useSafeAreaInsets();
+      : // eslint-disable-next-line react-hooks/rules-of-hooks
+        useSafeAreaInsets();
   const [showSearch, setShowSearch] = useState(false);
   const [kh, setKh] = useState(0);
   const editorRef = useRef();
@@ -251,7 +253,7 @@ const ShareView = ({ quicknote = false }) => {
     return note;
   };
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       defaultNote.content.data = null;
       setNote({ ...defaultNote });
@@ -282,7 +284,7 @@ const ShareView = ({ quicknote = false }) => {
       console.error(e);
     }
     setLoadingIntent(false);
-  };
+  }, [onLoad]);
 
   useEffect(() => {
     (async () => {
@@ -291,7 +293,7 @@ const ShareView = ({ quicknote = false }) => {
       loadData();
       useShareStore.getState().restoreAppendNote();
     })();
-  }, []);
+  }, [loadData]);
 
   const close = async () => {
     setNote({ ...defaultNote });
@@ -304,20 +306,23 @@ const ShareView = ({ quicknote = false }) => {
     }
   };
 
-  const onLoad = (editor) => {
-    if (editor) {
-      Storage.write("shareExtensionOpened", "opened");
-      return loadData();
-    }
-    eSendEvent(eOnLoadNote + "shareEditor", {
-      id: null,
-      content: {
-        type: "tiptap",
-        data: noteContent.current
-      },
-      forced: true
-    });
-  };
+  const onLoad = useCallback(
+    (editor) => {
+      if (editor) {
+        Storage.write("shareExtensionOpened", "opened");
+        return loadData();
+      }
+      eSendEvent(eOnLoadNote + "shareEditor", {
+        id: null,
+        content: {
+          type: "tiptap",
+          data: noteContent.current
+        },
+        forced: true
+      });
+    },
+    [loadData]
+  );
 
   const onPress = async () => {
     setLoading(true);

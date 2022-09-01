@@ -320,15 +320,7 @@ export const useEditor = (
         loadImages();
       }
     },
-    [
-      commands,
-      editorId,
-      isDefaultEditor,
-      loadContent,
-      overlay,
-      postMessage,
-      reset
-    ]
+    [commands, isDefaultEditor, loadContent, overlay, postMessage, reset]
   );
 
   const loadImages = () => {
