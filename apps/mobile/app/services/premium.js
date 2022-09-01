@@ -35,6 +35,8 @@ import {
   eShowGetPremium
 } from "../utils/events";
 import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
+import Config from "react-native-config";
+
 import SettingsService from "./settings";
 let premiumStatus = 0;
 let products = [];
@@ -92,7 +94,7 @@ async function getProducts() {
 }
 
 function get() {
-  if (__DEV__) return true;
+  if (__DEV__ || Config.isTesting) return true;
 
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
