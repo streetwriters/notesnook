@@ -19,6 +19,12 @@
     },
     "run-ios": {
       "dependsOn": ["^build"]
+    },
+    "build-ios": {
+      "dependsOn": ["^build"]
+    },
+    "build-android": {
+      "dependsOn": ["^build"]
     }
   }
 }
