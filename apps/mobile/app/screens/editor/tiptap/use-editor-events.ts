@@ -267,7 +267,7 @@ export const useEditorEvents = (
     }
 
     return () => {
-      if (handleBack.current) {
+      if (handleBack.current && DDS.isTab) {
         handleBack.current.remove();
       }
     };
