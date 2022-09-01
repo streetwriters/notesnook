@@ -116,3 +116,50 @@ There are several other folders at the root:
 ### Running the tests
 
 When you are done making the required changes, you will need to run the tests to make sure you didn't break anything. We use Detox as the testing framework & the tests can be started as follows:
+
+### Android
+
+To run the tests on android, you will need to create an emulator device on your system:
+
+```
+$ANDROID_HOME/tools/bin/avdmanager create avd -n Pixel_5_API_31 -d pixel --package "system-images;android-31;default;x86_64"
+```
+
+If you face problems, follow the detailed guide in [Detox documentation](https://wix.github.io/Detox/docs/introduction/android-dev-env). Keep the emulator name set to `Pixel_5_API_31`.
+
+Once you have created an emulator device, build the android apks
+
+```
+npm run build:android
+```
+
+Finally run the tests
+
+```
+npm run test:android
+```
+
+### iOS
+
+To run e2e tests on iOS simulator, you must be on a Mac with XCode installed.
+
+First install [AppleSimulatorUtils](https://github.com/wix/AppleSimulatorUtils)
+
+```
+brew tap wix/brew
+brew install applesimutils
+```
+
+Now build the iOS app for testing:
+
+```
+npm run build:ios
+```
+
+Finally run the tests:
+
+```
+npm run test:ios
+```
+
+All tests on iOS are configured to run on `iPhone 8` simulator.
