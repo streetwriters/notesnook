@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Clipboard from "@react-native-clipboard/clipboard";
 import React, { useRef, useState } from "react";
 import { Linking, Platform, Text, TextInput, View } from "react-native";
+import { getVersion } from "react-native-device-info";
 import { db } from "../../../common/database";
 import { eSendEvent, ToastEvent } from "../../../services/event-manager";
 import PremiumService from "../../../services/premium";
@@ -29,7 +30,6 @@ import { eCloseProgressDialog } from "../../../utils/events";
 import { openLinkInBrowser } from "../../../utils/functions";
 import { SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
-import { APP_VERSION } from "../../../version";
 import DialogHeader from "../../dialog/dialog-header";
 import { presentDialog } from "../../dialog/functions";
 import { Button } from "../../ui/button";
@@ -59,7 +59,7 @@ export const Issue = ({ defaultTitle, defaultBody, issueTitle }) => {
           body.current +
           `\n_______________
 **Device information:**
-App version: ${APP_VERSION}
+App version: ${getVersion()}
 Platform: ${Platform.OS}
 Model: ${Platform.constants.Brand || ""}-${Platform.constants.Model || ""}-${
             Platform.constants.Version || ""
@@ -187,7 +187,9 @@ For example:
       <Paragraph
         size={SIZE.xs}
         color={colors.icon}
-      >{`App version: ${APP_VERSION} Platform: ${Platform.OS} Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${Platform.constants.Version}`}</Paragraph>
+      >{`App version: ${getVersion()} Platform: ${Platform.OS} Model: ${
+        Platform.constants.Brand
+      }-${Platform.constants.Model}-${Platform.constants.Version}`}</Paragraph>
 
       <Seperator />
       <Button

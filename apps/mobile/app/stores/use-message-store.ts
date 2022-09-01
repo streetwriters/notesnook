@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Platform } from "react-native";
+import { getVersion } from "react-native-device-info";
 import create, { State } from "zustand";
-import { APP_VERSION } from "../version";
-import PremiumService from "../services/premium";
-import { SUBSCRIPTION_STATUS } from "../utils/constants";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
+import PremiumService from "../services/premium";
+import { SUBSCRIPTION_STATUS } from "../utils/constants";
 import layoutmanager from "../utils/layout-manager";
 export interface MessageStore extends State {
   message: Message;
@@ -167,7 +167,7 @@ async function shouldShowAnnouncement(announcement: Announcement) {
   );
 
   if (announcement.appVersion) {
-    return announcement.appVersion === APP_VERSION;
+    return announcement.appVersion === (getVersion() as unknown as number);
   }
 
   if (!show) return false;

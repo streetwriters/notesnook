@@ -59,13 +59,14 @@ import {
   eOpenRestoreDialog
 } from "../../utils/events";
 import { sleep } from "../../utils/time";
-import { APP_VERSION } from "../../version";
 import { MFARecoveryCodes, MFASheet } from "./2fa";
 import AppLock from "./app-lock";
 import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
+import { getVersion } from "react-native-device-info";
+
 const format = (ver: number) => {
   const parts = ver.toString().split("");
   return `v${parts[0]}.${parts[1]}.${
@@ -1014,7 +1015,7 @@ export const settingsGroups: SettingSection[] = [
             console.error(e);
           }
         },
-        description: format(APP_VERSION)
+        description: getVersion()
       }
     ]
   }

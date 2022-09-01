@@ -17,8 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import React from "react";
 import { Platform, View } from "react-native";
-import { APP_VERSION } from "../../../version";
+import { getVersion } from "react-native-device-info";
+import { features } from "../../../features";
 import { eSendEvent, presentSheet } from "../../../services/event-manager";
 import SettingsService from "../../../services/settings";
 import { useThemeStore } from "../../../stores/use-theme-store";
@@ -28,8 +30,6 @@ import { Button } from "../../ui/button";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
-import { features } from "../../../features";
-import React from "react";
 export type FeatureType = {
   title: string;
   body: string;
@@ -89,13 +89,13 @@ NewFeature.present = () => {
   const { version, introCompleted } = SettingsService.get();
   if (!introCompleted) {
     SettingsService.set({
-      version: APP_VERSION
+      version: getVersion()
     });
     return;
   }
-  if (version && version === APP_VERSION) return false;
+  if (version && version === getVersion()) return false;
   SettingsService.set({
-    version: APP_VERSION
+    version: getVersion()
   });
   const _features = features?.filter(
     (feature) => !feature.platform || feature.platform === Platform.OS
