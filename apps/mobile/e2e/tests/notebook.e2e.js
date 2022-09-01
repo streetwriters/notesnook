@@ -272,7 +272,7 @@ describe("NOTEBOOKS", () => {
     await visibleByText("Notebook 1");
   });
 
-  it.only("Pin topic to side menu", async () => {
+  it("Pin topic to side menu", async () => {
     await prepare();
     await navigate("Notebooks");
     await tapByText("Skip introduction");

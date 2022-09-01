@@ -7,6 +7,12 @@
       "device": {
         "avdName": "Pixel_5_API_31"
       }
+    },
+    "simulator": {
+      "type": "ios.simulator",
+      "device": {
+        "type": "iPhone 8"
+      }
     }
   },
   "apps": {
@@ -14,13 +20,19 @@
       "type": "android.apk",
       "binaryPath": "android/app/build/outputs/apk/debug/app-x86_64-debug.apk",
       "testBinaryPath": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
-      "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd .."
+      "build": "cd android ; ENVFILE=.env.test ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd .."
     },
     "android.release": {
       "type": "android.apk",
       "binaryPath": "android/app/build/outputs/apk/release/app-x86_64-release.apk",
       "testBinaryPath": "android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk",
-      "build": "cd android ; ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release ; cd .."
+      "build": "cd android ; ENVFILE=.env.test ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release ; cd .."
+    },
+    "ios.release": {
+      "name": "Notesnook",
+      "type": "ios.app",
+      "binaryPath": "ios/build/Build/Products/Release-iphonesimulator/Notesnook.app",
+      "build": "ENVFILE=.env.test xcodebuild -workspace ios/Notesnook.xcworkspace -scheme NotesnookRelease -sdk iphonesimulator -derivedDataPath ios/build"
     }
   },
   "configurations": {
@@ -31,6 +43,10 @@
     "android.emu.release": {
       "app": "android.release",
       "device": "emulator"
+    },
+    "ios.sim.release": {
+      "device": "simulator",
+      "app": "ios.release"
     }
   }
 }

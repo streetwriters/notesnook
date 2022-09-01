@@ -1,28 +1,30 @@
 {
   "name": "@notesnook/mobile",
-  "version": "2.1.7",
+  "version": "2.1.8",
   "private": true,
   "workspaces": [
     "native/",
     "app/"
   ],
   "scripts": {
-    "postinstall": "yarn patch-package",
-    "patch-lib": "./scripts/patch-package.sh",
-    "run-android": "cd native && REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ react-native run-android --active-arch-only",
+    "run-android": "cd native && react-native run-android --active-arch-only",
     "run-ios": "cd native && react-native run-ios",
     "start": "cd native && react-native start",
     "repack": "cd native && react-native webpack-start",
-    "install-pods": "cd native/ios && pod install"
+    "install-pods": "cd native/ios && pod install",
+    "build-ios": "cd native && detox build -c ios.sim.release",
+    "build-android": "cd native && detox build -c android.emu.release",
+    "e2e-android": "cd native && detox test --configuration android.emu.release --detectOpenHandles",
+    "e2e-ios": "cd native && detox test -c ios.sim.release --detectOpenHandles",
+    "bump": "npx react-native bump-version --skip-semver-for android"
   },
   "devDependencies": {
     "patch-package": "^6.4.7",
-    "postinstall-postinstall": "^2.1.0",
     "typescript": "^4.8.2"
   },
   "dependencies": {
+    "@notesnook/core": "*",
     "@notesnook/editor": "*",
-    "@notesnook/editor-mobile": "*",
-    "@notesnook/core": "*"
+    "@notesnook/editor-mobile": "*"
   }
 }

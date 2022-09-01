@@ -348,7 +348,7 @@ index 063582c..472019c 100644
 +endif ()
 \ No newline at end of file
 diff --git a/node_modules/react-native-reanimated/android/build.gradle b/node_modules/react-native-reanimated/android/build.gradle
-index dfb79c8..51875ce 100644
+index dfb79c8..323e5ec 100644
 --- a/node_modules/react-native-reanimated/android/build.gradle
 +++ b/node_modules/react-native-reanimated/android/build.gradle
 @@ -1,10 +1,9 @@
@@ -656,15 +656,16 @@ index dfb79c8..51875ce 100644
                  _stackProtectorFlag ? (cppFlags("-fstack-protector-all")) : null
              }
          }
-@@ -411,6 +238,7 @@ android {
+@@ -411,6 +238,8 @@ android {
                  "**/libhermes.so",
                  "**/libreactnativejni.so",
                  "**/libjscexecutor.so",
 +                "**/libv8executor.so",
++                "META-INF/MANIFEST.MF"
          ]
      }
      tasks.withType(JavaCompile) {
-@@ -435,7 +263,7 @@ task cleanCmakeCache() {
+@@ -435,7 +264,7 @@ task cleanCmakeCache() {
  }
  
  task printVersions {
@@ -673,7 +674,7 @@ index dfb79c8..51875ce 100644
      println "Gradle: ${project.gradle.gradleVersion}"
  }
  
-@@ -446,10 +274,10 @@ task Log {
+@@ -446,10 +275,10 @@ task Log {
  task applyJavaPatches(type: Copy) {
      def patchDirectory = file("${projectDir}/rnVersionPatch/${rnMinorVersion}")
      if (patchDirectory.exists()) {
@@ -686,7 +687,7 @@ index dfb79c8..51875ce 100644
      }
  }
  
-@@ -643,7 +471,7 @@ task extractSOFiles {
+@@ -643,7 +472,7 @@ task extractSOFiles {
  task packageNdkLibs(type: Copy) {
      from("$buildDir/reanimated-ndk/all")
      include("**/libreanimated.so")
@@ -695,7 +696,7 @@ index dfb79c8..51875ce 100644
          include("**/libturbomodulejsijni.so")
      }
      into("$projectDir/src/main/jniLibs")
-@@ -668,8 +496,7 @@ dependencies {
+@@ -668,8 +497,7 @@ dependencies {
      implementation "com.facebook.yoga:proguard-annotations:1.19.0"
      if (isDeveloperMode()) {
          implementation "com.facebook.fbjni:fbjni:" + FBJNI_VERSION
@@ -705,7 +706,7 @@ index dfb79c8..51875ce 100644
          implementation "com.facebook.fbjni:fbjni-java-only:" + FBJNI_VERSION
      }
      implementation "com.facebook.react:react-native:+" // From node_modules
-@@ -677,6 +504,11 @@ dependencies {
+@@ -677,6 +505,11 @@ dependencies {
      extractHeaders("com.facebook.fbjni:fbjni:" + FBJNI_VERSION + ":headers")
      extractSO("com.facebook.fbjni:fbjni:" + FBJNI_VERSION)
  
@@ -717,7 +718,7 @@ index dfb79c8..51875ce 100644
      def buildType = "debug"
      tasks.all({ task ->
          if (task.name == "buildCMakeRelease") {
-@@ -688,25 +520,33 @@ dependencies {
+@@ -688,25 +521,33 @@ dependencies {
          rnAarMatcher = "**/**/*.aar"
      }
      def rnAAR = fileTree("$reactNative/android").matching({ it.include rnAarMatcher }).singleFile
@@ -758,7 +759,7 @@ index dfb79c8..51875ce 100644
      buildTasks.forEach { task -> task.dependsOn(dependsOnTask) }
  }
  
-@@ -717,11 +557,30 @@ afterEvaluate {
+@@ -717,11 +558,30 @@ afterEvaluate {
      nativeBuildDependsOn(prepareThirdPartyNdkHeaders)
      nativeBuildDependsOn(extractAARHeaders)
      nativeBuildDependsOn(extractSOFiles)

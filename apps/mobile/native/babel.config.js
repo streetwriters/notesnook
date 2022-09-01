@@ -28,6 +28,5 @@ const configs = {
 module.exports = function (api, opts) {
   api.cache(true);
   if (!env) env = 'production';
-  console.log('babel-env:', env);
   return configs.env[env];
 };

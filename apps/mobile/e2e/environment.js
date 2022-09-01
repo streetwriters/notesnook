@@ -17,11 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {
+const {
   DetoxCircusEnvironment,
   SpecReporter,
   WorkerAssignReporter
-} from "detox/runners/jest-circus";
+} = require("detox/runners/jest-circus");
+
+const sleep = (duration) =>
+  new Promise((resolve) =>
+    setTimeout(() => {
+      resolve();
+    }, duration)
+  );
 
 class CustomDetoxEnvironment extends DetoxCircusEnvironment {
   constructor(config, context) {
@@ -36,6 +43,14 @@ class CustomDetoxEnvironment extends DetoxCircusEnvironment {
       SpecReporter,
       WorkerAssignReporter
     });
+  }
+
+  async initDetox() {
+    const instance = await this.detox.init(undefined, { launchApp: false });
+    await sleep(10000);
+    await instance.device.reverseTcpPort(8081); // added this line
+    await instance.device.launchApp();
+    return instance;
   }
 }
 

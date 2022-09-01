@@ -3,20 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "run-android": "REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ react-native run-android --active-arch-only",
-    "release": "react-native run-android --variant=release",
-    "run-ios": "react-native run-ios",
-    "start": "react-native start",
-    "repack": "react-native webpack-start",
-    "test": "jest --forceExit",
-    "lint": "eslint .",
-    "build-detox-android": "REACT_NATIVE_DEPENDENCIES=$HOME/Repos/notesnook-mobile/rn-build-deps/ ENVFILE=.env.test detox build -c android.emu.debug",
-    "test-android": "adb reverse tcp:8081 tcp:8081 && yarn detox test --configuration android.emu.debug --detectOpenHandles",
-    "test-android-release": "detox test --configuration android.emu.release",
-    "bump": "npx react-native bump-version --skip-semver-for android",
-    "online": "adb reverse tcp:8081 tcp:8081 && adb reverse tcp:3000 tcp:3000"
-  },
   "dependencies": {
     "@callstack/repack": "^3.0.0-next.7",
     "@react-native-clipboard/clipboard": "^1.9.0",

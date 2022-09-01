@@ -29,7 +29,7 @@ module.exports = (env) => {
     bundleFilename = undefined,
     sourceMapFilename = undefined,
     assetsPath = undefined,
-    reactNativePath = require.resolve("react-native"),
+    reactNativePath = path.join(__dirname, "../node_modules/react-native"),
   } = env;
 
   if (!platform) {
@@ -80,10 +80,12 @@ module.exports = (env) => {
        * structure. For simple/typical project you won't need it.
        */
       alias: {
-        //'react-native': reactNativePath,
+        'react-native': reactNativePath,
         "react": path.join(__dirname, "../node_modules/react"),
         "react-dom": path.join(__dirname, "../node_modules/react-dom"),
-        "@notesnook/editor": path.join(__dirname, "../../../packages/editor"),
+        "@notesnook": path.join(__dirname, "../../../packages"),
+        "showdown": path.join(__dirname, "../node_modules/showdown"),
+        "qclone": path.join(__dirname, "../node_modules/qclone"),
       },
     },
     /**

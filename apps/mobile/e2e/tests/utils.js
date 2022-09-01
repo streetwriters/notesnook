@@ -21,7 +21,7 @@ import { notesnook } from "../test.ids";
 import { readFileSync } from "fs";
 import { expect as jestExpect } from "@jest/globals";
 import { toMatchImageSnapshot } from "jest-image-snapshot";
-import { device as _device, web } from "detox";
+import { device as _device } from "detox";
 jestExpect.extend({ toMatchImageSnapshot });
 
 const sleep = (duration) =>
