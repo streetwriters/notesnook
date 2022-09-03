@@ -1,5 +1,5 @@
 <p align="center">
-<img style="align:center;" src="https://notesnook.com/logo.svg" alt="Notesnook Logo" width="100" />
+<img style="align:center;" src="https://raw.githubusercontent.com/streetwriters/notesnook/master/resources/icon.png" alt="Notesnook Logo" width="100" />
 </p>
 
 <h1 align="center">Notesnook</h1>
