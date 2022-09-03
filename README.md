@@ -19,7 +19,7 @@ Notesnook is our **proof** that privacy does _not_ (always) have to come at the 
 This repository contains all the code required to build & use the Notesnook web, desktop & mobile clients. If you are looking for a full features list or screenshots, please check the [website](https://notesnook.com/).
 
 ### Download the app
- <a href='https://play.google.com/store/apps/details?id=com.streetwriters.notesnook&hl=en_IN&gl=US'><kbd><img height="38" src="download_badges/download_on_the_play_store_badge.svg" alt="Get it on Google Play" /></kbd></a>
+ <a href='https://play.google.com/store/apps/details?id=com.streetwriters.notesnook'><kbd><img height="38" src="download_badges/download_on_the_play_store_badge.svg" alt="Get it on Google Play" /></kbd></a>
  <a href='https://apps.apple.com/us/app/notesnook-take-private-notes/id1544027013'><kbd><img src="download_badges/download_on_the_app_store_badge.svg" alt="Download on App Store" /></kbd></a>
 
 ## Developer guide
