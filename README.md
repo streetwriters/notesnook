@@ -1,5 +1,5 @@
 <p align="center">
-<img style="align:center;" src="https://raw.githubusercontent.com/streetwriters/notesnook/master/resources/icon.png" alt="Notesnook Logo" width="100" />
+<img style="align:center;" src="./resources/icon.png" alt="Notesnook Logo" width="100" />
 </p>
 
 <h1 align="center">Notesnook</h1>
@@ -34,33 +34,22 @@ Notesnook is built using the following technologies:
 
 ### Monorepo structure
 
-| Name                       | Path                                     | Description                                                       |
-| -------------------------- | ---------------------------------------- | ----------------------------------------------------------------- |
-| `@notesnook/web`           | [/apps/web][web]                         | Web/desktop clients                                               |
-| `@notesnook/mobile`        | [/apps/mobile][mobile]                   | Android/iOS clients                                               |
-| `@notesnook/core`          | [/packages/core][core]                   | Shared core between all platforms                                 |
-| `@notesnook/crypto`        | [/packages/crypto][crypto]               | Cryptography library wrapper around libsodium                     |
-| `@notesnook/editor`        | [/packages/editor][editor]               | Notesnook editor + all extensions                                 |
-| `@notesnook/editor-mobile` | [/packages/editor-mobile][editor-mobile] | A very thin wrapper around `@notesnook/editor` for mobile clients |
-| `@notesnook/logger`        | [/packages/logger][logger]               | Simple & pluggable logger                                         |
-| `@notesnook/crypto-worker` | [/packages/crypto-worker][crypto-worker] | Helpers to use `@notesnook/crypto` from a Worker                  |
-| `@notesnook/streamable-fs` | [/packages/streamable-fs][streamable-fs] | Streaming interface around an IndexedDB based file system         |
-| `@notesnook/theme`         | [/packages/theme][theme]                 | The core theme used in web & desktop clients                      |
-
-[web]: /apps/web
-[mobile]: /apps/mobile
-[core]: /packages/core
-[crypto]: /packages/crypto
-[editor]: /packages/editor
-[editor-mobile]: /packages/editor-mobile
-[logger]: /packages/logger
-[crypto-worker]: /packages/crypto-worker
-[streamable-fs]: /packages/streamable-fs
-[theme]: /packages/theme
+| Name                       | Path                                               | Description                                                       |
+| -------------------------- | -------------------------------------------------- | ----------------------------------------------------------------- |
+| `@notesnook/web`           | [/apps/web](/apps/web)                             | Web/Desktop clients                                               |
+| `@notesnook/mobile`        | [/apps/mobile](/apps/mobile)                       | Android/iOS clients                                               |
+| `@notesnook/core`          | [/packages/core](/packages/core)                   | Shared core between all platforms                                 |
+| `@notesnook/crypto`        | [/packages/crypto](/packages/crypto)               | Cryptography library wrapper around libsodium                     |
+| `@notesnook/editor`        | [/packages/editor](/packages/editor)               | Notesnook editor + all extensions                                 |
+| `@notesnook/editor-mobile` | [/packages/editor-mobile](/packages/editor-mobile) | A very thin wrapper around `@notesnook/editor` for mobile clients |
+| `@notesnook/logger`        | [/packages/logger](/packages/logger)               | Simple & pluggable logger                                         |
+| `@notesnook/crypto-worker` | [/packages/crypto-worker](/packages/crypto-worker) | Helpers to use `@notesnook/crypto` from a Worker                  |
+| `@notesnook/streamable-fs` | [/packages/streamable-fs](/packages/streamable-fs) | Streaming interface around an IndexedDB based file system         |
+| `@notesnook/theme`         | [/packages/theme](/packages/theme)                 | The core theme used in web & desktop clients                      |
 
 ### Contributing guidelines
 
-If you are interested in contributing to Notesnook, I highly recommend checking out [the contributing guidelines](/CONTRIBUTING.md) here. You'll find all the relevant information such as [style guideline](/CONTRIBUTING.md#style-guidelines), [how to make a PR](/CONTRIBUTING.md#opening--submitting-a-pull-request), [how to commit](/CONTRIBUTING.md#commit-guidelines) etc., there.
+If you are interested in contributing to Notesnook, I highly recommend checking out the [contributing guidelines](/CONTRIBUTING.md) You'll find all the relevant information such as [style guideline](/CONTRIBUTING.md#style-guidelines), [how to make a PR](/CONTRIBUTING.md#opening--submitting-a-pull-request), [how to commit](/CONTRIBUTING.md#commit-guidelines) etc., there.
 
 ### Support & help
 
@@ -75,7 +64,7 @@ We take all queries, issues and bug reports that you might have. Feel free to as
 
 ## Additional Resources
 
-- [Migrating & importing your data from other apps — Importer](https://importer.notesnook.com/)
-- [Privacy policy](https://notesnook.com/privacy) & [terms of service](https://notesnook.com/terms)
+- [Migrating & Importing your data from other apps — Importer](https://importer.notesnook.com/)
+- [Privacy policy](https://notesnook.com/privacy) & [Terms of service](https://notesnook.com/terms)
 - [Verify Notesnook encryption claims yourself — Vericrypt](https://vericrypt.notesnook.com/)
 - [Why Notesnook requires an email address?](https://blog.notesnook.com/why-notesnook-requires-an-email-address/)
