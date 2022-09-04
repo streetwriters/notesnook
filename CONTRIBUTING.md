@@ -143,7 +143,7 @@ Submit all changes directly to the [`master branch`](https://github.com/streetwr
 
 ## Review Process
 
-We deeply appreciate everyone who takes the time to make a contribution. We will review all contributions as quickly as possible. **As a reminder, [opening an issue](https://github.com/opensearch-project/OpenSearch/issues/new/choose) and discussing your change before you make it, is the best way to smooth the PR process.** This will prevent a rejection because someone else is already working on the problem, or because the solution is incompatible with the architectural direction.
+We deeply appreciate everyone who takes the time to make a contribution. We will review all contributions as quickly as possible. **As a reminder, [opening an issue](https://github.com/streetwriters/notesnook/issues/new/choose) and discussing your change before you make it, is the best way to smooth the PR process.** This will prevent a rejection because someone else is already working on the problem, or because the solution is incompatible with the architectural direction.
 
 During the PR process, expect that there will be some back-and-forth. Please try to respond to comments in a timely fashion, and:
 
