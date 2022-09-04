@@ -2,19 +2,19 @@
 
 Thank you so much for considering to contribute to Notesnook! If you have no idea where to start, what to do, what you _can_ do then you are in the right place. There are plenty of ways you can contribute to Notesnook; many don't even require coding skills.
 
-## **Ways to Contribute**
+## Ways to Contribute
 
-### **Reporting a bug**
+### Reporting a bug
 
 Ugh! Bugs!
 
-> A bug is when software behaves in a way that you didn't expect and the developer didn't intend.
+> A bug is when software behaves in a way that you didn't expect, and the developer didn't intend.
 
 To help us understand what's going on, we first want to **make sure you're using the latest version of Notesnook**.
 
 Once you've **confirmed that the bug still exists in the latest version**, you'll want to check to make sure it's not something we already know about in the [opened GitHub issues](https://github.com/streetwriters/notesnook/issues).
 
-If you've **upgraded to the latest version and you can't find it in our open issues** list, it's time to [open a new issue](https://github.com/streetwriters/notesnook/issues/new/choose). It is recommended that you fill out all the fields in the GitHub issue form with as much detail as possible. This includes:
+If you've **upgraded to the latest version, and you can't find it in our open issues** list, it's time to [open a new issue](https://github.com/streetwriters/notesnook/issues/new/choose). It is recommended that you fill out all the fields in the GitHub issue form with as much detail as possible. This includes:
 
 1. Exact steps to reproduce the problem
 2. Video or picture showing the problem
@@ -36,7 +36,7 @@ If you find a mistake in the documentation or would like to contribute something
 
 ### Helping out in the issue tracker
 
-There are always new issues getting opened that need to be triaged, sorted & organized so the developers can easily find the most critical and/or relevant bugs to fix. Any help in this regard is appreciated.
+There are always new issues getting opened that need to be triaged, sorted & organized, so the developers can easily find the most critical and/or relevant bugs to fix. Any help in this regard is appreciated.
 
 In addition to this, you can help out in the following ways:
 
@@ -49,7 +49,7 @@ In addition to this, you can help out in the following ways:
 
 > Before you start contributing code, **make sure to read the [commit guidelines](#commit-guidelines), [git branch organization](#git-branch-organization) & [style guidelines](#style-guidelines).**
 
-As with other types of contributions, **the first step is to **[**open an issue**](https://github.com/streetwriters/notesnook/issues/new/choose)** on GitHub**. Opening an issue before you make changes ensures that someone else isn't already working on that particular problem. It also lets us all work together to find the right approach before you spend a bunch of time on a PR. **So again, when in doubt, open an issue**.
+As with other types of contributions, **the first step is to [open an issue](https://github.com/streetwriters/notesnook/issues/new/choose) on GitHub**. Opening an issue before you make changes ensures that someone else isn't already working on that particular problem. It also lets us all work together to find the right approach before you spend a bunch of time on a PR. **So again, when in doubt, open an issue**.
 
 #### Implementing a new feature or fixing a bug
 
@@ -72,16 +72,16 @@ Once you are done, [open a new pull request](https://docs.github.com/en/pull-req
 4. Ensure the test suite passes (`npm run test`).
 5. Format your code with prettier (`npm run prettier`).
 6. Make sure your code lints (`npm run lint`). Tip: `npm run linc` to only check changed files.
-7. Read & follow the commit guidelines
-8. Read & follow the style guidelines
+7. Read & follow the commit guidelines.
+8. Read & follow the style guidelines.
 
 ### Commit guidelines
 
 #### Sign-off your commits
 
-To keep Notesnook 100% open source we use [DCO (Developer Certificate of Origin)](http://DeveloperCertificate.org) instead of CLA. We respect intellectual property rights of others and a Developer Certificate of Origin **(DCO) is a lightweight mechanism to make sure all incoming contributions are correctly attributed and licensed**.
+To keep Notesnook 100% open source we use [DCO (Developer Certificate of Origin)](http://DeveloperCertificate.org) instead of CLA. We respect intellectual property rights of others, and a **Developer Certificate of Origin (DCO) is a lightweight mechanism to make sure all incoming contributions are correctly attributed and licensed**.
 
-The DCO is a declaration attached to every contribution made by every developer in the message of every commit. The developer simply adds a `Signed-off-by` statement and thereby agrees to the DCO, which at [DeveloperCertificate.org](http://DeveloperCertificate.org).
+The DCO is a declaration attached to every contribution made by every developer in the message of every commit. The developer simply adds a `Signed-off-by` statement and thereby agrees to the DCO, which can be viewed at [DeveloperCertificate.org](http://DeveloperCertificate.org).
 
 **We require that every contribution to Notesnook is signed with a Developer Certificate of Origin**. Additionally, **please use your real name**. We do not accept anonymous contributors nor those utilizing pseudonyms.
 
@@ -114,7 +114,7 @@ All commits must include valid scopes in the commit message. **Valid commit scop
 
 1. `config`: changes related to config of installed tools in the repo (e.g. eslint rules)
 2. `ci`: changes related to CI
-3. `setup`: setting up someting new in the repo (e.g. eslint, commitlint)
+3. `setup`: setting up something new in the repo (e.g. eslint, commitlint)
 4. `docs`: changes related to documentation (README etc.)
 5. `misc`: miscellaneous changes like package-lock.json updates
 
@@ -136,14 +136,14 @@ However, there are still some styles that the linter cannot pick up. If you are 
 
 ## Git Branch Organization
 
-Submit all changes directly to the [`master branch`](https://github.com/facebook/react/tree/main). We don’t use separate branches for development or for upcoming releases. This requires us to always keep the `master` branch in a deployable state which means:
+Submit all changes directly to the [`master branch`](https://github.com/streetwriters/notesnook). We don’t use separate branches for development or for upcoming releases. This requires us to always keep the `master` branch in a deployable state which means:
 
 1. All tests must be passing at all times
 2. There should be as few breaking changes as possible
 
-## **Review Process**
+## Review Process
 
-We deeply appreciate everyone who takes the time to make a contribution. We will review all contributions as quickly as possible. **As a reminder, **[**opening an issue**](https://github.com/opensearch-project/OpenSearch/issues/new/choose)** discussing your change before you make it is the best way to smooth the PR process.** This will prevent a rejection because someone else is already working on the problem, or because the solution is incompatible with the architectural direction.
+We deeply appreciate everyone who takes the time to make a contribution. We will review all contributions as quickly as possible. **As a reminder, [opening an issue](https://github.com/streetwriters/notesnook/issues/new/choose) and discussing your change before you make it, is the best way to smooth the PR process.** This will prevent a rejection because someone else is already working on the problem, or because the solution is incompatible with the architectural direction.
 
 During the PR process, expect that there will be some back-and-forth. Please try to respond to comments in a timely fashion, and:
 
