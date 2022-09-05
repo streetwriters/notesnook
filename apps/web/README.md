@@ -1,5 +1,5 @@
 <p align="center">
-<img style="align:center;" src="/resources/screenshots/web.jpg" alt="Notesnook web screenshot" width="600" />
+<img style="align:center;" src="../../resources/screenshots/web.jpg" alt="Notesnook web screenshot" width="600" />
 </p>
 
 <h1 align="center">Notesnook Web</h1>
@@ -12,16 +12,16 @@
 
 ### The desktop app?
 
-You can find all the desktop related code in [the `desktop/` directory](./desktop/). Since it uses the web app directly, we are keeping both together. (We should probably move it to it's own project at some point.)
+You can find all the desktop related code in the [desktop](./desktop/) directory. Since it uses the web app directly, we are keeping both together. (We should probably move it to it's own project at some point.)
 
 ### Downloads & releases
 
-- Web app: [try it out here](https://app.notesnook.com/)
-- Desktop app: [download for your platform from here](https://notesnook.com/downloads)
+- Web app: [Try it out here.](https://app.notesnook.com/)
+- Desktop app: [Download for your platform from here.](https://notesnook.com/downloads)
 
 ## Build instructions
 
-**Before you start it is recommended that you read [the contributing guidelines](/CONTRIBUTING.md).**
+**Before you start it is recommended that you read the [contributing guidelines](../../CONTRIBUTING.md).**
 
 ### Setting up the development environment
 
