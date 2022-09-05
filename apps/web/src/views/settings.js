@@ -194,9 +194,9 @@ function Settings() {
                   variant="columnCenter"
                   bg="shade"
                   mr={2}
-                  size={35}
                   sx={{
-                    borderRadius: 80
+                    borderRadius: 80,
+                    size: 35
                   }}
                 >
                   <Icon.User size={20} color="primary" />
