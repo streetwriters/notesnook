@@ -84,7 +84,12 @@ export default function AnnouncementBody({
               />
             );
           case "callToActions":
-            return <InlineCalltoActions item={item} />;
+            return (
+              <InlineCalltoActions
+                item={item}
+                removeAnnouncement={removeAnnouncement}
+              />
+            );
           case "text":
             return (
               <Text
@@ -252,7 +257,7 @@ function CalltoActions({ item, removeAnnouncement }) {
   );
 }
 
-function InlineCalltoActions({ item }) {
+function InlineCalltoActions({ item, removeAnnouncement }) {
   const { actions, style } = item;
   return (
     <Flex px={2} sx={mapStyle(style)}>
@@ -278,6 +283,7 @@ function InlineCalltoActions({ item }) {
                 mr: 1
               }
             }}
+            removeAnnouncement={removeAnnouncement}
           />
         ))}
     </Flex>
@@ -290,7 +296,7 @@ function CalltoAction({ action, variant, sx, removeAnnouncement }) {
       variant={variant}
       sx={sx}
       onClick={async () => {
-        removeAnnouncement();
+        if (removeAnnouncement) removeAnnouncement();
         closeOpenedDialog();
         trackEvent(ANALYTICS_EVENTS.announcementCta, action.data);
         switch (action.type) {
