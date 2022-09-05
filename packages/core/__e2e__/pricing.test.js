@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import Pricing from "../pricing";
+import Pricing from "../api/pricing";
 
 test.each(["monthly", "yearly", undefined])(`get %s price`, async (period) => {
   const pricing = new Pricing();
