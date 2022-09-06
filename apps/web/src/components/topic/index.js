@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import React, { useMemo } from "react";
 import ListItem from "../list-item";
 import { db } from "../../common/db";
 import { store as appStore } from "../../stores/app-store";
@@ -28,7 +28,12 @@ import { Multiselect } from "../../common/multi-select";
 import { pluralize } from "../../utils/string";
 
 function Topic({ item, index, onClick }) {
+  const { id, notebookId } = item;
   const topic = item;
+  const totalNotes = useMemo(() => {
+    return db.notebooks.notebook(notebookId)?.topics.topic(id).totalNotes;
+  }, [id, notebookId]);
+
   return (
     <ListItem
       selectable
@@ -50,7 +55,7 @@ function Topic({ item, index, onClick }) {
             •
           </Text>
           <Text variant="subBody">
-            {pluralize(topic.notes?.length || 0, "note", "notes")}
+            {pluralize(totalNotes || 0, "note", "notes")}
           </Text>
         </Flex>
       }
@@ -64,10 +69,7 @@ function Topic({ item, index, onClick }) {
 }
 
 export default React.memo(Topic, (prev, next) => {
-  return (
-    prev?.item?.title === next?.item?.title &&
-    prev?.item?.notes.length === next?.item?.notes.length
-  );
+  return prev?.item?.title === next?.item?.title;
 });
 
 const menuItems = [
