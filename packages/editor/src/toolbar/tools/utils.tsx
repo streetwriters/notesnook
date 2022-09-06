@@ -150,8 +150,17 @@ export const insetBlockWithParagraph = (
     // case 2: Node is empty but document is not empty
   } else if (nodeSize === 2 && tr?.doc.content.size !== 2) {
     commands(editor)?.run();
-    // we will not insert a paragraph if there is a next sibling present
-    if (!nextSibling) insertParagraph(editor, true);
+
+    // If there is not next sibling,we are probably at the end of the document.
+    if (!nextSibling) {
+      const docSize = editor.current?.state.doc.content.size || 0;
+      editor.current
+        ?.chain()
+        .insertContentAt(docSize, "<p></p>", {
+          updateSelection: false
+        })
+        .run();
+    }
 
     // case 3: Node and document both are empty.
   } else if (nodeSize === 2 && tr?.doc.content.size === 2) {
