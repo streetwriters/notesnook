@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNotesStore } from "../stores/note-store";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
@@ -25,11 +25,8 @@ import { hashNavigate, navigate } from "../navigation";
 import FavoritesPlaceholder from "../components/placeholders/favorites-placeholder";
 import { groupArray } from "@notesnook/core/utils/grouping";
 import { db } from "../common/db";
-import { Flex, Text } from "@theme-ui/components";
-import { SyncError } from "../components/icons";
 
 function Notes() {
-  const [isSynced, setIsSynced] = useState(true);
   const context = useNotesStore((store) => store.context);
   const refreshContext = useNotesStore((store) => store.refreshContext);
   const type = context?.type === "favorite" ? "favorites" : "notes";
@@ -37,14 +34,6 @@ function Notes() {
   useEffect(() => {
     if (context?.type === "color" && context?.notes?.length <= 0) {
       navigate("/", true);
-    }
-  }, [context]);
-
-  useEffect(() => {
-    if (context?.type === "topic") {
-      const { id, topic } = context.value;
-      if (!db.notebooks.notebook(id)?.topics.topic(topic)?.synced())
-        setIsSynced(false);
     }
   }, [context]);
 
@@ -56,16 +45,6 @@ function Notes() {
       refresh={refreshContext}
       context={{ ...context, notes: undefined }}
       items={groupArray(context.notes, db.settings.getGroupOptions(type))}
-      header={
-        isSynced ? null : (
-          <Flex bg="errorBg" p={2} py={1} sx={{ alignItems: "center" }}>
-            <SyncError color="error" size={16} />
-            <Text variant={"body"} ml={1} sx={{ color: "error" }}>
-              Some notes of this topic are not synced.
-            </Text>
-          </Flex>
-        )
-      }
       placeholder={
         context.type === "favorite" ? FavoritesPlaceholder : NotesPlaceholder
       }
