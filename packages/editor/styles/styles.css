@@ -317,6 +317,7 @@ span:focus .fake-cursor {
   font-size: 0.95em;
   font-family: "Consolas", "Ubuntu Mono", monospace;
   cursor: auto;
+  margin-top: 1em;
 }
 
 .math-node.empty-math .math-render::before {
