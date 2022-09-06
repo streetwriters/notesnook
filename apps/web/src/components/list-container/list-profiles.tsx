@@ -42,6 +42,9 @@ export type Item = { id: string; type: string; title: string } & Record<
   unknown
 >;
 
+type NotebookReference = Item & { topics: string[] };
+type NotebookType = Item & { topics: Item[] };
+
 export type Context = { type: string } & Record<string, unknown>;
 type ItemWrapperProps = {
   index: number;
@@ -114,26 +117,41 @@ function getTags(item: Item) {
   return tags || [];
 }
 
-function getNotebook(notebooks: Item[], contextType: string) {
+type NotebookResult =
+  | {
+      id: string;
+      title: string;
+      dateEdited: number;
+      topic: { id: string; title: string };
+    }
+  | undefined;
+
+function getNotebook(
+  notebooks: Item[],
+  contextType: string
+): NotebookResult | undefined {
   if (contextType === "topic" || !notebooks?.length) return;
 
-  const noteNotebook = notebooks[0] as Item & { topics: string[] };
-  const topicId = noteNotebook.topics[0];
+  return notebooks.reduce<NotebookResult>(function (
+    prev: NotebookResult,
+    curr
+  ): NotebookResult {
+    if (prev) return prev;
+    const topicId = (curr as NotebookReference).topics[0];
+    const notebook = db.notebooks?.notebook(curr.id)?.data as NotebookType;
+    if (!notebook) return;
 
-  const notebook = db.notebooks?.notebook(noteNotebook.id)?.data as Item & {
-    topics: Item[];
-  };
-  if (!notebook) return;
+    const topic = notebook.topics.find((t: Item) => t.id === topicId);
+    if (!topic) return;
 
-  const topic = notebook.topics.find((t: Item) => t.id === topicId);
-  if (!topic) return;
-
-  return {
-    id: notebook.id,
-    title: notebook.title,
-    dateEdited: notebook.dateEdited,
-    topic: { id: topicId, title: topic.title }
-  };
+    return {
+      id: notebook.id,
+      title: notebook.title,
+      dateEdited: notebook.dateEdited,
+      topic: { id: topicId, title: topic.title }
+    } as NotebookResult;
+  },
+  undefined as NotebookResult);
 }
 
 function getDate(item: Item, groupType: keyof typeof ListProfiles) {
