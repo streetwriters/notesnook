@@ -21,6 +21,7 @@ import { Editor } from "../../types";
 import { MenuButton } from "../../components/menu/types";
 import { ToolButton } from "../components/tool-button";
 import { ToolProps } from "../types";
+import { ChainedCommands } from "@tiptap/core";
 
 export function menuButtonToTool(
   constructItem: (editor: Editor) => MenuButton
@@ -38,3 +39,50 @@ export function menuButtonToTool(
     );
   };
 }
+
+export const insetBlockWithParagraph = (
+  editor: Editor,
+  commands?: (editor: Editor) => ChainedCommands | undefined
+) => {
+  if (!commands) return;
+  const tr = editor.current?.state.tr;
+  const from = tr?.selection.from || 0;
+  const currentParagraph = tr?.doc.nodeAt(from - 1);
+  const nodeSize = currentParagraph?.nodeSize || 0;
+
+  if (nodeSize > 2) {
+    editor?.current
+      ?.chain()
+      .insertContent("<p></p>", {
+        updateSelection: false
+      })
+      .insertContent("<p></p>", {
+        updateSelection: true
+      })
+      .run();
+    commands(editor)?.run();
+  } else if (nodeSize === 2 && tr?.doc.content.size !== 2) {
+    commands(editor)?.run();
+    const nextSibling = tr?.doc.nodeAt(from + 1);
+    if (!nextSibling) {
+      editor.current
+        ?.chain()
+        .insertContent("<p></p>", {
+          updateSelection: true
+        })
+        .run();
+    }
+  } else if (nodeSize === 2 && tr?.doc.content.size === 2) {
+    const lastPosition = editor.current?.state.doc.content.size || 0;
+    editor.current
+      ?.chain()
+      .insertContentAt(lastPosition - 1, "<p></p>", {
+        updateSelection: true
+      })
+      .insertContentAt(lastPosition, "<p></p>", {
+        updateSelection: false
+      })
+      .run();
+    commands(editor)?.run();
+  }
+};

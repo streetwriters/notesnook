@@ -17,19 +17,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ToolProps } from "../types";
-import { Editor } from "../../types";
-import { Icons } from "../icons";
 import { useMemo, useRef, useState } from "react";
-import { Icon } from "../components/icon";
-import { EmbedPopup } from "../popups/embed-popup";
-import { TablePopup } from "../popups/table-popup";
-import { MenuItem } from "../../components/menu/types";
-import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
-import { ResponsivePresenter } from "../../components/responsive";
-import { showPopup } from "../../components/popup-presenter";
-import { ImageUploadPopup } from "../popups/image-upload";
 import { Button } from "../../components/button";
+import { MenuItem } from "../../components/menu/types";
+import { showPopup } from "../../components/popup-presenter";
+import { ResponsivePresenter } from "../../components/responsive";
+import { Editor } from "../../types";
+import { Icon } from "../components/icon";
+import { Icons } from "../icons";
+import { EmbedPopup } from "../popups/embed-popup";
+import { ImageUploadPopup } from "../popups/image-upload";
+import { TablePopup } from "../popups/table-popup";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
+import { ToolProps } from "../types";
+import { insetBlockWithParagraph } from "./utils";
 
 export function InsertBlock(props: ToolProps) {
   const { editor } = props;
@@ -112,7 +113,19 @@ const codeblock = (editor: Editor): MenuItem => ({
   title: "Code block",
   icon: "codeblock",
   isChecked: editor?.isActive("codeBlock"),
-  onClick: () => editor.current?.chain().focus().toggleCodeBlock().run()
+  onClick: () => {
+    const node = editor.current?.state.selection.from || 0;
+    const tr = editor.current?.state.tr;
+    const currentNode = tr?.doc.nodeAt(node - 1);
+    if (currentNode?.type.name === "codeblock") {
+      editor.current?.chain().focus().toggleCodeBlock().run();
+    } else {
+      insetBlockWithParagraph(editor, (editor) =>
+        editor.current?.chain().focus().toggleCodeBlock()
+      );
+    }
+    editor.current?.chain().focus().run();
+  }
 });
 
 const blockquote = (editor: Editor): MenuItem => ({
@@ -121,7 +134,11 @@ const blockquote = (editor: Editor): MenuItem => ({
   title: "Quote",
   icon: "blockquote",
   isChecked: editor?.isActive("blockQuote"),
-  onClick: () => editor.current?.chain().focus().toggleBlockquote().run()
+  onClick: () => {
+    insetBlockWithParagraph(editor, (editor) =>
+      editor.current?.chain().focus().toggleBlockquote()
+    );
+  }
 });
 
 const mathblock = (editor: Editor): MenuItem => ({
@@ -130,7 +147,11 @@ const mathblock = (editor: Editor): MenuItem => ({
   title: "Math & formulas",
   icon: "mathBlock",
   isChecked: editor?.isActive("mathBlock"),
-  onClick: () => editor.current?.chain().focus().insertMathBlock().run()
+  onClick: () => {
+    insetBlockWithParagraph(editor, (editor) =>
+      editor.current?.chain().focus().insertMathBlock()
+    );
+  }
 });
 
 const image = (editor: Editor, isMobile: boolean): MenuItem => ({
@@ -177,14 +198,13 @@ const table = (editor: Editor): MenuItem => ({
         component: (props) => (
           <TablePopup
             onInsertTable={(size) => {
-              editor.current
-                ?.chain()
-                .focus()
-                .insertTable({
+              insetBlockWithParagraph(editor, (editor) =>
+                editor.current?.chain().focus().insertTable({
                   rows: size.rows,
                   cols: size.columns
                 })
-                .run();
+              );
+
               props.onClick?.();
             }}
           />

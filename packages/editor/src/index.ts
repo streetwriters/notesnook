@@ -70,11 +70,19 @@ import { Paragraph } from "./extensions/paragraph";
 import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
 import { Code } from "@tiptap/extension-code";
 import { DateTime } from "./extensions/date-time";
+import { EditorView } from "prosemirror-view";
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
   .filter(([name]) => name !== "ClipboardTextSerializer")
   .map(([, extension]) => extension);
+
+EditorView.prototype.updateState = function updateState(state) {
+  //@ts-ignore
+  if (!this.docView) return; // This prevents the matchesNode error on hot reloads
+  //@ts-ignore
+  this.updateStateInner(state, this.state.plugins != state.plugins);
+};
 
 type TiptapOptions = EditorOptions &
   AttachmentOptions & {
