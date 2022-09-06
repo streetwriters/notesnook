@@ -231,7 +231,9 @@ const embedMobile = (editor: Editor): MenuItem => ({
               title="Insert embed"
               onClose={(embed) => {
                 if (!embed) return onClick?.();
-                editor.current?.chain().insertEmbed(embed).run();
+                insetBlockWithParagraph(editor, (editor) =>
+                  editor.current?.chain().insertEmbed(embed)
+                );
                 onClick?.();
               }}
             />
@@ -280,7 +282,11 @@ const tasklist = (editor: Editor): MenuItem => ({
   title: "Task list",
   icon: "checkbox",
   isChecked: editor?.isActive("taskList"),
-  onClick: () => editor.current?.chain().focus().toggleTaskList().run()
+  onClick: () => {
+    insetBlockWithParagraph(editor, (editor) =>
+      editor.current?.chain().focus().toggleTaskList()
+    );
+  }
 });
 
 const outlinelist = (editor: Editor): MenuItem => ({
@@ -289,7 +295,11 @@ const outlinelist = (editor: Editor): MenuItem => ({
   title: "Outline list",
   icon: "outlineList",
   isChecked: editor?.isActive("outlineList"),
-  onClick: () => editor.current?.chain().focus().toggleOutlineList().run()
+  onClick: () => {
+    insetBlockWithParagraph(editor, (editor) =>
+      editor.current?.chain().focus().toggleOutlineList()
+    );
+  }
 });
 
 const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
@@ -312,6 +322,7 @@ const uploadImageFromURLMobile = (editor: Editor): MenuItem => ({
                 .focus()
                 .insertImage(image)
                 .run();
+
               onClick?.();
             }}
             onClose={() => {
