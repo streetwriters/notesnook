@@ -30,7 +30,7 @@ import { ImageUploadPopup } from "../popups/image-upload";
 import { TablePopup } from "../popups/table-popup";
 import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
-import { insetBlockWithParagraph } from "./utils";
+import { insertBlockWithParagraph } from "./utils";
 
 export function InsertBlock(props: ToolProps) {
   const { editor } = props;
@@ -120,7 +120,7 @@ const codeblock = (editor: Editor): MenuItem => ({
     if (currentNode?.type.name === "codeblock") {
       editor.current?.chain().focus().toggleCodeBlock().run();
     } else {
-      insetBlockWithParagraph(editor, (editor) =>
+      insertBlockWithParagraph(editor, (editor) =>
         editor.current?.chain().focus().toggleCodeBlock()
       );
     }
@@ -135,7 +135,7 @@ const blockquote = (editor: Editor): MenuItem => ({
   icon: "blockquote",
   isChecked: editor?.isActive("blockQuote"),
   onClick: () => {
-    insetBlockWithParagraph(editor, (editor) =>
+    insertBlockWithParagraph(editor, (editor) =>
       editor.current?.chain().focus().toggleBlockquote()
     );
   }
@@ -148,7 +148,7 @@ const mathblock = (editor: Editor): MenuItem => ({
   icon: "mathBlock",
   isChecked: editor?.isActive("mathBlock"),
   onClick: () => {
-    insetBlockWithParagraph(editor, (editor) =>
+    insertBlockWithParagraph(editor, (editor) =>
       editor.current?.chain().focus().insertMathBlock()
     );
   }
@@ -198,7 +198,7 @@ const table = (editor: Editor): MenuItem => ({
         component: (props) => (
           <TablePopup
             onInsertTable={(size) => {
-              insetBlockWithParagraph(editor, (editor) =>
+              insertBlockWithParagraph(editor, (editor) =>
                 editor.current?.chain().focus().insertTable({
                   rows: size.rows,
                   cols: size.columns
@@ -231,7 +231,7 @@ const embedMobile = (editor: Editor): MenuItem => ({
               title="Insert embed"
               onClose={(embed) => {
                 if (!embed) return onClick?.();
-                insetBlockWithParagraph(editor, (editor) =>
+                insertBlockWithParagraph(editor, (editor) =>
                   editor.current?.chain().insertEmbed(embed)
                 );
                 onClick?.();
@@ -283,7 +283,7 @@ const tasklist = (editor: Editor): MenuItem => ({
   icon: "checkbox",
   isChecked: editor?.isActive("taskList"),
   onClick: () => {
-    insetBlockWithParagraph(editor, (editor) =>
+    insertBlockWithParagraph(editor, (editor) =>
       editor.current?.chain().focus().toggleTaskList()
     );
   }
@@ -296,7 +296,7 @@ const outlinelist = (editor: Editor): MenuItem => ({
   icon: "outlineList",
   isChecked: editor?.isActive("outlineList"),
   onClick: () => {
-    insetBlockWithParagraph(editor, (editor) =>
+    insertBlockWithParagraph(editor, (editor) =>
       editor.current?.chain().focus().toggleOutlineList()
     );
   }

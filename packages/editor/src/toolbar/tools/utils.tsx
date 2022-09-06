@@ -111,7 +111,7 @@ function insertParagraphsAtPosition(
     .run();
 }
 
-export const insetBlockWithParagraph = (
+export const insertBlockWithParagraph = (
   editor: Editor,
   commands?: (editor: Editor) => ChainedCommands | undefined
 ) => {
