@@ -57,7 +57,9 @@ test("permanently delete a note", () =>
 test("restore a deleted note that was in a notebook", () =>
   noteTest().then(async ({ db, id }) => {
     let nbId = await db.notebooks.add(TEST_NOTEBOOK);
-    await db.notebooks.notebook(nbId).topics.topic("hello").add(id);
+    const topic = db.notebooks.notebook(nbId).topics.topic("hello");
+    await db.notes.addToNotebook({ id: nbId, topic: topic.id }, id);
+
     await db.notes.delete(id);
     await db.trash.restore(db.trash.all[0].id);
     expect(db.trash.all).toHaveLength(0);
@@ -68,7 +70,7 @@ test("restore a deleted note that was in a notebook", () =>
     expect(await note.content()).toBe(TEST_NOTE.content.data);
 
     const notebook = db.notebooks.notebook(nbId);
-    expect(notebook.topics.topic("hello").has(id)).toBe(true);
+    expect(notebook.topics.topic(topic.id).has(id)).toBe(true);
 
     expect(note.notebooks.some((n) => n.id === nbId)).toBe(true);
 
@@ -102,7 +104,9 @@ test("restore a deleted locked note", () =>
 test("restore a deleted note that's in a deleted notebook", () =>
   noteTest().then(async ({ db, id }) => {
     let nbId = await db.notebooks.add(TEST_NOTEBOOK);
-    await db.notebooks.notebook(nbId).topics.topic("hello").add(id);
+    const topic = db.notebooks.notebook(nbId).topics.topic("hello");
+    await db.notes.addToNotebook({ id: nbId, topic: topic.id }, id);
+
     await db.notes.delete(id);
     await db.notebooks.delete(nbId);
     const deletedNote = db.trash.all.find(
@@ -117,7 +121,10 @@ test("restore a deleted note that's in a deleted notebook", () =>
 test("delete a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let noteId = await db.notes.add(TEST_NOTE);
-    await db.notebooks.notebook(id).topics.topic("hello").add(noteId);
+    let notebook = db.notebooks.notebook(id);
+    const topic = notebook.topics.topic("hello");
+    await db.notes.addToNotebook({ id, topic: topic.id }, noteId);
+
     await db.notebooks.delete(id);
     expect(db.notebooks.notebook(id)).toBeUndefined();
     expect(db.notes.note(noteId).notebook).toBeUndefined();
@@ -126,7 +133,9 @@ test("delete a notebook", () =>
 test("restore a deleted notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let noteId = await db.notes.add(TEST_NOTE);
-    await db.notebooks.notebook(id).topics.topic("hello").add(noteId);
+    const topic = db.notebooks.notebook(id).topics.topic("hello");
+    await db.notes.addToNotebook({ id, topic: topic.id }, noteId);
+
     await db.notebooks.delete(id);
     await db.trash.restore(id);
 
@@ -137,21 +146,24 @@ test("restore a deleted notebook", () =>
     const noteNotebook = note.notebooks.find((n) => n.id === id);
     expect(noteNotebook).toBeDefined();
     expect(noteNotebook.topics).toHaveLength(1);
-
     expect(notebook.topics.topic(noteNotebook.topics[0])).toBeDefined();
   }));
 
 test("restore a notebook that has deleted notes", () =>
   notebookTest().then(async ({ db, id }) => {
     let noteId = await db.notes.add(TEST_NOTE);
-    await db.notebooks.notebook(id).topics.topic("hello").add(noteId);
+
+    let notebook = db.notebooks.notebook(id);
+    const topic = notebook.topics.topic("hello");
+    await db.notes.addToNotebook({ id, topic: topic.id }, noteId);
+
     await db.notebooks.delete(id);
     await db.notes.delete(noteId);
     const deletedNotebook = db.trash.all.find(
       (v) => v.id === id && v.itemType === "notebook"
     );
     await db.trash.restore(deletedNotebook.id);
-    let notebook = db.notebooks.notebook(id);
+    notebook = db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
     expect(notebook.topics.topic("hello").has(noteId)).toBe(false);
   }));

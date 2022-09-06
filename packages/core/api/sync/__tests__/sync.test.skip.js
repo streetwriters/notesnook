@@ -296,7 +296,7 @@ test("issue: remove notebook reference from notes that are removed from topic du
   expect(deviceB.notebooks.notebook(id)).toBeDefined();
 
   const noteA = await deviceA.notes.add({ title: "Note 1" });
-  await deviceA.notes.move({ id, topic: "Topic 1" }, noteA);
+  await deviceA.notes.addToNotebook({ id, topic: "Topic 1" }, noteA);
 
   expect(
     deviceA.notebooks.notebook(id).topics.topic("Topic 1").totalNotes
@@ -305,7 +305,7 @@ test("issue: remove notebook reference from notes that are removed from topic du
   await delay(2000);
 
   const noteB = await deviceB.notes.add({ title: "Note 2" });
-  await deviceB.notes.move({ id, topic: "Topic 1" }, noteB);
+  await deviceB.notes.addToNotebook({ id, topic: "Topic 1" }, noteB);
 
   expect(
     deviceB.notebooks.notebook(id).topics.topic("Topic 1").totalNotes

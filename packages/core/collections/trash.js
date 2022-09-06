@@ -83,9 +83,12 @@ export default class Trash {
       if (item.itemType === "note") {
         await this._db.content.remove(item.contentId);
         await this._db.noteHistory.clearSessions(id);
+      } else if (item.itemType === "notebook") {
+        await this._db.notes._clearAllNotebookReferences(item.id);
       }
       await collection.removeItem(id);
     }
+    this._db.notes.topicReferences.rebuild();
   }
 
   async restore(...ids) {
@@ -99,44 +102,12 @@ export default class Trash {
       delete item.itemType;
 
       if (item.type === "note") {
-        let { notebooks } = item;
-        item.notebooks = undefined;
         await this.collections.notes.add(item);
-
-        if (notebooks) {
-          for (let nb of notebooks) {
-            const { id, topics } = nb;
-            for (let topic of topics) {
-              // if the notebook or topic has been deleted
-              if (
-                !this._db.notebooks._collection.exists(id) ||
-                !this._db.notebooks.notebook(id).topics.has(topic)
-              ) {
-                notebooks = undefined;
-                continue;
-              }
-
-              // restore the note to the topic it was in before deletion
-              await this._db.notebooks
-                .notebook(id)
-                .topics.topic(topic)
-                .add(item.id);
-            }
-          }
-        }
       } else if (item.type === "notebook") {
-        const { topics } = item;
-        item.topics = [];
         await this.collections.notebooks.add(item);
-        let notebook = this._db.notebooks.notebook(item.id);
-        for (let topic of topics) {
-          await notebook.topics.add(topic.title);
-          let t = notebook.topics.topic(topic.title);
-          if (!t) continue;
-          if (topic.notes) await t.add(...topic.notes);
-        }
       }
     }
+    this._db.notes.topicReferences.rebuild();
   }
 
   async clear() {

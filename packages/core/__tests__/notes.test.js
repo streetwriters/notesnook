@@ -60,7 +60,9 @@ test("delete note", () =>
     let notebookId = await db.notebooks.add(TEST_NOTEBOOK);
     let topics = db.notebooks.notebook(notebookId).topics;
     let topic = topics.topic("hello");
-    await topic.add(id);
+
+    await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, id);
+
     topic = topics.topic("hello");
 
     expect(topic.all.findIndex((v) => v.id === id)).toBeGreaterThan(-1);
@@ -192,7 +194,9 @@ test("add note to topic", () =>
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
-    await topic.add(id);
+
+    await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, id);
+
     topic = topics.topic("Home");
     expect(topic.all).toHaveLength(1);
     expect(topic.totalNotes).toBe(1);
@@ -207,7 +211,9 @@ test("duplicate note to topic should not be added", () =>
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
-    await topic.add(id);
+
+    await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, id);
+
     topic = topics.topic("Home");
     expect(topic.all).toHaveLength(1);
   }));
@@ -218,7 +224,7 @@ test("add the same note to 2 notebooks", () =>
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home")._topic;
-    await db.notes.move({ id: notebookId, topic: topic.id }, id);
+    await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, id);
 
     expect(topics.topic(topic.id).has(id)).toBe(true);
 
@@ -226,7 +232,7 @@ test("add the same note to 2 notebooks", () =>
     let topics2 = db.notebooks.notebook(notebookId2).topics;
     await topics2.add("Home2");
     let topic2 = topics2.topic("Home2")._topic;
-    await db.notes.move({ id: notebookId2, topic: topic2.id }, id);
+    await db.notes.addToNotebook({ id: notebookId2, topic: topic2.id }, id);
 
     let note = db.notes.note(id);
     expect(note.notebooks).toHaveLength(2);
@@ -239,8 +245,10 @@ test("moving note to same notebook and topic should do nothing", () =>
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
-    await topic.add(id);
-    await db.notes.move({ id: notebookId, topic: "Home" }, id);
+
+    await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, id);
+    await db.notes.addToNotebook({ id: notebookId, topic: topic.id }, id);
+
     let note = db.notes.note(id);
     expect(note.notebooks.some((n) => n.id === notebookId)).toBe(true);
   }));
@@ -341,16 +349,6 @@ test("note content should not contain image base64 data after save", () =>
     const content = await note.content();
     expect(content).not.toContain(`src="data:image/png;`);
     expect(content).not.toContain(`src=`);
-  }));
-
-test("repairing notebook references should delete non-existent notebooks", () =>
-  noteTest({
-    ...TEST_NOTE,
-    notebooks: [{ id: "hello", topics: ["helloworld"] }]
-  }).then(async ({ db, id }) => {
-    await db.notes.repairReferences();
-    let note = db.notes.note(id);
-    expect(note.notebooks).toHaveLength(0);
   }));
 
 test("adding a note with an invalid tag should clean the tag array", () =>

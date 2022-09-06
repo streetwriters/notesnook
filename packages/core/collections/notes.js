@@ -22,9 +22,23 @@ import Note from "../models/note";
 import getId from "../utils/id";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone/src/qclone";
-import { deleteItem } from "../utils/array";
+import { deleteItem, findById } from "../utils/array";
+
+/**
+ * @typedef {{ id: string, topic: string, rebuildCache?: boolean }} NotebookReference
+ */
 
 export default class Notes extends Collection {
+  constructor(db, name, cached) {
+    super(db, name, cached);
+    this.topicReferences = new NoteIdCache(this._db);
+  }
+
+  async init() {
+    await super.init();
+    this.topicReferences.rebuild();
+  }
+
   async merge(remoteNote) {
     if (!remoteNote) return;
 
@@ -119,7 +133,6 @@ export default class Notes extends Collection {
     await this._collection.addItem(note);
 
     await this._resolveColorAndTags(note);
-    await this._resolveNotebooks(note);
     return note.id;
   }
 
@@ -207,16 +220,13 @@ export default class Notes extends Collection {
       if (!item) continue;
       const itemData = qclone(item.data);
 
-      if (itemData.notebooks) {
+      if (itemData.notebooks && !moveToTrash) {
         for (let notebook of itemData.notebooks) {
-          const notebookRef = this._db.notebooks.notebook(notebook.id);
-          if (!notebookRef) continue;
-
           for (let topicId of notebook.topics) {
-            const topic = notebookRef.topics.topic(topicId);
-            if (!topic) continue;
-
-            await topic.delete(id);
+            await this.removeFromNotebook(
+              { id: notebook.id, topic: topicId, rebuildCache: false },
+              id
+            );
           }
         }
       }
@@ -244,46 +254,7 @@ export default class Notes extends Collection {
         await this._db.content.remove(itemData.contentId);
       }
     }
-  }
-
-  async move(to, ...noteIds) {
-    if (!to) throw new Error("The destination notebook cannot be undefined.");
-    if (!to.id || !to.topic)
-      throw new Error(
-        "The destination notebook must contain notebookId and topic."
-      );
-    let topic = this._db.notebooks.notebook(to.id).topics.topic(to.topic);
-    if (!topic) throw new Error("No such topic exists.");
-    await topic.add(...noteIds);
-  }
-
-  async repairReferences(notes) {
-    notes = notes || this.all;
-    for (let note of notes) {
-      const { notebooks } = note;
-      if (!notebooks) continue;
-
-      for (let notebook of notebooks) {
-        const nb = this._db.notebooks.notebook(notebook.id);
-
-        if (nb) {
-          for (let topic of notebook.topics) {
-            const _topic = nb.topics.topic(topic);
-            if (!_topic || !_topic.has(note.id)) {
-              deleteItem(notebook.topics, topic);
-              await this.add(note);
-              continue;
-            }
-          }
-        }
-
-        if (!nb || !notebook.topics.length) {
-          deleteItem(notebooks, notebook);
-          await this.add(note);
-          continue;
-        }
-      }
-    }
+    this.topicReferences.rebuild();
   }
 
   async _resolveColorAndTags(note) {
@@ -307,16 +278,97 @@ export default class Notes extends Collection {
     }
   }
 
-  async _resolveNotebooks(note) {
-    const { notebooks, id } = note;
-    if (!notebooks) return;
+  /**
+   * @param {NotebookReference} to
+   */
+  async addToNotebook(to, ...noteIds) {
+    if (!to) throw new Error("The destination notebook cannot be undefined.");
+    if (!to.id || !to.topic)
+      throw new Error(
+        "The destination notebook must contain notebookId and topic."
+      );
 
-    for (const notebook of notebooks) {
-      const nb = this._db.notebooks.notebook(notebook.id);
-      if (!nb) continue;
-      for (const topic of notebook.topics) {
-        await this.move({ id: notebook.id, topic }, id);
+    const { id: notebookId, topic: topicId } = to;
+
+    for (let noteId of noteIds) {
+      let note = this._db.notes.note(noteId);
+      if (!note || note.data.deleted) continue;
+
+      const notebooks = note.notebooks || [];
+
+      const noteNotebook = notebooks.find((nb) => nb.id === notebookId);
+      const noteHasNotebook = !!noteNotebook;
+      const noteHasTopic =
+        noteHasNotebook && noteNotebook.topics.indexOf(topicId) > -1;
+      if (noteHasNotebook && !noteHasTopic) {
+        // 1 note can be inside multiple topics
+        noteNotebook.topics.push(topicId);
+      } else if (!noteHasNotebook) {
+        notebooks.push({
+          id: notebookId,
+          topics: [topicId]
+        });
       }
+
+      if (!noteHasNotebook || !noteHasTopic) {
+        await this._db.notes.add({
+          id: noteId,
+          notebooks
+        });
+        this.topicReferences.add(topicId, noteId);
+      }
+    }
+  }
+
+  /**
+   * @param {NotebookReference} to
+   */
+  async removeFromNotebook(to, ...noteIds) {
+    if (!to) throw new Error("The destination notebook cannot be undefined.");
+    if (!to.id || !to.topic)
+      throw new Error(
+        "The destination notebook must contain notebookId and topic."
+      );
+
+    const { id: notebookId, topic: topicId, rebuildCache = true } = to;
+
+    for (const noteId of noteIds) {
+      const note = this.note(noteId);
+      if (!note || note.deleted || !note.notebooks) {
+        continue;
+      }
+
+      const { notebooks } = note;
+
+      const notebook = findById(notebooks, notebookId);
+      if (!notebook) continue;
+
+      const { topics } = notebook;
+      if (!deleteItem(topics, topicId)) continue;
+
+      if (topics.length <= 0) deleteItem(notebooks, notebook);
+
+      await this._db.notes.add({
+        id: noteId,
+        notebooks
+      });
+    }
+    if (rebuildCache) this.topicReferences.rebuild();
+  }
+
+  async _clearAllNotebookReferences(notebookId) {
+    const notes = this._db.notes.all;
+
+    for (const note of notes) {
+      const { notebooks } = note;
+      if (!notebooks) continue;
+
+      for (let notebook of notebooks) {
+        if (notebook.id !== notebookId) continue;
+        if (!deleteItem(notebooks, notebook)) continue;
+      }
+
+      await this._collection.updateItem(note);
     }
   }
 }
@@ -338,4 +390,55 @@ function getNoteTitle(note, oldNote) {
     dateStyle: "short",
     timeStyle: "short"
   })}`;
+}
+
+class NoteIdCache {
+  /**
+   *
+   * @param {import("../api/index").default} db
+   */
+  constructor(db) {
+    this._db = db;
+    this.cache = new Map();
+  }
+
+  rebuild() {
+    this.cache = new Map();
+    const notes = this._db.notes.all;
+
+    for (const note of notes) {
+      const { notebooks } = note;
+      if (!notebooks) continue;
+
+      for (let notebook of notebooks) {
+        for (let topic of notebook.topics) {
+          this.add(topic, note.id);
+        }
+      }
+    }
+  }
+
+  add(topicId, noteId) {
+    let noteIds = this.cache.get(topicId);
+    if (!noteIds) noteIds = [];
+    if (noteIds.includes(noteId)) return;
+    noteIds.push(noteId);
+    this.cache.set(topicId, noteIds);
+  }
+
+  has(topicId, noteId) {
+    let noteIds = this.cache.get(topicId);
+    if (!noteIds) return false;
+    return noteIds.includes(noteId);
+  }
+
+  count(topicId) {
+    let noteIds = this.cache.get(topicId);
+    if (!noteIds) return 0;
+    return noteIds.length;
+  }
+
+  get(topicId) {
+    return this.cache.get(topicId) || [];
+  }
 }

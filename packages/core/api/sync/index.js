@@ -371,6 +371,8 @@ class Sync {
   async onRemoteSyncCompleted(lastSynced) {
     // refresh monographs on sync completed
     await this.db.monographs.init();
+    // refresh topic references
+    this.db.notes.topicReferences.refresh();
 
     await this.start(false, false, lastSynced);
   }

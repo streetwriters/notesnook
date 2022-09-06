@@ -116,7 +116,7 @@ export default class Topics {
       const topic = this.topic(topicId);
       if (!topic) continue;
 
-      await topic.delete(...topic._topic.notes);
+      await topic.clear();
       await this._db.settings.unpin(topicId);
 
       const topicIndex = allTopics.findIndex(
@@ -138,7 +138,6 @@ export function makeTopic(topic, notebookId) {
     notebookId,
     title: topic.trim(),
     dateCreated: Date.now(),
-    dateEdited: Date.now(),
-    notes: []
+    dateEdited: Date.now()
   };
 }
