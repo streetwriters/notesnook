@@ -58,7 +58,7 @@ function MoveDialog({ onClose, noteIds }) {
                   .topics.topic(item.topic)
                   .delete(...noteIds);
               } else if (item.type === "add") {
-                await db.notes.move(item, ...noteIds);
+                await db.notes.addToNotebook(item, ...noteIds);
               }
             } catch (e) {
               showToast("error", e.message);

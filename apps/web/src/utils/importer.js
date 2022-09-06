@@ -68,7 +68,7 @@ async function importNote(note) {
   const noteId = await db.notes.add(note);
 
   for (let notebook of notebooks) {
-    await db.notes.move(await importNotebook(notebook), noteId);
+    await db.notes.addToNotebook(await importNotebook(notebook), noteId);
   }
 }
 
