@@ -32,7 +32,7 @@ export default class Notebook {
 
   get totalNotes() {
     return this._notebook.topics.reduce((sum, topic) => {
-      return sum + topic.notes.length;
+      return sum + this._db.notes.topicReferences.count(topic.id);
     }, 0);
   }
 

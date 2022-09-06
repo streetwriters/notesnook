@@ -51,25 +51,25 @@ test("add note to topic", () =>
     let topics = db.notebooks.notebook(id).topics;
     let topic = topics.topic("hello");
     let noteId = await db.notes.add(TEST_NOTE);
-    await topic.add(noteId);
+    await db.notes.addToNotebook({ id, topic: topic.id }, noteId);
 
     topic = topics.topic("hello");
     expect(topic.totalNotes).toBe(1);
     expect(db.notebooks.notebook(id).totalNotes).toBe(1);
   }));
 
-test("delete note to topic", () =>
+test("delete note of a topic", () =>
   notebookTest().then(async ({ db, id }) => {
     let topics = db.notebooks.notebook(id).topics;
     let topic = topics.topic("hello");
     let noteId = await db.notes.add(TEST_NOTE);
-    await topic.add(noteId);
+    await db.notes.addToNotebook({ id, topic: topic.id }, noteId);
 
     topic = topics.topic("hello");
     expect(topic.totalNotes).toBe(1);
     expect(db.notebooks.notebook(id).totalNotes).toBe(1);
 
-    await topic.delete(noteId);
+    await db.notes.removeFromNotebook({ id, topic: topic.id }, noteId);
 
     topic = topics.topic("hello");
     expect(topic.totalNotes).toBe(0);
@@ -116,7 +116,8 @@ test("get topic", () =>
     let noteId = await db.notes.add({
       content: TEST_NOTE.content
     });
-    await topic.add(noteId);
+    await db.notes.addToNotebook({ id, topic: topic.id }, noteId);
+
     topic = topics.topic("Home");
     expect(await db.content.get(topic.all[0].contentId)).toBeDefined();
     expect(topic.totalNotes).toBe(1);
@@ -136,7 +137,7 @@ test("delete note from edited topic", () =>
       let topics = db.notebooks.notebook(id).topics;
       await topics.add("Home");
       let topic = topics.topic("Home");
-      await db.notes.move({ id, topic: topic._topic.title }, noteId);
+      await db.notes.addToNotebook({ id, topic: topic._topic.title }, noteId);
       await topics.add({ id: topic._topic.id, title: "Hello22" });
       await db.notes.delete(noteId);
     })

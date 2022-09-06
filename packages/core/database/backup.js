@@ -181,12 +181,7 @@ export default class Backup {
     ];
 
     await this._db.syncer.acquireLock(async () => {
-      if (
-        await this._migrator.migrate(collections, (id) => data[id], version)
-      ) {
-        await this._db.notes.repairReferences();
-        await this._db.notebooks.repairReferences();
-      }
+      await this._migrator.migrate(collections, (id) => data[id], version);
     });
   }
 

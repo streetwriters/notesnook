@@ -22,7 +22,6 @@ import Notebook from "../models/notebook";
 import getId from "../utils/id";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { qclone } from "qclone";
-import setManipulator from "../utils/set";
 
 export default class Notebooks extends Collection {
   async merge(remoteNotebook) {
@@ -36,7 +35,6 @@ export default class Notebooks extends Collection {
       const lastSyncedTimestamp = await this._db.lastSynced();
       let isChanged = false;
       // merge new and old topics
-      // We need to handle 3 cases:
       for (let oldTopic of localNotebook.topics) {
         const newTopicIndex = remoteNotebook.topics.findIndex(
           (t) => t.id === oldTopic.id
@@ -60,24 +58,9 @@ export default class Notebooks extends Collection {
         else if (newTopic && oldTopic.dateEdited > newTopic.dateEdited) {
           remoteNotebook.topics[newTopicIndex] = {
             ...oldTopic,
-            notes: setManipulator.union(oldTopic.notes, newTopic.notes),
             dateEdited: Date.now()
           };
           isChanged = true;
-        }
-        // CASE 4: if topic exists in both notebooks:
-        //      if newTopic.dateEdited > oldTopic.dateEdited: we iterate
-        //      on all notes that are not in newTopic (if any)
-        //      and dereference them.
-        else if (newTopic && newTopic.dateEdited > oldTopic.dateEdited) {
-          const removedNotes = setManipulator.complement(
-            oldTopic.notes,
-            newTopic.notes
-          );
-
-          await this.notebook(remoteNotebook.id)
-            .topics.topic(oldTopic.id)
-            .delete(...removedNotes);
         }
       }
       remoteNotebook.remote = !isChanged;
@@ -163,20 +146,10 @@ export default class Notebooks extends Collection {
       let notebook = this.notebook(id);
       if (!notebook) continue;
       const notebookData = qclone(notebook.data);
-      await notebook.topics.delete(...notebook.data.topics);
+      // await notebook.topics.delete(...notebook.data.topics);
       await this._collection.removeItem(id);
       await this._db.settings.unpin(id);
       await this._db.trash.add(notebookData);
-    }
-  }
-
-  async repairReferences() {
-    for (let notebook of this.all) {
-      const _notebook = this.notebook(notebook);
-      for (let topic of notebook.topics) {
-        const _topic = _notebook.topics.topic(topic.id);
-        await _topic.add(...topic.notes);
-      }
     }
   }
 }
