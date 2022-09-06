@@ -51,8 +51,6 @@ export function usePermissionHandler(options: PermissionHandlerOptions) {
         ev.preventDefault();
         break;
       }
-
-      ev.preventDefault();
     }
     window.addEventListener("permissionrequest", onPermissionRequested);
     return () => {
