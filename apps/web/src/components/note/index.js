@@ -445,11 +445,12 @@ const topicNoteMenuItems = [
           throw new Error("context is missing");
 
         const ids = items.map((i) => i.id);
-        const topic = db.notebooks
-          .notebook(context.value.id)
-          ?.topics?.topic(context.value.topic);
-        if (!topic) throw new Error("topic not found");
-        await topic.delete(...ids);
+
+        await db.notes.removeFromNotebook(
+          { id: context.value.id, topic: context.value.topic },
+          ...ids
+        );
+
         store.refresh();
 
         showToast("success", "Note removed from topic.");
