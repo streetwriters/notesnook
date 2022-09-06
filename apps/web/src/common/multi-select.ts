@@ -104,6 +104,7 @@ async function deleteTopics(notebookId: string, topics: Item[]) {
         ?.notebook(notebookId)
         .topics.delete(...topics.map((t) => t.id));
       notebookStore.setSelectedNotebook(notebookId);
+      noteStore.refresh();
     }
   });
   showToast("success", `${topics.length} topics deleted`);
