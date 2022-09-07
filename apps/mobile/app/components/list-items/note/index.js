@@ -22,13 +22,12 @@ import React from "react";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
+import { db } from "../../../common/database";
 import { TaggedNotes } from "../../../screens/notes/tagged";
 import { TopicNotes } from "../../../screens/notes/topic-notes";
-import useNavigationStore from "../../../stores/use-navigation-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { COLORS_NOTE } from "../../../utils/color-scheme";
-import { db } from "../../../common/database";
 import { SIZE } from "../../../utils/size";
 import { Properties } from "../../properties";
 import { Button } from "../../ui/button";
@@ -54,24 +53,24 @@ const showActionSheet = (item) => {
 function getNotebook(item) {
   const isTrash = item.type === "trash";
   if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
-  const currentScreen = useNavigationStore.getState().currentScreen;
-  const filteredNotebooks = item.notebooks?.filter(
-    (n) => n.id !== currentScreen.notebookId
-  );
-  let item_notebook =
-    filteredNotebooks?.length > 0 ? filteredNotebooks.slice(0, 1)[0] : null;
-  let notebook = item_notebook && db.notebooks.notebook(item_notebook.id);
-  if (!notebook) return [];
-  let topic = notebook.topics.topic(item_notebook.topics[0])?._topic;
-  if (!topic) return [];
-  notebook = notebook.data;
-  return [
-    {
-      title: `${notebook?.title} › ${topic?.title}`,
-      notebook: notebook,
-      topic: topic
-    }
-  ];
+
+  return item.notebooks.reduce(function (prev, curr) {
+    if (prev) return prev;
+    const topicId = curr.topics[0];
+    const notebook = db.notebooks?.notebook(curr.id)?.data;
+    if (!notebook) return;
+
+    const topic = notebook.topics.find((t) => t.id === topicId);
+    if (!topic) return;
+
+    return [
+      {
+        title: `${notebook?.title} › ${topic?.title}`,
+        notebook: notebook,
+        topic: topic
+      }
+    ];
+  }, []);
 }
 
 const NoteItem = ({
