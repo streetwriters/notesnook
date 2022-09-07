@@ -40,10 +40,6 @@ import getId from "../utils/id";
 
 const ALLOWED_SHORTCUT_TYPES = ["notebook", "topic", "tag"];
 export default class Shortcuts extends Collection {
-  shortcut(id) {
-    return this._collection.getItem(id);
-  }
-
   async merge(shortcut) {
     if (!shortcut) return;
     await this._collection.addItem(shortcut);
@@ -133,15 +129,22 @@ export default class Shortcuts extends Collection {
   }
 
   exists(itemId) {
-    return !!this.find(itemId);
+    return !!this.shortcut(itemId);
   }
 
-  find(itemId) {
-    return this.all.find((shortcut) => shortcut.item.id === itemId);
+  shortcut(id) {
+    return this.all.find(
+      (shortcut) => shortcut.item.id === id || shortcut.id === id
+    );
   }
 
   async remove(...shortcutIds) {
-    for (const id of shortcutIds) {
+    const shortcuts = this.all.filter((shortcut) =>
+      shortcutIds.includes(
+        shortcut.item.id0 || shortcutIds.includes(shortcut.id)
+      )
+    );
+    for (const { id } of shortcuts) {
       await this._collection.removeItem(id);
     }
   }
