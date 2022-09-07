@@ -99,10 +99,9 @@ export const useActions = ({ close = () => null, item }) => {
   const isNoteInTopic = () => {
     const currentScreen = useNavigationStore.getState().currentScreen;
     if (item.type !== "note" || currentScreen.name !== "TopicNotes") return;
-    return db.notebooks
-      .notebook(currentScreen.notebookId)
-      .topics.topic(currentScreen.id)
-      .has(item.id);
+    return (
+      db.notes?.topicReferences.get(currentScreen.id).indexOf(item.id) > -1
+    );
   };
 
   const onUpdate = useCallback(
