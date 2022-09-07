@@ -76,6 +76,10 @@ class Migrations {
         type: "settings"
       },
       {
+        index: this._db.shorcuts.raw,
+        dbCollection: this._db.shorcuts
+      },
+      {
         index: this._db.notes.raw,
         dbCollection: this._db.notes
       }

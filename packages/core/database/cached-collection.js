@@ -70,6 +70,10 @@ export default class CachedCollection extends IndexedCollection {
     return this.map.has(id);
   }
 
+  count() {
+    return this.map.size;
+  }
+
   getItem(id) {
     return this.map.get(id);
   }

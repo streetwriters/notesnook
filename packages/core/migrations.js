@@ -57,6 +57,7 @@ export const migrations = {
   5.5: {},
   5.6: {
     note: false,
+    shortcut: false,
     notebook: false,
     tag: false,
     attachment: false,

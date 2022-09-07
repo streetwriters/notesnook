@@ -23,7 +23,7 @@ import { logger } from "../../logger";
 class Collector {
   /**
    *
-   * @param {Database} db
+   * @param {import("../index").default} db
    */
   constructor(db) {
     this._db = db;
@@ -38,6 +38,7 @@ class Collector {
 
     const items = [
       ...this._collect("note", this._db.notes.raw, isForceSync),
+      ...this._collect("shortcut", this._db.shorcuts.raw, isForceSync),
       ...this._collect("notebook", this._db.notebooks.raw, isForceSync),
       ...this._collect("content", await this._db.content.all(), isForceSync),
       ...this._collect(
