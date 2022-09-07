@@ -435,7 +435,7 @@ const MoveNoteComponent = ({ note }) => {
                           {item.title}
                         </Paragraph>
                         <Paragraph color={colors.icon} size={SIZE.xs}>
-                          {item.notes.length + " notes"}
+                          {getTotalNotes(item) + " notes"}
                         </Paragraph>
                         {getCount(item) ? (
                           <View
