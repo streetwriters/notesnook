@@ -48,7 +48,7 @@ class AppStore extends BaseStore {
   colors = [];
   globalMenu = { items: [], data: {} };
   reminders = [];
-  menuPins = [];
+  shortcuts = [];
   lastSynced = 0;
 
   init = () => {
@@ -101,7 +101,7 @@ class AppStore extends BaseStore {
 
   refreshNavItems = () => {
     this.set((state) => {
-      state.menuPins = db.settings.pins;
+      state.shortcuts = db.shortcuts.resolved;
       state.colors = db.colors.all;
     });
   };
@@ -158,15 +158,18 @@ class AppStore extends BaseStore {
     });
   };
 
-  pinItemToMenu = async (item) => {
-    if (db.settings.isPinned(item.id)) {
-      await db.settings.unpin(item.id);
+  addToShortcuts = async (item) => {
+    if (db.shortcuts.exists(item.id)) {
+      await db.shortcuts.remove(item.id);
       this.refreshNavItems();
       showToast("success", `Shortcut removed!`);
     } else {
-      await db.settings.pin(item.type, {
-        id: item.id,
-        notebookId: item.notebookId
+      await db.shortcuts.add({
+        item: {
+          type: item.type,
+          id: item.id,
+          notebookId: item.notebookId
+        }
       });
       this.refreshNavItems();
       showToast("success", `Shortcut created!`);

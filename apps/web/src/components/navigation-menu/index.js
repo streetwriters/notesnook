@@ -90,7 +90,7 @@ function NavigationMenu(props) {
   const [location, previousLocation, state] = useLocation();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const colors = useAppStore((store) => store.colors);
-  const pins = useAppStore((store) => store.menuPins);
+  const shortcuts = useAppStore((store) => store.shortcuts);
   const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const isMobile = useMobile();
@@ -188,40 +188,40 @@ function NavigationMenu(props) {
             my={1}
             sx={{ width: "85%", height: "0.8px", alignSelf: "center" }}
           />
-          {pins.map((pin) => (
+          {shortcuts.map((item) => (
             <NavigationItem
               isTablet={isTablet}
-              key={pin.id}
-              title={pin.type === "tag" ? db.tags.alias(pin.id) : pin.title}
+              key={item.id}
+              title={item.type === "tag" ? db.tags.alias(item.id) : item.title}
               menu={{
                 items: [
                   {
                     key: "removeshortcut",
                     title: () => "Remove shortcut",
-                    onClick: async ({ pin }) => {
-                      await db.settings.unpin(pin.id);
+                    onClick: async ({ item }) => {
+                      await db.shortcuts.remove(item.id);
                       refreshNavItems();
                     }
                   }
                 ],
-                extraData: { pin }
+                extraData: { item }
               }}
               icon={
-                pin.type === "notebook"
+                item.type === "notebook"
                   ? Notebook2
-                  : pin.type === "tag"
+                  : item.type === "tag"
                   ? Tag2
                   : Topic
               }
               isShortcut
-              selected={shouldSelectNavItem(location, pin)}
+              selected={shouldSelectNavItem(location, item)}
               onClick={() => {
-                if (pin.type === "notebook") {
-                  _navigate(`/notebooks/${pin.id}`);
-                } else if (pin.type === "topic") {
-                  _navigate(`/notebooks/${pin.notebookId}/${pin.id}`);
-                } else if (pin.type === "tag") {
-                  _navigate(`/tags/${pin.id}`);
+                if (item.type === "notebook") {
+                  _navigate(`/notebooks/${item.id}`);
+                } else if (item.type === "topic") {
+                  _navigate(`/notebooks/${item.notebookId}/${item.id}`);
+                } else if (item.type === "tag") {
+                  _navigate(`/tags/${item.id}`);
                 }
               }}
             />

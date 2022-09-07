@@ -143,8 +143,8 @@ const menuItems = [
     key: "shortcut",
     icon: Icon.Shortcut,
     title: ({ notebook }) =>
-      db.settings.isPinned(notebook.id) ? "Remove shortcut" : "Create shortcut",
-    onClick: ({ notebook }) => appStore.pinItemToMenu(notebook)
+      db.shortcuts.exists(notebook.id) ? "Remove shortcut" : "Create shortcut",
+    onClick: ({ notebook }) => appStore.addToShortcuts(notebook)
   },
   {
     key: "movetotrash",
