@@ -67,7 +67,12 @@ export const MoveNotes = ({
 
   const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
   const [topic, setTopic] = useState(selectedTopic);
-  notes = notes.filter((note) => topic?.notes.indexOf(note.id) === -1);
+
+  notes = notes.filter((note) => {
+    if (!topic) return [];
+    const noteIds = db.notes?.topicReferences.get(topic.id);
+    return noteIds.indexOf(note.id) === -1;
+  });
 
   const select = (id: string) => {
     const index = selectedNoteIds.indexOf(id);

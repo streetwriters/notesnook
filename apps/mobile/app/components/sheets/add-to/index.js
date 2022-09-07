@@ -194,6 +194,7 @@ const MoveNoteComponent = ({ note }) => {
         ? selectedItemsList.map((n) => n.id)
         : [note?.id];
     let ids = [];
+
     let notebooks = db.notebooks.all;
     for (let i = 0; i < notebooks.length; i++) {
       if (notebooks[i].topics) {
@@ -201,7 +202,8 @@ const MoveNoteComponent = ({ note }) => {
           let topic = notebooks[i].topics[t];
           if (topic.type !== "topic") continue;
           for (let id of notes) {
-            if (topic.notes.indexOf(id) > -1) {
+            const noteIds = db.notes?.topicReferences.get(topic.id);
+            if (noteIds.indexOf(id) > -1) {
               if (ids.indexOf(notebooks[i].id) === -1) {
                 ids.push(notebooks[i].id);
               }
@@ -237,7 +239,8 @@ const MoveNoteComponent = ({ note }) => {
         : [note?.id];
     let count = 0;
     for (let id of notes) {
-      if (topic.notes.indexOf(id) > -1) {
+      const noteIds = db.notes?.topicReferences.get(topic.id);
+      if (noteIds.indexOf(id) > -1) {
         count++;
       }
     }
