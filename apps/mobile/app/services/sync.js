@@ -27,7 +27,7 @@ import { DatabaseLogger } from "../common/database/index";
 import { ToastEvent } from "./event-manager";
 
 NetInfo.configure({
-  reachabilityUrl: "https://bing.com",
+  reachabilityUrl: "https://notesnook.com",
   reachabilityTest: (response) => {
     if (!response) return false;
     return response?.status >= 200 && response?.status < 300;
