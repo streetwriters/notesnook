@@ -37,7 +37,6 @@ import { useNoteStore } from "../../stores/use-notes-store";
 import { NoteType, TopicType } from "../../utils/types";
 import {
   getAlias,
-  isSynced,
   openEditor,
   openMonographsWebpage,
   setOnFirstSave,
@@ -95,7 +94,6 @@ const NotesPage = ({
 >) => {
   const params = useRef<NotesScreenParams>(route?.params);
   const [notes, setNotes] = useState<NoteType[]>(get(route.params, true));
-  const [warning, setWarning] = useState(!isSynced(route.params));
   const loading = useNoteStore((state) => state.loading);
   const [loadingNotes, setLoadingNotes] = useState(false);
   const alias = getAlias(params.current);
@@ -178,7 +176,6 @@ const NotesPage = ({
         ) {
           return Navigation.goBack();
         }
-        if (item.type === "topic") setWarning(!isSynced(params.current));
         setNotes(notes);
         syncWithNavigation();
       } catch (e) {
@@ -213,7 +210,6 @@ const NotesPage = ({
     >
       <List
         listData={notes}
-        warning={warning ? WARNING_DATA : null}
         type="notes"
         refreshCallback={onRequestUpdate}
         loading={loading || !isFocused}

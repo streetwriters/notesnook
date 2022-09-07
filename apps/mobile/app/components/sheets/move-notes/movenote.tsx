@@ -298,10 +298,11 @@ export const MoveNotes = ({
       {selectedNoteIds.length > 0 ? (
         <Button
           onPress={async () => {
-            await db.notes?.move(
+            if (!topic) return;
+            await db.notes?.addToNotebook(
               {
-                topic: topic?.id,
-                id: topic?.notebookId
+                topic: topic.id,
+                id: topic.notebookId
               },
               ...selectedNoteIds
             );

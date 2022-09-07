@@ -83,22 +83,12 @@ export const setOnFirstSave = (
   editorState().onNoteCreated = (id) => onNoteCreated(id, data);
 };
 
-export function isSynced(params: NotesScreenParams) {
-  if (params.item.type === "topic") {
-    const topic = db.notebooks
-      ?.notebook(params.item.notebookId)
-      ?.topics.topic(params.item.id);
-
-    return !topic ? true : topic?.synced();
-  }
-  return true;
-}
-
 async function onNoteCreated(id: string, params: FirstSaveData) {
   if (!params) return;
   switch (params.type) {
     case "topic": {
-      await db.notes?.move(
+      if (!params.notebook) break;
+      await db.notes?.addToNotebook(
         {
           topic: params.id,
           id: params.notebook
