@@ -165,7 +165,7 @@ export default class Notebooks extends Collection {
       const notebookData = qclone(notebook.data);
       await notebook.topics.delete(...notebook.data.topics);
       await this._collection.removeItem(id);
-      await this._db.settings.unpin(id);
+      await this._db.shortcuts.remove(id);
       await this._db.trash.add(notebookData);
     }
   }

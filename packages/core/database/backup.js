@@ -171,7 +171,7 @@ export default class Backup {
       },
       {
         index: data["shortcuts"],
-        dbCollection: this._db.shorcuts
+        dbCollection: this._db.shortcuts
       },
       {
         index: data["notes"],

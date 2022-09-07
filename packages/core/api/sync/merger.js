@@ -44,8 +44,8 @@ class Merger {
         set: (item) => this._db.notes.merge(item)
       },
       shortcut: {
-        get: (id) => this._db.shorcuts.shortcut(id),
-        set: (item) => this._db.shorcuts.merge(item)
+        get: (id) => this._db.shortcuts.shortcut(id),
+        set: (item) => this._db.shortcuts.merge(item)
       },
       notebook: {
         threshold: 1000,

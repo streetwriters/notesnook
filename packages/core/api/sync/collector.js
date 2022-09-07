@@ -38,7 +38,7 @@ class Collector {
 
     const items = [
       ...this._collect("note", this._db.notes.raw, isForceSync),
-      ...this._collect("shortcut", this._db.shorcuts.raw, isForceSync),
+      ...this._collect("shortcut", this._db.shortcuts.raw, isForceSync),
       ...this._collect("notebook", this._db.notebooks.raw, isForceSync),
       ...this._collect("content", await this._db.content.all(), isForceSync),
       ...this._collect(

@@ -120,7 +120,7 @@ export default class Tags extends Collection {
       if (hasItem(note.tags, tag.title)) await note.untag(tag.title);
     }
 
-    await this._db.settings.unpin(tagId);
+    await this._db.shortcuts.remove(tagId);
     await this._collection.deleteItem(tagId);
   }
 
@@ -135,7 +135,7 @@ export default class Tags extends Collection {
 
     if (tag.noteIds.length > 0) await this._collection.addItem(tag);
     else {
-      await this._db.settings.unpin(tag.id);
+      await this._db.shortcuts.remove(tag.id);
       await this._collection.deleteItem(tag.id);
     }
   }

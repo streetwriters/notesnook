@@ -141,7 +141,7 @@ class Database {
     /**@type {NoteHistory} */
     this.noteHistory = await NoteHistory.new(this, "notehistory", false);
     /**@type {Shortcuts} */
-    this.shorcuts = await Shortcuts.new(this, "shorcuts");
+    this.shortcuts = await Shortcuts.new(this, "shortcuts");
 
     this.trash = new Trash(this);
 
