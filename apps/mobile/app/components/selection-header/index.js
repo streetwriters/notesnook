@@ -246,10 +246,14 @@ export const SelectionHeader = React.memo(() => {
               if (selectedItemsList.length > 0) {
                 const currentTopic =
                   useNavigationStore.getState().currentScreen;
-                await db.notebooks
-                  .notebook(currentTopic.notebookId)
-                  .topics.topic(currentTopic.id)
-                  .delete(...selectedItemsList.map((item) => item.id));
+                await db.notes.removeFromNotebook(
+                  {
+                    id: currentTopic.notebookId,
+                    topic: currentTopic.id
+                  },
+                  ...selectedItemsList.map((item) => item.id)
+                );
+
                 Navigation.queueRoutesForUpdate(
                   "Notes",
                   "Favorites",
