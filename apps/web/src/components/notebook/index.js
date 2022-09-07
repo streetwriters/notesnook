@@ -84,16 +84,18 @@ function Notebook(props) {
               <Text variant="subBody" sx={{ color: "primary" }}>
                 Notebook
               </Text>
-              <Text as="span" mx={1}>
+              <Text as="span" mx={1} sx={{ color: "inherit" }}>
                 •
               </Text>
               {new Date(date).toLocaleDateString("en", {
                 dateStyle: "medium"
               })}
-              <Text as="span" mx={1}>
+              <Text as="span" mx={1} sx={{ color: "inherit" }}>
                 •
               </Text>
-              <Text>{pluralize(totalNotes, "note", "notes")}</Text>
+              <Text sx={{ color: "inherit" }}>
+                {pluralize(totalNotes, "note", "notes")}
+              </Text>
             </Flex>
           </>
         )
