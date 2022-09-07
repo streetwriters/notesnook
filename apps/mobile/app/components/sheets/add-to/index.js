@@ -151,15 +151,19 @@ const MoveNoteComponent = ({ note }) => {
         : [note?.id];
 
     if (getCount(item)) {
-      await db.notebooks
-        .notebook(item.notebookId)
-        .topics.topic(item.id)
-        .delete(...noteIds);
+      await db.notes.removeFromNotebook(
+        {
+          id: item.notebookId,
+          topic: item.id
+        },
+        ...noteIds
+      );
     } else {
-      await db.notes.move(
+      await db.notes.addToNotebook(
         {
           topic: item.id,
-          id: item.notebookId
+          id: item.notebookId,
+          rebuildCache: true
         },
         ...noteIds
       );

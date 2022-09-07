@@ -480,10 +480,13 @@ export const useActions = ({ close = () => null, item }) => {
   async function removeNoteFromTopic() {
     const currentScreen = useNavigationStore.getState().currentScreen;
     if (currentScreen.name !== "TopicNotes") return;
-    await db.notebooks
-      .notebook(currentScreen.notebookId)
-      .topics.topic(currentScreen.id)
-      .delete(item.id);
+    await db.notes.removeFromNotebook(
+      {
+        id: currentScreen.notebookId,
+        topic: currentScreen.id
+      },
+      item.id
+    );
     Navigation.queueRoutesForUpdate(
       "TaggedNotes",
       "ColoredNotes",
