@@ -25,9 +25,9 @@ import {
   useWindowDimensions,
   View
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import umami from "../../common/analytics";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { DDS } from "../../services/device-detection";
 import SettingsService from "../../services/settings";
@@ -57,7 +57,7 @@ const Intro = ({ navigation }) => {
     (state) => state.settings.telemetry
   );
   const { height } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   useNavigationFocus(navigation, {
     onFocus: () => {
       tabBarRef.current.lock();

@@ -25,9 +25,9 @@ import {
   TextInput,
   View
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Editor from ".";
 import { PremiumToast } from "../../components/premium/premium-toast";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
@@ -41,7 +41,7 @@ export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
   const loading = useNoteStore((state) => state.loading);
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted

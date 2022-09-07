@@ -19,15 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useCallback } from "react";
 import { FlatList, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { notesnook } from "../../../e2e/test.ids";
+import umami from "../../common/analytics";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
 import { eSendEvent } from "../../services/event-manager";
-import { useUserStore } from "../../stores/use-user-store";
-import { useSettingStore } from "../../stores/use-setting-store";
+import Navigation from "../../services/navigation";
 import { useNoteStore } from "../../stores/use-notes-store";
+import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
-import umami from "../../common/analytics";
+import { useUserStore } from "../../stores/use-user-store";
 import { toggleDarkMode } from "../../utils/color-scheme/utils";
 import { MenuItemsList, SUBSCRIPTION_STATUS } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
@@ -35,13 +36,12 @@ import { ColorSection } from "./color-section";
 import { MenuItem } from "./menu-item";
 import { TagsSection } from "./pinned-section";
 import { UserStatus } from "./user-status";
-import Navigation from "../../services/navigation";
 
 export const SideMenu = React.memo(
   function SideMenu() {
     const colors = useThemeStore((state) => state.colors);
     const deviceMode = useSettingStore((state) => state.deviceMode);
-    const insets = useSafeAreaInsets();
+    const insets = useGlobalSafeAreaInsets();
     const subscriptionType = useUserStore(
       (state) => state.user?.subscription?.type
     );
@@ -50,7 +50,6 @@ export const SideMenu = React.memo(
       (state) => state.settings.introCompleted
     );
     const noTextMode = false;
-
     const BottomItemsList = [
       {
         name: colors.night ? "Day" : "Night",

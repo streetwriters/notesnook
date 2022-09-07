@@ -21,6 +21,7 @@ import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { withErrorBoundry } from "./components/exception-handler";
+import GlobalSafeAreaProvider from "./components/globalsafearea";
 import Launcher from "./components/launcher";
 import { useAppEvents } from "./hooks/use-app-events";
 import { ApplicationHolder } from "./navigation";
@@ -28,6 +29,7 @@ import Notifications from "./services/notifications";
 import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useUserStore } from "./stores/use-user-store";
+import { View } from "react-native";
 
 SettingsService.init();
 SettingsService.checkOrientation();
@@ -48,16 +50,37 @@ const App = () => {
     }, 100);
   }, []);
   return (
-    <GestureHandlerRootView
+    <View
       style={{
-        flex: 1
+        height: "100%",
+        width: "100%"
       }}
     >
-      <SafeAreaProvider>
+      <View
+        style={{
+          position: "absolute",
+          height: "1%",
+          width: "1%",
+          left: -999,
+          right: -999
+        }}
+        pointerEvents="none"
+      >
+        <SafeAreaProvider>
+          <GlobalSafeAreaProvider />
+        </SafeAreaProvider>
+      </View>
+
+      <GestureHandlerRootView
+        style={{
+          height: "100%",
+          width: "100%"
+        }}
+      >
         <ApplicationHolder />
         <Launcher />
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+      </GestureHandlerRootView>
+    </View>
   );
 };
 

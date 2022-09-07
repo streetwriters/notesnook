@@ -21,8 +21,8 @@ import KeepAwake from "@sayem314/react-native-keep-awake";
 import React, { useEffect, useRef, useState } from "react";
 import { Modal, SafeAreaView, Text, View } from "react-native";
 import Animated from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { db } from "../../common/database";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import Editor from "../../screens/editor";
 import { editorController } from "../../screens/editor/tiptap/utils";
 import { DDS } from "../../services/device-detection";
@@ -53,7 +53,7 @@ const MergeConflicts = () => {
   const [keep, setKeep] = useState(null);
   const [copy, setCopy] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const content = useRef(null);
   const isKeepingConflicted = !keep?.conflicted;
   const isKeeping = !!keep;
