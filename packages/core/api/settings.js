@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EV, EVENTS } from "../common";
 import id from "../utils/id";
 import "../types";
-import setManipulator from "../utils/set";
 
 class Settings {
   /**
@@ -49,11 +48,6 @@ class Settings {
   async merge(item) {
     if (this._settings.dateModified > (await this._db.lastSynced())) {
       this._settings.id = item.id;
-      this._settings.pins = setManipulator.union(
-        this._settings.pins,
-        item.pins,
-        (p) => p.data.id
-      );
       this._settings.groupOptions = {
         ...this._settings.groupOptions,
         ...item.groupOptions
@@ -131,55 +125,10 @@ class Settings {
     return this._settings.aliases[id];
   }
 
-  async pin(type, data) {
-    if (type !== "notebook" && type !== "topic" && type !== "tag")
-      throw new Error("This item cannot be pinned.");
-    if (this.isPinned(data.id)) return;
-    this._settings.pins.push({ type, data });
-
-    await this._saveSettings();
-  }
-
-  async unpin(id) {
-    const index = this._settings.pins.findIndex((i) => i.data.id === id);
-    if (index <= -1) return;
-    this._settings.pins.splice(index, 1);
-
-    await this._saveSettings();
-  }
-
-  isPinned(id) {
-    return !!this._settings.pins.find((v) => v.data.id === id);
-  }
-
-  get pins() {
-    return this._settings.pins.reduce((prev, pin) => {
-      if (!pin || !pin.data) return;
-
-      let item = null;
-      if (pin.type === "notebook") {
-        const notebook = this._db.notebooks.notebook(pin.data.id);
-        item = notebook ? notebook.data : null;
-      } else if (pin.type === "topic") {
-        const notebook = this._db.notebooks.notebook(pin.data.notebookId);
-        if (notebook) {
-          const topic = notebook.topics.topic(pin.data.id);
-          if (topic) item = topic._topic;
-        }
-      } else if (pin.type === "tag") {
-        item = this._db.tags.tag(pin.data.id);
-      }
-      if (item) prev.push(item);
-      else this.unpin(pin.data.id); // TODO risky.
-      return prev;
-    }, []);
-  }
-
   _initSettings(settings) {
     this._settings = {
       type: "settings",
       id: id(),
-      pins: [],
       groupOptions: {},
       toolbarConfig: {},
       aliases: {},
