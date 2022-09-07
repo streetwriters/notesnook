@@ -100,7 +100,7 @@ export const useActions = ({ close = () => null, item }) => {
     const currentScreen = useNavigationStore.getState().currentScreen;
     if (item.type !== "note" || currentScreen.name !== "TopicNotes") return;
     return (
-      db.notes?.topicReferences.get(currentScreen.id).indexOf(item.id) > -1
+      db.notes?.topicReferences?.get(currentScreen.id)?.indexOf(item.id) > -1
     );
   };
 
