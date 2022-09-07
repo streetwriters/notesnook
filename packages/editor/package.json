@@ -71,8 +71,8 @@
     "react-dom": ">=17.0.0"
   },
   "scripts": {
-    "build": "./scripts/build.sh",
-    "watch": "./scripts/build.sh --watch",
+    "build": "./scripts/build.mjs",
+    "watch": "./scripts/build.mjs --watch",
     "prepub": "npm run build",
     "pub": "np",
     "postinstall": "npx patch-package"
