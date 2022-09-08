@@ -14,6 +14,12 @@
     "start": {
       "dependsOn": ["^build"]
     },
+    "test:core": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
     "run-android": {
       "dependsOn": ["^build"]
     },
