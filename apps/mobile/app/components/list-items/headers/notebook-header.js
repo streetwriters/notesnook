@@ -33,7 +33,7 @@ import Paragraph from "../../ui/typography/paragraph";
 export const NotebookHeader = ({ notebook, onEditNotebook }) => {
   const colors = useThemeStore((state) => state.colors);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
-    db.settings.isPinned(notebook.id)
+    db.shortcuts.exists(notebook.id)
   );
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const totalNotes = getTotalNotes(notebook);
@@ -42,15 +42,20 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
   const onPinNotebook = async () => {
     try {
       if (isPinnedToMenu) {
-        await db.settings.unpin(notebook.id);
+        await db.shortcuts.remove(notebook.id);
       } else {
-        await db.settings.pin(notebook.type, { id: notebook.id });
+        await db.shortcuts.add({
+          item: {
+            id: notebook.id,
+            type: "notebook"
+          }
+        });
         ToastEvent.show({
           heading: "Shortcut created",
           type: "success"
         });
       }
-      setIsPinnedToMenu(db.settings.isPinned(notebook.id));
+      setIsPinnedToMenu(db.shortcuts.exists(notebook.id));
       setMenuPins();
     } catch (e) {
       console.error(e);
