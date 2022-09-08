@@ -97,18 +97,14 @@ async function editNote(title, content, noDelay = false) {
 }
 
 async function downloadFile(downloadActionSelector, encoding) {
-  const promiseEvent = new Promise((resolve) => {
-    page.on("download", async (download) => {
-      const path = await download.path();
-      resolve(fs.readFileSync(path, { encoding }));
-    });
-  });
-
   await page.waitForSelector(downloadActionSelector);
 
-  await page.click(downloadActionSelector);
-
-  await promiseEvent;
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    await page.click(downloadActionSelector)
+  ]);
+  const path = await download.path();
+  return fs.readFileSync(path, { encoding });
 }
 
 async function getEditorTitle() {
