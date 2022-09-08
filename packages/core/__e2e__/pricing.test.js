@@ -22,7 +22,15 @@ import Pricing from "../api/pricing";
 test.each(["monthly", "yearly", undefined])(`get %s price`, async (period) => {
   const pricing = new Pricing();
   const price = await pricing.price(period);
-  expect(price).toMatchSnapshot(`${period || "monthly"}-pricing`);
+  expect(price).toMatchSnapshot(
+    {
+      country: expect.any(String),
+      countryCode: expect.any(String),
+      discount: expect.any(Number),
+      price: expect.any(Number)
+    },
+    `${period || "monthly"}-pricing`
+  );
 });
 
 describe.each(["android", "ios", "web"])(`get %s pricing tier`, (platform) => {
@@ -31,7 +39,14 @@ describe.each(["android", "ios", "web"])(`get %s pricing tier`, (platform) => {
     async (period) => {
       const pricing = new Pricing();
       const price = await pricing.sku(platform, period);
-      expect(price).toMatchSnapshot(`${period}-${platform}-pricing`);
+      expect(price).toMatchSnapshot(
+        {
+          country: expect.any(String),
+          countryCode: expect.any(String),
+          discount: expect.any(Number)
+        },
+        `${period}-${platform}-pricing`
+      );
     }
   );
 });
