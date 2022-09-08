@@ -59,7 +59,7 @@ export default class Shortcuts extends Collection {
       throw new Error("Cannot create a shortcut for this type of item.");
 
     let oldShortcut = shortcut.item
-      ? this.find(shortcut.item.id)
+      ? this.shortcut(shortcut.item.id)
       : shortcut.id
       ? this._collection.getItem(shortcut.id)
       : null;
