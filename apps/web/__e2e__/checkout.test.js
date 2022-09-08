@@ -57,7 +57,6 @@ async function getPrices() {
  * @param {string} prices
  */
 function roundOffPrices(prices) {
-  console.log(prices);
   return prices.replaceAll(/(\d+.\d+)/gm, (str, price) => {
     price = parseFloat(price);
     return isNaN(price) ? 0 : Math.ceil(Math.round(price) / 10) * 10;
