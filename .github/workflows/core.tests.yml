@@ -7,6 +7,8 @@ on:
       - "master"
     paths:
       - "packages/core/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/core.tests.yml" 
   pull_request:
     types:
       - "ready_for_review"
@@ -28,7 +30,7 @@ jobs:
       - name: Add environment variables
         run: |
           echo "EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
-          echo "PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
+          echo "PASSWORD='${{ secrets.USER_PASSWORD }}'" >> $GITHUB_ENV
           echo "HASHED_PASSWORD=${{ secrets.USER_HASHED_PASSWORD }}" >> $GITHUB_ENV
       - name: Run all @notesnook/core tests
         run: npx nx test:e2e @notesnook/core
