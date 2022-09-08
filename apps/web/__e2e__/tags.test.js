@@ -208,6 +208,8 @@ test("delete a shortcut of a tag", async ({ page }) => {
     await clickMenuItem("shortcut");
   });
 
+  await page.waitForTimeout(1000);
+
   expect(
     await page.isVisible(new Menu("navitem").item("helloworld").build())
   ).toBe(true);
@@ -218,6 +220,8 @@ test("delete a shortcut of a tag", async ({ page }) => {
       await clickMenuItem("removeshortcut");
     }
   );
+
+  await page.waitForTimeout(1000);
 
   expect(
     await page.isVisible(new Menu("navitem").item("helloworld").build())
