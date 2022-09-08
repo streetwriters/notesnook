@@ -53,7 +53,6 @@ export const useCheckoutStore = create<ICheckoutStore>((set) => ({
   onApplyCoupon: (couponCode) =>
     set(
       produce((state: ICheckoutStore) => {
-        console.log("SETTING coupon", couponCode);
         state.couponCode = couponCode;
       })
     ),

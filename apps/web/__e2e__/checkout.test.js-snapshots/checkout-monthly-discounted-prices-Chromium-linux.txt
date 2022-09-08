@@ -1,4 +1,5 @@
 subtotal: $10
 tax: $0
 discount: -$10
-total: $10then $10/mo
+total: $10
+first month then $10/mo

@@ -83,6 +83,7 @@ export function PlansList(props: PlansListProps) {
             >
               <Text variant="subtitle" sx={{ fontWeight: "normal" }}>
                 {metadata.title}
+                <br />
                 <Text
                   variant="body"
                   sx={{ fontWeight: "normal", color: "fontTertiary" }}
@@ -134,4 +135,8 @@ function RecurringPricing(props: RecurringPricingProps) {
 
 export function formatPeriod(period: Period) {
   return period === "monthly" ? "/mo" : period === "yearly" ? "/yr" : "";
+}
+
+export function getFullPeriod(period: Period) {
+  return period === "monthly" ? "month" : period === "yearly" ? "year" : "";
 }

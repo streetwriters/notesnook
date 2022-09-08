@@ -33,7 +33,7 @@ import { Features } from "./features";
 import { PaddleCheckout } from "./paddle";
 import { Period, Plan, PricingInfo } from "./types";
 import { PLAN_METADATA, usePlans } from "./plans";
-import { formatPeriod, PlansList } from "./plan-list";
+import { formatPeriod, getFullPeriod, PlansList } from "./plan-list";
 import { showToast } from "../../../utils/toast";
 import { TaskManager } from "../../../common/task-manager";
 import { db } from "../../../common/db";
@@ -51,11 +51,16 @@ export function BuyDialog(props: BuyDialogProps) {
   const { onClose, couponCode, plan } = props;
   const theme = useTheme() as Theme;
 
+  const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
   useEffect(() => {
     return () => {
       useCheckoutStore.getState().reset();
     };
   }, []);
+
+  useEffect(() => {
+    if (couponCode) onApplyCoupon(couponCode);
+  }, [couponCode, onApplyCoupon]);
 
   return (
     <Modal
@@ -136,37 +141,41 @@ export function BuyDialog(props: BuyDialogProps) {
           p={4}
           py={50}
         >
-          <SideBar
-            onClose={onClose}
-            couponCode={couponCode}
-            initialPlan={plan}
-          />
+          <SideBar onClose={onClose} initialPlan={plan} />
         </Flex>
-        <Details initialCouponCode={couponCode} />
+        <Details />
       </Flex>
     </Modal>
   );
 }
 
 type SideBarProps = {
-  couponCode?: string;
   initialPlan?: Period;
   onClose: () => void;
 };
 function SideBar(props: SideBarProps) {
-  const { couponCode, initialPlan, onClose } = props;
+  const { initialPlan, onClose } = props;
   const [showPlans, setShowPlans] = useState(!!initialPlan);
   const onPlanSelected = useCheckoutStore((state) => state.onPlanSelected);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const pricingInfo = useCheckoutStore((state) => state.pricingInfo);
   const user = useUserStore((store) => store.user);
+  const couponCode = useCheckoutStore((store) => store.couponCode);
+  const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
 
   if (user && selectedPlan)
     return (
       <SelectedPlan
         plan={selectedPlan}
         pricingInfo={pricingInfo}
-        onChangePlan={initialPlan ? undefined : () => onPlanSelected(undefined)}
+        onChangePlan={
+          initialPlan
+            ? undefined
+            : () => {
+                onApplyCoupon(undefined);
+                onPlanSelected(undefined);
+              }
+        }
       />
     );
 
@@ -212,16 +221,11 @@ function SideBar(props: SideBarProps) {
   );
 }
 
-type DetailsProps = {
-  initialCouponCode?: string;
-};
-function Details(props: DetailsProps) {
-  const { initialCouponCode } = props;
+function Details() {
   const user = useUserStore((store) => store.user);
   const selectedPlan = useCheckoutStore((state) => state.selectedPlan);
   const onPriceUpdated = useCheckoutStore((state) => state.onPriceUpdated);
   const couponCode = useCheckoutStore((store) => store.couponCode);
-  const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
   const setIsApplyingCoupon = useCheckoutStore(
     (store) => store.setIsApplyingCoupon
   );
@@ -237,11 +241,16 @@ function Details(props: DetailsProps) {
         onCouponApplied={() => setIsApplyingCoupon(true)}
         onPriceUpdated={(pricingInfo) => {
           onPriceUpdated(pricingInfo);
-          console.log(initialCouponCode, "applying coupon", couponCode);
+          // console.log(
+          //   initialCouponCode,
+          //   "applying coupon",
+          //   couponCode,
+          //   pricingInfo.coupon
+          // );
 
-          if (!initialCouponCode || initialCouponCode === couponCode) return;
-          console.log(initialCouponCode, "applying coupon");
-          onApplyCoupon(initialCouponCode);
+          // if (!initialCouponCode || initialCouponCode === couponCode) return;
+          // console.log(initialCouponCode, "applying coupon");
+          // onApplyCoupon(initialCouponCode);
         }}
       />
     );
@@ -343,14 +352,12 @@ type SelectedPlanProps = {
 function SelectedPlan(props: SelectedPlanProps) {
   const { plan, pricingInfo, onChangePlan } = props;
   const metadata = PLAN_METADATA[plan.period];
-  const [isInvalidCoupon, setIsInvalidCoupon] = useState(false);
   const [isApplyingCoupon, setIsApplyingCoupon] = useCheckoutStore((store) => [
     store.isApplyingCoupon,
     store.setIsApplyingCoupon
   ]);
 
   const onApplyCoupon = useCheckoutStore((store) => store.onApplyCoupon);
-  const couponCode = useCheckoutStore((store) => store.couponCode);
   const couponInputRef = useRef<HTMLInputElement>(null);
 
   const applyCoupon = useCallback(() => {
@@ -371,15 +378,7 @@ function SelectedPlan(props: SelectedPlanProps) {
 
     const couponValue = couponInputRef.current.value;
 
-    const isInvalidCoupon =
-      (!!couponValue && couponValue !== pricingInfo?.coupon) ||
-      (!!couponCode && couponCode !== pricingInfo?.coupon);
-
-    setIsInvalidCoupon(isInvalidCoupon);
-    if (isInvalidCoupon) {
-      if (couponCode) couponInputRef.current.value = couponCode;
-      return;
-    }
+    if (pricingInfo?.invalidCoupon) return;
 
     const pricingInfoCoupon = pricingInfo?.coupon || "";
     if (couponValue !== pricingInfoCoupon) {
@@ -417,7 +416,7 @@ function SelectedPlan(props: SelectedPlanProps) {
 
           <Field
             inputRef={couponInputRef}
-            variant={isInvalidCoupon ? "error" : "input"}
+            variant={pricingInfo.invalidCoupon ? "error" : "input"}
             sx={{ alignSelf: "stretch", my: 2 }}
             styles={{ input: { fontSize: "body" } }}
             data-test-id="checkout-coupon-code"
@@ -426,7 +425,7 @@ function SelectedPlan(props: SelectedPlanProps) {
             placeholder={
               isApplyingCoupon ? "Applying coupon code..." : "Coupon code"
             }
-            autoFocus={isInvalidCoupon}
+            autoFocus={pricingInfo.invalidCoupon}
             disabled={!!pricingInfo?.coupon}
             onKeyUp={(e: KeyboardEvent) => {
               if (e.code === "Enter") applyCoupon();
@@ -531,14 +530,17 @@ function CheckoutPricing(props: CheckoutPricingProps) {
           Total
         </Text>
         <Text
+          as="div"
           data-test-id={`checkout-price-total`}
           variant="body"
           sx={{ fontSize: "heading", textAlign: "end", color: "text" }}
         >
           {currentTotal}
-          {isDiscounted ? null : (
-            <Text sx={{ fontSize: "body" }}>{`then ${recurringTotal}`}</Text>
-          )}
+          <Text as="div" sx={{ fontSize: "body" }}>
+            {isDiscounted
+              ? "forever"
+              : `first ${getFullPeriod(period)} then ${recurringTotal}`}
+          </Text>
         </Text>
       </Flex>
     </>
