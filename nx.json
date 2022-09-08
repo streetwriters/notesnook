@@ -14,7 +14,7 @@
     "start": {
       "dependsOn": ["^build"]
     },
-    "test:core": {
+    "test:e2e": {
       "dependsOn": ["^build"]
     },
     "test": {
