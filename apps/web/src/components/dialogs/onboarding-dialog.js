@@ -40,6 +40,7 @@ import AccentItem from "../accent-item";
 import { useCallback, useState } from "react";
 import Config from "../../utils/config";
 import { getAllAccents } from "@notesnook/theme";
+import { isTesting } from "../../utils/platform";
 
 const newUserSteps = [
   {
@@ -121,6 +122,8 @@ const onboarding = {
 };
 
 export function interruptedOnboarding() {
+  if (process.env.NODE_ENV === "development" || isTesting()) return;
+
   for (let key in onboarding) {
     const index = Config.get(key, undefined);
     if (index >= 0 && index < onboarding[key].length - 1) return key;
