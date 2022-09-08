@@ -372,7 +372,7 @@ class Sync {
     // refresh monographs on sync completed
     await this.db.monographs.init();
     // refresh topic references
-    this.db.notes.topicReferences.refresh();
+    this.db.notes.topicReferences.rebuild();
 
     await this.start(false, false, lastSynced);
   }
