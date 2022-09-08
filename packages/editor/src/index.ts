@@ -62,7 +62,8 @@ import { useToolbarStore } from "./toolbar/stores/toolbar-store";
 import { useEditor } from "./hooks/use-editor";
 import {
   EditorOptions,
-  extensions as TiptapCoreExtensions
+  extensions as TiptapCoreExtensions,
+  getHTMLFromFragment
 } from "@tiptap/core";
 import { usePermissionHandler } from "./hooks/use-permission-handler";
 import { Highlight } from "./extensions/highlight";
@@ -223,7 +224,7 @@ const useTiptap = (
   return editor;
 };
 
-export { useTiptap, Toolbar, usePermissionHandler };
+export { useTiptap, Toolbar, usePermissionHandler, getHTMLFromFragment };
 export * from "./types";
 export * from "./extensions/react";
 export * from "./toolbar";

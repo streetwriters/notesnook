@@ -67,6 +67,12 @@ export function useConfigureEditor() {
   return useEditorContext((store) => store.configure);
 }
 
+export const configureEditor = (
+  partial:
+    | Partial<EditorSubState>
+    | ((oldState: EditorSubState) => Partial<EditorSubState>)
+) => useEditorContext.getState().configure(partial);
+
 export function useHistory() {
   return useEditorContext(
     (store) =>

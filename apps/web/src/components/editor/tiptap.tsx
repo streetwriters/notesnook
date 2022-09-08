@@ -30,26 +30,32 @@ import {
   PortalProvider,
   Editor,
   AttachmentType,
-  usePermissionHandler
+  usePermissionHandler,
+  getHTMLFromFragment
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import useMobile from "../../hooks/use-mobile";
 import { Attachment } from "./picker";
 import { IEditor } from "./types";
-import { useConfigureEditor, useSearch, useToolbarConfig } from "./context";
+import {
+  useConfigureEditor,
+  useSearch,
+  useToolbarConfig,
+  configureEditor
+} from "./context";
 import { createPortal } from "react-dom";
 import { getCurrentPreset } from "../../common/toolbar-config";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useSettingsStore } from "../../stores/setting-store";
+import { debounceWithId } from "../../utils/debounce";
+import { store as editorstore } from "../../stores/editor-store";
 
-const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 0 : 300;
-let saveTimeout = 0;
 type TipTapProps = {
   editorContainer: HTMLElement;
   onLoad?: () => void;
-  onChange?: (content: string) => void;
+  onChange?: (id: string, sessionId: string, content: string) => void;
   onInsertAttachment?: (type: AttachmentType) => void;
   onDownloadAttachment?: (attachment: Attachment) => void;
   onAttachFile?: (file: File) => void;
@@ -60,6 +66,21 @@ type TipTapProps = {
   nonce?: number;
   theme: Theme;
 };
+
+const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
+
+function save(text: string, onChange: () => void) {
+  onChange();
+  configureEditor({
+    statistics: {
+      words: {
+        total: countWords(text),
+        selected: 0
+      }
+    }
+  });
+}
+const deferredSave = debounceWithId(save, SAVE_INTERVAL);
 
 function TipTap(props: TipTapProps) {
   const {
@@ -134,20 +155,14 @@ function TipTap(props: TipTapProps) {
       },
       onUpdate: ({ editor }) => {
         if (!editor.isEditable) return;
+        const { id, sessionId } = editorstore.get().session;
+        const content = editor.state.doc.content;
+        const text = editor.view.dom.innerText;
 
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => {
-          if (onChange) onChange(editor.getHTML());
-
-          configure({
-            statistics: {
-              words: {
-                total: countWords(editor.view.dom.innerText),
-                selected: 0
-              }
-            }
-          });
-        }, SAVE_INTERVAL) as unknown as number;
+        deferredSave(sessionId, text, () => {
+          const html = getHTMLFromFragment(content, editor.schema);
+          onChange?.(id, sessionId, html);
+        });
       },
       onDestroy: () => {
         configure({

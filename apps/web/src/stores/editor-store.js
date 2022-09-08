@@ -147,8 +147,10 @@ class EditorStore extends BaseStore {
     this.setSaveState(0);
     try {
       const id = await this._getSaveFn()({ ...session, id: sessionId });
-      if (currentSession && currentSession.id !== sessionId)
+      if (currentSession && currentSession.id !== sessionId) {
+        noteStore.refresh();
         throw new Error("Aborting save operation: old session.");
+      }
 
       let note = db.notes.note(id)?.data;
       if (!note) throw new Error("Note not saved.");
