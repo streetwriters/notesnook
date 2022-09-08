@@ -108,6 +108,18 @@ export function useEditorController(update: () => void): EditorController {
       const value = message.value;
       global.sessionId = message.sessionId;
       switch (type) {
+        case "native:updatehtml": {
+          htmlContentRef.current = value;
+          if (!editor) break;
+          const { from, to } = editor.state.selection;
+          editor?.commands.setContent(htmlContentRef.current, false);
+          editor.commands.setTextSelection({
+            from,
+            to
+          });
+
+          break;
+        }
         case "native:html":
           htmlContentRef.current = value;
           update();

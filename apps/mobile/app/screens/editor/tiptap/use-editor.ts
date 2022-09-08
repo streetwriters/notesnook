@@ -47,6 +47,7 @@ import {
   makeSessionId,
   post
 } from "./utils";
+import { EVENTS } from "@notesnook/core/common";
 
 export const useEditor = (
   editorId = "",
@@ -69,6 +70,8 @@ export const useEditor = (
   const insets = useSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const saveCount = useRef(0);
+  const lastSuccessfulSaveTime = useRef<number>(0);
+  const lock = useRef(false);
 
   const postMessage = useCallback(
     async <T>(type: string, data: T) =>
@@ -152,6 +155,7 @@ export const useEditor = (
       saveCount.current = 0;
       useEditorStore.getState().setReadonly(false);
       postMessage(EditorEvents.title, "");
+      lastSuccessfulSaveTime.current = 0;
       await commands.clearContent();
       await commands.clearTags();
       if (resetState) {
@@ -243,6 +247,8 @@ export const useEditor = (
           note = db.notes?.note(id)?.data as Note;
           await commands.setStatus(timeConverter(note.dateEdited), "Saved");
 
+          lastSuccessfulSaveTime.current = note.dateEdited;
+
           if (
             saveCount.current < 2 ||
             currentNote.current?.title !== note.title ||
@@ -257,8 +263,8 @@ export const useEditor = (
             );
           }
         }
-        saveCount.current++;
 
+        saveCount.current++;
         return id;
       } catch (e) {
         console.log("Error saving note: ", e);
@@ -272,7 +278,7 @@ export const useEditor = (
     if (note.locked || note.content) {
       currentContent.current = {
         data: note.content?.data,
-        type: note.content?.type || "tiny"
+        type: note.content?.type || "tiptap"
       };
     } else {
       currentContent.current = await db.content?.raw(note.contentId);
@@ -297,6 +303,7 @@ export const useEditor = (
         sessionHistoryId.current = Date.now();
         await commands.setSessionId(nextSessionId);
         await commands.focus();
+        lastSuccessfulSaveTime.current = 0;
         useEditorStore.getState().setReadonly(false);
       } else {
         if (!item.forced && currentNote.current?.id === item.id) return;
@@ -304,6 +311,7 @@ export const useEditor = (
         overlay(true, item);
         currentNote.current && (await reset(false));
         await loadContent(item as NoteType);
+        lastSuccessfulSaveTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
@@ -345,12 +353,34 @@ export const useEditor = (
     }, 300);
   };
 
+  const onSyncComplete = useCallback(async () => {
+    if (currentNote.current) {
+      const note = db.notes?.note(currentNote.current?.id).data as NoteType;
+      if (note.dateEdited !== lastSuccessfulSaveTime.current) {
+        currentContent.current = await db.content?.raw(note.contentId);
+        lock.current = true;
+        lastSuccessfulSaveTime.current = note.dateEdited;
+        await postMessage(
+          EditorEvents.updatehtml,
+          currentContent.current?.data
+        );
+        lock.current = false;
+        await commands.setStatus(timeConverter(note.dateEdited), "Saved");
+      }
+    }
+  }, [commands, postMessage]);
+
   useEffect(() => {
+    const syncCompletedSubscription = db.eventManager?.subscribe(
+      EVENTS.syncCompleted,
+      onSyncComplete
+    );
     eSubscribeEvent(eOnLoadNote + editorId, loadNote);
     return () => {
+      syncCompletedSubscription?.unsubscribe();
       eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
     };
-  }, [editorId, loadNote]);
+  }, [editorId, loadNote, onSyncComplete]);
 
   const saveContent = useCallback(
     ({
@@ -362,6 +392,7 @@ export const useEditor = (
       content?: string;
       type: string;
     }) => {
+      if (lock.current) return;
       if (type === EditorEvents.content) {
         currentContent.current = {
           data: content,
