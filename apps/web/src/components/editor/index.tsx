@@ -64,7 +64,6 @@ function onTitleChange(noteId: string, title: string) {
   editorstore.get().setTitle(noteId, title);
 }
 
-const debouncedOnEditorChange = debounceWithId(onEditorChange, 100);
 const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);
 
 export default function EditorManager({
@@ -185,9 +184,9 @@ type EditorOptions = {
   onLoadMedia?: () => void;
 };
 type EditorProps = {
+  content: string;
   title?: string;
   nonce?: number;
-  content: string;
   options?: EditorOptions;
 };
 export function Editor(props: EditorProps) {
@@ -244,10 +243,7 @@ export function Editor(props: EditorProps) {
         onLoad={() => {
           if (onLoadMedia) onLoadMedia();
         }}
-        onChange={(content) => {
-          const { id, sessionId } = editorstore.get().session;
-          debouncedOnEditorChange(sessionId, id, sessionId, content);
-        }}
+        onChange={onEditorChange}
         onDownloadAttachment={(attachment) =>
           downloadAttachment(attachment.hash)
         }
