@@ -141,7 +141,7 @@ export default class Shortcuts extends Collection {
   async remove(...shortcutIds) {
     const shortcuts = this.all.filter((shortcut) =>
       shortcutIds.includes(
-        shortcut.item.id0 || shortcutIds.includes(shortcut.id)
+        shortcut.item.id || shortcutIds.includes(shortcut.id)
       )
     );
     for (const { id } of shortcuts) {
