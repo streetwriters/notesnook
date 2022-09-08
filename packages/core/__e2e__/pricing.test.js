@@ -43,7 +43,8 @@ describe.each(["android", "ios", "web"])(`get %s pricing tier`, (platform) => {
         {
           country: expect.any(String),
           countryCode: expect.any(String),
-          discount: expect.any(Number)
+          discount: expect.any(Number),
+          sku: expect.any(String)
         },
         `${period}-${platform}-pricing`
       );

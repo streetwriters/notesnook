@@ -5,7 +5,7 @@ Object {
   "country": Any<String>,
   "countryCode": Any<String>,
   "discount": Any<Number>,
-  "sku": "com.streetwriters.notesnook.sub.mo.tier3",
+  "sku": Any<String>,
 }
 `;
 
@@ -14,7 +14,7 @@ Object {
   "country": Any<String>,
   "countryCode": Any<String>,
   "discount": Any<Number>,
-  "sku": "com.streetwriters.notesnook.sub.yr.tier3",
+  "sku": Any<String>,
 }
 `;
 
@@ -23,7 +23,7 @@ Object {
   "country": Any<String>,
   "countryCode": Any<String>,
   "discount": Any<Number>,
-  "sku": "com.streetwriters.notesnook.sub.mo.tier3",
+  "sku": Any<String>,
 }
 `;
 
@@ -32,7 +32,7 @@ Object {
   "country": Any<String>,
   "countryCode": Any<String>,
   "discount": Any<Number>,
-  "sku": "com.streetwriters.notesnook.sub.yr.tier3",
+  "sku": Any<String>,
 }
 `;
 
@@ -59,7 +59,7 @@ Object {
   "country": Any<String>,
   "countryCode": Any<String>,
   "discount": Any<Number>,
-  "sku": "763943",
+  "sku": Any<String>,
 }
 `;
 
@@ -68,7 +68,7 @@ Object {
   "country": Any<String>,
   "countryCode": Any<String>,
   "discount": Any<Number>,
-  "sku": "763945",
+  "sku": Any<String>,
 }
 `;
 
