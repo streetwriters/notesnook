@@ -8,8 +8,6 @@
 <a href="https://notesnook.com/">Website</a> | <a href="https://notesnook.com/about">About us</a> | <a href="https://notesnook.com/roadmap">Roadmap</a> | <a href="https://notesnook.com/downloads">Downloads</a> | <a href="https://twitter.com/@notesnook">Twitter</a> | <a href="https://discord.gg/5davZnhw3V">Discord</a>
 </p>
 
-> **To celebrate the open sourcing of Notesnook, we are giving away first year of Notesnook Pro at 75% off. [Support us by subscribing](https://app.notesnook.com/#/buy/yearly/OPENSOURCE)!**
-
 ## Overview
 
 Notesnook is a free (as in speech) & open source note taking app focused on user privacy & ease of use. To ensure zero knowledge principles, Notesnook encrypts everything on your device using `XChaCha20-Poly1305` & `Argon2`.
