@@ -23,6 +23,7 @@ function TextWithTip({ text, tip, sx, color }) {
   return (
     <Text sx={{ ...sx, fontSize: "body", color: color || "text" }}>
       {text}
+      <br />
       <Text
         sx={{
           wordBreak: "break-word",

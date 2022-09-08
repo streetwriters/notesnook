@@ -29,7 +29,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { Box, Flex, Text } from "@theme-ui/components";
+import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import { formatDate } from "@notesnook/core/utils/date";
@@ -419,18 +419,18 @@ function getDialogData(type: string) {
         subtitle: (
           <>
             All your data will be re-encrypted and synced with the new password.
-            <Box mt={1} p={1} bg="errorBg" sx={{ color: "error" }}>
-              <Text as="p" my={0}>
+            <Text as="div" mt={1} p={1} bg="errorBg" sx={{ color: "error" }}>
+              <Text as="p" my={0} sx={{ color: "inherit" }}>
                 It is recommended that you <b>log out from all other devices</b>{" "}
                 before continuing.
               </Text>
-              <Text as="p" my={0} mt={1}>
+              <Text as="p" my={0} mt={1} sx={{ color: "inherit" }}>
                 If this process is interrupted, there is a high chance of data
                 corruption so{" "}
                 <b>please do NOT shut down your device or close your browser</b>{" "}
                 until this process completes.
               </Text>
-            </Box>
+            </Text>
           </>
         ),
         positiveButtonText: "Change password"
