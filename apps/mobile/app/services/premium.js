@@ -161,6 +161,7 @@ const onUserStatusCheck = async (type) => {
         break;
       case CHECK_IDS.databaseSync:
         message = null;
+        status = true;
         break;
     }
 
