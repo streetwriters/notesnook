@@ -1,6 +1,7 @@
 name: "Test @notesnook/core"
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "master"
