@@ -1,0 +1,27 @@
+name: "Test @notesnook/core"
+
+on:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "packages/core/**"
+  pull_request:
+    types:
+      - "ready_for_review"
+      - "opened"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+      - name: Prepare environment
+        run: npm install
+      - name: Run all @notesnook/core tests
+        run: npx nx test:e2e @notesnook/core
