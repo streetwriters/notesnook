@@ -2,3 +2,4 @@ subtotal: ₹4070
 tax: ₹740
 discount: ₹0
 total: ₹4800/yr
+forever

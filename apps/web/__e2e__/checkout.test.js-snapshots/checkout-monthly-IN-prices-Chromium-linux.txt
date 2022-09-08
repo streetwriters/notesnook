@@ -2,3 +2,4 @@ subtotal: ₹370
 tax: ₹70
 discount: ₹0
 total: ₹440/mo
+forever

@@ -65,10 +65,11 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
   }, [checkoutId]);
 
   const updatePrice = useCallback(
-    async (checkoutId: string) => {
+    async (checkoutId: string, isInvalidCoupon?: boolean) => {
       const checkoutData = await getCheckoutData(checkoutId);
       if (!checkoutData) return;
       const pricingInfo = getPricingInfo(plan, checkoutData);
+      pricingInfo.invalidCoupon = isInvalidCoupon;
       if (onPriceUpdated) onPriceUpdated(pricingInfo);
       return pricingInfo;
     },
@@ -123,7 +124,7 @@ export function PaddleCheckout(props: PaddleCheckoutProps) {
         ? await applyCoupon(checkoutId, coupon)
         : await removeCoupon(checkoutId);
       if (!checkoutData) {
-        await updatePrice(checkoutId);
+        await updatePrice(checkoutId, true);
         return;
       }
       appliedCouponCode.current = coupon;
@@ -235,6 +236,7 @@ async function applyCoupon(
     headers,
     method: "POST"
   });
+
   if (!response.ok) return false;
   const json = (await response.json()) as CheckoutDataResponse;
 

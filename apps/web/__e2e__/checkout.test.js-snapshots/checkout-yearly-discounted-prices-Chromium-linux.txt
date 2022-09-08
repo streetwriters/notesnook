@@ -1,4 +1,5 @@
 subtotal: $50
 tax: $0
 discount: -$10
-total: $50then $50/yr
+total: $50
+first year then $50/yr

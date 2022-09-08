@@ -52,6 +52,7 @@ export const PLAN_METADATA: Record<Period, PlanMetadata> = {
 
 let CACHED_PLANS: Plan[];
 export async function getPlans(): Promise<Plan[] | null> {
+  return DEFAULT_PLANS;
   if (isTesting()) return DEFAULT_PLANS;
   if (CACHED_PLANS) return CACHED_PLANS;
 

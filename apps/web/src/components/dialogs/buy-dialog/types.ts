@@ -104,6 +104,7 @@ export type PricingInfo = {
   recurringPrice: Price;
   discount: Discount;
   coupon?: string;
+  invalidCoupon?: boolean;
 };
 
 export type Discount = {
