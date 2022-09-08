@@ -388,8 +388,8 @@ function Settings() {
               sx={{ py: 2 }}
             />
             <Flex
-              flexWrap="wrap"
               sx={{
+                flexWrap: "wrap",
                 borderRadius: "default",
                 justifyContent: "left"
               }}
