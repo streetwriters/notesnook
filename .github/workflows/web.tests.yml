@@ -1,0 +1,43 @@
+name: Test @notesnook/web
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "apps/web/**"
+      # re-run workflow if workflow file changes
+      - ".github/workflows/web.tests.yml" 
+  pull_request:
+    types:
+      - "ready_for_review"
+      - "opened"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Add environment variables
+        run: |
+          echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
+          echo "CURRENT_USER_PASSWORD='${{ secrets.USER_PASSWORD }}'" >> $GITHUB_ENV
+          echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
+
+      - name: Prepare environment
+        run: npm install
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: ./apps/web
+
+      - name: Run all @notesnook/web tests
+        run: npm run test:web
