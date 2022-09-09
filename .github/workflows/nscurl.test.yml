@@ -1,0 +1,14 @@
+name: "Test Payments endpoint"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *"
+
+jobs:
+  ats-diagnostics:
+    runs-on: macos-latest
+
+    steps:
+      - name: Run ats-diagnostics
+        run: nscurl --ats-diagnostics https://payments.streetwriters.co
