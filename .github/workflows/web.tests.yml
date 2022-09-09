@@ -33,7 +33,7 @@ jobs:
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Prepare environment
-        run: npm install
+        run: npm ci
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
