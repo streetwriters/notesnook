@@ -18,10 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import {
-  downloadAttachment,
-  downloadFile,
-  getUploadedFileSize,
-  checkAttachment
+  checkAttachment, downloadFile,
+  getUploadedFileSize
 } from "./download";
 import {
   clearFileStorage,
@@ -40,7 +38,6 @@ export default {
   downloadFile: cancelable(downloadFile),
   deleteFile,
   exists,
-  downloadAttachment,
   clearFileStorage,
   getUploadedFileSize,
   checkAttachment

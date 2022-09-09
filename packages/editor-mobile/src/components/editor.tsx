@@ -95,7 +95,6 @@ const Tiptap = ({
 
   const update = useCallback(() => {
     setTick((tick) => tick + 1);
-
     globalThis.editorController.setTitlePlaceholder("Note title");
   }, []);
 
