@@ -21,10 +21,10 @@ const IS_CI = !!process.env.CI;
 
 const projects = IS_CI
   ? [
-      {
-        name: "Firefox",
-        use: { browserName: "firefox" }
-      },
+      // {
+      //   name: "Firefox",
+      //   use: { browserName: "firefox" }
+      // },
       // {
       //   name: "WebKit",
       //   use: { browserName: "webkit" }
@@ -56,9 +56,10 @@ const projects = IS_CI
 module.exports = {
   webServer: {
     command: "npm run debug",
+    url: "http://localhost:3000",
     port: 3000,
     timeout: 60 * 1000,
-    reuseExistingServer: true //!IS_CI,
+    reuseExistingServer: !IS_CI
   },
   // Look for test files in thcleare "tests" directory, relative to this configuration file
   testDir: "__e2e__",
@@ -70,6 +71,7 @@ module.exports = {
   retries: IS_CI ? 1 : 0,
   fullyParallel: true,
   use: {
+    baseURL: "http://localhost:3000/",
     headless: true,
     acceptDownloads: true,
 
