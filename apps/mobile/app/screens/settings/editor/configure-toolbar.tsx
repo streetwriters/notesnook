@@ -34,7 +34,7 @@ export const ConfigureToolbar = () => {
   const colors = useThemeStore((state) => state.colors);
 
   const renderGroups = () => {
-    return data.map((item, index) => (
+    return data?.map((item, index) => (
       <Group key={`group-${index}`} item={item} index={index} />
     ));
   };
@@ -128,7 +128,7 @@ export const ConfigureToolbar = () => {
                 width: "100%"
               }}
               onPress={() => {
-                const _data = data.slice();
+                const _data = data ? data.slice() : [];
                 _data.push([]);
                 useDragState.getState().setData(_data);
               }}
