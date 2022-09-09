@@ -25,9 +25,15 @@ const projects = IS_CI
         name: "Firefox",
         use: { browserName: "firefox" }
       },
+      // {
+      //   name: "WebKit",
+      //   use: { browserName: "webkit" }
+      // },
       {
-        name: "WebKit",
-        use: { browserName: "webkit" }
+        name: "Chromium",
+        use: {
+          browserName: "chromium"
+        }
       }
     ]
   : [
@@ -39,12 +45,12 @@ const projects = IS_CI
       }
       // {
       //   name: "Firefox",
-      //   use: { browserName: "firefox" },
+      //   use: { browserName: "firefox" }
       // },
       // {
       //   name: "WebKit",
-      //   use: { browserName: "webkit" },
-      // },
+      //   use: { browserName: "webkit" }
+      // }
     ];
 
 module.exports = {
@@ -58,10 +64,11 @@ module.exports = {
   testDir: "__e2e__",
 
   // Each test is given 30 seconds
-  timeout: 30000,
-  workers: IS_CI ? 3 : 4,
+  timeout: 45000,
+  workers: IS_CI ? 3 : 6,
   reporter: "list",
-  retries: IS_CI ? 3 : 0,
+  retries: IS_CI ? 1 : 0,
+  fullyParallel: true,
   use: {
     headless: true,
     acceptDownloads: true,

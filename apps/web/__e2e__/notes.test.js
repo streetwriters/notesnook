@@ -401,6 +401,8 @@ test.describe("run tests independently", () => {
 
     await lockUnlockNote(noteSelector, "unlock");
 
+    await page.waitForTimeout(1000);
+
     await expect(
       isAbsent(List.new("note").grouped().atIndex(0).locked().build())
     ).resolves.toBeTruthy();

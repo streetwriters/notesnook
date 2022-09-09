@@ -22,15 +22,27 @@ const { getTestId, loginUser } = require("./utils");
 
 test.setTimeout(45 * 1000);
 /**
- * @type {Page}
+ * @type {import('@playwright/test').Page}
  */
 var page = null;
 global.page = null;
-test.beforeEach(async ({ page: _page, baseURL }) => {
+
+test.describe.configure({ mode: "serial" });
+
+test.beforeAll(async ({ browser, baseURL }) => {
+  // Create page yourself and sign in.
+  const _page = await browser.newPage();
   global.page = _page;
   page = _page;
+
   await page.goto(baseURL);
   await page.waitForSelector(getTestId("routeHeader"));
+
+  await loginUser();
+});
+
+test.afterAll(async () => {
+  await page.close();
 });
 
 const plans = [
@@ -58,8 +70,9 @@ async function getPrices() {
  */
 function roundOffPrices(prices) {
   return prices.replaceAll(/(\d+.\d+)/gm, (str, price) => {
-    price = parseFloat(price);
-    return isNaN(price) ? 0 : Math.ceil(Math.round(price) / 10) * 10;
+    const digits = "0".repeat(price.length - 1);
+    return isNaN(parseFloat(price)) ? 0 : `${price[0]}${digits}`;
+    // Math.ceil(Math.round(price) / 10) * 10;
   });
 }
 
@@ -120,11 +133,7 @@ async function forEachPlan(action) {
   }
 }
 
-test("change plans", async ({ page }, info) => {
-  info.setTimeout(0);
-
-  await loginUser();
-
+test("change plans", async () => {
   await page.goto("/notes/#/buy/");
 
   await page.waitForSelector(getTestId("see-all-plans"));
@@ -138,11 +147,7 @@ test("change plans", async ({ page }, info) => {
   });
 });
 
-test("confirm plan prices", async ({ page }, info) => {
-  info.setTimeout(0);
-
-  await loginUser();
-
+test("confirm plan prices", async () => {
   await page.goto("/#/buy/");
 
   await page.waitForSelector(getTestId("see-all-plans"));
@@ -155,11 +160,7 @@ test("confirm plan prices", async ({ page }, info) => {
   });
 });
 
-test("changing locale should show localized prices", async ({ page }, info) => {
-  info.setTimeout(0);
-
-  await loginUser();
-
+test("changing locale should show localized prices", async () => {
   await page.goto("/#/buy/");
 
   await page.waitForSelector(getTestId("see-all-plans"));
@@ -176,13 +177,7 @@ test("changing locale should show localized prices", async ({ page }, info) => {
   });
 });
 
-test("applying coupon should change discount & total price", async ({
-  page
-}, info) => {
-  info.setTimeout(0);
-
-  await loginUser();
-
+test("applying coupon should change discount & total price", async () => {
   await page.goto("/#/buy/");
 
   await page.waitForSelector(getTestId("see-all-plans"));
@@ -209,10 +204,7 @@ test("applying coupon should change discount & total price", async ({
   });
 });
 
-test("apply coupon through url", async ({ page }, info) => {
-  info.setTimeout(0);
-  await loginUser();
-
+test("apply coupon through url", async () => {
   for (let plan of plans) {
     await page.goto(`/#/buy/${plan.key}/${plan.coupon}`);
 
@@ -229,11 +221,7 @@ test("apply coupon through url", async ({ page }, info) => {
   }
 });
 
-test("apply coupon after changing country", async ({ page }, info) => {
-  info.setTimeout(0);
-
-  await loginUser();
-
+test("apply coupon after changing country", async () => {
   await page.goto("/#/buy/");
 
   await page.waitForSelector(getTestId("see-all-plans"));
