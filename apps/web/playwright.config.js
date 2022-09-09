@@ -56,7 +56,6 @@ const projects = IS_CI
 module.exports = {
   webServer: {
     command: "npm run debug",
-    url: "http://localhost:3000",
     port: 3000,
     timeout: 60 * 1000,
     reuseExistingServer: !IS_CI
