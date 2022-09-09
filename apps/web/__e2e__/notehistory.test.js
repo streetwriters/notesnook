@@ -63,11 +63,15 @@ test("switching sessions should change editor content", async () => {
 
   await page.click(List.new("session").atIndex(1).build());
 
+  await page.waitForTimeout(500);
+
   expect(await getEditorContent()).toBe(NOTE.content);
 
   await page.click(getTestId("properties"));
 
   await page.click(List.new("session").atIndex(0).build());
+
+  await page.waitForTimeout(500);
 
   expect(await getEditorContent()).toBe(`Some edited text.${NOTE.content}`);
 });
@@ -79,9 +83,13 @@ test("cancelling session restore should bring editor content back to original", 
 
   await page.click(List.new("session").atIndex(1).build());
 
+  await page.waitForTimeout(500);
+
   expect(await getEditorContent()).toBe(NOTE.content);
 
   await page.click(getTestId("editor-notice-cancel"));
+
+  await page.waitForTimeout(500);
 
   expect(await getEditorContent()).toBe(`Some edited text.${NOTE.content}`);
 });
@@ -93,9 +101,13 @@ test("restoring a session should change note's content", async () => {
 
   await page.click(List.new("session").atIndex(1).build());
 
+  await page.waitForTimeout(500);
+
   expect(await getEditorContent()).toBe(NOTE.content);
 
   await page.click(getTestId("editor-notice-action"));
+
+  await page.waitForTimeout(500);
 
   expect(await getEditorContent()).toBe(NOTE.content);
 

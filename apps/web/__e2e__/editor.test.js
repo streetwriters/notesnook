@@ -251,7 +251,7 @@ test.skip("last line doesn't get saved if it's font is different", async () => {
   expect(content).toMatchSnapshot(`last-line-with-different-font.txt`);
 });
 
-test("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
+test.only("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
   page
 }) => {
   await createNoteAndCheckPresence({
@@ -270,13 +270,11 @@ test("editing a note and switching immediately to another note and making an edi
   for (let i = 0; i < 10; ++i) {
     await page.click(selector2);
 
-    await editNote(null, `Test note 1 (${i}) `, true);
+    await editNote(null, `Test note 1 (${i}) `);
 
-    await page.click(selector1);
+    await page.click(selector2);
 
-    await editNote(null, `Test note 2 (${i})`, true);
-
-    await page.waitForTimeout(100);
+    await editNote(null, `Test note 2 (${i})`);
   }
 
   await page.click(selector1);
@@ -310,9 +308,11 @@ test("editing a note and switching immediately to another note and editing the t
   for (let i = 0; i < 10; ++i) {
     await page.click(selector2);
 
-    await editNote(`Test note 2 (${i})`, null, true);
+    await editNote(`Test note 1 (${i})`, null, true);
 
-    await page.click(selector1);
+    await page.waitForTimeout(100);
+
+    await page.click(selector2);
 
     await editNote(`Test note 2 (${i})`, null, true);
 
