@@ -249,7 +249,7 @@ const ExportNotesSheet = () => {
                   onPress={async () => {
                     if (Platform.OS === "ios") {
                       Share.open({
-                        url: "file:/" + result.filePath
+                        url: result.filePath
                       }).catch(console.log);
                     } else {
                       FileViewer.open(result.filePath, {
