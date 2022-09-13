@@ -59,6 +59,7 @@ import { NoteType } from "../../../utils/types";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
+import { openLinkInBrowser } from "../../../utils/functions";
 
 export const EventTypes = {
   selection: "editor-event:selection",
@@ -75,7 +76,8 @@ export const EventTypes = {
   pro: "editor-event:pro",
   monograph: "editor-event:monograph",
   properties: "editor-event:properties",
-  fullscreen: "editor-event:fullscreen"
+  fullscreen: "editor-event:fullscreen",
+  link: "editor-event:link"
 };
 
 const publishNote = async (editor: useEditorType) => {
@@ -362,6 +364,9 @@ export const useEditorEvents = (
           break;
         case EventTypes.back:
           onBackPress();
+          break;
+        case EventTypes.link:
+          openLinkInBrowser(editorMessage.value as string);
           break;
         default:
           break;

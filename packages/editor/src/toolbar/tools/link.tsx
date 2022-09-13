@@ -22,7 +22,7 @@ import { ToolButton } from "../components/tool-button";
 import { useCallback, useRef, useState } from "react";
 import { ResponsivePresenter } from "../../components/responsive";
 import { LinkPopup } from "../popups/link-popup";
-import { useToolbarLocation } from "../stores/toolbar-store";
+import { useIsMobile, useToolbarLocation } from "../stores/toolbar-store";
 import { MoreTools } from "../components/more-tools";
 import { useRefValue } from "../../hooks/use-ref-value";
 import { findMark, selectionToOffset } from "../utils/prosemirror";
@@ -207,13 +207,24 @@ export function OpenLink(props: ToolProps) {
 
   return (
     <Flex sx={{ alignItems: "center" }}>
-      <Link href={href} target="_blank" variant="body" sx={{ mr: 1 }}>
+      <Link
+        href={href}
+        onClick={(e) => {
+          e.preventDefault();
+          editor.commands.openLink(href);
+        }}
+        target="_blank"
+        variant="body"
+        sx={{ mr: 1 }}
+      >
         {href}
       </Link>
       <ToolButton
         {...props}
         toggled={false}
-        onClick={() => window.open(href, "_blank")}
+        onClick={() => {
+          editor.commands.openLink(href);
+        }}
       />
     </Flex>
   );

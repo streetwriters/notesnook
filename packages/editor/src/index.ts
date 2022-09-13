@@ -71,7 +71,7 @@ import { Paragraph } from "./extensions/paragraph";
 import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer";
 import { Code } from "@tiptap/extension-code";
 import { DateTime } from "./extensions/date-time";
-
+import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
   .filter(([name]) => name !== "ClipboardTextSerializer")
@@ -83,7 +83,7 @@ type TiptapOptions = EditorOptions &
     isMobile?: boolean;
     isKeyboardOpen?: boolean;
     doubleSpacedLines?: boolean;
-  };
+  } & OpenLinkOptions;
 
 const useTiptap = (
   options: Partial<TiptapOptions> = {},
@@ -96,6 +96,7 @@ const useTiptap = (
     isKeyboardOpen,
     onDownloadAttachment,
     onOpenAttachmentPicker,
+    onOpenLink,
     onBeforeCreate,
     ...restOptions
   } = options;
@@ -181,7 +182,9 @@ const useTiptap = (
         Placeholder.configure({
           placeholder: "Start writing your note..."
         }),
-
+        OpenLink.configure({
+          onOpenLink
+        }),
         ImageNode.configure({ allowBase64: true }),
         EmbedNode,
         AttachmentNode.configure({
@@ -209,7 +212,8 @@ const useTiptap = (
       onDownloadAttachment,
       onOpenAttachmentPicker,
       PortalProviderAPI,
-      onBeforeCreate
+      onBeforeCreate,
+      onOpenLink
     ]
   );
 
