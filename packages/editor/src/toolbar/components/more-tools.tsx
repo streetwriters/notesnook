@@ -25,6 +25,7 @@ import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
 import { ToolId } from "../tools";
 import { ToolbarGroup } from "./toolbar-group";
+import { useCallback } from "react";
 
 type MoreToolsProps = ToolProps & {
   popupId: string;
@@ -37,6 +38,7 @@ export function MoreTools(props: MoreToolsProps) {
   const isBottom = toolbarLocation === "bottom";
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const onClosed = useCallback(() => setIsOpen(false), [setIsOpen]);
 
   return (
     <>
@@ -50,7 +52,7 @@ export function MoreTools(props: MoreToolsProps) {
         isOpen={isOpen}
         group={"toolbarGroup"}
         id={popupId}
-        onClosed={() => setIsOpen(false)}
+        onClosed={onClosed}
         position={{
           isTargetAbsolute: true,
           target: isBottom ? getToolbarElement() : buttonRef.current || "mouse",
