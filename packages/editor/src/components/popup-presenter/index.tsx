@@ -253,7 +253,7 @@ export function PopupWrapper(props: PopupWrapperProps) {
   }, [autoCloseOnUnmount, id, PopupRenderer]);
 
   useEffect(() => {
-    if (PopupRenderer && isPopupOpen) {
+    if (PopupRenderer && isPopupOpen && !PopupRenderer.isOpen(id)) {
       PopupRenderer.openPopup(id, function Popup({ id }) {
         const isPopupOpen = useToolbarStore(
           (store) => !!store.openedPopups[id]
