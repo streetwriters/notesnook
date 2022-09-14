@@ -62,9 +62,16 @@ export class AutoSync {
     if (item && (item.remote || item.localOnly || item.failed)) return;
 
     clearTimeout(this.timeout);
+    // auto sync interval must not be 0 to avoid issues
+    // during data collection which works based on Date.now().
+    // It is required that the dateModified of an item should
+    // be a few milliseconds less than Date.now(). Setting sync
+    // interval to 0 causes a conflict where Date.now() & dateModified
+    // are equal causing the item to not be synced.
+    const interval = item.type === "tiptap" ? 100 : this.interval;
     this.timeout = setTimeout(() => {
       this.logger.info(`Sync requested by: ${id}`);
       this.db.eventManager.publish(EVENTS.databaseSyncRequested, false, false);
-    }, this.interval);
+    }, interval);
   }
 }
