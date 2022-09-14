@@ -34,6 +34,7 @@ import {
 } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
+import { Config } from "react-native-config";
 export const Subscription = () => {
   const user = useUserStore((state) => state.user);
   const monthlyPlan = usePricing("monthly");
@@ -49,6 +50,19 @@ export const Subscription = () => {
       PremiumService.showVerifyEmailDialog();
       return;
     }
+
+    if (Config.GITHUB_RELEASE) {
+      presentSheet({
+        paragraph:
+          "This version of Notesnook app does not support in-app purchases. Kindly login on the Notesnook web app to make the purchase.",
+        action: () => {
+          Linking.openURL("https://app.notesnook.com");
+        },
+        actionText: "Go to web app"
+      });
+      return;
+    }
+
     if (
       user?.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
       Platform.OS === "android"
@@ -78,10 +92,10 @@ export const Subscription = () => {
     <View>
       {isNotPro ? (
         <Button
-          height={35}
+          height={40}
           style={{
             borderRadius: 100,
-            paddingHorizontal: 16,
+            paddingHorizontal: 25,
             alignSelf: "flex-start"
           }}
           fontSize={SIZE.sm}
@@ -96,11 +110,16 @@ export const Subscription = () => {
               ? "Manage subscription from desktop app"
               : user.subscription?.type ===
                   SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
-                Platform.OS === "android"
+                Platform.OS === "android" &&
+                !Config.GITHUB_RELEASE
               ? "Resubscribe from Google Playstore"
               : user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
-              ? `Resubscribe to Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
-              : `Get Pro (${monthlyPlan?.product?.localizedPrice} / mo)`
+              ? `Resubscribe to Pro (${
+                  monthlyPlan?.product?.localizedPrice || "$4.49"
+                } / mo)`
+              : `Get Pro (${
+                  monthlyPlan?.product?.localizedPrice || "$4.49"
+                } / mo)`
           }
         />
       ) : null}
