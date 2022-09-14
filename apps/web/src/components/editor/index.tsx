@@ -27,6 +27,7 @@ import {
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 import Toolbar from "./toolbar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
@@ -89,6 +90,7 @@ export default function EditorManager({
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isReadonly = useStore((store) => store.session.readonly);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isPreviewSession = !!previewSession.current;
 
   const openSession = useCallback(async (noteId: string | number) => {
@@ -158,7 +160,8 @@ export default function EditorManager({
         options={{
           readonly: isReadonly || isPreviewSession,
           onRequestFocus: () => toggleProperties(false),
-          onLoadMedia: loadMedia
+          onLoadMedia: loadMedia,
+          focusMode: isFocusMode
         }}
       />
       {arePropertiesVisible && (
