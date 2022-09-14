@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Flex, Button } from "@theme-ui/components";
 import * as Icon from "../icons";
-import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { ScrollerProps, Virtuoso, VirtuosoHandle } from "react-virtuoso";
 import {
   useStore as useSelectionStore,
   store as selectionStore
@@ -32,11 +32,25 @@ import {
   Item,
   ListProfiles
 } from "./list-profiles";
-import { CustomScrollbarsVirtualList } from "../scroll-container";
 import ReminderBar from "../reminder-bar";
 import Announcements from "../announcements";
 import useAnnouncements from "../../hooks/use-announcements";
 import { ListLoader } from "../loaders/list-loader";
+import ScrollContainer from "../scroll-container";
+
+const CustomScrollbarsVirtualList = forwardRef<HTMLDivElement, ScrollerProps>(
+  function CustomScrollbarsVirtualList(props, ref) {
+    return (
+      <ScrollContainer
+        {...props}
+        forwardedRef={(sRef) => {
+          if (typeof ref === "function") ref(sRef);
+          else if (ref) ref.current = sRef;
+        }}
+      />
+    );
+  }
+);
 
 type ListContainerProps = {
   type: keyof typeof ListProfiles;

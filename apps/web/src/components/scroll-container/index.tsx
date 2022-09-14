@@ -17,18 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useRef } from "react";
+import React, { PropsWithChildren, useRef } from "react";
 import { Box } from "@theme-ui/components";
 import { Scrollbars } from "rc-scrollbars";
 
-const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
-  const ref = useRef();
+type ScrollContainerProps = {
+  style?: React.CSSProperties;
+  forwardedRef?: (ref: HTMLDivElement | null) => void;
+};
+
+const ScrollContainer = ({
+  children,
+  style,
+  forwardedRef,
+  ...props
+}: PropsWithChildren<ScrollContainerProps>) => {
+  const ref = useRef<Scrollbars>();
+
   return (
     <Scrollbars
       {...props}
       autoHide
       ref={(sRef) => {
-        forwardedRef && sRef && forwardedRef(sRef.view);
+        if (!sRef) return;
+        forwardedRef && forwardedRef((sRef.view as HTMLDivElement) || null);
         ref.current = sRef;
       }}
       style={{ ...style, overflowY: "hidden" }}
@@ -37,13 +49,25 @@ const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
           {...props}
           style={{ ...style, inset: "-1px" }}
           onMouseEnter={() => {
-            const height = ref.current.getThumbVerticalHeight();
-            const width = ref.current.getThumbHorizontalWidth();
-            if (height !== ref.current.thumbVertical.style.height)
-              ref.current.thumbVertical.style.height = `${height}px`;
-            else if (ref.current.thumbHorizontal.style.width !== width) {
-              ref.current.thumbHorizontal.style.width = `${width}px`;
-            }
+            if (
+              !ref.current ||
+              !ref.current.thumbVertical ||
+              !ref.current.thumbHorizontal
+            )
+              return;
+            const {
+              thumbHorizontal,
+              thumbVertical,
+              getThumbHorizontalWidth,
+              getThumbVerticalHeight
+            } = ref.current;
+
+            const height = `${getThumbVerticalHeight()}px`;
+            const width = `${getThumbHorizontalWidth()}px`;
+            if (height !== thumbVertical.style.height)
+              thumbVertical.style.height = height;
+            else if (thumbHorizontal.style.width !== width)
+              thumbHorizontal.style.width = width;
           }}
         />
       )}
@@ -63,16 +87,20 @@ const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
 };
 export default ScrollContainer;
 
+type FlexScrollContainerProps = {
+  className?: string;
+  style?: React.CSSProperties;
+  viewStyle?: React.CSSProperties;
+};
+
 export function FlexScrollContainer({
   children,
   className,
   style,
-  viewStyle,
-  ...props
-}) {
+  viewStyle
+}: PropsWithChildren<FlexScrollContainerProps>) {
   return (
     <Scrollbars
-      {...props}
       autoHide
       style={{
         overflowY: "hidden",
@@ -88,7 +116,7 @@ export function FlexScrollContainer({
           {...props}
           className={className}
           style={{
-            overflow: "auto",
+            overflow: "scroll",
             position: "relative",
             flex: "1 1 auto",
             ...viewStyle
@@ -114,9 +142,3 @@ export function FlexScrollContainer({
     </Scrollbars>
   );
 }
-
-export const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => {
-  return (
-    <ScrollContainer {...props} forwardedRef={(sRef) => (ref.current = sRef)} />
-  );
-});
