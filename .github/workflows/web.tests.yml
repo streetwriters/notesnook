@@ -39,5 +39,8 @@ jobs:
         run: npx playwright install --with-deps
         working-directory: ./apps/web
 
+      - name: Generate test build
+        run: npm run build:test:web
+
       - name: Run all @notesnook/web tests
         run: npm run test:web
