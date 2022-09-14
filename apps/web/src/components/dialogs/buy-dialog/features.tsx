@@ -17,13 +17,53 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, Flex, Box, BoxProps } from "@theme-ui/components";
-import * as Icon from "../../icons";
+import { Text, Flex, Box } from "@theme-ui/components";
+import {
+  Accent,
+  Android,
+  Anonymous,
+  Backup,
+  Billboard,
+  Cellphone,
+  CellphoneLock,
+  CheckCircleOutline,
+  Chrome,
+  CloudLock,
+  EncryptedBackup,
+  Export,
+  FileCabinet,
+  Firefox,
+  Harddisk,
+  Home,
+  HTML,
+  Icon,
+  ImageMultiple,
+  Ios,
+  Linux,
+  Markdown,
+  Notebook2,
+  Palette,
+  PDF,
+  Pin,
+  Pro,
+  Safari,
+  ShieldLock,
+  Shortcut,
+  Table,
+  Timebomb,
+  Windows,
+  Lock,
+  MacOs,
+  File,
+  Embed,
+  Text as TextIcon,
+  ThemeIcon
+} from "../../icons";
 
 type Feature = {
   id: string;
   title?: string;
-  icon?: (props: BoxProps & { size: number }) => JSX.Element;
+  icon?: Icon;
   pro?: boolean;
 };
 
@@ -45,27 +85,27 @@ const sections: Section[] = [
       {
         id: "zero-ads",
         title: "Zero ads & zero trackers",
-        icon: Icon.Billboard
+        icon: Billboard
       },
       {
         id: "on-device-encryption",
         title: "On device encryption",
-        icon: Icon.Cellphone
+        icon: Cellphone
       },
       {
         id: "secure-app-lock",
         title: "Secure app lock for all",
-        icon: Icon.CellphoneLock
+        icon: CellphoneLock
       },
       {
         id: "end-to-end-encrypted",
         title: "100% end-to-end encrypted",
-        icon: Icon.Lock
+        icon: Lock
       },
       {
         id: "private-vault",
         title: "Private vault for notes",
-        icon: Icon.ShieldLock,
+        icon: ShieldLock,
         pro: true
       }
     ]
@@ -83,35 +123,35 @@ const sections: Section[] = [
     features: [
       {
         id: "ios",
-        icon: Icon.iOS
+        icon: Ios
       },
       {
         id: "android",
-        icon: Icon.Android
+        icon: Android
       },
       {
         id: "windows",
-        icon: Icon.Windows
+        icon: Windows
       },
       {
         id: "linux",
-        icon: Icon.Linux
+        icon: Linux
       },
       {
         id: "macos",
-        icon: Icon.MacOS
+        icon: MacOs
       },
       {
         id: "chrome",
-        icon: Icon.Chrome
+        icon: Chrome
       },
       {
         id: "firefox",
-        icon: Icon.Firefox
+        icon: Firefox
       },
       {
         id: "safari",
-        icon: Icon.Safari
+        icon: Safari
       }
     ]
   },
@@ -124,27 +164,27 @@ const sections: Section[] = [
       {
         id: "bulletproof-encryption",
         title: "Bulletproof encryption",
-        icon: Icon.Lock
+        icon: Lock
       },
       {
         id: "4k-images",
         title: "High quality 4K images",
-        icon: Icon.ImageMultiple
+        icon: ImageMultiple
       },
       {
         id: "unlimited-storage",
         title: "Unlimited storage",
-        icon: Icon.Harddisk
+        icon: Harddisk
       },
       {
         id: "500-mb-files",
         title: "Upto 500 MB per file",
-        icon: Icon.FileCabinet
+        icon: FileCabinet
       },
       {
         id: "file-types",
         title: "All file types supported",
-        icon: Icon.File
+        icon: File
       }
     ]
   },
@@ -161,17 +201,17 @@ const sections: Section[] = [
       {
         id: "anon-publishing",
         title: "Anonymous publishing",
-        icon: Icon.Anonymous
+        icon: Anonymous
       },
       {
         id: "password-protected-publishing",
         title: "Password protection",
-        icon: Icon.CloudLock
+        icon: CloudLock
       },
       {
         id: "self-destructive-notes",
         title: "Self destructable notes",
-        icon: Icon.Timebomb
+        icon: Timebomb
       }
     ]
   },
@@ -183,24 +223,24 @@ const sections: Section[] = [
       {
         id: "unlimited-notebooks",
         title: "Unlimited notebooks*",
-        icon: Icon.Notebook2,
+        icon: Notebook2,
         pro: true
       },
       {
         id: "colors-tags",
         title: "Colors & tags*",
-        icon: Icon.Palette,
+        icon: Palette,
         pro: true
       },
       {
         id: "side-menu-shortcuts",
         title: "Side menu shortcuts",
-        icon: Icon.Shortcut
+        icon: Shortcut
       },
       {
         id: "pins-favorites",
         title: "Pins & favorites",
-        icon: Icon.Pin
+        icon: Pin
       }
     ],
     info: "* Free users can only create 3 notebooks (no limit on topics) and 5 tags."
@@ -215,22 +255,22 @@ const sections: Section[] = [
       {
         id: "lists-tables",
         title: "Lists & tables",
-        icon: Icon.Table
+        icon: Table
       },
       {
         id: "image-embeds",
         title: "Images & embeds",
-        icon: Icon.Embed
+        icon: Embed
       },
       {
         id: "checklists",
         title: "Checklists",
-        icon: Icon.CheckCircleOutline
+        icon: CheckCircleOutline
       },
       {
         id: "md-shortcuts",
         title: "Markdown shortcuts",
-        icon: Icon.Markdown
+        icon: Markdown
       }
     ]
   },
@@ -243,30 +283,30 @@ const sections: Section[] = [
       {
         id: "export-markdown",
         title: "Export as Markdown",
-        icon: Icon.Markdown,
+        icon: Markdown,
         pro: true
       },
       {
         id: "export-pdf",
         title: "Export as PDF",
-        icon: Icon.PDF,
+        icon: PDF,
         pro: true
       },
       {
         id: "export-html",
         title: "Export as HTML",
-        icon: Icon.HTML,
+        icon: HTML,
         pro: true
       },
       {
         id: "export-txt",
         title: "Export as text",
-        icon: Icon.Text
+        icon: TextIcon
       },
       {
         id: "bulk-exports",
         title: "Bulk exports",
-        icon: Icon.Export
+        icon: Export
       }
     ]
   },
@@ -278,13 +318,13 @@ const sections: Section[] = [
       {
         id: "auto-backups",
         title: "Automatic monthly, weekly & daily backups",
-        icon: Icon.Backup,
+        icon: Backup,
         pro: true
       },
       {
         id: "backup-encryption",
         title: "Backup encryption",
-        icon: Icon.EncryptedBackup,
+        icon: EncryptedBackup,
         pro: true
       }
     ]
@@ -298,17 +338,17 @@ const sections: Section[] = [
       {
         id: "10-themes",
         title: "10+ themes",
-        icon: Icon.Accent
+        icon: Accent
       },
       {
         id: "dark-mode",
         title: "Automatic dark mode",
-        icon: Icon.Theme
+        icon: ThemeIcon
       },
       {
         id: "default-home-page",
         title: "Change default home page",
-        icon: Icon.Home
+        icon: Home
       }
     ]
   }
@@ -342,7 +382,7 @@ export function Features() {
               sx={{ borderRadius: 50, alignSelf: "start" }}
               mb={1}
             >
-              <Icon.Pro color="primary" size={16} />
+              <Pro color="primary" size={16} />
               <Text variant="body" ml={"2px"} sx={{ color: "primary" }}>
                 Pro
               </Text>
@@ -381,7 +421,7 @@ export function Features() {
                     <Flex
                       sx={{ alignItems: "center", justifyContent: "center" }}
                     >
-                      <Icon.Pro color="primary" size={14} />
+                      <Pro color="primary" size={14} />
                       <Text
                         variant="subBody"
                         ml={"2px"}

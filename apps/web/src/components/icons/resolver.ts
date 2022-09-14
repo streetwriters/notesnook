@@ -17,35 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-export function toTitleCase(str) {
-  if (!str || !str[0]) {
-    return "";
-  }
-  return str[0].toUpperCase() + str.substring(1);
-}
+import { toTitleCase, toCamelCase, KebabCase } from "../../utils/string";
+import * as Icons from "./index";
 
-export function toCamelCase(str) {
-  return str.replaceAll(/-(.{1})/gm, (_str, letter) => {
-    return letter.toUpperCase();
-  });
-}
-
-/**
- *
- * @param {String} str
- */
-export function countWords(str) {
-  str = str.trim();
-  if (!str.length) return 0;
-  return str.split(/\W+\S/).length;
-}
-
-/**
- *
- * @param {string} count
- * @param {string} singular
- * @param {string} plural
- */
-export function pluralize(count, singular, plural) {
-  return !count || count > 1 ? `${count} ${plural}` : `${count} ${singular}`;
+export function getIconFromAlias<T extends KebabCase<keyof typeof Icons>>(
+  alias: T
+) {
+  if (!alias) return;
+  const iconName = toTitleCase(toCamelCase(alias));
+  return Icons[iconName as keyof typeof Icons];
 }

@@ -18,17 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BoxProps, Button, Flex, Link, Text } from "@theme-ui/components";
+import { Button, Flex, Link, Text } from "@theme-ui/components";
 import {
   CheckCircle,
   Loading,
   Error as ErrorIcon,
-  MFAAuthenticator,
-  MFASMS,
-  MFAEmail,
-  MFARecoveryCode,
+  MfaAuthenticator,
+  MfaSms,
+  MfaEmail,
+  MfaRecoveryCode,
   ArrowRight,
-  Logout
+  Logout,
+  Icon
 } from "../components/icons";
 import Field from "../components/field";
 import { getQueryParams, hardNavigate, makeURL } from "../navigation";
@@ -667,13 +668,13 @@ type MFAMethodType = AuthenticatorType | "recoveryCode";
 type MFAMethod = {
   type: MFAMethodType;
   title: string;
-  icon: (props: BoxProps & { size: number }) => JSX.Element;
+  icon: Icon;
 };
 const MFAMethods: MFAMethod[] = [
-  { type: "app", title: "Use an authenticator app", icon: MFAAuthenticator },
-  { type: "sms", title: "Send code to your phone number", icon: MFASMS },
-  { type: "email", title: "Send code to your email address", icon: MFAEmail },
-  { type: "recoveryCode", title: "Use a recovery code", icon: MFARecoveryCode }
+  { type: "app", title: "Use an authenticator app", icon: MfaAuthenticator },
+  { type: "sms", title: "Send code to your phone number", icon: MfaSms },
+  { type: "email", title: "Send code to your email address", icon: MfaEmail },
+  { type: "recoveryCode", title: "Use a recovery code", icon: MfaRecoveryCode }
 ];
 function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
   const { navigate, formData } = props;

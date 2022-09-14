@@ -179,41 +179,71 @@ import {
 } from "@mdi/js";
 import { useTheme } from "@emotion/react";
 import { AnimatedFlex } from "../animated";
+import { Theme } from "@notesnook/theme";
+import { FlexProps } from "@theme-ui/components";
+import { MotionProps } from "framer-motion";
 
-function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
-  const theme = useTheme();
+type MDIIconWrapperProps = {
+  title?: string;
+  path: string;
+  size?: keyof Theme["iconSizes"] | number;
+  color?: keyof Theme["colors"];
+  rotate?: boolean;
+};
+function MDIIconWrapper({
+  title,
+  path,
+  size = 24,
+  color = "icon",
+  rotate
+}: MDIIconWrapperProps) {
+  const theme = useTheme() as Theme;
+
+  const themedColor: string = theme?.colors
+    ? (theme.colors[color] as string)
+    : color;
 
   return (
     <MDIIcon
+      className="icon"
       title={title}
-      path={name}
-      size={size + "px"}
+      path={path}
+      size={
+        typeof size === "string"
+          ? `${theme?.iconSizes[size] || 24}px`
+          : `${size}px`
+      }
       style={{
-        strokeWidth: stroke || "0px",
-        stroke: theme.colors[color] || color
+        stroke: themedColor
       }}
-      color={theme.colors[color] || color}
+      color={themedColor}
       spin={rotate}
     />
   );
 }
 
-function createIcon(name, rotate = false) {
-  const NNIcon = function NNIcon(props) {
-    const [isHovering, setIsHovering] = useState();
+type IconProps = FlexProps &
+  MotionProps &
+  Omit<MDIIconWrapperProps, "path"> & {
+    hoverColor?: keyof Theme["colors"];
+  };
+
+export type Icon = {
+  (props: IconProps): JSX.Element;
+  isReactComponent: boolean;
+};
+
+function createIcon(path: string, rotate = false) {
+  const NNIcon: Icon = function Icon(props) {
+    const [isHovering, setIsHovering] = useState(false);
+    const { sx, rotate: _rotate = rotate, size, ...restProps } = props;
     return (
       <AnimatedFlex
-        id={props.id}
-        className={props.className}
-        title={props.title}
-        variant={props.variant}
+        {...restProps}
         whileHover={{ scale: 1.1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        animate={props.animation}
-        onClick={props.onClick}
-        data-test-id={props["data-test-id"]}
         sx={{
-          ...props.sx,
+          ...sx,
           justifyContent: "center",
           alignItems: "center",
           flexShrink: 0
@@ -221,14 +251,14 @@ function createIcon(name, rotate = false) {
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        <Icon
+        <MDIIconWrapper
           title={props.title}
-          name={name}
-          rotate={rotate}
+          path={path}
+          rotate={_rotate}
+          size={size}
           color={
             props.hoverColor && isHovering ? props.hoverColor : props.color
           }
-          {...props}
         />
       </AnimatedFlex>
     );
@@ -290,7 +320,7 @@ export const PinFilled = createIcon(mdiPin);
 export const User = createIcon(mdiAccountOutline);
 export const DarkMode = createIcon(mdiWeatherNight);
 export const LightMode = createIcon(mdiWeatherSunny);
-export const Theme = createIcon(mdiThemeLightDark);
+export const ThemeIcon = createIcon(mdiThemeLightDark);
 export const Checkmark = createIcon(mdiCheck);
 export const DoubleCheckmark = createIcon(mdiCheckAll);
 export const CheckCircle = createIcon(mdiCheckCircle);
@@ -366,11 +396,11 @@ export const Pro = createIcon(mdiCrownOutline);
 export const EncryptedBackup = createIcon(mdiDatabaseLockOutline);
 export const Accent = createIcon(mdiPaletteSwatchOutline);
 
-export const iOS = createIcon(mdiAppleIos);
+export const Ios = createIcon(mdiAppleIos);
 export const Android = createIcon(mdiAndroid);
 export const Windows = createIcon(mdiMicrosoftWindows);
 export const Linux = createIcon(mdiLinux);
-export const MacOS = createIcon(mdiApple);
+export const MacOs = createIcon(mdiApple);
 export const Chrome = createIcon(mdiGoogleChrome);
 export const Firefox = createIcon(mdiFirefox);
 export const Safari = createIcon(mdiAppleSafari);
@@ -395,11 +425,11 @@ export const OrderNewestOldest = createIcon(mdiOrderNumericAscending);
 export const Saved = createIcon(mdiContentSaveCheckOutline);
 export const NotSaved = createIcon(mdiContentSaveAlertOutline);
 
-export const MFAAuthenticator = createIcon(mdiCellphoneKey);
-export const MFAEmail = createIcon(mdiEmailOutline);
-export const MFARecoveryCode = createIcon(mdiRestore);
-export const MFASMS = createIcon(mdiMessageLockOutline);
-export const MFAEnabled = createIcon(mdiShieldCheckOutline);
+export const MfaAuthenticator = createIcon(mdiCellphoneKey);
+export const MfaEmail = createIcon(mdiEmailOutline);
+export const MfaRecoveryCode = createIcon(mdiRestore);
+export const MfaSms = createIcon(mdiMessageLockOutline);
+export const MfaEnabled = createIcon(mdiShieldCheckOutline);
 export const Reupload = createIcon(mdiProgressUpload);
 export const Rename = createIcon(mdiFormTextbox);
 export const Upload = createIcon(mdiCloudOffOutline);
