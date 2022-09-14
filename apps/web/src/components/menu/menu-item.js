@@ -88,10 +88,8 @@ function MenuItem({ item, isFocused, onMouseEnter, onMouseLeave, onClick }) {
           </Text>
           {isPremium && <Pro size={14} color="primary" sx={{ ml: 1 }} />}
         </Flex>
-        <Flex>
-          {isChecked && (
-            <Check size={14} data-test-id={`menuitem-${key}-checked`} />
-          )}
+        <Flex data-test-id={`toggle-state-${isChecked ? "on" : "off"}`}>
+          {isChecked && <Check size={14} />}
           {hasSubmenu && <ChevronRight size={14} />}
           {modifier && (
             <Text

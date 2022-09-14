@@ -37,10 +37,13 @@ function Header({ readonly }) {
   return (
     <>
       {!readonly && id && (
-        <Flex sx={{ lineHeight: 2.5, alignItems: "center", flexWrap: "wrap" }}>
+        <Flex
+          sx={{ lineHeight: 2.5, alignItems: "center", flexWrap: "wrap" }}
+          data-test-id="tags"
+        >
           {tags?.map((tag) => (
             <IconTag
-              testId={`tag-${tag}`}
+              testId={`tag`}
               key={tag}
               text={db.tags.alias(tag)}
               icon={Icon.Tag}

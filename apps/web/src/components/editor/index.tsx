@@ -368,6 +368,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
       bg="bgSecondary"
       p={2}
       sx={{ alignItems: "center", justifyContent: "space-between" }}
+      data-test-id="preview-notice"
     >
       <Flex mr={4} sx={{ flexDirection: "column" }}>
         <Text variant={"subtitle"}>Preview</Text>
@@ -378,7 +379,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
       </Flex>
       <Flex>
         <Button
-          data-test-id="editor-notice-cancel"
+          data-test-id="preview-notice-cancel"
           variant={"secondary"}
           mr={1}
           px={4}
@@ -387,7 +388,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
           Cancel
         </Button>
         <Button
-          data-test-id="editor-notice-action"
+          data-test-id="preview-notice-restore"
           px={4}
           onClick={async () => {
             await disablePreviewMode(false);

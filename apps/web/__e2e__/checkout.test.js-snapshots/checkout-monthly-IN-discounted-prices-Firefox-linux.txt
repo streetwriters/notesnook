@@ -1,5 +1,0 @@
-subtotal: ₹300000
-tax: ₹60000
-discount: -₹200000
-total: ₹200000
-first month then ₹400000/mo

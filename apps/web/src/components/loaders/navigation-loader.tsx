@@ -25,7 +25,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 export const NavigationLoader = memo(function NavigationLoader() {
   return (
     <Flex
-      id="navigationmenu"
+      id="navigation-menu"
       sx={{
         height: "100%",
         zIndex: 1,
