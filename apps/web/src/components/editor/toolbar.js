@@ -88,8 +88,8 @@ function Toolbar() {
   const inlineTools = useMemo(
     () => [
       {
-        title: theme === "Dark" ? "Light mode" : "Dark mode",
-        icon: Icon.Theme,
+        title: theme === "dark" ? "Light mode" : "Dark mode",
+        icon: Icon.ThemeIcon,
         hidden: !isFocusMode,
         enabled: true,
         onClick: () => toggleNightMode()
@@ -218,7 +218,7 @@ function Toolbar() {
       <Flex>
         {tools.map((tool) => (
           <Button
-            data-test-id={tool.title.toLowerCase().replace(/ /g, "-")}
+            data-test-id={tool.title}
             disabled={!tool.enabled}
             variant="tool"
             title={tool.title}
@@ -258,7 +258,7 @@ function Toolbar() {
         >
           {inlineTools.map((tool) => (
             <Button
-              data-test-id={tool.title.toLowerCase().replace(/ /g, "-")}
+              data-test-id={tool.title}
               disabled={!tool.enabled}
               variant="tool"
               bg="transparent"

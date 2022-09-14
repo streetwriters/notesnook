@@ -6,6 +6,7 @@
     "bootstrap": "lerna bootstrap -- --legacy-peer-deps",
     "build": "nx run-many --target=build --all --exclude=@notesnook/mobile,@notesnook/web",
     "build:web": "nx build @notesnook/web",
+    "build:test:web": "nx build:test @notesnook/web",
     "start:web": "nx start @notesnook/web",
     "install:web": "lerna add --scope=@notesnook/web ",
     "install:mobile": "lerna add --scope=@notesnook/mobile ",

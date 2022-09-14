@@ -127,7 +127,7 @@ function Note(props) {
                   size={11}
                   color={"fontTertiary"}
                   sx={{ mr: 1 }}
-                  data-test-id={`note-${index}-locked`}
+                  data-test-id={`locked`}
                 />
               )}
               {note.favorite && (
@@ -174,7 +174,7 @@ function Note(props) {
                   size={13}
                   color={"fontTertiary"}
                   sx={{ mr: 1 }}
-                  data-test-id={`note-${index}-locked`}
+                  data-test-id={`locked`}
                 />
               )}
 
@@ -185,7 +185,7 @@ function Note(props) {
               {tags?.map((tag) => {
                 return (
                   <Button
-                    data-test-id={`note-${index}-tags-${tag.alias}`}
+                    data-test-id={`tag-item`}
                     key={tag.id}
                     variant="anchor"
                     mr={1}
@@ -275,7 +275,8 @@ const notFullySyncedText =
 const menuItems = [
   {
     key: "pin",
-    title: ({ note }) => (note.pinned ? "Unpin" : "Pin"),
+    title: "Pin",
+    checked: ({ note }) => note.pinned,
     icon: Icon.Pin,
     onClick: async ({ note }) => {
       await pin(note);
@@ -283,7 +284,8 @@ const menuItems = [
   },
   {
     key: "favorite",
-    title: ({ note }) => (note.favorite ? "Unfavorite" : "Favorite"),
+    title: "Favorite",
+    checked: ({ note }) => note.favorite,
     icon: Icon.StarOutline,
     onClick: ({ note }) => store.favorite(note.id)
   },
@@ -310,8 +312,8 @@ const menuItems = [
         return "You cannot publish a locked note.";
     },
     icon: Icon.Publish,
-    title: ({ note }) =>
-      db.monographs.isPublished(note.id) ? "Unpublish" : "Publish",
+    title: "Publish",
+    checked: ({ note }) => db.monographs.isPublished(note.id),
     onClick: async ({ note }) => {
       const isPublished = db.monographs.isPublished(note.id);
       if (isPublished) await db.monographs.unpublish(note.id);
@@ -371,7 +373,8 @@ const menuItems = [
     key: "lock",
     disabled: ({ note }) =>
       !db.notes.note(note.id).synced() ? notFullySyncedText : false,
-    title: ({ note }) => (note.locked ? "Unlock" : "Lock"),
+    title: "Lock",
+    checked: ({ note }) => note.locked,
     icon: Icon.Lock,
     onClick: async ({ note }) => {
       const { unlock, lock } = store.get();
@@ -390,7 +393,8 @@ const menuItems = [
     hidden: () => !userstore.get().isLoggedIn,
     disabled: ({ note }) =>
       !db.notes.note(note.id).synced() ? notFullySyncedText : false,
-    title: ({ note }) => (note.localOnly ? "Enable sync" : "Disable sync"),
+    title: "Disable sync",
+    checked: ({ note }) => note.localOnly,
     icon: ({ note }) => (note.localOnly ? Icon.Sync : Icon.SyncOff),
     onClick: async ({ note }) => {
       if (

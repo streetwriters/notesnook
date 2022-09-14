@@ -31,7 +31,7 @@ import { pluralize } from "../../utils/string";
 
 const menuItems = [
   {
-    key: "rename",
+    key: "edit",
     title: "Rename tag",
     icon: Icon.Edit,
     onClick: ({ tag }) => {

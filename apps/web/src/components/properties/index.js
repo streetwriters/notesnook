@@ -39,15 +39,26 @@ import { formatBytes } from "../../utils/filename";
 import { getTotalSize } from "../../common/attachments";
 
 const tools = [
-  { key: "pinned", icon: Icon.Pin, label: "Pin" },
+  { key: "pin", property: "pinned", icon: Icon.Pin, label: "Pin" },
   {
     key: "favorite",
+    property: "favorite",
     icon: Icon.StarOutline,
     label: "Favorite"
   },
-  { key: "locked", icon: Icon.Unlock, label: "Lock" },
-  { key: "readonly", icon: Icon.Readonly, label: "Readonly" },
-  { key: "localOnly", icon: Icon.SyncOff, label: "Disable sync" }
+  { key: "lock", icon: Icon.Unlock, label: "Lock", property: "locked" },
+  {
+    key: "readonly",
+    icon: Icon.Readonly,
+    label: "Readonly",
+    property: "readonly"
+  },
+  {
+    key: "local-only",
+    icon: Icon.SyncOff,
+    label: "Disable sync",
+    property: "localOnly"
+  }
 ];
 
 const metadataItems = [
@@ -80,15 +91,15 @@ function Properties(props) {
   const changeState = useCallback(
     function changeState(prop) {
       switch (prop) {
-        case "locked":
+        case "lock":
           return store.get().session.locked
             ? noteStore.unlock(sessionId)
             : noteStore.lock(sessionId);
         case "readonly":
           return noteStore.readonly(sessionId);
-        case "localOnly":
+        case "local-only":
           return noteStore.localOnly(sessionId);
-        case "pinned":
+        case "pin":
           return noteStore.pin(sessionId);
         case "favorite":
           return noteStore.favorite(sessionId);
@@ -156,7 +167,7 @@ function Properties(props) {
                   <Toggle
                     {...tool}
                     key={tool.key}
-                    toggleKey={tool.key}
+                    toggleKey={tool.property}
                     onToggle={(state) => changeState(tool.key, state)}
                     testId={`properties-${tool.key}`}
                   />
@@ -208,13 +219,20 @@ function Properties(props) {
                       }}
                       data-test-id={`properties-${label}`}
                     >
-                      <Icon.Circle size={35} color={label.toLowerCase()} />
+                      <Icon.Circle
+                        size={35}
+                        color={label.toLowerCase()}
+                        data-test-id={`toggle-state-${
+                          label.toLowerCase() === color?.toLowerCase()
+                            ? "on"
+                            : "off"
+                        }`}
+                      />
                       {label.toLowerCase() === color?.toLowerCase() && (
                         <Icon.Checkmark
                           color="static"
                           size={18}
                           sx={{ position: "absolute", left: "8px" }}
-                          data-test-id={`properties-${label}-check`}
                         />
                       )}
                     </Flex>
@@ -329,7 +347,7 @@ function Properties(props) {
               return (
                 <Flex
                   key={session.id}
-                  data-test-id={`session-${index}`}
+                  data-test-id={`session-item`}
                   py={1}
                   px={2}
                   sx={{
@@ -370,9 +388,13 @@ function Properties(props) {
                     }
                   }}
                 >
-                  <Text variant={"body"}>{label}</Text>
+                  <Text variant={"body"} data-test-id="title">
+                    {label}
+                  </Text>
                   <Flex sx={{ fontSize: "subBody", color: "fontTertiary" }}>
-                    {session.locked && <Icon.Lock size={14} />}
+                    {session.locked && (
+                      <Icon.Lock size={14} data-test-id="locked" />
+                    )}
                     <TimeAgo
                       live
                       datetime={session.dateModified}
