@@ -180,6 +180,7 @@ class Merger {
 
     if (!localItem) {
       await add(remoteItem);
+      return remoteItem;
     } else {
       const isResolved = localItem.dateResolved === remoteItem.dateModified;
       const isModified = localItem.dateModified > this._lastSynced;
@@ -194,6 +195,7 @@ class Merger {
         if (timeDiff < threshold) {
           if (remoteItem.dateModified > localItem.dateModified) {
             await add(remoteItem);
+            return remoteItem;
           }
           return;
         }
@@ -210,6 +212,7 @@ class Merger {
         await markAsConflicted(localItem, remoteItem);
       } else if (!isResolved) {
         await add(remoteItem);
+        return remoteItem;
       }
     }
   }
@@ -227,7 +230,7 @@ class Merger {
     }
 
     if (definition.conflict) {
-      await this._mergeItemWithConflicts(
+      return await this._mergeItemWithConflicts(
         item,
         definition.get,
         definition.set,
