@@ -360,11 +360,18 @@ export const useEditor = (
         currentContent.current = await db.content?.raw(note.contentId);
         lock.current = true;
         lastSuccessfulSaveTime.current = note.dateEdited;
+
         await postMessage(
           EditorEvents.updatehtml,
           currentContent.current?.data
         );
         lock.current = false;
+        if (note.title !== currentNote.current.title) {
+          postMessage(EditorEvents.title, note.title);
+        }
+        if (note.tags !== currentNote.current.tags) {
+          await commands.setTags(note);
+        }
         await commands.setStatus(timeConverter(note.dateEdited), "Saved");
       }
     }
