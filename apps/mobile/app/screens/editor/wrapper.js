@@ -31,7 +31,6 @@ import { PremiumToast } from "../../components/premium/premium-toast";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
-import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { editorRef } from "../../utils/global-refs";
