@@ -54,8 +54,7 @@ export const CHECK_IDS = {
   noteExport: "note:export",
   vaultAdd: "vault:add",
   notebookAdd: "notebook:add",
-  backupEncrypt: "backup:encrypt",
-  databaseSync: "database:sync"
+  backupEncrypt: "backup:encrypt"
 };
 
 export const EVENTS = {

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { checkIsUserPremium, CHECK_IDS, EVENTS } from "../../common";
+import { EVENTS } from "../../common";
 import { logger } from "../../logger";
 
 export class AutoSync {
@@ -36,8 +36,6 @@ export class AutoSync {
 
   async start() {
     this.logger.info(`Auto sync requested`);
-
-    if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) return;
     if (this.isAutoSyncing) return;
 
     this.isAutoSyncing = true;
