@@ -33,7 +33,8 @@ import {
   DarkMode,
   LightMode,
   Login,
-  Circle
+  Circle,
+  Icon
 } from "../icons";
 import { AnimatedFlex } from "../animated";
 import NavigationItem from "./navigation-item";
@@ -47,8 +48,18 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import useLocation from "../../hooks/use-location";
 import { FlexScrollContainer } from "../scroll-container";
 
+type Route = {
+  title: string;
+  path: string;
+  icon: Icon;
+  isNew?: boolean;
+};
+
 const navigationHistory = new Map();
-function shouldSelectNavItem(route, pin) {
+function shouldSelectNavItem(
+  route: string,
+  pin: { type: string; id: string; notebookId: string }
+) {
   if (pin.type === "notebook") {
     return route === `/notebooks/${pin.id}`;
   } else if (pin.type === "topic") {
@@ -56,9 +67,10 @@ function shouldSelectNavItem(route, pin) {
   } else if (pin.type === "tag") {
     return route === `/tags/${pin.id}`;
   }
+  return false;
 }
 
-const routes = [
+const routes: Route[] = [
   { title: "Notes", path: "/notes", icon: Note },
   {
     title: "Notebooks",
@@ -79,13 +91,18 @@ const routes = [
   { title: "Trash", path: "/trash", icon: Trash }
 ];
 
-const settings = {
+const settings: Route = {
   title: "Settings",
   path: "/settings",
   icon: Settings
 };
 
-function NavigationMenu(props) {
+type NavigationMenuProps = {
+  toggleNavigationContainer: (toggleState?: boolean) => void;
+  isTablet: boolean;
+};
+
+function NavigationMenu(props: NavigationMenuProps) {
   const { toggleNavigationContainer, isTablet } = props;
   const [location, previousLocation, state] = useLocation();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
@@ -117,7 +134,8 @@ function NavigationMenu(props) {
 
   return (
     <AnimatedFlex
-      id="navigationmenu"
+      id="navigation-menu"
+      data-test-id="navigation-menu"
       initial={{
         opacity: 1
       }}
@@ -162,25 +180,22 @@ function NavigationMenu(props) {
             <NavigationItem
               isTablet={isTablet}
               key={color.id}
-              title={db.colors.alias(color.id)}
+              title={db.colors?.alias(color.id)}
               icon={Circle}
               selected={location === `/colors/${color.id}`}
               color={color.title.toLowerCase()}
               onClick={() => {
                 _navigate(`/colors/${color.id}`);
               }}
-              menu={{
-                items: [
-                  {
-                    key: "rename",
-                    title: () => "Rename color",
-                    onClick: async ({ color }) => {
-                      await showRenameColorDialog(color.id);
-                    }
+              menuItems={[
+                {
+                  key: "rename",
+                  title: () => "Rename color",
+                  onClick: async () => {
+                    await showRenameColorDialog(color.id);
                   }
-                ],
-                extraData: { color }
-              }}
+                }
+              ]}
             />
           ))}
           <Box
@@ -192,20 +207,17 @@ function NavigationMenu(props) {
             <NavigationItem
               isTablet={isTablet}
               key={pin.id}
-              title={pin.type === "tag" ? db.tags.alias(pin.id) : pin.title}
-              menu={{
-                items: [
-                  {
-                    key: "removeshortcut",
-                    title: () => "Remove shortcut",
-                    onClick: async ({ pin }) => {
-                      await db.settings.unpin(pin.id);
-                      refreshNavItems();
-                    }
+              title={pin.type === "tag" ? db.tags?.alias(pin.id) : pin.title}
+              menuItems={[
+                {
+                  key: "remove-shortcut",
+                  title: () => "Remove shortcut",
+                  onClick: async () => {
+                    await db.settings?.unpin(pin.id);
+                    refreshNavItems();
                   }
-                ],
-                extraData: { pin }
-              }}
+                }
+              ]}
               icon={
                 pin.type === "notebook"
                   ? Notebook2
@@ -279,7 +291,7 @@ function NavigationMenu(props) {
 }
 export default NavigationMenu;
 
-function findNestedRoute(location) {
+function findNestedRoute(location: string) {
   let level = location.split("/").length;
   let nestedRoute = undefined;
   const history = Array.from(navigationHistory.keys());

@@ -21,9 +21,25 @@ import { Button, Flex, Text } from "@theme-ui/components";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useMenuTrigger } from "../../hooks/use-menu";
 import useMobile from "../../hooks/use-mobile";
-import * as Icons from "../icons";
+import { PropsWithChildren } from "react";
+import { Theme } from "@notesnook/theme";
+import { Icon, Circle, Shortcut } from "../icons";
 
-function NavigationItem(props) {
+type NavigationItemProps = {
+  icon: Icon;
+  color?: keyof Theme["colors"];
+  title: string;
+  isTablet?: boolean;
+  isLoading?: boolean;
+  isShortcut?: boolean;
+  isNew?: boolean;
+  selected?: boolean;
+  onClick?: () => void;
+  // TODO: add proper typings here
+  menuItems?: any[];
+};
+
+function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
   const {
     icon: Icon,
     color,
@@ -32,7 +48,10 @@ function NavigationItem(props) {
     isShortcut,
     isNew,
     children,
-    isTablet
+    isTablet,
+    selected,
+    onClick,
+    menuItems
   } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const { openMenu } = useMenuTrigger();
@@ -40,7 +59,7 @@ function NavigationItem(props) {
 
   return (
     <Flex
-      bg={props.selected ? "bgSecondaryHover" : "transparent"}
+      bg={selected ? "bgSecondaryHover" : "transparent"}
       sx={{
         borderRadius: "default",
         mx: 1,
@@ -56,7 +75,7 @@ function NavigationItem(props) {
       }}
     >
       <Button
-        data-test-id={`navitem-${title.toLowerCase()}`}
+        data-test-id={`navigation-item`}
         bg={"transparent"}
         sx={{
           px: 2,
@@ -65,35 +84,35 @@ function NavigationItem(props) {
           justifyContent: isTablet ? "center" : "flex-start",
           display: "flex"
         }}
-        label={title}
         title={title}
         onContextMenu={(e) => {
-          if (!props.menu) return;
+          if (!menuItems) return;
           e.preventDefault();
-          openMenu(props.menu.items, props.menu.extraData, false);
+          openMenu(menuItems);
         }}
         onClick={() => {
           if (isMobile) toggleSideMenu(false);
-          props.onClick();
+          if (onClick) onClick();
         }}
       >
         <Icon
           size={isTablet ? 18 : 15}
-          color={color || (props.selected ? "primary" : "icon")}
+          color={color || (selected ? "primary" : "icon")}
           rotate={isLoading}
         />
         {isNew && (
-          <Icons.Circle
+          <Circle
             size={6}
             sx={{ position: "absolute", bottom: "8px", left: "23px" }}
             color={"primary"}
           />
         )}
         {isShortcut && (
-          <Icons.Shortcut
+          <Shortcut
             size={8}
             sx={{ position: "absolute", bottom: "8px", left: "6px" }}
             color={color || "icon"}
+            data-test-id="shortcut"
           />
         )}
 
@@ -103,11 +122,12 @@ function NavigationItem(props) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            fontWeight: props.selected ? "bold" : "normal",
+            fontWeight: selected ? "bold" : "normal",
             fontSize: "subtitle",
             display: isTablet ? "none" : "block"
           }}
           ml={1}
+          data-test-id="title"
         >
           {title}
         </Text>
