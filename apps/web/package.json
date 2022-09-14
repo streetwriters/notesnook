@@ -84,7 +84,6 @@
     "typescript": "^4.8.2",
     "webpack-bundle-analyzer": "^4.5.0",
     "worker-loader": "^3.0.8",
-    "zx": "^2.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   },
@@ -97,7 +96,9 @@
   "scripts": {
     "start": "env-cmd -e all,dev,web react-scripts start",
     "start:desktop": "env-cmd -e all,desktop react-scripts start",
+    "start:test": "serve -s build/ -p 3000",
     "build": "env-cmd -e all,web react-scripts --max_old_space_size=8092 build",
+    "build:test": "env-cmd -e all,dev,web,silent react-scripts build",
     "build:beta": "env-cmd -e all,web,beta react-scripts build",
     "build:profile": "env-cmd -e all,web react-scripts build --profile",
     "build:desktop": "env-cmd -e all,desktop react-scripts build",

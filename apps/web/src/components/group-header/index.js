@@ -231,8 +231,10 @@ function GroupHeader(props) {
         justifyContent: "space-between"
       }}
       tabIndex={0}
+      data-test-id="group-header"
     >
       <Text
+        data-test-id="title"
         variant="subtitle"
         sx={{
           fontSize: "body",

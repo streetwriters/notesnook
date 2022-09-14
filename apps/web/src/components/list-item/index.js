@@ -79,6 +79,7 @@ function ListItem(props) {
 
   return (
     <Flex
+      id={`id_${props.item.id}`}
       ref={listItemRef}
       bg={isSelected ? "shade" : background}
       onContextMenu={(e) => {
@@ -158,12 +159,12 @@ function ListItem(props) {
           }
         }
       }}
-      data-test-id={`${props.item.type}-${props.index}`}
+      data-test-id={`list-item`}
     >
       {!isCompact && props.header}
 
       <Text
-        data-test-id={`${props.item.type}-${props.index}-title`}
+        data-test-id={`title`}
         variant={"subtitle"}
         sx={{
           whiteSpace: "nowrap",
@@ -181,7 +182,7 @@ function ListItem(props) {
         <Text
           as="p"
           variant="body"
-          data-test-id={`${props.item.type}-${props.index}-body`}
+          data-test-id={`description`}
           sx={{
             lineHeight: `1.2rem`,
             overflow: "hidden",

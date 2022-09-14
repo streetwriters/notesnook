@@ -88,6 +88,7 @@ function TimeAgo({ datetime, live, locale, opts, sx, ...restProps }) {
       }}
       title={formatDate(datetime)}
       as="time"
+      data-test-id="time"
       dateTime={toDate(datetime).toISOString()}
     >
       {format(datetime, locale, opts)}

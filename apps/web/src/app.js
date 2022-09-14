@@ -81,7 +81,7 @@ function App() {
               show={show}
             />
           )}
-          <Toaster />
+          <Toaster containerClassName="toasts-container" />
         </Flex>
       </ThemeProvider>
     </LazyMotion>

@@ -42,30 +42,30 @@ const projects = IS_CI
         use: {
           browserName: "chromium"
         }
+      },
+      {
+        name: "Firefox",
+        use: { browserName: "firefox" }
+      },
+      {
+        name: "WebKit",
+        use: { browserName: "webkit" }
       }
-      // {
-      //   name: "Firefox",
-      //   use: { browserName: "firefox" }
-      // },
-      // {
-      //   name: "WebKit",
-      //   use: { browserName: "webkit" }
-      // }
     ];
 
 module.exports = {
   webServer: {
-    command: "npm run debug",
+    command: "npm run start:test",
     port: 3000,
     timeout: 60 * 1000,
-    reuseExistingServer: !IS_CI
+    reuseExistingServer: true
   },
   // Look for test files in thcleare "tests" directory, relative to this configuration file
   testDir: "__e2e__",
 
   // Each test is given 30 seconds
-  timeout: 45000,
-  workers: IS_CI ? 3 : 6,
+  timeout: 30000,
+  workers: IS_CI ? 2 : 2,
   reporter: "list",
   retries: IS_CI ? 1 : 0,
   fullyParallel: true,

@@ -1,5 +1,0 @@
-subtotal: $4000
-tax: $0000
-discount: $0000
-total: $4000/mo
-forever

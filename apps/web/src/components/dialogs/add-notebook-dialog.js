@@ -143,7 +143,7 @@ class AddNotebookDialog extends React.Component {
         <Flex sx={{ overflowY: "auto", flexDirection: "column" }}>
           <Field
             defaultValue={this.title}
-            data-test-id="and-name"
+            data-test-id="title-input"
             autoFocus
             required
             label="Title"
@@ -157,7 +157,7 @@ class AddNotebookDialog extends React.Component {
             }}
           />
           <Field
-            data-test-id="and-description"
+            data-test-id="description-input"
             label="Description"
             name="description"
             id="description"
@@ -168,12 +168,12 @@ class AddNotebookDialog extends React.Component {
           />
           <Field
             inputRef={(ref) => (this._topicInputRef = ref)}
-            data-test-id="and-topic"
+            data-test-id="edit-topic-input"
             label="Topics"
             name="topic"
             id="topic"
             action={{
-              testId: "and-topic-action",
+              testId: "edit-topic-action",
               onClick: () => {
                 if (this.state.isEditting) {
                   this.doneEditingTopic();
@@ -211,7 +211,6 @@ class AddNotebookDialog extends React.Component {
               onEdit={() => this.editTopic(index)}
               onDoneEditing={() => this.doneEditingTopic()}
               onDelete={() => this.removeTopic(index)}
-              index={index}
             />
           ))}
         </Flex>
@@ -223,15 +222,8 @@ class AddNotebookDialog extends React.Component {
 export default AddNotebookDialog;
 
 function TopicItem(props) {
-  const {
-    title,
-    onEdit,
-    onDoneEditing,
-    onDelete,
-    isEditing,
-    hideActions,
-    index
-  } = props;
+  const { title, onEdit, onDoneEditing, onDelete, isEditing, hideActions } =
+    props;
   return (
     <Flex
       p={2}
@@ -246,6 +238,7 @@ function TopicItem(props) {
         justifyContent: "space-between"
       }}
       onClick={isEditing ? onDoneEditing : onEdit}
+      data-test-id="topic-item"
     >
       <Flex sx={{ alignItems: "center", justifyContent: "center" }}>
         <Icon.Topic />
@@ -265,7 +258,6 @@ function TopicItem(props) {
               display: "flex"
             }}
             onClick={isEditing ? onDoneEditing : onEdit}
-            data-test-id={`and-topic-${index}-actions-edit`}
           >
             {isEditing ? "Done" : "Edit"}
           </Text>

@@ -70,7 +70,7 @@ function RecoveryKeyDialog(props) {
             to recover your data.
           </Text>
           <Text
-            data-test-id="recoveryKey"
+            data-test-id="recovery-key"
             className="selectable"
             mt={2}
             bg="bgSecondary"

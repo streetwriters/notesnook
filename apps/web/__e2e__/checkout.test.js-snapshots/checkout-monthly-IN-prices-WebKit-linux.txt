@@ -1,5 +1,0 @@
-subtotal: ₹300000
-tax: ₹60000
-discount: ₹0000
-total: ₹400000/mo
-forever
