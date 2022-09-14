@@ -168,14 +168,10 @@ function SideBar(props: SideBarProps) {
       <SelectedPlan
         plan={selectedPlan}
         pricingInfo={pricingInfo}
-        onChangePlan={
-          initialPlan
-            ? undefined
-            : () => {
-                onApplyCoupon(undefined);
-                onPlanSelected(undefined);
-              }
-        }
+        onChangePlan={() => {
+          onApplyCoupon(undefined);
+          onPlanSelected(undefined);
+        }}
       />
     );
 
