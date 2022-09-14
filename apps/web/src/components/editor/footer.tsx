@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { formatDate } from "@notesnook/core/utils/date";
 import { Flex, Text } from "@theme-ui/components";
+import { useMemo } from "react";
 import { useStore } from "../../stores/editor-store";
 import { Loading, Saved, NotSaved } from "../icons";
 import { useNoteStatistics } from "./context";
@@ -33,8 +34,12 @@ function EditorFooter() {
   const { words } = useNoteStatistics();
   const dateEdited = useStore((store) => store.session.dateEdited);
   const id = useStore((store) => store.session.id);
-  const SaveStateIcon = useStore(
-    (store) => SAVE_STATE_ICON_MAP[store.session.saveState]
+  const saveState = useStore(
+    (store) => store.session.saveState
+  ) as keyof typeof SAVE_STATE_ICON_MAP;
+  const SaveStateIcon = useMemo(
+    () => SAVE_STATE_ICON_MAP[saveState],
+    [saveState]
   );
 
   if (!id) return null;
@@ -55,6 +60,8 @@ function EditorFooter() {
         variant="subBody"
         mr={2}
         sx={{ color: "bgSecondaryText" }}
+        data-test-id="editor-date-edited"
+        title={dateEdited?.toString()}
       >
         {formatDate(dateEdited || Date.now())}
       </Text>
