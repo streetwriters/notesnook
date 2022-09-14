@@ -38,7 +38,6 @@ RCTBridge *bridge;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   RCTAppSetupPrepareApp(application);
-  shareViewController = [UIViewController new];
   bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   
 #if RCT_NEW_ARCH_ENABLED
@@ -49,43 +48,19 @@ RCTBridge *bridge;
   bridge.surfacePresenter = _bridgeAdapter.surfacePresenter;
 #endif
   
-  NSURL *url = (NSURL *) [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey];
-  if (url != nil) {
-    navController = [[UINavigationController alloc] initWithRootViewController:shareViewController];
+  rootViewController = [UIViewController new];
+  NSDictionary *initProps = [self prepareInitialProps];
+  UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"Notesnook" , initProps);
+  
+  if (@available(iOS 13.0, *)) {
+    rootView.backgroundColor = [UIColor systemBackgroundColor];
   } else {
-    rootViewController = [UIViewController new];
-    navController = [[UINavigationController alloc] initWithRootViewController:rootViewController];
+    rootView.backgroundColor = [UIColor whiteColor];
   }
-  
-  
-  navController.navigationBarHidden = YES;
-  
-  if (url != nil) {
-    RCTRootView *shareView = [[RCTRootView alloc] initWithBridge:bridge
-                                                      moduleName:@"QuickNoteIOS"
-                                               initialProperties:nil];
-    if (@available(iOS 13.0, *)) {
-      shareView.backgroundColor = [UIColor systemBackgroundColor];
-    } else {
-      shareView.backgroundColor = [UIColor whiteColor];
-    }
-    shareViewController.view = shareView;
-    [RNBootSplash initWithStoryboard:@"BootSplash" rootView:shareView];
-  } else {
-      NSDictionary *initProps = [self prepareInitialProps];
-      UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"Notesnook" , initProps);
-
-    if (@available(iOS 13.0, *)) {
-      rootView.backgroundColor = [UIColor systemBackgroundColor];
-    } else {
-      rootView.backgroundColor = [UIColor whiteColor];
-    }
-    rootViewController.view = rootView;
-    [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
-  }
-  
+  rootViewController.view = rootView;
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-  self.window.rootViewController = navController;
+  self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
   return YES;
 }
@@ -119,44 +94,13 @@ RCTBridge *bridge;
 }
 
 - (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
-    [RNShortcuts performActionForShortcutItem:shortcutItem completionHandler:completionHandler];
+  [RNShortcuts performActionForShortcutItem:shortcutItem completionHandler:completionHandler];
 }
 
 - (BOOL)application:(UIApplication *)application
             openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
-  
-  if ([url.absoluteString isEqual:@"ShareMedia://QuickNoteWidget"]) {
-    if (rootViewController != nil) {
-      
-      RCTRootView *shareView = [[RCTRootView alloc] initWithBridge:bridge
-                                                        moduleName:@"QuickNoteIOS"
-                                                 initialProperties:nil];
-      shareView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
-      shareViewController.view = shareView;
-      [navController pushViewController:shareViewController animated:false];
-    }
-    
-  }
-  
-  if ([url.absoluteString isEqual:@"ShareMedia://MainApp"]) {
-    if (rootViewController == nil) {
-      UIApplication *app = [UIApplication sharedApplication];
-      [app performSelector:@selector(suspend)];
-      [NSThread sleepForTimeInterval:1.0];
-      exit(0);
-    } else {
-      UIApplication *app = [UIApplication sharedApplication];
-      [app performSelector:@selector(suspend)];
-      [NSThread sleepForTimeInterval:0.5];
-      [navController popToRootViewControllerAnimated:false];
-      
-    }
-    
-    
-  }
-  
   return [RCTLinkingManager application:application openURL:url options:options];
 }
 

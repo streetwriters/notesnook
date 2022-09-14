@@ -21,6 +21,7 @@ import { useEffect } from "react";
 import { NativeEventEmitter, NativeModule } from "react-native";
 import { useRef } from "react";
 import { Platform } from "react-native";
+import { Linking } from "react-native";
 const ShortcutsEmitter = new NativeEventEmitter(
   Shortcuts as unknown as NativeModule
 );
@@ -46,6 +47,11 @@ export const useShortcutManager = ({
   }, [shortcuts]);
 
   useEffect(() => {
+    Linking.getInitialURL().then((url) => {
+      if (url?.startsWith("ShareMedia://QuickNoteWidget")) {
+        onShortcutPressed(defaultShortcuts[0]);
+      }
+    });
     Shortcuts.getInitialShortcut().then((shortcut) => {
       if (initialShortcutRecieved.current) return;
       onShortcutPressed(shortcut);
