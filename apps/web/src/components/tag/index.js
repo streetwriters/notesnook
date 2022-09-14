@@ -26,6 +26,7 @@ import { store as editorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
 import { showToast } from "../../utils/toast";
+import { pluralize } from "../../utils/string";
 
 const menuItems = [
   {
@@ -55,7 +56,7 @@ const menuItems = [
           await editorStore.clearSession();
         await db.tags.remove(tag.id);
       }
-      showToast("success", `${items.length} tags deleted`);
+      showToast("success", `${pluralize(items.length, "tag", "tags")} deleted`);
       tagStore.refresh();
     },
     multiSelect: true
