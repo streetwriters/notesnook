@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { BoxProps } from "@theme-ui/components";
 import { Perform } from "../../../common/dialog-controller";
+import { Icon } from "../../icons";
 
 export type AuthenticatorType = "app" | "sms" | "email";
 
@@ -26,7 +26,7 @@ export type Authenticator = {
   type: AuthenticatorType;
   title: string;
   subtitle: string;
-  icon: React.FunctionComponent<BoxProps & { size: number }>;
+  icon: Icon;
   recommended?: boolean;
 };
 

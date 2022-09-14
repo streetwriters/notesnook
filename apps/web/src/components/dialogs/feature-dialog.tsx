@@ -17,23 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Text, Flex, BoxProps } from "@theme-ui/components";
+import { Text, Flex } from "@theme-ui/components";
 import Dialog from "./dialog";
-import * as Icon from "../icons";
 import { getHomeRoute, hardNavigate } from "../../navigation";
 import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
 import { isTesting } from "../../utils/platform";
 import { useEffect } from "react";
+import { ArrowRight, Checkmark, Icon, Warn, Date } from "../icons";
 
 type CallToAction = {
   title: string;
-  icon?: (props: BoxProps & { size: number }) => JSX.Element;
+  icon?: Icon;
   action?: () => void;
 };
 type SubFeature = {
   title: string;
-  icon?: (props: BoxProps & { size: number }) => JSX.Element;
+  icon?: Icon;
   subtitle?: string | JSX.Element;
 };
 type Feature = {
@@ -51,7 +51,7 @@ const features: Record<FeatureKeys, Feature> = {
     subtitle: "You can now sync your notes to unlimited devices.",
     cta: {
       title: "Continue",
-      icon: Icon.ArrowRight,
+      icon: ArrowRight,
       action: () => hardNavigate(getHomeRoute())
     }
   },
@@ -65,7 +65,7 @@ const features: Record<FeatureKeys, Feature> = {
     subFeatures: appVersion.isBeta
       ? [
           {
-            icon: Icon.Warn,
+            icon: Warn,
             title: "Notice",
             subtitle: (
               <>
@@ -77,7 +77,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           },
           {
-            icon: Icon.Warn,
+            icon: Warn,
             title: "Notice 2",
             subtitle: (
               <>
@@ -91,7 +91,7 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            icon: Icon.Date,
+            icon: Date,
             title: "Shortcuts for adding current date in a note",
             subtitle: (
               <>
@@ -109,7 +109,7 @@ const features: Record<FeatureKeys, Feature> = {
         ],
     cta: {
       title: "Got it",
-      icon: Icon.Checkmark,
+      icon: Checkmark,
       action: () => {
         Config.set(`${appVersion.numerical}:highlights`, true);
       }
