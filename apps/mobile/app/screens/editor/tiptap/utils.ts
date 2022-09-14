@@ -20,12 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { createRef, MutableRefObject, RefObject } from "react";
 import { TextInput } from "react-native";
 import WebView from "react-native-webview";
+import { MMKV } from "../../../common/database/mmkv";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../../services/event-manager";
 import { NoteType } from "../../../utils/types";
-import { EditorState, useEditorType } from "./types";
+import { AppState, EditorState, useEditorType } from "./types";
 export const textInput = createRef<TextInput>();
 export const editorController =
   createRef<useEditorType>() as MutableRefObject<useEditorType>;
@@ -118,4 +119,26 @@ export function isContentInvalid(content: string | undefined) {
     content === "<p><br></p>" ||
     content === "<p>&nbsp;</p>"
   );
+}
+
+export function getAppState() {
+  const json = MMKV.getString("appState");
+  if (json) {
+    const appState = JSON.parse(json) as AppState;
+    if (
+      appState.editing &&
+      !appState.note?.locked &&
+      appState.note?.id &&
+      Date.now() < appState.timestamp + 3600000
+    ) {
+      return appState;
+    } else {
+      return null;
+    }
+  }
+  return null;
+}
+
+export function clearAppState() {
+  MMKV.removeItem("appState");
 }

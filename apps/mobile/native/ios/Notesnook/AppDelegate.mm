@@ -6,6 +6,7 @@
 #import <RNBootSplash/RNBootSplash.h>
 #import <React/RCTAppSetupUtils.h>
 #import <React/RCTLinkingManager.h>
+#import "RNShortcuts.h"
 
 #if RCT_NEW_ARCH_ENABLED
 #import <React/CoreModulesPlugins.h>
@@ -115,6 +116,10 @@ RCTBridge *bridge;
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
+}
+
+- (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
+    [RNShortcuts performActionForShortcutItem:shortcutItem completionHandler:completionHandler];
 }
 
 - (BOOL)application:(UIApplication *)application

@@ -38,7 +38,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { notesnook } from "../../e2e/test.ids";
 import { SideMenu } from "../components/side-menu";
 import { FluidTabs } from "../components/tabs";
-import { editorController, editorState } from "../screens/editor/tiptap/utils";
+import {
+  clearAppState,
+  editorController,
+  editorState,
+  getAppState
+} from "../screens/editor/tiptap/utils";
 import { EditorWrapper } from "../screens/editor/wrapper";
 import { DDS } from "../services/device-detection";
 import {
@@ -61,6 +66,8 @@ import { editorRef, tabBarRef } from "../utils/global-refs";
 import { hideAllTooltips } from "../hooks/use-tooltip";
 import { NavigationStack } from "./navigation-stack";
 import { useCallback } from "react";
+import { useShortcutManager } from "../hooks/use-shortcut-manager";
+import { sleep } from "../utils/time";
 
 const _TabsHolder = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -79,6 +86,27 @@ const _TabsHolder = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
+
+  useShortcutManager({
+    onShortcutPressed: async (item) => {
+      if (!item && getAppState()) {
+        editorState().movedAway = false;
+        tabBarRef.current?.goToPage(1, false);
+        return;
+      }
+      if (item.type === "notesnook.action.newnote") {
+        clearAppState();
+        if (!tabBarRef.current) {
+          await sleep(3000);
+          editorState().movedAway = false;
+          tabBarRef.current?.goToPage(1, false);
+          return;
+        }
+        editorState().movedAway = false;
+        tabBarRef.current?.goToPage(1, false);
+      }
+    }
+  });
 
   const onOrientationChange = (o, o2) => {
     setOrientation(o || o2);

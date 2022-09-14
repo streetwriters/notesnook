@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { Platform, View } from "react-native";
 import RNBootSplash from "react-native-bootsplash";
 import { checkVersion } from "react-native-check-version";
 import { enabled } from "react-native-privacy-snapshot";
-import { editorState } from "../../screens/editor/tiptap/utils";
+import { DatabaseLogger, db, loadDatabase } from "../../common/database";
+import { useAppState } from "../../hooks/use-app-state";
 import BackupService from "../../services/backup";
 import BiometricService from "../../services/biometrics";
-import { DDS } from "../../services/device-detection";
 import {
   eSendEvent,
   presentSheet,
@@ -40,10 +40,7 @@ import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
-import { DatabaseLogger, db, loadDatabase } from "../../common/database";
-import { MMKV } from "../../common/database/mmkv";
 import { eOpenAnnouncementDialog } from "../../utils/events";
-import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { SVG } from "../auth/background";
@@ -58,8 +55,6 @@ import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
-import { useAppState } from "../../hooks/use-app-state";
-import { useCallback } from "react";
 
 const Launcher = React.memo(
   function Launcher() {
@@ -80,9 +75,6 @@ const Launcher = React.memo(
     const loadNotes = useCallback(async () => {
       if (verifyUser) {
         return;
-      }
-      if (!dbInitCompleted.current) {
-        await restoreEditorState();
       }
       setImmediate(() => {
         db.notes.init().then(() => {
@@ -185,27 +177,6 @@ const Launcher = React.memo(
         return true;
       } catch (e) {
         return false;
-      }
-    };
-
-    const restoreEditorState = async () => {
-      let appState = MMKV.getString("appState");
-      if (appState) {
-        appState = JSON.parse(appState);
-        if (
-          appState.note &&
-          !appState.note.locked &&
-          !appState.movedAway &&
-          Date.now() < appState.timestamp + 3600000
-        ) {
-          editorState().currentlyEditing = true;
-          editorState().isRestoringState = true;
-          editorState().movedAway = false;
-          if (!DDS.isTab) {
-            tabBarRef.current?.goToPage(1);
-          }
-          eSendEvent("loadingNote", appState.note);
-        }
       }
     };
 

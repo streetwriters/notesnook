@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import WebView from "react-native-webview";
+import { db } from "../../../common/database";
 import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
@@ -29,19 +30,20 @@ import {
 import Navigation from "../../../services/navigation";
 import { TipManager } from "../../../services/tip-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
+import { useNoteStore } from "../../../stores/use-notes-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
-import { db } from "../../../common/database";
-import { MMKV } from "../../../common/database/mmkv";
 import { eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { timeConverter } from "../../../utils/time";
 import { NoteType } from "../../../utils/types";
 import Commands from "./commands";
-import { AppState, Content, EditorState, Note, SavePayload } from "./types";
+import { Content, EditorState, Note, SavePayload } from "./types";
 import {
+  clearAppState,
   defaultState,
   EditorEvents,
+  getAppState,
   isContentInvalid,
   isEditorLoaded,
   makeSessionId,
@@ -345,13 +347,6 @@ export const useEditor = (
     }, 300);
   };
 
-  useEffect(() => {
-    eSubscribeEvent(eOnLoadNote + editorId, loadNote);
-    return () => {
-      eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
-    };
-  }, [editorId, loadNote]);
-
   const saveContent = useCallback(
     ({
       title,
@@ -400,37 +395,41 @@ export const useEditor = (
   );
 
   const restoreEditorState = useCallback(async () => {
-    const json = await MMKV.getItem("appState");
-    if (json) {
-      const appState = JSON.parse(json) as AppState;
-      if (
-        appState.editing &&
-        !appState.note?.locked &&
-        appState.note?.id &&
-        Date.now() < appState.timestamp + 3600000
-      ) {
-        state.current.isRestoringState = true;
-        overlay(true, appState.note);
-        state.current.currentlyEditing = true;
-        if (!DDS.isTab) {
-          tabBarRef.current?.goToPage(1);
-        }
-        setTimeout(() => {
-          if (appState.note) {
-            loadNote(appState.note);
-          }
-        }, 1);
-        MMKV.removeItem("appState");
-        state.current.movedAway = false;
-        eSendEvent("load_overlay", "hide_editor");
-        state.current.isRestoringState = false;
-        return;
-      }
-      state.current.isRestoringState = false;
-      return;
+    const appState = getAppState();
+    if (!appState) return;
+    overlay(true, appState.note);
+    state.current.isRestoringState = true;
+    state.current.currentlyEditing = true;
+    state.current.movedAway = false;
+    if (!DDS.isTab) {
+      tabBarRef.current?.goToPage(1, false);
     }
+    if (appState.note) {
+      if (useNoteStore.getState().loading) {
+        const remove = useNoteStore.subscribe((state) => {
+          if (!state.loading && appState.note) {
+            loadNote(appState.note);
+            remove();
+          }
+        });
+      } else {
+        loadNote(appState.note);
+      }
+    }
+    clearAppState();
     state.current.isRestoringState = false;
   }, [loadNote, overlay]);
+
+  useEffect(() => {
+    isDefaultEditor && restoreEditorState();
+  }, [isDefaultEditor, restoreEditorState]);
+
+  useEffect(() => {
+    eSubscribeEvent(eOnLoadNote + editorId, loadNote);
+    return () => {
+      eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
+    };
+  }, [editorId, loadNote, restoreEditorState, isDefaultEditor]);
 
   const onLoad = useCallback(async () => {
     state.current.ready = true;
@@ -443,7 +442,6 @@ export const useEditor = (
       loadNote({ ...currentNote.current, forced: true });
     } else {
       await commands.setPlaceholder(placeholderTip.current);
-      isDefaultEditor && restoreEditorState();
     }
     commands.setSettings();
   }, [
@@ -453,8 +451,7 @@ export const useEditor = (
     commands,
     isDefaultEditor,
     insets,
-    loadNote,
-    restoreEditorState
+    loadNote
   ]);
 
   return {

@@ -40,7 +40,7 @@ import { editorController, editorState, textInput } from "./tiptap/utils";
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const loading = useNoteStore((state) => state.loading);
+  const loading = false;
   const insets = useSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
   const introCompleted = useSettingStore(
