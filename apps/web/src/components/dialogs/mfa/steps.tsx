@@ -30,9 +30,9 @@ import { Text, Flex, Button, Box } from "@theme-ui/components";
 import { useSessionState } from "../../../hooks/use-session-state";
 import {
   Loading,
-  MFAAuthenticator,
-  MFAEmail,
-  MFASMS,
+  MfaAuthenticator,
+  MfaEmail,
+  MfaSms,
   Download,
   Print,
   Copy,
@@ -104,20 +104,20 @@ const Authenticators: Authenticator[] = [
     title: "Set up using an Authenticator app",
     subtitle:
       "Use an authenticator app like Aegis or Raivo Authenticator to get the authentication codes.",
-    icon: MFAAuthenticator,
+    icon: MfaAuthenticator,
     recommended: true
   },
   {
     type: "sms",
     title: "Set up using SMS",
     subtitle: "Notesnook will send you an SMS text with the 2FA code at login.",
-    icon: MFASMS
+    icon: MfaSms
   },
   {
     type: "email",
     title: "Set up using Email",
     subtitle: "Notesnook will send you the 2FA code on your email at login.",
-    icon: MFAEmail
+    icon: MfaEmail
   }
 ];
 export type AuthenticatorOnNext = (authenticator: Authenticator) => void;
