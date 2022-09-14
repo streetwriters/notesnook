@@ -22,6 +22,7 @@ import { hashNavigate, navigate } from "../../navigation";
 import { Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
 import { store as tagStore } from "../../stores/tag-store";
+import { store as noteStore } from "../../stores/note-store";
 import { store as editorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
@@ -58,6 +59,7 @@ const menuItems = [
       }
       showToast("success", `${pluralize(items.length, "tag", "tags")} deleted`);
       tagStore.refresh();
+      noteStore.refresh();
     },
     multiSelect: true
   }
