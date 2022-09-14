@@ -139,6 +139,11 @@ class EditorStore extends BaseStore {
   };
 
   saveSession = async (sessionId, session) => {
+    if (!session) {
+      logger.warn("Session cannot be undefined", { sessionId, session });
+      return;
+    }
+
     const currentSession = this.get().session;
     if (currentSession.readonly && session.readonly !== false) return; // do not allow saving of readonly session
     if (currentSession.saveState === 0 && !currentSession.id && !sessionId)
@@ -185,7 +190,7 @@ class EditorStore extends BaseStore {
         if (!!state.session.id && state.session.id !== note.id) return;
 
         for (let key in session) {
-          if (key === "content") continue;
+          if (key === "content" && !state.session.locked) continue;
           state.session[key] = session[key];
         }
 
@@ -200,8 +205,8 @@ class EditorStore extends BaseStore {
       this.setSaveState(1);
     } catch (err) {
       this.setSaveState(-1);
-      logger.info(err);
-      if (session.locked) {
+      logger.error(err);
+      if (currentSession.locked) {
         hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
       }
     }

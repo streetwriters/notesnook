@@ -388,7 +388,6 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
           px={4}
           onClick={async () => {
             await disablePreviewMode(false);
-            await editorstore.get().saveSession();
           }}
         >
           Restore
