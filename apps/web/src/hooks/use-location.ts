@@ -17,18 +17,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { useState, useEffect } = require("react");
-const { getCurrentPath, NavigationEvents } = require("../navigation");
+import { useState, useEffect } from "react";
+import { getCurrentPath, NavigationEvents } from "../navigation";
 
 export default function useLocation() {
   const [location, setLocation] = useState(getCurrentPath());
-  const [previousLocation, setPreviousLocation] = useState();
-  const [navigationState, setNavigationState] = useState();
+  const [previousLocation, setPreviousLocation] = useState<string>();
+  const [navigationState, setNavigationState] =
+    useState<NavigationStates>("neutral");
 
   useEffect(() => {
     const navigateEvent = NavigationEvents.subscribe(
       "onNavigate",
-      (_, currentLocation) => {
+      (_: any, currentLocation: string) => {
         setLocation((prev) => {
           setNavigationState(getNavigationState(currentLocation, prev));
           setPreviousLocation(prev);
@@ -40,14 +41,18 @@ export default function useLocation() {
       navigateEvent.unsubscribe();
     };
   }, []);
-  return [location, previousLocation, navigationState];
+  return [location, previousLocation, navigationState] as const;
 }
 
-function getNavigationState(currentLocation, previousLocation) {
+type NavigationStates = "forward" | "backward" | "same" | "neutral";
+function getNavigationState(
+  currentLocation: string,
+  previousLocation: string
+): NavigationStates {
   if (!previousLocation || !currentLocation) return "neutral";
 
-  let currentLevels = currentLocation.split("/");
-  let previousLevels = previousLocation.split("/");
+  const currentLevels = currentLocation.split("/");
+  const previousLevels = previousLocation.split("/");
   const isSameRoot = currentLevels[1] === previousLevels[1];
   return isSameRoot
     ? currentLevels.length > previousLevels.length
