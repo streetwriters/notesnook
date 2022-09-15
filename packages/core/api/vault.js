@@ -242,7 +242,12 @@ export default class Vault {
     });
   }
 
-  async decryptContent(encryptedContent, password) {
+  async decryptContent(encryptedContent, password = null) {
+    if (!password) {
+      await this._check();
+      password = this._password;
+    }
+
     let decryptedContent = await this._storage.decrypt(
       { password },
       encryptedContent.data

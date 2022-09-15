@@ -17,31 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Input } from "@theme-ui/components";
+import { useStore, store } from "../../stores/editor-store";
+import { debounceWithId } from "../../utils/debounce";
 
 type TitleBoxProps = {
-  nonce?: number;
   readonly: boolean;
-  title: string;
-  setTitle: (title: string) => void;
 };
 
 function TitleBox(props: TitleBoxProps) {
-  const { readonly, setTitle, title, nonce } = props;
-  const [currentTitle, setCurrentTitle] = useState<string>("");
-
-  useEffect(
-    () => {
-      setCurrentTitle(title);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [nonce]
-  );
+  const { readonly } = props;
+  const title = useStore((store) => store.session.title);
 
   return (
     <Input
-      value={currentTitle}
+      value={title}
       variant="clean"
       data-test-id="editor-title"
       className="editorTitle"
@@ -55,16 +46,20 @@ function TitleBox(props: TitleBoxProps) {
         width: "100%"
       }}
       onChange={(e) => {
-        setCurrentTitle(e.target.value);
-        setTitle(e.target.value);
+        const { sessionId, id } = store.get().session;
+        debouncedOnTitleChange(sessionId, id, e.target.value);
       }}
     />
   );
 }
 
 export default React.memo(TitleBox, (prevProps, nextProps) => {
-  return (
-    prevProps.readonly === nextProps.readonly &&
-    prevProps.nonce === nextProps.nonce
-  );
+  return prevProps.readonly === nextProps.readonly;
 });
+
+function onTitleChange(noteId: string, title: string) {
+  if (!title) return;
+  store.get().setTitle(noteId, title);
+}
+
+const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);
