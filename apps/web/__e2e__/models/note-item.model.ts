@@ -39,7 +39,7 @@ export class NoteItemModel extends BaseItemModel {
   }
 
   async openNote() {
-    await this.locator.click();
+    await this.click();
     const title = await this.getTitle();
     const description = await this.getDescription();
 

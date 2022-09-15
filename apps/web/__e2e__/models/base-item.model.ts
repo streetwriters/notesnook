@@ -31,6 +31,19 @@ export class BaseItemModel {
     this.descriptionText = this.locator.locator(getTestId(`description`));
   }
 
+  async isSelected() {
+    return (await this.locator.getAttribute("class"))?.includes("selected");
+  }
+
+  async isFocused() {
+    return await this.locator.evaluate((el) => el === document.activeElement);
+  }
+
+  async click() {
+    await this.locator.scrollIntoViewIfNeeded();
+    await this.locator.click();
+  }
+
   async getId() {
     return await this.locator.getAttribute("id");
   }
