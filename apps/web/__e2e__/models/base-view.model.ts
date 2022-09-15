@@ -72,4 +72,26 @@ export class BaseViewModel {
       await this.list.waitFor();
     }
   }
+
+  async focus() {
+    const items = this.list.locator(
+      `${getTestId(`virtuoso-item-list`)} >> ${getTestId("list-item")}`
+    );
+    await items.nth(0).click();
+    await items.nth(0).click();
+  }
+
+  // async selectAll() {
+  //   await this.press("Control+a");
+  // }
+
+  // async selectNext() {
+  //   await this.press("ArrowDown");
+  // }
+
+  async press(key: string) {
+    const itemList = this.list.locator(getTestId(`virtuoso-item-list`));
+    await itemList.press(key);
+    await this.page.waitForTimeout(300);
+  }
 }
