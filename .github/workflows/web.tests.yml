@@ -49,5 +49,5 @@ jobs:
         if: failure()
         with:
           name: test-results
-          path: test-results
+          path: apps/web/test-results
           retention-days: 5

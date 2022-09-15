@@ -64,10 +64,10 @@ module.exports = {
   testDir: "__e2e__",
 
   // Each test is given 30 seconds
-  timeout: 30000,
-  workers: IS_CI ? 2 : 2,
+  timeout: 15000,
+  workers: IS_CI ? 3 : 2,
   reporter: "list",
-  retries: IS_CI ? 1 : 0,
+  retries: IS_CI ? 0 : 0,
   fullyParallel: true,
   use: {
     baseURL: "http://localhost:3000/",
