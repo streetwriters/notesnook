@@ -75,11 +75,10 @@ function ListItem(props) {
       : inInSelection;
   });
 
-  const selectItem = useSelectionStore((store) => store.selectItem);
-
   return (
     <Flex
       id={`id_${props.item.id}`}
+      className={isSelected ? "selected" : ""}
       ref={listItemRef}
       bg={isSelected ? "shade" : background}
       onContextMenu={(e) => {
@@ -140,23 +139,13 @@ function ListItem(props) {
         alignItems: isCompact ? "center" : undefined
       }}
       onKeyPress={(e) => {
-        if (e.key === "Enter") {
-          e.target.click();
-        } else {
+        if (e.key !== "Enter") {
           if (props.onKeyPress) props.onKeyPress(e);
         }
       }}
       onClick={(e) => {
-        if (e.shiftKey) {
-          //ignore (handled by listcontainer)
-        } else if (e.ctrlKey) {
-          selectItem(props.item);
-        } else {
-          selectionStore.toggleSelectionMode(false);
-          if (props.onClick) {
-            selectItem(props.item);
-            props.onClick();
-          }
+        if (props.onClick) {
+          props.onClick();
         }
       }}
       data-test-id={`list-item`}
