@@ -279,7 +279,8 @@ export const useEditor = (
     if (note.locked || note.content) {
       currentContent.current = {
         data: note.content?.data,
-        type: note.content?.type || "tiptap"
+        type: note.content?.type || "tiptap",
+        noteId: currentNote.current?.id as string
       };
     } else {
       currentContent.current = await db.content?.raw(note.contentId);
@@ -354,29 +355,40 @@ export const useEditor = (
     }, 300);
   };
 
+  const lockNoteWithVault = useCallback((note: NoteType) => {
+    eSendEvent(eClearEditor);
+    openVault({
+      item: note,
+      novault: true,
+      locked: true,
+      goToEditor: true,
+      title: "Open note",
+      description: "Unlock note to open it in editor."
+    });
+  }, []);
+
   const onSyncComplete = useCallback(
     async (data: NoteType | Content) => {
-      const noteId = (data as NoteType).id || (data as Content).noteId;
+      const noteId = data.type === "tiptap" ? data.noteId : data.id;
 
       if (!currentNote.current || noteId !== currentNote.current.id) return;
+      const isContentEncrypted = typeof (data as Content)?.data === "object";
       const note = db.notes?.note(currentNote.current?.id).data as NoteType;
-      if (note.dateEdited === lastSuccessfulSaveTime.current) return;
       lock.current = true;
+
       if (data.type === "tiptap") {
-        if (!currentNote.current.locked && note.locked) {
-          eSendEvent(eClearEditor);
-          openVault({
-            item: note,
-            novault: true,
-            locked: true,
-            goToEditor: true,
-            title: "Open note",
-            description: "Unlock note to open it in editor."
-          });
-        } else if (currentNote.current.locked && note.locked) {
-          // handle locked note unlocking.
-          // Try to unlock & set the content if it is different from current content.
-          // If failed close editor and show open-note dialog.
+        if (!currentNote.current.locked && isContentEncrypted) {
+          lockNoteWithVault(note);
+        } else if (currentNote.current.locked && isContentEncrypted) {
+          const decryptedContent = (await db.vault?.decryptContent(
+            data
+          )) as Content;
+          if (!decryptedContent) {
+            lockNoteWithVault(note);
+          } else {
+            await postMessage(EditorEvents.updatehtml, decryptedContent.data);
+            currentContent.current = decryptedContent;
+          }
         } else {
           const _nextContent = await db.content?.raw(note.contentId);
           lastSuccessfulSaveTime.current = note.dateEdited;
@@ -386,6 +398,7 @@ export const useEditor = (
           }
         }
       } else {
+        const note = data as NoteType;
         if (note.title !== currentNote.current.title) {
           postMessage(EditorEvents.title, note.title);
         }
@@ -397,12 +410,12 @@ export const useEditor = (
 
       lock.current = false;
     },
-    [commands, postMessage]
+    [commands, postMessage, lockNoteWithVault]
   );
 
   useEffect(() => {
     const syncCompletedSubscription = db.eventManager?.subscribe(
-      EVENTS.syncCompleted,
+      EVENTS.syncItemMerged,
       onSyncComplete
     );
     eSubscribeEvent(eOnLoadNote + editorId, loadNote);
@@ -426,7 +439,8 @@ export const useEditor = (
       if (type === EditorEvents.content) {
         currentContent.current = {
           data: content,
-          type: "tiptap"
+          type: "tiptap",
+          noteId: currentNote.current?.id as string
         };
       }
       const params = {
