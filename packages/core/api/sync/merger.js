@@ -165,6 +165,7 @@ class Merger {
     let localItem = await get(remoteItem.id);
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
       await add(remoteItem);
+      return remoteItem;
     }
   }
 
@@ -238,7 +239,7 @@ class Merger {
         definition.threshold
       );
     } else if (definition.get && definition.set) {
-      await this._mergeItem(item, definition.get, definition.set);
+      return await this._mergeItem(item, definition.get, definition.set);
     } else if (!definition.get && definition.set) {
       await definition.set(item);
     }
