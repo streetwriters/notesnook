@@ -24,7 +24,8 @@ import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  openVault
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { TipManager } from "../../../services/tip-manager";
@@ -33,7 +34,7 @@ import { useTagStore } from "../../../stores/use-tag-store";
 import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
 import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
-import { eOnLoadNote } from "../../../utils/events";
+import { eClearEditor, eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { timeConverter } from "../../../utils/time";
 import { NoteType } from "../../../utils/types";
@@ -353,19 +354,38 @@ export const useEditor = (
     }, 300);
   };
 
-  const onSyncComplete = useCallback(async () => {
-    if (currentNote.current) {
-      const note = db.notes?.note(currentNote.current?.id).data as NoteType;
-      if (note.dateEdited !== lastSuccessfulSaveTime.current) {
-        currentContent.current = await db.content?.raw(note.contentId);
-        lock.current = true;
-        lastSuccessfulSaveTime.current = note.dateEdited;
+  const onSyncComplete = useCallback(
+    async (data: NoteType | Content) => {
+      const noteId = (data as NoteType).id || (data as Content).noteId;
 
-        await postMessage(
-          EditorEvents.updatehtml,
-          currentContent.current?.data
-        );
-        lock.current = false;
+      if (!currentNote.current || noteId !== currentNote.current.id) return;
+      const note = db.notes?.note(currentNote.current?.id).data as NoteType;
+      if (note.dateEdited === lastSuccessfulSaveTime.current) return;
+      lock.current = true;
+      if (data.type === "tiptap") {
+        if (!currentNote.current.locked && note.locked) {
+          eSendEvent(eClearEditor);
+          openVault({
+            item: note,
+            novault: true,
+            locked: true,
+            goToEditor: true,
+            title: "Open note",
+            description: "Unlock note to open it in editor."
+          });
+        } else if (currentNote.current.locked && note.locked) {
+          // handle locked note unlocking.
+          // Try to unlock & set the content if it is different from current content.
+          // If failed close editor and show open-note dialog.
+        } else {
+          const _nextContent = await db.content?.raw(note.contentId);
+          lastSuccessfulSaveTime.current = note.dateEdited;
+          if (_nextContent !== currentContent.current?.data) {
+            await postMessage(EditorEvents.updatehtml, _nextContent.data);
+            currentContent.current = _nextContent;
+          }
+        }
+      } else {
         if (note.title !== currentNote.current.title) {
           postMessage(EditorEvents.title, note.title);
         }
@@ -374,8 +394,11 @@ export const useEditor = (
         }
         await commands.setStatus(timeConverter(note.dateEdited), "Saved");
       }
-    }
-  }, [commands, postMessage]);
+
+      lock.current = false;
+    },
+    [commands, postMessage]
+  );
 
   useEffect(() => {
     const syncCompletedSubscription = db.eventManager?.subscribe(
