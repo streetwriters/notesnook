@@ -56,6 +56,7 @@
     "react-virtuoso": "2.4.0",
     "showdown": "github:thecodrr/showdown",
     "timeago.js": "^4.0.2",
+    "w3c-keyname": "^2.2.6",
     "web-streams-polyfill": "^3.1.1",
     "wouter": "^2.7.3",
     "zustand": "^3.3.1"
@@ -80,12 +81,12 @@
     "lorem-ipsum": "^2.0.4",
     "patch-package": "^6.4.7",
     "progress-bar-webpack-plugin": "^2.1.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "source-map-explorer": "^2.5.2",
     "typescript": "^4.8.2",
     "webpack-bundle-analyzer": "^4.5.0",
-    "worker-loader": "^3.0.8",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "worker-loader": "^3.0.8"
   },
   "overrides": {
     "react@>17": "17.0.2",
