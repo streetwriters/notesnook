@@ -52,7 +52,7 @@ export class AuthModel {
     await this.submitButton.click();
 
     await this.page
-      .locator(getTestId("sync-status-completed"))
+      .locator(getTestId("sync-status-syncing"))
       .waitFor({ state: "visible" });
   }
 }
