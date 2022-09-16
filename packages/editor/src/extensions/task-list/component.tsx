@@ -80,9 +80,9 @@ export function TaskListComponent(
     <>
       <Flex
         sx={{
-          flexDirection: "column",
-          ":hover > div > .toggleSublist": { opacity: 1 }
+          flexDirection: "column"
         }}
+        className="task-list-tools"
       >
         {isNested ? (
           <Flex
@@ -108,6 +108,7 @@ export function TaskListComponent(
                 alignSelf: "start",
                 mr: 2,
                 cursor: "pointer",
+                ":hover": { opacity: 1 },
                 ".icon:hover path": {
                   fill: "var(--checked) !important"
                 }
