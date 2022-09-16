@@ -68,7 +68,7 @@ export class AutoSync {
     // be a few milliseconds less than Date.now(). Setting sync
     // interval to 0 causes a conflict where Date.now() & dateModified
     // are equal causing the item to not be synced.
-    const interval = item.type === "tiptap" ? 100 : this.interval;
+    const interval = item && item.type === "tiptap" ? 100 : this.interval;
     this.timeout = setTimeout(() => {
       this.logger.info(`Sync requested by: ${id}`);
       this.db.eventManager.publish(EVENTS.databaseSyncRequested, false, false);
