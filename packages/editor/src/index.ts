@@ -72,18 +72,20 @@ import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer"
 import { Code } from "@tiptap/extension-code";
 import { DateTime } from "./extensions/date-time";
 import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
+
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
   .filter(([name]) => name !== "ClipboardTextSerializer")
   .map(([, extension]) => extension);
 
 type TiptapOptions = EditorOptions &
-  AttachmentOptions & {
+  AttachmentOptions &
+  OpenLinkOptions & {
     theme: Theme;
     isMobile?: boolean;
     isKeyboardOpen?: boolean;
     doubleSpacedLines?: boolean;
-  } & OpenLinkOptions;
+  };
 
 const useTiptap = (
   options: Partial<TiptapOptions> = {},
