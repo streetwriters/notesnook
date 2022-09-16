@@ -17,48 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { PlaywrightTestConfig } from "@playwright/test";
+
 const IS_CI = !!process.env.CI;
 
-const projects = IS_CI
-  ? [
-      // {
-      //   name: "Firefox",
-      //   use: { browserName: "firefox" }
-      // },
-      // {
-      //   name: "WebKit",
-      //   use: { browserName: "webkit" }
-      // },
-      {
-        name: "Chromium",
-        use: {
-          browserName: "chromium"
-        }
-      }
-    ]
-  : [
-      {
-        name: "Chromium",
-        use: {
-          browserName: "chromium"
-        }
-      },
-      {
-        name: "Firefox",
-        use: { browserName: "firefox" }
-      },
-      {
-        name: "WebKit",
-        use: { browserName: "webkit" }
-      }
-    ];
-
-module.exports = {
+const config: PlaywrightTestConfig = {
   webServer: {
     command: "npm run start:test",
     port: 3000,
     timeout: 60 * 1000,
-    reuseExistingServer: true
+    reuseExistingServer: false
   },
   // Look for test files in thcleare "tests" directory, relative to this configuration file
   testDir: "__e2e__",
@@ -69,6 +37,8 @@ module.exports = {
   reporter: "list",
   retries: IS_CI ? 0 : 0,
   fullyParallel: true,
+  preserveOutput: "failures-only",
+  outputDir: "test-results",
   use: {
     baseURL: "http://localhost:3000/",
     headless: true,
@@ -82,11 +52,27 @@ module.exports = {
     viewport: {
       width: 1280,
       height: 720
-    },
-    screen: {
-      width: 1280,
-      height: 720
     }
   },
-  projects
+  projects: IS_CI
+    ? [
+        {
+          name: "Chromium",
+          use: {
+            browserName: "chromium"
+          }
+        }
+      ]
+    : [
+        {
+          name: "Firefox",
+          use: { browserName: "firefox" }
+        },
+        {
+          name: "WebKit",
+          use: { browserName: "webkit" }
+        }
+      ]
 };
+
+export default config;
