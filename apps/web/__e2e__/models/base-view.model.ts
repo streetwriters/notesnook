@@ -24,10 +24,14 @@ import { iterateList } from "./utils";
 export class BaseViewModel {
   protected readonly page: Page;
   protected readonly list: Locator;
+  private readonly listPlaceholder: Locator;
 
   constructor(page: Page, pageId: string) {
     this.page = page;
     this.list = page.locator(`#${pageId} >> ${getTestId("note-list")}`);
+    this.listPlaceholder = page.locator(
+      `#${pageId} >> ${getTestId("list-placeholder")}`
+    );
   }
 
   async findGroup(groupName: string) {
@@ -43,9 +47,11 @@ export class BaseViewModel {
   }
 
   protected async *iterateItems() {
+    await this.waitForList();
     const locator = this.list.locator(
       `${getTestId(`virtuoso-item-list`)} >> ${getTestId("list-item")}`
     );
+
     for await (const _item of iterateList(locator)) {
       const id = await _item.getAttribute("id");
       if (!id) return;
@@ -57,5 +63,13 @@ export class BaseViewModel {
 
   async waitForItem(title: string) {
     await this.list.locator(getTestId("title"), { hasText: title }).waitFor();
+  }
+
+  async waitForList() {
+    try {
+      await this.listPlaceholder.waitFor({ timeout: 1000 });
+    } catch {
+      await this.list.waitFor();
+    }
   }
 }

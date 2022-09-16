@@ -100,7 +100,7 @@ function ListContainer(props: ListContainerProps) {
           ) : (
             <>
               {header || <ReminderBar />}
-              <Flex variant="columnCenterFill">
+              <Flex variant="columnCenterFill" data-test-id="list-placeholder">
                 <props.placeholder />
               </Flex>
             </>

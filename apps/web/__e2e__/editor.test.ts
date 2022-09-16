@@ -169,7 +169,9 @@ test("select all & backspace should clear all content in editor", async ({
 
 test("editing a note and switching immediately to another note and making an edit shouldn't overlap both notes", async ({
   page
-}) => {
+}, test) => {
+  test.setTimeout(45 * 1000);
+
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();
@@ -206,7 +208,9 @@ test("editing a note and switching immediately to another note and making an edi
 
 test("editing a note and switching immediately to another note and editing the title shouldn't overlap both notes", async ({
   page
-}) => {
+}, test) => {
+  test.setTimeout(45 * 1000);
+
   const app = new AppModel(page);
   await app.goto();
   const notes = await app.goToNotes();

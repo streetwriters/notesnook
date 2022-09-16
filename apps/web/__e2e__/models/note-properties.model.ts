@@ -176,6 +176,7 @@ export class NotePropertiesModel extends BaseProperties {
 
   async open() {
     await this.propertiesButton.click();
+    await this.propertiesCloseButton.waitFor();
   }
 
   async close() {
@@ -184,6 +185,8 @@ export class NotePropertiesModel extends BaseProperties {
 
   async getSessionHistory() {
     await this.open();
+    await this.sessionItems.first().waitFor();
+
     const history: SessionHistoryItemModel[] = [];
     for await (const item of iterateList(this.sessionItems)) {
       history.push(new SessionHistoryItemModel(this, item));
