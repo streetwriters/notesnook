@@ -47,7 +47,9 @@ export function onBackspacePressed(
     if (isFirstOfType(type, editor.state)) {
       const parentList = getListFromListItem(type, editor.state);
       if (!parentList) return false;
-      if (parentList.childCount > 1) return editor.commands.deleteNode(type);
+      if (parentList.childCount > 1) {
+        return editor.commands.liftListItem(type);
+      }
       return editor.commands.deleteNode(parentList.type);
     }
 
