@@ -235,8 +235,14 @@ function TipTap(props: TipTapProps) {
     if (!editorContainer) return;
     const currentEditor = editor;
     function onClick(e: MouseEvent) {
-      if (currentEditor?.isFocused || e.target !== editorContainer) return;
-      currentEditor?.commands.focus("end");
+      if (e.target !== editorContainer) return;
+      const lastNode = currentEditor?.state.doc.lastChild;
+      const isLastNodeParagraph = lastNode?.type.name === "paragraph";
+      const isEmpty = lastNode?.nodeSize === 2;
+      if (isLastNodeParagraph && isEmpty) currentEditor?.commands.focus("end");
+      else {
+        currentEditor?.chain().focus("end").insertContent("<p></p>").run();
+      }
     }
     editorContainer.addEventListener("click", onClick);
     return () => {
