@@ -28,6 +28,8 @@ import { getTestId, USER } from "./utils";
 //   await page.reload();
 // }
 
+test.setTimeout(45 * 1000);
+
 test("login user", async ({ page }) => {
   const app = new AppModel(page);
   await app.auth.goto();
