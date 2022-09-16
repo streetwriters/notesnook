@@ -39,8 +39,8 @@ export class SettingsViewModel {
     await this.logoutButton.click();
     await confirmDialog(this.page);
     await this.page
-      .locator(getTestId("sync-status-synced"))
-      .waitFor({ state: "hidden" });
+      .locator(getTestId("not-logged-in"))
+      .waitFor({ state: "visible" });
   }
 
   async getRecoveryKey(password: string) {
