@@ -1,5 +1,0 @@
-subtotal: ₹4000000
-tax: ₹700000
-discount: ₹0000
-total: ₹4000000/yr
-forever

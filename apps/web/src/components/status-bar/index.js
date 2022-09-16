@@ -102,6 +102,7 @@ function StatusBar() {
               justifyContent: "center",
               display: "flex"
             }}
+            data-test-id="not-logged-in"
           >
             <Circle size={7} color="error" />
             <Text variant="subBody" ml={1} sx={{ color: "bgSecondaryText" }}>

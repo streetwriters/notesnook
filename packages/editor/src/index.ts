@@ -72,6 +72,8 @@ import { ClipboardTextSerializer } from "./extensions/clipboard-text-serializer"
 import { Code } from "@tiptap/extension-code";
 import { DateTime } from "./extensions/date-time";
 import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
+
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
@@ -146,6 +148,25 @@ const useTiptap = (
           },
           dropcursor: {
             class: "drop-cursor"
+          },
+          horizontalRule: false
+        }),
+        HorizontalRule.extend({
+          addInputRules() {
+            return [
+              {
+                find: /^(?:---|—-|___\s|\*\*\*\s)$/,
+                handler: ({ state, range, commands }) => {
+                  commands.splitBlock();
+
+                  const attributes = {};
+                  const { tr } = state;
+                  const start = range.from;
+                  const end = range.to;
+                  tr.replaceWith(start - 1, end, this.type.create(attributes));
+                }
+              }
+            ];
           }
         }),
         CharacterCount,

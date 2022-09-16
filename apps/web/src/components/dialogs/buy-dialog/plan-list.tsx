@@ -61,7 +61,7 @@ export function PlansList(props: PlansListProps) {
             <Button
               key={metadata.title}
               disabled={isLoading}
-              data-test-id={`checkout-plan-${plan.period}`}
+              data-test-id={`checkout-plan`}
               variant="tool"
               mt={1}
               bg="transparent"
@@ -81,7 +81,11 @@ export function PlansList(props: PlansListProps) {
                 display: "flex"
               }}
             >
-              <Text variant="subtitle" sx={{ fontWeight: "normal" }}>
+              <Text
+                variant="subtitle"
+                sx={{ fontWeight: "normal" }}
+                data-test-id="title"
+              >
                 {metadata.title}
                 <br />
                 <Text

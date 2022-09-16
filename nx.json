@@ -11,6 +11,9 @@
     "build": {
       "dependsOn": ["^build"]
     },
+    "build:test": {
+      "dependsOn": ["^build"]
+    },
     "start": {
       "dependsOn": ["^build"]
     },

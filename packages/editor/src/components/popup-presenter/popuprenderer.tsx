@@ -40,6 +40,10 @@ export class PopupRenderer extends React.Component<
     popups: [] as PopupRendererState["popups"]
   };
 
+  isOpen(id: string) {
+    return !!this.state.popups?.find((popup) => popup.id === id);
+  }
+
   openPopup = (id: string, popup: PopupComponent) => {
     if (!popup) return;
     this.setState((prev) => {

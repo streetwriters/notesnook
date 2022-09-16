@@ -168,14 +168,10 @@ function SideBar(props: SideBarProps) {
       <SelectedPlan
         plan={selectedPlan}
         pricingInfo={pricingInfo}
-        onChangePlan={
-          initialPlan
-            ? undefined
-            : () => {
-                onApplyCoupon(undefined);
-                onPlanSelected(undefined);
-              }
-        }
+        onChangePlan={() => {
+          onApplyCoupon(undefined);
+          onPlanSelected(undefined);
+        }}
       />
     );
 
@@ -509,12 +505,17 @@ function CheckoutPricing(props: CheckoutPricingProps) {
           key={field.key}
           mt={1}
           sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
+          data-test-id={`checkout-price-item`}
         >
-          <Text variant="body" sx={{ fontSize: "subtitle" }}>
+          <Text
+            variant="body"
+            sx={{ fontSize: "subtitle" }}
+            data-test-id={`label`}
+          >
             {field.label}
           </Text>
           <Text
-            data-test-id={`checkout-price-${field.key}`}
+            data-test-id={`value`}
             variant="body"
             sx={{ fontSize: "subtitle", color: field.color || "text" }}
           >
@@ -525,18 +526,23 @@ function CheckoutPricing(props: CheckoutPricingProps) {
       <Flex
         mt={1}
         sx={{ justifyContent: "space-between", alignSelf: "stretch" }}
+        data-test-id={`checkout-price-item`}
       >
-        <Text variant="body" sx={{ fontSize: "heading" }}>
+        <Text
+          variant="body"
+          sx={{ fontSize: "heading" }}
+          data-test-id={`label`}
+        >
           Total
         </Text>
-        <Text
-          as="div"
-          data-test-id={`checkout-price-total`}
-          variant="body"
-          sx={{ fontSize: "heading", textAlign: "end", color: "text" }}
-        >
-          {currentTotal}
-          <Text as="div" sx={{ fontSize: "body" }}>
+        <Text as="div" variant="body" sx={{ textAlign: "end" }}>
+          <Text
+            data-test-id={`value`}
+            sx={{ fontSize: "heading", color: "text" }}
+          >
+            {currentTotal}
+          </Text>
+          <Text as="div" sx={{ fontSize: "body", color: "text" }}>
             {isDiscounted
               ? "forever"
               : `first ${getFullPeriod(period)} then ${recurringTotal}`}

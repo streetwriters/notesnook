@@ -27,6 +27,7 @@ import {
 import { Box, Button, Flex, Text } from "@theme-ui/components";
 import Properties from "../properties";
 import { useStore, store as editorstore } from "../../stores/editor-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 import Toolbar from "./toolbar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
@@ -89,6 +90,7 @@ export default function EditorManager({
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isReadonly = useStore((store) => store.session.readonly);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isPreviewSession = !!previewSession.current;
 
   const openSession = useCallback(async (noteId: string | number) => {
@@ -158,7 +160,8 @@ export default function EditorManager({
         options={{
           readonly: isReadonly || isPreviewSession,
           onRequestFocus: () => toggleProperties(false),
-          onLoadMedia: loadMedia
+          onLoadMedia: loadMedia,
+          focusMode: isFocusMode
         }}
       />
       {arePropertiesVisible && (
@@ -365,6 +368,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
       bg="bgSecondary"
       p={2}
       sx={{ alignItems: "center", justifyContent: "space-between" }}
+      data-test-id="preview-notice"
     >
       <Flex mr={4} sx={{ flexDirection: "column" }}>
         <Text variant={"subtitle"}>Preview</Text>
@@ -375,7 +379,7 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
       </Flex>
       <Flex>
         <Button
-          data-test-id="editor-notice-cancel"
+          data-test-id="preview-notice-cancel"
           variant={"secondary"}
           mr={1}
           px={4}
@@ -384,11 +388,10 @@ function PreviewModeNotice(props: PreviewModeNoticeProps) {
           Cancel
         </Button>
         <Button
-          data-test-id="editor-notice-action"
+          data-test-id="preview-notice-restore"
           px={4}
           onClick={async () => {
             await disablePreviewMode(false);
-            await editorstore.get().saveSession();
           }}
         >
           Restore

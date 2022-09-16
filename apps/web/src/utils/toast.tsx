@@ -22,6 +22,7 @@ import ThemeProvider from "../components/theme-provider";
 import { Error, Warn, Success } from "../components/icons";
 import { store as appstore } from "../stores/app-store";
 import toast from "react-hot-toast";
+import { Theme } from "@notesnook/theme";
 
 type ToastType = "success" | "error" | "warn" | "info";
 type ToastAction = {
@@ -41,7 +42,9 @@ function showToast(
   const IconComponent =
     type === "error" ? Error : type === "success" ? Success : Warn;
 
-  const RenderedIcon = () => <IconComponent size={28} color={type} />;
+  const RenderedIcon = () => (
+    <IconComponent size={28} color={type as keyof Theme["colors"]} />
+  );
 
   const id = toast(<ToastContainer message={message} actions={actions} />, {
     duration: hideAfter || Infinity,

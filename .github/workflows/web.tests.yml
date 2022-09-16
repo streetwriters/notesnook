@@ -29,7 +29,7 @@ jobs:
       - name: Add environment variables
         run: |
           echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
-          echo "CURRENT_USER_PASSWORD='${{ secrets.USER_PASSWORD }}'" >> $GITHUB_ENV
+          echo "CURRENT_USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Prepare environment
@@ -39,5 +39,15 @@ jobs:
         run: npx playwright install --with-deps
         working-directory: ./apps/web
 
+      - name: Generate test build
+        run: npm run build:test:web
+
       - name: Run all @notesnook/web tests
         run: npm run test:web
+
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: apps/web/test-results
+          retention-days: 5

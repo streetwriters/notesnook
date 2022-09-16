@@ -42,7 +42,12 @@ export default class Lookup {
   }
 
   notebooks(array, query) {
-    return search(array, query, (n) => `${n.title} ${n.description}`);
+    return search(
+      array,
+      query,
+      (n) =>
+        `${n.title} ${n.description} ${n.topics.map((t) => t.title).join(" ")}`
+    );
   }
 
   topics(array, query) {

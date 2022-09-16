@@ -24,8 +24,8 @@ import { store as attachmentStore } from "../stores/attachment-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import Vault from "./vault";
-import { showItemDeletedToast } from "./toasts";
 import { TaskManager } from "./task-manager";
+import { pluralize } from "../utils/string";
 
 type Item = {
   id: string;
@@ -56,13 +56,16 @@ async function moveNotesToTrash(notes: Item[], confirm = true) {
     id: "deleteNotes",
     action: async (report) => {
       report({
-        text: `Deleting ${items.length} notes...`
+        text: `Deleting ${pluralize(items.length, "note", "notes")}...`
       });
       await noteStore.delete(...items);
     }
   });
 
-  showToast("success", `${items.length} notes moved to trash`);
+  showToast(
+    "success",
+    `${pluralize(items.length, "note", "notes")} moved to trash`
+  );
 }
 
 async function moveNotebooksToTrash(notebooks: Item[]) {
@@ -79,17 +82,20 @@ async function moveNotebooksToTrash(notebooks: Item[]) {
     id: "deleteNotebooks",
     action: async (report) => {
       report({
-        text: `Deleting ${notebooks.length} notebooks...`
+        text: `Deleting ${pluralize(
+          notebooks.length,
+          "notebook",
+          "notebooks"
+        )}...`
       });
       await notebookStore.delete(...notebooks.map((i) => i.id));
     }
   });
 
-  if (isMultiselect) {
-    showToast("success", `${notebooks.length} notebooks moved to trash`);
-  } else {
-    showItemDeletedToast(item);
-  }
+  showToast(
+    "success",
+    `${pluralize(notebooks.length, "notebook", "notebooks")} moved to trash`
+  );
 }
 
 async function deleteTopics(notebookId: string, topics: Item[]) {
@@ -98,7 +104,7 @@ async function deleteTopics(notebookId: string, topics: Item[]) {
     id: "deleteTopics",
     action: async (report) => {
       report({
-        text: `Deleting ${topics.length} topics...`
+        text: `Deleting ${pluralize(topics.length, "topic", "topics")}...`
       });
       await db.notebooks
         ?.notebook(notebookId)
@@ -107,7 +113,10 @@ async function deleteTopics(notebookId: string, topics: Item[]) {
       noteStore.refresh();
     }
   });
-  showToast("success", `${topics.length} topics deleted`);
+  showToast(
+    "success",
+    `${pluralize(topics.length, "topic", "topics")} deleted`
+  );
 }
 
 async function deleteAttachments(attachments: Item[]) {
@@ -125,7 +134,11 @@ async function deleteAttachments(attachments: Item[]) {
       for (let i = 0; i < attachments.length; ++i) {
         const attachment = attachments[i];
         report({
-          text: `Deleting ${attachments.length} attachments...`,
+          text: `Deleting ${pluralize(
+            attachments.length,
+            "attachment",
+            "attachments"
+          )}...`,
           current: i,
           total: attachments.length
         });
@@ -133,7 +146,10 @@ async function deleteAttachments(attachments: Item[]) {
       }
     }
   });
-  showToast("success", `${attachments.length} attachments deleted`);
+  showToast(
+    "success",
+    `${pluralize(attachments.length, "attachment", "attachments")} deleted`
+  );
 }
 
 export const Multiselect = {
