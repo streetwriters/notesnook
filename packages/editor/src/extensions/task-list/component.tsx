@@ -66,12 +66,14 @@ export function TaskListComponent(
   }, [editor.commands, editor.state.doc, getParent, node, node.childCount]);
 
   useEffect(() => {
-    const children = findChildren(
-      node,
-      (node) => node.type.name === TaskItemNode.name
-    );
-    const checked = children.filter((node) => node.node.attrs.checked).length;
-    const total = children.length;
+    let checked = 0;
+    let total = 0;
+    node.forEach((node) => {
+      if (node.type.name === TaskItemNode.name) {
+        if (node.attrs.checked) checked++;
+        total++;
+      }
+    });
     const percentage = Math.round((checked / total) * 100);
     setStats({ checked, total, percentage });
   }, [isNested, node]);
