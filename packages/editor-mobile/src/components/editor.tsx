@@ -88,7 +88,10 @@ const Tiptap = ({
       content: global.editorController?.content?.current,
       isMobile: true,
       isKeyboardOpen: settings.keyboardShown,
-      doubleSpacedLines: settings.doubleSpacedLines
+      doubleSpacedLines: settings.doubleSpacedLines,
+      onOpenLink: (url) => {
+        return global.editorController.openLink(url);
+      }
     },
     [layout, settings.readonly, tick]
   );

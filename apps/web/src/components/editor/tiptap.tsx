@@ -202,6 +202,10 @@ function TipTap(props: TipTapProps) {
       onDownloadAttachment: (_editor, attachment) => {
         onDownloadAttachment?.(attachment);
         return true;
+      },
+      onOpenLink: (url) => {
+        window.open(url, "_blank");
+        return true;
       }
     },
     // IMPORTANT: only put stuff here that the editor depends on.
