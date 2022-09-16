@@ -23,13 +23,29 @@ import { AppModel } from "./models/app.model";
 import { PriceItem } from "./models/types";
 
 test.setTimeout(45 * 1000);
+test.describe.configure({ mode: "serial" });
 
-async function login(page: Page) {
-  const app = new AppModel(page);
+let page: Page;
+let app: AppModel;
+
+test.beforeAll(async ({ browser }) => {
+  const { email, key, password } = USER.CURRENT;
+  if (!email || !password) throw new Error("Failed to load user credentials.");
+
+  // Create page yourself and sign in.
+  page = await browser.newPage();
+  app = new AppModel(page);
   await app.auth.goto();
-  await app.auth.login(USER.CURRENT);
-  return app;
-}
+  await app.auth.login({ email, key, password });
+});
+
+test.afterAll(async () => {
+  await page.close();
+});
+
+test.afterEach(async () => {
+  await app.goto();
+});
 
 function roundOffPrices(prices: PriceItem[]) {
   return prices
@@ -44,8 +60,7 @@ function roundOffPrices(prices: PriceItem[]) {
     .join("\n");
 }
 
-test("change plans", async ({ page }) => {
-  const app = await login(page);
+test("change plans", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
@@ -61,8 +76,7 @@ test("change plans", async ({ page }) => {
   expect(titles.join("").length).toBeGreaterThan(0);
 });
 
-test("confirm plan prices", async ({ page }) => {
-  const app = await login(page);
+test("confirm plan prices", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
@@ -81,8 +95,7 @@ test("confirm plan prices", async ({ page }) => {
   }
 });
 
-test("changing locale should show localized prices", async ({ page }) => {
-  const app = await login(page);
+test("changing locale should show localized prices", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
@@ -102,10 +115,7 @@ test("changing locale should show localized prices", async ({ page }) => {
   }
 });
 
-test("applying coupon should change discount & total price", async ({
-  page
-}) => {
-  const app = await login(page);
+test("applying coupon should change discount & total price", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
@@ -127,8 +137,7 @@ test("applying coupon should change discount & total price", async ({
   }
 });
 
-test("apply coupon through url", async ({ page }) => {
-  const app = await login(page);
+test("apply coupon through url", async () => {
   const planPrices: Record<string, string> = {};
   for (const plan of ["monthly", "yearly"] as const) {
     await app.checkout.goto(plan, "INTRO50");
@@ -147,8 +156,7 @@ test("apply coupon through url", async ({ page }) => {
   }
 });
 
-test("apply coupon after changing country", async ({ page }) => {
-  const app = await login(page);
+test("apply coupon after changing country", async () => {
   await app.checkout.goto();
   const plans = await app.checkout.getPlans();
 
