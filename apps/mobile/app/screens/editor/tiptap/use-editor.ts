@@ -369,6 +369,7 @@ export const useEditor = (
 
   const onSyncComplete = useCallback(
     async (data: NoteType | Content) => {
+      if (!data) return;
       const noteId = data.type === "tiptap" ? data.noteId : data.id;
 
       if (!currentNote.current || noteId !== currentNote.current.id) return;
