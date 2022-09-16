@@ -32,7 +32,7 @@ const config: PlaywrightTestConfig = {
   testDir: "__e2e__",
 
   // Each test is given 30 seconds
-  timeout: 15000,
+  timeout: 20000,
   workers: IS_CI ? 3 : 2,
   reporter: "list",
   retries: IS_CI ? 0 : 0,
@@ -45,9 +45,9 @@ const config: PlaywrightTestConfig = {
     acceptDownloads: true,
 
     // Artifacts
-    trace: IS_CI ? "off" : "retain-on-failure",
-    screenshot: IS_CI ? "off" : "only-on-failure",
-    video: IS_CI ? "off" : "retry-with-video",
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+    video: "retry-with-video",
 
     viewport: {
       width: 1280,
