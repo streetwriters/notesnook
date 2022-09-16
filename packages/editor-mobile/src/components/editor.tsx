@@ -106,6 +106,58 @@ const Tiptap = ({
   useLayoutEffect(() => {
     setLayout(true);
   }, []);
+
+  const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
+    (event) => {
+      const y = event.nativeEvent.pageY;
+      const x = event.nativeEvent.pageX;
+      const element = document.elementFromPoint(x, y);
+      if (!element) return;
+      if (element.id === "statusbar" || element.id === "header") {
+        const firstChild = globalThis.editor?.state.doc.firstChild;
+        const isParagraph = firstChild?.type.name === "paragraph";
+        const isFirstChildEmpty =
+          !firstChild?.textContent || firstChild?.textContent?.length === 0;
+        if (isParagraph && isFirstChildEmpty) {
+          globalThis.editor?.commands.focus();
+          return;
+        }
+        globalThis.editor
+          ?.chain()
+          .insertContentAt(0, "<p></p>", {
+            updateSelection: true
+          })
+          .run();
+        setTimeout(() => {
+          globalThis.editor?.commands.focus();
+        }, 1);
+      }
+    },
+    []
+  );
+
+  const onClickBottomArea = useCallback(() => {
+    const docSize = globalThis.editor?.state.doc.content.size;
+    if (!docSize) return;
+    const lastChild = globalThis.editor?.state.doc.lastChild;
+    const isParagraph = lastChild?.type.name === "paragraph";
+    const isLastChildEmpty =
+      !lastChild?.textContent || lastChild?.textContent?.length === 0;
+    if (isParagraph && isLastChildEmpty) {
+      globalThis.editor?.commands.focus();
+      return;
+    }
+    globalThis.editor
+      ?.chain()
+      .insertContentAt(docSize - 1, "<p></p>", {
+        updateSelection: true
+      })
+      .run();
+    setTimeout(() => {
+      globalThis.editor?.commands.focus();
+    }, 1);
+  }, []);
+
   return (
     <>
       <div
@@ -116,6 +168,8 @@ const Tiptap = ({
           maxWidth: "100vw",
           marginBottom: "5px"
         }}
+        id="editorroot"
+        onDoubleClick={onClickEmptyArea}
       >
         <Header
           hasRedo={_editor?.can().redo() || false}
@@ -130,8 +184,6 @@ const Tiptap = ({
             overflowY: "scroll",
             flexDirection: "column",
             height: "100%",
-            flexGrow: 1,
-            flexShrink: 1,
             display: "flex"
           }}
         >
@@ -154,23 +206,11 @@ const Tiptap = ({
           />
 
           <div
-            onDoubleClick={() => {
-              const lastPosition = globalThis.editor?.state.doc.content.size;
-              if (!lastPosition) return;
-              globalThis.editor
-                ?.chain()
-                .insertContentAt(lastPosition - 1, "<p></p>", {
-                  updateSelection: true
-                })
-                .run();
-              setTimeout(() => {
-                globalThis.editor?.commands.focus();
-              }, 1);
-            }}
+            onClick={onClickBottomArea}
             style={{
-              flexShrink: 0,
-              height: 150,
-              width: "100%"
+              flexGrow: 1,
+              width: "100%",
+              minHeight: 250
             }}
           />
         </div>
@@ -198,7 +238,6 @@ const ContentDiv = memo(
         style={{
           padding: 12,
           paddingTop: props.padding,
-          flex: 1,
           color: theme.pri,
           marginTop: -12,
           caretColor: theme.accent

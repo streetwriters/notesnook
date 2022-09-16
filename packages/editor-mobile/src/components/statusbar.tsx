@@ -83,13 +83,15 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
     };
   }, [onScroll, container]);
 
-  const paragraphStyle = {
+  const paragraphStyle:React.CSSProperties = {
     marginTop: 0,
     marginBottom: 0,
     fontSize: "12px",
     color: "var(--nn_icon)",
     marginRight: 8,
-    paddingBottom: 0
+    paddingBottom: 0,
+    userSelect:"none",
+    pointerEvents:"none"
   };
 
   return (
@@ -107,6 +109,7 @@ function StatusBar({ container }: { container: RefObject<HTMLDivElement> }) {
         paddingTop: 2,
         paddingBottom: 2
       }}
+      id="statusbar"
     >
       <p style={paragraphStyle}>{words}</p>
       <p style={paragraphStyle}>{status.date}</p>
