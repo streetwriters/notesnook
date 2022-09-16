@@ -66,6 +66,8 @@ class UserManager {
   }
 
   async signup(email, password) {
+    email = email.toLowerCase();
+
     const hashedPassword = await this._storage.hash(password, email);
     await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
       email,
@@ -88,6 +90,8 @@ class UserManager {
    * @private
    */
   async _login({ email, password, hashedPassword, code, method }) {
+    email = email.toLowerCase();
+
     if (!hashedPassword) {
       hashedPassword = await this._storage.hash(password, email);
     }
