@@ -65,6 +65,17 @@ export function onBackspacePressed(
   }
 }
 
+export function onArrowUpPressed(editor: Editor, name: string, type: NodeType) {
+  const { selection } = editor.state;
+  const { empty } = selection;
+
+  if (!empty || !isFirstOfType(type, editor.state)) return false;
+  const parentList = getListFromListItem(type, editor.state);
+  if (editor.state.doc.firstChild === parentList)
+    return editor.commands.insertContentAt(0, "<p></p>");
+  return false;
+}
+
 function isInside(name: string, type: NodeType, state: EditorState) {
   const { $from } = state.selection;
 
