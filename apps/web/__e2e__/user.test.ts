@@ -78,6 +78,31 @@ test("login user & wait for sync", async ({ page }, info) => {
   expect(await app.isSynced()).toBeTruthy();
 });
 
+test("logged in user should not be able to open unauthorized routes", async ({
+  page
+}, info) => {
+  info.setTimeout(45 * 1000);
+
+  const app = new AppModel(page);
+  await app.auth.goto();
+  await app.auth.login(USER.CURRENT);
+
+  const unauthorizedRoutes = [
+    "/login",
+    "/signup",
+    "/recover",
+    "/mfa/code",
+    "/mfa/select"
+  ] as const;
+
+  for (const route of unauthorizedRoutes) {
+    await page.goto(route);
+
+    await page.waitForURL(/\/notes/gm);
+    expect(await app.navigation.findItem("Notes")).toBeDefined();
+  }
+});
+
 // test("login user and change password repeatedly", async ({
 //   page,
 //   browserName
