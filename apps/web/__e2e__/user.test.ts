@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { test, expect } from "@playwright/test";
 import { AppModel } from "./models/app.model";
-import { USER } from "./utils";
+import { getTestId, USER } from "./utils";
 
 // async function forceExpireSession() {
 //   await page.evaluate(() => {
@@ -34,7 +34,8 @@ test("login user", async ({ page }) => {
 
   await app.auth.login(USER.CURRENT);
 
-  expect(await app.isSynced()).toBeTruthy();
+  const settings = await app.goToSettings();
+  expect(await settings.isLoggedIn()).toBeTruthy();
 });
 
 test("logout user", async ({ page }) => {
@@ -59,6 +60,20 @@ test("check recovery key of user", async ({ page }) => {
     (await settings.getRecoveryKey(USER.CURRENT.password));
 
   expect(key).toBe(USER.CURRENT.key);
+});
+
+test("login user & wait for sync", async ({ page }, info) => {
+  info.setTimeout(45 * 1000);
+
+  const app = new AppModel(page);
+  await app.auth.goto();
+
+  await app.auth.login(USER.CURRENT);
+
+  await page
+    .locator(getTestId("sync-status-completed"))
+    .waitFor({ state: "visible" });
+  expect(await app.isSynced()).toBeTruthy();
 });
 
 // test("login user and change password repeatedly", async ({
