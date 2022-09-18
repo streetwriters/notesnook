@@ -58,4 +58,8 @@ export class ToggleModel {
   private getToggleState(locator: Locator, state: TOGGLE_STATES) {
     return locator.locator(getTestId(`toggle-state-${state}`));
   }
+
+  waitFor() {
+    return this.toggle.waitFor();
+  }
 }

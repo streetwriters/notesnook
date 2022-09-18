@@ -177,6 +177,7 @@ export class NotePropertiesModel extends BaseProperties {
   async open() {
     await this.propertiesButton.click();
     await this.propertiesCloseButton.waitFor();
+    await this.page.waitForTimeout(1000);
   }
 
   async close() {
@@ -274,6 +275,8 @@ export class NoteContextMenuModel extends BaseProperties {
           await newItemInput.waitFor({ state: "visible" });
           await newItemInput.fill(topic);
           await newItemInput.press("Enter");
+
+          await item.locator(getTestId("topic"), { hasText: topic }).waitFor();
         }
 
         const topicItems = item.locator(getTestId("topic"));
@@ -320,6 +323,7 @@ class SessionHistoryItemModel {
   async preview(password?: string) {
     await this.properties.open();
     const isLocked = await this.locked.isVisible();
+
     await this.locator.click();
     if (password && isLocked) {
       await fillPasswordDialog(this.page, password);

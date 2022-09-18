@@ -158,9 +158,10 @@ test("select all & backspace should clear all content in editor", async ({
   const notes = await app.goToNotes();
   const note = await notes.createNote(NOTE);
 
-  await notes.editor.selectAll();
-  await page.keyboard.press("Backspace");
-  await notes.editor.waitForSaving();
+  await notes.editor.editAndWait(async () => {
+    await notes.editor.selectAll();
+    await page.keyboard.press("Backspace");
+  });
 
   await notes.newNote();
   await note?.openNote();
