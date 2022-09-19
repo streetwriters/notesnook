@@ -59,10 +59,9 @@ const App = () => {
       <View
         style={{
           position: "absolute",
-          height: "1%",
-          width: "1%",
-          left: -999,
-          right: -999
+          width: "100%",
+          height: "100%",
+          zIndex: -1
         }}
         pointerEvents="none"
       >
