@@ -34,14 +34,19 @@ import Animated, {
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
 import { SideMenu } from "../components/side-menu";
 import { FluidTabs } from "../components/tabs";
 import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
+import { useShortcutManager } from "../hooks/use-shortcut-manager";
 import { hideAllTooltips } from "../hooks/use-tooltip";
-import { editorController, editorState } from "../screens/editor/tiptap/utils";
+import {
+  clearAppState,
+  editorController,
+  editorState,
+  getAppState
+} from "../screens/editor/tiptap/utils";
 import { EditorWrapper } from "../screens/editor/wrapper";
 import { DDS } from "../services/device-detection";
 import {
@@ -60,6 +65,7 @@ import {
   eOpenFullscreenEditor
 } from "../utils/events";
 import { editorRef, tabBarRef } from "../utils/global-refs";
+import { sleep } from "../utils/time";
 import { NavigationStack } from "./navigation-stack";
 
 const _TabsHolder = () => {
@@ -79,6 +85,29 @@ const _TabsHolder = () => {
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
+
+  useShortcutManager({
+    onShortcutPressed: async (item) => {
+      if (!item && getAppState()) {
+        editorState().movedAway = false;
+        tabBarRef.current?.goToPage(1, false);
+        return;
+      }
+      if (item.type === "notesnook.action.newnote") {
+        clearAppState();
+        if (!tabBarRef.current) {
+          await sleep(3000);
+          eSendEvent(eOnLoadNote, { type: "new" });
+          editorState().movedAway = false;
+          tabBarRef.current?.goToPage(1, false);
+          return;
+        }
+        eSendEvent(eOnLoadNote, { type: "new" });
+        editorState().movedAway = false;
+        tabBarRef.current?.goToPage(1, false);
+      }
+    }
+  });
 
   const onOrientationChange = (o, o2) => {
     setOrientation(o || o2);

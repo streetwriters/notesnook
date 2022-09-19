@@ -1,0 +1,35 @@
+diff --git a/node_modules/react-native-actions-shortcuts/android/src/main/java/com/reactnativeshortcuts/ShortcutItem.kt b/node_modules/react-native-actions-shortcuts/android/src/main/java/com/reactnativeshortcuts/ShortcutItem.kt
+index b438823..ba03915 100644
+--- a/node_modules/react-native-actions-shortcuts/android/src/main/java/com/reactnativeshortcuts/ShortcutItem.kt
++++ b/node_modules/react-native-actions-shortcuts/android/src/main/java/com/reactnativeshortcuts/ShortcutItem.kt
+@@ -70,8 +70,7 @@ data class ShortcutItem(
+             val shortTitle = bundle.getString(KeyName.shortTitle)
+             val iconName = bundle.getString(KeyName.iconName)
+             val jsonString = bundle.getString(KeyName.data)
+-            val jsonObject = JSONObject(jsonString)
+-
++            val jsonObject = if (jsonString != null) JSONObject(jsonString) else null
+             return ShortcutItem(type, title, shortTitle ?: title, iconName, jsonObject)
+         }
+ 
+diff --git a/node_modules/react-native-actions-shortcuts/ios/Shortcuts.swift b/node_modules/react-native-actions-shortcuts/ios/Shortcuts.swift
+index ad77cd9..10b79e0 100644
+--- a/node_modules/react-native-actions-shortcuts/ios/Shortcuts.swift
++++ b/node_modules/react-native-actions-shortcuts/ios/Shortcuts.swift
+@@ -2,7 +2,7 @@ import UIKit
+ 
+ typealias ShortcutItem = [String: Any];
+ 
+-protocol ShortcutsDelegate: class {
++protocol ShortcutsDelegate: AnyObject {
+     func onShortcutItemPressed(_ item: ShortcutItem)
+ }
+ 
+@@ -114,6 +114,6 @@ fileprivate extension UIApplicationShortcutIcon {
+         guard let imageName = imageName else {
+             return nil
+         }
+-        return UIApplicationShortcutIcon(templateImageName: imageName)
++        return UIApplicationShortcutIcon(systemImageName: imageName)
+     }
+ }
