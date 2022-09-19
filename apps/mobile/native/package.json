@@ -29,7 +29,7 @@
     "react-native-exception-handler": "^2.10.10",
     "react-native-exit-app": "https://github.com/ammarahm-ed/react-native-exit-app.git",
     "react-native-file-viewer": "^2.1.1",
-    "react-native-fingerprint-scanner": "https://github.com/standardnotes/react-native-fingerprint-scanner.git",
+    "react-native-fingerprint-scanner": "https://github.com/ammarahm-ed/react-native-fingerprint-scanner.git",
     "react-native-gesture-handler": "^2.5.0",
     "react-native-get-random-values": "^1.7.0",
     "react-native-html-to-pdf-lite": "^0.9.1",

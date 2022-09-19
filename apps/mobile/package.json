@@ -27,6 +27,7 @@
     "@notesnook/core": "*",
     "@notesnook/editor": "*",
     "@notesnook/editor-mobile": "*",
-    "react-native-actions-shortcuts": "^1.0.1"
+    "react-native-actions-shortcuts": "^1.0.1",
+    "react-native-fingerprint-scanner": "https://github.com/ammarahm-ed/react-native-fingerprint-scanner.git"
   }
 }
