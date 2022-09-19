@@ -22,6 +22,7 @@ import Config from "react-native-config";
 import { FileType } from "react-native-scoped-storage";
 import create, { State } from "zustand";
 import { ACCENT } from "../utils/color-scheme";
+import { initialWindowMetrics } from "react-native-safe-area-context";
 
 export type Settings = {
   showToolbarOnTop?: boolean;
@@ -69,6 +70,13 @@ type DimensionsType = {
   height: number;
 };
 
+type Insets = {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+};
+
 export interface SettingStore extends State {
   settings: Settings;
   fullscreen: boolean;
@@ -84,6 +92,8 @@ export interface SettingStore extends State {
   sheetKeyboardHandler: boolean;
   requestBiometrics: boolean;
   setRequestBiometrics: (requestBiometrics: boolean) => void;
+  insets: Insets;
+  setInsets: (insets: Insets) => void;
 }
 
 const { width, height } = Dimensions.get("window");
@@ -139,5 +149,9 @@ export const useSettingStore = create<SettingStore>((set) => ({
   setSheetKeyboardHandler: (sheetKeyboardHandler) =>
     set({ sheetKeyboardHandler }),
   requestBiometrics: false,
-  setRequestBiometrics: (requestBiometrics) => set({ requestBiometrics })
+  setRequestBiometrics: (requestBiometrics) => set({ requestBiometrics }),
+  setInsets: (insets) => set({ insets }),
+  insets: initialWindowMetrics?.insets
+    ? initialWindowMetrics.insets
+    : { top: 0, right: 0, left: 0, bottom: 0 }
 }));

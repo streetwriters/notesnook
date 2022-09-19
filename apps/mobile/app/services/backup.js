@@ -114,8 +114,8 @@ async function presentBackupCompleteSheet(backupFilePath) {
         action: () => {
           if (Platform.OS === "ios") {
             Share.open({
-              url: "file:/" + backupFilePath,
-              failOnCancel: false
+              url: backupFilePath,
+              failOnCancel: false,
             }).catch(console.log);
           } else {
             FileViewer.open(backupFilePath, {

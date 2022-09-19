@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useSyncProgress from "../../hooks/use-sync-progress";
 import { eSendEvent } from "../../services/event-manager";
 import Sync from "../../services/sync";
@@ -38,7 +38,7 @@ export const UserStatus = () => {
   const user = useUserStore((state) => state.user);
   const syncing = useUserStore((state) => state.syncing);
   const lastSynced = useUserStore((state) => state.lastSynced);
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const { progress } = useSyncProgress();
   return (
     <View

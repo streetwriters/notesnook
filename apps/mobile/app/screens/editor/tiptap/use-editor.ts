@@ -18,8 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import WebView from "react-native-webview";
+import { db } from "../../../common/database";
+import { MMKV } from "../../../common/database/mmkv";
+import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
@@ -31,8 +33,6 @@ import { TipManager } from "../../../services/tip-manager";
 import { useEditorStore } from "../../../stores/use-editor-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
-import { db } from "../../../common/database";
-import { MMKV } from "../../../common/database/mmkv";
 import { eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { timeConverter } from "../../../utils/time";
@@ -66,7 +66,7 @@ export const useEditor = (
   const state = useRef<Partial<EditorState>>(defaultState);
   const placeholderTip = useRef(TipManager.placeholderTip());
   const tags = useTagStore((state) => state.tags);
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const saveCount = useRef(0);
 

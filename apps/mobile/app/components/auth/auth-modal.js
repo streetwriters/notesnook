@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useRef, useState } from "react";
 import { Platform, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
@@ -47,7 +47,7 @@ const AuthModal = () => {
   const [visible, setVisible] = useState(false);
   const [currentAuthMode, setCurrentAuthMode] = useState(AuthMode.login);
   const actionSheetRef = useRef();
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
 
   useEffect(() => {
     eSubscribeEvent(eOpenLoginDialog, open);

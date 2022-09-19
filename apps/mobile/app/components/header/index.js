@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { SearchBar } from "../../screens/search/search-bar";
 import {
   eSubscribeEvent,
@@ -32,11 +32,10 @@ import { eScrollEvent } from "../../utils/events";
 import { LeftMenus } from "./left-menus";
 import { RightMenus } from "./right-menus";
 import { Title } from "./title";
-import { useCallback } from "react";
 
 const _Header = () => {
   const colors = useThemeStore((state) => state.colors);
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const [hide, setHide] = useState(true);
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const currentScreen = useNavigationStore(

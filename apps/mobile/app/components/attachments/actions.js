@@ -18,11 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { db } from "../../common/database";
 import filesystem from "../../common/filesystem";
+import downloadAttachment from "../../common/filesystem/download-attachment";
 import { useAttachmentProgress } from "../../hooks/use-attachment-progress";
 import picker from "../../screens/editor/tiptap/picker";
 import {
@@ -49,7 +50,6 @@ import { Notice } from "../ui/notice";
 import { PressableButton } from "../ui/pressable";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
 
 const Actions = ({ attachment, setAttachments, fwdRef }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -70,7 +70,7 @@ const Actions = ({ attachment, setAttachments, fwdRef }) => {
           await db.fs.cancel(attachment.metadata.hash, "download");
           useAttachmentStore.getState().remove(attachment.metadata.hash);
         }
-        filesystem.downloadAttachment(attachment.metadata.hash, false);
+        downloadAttachment(attachment.metadata.hash, false);
         eSendEvent(eCloseProgressDialog, contextId);
       },
       icon: "download"

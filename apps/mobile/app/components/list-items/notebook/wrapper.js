@@ -31,9 +31,9 @@ import SelectionWrapper from "../selection-wrapper";
 
 const navigateToNotebook = (item, canGoBack) => {
   if (!item) return;
-  Navigation.navigate <
-    "Notebook" >
-    ({
+
+  Navigation.navigate(
+    {
       title: item.title,
       name: "Notebook",
       id: item.id,
@@ -43,7 +43,8 @@ const navigateToNotebook = (item, canGoBack) => {
       title: item.title,
       item: item,
       canGoBack
-    });
+    }
+  );
 };
 
 export const openNotebookTopic = (item) => {

@@ -71,6 +71,7 @@ const PublishNoteSheet = () => {
   }, []);
 
   const open = (item) => {
+    if (!item) return;
     setNote(item);
     setPublishing(false);
     setSelfDestruct(false);
@@ -168,7 +169,7 @@ const PublishNoteSheet = () => {
         }}
       >
         <DialogHeader
-          title={note.title}
+          title={note?.title}
           paragraph={`Anyone with the link${
             isLocked ? " and password" : ""
           } of the published note can view it.`}
@@ -190,10 +191,10 @@ const PublishNoteSheet = () => {
               }}
             >
               Please wait...
-              {loading &&
+              {loading && loading.current && loading.total ?
                 `\nDownloading attachments (${
                   loading?.current / loading?.total
-                })`}
+                })` : ""}
             </Paragraph>
           </View>
         ) : (
