@@ -109,6 +109,17 @@ const Tiptap = ({
 
   const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {
+      if (
+        containerRef.current?.scrollTop &&
+        containerRef.current?.scrollTop > 0
+      ) {
+        containerRef.current?.scrollTo({
+          left: 0,
+          top: 0,
+          behavior: "smooth"
+        });
+        return;
+      }
       const y = event.nativeEvent.pageY;
       const x = event.nativeEvent.pageX;
       const element = document.elementFromPoint(x, y);
