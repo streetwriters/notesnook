@@ -110,14 +110,21 @@ function Autosuggest({
     if (filterText.length <= 0 && filtered.length <= 0) {
       closeMenu();
       return;
-    } else if (filterText.length > 0 && filtered.length <= 0) {
+    }
+
+    if (
+      filterText.length > 0 &&
+      filtered.every((item) => item.title !== filterText)
+    ) {
       items.push({
         key: "new",
         title: () => `Create "${filterText}" tag`,
         icon: Icon.Plus,
         onClick: () => onAction("add", filterText)
       });
-    } else {
+    }
+
+    if (filtered.length > 0) {
       items.push(
         ...filtered.map((tag) => ({
           key: tag.id,
@@ -177,6 +184,8 @@ function Autosuggest({
         const text = getInputValue();
         if (e.key === "Enter" && !!text && !filtered.length) {
           onAction("add", text);
+        } else if (e.key === "Enter" && !!text && !!filtered.length) {
+          onAction("select", filtered[0]);
         } else if (!text && e.key === "Backspace") {
           onRemove();
           setFiltered([]);
