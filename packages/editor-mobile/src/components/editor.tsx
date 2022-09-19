@@ -109,22 +109,23 @@ const Tiptap = ({
 
   const onClickEmptyArea: React.MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {
-      if (
-        containerRef.current?.scrollTop &&
-        containerRef.current?.scrollTop > 0
-      ) {
-        containerRef.current?.scrollTo({
-          left: 0,
-          top: 0,
-          behavior: "smooth"
-        });
-        return;
-      }
       const y = event.nativeEvent.pageY;
       const x = event.nativeEvent.pageX;
       const element = document.elementFromPoint(x, y);
       if (!element) return;
       if (element.id === "statusbar" || element.id === "header") {
+        if (
+          containerRef.current?.scrollTop &&
+          containerRef.current?.scrollTop > 0
+        ) {
+          containerRef.current?.scrollTo({
+            left: 0,
+            top: 0,
+            behavior: "smooth"
+          });
+          return;
+        }
+
         const firstChild = globalThis.editor?.state.doc.firstChild;
         const isParagraph = firstChild?.type.name === "paragraph";
         const isFirstChildEmpty =
