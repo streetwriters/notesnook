@@ -37,6 +37,8 @@ async function populateList(page: Page, count = 5) {
   return { notes, app, notesList: notesList.reverse() };
 }
 
+test.setTimeout(30 * 1000);
+
 test("ctrl+a should select all notes", async ({ page }) => {
   const { notesList, notes } = await populateList(page);
   await notes.focus();
@@ -211,7 +213,7 @@ test("select notes using Shift+Click downwards", async ({ page }) => {
   for (let i = 0; i <= 5; i++) {
     expect(await notesList[i].isSelected()).toBeTruthy();
   }
-  expect(await notesList[5].isFocused()).toBeTruthy();
+  expect(await notesList[6].isSelected()).toBeFalsy();
 });
 
 test("select notes using Shift+Click upwards", async ({ page }) => {
