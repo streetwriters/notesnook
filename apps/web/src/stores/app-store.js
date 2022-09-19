@@ -203,36 +203,33 @@ class AppStore extends BaseStore {
     this.updateLastSynced();
 
     this.updateSyncStatus("syncing");
-    return db
-      .sync(full, force)
-      .then(async (result) => {
-        if (!result) return this.updateSyncStatus("failed");
-        else if (full) this.updateSyncStatus("completed");
+    try {
+      const result = await db.sync(full, force);
 
-        await this.updateLastSynced();
-      })
-      .catch(async (err) => {
-        logger.error(err);
-        if (err.code === "MERGE_CONFLICT") {
-          if (editorstore.get().session.id)
-            editorstore.openSession(editorstore.get().session.id, true);
-          await this.refresh();
-          this.updateSyncStatus("conflicts");
-        } else {
-          this.updateSyncStatus("failed");
-        }
+      if (!result) return this.updateSyncStatus("failed");
+      else if (full) this.updateSyncStatus("completed");
 
-        if (err?.message?.indexOf("Failed to fetch") > -1) return;
+      await this.updateLastSynced();
+    } catch (err) {
+      logger.error(err);
+      if (err.code === "MERGE_CONFLICT") {
+        if (editorstore.get().session.id)
+          editorstore.openSession(editorstore.get().session.id, true);
+        await this.refresh();
+        this.updateSyncStatus("conflicts");
+      } else {
+        this.updateSyncStatus("failed");
+      }
 
-        showToast("error", err.message);
-      })
-      .finally(() => {
-        if (this.get().syncStatus.key === "conflicts") return;
+      if (err?.message?.indexOf("Failed to fetch") > -1) return;
 
+      showToast("error", err.message);
+    } finally {
+      if (this.get().syncStatus.key !== "conflicts")
         syncStatusTimeout = setTimeout(() => {
           this.updateSyncStatus("synced");
         }, 3000);
-      });
+    }
   };
 
   /**
