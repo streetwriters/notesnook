@@ -216,6 +216,7 @@ function Settings() {
           <>
             <Button
               variant="list"
+              data-test-id="backup-recovery-key"
               onClick={async () => {
                 if (await verifyAccount()) await showRecoveryKeyDialog();
               }}
@@ -1055,6 +1056,7 @@ function AccountStatusContainer(props) {
         border: "1px solid var(--border)",
         flexDirection: "column"
       }}
+      data-test-id="account-status"
     >
       <Flex sx={{ flex: "1", justifyContent: "space-between" }}>
         <Flex>

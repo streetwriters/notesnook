@@ -17,17 +17,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "../../components/ui/button";
 import { IconButton } from "../../components/ui/icon-button";
 import Paragraph from "../../components/ui/typography/paragraph";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -37,13 +37,12 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { eClearEditor, eOnLoadNote } from "../../utils/events";
 import { SIZE } from "../../utils/size";
 import { editorState } from "./tiptap/utils";
-import { useCallback } from "react";
 const EditorOverlay = ({ editorId = "", editor }) => {
   const colors = useThemeStore((state) => state.colors);
   const [error, setError] = useState(false);
   const opacity = useSharedValue(1);
   const translateValue = useSharedValue(6000);
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const timers = useRef({
     loading: 0,

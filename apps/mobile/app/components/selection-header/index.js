@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useCallback, useEffect } from "react";
 import { BackHandler, Platform, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { db } from "../../common/database";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { eSendEvent, ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import useNavigationStore from "../../stores/use-navigation-store";
@@ -45,7 +45,7 @@ export const SelectionHeader = React.memo(() => {
   const clearSelection = useSelectionStore((state) => state.clearSelection);
   const currentScreen = useNavigationStore((state) => state.currentScreen);
   const screen = currentScreen.name;
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
 
   useEffect(() => {
     if (selectionMode) {

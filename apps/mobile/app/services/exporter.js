@@ -25,7 +25,7 @@ import RNFetchBlob from "rn-fetch-blob";
 import { toTXT } from "../utils";
 import { sanitizeFilename } from "../utils/sanitizer";
 import Storage from "../common/database/storage";
-import db from "../common/database";
+import {db} from "../common/database/index";
 
 const defaultStyle = `<style>
 .img_size_one {
@@ -332,6 +332,7 @@ hr {
 </style>`;
 
 async function releasePermissions(path) {
+  if (Platform.OS === "ios") return;
   const uris = await ScopedStorage.getPersistedUriPermissions();
   for (let uri of uris) {
     if (path.startsWith(uri)) {
@@ -349,8 +350,7 @@ async function saveToPDF(note) {
   }
 
   Platform.OS === "ios" && (await Storage.checkAndCreateDir("/exported/PDF/"));
-
-  let html = await db.notes.note(note).export("html");
+  let html = await db.notes.note(note.id).export("html");
   html = decode(html, {
     level: EntityLevel.HTML
   });

@@ -15,12 +15,29 @@
 }
 
 .ProseMirror hr {
-  background-color: var(--border);
-  border-width: 0;
-  height: 2px;
+  box-sizing: border-box;
+  background-color: transparent;
+  border-width: 0px;
+  margin-block: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  position: relative;
 }
 
-.ProseMirror code:not(pre code) {
+.ProseMirror hr::after {
+  content: "";
+  position: absolute;
+  width: 99%;
+  height: 5px;
+  background-color: var(--border);
+}
+
+.ProseMirror hr.ProseMirror-selectednode::after {
+  border: 2px solid var(--primary);
+}
+
+.ProseMirror code:not(pre code){
   background-color: var(--bgSecondary);
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -28,6 +45,11 @@
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
   font-size: 10pt !important;
+}
+
+.ProseMirror code > span  {
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
+    Menlo, monospace !important;
 }
 
 .ProseMirror li p {

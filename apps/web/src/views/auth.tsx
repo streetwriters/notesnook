@@ -18,17 +18,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { BoxProps, Button, Flex, Link, Text } from "@theme-ui/components";
+import { Button, Flex, Link, Text } from "@theme-ui/components";
 import {
   CheckCircle,
   Loading,
   Error as ErrorIcon,
-  MFAAuthenticator,
-  MFASMS,
-  MFAEmail,
-  MFARecoveryCode,
+  MfaAuthenticator,
+  MfaSms,
+  MfaEmail,
+  MfaRecoveryCode,
   ArrowRight,
-  Logout
+  Logout,
+  Icon
 } from "../components/icons";
 import Field from "../components/field";
 import { getQueryParams, hardNavigate, makeURL } from "../navigation";
@@ -143,8 +144,17 @@ const routePaths: Record<AuthRoutes, string> = {
   "mfa:select": "/mfa/select"
 };
 
+const authorizedRoutes: AuthRoutes[] = [
+  "login",
+  "signup",
+  "mfa:code",
+  "mfa:select",
+  "recover"
+];
+
 function Auth(props: AuthProps) {
   const [route, setRoute] = useState(props.route);
+  const [isReady, setIsReady] = useState(false);
   const [storedFormData, setStoredFormData] = useState<
     BaseFormData | undefined
   >();
@@ -152,6 +162,18 @@ function Auth(props: AuthProps) {
   useEffect(() => {
     window.history.replaceState({}, "", makeURL(routePaths[route]));
   }, [route]);
+
+  const [isAppLoaded] = useDatabase();
+
+  useEffect(() => {
+    if (!isAppLoaded) return;
+    db.user?.getUser().then((user) => {
+      if (user && authorizedRoutes.includes(route)) return openURL("/");
+      setIsReady(true);
+    });
+  }, [isAppLoaded, route]);
+
+  if (!isReady) return <></>;
 
   return (
     <AuthContainer>
@@ -221,7 +243,6 @@ export default Auth;
 
 function Login(props: BaseAuthComponentProps<"login">) {
   const { navigate } = props;
-  const [isAppLoaded] = useDatabase();
 
   return (
     <AuthForm
@@ -266,11 +287,7 @@ function Login(props: BaseAuthComponentProps<"login">) {
           >
             Forgot password?
           </Button>
-          <SubmitButton
-            text="Login to your account"
-            disabled={!isAppLoaded}
-            loading={!isAppLoaded}
-          />
+          <SubmitButton text="Login to your account" />
         </>
       )}
     </AuthForm>
@@ -279,7 +296,6 @@ function Login(props: BaseAuthComponentProps<"login">) {
 
 function Signup(props: BaseAuthComponentProps<"signup">) {
   const { navigate } = props;
-  const [isAppLoaded] = useDatabase();
 
   return (
     <AuthForm
@@ -328,11 +344,7 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
             label="Confirm password"
             defaultValue={form?.["confirm-password"]}
           />
-          <SubmitButton
-            text="Create account"
-            disabled={!isAppLoaded}
-            loading={!isAppLoaded}
-          />
+          <SubmitButton text="Create account" />
           <Text
             mt={4}
             variant="subBody"
@@ -365,11 +377,9 @@ function Signup(props: BaseAuthComponentProps<"signup">) {
 
 function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
   const { navigate } = props;
-  const [isAppLoaded] = useDatabase();
   const [user, setUser] = useState<User | undefined>();
 
   useEffect(() => {
-    if (!isAppLoaded) return;
     (async () => {
       const user = await db.user?.getUser();
       const isSessionExpired = Config.get("sessionExpired", false);
@@ -380,7 +390,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
         openURL("/login");
       } else openURL("/");
     })();
-  }, [isAppLoaded]);
+  }, []);
 
   return (
     <AuthForm
@@ -431,18 +441,13 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
       >
         Forgot password?
       </Button>
-      <SubmitButton
-        text="Relogin to your account"
-        disabled={!isAppLoaded}
-        loading={!isAppLoaded}
-      />
+      <SubmitButton text="Relogin to your account" />
     </AuthForm>
   );
 }
 
 function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
   const { navigate, formData } = props;
-  const [isAppLoaded] = useDatabase();
   const [success, setSuccess] = useState<string>();
 
   return (
@@ -484,11 +489,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
               {success}
             </Text>
           </Flex>
-          <SubmitButton
-            text="Send again"
-            disabled={!isAppLoaded}
-            loading={!isAppLoaded}
-          />
+          <SubmitButton text="Send again" />
         </>
       ) : (
         <>
@@ -501,11 +502,7 @@ function AccountRecovery(props: BaseAuthComponentProps<"recover">) {
             defaultValue={formData ? formData.email : ""}
             autoFocus
           />
-          <SubmitButton
-            text="Send recovery email"
-            disabled={!isAppLoaded}
-            loading={!isAppLoaded}
-          />
+          <SubmitButton text="Send recovery email" />
         </>
       )}
     </AuthForm>
@@ -547,7 +544,6 @@ function getTexts(formData: MFAFormData) {
 
 function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
   const { navigate, formData } = props;
-  const [isAppLoaded] = useDatabase();
   const [isSending, setIsSending] = useState(false);
   const { elapsed, enabled, setEnabled } = useTimer(
     `2fa.${formData?.primaryMethod}`,
@@ -645,11 +641,7 @@ function MFACode(props: BaseAuthComponentProps<"mfa:code">) {
             : undefined
         }
       />
-      <SubmitButton
-        text="Submit"
-        disabled={!isAppLoaded}
-        loading={!isAppLoaded}
-      />
+      <SubmitButton text="Submit" />
       <Button
         type="button"
         mt={4}
@@ -667,13 +659,13 @@ type MFAMethodType = AuthenticatorType | "recoveryCode";
 type MFAMethod = {
   type: MFAMethodType;
   title: string;
-  icon: (props: BoxProps & { size: number }) => JSX.Element;
+  icon: Icon;
 };
 const MFAMethods: MFAMethod[] = [
-  { type: "app", title: "Use an authenticator app", icon: MFAAuthenticator },
-  { type: "sms", title: "Send code to your phone number", icon: MFASMS },
-  { type: "email", title: "Send code to your email address", icon: MFAEmail },
-  { type: "recoveryCode", title: "Use a recovery code", icon: MFARecoveryCode }
+  { type: "app", title: "Use an authenticator app", icon: MfaAuthenticator },
+  { type: "sms", title: "Send code to your phone number", icon: MfaSms },
+  { type: "email", title: "Send code to your email address", icon: MfaEmail },
+  { type: "recoveryCode", title: "Use a recovery code", icon: MfaRecoveryCode }
 ];
 function MFASelector(props: BaseAuthComponentProps<"mfa:select">) {
   const { navigate, formData } = props;

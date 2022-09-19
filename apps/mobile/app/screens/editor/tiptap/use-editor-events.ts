@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import type { Attachment } from "@notesnook/editor/dist/extensions/attachment/index";
+import { getDefaultPresets } from "@notesnook/editor/dist/toolbar/tool-definitions";
 import { useCallback, useEffect, useRef } from "react";
 import {
   BackHandler,
@@ -28,6 +28,9 @@ import {
   NativeEventSubscription
 } from "react-native";
 import { WebViewMessageEvent } from "react-native-webview";
+import umami from "../../../common/analytics/index";
+import { db } from "../../../common/database";
+import useKeyboard from "../../../hooks/use-keyboard";
 import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
@@ -40,8 +43,6 @@ import { useEditorStore } from "../../../stores/use-editor-store";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { useUserStore } from "../../../stores/use-user-store";
-import umami from "../../../common/analytics/index";
-import { db } from "../../../common/database";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -52,13 +53,12 @@ import {
   eOpenPublishNoteDialog,
   eOpenTagsDialog
 } from "../../../utils/events";
-import filesystem from "../../../common/filesystem";
 import { tabBarRef } from "../../../utils/global-refs";
-import useKeyboard from "../../../hooks/use-keyboard";
 import { NoteType } from "../../../utils/types";
 import { useDragState } from "../../settings/editor/state";
 import { EditorMessage, EditorProps, useEditorType } from "./types";
 import { EditorEvents, editorState } from "./utils";
+import { openLinkInBrowser } from "../../../utils/functions";
 
 export const EventTypes = {
   selection: "editor-event:selection",
@@ -75,7 +75,8 @@ export const EventTypes = {
   pro: "editor-event:pro",
   monograph: "editor-event:monograph",
   properties: "editor-event:properties",
-  fullscreen: "editor-event:fullscreen"
+  fullscreen: "editor-event:fullscreen",
+  link: "editor-event:link"
 };
 
 const publishNote = async (editor: useEditorType) => {
@@ -337,12 +338,13 @@ export const useEditorEvents = (
           const { pick } = require("./picker.js").default;
           pick({ type: editorMessage.value });
           break;
-        case EventTypes.download:
-          filesystem.downloadAttachment(
-            (editorMessage.value as Attachment)?.hash,
-            true
-          );
+        case EventTypes.download: {
+          const downloadAttachment =
+            require("../../../common/filesystem/download-attachment").default;
+          downloadAttachment((editorMessage.value as Attachment)?.hash, true);
           break;
+        }
+
         case EventTypes.pro:
           if (editor.state.current?.isFocused) {
             editor.state.current.isFocused = true;
@@ -362,6 +364,9 @@ export const useEditorEvents = (
           break;
         case EventTypes.back:
           onBackPress();
+          break;
+        case EventTypes.link:
+          openLinkInBrowser(editorMessage.value as string);
           break;
         default:
           break;

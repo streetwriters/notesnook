@@ -150,6 +150,13 @@ export function TaskItemComponent(
               textDecorationLine: checked ? "line-through" : "none",
               opacity: checked ? 0.8 : 1
             },
+            // FIXME: this is quite fragile and will break if the structure
+            // changes. We should probably find a better & more robust
+            // solution for this.
+            "> .taskitem-content-wrapper > p:hover ~ div > div.task-list-tools .toggleSublist":
+              {
+                opacity: 1
+              },
             flex: 1
           }}
         />

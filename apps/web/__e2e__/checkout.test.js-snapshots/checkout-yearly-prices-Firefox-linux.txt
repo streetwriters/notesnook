@@ -1,5 +1,0 @@
-subtotal: $40000
-tax: $0000
-discount: $0000
-total: $40000/yr
-forever

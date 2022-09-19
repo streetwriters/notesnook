@@ -22,14 +22,16 @@ import { hashNavigate, navigate } from "../../navigation";
 import { Text } from "@theme-ui/components";
 import { store as appStore } from "../../stores/app-store";
 import { store as tagStore } from "../../stores/tag-store";
+import { store as noteStore } from "../../stores/note-store";
 import { store as editorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
 import { showToast } from "../../utils/toast";
+import { pluralize } from "../../utils/string";
 
 const menuItems = [
   {
-    key: "rename",
+    key: "edit",
     title: "Rename tag",
     icon: Icon.Edit,
     onClick: ({ tag }) => {
@@ -55,8 +57,9 @@ const menuItems = [
           await editorStore.clearSession();
         await db.tags.remove(tag.id);
       }
-      showToast("success", `${items.length} tags deleted`);
+      showToast("success", `${pluralize(items.length, "tag", "tags")} deleted`);
       tagStore.refresh();
+      noteStore.refresh();
     },
     multiSelect: true
   }

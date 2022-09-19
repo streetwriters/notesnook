@@ -24,12 +24,21 @@ jobs:
         with:
           node-version: 16.x
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-
+          cache-dependency-path: |
+            apps/mobile/package-lock.json
+            apps/web/package-lock.json
+            packages/core/package-lock.json
+            packages/crypto/package-lock.json
+            packages/crypto-worker/package-lock.json
+            packages/editor-mobile/package-lock.json
+            packages/editor/package-lock.json
+            packages/logger/package-lock.json
+            packages/streamable-fs/package-lock.json
+            packages/theme/package-lock.json
       - name: Add environment variables
         run: |
           echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
-          echo "CURRENT_USER_PASSWORD='${{ secrets.USER_PASSWORD }}'" >> $GITHUB_ENV
+          echo "CURRENT_USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Prepare environment
@@ -39,5 +48,15 @@ jobs:
         run: npx playwright install --with-deps
         working-directory: ./apps/web
 
+      - name: Generate test build
+        run: npm run build:test:web
+
       - name: Run all @notesnook/web tests
         run: npm run test:web
+
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-results
+          path: apps/web/test-results
+          retention-days: 5

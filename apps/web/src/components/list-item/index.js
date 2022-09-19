@@ -75,10 +75,10 @@ function ListItem(props) {
       : inInSelection;
   });
 
-  const selectItem = useSelectionStore((store) => store.selectItem);
-
   return (
     <Flex
+      id={`id_${props.item.id}`}
+      className={isSelected ? "selected" : ""}
       ref={listItemRef}
       bg={isSelected ? "shade" : background}
       onContextMenu={(e) => {
@@ -139,31 +139,21 @@ function ListItem(props) {
         alignItems: isCompact ? "center" : undefined
       }}
       onKeyPress={(e) => {
-        if (e.key === "Enter") {
-          e.target.click();
-        } else {
+        if (e.key !== "Enter") {
           if (props.onKeyPress) props.onKeyPress(e);
         }
       }}
       onClick={(e) => {
-        if (e.shiftKey) {
-          //ignore (handled by listcontainer)
-        } else if (e.ctrlKey) {
-          selectItem(props.item);
-        } else {
-          selectionStore.toggleSelectionMode(false);
-          if (props.onClick) {
-            selectItem(props.item);
-            props.onClick();
-          }
+        if (props.onClick) {
+          props.onClick();
         }
       }}
-      data-test-id={`${props.item.type}-${props.index}`}
+      data-test-id={`list-item`}
     >
       {!isCompact && props.header}
 
       <Text
-        data-test-id={`${props.item.type}-${props.index}-title`}
+        data-test-id={`title`}
         variant={"subtitle"}
         sx={{
           whiteSpace: "nowrap",
@@ -181,7 +171,7 @@ function ListItem(props) {
         <Text
           as="p"
           variant="body"
-          data-test-id={`${props.item.type}-${props.index}-body`}
+          data-test-id={`description`}
           sx={{
             lineHeight: `1.2rem`,
             overflow: "hidden",

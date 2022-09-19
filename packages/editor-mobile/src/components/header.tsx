@@ -77,6 +77,7 @@ export default function Header({
         position: "sticky",
         width: "100vw"
       }}
+   
     >
       {noHeader ? null : (
         <div
@@ -89,6 +90,7 @@ export default function Header({
             height: 50,
             alignItems: "center"
           }}
+          id='header'
         >
           {settings.deviceMode !== "mobile" && !settings.fullscreen ? (
             <div />

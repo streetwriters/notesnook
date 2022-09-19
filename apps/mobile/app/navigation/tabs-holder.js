@@ -21,8 +21,8 @@ import {
   activateKeepAwake,
   deactivateKeepAwake
 } from "@sayem314/react-native-keep-awake";
-import React, { useEffect, useRef, useState } from "react";
-import { Platform, View, StatusBar } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Platform, StatusBar, View } from "react-native";
 import {
   addSpecificOrientationListener,
   getInitialOrientation,
@@ -34,10 +34,13 @@ import Animated, {
   useSharedValue,
   withTiming
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { notesnook } from "../../e2e/test.ids";
+import { db } from "../common/database";
 import { SideMenu } from "../components/side-menu";
 import { FluidTabs } from "../components/tabs";
+import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
+import { useShortcutManager } from "../hooks/use-shortcut-manager";
+import { hideAllTooltips } from "../hooks/use-tooltip";
 import {
   clearAppState,
   editorController,
@@ -55,7 +58,6 @@ import { useEditorStore } from "../stores/use-editor-store";
 import { useSettingStore } from "../stores/use-setting-store";
 import { useThemeStore } from "../stores/use-theme-store";
 import { setWidthHeight } from "../utils";
-import { db } from "../common/database";
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -63,11 +65,8 @@ import {
   eOpenFullscreenEditor
 } from "../utils/events";
 import { editorRef, tabBarRef } from "../utils/global-refs";
-import { hideAllTooltips } from "../hooks/use-tooltip";
-import { NavigationStack } from "./navigation-stack";
-import { useCallback } from "react";
-import { useShortcutManager } from "../hooks/use-shortcut-manager";
 import { sleep } from "../utils/time";
+import { NavigationStack } from "./navigation-stack";
 
 const _TabsHolder = () => {
   const colors = useThemeStore((state) => state.colors);
@@ -78,7 +77,7 @@ const _TabsHolder = () => {
   const setDeviceModeState = useSettingStore((state) => state.setDeviceMode);
   const dimensions = useSettingStore((state) => state.dimensions);
   const setDimensions = useSettingStore((state) => state.setDimensions);
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const animatedOpacity = useSharedValue(0);
   const animatedTranslateY = useSharedValue(-9999);
   const overlayRef = useRef();
@@ -370,7 +369,8 @@ const _TabsHolder = () => {
       onLayout={_onLayout}
       testID={notesnook.ids.default.root}
       style={{
-        flex: 1,
+        height: "100%",
+        width: "100%",
         backgroundColor: colors.bg,
         paddingBottom: Platform.OS === "android" ? insets?.bottom : 0,
         marginRight:
@@ -443,6 +443,7 @@ const _TabsHolder = () => {
 
             <NavigationStack />
           </View>
+
           <EditorWrapper key="3" width={widths} dimensions={dimensions} />
         </FluidTabs>
       ) : null}

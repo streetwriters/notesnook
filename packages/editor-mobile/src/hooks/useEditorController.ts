@@ -61,6 +61,7 @@ export type EditorController = {
   content: MutableRefObject<string | null>;
   onUpdate: () => void;
   titlePlaceholder: string;
+  openLink: (url: string) => boolean;
   setTitlePlaceholder: React.Dispatch<React.SetStateAction<string>>;
 };
 
@@ -154,6 +155,11 @@ export function useEditorController(update: () => void): EditorController {
     post(EventTypes.download, attachment);
   }, []);
 
+  const openLink = useCallback((url: string) => {
+    post(EventTypes.link, url);
+    return true;
+  }, []);
+
   return {
     contentChange,
     selectionChange,
@@ -166,6 +172,7 @@ export function useEditorController(update: () => void): EditorController {
     openFilePicker,
     downloadAttachment,
     content: htmlContentRef,
+    openLink,
     onUpdate: onUpdate
   };
 }

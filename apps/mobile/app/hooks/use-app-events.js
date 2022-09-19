@@ -274,6 +274,7 @@ export const useAppEvents = () => {
       Walkthrough.present("prouser", false, true);
     }
     await PremiumService.setPremiumStatus();
+    useMessageStore.getState().setAnnouncement();
   };
 
   const onRequestPartialSync = async (full, force) => {

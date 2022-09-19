@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { Node, mergeAttributes, findChildren, Editor } from "@tiptap/core";
 import { NodeType } from "prosemirror-model";
 import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
-import { onBackspacePressed } from "../list-item/commands";
+import { onArrowUpPressed, onBackspacePressed } from "../list-item/commands";
 import { OutlineList } from "../outline-list/outline-list";
 import { createNodeView } from "../react";
 import { OutlineListItemComponent } from "./component";
@@ -95,7 +95,8 @@ export const OutlineListItem = Node.create<ListItemOptions>({
       Tab: () => this.editor.commands.sinkListItem(this.name),
       "Shift-Tab": () => this.editor.commands.liftListItem(this.name),
       Backspace: ({ editor }) =>
-        onBackspacePressed(editor, this.name, this.type)
+        onBackspacePressed(editor, this.name, this.type),
+      ArrowUp: ({ editor }) => onArrowUpPressed(editor, this.name, this.type)
     };
   },
 

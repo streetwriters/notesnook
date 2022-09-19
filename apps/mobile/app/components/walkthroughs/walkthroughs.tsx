@@ -306,7 +306,7 @@ const trialstarted: { id: string; steps: TStep[] } = {
   steps: [
     {
       title: "Your trial is activated",
-      text: "You can use all permium features for free for the next 14 days",
+      text: "You can use all premium features for free for the next 14 days",
       walkthroughItem: (colors) => <SvgView src={LAUNCH_ROCKET(colors.pri)} />,
       button: {
         type: "next",

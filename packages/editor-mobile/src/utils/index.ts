@@ -141,7 +141,8 @@ export const EventTypes = {
   pro: "editor-event:pro",
   monograph: "editor-event:monograph",
   properties: "editor-event:properties",
-  fullscreen: "editor-event:fullscreen"
+  fullscreen: "editor-event:fullscreen",
+  link: "editor-event:link"
 } as const;
 
 export function isReactNative(): boolean {

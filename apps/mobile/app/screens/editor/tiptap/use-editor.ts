@@ -18,9 +18,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import WebView from "react-native-webview";
 import { db } from "../../../common/database";
+import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
@@ -68,7 +68,7 @@ export const useEditor = (
   const state = useRef<Partial<EditorState>>(defaultState);
   const placeholderTip = useRef(TipManager.placeholderTip());
   const tags = useTagStore((state) => state.tags);
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const saveCount = useRef(0);
 

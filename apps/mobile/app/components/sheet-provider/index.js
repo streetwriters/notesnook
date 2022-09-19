@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { editorState } from "../../screens/editor/tiptap/utils";
@@ -33,7 +33,6 @@ import { Button } from "../ui/button";
 import SheetWrapper from "../ui/sheet";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
 const SheetProvider = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
   const [visible, setVisible] = useState(false);
@@ -194,8 +193,11 @@ const SheetProvider = ({ context = "global" }) => {
             accentColor={dialogData.iconColor || "accent"}
             accentText="light"
             type="accent"
-            height={50}
-            width="100%"
+            height={45}
+            width={250}
+            style={{
+              borderRadius: 100
+            }}
             fontSize={SIZE.md}
           />
         ) : null}

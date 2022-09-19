@@ -36,16 +36,12 @@ class ExceptionHandler extends React.Component<{
   component: string;
 }> {
   state: {
-    error: {
-      title: string;
-      stack: string;
-    } | null;
+    error: Error | null;
     hasError: boolean;
   } = {
     hasError: false,
     error: null
   };
-
   static getDerivedStateFromError(error: Error) {
     return { hasError: true, error: error };
   }
@@ -72,7 +68,7 @@ class ExceptionHandler extends React.Component<{
               this.state.error?.stack || "",
               this.props.component
             )}
-            defaultTitle={this.state.error?.title || "Unknown Error"}
+            defaultTitle={this.state.error?.message}
             issueTitle="An exception occured"
           />
           <Dialog />

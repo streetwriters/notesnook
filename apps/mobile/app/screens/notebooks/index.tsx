@@ -67,8 +67,8 @@ export const Notebooks = ({
       });
       SearchService.prepareSearch = prepareSearch;
       useNavigationStore.getState().setButtonAction(onPressFloatingButton);
-
-      if (notebooks.length === 0) {
+      //@ts-ignore need to update typings in core to fix this
+      if (db.notebooks.all.length === 0) {
         Walkthrough.present("notebooks");
       } else {
         Walkthrough.update("notebooks");

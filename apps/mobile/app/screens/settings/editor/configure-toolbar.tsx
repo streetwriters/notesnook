@@ -34,7 +34,7 @@ export const ConfigureToolbar = () => {
   const colors = useThemeStore((state) => state.colors);
 
   const renderGroups = () => {
-    return data.map((item, index) => (
+    return data?.map((item, index) => (
       <Group key={`group-${index}`} item={item} index={index} />
     ));
   };
@@ -128,7 +128,7 @@ export const ConfigureToolbar = () => {
                 width: "100%"
               }}
               onPress={() => {
-                const _data = data.slice();
+                const _data = data ? data.slice() : [];
                 _data.push([]);
                 useDragState.getState().setData(_data);
               }}
@@ -147,115 +147,3 @@ const styles = StyleSheet.create({
     width: "100%"
   }
 });
-
-// import React, { useEffect, useState } from 'react';
-// import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-// import DraggableFlatList, {
-//   RenderItemParams,
-//   ScaleDecorator
-// } from 'react-native-draggable-flatlist';
-// import { useThemeStore } from '../../stores/use-theme-store';
-// import {
-//   FlattenedToolbarItemType,
-//   getFlattenedToolbarDefinition,
-//   getToolbarDefinition,
-//   moveGroup,
-//   moveSubGroup,
-//   moveTool,
-//   toolbarDefinition
-// } from './toolbar-definition';
-// /**
-//  *
-//  * Flatten toolbar definition array with headers for each group.
-//  * Add them to list
-//  * Each list item gets it's data from tools
-//  * reorder items.
-//  * Save reordered data to database/storage.
-//  */
-
-// const flattened = getFlattenedToolbarDefinition(toolbarDefinition);
-// export function ConfigureToolbar() {
-//   const [data, setData] = useState(flattened);
-//   const colors = useThemeStore(state => state.colors);
-
-//   useEffect(() => {
-//     console.log(getToolbarDefinition(data));
-//   }, [data]);
-
-//   const onDragEnd = React.useCallback(
-//     ({ data: _data, from, to }) => {
-//       console.log(from, to);
-//       let prevDraggedItem = data[from];
-//       let nextDraggedItem = _data[to];
-
-//       switch (prevDraggedItem.type) {
-//         case 'group':
-//           _data = moveGroup(data, _data, to, from, prevDraggedItem, nextDraggedItem);
-//           break;
-//         case 'subgroup':
-//           _data = moveSubGroup(data, _data, to, from, prevDraggedItem, nextDraggedItem);
-//           break;
-//         case 'tool':
-//           _data = moveTool(data, _data, to, from, prevDraggedItem, nextDraggedItem);
-//           break;
-//       }
-
-//       setData(_data);
-//     },
-//     [data]
-//   );
-
-//   const renderItem = React.useCallback(
-//     ({ item, drag, isActive }: RenderItemParams<FlattenedToolbarItemType>) => {
-//       return (
-//         <ScaleDecorator>
-//           <TouchableOpacity
-//             onLongPress={drag}
-//             disabled={isActive}
-//             style={[
-//               styles.rowItem,
-//               {
-//                 backgroundColor: isActive ? colors.nav : colors.transGray,
-//                 borderWidth: 1,
-//                 borderColor: item.type === 'group' ? colors.accent : colors.nav
-//               }
-//             ]}
-//           >
-//             <Text style={styles.text}>
-//               {item.title} - {item.groupId}
-//             </Text>
-//           </TouchableOpacity>
-//         </ScaleDecorator>
-//       );
-//     },
-//     []
-//   );
-
-//   return (
-//     <DraggableFlatList
-//       data={data}
-//       onDragEnd={onDragEnd}
-//       style={{
-//         paddingHorizontal: 12
-//       }}
-//       keyExtractor={item => item.id}
-//       renderItem={renderItem}
-//     />
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   rowItem: {
-//     height: 50,
-//     width: '100%',
-//     justifyContent: 'center',
-//     marginBottom: 10,
-//     borderRadius: 10,
-//     paddingHorizontal: 12
-//   },
-//   text: {
-//     color: 'black',
-//     fontSize: 16,
-//     textAlign: 'left'
-//   }
-// });

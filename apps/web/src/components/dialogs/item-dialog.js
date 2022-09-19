@@ -52,7 +52,7 @@ function ItemDialog(props) {
           id="title"
           name="title"
           autoFocus
-          data-test-id="item-dialog-title"
+          data-test-id="title-input"
           defaultValue={props.defaultValue}
         />
       </Box>

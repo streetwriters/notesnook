@@ -136,7 +136,8 @@ const menuItems = [
   {
     key: "pin",
     icon: Icon.Pin,
-    title: ({ notebook }) => (notebook.pinned ? "Unpin" : "Pin"),
+    title: "Pin",
+    checked: ({ notebook }) => notebook.pinned,
     onClick: ({ notebook }) => pin(notebook)
   },
   {
