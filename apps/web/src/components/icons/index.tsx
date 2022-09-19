@@ -214,6 +214,7 @@ function MDIIconWrapper({
           : `${size}px`
       }
       style={{
+        strokeWidth: 0,
         stroke: themedColor
       }}
       color={themedColor}

@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ProgressBarComponent } from "../../components/ui/svg/lazy";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { SIZE } from "../../utils/size";
@@ -30,7 +30,7 @@ export const ProgressBar = () => {
   const [prog, setProg] = useState(0);
   const [visible, setVisible] = useState(false);
   const timer = useRef();
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const [width, setWidth] = useState(false);
 
   useEffect(() => {

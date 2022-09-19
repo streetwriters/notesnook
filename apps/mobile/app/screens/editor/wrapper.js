@@ -25,13 +25,12 @@ import {
   TextInput,
   View
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Editor from ".";
 import { PremiumToast } from "../../components/premium/premium-toast";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import useIsFloatingKeyboard from "../../hooks/use-is-floating-keyboard";
 import useKeyboard from "../../hooks/use-keyboard";
 import { DDS } from "../../services/device-detection";
-import { useNoteStore } from "../../stores/use-notes-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { editorRef } from "../../utils/global-refs";
@@ -40,8 +39,8 @@ import { editorController, editorState, textInput } from "./tiptap/utils";
 export const EditorWrapper = ({ width }) => {
   const colors = useThemeStore((state) => state.colors);
   const deviceMode = useSettingStore((state) => state.deviceMode);
-  const loading = useNoteStore((state) => state.loading);
-  const insets = useSafeAreaInsets();
+  const loading = false;
+  const insets = useGlobalSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
@@ -64,10 +63,11 @@ export const EditorWrapper = ({ width }) => {
   }, [loading]);
 
   const getMarginBottom = () => {
-    if (!keyboard.keyboardShown) return insets.bottom / 2;
-    if (Platform.isPad && !floating) return 16;
-    if (Platform.OS === "ios") return insets.bottom / 2;
-    return 6;
+    const bottomInsets = Platform.OS === "android" ? 14 : insets.bottom || 14;
+    if (!keyboard.keyboardShown) return bottomInsets / 1.5;
+    if (Platform.isPad && !floating) return bottomInsets;
+    if (Platform.OS === "ios") return bottomInsets / 1.5;
+    return bottomInsets;
   };
 
   return (

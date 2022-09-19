@@ -195,7 +195,7 @@ class RecoveryKeySheet extends React.Component {
     try {
       if (Platform.OS === "ios") {
         Share.open({
-          url: "file:/" + path,
+          url: path,
           failOnCancel: false
         }).catch(console.log);
       } else {

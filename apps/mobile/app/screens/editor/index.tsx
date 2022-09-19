@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { EV, EVENTS } from "@notesnook/core/common";
 import React, {
   forwardRef,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useState
@@ -29,13 +30,13 @@ import { Platform, ViewStyle } from "react-native";
 import WebView from "react-native-webview";
 import { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes";
 import { notesnook } from "../../../e2e/test.ids";
+import { db } from "../../common/database";
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from "../../services/event-manager";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { getElevation } from "../../utils";
-import { db } from "../../common/database";
 import { openLinkInBrowser } from "../../utils/functions";
 import { NoteType } from "../../utils/types";
 import { EDITOR_URI } from "./source";
@@ -43,7 +44,7 @@ import { EditorProps, useEditorType } from "./tiptap/types";
 import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
-import { useCallback } from "react";
+import { useLayoutEffect } from "react";
 
 const style: ViewStyle = {
   height: "100%",
@@ -118,14 +119,18 @@ const Editor = React.memo(
       }, [editor]);
 
       useEffect(() => {
-        onLoad && onLoad();
         eSubscribeEvent("webview_reset", onError);
         EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
         return () => {
           eUnSubscribeEvent("webview_reset", onError);
           EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
         };
-      }, [onError, onLoad, onMediaDownloaded]);
+      }, [onError, onMediaDownloaded]);
+
+      useLayoutEffect(() => {
+        onLoad && onLoad();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [onLoad]);
 
       if (withController) {
         editorController.current = editor;

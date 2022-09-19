@@ -19,18 +19,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react";
 import { ActivityIndicator, useWindowDimensions, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useThemeStore } from "../../stores/use-theme-store";
-import { useSettingStore } from "../../stores/use-setting-store";
+import { notesnook } from "../../../e2e/test.ids";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { useTip } from "../../services/tip-manager";
+import { useSettingStore } from "../../stores/use-setting-store";
+import { useThemeStore } from "../../stores/use-theme-store";
 import { COLORS_NOTE } from "../../utils/color-scheme";
 import { SIZE } from "../../utils/size";
+import { Tip } from "../tip";
 import { Button } from "../ui/button";
 import Seperator from "../ui/seperator";
-import { Tip } from "../tip";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { notesnook } from "../../../e2e/test.ids";
 
 export const Empty = React.memo(
   function Empty({
@@ -41,7 +41,7 @@ export const Empty = React.memo(
     screen
   }) {
     const colors = useThemeStore((state) => state.colors);
-    const insets = useSafeAreaInsets();
+    const insets = useGlobalSafeAreaInsets();
     const { height } = useWindowDimensions();
     const introCompleted = useSettingStore(
       (state) => state.settings.introCompleted

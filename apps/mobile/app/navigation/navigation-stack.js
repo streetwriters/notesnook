@@ -20,8 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
+import { SafeAreaView } from "react-native";
 import Container from "../components/container";
+import DelayLayout from "../components/delay-layout";
 import Intro from "../components/intro";
+import useGlobalSafeAreaInsets from "../hooks/use-global-safe-area-insets";
+import { hideAllTooltips } from "../hooks/use-tooltip";
 import Favorites from "../screens/favorites";
 import Home from "../screens/home";
 import Notebook from "../screens/notebook";
@@ -38,13 +42,12 @@ import Trash from "../screens/trash";
 import { eSendEvent } from "../services/event-manager";
 import SettingsService from "../services/settings";
 import useNavigationStore from "../stores/use-navigation-store";
+import { useNoteStore } from "../stores/use-notes-store";
 import { useSelectionStore } from "../stores/use-selection-store";
+import { useSettingStore } from "../stores/use-setting-store";
 import { useThemeStore } from "../stores/use-theme-store";
 import { history } from "../utils";
 import { rootNavigatorRef } from "../utils/global-refs";
-import { hideAllTooltips } from "../hooks/use-tooltip";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSettingStore } from "../stores/use-setting-store";
 const NativeStack = createNativeStackNavigator();
 const IntroStack = createNativeStackNavigator();
 
@@ -84,7 +87,8 @@ const _Tabs = () => {
     (state) => state.settings.introCompleted
   );
   const height = useSettingStore((state) => state.dimensions.height);
-  const insets = useSafeAreaInsets();
+  const loading = useNoteStore((state) => state.loading);
+  const insets = useGlobalSafeAreaInsets();
   const screenHeight = height - (50 + insets.top + insets.bottom);
   React.useEffect(() => {
     setTimeout(() => {
@@ -92,7 +96,18 @@ const _Tabs = () => {
     }, 1000);
   }, [homepage]);
 
-  return (
+  return loading && introCompleted ? (
+    <>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: colors.bg
+        }}
+      >
+        <DelayLayout animated={false} wait={loading} />
+      </SafeAreaView>
+    </>
+  ) : (
     <NativeStack.Navigator
       tabBar={() => null}
       initialRouteName={!introCompleted ? "Welcome" : homepage}

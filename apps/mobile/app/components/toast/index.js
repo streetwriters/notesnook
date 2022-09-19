@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Keyboard, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
+import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
 import { DDS } from "../../services/device-detection";
 import {
   eSubscribeEvent,
@@ -35,13 +35,12 @@ import { SIZE } from "../../utils/size";
 import { Button } from "../ui/button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
-import { useCallback } from "react";
 let toastMessages = [];
 export const Toast = ({ context = "global" }) => {
   const colors = useThemeStore((state) => state.colors);
   const [keyboard, setKeyboard] = useState(false);
   const [data, setData] = useState({});
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
   const hideTimeout = useRef();
   const [visible, setVisible] = useState(false);
 

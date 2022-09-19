@@ -176,6 +176,8 @@ export class NotePropertiesModel extends BaseProperties {
 
   async open() {
     await this.propertiesButton.click();
+    await this.propertiesCloseButton.waitFor();
+    await this.page.waitForTimeout(1000);
   }
 
   async close() {
@@ -184,6 +186,8 @@ export class NotePropertiesModel extends BaseProperties {
 
   async getSessionHistory() {
     await this.open();
+    await this.sessionItems.first().waitFor();
+
     const history: SessionHistoryItemModel[] = [];
     for await (const item of iterateList(this.sessionItems)) {
       history.push(new SessionHistoryItemModel(this, item));
@@ -271,6 +275,8 @@ export class NoteContextMenuModel extends BaseProperties {
           await newItemInput.waitFor({ state: "visible" });
           await newItemInput.fill(topic);
           await newItemInput.press("Enter");
+
+          await item.locator(getTestId("topic"), { hasText: topic }).waitFor();
         }
 
         const topicItems = item.locator(getTestId("topic"));

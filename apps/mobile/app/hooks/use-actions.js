@@ -18,13 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Clipboard from "@react-native-clipboard/clipboard";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import Share from "react-native-share";
 import { notesnook } from "../../e2e/test.ids";
 import { db } from "../common/database";
 import { presentDialog } from "../components/dialog/functions";
 import NoteHistory from "../components/note-history";
+import ExportNotesSheet from "../components/sheets/export-notes";
 import { MoveNotes } from "../components/sheets/move-notes/movenote";
 import {
   eSendEvent,
@@ -48,15 +49,12 @@ import { toggleDarkMode } from "../utils/color-scheme/utils";
 import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
-  eOpenAttachmentsDialog,
-  eOpenExportDialog,
-  eOpenLoginDialog,
+  eOpenAttachmentsDialog, eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
 } from "../utils/events";
 import { deleteItems } from "../utils/functions";
 import { sleep } from "../utils/time";
-import { useCallback } from "react";
 
 export const useActions = ({ close = () => null, item }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -538,7 +536,7 @@ export const useActions = ({ close = () => null, item }) => {
   async function exportNote() {
     close();
     await sleep(300);
-    eSendEvent(eOpenExportDialog, [item]);
+    ExportNotesSheet.present(item);
   }
 
   async function toggleLocalOnly() {

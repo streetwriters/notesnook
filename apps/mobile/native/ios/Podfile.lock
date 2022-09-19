@@ -227,6 +227,8 @@ PODS:
   - React-jsinspector (0.69.4)
   - React-logger (0.69.4):
     - glog
+  - react-native-actions-shortcuts (1.0.1):
+    - React
   - react-native-background-actions (2.6.7):
     - React-Core
   - react-native-begin-background-task (0.1.0):
@@ -432,6 +434,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../../node_modules/react-native/ReactCommon/logger`)
+  - react-native-actions-shortcuts (from `../../node_modules/react-native-actions-shortcuts`)
   - react-native-background-actions (from `../../node_modules/react-native-background-actions`)
   - react-native-begin-background-task (from `../../node_modules/react-native-begin-background-task`)
   - react-native-config (from `../../node_modules/react-native-config`)
@@ -534,6 +537,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../../node_modules/react-native/ReactCommon/logger"
+  react-native-actions-shortcuts:
+    :path: "../../node_modules/react-native-actions-shortcuts"
   react-native-background-actions:
     :path: "../../node_modules/react-native-background-actions"
   react-native-begin-background-task:
@@ -670,6 +675,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: a27badbbdbc0ff781813370736a2d1c7261181d4
   React-jsinspector: 8a3d3f5dcd23a91e8c80b1bf0e96902cd1dca999
   React-logger: 1088859f145b8f6dd0d3ed051a647ef0e3e80fad
+  react-native-actions-shortcuts: 5d9cf0c9c308333dfcc1e05c3f9afa8c428e2533
   react-native-background-actions: 2c251c986f23347f9c1722f05fd296938f60edb1
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
   react-native-config: 7cd105e71d903104e8919261480858940a6b9c0e

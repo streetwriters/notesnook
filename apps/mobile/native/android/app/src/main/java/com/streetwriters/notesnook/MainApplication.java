@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import com.dooboolab.RNIap.RNIapModule;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
@@ -88,8 +87,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                                     return new DocumentPickerModule(reactContext);
                                 case "RNShare":
                                     return new RNShareModule(reactContext);
-                                case "RNIapModule":
-                                    return new RNIapModule(reactContext);
                                 default:
                                     throw new IllegalArgumentException("Could not find module $name");
                             }
@@ -109,8 +106,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                                     map.put("RNFileViewer", getModuleInfo("RNFileViewer", "com.vinzscam.reactnativefileviewer.RNFileViewerModule"));
                                     map.put("RNDocumentPicker", getModuleInfo("RNDocumentPicker", "io.github.elyx0.reactnativedocumentpicker.DocumentPickerModule"));
                                     map.put("RNShare", getModuleInfo("RNShare", "cl.json.RNShareModule"));
-                                    map.put("RNIapModule", getModuleInfo("RNIapModule", "com.dooboolab.RNIap.RNIapModule"));
-
                                     return map;
                                 }
                             };

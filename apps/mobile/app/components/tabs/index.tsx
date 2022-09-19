@@ -36,6 +36,7 @@ import Animated, {
   WithSpringConfig,
   withTiming
 } from "react-native-reanimated";
+import { editorState } from "../../screens/editor/tiptap/utils";
 import { eSendEvent } from "../../services/event-manager";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { eClearEditor } from "../../utils/events";
@@ -50,7 +51,7 @@ interface TabProps extends ViewProps {
 }
 
 export interface TabsRef {
-  goToPage: (page: number) => void;
+  goToPage: (page: number, animated?:boolean) => void;
   goToIndex: (index: number) => 0 | undefined;
   unlock: () => boolean;
   lock: () => boolean;
@@ -109,7 +110,11 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
       if (deviceMode === "tablet" || fullscreen) {
         translateX.value = 0;
       } else {
-        if (prevWidths.current?.a !== widths.a) translateX.value = widths.a;
+        if (prevWidths.current?.a !== widths.a) {
+          translateX.value = editorState().movedAway
+            ? widths.a
+            : editorPosition;
+        }
       }
       isLoaded.current = true;
       prevWidths.current = widths;
@@ -135,13 +140,14 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
     translateX,
     isDrawerOpen,
     homePosition,
-    onDrawerStateChange
+    onDrawerStateChange,
+    editorPosition
   ]);
 
   useImperativeHandle(
     ref,
     (): TabsRef => ({
-      goToPage: (page: number) => {
+      goToPage: (page: number, animated = true) => {
         if (deviceMode === "tablet") {
           translateX.value = withTiming(0);
           return;
@@ -149,11 +155,15 @@ export const FluidTabs = forwardRef<TabsRef, TabProps>(function FluidTabs(
         page = page + 1;
         if (page === 1) {
           onDrawerStateChange(false);
-          translateX.value = withTiming(homePosition);
+          translateX.value = !animated
+            ? homePosition
+            : withTiming(homePosition);
           currentTab.value = 1;
         } else if (page === 2) {
           onDrawerStateChange(false);
-          translateX.value = withTiming(editorPosition);
+          translateX.value = !animated
+            ? editorPosition
+            : withTiming(editorPosition);
           currentTab.value = 2;
         }
       },

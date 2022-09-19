@@ -33,6 +33,7 @@ import ToolSheet from "./tool-sheet";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { ToolId } from "@notesnook/editor/dist/toolbar/tools";
+
 export const Group = ({
   item,
   index: groupIndex,

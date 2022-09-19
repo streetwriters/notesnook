@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import React from "react";
 import { Platform, View } from "react-native";
 import ActionSheet from "react-native-actions-sheet";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import useGlobalSafeAreaInsets from "../../../hooks/use-global-safe-area-insets";
 import { useSettingStore } from "../../../stores/use-setting-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { PremiumToast } from "../../premium/premium-toast";
@@ -48,8 +48,7 @@ const SheetWrapper = ({
   const smallTablet = deviceMode === "smallTablet";
   const dimensions = useSettingStore((state) => state.dimensions);
   const pitchBlack = useSettingStore((state) => state.settings.pitchBlack);
-
-  const insets = useSafeAreaInsets();
+  const insets = useGlobalSafeAreaInsets();
 
   let width = dimensions.width > 600 ? 600 : 500;
 

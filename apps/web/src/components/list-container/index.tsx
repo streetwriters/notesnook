@@ -37,6 +37,7 @@ import Announcements from "../announcements";
 import useAnnouncements from "../../hooks/use-announcements";
 import { ListLoader } from "../loaders/list-loader";
 import ScrollContainer from "../scroll-container";
+import { useKeyboardListNavigation } from "../../hooks/use-keyboard-list-navigation";
 
 const CustomScrollbarsVirtualList = forwardRef<HTMLDivElement, ScrollerProps>(
   function CustomScrollbarsVirtualList(props, ref) {
@@ -73,9 +74,13 @@ function ListContainer(props: ListContainerProps) {
 
   const [announcements, removeAnnouncement] = useAnnouncements();
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
+  const selectItem = useSelectionStore((store) => store.selectItem);
+  const deselectItem = useSelectionStore((store) => store.deselectItem);
+  const toggleSelection = useSelectionStore(
+    (store) => store.toggleSelectionMode
+  );
 
   const listRef = useRef<VirtuosoHandle>(null);
-  const focusedItemIndex = useRef(-1);
   const listContainerRef = useRef(null);
 
   const groups = useMemo(
@@ -89,6 +94,31 @@ function ListContainer(props: ListContainerProps) {
     };
   }, []);
 
+  const { onFocus, onMouseDown, onKeyDown } = useKeyboardListNavigation({
+    length: items.length,
+    reset: () => toggleSelection(false),
+    deselect: (index) => deselectItem(items[index]),
+    select: (index) => selectItem(items[index]),
+    bulkSelect: (indices) => setSelectedItems(indices.map((i) => items[i])),
+    focusItemAt: (index) => {
+      const item = items[index];
+      if (!item) return;
+
+      const element = document.getElementById(`id_${item.id}`);
+      if (!element) return;
+      element.focus();
+    },
+    skip: (index) => items[index].type === "header",
+    open: (index) => {
+      const item = items[index];
+      if (!item) return;
+
+      const element = document.getElementById(`id_${item.id}`);
+      if (!element) return;
+      element.click();
+    }
+  });
+
   const Component = ListProfiles[type];
 
   return (
@@ -100,7 +130,7 @@ function ListContainer(props: ListContainerProps) {
           ) : (
             <>
               {header || <ReminderBar />}
-              <Flex variant="columnCenterFill">
+              <Flex variant="columnCenterFill" data-test-id="list-placeholder">
                 <props.placeholder />
               </Flex>
             </>
@@ -112,13 +142,6 @@ function ListContainer(props: ListContainerProps) {
             ref={listContainerRef}
             variant="columnFill"
             data-test-id="note-list"
-            onFocus={(e) => {
-              if (e.target.parentElement?.dataset.index) {
-                focusedItemIndex.current = parseInt(
-                  e.target.parentElement.dataset.index
-                );
-              }
-            }}
           >
             <Virtuoso
               ref={listRef}
@@ -126,107 +149,20 @@ function ListContainer(props: ListContainerProps) {
               computeItemKey={(index) => items[index].id || items[index].title}
               defaultItemHeight={DEFAULT_ITEM_HEIGHT}
               totalCount={items.length}
-              onMouseDown={(e) => {
-                const target = e.target as HTMLElement;
-
-                const listItem = target.closest(
-                  `[data-item-index]`
-                ) as HTMLElement;
-                if (e.shiftKey && listItem && listItem.dataset.index) {
-                  e.preventDefault();
-                  const endIndex = parseInt(listItem.dataset.index);
-                  if (isNaN(endIndex)) return;
-                  setSelectedItems([
-                    ...selectionStore.get().selectedItems,
-                    ...items.slice(focusedItemIndex.current + 1, endIndex + 1)
-                  ]);
-                  (listItem.firstElementChild as HTMLElement)?.focus();
-                }
-              }}
               onBlur={() => setFocusedGroupIndex(-1)}
-              onKeyDown={(e) => {
-                if (e.code === "Escape") {
-                  selectionStore.toggleSelectionMode(false);
-                  return;
-                }
-
-                if (e.code === "KeyA" && e.ctrlKey) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setSelectedItems(
-                    items.filter((item) => item.type !== "header")
-                  );
-                  return;
-                }
-
-                // const isShiftKey = e.shiftKey;
-                const isUp = e.code === "ArrowUp";
-                const isDown = e.code === "ArrowDown";
-                const isHeader = (i: number) =>
-                  items && items[i]?.type === "header";
-                const moveDown = (i: number) =>
-                  i < items.length - 1 ? ++i : items.length - 1;
-                const moveUp = (i: number) => (i > 0 ? --i : 0);
-
-                const i = focusedItemIndex.current;
-                let nextIndex = i;
-
-                if (nextIndex <= -1 && (isUp || isDown)) {
-                  nextIndex = 0;
-                }
-
-                if (isUp) {
-                  nextIndex = moveUp(i);
-                  if (isHeader(nextIndex)) nextIndex = moveUp(nextIndex);
-                } else if (isDown) {
-                  nextIndex = moveDown(i);
-                  if (isHeader(nextIndex)) nextIndex = moveDown(nextIndex);
-                }
-
-                if (isUp || isDown) {
-                  e.preventDefault();
-
-                  listRef.current?.scrollIntoView({
-                    index: nextIndex,
-                    behavior: "auto",
-                    done: () => {
-                      const query = `[data-item-index="${nextIndex}"]`;
-                      const listItem = document.querySelector(query);
-                      if (!listItem) return;
-                      (listItem.firstElementChild as HTMLElement)?.focus();
-                    }
-                  });
-                  selectionStore.toggleSelectionMode(false);
-                  // if (isShiftKey) {
-                  //   const isUp = nextIndex < i; // ? "up" : "down";
-                  //   const isBefore = nextIndex < anchorIndex.current; // ? "before" : "after";
-                  //   let isSelect = isBefore ? isUp : !isUp;
-                  //   const selectedItems = selectionStore
-                  //     .get()
-                  //     .selectedItems.slice();
-
-                  //   if (isSelect && nextIndex === anchorIndex.current) {
-                  //     isSelect = false;
-                  //   }
-
-                  //   if (isSelect) selectedItems.push(items[nextIndex]);
-                  //   else {
-                  //     const indexOfItem = selectedItems.indexOf(items[i]);
-                  //     if (indexOfItem <= -1) return;
-                  //     selectedItems.splice(indexOfItem, 1);
-                  //   }
-                  //   setSelectedItems(selectedItems);
-                  // } else {
-                  //   setSelectedItems([items[nextIndex]]);
-                  //   // selectionStore.toggleSelectionMode(false);
-                  // }
-                }
-              }}
+              onKeyDown={(e) => onKeyDown(e.nativeEvent)}
               overscan={5}
               components={{
                 Scroller: CustomScrollbarsVirtualList,
                 Item: (props) => (
-                  <div {...props} style={{ paddingBottom: 1 }}>
+                  <div
+                    {...props}
+                    style={{ paddingBottom: 1 }}
+                    onFocus={() => onFocus(props["data-item-index"])}
+                    onMouseDown={(e) =>
+                      onMouseDown(e.nativeEvent, props["data-item-index"])
+                    }
+                  >
                     {props.children}
                   </div>
                 ),

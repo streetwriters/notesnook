@@ -126,7 +126,7 @@ export class EditorModel {
     });
   }
 
-  private async editAndWait(action: () => Promise<void>) {
+  async editAndWait(action: () => Promise<void>) {
     const oldDateEdited = await this.getDateEdited();
     await action();
     await this.page.waitForFunction(

@@ -278,13 +278,23 @@ const ShareView = ({ quicknote = false }) => {
         }
       }
       setNote({ ...note });
-
       onLoad();
     } catch (e) {
       console.error(e);
     }
     setLoadingIntent(false);
   }, [onLoad]);
+
+  const onLoad = useCallback(() => {
+    eSendEvent(eOnLoadNote + "shareEditor", {
+      id: null,
+      content: {
+        type: "tiptap",
+        data: noteContent.current
+      },
+      forced: true
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -305,24 +315,6 @@ const ShareView = ({ quicknote = false }) => {
       ShareExtension.close();
     }
   };
-
-  const onLoad = useCallback(
-    (editor) => {
-      if (editor) {
-        Storage.write("shareExtensionOpened", "opened");
-        return loadData();
-      }
-      eSendEvent(eOnLoadNote + "shareEditor", {
-        id: null,
-        content: {
-          type: "tiptap",
-          data: noteContent.current
-        },
-        forced: true
-      });
-    },
-    [loadData]
-  );
 
   const onPress = async () => {
     setLoading(true);
@@ -391,6 +383,11 @@ const ShareView = ({ quicknote = false }) => {
       setLoading(false);
     }
   };
+
+  const onLoadEditor = useCallback(() => {
+    Storage.write("shareExtensionOpened", "opened");
+    loadData();
+  }, [loadData]);
 
   return loadingExtension ? null : (
     <SafeAreaView
@@ -608,9 +605,7 @@ const ShareView = ({ quicknote = false }) => {
                       noHeader={true}
                       noToolbar={true}
                       readonly={false}
-                      onLoad={() => {
-                        onLoad(true);
-                      }}
+                      onLoad={onLoadEditor}
                       onChange={(html) => {
                         noteContent.current = html;
                       }}

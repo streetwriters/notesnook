@@ -1,0 +1,26 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2022 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+<<<<<<<< HEAD:apps/web/__e2e__/notes.issues.test.ts
+import { test } from "@playwright/test";
+test.skip("TODO: make sure jump to group works", () => {});
+========
+export * from "./open-link";
+export { OpenLink as default } from "./open-link";
+>>>>>>>> master:packages/editor/src/extensions/open-link/index.ts

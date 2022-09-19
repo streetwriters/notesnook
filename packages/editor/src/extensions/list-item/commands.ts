@@ -47,7 +47,9 @@ export function onBackspacePressed(
     if (isFirstOfType(type, editor.state)) {
       const parentList = getListFromListItem(type, editor.state);
       if (!parentList) return false;
-      if (parentList.childCount > 1) return editor.commands.deleteNode(type);
+      if (parentList.childCount > 1) {
+        return editor.commands.liftListItem(type);
+      }
       return editor.commands.deleteNode(parentList.type);
     }
 
@@ -61,6 +63,17 @@ export function onBackspacePressed(
     // like it should be.
     return editor.chain().joinBackward().joinBackward().run();
   }
+}
+
+export function onArrowUpPressed(editor: Editor, name: string, type: NodeType) {
+  const { selection } = editor.state;
+  const { empty } = selection;
+
+  if (!empty || !isFirstOfType(type, editor.state)) return false;
+  const parentList = getListFromListItem(type, editor.state);
+  if (editor.state.doc.firstChild === parentList)
+    return editor.commands.insertContentAt(0, "<p></p>");
+  return false;
 }
 
 function isInside(name: string, type: NodeType, state: EditorState) {

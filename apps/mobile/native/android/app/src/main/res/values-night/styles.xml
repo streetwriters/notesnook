@@ -1,0 +1,8 @@
+<resources>
+ <!-- BootTheme should inherit from Theme.SplashScreen -->
+  <style name="BootTheme" parent="Theme.SplashScreen">
+    <item name="windowSplashScreenBackground">@color/bootsplash_background_dark</item>
+    <item name="windowSplashScreenAnimatedIcon">@mipmap/logo_dark</item>
+    <item name="postSplashScreenTheme">@style/AppTheme</item>
+  </style>
+</resources>

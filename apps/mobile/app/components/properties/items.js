@@ -21,6 +21,7 @@ import React from "react";
 import { View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { getRandomId } from "../../common/filesystem/utils";
 import { useActions } from "../../hooks/use-actions";
 import { DDS } from "../../services/device-detection";
 import { useSettingStore } from "../../stores/use-setting-store";
@@ -111,6 +112,7 @@ export const Items = ({ item, buttons, close }) => {
   return item.type === "note" ? (
     <FlatList
       data={data}
+      key={`note_prop_list_${buttons.length}`}
       keyExtractor={(item) => item.title}
       numColumns={buttons.length < 5 ? buttons.length : columnItemsCount}
       style={{

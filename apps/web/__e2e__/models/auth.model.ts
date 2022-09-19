@@ -41,6 +41,12 @@ export class AuthModel {
 
   async goto() {
     await this.page.goto("/login");
+    await this.ready();
+  }
+
+  async ready() {
+    await this.submitButton.waitFor({ state: "visible" });
+    return true;
   }
 
   async login(user: Partial<User>) {
@@ -52,7 +58,7 @@ export class AuthModel {
     await this.submitButton.click();
 
     await this.page
-      .locator(getTestId("sync-status-completed"))
+      .locator(getTestId("sync-status-syncing"))
       .waitFor({ state: "visible" });
   }
 }

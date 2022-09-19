@@ -7,7 +7,10 @@
     "jsx": "react-native",
     "noEmit": true,
     "maxNodeModuleJsDepth": 6,
-    "types": ["node", "jest", "detox"]
+    "types": ["node", "jest", "detox"],
+    "paths": {
+      "@notesnook/*": ["../../packages"]
+    }
   },
   "exclude": ["native"]
 }

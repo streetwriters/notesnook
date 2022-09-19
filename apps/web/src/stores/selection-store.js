@@ -38,12 +38,20 @@ class SelectionStore extends BaseStore {
   selectItem = (item) => {
     const index = this.get().selectedItems.findIndex((v) => item.id === v.id);
     this.set((state) => {
-      if (index >= 0) {
-        state.selectedItems.splice(index, 1);
-      } else {
+      if (index <= -1) {
         state.selectedItems.push(item);
       }
     });
+  };
+
+  deselectItem = (item) => {
+    this.set((state) => {
+      const index = state.selectedItems.findIndex((v) => item.id === v.id);
+      if (index >= 0) {
+        state.selectedItems.splice(index, 1);
+      }
+    });
+
     if (this.get().selectedItems.length <= 0) {
       this.toggleSelectionMode();
     }

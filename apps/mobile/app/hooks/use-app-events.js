@@ -46,6 +46,7 @@ import { MMKV } from "../common/database/mmkv";
 import {
   eClearEditor,
   eCloseProgressDialog,
+  eOnLoadNote,
   refreshNotesPage
 } from "../utils/events";
 import Sync from "../services/sync";
@@ -64,6 +65,8 @@ import {
 import { useEditorStore } from "../stores/use-editor-store";
 import { useDragState } from "../screens/settings/editor/state";
 import { useCallback } from "react";
+import { clearAppState } from "../screens/editor/tiptap/utils";
+import { tabBarRef } from "../utils/global-refs";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -79,7 +82,8 @@ export const useAppEvents = () => {
     prevState: null,
     showingDialog: false,
     removeInternetStateListener: null,
-    isReconnecting: false
+    isReconnecting: false,
+    initialUrl: null
   });
 
   const onLoadingAttachmentProgress = (data) => {
@@ -165,22 +169,24 @@ export const useAppEvents = () => {
   };
 
   useEffect(() => {
+    if (!refValues.current.initialUrl) {
+      Linking.getInitialURL().then((url) => {
+        refValues.current.initialUrl = url;
+      });
+    }
     let sub;
     if (!loading && !verify) {
       setTimeout(() => {
         sub = AppState.addEventListener("change", onAppStateChanged);
-      }, 1000);
-      (async () => {
-        try {
-          let url = await Linking.getInitialURL();
-          if (url?.startsWith("https://app.notesnook.com/account/verified")) {
-            await onEmailVerified();
-          }
-          await onUserUpdated();
-        } catch (e) {
-          console.error(e);
+        if (
+          refValues.current.initialUrl?.startsWith(
+            "https://app.notesnook.com/account/verified"
+          )
+        ) {
+          onEmailVerified();
         }
-      })();
+      }, 1000);
+      onUserUpdated();
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(
         onInternetStateChanged
       );
@@ -219,7 +225,11 @@ export const useAppEvents = () => {
       try {
         if (url.startsWith("https://app.notesnook.com/account/verified")) {
           await onEmailVerified();
-        } else {
+        } else if (url.startsWith("ShareMedia://QuickNoteWidget")) {
+          clearAppState();
+          editorState().movedAway = false;
+          eSendEvent(eOnLoadNote, { type: "new" });
+          tabBarRef.current?.goToPage(1, false);
           return;
         }
       } catch (e) {
@@ -260,6 +270,7 @@ export const useAppEvents = () => {
       Walkthrough.present("prouser", false, true);
     }
     await PremiumService.setPremiumStatus();
+    useMessageStore.getState().setAnnouncement();
   };
 
   const onRequestPartialSync = async (full, force) => {
