@@ -1,3 +1,291 @@
+diff --git a/node_modules/react-native-fingerprint-scanner/android/build.gradle b/node_modules/react-native-fingerprint-scanner/android/build.gradle
+index eaf3829..3ff988a 100644
+--- a/node_modules/react-native-fingerprint-scanner/android/build.gradle
++++ b/node_modules/react-native-fingerprint-scanner/android/build.gradle
+@@ -45,9 +45,5 @@ dependencies {
+     // androidx:biometric now supports fingerprint back to Android v23
+     implementation "androidx.biometric:biometric:1.0.1"
+ 
+-    // retain fingerprintScanner lib for compat with Android v16-23 device-specific drivers (Samsung & MeiZu)
+-    // 1.2.3 is the minimum version compatible with androidx.
+-    // See https://github.com/uccmawei/FingerprintIdentify/issues/74
+-    // (translation https://translate.google.com/translate?sl=zh-CN&tl=en&u=https://github.com/uccmawei/FingerprintIdentify/issues/74)
+-    implementation "com.wei.android.lib:fingerprintidentify:${safeExtGet("fingerprintidentify", "1.2.6")}"
++    
+ }
+diff --git a/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java b/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
+index 2db879d..69e6f42 100644
+--- a/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
++++ b/node_modules/react-native-fingerprint-scanner/android/src/main/java/com/hieuvp/fingerprint/ReactNativeFingerprintScannerModule.java
+@@ -1,6 +1,8 @@
+ package com.hieuvp.fingerprint;
+ 
++import android.annotation.TargetApi;
+ import android.os.Build;
++import android.app.KeyguardManager;
+ import androidx.annotation.NonNull;
+ import androidx.biometric.BiometricPrompt;
+ import androidx.biometric.BiometricManager;
+@@ -22,9 +24,7 @@ import com.facebook.react.bridge.UiThreadUtil;
+ 
+ // for Samsung/MeiZu compat, Android v16-23
+ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter;
+-import com.wei.android.lib.fingerprintidentify.FingerprintIdentify;
+-import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint.ExceptionListener;
+-import com.wei.android.lib.fingerprintidentify.base.BaseFingerprint.IdentifyListener;
++import static android.content.Context.KEYGUARD_SERVICE;
+ 
+ 
+ @ReactModule(name="ReactNativeFingerprintScanner")
+@@ -38,13 +38,14 @@ public class ReactNativeFingerprintScannerModule
+ 
+     private final ReactApplicationContext mReactContext;
+     private BiometricPrompt biometricPrompt;
++    private KeyguardManager mKeyguardManager;
++    private boolean mDeviceCredentialAllowed = false;
+ 
+-    // for Samsung/MeiZu compat, Android v16-23
+-    private FingerprintIdentify mFingerprintIdentify;
+ 
+     public ReactNativeFingerprintScannerModule(ReactApplicationContext reactContext) {
+         super(reactContext);
+         mReactContext = reactContext;
++        mKeyguardManager = (KeyguardManager) reactContext.getSystemService(KEYGUARD_SERVICE);
+     }
+ 
+     @Override
+@@ -70,7 +71,12 @@ public class ReactNativeFingerprintScannerModule
+     }
+ 
+     private boolean requiresLegacyAuthentication() {
+-        return currentAndroidVersion() < 23;
++        return false;
++    }
++
++    @TargetApi(23)
++    private boolean isDeviceSecure() {
++        return currentAndroidVersion() >= 23 && mKeyguardManager.isDeviceSecure();
+     }
+ 
+     public class AuthCallback extends BiometricPrompt.AuthenticationCallback {
+@@ -94,7 +100,7 @@ public class ReactNativeFingerprintScannerModule
+         }
+     }
+ 
+-    public BiometricPrompt getBiometricPrompt(final Promise promise) {
++    public BiometricPrompt getBiometricPrompt(final FragmentActivity fragmentActivity, final Promise promise) {
+         // memoize so can be accessed to cancel
+         if (biometricPrompt != null) {
+             return biometricPrompt;
+@@ -104,12 +110,11 @@ public class ReactNativeFingerprintScannerModule
+         mReactContext.addLifecycleEventListener(this);
+ 
+         AuthCallback authCallback = new AuthCallback(promise);
+-        FragmentActivity fragmentActivity = (FragmentActivity) getCurrentActivity();
+         Executor executor = Executors.newSingleThreadExecutor();
+         biometricPrompt = new BiometricPrompt(
+-            fragmentActivity,
+-            executor,
+-            authCallback
++                fragmentActivity,
++                executor,
++                authCallback
+         );
+ 
+         return biometricPrompt;
+@@ -120,18 +125,27 @@ public class ReactNativeFingerprintScannerModule
+             new Runnable() {
+                 @Override
+                 public void run() {
+-                    BiometricPrompt bioPrompt = getBiometricPrompt(promise);
++                    FragmentActivity fragmentActivity = (FragmentActivity) mReactContext.getCurrentActivity();
++
++                    if(fragmentActivity == null) return;
++
++                    BiometricPrompt bioPrompt = getBiometricPrompt(fragmentActivity, promise);
++                    boolean allowDeviceCredential = mDeviceCredentialAllowed &&
++                                isDeviceSecure();
+ 
+-                    PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+-                        .setDeviceCredentialAllowed(false)
++                    PromptInfo.Builder promptInfo = new BiometricPrompt.PromptInfo.Builder()
++                        .setDeviceCredentialAllowed(allowDeviceCredential)
+                         .setConfirmationRequired(false)
+-                        .setNegativeButtonText(cancelButton)
+                         .setDescription(description)
+                         .setSubtitle(subtitle)
+-                        .setTitle(title)
+-                        .build();
++                        .setTitle(title);
+ 
+-                    bioPrompt.authenticate(promptInfo);
++                    // This should not be set if a backup is allowed (PIN/Pattern/Password)
++                    if(!allowDeviceCredential) {
++                        promptInfo = promptInfo.setNegativeButtonText(cancelButton);
++                    }
++
++                    bioPrompt.authenticate(promptInfo.build());
+                 }
+             });
+ 
+@@ -208,10 +222,6 @@ public class ReactNativeFingerprintScannerModule
+ 
+     @ReactMethod
+     public void release() {
+-        if (requiresLegacyAuthentication()) {
+-            getFingerprintIdentify().cancelIdentify();
+-            mFingerprintIdentify = null;
+-        }
+ 
+         // consistent across legacy and current API
+         if (biometricPrompt != null) {
+@@ -242,35 +252,13 @@ public class ReactNativeFingerprintScannerModule
+         }
+     }
+ 
+-
+-    // for Samsung/MeiZu compat, Android v16-23
+-    private FingerprintIdentify getFingerprintIdentify() {
+-        if (mFingerprintIdentify != null) {
+-            return mFingerprintIdentify;
+-        }
+-        mReactContext.addLifecycleEventListener(this);
+-        mFingerprintIdentify = new FingerprintIdentify(mReactContext);
+-        mFingerprintIdentify.setSupportAndroidL(true);
+-        mFingerprintIdentify.setExceptionListener(
+-            new ExceptionListener() {
+-                @Override
+-                public void onCatchException(Throwable exception) {
+-                    mReactContext.removeLifecycleEventListener(ReactNativeFingerprintScannerModule.this);
+-                }
+-            }
+-        );
+-        mFingerprintIdentify.init();
+-        return mFingerprintIdentify;
++    @ReactMethod
++    public void setDeviceCredentialAllowed(boolean allowed) {
++        mDeviceCredentialAllowed = allowed;
+     }
+ 
+     private String legacyGetErrorMessage() {
+-        if (!getFingerprintIdentify().isHardwareEnable()) {
+-            return "FingerprintScannerNotSupported";
+-        } else if (!getFingerprintIdentify().isRegisteredFingerprint()) {
+-            return "FingerprintScannerNotEnrolled";
+-        } else if (!getFingerprintIdentify().isFingerprintEnable()) {
+-            return "FingerprintScannerNotAvailable";
+-        }
++       
+ 
+         return null;
+     }
+@@ -283,41 +271,5 @@ public class ReactNativeFingerprintScannerModule
+             ReactNativeFingerprintScannerModule.this.release();
+             return;
+         }
+-
+-        getFingerprintIdentify().resumeIdentify();
+-        getFingerprintIdentify().startIdentify(MAX_AVAILABLE_TIMES, new IdentifyListener() {
+-            @Override
+-            public void onSucceed() {
+-                promise.resolve(true);
+-            }
+-
+-            @Override
+-            public void onNotMatch(int availableTimes) {
+-                if (availableTimes <= 0) {
+-                    mReactContext.getJSModule(RCTDeviceEventEmitter.class)
+-                            .emit("FINGERPRINT_SCANNER_AUTHENTICATION", "DeviceLocked");
+-
+-                } else {
+-                    mReactContext.getJSModule(RCTDeviceEventEmitter.class)
+-                            .emit("FINGERPRINT_SCANNER_AUTHENTICATION", "AuthenticationNotMatch");
+-                }
+-            }
+-
+-            @Override
+-            public void onFailed(boolean isDeviceLocked) {
+-                if(isDeviceLocked){
+-                    promise.reject("AuthenticationFailed", "DeviceLocked");
+-                } else {
+-                    promise.reject("AuthenticationFailed", TYPE_FINGERPRINT_LEGACY);
+-                }
+-                ReactNativeFingerprintScannerModule.this.release();
+-            }
+-
+-            @Override
+-            public void onStartFailedByDeviceLocked() {
+-                // the first start failed because the device was locked temporarily
+-                promise.reject("AuthenticationFailed", "DeviceLocked");
+-            }
+-        });
+     }
+ }
+diff --git a/node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.m b/node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.m
+index e29bad7..d760e01 100644
+--- a/node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.m
++++ b/node_modules/react-native-fingerprint-scanner/ios/ReactNativeFingerprintScanner.m
+@@ -65,10 +65,19 @@ @implementation ReactNativeFingerprintScanner
+         context.localizedFallbackTitle = @"";
+     }
+ 
++    __auto_type policy = LAPolicyDeviceOwnerAuthenticationWithBiometrics;
++
++    if (@available(iOS 9, *)) {
++        if (fallbackEnabled) {
++            policy = LAPolicyDeviceOwnerAuthentication;
++        }
++    }
++
++
+     // Device has FingerprintScanner
+-    if ([context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
++    if ([context canEvaluatePolicy:policy error:&error]) {
+         // Attempt Authentication
+-        [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
++        [context evaluatePolicy:policy
+                 localizedReason:reason
+                           reply:^(BOOL success, NSError *error)
+          {
+diff --git a/node_modules/react-native-fingerprint-scanner/package-lock.json b/node_modules/react-native-fingerprint-scanner/package-lock.json
+deleted file mode 100644
+index 1cc934c..0000000
+--- a/node_modules/react-native-fingerprint-scanner/package-lock.json
++++ /dev/null
+@@ -1,5 +0,0 @@
+-{
+-  "name": "react-native-fingerprint-scanner",
+-  "version": "4.0.0",
+-  "lockfileVersion": 1
+-}
+diff --git a/node_modules/react-native-fingerprint-scanner/react-native-fingerprint-scanner.podspec b/node_modules/react-native-fingerprint-scanner/react-native-fingerprint-scanner.podspec
+index e9fbd07..699fd80 100644
+--- a/node_modules/react-native-fingerprint-scanner/react-native-fingerprint-scanner.podspec
++++ b/node_modules/react-native-fingerprint-scanner/react-native-fingerprint-scanner.podspec
+@@ -3,19 +3,18 @@ require 'json'
+ package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
+ 
+ Pod::Spec.new do |s|
+-  s.name         = package['name']
++  s.name         = 'react-native-fingerprint-scanner'
+   s.version      = package['version']
+   s.summary      = package['description']
+   s.license      = package['license']
+-
+   s.authors      = package['author']
+   s.homepage     = package['homepage']
+-  s.platform     = :ios, "9.0"
++  s.platform     = :ios, "8.0"
+ 
+-  s.source          = { :git => "https://github.com/hieuvp/react-native-fingerprint-scanner.git", :tag => "v#{s.version}" }
++  s.source        = { :git => package['repository']['url'], :tag => s.version }
+   s.source_files    = 'ios/**/*.{h,m}'
+   s.preserve_paths  = '**/*.js'
+   s.framework       = 'LocalAuthentication'
+ 
+-  s.dependency 'React'
++  s.dependency 'React-Core'
+ end
 diff --git a/node_modules/react-native-fingerprint-scanner/react-native.config.js b/node_modules/react-native-fingerprint-scanner/react-native.config.js
 deleted file mode 100644
 index 5f794ab..0000000
@@ -15,3 +303,27 @@ index 5f794ab..0000000
 -    hooks: {},
 -  },
 -};
+diff --git a/node_modules/react-native-fingerprint-scanner/src/authenticate.android.js b/node_modules/react-native-fingerprint-scanner/src/authenticate.android.js
+index f01ae83..b2bcd40 100644
+--- a/node_modules/react-native-fingerprint-scanner/src/authenticate.android.js
++++ b/node_modules/react-native-fingerprint-scanner/src/authenticate.android.js
+@@ -38,7 +38,7 @@ const authLegacy = (onAttempt, resolve, reject) => {
+ 
+ const nullOnAttempt = () => null;
+ 
+-export default ({ title, subTitle, description, cancelButton, onAttempt }) => {
++export default ({ title, subTitle, description, cancelButton, onAttempt, deviceCredentialAllowed = false }) => {
+   return new Promise((resolve, reject) => {
+     if (!title) {
+       title = description ? description : "Log In";
+@@ -61,6 +61,10 @@ export default ({ title, subTitle, description, cancelButton, onAttempt }) => {
+       return authLegacy(onAttempt, resolve, reject);
+     }
+ 
++    if (Platform.Version >= 29 && deviceCredentialAllowed === true) {
++      ReactNativeFingerprintScanner.setDeviceCredentialAllowed(true);
++    }
++
+     return authCurrent(title, subTitle, description, cancelButton, resolve, reject);
+   });
+ }
