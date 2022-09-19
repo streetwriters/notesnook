@@ -405,13 +405,30 @@ class Sync {
   async checkConnection() {
     try {
       if (this.connection.state !== signalr.HubConnectionState.Connected) {
-        if (this.connection.state !== signalr.HubConnectionState.Disconnected)
+        if (this.connection.state !== signalr.HubConnectionState.Disconnected) {
           await this.connection.stop();
+        }
 
-        await this.connection.start();
+        await promiseTimeout(15000, this.connection.start());
       }
     } catch (e) {
+      this.connection.stop();
       this.logger.warn(e.message);
+      throw new Error(
+        "Could not connect to the Sync server. Please try again."
+      );
     }
   }
+}
+
+function promiseTimeout(ms, promise) {
+  // Create a promise that rejects in <ms> milliseconds
+  let timeout = new Promise((resolve, reject) => {
+    let id = setTimeout(() => {
+      clearTimeout(id);
+      reject(new Error("Sync timed out in " + ms + "ms."));
+    }, ms);
+  });
+  // Returns a race between our timeout and the passed in promise
+  return Promise.race([promise, timeout]);
 }
