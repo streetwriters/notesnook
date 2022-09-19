@@ -96,34 +96,29 @@ export const DateTime = Extension.create({
 });
 
 function currentTime() {
-  return new Date().toLocaleTimeString("en-US", {
-    second: undefined,
-    minute: "2-digit",
-    hour12: true,
-    hour: "2-digit"
+  return new Date().toLocaleTimeString(window.navigator.languages.slice(), {
+    hour: "2-digit",
+    minute: "2-digit"
   });
 }
 
 function currentDateTime() {
-  return `${getISO8601Date()}, ${currentTime()}`;
+  return `${currentDate()}, ${currentTime()}`;
 }
 
 function currentDate() {
-  return getISO8601Date();
-}
-
-function getISO8601Date(): string {
-  const year = new Date().getFullYear();
-  const month = new Date().getMonth() + 1;
-  const day = new Date().getDate();
-  return `${year}-${month}-${day}`;
+  return new Date().toLocaleDateString(window.navigator.languages.slice(), {
+    month: "long",
+    day: "2-digit",
+    year: "numeric"
+  });
 }
 
 function shortcutInputRule(config: {
   shortcut: string;
   replace: () => string;
 }) {
-  const regex = new RegExp(`(^| )${config.shortcut}(\\s)`);
+  const regex = new RegExp(`(^| )${config.shortcut}(\\s)`, "i");
   return textInputRule({
     find: regex,
     replace: (match) => {
