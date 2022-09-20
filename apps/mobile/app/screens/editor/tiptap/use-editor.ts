@@ -25,7 +25,8 @@ import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  openVault
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
 import { TipManager } from "../../../services/tip-manager";
@@ -33,7 +34,7 @@ import { useEditorStore } from "../../../stores/use-editor-store";
 import { useNoteStore } from "../../../stores/use-notes-store";
 import { useTagStore } from "../../../stores/use-tag-store";
 import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
-import { eOnLoadNote } from "../../../utils/events";
+import { eClearEditor, eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { timeConverter } from "../../../utils/time";
 import { NoteType } from "../../../utils/types";
@@ -49,6 +50,7 @@ import {
   makeSessionId,
   post
 } from "./utils";
+import { EVENTS } from "@notesnook/core/common";
 
 export const useEditor = (
   editorId = "",
@@ -71,6 +73,8 @@ export const useEditor = (
   const insets = useGlobalSafeAreaInsets();
   const isDefaultEditor = editorId === "";
   const saveCount = useRef(0);
+  const lastSuccessfulSaveTime = useRef<number>(0);
+  const lock = useRef(false);
 
   const postMessage = useCallback(
     async <T>(type: string, data: T) =>
@@ -154,6 +158,7 @@ export const useEditor = (
       saveCount.current = 0;
       useEditorStore.getState().setReadonly(false);
       postMessage(EditorEvents.title, "");
+      lastSuccessfulSaveTime.current = 0;
       await commands.clearContent();
       await commands.clearTags();
       if (resetState) {
@@ -245,6 +250,8 @@ export const useEditor = (
           note = db.notes?.note(id)?.data as Note;
           await commands.setStatus(timeConverter(note.dateEdited), "Saved");
 
+          lastSuccessfulSaveTime.current = note.dateEdited;
+
           if (
             saveCount.current < 2 ||
             currentNote.current?.title !== note.title ||
@@ -259,8 +266,8 @@ export const useEditor = (
             );
           }
         }
-        saveCount.current++;
 
+        saveCount.current++;
         return id;
       } catch (e) {
         console.log("Error saving note: ", e);
@@ -274,7 +281,8 @@ export const useEditor = (
     if (note.locked || note.content) {
       currentContent.current = {
         data: note.content?.data,
-        type: note.content?.type || "tiny"
+        type: note.content?.type || "tiptap",
+        noteId: currentNote.current?.id as string
       };
     } else {
       currentContent.current = await db.content?.raw(note.contentId);
@@ -299,6 +307,7 @@ export const useEditor = (
         sessionHistoryId.current = Date.now();
         await commands.setSessionId(nextSessionId);
         await commands.focus();
+        lastSuccessfulSaveTime.current = 0;
         useEditorStore.getState().setReadonly(false);
       } else {
         if (!item.forced && currentNote.current?.id === item.id) return;
@@ -306,6 +315,7 @@ export const useEditor = (
         overlay(true, item);
         currentNote.current && (await reset(false));
         await loadContent(item as NoteType);
+        lastSuccessfulSaveTime.current = item.dateEdited;
         const nextSessionId = makeSessionId(item as NoteType);
         sessionHistoryId.current = Date.now();
         setSessionId(nextSessionId);
@@ -347,6 +357,77 @@ export const useEditor = (
     }, 300);
   };
 
+  const lockNoteWithVault = useCallback((note: NoteType) => {
+    eSendEvent(eClearEditor);
+    openVault({
+      item: note,
+      novault: true,
+      locked: true,
+      goToEditor: true,
+      title: "Open note",
+      description: "Unlock note to open it in editor."
+    });
+  }, []);
+
+  const onSyncComplete = useCallback(
+    async (data: NoteType | Content) => {
+      if (!data) return;
+      const noteId = data.type === "tiptap" ? data.noteId : data.id;
+
+      if (!currentNote.current || noteId !== currentNote.current.id) return;
+      const isContentEncrypted = typeof (data as Content)?.data === "object";
+      const note = db.notes?.note(currentNote.current?.id).data as NoteType;
+      lock.current = true;
+
+      if (data.type === "tiptap") {
+        if (!currentNote.current.locked && isContentEncrypted) {
+          lockNoteWithVault(note);
+        } else if (currentNote.current.locked && isContentEncrypted) {
+          const decryptedContent = (await db.vault?.decryptContent(
+            data
+          )) as Content;
+          if (!decryptedContent) {
+            lockNoteWithVault(note);
+          } else {
+            await postMessage(EditorEvents.updatehtml, decryptedContent.data);
+            currentContent.current = decryptedContent;
+          }
+        } else {
+          const _nextContent = await db.content?.raw(note.contentId);
+          lastSuccessfulSaveTime.current = note.dateEdited;
+          if (_nextContent !== currentContent.current?.data) {
+            await postMessage(EditorEvents.updatehtml, _nextContent.data);
+            currentContent.current = _nextContent;
+          }
+        }
+      } else {
+        const note = data as NoteType;
+        if (note.title !== currentNote.current.title) {
+          postMessage(EditorEvents.title, note.title);
+        }
+        if (note.tags !== currentNote.current.tags) {
+          await commands.setTags(note);
+        }
+        await commands.setStatus(timeConverter(note.dateEdited), "Saved");
+      }
+
+      lock.current = false;
+    },
+    [commands, postMessage, lockNoteWithVault]
+  );
+
+  useEffect(() => {
+    const syncCompletedSubscription = db.eventManager?.subscribe(
+      EVENTS.syncItemMerged,
+      onSyncComplete
+    );
+    eSubscribeEvent(eOnLoadNote + editorId, loadNote);
+    return () => {
+      syncCompletedSubscription?.unsubscribe();
+      eUnSubscribeEvent(eOnLoadNote + editorId, loadNote);
+    };
+  }, [editorId, loadNote, onSyncComplete]);
+
   const saveContent = useCallback(
     ({
       title,
@@ -357,10 +438,12 @@ export const useEditor = (
       content?: string;
       type: string;
     }) => {
+      if (lock.current) return;
       if (type === EditorEvents.content) {
         currentContent.current = {
           data: content,
-          type: "tiptap"
+          type: "tiptap",
+          noteId: currentNote.current?.id as string
         };
       }
       const params = {

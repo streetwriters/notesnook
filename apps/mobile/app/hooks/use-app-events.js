@@ -213,14 +213,10 @@ export const useAppEvents = () => {
   }, []);
 
   const onSyncComplete = useCallback(async () => {
+    console.log('Sync complete');
     initAfterSync();
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseProgressDialog, "sync_progress");
-    let id = useEditorStore.getState().currentEditingNote;
-    let note = id && db.notes.note(id).data;
-    if (note) {
-      //await updateNoteInEditor();
-    }
   }, [setLastSynced]);
 
   const onUrlRecieved = useCallback(

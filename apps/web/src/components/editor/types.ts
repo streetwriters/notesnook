@@ -30,6 +30,7 @@ export interface IEditor {
   focus: () => void;
   undo: () => void;
   redo: () => void;
+  updateContent: (content: string) => void;
   attachFile: (file: Attachment) => void;
   loadImage: (hash: string, src: string) => void;
   sendAttachmentProgress: (

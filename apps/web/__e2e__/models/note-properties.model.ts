@@ -323,7 +323,6 @@ class SessionHistoryItemModel {
   async preview(password?: string) {
     await this.properties.open();
     const isLocked = await this.locked.isVisible();
-
     await this.locator.click();
     if (password && isLocked) {
       await fillPasswordDialog(this.page, password);

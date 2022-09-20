@@ -153,13 +153,14 @@ function TipTap(props: TipTapProps) {
         });
         if (onLoad) onLoad();
       },
-      onUpdate: ({ editor }) => {
-        if (!editor.isEditable) return;
+      onUpdate: ({ editor, transaction }) => {
+        const preventSave = transaction?.getMeta("preventSave") as boolean;
         const { id, sessionId } = editorstore.get().session;
         const content = editor.state.doc.content;
         const text = editor.view.dom.innerText;
 
         deferredSave(sessionId, text, () => {
+          if (!editor.isEditable || preventSave) return;
           const html = getHTMLFromFragment(content, editor.schema);
           onChange?.(id, sessionId, html);
         });
@@ -315,6 +316,21 @@ function toIEditor(editor: Editor): IEditor {
     focus: () => editor.current?.commands.focus("start"),
     undo: () => editor.current?.commands.undo(),
     redo: () => editor.current?.commands.redo(),
+    updateContent: (content) => {
+      const { from, to } = editor.state.selection;
+      editor.current
+        ?.chain()
+        .command(({ tr }) => {
+          tr.setMeta("preventSave", true);
+          return true;
+        })
+        .setContent(content, true)
+        .setTextSelection({
+          from,
+          to
+        })
+        .run();
+    },
     attachFile: (file: Attachment) => {
       if (file.dataurl) {
         editor.current?.commands.insertImage({ ...file, src: file.dataurl });

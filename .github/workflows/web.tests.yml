@@ -13,6 +13,8 @@ on:
     types:
       - "ready_for_review"
       - "opened"
+      - "synchronize"
+      - "reopened"
 
 jobs:
   test:

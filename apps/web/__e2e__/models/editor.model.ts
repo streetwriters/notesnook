@@ -115,6 +115,7 @@ export class EditorModel {
   async typeTitle(text: string, delay = 0) {
     await this.editAndWait(async () => {
       await this.title.focus();
+      await this.title.press("End");
       await this.title.type(text, { delay });
     });
   }
@@ -160,8 +161,12 @@ export class EditorModel {
 
   async setTags(tags: string[]) {
     for (const tag of tags) {
+      await this.tagInput.focus();
       await this.tagInput.fill(tag);
       await this.tagInput.press("Enter");
+      await this.tags
+        .locator(":scope", { hasText: new RegExp(`^${tag}$`) })
+        .waitFor();
     }
   }
 

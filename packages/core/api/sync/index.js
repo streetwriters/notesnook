@@ -381,11 +381,13 @@ class Sync {
    * @param {SyncTransferItem} syncStatus
    * @private
    */
-  onSyncItem(syncStatus) {
+  async onSyncItem(syncStatus) {
     const { item: itemJSON, itemType } = syncStatus;
     const item = JSON.parse(itemJSON);
 
-    return this.merger.mergeItem(itemType, item);
+    const remoteItem = await this.merger.mergeItem(itemType, item);
+    if (remoteItem)
+      this.db.eventManager.publish(EVENTS.syncItemMerged, remoteItem);
   }
 
   /**

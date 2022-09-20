@@ -74,14 +74,22 @@ class EditorStore extends BaseStore {
     });
   };
 
-  refresh = async () => {
-    const { id } = this.get().session;
-    await this.openSession(id, true);
-  };
-
   refreshTags = () => {
     this.set((state) => {
       state.session.tags = state.session.tags.slice();
+    });
+  };
+
+  updateSession = async (item) => {
+    this.set((state) => {
+      state.session.title = item.title;
+      state.session.tags = item.tags;
+      state.session.pinned = item.pinned;
+      state.session.favorite = item.favorite;
+      state.session.readonly = item.readonly;
+      state.session.dateEdited = item.dateEdited;
+      state.session.dateCreated = item.dateCreated;
+      state.session.locked = item.locked;
     });
   };
 
