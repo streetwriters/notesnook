@@ -149,7 +149,7 @@ export function isReactNative(): boolean {
   return !!window.ReactNativeWebView;
 }
 
-export function logger(type: "info" | "warn" | "error", ...logs: unknown[]) {
+export function logger(type: "info" | "warn" | "error", ...logs: unknown[]):void {
   const logString = logs
     .map((log) => {
       return typeof log !== "string" ? JSON.stringify(log) : log;
@@ -162,7 +162,7 @@ export function logger(type: "info" | "warn" | "error", ...logs: unknown[]) {
 export function post<T extends keyof typeof EventTypes>(
   type: typeof EventTypes[T],
   value?: unknown
-) {
+):void {
   if (isReactNative()) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({

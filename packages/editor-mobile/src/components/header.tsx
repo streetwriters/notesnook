@@ -65,7 +65,7 @@ export default function Header({
   settings: Settings;
   hasUndo: boolean;
   hasRedo: boolean;
-}) {
+}): JSX.Element {
   const insets = useSafeArea();
   return (
     <div

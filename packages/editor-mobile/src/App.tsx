@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import "./App.css";
 import Tiptap from "./components/editor";
 
-function App() {
+function App(): JSX.Element {
   return <Tiptap />;
 }
 

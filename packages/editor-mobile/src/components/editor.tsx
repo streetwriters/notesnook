@@ -297,7 +297,7 @@ const modifyToolbarTheme = (toolbarTheme: Theme) => {
   };
 };
 
-const TiptapProvider = () => {
+const TiptapProvider = (): JSX.Element => {
   const settings = useSettings();
   const theme = useEditorThemeStore((state) => state.colors);
   const toolbarTheme = useTheme({

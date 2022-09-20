@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { getDefaultPresets } from "@notesnook/editor";
 import { useState } from "react";
+import { Settings } from "../utils";
 
 const settingsJson = localStorage.getItem("editorSettings");
 const initialState = {
@@ -61,7 +62,7 @@ global.settingsController.previous.noHeader = globalThis.noHeader;
 global.settingsController.previous.noToolbar = globalThis.noToolbar;
 global.settingsController.previous.readonly = globalThis.readonly;
 
-export const useSettings = () => {
+export const useSettings = ():Settings => {
   const [settings, setSettings] = useState({
     ...global.settingsController.previous
   });

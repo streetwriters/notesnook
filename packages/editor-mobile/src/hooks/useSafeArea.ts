@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useState } from "react";
+import { SafeAreaType } from "../utils";
 
 const insetsStorage = localStorage.getItem("safeAreaInsets");
 const initialState =
@@ -42,7 +43,7 @@ global.safeAreaController = {
   previous: initialState
 };
 
-export const useSafeArea = () => {
+export const useSafeArea = ():SafeAreaType => {
   const [safeArea, setSafeArea] = useState(global.safeAreaController.previous);
   global.safeAreaController.set = setSafeArea;
 

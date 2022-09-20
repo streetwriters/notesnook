@@ -21,7 +21,7 @@ import { useRef, useState } from "react";
 import { EventTypes } from "../utils";
 import styles from "./styles.module.css";
 
-export default function Tags() {
+export default function Tags(): JSX.Element {
   const [tags, setTags] = useState<{ title: string; alias: string }[]>([]);
   const editorTags = useRef({
     setTags: setTags
