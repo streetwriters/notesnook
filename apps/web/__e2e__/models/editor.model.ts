@@ -161,9 +161,12 @@ export class EditorModel {
 
   async setTags(tags: string[]) {
     for (const tag of tags) {
+      await this.tagInput.focus();
       await this.tagInput.fill(tag);
       await this.tagInput.press("Enter");
-      await this.tags.locator(":scope", { hasText: tag }).waitFor();
+      await this.tags
+        .locator(":scope", { hasText: new RegExp(`^${tag}$`) })
+        .waitFor();
     }
   }
 
