@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Input } from "@theme-ui/components";
 import { useStore, store } from "../../stores/editor-store";
 import { debounceWithId } from "../../utils/debounce";
@@ -28,11 +28,16 @@ type TitleBoxProps = {
 
 function TitleBox(props: TitleBoxProps) {
   const { readonly } = props;
+  const inputRef = useRef<HTMLInputElement>(null);
   const title = useStore((store) => store.session.title);
+
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.value = title;
+  }, [title]);
 
   return (
     <Input
-      value={title}
+      ref={inputRef}
       variant="clean"
       data-test-id="editor-title"
       className="editorTitle"

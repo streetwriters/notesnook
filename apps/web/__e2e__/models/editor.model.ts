@@ -115,6 +115,7 @@ export class EditorModel {
   async typeTitle(text: string, delay = 0) {
     await this.editAndWait(async () => {
       await this.title.focus();
+      await this.title.press("End");
       await this.title.type(text, { delay });
     });
   }
