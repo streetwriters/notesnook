@@ -17,7 +17,9 @@
     "build-android": "cd native && detox build -c android.emu.release",
     "e2e-android": "cd native && detox test --configuration android.emu.release --detectOpenHandles",
     "e2e-ios": "cd native && detox test -c ios.sim.release --detectOpenHandles",
-    "bump": "npx react-native bump-version --skip-semver-for android"
+    "bump": "npx react-native bump-version --skip-semver-for android",
+    "release-android": "cd native/android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew bundleRelease --no-daemon",
+    "release-android-bundle": "cd native/android && ./gradlew bundleRelease --no-daemon"
   },
   "devDependencies": {
     "patch-package": "^6.4.7",
