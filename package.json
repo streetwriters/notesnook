@@ -4,8 +4,8 @@
   "scripts": {
     "prepare": "husky install && npm run bootstrap",
     "bootstrap": "lerna bootstrap --ignore=@notesnook/mobile --ignore=@notesnook/web -- --legacy-peer-deps",
-    "bootstrap:web": "lerna bootstrap --scope=@notesnook/web -- --legacy-peer-deps",
-    "bootstrap:mobile": "lerna bootstrap --scope=@notesnook/web -- --legacy-peer-deps",
+    "bootstrap:web": "lerna bootstrap --ignore=@notesnook/mobile -- --legacy-peer-deps",
+    "bootstrap:mobile": "lerna bootstrap --ignore=@notesnook/web -- --legacy-peer-deps",
     "build": "nx run-many --target=build --all --exclude=@notesnook/mobile,@notesnook/web",
     "build:web": "nx build @notesnook/web",
     "build:test:web": "nx build:test @notesnook/web",
