@@ -163,6 +163,7 @@ export class EditorModel {
     for (const tag of tags) {
       await this.tagInput.fill(tag);
       await this.tagInput.press("Enter");
+      await this.tags.locator(":scope", { hasText: tag }).waitFor();
     }
   }
 

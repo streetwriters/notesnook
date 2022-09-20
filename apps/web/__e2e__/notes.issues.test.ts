@@ -34,7 +34,6 @@ test("#1002 Can't add a tag that's a substring of an existing tag", async ({
   await notes.createNote(NOTE);
 
   await notes.editor.setTags(tags);
-  await page.waitForTimeout(200);
 
   const noteTags = await notes.editor.getTags();
   expect(noteTags).toHaveLength(tags.length);
