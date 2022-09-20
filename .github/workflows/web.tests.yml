@@ -17,11 +17,14 @@ on:
       - "reopened"
 
 jobs:
-  test:
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 16.x
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
@@ -37,28 +40,60 @@ jobs:
             packages/logger/package-lock.json
             packages/streamable-fs/package-lock.json
             packages/theme/package-lock.json
+
+      - name: Prepare environment
+        run: npm ci
+
+      - name: Generate test build
+        run: npm run build:test:web
+
+      - name: Archive build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: apps/web/build
+  test:
+    needs: build
+    name: 🧪 Test (${{ matrix.shard }}/${{ strategy.job-total }})
+    strategy:
+      matrix:
+        shard: [1,2,3]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      
+      - name: Install serve
+        run: npm i -g serve
+
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: ./apps/web/build
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: ./apps/web
+
       - name: Add environment variables
         run: |
           echo "USER_EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
           echo "CURRENT_USER_PASSWORD=${{ secrets.USER_PASSWORD }}" >> $GITHUB_ENV
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
-      - name: Prepare environment
-        run: npm ci
+      - name: Run tests
+        run: npm run test:web -- --shard=${{ matrix.shard }}/${{ strategy.job-total }})
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-        working-directory: ./apps/web
-
-      - name: Generate test build
-        run: npm run build:test:web
-
-      - name: Run all @notesnook/web tests
-        run: npm run test:web
-
-      - uses: actions/upload-artifact@v3
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: test-results
+          name: test-results-${{ matrix.shard }}
           path: apps/web/test-results
           retention-days: 5
