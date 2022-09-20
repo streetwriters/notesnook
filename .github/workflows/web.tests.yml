@@ -8,7 +8,7 @@ on:
     paths:
       - "apps/web/**"
       # re-run workflow if workflow file changes
-      - ".github/workflows/web.tests.yml" 
+      - ".github/workflows/web.tests.yml"
   pull_request:
     types:
       - "ready_for_review"
@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: |
             apps/mobile/package-lock.json
             apps/web/package-lock.json
@@ -59,7 +59,7 @@ jobs:
     name: 🧪 Test (${{ matrix.shard }}/${{ strategy.job-total }})
     strategy:
       matrix:
-        shard: [1,2,3]
+        shard: [1, 2, 3]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -69,7 +69,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      
+
       - name: Install packages
         run: npm i --ignore-scripts
 
@@ -81,7 +81,7 @@ jobs:
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-        working-directory: ./apps/web
+        working-directory: apps/web
 
       - name: Add environment variables
         run: |
@@ -90,7 +90,8 @@ jobs:
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Run tests
-        run: npm run test:web -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: npm run test -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        working-directory: apps/web
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
