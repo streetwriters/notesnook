@@ -17,10 +17,5 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-<<<<<<<< HEAD:apps/web/__e2e__/notes.issues.test.ts
-import { test } from "@playwright/test";
-test.skip("TODO: make sure jump to group works", () => {});
-========
 export * from "./open-link";
 export { OpenLink as default } from "./open-link";
->>>>>>>> master:packages/editor/src/extensions/open-link/index.ts
