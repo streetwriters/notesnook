@@ -43,7 +43,7 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --no-audit
+          npm i --ignore-scripts --no-audit
           npx lerna bootstrap --ignore=@notesnook/mobile -- --no-audit
 
       - name: Generate test build
@@ -72,7 +72,7 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --ignore-scripts --no-audit
+          npm i --ignore-scripts --no-audit
           npx lerna bootstrap --ignore=@notesnook/mobile -- --no-audit
 
       - name: Download build
