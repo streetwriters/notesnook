@@ -43,7 +43,7 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci
+          npm ci --no-audit
           npm run bootstrap:web
 
       - name: Generate test build
@@ -71,7 +71,9 @@ jobs:
           node-version: 16.x
 
       - name: Install packages
-        run: npm i --ignore-scripts
+        run: |
+          npm ci --no-audit
+          npm run bootstrap:web
 
       - name: Download build
         uses: actions/download-artifact@v3
@@ -90,8 +92,7 @@ jobs:
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Run tests
-        run: npm run test -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
-        working-directory: apps/web
+        run: npm run test:web -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
