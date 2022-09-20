@@ -72,6 +72,7 @@ const _SectionItem = ({ item }: { item: SettingSection }) => {
         flexDirection: "row",
         justifyContent: "space-between",
         paddingVertical: 20,
+        borderRadius:0,
         ...styles
       }}
       onPress={() => {
