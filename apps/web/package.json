@@ -99,7 +99,7 @@
     "start:desktop": "env-cmd -e all,desktop react-scripts start",
     "start:test": "serve -s build/ -p 3000",
     "build": "env-cmd -e all,web react-scripts --max_old_space_size=8092 build",
-    "build:test": "env-cmd -e all,dev,web,silent react-scripts build",
+    "build:test": "env-cmd -e all,dev,web,silent react-scripts build --test",
     "build:beta": "env-cmd -e all,web,beta react-scripts build",
     "build:profile": "env-cmd -e all,web react-scripts build --profile",
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
