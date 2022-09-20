@@ -41,9 +41,7 @@ jobs:
         run: cd apps/mobile/native/android && chmod +x ./gradlew
 
       - name: Build Android App Bundle
-        run: |
-          cd apps/mobile/native/android && ./gradlew bundleRelease --no-daemon
+        run: yarn release:android:bundle
 
       - name: Build Android App APKS
-        run: |
-          cd apps/mobile/native/android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew assembleRelease --no-daemon
+        run: yarn release:android
