@@ -30,7 +30,7 @@ import { ToastsModel } from "./toasts.model";
 import { TrashViewModel } from "./trash-view.model";
 
 export class AppModel {
-  private readonly page: Page;
+  readonly page: Page;
   readonly toasts: ToastsModel;
   readonly navigation: NavigationMenuModel;
   readonly auth: AuthModel;
@@ -102,5 +102,14 @@ export class AppModel {
         .isVisible()) ||
       (await this.page.locator(getTestId("sync-status-synced")).isVisible())
     );
+  }
+
+  async waitForSync(
+    state: "completed" | "synced" = "completed",
+    text?: string
+  ) {
+    await this.page
+      .locator(getTestId(`sync-status-${state}`), { hasText: text })
+      .waitFor({ state: "visible" });
   }
 }
