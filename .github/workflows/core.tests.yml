@@ -31,7 +31,7 @@ jobs:
 
       - name: Prepare environment
         run: |
-          npm ci
+          npm ci --no-audit
       - name: Add environment variables
         run: |
           echo "EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV

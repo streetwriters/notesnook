@@ -43,8 +43,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --no-audit
-          npm run bootstrap:web
+          npm ci --ignore-scripts --no-audit
+          npx lerna bootstrap --ignore=@notesnook/mobile -- --no-audit
 
       - name: Generate test build
         run: npm run build:test:web
@@ -72,8 +72,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm ci --no-audit
-          npm run bootstrap:web
+          npm ci --ignore-scripts --no-audit
+          npx lerna bootstrap --ignore=@notesnook/mobile -- --no-audit
 
       - name: Download build
         uses: actions/download-artifact@v3
