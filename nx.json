@@ -11,7 +11,7 @@
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/build"]
+      "outputs": ["{projectRoot}/build", "{projectRoot}/dist"]
     },
     "build:test": {
       "dependsOn": ["^build"],
