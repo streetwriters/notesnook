@@ -43,8 +43,8 @@ jobs:
 
       - name: Install packages
         run: |
-          npm i --ignore-scripts --no-audit
-          npx lerna bootstrap --ignore=@notesnook/mobile -- --no-audit
+          npm i --ignore-scripts --prefer-offline --no-audit
+          npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
 
       - name: Setup environment
         run: |
@@ -94,7 +94,7 @@ jobs:
 
       - name: Install packages
         run: |
-          npm i --ignore-scripts --no-audit
+          npm i --ignore-scripts --prefer-offline --no-audit
           npm install -D @playwright/test
 
       - name: Validate build extraction
