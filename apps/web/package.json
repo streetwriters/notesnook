@@ -62,7 +62,7 @@
     "zustand": "^3.3.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.24.1",
+    "@playwright/test": "^1.26.0",
     "@types/file-saver": "^2.0.5",
     "@types/hookrouter": "^2.2.5",
     "@types/node-fetch": "^2.5.10",
@@ -99,14 +99,13 @@
     "start:desktop": "env-cmd -e all,desktop react-scripts start",
     "start:test": "serve -s build/ -p 3000",
     "build": "env-cmd -e all,web react-scripts --max_old_space_size=8092 build",
-    "build:test": "env-cmd -e all,dev,web,silent react-scripts build",
+    "build:test": "env-cmd -e all,dev,web,silent react-scripts build --test",
     "build:beta": "env-cmd -e all,web,beta react-scripts build",
     "build:profile": "env-cmd -e all,web react-scripts build --profile",
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
     "debug": "env-cmd -e all,dev,web,silent react-scripts start",
     "test": "playwright test",
-    "test:all": "env-cmd -e test playwright test",
     "eject": "react-scripts eject",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "postinstall": "patch-package"
@@ -133,14 +132,5 @@
   },
   "volta": {
     "node": "16.15.1"
-  },
-  "nx": {
-    "targets": {
-      "build": {
-        "outputs": [
-          "{projectRoot}/build"
-        ]
-      }
-    }
   }
 }

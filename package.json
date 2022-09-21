@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "prepare": "husky install && npm run bootstrap",
-    "bootstrap": "lerna bootstrap -- --legacy-peer-deps",
+    "bootstrap": "lerna bootstrap -- --legacy-peer-deps --no-audit",
     "build": "nx run-many --target=build --all --exclude=@notesnook/mobile,@notesnook/web",
     "build:web": "nx build @notesnook/web",
     "build:test:web": "nx build:test @notesnook/web",
@@ -51,6 +51,7 @@
     "zx": "^7.0.8"
   },
   "dependencies": {
+    "@nrwl/nx-cloud": "^14.6.2",
     "eslint-plugin-header": "^3.1.1"
   }
 }
