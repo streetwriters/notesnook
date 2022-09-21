@@ -84,7 +84,12 @@ class Migrations {
         dbCollection: this._db.notes
       }
     ];
-    await this._migrator.migrate(collections, (item) => item, this.dbVersion);
+    await this._migrator.migrate(
+      this._db,
+      collections,
+      (item) => item,
+      this.dbVersion
+    );
     await this._db.storage.write("v", CURRENT_DATABASE_VERSION);
     this.dbVersion = CURRENT_DATABASE_VERSION;
   }

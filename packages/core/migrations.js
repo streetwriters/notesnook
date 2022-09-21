@@ -25,7 +25,10 @@ export const migrations = {
   5.1: {},
   5.2: {
     note: replaceDateEditedWithDateModified(),
-    notebook: replaceDateEditedWithDateModified(),
+    notebook: (item) => {
+      item = replaceDateEditedWithDateModified()(item);
+      return migrations["5.6"].notebook(item);
+    },
     tag: replaceDateEditedWithDateModified(true),
     attachment: replaceDateEditedWithDateModified(true),
     trash: replaceDateEditedWithDateModified(),
@@ -37,7 +40,10 @@ export const migrations = {
       item.data = removeToxClassFromChecklist(wrapTablesWithDiv(item.data));
       return migrations["5.3"].tiny(item);
     },
-    settings: replaceDateEditedWithDateModified(true)
+    settings: (item) => {
+      item = replaceDateEditedWithDateModified(true)(item);
+      return migrations["5.6"].settings(item);
+    }
   },
   5.3: {
     tiny: (item) => {
@@ -56,6 +62,28 @@ export const migrations = {
   },
   5.5: {},
   5.6: {
+    notebook: (item) => {
+      item.topics = item.topics.map((topic) => {
+        delete topic.notes;
+        return topic;
+      });
+      return item;
+    },
+    settings: async (item, db) => {
+      for (const pin of item.pins) {
+        await db.shortcuts.add({
+          item: {
+            type: pin.type,
+            id: pin.data.id,
+            notebookId: pin.data.notebookId
+          }
+        });
+      }
+      delete item.pins;
+      return item;
+    }
+  },
+  5.7: {
     note: false,
     shortcut: false,
     notebook: false,

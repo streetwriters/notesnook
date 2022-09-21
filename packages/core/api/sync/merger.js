@@ -125,7 +125,7 @@ class Merger {
     };
   }
 
-  _migrate(deserialized, version) {
+  async _migrate(deserialized, version) {
     // it is a locked note, bail out.
     if (deserialized.alg && deserialized.cipher) return deserialized;
 
@@ -146,7 +146,7 @@ class Merger {
 
     const migrate = migrations[version][type];
     if (migrate) {
-      return migrate(deserialized);
+      return await migrate(deserialized, this._db);
     }
     return deserialized;
   }
@@ -161,7 +161,7 @@ class Merger {
     deserialized.remote = true;
     deserialized.synced = true;
     if (!migrate) return deserialized;
-    return this._migrate(deserialized, item.v);
+    return await this._migrate(deserialized, item.v);
   }
 
   async _mergeItem(remoteItem, get, add) {
