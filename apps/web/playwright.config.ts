@@ -35,7 +35,7 @@ const config: PlaywrightTestConfig = {
   timeout: IS_CI ? 30000 : 15000,
   workers: IS_CI ? 2 : 2,
   reporter: "list",
-  retries: IS_CI ? 0 : 0,
+  retries: IS_CI ? 1 : 0,
   fullyParallel: true,
   preserveOutput: "failures-only",
   outputDir: "test-results",
