@@ -127,6 +127,13 @@ export class EditorModel {
     });
   }
 
+  async clear() {
+    await this.editAndWait(async () => {
+      await this.selectAll();
+      await this.content.press("Backspace");
+    });
+  }
+
   async editAndWait(action: () => Promise<void>) {
     const oldDateEdited = await this.getDateEdited();
     await action();
@@ -154,8 +161,7 @@ export class EditorModel {
 
   async selectAll() {
     await this.content.focus();
-    await this.page.keyboard.press("Home");
-    await this.page.keyboard.press("Shift+End");
+    await this.page.keyboard.press("Control+a");
     await this.page.waitForTimeout(500);
   }
 
