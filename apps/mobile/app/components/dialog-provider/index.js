@@ -35,7 +35,6 @@ import { Expiring } from "../premium/expiring";
 import SheetProvider from "../sheet-provider";
 import { AddNotebookSheet } from "../sheets/add-notebook";
 import AddToNotebookSheet from "../sheets/add-to";
-import ExportNotesSheet from "../sheets/export-notes";
 import ManageTagsSheet from "../sheets/manage-tags";
 import PublishNoteSheet from "../sheets/publish-note";
 import RateAppSheet from "../sheets/rate-app";
@@ -54,7 +53,6 @@ const DialogProvider = () => {
       <PremiumDialog colors={colors} />
       <AuthModal colors={colors} />
       <MergeConflicts />
-      <ExportNotesSheet />
       <RecoveryKeySheet colors={colors} />
       <SheetProvider />
       <SheetProvider context="sync_progress" />
