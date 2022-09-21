@@ -63,12 +63,15 @@ export const EditorWrapper = ({ width }) => {
   }, [loading]);
 
   const getMarginBottom = () => {
-    const bottomInsets = Platform.OS === "android" ? 14 : insets.bottom || 14;
+    const bottomInsets = Platform.OS === "android" ? 12 : insets.bottom || 14;
     if (!keyboard.keyboardShown) return bottomInsets / 1.5;
     if (Platform.isPad && !floating) return bottomInsets;
     if (Platform.OS === "ios") return bottomInsets / 1.5;
-    return bottomInsets;
+    return 0;
   };
+
+  const KeyboardAvoidingViewIOS =
+    Platform.OS === "ios" ? KeyboardAvoidingView : View;
 
   return (
     <View
@@ -77,17 +80,18 @@ export const EditorWrapper = ({ width }) => {
       style={{
         width: width[!introCompleted ? "mobile" : deviceMode]?.c,
         height: "100%",
+        minHeight: "100%",
         backgroundColor: colors.bg,
         borderLeftWidth: DDS.isTab ? 1 : 0,
         borderLeftColor: DDS.isTab ? colors.nav : "transparent"
       }}
     >
       {loading || !introCompleted ? null : (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        <KeyboardAvoidingViewIOS
+          behavior="padding"
           style={{
-            flex: 1,
-            marginBottom: getMarginBottom()
+            marginBottom: getMarginBottom(),
+            flex: 1
           }}
           enabled={!floating}
           keyboardVerticalOffset={0}
@@ -101,7 +105,7 @@ export const EditorWrapper = ({ width }) => {
           />
           <ProgressBar />
           <Editor key="editor" withController={true} />
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingViewIOS>
       )}
     </View>
   );
