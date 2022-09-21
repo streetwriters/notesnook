@@ -25,6 +25,7 @@ import {
 } from "./utils";
 import v52Backup from "./__fixtures__/backup.v5.2.json";
 import v52BackupCopy from "./__fixtures__/backup.v5.2.copy.json";
+import v56BackupCopy from "./__fixtures__/backup.v5.6.json";
 import { qclone } from "qclone";
 
 beforeEach(() => {
@@ -85,7 +86,8 @@ test("import tempered backup", () =>
 
 describe.each([
   ["v5.2", v52Backup],
-  ["v5.2 copy", v52BackupCopy]
+  ["v5.2 copy", v52BackupCopy],
+  ["v5.6", v56BackupCopy]
 ])("testing backup version: %s", (version, data) => {
   test(`import ${version} backup`, () => {
     return databaseTest().then(async (db) => {
@@ -94,10 +96,11 @@ describe.each([
       expect(db.settings.raw.id).toBeDefined();
       expect(db.settings.raw.dateModified).toBeDefined();
       expect(db.settings.raw.dateEdited).toBeUndefined();
+      expect(db.settings.raw.pins).toBeUndefined();
 
       expect(
         db.notes.all.every((v) => {
-          const doesNotHaveContent = v.contentId && !v.content;
+          const doesNotHaveContent = !v.content;
           const doesNotHaveColors = !v.colors && (!v.color || v.color.length);
           const hasTopicsInAllNotebooks =
             !v.notebooks ||
@@ -118,8 +121,14 @@ describe.each([
       ).toBeTruthy();
 
       expect(
+        db.notebooks.all.every((v) => v.topics.every((topic) => !topic.notes))
+      ).toBeTruthy();
+
+      expect(
         db.attachments.all.every((v) => v.dateModified > 0 && !v.dateEdited)
       ).toBeTruthy();
+
+      expect(db.shortcuts.all).toHaveLength(data.data.settings.pins.length);
 
       const allContent = await db.content.all();
       expect(

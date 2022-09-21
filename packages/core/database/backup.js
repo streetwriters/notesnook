@@ -132,6 +132,7 @@ export default class Backup {
 
     switch (version) {
       case CURRENT_DATABASE_VERSION:
+      case 5.6:
       case 5.5:
       case 5.4:
       case 5.3:
@@ -185,7 +186,12 @@ export default class Backup {
     ];
 
     await this._db.syncer.acquireLock(async () => {
-      await this._migrator.migrate(collections, (id) => data[id], version);
+      await this._migrator.migrate(
+        this._db,
+        collections,
+        (id) => data[id],
+        version
+      );
     });
   }
 
