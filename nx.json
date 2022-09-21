@@ -10,10 +10,12 @@
   },
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/build"]
     },
     "build:test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/build"]
     },
     "start": {
       "dependsOn": ["^build"]
