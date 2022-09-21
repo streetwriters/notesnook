@@ -111,7 +111,8 @@ jobs:
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Run tests
-        run: npm run test:web -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        working-directory: apps/web
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
