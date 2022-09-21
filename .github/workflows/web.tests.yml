@@ -95,12 +95,13 @@ jobs:
       - name: Install packages
         run: |
           npm i --ignore-scripts --no-audit
+          npm install -D @playwright/test
 
       - name: Validate build extraction
         run: ls -ld ./apps/web/build/index.html
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npx playwright install chromium --with-deps
         working-directory: apps/web
 
       - name: Add environment variables
@@ -110,8 +111,7 @@ jobs:
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Run tests
-        run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
-        working-directory: apps/web
+        run: npm run test:web -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
