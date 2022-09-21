@@ -85,7 +85,14 @@ export const NotebookHeader = ({ notebook, onEditNotebook }) => {
           alignItems: "center"
         }}
       >
-        <Heading size={SIZE.xxl}>{notebook.title}</Heading>
+        <Heading
+          style={{
+            flexShrink: 1
+          }}
+          size={SIZE.xxl}
+        >
+          {notebook.title}
+        </Heading>
 
         <View
           style={{
