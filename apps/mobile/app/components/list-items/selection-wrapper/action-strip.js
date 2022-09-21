@@ -47,7 +47,7 @@ export const ActionStrip = ({ note, setActionStrip }) => {
   const [width, setWidth] = useState(dWidth - 16);
   useEffect(() => {
     if (note.type === "note") return;
-    setIsPinnedToMenu(db.settings.isPinned(note.id));
+    setIsPinnedToMenu(db.shortcuts.exists(note.id));
   }, [note.id, note.type]);
 
   const updateNotes = () => {
@@ -117,26 +117,34 @@ export const ActionStrip = ({ note, setActionStrip }) => {
       onPress: async () => {
         try {
           if (isPinnedToMenu) {
-            await db.settings.unpin(note.id);
+            await db.shortcuts.remove(note.id);
             ToastEvent.show({
               heading: "Shortcut removed from menu",
               type: "success"
             });
           } else {
             if (note.type === "topic") {
-              await db.settings.pin(note.type, {
-                id: note.id,
-                notebookId: note.notebookId
+              await db.shortcuts.add({
+                item: {
+                  type: "topic",
+                  id: note.id,
+                  notebookId: note.notebookId
+                }
               });
             } else {
-              await db.settings.pin(note.type, { id: note.id });
+              await db.shortcuts.add({
+                item: {
+                  type: "notebook",
+                  id: note.id
+                }
+              });
             }
             ToastEvent.show({
               heading: "Shortcut added to menu",
               type: "success"
             });
           }
-          setIsPinnedToMenu(db.settings.isPinned(note.id));
+          setIsPinnedToMenu(db.shortcuts.exists(note.id));
           setMenuPins();
 
           setActionStrip(false);

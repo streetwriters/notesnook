@@ -41,9 +41,9 @@ const menuItems = [
   {
     key: "shortcut",
     title: ({ tag }) =>
-      db.settings.isPinned(tag.id) ? "Remove shortcut" : "Create shortcut",
+      db.shortcuts.exists(tag.id) ? "Remove shortcut" : "Create shortcut",
     icon: Icon.Shortcut,
-    onClick: ({ tag }) => appStore.pinItemToMenu(tag)
+    onClick: ({ tag }) => appStore.addToShortcuts(tag)
   },
   {
     key: "delete",

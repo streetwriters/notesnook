@@ -117,7 +117,7 @@ export default class Topics {
       if (!topic) continue;
 
       await topic.clear();
-      await this._db.settings.unpin(topicId);
+      await this._db.shortcuts.remove(topicId);
 
       const topicIndex = allTopics.findIndex(
         (t) => t.id === topicId || t.title === topicId

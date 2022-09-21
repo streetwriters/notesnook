@@ -46,6 +46,7 @@ import MFAManager from "./mfa-manager";
 import EventManager from "../utils/event-manager";
 import Pricing from "./pricing";
 import { logger } from "../logger";
+import Shortcuts from "../collections/shortcuts";
 
 /**
  * @type {EventSource}
@@ -139,6 +140,8 @@ class Database {
     this.attachments = await Attachments.new(this, "attachments");
     /**@type {NoteHistory} */
     this.noteHistory = await NoteHistory.new(this, "notehistory", false);
+    /**@type {Shortcuts} */
+    this.shortcuts = await Shortcuts.new(this, "shortcuts");
 
     this.trash = new Trash(this);
 

@@ -170,6 +170,10 @@ export default class Backup {
         dbCollection: this._db.content
       },
       {
+        index: data["shortcuts"],
+        dbCollection: this._db.shortcuts
+      },
+      {
         index: data["notes"],
         dbCollection: this._db.notes
       },

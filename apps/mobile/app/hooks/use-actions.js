@@ -62,7 +62,7 @@ export const useActions = ({ close = () => null, item }) => {
   const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
   const setMenuPins = useMenuStore((state) => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
-    db.settings.isPinned(item.id)
+    db.shortcuts.exists(item.id)
   );
   const user = useUserStore((state) => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
@@ -75,7 +75,7 @@ export const useActions = ({ close = () => null, item }) => {
     if (item.id === null) return;
     checkNotifPinned();
     if (item.type !== "note") {
-      setIsPinnedToMenu(db.settings.isPinned(item.id));
+      setIsPinnedToMenu(db.shortcuts.exists(item.id));
     }
   }, [checkNotifPinned, item]);
 
@@ -363,21 +363,29 @@ export const useActions = ({ close = () => null, item }) => {
     close();
     try {
       if (isPinnedToMenu) {
-        await db.settings.unpin(item.id);
+        await db.shortcuts.remove(item.id);
       } else {
         if (item.type === "topic") {
-          await db.settings.pin(item.type, {
-            id: item.id,
-            notebookId: item.notebookId
+          await db.shortcuts.add({
+            item: {
+              type: "topic",
+              id: item.id,
+              notebookId: item.notebookId
+            }
           });
         } else {
-          await db.settings.pin(item.type, { id: item.id });
+          await db.shortcuts.add({
+            item: {
+              type: item.type,
+              id: item.id
+            }
+          });
         }
       }
-      setIsPinnedToMenu(db.settings.isPinned(item.id));
+      setIsPinnedToMenu(db.shortcuts.exists(item.id));
       setMenuPins();
     } catch (e) {
-      console.error(e);
+      console.error("error", e);
     }
   }
 

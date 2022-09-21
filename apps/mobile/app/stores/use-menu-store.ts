@@ -34,11 +34,11 @@ export const useMenuStore = create<MenuStore>((set) => ({
   colorNotes: [],
   setMenuPins: () => {
     try {
-      set({ menuPins: db.settings?.pins || [] });
+      set({ menuPins: [...(db.shortcuts?.resolved as [])] });
     } catch (e) {
       setTimeout(() => {
         try {
-          set({ menuPins: db.settings?.pins || [] });
+          set({ menuPins: [...(db.shortcuts?.resolved as [])] });
         } catch (e) {
           console.error(e);
         }

@@ -64,12 +64,13 @@ export default Topics;
 function NotebookHeader({ notebook }) {
   const { title, description, topics, dateEdited } = notebook;
   const [isShortcut, setIsShortcut] = useState(false);
-  const menuPins = useAppStore((store) => store.menuPins);
-  const pinItemToMenu = useAppStore((store) => store.pinItemToMenu);
-  useEffect(() => {
-    setIsShortcut(menuPins.findIndex((p) => p.id === notebook.id) > -1);
-  }, [menuPins, notebook]);
+  const shortcuts = useAppStore((store) => store.shortcuts);
+  const addToShortcuts = useAppStore((store) => store.addToShortcuts);
   const totalNotes = getTotalNotes(notebook);
+
+  useEffect(() => {
+    setIsShortcut(shortcuts.findIndex((p) => p.id === notebook.id) > -1);
+  }, [shortcuts, notebook]);
 
   return (
     <Flex mx={2} my={2} sx={{ flexDirection: "column" }}>
@@ -83,7 +84,7 @@ function NotebookHeader({ notebook }) {
             mr={1}
             p={0}
             title={isShortcut ? "Remove shortcut" : "Create shortcut"}
-            onClick={() => pinItemToMenu(notebook)}
+            onClick={() => addToShortcuts(notebook)}
           >
             {isShortcut ? (
               <RemoveShortcutLink size={16} />

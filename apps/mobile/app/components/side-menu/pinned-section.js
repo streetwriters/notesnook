@@ -158,7 +158,7 @@ export const PinItem = React.memo(
               title="Remove Shortcut"
               type="error"
               onPress={async () => {
-                await db.settings.unpin(item.id);
+                await db.shortcuts.remove(item.id);
                 setVisible(false);
                 setMenuPins();
               }}
