@@ -46,6 +46,10 @@ jobs:
           npm i --ignore-scripts --no-audit
           npx lerna bootstrap --ignore=@notesnook/mobile -- --no-audit
 
+      - name: Setup environment
+        run: |
+          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
       - name: Generate test build
         run: npm run build:test:web
 

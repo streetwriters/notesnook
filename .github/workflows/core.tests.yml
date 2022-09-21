@@ -48,5 +48,7 @@ jobs:
           echo "EMAIL=${{ secrets.USER_EMAIL }}" >> $GITHUB_ENV
           echo "PASSWORD='${{ secrets.USER_PASSWORD }}'" >> $GITHUB_ENV
           echo "HASHED_PASSWORD=${{ secrets.USER_HASHED_PASSWORD }}" >> $GITHUB_ENV
+          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
       - name: Run all @notesnook/core tests
         run: npx nx test:e2e @notesnook/core

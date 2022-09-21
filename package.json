@@ -51,6 +51,7 @@
     "zx": "^7.0.8"
   },
   "dependencies": {
+    "@nrwl/nx-cloud": "^14.6.2",
     "eslint-plugin-header": "^3.1.1"
   }
 }
