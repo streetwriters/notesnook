@@ -37,7 +37,7 @@ import { useThemeStore } from "../../stores/use-theme-store";
 import { dHeight } from "../../utils";
 import { eOnLoadNote, eShowMergeDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import { timeConverter } from "../../utils/time";
+import { sleep, timeConverter } from "../../utils/time";
 import BaseDialog from "../dialog/base-dialog";
 import DialogButtons from "../dialog/dialog-buttons";
 import DialogContainer from "../dialog/dialog-container";
@@ -313,9 +313,10 @@ const MergeConflicts = () => {
               noToolbar
               readonly
               editorId=":conflictPrimary"
-              onLoad={() => {
+              onLoad={async () => {
                 const note = db.notes.note(content.current?.noteId)?.data;
                 if (!note) return;
+                await sleep(300);
                 eSendEvent(eOnLoadNote + ":conflictPrimary", {
                   ...note,
                   content: {
@@ -347,9 +348,10 @@ const MergeConflicts = () => {
               noToolbar
               readonly
               editorId=":conflictSecondary"
-              onLoad={() => {
+              onLoad={async () => {
                 const note = db.notes.note(content.current?.noteId)?.data;
                 if (!note) return;
+                await sleep(300);
                 eSendEvent(eOnLoadNote + ":conflictSecondary", {
                   ...note,
                   content: { ...content.current.conflicted, isPreview: true }

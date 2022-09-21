@@ -28,6 +28,7 @@ import Navigation from "../../services/navigation";
 import { useEditorStore } from "../../stores/use-editor-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { eCloseProgressDialog, eOnLoadNote } from "../../utils/events";
+import { sleep } from "../../utils/time";
 import DialogHeader from "../dialog/dialog-header";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
@@ -71,15 +72,20 @@ export default function NotePreview({ session, content }) {
     >
       <DialogHeader padding={12} title={session.session} />
       {!session.locked ? (
-        <>
+        <View
+          style={{
+            flex: 1
+          }}
+        >
           <EditorOverlay editorId={editorId} />
           <Editor
             noHeader
             noToolbar
             readonly
             editorId={editorId}
-            onLoad={() => {
+            onLoad={async () => {
               const note = db.notes.note(session.noteId)?.data;
+              await sleep(300);
               eSendEvent(eOnLoadNote + editorId, {
                 ...note,
                 content: {
@@ -89,7 +95,7 @@ export default function NotePreview({ session, content }) {
               });
             }}
           />
-        </>
+        </View>
       ) : (
         <View
           style={{
