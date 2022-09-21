@@ -55,11 +55,10 @@ function getNotebook(item) {
   if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
 
   return item.notebooks.reduce(function (prev, curr) {
-    if (prev) return prev;
+    if (prev && prev.length > 0) return prev;
     const topicId = curr.topics[0];
     const notebook = db.notebooks?.notebook(curr.id)?.data;
     if (!notebook) return;
-
     const topic = notebook.topics.find((t) => t.id === topicId);
     if (!topic) return;
 
