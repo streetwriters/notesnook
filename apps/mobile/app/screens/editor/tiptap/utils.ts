@@ -44,6 +44,7 @@ export function editorState() {
 
 export const EditorEvents: { [name: string]: string } = {
   html: "native:html",
+  updatehtml: "native:updatehtml",
   title: "native:title",
   theme: "native:theme",
   titleplaceholder: "native:titleplaceholder",

@@ -54,8 +54,7 @@ export const CHECK_IDS = {
   noteExport: "note:export",
   vaultAdd: "vault:add",
   notebookAdd: "notebook:add",
-  backupEncrypt: "backup:encrypt",
-  databaseSync: "database:sync"
+  backupEncrypt: "backup:encrypt"
 };
 
 export const EVENTS = {
@@ -70,6 +69,7 @@ export const EVENTS = {
   databaseSyncRequested: "db:syncRequested",
   syncProgress: "sync:progress",
   syncCompleted: "sync:completed",
+  syncItemMerged: "sync:itemMerged",
   databaseUpdated: "db:updated",
   databaseCollectionInitiated: "db:collectionInitiated",
   appRefreshRequested: "app:refreshRequested",

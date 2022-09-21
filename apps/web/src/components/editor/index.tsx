@@ -32,7 +32,6 @@ import Toolbar from "./toolbar";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { FlexScrollContainer } from "../scroll-container";
 import { formatDate } from "@notesnook/core/utils/date";
-import { debounceWithId } from "../../utils/debounce";
 import Tiptap from "./tiptap";
 import Header from "./header";
 import { Attachment } from "../icons";
@@ -59,14 +58,6 @@ function onEditorChange(noteId: string, sessionId: string, content: string) {
   });
 }
 
-function onTitleChange(noteId: string, title: string) {
-  if (!title) return;
-
-  editorstore.get().setTitle(noteId, title);
-}
-
-const debouncedOnTitleChange = debounceWithId(onTitleChange, 100);
-
 export default function EditorManager({
   noteId,
   nonce
@@ -83,9 +74,9 @@ export default function EditorManager({
   const [timestamp, setTimestamp] = useState<number>(0);
 
   const content = useRef<string>("");
-  const title = useRef<string>("");
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
+  const editorInstance = useEditorInstance();
 
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
@@ -93,14 +84,43 @@ export default function EditorManager({
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isPreviewSession = !!previewSession.current;
 
+  useEffect(() => {
+    const event = db.eventManager.subscribe(
+      EVENTS.syncItemMerged,
+      async (item?: Record<string, string>) => {
+        if (!item) return;
+
+        const { id, contentId, locked } = editorstore.get().session;
+        const isContent = item.type === "tiptap" && item.id === contentId;
+        const isNote = item.type === "note" && item.id === id;
+
+        if (isContent) {
+          if (locked) {
+            const result = await db.vault?.decryptContent(item).catch(() => {});
+            if (result) item.data = result.data;
+            else EV.publish(EVENTS.vaultLocked);
+          }
+
+          editorInstance.current?.updateContent(item.data);
+        } else if (isNote) {
+          if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
+
+          editorstore.get().updateSession(item);
+        }
+      }
+    );
+    return () => {
+      event.unsubscribe();
+    };
+  }, [editorInstance]);
+
   const openSession = useCallback(async (noteId: string | number) => {
     await editorstore.get().openSession(noteId);
 
-    const { getSessionContent, session } = editorstore.get();
+    const { getSessionContent } = editorstore.get();
     const sessionContent = await getSessionContent();
 
     previewSession.current = undefined;
-    title.current = session.title;
     content.current = sessionContent?.data;
     setTimestamp(Date.now());
   }, []);
@@ -123,7 +143,6 @@ export default function EditorManager({
     (async function () {
       await editorstore.newSession(nonce);
 
-      title.current = "";
       content.current = "";
       setTimestamp(Date.now());
     })();
@@ -147,6 +166,7 @@ export default function EditorManager({
         flexDirection: "column"
       }}
     >
+      {/* <UpdatesPendingNotice /> */}
       {previewSession.current && (
         <PreviewModeNotice
           {...previewSession.current}
@@ -155,7 +175,6 @@ export default function EditorManager({
       )}
       <Editor
         nonce={timestamp}
-        title={title.current}
         content={content.current}
         options={{
           readonly: isReadonly || isPreviewSession,
@@ -188,7 +207,6 @@ type EditorOptions = {
 };
 type EditorProps = {
   content: string;
-  title?: string;
   nonce?: number;
   options?: EditorOptions;
 };
@@ -268,7 +286,7 @@ export function Editor(props: EditorProps) {
 }
 
 function EditorChrome(props: PropsWithChildren<EditorProps>) {
-  const { title, nonce, options, children } = props;
+  const { options, children } = props;
   const { readonly, focusMode, headless, onRequestFocus } = options || {
     headless: false,
     readonly: false,
@@ -313,17 +331,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
               }}
             />
           )}
-          {title !== undefined ? (
-            <Titlebox
-              nonce={nonce}
-              readonly={readonly || false}
-              setTitle={(title) => {
-                const { sessionId, id } = editorstore.get().session;
-                debouncedOnTitleChange(sessionId, id, title);
-              }}
-              title={title}
-            />
-          ) : null}
+          <Titlebox readonly={readonly || false} />
           <Header readonly={readonly} />
           {children}
         </Flex>

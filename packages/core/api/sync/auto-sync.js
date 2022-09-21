@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { checkIsUserPremium, CHECK_IDS, EVENTS } from "../../common";
+import { EVENTS } from "../../common";
 import { logger } from "../../logger";
 
 export class AutoSync {
@@ -36,8 +36,6 @@ export class AutoSync {
 
   async start() {
     this.logger.info(`Auto sync requested`);
-
-    if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) return;
     if (this.isAutoSyncing) return;
 
     this.isAutoSyncing = true;
@@ -64,9 +62,16 @@ export class AutoSync {
     if (item && (item.remote || item.localOnly || item.failed)) return;
 
     clearTimeout(this.timeout);
+    // auto sync interval must not be 0 to avoid issues
+    // during data collection which works based on Date.now().
+    // It is required that the dateModified of an item should
+    // be a few milliseconds less than Date.now(). Setting sync
+    // interval to 0 causes a conflict where Date.now() & dateModified
+    // are equal causing the item to not be synced.
+    const interval = item && item.type === "tiptap" ? 100 : this.interval;
     this.timeout = setTimeout(() => {
       this.logger.info(`Sync requested by: ${id}`);
       this.db.eventManager.publish(EVENTS.databaseSyncRequested, false, false);
-    }, this.interval);
+    }, interval);
   }
 }

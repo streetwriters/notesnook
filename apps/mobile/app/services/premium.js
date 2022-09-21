@@ -159,9 +159,6 @@ const onUserStatusCheck = async (type) => {
           desc: "With Notesnook Pro you can add notes to your vault and do so much more! Get it now."
         };
         break;
-      case CHECK_IDS.databaseSync:
-        message = null;
-        break;
     }
 
     if (message) {
