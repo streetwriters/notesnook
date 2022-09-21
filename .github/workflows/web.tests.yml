@@ -69,6 +69,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: ./apps/web/build
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -89,13 +95,6 @@ jobs:
       - name: Install packages
         run: |
           npm i --ignore-scripts --no-audit
-          npx lerna bootstrap --ignore=@notesnook/mobile -- --ignore-scripts --no-audit --only=dev
-
-      - name: Download build
-        uses: actions/download-artifact@v3
-        with:
-          name: build
-          path: ./apps/web/build
 
       - name: Validate build extraction
         run: ls -ld ./apps/web/build/index.html
@@ -111,7 +110,8 @@ jobs:
           echo "CURRENT_USER_KEY=${{ secrets.USER_KEY }}" >> $GITHUB_ENV
 
       - name: Run tests
-        run: npm run test:web -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        run: npx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+        working-directory: apps/web
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
