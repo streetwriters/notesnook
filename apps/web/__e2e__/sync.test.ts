@@ -52,7 +52,7 @@ const NOTE = {
 test("edits in a note opened on 2 devices should sync in real-time", async ({
   browser
 }, info) => {
-  info.setTimeout(30 * 1000);
+  info.setTimeout(60 * 1000);
   const newContent = makeid(24).repeat(2);
 
   const [deviceA, deviceB] = await Promise.all([
@@ -68,19 +68,16 @@ test("edits in a note opened on 2 devices should sync in real-time", async ({
   const noteA = await notesA.findNote(NOTE);
   await Promise.all([noteA, noteB].map((note) => note?.openNote()));
 
-  const [beforeContentA, beforeContentB] = await Promise.all(
-    [notesA, notesB].map((notes) => notes?.editor.getContent("text"))
-  );
+  await notesB.editor.clear();
   await actAndSync([deviceA, deviceB], notesB.editor.setContent(newContent));
+
   const [afterContentA, afterContentB] = await Promise.all(
     [notesA, notesB].map((notes) => notes?.editor.getContent("text"))
   );
-
   expect(noteA).toBeDefined();
   expect(noteB).toBeDefined();
-  expect(beforeContentA).toBe(beforeContentB);
-  expect(afterContentA).toBe(`${newContent}${beforeContentA}`);
-  expect(afterContentB).toBe(`${newContent}${beforeContentB}`);
+  expect(afterContentA).toBe(newContent);
+  expect(afterContentB).toBe(newContent);
 });
 
 function makeid(length: number) {

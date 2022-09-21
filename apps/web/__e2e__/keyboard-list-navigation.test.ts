@@ -137,7 +137,9 @@ test("pressing Shift+ArrowUp should select previous note", async ({ page }) => {
 
 test("use Shift+ArrowUp & Shift+ArrowDown for note selection", async ({
   page
-}) => {
+}, info) => {
+  info.setTimeout(60 * 1000);
+
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
   // move focus 5 items down
@@ -187,7 +189,9 @@ test("use Shift+ArrowUp & Shift+ArrowDown for note selection", async ({
   expect(await notesList[5].isSelected()).toBeTruthy();
 });
 
-test("select notes using Control+Click", async ({ page }) => {
+test("select notes using Control+Click", async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
 
@@ -202,7 +206,9 @@ test("select notes using Control+Click", async ({ page }) => {
   }
 });
 
-test("select notes using Shift+Click downwards", async ({ page }) => {
+test("select notes using Shift+Click downwards", async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
 
@@ -216,7 +222,9 @@ test("select notes using Shift+Click downwards", async ({ page }) => {
   expect(await notesList[6].isSelected()).toBeFalsy();
 });
 
-test("select notes using Shift+Click upwards", async ({ page }) => {
+test("select notes using Shift+Click upwards", async ({ page }, info) => {
+  info.setTimeout(60 * 1000);
+
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
 

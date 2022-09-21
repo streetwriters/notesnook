@@ -74,14 +74,28 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
             }
           }
           notestore.refresh();
-          showToast(
-            "success",
-            `Added ${pluralize(noteIds.length, "note", "notes")} to ${pluralize(
-              selected.filter((a) => a.type === "add").length,
-              "topic",
-              "topics"
-            )}`
-          );
+          const addedTopics = selected.filter((a) => a.type === "add").length;
+          const removedTopics = selected.filter(
+            (a) => a.type === "remove"
+          ).length;
+          if (addedTopics)
+            showToast(
+              "success",
+              `Added ${pluralize(
+                noteIds.length,
+                "note",
+                "notes"
+              )} to ${pluralize(addedTopics, "topic", "topics")}`
+            );
+          if (removedTopics)
+            showToast(
+              "success",
+              `Removed ${pluralize(
+                noteIds.length,
+                "note",
+                "notes"
+              )} from ${pluralize(removedTopics, "topic", "topics")}`
+            );
           onClose(true);
         }
       }}

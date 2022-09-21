@@ -212,7 +212,7 @@ function NavigationMenu(props: NavigationMenuProps) {
                 {
                   key: "removeshortcut",
                   title: () => "Remove shortcut",
-                  onClick: async ({ item }: { item: { id: string } }) => {
+                  onClick: async () => {
                     await db.shortcuts?.remove(item.id);
                     refreshNavItems();
                   }
