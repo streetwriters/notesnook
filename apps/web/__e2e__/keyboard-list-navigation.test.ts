@@ -137,7 +137,9 @@ test("pressing Shift+ArrowUp should select previous note", async ({ page }) => {
 
 test("use Shift+ArrowUp & Shift+ArrowDown for note selection", async ({
   page
-}) => {
+}, info) => {
+  info.setTimeout(60 * 1000);
+
   const { notesList, notes } = await populateList(page, 10);
   await notes.focus();
   // move focus 5 items down
