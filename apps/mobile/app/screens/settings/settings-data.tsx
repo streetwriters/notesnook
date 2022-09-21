@@ -82,7 +82,7 @@ export const settingsGroups: SettingSection[] = [
           const user = current as User;
           const isBasic = user.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
           const isTrial = user.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-          return isBasic
+          return isBasic || !user.subscription?.type
             ? "Subscribe to Pro"
             : isTrial
             ? "Your free trial has started"
