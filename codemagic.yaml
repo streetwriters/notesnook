@@ -8,7 +8,6 @@ workflows:
         - appstore_credentials
         - certificate_credentials
         - provisioning_profile
-        - github_token
 
       vars:
         XCODE_WORKSPACE: "Notesnook.xcworkspace" # <-- Put the name of your Xcode workspace here
@@ -28,7 +27,7 @@ workflows:
           npm i
       - name: Install CocoaPods dependencies
         script: |
-          cd ios && pod install
+          yarn prepare:ios
       - name: Set up keychain to be used for codesigning using Codemagic CLI 'keychain' command
         script: |
           keychain initialize

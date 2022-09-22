@@ -47,6 +47,9 @@
     },
     "release-android-bundle": {
       "dependsOn": ["^build"]
+    },
+    "release-ios": {
+      "dependsOn": ["^build"]
     }
   }
 }
