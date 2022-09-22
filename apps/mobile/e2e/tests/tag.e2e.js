@@ -62,7 +62,7 @@ describe("Tags", () => {
     await notVisibleByText("#testtag");
   });
 
-  it("Creat shortcut of a tag", async () => {
+  it.only("Creat shortcut of a tag", async () => {
     await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
@@ -73,7 +73,9 @@ describe("Tags", () => {
     await device.pressBack();
     await device.pressBack();
     await navigate("Tags");
+    await sleep(500);
     await tapById(notesnook.ids.tag.menu);
+    await sleep(500);
     await tapByText("Add Shortcut");
     let menu = elementById(notesnook.ids.default.header.buttons.left);
     await menu.tap();
