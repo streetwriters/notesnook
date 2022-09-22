@@ -18,7 +18,7 @@
     "e2e-android": "cd native && detox test --configuration android.emu.release --detectOpenHandles",
     "e2e-ios": "cd native && detox test -c ios.sim.release --detectOpenHandles",
     "bump": "npx react-native bump-version --skip-semver-for android",
-    "release-android": "cd native/android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew bundleRelease --no-daemon",
+    "release-android": "cd native/android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew assembleRelease --no-daemon",
     "release-android-bundle": "cd native/android && ./gradlew bundleRelease --no-daemon",
     "release-ios": "xcode-project build-ipa --workspace 'native/ios/Notesnook.xcworkspace' --scheme '$XCODE_SCHEME'"
   },
