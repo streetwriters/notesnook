@@ -23,18 +23,9 @@ workflows:
       cache_paths:
         - $HOME/Library/Caches/CocoaPods
     scripts:
-      - name: Setup npmrc
-        script: |
-          echo "registry=https://npm.pkg.github.com" > .npmrc
-          echo "@streetwriters:registry=https://npm.pkg.github.com" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=$PACKAGES_TOKEN" >> .npmrc
-
-      - name: Setup yarnrc
-        script: echo "\"@streetwriters:registry\" \"https://npm.pkg.github.com\"" > .yarnrc
-
       - name: Install npm dependencies
         script: |
-          yarn install --network-concurrency 1
+          npm i
       - name: Install CocoaPods dependencies
         script: |
           cd ios && pod install
@@ -64,7 +55,7 @@ workflows:
         script: xcode-project use-profiles
       - name: Build ipa for distribution
         script: |
-          xcode-project build-ipa --workspace "$FCI_BUILD_DIR/ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
+          yarn release:ios
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
