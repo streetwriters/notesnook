@@ -86,7 +86,7 @@ jobs:
           tag_name: ${{ steps.package-version.outputs.current-version}}-android
           name: Notesnook Android v${{ steps.package-version.outputs.current-version}}
           repository: streetwriters/notesnook
-          token: ${{ secrets.NOTESNOOK_GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-arm64-v8a.apk
             apps/mobile/native/android/app/build/outputs/apk/release/notesnook-armeabi-v7a.apk
