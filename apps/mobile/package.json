@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "2.1.8",
+  "version": "2.2.0",
   "private": true,
   "workspaces": [
     "native/",

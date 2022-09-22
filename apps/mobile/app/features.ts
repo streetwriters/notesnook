@@ -19,4 +19,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { FeatureType } from "./components/sheets/new-feature";
 
-export const features: FeatureType[] = [];
+export const features: FeatureType[] = [
+  {
+    title: "Auto sync for all",
+    body: "We have enabled automatic sync for all users in this update. No need to run sync manually."
+  },
+  {
+    title: "Realtime sync updates",
+    body: "As soon as new changes arrive, any note opened in the editor will update automatically while maintaining cursor position."
+  },
+  {
+    title: "Quick actions & shortcuts",
+    body: "Long press on app icon to see shortcuts and quick actions. Currently we have added support for opening the editor for creating a new note from launcher."
+  },
+  {
+    title: "Splashscreen follows system theme",
+    body: "Previously the app would always show a white splashscreen on launch which was very uncomfortable for eyes at night. Splashscreen will follow system theme now."
+  }
+];
