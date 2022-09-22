@@ -1,5 +1,6 @@
-- Now you can disable double spaced lines in editor
-- Uploading full quality images is not supported.
-- Many bug fixes and performance improvements
+- Auto & real time sync enabled for all users
+- Added Quick actions & shortcuts to launcher
+- Splashscreen will now follow system theme
+- Many bug fixes and improvements
 
 Thank you for using Notesnook!
