@@ -49,7 +49,7 @@ jobs:
           releaseDirectory: apps/mobile/native/android/app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyStorePassword: ${{ secrets.KEY_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}        
 
       - name: Build apks for Github release
@@ -62,7 +62,7 @@ jobs:
           releaseDirectory: apps/mobile/native/android/app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.PUBLIC_SIGNING_KEY }}
           alias: ${{ secrets.PUBLIC_ALIAS }}
-          keyStorePassword: ${{ secrets.PUBLIC_KEY_STORE_PASSWORD }}
+          keyStorePassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}
           keyPassword: ${{ secrets.PUBLIC_KEY_PASSWORD }}    
 
       - name: Rename apk files
