@@ -280,6 +280,7 @@ export const useActions = ({ close = () => null, item }) => {
   }
 
   const checkNoteSynced = () => {
+    if (!user) return true;
     if (item.type !== "note" || item.itemType !== "note") return true;
     let isTrash = item.itemType === "note";
     if (!isTrash && !db.notes.note(item.id).synced()) {
