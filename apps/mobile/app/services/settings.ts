@@ -22,88 +22,10 @@ import Orientation from "react-native-orientation";
 import { enabled } from "react-native-privacy-snapshot";
 import { MMKV } from "../common/database/mmkv";
 import { SettingStore, useSettingStore } from "../stores/use-setting-store";
-import { ThemeStore } from "../stores/use-theme-store";
 import { AndroidModule } from "../utils";
 import { getColorScheme } from "../utils/color-scheme/utils";
 import { scale, updateSize } from "../utils/size";
 import { DDS } from "./device-detection";
-
-function migrate(settings: SettingStore["settings"]) {
-  if (settings.migrated) return true;
-
-  const introCompleted = MMKV.getString("introCompleted");
-
-  if (!introCompleted) {
-    settings.migrated = true;
-    set(settings);
-    return;
-  }
-
-  settings.introCompleted = true;
-  MMKV.removeItem("introCompleted");
-
-  let askForRating = MMKV.getString("askForRating");
-  if (askForRating) {
-    if (askForRating === "completed" || askForRating === "never") {
-      settings.rateApp = false;
-    } else {
-      askForRating = JSON.parse(askForRating);
-      settings.rateApp = (
-        askForRating as unknown as { timestamp: number }
-      ).timestamp;
-    }
-
-    MMKV.removeItem("askForRating");
-  }
-
-  let askForBackup = MMKV.getString("askForBackup");
-  if (askForBackup) {
-    askForBackup = JSON.parse(askForBackup);
-    settings.rateApp = (
-      askForBackup as unknown as { timestamp: number }
-    ).timestamp;
-    MMKV.removeItem("askForBackup");
-  }
-
-  const lastBackupDate = MMKV.getString("backupDate");
-  if (lastBackupDate) settings.lastBackupDate = parseInt(lastBackupDate);
-  MMKV.removeItem("backupDate");
-
-  const isUserEmailConfirmed = MMKV.getString("isUserEmailConfirmed");
-  if (isUserEmailConfirmed === "yes") settings.userEmailConfirmed = true;
-  if (isUserEmailConfirmed === "no") settings.userEmailConfirmed = false;
-
-  MMKV.removeItem("isUserEmailConfirmed");
-
-  const userHasSavedRecoveryKey = MMKV.getString("userHasSavedRecoveryKey");
-  if (userHasSavedRecoveryKey) settings.recoveryKeySaved = true;
-  MMKV.removeItem("userHasSavedRecoveryKey");
-
-  const accentColor = MMKV.getString("accentColor");
-  if (accentColor) settings.theme.accent = accentColor;
-  MMKV.removeItem("accentColor");
-
-  let theme = MMKV.getString("theme");
-  if (theme) {
-    theme = JSON.parse(theme);
-    if ((theme as unknown as ThemeStore["colors"]).night)
-      settings.theme.dark = true;
-    MMKV.removeItem("theme");
-  }
-  const backupStorageDir = MMKV.getString("backupStorageDir");
-  if (backupStorageDir)
-    settings.backupDirectoryAndroid = JSON.parse(backupStorageDir);
-  MMKV.removeItem("backupStorageDir");
-
-  const dontShowCompleteSheet = MMKV.getString("dontShowCompleteSheet");
-  if (dontShowCompleteSheet) settings.showBackupCompleteSheet = false;
-  MMKV.removeItem("dontShowCompleteSheet");
-
-  settings.migrated = true;
-  set(settings);
-
-  return true;
-}
 
 function init() {
   scale.fontScale = 1;
@@ -121,12 +43,10 @@ function init() {
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
   }
-  setTimeout(() => setPrivacyScreen(settings));
+  setTimeout(() => setPrivacyScreen(settings), 1);
   updateSize();
   useSettingStore.getState().setSettings({ ...settings });
-  migrate(settings);
   getColorScheme();
-  return;
 }
 
 function setPrivacyScreen(settings: SettingStore["settings"]) {

@@ -104,7 +104,7 @@ export const useSettingStore = create<SettingStore>((set) => ({
     showKeyboardOnOpen: false,
     fontScale: 1,
     forcePortraitOnTablet: false,
-    useSystemTheme: false,
+    useSystemTheme: true,
     reminder: "off",
     encryptedBackup: false,
     homepage: "Notes",
