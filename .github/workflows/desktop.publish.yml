@@ -1,6 +1,13 @@
 name: Publish @notesnook/desktop
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        type: boolean
+        required: true
+        default: false
+        description: "Release after successful build?"
 
 jobs:
   build:
@@ -91,7 +98,7 @@ jobs:
 
           # If the commit is tagged with a version (e.g. "v1.0.0"),
           # release the app after building
-          release: true
+          release: ${{ inputs.release }}
         env:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.api_key_id }}
