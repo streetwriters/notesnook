@@ -19,7 +19,6 @@
     "build:android": "nx build-android @notesnook/mobile",
     "release:android": "nx release-android @notesnook/mobile",
     "release:android:bundle": "nx release-android-bundle @notesnook/mobile",
-    "release:ios": "nx release-ios @notesnook/mobile",
     "test:ios": "nx e2e-ios @notesnook/mobile",
     "test:android": "nx e2e-android @notesnook/mobile",
     "start:metro": "nx start @notesnook/mobile",

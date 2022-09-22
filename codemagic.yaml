@@ -52,9 +52,12 @@ workflows:
           fi
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
+      - name: Build packages
+        script: |
+          yarn build
       - name: Build ipa for distribution
         script: |
-          yarn release:ios
+          xcode-project build-ipa --workspace "$FCI_BUILD_DIR/apps/mobile/native/ios/$XCODE_WORKSPACE" --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
