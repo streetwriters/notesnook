@@ -17,6 +17,10 @@
       "dependsOn": ["^build"],
       "outputs": ["{projectRoot}/build"]
     },
+    "build:desktop": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/build"]
+    },
     "start": {
       "dependsOn": ["^build"]
     },
