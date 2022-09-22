@@ -73,7 +73,6 @@ export default function EditorManager({
   // update.
   const [timestamp, setTimestamp] = useState<number>(0);
 
-  const content = useRef<string>("");
   const previewSession = useRef<PreviewSession>();
   const [dropRef, overlayRef] = useDragOverlay();
   const editorInstance = useEditorInstance();
@@ -116,12 +115,7 @@ export default function EditorManager({
 
   const openSession = useCallback(async (noteId: string | number) => {
     await editorstore.get().openSession(noteId);
-
-    const { getSessionContent } = editorstore.get();
-    const sessionContent = await getSessionContent();
-
     previewSession.current = undefined;
-    content.current = sessionContent?.data;
     setTimestamp(Date.now());
   }, []);
 
@@ -132,7 +126,7 @@ export default function EditorManager({
         previewSession.current.content,
         true
       );
-    } else if (noteId && content.current) {
+    } else if (noteId && editorstore.get().session.content) {
       await db.attachments?.downloadImages(noteId);
     }
   }, [noteId]);
@@ -143,7 +137,6 @@ export default function EditorManager({
     (async function () {
       await editorstore.newSession(nonce);
 
-      content.current = "";
       setTimestamp(Date.now());
     })();
   }, [isNewSession, nonce]);
@@ -175,7 +168,10 @@ export default function EditorManager({
       )}
       <Editor
         nonce={timestamp}
-        content={content.current}
+        content={
+          previewSession.current?.content?.data ||
+          editorstore.get().session?.content?.data
+        }
         options={{
           readonly: isReadonly || isPreviewSession,
           onRequestFocus: () => toggleProperties(false),
@@ -186,8 +182,6 @@ export default function EditorManager({
       {arePropertiesVisible && (
         <Properties
           onOpenPreviewSession={async (session: PreviewSession) => {
-            const { content: sessionContent } = session;
-            content.current = sessionContent.data;
             previewSession.current = session;
             setTimestamp(Date.now());
           }}

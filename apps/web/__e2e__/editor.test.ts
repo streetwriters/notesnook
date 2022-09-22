@@ -261,3 +261,18 @@ test("editing a note and toggling read-only mode should show updated content", a
     `readonly-edited-note.txt`
   );
 });
+
+test("creating a new note and toggling read-only mode should not empty editor content", async ({
+  page
+}) => {
+  const app = new AppModel(page);
+  await app.goto();
+  const notes = await app.goToNotes();
+  const note = await notes.createNote(NOTE);
+
+  await note?.properties.readonly();
+
+  expect(await note?.properties.isReadonly()).toBeTruthy();
+  expect(await notes.editor.getContent("text")).not.toHaveLength(0);
+  expect(await notes.editor.getContent("text")).toBe(NOTE.content);
+});

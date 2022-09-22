@@ -134,11 +134,13 @@ class EditorStore extends BaseStore {
     if (note.conflicted)
       return hashNavigate(`/notes/${noteId}/conflict`, { replace: true });
 
+    const content = await db.content.raw(note.contentId);
     this.set((state) => {
       const defaultSession = getDefaultSession(note.dateEdited);
       state.session = {
         ...defaultSession,
         ...note,
+        content,
         state: SESSION_STATES.new,
         attachmentsLength: db.attachments.ofNote(note.id, "all")?.length || 0
       };
@@ -194,11 +196,14 @@ class EditorStore extends BaseStore {
         attachmentStore.refresh();
       }
 
+      if (session.content) {
+        this.get().session.content = session.content;
+      }
       this.set((state) => {
         if (!!state.session.id && state.session.id !== note.id) return;
 
         for (let key in session) {
-          if (key === "content" && !state.session.locked) continue;
+          if (key === "content") continue;
           state.session[key] = session[key];
         }
 
@@ -266,18 +271,6 @@ class EditorStore extends BaseStore {
     return this.saveSession(noteId, { sessionId, content });
   };
 
-  getSessionContent = async () => {
-    const session = this.get().session;
-    switch (session.sessionType) {
-      case "default":
-        return await db.content.raw(session.contentId);
-      case "locked":
-        return session.content;
-      default:
-        return;
-    }
-  };
-
   setTag = (tag) => {
     return this._setTag(tag);
   };
@@ -338,7 +331,3 @@ class EditorStore extends BaseStore {
  */
 const [useStore, store] = createStore(EditorStore);
 export { useStore, store, SESSION_STATES };
-
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

@@ -32,7 +32,7 @@ const config: PlaywrightTestConfig = {
   testDir: "__e2e__",
 
   // Each test is given 30 seconds
-  timeout: IS_CI ? 30000 : 15000,
+  timeout: 30000,
   workers: IS_CI ? 2 : 2,
   reporter: "list",
   retries: IS_CI ? 1 : 0,
