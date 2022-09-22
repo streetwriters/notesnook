@@ -90,7 +90,7 @@ jobs:
           package_root: ./apps/web/desktop
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.GH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           build_script_name: "build"
           # macOS code signing certificate
           mac_certs: ${{ secrets.mac_certs }}
