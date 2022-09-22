@@ -111,7 +111,8 @@
     },
     "win": {
       "target": [
-        "nsis"
+        "nsis",
+        "portable"
       ],
       "icon": "assets/icons/app.ico"
     },
