@@ -24,7 +24,15 @@ import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
 import { isTesting } from "../../utils/platform";
 import { useEffect } from "react";
-import { ArrowRight, Checkmark, Icon, Warn, Date } from "../icons";
+import {
+  ArrowRight,
+  Checkmark,
+  Icon,
+  Warn,
+  Sync,
+  Edit,
+  Github
+} from "../icons";
 
 type CallToAction = {
   title: string;
@@ -91,20 +99,32 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            icon: Date,
-            title: "Shortcuts for adding current date in a note",
+            icon: Github,
+            title: "Notesnook is now open source!",
             subtitle: (
               <>
-                You can now use <Code text="Alt+d" /> or type{" "}
-                <Code text="/date" />
-                to add current date directly in a note.
-                <br />
-                To add current time, use <Code text="Alt+t" /> or type{" "}
-                <Code text="/time" />.<br />
-                To add current date <em>and time</em> use{" "}
-                <Code text="Ctrl+Alt+d" /> or just type <Code text="/now" />.
+                {
+                  "If you didn't know already, we have gone fully open source! You can check out our source code "
+                }
+                <a href="https://github.com/streetwriters/notesnook">here</a>.
+                Be sure to leave a star!
               </>
             )
+          },
+          {
+            icon: Sync,
+            title: "Auto sync is now available for all users free or pro!"
+          },
+          {
+            icon: Edit,
+            title: "Editor now supports full real-time syncing",
+            subtitle:
+              "This means you no longer have to reopen a note to see the edits you made. And it works for locked notes too!"
+          },
+          {
+            title: "Lots of sync reliability improvements",
+            subtitle:
+              "We have fixed errors such as 'Some notes of this topic are not synced' & other issues like shortcuts suddenly disappearing etc."
           }
         ],
     cta: {
