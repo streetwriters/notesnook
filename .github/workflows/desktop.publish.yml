@@ -1,0 +1,98 @@
+name: Publish @notesnook/desktop
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: "npm"
+          cache-dependency-path: |
+            apps/mobile/package-lock.json
+            apps/web/package-lock.json
+            packages/core/package-lock.json
+            packages/crypto/package-lock.json
+            packages/crypto-worker/package-lock.json
+            packages/editor-mobile/package-lock.json
+            packages/editor/package-lock.json
+            packages/logger/package-lock.json
+            packages/streamable-fs/package-lock.json
+            packages/theme/package-lock.json
+
+      - name: Install packages
+        run: |
+          npm i --ignore-scripts --prefer-offline --no-audit
+          npx lerna bootstrap --ignore=@notesnook/mobile -- --prefer-offline --no-audit
+
+      - name: Setup environment
+        run: |
+          echo "NX_CLOUD_ACCESS_TOKEN=${{ secrets.NX_CLOUD_ACCESS_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Generate desktop build
+        run: npx nx build:desktop @notesnook/web
+
+      - name: Archive build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: apps/web/build/**/*
+
+  publish:
+    name: Publish
+    needs: build
+    runs-on: ${{ matrix.os }}
+
+    # Platforms to build on/for
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: ./apps/web/desktop/build
+
+      - name: Prepare for app notarization (macOS)
+        if: startsWith(matrix.os, 'macos')
+        # Import Apple API key for app notarization on macOS
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@master
+        with:
+          package_root: ./apps/web/desktop
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.GH_TOKEN }}
+          build_script_name: "build"
+          # macOS code signing certificate
+          mac_certs: ${{ secrets.mac_certs }}
+          mac_certs_password: ${{ secrets.mac_certs_password }}
+
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: true
+        env:
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.api_key_id }}
+          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
