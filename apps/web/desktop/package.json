@@ -38,7 +38,7 @@
     "appId": "com.streetwriters.notesnook",
     "productName": "Notesnook",
     "copyright": "Copyright © 2022 Streetwriters (Private) Ltd.",
-    "artifactName": "notesnook_${arch}.${ext}",
+    "artifactName": "notesnook_${os}_${arch}.${ext}",
     "files": [
       "!*.chunk.js.map",
       "!*.chunk.js.LICENSE.txt",
@@ -115,6 +115,9 @@
         "portable"
       ],
       "icon": "assets/icons/app.ico"
+    },
+    "portable": {
+      "artifactName": "notesnook_${os}_${arch}_portable.${ext}"
     },
     "nsis": {
       "oneClick": true,

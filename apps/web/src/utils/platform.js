@@ -77,33 +77,37 @@ export function getDownloadLink(platform) {
       return [
         {
           type: "Download .dmg (x64)",
-          link: `${baseurl}/notesnook_x64.dmg`
+          link: `${baseurl}/notesnook_mac_x64.dmg`
         },
         {
           type: "Download .dmg (arm64)",
-          link: `${baseurl}/notesnook_arm64.dmg`
+          link: `${baseurl}/notesnook_mac_arm64.dmg`
         }
       ];
     case "Windows":
       return [
         {
           type: "Download .exe (x64)",
-          link: `${baseurl}/notesnook_x64.exe`
+          link: `${baseurl}/notesnook_win_x64.exe`
+        },
+        {
+          type: "Download portable .exe (x64)",
+          link: `${baseurl}/notesnook_win_x64_portable.exe`
         }
       ];
     case "Linux":
       return [
         {
           type: "Download .AppImage",
-          link: `${baseurl}/notesnook_x86_64.AppImage`
+          link: `${baseurl}/notesnook_linux_x86_64.AppImage`
         },
         {
           type: "Download .deb",
-          link: `${baseurl}/notesnook_amd64.deb`
+          link: `${baseurl}/notesnook_linux_amd64.deb`
         },
         {
           type: "Download .rpm",
-          link: `${baseurl}/notesnook_x86_64.rpm`
+          link: `${baseurl}/notesnook_linux_x86_64.rpm`
         }
       ];
     default:
