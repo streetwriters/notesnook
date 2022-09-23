@@ -77,6 +77,12 @@ jobs:
           name: build
           path: ./apps/web/desktop/build
 
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+        if: startsWith(matrix.os, 'linux')
+        with:
+          snapcraft_token: ${{ secrets.snapcraft_token }}
+
       - name: Prepare for app notarization (macOS)
         if: startsWith(matrix.os, 'macos')
         # Import Apple API key for app notarization on macOS

@@ -127,12 +127,18 @@
       "target": [
         "AppImage",
         "deb",
-        "rpm"
+        "rpm",
+        "snap"
       ],
       "category": "Office",
       "icon": "assets/icons/app.icns",
       "description": "Your private note taking space",
       "executableName": "Notesnook"
+    },
+    "snap": {
+      "autoStart": false,
+      "confinement": "strict",
+      "allowNativeWayland": true
     },
     "extraResources": [
       "./assets/**"
@@ -141,10 +147,18 @@
       "buildResources": "assets",
       "output": "./dist/"
     },
-    "publish": {
-      "provider": "github",
-      "repo": "notesnook",
-      "owner": "streetwriters"
-    }
+    "publish": [
+      {
+        "provider": "github",
+        "repo": "notesnook",
+        "owner": "streetwriters"
+      },
+      {
+        "provider": "snapStore",
+        "repo": "notesnook",
+        "channels": "stable",
+        "publishAutoUpdate": false
+      }
+    ]
   }
 }
