@@ -76,12 +76,13 @@ jobs:
         run: |
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
-          echo "CSC_LINK=${{ secrets.mac_certs }}" >> $GITHUB_ENV
-          echo "CSC_KEY_PASSWORD=${{ secrets.mac_certs_password }}" >> $GITHUB_ENV
-          echo "API_KEY_ID=${{ secrets.api_key_id }}" >> $GITHUB_ENV
-          echo "API_KEY_ISSUER_ID=${{ secrets.api_key_issuer_id }}" >> $GITHUB_ENV
 
       - name: Deploy to Testflight
+        env:
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+          API_KEY_ID: ${{ secrets.api_key_id }}
+          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
         run: |
           apple_app_id=$(cat package.json | jq .mac.appId | cut -d '"' -f 2)
           app_bundle_id=$(cat package.json | jq .mac.bundleId | cut -d '"' -f 2)
