@@ -52,15 +52,10 @@ jobs:
           name: build
           path: apps/web/build/**/*
 
-  publish:
-    name: Publish
+  build-macos:
+    name: Build macOS
     needs: build
-    runs-on: ${{ matrix.os }}
-
-    # Platforms to build on/for
-    strategy:
-      matrix:
-        os: [macos-12]
+    runs-on: macos-12
 
     steps:
       - name: Check out Git repository
@@ -77,56 +72,16 @@ jobs:
           name: build
           path: ./apps/web/desktop/build
 
-      - name: Setup Snapcraft Auth
-        run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
-
-      - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
-        if: startsWith(matrix.os, 'ubuntu')
-
-      - name: Prepare for app notarization (macOS)
-        if: startsWith(matrix.os, 'macos')
-        # Import Apple API key for app notarization on macOS
+      - name: Setup notarization & signing
         run: |
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
-
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@master
-        with:
-          package_root: ./apps/web/desktop
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script_name: "build"
-          # macOS code signing certificate
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
-
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ inputs.release }}
-        env:
-          # macOS notarization API key
-          API_KEY_ID: ${{ secrets.api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
-
-      - name: Publish on Snapcraft
-        if: startsWith(matrix.os, 'ubuntu')
-        run: |
-          version=$(cat package.json | jq .version | cut -d '"' -f 2)
-          is_published=$(snapcraft status notesnook | grep "${version}" | grep "stable" | wc -l)
-
-          if [ ! $is_published -eq 1 ]
-          then
-              snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
-          else
-              echo "Already published."
-          fi
-        working-directory: ./apps/web/desktop
+          echo "CSC_LINK=${{ secrets.mac_certs }}" >> $GITHUB_ENV
+          echo "CSC_KEY_PASSWORD=${{ secrets.mac_certs_password }}" >> $GITHUB_ENV
+          echo "API_KEY_ID=${{ secrets.api_key_id }}" >> $GITHUB_ENV
+          echo "API_KEY_ISSUER_ID=${{ secrets.api_key_issuer_id }}" >> $GITHUB_ENV
 
       - name: Deploy to Testflight
-        if: startsWith(matrix.os, 'macos')
         run: |
           apple_app_id=$(cat package.json | jq .mac.appId | cut -d '"' -f 2)
           app_bundle_id=$(cat package.json | jq .mac.bundleId | cut -d '"' -f 2)
@@ -141,4 +96,58 @@ jobs:
           echo "Uploading ${file} using altool..."
 
           xcrun altool --upload-package --type osx --file "${file}" --apiKey ${{ secrets.api_key }} --apiIssuer ${{ secrets.api_key_id }} --apple-id "${apple_app_id}" --bundle-id "${app_bundle_id}" --bundle-short-version-string "${app_version}" --bundle-version "${bundle_version}"
-        working-directory: ./apps/web/desktop
+        working-directory: ./apps/web/desktop     
+  # publish:
+  #   name: Publish
+  #   needs: build
+  #   runs-on: ${{ matrix.os }}
+
+  #   # Platforms to build on/for
+  #   strategy:
+  #     matrix:
+  #       os: [macos-12]
+
+  #   steps:
+      # - name: Check out Git repository
+      #   uses: actions/checkout@v3
+
+      # - name: Setup Node
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 16.x
+
+      # - name: Download build
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: build
+      #     path: ./apps/web/desktop/build
+
+  #     - name: Setup Snapcraft Auth
+  #       if: startsWith(matrix.os, 'ubuntu')
+  #       run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
+
+  #     - name: Install Snapcraft
+  #       uses: samuelmeuli/action-snapcraft@v1
+  #       if: startsWith(matrix.os, 'ubuntu')
+
+
+
+      # - name: Build (macOS)
+      #   if: startsWith(matrix.os, 'macos')
+      #   run: |
+          
+
+  #     - name: Publish on Snapcraft
+  #       if: startsWith(matrix.os, 'ubuntu')
+  #       run: |
+  #         version=$(cat package.json | jq .version | cut -d '"' -f 2)
+  #         is_published=$(snapcraft status notesnook | grep "${version}" | grep "stable" | wc -l)
+
+  #         if [ ! $is_published -eq 1 ]
+  #         then
+  #             snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
+  #         else
+  #             echo "Already published."
+  #         fi
+  #       working-directory: ./apps/web/desktop
+
