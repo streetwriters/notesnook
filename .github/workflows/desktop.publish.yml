@@ -114,9 +114,6 @@ jobs:
       - name: Publish on Snapcraft
         if: startsWith(matrix.os, 'ubuntu')
         run: |
-          echo "Installing jq..."
-          sudo apt-get install jq
-
           version=$(cat package.json | jq .version | cut -d '"' -f 2)
           is_published=$(snapcraft status notesnook | grep "${version}" | grep "stable" | wc -l)
 
@@ -131,9 +128,6 @@ jobs:
       - name: Deploy to Testflight
         if: startsWith(matrix.os, 'macos')
         run: |
-          echo "Installing jq..."
-          brew install jq
-
           apple_app_id=$(cat package.json | jq .mac.appId | cut -d '"' -f 2)
           app_bundle_id=$(cat package.json | jq .mac.bundleId | cut -d '"' -f 2)
           app_version=$(cat package.json | jq .version | cut -d '"' -f 2)
