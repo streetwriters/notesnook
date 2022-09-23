@@ -34,6 +34,11 @@
     "email": "support@streetwriters.co",
     "url": "https://streetwriters.co"
   },
+  "mac": {
+    "bundleId": "com.streetwriters.notesnook",
+    "bundleVersion": "1",
+    "appId": "1544027013"
+  },
   "build": {
     "appId": "com.streetwriters.notesnook",
     "productName": "Notesnook",

@@ -113,5 +113,38 @@ jobs:
 
       - name: Publish on Snapcraft
         if: startsWith(matrix.os, 'ubuntu')
-        run: snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
+        run: |
+          echo "Installing jq..."
+          sudo apt-get install jq
+
+          version=$(cat package.json | jq .version | cut -d '"' -f 2)
+          is_published=$(snapcraft status notesnook | grep "${version}" | grep "stable" | wc -l)
+
+          if [ ! $is_published -eq 1 ]
+          then
+              snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
+          else
+              echo "Already published."
+          fi
+        working-directory: ./apps/web/desktop
+
+      - name: Deploy to Testflight
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          echo "Installing jq..."
+          brew install jq
+
+          apple_app_id=$(cat package.json | jq .mac.appId | cut -d '"' -f 2)
+          app_bundle_id=$(cat package.json | jq .mac.bundleId | cut -d '"' -f 2)
+          app_version=$(cat package.json | jq .version | cut -d '"' -f 2)
+          bundle_version=$(cat package.json | jq .mac.bundleVersion | cut -d '"' -f 2)
+
+          echo "Building package ${app_version} ${bundle_version} ..."
+          npx electron-builder --mac mas --universal -p never
+          
+          file=$(find ./dist/mas-universal/notesnook*.pkg)
+
+          echo "Uploading ${file} using altool..."
+
+          xcrun altool --upload-package --type osx --file "${file}" --apiKey ${{ secrets.api_key }} --apiIssuer ${{ secrets.api_key_id }} --apple-id "${apple_app_id}" --bundle-id "${app_bundle_id}" --bundle-short-version-string "${app_version}" --bundle-version "${bundle_version}"
         working-directory: ./apps/web/desktop
