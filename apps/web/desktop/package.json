@@ -152,12 +152,6 @@
         "provider": "github",
         "repo": "notesnook",
         "owner": "streetwriters"
-      },
-      {
-        "provider": "snapStore",
-        "repo": "notesnook",
-        "channels": "stable",
-        "publishAutoUpdate": false
       }
     ]
   }
