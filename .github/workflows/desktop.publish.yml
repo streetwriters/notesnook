@@ -72,7 +72,11 @@ jobs:
           name: build
           path: ./apps/web/desktop/build
 
-      - name: Setup notarization & signing
+      - name: Install packages
+        run: npm i
+        working-directory: ./apps/web/desktop
+
+      - name: Setup notarization
         run: |
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
