@@ -77,11 +77,12 @@ jobs:
           name: build
           path: ./apps/web/desktop/build
 
+      - name: Setup Snapcraft Auth
+        run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
+
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@v1
         if: startsWith(matrix.os, 'ubuntu')
-        with:
-          snapcraft_token: ${{ secrets.snapcraft_token }}
 
       - name: Prepare for app notarization (macOS)
         if: startsWith(matrix.os, 'macos')
