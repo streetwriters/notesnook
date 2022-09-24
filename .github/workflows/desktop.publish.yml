@@ -89,28 +89,29 @@ jobs:
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
         working-directory: ./apps/web/desktop
 
-      - name: Deploy to Testflight
+      - name: Build app
         env:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+          DEBUG: electron-osx-sign*
+        run: npx electron-builder --mac mas --universal -p never
+        working-directory: ./apps/web/desktop
+
+      - name: Deploy to Testflight
+        env:
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
-          DEBUG: electron-osx-sign*
         run: |
-          apple_app_id=$(cat package.json | jq -r .mac.appId)
-          app_bundle_id=$(cat package.json | jq -r .mac.bundleId)
+          apple_app_id=$(cat package.json | jq -r .appAppleId)
+          app_bundle_id=$(cat package.json | jq -r .build.appId)
           app_version=$(cat package.json | jq -r .version)
-          bundle_version=$(cat package.json | jq -r .mac.bundleVersion)
-
-          echo "Building package ${app_version} ${bundle_version} ..."
-          npx electron-builder --mac mas --universal -p never
-          
+          bundle_version=$(cat package.json | jq -r .build.mac.bundleVersion)          
           package=$(find ./dist/mas-universal/notesnook*.pkg)
 
           echo "Uploading ${package} using altool..."
 
           xcrun altool --upload-package $package -t osx --apiKey $API_KEY_ID --apiIssuer $API_KEY_ISSUER_ID --apple-id $apple_app_id --bundle-id $app_bundle_id --bundle-short-version-string $app_version --bundle-version $bundle_version
-        working-directory: ./apps/web/desktop     
+        working-directory: ./apps/web/desktop
   # publish:
   #   name: Publish
   #   needs: build
