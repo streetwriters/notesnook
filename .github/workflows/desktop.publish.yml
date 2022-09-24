@@ -87,6 +87,7 @@ jobs:
       
       - name: Install provisioning profile
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
+        working-directory: ./apps/web/desktop
 
       - name: Deploy to Testflight
         env:
