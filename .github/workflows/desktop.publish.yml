@@ -84,6 +84,9 @@ jobs:
         run: |
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+      
+      - name: Install provisioning profile
+        run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
 
       - name: Deploy to Testflight
         env:
@@ -91,6 +94,7 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
+          DEBUG: electron-osx-sign*
         run: |
           apple_app_id=$(cat package.json | jq -r .mac.appId)
           app_bundle_id=$(cat package.json | jq -r .mac.bundleId)
