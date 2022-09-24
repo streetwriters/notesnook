@@ -94,6 +94,7 @@ export interface Plan {
   originalPrice?: Price;
   discount: number;
   country: string;
+  platform: "web" | "macos";
 }
 
 export type PricingInfo = {

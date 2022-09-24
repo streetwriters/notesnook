@@ -17,21 +17,23 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const getZoomFactor = require("./getZoomFactor");
-const selectDirectory = require("./selectDirectory");
-const getProducts = require("./getProducts");
+import { Plan, PricingInfo } from "./types";
+import { useEffect } from "react";
 
-const calls = {
-  getZoomFactor,
-  selectDirectory,
-  getProducts
+type AppleCheckoutProps = {
+  user: { id: string; email: string };
+  plan: Plan;
+  onPriceUpdated?: (pricingInfo: PricingInfo) => void;
+  onCouponApplied?: () => void;
+  coupon?: string;
 };
-
-module.exports.getCall = function getAction(callName) {
-  try {
-    if (!calls[callName]) throw new Error("Invalid call name.");
-  } catch (e) {
-    console.error(e);
-  }
-  return calls[callName];
-};
+export function AppleCheckout(props: AppleCheckoutProps) {
+  useEffect(() => {
+    (async function () {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      console.log(window.config, props.plan.id, await window.config.products([props.plan.id]));
+    })();
+  }, [props]);
+  return null;
+}

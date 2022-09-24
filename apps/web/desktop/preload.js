@@ -48,6 +48,12 @@ contextBridge.exposeInMainWorld("config", {
     return ipcRenderer.invoke("fromRenderer", {
       type: "getZoomFactor"
     });
+  },
+  products: (productIds) => {
+    return ipcRenderer.invoke("fromRenderer", {
+      type: "getProducts",
+      productIds
+    });
   }
 });
 

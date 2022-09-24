@@ -40,6 +40,7 @@ import { db } from "../../../common/db";
 import { useCheckoutStore } from "./store";
 import { getCurrencySymbol } from "./helpers";
 import { Theme } from "@notesnook/theme";
+import { AppleCheckout } from "./apple";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -227,11 +228,33 @@ function Details() {
   );
   const theme = useThemeStore((store) => store.theme);
 
-  if (selectedPlan && user)
+  if (selectedPlan && user && selectedPlan.platform === "web")
     return (
       <PaddleCheckout
         plan={selectedPlan}
         theme={theme}
+        user={user}
+        coupon={couponCode}
+        onCouponApplied={() => setIsApplyingCoupon(true)}
+        onPriceUpdated={(pricingInfo) => {
+          onPriceUpdated(pricingInfo);
+          // console.log(
+          //   initialCouponCode,
+          //   "applying coupon",
+          //   couponCode,
+          //   pricingInfo.coupon
+          // );
+
+          // if (!initialCouponCode || initialCouponCode === couponCode) return;
+          // console.log(initialCouponCode, "applying coupon");
+          // onApplyCoupon(initialCouponCode);
+        }}
+      />
+    );
+  else if (selectedPlan && user && selectedPlan.platform === "macos")
+    return (
+      <AppleCheckout
+        plan={selectedPlan}
         user={user}
         coupon={couponCode}
         onCouponApplied={() => setIsApplyingCoupon(true)}

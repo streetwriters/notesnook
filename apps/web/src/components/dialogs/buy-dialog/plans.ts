@@ -18,8 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { useEffect, useState } from "react";
+import { db } from "../../../common/db";
 import { isTesting } from "../../../utils/platform";
 import { Period, Plan } from "./types";
+import { getPlatform } from "../../../utils/platform";
 
 type PlanMetadata = {
   title: string;
@@ -33,7 +35,8 @@ export const DEFAULT_PLANS: Plan[] = [
     currency: "USD",
     discount: 0,
     id: "648884",
-    price: { gross: 4.49, net: 0, tax: 0 }
+    price: { gross: 4.49, net: 0, tax: 0 },
+    platform: "web"
   },
   {
     period: "yearly",
@@ -41,7 +44,8 @@ export const DEFAULT_PLANS: Plan[] = [
     currency: "USD",
     discount: 0,
     id: "658759",
-    price: { gross: 49.99, net: 0, tax: 0 }
+    price: { gross: 49.99, net: 0, tax: 0 },
+    platform: "web"
   }
 ];
 
@@ -52,9 +56,34 @@ export const PLAN_METADATA: Record<Period, PlanMetadata> = {
 
 let CACHED_PLANS: Plan[];
 export async function getPlans(): Promise<Plan[] | null> {
-  return DEFAULT_PLANS;
   if (isTesting()) return DEFAULT_PLANS;
   if (CACHED_PLANS) return CACHED_PLANS;
+  if (getPlatform() === "macOS") {
+    const result = (
+      await Promise.all(
+        (["monthly", "yearly"] as const).map(
+          async (period): Promise<Plan | null> => {
+            const plan = await db.pricing?.sku("ios", period);
+            const price = await db.pricing?.price(period);
+            if (plan && price)
+              return {
+                period,
+                country: plan?.countryCode,
+                currency: "USD",
+                id: plan.sku,
+                discount: price.discount,
+                price: { gross: parseFloat(price.price), net: 0, tax: 0 },
+                originalPrice: DEFAULT_PLANS.find((p) => p.period === period)?.price,
+                platform: "macos"
+              };
+            return null;
+          }
+        )
+      )
+    ).filter((p) => !!p);
+    if (result.length < 2) return DEFAULT_PLANS;
+    return result as Plan[];
+  }
 
   const url = `https://notesnook.com/api/v1/prices/products/web`;
   const response = await fetch(url);
