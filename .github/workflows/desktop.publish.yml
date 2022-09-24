@@ -96,8 +96,6 @@ jobs:
           app_bundle_id=$(cat package.json | jq -r .mac.bundleId)
           app_version=$(cat package.json | jq -r .version)
           bundle_version=$(cat package.json | jq -r .mac.bundleVersion)
-          api_key=${{ secrets.api_key }}
-          api_issuer=${{ secrets.api_key_id }}
 
           echo "Building package ${app_version} ${bundle_version} ..."
           npx electron-builder --mac mas --universal -p never
@@ -106,7 +104,7 @@ jobs:
 
           echo "Uploading ${package} using altool..."
 
-          xcrun altool --upload-package $package -t osx --apiKey $api_key --apiIssuer $api_issuer --apple-id $apple_app_id --bundle-id $app_bundle_id --bundle-short-version-string $app_version --bundle-version $bundle_version
+          xcrun altool --upload-package $package -t osx --apiKey $API_KEY_ID --apiIssuer $API_KEY_ISSUER_ID --apple-id $apple_app_id --bundle-id $app_bundle_id --bundle-short-version-string $app_version --bundle-version $bundle_version
         working-directory: ./apps/web/desktop     
   # publish:
   #   name: Publish
