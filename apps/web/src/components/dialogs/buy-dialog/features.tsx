@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Text, Flex, Box } from "@theme-ui/components";
+import { isMacApp } from "../../../utils/platform";
 import {
   Accent,
   Android,
@@ -74,6 +75,7 @@ type Section = {
   info?: string;
   pro?: boolean;
   features?: Feature[];
+  isVisible?: () => boolean;
 };
 
 const sections: Section[] = [
@@ -120,6 +122,7 @@ const sections: Section[] = [
     title: "100% cross platform",
     detail: "Notesnook is available on all major platforms — for everyone.",
     columns: 8,
+    isVisible: () => !isMacApp(),
     features: [
       {
         id: "ios",
@@ -367,86 +370,90 @@ export function Features() {
       pt={6}
       bg="background"
     >
-      {sections.map((section) => (
-        <Flex
-          key={section.title}
-          px={6}
-          pb={50}
-          sx={{ flexDirection: "column" }}
-        >
-          {section.pro && (
-            <Flex
-              bg="bgSecondary"
-              px={2}
-              py="2px"
-              sx={{ borderRadius: 50, alignSelf: "start" }}
-              mb={1}
-            >
-              <Pro color="primary" size={16} />
-              <Text variant="body" ml={"2px"} sx={{ color: "primary" }}>
-                Pro
-              </Text>
-            </Flex>
-          )}
-          <Text variant="body" sx={{ fontSize: "1.3rem" }}>
-            {section.title}
-          </Text>
-          <Text
-            variant="body"
-            mt={1}
-            sx={{ fontSize: "title", color: "fontTertiary" }}
+      {sections.map((section) => {
+        if (section.isVisible && !section.isVisible()) return null;
+
+        return (
+          <Flex
+            key={section.title}
+            px={6}
+            pb={50}
+            sx={{ flexDirection: "column" }}
           >
-            {section.detail}
-          </Text>
-          {section.features && (
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: section.columns
-                  ? "1fr ".repeat(section.columns)
-                  : "1fr 1fr 1fr",
-                gap: 3
-              }}
-              mt={4}
-            >
-              {section.features.map((feature) => (
-                <Flex
-                  key={feature.id}
-                  sx={{ flexDirection: "column", alignItems: "start" }}
-                >
-                  {feature.icon && (
-                    <feature.icon size={20} color="text" sx={{ mb: 1 }} />
-                  )}
-                  {feature.pro && (
-                    <Flex
-                      sx={{ alignItems: "center", justifyContent: "center" }}
-                    >
-                      <Pro color="primary" size={14} />
-                      <Text
-                        variant="subBody"
-                        ml={"2px"}
-                        sx={{ color: "primary" }}
-                      >
-                        Pro
-                      </Text>
-                    </Flex>
-                  )}
-                  {feature.title && (
-                    <Text variant="body" sx={{ fontSize: "subtitle" }}>
-                      {feature.title}
-                    </Text>
-                  )}
-                </Flex>
-              ))}
-            </Box>
-          )}
-          {section.info && (
-            <Text mt={1} variant="subBody">
-              {section.info}
+            {section.pro && (
+              <Flex
+                bg="bgSecondary"
+                px={2}
+                py="2px"
+                sx={{ borderRadius: 50, alignSelf: "start" }}
+                mb={1}
+              >
+                <Pro color="primary" size={16} />
+                <Text variant="body" ml={"2px"} sx={{ color: "primary" }}>
+                  Pro
+                </Text>
+              </Flex>
+            )}
+            <Text variant="body" sx={{ fontSize: "1.3rem" }}>
+              {section.title}
             </Text>
-          )}
-        </Flex>
-      ))}
+            <Text
+              variant="body"
+              mt={1}
+              sx={{ fontSize: "title", color: "fontTertiary" }}
+            >
+              {section.detail}
+            </Text>
+            {section.features && (
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: section.columns
+                    ? "1fr ".repeat(section.columns)
+                    : "1fr 1fr 1fr",
+                  gap: 3
+                }}
+                mt={4}
+              >
+                {section.features.map((feature) => (
+                  <Flex
+                    key={feature.id}
+                    sx={{ flexDirection: "column", alignItems: "start" }}
+                  >
+                    {feature.icon && (
+                      <feature.icon size={20} color="text" sx={{ mb: 1 }} />
+                    )}
+                    {feature.pro && (
+                      <Flex
+                        sx={{ alignItems: "center", justifyContent: "center" }}
+                      >
+                        <Pro color="primary" size={14} />
+                        <Text
+                          variant="subBody"
+                          ml={"2px"}
+                          sx={{ color: "primary" }}
+                        >
+                          Pro
+                        </Text>
+                      </Flex>
+                    )}
+                    {feature.title && (
+                      <Text variant="body" sx={{ fontSize: "subtitle" }}>
+                        {feature.title}
+                      </Text>
+                    )}
+                  </Flex>
+                ))}
+              </Box>
+            )}
+            {section.info && (
+              <Text mt={1} variant="subBody">
+                {section.info}
+              </Text>
+            )}
+          </Flex>
+        );
+      })}
     </Flex>
   );
 }
