@@ -109,7 +109,7 @@ jobs:
 
           echo "Uploading ${file} using altool..."
 
-          # xcrun altool --upload-package --type osx --file "${file}" --apiKey ${{ secrets.api_key }} --apiIssuer ${{ secrets.api_key_id }} --apple-id "${apple_app_id}" --bundle-id "${app_bundle_id}" --bundle-short-version-string "${app_version}" --bundle-version "${bundle_version}"
+          xcrun altool --upload-package --type osx --file "${file}" --apiKey ${{ secrets.api_key }} --apiIssuer ${{ secrets.api_key_id }} --apple-id "${apple_app_id}" --bundle-id "${app_bundle_id}" --bundle-short-version-string "${app_version}" --bundle-version "${bundle_version}"
         working-directory: ./apps/web/desktop     
   # publish:
   #   name: Publish
