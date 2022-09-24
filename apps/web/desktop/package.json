@@ -35,12 +35,12 @@
     "url": "https://streetwriters.co"
   },
   "mac": {
-    "bundleId": "com.streetwriters.notesnook",
+    "bundleId": "org.streetwriters.notesnook",
     "bundleVersion": "1",
     "appId": "1544027013"
   },
   "build": {
-    "appId": "com.streetwriters.notesnook",
+    "appId": "org.streetwriters.notesnook",
     "productName": "Notesnook",
     "copyright": "Copyright © 2022 Streetwriters (Private) Ltd.",
     "artifactName": "notesnook_${os}_${arch}.${ext}",

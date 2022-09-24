@@ -3,14 +3,14 @@
 <plist version="1.0">
 <dict>
 	<key>com.apple.application-identifier</key>
-	<string>53CWBG3QUC.com.streetwriters.notesnook</string>
+	<string>53CWBG3QUC.org.streetwriters.notesnook</string>
 	<key>com.apple.developer.team-identifier</key>
 	<string>53CWBG3QUC</string>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>53CWBG3QUC.com.streetwriters.notesnook</string>
+		<string>53CWBG3QUC.org.streetwriters.notesnook</string>
 	</array>
 	<key>com.apple.security.cs.allow-jit</key>
 	<true/>
