@@ -85,17 +85,22 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
+      - name: Install signing certificate
+        run: |
+          echo "$MAC_DISTRIBUTION_CERT" | base64 --decode > /tmp/certificate.p12
+          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $MAC_DISTRIBUTION_CERT_KEY
+
       - name: Deploy to Testflight
         env:
-          CSC_LINK: ${{ secrets.mac_certs }}
-          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+          CSC_LINK: ${{ secrets.MAC_DISTRIBUTION_CERT }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_DISTRIBUTION_CERT_KEY }}
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
         run: |
-          apple_app_id=$(cat package.json | jq .mac.appId | cut -d '"' -f 2)
-          app_bundle_id=$(cat package.json | jq .mac.bundleId | cut -d '"' -f 2)
-          app_version=$(cat package.json | jq .version | cut -d '"' -f 2)
-          bundle_version=$(cat package.json | jq .mac.bundleVersion | cut -d '"' -f 2)
+          apple_app_id=$(cat package.json | jq -r .mac.appId)
+          app_bundle_id=$(cat package.json | jq -r .mac.bundleId)
+          app_version=$(cat package.json | jq -r .version)
+          bundle_version=$(cat package.json | jq -r .mac.bundleVersion)
 
           echo "Building package ${app_version} ${bundle_version} ..."
           npx electron-builder --mac mas --universal -p never
@@ -104,7 +109,7 @@ jobs:
 
           echo "Uploading ${file} using altool..."
 
-          xcrun altool --upload-package --type osx --file "${file}" --apiKey ${{ secrets.api_key }} --apiIssuer ${{ secrets.api_key_id }} --apple-id "${apple_app_id}" --bundle-id "${app_bundle_id}" --bundle-short-version-string "${app_version}" --bundle-version "${bundle_version}"
+          # xcrun altool --upload-package --type osx --file "${file}" --apiKey ${{ secrets.api_key }} --apiIssuer ${{ secrets.api_key_id }} --apple-id "${apple_app_id}" --bundle-id "${app_bundle_id}" --bundle-short-version-string "${app_version}" --bundle-version "${bundle_version}"
         working-directory: ./apps/web/desktop     
   # publish:
   #   name: Publish
