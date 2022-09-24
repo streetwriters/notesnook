@@ -87,8 +87,8 @@ jobs:
 
       - name: Deploy to Testflight
         env:
-          CSC_LINK: ${{ secrets.MAC_DISTRIBUTION_CERT }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_DISTRIBUTION_CERT_KEY }}
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
         run: |
