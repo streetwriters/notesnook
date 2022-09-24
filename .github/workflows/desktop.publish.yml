@@ -85,11 +85,6 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
-      - name: Install signing certificate
-        run: |
-          echo "$MAC_DISTRIBUTION_CERT" | base64 --decode > /tmp/certificate.p12
-          keychain add-certificates --certificate /tmp/certificate.p12 --certificate-password $MAC_DISTRIBUTION_CERT_KEY
-
       - name: Deploy to Testflight
         env:
           CSC_LINK: ${{ secrets.MAC_DISTRIBUTION_CERT }}
