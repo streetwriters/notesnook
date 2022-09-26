@@ -2,7 +2,7 @@
   "name": "@notesnook/core",
   "version": "7.3.6",
   "main": "./api/index.js",
-  "license": "GPL-3.0",
+  "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "git://github.com/streetwriters/notesnook-core.git"

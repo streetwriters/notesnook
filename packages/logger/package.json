@@ -14,7 +14,7 @@
   "keywords": [
     "logger"
   ],
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/streetwriters/logger/issues"
   },

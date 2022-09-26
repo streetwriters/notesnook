@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "libsodium-wrappers": "0.7.9"
   },

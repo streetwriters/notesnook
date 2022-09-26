@@ -8,7 +8,7 @@
     "build": "tsc --declaration --outDir ./dist"
   },
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@notesnook/crypto": "*",
     "comlink": "^4.3.1"

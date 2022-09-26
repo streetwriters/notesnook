@@ -2,6 +2,7 @@
   "name": "@notesnook/mobile-app",
   "version": "1.0.0",
   "main": "./App.js",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@flyerhq/react-native-link-preview": "^1.6.0",
     "@mdi/js": "^6.7.96",
