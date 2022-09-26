@@ -117,6 +117,7 @@ All commits must include valid scopes in the commit message. **Valid commit scop
 3. `setup`: setting up something new in the repo (e.g. eslint, commitlint)
 4. `docs`: changes related to documentation (README etc.)
 5. `misc`: miscellaneous changes like package-lock.json updates
+6. `global`: changes related to the whole repo
 
 **Some example commits would look like this:**
 

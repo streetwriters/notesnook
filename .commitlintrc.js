@@ -25,7 +25,8 @@ const SCOPES = [
   "setup",
   "docs",
   "refactor",
-  "misc"
+  "misc",
+  "global"
 ];
 
 module.exports = {
