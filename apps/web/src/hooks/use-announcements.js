@@ -72,7 +72,11 @@ export default function useAnnouncements(type = "inline") {
   return [announcements.filter((a) => a.type === type), remove];
 }
 
-export const allowedPlatforms = ["all", process.env.REACT_APP_PLATFORM];
+export const allowedPlatforms = [
+  "all",
+  process.env.REACT_APP_PLATFORM,
+  window.os
+];
 
 async function shouldShowAnnouncement(announcement) {
   if (Config.get(announcement.id) === "removed") return false;
