@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/mobile",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": true,
   "license": "GPL-3.0-or-later",
   "workspaces": [
@@ -18,7 +18,7 @@
     "build-android": "cd native && detox build -c android.emu.release",
     "e2e-android": "cd native && detox test --configuration android.emu.release --detectOpenHandles",
     "e2e-ios": "cd native && detox test -c ios.sim.release --detectOpenHandles",
-    "bump": "npx react-native bump-version --skip-semver-for android",
+    "bump": "cd native && npx react-native bump-version --skip-semver-for android",
     "release-android": "cd native/android && GITHUB_RELEASE=true ENVFILE=.env.public ./gradlew assembleRelease --no-daemon",
     "release-android-bundle": "cd native/android && ./gradlew bundleRelease --no-daemon"
   },

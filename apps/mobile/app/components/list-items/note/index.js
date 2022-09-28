@@ -58,9 +58,9 @@ function getNotebook(item) {
     if (prev && prev.length > 0) return prev;
     const topicId = curr.topics[0];
     const notebook = db.notebooks?.notebook(curr.id)?.data;
-    if (!notebook) return;
+    if (!notebook) return [];
     const topic = notebook.topics.find((t) => t.id === topicId);
-    if (!topic) return;
+    if (!topic) return [];
 
     return [
       {
