@@ -330,7 +330,7 @@ export function usePopupHandler(options: UsePopupHandlerOptions) {
 
   useEffect(() => {
     if (!isPopupOpen) onClosed?.();
-  }, [isPopupOpen, onClosed]);
+  }, [isPopupOpen]);
 
   useEffect(() => {
     if (isPopupOpen) {
