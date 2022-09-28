@@ -18,15 +18,14 @@ module.exports = {
   },
   all: {
     UV_THREADPOOL_SIZE: IS_CI ? NUM_CPUS : 2,
-    GENERATE_SOURCEMAP: false,
+    GENERATE_SOURCEMAP: process.env.NODE_ENV !== "production",
     INLINE_RUNTIME_CHUNK: false,
     DISABLE_ESLINT_PLUGIN: true,
     REACT_APP_GIT_HASH: gitHash,
     REACT_APP_VERSION: APP_VERSION
   },
   dev: {
-    REACT_APP_LOCALHOST: ip.address(),
-    REACT_APP_CI: "true"
+    REACT_APP_LOCALHOST: ip.address()
   },
   web: {
     REACT_APP_PLATFORM: "web"

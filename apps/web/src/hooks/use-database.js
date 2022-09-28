@@ -37,8 +37,7 @@ export default function useDatabase(persistence) {
 
     (async () => {
       await import("../app.css");
-      if (process.env.NODE_ENV !== "development")
-        await initializeDatabase(persistence);
+      await initializeDatabase(persistence);
       setIsAppLoaded(true);
       memory.isAppLoaded = true;
     })();
