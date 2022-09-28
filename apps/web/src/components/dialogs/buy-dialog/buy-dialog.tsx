@@ -40,7 +40,7 @@ import { db } from "../../../common/db";
 import { useCheckoutStore } from "./store";
 import { getCurrencySymbol } from "./helpers";
 import { Theme } from "@notesnook/theme";
-import { isMacApp } from "../../../utils/platform";
+import { isMacStoreApp } from "../../../utils/platform";
 
 type BuyDialogProps = {
   couponCode?: string;
@@ -284,7 +284,7 @@ function TrialOrUpgrade(props: TrialOrUpgradeProps) {
           {formatPeriod(plan.period)}
         </Text>
       )}
-      {isMacApp() ? (
+      {isMacStoreApp() ? (
         <>
           <Text variant={"subBody"} mt={2} sx={{ textAlign: "center" }}>
             You cannot upgrade from the macOS app.

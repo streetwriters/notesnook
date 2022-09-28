@@ -126,8 +126,8 @@ export function isDesktop() {
   return "api" in window;
 }
 
-export function isMacApp() {
-  return true; // window.os === "darwin";
+export function isMacStoreApp() {
+  return window.os === "mas";
 }
 
 export function isTesting() {

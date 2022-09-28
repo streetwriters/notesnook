@@ -109,10 +109,6 @@ jobs:
       - name: Install packages
         run: npm i
         working-directory: ./apps/web/desktop
-
-      - name: Build Electron wrapper
-        run: npm run build
-        working-directory: ./apps/web/desktop
       
       - name: Install provisioning profile
         run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
@@ -124,6 +120,7 @@ jobs:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
+          npm run build:mas
           npx electron-builder --mac mas --universal -p never
         working-directory: ./apps/web/desktop
 
@@ -133,6 +130,7 @@ jobs:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
+          npm run build
           if [ ${{ inputs.publish-github }} == true ]; then
             npx electron-builder --mac zip dmg -p always
           else

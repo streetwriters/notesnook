@@ -54,7 +54,7 @@ import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "@notesnook/core/common";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
-import { isDesktop, isMacApp } from "../utils/platform";
+import { isDesktop, isMacStoreApp } from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@theme-ui/components";
@@ -103,11 +103,11 @@ const otherItems = [
     link: "https://discord.com/invite/zQBK97EE22"
   },
   {
-    title: isMacApp() ? "Download for iOS" : "Download for iOS & Android",
-    description: isMacApp()
+    title: isMacStoreApp() ? "Download for iOS" : "Download for iOS & Android",
+    description: isMacStoreApp()
       ? "Notesnook is also available on iOS"
       : "Notesnook is available on Android & iOS",
-    link: isMacApp()
+    link: isMacStoreApp()
       ? "https://apps.apple.com/us/app/notesnook-take-private-notes/id1544027013"
       : "https://notesnook.com/"
   },

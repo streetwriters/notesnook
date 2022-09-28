@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Text, Flex, Box } from "@theme-ui/components";
-import { isMacApp } from "../../../utils/platform";
+import { isMacStoreApp } from "../../../utils/platform";
 import {
   Accent,
   Android,
@@ -122,7 +122,7 @@ const sections: Section[] = [
     title: "100% cross platform",
     detail: "Notesnook is available on all major platforms — for everyone.",
     columns: 8,
-    isVisible: () => !isMacApp(),
+    isVisible: () => !isMacStoreApp(),
     features: [
       {
         id: "ios",

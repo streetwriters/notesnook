@@ -19,9 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const { contextBridge, ipcRenderer } = require("electron");
 
+// eslint-disable-next-line no-undef
+contextBridge.exposeInMainWorld("os", MAC_APP_STORE ? "mas" : process.platform);
+
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
-contextBridge.exposeInMainWorld("os", process.platform);
 contextBridge.exposeInMainWorld("api", {
   send: (channel, data) => {
     // whitelist channels
