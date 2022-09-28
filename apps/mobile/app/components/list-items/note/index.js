@@ -105,7 +105,7 @@ const NoteItem = ({
               marginBottom: 2.5
             }}
           >
-            {notebooks.map((_item) => (
+            {notebooks?.map((_item) => (
               <Button
                 title={_item.title}
                 key={_item}
