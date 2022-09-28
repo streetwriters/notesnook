@@ -63,7 +63,7 @@ jobs:
           path: apps/web/build/**/*
 
   build-macos:
-    name: Build macOS
+    name: Build for macOS
     needs: build
     runs-on: macos-12
 
@@ -132,9 +132,9 @@ jobs:
         run: |
           npm run build
           if [ ${{ inputs.publish-github }} == true ]; then
-            npx electron-builder --mac zip dmg -p always
+            npx electron-builder --mac zip dmg --arm64 --x64 -p always
           else
-            npx electron-builder --mac zip dmg -p never
+            npx electron-builder --mac zip dmg --arm64 --x64 -p never
           fi
         working-directory: ./apps/web/desktop
 
@@ -256,8 +256,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if (${{ inputs.publish-github }} == true) {
-            npx electron-builder --win -p always
+            npx electron-builder --win --publish always
           } else {
-            npx electron-builder --win -p never
+            npx electron-builder --win --publish never
           }
         working-directory: ./apps/web/desktop
