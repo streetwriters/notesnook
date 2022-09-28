@@ -68,6 +68,9 @@ jobs:
     runs-on: macos-12
 
     steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
       - name: Setup notarization
         run: |
           mkdir -p ~/private_keys/
@@ -84,15 +87,12 @@ jobs:
 
       - name: Get App Store Version
         id: appstore
-        uses: ilyalehchylin/appstore-connect-app-version@master
+        uses: ilyalehchylin/appstore-connect-app-version@v1.2
         with:
           app-id: ${{ steps.app_metadata.outputs.apple_app_id }}
           key-id: ${{ secrets.api_key_id }}
           issuer-id: ${{ secrets.api_key_issuer_id }}
           private-key-raw: ${{ secrets.api_key }}
-
-      - name: Check out Git repository
-        uses: actions/checkout@v3
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -157,6 +157,9 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
       - name: Collect app metadata
         id: app_metadata
         working-directory: ./apps/web/desktop
@@ -177,10 +180,7 @@ jobs:
         run:
           is_published=$(snapcraft status notesnook | grep ${{ steps.app_metadata.app_version }} | wc -l)
           echo ::set-output name=is_version_published::$is_published
-
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-
+        
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
