@@ -142,15 +142,7 @@ function isSessionExpired(path: Routes): RouteWithPath<AuthProps> | null {
   return null;
 }
 
-if (process.env.NODE_ENV === "development") {
-  (async function dev() {
-    const { initializeDatabase } = await import("./common/db");
-    await initializeDatabase();
-    renderApp();
-  })();
-} else {
-  renderApp();
-}
+renderApp();
 
 async function renderApp() {
   const {
