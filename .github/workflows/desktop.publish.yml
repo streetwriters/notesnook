@@ -76,6 +76,15 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
+      - name: Collect app metadata
+        id: app_metadata
+        working-directory: ./apps/web/desktop
+        run: |
+          echo ::set-output name=apple_app_id::$(cat package.json | jq -r .appAppleId)
+          echo ::set-output name=app_bundle_id::$(cat package.json | jq -r .build.appId)
+          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
+          echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
+        
       - name: Get App Store Version
         id: appstore
         uses: streetwriters/appstore-connect-app-version@develop
@@ -85,18 +94,6 @@ jobs:
           issuer-id: ${{ secrets.api_key_issuer_id }}
           private-key-raw: ${{ secrets.api_key }}
           platform: "MAC_OS"
-
-      - name: Collect app metadata
-        id: app_metadata
-        working-directory: ./apps/web/desktop
-        run: |
-          echo ::set-output name=apple_app_id::$(cat package.json | jq -r .appAppleId)
-          echo ::set-output name=app_bundle_id::$(cat package.json | jq -r .build.appId)
-          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
-          echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
-
-          echo ${{ steps.appstore.outputs.app-version-latest }}
-          echo $(cat package.json | jq -r .version)
 
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -122,7 +119,7 @@ jobs:
         working-directory: ./apps/web/desktop
 
       - name: Build app for Mac App Store
-        if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.app_version
+        if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.outputs.app_version
         env:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
@@ -132,7 +129,7 @@ jobs:
 
       - name: Build zip and dmg
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
@@ -144,7 +141,7 @@ jobs:
         working-directory: ./apps/web/desktop
 
       - name: Deploy to Testflight
-        if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.app_version
+        if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.outputs.app_version
         env:
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
@@ -153,7 +150,7 @@ jobs:
 
           echo "Uploading ${package} using altool..."
 
-          xcrun altool --upload-package $package -t osx --apiKey $API_KEY_ID --apiIssuer $API_KEY_ISSUER_ID --apple-id ${{ steps.app_metadata.apple_app_id }} --bundle-id ${{ steps.app_metadata.app_bundle_id }}--bundle-short-version-string ${{ steps.app_metadata.app_version }} --bundle-version ${{ steps.app_metadata.bundle_version }}
+          xcrun altool --upload-package $package -t osx --apiKey $API_KEY_ID --apiIssuer $API_KEY_ISSUER_ID --apple-id ${{ steps.app_metadata.outputs.apple_app_id }} --bundle-id ${{ steps.app_metadata.outputs.app_bundle_id }}--bundle-short-version-string ${{ steps.app_metadata.outputs.app_version }} --bundle-version ${{ steps.app_metadata.outputs.bundle_version }}
         working-directory: ./apps/web/desktop
 
   build-linux:
@@ -183,7 +180,7 @@ jobs:
         if: inputs.publish-snap
         id: snapcraft
         run:
-          echo ::set-output name=is_published::$(snapcraft status notesnook | grep ${{ steps.app_metadata.app_version }} | wc -l)
+          echo ::set-output name=is_published::$(snapcraft status notesnook | grep ${{ steps.app_metadata.outputs.app_version }} | wc -l)
           echo $is_published
         
       - name: Setup Node
@@ -213,7 +210,7 @@ jobs:
 
       - name: Build AppImage deb and rpm
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ ${{ inputs.publish-github }} == true ]; then
             npx electron-builder --linux AppImage deb rpm -p always
@@ -258,7 +255,7 @@ jobs:
 
       - name: Build app
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if (${{ inputs.publish-github }} == true) {
             npx electron-builder --win -p always
