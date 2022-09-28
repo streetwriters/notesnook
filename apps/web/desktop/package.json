@@ -3,6 +3,7 @@
   "productName": "Notesnook",
   "description": "Your private note taking space",
   "version": "2.2.0",
+  "appAppleId": "1544027013",
   "private": true,
   "main": "./build/electron.js",
   "homepage": "https://notesnook.com/",
@@ -35,7 +36,7 @@
     "url": "https://streetwriters.co"
   },
   "build": {
-    "appId": "com.streetwriters.notesnook",
+    "appId": "org.streetwriters.notesnook",
     "productName": "Notesnook",
     "copyright": "Copyright © 2022 Streetwriters (Private) Ltd.",
     "artifactName": "notesnook_${os}_${arch}.${ext}",
@@ -68,6 +69,8 @@
     "afterSign": "electron-builder-notarize",
     "afterPack": "./scripts/removeLocales.js",
     "mac": {
+      "bundleVersion": "220",
+      "minimumSystemVersion": "10.14.0",
       "target": [
         {
           "target": "dmg",
@@ -108,6 +111,12 @@
       ],
       "icon": "assets/icons/app.icns",
       "title": "Install Notesnook"
+    },
+    "mas": {
+      "entitlements": "assets/entitlements.mas.plist",
+      "entitlementsInherit": "assets/entitlements.mas.inherit.plist",
+      "entitlementsLoginHelper": "assets/entitlements.mas.loginhelper.plist",
+      "hardenedRuntime": true
     },
     "win": {
       "target": [

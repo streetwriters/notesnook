@@ -3,11 +3,21 @@ name: Publish @notesnook/desktop
 on:
   workflow_dispatch:
     inputs:
-      release:
+      publish-apple:
         type: boolean
         required: true
-        default: false
-        description: "Release after successful build?"
+        default: true
+        description: "Publish on Mac App Store?"
+      publish-snap:
+        type: boolean
+        required: true
+        default: true
+        description: "Publish on Snapcraft?"
+      publish-github:
+        type: boolean
+        required: true
+        default: true
+        description: "Publish on GitHub releases?"
 
 jobs:
   build:
@@ -52,15 +62,173 @@ jobs:
           name: build
           path: apps/web/build/**/*
 
-  publish:
-    name: Publish
+  build-macos:
+    name: Build macOS
     needs: build
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-12
 
-    # Platforms to build on/for
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Setup notarization
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
+
+      - name: Collect app metadata
+        id: app_metadata
+        working-directory: ./apps/web/desktop
+        run: |
+          echo ::set-output name=apple_app_id::$(cat package.json | jq -r .appAppleId)
+          echo ::set-output name=app_bundle_id::$(cat package.json | jq -r .build.appId)
+          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
+          echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
+        
+      - name: Get App Store Version
+        id: appstore
+        uses: streetwriters/appstore-connect-app-version@develop
+        with:
+          app-id: ${{ steps.app_metadata.outputs.apple_app_id }}
+          key-id: ${{ secrets.api_key_id }}
+          issuer-id: ${{ secrets.api_key_issuer_id }}
+          private-key-raw: ${{ secrets.api_key }}
+          platform: "MAC_OS"
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: ./apps/web/desktop/build
+
+      - name: Install packages
+        run: npm i
+        working-directory: ./apps/web/desktop
+
+      - name: Build Electron wrapper
+        run: npm run build
+        working-directory: ./apps/web/desktop
+      
+      - name: Install provisioning profile
+        run: echo "${{ secrets.MAC_PROVISIONING_PROFILE }}" | base64 --decode > embedded.provisionprofile
+        working-directory: ./apps/web/desktop
+
+      - name: Build app for Mac App Store
+        if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.outputs.app_version
+        env:
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+        run: |
+          npx electron-builder --mac mas --universal -p never
+        working-directory: ./apps/web/desktop
+
+      - name: Build zip and dmg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
+        run: |
+          if [ ${{ inputs.publish-github }} == true ]; then
+            npx electron-builder --mac zip dmg -p always
+          else
+            npx electron-builder --mac zip dmg -p never
+          fi
+        working-directory: ./apps/web/desktop
+
+      - name: Deploy to Testflight
+        if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.outputs.app_version
+        env:
+          API_KEY_ID: ${{ secrets.api_key_id }}
+          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
+        run: |       
+          package=$(find ./dist/mas-universal/notesnook*.pkg)
+
+          echo "Uploading ${package} using altool..."
+
+          xcrun altool --upload-package $package -t osx --apiKey $API_KEY_ID --apiIssuer $API_KEY_ISSUER_ID --apple-id ${{ steps.app_metadata.outputs.apple_app_id }} --bundle-id ${{ steps.app_metadata.outputs.app_bundle_id }}--bundle-short-version-string ${{ steps.app_metadata.outputs.app_version }} --bundle-version ${{ steps.app_metadata.outputs.bundle_version }}
+        working-directory: ./apps/web/desktop
+
+  build-linux:
+    name: Build for Linux
+    needs: build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Collect app metadata
+        id: app_metadata
+        working-directory: ./apps/web/desktop
+        run: |
+          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
+
+      - name: Setup Snapcraft Auth
+        if: inputs.publish-snap
+        run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
+
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+        if: inputs.publish-snap
+
+      - name: Get version info from Snapcraft
+        if: inputs.publish-snap
+        id: snapcraft
+        run:
+          echo ::set-output name=is_published::$(snapcraft status notesnook | grep ${{ steps.app_metadata.outputs.app_version }} | wc -l)
+          echo $is_published
+        
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: ./apps/web/desktop/build
+
+      - name: Install packages
+        run: npm i
+        working-directory: ./apps/web/desktop
+
+      - name: Build Electron wrapper
+        run: npm run build
+        working-directory: ./apps/web/desktop
+
+      - name: Build snap
+        if: inputs.publish-snap && steps.snapcraft.outputs.is_published <= 0
+        run: |
+          npx electron-builder --linux snap -p never
+        working-directory: ./apps/web/desktop
+
+      - name: Build AppImage deb and rpm
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ${{ inputs.publish-github }} == true ]; then
+            npx electron-builder --linux AppImage deb rpm -p always
+          else
+            npx electron-builder --linux AppImage deb rpm -p never
+          fi
+        working-directory: ./apps/web/desktop
+
+      - name: Publish on Snapcraft
+        if: inputs.publish-snap && steps.snapcraft.outputs.is_published <= 0
+        run: |
+          snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
+        working-directory: ./apps/web/desktop
+
+  build-windows:
+    name: Build for Windows
+    needs: build
+    runs-on: windows-latest
 
     steps:
       - name: Check out Git repository
@@ -77,41 +245,21 @@ jobs:
           name: build
           path: ./apps/web/desktop/build
 
-      - name: Setup Snapcraft Auth
-        run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.snapcraft_token }}" >> $GITHUB_ENV
+      - name: Install packages
+        run: npm i
+        working-directory: ./apps/web/desktop
 
-      - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v1
-        if: startsWith(matrix.os, 'ubuntu')
+      - name: Build Electron wrapper
+        run: npm run build
+        working-directory: ./apps/web/desktop
 
-      - name: Prepare for app notarization (macOS)
-        if: startsWith(matrix.os, 'macos')
-        # Import Apple API key for app notarization on macOS
-        run: |
-          mkdir -p ~/private_keys/
-          echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
-
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@master
-        with:
-          package_root: ./apps/web/desktop
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script_name: "build"
-          # macOS code signing certificate
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
-
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ inputs.release }}
+      - name: Build app
         env:
-          # macOS notarization API key
-          API_KEY_ID: ${{ secrets.api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
-
-      - name: Publish on Snapcraft
-        if: startsWith(matrix.os, 'ubuntu')
-        run: snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if (${{ inputs.publish-github }} == true) {
+            npx electron-builder --win -p always
+          } else {
+            npx electron-builder --win -p never
+          }
         working-directory: ./apps/web/desktop

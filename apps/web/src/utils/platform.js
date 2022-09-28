@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 export function getPlatform() {
+  if (window.os) return window.os;
+
   var userAgent = window.navigator.userAgent,
     platform = window.navigator.platform,
     macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"],
@@ -122,6 +124,10 @@ export function getDownloadLink(platform) {
 
 export function isDesktop() {
   return "api" in window;
+}
+
+export function isMacApp() {
+  return true; // window.os === "darwin";
 }
 
 export function isTesting() {
