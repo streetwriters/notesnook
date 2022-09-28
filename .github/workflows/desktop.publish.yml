@@ -255,7 +255,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if (${{ inputs.publish-github }} == true) {
+          if ($${{ inputs.publish-github }} == $true) {
             npx electron-builder --win --publish always
           } else {
             npx electron-builder --win --publish never
