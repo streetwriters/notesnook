@@ -118,7 +118,7 @@ jobs:
         working-directory: ./apps/web/desktop
 
       - name: Build app for Mac App Store
-        if: inputs.publish-apple
+        if: inputs.publish-apple && steps.appstore.outputs.app-version-latest != steps.app_metadata.app_version
         env:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
@@ -128,6 +128,7 @@ jobs:
 
       - name: Build zip and dmg
         env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
         run: |
@@ -178,8 +179,8 @@ jobs:
         if: inputs.publish-snap
         id: snapcraft
         run:
-          is_published=$(snapcraft status notesnook | grep ${{ steps.app_metadata.app_version }} | wc -l)
-          echo ::set-output name=is_version_published::$is_published
+          echo ::set-output name=is_published::$(snapcraft status notesnook | grep ${{ steps.app_metadata.app_version }} | wc -l)
+          echo $is_published
         
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -207,6 +208,8 @@ jobs:
         working-directory: ./apps/web/desktop
 
       - name: Build AppImage deb and rpm
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           if [ ${{ inputs.publish-github }} == true ]; then
             npx electron-builder --linux AppImage deb rpm -p always
@@ -250,10 +253,12 @@ jobs:
         working-directory: ./apps/web/desktop
 
       - name: Build app
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          if [ ${{ inputs.publish-github }} == true ]; then
+          if (${{ inputs.publish-github }} == true) {
             npx electron-builder --win -p always
-          else
+          } else {
             npx electron-builder --win -p never
-          fi
+          }
         working-directory: ./apps/web/desktop
