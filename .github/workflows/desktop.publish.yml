@@ -76,6 +76,16 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
 
+      - name: Get App Store Version
+        id: appstore
+        uses: streetwriters/appstore-connect-app-version@develop
+        with:
+          app-id: ${{ steps.app_metadata.outputs.apple_app_id }}
+          key-id: ${{ secrets.api_key_id }}
+          issuer-id: ${{ secrets.api_key_issuer_id }}
+          private-key-raw: ${{ secrets.api_key }}
+          platform: "MAC_OS"
+
       - name: Collect app metadata
         id: app_metadata
         working-directory: ./apps/web/desktop
@@ -85,14 +95,8 @@ jobs:
           echo ::set-output name=app_version::$(cat package.json | jq -r .version)
           echo ::set-output name=bundle_version::$(cat package.json | jq -r .build.mac.bundleVersion)
 
-      - name: Get App Store Version
-        id: appstore
-        uses: ilyalehchylin/appstore-connect-app-version@v1.2
-        with:
-          app-id: ${{ steps.app_metadata.outputs.apple_app_id }}
-          key-id: ${{ secrets.api_key_id }}
-          issuer-id: ${{ secrets.api_key_issuer_id }}
-          private-key-raw: ${{ secrets.api_key }}
+          echo ${{ steps.appstore.outputs.app-version-latest }}
+          echo $(cat package.json | jq -r .version)
 
       - name: Setup Node
         uses: actions/setup-node@v3
