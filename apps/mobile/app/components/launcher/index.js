@@ -102,7 +102,8 @@ const Launcher = React.memo(
       if (db.migrations.required() && !verifyUser) {
         presentSheet({
           component: <Migrate />,
-          onClose: () => {
+          onClose: async () => {
+            await db.init();
             loadNotes();
           },
           disableClosing: true
@@ -116,10 +117,6 @@ const Launcher = React.memo(
         useUserStore.getState().setUser(await db.user?.getUser());
       }
     }, [loadNotes, verifyUser]);
-
-    // useEffect(() => {
-    //   hideSplashScreen();
-    // }, [verifyUser]);
 
     useEffect(() => {
       if (!loading) {
