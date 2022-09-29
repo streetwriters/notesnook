@@ -63,6 +63,8 @@ export const migrations = {
   5.5: {},
   5.6: {
     notebook: (item) => {
+      if (!item.topics) return item;
+
       item.topics = item.topics.map((topic) => {
         delete topic.notes;
         return topic;
@@ -70,7 +72,11 @@ export const migrations = {
       return item;
     },
     settings: async (item, db) => {
+      if (!item.pins) return item;
+
       for (const pin of item.pins) {
+        if (!pin.data) continue;
+
         await db.shortcuts.add({
           item: {
             type: pin.type,
