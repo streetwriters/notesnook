@@ -140,7 +140,7 @@
       "category": "Office",
       "icon": "assets/icons/app.icns",
       "description": "Your private note taking space",
-      "executableName": "Notesnook"
+      "executableName": "notesnook"
     },
     "snap": {
       "autoStart": false,
