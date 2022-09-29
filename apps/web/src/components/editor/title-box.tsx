@@ -30,10 +30,11 @@ function TitleBox(props: TitleBoxProps) {
   const { readonly } = props;
   const inputRef = useRef<HTMLInputElement>(null);
   const title = useStore((store) => store.session.title);
+  const id = useStore((store) => store.session.id);
 
   useEffect(() => {
     if (inputRef.current) inputRef.current.value = title;
-  }, [title]);
+  }, [id]);
 
   return (
     <Input
