@@ -151,13 +151,6 @@ export const useActions = ({ close = () => null, item }) => {
     if (!item.id) return;
     close();
     let type = item.type;
-    if (db[`${type}s`].pinned.length === 3 && !item.pinned) {
-      ToastEvent.show({
-        heading: `Cannot pin more than 3 ${type}s`,
-        type: "error"
-      });
-      return;
-    }
     await db[`${type}s`][type](item.id).pin();
     Navigation.queueRoutesForUpdate(
       "TaggedNotes",
