@@ -34,6 +34,12 @@ class Migrator {
           await collection.dbCollection?._collection?.addItem(item);
           continue;
         }
+
+        // temporary fix for streetwriters/notesnook#751
+        if (item.type === "content") {
+          item.type = "tiptap";
+        }
+
         const migrate = migrations[version][item.type || collection.type];
         if (migrate) item = await migrate(item, db);
 
