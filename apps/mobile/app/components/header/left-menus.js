@@ -51,7 +51,7 @@ export const LeftMenus = () => {
     }
   };
 
-  return isTablet ? null : (
+  return isTablet && !canGoBack ? null : (
     <IconButton
       testID={notesnook.ids.default.header.buttons.left}
       customStyle={{
