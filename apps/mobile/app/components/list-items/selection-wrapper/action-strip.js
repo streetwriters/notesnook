@@ -69,22 +69,8 @@ export const ActionStrip = ({ note, setActionStrip }) => {
         if (!note.id) return;
 
         if (note.type === "note") {
-          if (db.notes.pinned.length === 3 && !note.pinned) {
-            ToastEvent.show({
-              heading: "Cannot pin more than 3 notes",
-              type: "error"
-            });
-            return;
-          }
           await db.notes.note(note.id).pin();
         } else {
-          if (db.notebooks.pinned.length === 3 && !note.pinned) {
-            ToastEvent.show({
-              heading: "Cannot pin more than 3 notebooks",
-              type: "error"
-            });
-            return;
-          }
           await db.notebooks.notebook(note.id).pin();
           setNotebooks();
         }
