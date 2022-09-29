@@ -62,7 +62,6 @@ jobs:
           name: build
           path: apps/web/build/**/*
 
-
       - name: Collect app metadata
         id: app_metadata
         working-directory: ./apps/web/desktop
@@ -71,7 +70,7 @@ jobs:
 
       - name: Package desktop build
         run: |
-          zip -r ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip ./apps/web/desktop/build/
+          zip -r ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip ./apps/web/build/
           echo "Build folder archived to ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip"
 
       - name: Upload desktop build
@@ -186,12 +185,6 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
-
-      - name: Collect app metadata
-        id: app_metadata
-        working-directory: ./apps/web/desktop
-        run: |
-          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
 
       - name: Setup Snapcraft Auth
         if: inputs.publish-snap
