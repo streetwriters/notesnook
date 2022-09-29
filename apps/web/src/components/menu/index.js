@@ -243,6 +243,7 @@ function MenuContainer({ title, children }) {
             fontFamily: "body",
             color: "primary"
           }}
+          data-test-id="menu-title"
         >
           {title}
         </Text>

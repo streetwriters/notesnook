@@ -95,8 +95,7 @@ export function useKeyboardListNavigation(
         }
         bulkSelect(indices);
         focusItemAt(endIndex);
-        // (item.firstElementChild as HTMLElement)?.focus();
-      } else {
+      } else if (e.button === 0) {
         resetSelection();
         select(itemIndex);
       }
