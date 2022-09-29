@@ -24,15 +24,7 @@ import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
 import { isTesting } from "../../utils/platform";
 import { useEffect } from "react";
-import {
-  ArrowRight,
-  Checkmark,
-  Icon,
-  Warn,
-  Sync,
-  Edit,
-  Github
-} from "../icons";
+import { ArrowRight, Checkmark, Icon, Warn, Pin } from "../icons";
 
 type CallToAction = {
   title: string;
@@ -99,32 +91,9 @@ const features: Record<FeatureKeys, Feature> = {
         ]
       : [
           {
-            icon: Github,
-            title: "Notesnook is now open source!",
-            subtitle: (
-              <>
-                {
-                  "If you didn't know already, we have gone fully open source! You can check out our source code "
-                }
-                <a href="https://github.com/streetwriters/notesnook">here</a>.
-                Be sure to leave a star!
-              </>
-            )
-          },
-          {
-            icon: Sync,
-            title: "Auto sync is now available for all users free or pro!"
-          },
-          {
-            icon: Edit,
-            title: "Editor now supports full real-time syncing",
-            subtitle:
-              "This means you no longer have to reopen a note to see the edits you made. And it works for locked notes too!"
-          },
-          {
-            title: "Lots of sync reliability improvements",
-            subtitle:
-              "We have fixed errors such as 'Some notes of this topic are not synced' & other issues like shortcuts suddenly disappearing etc."
+            icon: Pin,
+            title: "No limits on pins",
+            subtitle: "You can now pin as many notes & notebooks as you like."
           }
         ],
     cta: {

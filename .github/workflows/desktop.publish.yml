@@ -233,6 +233,22 @@ jobs:
           snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
         working-directory: ./apps/web/desktop
 
+      - name: Package desktop build
+        run: |
+          mv ./apps/web/desktop/build/ ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}
+          echo "Moved build folder to ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}"
+
+      - name: Upload desktop build
+        uses: fnkr/github-action-ghr@v1
+        if: inputs.publish-github
+        env:
+          GHR_COMPRESS: xz
+          GHR_DELETE: false
+          GHR_REPLACE: true
+          GHR_PATH: ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}
+          GITHUB_REF: refs/tags/v${{ steps.app_metadata.outputs.app_version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-windows:
     name: Build for Windows
     needs: build
