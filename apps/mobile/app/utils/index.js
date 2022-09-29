@@ -130,10 +130,12 @@ export function setWidthHeight(size) {
 export function getTotalNotes(item) {
   if (!item || item.type === "header") return 0;
   if (item.type === "topic") {
-    return db.notebooks.notebook(item.notebookId)?.topics.topic(item.id)
-      .totalNotes;
+    return (
+      db.notebooks.notebook(item.notebookId)?.topics.topic(item.id)
+        ?.totalNotes || 0
+    );
   }
-  return db.notebooks.notebook(item.id)?.totalNotes;
+  return db.notebooks.notebook(item.id)?.totalNotes || 0;
 }
 
 export async function toTXT(note, notitle) {
