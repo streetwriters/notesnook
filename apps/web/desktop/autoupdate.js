@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 const { autoUpdater } = require("electron-updater");
 const { EVENTS } = require("./events");
 const { sendMessageToRenderer } = require("./ipc/utils");
-const { getChangelog } = require("./changelog");
 
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
@@ -36,9 +35,7 @@ async function configureAutoUpdater() {
   autoUpdater.addListener("checking-for-update", () => {
     sendMessageToRenderer(EVENTS.checkingForUpdate);
   });
-  autoUpdater.addListener("update-available", async (info) => {
-    info.releaseNotes = await getChangelog(info.version);
-    console.log("Get release notes!", info.releaseNotes);
+  autoUpdater.addListener("update-available", (info) => {
     sendMessageToRenderer(EVENTS.updateAvailable, info);
   });
   autoUpdater.addListener("download-progress", (progress) => {

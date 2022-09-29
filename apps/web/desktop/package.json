@@ -13,8 +13,7 @@
     "electron-better-ipc": "^2.0.1",
     "electron-serve": "^1.1.0",
     "electron-updater": "^5.2.1",
-    "isomorphic-fetch": "^3.0.0",
-    "showdown": "^2.1.0"
+    "isomorphic-fetch": "^3.0.0"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.6.2",
@@ -22,9 +21,7 @@
     "electron-builder": "^23.3.3",
     "electron-builder-notarize": "^1.5.0",
     "electron-reloader": "^1.2.3",
-    "esbuild": "^0.15.8",
-    "mvdir": "^1.0.21",
-    "zx": "^7.0.7"
+    "esbuild": "^0.15.8"
   },
   "scripts": {
     "build": "esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node --tsconfig=tsconfig.json --define:MAC_APP_STORE=false",
