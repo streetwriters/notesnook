@@ -200,13 +200,6 @@ jobs:
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@v1
         if: inputs.publish-snap
-
-      - name: Get version info from Snapcraft
-        if: inputs.publish-snap
-        id: snapcraft
-        run:
-          echo ::set-output name=is_published::$(snapcraft status notesnook | grep ${{ steps.app_metadata.outputs.app_version }} | wc -l)
-          echo $is_published
         
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -228,7 +221,7 @@ jobs:
         working-directory: ./apps/web/desktop
 
       - name: Build snap
-        if: inputs.publish-snap && steps.snapcraft.outputs.is_published <= 0
+        if: inputs.publish-snap
         run: |
           npx electron-builder --linux snap -p never
         working-directory: ./apps/web/desktop
@@ -245,7 +238,7 @@ jobs:
         working-directory: ./apps/web/desktop
 
       - name: Publish on Snapcraft
-        if: inputs.publish-snap && steps.snapcraft.outputs.is_published <= 0
+        if: inputs.publish-snap
         run: |
           snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
         working-directory: ./apps/web/desktop
