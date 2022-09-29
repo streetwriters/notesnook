@@ -55,9 +55,6 @@ class NotebookStore extends BaseStore {
 
   pin = async (notebookId) => {
     const notebook = db.notebooks.notebook(notebookId);
-    if (!notebook._notebook.pinned && db.notebooks.pinned.length >= 3) {
-      throw new Error("You cannot pin more than 3 notebooks.");
-    }
     await notebook.pin();
     this.refresh();
   };
