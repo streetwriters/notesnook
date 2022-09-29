@@ -34,6 +34,7 @@ export const useEditor = (
   const [editor, setEditor] = useState<Editor | null>(null);
   const forceUpdate = useForceUpdate();
   const editorRef = useRef<Editor | null>(editor);
+  const updateTimeout = useRef<number>();
 
   useEffect(
     () => {
@@ -44,13 +45,16 @@ export const useEditor = (
       setEditor(instance);
 
       instance.on("transaction", () => {
-        requestAnimationFrame(() => {
+        clearTimeout(updateTimeout.current);
+        updateTimeout.current = setTimeout(() => {
           requestAnimationFrame(() => {
-            if (isMounted) {
-              forceUpdate();
-            }
+            requestAnimationFrame(() => {
+              if (isMounted) {
+                forceUpdate();
+              }
+            });
           });
-        });
+        }, 100) as unknown as number;
       });
 
       return () => {
