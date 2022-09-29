@@ -74,7 +74,6 @@ import { DateTime } from "./extensions/date-time";
 import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
 
-
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
   .filter(([name]) => name !== "ClipboardTextSerializer")
@@ -256,3 +255,4 @@ export * from "./types";
 export * from "./extensions/react";
 export * from "./toolbar";
 export { type AttachmentType, type Attachment } from "./extensions/attachment";
+export { type Fragment } from "prosemirror-model";

@@ -31,7 +31,8 @@ import {
   Editor,
   AttachmentType,
   usePermissionHandler,
-  getHTMLFromFragment
+  getHTMLFromFragment,
+  Fragment
 } from "@notesnook/editor";
 import { Box, Flex } from "@theme-ui/components";
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
@@ -69,17 +70,28 @@ type TipTapProps = {
 
 const SAVE_INTERVAL = process.env.REACT_APP_TEST ? 100 : 300;
 
-function save(text: string, onChange: () => void) {
-  onChange();
+function save(
+  sessionId: string,
+  noteId: string,
+  editor: Editor,
+  content: Fragment,
+  preventSave: boolean,
+  onChange?: (id: string, sessionId: string, html: string) => void
+) {
   configureEditor({
     statistics: {
       words: {
-        total: countWords(text),
+        total: countWords(content.textBetween(0, content.size)),
         selected: 0
       }
     }
   });
+
+  if (preventSave) return;
+  const html = getHTMLFromFragment(content, editor.schema);
+  onChange?.(noteId, sessionId, html);
 }
+
 const deferredSave = debounceWithId(save, SAVE_INTERVAL);
 
 function TipTap(props: TipTapProps) {
@@ -157,13 +169,16 @@ function TipTap(props: TipTapProps) {
         const preventSave = transaction?.getMeta("preventSave") as boolean;
         const { id, sessionId } = editorstore.get().session;
         const content = editor.state.doc.content;
-        const text = editor.view.dom.innerText;
 
-        deferredSave(sessionId, text, () => {
-          if (!editor.isEditable || preventSave) return;
-          const html = getHTMLFromFragment(content, editor.schema);
-          onChange?.(id, sessionId, html);
-        });
+        deferredSave(
+          sessionId,
+          sessionId,
+          id,
+          editor as Editor,
+          content,
+          preventSave || !editor.isEditable,
+          onChange
+        );
       },
       onDestroy: () => {
         configure({
@@ -181,12 +196,13 @@ function TipTap(props: TipTapProps) {
         });
       },
       onSelectionUpdate: ({ editor, transaction }) => {
+        const content = editor.state.doc.content;
         configure((old) => ({
           statistics: {
             words: {
               total:
                 old.statistics?.words.total ||
-                countWords(editor.view.dom.innerText),
+                countWords(content.textBetween(0, content.size)),
               selected: getSelectedWords(
                 editor as Editor,
                 transaction.selection
