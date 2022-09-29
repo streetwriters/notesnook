@@ -21,10 +21,18 @@ import { Page, Locator } from "@playwright/test";
 import { getTestId } from "../utils";
 
 export class ContextMenuModel {
-  constructor(private readonly page: Page) {}
+  readonly titleText: Locator;
+  constructor(private readonly page: Page) {
+    this.titleText = this.page.locator(getTestId(`menu-title`));
+  }
+
+  async title() {
+    return await this.titleText.textContent();
+  }
 
   async open(locator: Locator) {
     await locator.click({ button: "right" });
+    await this.titleText.waitFor();
   }
 
   async clickOnItem(id: string) {

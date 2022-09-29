@@ -50,6 +50,20 @@ test("ctrl+a should select all notes", async ({ page }) => {
   }
 });
 
+test("right clicking on selected notes should open multi-selection menu", async ({
+  page
+}) => {
+  const { notesList, notes } = await populateList(page);
+  await notes.focus();
+  await notes.press("Control+a");
+
+  await notesList[1].contextMenu.open();
+
+  expect(await notesList[1].contextMenu.title()).toBe(
+    `${notesList.length} items selected`
+  );
+});
+
 test("pressing Escape should deselect all items", async ({ page }) => {
   const { notesList, notes } = await populateList(page);
   await notes.focus();
