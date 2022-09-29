@@ -47,11 +47,9 @@ export default function useAutoUpdater() {
     function updateAvailable(info) {
       changeStatus({
         type: "available",
-        version: info.version,
-        changelog: info.releaseNotes
+        version: info.version
       });
       showUpdateAvailableNotice({
-        changelog: info.releaseNotes,
         version: info.version
       });
     }

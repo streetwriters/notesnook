@@ -71,4 +71,4 @@ export function getServiceWorkerVersion(
   });
 }
 
-export { getChangelog } from "@notesnook/desktop/changelog";
+export { getChangelog } from "./changelog";

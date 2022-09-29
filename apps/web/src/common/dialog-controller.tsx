@@ -36,7 +36,6 @@ import { formatDate } from "@notesnook/core/utils/date";
 import downloadUpdate from "../commands/download-update";
 import installUpdate from "../commands/install-update";
 import { AppVersion, getChangelog } from "../utils/version";
-import { isDesktop } from "../utils/platform";
 import { Period } from "../components/dialogs/buy-dialog/types";
 import { FeatureKeys } from "../components/dialogs/feature-dialog";
 import { AuthenticatorType } from "../components/dialogs/mfa/types";
@@ -706,13 +705,13 @@ export function showInvalidSystemTimeDialog({
   });
 }
 
-export function showUpdateAvailableNotice({
-  changelog,
+export async function showUpdateAvailableNotice({
   version
 }: {
-  changelog: string;
   version: string;
 }) {
+  const changelog = await getChangelog(version);
+
   return showUpdateDialog({
     title: `New version available`,
     subtitle: `v${version} is available for download`,
@@ -722,7 +721,7 @@ export function showUpdateAvailableNotice({
 }
 
 export async function showUpdateReadyNotice({ version }: { version: string }) {
-  const changelog = isDesktop() ? null : await getChangelog(version);
+  const changelog = await getChangelog(version);
   return await showUpdateDialog({
     title: `Update ready for installation`,
     subtitle: `v${version} is ready to be installed.`,
