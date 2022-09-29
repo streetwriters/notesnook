@@ -108,9 +108,6 @@ class NoteStore extends BaseStore {
 
   pin = async (id) => {
     const note = db.notes.note(id);
-    if (!note.data.pinned && db.notes.pinned.length >= 3) {
-      throw new Error("You cannot pin more than 3 notes.");
-    }
     await note.pin();
     this._syncEditor(note.id, "pinned", !note.data.pinned);
     this.refresh();
