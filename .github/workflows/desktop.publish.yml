@@ -62,6 +62,27 @@ jobs:
           name: build
           path: apps/web/build/**/*
 
+
+      - name: Collect app metadata
+        id: app_metadata
+        working-directory: ./apps/web/desktop
+        run: |
+          echo ::set-output name=app_version::$(cat package.json | jq -r .version)
+
+      - name: Package desktop build
+        run: |
+          zip -r ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip ./apps/web/desktop/build/
+          echo "Build folder archived to ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip"
+
+      - name: Upload desktop build
+        uses: softprops/action-gh-release@v1
+        if: inputs.publish-github
+        with:
+          draft: true
+          name: Notesnook Desktop v${{ steps.app_metadata.outputs.app_version }}
+          tag_name: v${{ steps.app_metadata.outputs.app_version }}
+          files: ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}.zip
+
   build-macos:
     name: Build for macOS
     needs: build
@@ -122,8 +143,6 @@ jobs:
           APPLE_API_KEY: ${{ secrets.api_key }}
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
           APPLE_API_KEY_ISSUER: ${{ secrets.api_key_issuer_id }}
-          API_KEY_ID: ${{ secrets.api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
         run: |
           npm run build:mas
           npx electron-builder --mac mas --universal -p never
@@ -137,8 +156,6 @@ jobs:
           APPLE_API_KEY: ${{ secrets.api_key }}
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
           APPLE_API_KEY_ISSUER: ${{ secrets.api_key_issuer_id }}
-          API_KEY_ID: ${{ secrets.api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
         run: |
           npm run build
           if [ ${{ inputs.publish-github }} == true ]; then
@@ -232,22 +249,6 @@ jobs:
         run: |
           snapcraft upload --release=stable ./dist/notesnook_linux_amd64.snap
         working-directory: ./apps/web/desktop
-
-      - name: Package desktop build
-        run: |
-          mv ./apps/web/desktop/build/ ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}
-          echo "Moved build folder to ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}"
-
-      - name: Upload desktop build
-        uses: fnkr/github-action-ghr@v1
-        if: inputs.publish-github
-        env:
-          GHR_COMPRESS: xz
-          GHR_DELETE: false
-          GHR_REPLACE: true
-          GHR_PATH: ./notesnook_build_v${{ steps.app_metadata.outputs.app_version }}
-          GITHUB_REF: refs/tags/v${{ steps.app_metadata.outputs.app_version }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-windows:
     name: Build for Windows
