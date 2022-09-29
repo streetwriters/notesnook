@@ -139,9 +139,6 @@ jobs:
         env:
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
-          APPLE_API_KEY: AuthKey_${{ secrets.api_key_id }}.p8
-          APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
-          APPLE_API_KEY_ISSUER: ${{ secrets.api_key_issuer_id }}
         run: |
           npm run build:mas
           npx electron-builder --mac mas --universal -p never
@@ -152,7 +149,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.mac_certs }}
           CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
-          APPLE_API_KEY: AuthKey_${{ secrets.api_key_id }}.p8
+          APPLE_API_KEY: ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
           APPLE_API_KEY_ID: ${{ secrets.api_key_id }}
           APPLE_API_KEY_ISSUER: ${{ secrets.api_key_issuer_id }}
         run: |
