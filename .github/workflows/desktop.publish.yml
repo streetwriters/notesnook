@@ -171,7 +171,7 @@ jobs:
 
           echo "Uploading ${package} using altool..."
 
-          xcrun altool --upload-package $package -t osx --apiKey $API_KEY_ID --apiIssuer $API_KEY_ISSUER_ID --apple-id ${{ steps.app_metadata.outputs.apple_app_id }} --bundle-id ${{ steps.app_metadata.outputs.app_bundle_id }}--bundle-short-version-string ${{ steps.app_metadata.outputs.app_version }} --bundle-version ${{ steps.app_metadata.outputs.bundle_version }}
+          xcrun altool --upload-package $package -t osx --apiKey $API_KEY_ID --apiIssuer $API_KEY_ISSUER_ID --apple-id ${{ steps.app_metadata.outputs.apple_app_id }} --bundle-id ${{ steps.app_metadata.outputs.app_bundle_id }} --bundle-short-version-string ${{ steps.app_metadata.outputs.app_version }} --bundle-version ${{ steps.app_metadata.outputs.bundle_version }}
         working-directory: ./apps/web/desktop
 
   build-linux:
