@@ -82,6 +82,7 @@ const _TabsHolder = () => {
   const animatedTranslateY = useSharedValue(-9999);
   const overlayRef = useRef();
   const [orientation, setOrientation] = useState(getInitialOrientation());
+
   const introCompleted = useSettingStore(
     (state) => state.settings.introCompleted
   );
@@ -192,7 +193,7 @@ const _TabsHolder = () => {
     }
     let size = event?.nativeEvent?.layout;
     if (!size || (size.width === dimensions.width && deviceMode !== null)) {
-      DDS.setSize(size);
+      DDS.setSize(size, orientation);
       setDeviceMode(deviceMode, size);
       checkDeviceType(size);
       return;
@@ -209,8 +210,7 @@ const _TabsHolder = () => {
       height: size.height
     });
     setWidthHeight(size);
-    DDS.setSize(size);
-
+    DDS.setSize(size, orientation);
     if (DDS.isLargeTablet()) {
       setDeviceMode("tablet", size);
       setTimeout(() => {
