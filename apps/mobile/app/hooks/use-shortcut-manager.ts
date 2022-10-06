@@ -22,9 +22,14 @@ import { NativeEventEmitter, NativeModule } from "react-native";
 import { useRef } from "react";
 import { Platform } from "react-native";
 import { Linking } from "react-native";
+import deviceInfoModule from "react-native-device-info";
 const ShortcutsEmitter = new NativeEventEmitter(
   Shortcuts as unknown as NativeModule
 );
+
+function isSupported() {
+  return Platform.OS !== "android" || deviceInfoModule.getApiLevelSync() > 25;
+}
 const defaultShortcuts: ShortcutItem[] = [
   {
     type: "notesnook.action.newnote",
@@ -43,6 +48,7 @@ export const useShortcutManager = ({
   const initialShortcutRecieved = useRef(false);
 
   useEffect(() => {
+    if (!isSupported()) return;
     Shortcuts.setShortcuts(shortcuts);
   }, [shortcuts]);
 
@@ -52,6 +58,7 @@ export const useShortcutManager = ({
         onShortcutPressed(defaultShortcuts[0]);
       }
     });
+    if (!isSupported()) return;
     Shortcuts.getInitialShortcut().then((shortcut) => {
       if (initialShortcutRecieved.current) return;
       onShortcutPressed(shortcut);
