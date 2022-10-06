@@ -1,4 +1,3 @@
-#!/usr/bin/env -S npx zx
 /*
 This file is part of the Notesnook project (https://notesnook.com/)
 
