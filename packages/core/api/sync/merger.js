@@ -128,14 +128,7 @@ class Merger {
     // it is a locked note, bail out.
     if (deserialized.alg && deserialized.cipher) return deserialized;
 
-    let type = deserialized.type;
-    // temporary fix for streetwriters/notesnook#751
-    if (type === "content") {
-      type = "tiptap";
-      deserialized.type = type;
-    }
-
-    return migrateItem(deserialized, version, type, this._db);
+    return migrateItem(deserialized, version, deserialized.type, this._db);
   }
 
   async _deserialize(item, migrate = true) {
