@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useStore } from "../../stores/editor-store";
 import { Input } from "@theme-ui/components";
 import * as Icon from "../icons";
@@ -80,9 +80,9 @@ function Autosuggest({
   onAdd,
   defaultItems
 }) {
-  const [filtered, setFiltered] = useState([]);
   const inputRef = useRef();
-  const { openMenu, closeMenu } = useMenuTrigger();
+  const filteredItems = useRef([]);
+  const { openMenu, closeMenu, isOpen } = useMenuTrigger();
   const clearInput = useCallback(() => {
     inputRef.current.value = "";
     inputRef.current.focus();
@@ -100,60 +100,58 @@ function Autosuggest({
         onAdd(value);
       }
       clearInput();
+      closeMenu();
     },
-    [onSelect, onAdd, clearInput]
+    [clearInput, closeMenu, onSelect, onAdd]
+  );
+
+  const onOpenMenu = useCallback(
+    (filtered) => {
+      const filterText = getInputValue();
+      let items = [];
+
+      if (!filterText && filtered.length <= 0) {
+        closeMenu();
+        return;
+      }
+
+      const isExactMatch = filtered.some((item) => item.title === filterText);
+      if (filterText && !isExactMatch) {
+        items.push({
+          key: "new",
+          title: () => `Create "${filterText}" tag`,
+          icon: Icon.Plus,
+          onClick: () => onAction("add", filterText)
+        });
+      }
+
+      if (filtered.length > 0) {
+        items.push(
+          ...filtered.map((tag) => ({
+            key: tag.id,
+            title: () => tag.alias,
+            icon: Icon.Tag,
+            onClick: () => onAction("select", tag)
+          }))
+        );
+      }
+
+      openMenu(items, {
+        type: "autocomplete",
+        positionOptions: {
+          relativeTo: inputRef.current,
+          absolute: true,
+          location: "below"
+        }
+      });
+      filteredItems.current = filtered;
+    },
+    [closeMenu, getInputValue, onAction, openMenu]
   );
 
   useEffect(() => {
-    const filterText = getInputValue();
-    let items = [];
-    if (filterText.length <= 0 && filtered.length <= 0) {
-      closeMenu();
-      return;
-    }
-
-    if (
-      filterText.length > 0 &&
-      filtered.every((item) => item.title !== filterText)
-    ) {
-      items.push({
-        key: "new",
-        title: () => `Create "${filterText}" tag`,
-        icon: Icon.Plus,
-        onClick: () => onAction("add", filterText)
-      });
-    }
-
-    if (filtered.length > 0) {
-      items.push(
-        ...filtered.map((tag) => ({
-          key: tag.id,
-          title: () => tag.title,
-          icon: Icon.Tag,
-          onClick: () => onAction("select", tag)
-        }))
-      );
-    }
-
-    openMenu(items, {
-      type: "autocomplete",
-      positionOptions: {
-        relativeTo: inputRef.current,
-        absolute: true,
-        location: "below"
-      }
-    });
-  }, [filtered, getInputValue, closeMenu, openMenu, onAction]);
-
-  useEffect(() => {
-    const text = getInputValue();
-    const isFocused = document.activeElement === inputRef.current;
-    if (isFocused && !text) setFiltered(defaultItems);
-  }, [defaultItems, getInputValue]);
-
-  useEffect(() => {
-    setFiltered([]);
-  }, [sessionId]);
+    closeMenu();
+  }, [sessionId, closeMenu]);
 
   return (
     <Input
@@ -170,30 +168,36 @@ function Autosuggest({
       data-test-id="editor-tag-input"
       onFocus={() => {
         const text = getInputValue();
-        if (!text) setFiltered(defaultItems);
+        console.log(defaultItems);
+        if (!text) onOpenMenu(defaultItems.slice());
       }}
       onChange={(e) => {
         const { value } = e.target;
         if (!value.length) {
-          setFiltered([]);
+          closeMenu();
           return;
         }
-        setFiltered(filter(value));
+        onOpenMenu(filter(value));
       }}
       onKeyDown={(e) => {
         const text = getInputValue();
-        if (e.key === "Enter" && !!text && !filtered.length) {
+        if (
+          e.key === "Enter" &&
+          !!text &&
+          isOpen &&
+          filteredItems.current.length <= 0
+        ) {
           onAction("add", text);
-        } else if (e.key === "Enter" && !!text && !!filtered.length) {
-          onAction("select", filtered[0]);
+        } else if (e.key === "Enter" && !!text && isOpen) {
+          onAction("select", filteredItems.current[0]);
         } else if (!text && e.key === "Backspace") {
           onRemove();
-          setFiltered([]);
+          closeMenu();
         } else if (e.key === "Escape") {
-          setFiltered([]);
+          closeMenu();
           e.stopPropagation();
         } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-          if (e.key === "ArrowDown" && !text) setFiltered(defaultItems);
+          if (e.key === "ArrowDown" && !text) onOpenMenu(defaultItems.slice());
 
           e.preventDefault();
         }
