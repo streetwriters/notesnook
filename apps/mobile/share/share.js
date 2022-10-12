@@ -49,6 +49,7 @@ import { eOnLoadNote } from "../app/utils/events";
 import { Search } from "./search";
 import { useShareStore } from "./store";
 import { useCallback } from "react";
+import { sleep } from "../app/utils/time";
 const getLinkPreview = (url) => {
   return getPreviewData(url, 5000);
 };
@@ -320,7 +321,7 @@ const ShareView = ({ quicknote = false }) => {
     setLoading(true);
     await db.init();
     await db.notes.init();
-
+    await sleep(1500);
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
       Alert.alert("The note you are trying to append to has been deleted.");
@@ -330,6 +331,7 @@ const ShareView = ({ quicknote = false }) => {
     let _note;
     if (appendNote && db.notes.note(appendNote.id)) {
       let raw = await db.content.raw(appendNote.contentId);
+      console.log("Current content:",noteContent.current);
       _note = {
         content: {
           data: raw.data + "\n" + noteContent.current,
