@@ -68,7 +68,7 @@
     "afterPack": "./scripts/removeLocales.js",
     "mac": {
       "bundleVersion": "221",
-      "minimumSystemVersion": "10.14.0",
+      "minimumSystemVersion": "10.12.0",
       "target": [
         {
           "target": "dmg",
