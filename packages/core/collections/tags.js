@@ -22,6 +22,7 @@ import { makeId } from "../utils/id";
 import { deleteItems, hasItem } from "../utils/array";
 import setManipulator from "../utils/set";
 import { Mutex } from "async-mutex";
+import { checkIsUserPremium, CHECK_IDS } from "../common";
 
 export default class Tags extends Collection {
   constructor(db, name, cached) {
@@ -49,6 +50,13 @@ export default class Tags extends Collection {
 
       if (tag && !noteIds.length)
         throw new Error("A tag with this id already exists.");
+
+      if (
+        !tag &&
+        this.all.length >= 5 &&
+        !(await checkIsUserPremium(CHECK_IDS.noteTag))
+      )
+        return;
 
       tag = tag || {
         title: tagId
