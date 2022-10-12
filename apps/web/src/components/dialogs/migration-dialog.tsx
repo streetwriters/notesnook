@@ -35,7 +35,7 @@ export default function MigrationDialog(props: MigrationDialogProps) {
       isOpen={true}
       title={"Database migration required"}
       description={
-        "Due to new features we need to migrate your data to a newer version. This is NOT a destructive operation."
+        "Due to new features we need to migrate your data to a newer version."
       }
       positiveButton={{
         text: "Backup and migrate",
@@ -62,18 +62,7 @@ export default function MigrationDialog(props: MigrationDialogProps) {
           your data.
         </Text>
         <Text as="li" variant={"body"}>
-          Some <b>merge conflicts</b> are expected in your notes after a
-          migration. It is <b>recommended</b> that you resolve them carefully.
-          <Text as="ol" sx={{ paddingInlineStart: 20 }}>
-            <Text as="li" variant={"body"}>
-              <b>But if you are feeling reckless enough</b> to risk losing some
-              data, you can logout &amp; log back in.
-            </Text>
-          </Text>
-        </Text>
-        <Text as="li" variant={"body"}>
-          If you face any other issues or if you are unsure about what to do,
-          feel free to reach out to us via{" "}
+          If you face any issues feel free to reach out to us via{" "}
           <a href="https://discord.com/invite/zQBK97EE22">Discord</a> or email
           us at{" "}
           <a href="mailto:support@streetwriters.co">support@streetwriters.co</a>
