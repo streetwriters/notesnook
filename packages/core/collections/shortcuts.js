@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Collection from "./collection";
-import getId from "../utils/id";
+import { EVENTS } from "../common";
 
 /**
  * @typedef {{
@@ -45,6 +45,11 @@ export default class Shortcuts extends Collection {
     await this._collection.addItem(shortcut);
   }
 
+  async init() {
+    await super.init();
+    await this.dedupe();
+  }
+
   /**
    *
    * @param {Partial<Shortcut>} shortcut
@@ -53,7 +58,9 @@ export default class Shortcuts extends Collection {
   async add(shortcut) {
     if (!shortcut) return;
     if (shortcut.remote)
-      throw new Error("Please use db.shortcuts.merge to merge remote notes.");
+      throw new Error(
+        "Please use db.shortcuts.merge to merge remote shortcuts."
+      );
 
     if (!ALLOWED_SHORTCUT_TYPES.includes(shortcut.item.type))
       throw new Error("Cannot create a shortcut for this type of item.");
@@ -63,12 +70,13 @@ export default class Shortcuts extends Collection {
       : shortcut.id
       ? this._collection.getItem(shortcut.id)
       : null;
-    const id = shortcut.id || (oldShortcut && oldShortcut.id) || getId();
 
     shortcut = {
       ...oldShortcut,
       ...shortcut
     };
+
+    const id = shortcut.id || shortcut.item.id;
 
     shortcut = {
       id,
@@ -147,5 +155,22 @@ export default class Shortcuts extends Collection {
     for (const { id } of shortcuts) {
       await this._collection.removeItem(id);
     }
+  }
+
+  async dedupe() {
+    const oldShortcuts = this.all.filter(
+      (shortcut) => shortcut.id !== shortcut.item.id
+    );
+
+    for (const shortcut of oldShortcuts) {
+      await this._collection.addItem({ ...shortcut, id: shortcut.item.id });
+    }
+
+    for (const shortcut of oldShortcuts) {
+      await this._collection.removeItem(shortcut.id);
+    }
+
+    if (oldShortcuts.length > 0)
+      this._db.eventManager.publish(EVENTS.appRefreshRequested);
   }
 }
