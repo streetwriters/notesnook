@@ -258,7 +258,11 @@ function TipTap(props: TipTapProps) {
       const isEmpty = lastNode?.nodeSize === 2;
       if (isLastNodeParagraph && isEmpty) currentEditor?.commands.focus("end");
       else {
-        currentEditor?.chain().focus("end").insertContent("<p></p>").run();
+        currentEditor
+          ?.chain()
+          .insertContentAt(currentEditor?.state.doc.nodeSize - 2, "<p></p>")
+          .focus("end")
+          .run();
       }
     }
     editorContainer.addEventListener("click", onClick);
