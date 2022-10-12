@@ -322,6 +322,7 @@ const ShareView = ({ quicknote = false }) => {
     await db.init();
     await db.notes.init();
     await sleep(1500);
+    if (!noteContent.current) return;
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
       Alert.alert("The note you are trying to append to has been deleted.");
@@ -331,7 +332,6 @@ const ShareView = ({ quicknote = false }) => {
     let _note;
     if (appendNote && db.notes.note(appendNote.id)) {
       let raw = await db.content.raw(appendNote.contentId);
-      console.log("Current content:",noteContent.current);
       _note = {
         content: {
           data: raw.data + "\n" + noteContent.current,
