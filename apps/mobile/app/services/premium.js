@@ -38,6 +38,7 @@ import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
 import Config from "react-native-config";
 
 import SettingsService from "./settings";
+import { sleep } from "../utils/time";
 let premiumStatus = 0;
 let products = [];
 let user = null;
@@ -94,7 +95,7 @@ async function getProducts() {
 }
 
 function get() {
-  if (__DEV__ || Config.isTesting) return true;
+  //if (__DEV__ || Config.isTesting) return true;
 
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
@@ -150,7 +151,9 @@ const onUserStatusCheck = async (type) => {
         };
         break;
       case CHECK_IDS.notebookAdd:
-        eSendEvent(eOpenPremiumDialog);
+        setTimeout(() => {
+          eSendEvent(eOpenPremiumDialog);
+        }, 500);
         break;
       case CHECK_IDS.vaultAdd:
         message = {
