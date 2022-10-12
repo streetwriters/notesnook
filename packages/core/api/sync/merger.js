@@ -18,10 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { migrations } from "../../migrations";
-import SparkMD5 from "spark-md5";
 import setManipulator from "../../utils/set";
 import { CURRENT_DATABASE_VERSION } from "../../common";
 import { logger } from "../../logger";
+import { isHTMLEqual } from "../../utils/html-diff";
 
 class Merger {
   /**
@@ -70,7 +70,7 @@ class Merger {
               !local.data ||
               !remote.data ||
               remote.data === "undefined" || //TODO not sure about this
-              SparkMD5.hash(local.data) === SparkMD5.hash(remote.data))
+              isHTMLEqual(local.data, remote.data))
           )
             return;
 
