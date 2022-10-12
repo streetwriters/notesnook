@@ -71,7 +71,7 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return search(array, query, (n) => n.title);
+    return search(array, query, (n) => n.alias || n.title);
   }
 }
 
