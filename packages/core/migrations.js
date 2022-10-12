@@ -98,7 +98,22 @@ const migrations = [
       }
     }
   },
-  { version: 5.7, types: {} }
+  {
+    version: 5.7,
+    types: {
+      tiny: (item) => {
+        if (!item.data || item.data.iv) return item;
+        item.type = "tiptap";
+        return item;
+      },
+      content: (item) => {
+        if (!item.data || item.data.iv) return item;
+        item.type = "tiptap";
+        return item;
+      }
+    }
+  },
+  { version: 5.8, types: {} }
 ];
 
 export async function migrateItem(item, version, type, database) {

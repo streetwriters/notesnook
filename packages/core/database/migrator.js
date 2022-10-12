@@ -30,14 +30,10 @@ class Migrator {
           continue;
         }
 
+        // check if item is permanently deleted or just a soft delete
         if (item.deleted && !item.type) {
           await collection.dbCollection?._collection?.addItem(item);
           continue;
-        }
-
-        // temporary fix for streetwriters/notesnook#751
-        if (item.type === "content") {
-          item.type = "tiptap";
         }
 
         item = await migrateItem(

@@ -83,4 +83,4 @@ export const EVENTS = {
   systemTimeInvalid: "system:invalidTime"
 };
 
-export const CURRENT_DATABASE_VERSION = 5.7;
+export const CURRENT_DATABASE_VERSION = 5.8;
