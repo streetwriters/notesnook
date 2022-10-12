@@ -30,6 +30,7 @@ import { sanitizeFilename } from "../utils/sanitizer";
 import { sleep } from "../utils/time";
 import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
 import SettingsService from "./settings";
+import PremiumService from "./premium";
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -164,9 +165,10 @@ async function run(progress, context) {
   }
 
   try {
+
     backup = await db.backup.export(
       "mobile",
-      SettingsService.get().encryptedBackup
+      PremiumService.get() ? SettingsService.get().encryptedBackup : false
     );
     if (!backup) throw new Error("Backup returned empty.");
   } catch (e) {
