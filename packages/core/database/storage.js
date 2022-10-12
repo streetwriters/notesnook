@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { randomBytes } from "../utils/random";
 
 export default class Storage {
-  constructor(context) {
-    this.storage = context;
+  constructor(storage) {
+    this.storage = storage;
   }
 
   write(key, data) {

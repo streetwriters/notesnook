@@ -20,14 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Storage from "./storage";
 
 export default class Indexer extends Storage {
-  constructor(context, type) {
-    super(context);
+  constructor(storage, type) {
+    super(storage);
     this.type = type;
     this.indices = [];
   }
 
   async init() {
-    this.indices = (await this.read(this.type, true)) || [];
+    this.indices = (await super.read(this.type, true)) || [];
+    await this.migrateIndices();
   }
 
   exists(key) {
@@ -37,7 +38,7 @@ export default class Indexer extends Storage {
   async index(key) {
     if (this.exists(key)) return;
     this.indices.push(key);
-    await this.write(this.type, this.indices);
+    await super.write(this.type, this.indices);
   }
 
   getIndices() {
@@ -47,11 +48,52 @@ export default class Indexer extends Storage {
   async deindex(key) {
     if (!this.exists(key)) return;
     this.indices.splice(this.indices.indexOf(key), 1);
-    await this.write(this.type, this.indices);
+    await super.write(this.type, this.indices);
   }
 
   async clear() {
     this.indices = [];
     await super.clear();
   }
+
+  read(key, isArray = false) {
+    return super.read(this.makeId(key), isArray);
+  }
+
+  write(key, data) {
+    return super.write(this.makeId(key), data);
+  }
+
+  remove(key) {
+    return super.remove(this.makeId(key));
+  }
+
+  async readMulti(keys) {
+    const entries = await super.readMulti(keys.map(this.makeId));
+    entries.forEach((entry) => {
+      entry[0] = entry[0].replace(`_${this.type}`, "");
+    });
+    return entries;
+  }
+
+  async migrateIndices() {
+    const keys = (await super.getAllKeys()).filter(
+      (key) => !key.endsWith(`_${this.type}`) && this.exists(key)
+    );
+    for (const id of keys) {
+      const item = await super.read(id);
+      if (!item) continue;
+
+      await this.write(id, item);
+    }
+
+    // remove old ids once they have been moved
+    for (const id of keys) {
+      await this.remove(id);
+    }
+  }
+
+  makeId = (id) => {
+    return `${id}_${this.type}`;
+  };
 }
