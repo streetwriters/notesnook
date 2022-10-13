@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Collection from "./collection";
-import { EVENTS } from "../common";
+import { EV, EVENTS } from "../common";
 
 /**
  * @typedef {{
@@ -170,7 +170,6 @@ export default class Shortcuts extends Collection {
       await this._collection.removeItem(shortcut.id);
     }
 
-    if (oldShortcuts.length > 0)
-      this._db.eventManager.publish(EVENTS.appRefreshRequested);
+    if (oldShortcuts.length > 0) EV.publish(EVENTS.appRefreshRequested);
   }
 }
