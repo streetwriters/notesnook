@@ -64,6 +64,7 @@ import { openPath } from "../commands/open";
 import { getAllAccents } from "@notesnook/theme";
 import { debounce } from "../utils/debounce";
 import { clearLogs, downloadLogs } from "../utils/logger";
+import { exportNotes } from "../common/export";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -507,6 +508,27 @@ function Settings() {
                 tip="Create a backup file of all your data"
               />
             </Button>
+            <OptionsItem
+              title={"Export all your notes"}
+              tip={
+                "Create a zip file containing all your notes as TXT, MD or HTML files"
+              }
+              options={["Text", "Markdown", "HTML"]}
+              selectedOption={-1}
+              onSelectionChanged={async (option) => {
+                await db.notes.init();
+                const format =
+                  option === "Text"
+                    ? "txt"
+                    : option === "Markdown"
+                    ? "md"
+                    : "html";
+                await exportNotes(
+                  format,
+                  db.notes.all.map((n) => n.id)
+                );
+              }}
+            />
             {isLoggedIn && (
               <>
                 <Button
@@ -865,7 +887,7 @@ function OptionsItem(props) {
               ":hover": { color: selectedOption === index ? "static" : "text" },
               flex: 1,
               textAlign: "center",
-              color: selectedOption === index ? "static" : "gray"
+              color: selectedOption === index ? "static" : "bgSecondaryText"
             }}
           >
             {option}

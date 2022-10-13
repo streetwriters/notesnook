@@ -152,6 +152,9 @@ export default class Notes extends Collection {
     return this._collection.getRaw();
   }
 
+  /**
+   * @returns {any[]}
+   */
   get all() {
     const items = this._collection.getItems();
     return items;
