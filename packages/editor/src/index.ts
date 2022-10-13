@@ -73,6 +73,7 @@ import { Code } from "@tiptap/extension-code";
 import { DateTime } from "./extensions/date-time";
 import { OpenLink, OpenLinkOptions } from "./extensions/open-link";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import { KeyMap } from "./extensions/key-map";
 
 const CoreExtensions = Object.entries(TiptapCoreExtensions)
   // we will implement our own customized clipboard serializer
@@ -222,7 +223,8 @@ const useTiptap = (
         MathBlock,
         KeepInView,
         SelectionPersist,
-        DateTime
+        DateTime,
+        KeyMap
       ],
       onBeforeCreate: ({ editor }) => {
         editor.storage.portalProviderAPI = PortalProviderAPI;
