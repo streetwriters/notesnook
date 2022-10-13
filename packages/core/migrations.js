@@ -19,88 +19,123 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { parseHTML } from "./utils/html-parser";
 import { decodeHTML5 } from "entities";
+import { CURRENT_DATABASE_VERSION } from "./common";
 
-export const migrations = {
-  5.0: {},
-  5.1: {},
-  5.2: {
-    note: replaceDateEditedWithDateModified(),
-    notebook: (item) => {
-      item = replaceDateEditedWithDateModified()(item);
-      return migrations["5.6"].notebook(item);
-    },
-    tag: replaceDateEditedWithDateModified(true),
-    attachment: replaceDateEditedWithDateModified(true),
-    trash: replaceDateEditedWithDateModified(),
-    tiny: (item) => {
-      item = replaceDateEditedWithDateModified()(item);
+const migrations = [
+  { version: 5.0, types: {} },
+  { version: 5.1, types: {} },
+  {
+    version: 5.2,
+    types: {
+      note: replaceDateEditedWithDateModified(false),
+      notebook: replaceDateEditedWithDateModified(false),
+      tag: replaceDateEditedWithDateModified(true),
+      attachment: replaceDateEditedWithDateModified(true),
+      trash: replaceDateEditedWithDateModified(),
+      tiny: (item) => {
+        item = replaceDateEditedWithDateModified(false)(item);
 
-      if (!item.data || item.data.iv) return migrations["5.3"].tiny(item);
+        if (!item.data || item.data.iv) return item;
 
-      item.data = removeToxClassFromChecklist(wrapTablesWithDiv(item.data));
-      return migrations["5.3"].tiny(item);
-    },
-    settings: (item) => {
-      item = replaceDateEditedWithDateModified(true)(item);
-      return migrations["5.6"].settings(item);
+        item.data = removeToxClassFromChecklist(wrapTablesWithDiv(item.data));
+        return item;
+      },
+      settings: replaceDateEditedWithDateModified(true)
     }
   },
-  5.3: {
-    tiny: (item) => {
-      if (!item.data || item.data.iv) return migrations["5.4"].tiny(item);
-      item.data = decodeWrappedTableHtml(item.data);
-      return migrations["5.4"].tiny(item);
-    }
-  },
-  5.4: {
-    tiny: (item) => {
-      if (!item.data || item.data.iv) return item;
-      item.type = "tiptap";
-      item.data = tinyToTiptap(item.data);
-      return item;
-    }
-  },
-  5.5: {},
-  5.6: {
-    notebook: (item) => {
-      if (!item.topics) return item;
-
-      item.topics = item.topics.map((topic) => {
-        delete topic.notes;
-        return topic;
-      });
-      return item;
-    },
-    settings: async (item, db) => {
-      if (!item.pins) return item;
-
-      for (const pin of item.pins) {
-        if (!pin.data) continue;
-
-        await db.shortcuts.add({
-          item: {
-            type: pin.type,
-            id: pin.data.id,
-            notebookId: pin.data.notebookId
-          }
-        });
+  {
+    version: 5.3,
+    types: {
+      tiny: (item) => {
+        if (!item.data || item.data.iv) return item;
+        item.data = decodeWrappedTableHtml(item.data);
+        return item;
       }
-      delete item.pins;
-      return item;
     }
   },
-  5.7: {
-    note: false,
-    shortcut: false,
-    notebook: false,
-    tag: false,
-    attachment: false,
-    trash: false,
-    tiny: false,
-    tiptap: false,
-    settings: false
+  {
+    version: 5.4,
+    types: {
+      tiny: (item) => {
+        if (!item.data || item.data.iv) return item;
+        item.type = "tiptap";
+        item.data = tinyToTiptap(item.data);
+        return item;
+      }
+    }
+  },
+  {
+    version: 5.5,
+    types: {}
+  },
+  {
+    version: 5.6,
+    types: {
+      notebook: (item) => {
+        if (!item.topics) return item;
+
+        item.topics = item.topics.map((topic) => {
+          delete topic.notes;
+          return topic;
+        });
+        return item;
+      },
+      settings: async (item, db) => {
+        if (!item.pins) return item;
+
+        for (const pin of item.pins) {
+          if (!pin.data) continue;
+          await db.shortcuts.add({
+            item: {
+              type: pin.type,
+              id: pin.data.id,
+              notebookId: pin.data.notebookId
+            }
+          });
+        }
+        delete item.pins;
+        return item;
+      }
+    }
+  },
+  {
+    version: 5.7,
+    types: {
+      tiny: (item) => {
+        if (!item.data || item.data.iv) return item;
+        item.type = "tiptap";
+        return item;
+      },
+      content: (item) => {
+        if (!item.data || item.data.iv) return item;
+        item.type = "tiptap";
+        return item;
+      }
+    }
+  },
+  { version: 5.8, types: {} }
+];
+
+export async function migrateItem(item, version, type, database) {
+  let migrationStartIndex = migrations.findIndex((m) => m.version === version);
+  if (migrationStartIndex <= -1) {
+    throw new Error(
+      version > CURRENT_DATABASE_VERSION
+        ? `Please update the app to the latest version.`
+        : `You seem to be on a very outdated version. Please update the app to the latest version.`
+    );
   }
-};
+
+  for (; migrationStartIndex < migrations.length; ++migrationStartIndex) {
+    const migration = migrations[migrationStartIndex];
+    if (migration.version === CURRENT_DATABASE_VERSION) break;
+
+    const itemMigrator = migration.types[type];
+    if (!itemMigrator) continue;
+    item = await itemMigrator(item, database);
+  }
+  return item;
+}
 
 function replaceDateEditedWithDateModified(removeDateEditedProperty = false) {
   return function (item) {

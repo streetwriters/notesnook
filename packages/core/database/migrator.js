@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { migrations } from "../migrations";
+import { migrateItem } from "../migrations";
 
 class Migrator {
   async migrate(db, collections, get, version) {
@@ -30,18 +30,18 @@ class Migrator {
           continue;
         }
 
+        // check if item is permanently deleted or just a soft delete
         if (item.deleted && !item.type) {
           await collection.dbCollection?._collection?.addItem(item);
           continue;
         }
 
-        // temporary fix for streetwriters/notesnook#751
-        if (item.type === "content") {
-          item.type = "tiptap";
-        }
-
-        const migrate = migrations[version][item.type || collection.type];
-        if (migrate) item = await migrate(item, db);
+        item = await migrateItem(
+          item,
+          version,
+          item.type || collection.type,
+          db
+        );
 
         if (collection.dbCollection.merge) {
           await collection.dbCollection.merge(item);

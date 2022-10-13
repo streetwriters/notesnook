@@ -48,6 +48,7 @@ import { Walkthrough } from "../walkthroughs";
 import { features } from "./features";
 import { Group } from "./group";
 import { PricingPlans } from "./pricing-plans";
+import { Platform } from 'react-native';
 
 export const Component = ({ close, promo }) => {
   const colors = useThemeStore((state) => state.colors);
@@ -104,7 +105,7 @@ export const Component = ({ close, promo }) => {
         customStyle={{
           position: "absolute",
           right: DDS.isTab ? 30 : 15,
-          top: 30,
+          top: Platform.OS === "ios" ? 0 : 30,
           zIndex: 10,
           width: 50,
           height: 50

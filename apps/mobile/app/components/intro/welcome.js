@@ -94,6 +94,35 @@ export const WelcomeNotice = () => {
         type="accent"
         title="Create your account"
       />
+
+      <Button
+        title="Skip for now"
+        onPress={() => {
+          SettingsService.set({
+            introCompleted: true
+          });
+          Navigation.replace(
+            {
+              name: "Notes"
+            },
+            {
+              canGoBack: false
+            }
+          );
+        }}
+        iconSize={20}
+        type="gray"
+        iconPosition="right"
+        icon="chevron-right"
+        height={25}
+        iconStyle={{
+          marginTop: 2
+        }}
+        style={{
+          paddingHorizontal: 6,
+          marginTop:10
+        }}
+      />
     </Animated.View>
   );
 };

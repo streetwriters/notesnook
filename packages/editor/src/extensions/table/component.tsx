@@ -150,6 +150,7 @@ function TableRowToolbar(props: TableToolbarProps) {
         bg: "background",
         flexWrap: "nowrap",
         borderRadius: "default",
+        flexDirection: "column",
         opacity: 0.3,
         ":hover": {
           opacity: 1

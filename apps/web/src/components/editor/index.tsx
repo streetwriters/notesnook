@@ -308,7 +308,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
               ? "min(100%, 850px)"
               : "max(calc(100% - 200px), 850px)"
           }}
-          px={2}
+          px={6}
           onClick={onRequestFocus}
           // mt={[2, 2, 25]}
         >

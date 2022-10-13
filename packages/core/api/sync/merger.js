@@ -17,9 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { migrations } from "../../migrations";
+import { migrateItem } from "../../migrations";
 import setManipulator from "../../utils/set";
-import { CURRENT_DATABASE_VERSION } from "../../common";
 import { logger } from "../../logger";
 import { isHTMLEqual } from "../../utils/html-diff";
 
@@ -129,26 +128,7 @@ class Merger {
     // it is a locked note, bail out.
     if (deserialized.alg && deserialized.cipher) return deserialized;
 
-    let type = deserialized.type;
-    // temporary fix for streetwriters/notesnook#751
-    if (type === "content") {
-      type = "tiptap";
-      deserialized.type = type;
-    }
-
-    if (!migrations[version]) {
-      throw new Error(
-        version > CURRENT_DATABASE_VERSION
-          ? `Cannot migrate item to v${version}. Please update your client to the latest version.`
-          : `Could not migrate item to v${version}. Please report this bug to the developers.`
-      );
-    }
-
-    const migrate = migrations[version][type];
-    if (migrate) {
-      return await migrate(deserialized, this._db);
-    }
-    return deserialized;
+    return migrateItem(deserialized, version, deserialized.type, this._db);
   }
 
   async _deserialize(item, migrate = true) {

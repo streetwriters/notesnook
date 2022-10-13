@@ -35,7 +35,7 @@ import { isiOS } from "../../utils/platform";
 export function TaskItemComponent(
   props: ReactNodeViewProps<TaskItemAttributes>
 ) {
-  const { editor, updateAttributes, getPos, forwardRef } = props;
+  const { editor, updateAttributes, getPos, forwardRef, node } = props;
   const { checked } = props.node.attrs;
   const isMobile = useIsMobile();
 
@@ -43,12 +43,12 @@ export function TaskItemComponent(
     if (!editor.isEditable || !editor.current) return false;
 
     const { empty, from, to } = editor.current.state.selection;
-    if (!empty) {
-      const selectedTaskItems = findChildrenInRange(
-        editor.current.state.doc,
-        { from, to },
-        (node) => node.type.name === TaskItemNode.name
-      );
+    const selectedTaskItems = findChildrenInRange(
+      editor.current.state.doc,
+      { from, to },
+      (node) => node.type.name === TaskItemNode.name
+    );
+    if (!empty && selectedTaskItems.findIndex((a) => a.node === node) > -1) {
       editor.current.commands.command(({ tr }) => {
         for (const { node, pos } of selectedTaskItems) {
           tr.setNodeMarkup(pos, null, { checked: !checked });
@@ -70,7 +70,7 @@ export function TaskItemComponent(
     }
 
     return true;
-  }, [editor, checked, updateAttributes, getPos]);
+  }, [editor, checked, updateAttributes, getPos, node]);
 
   return (
     <>
