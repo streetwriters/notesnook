@@ -100,17 +100,18 @@ export const Paragraph = Node.create<ParagraphOptions>({
         const { state } = editor;
         const { selection } = state;
         const { $from, empty, $to } = selection;
+        const atEnd = $to.parentOffset === $to.parent.content.size;
 
-        if (!empty || $from.parent.type !== this.type || $from.depth > 1) {
+        if (
+          !empty ||
+          $from.parent.type !== this.type ||
+          $from.depth > 1 ||
+          atEnd
+        ) {
           return false;
         }
 
-        const endsWithNewline = $from.nodeBefore === null;
-        const atEnd = $to.parentOffset === $to.parent.content.size;
-
-        if (endsWithNewline) {
-          return createParagraph(editor, this.type, true, false);
-        } else if (!atEnd) {
+        if (!atEnd) {
           return createParagraph(editor, this.type, false, true);
         }
 
