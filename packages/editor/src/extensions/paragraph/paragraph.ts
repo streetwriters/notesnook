@@ -86,6 +86,7 @@ export const Paragraph = Node.create<ParagraphOptions>({
       setParagraph:
         () =>
         ({ commands }) => {
+          console.log("HELLO2");
           return commands.setNode(this.name);
         }
     };
@@ -98,17 +99,19 @@ export const Paragraph = Node.create<ParagraphOptions>({
 
         const { state } = editor;
         const { selection } = state;
-        const { $from, empty } = selection;
+        const { $from, empty, $to } = selection;
 
         if (!empty || $from.parent.type !== this.type || $from.depth > 1) {
           return false;
         }
 
         const endsWithNewline = $from.nodeBefore === null;
+        const atEnd = $to.parentOffset === $to.parent.content.size;
 
         if (endsWithNewline) {
-          createParagraph(editor, this.type, true, false);
-          return true;
+          return createParagraph(editor, this.type, true, false);
+        } else if (!atEnd) {
+          return createParagraph(editor, this.type, false, true);
         }
 
         return false;
