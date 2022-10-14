@@ -18,19 +18,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { Fragment, useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View, ActivityIndicator } from "react-native";
 import FileViewer from "react-native-file-viewer";
 import Share from "react-native-share";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../../e2e/test.ids";
+import { db } from "../../../common/database";
 import { presentSheet, ToastEvent } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
+import PremiumService from "../../../services/premium";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { getElevation } from "../../../utils";
 import { ph, pv, SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
 import { Button } from "../../ui/button";
+import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
 import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
@@ -41,22 +44,23 @@ const ExportNotesSheet = ({ notes }) => {
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);
   const [result, setResult] = useState({});
+  const [status, setStatus] = useState(null);
 
-  const save = async (func) => {
+  const save = async (type) => {
     if (exporting) return;
+    if (!PremiumService.get() && type !== "txt") return;
     setExporting(true);
     setComplete(false);
-    let res;
-    for (var i = 0; i < notes.length; i++) {
-      let note = notes[i];
-      res = await func(note);
-      if (!res) {
-        setExporting(false);
-        return;
-      }
+    let result;
+    if (notes.length > 1) {
+      result = await Exporter.bulkExport(notes, type, setStatus);
+    } else {
+      result = await Exporter.exportNote(notes[0], type);
+      await sleep(1000);
     }
+    if (!result) return setExporting(false);
 
-    setResult(res);
+    setResult(result);
     setComplete(true);
     setExporting(false);
   };
@@ -65,7 +69,7 @@ const ExportNotesSheet = ({ notes }) => {
     {
       title: "PDF",
       func: async () => {
-        await save(Exporter.saveToPDF, "PDF");
+        await save("pdf");
       },
       icon: "file-pdf-box",
       desc: "Can be opened in a pdf reader like Adobe or Foxit Reader",
@@ -74,7 +78,7 @@ const ExportNotesSheet = ({ notes }) => {
     {
       title: "Markdown",
       func: async () => {
-        await save(Exporter.saveToMarkdown, "Markdown");
+        await save("md");
       },
       icon: "language-markdown",
       desc: "Can be opened in any text or markdown editor",
@@ -83,7 +87,7 @@ const ExportNotesSheet = ({ notes }) => {
     {
       title: "Plain Text",
       func: async () => {
-        await save(Exporter.saveToText, "Text");
+        await save("txt");
       },
       icon: "card-text",
       desc: "Can be opened in any text editor",
@@ -92,7 +96,7 @@ const ExportNotesSheet = ({ notes }) => {
     {
       title: "HTML",
       func: async () => {
-        await save(Exporter.saveToHTML, "Html");
+        await save("html");
       },
       icon: "language-html5",
       desc: "Can be opened in any web browser",
@@ -102,151 +106,209 @@ const ExportNotesSheet = ({ notes }) => {
 
   return (
     <View>
-      <View
-        style={{
-          paddingHorizontal: 12
-        }}
-      >
-        <DialogHeader
-          icon="export"
-          title="Export Note"
-          paragraph={
-            "All exports are saved in Notesnook/exported folder in phone storage"
-          }
-        />
-      </View>
+      {!complete && !exporting ? (
+        <>
+          <View
+            style={{
+              paddingHorizontal: 12
+            }}
+          >
+            <DialogHeader
+              icon="export"
+              title={notes.length > 1 ? "Export Notes" : "Export Note"}
+              paragraph={`All exports are saved in ${
+                Platform.OS === "android"
+                  ? "the selected"
+                  : "Notesnook/exported"
+              } folder in phone storage`}
+            />
+          </View>
 
-      <Seperator half />
+          <Seperator half />
+        </>
+      ) : null}
+
       <View style={styles.buttonContainer}>
-        {actions.map((item) => (
-          <Fragment key={item.title}>
-            <Seperator half />
-            <PressableButton
-              onPress={item.func}
-              customStyle={{
-                width: "100%",
-                alignItems: "center",
-                flexDirection: "row",
-                paddingRight: 12,
-                paddingVertical: 10,
-                justifyContent: "flex-start",
-                borderRadius: 0,
-                paddingHorizontal: 12
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: colors.shade,
-                  borderRadius: 5,
-                  height: 60,
-                  width: 60,
-                  justifyContent: "center",
-                  alignItems: "center"
+        {!exporting && !complete ? (
+          actions.map((item) => (
+            <Fragment key={item.title}>
+              <Seperator half />
+              <PressableButton
+                onPress={item.func}
+                customStyle={{
+                  width: "100%",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  paddingRight: 12,
+                  paddingVertical: 10,
+                  justifyContent: "flex-start",
+                  borderRadius: 0,
+                  paddingHorizontal: 12
                 }}
               >
-                <Icon
-                  name={item.icon}
-                  color={colors.accent}
-                  size={SIZE.xxxl + 10}
+                <View
+                  style={{
+                    backgroundColor: colors.shade,
+                    borderRadius: 5,
+                    height: 60,
+                    width: 60,
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
+                  <Icon
+                    name={item.icon}
+                    color={colors.accent}
+                    size={SIZE.xxxl + 10}
+                  />
+                </View>
+                <View
+                  style={{
+                    flexShrink: 1
+                  }}
+                >
+                  <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
+                    {item.title}
+                  </Heading>
+                  <Paragraph
+                    style={{ marginLeft: 10 }}
+                    size={SIZE.sm}
+                    color={colors.icon}
+                  >
+                    {item.desc}
+                  </Paragraph>
+                </View>
+              </PressableButton>
+            </Fragment>
+          ))
+        ) : (
+          <View
+            style={{
+              minHeight: 150,
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              paddingHorizontal: 12,
+              paddingVertical: 20
+            }}
+          >
+            {!complete ? (
+              <>
+                <ActivityIndicator />
+                <Paragraph>
+                  {notes.length === 1
+                    ? "Exporting note... Please wait"
+                    : `Exporting notes${
+                        status ? ` (${status})` : ``
+                      }... Please wait`}
+                </Paragraph>
+              </>
+            ) : (
+              <>
+                <IconButton
+                  name="export"
+                  color={colors.icon}
+                  size={50}
+                  customStyle={{
+                    width: 70,
+                    height: 70
+                  }}
                 />
-              </View>
-              <View
-                style={{
-                  flexShrink: 1
-                }}
-              >
-                <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
-                  {item.title}
-                </Heading>
-                <Paragraph
-                  style={{ marginLeft: 10 }}
-                  size={SIZE.sm}
+                <Heading
+                  style={{
+                    textAlign: "center",
+                    marginTop: 10
+                  }}
                   color={colors.icon}
                 >
-                  {item.desc}
+                  {notes.length > 1 ? "Notes exported" : "Note exported"}
+                </Heading>
+                <Paragraph
+                  style={{
+                    textAlign: "center"
+                  }}
+                >
+                  Your {notes.length > 1 ? "notes are" : "note is"} exported
+                  successfully as {result.fileName}
                 </Paragraph>
-              </View>
-            </PressableButton>
-          </Fragment>
-        ))}
-
-        <View
-          style={{
-            width: "100%",
-            paddingHorizontal: 12,
-            marginTop: 10
-          }}
-        >
-          {complete && (
-            <>
-              <Button
-                title="Open"
-                type="accent"
-                width="100%"
-                fontSize={SIZE.md}
-                onPress={async () => {
-                  close();
-                  await sleep(500);
-                  FileViewer.open(result.filePath, {
-                    showOpenWithDialog: true,
-                    showAppsSuggestions: true
-                  }).catch(() => {
-                    ToastEvent.show({
-                      heading: "Cannot open",
-                      message: `No application found to open ${result.name} file.`,
-                      type: "success",
-                      context: "local"
-                    });
-                  });
-                }}
-                height={50}
-              />
-              <Button
-                title="Share"
-                type="shade"
-                width="100%"
-                fontSize={SIZE.md}
-                style={{
-                  marginTop: 10
-                }}
-                onPress={async () => {
-                  if (Platform.OS === "ios") {
-                    Share.open({
-                      url: result.filePath
-                    }).catch(console.log);
-                  } else {
+                <Button
+                  title="Open"
+                  type="accent"
+                  width={250}
+                  fontSize={SIZE.md}
+                  style={{
+                    marginTop: 10,
+                    borderRadius: 100
+                  }}
+                  onPress={async () => {
+                    close();
+                    await sleep(500);
                     FileViewer.open(result.filePath, {
                       showOpenWithDialog: true,
-                      showAppsSuggestions: true,
-                      shareFile: true
-                    }).catch(console.log);
-                  }
-                }}
-                height={50}
-              />
-            </>
-          )}
-          {complete && (
-            <Paragraph
-              style={{
-                textAlign: "center",
-                marginTop: 5
-              }}
-              color={colors.icon}
-              size={SIZE.xs}
-            >
-              {"Note exported as " + result.fileName}
-            </Paragraph>
-          )}
-        </View>
+                      showAppsSuggestions: true
+                    }).catch(() => {
+                      ToastEvent.show({
+                        heading: "Cannot open",
+                        message: `No application found to open ${result.name} file.`,
+                        type: "success",
+                        context: "local"
+                      });
+                    });
+                  }}
+                  height={50}
+                />
+                <Button
+                  title="Share"
+                  type="grayAccent"
+                  width={250}
+                  fontSize={SIZE.md}
+                  style={{
+                    marginTop: 10,
+                    borderRadius: 100
+                  }}
+                  onPress={async () => {
+                    if (Platform.OS === "ios") {
+                      Share.open({
+                        url: result.filePath
+                      }).catch(console.log);
+                    } else {
+                      FileViewer.open(result.filePath, {
+                        showOpenWithDialog: true,
+                        showAppsSuggestions: true,
+                        shareFile: true
+                      }).catch(console.log);
+                    }
+                  }}
+                  height={50}
+                />
+                <Button
+                  title="Export in another format"
+                  type="grayAccent"
+                  width={250}
+                  fontSize={SIZE.md}
+                  style={{
+                    marginTop: 10,
+                    borderRadius: 100
+                  }}
+                  onPress={async () => {
+                    setComplete(false);
+                    setResult(null);
+                    setExporting(false);
+                  }}
+                  height={50}
+                />
+              </>
+            )}
+          </View>
+        )}
       </View>
     </View>
   );
 };
 
-ExportNotesSheet.present = (note) => {
+ExportNotesSheet.present = (note, allNotes) => {
   presentSheet({
-    component: <ExportNotesSheet notes={[note]} />
+    component: <ExportNotesSheet notes={allNotes ? db.notes.all : [note]} />
   });
 };
 
