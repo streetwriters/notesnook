@@ -314,16 +314,6 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     const isClickEvent = event.type === "mousedown";
     const isDragEvent = event.type.startsWith("drag");
 
-    // if (event instanceof DragEvent && event.dataTransfer) {
-    //   console.log(
-    //     `[${event.type}]:`,
-    //     this.editor.view.dragging,
-    //     event.dataTransfer.getData("Text"),
-    //     event.dataTransfer.getData("text/plain"),
-    //     event.dataTransfer.getData("text/html")
-    //   );
-    // }
-
     // ProseMirror tries to drag selectable nodes
     // even if `draggable` is set to `false`
     // this fix prevents that
