@@ -17,7 +17,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { Button, Flex, Input, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import { db } from "../../common/db";
@@ -128,6 +135,14 @@ function MoveDialog({ onClose, noteIds }: MoveDialogProps) {
               <TreeNode
                 item={notebook}
                 items={notebook.topics}
+                placeholder={
+                  <Text
+                    variant="body"
+                    sx={{ color: "fontTertiary", textAlign: "center" }}
+                  >
+                    {"You have no topics in this notebook."}
+                  </Text>
+                }
                 isSelected={(item) => {
                   if (item.type === "notebook") {
                     return notebook.topics.some((topic) =>
@@ -294,24 +309,34 @@ type TreeNodeProps<T extends Item> = {
   isSelected: (item: T) => boolean;
   onSelected: (item: T) => void;
   onCreateItem?: (title: string) => void;
+  placeholder?: JSX.Element;
 };
 
 function TreeNode<T extends Item>(props: TreeNodeProps<T>) {
-  const { isSelected, item, items, onCreateItem, onSelected, sx } = props;
+  const { isSelected, item, items, onCreateItem, onSelected, sx, placeholder } =
+    props;
 
   const [expanded, setExpanded] = useState(false);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const _isSelected = useMemo(() => isSelected(item), [item, isSelected]);
 
   return (
     <Flex sx={{ flexDirection: "column" }} data-test-id={item.type}>
       <TreeItem
         title={item.title}
         testId={`tree-item`}
+        isSelected={_isSelected}
         icon={
-          items ? (expanded ? Icon.ChevronDown : Icon.ChevronRight) : Icon.Topic
+          _isSelected
+            ? Icon.Checkmark
+            : items
+            ? expanded
+              ? Icon.ChevronDown
+              : Icon.ChevronRight
+            : Icon.Topic
         }
         sx={{
-          bg: isSelected(item) ? "shade" : "transparent",
+          bg: _isSelected ? "shade" : "transparent",
           ...sx
         }}
         onExpand={() => {
@@ -337,13 +362,10 @@ function TreeNode<T extends Item>(props: TreeNodeProps<T>) {
               <Input
                 data-test-id={`new-tree-item-input`}
                 autoFocus
-                sx={{ bg: "background", p: 1 }}
-                placeholder="Press enter to create"
+                sx={{ bg: "background", p: "7px" }}
+                placeholder="Press enter to create a new topic"
                 onBlur={() => setIsCreatingNew(false)}
                 onKeyDown={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-
                   if (e.key === "Enter") {
                     setIsCreatingNew(false);
                     onCreateItem?.((e.target as HTMLInputElement).value);
@@ -354,15 +376,17 @@ function TreeNode<T extends Item>(props: TreeNodeProps<T>) {
               />
             </Flex>
           ) : null}
-          {items?.map((item) => (
-            <TreeNode
-              key={item.id}
-              item={item}
-              isSelected={isSelected}
-              onSelected={() => onSelected(item)}
-              sx={{ pl: 3 }}
-            />
-          ))}
+          {items?.length
+            ? items?.map((item) => (
+                <TreeNode
+                  key={item.id}
+                  item={item}
+                  isSelected={isSelected}
+                  onSelected={() => onSelected(item)}
+                  sx={{ pl: 3 }}
+                />
+              ))
+            : placeholder}
         </>
       ) : null}
     </Flex>
@@ -376,6 +400,7 @@ type TreeItemProps = {
   sx?: ThemeUIStyleObject;
   onCreateItem?: (() => void) | null;
   testId?: string;
+  isSelected: boolean;
 };
 
 function TreeItem(props: TreeItemProps) {
@@ -385,7 +410,8 @@ function TreeItem(props: TreeItemProps) {
     onExpand,
     title,
     sx,
-    testId
+    testId,
+    isSelected
   } = props;
 
   return (
@@ -394,7 +420,7 @@ function TreeItem(props: TreeItemProps) {
         alignItems: "center",
         p: "3px",
         cursor: "pointer",
-        ":hover": { bg: "hover" },
+        ":hover": { bg: isSelected ? "dimPrimary" : "hover" },
         justifyContent: "space-between",
         ...sx
       }}
