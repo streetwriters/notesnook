@@ -40,14 +40,14 @@ import Seperator from "../../ui/seperator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { Issue } from "../github/issue";
+import { useEffect } from "react";
+import SettingsService from "../../../services/settings";
+import { Platform } from "react-native";
+import { useCallback } from "react";
 
-const alertMessage = `Read carefully before continuing:
+const alertMessage = `To keep your data safe, we will save a backup of your data on your device before migration starts.
 
-It is required that you download and save a backup of your data.
-
-Some merge conflicts in your notes after a migration are expected. It is recommended that you resolve them carefully. But if you are feeling reckless and want to risk losing some data, you can logout log back in.
-
-If you face any other issues or are unsure about what to do, feel free to reach out to us via https://discord.com/invite/zQBK97EE22 or email us at support@streetwriters.co`;
+If you face any other issues after migration, feel free to reach out to us on https://discord.com/invite/zQBK97EE22 or email us at support@streetwriters.co`;
 
 export const makeError = (
   stack: string,
@@ -63,7 +63,7 @@ export default function Migrate() {
   const [_error, _setError] = useState<Error>();
   const [reset, setReset] = useState(false);
 
-  const reportError = (error: Error) => {
+  const reportError = React.useCallback((error: Error) => {
     _setError(error);
     presentSheet({
       context: "local",
@@ -75,9 +75,9 @@ export default function Migrate() {
         />
       )
     });
-  };
+  }, []);
 
-  const startMigration = async () => {
+  const startMigration = useCallback(async () => {
     try {
       setLoading(true);
       const backupSaved = await BackupService.run(false, "local");
@@ -105,7 +105,13 @@ export default function Migrate() {
       setLoading(false);
       reportError(e as Error);
     }
-  };
+  }, [reportError]);
+
+  useEffect(() => {
+    if (SettingsService.get().backupDirectoryAndroid || Platform.OS === "ios") {
+      startMigration();
+    }
+  }, [startMigration]);
 
   return (
     <View
@@ -117,11 +123,11 @@ export default function Migrate() {
       <DialogHeader
         title="Database migration required"
         paragraph={
-          "Due to new features we need to migrate your data to a newer version. This is NOT a destructive operation."
+          "Due to new features added we need to migrate your data to a newer version. This is NOT a destructive operation."
         }
       />
       <Seperator />
-      <Notice type="alert" selectable={true} text={alertMessage} />
+      <Notice type="information" selectable={true} text={alertMessage} />
 
       {loading ? (
         <>
