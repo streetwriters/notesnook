@@ -53,7 +53,8 @@
     "react-native-vector-icons": "^9.0.0",
     "react-native-webview": "^11.14.1",
     "rn-extensions-share": "^2.4.0",
-    "rn-fetch-blob": "^0.12.0"
+    "rn-fetch-blob": "^0.12.0",
+    "react-native-zip-archive": "6.0.8"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

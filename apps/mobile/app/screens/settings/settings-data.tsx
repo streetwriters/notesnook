@@ -20,12 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import dayjs from "dayjs";
 import React from "react";
 import { Linking, Platform } from "react-native";
+import { getVersion } from "react-native-device-info";
 import * as RNIap from "react-native-iap";
 import { enabled } from "react-native-privacy-snapshot";
 import { db } from "../../common/database";
 import { MMKV } from "../../common/database/mmkv";
 import { ChangePassword } from "../../components/auth/change-password";
 import { presentDialog } from "../../components/dialog/functions";
+import ExportNotesSheet from "../../components/sheets/export-notes";
 import { Issue } from "../../components/sheets/github/issue";
 import { Progress } from "../../components/sheets/progress";
 import { Update } from "../../components/sheets/update";
@@ -65,7 +67,6 @@ import { useDragState } from "./editor/state";
 import { verifyUser } from "./functions";
 import { SettingSection } from "./types";
 import { getTimeLeft } from "./user-section";
-import { getVersion } from "react-native-device-info";
 
 export const settingsGroups: SettingSection[] = [
   {
@@ -747,6 +748,16 @@ export const settingsGroups: SettingSection[] = [
             return;
           }
           eSendEvent(eOpenRestoreDialog);
+        }
+      },
+      {
+        id: "export-notes",
+        name: "Export all notes",
+        icon: "export",
+        description:
+          "Export all notes as pdf, markdown, html or text in a single zip file",
+        modifer: () => {
+          ExportNotesSheet.present(undefined, true);
         }
       }
     ]

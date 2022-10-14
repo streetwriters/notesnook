@@ -18,15 +18,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { decode, EntityLevel } from "entities";
+import { zip } from "fflate";
 import { Platform } from "react-native";
 import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
 import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "rn-fetch-blob";
+import { db } from "../common/database/index";
+import Storage from "../common/database/storage";
 import { toTXT } from "../utils";
 import { sanitizeFilename } from "../utils/sanitizer";
-import Storage from "../common/database/storage";
-import {db} from "../common/database/index";
-
+import { sleep } from "../utils/time";
 const defaultStyle = `<style>
 .img_size_one {
   width:100%;
@@ -331,6 +332,20 @@ hr {
 
 </style>`;
 
+const MIMETypes = {
+  txt: "text/plain",
+  pdf: "application/pdf",
+  md: "text/markdown",
+  html: "text/html"
+};
+
+const FolderNames = {
+  txt: "Text",
+  pdf: "PDF",
+  md: "Markdown",
+  html: "Html"
+};
+
 async function releasePermissions(path) {
   if (Platform.OS === "ios") return;
   const uris = await ScopedStorage.getPersistedUriPermissions();
@@ -341,197 +356,218 @@ async function releasePermissions(path) {
   }
 }
 
-async function saveToPDF(note) {
-  let androidSavePath = "/Notesnook/exported/PDF";
+/**
+ *
+ * @param {"Text" | "PDF" | "Markdown" | "Html" } type
+ * @returns
+ */
+async function getPath(type) {
+  let path =
+    Platform.OS === "ios" &&
+    (await Storage.checkAndCreateDir(`/exported/${type}/`));
+
   if (Platform.OS === "android") {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
-    androidSavePath = file.uri;
+    path = file.uri;
   }
+  return path;
+}
 
-  Platform.OS === "ios" && (await Storage.checkAndCreateDir("/exported/PDF/"));
+/**
+ *
+ * @param {string} path
+ * @param {string} data
+ * @param {string} title
+ * @param {"txt" | "pdf" | "md" | "html"} extension
+ * @returns
+ */
+async function save(path, data, fileName, extension) {
+  let uri;
+  if (Platform.OS === "android") {
+    uri = await ScopedStorage.writeFile(
+      path,
+      data,
+      fileName + `.${extension}`,
+      MIMETypes[extension],
+      "utf8",
+      false
+    );
+    await releasePermissions(path);
+  } else {
+    path = path + fileName + `.${extension}`;
+    await RNFetchBlob.fs.writeFile(path, data, "utf8");
+  }
+  return uri || path;
+}
+
+async function makeHtml(note) {
   let html = await db.notes.note(note.id).export("html");
   html = decode(html, {
     level: EntityLevel.HTML
   });
-  let fileName = sanitizeFilename(note.title + Date.now(), {
-    replacement: "_"
-  });
-  let html3 = html;
   if (html.indexOf("<head>") > -1) {
-    let html1 = html.substring(0, html.indexOf("<head>") + 6);
-    let html2 = html.substring(html.indexOf("<head>") + 6);
-    html3 = html1 + defaultStyle + html2;
+    let chunk1 = html.substring(0, html.indexOf("<head>") + 6);
+    let chunk2 = html.substring(html.indexOf("<head>") + 6);
+    html = chunk1 + defaultStyle + chunk2;
   }
-
-  let options = {
-    html: html3,
-    fileName: Platform.OS === "ios" ? "/exported/PDF/" + fileName : fileName,
-    width: 595,
-    height: 852,
-    bgColor: "#FFFFFF",
-    padding: 30,
-    base64: Platform.OS === "android"
-  };
-  if (Platform.OS === "ios") {
-    options.directory = "Documents";
-  }
-  let res = await RNHTMLtoPDF.convert(options);
-
-  let fileUri;
-  if (Platform.OS === "android") {
-    fileUri = await ScopedStorage.writeFile(
-      androidSavePath,
-      res.base64,
-      fileName,
-      "application/pdf",
-      "base64",
-      false
-    );
-
-    if (res.filePath) {
-      await RNFetchBlob.fs.unlink(res.filePath);
-    }
-  }
-
-  await releasePermissions(androidSavePath);
-
-  return {
-    filePath: fileUri || res.filePath,
-    type: "application/pdf",
-    name: "PDF",
-    fileName: fileName
-  };
+  return html;
 }
 
-async function saveToMarkdown(note) {
-  let path =
-    Platform.OS === "ios" &&
-    (await Storage.checkAndCreateDir("/exported/Markdown/"));
-  if (Platform.OS === "android") {
-    let file = await ScopedStorage.openDocumentTree(true);
-    if (!file) return;
-    path = file.uri;
+/**
+ *
+ * @param {"txt" | "pdf" | "md" | "html"} type
+ */
+async function exportAs(type, note, bulk) {
+  console.log(type, "type");
+  let data;
+  switch (type) {
+    case "html":
+      {
+        data = await makeHtml(note);
+        console.log("html created", data);
+      }
+      break;
+    case "md":
+      data = await db.notes.note(note.id).export("md");
+      break;
+    case "pdf":
+      {
+        let html = await makeHtml(note);
+        let fileName = sanitizeFilename(note.title + Date.now(), {
+          replacement: "_"
+        });
+
+        let options = {
+          html: html,
+          fileName:
+            Platform.OS === "ios" ? "/exported/PDF/" + fileName : fileName,
+          width: 595,
+          height: 852,
+          bgColor: "#FFFFFF",
+          padding: 30,
+          base64: bulk || Platform.OS === "android"
+        };
+        if (Platform.OS === "ios") {
+          options.directory = "Documents";
+        }
+        let res = await RNHTMLtoPDF.convert(options);
+        data = !bulk && Platform.OS === "ios" ? res.filePath : res.base64;
+        if (bulk && res.filePath) {
+          RNFetchBlob.fs.unlink(res.filePath);
+        }
+      }
+      break;
+    case "txt":
+      data = await toTXT(note);
+      break;
   }
 
-  let markdown = await db.notes.note(note.id).export("md");
+  return data;
+}
+
+/**
+ *
+ * @param {"txt" | "pdf" | "md" | "html"} type
+ */
+async function exportNote(note, type) {
+  let path = await getPath(FolderNames[type]);
+  if (!path) return;
+  let result = await exportAs(type, note);
+
   let fileName = sanitizeFilename(note.title + Date.now(), {
     replacement: "_"
   });
 
-  let fileUri;
-  if (Platform.OS === "android") {
-    fileUri = await ScopedStorage.writeFile(
-      path,
-      markdown,
-      fileName + ".md",
-      "text/markdown",
-      "utf8",
-      false
-    );
-    await releasePermissions(path);
+  if (type === "pdf" && Platform.OS === "ios") {
+    path = result;
   } else {
-    path = path + fileName + ".md";
-    await RNFetchBlob.fs.writeFile(path, markdown, "utf8");
+    path = await save(path, result, fileName, type);
   }
 
   return {
-    filePath: fileUri || path,
-    type: "text/markdown",
-    name: "Markdown",
-    fileName: fileName
-  };
-}
-
-async function saveToText(note) {
-  let path =
-    Platform.OS === "ios" &&
-    (await Storage.checkAndCreateDir("/exported/Text/"));
-  if (Platform.OS === "android") {
-    let file = await ScopedStorage.openDocumentTree(true);
-    if (!file) return;
-    path = file.uri;
-  }
-
-  let text = await toTXT(note);
-  let fileName = sanitizeFilename(note.title + Date.now(), {
-    replacement: "_"
-  });
-
-  let fileUri;
-  if (Platform.OS === "android") {
-    fileUri = await ScopedStorage.writeFile(
-      path,
-      text,
-      fileName + ".txt",
-      "text/plain",
-      "utf8",
-      false
-    );
-    await releasePermissions(path);
-  } else {
-    path = path + fileName + ".txt";
-    await RNFetchBlob.fs.writeFile(path, text, "utf8");
-  }
-
-  return {
-    filePath: fileUri || path,
+    filePath: path,
     type: "text/plain",
     name: "Text",
-    fileName: fileName
+    fileName: fileName + `.${type}`
   };
 }
 
-async function saveToHTML(note) {
-  let path =
-    Platform.OS === "ios" &&
-    (await Storage.checkAndCreateDir("/exported/Html/"));
-  if (Platform.OS === "android") {
-    let file = await ScopedStorage.openDocumentTree(true);
-    if (!file) return;
-    path = file.uri;
-  }
-
-  let html = await db.notes.note(note.id).export("html");
-  let fileName = sanitizeFilename(note.title + Date.now(), {
-    replacement: "_"
+function copyFileAsync(source, dest) {
+  return new Promise((resolve) => {
+    ScopedStorage.copyFile(source, dest, () => {
+      resolve();
+    });
   });
-  let html3 = html;
-  if (html.indexOf("<head>") > -1) {
-    let html1 = html.substring(0, html.indexOf("<head>") + 6);
-    let html2 = html.substring(html.indexOf("<head>") + 6);
-    html3 = html1 + defaultStyle + html2;
-  }
+}
 
-  let fileUri;
-  if (Platform.OS === "android") {
-    fileUri = await ScopedStorage.writeFile(
-      path,
-      html3,
-      fileName + ".html",
-      "text/html",
-      "utf8",
-      false
+function zipAsync(results) {
+  return new Promise((resolve) => {
+    zip(results, (err, data) => {
+      resolve(Buffer.from(data.buffer).toString("base64"));
+    });
+  });
+}
+
+/**
+ *
+ * @param {"txt" | "pdf" | "md" | "html"} type
+ */
+async function bulkExport(notes, type, callback) {
+  let path = await getPath(FolderNames[type]);
+  if (!path) return;
+
+  const results = {};
+  for (var i = 0; i < notes.length; i++) {
+    await sleep(1);
+    let note = notes[i];
+    let result = await exportAs(type, note);
+    let fileName = sanitizeFilename(note.title + Date.now(), {
+      replacement: "_"
+    });
+    results[fileName + `.${type}`] = Buffer.from(
+      result,
+      type === "pdf" ? "base64" : "utf-8"
     );
-    await releasePermissions(path);
-  } else {
-    path = path + fileName + ".html";
-    await RNFetchBlob.fs.writeFile(path, html3, "utf8");
+    callback(`${i + 1}/${notes.length}`);
+  }
+  callback("zipping");
+  await sleep(1);
+  const zipped = await zipAsync(results);
+  const fileName = `nn-export-all-${type}-${Date.now()}.zip`;
+  callback("saving to disk");
+  await sleep(1);
+  try {
+    if (Platform.OS === "ios") {
+      RNFetchBlob.fs.writeFile(path + `/${fileName}`, zipped, "base64");
+    } else {
+      const templFile = RNFetchBlob.fs.dirs.CacheDir + `/${fileName}`;
+      await RNFetchBlob.fs.writeFile(templFile, zipped, "base64");
+      const file = await ScopedStorage.createFile(
+        path,
+        fileName,
+        "application/zip"
+      );
+      path = file.uri;
+      await copyFileAsync("file://" + templFile, path);
+      await RNFetchBlob.fs.unlink(templFile);
+      callback();
+    }
+  } catch (e) {
+    console.log(e, "error");
   }
 
   return {
-    filePath: fileUri || path,
-    type: "text/html",
-    name: "Html",
+    filePath: path,
+    type: "application/zip",
+    name: "zip",
     fileName: fileName
   };
 }
 
 const Exporter = {
-  saveToHTML,
-  saveToText,
-  saveToMarkdown,
-  saveToPDF
+  exportNote,
+  bulkExport
 };
 
 export default Exporter;
