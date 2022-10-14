@@ -18,8 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Keyboard, View } from "react-native";
-import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import { Keyboard, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { notesnook } from "../../../e2e/test.ids";
 import useGlobalSafeAreaInsets from "../../hooks/use-global-safe-area-insets";
@@ -136,15 +135,14 @@ export const Toast = ({ context = "global" }) => {
 
   return (
     visible && (
-      <Animated.View
-        onTouchEnd={() => {
-          if (!data.func) {
-            if (hideTimeout.current) {
-              clearTimeout(hideTimeout.current);
-            }
-            hideToastFunc();
+      <TouchableOpacity
+        onPress={() => {
+          if (hideTimeout.current) {
+            clearTimeout(hideTimeout.current);
           }
+          hideToastFunc();
         }}
+        activeOpacity={1}
         style={{
           width: DDS.isTab ? 400 : "100%",
           alignItems: "center",
@@ -156,9 +154,7 @@ export const Toast = ({ context = "global" }) => {
           elevation: 15
         }}
       >
-        <Animated.View
-          entering={FadeInUp.springify()}
-          exiting={FadeOutUp}
+        <View
           style={{
             ...getElevation(5),
             maxWidth: "95%",
@@ -250,8 +246,8 @@ export const Toast = ({ context = "global" }) => {
               }}
             />
           ) : null}
-        </Animated.View>
-      </Animated.View>
+        </View>
+      </TouchableOpacity>
     )
   );
 };
