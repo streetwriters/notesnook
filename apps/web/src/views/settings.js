@@ -500,6 +500,7 @@ function Settings() {
             <Button
               variant="list"
               onClick={async () => {
+                if (!isUserPremium() && encryptBackups) toggleEncryptBackups();
                 if (await verifyAccount()) await createBackup();
               }}
             >

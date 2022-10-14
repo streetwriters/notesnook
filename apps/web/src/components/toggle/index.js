@@ -27,11 +27,11 @@ import Switch from "../switch";
 function Toggle(props) {
   const { title, onTip, offTip, isToggled, onToggled, onlyIf, premium } = props;
   const onClick = useCallback(async () => {
-    if (isUserPremium() || !premium) onToggled();
+    if (isUserPremium() || !premium || isToggled) onToggled();
     else {
       await showBuyDialog();
     }
-  }, [onToggled, premium]);
+  }, [onToggled, premium, isToggled]);
 
   if (onlyIf === false) return null;
   return (
