@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Extension } from "@tiptap/core";
+import { isListActive } from "../../toolbar/utils/prosemirror";
 
 export const KeyMap = Extension.create({
   name: "key-map",
@@ -25,6 +26,7 @@ export const KeyMap = Extension.create({
   addKeyboardShortcuts() {
     return {
       Tab: ({ editor }) => {
+        if (isListActive(editor)) return false;
         return editor.commands.insertContent("\t");
       }
     };
