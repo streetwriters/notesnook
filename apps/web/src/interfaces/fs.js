@@ -569,6 +569,12 @@ class ChunkDistributor {
 }
 
 function parseS3Error(data) {
+  if (!(data instanceof ArrayBuffer)) {
+    return {
+      Code: "UNKNOWN",
+      Message: "An unknown error occured while uploading the attachment."
+    };
+  }
   const xml = new TextDecoder().decode(data);
   const doc = new DOMParser().parseFromString(xml, "text/xml");
 
