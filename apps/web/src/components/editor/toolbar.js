@@ -170,7 +170,7 @@ function Toolbar() {
   );
 
   return (
-    <Flex m={2} sx={{ justifyContent: "space-between" }}>
+    <Flex mx={2} my={1} sx={{ justifyContent: "space-between" }}>
       <Flex sx={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Icon.ArrowLeft
           sx={{

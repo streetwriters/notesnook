@@ -64,7 +64,7 @@ function Header(props) {
   return (
     <Flex mx={2} sx={{ flexDirection: "column", justifyContent: "center" }}>
       <Flex sx={{ alignItems: "center", justifyContent: "space-between" }}>
-        <Flex py={2} sx={{ alignItems: "center", justifyContent: "center" }}>
+        <Flex py={1} sx={{ alignItems: "center", justifyContent: "center" }}>
           {buttons?.back ? (
             <Icon.ArrowLeft
               size={24}
