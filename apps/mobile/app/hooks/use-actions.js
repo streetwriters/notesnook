@@ -538,7 +538,7 @@ export const useActions = ({ close = () => null, item }) => {
   async function exportNote() {
     close();
     await sleep(300);
-    ExportNotesSheet.present(item);
+    ExportNotesSheet.present([item]);
   }
 
   async function toggleLocalOnly() {

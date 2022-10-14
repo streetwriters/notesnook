@@ -115,7 +115,11 @@ const ExportNotesSheet = ({ notes }) => {
           >
             <DialogHeader
               icon="export"
-              title={notes.length > 1 ? "Export Notes" : "Export Note"}
+              title={
+                notes.length > 1
+                  ? `Export ${notes.length} Notes`
+                  : "Export Note"
+              }
               paragraph={`All exports are saved in ${
                 Platform.OS === "android"
                   ? "the selected"
@@ -221,7 +225,9 @@ const ExportNotesSheet = ({ notes }) => {
                   }}
                   color={colors.icon}
                 >
-                  {notes.length > 1 ? "Notes exported" : "Note exported"}
+                  {notes.length > 1
+                    ? `${notes.length} Notes exported`
+                    : "Note exported"}
                 </Heading>
                 <Paragraph
                   style={{
@@ -306,9 +312,9 @@ const ExportNotesSheet = ({ notes }) => {
   );
 };
 
-ExportNotesSheet.present = (note, allNotes) => {
+ExportNotesSheet.present = (notes, allNotes) => {
   presentSheet({
-    component: <ExportNotesSheet notes={allNotes ? db.notes.all : [note]} />
+    component: <ExportNotesSheet notes={allNotes ? db.notes.all : notes} />
   });
 };
 

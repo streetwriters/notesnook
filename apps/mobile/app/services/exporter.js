@@ -534,7 +534,7 @@ async function bulkExport(notes, type, callback) {
   callback("zipping");
   await sleep(1);
   const zipped = await zipAsync(results);
-  const fileName = `nn-export-all-${type}-${Date.now()}.zip`;
+  const fileName = `nn-export-${notes.length}-${type}-${Date.now()}.zip`;
   callback("saving to disk");
   await sleep(1);
   try {

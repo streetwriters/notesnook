@@ -32,6 +32,7 @@ import { tabBarRef } from "../../utils/global-refs";
 import { SIZE } from "../../utils/size";
 import { sleep } from "../../utils/time";
 import { presentDialog } from "../dialog/functions";
+import ExportNotesSheet from "../sheets/export-notes";
 import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 
@@ -225,19 +226,32 @@ export const SelectionHeader = React.memo(() => {
         {screen === "Trash" ||
         screen === "Notebooks" ||
         screen === "Notebook" ? null : (
-          <IconButton
-            onPress={async () => {
-              //setSelectionMode(false);
-              await sleep(100);
-              eSendEvent(eOpenMoveNoteDialog);
-            }}
-            customStyle={{
-              marginLeft: 10
-            }}
-            color={colors.pri}
-            name="plus"
-            size={SIZE.xl}
-          />
+          <>
+            <IconButton
+              onPress={async () => {
+                //setSelectionMode(false);
+                await sleep(100);
+                eSendEvent(eOpenMoveNoteDialog);
+              }}
+              customStyle={{
+                marginLeft: 10
+              }}
+              color={colors.pri}
+              name="plus"
+              size={SIZE.xl}
+            />
+            <IconButton
+              onPress={async () => {
+                ExportNotesSheet.present(selectedItemsList);
+              }}
+              customStyle={{
+                marginLeft: 10
+              }}
+              color={colors.pri}
+              name="export"
+              size={SIZE.xl}
+            />
+          </>
         )}
 
         {screen === "TopicNotes" ? (

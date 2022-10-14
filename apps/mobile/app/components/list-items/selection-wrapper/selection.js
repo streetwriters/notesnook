@@ -18,20 +18,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useSelectionStore } from "../../../stores/use-selection-store";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { SIZE } from "../../../utils/size";
 
-export const SelectionIcon = ({ setActionStrip, item, compactMode }) => {
+export const SelectionIcon = ({ setActionStrip, item }) => {
   const colors = useThemeStore((state) => state.colors);
 
   const selectionMode = useSelectionStore((state) => state.selectionMode);
   const selectedItemsList = useSelectionStore(
     (state) => state.selectedItemsList
   );
-  const setSelectedItem = useSelectionStore((state) => state.setSelectedItem);
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
@@ -60,43 +59,25 @@ export const SelectionIcon = ({ setActionStrip, item, compactMode }) => {
     selected
   ]);
 
-  const onPress = () => {
-    setSelectedItem(item);
-  };
-
-  return selectionMode ? (
+  return selectionMode && selected ? (
     <View
       style={{
-        display: "flex",
-        opacity: 1,
-        width: "10%",
-        height: compactMode ? 40 : 70,
+        width: 40,
+        height: 40,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: colors.bg,
-        borderRadius: 5,
         marginRight: 10,
         borderWidth: 1,
-        borderColor: selected ? colors.accent : colors.border
+        borderRadius: 100,
+        borderColor: colors.border
       }}
+      pointerEvents="none"
     >
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={onPress}
-        style={{
-          justifyContent: "center",
-          alignItems: "center",
-          height: 70
-        }}
-      >
-        {selected && (
-          <Icon
-            size={SIZE.xl}
-            color={selected ? colors.accent : colors.icon}
-            name="check"
-          />
-        )}
-      </TouchableOpacity>
+      <Icon
+        size={SIZE.xl}
+        color={selected ? colors.accent : colors.icon}
+        name="check"
+      />
     </View>
   ) : null;
 };
