@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { Extension } from "@tiptap/core";
+import { isInTable } from "@_ueberdosis/prosemirror-tables";
 import { isListActive } from "../../toolbar/utils/prosemirror";
 
 export const KeyMap = Extension.create({
@@ -26,7 +27,7 @@ export const KeyMap = Extension.create({
   addKeyboardShortcuts() {
     return {
       Tab: ({ editor }) => {
-        if (isListActive(editor)) return false;
+        if (isListActive(editor) || isInTable(editor.state)) return false;
         return editor.commands.insertContent("\t");
       }
     };
