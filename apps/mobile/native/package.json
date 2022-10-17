@@ -40,7 +40,7 @@
     "react-native-mmkv-storage": "^0.8.0",
     "react-native-orientation": "https://github.com/yamill/react-native-orientation.git",
     "react-native-privacy-snapshot": "https://github.com/standardnotes/react-native-privacy-snapshot.git",
-    "react-native-push-notification": "^8.1.1",
+    "react-native-push-notification": "github:ammarahm-ed/react-native-push-notification",
     "react-native-reanimated": "2.9.1",
     "react-native-safe-area-context": "^4.3.1",
     "react-native-scoped-storage": "^1.9.3",

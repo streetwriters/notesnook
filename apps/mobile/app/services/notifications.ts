@@ -32,6 +32,7 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
 import { editorState } from "../screens/editor/tiptap/utils";
+import DeviceInfo from "react-native-device-info";
 
 const NOTIFICATION_TAG = "notesnook";
 const CHANNEL_ID = "com.streetwriters.notesnook";
@@ -149,7 +150,20 @@ function remove(tag: string, id: string) {
   });
 }
 
-function pinQuickNote(launch: boolean) {
+async function hasPermissions() {
+  if (DeviceInfo.getApiLevelSync() < 33) return true;
+  //@ts-ignore
+  if (!(await PushNotification.areNotificationsEnabled())) {
+    //@ts-ignore
+    const result = await PushNotification.askForPermission();
+    if (result) return true;
+    return true;
+  }
+  return true;
+}
+
+async function pinQuickNote(launch: boolean) {
+  if (!(await hasPermissions())) return;
   get().then((items) => {
     const notif = items.filter((i) => i.tag === "notesnook_note_input");
     if (notif && launch) {
@@ -173,7 +187,7 @@ async function unpinQuickNote() {
   SettingsService.set({ notifNotes: false });
 }
 
-function present({
+async function present({
   title,
   message,
   subtitle,
@@ -196,6 +210,7 @@ function present({
   reply_button_text?: string;
   id?: number;
 }) {
+  if (!(await hasPermissions())) return;
   PushNotification.localNotification({
     id: id,
     channelId: CHANNEL_ID,
