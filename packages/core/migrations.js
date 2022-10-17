@@ -110,7 +110,12 @@ const migrations = [
         if (!item.data || item.data.iv) return item;
         item.type = "tiptap";
         return item;
-    },
+      },
+      shortcut: (item) => {
+        if (item.id === item.item.id) return item;
+        item.id = item.item.id;
+        return item;
+      },
       tiptap: (item) => {
         return changeSessionContentType(item);
       },

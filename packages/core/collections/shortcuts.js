@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Collection from "./collection";
-import { EV, EVENTS } from "../common";
 
 /**
  * @typedef {{
@@ -43,11 +42,6 @@ export default class Shortcuts extends Collection {
   async merge(shortcut) {
     if (!shortcut) return;
     await this._collection.addItem(shortcut);
-  }
-
-  async init() {
-    await super.init();
-    await this.dedupe();
   }
 
   /**
@@ -155,21 +149,5 @@ export default class Shortcuts extends Collection {
     for (const { id } of shortcuts) {
       await this._collection.removeItem(id);
     }
-  }
-
-  async dedupe() {
-    const oldShortcuts = this.all.filter(
-      (shortcut) => shortcut.id !== shortcut.item.id
-    );
-
-    for (const shortcut of oldShortcuts) {
-      await this._collection.addItem({ ...shortcut, id: shortcut.item.id });
-    }
-
-    for (const shortcut of oldShortcuts) {
-      await this._collection.removeItem(shortcut.id);
-    }
-
-    if (oldShortcuts.length > 0) EV.publish(EVENTS.appRefreshRequested);
   }
 }
