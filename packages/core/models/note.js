@@ -160,6 +160,13 @@ export default class Note {
   }
 
   async tag(tag) {
+    if (
+      !this._db.tags.tag(tag) &&
+      this._db.tags.all.length >= 5 &&
+      !(await checkIsUserPremium(CHECK_IDS.noteTag))
+    )
+      return;
+
     let tagItem = await this._db.tags.add(tag, this._note.id);
     if (addItem(this._note.tags, tagItem.title))
       await this._db.notes.add(this._note);
