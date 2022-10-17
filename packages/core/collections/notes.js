@@ -264,8 +264,8 @@ export default class Notes extends Collection {
     const { color, tags, id } = note;
 
     if (color) {
-      const { title } = await this._db.colors.add(color, id);
-      note.color = title;
+      const addedColor = await this._db.colors.add(color, id);
+      if (addedColor) note.color = addedColor.title;
     }
 
     if (tags && tags.length) {
