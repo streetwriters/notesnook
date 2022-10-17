@@ -161,6 +161,8 @@ class EditorStore extends BaseStore {
 
     this.setSaveState(0);
     try {
+      if (session.content) this.get().session.content = session.content;
+
       const id = await this._getSaveFn()({ ...session, id: sessionId });
       if (currentSession && currentSession.id !== sessionId) {
         noteStore.refresh();
@@ -196,9 +198,6 @@ class EditorStore extends BaseStore {
         attachmentStore.refresh();
       }
 
-      if (session.content) {
-        this.get().session.content = session.content;
-      }
       this.set((state) => {
         if (!!state.session.id && state.session.id !== note.id) return;
 

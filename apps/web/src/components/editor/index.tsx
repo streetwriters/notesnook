@@ -145,7 +145,7 @@ export default function EditorManager({
     if (!isOldSession) return;
 
     openSession(noteId);
-  }, [openSession, noteId, isOldSession, isReadonly]);
+  }, [noteId]);
 
   return (
     <Flex
@@ -295,8 +295,7 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
       <Toolbar />
       <FlexScrollContainer
         className="editorScroll"
-        style={{}}
-        viewStyle={{ display: "flex", flexDirection: "column" }}
+        style={{ display: "flex", flexDirection: "column" }}
       >
         <Flex
           variant="columnFill"
