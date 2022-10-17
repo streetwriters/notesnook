@@ -27,13 +27,15 @@ import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "../utils/filename";
-import { isTesting } from "../utils/platform";
+import { isDesktop, isTesting } from "../utils/platform";
 import { store as userstore } from "../stores/user-store";
 import FileSaver from "file-saver";
 import { showToast } from "../utils/toast";
 import { SUBSCRIPTION_STATUS } from "./constants";
 import { showFilePicker } from "../components/editor/picker";
 import { logger } from "../utils/logger";
+import { PATHS } from "@notesnook/desktop/paths";
+import saveFile from "../commands/save-file";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -68,7 +70,7 @@ export async function introduceFeatures() {
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 
-export async function createBackup(save = true) {
+export async function createBackup() {
   const encryptBackups = Config.get("encryptBackups", false);
   const data = await showLoadingDialog({
     title: "Creating backup",
@@ -87,8 +89,14 @@ export async function createBackup(save = true) {
   );
 
   const ext = "nnbackup";
-  if (!save) {
-    return { data, filename, ext };
+  if (isDesktop()) {
+    const directory = Config.get(
+      "backupStorageLocation",
+      PATHS.backupsDirectory
+    );
+    const filePath = `${directory}/${filename}.${ext}`;
+    saveFile(filePath, data);
+    showToast("success", `Backup saved at ${filePath}.`);
   } else {
     FileSaver.saveAs(new Blob([Buffer.from(data)]), `${filename}.${ext}`);
   }

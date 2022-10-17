@@ -26,8 +26,6 @@ import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { isDesktop, isTesting } from "../utils/platform";
-import saveFile from "../commands/save-file";
-import { PATHS } from "@notesnook/desktop/paths";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { showToast } from "../utils/toast";
 
@@ -110,14 +108,7 @@ export async function resetReminders() {
 
   if (await shouldAddBackupReminder()) {
     if (isDesktop()) {
-      const { data, filename, ext } = await createBackup(false);
-      const directory = Config.get(
-        "backupStorageLocation",
-        PATHS.backupsDirectory
-      );
-      const filePath = `${directory}/${filename}.${ext}`;
-      saveFile(filePath, data);
-      showToast("success", `Backup saved at ${filePath}.`);
+      await createBackup();
     } else if (isUserPremium() && !isTesting()) {
       if (openedToast !== null) return;
       openedToast = showToast(
@@ -135,7 +126,7 @@ export async function resetReminders() {
           },
           {
             text: "Download",
-            onClick: () => createBackup(true),
+            onClick: () => createBackup(),
             type: "primary"
           }
         ],
