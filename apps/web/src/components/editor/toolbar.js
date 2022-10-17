@@ -196,15 +196,15 @@ function Toolbar() {
             zIndex: isTitleVisible ? 1 : -1
           }}
           transition={{ duration: 0.5 }}
-          fontWeight="heading"
-          fontSize="heading"
           value={title}
-          color="text"
           onChange={(e) => {
             const title = e.target.value;
             setTitle(sessionId, title);
           }}
           sx={{
+            fontWeight: "heading",
+            fontSize: "heading",
+            color: "text",
             p: 0,
             borderWidth: 0,
             borderRadius: "default",

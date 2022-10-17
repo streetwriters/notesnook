@@ -24,7 +24,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 
 export const EditorLoader = memo(function EditorLoader() {
   return (
-    <Flex sx={{ flexDirection: "column", p: 2 }}>
+    <Flex sx={{ flexDirection: "column", p: 2, py: 1 }}>
       <Flex sx={{ alignItems: "end", justifyContent: "end" }}>
         <Skeleton
           width={45}

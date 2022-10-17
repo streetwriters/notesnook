@@ -26,7 +26,7 @@ import { ListLoader } from "./list-loader";
 export const ViewLoader = memo(function ViewLoader() {
   return (
     <Box sx={{ m: 1 }}>
-      <Flex sx={{ justifyContent: "space-between", py: 2 }}>
+      <Flex sx={{ justifyContent: "space-between", py: 0 }}>
         <Skeleton
           height={35}
           width={100}
