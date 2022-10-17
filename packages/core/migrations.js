@@ -22,11 +22,11 @@ import { decodeHTML5 } from "entities";
 import { CURRENT_DATABASE_VERSION } from "./common";
 
 const migrations = [
-  { version: 5.0, types: {} },
-  { version: 5.1, types: {} },
+  { version: 5.0, items: {} },
+  { version: 5.1, items: {} },
   {
     version: 5.2,
-    types: {
+    items: {
       note: replaceDateEditedWithDateModified(false),
       notebook: replaceDateEditedWithDateModified(false),
       tag: replaceDateEditedWithDateModified(true),
@@ -45,7 +45,7 @@ const migrations = [
   },
   {
     version: 5.3,
-    types: {
+    items: {
       tiny: (item) => {
         if (!item.data || item.data.iv) return item;
         item.data = decodeWrappedTableHtml(item.data);
@@ -55,7 +55,7 @@ const migrations = [
   },
   {
     version: 5.4,
-    types: {
+    items: {
       tiny: (item) => {
         if (!item.data || item.data.iv) return item;
         item.type = "tiptap";
@@ -66,11 +66,11 @@ const migrations = [
   },
   {
     version: 5.5,
-    types: {}
+    items: {}
   },
   {
     version: 5.6,
-    types: {
+    items: {
       notebook: (item) => {
         if (!item.topics) return item;
 
@@ -100,7 +100,7 @@ const migrations = [
   },
   {
     version: 5.7,
-    types: {
+    items: {
       tiny: (item) => {
         if (!item.data || item.data.iv) return item;
         item.type = "tiptap";
@@ -113,7 +113,7 @@ const migrations = [
       }
     }
   },
-  { version: 5.8, types: {} }
+  { version: 5.8, items: {} }
 ];
 
 export async function migrateItem(item, version, type, database) {
@@ -130,7 +130,7 @@ export async function migrateItem(item, version, type, database) {
     const migration = migrations[migrationStartIndex];
     if (migration.version === CURRENT_DATABASE_VERSION) break;
 
-    const itemMigrator = migration.types[type];
+    const itemMigrator = migration.items && migration.items[type];
     if (!itemMigrator) continue;
     item = await itemMigrator(item, database);
   }
