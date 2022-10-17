@@ -42,6 +42,9 @@ export default class Backup {
     return this._db.storage.read("lastBackupTime");
   }
 
+  async updateBackupTime() {
+    await this._db.storage.write("lastBackupTime", Date.now());
+  }
   /**
    *
    * @param {"web"|"mobile"|"node"} type

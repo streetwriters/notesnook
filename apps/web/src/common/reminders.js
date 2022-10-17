@@ -126,8 +126,8 @@ export async function resetReminders() {
         [
           {
             text: "Later",
-            onClick: () => {
-              createBackup(false);
+            onClick: async () => {
+              await db.backup.updateBackupTime();
               openedToast?.hide();
               openedToast = null;
             },
