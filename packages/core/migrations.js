@@ -104,12 +104,25 @@ const migrations = [
       tiny: (item) => {
         if (!item.data || item.data.iv) return item;
         item.type = "tiptap";
-        return item;
+        return changeSessionContentType(item);
       },
       content: (item) => {
         if (!item.data || item.data.iv) return item;
         item.type = "tiptap";
         return item;
+    },
+      tiptap: (item) => {
+        return changeSessionContentType(item);
+      },
+      notehistory: (item) => {
+        item.type = "session";
+        return item;
+      }
+    },
+    collection: async (collection) => {
+      if (collection._collection) {
+        const indexer = collection._collection.indexer;
+        await indexer.migrateIndices();
       }
     }
   },
@@ -135,6 +148,28 @@ export async function migrateItem(item, version, type, database) {
     item = await itemMigrator(item, database);
   }
   return item;
+}
+
+export async function migrateCollection(collection, version) {
+  let migrationStartIndex = migrations.findIndex((m) => m.version === version);
+  if (migrationStartIndex <= -1) {
+    throw new Error(
+      version > CURRENT_DATABASE_VERSION
+        ? `Please update the app to the latest version.`
+        : `You seem to be on a very outdated version. Please update the app to the latest version.`
+    );
+  }
+
+  for (; migrationStartIndex < migrations.length; ++migrationStartIndex) {
+    const migration = migrations[migrationStartIndex];
+    if (migration.version === CURRENT_DATABASE_VERSION) break;
+
+    if (!migration.collection) continue;
+    await migration.collection(collection);
+
+    if (collection._collection && collection._collection.init)
+      await collection._collection.init();
+  }
 }
 
 function replaceDateEditedWithDateModified(removeDateEditedProperty = false) {
@@ -234,4 +269,12 @@ export function tinyToTiptap(html) {
   }
 
   return document.body.innerHTML;
+}
+
+function changeSessionContentType(item) {
+  if (item.id.endsWith("_content")) {
+    item.contentType = item.type;
+    item.type = "sessioncontent";
+  }
+  return item;
 }

@@ -154,32 +154,39 @@ export default class Backup {
         "This backup was made from a newer version of Notesnook. Cannot migrate."
       );
 
-    // we have to reindex to make sure we handle all the items
-    // properly.
-    reindex(data);
     const collections = [
       {
-        index: data["attachments"],
+        index: () => data["attachments"],
         dbCollection: this._db.attachments
       },
       {
-        index: data["notebooks"],
+        index: () => data["notebooks"],
         dbCollection: this._db.notebooks
       },
       {
-        index: data["content"],
+        index: () => data["content"],
         dbCollection: this._db.content
       },
       {
-        index: data["shortcuts"],
+        index: () => data["shortcuts"],
         dbCollection: this._db.shortcuts
       },
       {
-        index: data["notes"],
+        index: () => data["notehistory"],
+        dbCollection: this._db.noteHistory,
+        type: "notehistory"
+      },
+      {
+        index: () => data["sessioncontent"],
+        dbCollection: this._db.noteHistory.sessionContent,
+        type: "sessioncontent"
+      },
+      {
+        index: () => data["notes"],
         dbCollection: this._db.notes
       },
       {
-        index: ["settings"],
+        index: () => ["settings"],
         dbCollection: this._db.settings,
         type: "settings"
       }

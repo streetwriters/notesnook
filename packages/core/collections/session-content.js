@@ -17,11 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { tinyToTiptap } from "../migrations";
 import { compress, decompress } from "../utils/compression";
 import { makeSessionContentId } from "../utils/id";
 import Collection from "./collection";
 
 export default class SessionContent extends Collection {
+  async merge(item) {
+    await this._collection.addItem(item);
+  }
+
   /**
    *
    * @param {string} sessionId
@@ -29,13 +34,14 @@ export default class SessionContent extends Collection {
    */
   async add(sessionId, content, locked) {
     if (!sessionId || !content) return;
-    let compressed = locked ? null : compress(content.data);
+    let data = locked ? content.data : compress(content.data);
 
     await this._collection.addItem({
+      type: "sessioncontent",
       id: makeSessionContentId(sessionId),
-      data: compressed || content.data,
-      type: content.type,
-      compressed: !!compressed,
+      data,
+      contentType: content.type,
+      compressed: !locked,
       localOnly: true,
       locked
     });
@@ -49,9 +55,16 @@ export default class SessionContent extends Collection {
   async get(sessionContentId) {
     if (!sessionContentId) return;
     let session = await this._collection.getItem(sessionContentId);
+
+    if (session.contentType === "tiny" && session.compressed) {
+      session.compressed = compress(tinyToTiptap(decompress(session.data)));
+      session.contentType = "tiptap";
+      await this._collection.addItem(session);
+    }
+
     return {
       data: session.compressed ? decompress(session.data) : session.data,
-      type: session.type
+      type: session.contentType
     };
   }
 
@@ -64,7 +77,7 @@ export default class SessionContent extends Collection {
   }
 
   async all() {
-    let indices = await this._collection.indexer.getIndices();
+    let indices = this._collection.indexer.getIndices();
     let items = await this._collection.getItems(indices);
 
     return Object.values(items);

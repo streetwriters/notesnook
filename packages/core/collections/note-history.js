@@ -51,6 +51,16 @@ export default class NoteHistory extends Collection {
     );
   }
 
+  async merge(item) {
+    await this._collection.addItem(item);
+  }
+
+  async all() {
+    return Object.values(
+      await this._collection.getItems(this._collection.indexer.indices)
+    );
+  }
+
   /**
    * Get complete session history of a note.
    * @param noteId id of the note
@@ -84,6 +94,7 @@ export default class NoteHistory extends Collection {
     let locked = this._db.notes.note(noteId)?.data?.locked;
 
     let session = {
+      type: "session",
       id: sessionId,
       sessionContentId: makeSessionContentId(sessionId),
       noteId,
@@ -180,14 +191,14 @@ export default class NoteHistory extends Collection {
       await this._db.content.add({
         id: note.contentId,
         data: content.data,
-        type: content.type
+        type: content.contentType
       });
     } else {
       await this._db.notes.add({
         id: session.noteId,
         content: {
           data: content.data,
-          type: content.type
+          type: content.contentType
         }
       });
     }

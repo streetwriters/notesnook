@@ -42,56 +42,71 @@ class Migrations {
   }
 
   async migrate() {
-    if (!this.required() || this._isMigrating) return;
-    this._isMigrating = true;
+    try {
+      if (!this.required() || this._isMigrating) return;
+      this._isMigrating = true;
 
-    await this._db.notes.init();
-    const content = await this._db.content.all();
+      await this._db.notes.init();
 
-    const collections = [
-      { index: this._db.attachments.all, dbCollection: this._db.attachments },
-      {
-        index: this._db.notebooks.raw,
-        dbCollection: this._db.notebooks
-      },
-      {
-        index: this._db.tags.raw,
-        dbCollection: this._db.tags
-      },
-      {
-        index: this._db.colors.raw,
-        dbCollection: this._db.colors
-      },
-      {
-        index: this._db.trash.raw,
-        dbCollection: this._db.trash
-      },
-      {
-        index: content,
-        dbCollection: this._db.content
-      },
-      {
-        index: [this._db.settings.raw],
-        dbCollection: this._db.settings,
-        type: "settings"
-      },
-      {
-        index: this._db.shortcuts.raw,
-        dbCollection: this._db.shortcuts
-      },
-      {
-        index: this._db.notes.raw,
-        dbCollection: this._db.notes
-      }
-    ];
-    await this._migrator.migrate(
-      this._db,
-      collections,
-      (item) => item,
-      this.dbVersion
-    );
-    await this._db.storage.write("v", CURRENT_DATABASE_VERSION);
-    this.dbVersion = CURRENT_DATABASE_VERSION;
+      const collections = [
+        {
+          index: () => this._db.attachments.all,
+          dbCollection: this._db.attachments
+        },
+        {
+          index: () => this._db.notebooks.raw,
+          dbCollection: this._db.notebooks
+        },
+        {
+          index: () => this._db.tags.raw,
+          dbCollection: this._db.tags
+        },
+        {
+          index: () => this._db.colors.raw,
+          dbCollection: this._db.colors
+        },
+        {
+          index: () => this._db.trash.raw,
+          dbCollection: this._db.trash
+        },
+        {
+          index: () => this._db.content.all(),
+          dbCollection: this._db.content
+        },
+        {
+          index: () => [this._db.settings.raw],
+          dbCollection: this._db.settings,
+          type: "settings"
+        },
+        {
+          index: () => this._db.shortcuts.raw,
+          dbCollection: this._db.shortcuts
+        },
+        {
+          index: () => this._db.noteHistory.sessionContent.all(),
+          dbCollection: this._db.noteHistory
+        },
+        {
+          index: () => this._db.noteHistory.sessionContent.all(),
+          dbCollection: this._db.noteHistory.sessionContent
+        },
+        {
+          index: () => this._db.notes.raw,
+          dbCollection: this._db.notes
+        }
+      ];
+
+      await this._migrator.migrate(
+        this._db,
+        collections,
+        (item) => item,
+        this.dbVersion
+      );
+      await this._db.storage.write("v", CURRENT_DATABASE_VERSION);
+      this.dbVersion = CURRENT_DATABASE_VERSION;
+    } finally {
+      this._isMigrating = false;
+    }
   }
 }
 export default Migrations;

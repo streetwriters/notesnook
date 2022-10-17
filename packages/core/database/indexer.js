@@ -28,7 +28,6 @@ export default class Indexer extends Storage {
 
   async init() {
     this.indices = (await super.read(this.type, true)) || [];
-    await this.migrateIndices();
   }
 
   exists(key) {
@@ -89,7 +88,7 @@ export default class Indexer extends Storage {
 
     // remove old ids once they have been moved
     for (const id of keys) {
-      await this.remove(id);
+      await super.remove(id);
     }
   }
 

@@ -17,14 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { migrateItem } from "../migrations";
+import { migrateCollection, migrateItem } from "../migrations";
 
 class Migrator {
   async migrate(db, collections, get, version) {
     for (let collection of collections) {
       if (!collection.index || !collection.dbCollection) continue;
-      for (var i = 0; i < collection.index.length; ++i) {
-        let id = collection.index[i];
+
+      await migrateCollection(collection.dbCollection, version);
+
+      const index = (await collection.index()) || [];
+      for (var i = 0; i < index.length; ++i) {
+        let id = index[i];
         let item = get(id);
         if (!item) {
           continue;
@@ -35,18 +39,23 @@ class Migrator {
           await collection.dbCollection?._collection?.addItem(item);
           continue;
         }
-
+        const itemId = item.id;
         item = await migrateItem(
           item,
           version,
-          item.type || collection.type,
+          item.type || collection.type || collection.dbCollection.type,
           db
         );
 
         if (collection.dbCollection.merge) {
           await collection.dbCollection.merge(item);
-        } else {
+        } else if (collection.dbCollection.add) {
           await collection.dbCollection.add(item);
+        }
+
+        // if id changed after migration, we need to delete the old one.
+        if (item.id !== itemId) {
+          await collection.dbCollection?._collection?.deleteItem(itemId);
         }
       }
     }
