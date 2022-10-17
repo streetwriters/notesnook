@@ -238,7 +238,6 @@ test("issue: colors are not properly created if multiple notes are synced togeth
   await delay(2000);
 
   const purpleColor = deviceB.colors.tag("purple");
-  console.log(noteIds, purpleColor.noteIds);
   expect(noteIds.every((id) => purpleColor.noteIds.indexOf(id) > -1)).toBe(
     true
   );
