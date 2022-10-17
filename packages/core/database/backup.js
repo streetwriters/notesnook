@@ -75,7 +75,7 @@ export default class Backup {
     }
 
     // save backup time
-    await this._db.storage.write("lastBackupTime", Date.now());
+    await this.updateBackupTime();
     return JSON.stringify({
       version: CURRENT_DATABASE_VERSION,
       type,
@@ -135,6 +135,7 @@ export default class Backup {
 
     switch (version) {
       case CURRENT_DATABASE_VERSION:
+      case 5.7:
       case 5.6:
       case 5.5:
       case 5.4:
@@ -237,28 +238,4 @@ function filterData(data) {
 
   skippedKeys.forEach((key) => delete data[key]);
   return data;
-}
-
-function reindex(data) {
-  for (let key in data) {
-    const item = data[key];
-    if (!item) {
-      delete data[key];
-      continue;
-    }
-    switch (item.type) {
-      case "notebook":
-        if (!data["notebooks"]) data["notebooks"] = [];
-        data["notebooks"].push(item.id);
-        break;
-      case "note":
-        if (!data["notes"]) data["notes"] = [];
-        data["notes"].push(item.id);
-        break;
-      case "content":
-        if (!data["content"]) data["content"] = [];
-        data["content"].push(item.id);
-        break;
-    }
-  }
 }
