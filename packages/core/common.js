@@ -46,6 +46,14 @@ export function sendSyncProgressEvent(EV, type, total, current) {
   });
 }
 
+export function sendMigrationProgressEvent(EV, collection, total, current) {
+  EV.publish(EVENTS.migrationProgress, {
+    collection,
+    total,
+    current: current === undefined ? total : current
+  });
+}
+
 export const CLIENT_ID = "notesnook";
 
 export const CHECK_IDS = {
@@ -73,6 +81,7 @@ export const EVENTS = {
   databaseUpdated: "db:updated",
   databaseCollectionInitiated: "db:collectionInitiated",
   appRefreshRequested: "app:refreshRequested",
+  migrationProgress: "migration:progress",
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
   userUnauthorized: "user:unauthorized",

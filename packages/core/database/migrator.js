@@ -17,12 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { sendMigrationProgressEvent } from "../common";
 import { migrateCollection, migrateItem } from "../migrations";
 
 class Migrator {
   async migrate(db, collections, get, version) {
     for (let collection of collections) {
       if (!collection.index || !collection.dbCollection) continue;
+
+      if (collection.dbCollection.collectionName)
+        sendMigrationProgressEvent(
+          db.eventManager,
+          collection.dbCollection.collectionName,
+          0,
+          0
+        );
 
       await migrateCollection(collection.dbCollection, version);
 
@@ -33,6 +42,14 @@ class Migrator {
         if (!item) {
           continue;
         }
+
+        if (collection.dbCollection.collectionName)
+          sendMigrationProgressEvent(
+            db.eventManager,
+            collection.dbCollection.collectionName,
+            index.length,
+            i + 1
+          );
 
         // check if item is permanently deleted or just a soft delete
         if (item.deleted && !item.type) {

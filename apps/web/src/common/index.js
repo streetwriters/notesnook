@@ -36,6 +36,8 @@ import { showFilePicker } from "../components/editor/picker";
 import { logger } from "../utils/logger";
 import { PATHS } from "@notesnook/desktop/paths";
 import saveFile from "../commands/save-file";
+import { TaskManager } from "./task-manager";
+import { EVENTS } from "@notesnook/core/common";
 
 export const CREATE_BUTTON_MAP = {
   notes: {
@@ -140,11 +142,25 @@ export async function restoreBackupFile(backup) {
       return !error;
     });
   } else {
-    await showLoadingDialog({
+    await TaskManager.startTask({
       title: "Restoring backup",
-      subtitle:
-        "Please do NOT close your browser or shut down your PC until the process completes.",
-      action: () => restore(backup)
+      subtitle: "This might take a while",
+      type: "modal",
+      action: (report) => {
+        db.eventManager.subscribe(
+          EVENTS.migrationProgress,
+          ({ collection, total, current }) => {
+            report({
+              text: `Restoring ${collection}...`,
+              current,
+              total
+            });
+          }
+        );
+
+        report({ text: `Restoring...` });
+        return restore(backup);
+      }
     });
   }
 }
