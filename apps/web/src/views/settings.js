@@ -47,7 +47,7 @@ import { createBackup, importBackup, verifyAccount } from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../hooks/use-persistent-state";
 import dayjs from "dayjs";
-import ScrollContainer from "../components/scroll-container";
+import { FlexScrollContainer } from "../components/scroll-container";
 import { showToast } from "../utils/toast";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
@@ -175,7 +175,7 @@ function Settings() {
   );
 
   return (
-    <ScrollContainer>
+    <FlexScrollContainer style={{ height: "100%" }}>
       <Flex variant="columnFill" px={2}>
         {isLoggedIn ? (
           <AccountStatus user={user} />
@@ -530,7 +530,7 @@ function Settings() {
                 );
               }}
             />
-            {isLoggedIn && (
+            {!isLoggedIn && (
               <>
                 <Button
                   variant="list"
@@ -830,7 +830,7 @@ function Settings() {
           </Flex>
         )}
       </Flex>
-    </ScrollContainer>
+    </FlexScrollContainer>
   );
 }
 

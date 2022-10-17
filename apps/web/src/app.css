@@ -147,6 +147,25 @@ textarea,
   --sash-hover-size: 4px;
 }
 
-.rc-scrollbars-view:hover ~ .rc-scrollbars-track {
-  opacity: 1 !important;
+.route#settings,
+#mainRouteContainer {
+  overflow: hidden;
+}
+
+.ms-track:hover,
+.ms-track:active {
+  background: var(--bgSecondary) !important;
+  border-width: 0px !important;
+}
+
+.ms-track {
+  border-width: 0px !important;
+}
+
+.ms-active .ms-thumb {
+  filter: brightness(80%);
+}
+
+.ms-thumb {
+  background: var(--bgSecondaryText) !important;
 }

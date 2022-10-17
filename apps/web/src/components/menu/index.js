@@ -215,13 +215,10 @@ function MenuContainer({ title, children }) {
   return (
     <Flex
       className="menuContainer"
-      as="ul"
       tabIndex={-1}
       bg="background"
       py={1}
       sx={{
-        position: "relative",
-        listStyle: "none",
         padding: 0,
         margin: 0,
         borderRadius: "default",
