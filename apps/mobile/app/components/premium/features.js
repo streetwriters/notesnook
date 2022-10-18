@@ -130,7 +130,7 @@ export const features = [
   {
     title: "Instant syncing",
     detail:
-      "Seemlessly work from anywhere on any device. Every change is synced instantly to all your devices.",
+      "Seamlessly work from anywhere on any device. Every change is synced instantly to all your devices.",
     pro: true
   },
   {
