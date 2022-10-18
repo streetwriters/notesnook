@@ -41,14 +41,19 @@ const navigateToTopic = (topic) => {
   TopicNotes.navigate(topic, true);
 };
 
-export const NotebookItem = ({ item, isTopic = false, isTrash, dateBy }) => {
+export const NotebookItem = ({
+  item,
+  isTopic = false,
+  isTrash,
+  dateBy,
+  totalNotes
+}) => {
   const colors = useThemeStore((state) => state.colors);
   const notebooksListMode = useSettingStore(
     (state) => state.settings.notebooksListMode
   );
   const compactMode = notebooksListMode === "compact";
   const topics = item.topics?.slice(0, 3) || [];
-  const totalNotes = getTotalNotes(item);
 
   return (
     <>

@@ -35,6 +35,7 @@ import { NoteWrapper } from "../list-items/note/wrapper";
 import { NotebookWrapper } from "../list-items/notebook/wrapper";
 import TagItem from "../list-items/tag";
 import { Empty } from "./empty";
+import { getTotalNotes } from "../../utils";
 
 const renderItems = {
   note: NoteWrapper,
@@ -52,6 +53,7 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
   const dateBy =
     groupOptions.sortBy !== "title" ? groupOptions.sortBy : "dateEdited";
 
+  const totalNotes = getTotalNotes(item);
   const tags =
     item.tags
       ?.slice(0, 3)
@@ -73,6 +75,7 @@ const RenderItem = ({ item, index, type, ...restArgs }) => {
       dateBy={dateBy}
       index={index}
       type={type}
+      totalNotes={totalNotes}
       {...restArgs}
     />
   );
