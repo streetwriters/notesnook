@@ -56,6 +56,8 @@ function CachedRouter() {
         route.remove();
         route = undefined;
       }
+    } else {
+      cache[key] = false;
     }
 
     if (!cache[key]) {
