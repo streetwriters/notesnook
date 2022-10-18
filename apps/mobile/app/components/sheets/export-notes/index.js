@@ -28,10 +28,12 @@ import { presentSheet, ToastEvent } from "../../../services/event-manager";
 import Exporter from "../../../services/exporter";
 import PremiumService from "../../../services/premium";
 import { useThemeStore } from "../../../stores/use-theme-store";
+import { useUserStore } from "../../../stores/use-user-store";
 import { getElevation } from "../../../utils";
 import { ph, pv, SIZE } from "../../../utils/size";
 import { sleep } from "../../../utils/time";
 import DialogHeader from "../../dialog/dialog-header";
+import { ProTag } from "../../premium/pro-tag";
 import { Button } from "../../ui/button";
 import { IconButton } from "../../ui/icon-button";
 import { PressableButton } from "../../ui/pressable";
@@ -45,6 +47,7 @@ const ExportNotesSheet = ({ notes }) => {
   const [complete, setComplete] = useState(false);
   const [result, setResult] = useState({});
   const [status, setStatus] = useState(null);
+  const premium = useUserStore((state) => state.premium);
 
   const save = async (type) => {
     if (exporting) return;
@@ -58,7 +61,9 @@ const ExportNotesSheet = ({ notes }) => {
       result = await Exporter.exportNote(notes[0], type);
       await sleep(1000);
     }
-    if (!result) return setExporting(false);
+    if (!result) {
+      return setExporting(false);
+    }
 
     setResult(result);
     setComplete(true);
@@ -72,8 +77,9 @@ const ExportNotesSheet = ({ notes }) => {
         await save("pdf");
       },
       icon: "file-pdf-box",
-      desc: "Can be opened in a pdf reader like Adobe or Foxit Reader",
-      id: notesnook.ids.dialogs.export.pdf
+      desc: "View in any pdf reader app",
+      id: notesnook.ids.dialogs.export.pdf,
+      pro: premium
     },
     {
       title: "Markdown",
@@ -81,8 +87,9 @@ const ExportNotesSheet = ({ notes }) => {
         await save("md");
       },
       icon: "language-markdown",
-      desc: "Can be opened in any text or markdown editor",
-      id: notesnook.ids.dialogs.export.md
+      desc: "View in any text or markdown editor",
+      id: notesnook.ids.dialogs.export.md,
+      pro: premium
     },
     {
       title: "Plain Text",
@@ -90,8 +97,9 @@ const ExportNotesSheet = ({ notes }) => {
         await save("txt");
       },
       icon: "card-text",
-      desc: "Can be opened in any text editor",
-      id: notesnook.ids.dialogs.export.text
+      desc: "View in any text editor",
+      id: notesnook.ids.dialogs.export.text,
+      pro: true
     },
     {
       title: "HTML",
@@ -99,8 +107,9 @@ const ExportNotesSheet = ({ notes }) => {
         await save("html");
       },
       icon: "language-html5",
-      desc: "Can be opened in any web browser",
-      id: notesnook.ids.dialogs.export.html
+      desc: "View in any web browser & html reader",
+      id: notesnook.ids.dialogs.export.html,
+      pro: premium
     }
   ];
 
@@ -147,7 +156,8 @@ const ExportNotesSheet = ({ notes }) => {
                   paddingVertical: 10,
                   justifyContent: "flex-start",
                   borderRadius: 0,
-                  paddingHorizontal: 12
+                  paddingHorizontal: 12,
+                  opacity: item.pro ? 1 : 0.5
                 }}
               >
                 <View
@@ -162,7 +172,7 @@ const ExportNotesSheet = ({ notes }) => {
                 >
                   <Icon
                     name={item.icon}
-                    color={colors.accent}
+                    color={item.pro ? colors.accent : colors.icon}
                     size={SIZE.xxxl + 10}
                   />
                 </View>
@@ -171,6 +181,7 @@ const ExportNotesSheet = ({ notes }) => {
                     flexShrink: 1
                   }}
                 >
+                  {!item.pro ? <ProTag size={12} /> : null}
                   <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
                     {item.title}
                   </Heading>
