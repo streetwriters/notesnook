@@ -17,8 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState } from "react";
-import { View } from "react-native";
+import { EVENTS } from "@notesnook/core/common";
+import React, { useCallback, useEffect, useState } from "react";
+import { Platform, View } from "react-native";
 import { db } from "../../../common/database";
 import { MMKV } from "../../../common/database/mmkv";
 import BackupService from "../../../services/backup";
@@ -27,27 +28,18 @@ import {
   presentSheet,
   ToastEvent
 } from "../../../services/event-manager";
+import SettingsService from "../../../services/settings";
 import { useThemeStore } from "../../../stores/use-theme-store";
 import { eCloseProgressDialog } from "../../../utils/events";
 import { sleep } from "../../../utils/time";
 import { Dialog } from "../../dialog";
 import DialogHeader from "../../dialog/dialog-header";
-import { presentDialog } from "../../dialog/functions";
 import SheetProvider from "../../sheet-provider";
 import { Button } from "../../ui/button";
-import { Notice } from "../../ui/notice";
 import Seperator from "../../ui/seperator";
 import { ProgressBarComponent } from "../../ui/svg/lazy";
 import Paragraph from "../../ui/typography/paragraph";
 import { Issue } from "../github/issue";
-import { useEffect } from "react";
-import SettingsService from "../../../services/settings";
-import { Platform } from "react-native";
-import { useCallback } from "react";
-
-const alertMessage = `To keep your data safe, we will save a backup of your data on your device before migration starts.
-
-If you face any other issues after migration, feel free to reach out to us on https://discord.com/invite/zQBK97EE22 or email us at support@streetwriters.co`;
 
 export const makeError = (
   stack: string,
@@ -57,11 +49,30 @@ export const makeError = (
 _______________________________
 Stacktrace: In ${component}::${stack}`;
 
+type Progress = {
+  collection: string;
+  total: number;
+  current: number;
+};
+
 export default function Migrate() {
   const colors = useThemeStore((state) => state.colors);
   const [loading, setLoading] = useState(false);
-  const [_error, _setError] = useState<Error>();
+  const [error, _setError] = useState<Error>();
   const [reset, setReset] = useState(false);
+  const [progress, setProgress] = useState<Progress>();
+
+  useEffect(() => {
+    const subscription = db.eventManager.subscribe(
+      EVENTS.migrationProgress,
+      (progress: Progress) => {
+        setProgress(progress);
+      }
+    );
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   const reportError = React.useCallback((error: Error) => {
     _setError(error);
@@ -80,6 +91,7 @@ export default function Migrate() {
   const startMigration = useCallback(async () => {
     try {
       setLoading(true);
+      await sleep(1000);
       const backupSaved = await BackupService.run(false, "local");
       if (!backupSaved) {
         ToastEvent.show({
@@ -92,15 +104,8 @@ export default function Migrate() {
       }
       await db.migrations?.migrate();
       eSendEvent(eCloseProgressDialog);
-      setLoading(false);
       await sleep(500);
-      presentDialog({
-        title: "Migration successful",
-        paragraph:
-          "Your data has been migrated. If you face any issues after the migration please reach out to us via email or Discord.",
-        context: "global",
-        negativeText: "Ok"
-      });
+      setLoading(false);
     } catch (e) {
       setLoading(false);
       reportError(e as Error);
@@ -120,14 +125,16 @@ export default function Migrate() {
         paddingTop: 12
       }}
     >
-      <DialogHeader
-        title="Database migration required"
-        paragraph={
-          "Due to new features added we need to migrate your data to a newer version. This is NOT a destructive operation."
-        }
-      />
+      {!loading ? (
+        <DialogHeader
+          title="Save a backup of your notes"
+          centered
+          paragraph={
+            "Thank you for updating Notesnook! We will be applying some minor changess for a better note taking experience."
+          }
+        />
+      ) : null}
       <Seperator />
-      <Notice type="information" selectable={true} text={alertMessage} />
 
       {loading ? (
         <>
@@ -156,11 +163,13 @@ export default function Migrate() {
                 textAlign: "center"
               }}
             >
-              Migration in progress... please wait
+              Updating {progress ? progress?.collection : null}
+              {progress ? `(${progress.current}/${progress.total}) ` : null}...
+              please wait
             </Paragraph>
           </View>
         </>
-      ) : _error ? (
+      ) : error ? (
         <>
           <Paragraph
             style={{
@@ -201,7 +210,7 @@ export default function Migrate() {
         </>
       ) : (
         <Button
-          title="Start migration"
+          title="Save & continue"
           type="accent"
           width={250}
           onPress={startMigration}

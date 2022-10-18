@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import { EVENTS } from "@notesnook/core/common";
 import React, { createRef, useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import DocumentPicker from "react-native-document-picker";
@@ -107,6 +108,19 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [backupDirectoryAndroid, setBackupDirectoryAndroid] = useState(false);
+  const [progress, setProgress] = useState();
+
+  useEffect(() => {
+    const subscription = db.eventManager.subscribe(
+      EVENTS.migrationProgress,
+      (progress) => {
+        setProgress(progress);
+      }
+    );
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     checkBackups();
@@ -292,9 +306,10 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
                   withPassword(
                     async (value) => {
                       try {
-                        await restoreBackup(backup, value);
-                        setRestoring(false);
-                        close();
+                        restoreBackup(backup, value).then(() => {
+                          close();
+                          setRestoring(false);
+                        });
                         return true;
                       } catch (e) {
                         backupError(e);
@@ -432,7 +447,9 @@ const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
               >
                 <ActivityIndicator color={colors.accent} />
                 <Paragraph color={colors.icon}>
-                  Restoring backup. Please wait.
+                  Restoring {progress ? progress?.collection : null}
+                  {progress ? `(${progress.current}/${progress.total}) ` : null}
+                  ...Please wait.
                 </Paragraph>
               </View>
             )
