@@ -41,7 +41,7 @@ import Seperator from "../../ui/seperator";
 import Heading from "../../ui/typography/heading";
 import Paragraph from "../../ui/typography/paragraph";
 
-const ExportNotesSheet = ({ notes }) => {
+const ExportNotesSheet = ({ notes, update }) => {
   const colors = useThemeStore((state) => state.colors);
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);
@@ -53,6 +53,7 @@ const ExportNotesSheet = ({ notes }) => {
     if (exporting) return;
     if (!PremiumService.get() && type !== "txt") return;
     setExporting(true);
+    update({ disableClosing: true });
     setComplete(false);
     let result;
     if (notes.length > 1) {
@@ -62,10 +63,11 @@ const ExportNotesSheet = ({ notes }) => {
       await sleep(1000);
     }
     if (!result) {
+      update({ disableClosing: false });
       return setExporting(false);
     }
-
     setResult(result);
+    update({ disableClosing: false });
     setComplete(true);
     setExporting(false);
   };
@@ -325,7 +327,12 @@ const ExportNotesSheet = ({ notes }) => {
 
 ExportNotesSheet.present = (notes, allNotes) => {
   presentSheet({
-    component: <ExportNotesSheet notes={allNotes ? db.notes.all : notes} />
+    component: (ref, close, update) => (
+      <ExportNotesSheet
+        notes={allNotes ? db.notes.all : notes}
+        update={update}
+      />
+    )
   });
 };
 
