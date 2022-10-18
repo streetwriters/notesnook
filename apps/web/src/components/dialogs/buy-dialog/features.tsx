@@ -115,7 +115,7 @@ const sections: Section[] = [
   {
     title: "Instant syncing",
     detail:
-      "Seemlessly work from anywhere. Every change is synced instantly everywhere.",
+      "Seamlessly work from anywhere. Every change is synced instantly everywhere.",
     pro: true
   },
   {
