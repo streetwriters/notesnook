@@ -44,6 +44,10 @@ import { isTesting } from "../utils/platform";
 import { useTimer } from "../hooks/use-timer";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { AuthenticatorType } from "../components/dialogs/mfa/types";
+import {
+  showLoadingDialog,
+  showLogoutConfirmation
+} from "../common/dialog-controller";
 
 type LoginFormData = {
   email: string;
@@ -216,8 +220,14 @@ function Auth(props: AuthProps) {
                 color: "error"
               }}
               onClick={async () => {
-                await db.user?.logout();
-                openURL("/login");
+                if (await showLogoutConfirmation()) {
+                  await showLoadingDialog({
+                    title: "You are being logged out",
+                    action: () => db.user?.logout(true),
+                    subtitle: "Please wait..."
+                  });
+                  openURL("/login");
+                }
               }}
             >
               <Logout size={16} sx={{ mr: 1 }} color="error" /> Logout
