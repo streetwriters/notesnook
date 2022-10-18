@@ -96,7 +96,9 @@ const routes = {
 const sessionExpiryExceptions: Routes[] = [
   "/recover",
   "/account/recovery",
-  "/sessionexpired"
+  "/sessionexpired",
+  "/mfa/code",
+  "/mfa/select"
 ];
 
 const serviceWorkerWhitelist: Routes[] = ["default"];
