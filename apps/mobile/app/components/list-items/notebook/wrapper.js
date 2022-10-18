@@ -101,7 +101,7 @@ export const openNotebookTopic = (item) => {
 };
 
 export const NotebookWrapper = React.memo(
-  function NotebookWrapper({ item, index, dateBy }) {
+  function NotebookWrapper({ item, index, dateBy, totalNotes }) {
     const isTrash = item.type === "trash";
 
     return (
@@ -118,11 +118,13 @@ export const NotebookWrapper = React.memo(
           dateBy={dateBy}
           index={index}
           isTrash={isTrash}
+          totalNotes={totalNotes}
         />
       </SelectionWrapper>
     );
   },
   (prev, next) => {
+    if (prev.totalNotes !== next.totalNotes) return false;
     if (prev.item.title !== next.item.title) return false;
     if (prev.dateBy !== next.dateBy) {
       return false;

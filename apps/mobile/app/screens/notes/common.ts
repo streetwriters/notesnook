@@ -102,7 +102,8 @@ async function onNoteCreated(id: string, params: FirstSaveData) {
         "TopicNotes",
         "Favorites",
         "Notes",
-        "Notebook"
+        "Notebook",
+        "Notebooks"
       );
       break;
     }
