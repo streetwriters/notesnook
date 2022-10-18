@@ -18,12 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { decode, EntityLevel } from "entities";
-import { zip } from "fflate";
+import { zipSync } from "fflate";
 import { Platform } from "react-native";
 import RNHTMLtoPDF from "react-native-html-to-pdf-lite";
 import * as ScopedStorage from "react-native-scoped-storage";
 import RNFetchBlob from "rn-fetch-blob";
-import { db } from "../common/database/index";
+import { DatabaseLogger, db } from "../common/database/index";
 import Storage from "../common/database/storage";
 import { toTXT } from "../utils";
 import { sanitizeFilename } from "../utils/sanitizer";
@@ -419,13 +419,11 @@ async function makeHtml(note) {
  * @param {"txt" | "pdf" | "md" | "html"} type
  */
 async function exportAs(type, note, bulk) {
-  console.log(type, "type");
   let data;
   switch (type) {
     case "html":
       {
         data = await makeHtml(note);
-        console.log("html created", data);
       }
       break;
     case "md":
@@ -474,7 +472,7 @@ async function exportNote(note, type) {
   let path = await getPath(FolderNames[type]);
   if (!path) return;
   let result = await exportAs(type, note);
-
+  if (!result) return null;
   let fileName = sanitizeFilename(note.title + Date.now(), {
     replacement: "_"
   });
@@ -501,12 +499,9 @@ function copyFileAsync(source, dest) {
   });
 }
 
-function zipAsync(results) {
-  return new Promise((resolve) => {
-    zip(results, (err, data) => {
-      resolve(Buffer.from(data.buffer).toString("base64"));
-    });
-  });
+function zipsync(results) {
+  let data = zipSync(results);
+  return Buffer.from(data.buffer).toString("base64");
 }
 
 /**
@@ -519,25 +514,34 @@ async function bulkExport(notes, type, callback) {
 
   const results = {};
   for (var i = 0; i < notes.length; i++) {
-    await sleep(1);
-    let note = notes[i];
-    let result = await exportAs(type, note);
-    let fileName = sanitizeFilename(note.title + Date.now(), {
-      replacement: "_"
-    });
-    results[fileName + `.${type}`] = Buffer.from(
-      result,
-      type === "pdf" ? "base64" : "utf-8"
-    );
-    callback(`${i + 1}/${notes.length}`);
+    try {
+      await sleep(1);
+      let note = notes[i];
+      if (note.locked) continue;
+      let result = await exportAs(type, note);
+      let fileName = sanitizeFilename(note.title + Date.now(), {
+        replacement: "_"
+      });
+      if (result) {
+        results[fileName + `.${type}`] = Buffer.from(
+          result,
+          type === "pdf" ? "base64" : "utf-8"
+        );
+      }
+      callback(`${i + 1}/${notes.length}`);
+    } catch (e) {
+      DatabaseLogger.error(e);
+    }
   }
-  callback("zipping");
-  await sleep(1);
-  const zipped = await zipAsync(results);
   const fileName = `nn-export-${notes.length}-${type}-${Date.now()}.zip`;
-  callback("saving to disk");
-  await sleep(1);
+
   try {
+    callback("zipping");
+    await sleep(1);
+    const zipped = zipsync(results);
+    callback("saving to disk");
+    await sleep(1);
+
     if (Platform.OS === "ios") {
       RNFetchBlob.fs.writeFile(path + `/${fileName}`, zipped, "base64");
     } else {
@@ -554,14 +558,15 @@ async function bulkExport(notes, type, callback) {
       callback();
     }
   } catch (e) {
-    console.log(e, "error");
+    DatabaseLogger.error(e);
   }
 
   return {
     filePath: path,
     type: "application/zip",
     name: "zip",
-    fileName: fileName
+    fileName: fileName,
+    count: results?.length || 0
   };
 }
 
