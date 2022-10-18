@@ -55,12 +55,6 @@ export default class NoteHistory extends Collection {
     await this._collection.addItem(item);
   }
 
-  async all() {
-    return Object.values(
-      await this._collection.getItems(this._collection.indexer.indices)
-    );
-  }
-
   /**
    * Get complete session history of a note.
    * @param noteId id of the note
@@ -191,14 +185,14 @@ export default class NoteHistory extends Collection {
       await this._db.content.add({
         id: note.contentId,
         data: content.data,
-        type: content.contentType
+        type: content.type
       });
     } else {
       await this._db.notes.add({
         id: session.noteId,
         content: {
           data: content.data,
-          type: content.contentType
+          type: content.type
         }
       });
     }
