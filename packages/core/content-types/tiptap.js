@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import showdown from "showdown";
+import showdown from "@streetwriters/showdown";
 import dataurl from "../utils/dataurl";
 import { getDummyDocument, parseHTML } from "../utils/html-parser";
 

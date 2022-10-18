@@ -36,6 +36,7 @@
     "@microsoft/signalr": "^6.0.7",
     "@microsoft/signalr-protocol-msgpack": "^6.0.7",
     "@notesnook/logger": "*",
+    "@streetwriters/showdown": "^3.0.1-alpha",
     "async-mutex": "^0.3.2",
     "base64-arraybuffer": "^1.0.2",
     "dayjs": "^1.11.3",
@@ -45,7 +46,6 @@
     "linkedom": "^0.14.17",
     "liqe": "^1.13.0",
     "qclone": "^1.1.0",
-    "showdown": "github:thecodrr/showdown",
     "spark-md5": "^3.0.2"
   },
   "np": {

@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`convert HTML to markdown with codeblock2: html-to-md-codeblock2.md 1`] = `
+"\`\`\`
+hello
+\`\`\`
+
+"
+`;
+
 exports[`convert HTML to markdown with codeblocks: html-to-md-codeblocks.md 1`] = `
 "Typescript is one of those languages that appear to be very simple. It's often described as \\"Javascript with types\\" and it fits that name very well. However, what many don't realize starting out with Typescript is that Typescript*is *a language and like all other languages it has it's own \\"secrets\\", it's own set of quirks.
 
