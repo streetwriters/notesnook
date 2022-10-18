@@ -35,7 +35,6 @@ const Sort = ({ type, screen }) => {
   const [groupOptions, setGroupOptions] = useState(
     db.settings.getGroupOptions(type)
   );
-
   const updateGroupOptions = async (_groupOptions) => {
     await db.settings.setGroupOptions(type, _groupOptions);
 
@@ -141,7 +140,8 @@ const Sort = ({ type, screen }) => {
           />
         ) : (
           Object.keys(SORT).map((item) =>
-            item === "title" && groupOptions.groupBy !== "none" ? null : (
+            (item === "title" && groupOptions.groupBy !== "none") ||
+            (screen === "Tags" && item === "dateEdited") ? null : (
               <Button
                 key={item}
                 type={groupOptions.sortBy === item ? "grayBg" : "gray"}
