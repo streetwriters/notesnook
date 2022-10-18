@@ -142,6 +142,7 @@ const Notebook = ({ route, navigation }: NavigationProps<"Notebook">) => {
         headerProps={{
           heading: params.current.title
         }}
+        loading={false}
         ListHeader={
           <NotebookHeader
             onEditNotebook={() => {
