@@ -24,7 +24,7 @@ import useMobile from "./hooks/use-mobile";
 import useTablet from "./hooks/use-tablet";
 import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
-import { Allotment } from "allotment";
+import { Allotment, LayoutPriority } from "allotment";
 import "allotment/dist/style.css";
 import Config from "./utils/config";
 import { useStore } from "./stores/app-store";
@@ -128,10 +128,10 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
       >
         <Allotment
           ref={panesRef}
-          proportionalLayout
+          proportionalLayout={false}
           onChange={(sizes) => {
             Config.set("paneSizes", sizes);
-            setIsNarrow(sizes[0] <= 132);
+            setIsNarrow(sizes[0] <= 55);
           }}
         >
           <Allotment.Pane
@@ -139,6 +139,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             minSize={50}
             preferredSize={isTablet ? 50 : paneSizes[0]}
             visible={!isFocusMode}
+            priority={LayoutPriority.Low}
           >
             <Flex sx={{ overflow: "hidden", flex: 1 }}>
               <SuspenseLoader
@@ -159,6 +160,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             minSize={2}
             preferredSize={paneSizes[1]}
             visible={show}
+            priority={LayoutPriority.Normal}
           >
             <Flex className="listMenu" variant="columnFill">
               <SuspenseLoader
@@ -168,8 +170,10 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
               />
             </Flex>
           </Allotment.Pane>
-
-          <Allotment.Pane className="pane editor-pane">
+          <Allotment.Pane
+            className="pane editor-pane"
+            priority={LayoutPriority.High}
+          >
             <Flex
               sx={{
                 overflow: "hidden",

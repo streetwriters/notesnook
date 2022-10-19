@@ -35,6 +35,7 @@ type NavigationItemProps = {
   isNew?: boolean;
   selected?: boolean;
   onClick?: () => void;
+  count?: number;
   // TODO: add proper typings here
   menuItems?: any[];
 };
@@ -51,7 +52,8 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
     isTablet,
     selected,
     onClick,
-    menuItems
+    menuItems,
+    count
   } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const { openMenu } = useMenuTrigger();
@@ -96,7 +98,7 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
         }}
       >
         <Icon
-          size={isTablet ? 18 : 15}
+          size={isTablet ? 16 : 15}
           color={color || (selected ? "primary" : "icon")}
           rotate={isLoading}
         />
@@ -132,7 +134,16 @@ function NavigationItem(props: PropsWithChildren<NavigationItemProps>) {
           {title}
         </Text>
       </Button>
-      {children}
+      {children ? (
+        children
+      ) : !isTablet && count !== undefined ? (
+        <Text
+          variant="subBody"
+          sx={{ mr: 1, bg: "hover", px: "3px", borderRadius: "default" }}
+        >
+          {count > 100 ? "100+" : count}
+        </Text>
+      ) : null}
     </Flex>
   );
 }

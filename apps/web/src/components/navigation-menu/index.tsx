@@ -249,7 +249,17 @@ function NavigationMenu(props: NavigationMenuProps) {
             onClick={() => hardNavigate("/login")}
           />
         )}
-
+        {isTablet && (
+          <NavigationItem
+            isTablet={isTablet}
+            title={theme === "dark" ? "Light mode" : "Dark mode"}
+            icon={theme === "dark" ? LightMode : DarkMode}
+            onClick={() => {
+              setFollowSystemTheme(false);
+              toggleNightMode();
+            }}
+          />
+        )}
         <NavigationItem
           isTablet={isTablet}
           key={settings.path}
@@ -278,9 +288,9 @@ function NavigationMenu(props: NavigationMenuProps) {
               }}
             >
               {theme === "dark" ? (
-                <DarkMode size={16} />
-              ) : (
                 <LightMode size={16} />
+              ) : (
+                <DarkMode size={16} />
               )}
             </Button>
           )}
