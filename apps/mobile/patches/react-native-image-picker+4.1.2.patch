@@ -1,8 +1,16 @@
 diff --git a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
-index 8e59033..2a2bf3b 100644
+index 8e59033..c87febe 100644
 --- a/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
 +++ b/node_modules/react-native-image-picker/android/src/main/java/com/imagepicker/Utils.java
-@@ -21,6 +21,7 @@ import android.provider.OpenableColumns;
+@@ -1,6 +1,7 @@
+ package com.imagepicker;
+ 
+ import android.Manifest;
++import android.annotation.SuppressLint;
+ import android.app.Activity;
+ import android.content.ClipData;
+ import android.content.ContentResolver;
+@@ -21,6 +22,7 @@ import android.provider.OpenableColumns;
  import android.util.Base64;
  import android.webkit.MimeTypeMap;
  
@@ -10,7 +18,7 @@ index 8e59033..2a2bf3b 100644
  import androidx.core.app.ActivityCompat;
  import androidx.core.content.FileProvider;
  import androidx.exifinterface.media.ExifInterface;
-@@ -36,6 +37,7 @@ import java.io.FileNotFoundException;
+@@ -36,6 +38,7 @@ import java.io.FileNotFoundException;
  import java.io.IOException;
  import java.io.InputStream;
  import java.io.OutputStream;
@@ -18,7 +26,18 @@ index 8e59033..2a2bf3b 100644
  import java.util.ArrayList;
  import java.util.Arrays;
  import java.util.Collections;
-@@ -383,7 +385,7 @@ public class Utils {
+@@ -266,7 +269,9 @@ public class Utils {
+         MediaMetadataRetriever m = new MediaMetadataRetriever();
+         m.setDataSource(context, uri);
+         int duration = Math.round(Float.parseFloat(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))) / 1000;
+-        m.release();
++        try {
++            m.release();
++        } catch(Exception e) {}
+         return duration;
+     }
+ 
+@@ -383,7 +388,7 @@ public class Utils {
          return fileUris;
      }
  
@@ -27,7 +46,7 @@ index 8e59033..2a2bf3b 100644
          String fileName = uri.getLastPathSegment();
          int[] dimensions = getImageDimensions(uri, context);
  
-@@ -418,13 +420,16 @@ public class Utils {
+@@ -418,13 +423,16 @@ public class Utils {
  
          for(int i = 0; i < fileUris.size(); ++i) {
              Uri uri = fileUris.get(i);
@@ -45,7 +64,7 @@ index 8e59033..2a2bf3b 100644
              } else if (isVideoType(uri, context)) {
                  assets.pushMap(getVideoResponseMap(uri, context));
              } else {
-@@ -438,6 +443,31 @@ public class Utils {
+@@ -438,6 +446,32 @@ public class Utils {
          return response;
      }
  
@@ -55,6 +74,7 @@ index 8e59033..2a2bf3b 100644
 +     * @param uri uri request for file name, cannot be null
 +     * @return the corresponding display name for file defined in uri or null if error occurs.
 +     */
++    @SuppressLint("Range")
 +    static String getNameFromURI(@NonNull Context context, @NonNull Uri uri) {
 +        String result = null;
 +        Cursor c = null;
@@ -81,7 +101,7 @@ diff --git a/node_modules/react-native-image-picker/ios/ImagePickerManager.m b/n
 index b634ffb..18b8950 100644
 --- a/node_modules/react-native-image-picker/ios/ImagePickerManager.m
 +++ b/node_modules/react-native-image-picker/ios/ImagePickerManager.m
-@@ -96,6 +96,39 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
+@@ -96,6 +96,39 @@ - (void) showPickerViewController:(UIViewController *)picker
      });
  }
  
@@ -121,7 +141,7 @@ index b634ffb..18b8950 100644
  #pragma mark - Helpers
  
  -(NSMutableDictionary *)mapImageToAsset:(UIImage *)image data:(NSData *)data {
-@@ -121,22 +154,14 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
+@@ -121,22 +154,14 @@ -(NSMutableDictionary *)mapImageToAsset:(UIImage *)image data:(NSData *)data {
      asset[@"type"] = [@"image/" stringByAppendingString:fileType];
  
      NSString *fileName = [self getImageFileName:fileType];

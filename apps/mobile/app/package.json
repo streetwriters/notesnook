@@ -21,7 +21,7 @@
     "react-native-qrcode-svg": "^6.0.6",
     "react-native-reanimated-material-menu": "github:ammarahm-ed/react-native-reanimated-material-menu",
     "react-native-reanimated-progress-bar": "1.0.1",
-    "showdown": "github:thecodrr/showdown",
+    "@streetwriters/showdown": "3.0.1-alpha",
     "toggle-switch-react-native": "3.2.0",
     "url": "^0.11.0",
     "validator": "^13.5.2",
