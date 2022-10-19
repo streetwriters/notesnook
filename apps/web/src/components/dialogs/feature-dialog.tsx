@@ -24,7 +24,7 @@ import { appVersion } from "../../utils/version";
 import Config from "../../utils/config";
 import { isTesting } from "../../utils/platform";
 import { useEffect } from "react";
-import { ArrowRight, Checkmark, Icon, Warn, Pin } from "../icons";
+import { ArrowRight, Checkmark, Icon, Warn } from "../icons";
 
 type CallToAction = {
   title: string;
@@ -89,13 +89,7 @@ const features: Record<FeatureKeys, Feature> = {
             )
           }
         ]
-      : [
-          {
-            icon: Pin,
-            title: "No limits on pins",
-            subtitle: "You can now pin as many notes & notebooks as you like."
-          }
-        ],
+      : [],
     cta: {
       title: "Got it",
       icon: Checkmark,
