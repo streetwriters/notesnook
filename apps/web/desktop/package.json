@@ -46,7 +46,7 @@
     "afterSign": "electron-builder-notarize",
     "afterPack": "./scripts/removeLocales.js",
     "mac": {
-      "bundleVersion": "221",
+      "bundleVersion": "222",
       "minimumSystemVersion": "10.12.0",
       "target": [
         {
