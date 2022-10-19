@@ -155,3 +155,6 @@ export const eOpenTrialEndingDialog = "602";
 
 export const eOpenAnnouncementDialog = "603";
 export const eCloseAnnouncementDialog = "604";
+
+export const eOpenLoading = "605";
+export const eCloseLoading = "606";

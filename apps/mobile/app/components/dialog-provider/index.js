@@ -26,6 +26,7 @@ import AuthModal from "../auth/auth-modal";
 import { SessionExpired } from "../auth/session-expired";
 import { Dialog } from "../dialog";
 import { AddTopicDialog } from "../dialogs/add-topic";
+import { LoadingDialog } from "../dialogs/loading";
 import ResultDialog from "../dialogs/result";
 import { VaultDialog } from "../dialogs/vault";
 import ImagePreview from "../image-preview";
@@ -47,6 +48,7 @@ const DialogProvider = () => {
 
   return (
     <>
+      <LoadingDialog />
       <Dialog context="global" />
       <AddTopicDialog colors={colors} />
       <AddNotebookSheet colors={colors} />
