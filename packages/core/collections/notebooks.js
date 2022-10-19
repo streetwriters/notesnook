@@ -21,7 +21,7 @@ import Collection from "./collection";
 import Notebook from "../models/notebook";
 import getId from "../utils/id";
 import { CHECK_IDS, checkIsUserPremium } from "../common";
-import { qclone } from "qclone";
+import qclone from "qclone";
 
 export default class Notebooks extends Collection {
   async merge(remoteNotebook) {

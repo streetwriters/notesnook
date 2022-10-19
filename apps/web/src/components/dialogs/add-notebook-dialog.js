@@ -21,7 +21,7 @@ import React from "react";
 import { Flex, Text } from "@theme-ui/components";
 import * as Icon from "../icons";
 import Dialog from "./dialog";
-import { qclone } from "qclone";
+import qclone from "qclone";
 import Field from "../field";
 import { showToast } from "../../utils/toast";
 

@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { groupArray } from "@notesnook/core/utils/grouping";
-import { qclone } from "qclone";
+import qclone from "qclone";
 import React, { useEffect, useRef, useState } from "react";
 import { db } from "../../common/database";
 import { FloatingButton } from "../../components/container/floating-button";

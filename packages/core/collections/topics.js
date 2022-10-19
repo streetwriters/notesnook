@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import Topic from "../models/topic";
-import { qclone } from "qclone";
+import qclone from "qclone";
 import id from "../utils/id";
 
 export default class Topics {

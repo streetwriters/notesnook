@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import set from "../../utils/set";
-import { qclone } from "qclone";
+import qclone from "qclone";
 import { logger } from "../../logger";
 
 export class SyncQueue {
