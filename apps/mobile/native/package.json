@@ -5,7 +5,7 @@
   "main": "index.js",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@callstack/repack": "^3.0.0-next.7",
+    "@callstack/repack": "^3.0.0",
     "@react-native-clipboard/clipboard": "^1.9.0",
     "@react-native-community/checkbox": "^0.5.8",
     "@react-native-community/netinfo": "^6.0.4",
@@ -45,7 +45,7 @@
     "react-native-safe-area-context": "^4.3.1",
     "react-native-scoped-storage": "^1.9.3",
     "react-native-screens": "^3.13.1",
-    "react-native-securerandom": "^1.0.0",
+    "react-native-securerandom": "^1.0.1",
     "react-native-share": "^7.2.0",
     "react-native-sodium": "github:ammarahm-ed/react-native-sodium",
     "react-native-svg": "^12.3.0",
