@@ -21,7 +21,7 @@ import ReactDOM from "react-dom";
 import { Dialogs } from "../components/dialogs";
 import { hardNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
-import { qclone } from "qclone";
+import qclone from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
 import { store as appStore } from "../stores/app-store";
