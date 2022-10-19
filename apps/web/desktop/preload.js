@@ -16,13 +16,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+/* global MAC_APP_STORE */
 
 const { contextBridge, ipcRenderer } = require("electron");
 
-let isMacAppStore =
-  // eslint-disable-next-line no-undef
-  process.env.NODE_ENV === "production" ? MAC_APP_STORE : false;
-contextBridge.exposeInMainWorld("os", isMacAppStore ? "mas" : process.platform);
+contextBridge.exposeInMainWorld("os", MAC_APP_STORE ? "mas" : process.platform);
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
