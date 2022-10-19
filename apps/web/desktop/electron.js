@@ -16,28 +16,26 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-/* global MAC_APP_STORE */
+/* global MAC_APP_STORE, RELEASE */
 
-require("isomorphic-fetch");
-const { app, BrowserWindow, nativeTheme, shell } = require("electron");
-const path = require("path");
-const os = require("os");
-const { isDevelopment } = require("./utils");
-const { registerProtocol, URL } = require("./protocol");
-const { configureAutoUpdater } = require("./autoupdate");
-const { getBackgroundColor, getTheme, setTheme } = require("./config/theme");
-const getZoomFactor = require("./ipc/calls/getZoomFactor");
-const { logger } = require("./logger");
-const { setupMenu } = require("./menu");
-const WindowState = require("./config/windowstate");
-const { sendMessageToRenderer } = require("./ipc/utils");
-const { EVENTS } = require("./events");
+import "isomorphic-fetch";
+import { app, BrowserWindow, nativeTheme, shell } from "electron";
+import { join } from "path";
+import { platform } from "os";
+import { isDevelopment } from "./utils";
+import { registerProtocol, PROTOCOL_URL } from "./protocol";
+import { configureAutoUpdater } from "./autoupdate";
+import { getBackgroundColor, getTheme, setTheme } from "./config/theme";
+import getZoomFactor from "./ipc/calls/getZoomFactor";
+import { logger } from "./logger";
+import { setupMenu } from "./menu";
+import { WindowState } from "./config/windowstate";
+import { sendMessageToRenderer } from "./ipc/utils";
+import { EVENTS } from "./events";
+import "./ipc/index.js";
 
-require("./ipc/index.js");
-try {
+if (!RELEASE) {
   require("electron-reloader")(module);
-} catch (_) {
-  // ignore
 }
 
 // only run a single instance
@@ -61,9 +59,9 @@ async function createWindow() {
     height: mainWindowState.height,
     backgroundColor: getBackgroundColor(),
     autoHideMenuBar: true,
-    icon: path.join(
+    icon: join(
       __dirname,
-      os.platform() === "win32" ? "app.ico" : "favicon-72x72.png"
+      platform() === "win32" ? "app.ico" : "favicon-72x72.png"
     ),
     webPreferences: {
       zoomFactor: getZoomFactor(),
@@ -84,7 +82,9 @@ async function createWindow() {
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
 
   try {
-    await mainWindow.loadURL(isDevelopment() ? "http://localhost:3000" : URL);
+    await mainWindow.loadURL(
+      isDevelopment() ? "http://localhost:3000" : PROTOCOL_URL
+    );
   } catch (e) {
     logger.error(e);
   }

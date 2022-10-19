@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { logger } = require("../logger");
-const { app } = require("electron");
-const path = require("path");
+import { logger } from "../logger";
+import { app } from "electron";
+import { isAbsolute, join } from "path";
 
 function sendMessageToRenderer(type, payload = {}) {
   const message = { type, ...payload };
@@ -28,9 +28,9 @@ function sendMessageToRenderer(type, payload = {}) {
 }
 
 function resolvePath(_path) {
-  if (path.isAbsolute(_path)) return _path;
+  if (isAbsolute(_path)) return _path;
 
-  return path.join(
+  return join(
     ..._path.split("/").map((segment) => {
       let resolved = segment;
       try {
@@ -43,4 +43,4 @@ function resolvePath(_path) {
   );
 }
 
-module.exports = { resolvePath, sendMessageToRenderer };
+export { resolvePath, sendMessageToRenderer };

@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { setTheme } = require("../../config/theme");
+import { setTheme } from "../../config/theme";
 
-module.exports = (args) => {
+export default (args) => {
   if (!global.win) return;
   const { theme } = args;
   setTheme(theme);

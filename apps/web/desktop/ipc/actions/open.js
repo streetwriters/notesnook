@@ -17,9 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { shell } = require("electron");
-const { resolvePath } = require("../utils");
-module.exports = (args) => {
+import { shell } from "electron";
+import { resolvePath } from "../utils";
+
+export default (args) => {
   const { link, linkType } = args;
   if (linkType === "path") return shell.openPath(resolvePath(link));
 };

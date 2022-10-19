@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { CancellationToken } = require("builder-util-runtime");
-const { autoUpdater } = require("electron-updater");
-const { EVENTS } = require("../../events");
-const { sendMessageToRenderer } = require("../utils");
+import { CancellationToken } from "builder-util-runtime";
+import { autoUpdater } from "electron-updater";
+import { EVENTS } from "../../events";
+import { sendMessageToRenderer } from "../utils";
 
-module.exports = () => {
+export default () => {
   sendMessageToRenderer(EVENTS.updateDownloadProgress, { progress: 0 });
   autoUpdater.cancellationToken = new CancellationToken();
   autoUpdater.downloadUpdate(autoUpdater.cancellationToken);

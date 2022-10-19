@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const JSONStorage = require("../jsonstorage");
+import { JSONStorage } from "../jsonstorage";
 
 function getZoomFactor() {
   let factor = parseFloat(JSONStorage.get("zoomFactor"));
@@ -28,4 +28,4 @@ function setZoomFactor(factor) {
   return JSONStorage.set("zoomFactor", factor.toString());
 }
 
-module.exports = { setZoomFactor, getZoomFactor };
+export { setZoomFactor, getZoomFactor };

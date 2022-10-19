@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { ipcMain } = require("electron");
-const { logger } = require("../logger");
-const { getAction } = require("./actions");
-const { getCall } = require("./calls");
+import { ipcMain } from "electron";
+import { logger } from "../logger";
+import { getAction } from "./actions";
+import { getCall } from "./calls";
 
 ipcMain.on("fromRenderer", async (event, args) => {
   logger.info("Action requested by renderer", args);

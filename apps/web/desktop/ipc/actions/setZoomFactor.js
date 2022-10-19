@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { setZoomFactor } = require("../../config/zoomfactor");
+import { setZoomFactor } from "../../config/zoomfactor";
 
-module.exports = (args) => {
+export default (args) => {
   if (!global.win) return;
   const { zoomFactor } = args;
   global.win.webContents.setZoomFactor(zoomFactor);

@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { app } = require("electron");
-const path = require("path");
-const fs = require("fs");
+import { app } from "electron";
+import { join } from "path";
+import { statSync } from "fs";
 
 function isDevelopment() {
   if (typeof electron === "string") {
@@ -33,18 +33,18 @@ function isDevelopment() {
 
 function getPath(filePath) {
   try {
-    const result = fs.statSync(filePath);
+    const result = statSync(filePath);
 
     if (result.isFile()) {
       return filePath;
     }
 
     if (result.isDirectory()) {
-      return getPath(path.join(filePath, "index.html"));
+      return getPath(join(filePath, "index.html"));
     }
   } catch (_) {
     // ignore
   }
 }
 
-module.exports = { getPath, isDevelopment };
+export { getPath, isDevelopment };

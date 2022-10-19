@@ -17,15 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const getZoomFactor = require("./getZoomFactor");
-const selectDirectory = require("./selectDirectory");
+import getZoomFactor from "./getZoomFactor";
+import selectDirectory from "./selectDirectory";
 
 const calls = {
   getZoomFactor,
   selectDirectory
 };
 
-module.exports.getCall = function getAction(callName) {
+export const getCall = function getAction(callName) {
   try {
     if (!calls[callName]) throw new Error("Invalid call name.");
   } catch (e) {

@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { Menu, MenuItem, clipboard } = require("electron");
+import { Menu, MenuItem, clipboard } from "electron";
 
 /**
  *
@@ -106,4 +106,4 @@ function setupMenu(mainWindow) {
     menu.popup();
   });
 }
-module.exports = { setupMenu };
+export { setupMenu };

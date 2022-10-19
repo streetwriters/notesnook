@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { app } = require("electron");
-const { diary, enable, default_reporter } = require("diary");
-const fs = require("fs");
-const path = require("path");
-const { isDevelopment } = require("./utils");
+import { app } from "electron";
+import { diary, enable, default_reporter } from "diary";
+import { createWriteStream } from "fs";
+import { join } from "path";
+import { isDevelopment } from "./utils";
 
 enable("native");
 
-const LOG_FILE_PATH = path.join(app.getPath("logs"), "notesnook.log");
-const logFileStream = fs.createWriteStream(LOG_FILE_PATH, {
+const LOG_FILE_PATH = join(app.getPath("logs"), "notesnook.log");
+const logFileStream = createWriteStream(LOG_FILE_PATH, {
   autoClose: true,
   flags: "a"
 });
@@ -51,4 +51,4 @@ function logFileReporter(e) {
   logFileStream.write(str);
 }
 
-module.exports.logger = native;
+export const logger = native;

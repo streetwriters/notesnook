@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const fs = require("fs");
-const path = require("path");
-const { logger } = require("../../logger");
-const { resolvePath } = require("../utils");
+import { mkdirSync, writeFileSync } from "fs";
+import { dirname } from "path";
+import { logger } from "../../logger";
+import { resolvePath } from "../utils";
 
-module.exports = (args) => {
+export default (args) => {
   try {
     const { data, filePath } = args;
     if (!data || !filePath) return;
@@ -31,8 +31,8 @@ module.exports = (args) => {
 
     logger.info("Saving file to", resolvedPath);
 
-    fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
-    fs.writeFileSync(resolvedPath, data);
+    mkdirSync(dirname(resolvedPath), { recursive: true });
+    writeFileSync(resolvedPath, data);
 
     logger.info("File saved to", resolvedPath);
   } catch (e) {

@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { autoUpdater } = require("electron-updater");
-const { EVENTS } = require("./events");
-const { sendMessageToRenderer } = require("./ipc/utils");
+import { autoUpdater } from "electron-updater";
+import { EVENTS } from "./events";
+import { sendMessageToRenderer } from "./ipc/utils";
 
 async function configureAutoUpdater() {
   autoUpdater.setFeedURL({
@@ -49,4 +49,4 @@ async function configureAutoUpdater() {
   });
 }
 
-module.exports = { configureAutoUpdater };
+export { configureAutoUpdater };

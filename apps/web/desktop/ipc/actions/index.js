@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const changeAppTheme = require("./changeAppTheme");
-const checkForUpdate = require("./checkForUpdate");
-const downloadUpdate = require("./downloadUpdate");
-const installUpdate = require("./installUpdate");
-const open = require("./open");
-const saveFile = require("./saveFile");
-const setZoomFactor = require("./setZoomFactor");
+import changeAppTheme from "./changeAppTheme";
+import checkForUpdate from "./checkForUpdate";
+import downloadUpdate from "./downloadUpdate";
+import installUpdate from "./installUpdate";
+import open from "./open";
+import saveFile from "./saveFile";
+import setZoomFactor from "./setZoomFactor";
 
 const actions = {
   changeAppTheme,
@@ -35,11 +35,11 @@ const actions = {
   setZoomFactor
 };
 
-module.exports.getAction = function getAction(actionName) {
+export function getAction(actionName) {
   try {
     if (!actions[actionName]) throw new Error("Invalid action name.");
   } catch (e) {
     console.error(e);
   }
   return actions[actionName];
-};
+}

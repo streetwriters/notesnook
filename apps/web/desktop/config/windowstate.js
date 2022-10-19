@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const JSONStorage = require("../jsonstorage");
-const electron = require("electron");
-const screen = electron.screen || electron.remote.screen;
+import { JSONStorage } from "../jsonstorage";
+import { screen as _screen, remote } from "electron";
+const screen = _screen || remote.screen;
 
 class WindowState {
   constructor(options) {
@@ -217,4 +217,4 @@ class WindowState {
   }
 }
 
-module.exports = WindowState;
+export { WindowState };

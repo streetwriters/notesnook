@@ -17,12 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { protocol } = require("electron");
-const { isDevelopment, getPath } = require("./utils");
-const fs = require("fs");
-const path = require("path");
-const { logger } = require("./logger");
-const { Blob } = require("buffer");
+import { protocol } from "electron";
+import { isDevelopment, getPath } from "./utils";
+import { createReadStream } from "fs";
+import { extname, normalize } from "path";
+import { logger } from "./logger";
+import { Blob } from "buffer";
+import { URL } from "url";
 
 const FILE_NOT_FOUND = -6;
 const BASE_PATH = isDevelopment() ? "../public" : "";
@@ -45,8 +46,8 @@ function registerProtocol() {
       if (shouldInterceptRequest(url)) {
         logger.info("Intercepting request:", request);
 
-        const loadIndex = !path.extname(url.pathname);
-        const absoluteFilePath = path.normalize(
+        const loadIndex = !extname(url.pathname);
+        const absoluteFilePath = normalize(
           `${__dirname}${
             loadIndex
               ? `${BASE_PATH}/index.html`
@@ -59,9 +60,9 @@ function registerProtocol() {
           callback({ error: FILE_NOT_FOUND });
           return;
         }
-        const fileExtension = path.extname(filePath).replace(".", "");
+        const fileExtension = extname(filePath).replace(".", "");
 
-        const data = fs.createReadStream(filePath);
+        const data = createReadStream(filePath);
         callback({
           data,
           mimeType: extensionToMimeType[fileExtension]
@@ -132,4 +133,5 @@ async function getBody(request) {
   return await blob.arrayBuffer();
 }
 
-module.exports = { registerProtocol, URL: `${PROTOCOL}://${HOSTNAME}/` };
+const PROTOCOL_URL = `${PROTOCOL}://${HOSTNAME}/`;
+export { registerProtocol, PROTOCOL_URL };

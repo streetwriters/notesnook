@@ -17,13 +17,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const fs = require("fs");
-const { app } = require("electron");
-const path = require("path");
+import { readFileSync, writeFileSync } from "fs";
+import { app } from "electron";
+import { join } from "path";
 
 const directory = app.getPath("userData");
 const filename = "config.json";
-const filePath = path.join(directory, filename);
+const filePath = join(directory, filename);
 class JSONStorage {
   static get(key, def) {
     const json = this.readJson();
@@ -45,7 +45,7 @@ class JSONStorage {
    */
   static readJson() {
     try {
-      const json = fs.readFileSync(filePath, "utf-8");
+      const json = readFileSync(filePath, "utf-8");
       return JSON.parse(json);
     } catch (e) {
       console.error(e);
@@ -58,10 +58,10 @@ class JSONStorage {
    */
   static writeJson(json) {
     try {
-      fs.writeFileSync(filePath, JSON.stringify(json));
+      writeFileSync(filePath, JSON.stringify(json));
     } catch (e) {
       console.error(e);
     }
   }
 }
-module.exports = JSONStorage;
+export { JSONStorage };

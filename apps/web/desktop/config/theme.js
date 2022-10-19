@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const JSONStorage = require("../jsonstorage");
-const { nativeTheme } = require("electron");
+import { JSONStorage } from "../jsonstorage";
+import { nativeTheme } from "electron";
 
 function getTheme() {
   return JSONStorage.get("theme") || "light";
@@ -34,4 +34,4 @@ function getBackgroundColor() {
   return nativeTheme.shouldUseDarkColors ? "#0f0f0f" : "#ffffff";
 }
 
-module.exports = { getTheme, setTheme, getBackgroundColor };
+export { getTheme, setTheme, getBackgroundColor };

@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-const { dialog } = require("electron");
-const { resolvePath } = require("../utils");
+import { dialog } from "electron";
+import { resolvePath } from "../utils";
 
-module.exports = async function (args, win) {
+export default async function (args, win) {
   const { title, buttonLabel, defaultPath } = args;
 
   const result = await dialog.showOpenDialog(win, {
@@ -32,4 +32,4 @@ module.exports = async function (args, win) {
   if (result.canceled) return;
 
   return result.filePaths[0];
-};
+}
