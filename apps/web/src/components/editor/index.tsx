@@ -302,14 +302,11 @@ function EditorChrome(props: PropsWithChildren<EditorProps>) {
           className="editor"
           sx={{
             alignSelf: ["stretch", focusMode ? "center" : "stretch", "center"],
-            width: "100%",
-            maxWidth: focusMode
-              ? "min(100%, 850px)"
-              : "max(calc(100% - 200px), 850px)"
+            maxWidth: "min(100%, 850px)",
+            width: "100%"
           }}
           px={6}
           onClick={onRequestFocus}
-          // mt={[2, 2, 25]}
         >
           {!isMobile && (
             <Box
