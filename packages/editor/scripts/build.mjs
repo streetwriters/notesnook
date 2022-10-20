@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import "zx/globals";
+import { langen } from "./langen.mjs";
 
 const ROOT_DIR = path.resolve(path.join(__dirname, ".."));
 
@@ -36,5 +37,12 @@ for (const name in pathsToCopy) {
     errorOnExist: false
   });
 }
+
+const languagesList = await langen(ROOT_DIR, path.join(ROOT_DIR, "languages"));
+
+fs.writeFileSync(
+  path.join(ROOT_DIR, "src", "extensions", "code-block", "languages.json"),
+  JSON.stringify(languagesList)
+);
 
 await $`cd ${ROOT_DIR} && npx tsc ${process.argv.slice(3)}`;

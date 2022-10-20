@@ -23,16 +23,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 require("isomorphic-fetch");
 
-async function main() {
+export async function langen(rootDirectory, saveDirectory) {
+  if (process.env.CI) return;
+
   const response = await fetch(
     "https://github.com/PrismJS/prism/raw/master/components.json"
   );
   if (!response.ok) return;
+
+  if (!fs.existsSync(saveDirectory))
+    fs.mkdirSync(saveDirectory, { recursive: true });
+
   const json = await response.json();
   let output = [];
   for (const key in json.languages) {
     if (key === "meta") continue;
     const language = json.languages[key];
+
+    const languagePath = path.join(
+      rootDirectory,
+      "node_modules",
+      "refractor",
+      "lang",
+      `${key}.js`
+    );
+    if (!fs.existsSync(languagePath)) continue;
+
     output.push({
       filename: key,
       title: language.title,
@@ -42,7 +58,10 @@ async function main() {
           : [language.alias]
         : undefined
     });
+
+    fs.copyFileSync(languagePath, path.join(saveDirectory, `${key}.js`));
   }
-  console.log(JSON.stringify(output));
+
+  return output;
 }
-main();
+// main();
