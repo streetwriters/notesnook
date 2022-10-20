@@ -35,7 +35,7 @@ import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { logger } from "../utils/logger";
 
 class UserStore extends BaseStore {
-  isLoggedIn = false;
+  isLoggedIn = undefined;
   isLoggingIn = false;
   isSigningIn = false;
   /**
@@ -50,7 +50,12 @@ class UserStore extends BaseStore {
     });
 
     db.user.getUser().then(async (user) => {
-      if (!user) return false;
+      if (!user) {
+        this.set((state) => {
+          state.isLoggedIn = false;
+        });
+        return;
+      }
       this.set((state) => {
         state.user = user;
         state.isLoggedIn = true;

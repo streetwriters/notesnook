@@ -241,7 +241,7 @@ function NavigationMenu(props: NavigationMenuProps) {
         </Flex>
       </FlexScrollContainer>
       <Flex sx={{ flexDirection: "column" }}>
-        {!isLoggedIn && (
+        {isLoggedIn === false && (
           <NavigationItem
             isTablet={isTablet}
             title="Login"

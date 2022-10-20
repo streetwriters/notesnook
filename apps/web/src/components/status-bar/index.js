@@ -93,7 +93,7 @@ function StatusBar() {
 
             <SyncStatus />
           </>
-        ) : (
+        ) : isLoggedIn === false ? (
           <Button
             variant="statusitem"
             onClick={() => hardNavigate("/login")}
@@ -109,7 +109,7 @@ function StatusBar() {
               Not logged in
             </Text>
           </Button>
-        )}
+        ) : null}
         <Button
           variant="statusitem"
           onClick={() => showIssueDialog()}
