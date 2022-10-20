@@ -41,7 +41,7 @@ clientsClaim();
  * @type {import("workbox-precaching/_types").PrecacheEntry[]}
  */
 var precacheRoutes = self.__WB_MANIFEST;
-const filters = [/KaTeX/i, /hack/i];
+const filters = [/KaTeX/i, /hack/i, /code-lang-/i];
 precacheAndRoute(
   precacheRoutes.filter((route) => {
     return filters.every((filter) => !filter.test(route.url));

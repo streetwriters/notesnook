@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "downlevelIteration": true,
-    "declaration": true
+    "declaration": true,
+    "removeComments": false
   }
 }

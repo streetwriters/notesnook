@@ -23,6 +23,9 @@ export function isLanguageLoaded(name: string) {
 }
 export async function loadLanguage(shortName: string) {
   const { default: language } = await import(
+    /* webpackChunkName: 'code-lang-[request]' */
+    /* webpackPrefetch: false */
+    /* webpackPreload: false */
     `../../../languages/${shortName}.js`
   );
 
