@@ -20,11 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { useStore } from "../../stores/theme-store";
 import { ThemeProvider as EmotionThemeProvider } from "@emotion/react";
 import { useTheme } from "@notesnook/theme";
+import { useEffect } from "react";
 
 function ThemeProviderWrapper(props) {
   const theme = useStore((store) => store.theme);
   const accent = useStore((store) => store.accent);
   const themeProperties = useTheme({ accent, theme });
+
+  useEffect(() => {
+    const root = document.querySelector("html");
+    if (root) root.setAttribute("data-theme", theme);
+  }, [theme]);
 
   return (
     <EmotionThemeProvider theme={themeProperties}>

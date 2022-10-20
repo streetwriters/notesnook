@@ -30,8 +30,8 @@ import Config from "./utils/config";
 import { useStore } from "./stores/app-store";
 import { Toaster } from "react-hot-toast";
 import { ViewLoader } from "./components/loaders/view-loader";
-import { NavigationLoader } from "./components/loaders/navigation-loader";
-import { StatusBarLoader } from "./components/loaders/status-bar-loader";
+import NavigationMenu from "./components/navigation-menu";
+import StatusBar from "./components/status-bar";
 import { EditorLoader } from "./components/loaders/editor-loader";
 
 const GlobalMenuWrapper = React.lazy(() =>
@@ -41,8 +41,6 @@ const AppEffects = React.lazy(() => import("./app-effects"));
 const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
 const CachedRouter = React.lazy(() => import("./components/cached-router"));
 const HashRouter = React.lazy(() => import("./components/hash-router"));
-const NavigationMenu = React.lazy(() => import("./components/navigation-menu"));
-const StatusBar = React.lazy(() => import("./components/status-bar"));
 
 function App() {
   const isMobile = useMobile();
@@ -142,16 +140,11 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
             priority={LayoutPriority.Low}
           >
             <Flex sx={{ overflow: "hidden", flex: 1 }}>
-              <SuspenseLoader
-                condition={isAppLoaded}
-                component={NavigationMenu}
-                props={{
-                  toggleNavigationContainer: (state) => {
-                    setShow(state || !show);
-                  },
-                  isTablet: isNarrow
+              <NavigationMenu
+                toggleNavigationContainer={(state) => {
+                  setShow(state || !show);
                 }}
-                fallback={<NavigationLoader />}
+                isTablet={isNarrow}
               />
             </Flex>
           </Allotment.Pane>
@@ -191,11 +184,7 @@ function DesktopAppContents({ isAppLoaded, show, setShow }) {
         </Allotment>
       </Flex>
 
-      <SuspenseLoader
-        fallback={<StatusBarLoader />}
-        component={StatusBar}
-        condition={isAppLoaded}
-      />
+      <StatusBar />
     </>
   );
 }
@@ -223,14 +212,7 @@ function MobileAppContents({ isAppLoaded }) {
           flexShrink: 0
         }}
       >
-        <SuspenseLoader
-          condition={isAppLoaded}
-          component={NavigationMenu}
-          props={{
-            toggleNavigationContainer: () => {}
-          }}
-          fallback={<NavigationLoader />}
-        />
+        <NavigationMenu toggleNavigationContainer={() => {}} isTablet={false} />
       </Flex>
       <Flex
         className="listMenu"

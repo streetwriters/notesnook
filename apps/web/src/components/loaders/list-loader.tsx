@@ -28,10 +28,10 @@ export const ListLoader = memo(function ListLoader() {
   return (
     <>
       <Flex
-        sx={{ py: 1, mx: 1, alignItems: "center", justifyContent: "center" }}
+        sx={{ py: 1, alignItems: "center", justifyContent: "center", px: 1 }}
       >
         <Box sx={{ height: 38 }}>
-          <Skeleton width={38} height={38} circle baseColor="var(--border)" />
+          <Skeleton width={38} height={38} circle />
         </Box>
         <Flex
           sx={{
@@ -42,10 +42,10 @@ export const ListLoader = memo(function ListLoader() {
           }}
         >
           <Box sx={{ height: 14 }}>
-            <Skeleton inline height={14} baseColor="var(--border)" />
+            <Skeleton inline height={14} />
           </Box>
           <Box sx={{ mt: 1, height: 10 }}>
-            <Skeleton inline height={10} baseColor="var(--border)" />
+            <Skeleton inline height={10} />
           </Box>
         </Flex>
       </Flex>
@@ -53,18 +53,16 @@ export const ListLoader = memo(function ListLoader() {
         <Box key={width} sx={{ py: 2, px: 1 }}>
           <Skeleton
             height={16}
-            baseColor="var(--border)"
             width={`${width}%`}
             style={{ marginBottom: 5 }}
           />
-          <Skeleton height={12} count={2} baseColor="var(--hover)" />
+          <Skeleton height={12} count={2} />
           <Flex>
-            <Skeleton height={10} inline width={50} baseColor="var(--hover)" />
+            <Skeleton height={10} inline width={50} />
             <Skeleton
               height={10}
               inline
               width={10}
-              baseColor="var(--shade)"
               circle
               style={{ marginLeft: 5 }}
             />
@@ -72,7 +70,6 @@ export const ListLoader = memo(function ListLoader() {
               height={10}
               inline
               width={10}
-              baseColor="var(--hover)"
               circle
               style={{ marginLeft: 5 }}
             />

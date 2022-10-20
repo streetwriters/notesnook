@@ -25,23 +25,12 @@ import { ListLoader } from "./list-loader";
 
 export const ViewLoader = memo(function ViewLoader() {
   return (
-    <Box sx={{ m: 1 }}>
-      <Flex sx={{ justifyContent: "space-between", py: 0 }}>
-        <Skeleton
-          height={35}
-          width={100}
-          borderRadius={5}
-          baseColor="var(--border)"
-        />
+    <Box sx={{ my: 1 }}>
+      <Flex sx={{ justifyContent: "space-between", py: 0, px: 1 }}>
+        <Skeleton height={35} width={100} borderRadius={5} />
         <Flex>
-          <Skeleton
-            height={35}
-            width={35}
-            circle
-            style={{ marginRight: 5 }}
-            baseColor="var(--border)"
-          />
-          <Skeleton height={35} width={35} circle baseColor="var(--border)" />
+          <Skeleton height={35} width={35} circle style={{ marginRight: 5 }} />
+          <Skeleton height={35} width={35} circle />
         </Flex>
       </Flex>
       <ListLoader />
