@@ -1,6 +1,6 @@
 {
   "name": "Notesnook",
-  "description": "Notesnook is a simple and private note taking app that keeps your notes organized and synced on your phone, tablet and computer.",
+  "description": "A fully open source & end-to-end encrypted note taking alternative to Evernote.",
   "short_name": "Notesnook",
   "shortcuts": [
     {
@@ -57,44 +57,39 @@
   ],
   "screenshots": [
     {
-      "src": "/screenshots/1.webp",
-      "sizes": "960x1920",
-      "type": "image/webp"
+      "src": "/screenshots/screenshot-1.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
     },
     {
-      "src": "/screenshots/2.webp",
-      "sizes": "960x1920",
-      "type": "image/webp"
+      "src": "/screenshots/screenshot-2.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
     },
     {
-      "src": "/screenshots/3.webp",
-      "sizes": "960x1920",
-      "type": "image/webp"
+      "src": "/screenshots/screenshot-3.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
     },
     {
-      "src": "/screenshots/4.webp",
-      "sizes": "960x1920",
-      "type": "image/webp"
+      "src": "/screenshots/screenshot-4.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
     },
     {
-      "src": "/screenshots/5.webp",
-      "sizes": "960x1920",
-      "type": "image/webp"
+      "src": "/screenshots/screenshot-5.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
     },
     {
-      "src": "/screenshots/6.webp",
-      "sizes": "960x1920",
-      "type": "image/webp"
+      "src": "/screenshots/screenshot-6.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
     },
     {
-      "src": "/screenshots/7.webp",
-      "sizes": "960x1920",
-      "type": "image/webp"
-    },
-    {
-      "src": "/screenshots/8.webp",
-      "sizes": "960x1920",
-      "type": "image/webp"
+      "src": "/screenshots/screenshot-7.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg"
     }
   ],
   "related_applications": [
