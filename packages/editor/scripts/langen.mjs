@@ -24,8 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 require("isomorphic-fetch");
 
 export async function langen(rootDirectory, saveDirectory) {
-  if (process.env.CI) return;
-
   const response = await fetch(
     "https://github.com/PrismJS/prism/raw/master/components.json"
   );
