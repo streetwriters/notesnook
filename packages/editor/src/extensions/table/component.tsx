@@ -37,7 +37,6 @@ import { getToolDefinition } from "../../toolbar/tool-definitions";
 import { getPosition } from "../../utils/position";
 import { findSelectedDOMNode } from "../../toolbar/utils/prosemirror";
 import { DesktopOnly } from "../../components/responsive";
-import { logger } from "nx/src/utils/logger";
 
 export function TableComponent(props: SelectionBasedReactNodeViewProps) {
   const { editor, node, forwardRef } = props;
@@ -137,7 +136,7 @@ function TableRowToolbar(props: TableToolbarProps) {
         rowToolsRef.current.style.top = `${pos.top}px`;
         rowToolsRef.current.style.left = `${pos.left}px`;
       } catch (err) {
-        logger.error(err);
+        console.error(err);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
