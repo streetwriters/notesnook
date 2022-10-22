@@ -46,9 +46,18 @@ export type PositionOptions = {
   parent?: HTMLElement | Element;
 };
 export function getPosition(
-  element: HTMLElement,
+  node: Node,
   options: PositionOptions
 ): { top: number; left: number } {
+  let element: HTMLElement;
+  if (node instanceof HTMLElement) {
+    element = node;
+  } else if (node.parentElement !== null) {
+    element = node.parentElement;
+  } else {
+    throw new Error(`Unsupported node type ${node.nodeType}`);
+  }
+
   const {
     target = "mouse",
     isTargetAbsolute = false,
