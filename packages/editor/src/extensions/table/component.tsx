@@ -125,19 +125,15 @@ function TableRowToolbar(props: TableToolbarProps) {
       const currentRow = findSelectedDOMNode(editor, ["tableRow"]);
       if (!currentRow) return;
 
-      try {
-        const pos = getPosition(rowToolsRef.current, {
-          location: "left",
-          target: currentRow,
-          align: "start",
-          xOffset: -5,
-          yOffset: -3
-        });
-        rowToolsRef.current.style.top = `${pos.top}px`;
-        rowToolsRef.current.style.left = `${pos.left}px`;
-      } catch (err) {
-        console.error(err);
-      }
+      const pos = getPosition(rowToolsRef.current, {
+        location: "left",
+        target: currentRow,
+        align: "start",
+        xOffset: -5,
+        yOffset: -3
+      });
+      rowToolsRef.current.style.top = `${pos.top}px`;
+      rowToolsRef.current.style.left = `${pos.left}px`;
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [editor.state.selection]
