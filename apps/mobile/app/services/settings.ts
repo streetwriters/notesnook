@@ -33,8 +33,8 @@ function reset() {
   if (settings.reminder !== "off" && settings.reminder !== "useroff") {
     settings.encryptedBackup = false;
     settings.reminder = "useroff";
-    setAutobackOffMessage();
     set(settings);
+    setTimeout(() => setAutobackOffMessage(), 10000);
   }
 }
 
