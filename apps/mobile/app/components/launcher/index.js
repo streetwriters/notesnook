@@ -24,7 +24,6 @@ import { checkVersion } from "react-native-check-version";
 import { enabled } from "react-native-privacy-snapshot";
 import { DatabaseLogger, db, loadDatabase } from "../../common/database";
 import { useAppState } from "../../hooks/use-app-state";
-import BackupService from "../../services/backup";
 import BiometricService from "../../services/biometrics";
 import {
   eSendEvent,
@@ -133,20 +132,7 @@ const Launcher = React.memo(
         eSendEvent("session_expired");
         return;
       }
-      const user = await db.user.getUser();
       await useMessageStore.getState().setAnnouncement();
-      if (PremiumService.get() && user) {
-        if (SettingsService.get().reminder === "off") {
-          SettingsService.set({ reminder: "daily" });
-        }
-        if (
-          await BackupService.checkBackupRequired(
-            SettingsService.get().reminder
-          )
-        ) {
-          sleep(2000).then(() => BackupService.run());
-        }
-      }
       if (NewFeature.present()) return;
       if (await checkAppUpdateAvailable()) return;
       if (await checkForRateAppRequest()) return;

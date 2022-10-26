@@ -122,3 +122,19 @@ const noMessage = {
 export function clearMessage() {
   useMessageStore.getState().setMessage(noMessage);
 }
+
+const autoBackupsOff = {
+  visible: true,
+  message: "Automatic backups turned off",
+  actionText: "Get Notesnook Pro to enable automatic backups",
+  onPress: () => {
+    clearMessage();
+  },
+  data: {},
+  icon: "backup-restore",
+  type: "error"
+};
+
+export function setAutobackOffMessage() {
+  useMessageStore.getState().setMessage(autoBackupsOff);
+}

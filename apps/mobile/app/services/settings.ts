@@ -26,6 +26,17 @@ import { AndroidModule } from "../utils";
 import { getColorScheme } from "../utils/color-scheme/utils";
 import { scale, updateSize } from "../utils/size";
 import { DDS } from "./device-detection";
+import { setAutobackOffMessage } from "./message";
+
+function reset() {
+  const settings = get();
+  if (settings.reminder !== "off" && settings.reminder !== "useroff") {
+    settings.encryptedBackup = false;
+    settings.reminder = "useroff";
+    setAutobackOffMessage();
+    set(settings);
+  }
+}
 
 function init() {
   scale.fontScale = 1;
@@ -128,7 +139,8 @@ const SettingsService = {
   get,
   toggle,
   onFirstLaunch,
-  checkOrientation
+  checkOrientation,
+  reset
 };
 
 export default SettingsService;

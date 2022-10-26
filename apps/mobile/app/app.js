@@ -30,16 +30,19 @@ import SettingsService from "./services/settings";
 import { TipManager } from "./services/tip-manager";
 import { useUserStore } from "./stores/use-user-store";
 import { View } from "react-native";
+import { useState } from "react";
 
 SettingsService.init();
 SettingsService.checkOrientation();
 const App = () => {
   useAppEvents();
+  const [init, setInit] = useState(false);
   useEffect(() => {
     let { appLockMode } = SettingsService.get();
     if (appLockMode && appLockMode !== "none") {
       useUserStore.getState().setVerifyUser(true);
     }
+    setInit(true);
     setTimeout(async () => {
       SettingsService.onFirstLaunch();
       await Notifications.get();
@@ -77,7 +80,7 @@ const App = () => {
         }}
       >
         <ApplicationHolder />
-        <Launcher />
+        {init && <Launcher />}
       </GestureHandlerRootView>
     </View>
   );
