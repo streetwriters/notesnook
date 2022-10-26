@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Flex, Text } from "@theme-ui/components";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -65,6 +65,7 @@ import { getAllAccents } from "@notesnook/theme";
 import { debounce } from "../utils/debounce";
 import { clearLogs, downloadLogs } from "../utils/logger";
 import { exportNotes } from "../common/export";
+import { scheduleBackups } from "../common/reminders";
 
 function subscriptionStatusToString(user) {
   const status = user?.subscription?.type;
@@ -173,6 +174,12 @@ function Settings() {
     "telemetry",
     true
   );
+
+  useEffect(() => {
+    (async () => {
+      await scheduleBackups();
+    })();
+  }, [backupReminderOffset]);
 
   return (
     <FlexScrollContainer style={{ height: "100%" }}>
@@ -563,7 +570,7 @@ function Settings() {
                   options={["Never", "Daily", "Weekly", "Monthly"]}
                   premium="backups"
                   selectedOption={backupReminderOffset}
-                  onSelectionChanged={(_option, index) =>
+                  onSelectionChanged={async (_option, index) =>
                     setBackupReminderOffset(index)
                   }
                 />

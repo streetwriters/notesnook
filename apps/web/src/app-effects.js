@@ -24,7 +24,7 @@ import { useStore as useNotesStore } from "./stores/note-store";
 import { useStore as useThemeStore } from "./stores/theme-store";
 import { useStore as useAttachmentStore } from "./stores/attachment-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
-import { resetReminders } from "./common/reminders";
+import { resetReminders, scheduleBackups } from "./common/reminders";
 import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
 import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
@@ -103,6 +103,7 @@ export default function AppEffects({ setShow }) {
 
         await showOnboardingDialog(interruptedOnboarding());
         await showFeatureDialog("highlights");
+        await scheduleBackups();
       })();
 
       return () => {
