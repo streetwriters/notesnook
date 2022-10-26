@@ -141,7 +141,8 @@ class Merger {
     deserialized.remote = true;
     deserialized.synced = true;
     if (!migrate) return deserialized;
-    return await this._migrate(deserialized, item.v);
+    await this._migrate(deserialized, item.v);
+    return deserialized;
   }
 
   async _mergeItem(remoteItem, get, add) {
