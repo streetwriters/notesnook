@@ -64,7 +64,8 @@ export default class CachedCollection extends IndexedCollection {
   }
 
   exists(id) {
-    return this.has(id) && !this.getItem(id).deleted;
+    const item = this.getItem(id);
+    return item && !item.deleted;
   }
 
   has(id) {
