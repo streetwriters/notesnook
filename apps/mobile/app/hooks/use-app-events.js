@@ -424,7 +424,7 @@ export const useAppEvents = () => {
             return;
           }
         }
-
+        checkAutoBackup();
         await reconnectSSE();
         await checkIntentState();
         MMKV.removeItem("appState");
