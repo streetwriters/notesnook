@@ -530,7 +530,7 @@ function Settings() {
                 );
               }}
             />
-            {!isLoggedIn && (
+            {isLoggedIn && (
               <>
                 <Button
                   variant="list"
