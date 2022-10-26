@@ -201,7 +201,8 @@ export default class Backup {
         this._db,
         collections,
         (id) => data[id],
-        version
+        version,
+        true
       );
     });
   }
