@@ -23,15 +23,54 @@ import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
-import { showRecoveryKeyDialog } from "../common/dialog-controller";
+import {
+  showBuyDialog,
+  showRecoveryKeyDialog
+} from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { isDesktop, isTesting } from "../utils/platform";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 import { showToast } from "../utils/toast";
+import { TaskScheduler } from "../utils/task-scheduler";
+
+export const BACKUP_CRON_EXPRESSIONS = [
+  "",
+  "0 0 8 * * *", // daily at 8 AM
+  "0 0 8 * * 1", // Every monday at 8 AM
+  "0 0 0 1 * *" // 1st day of every month
+];
+
+export async function scheduleBackups() {
+  const backupReminderOffset = Config.get(
+    "backupReminderOffset",
+    isUserPremium() ? 1 : 0
+  );
+
+  await TaskScheduler.stop("automatic-backups");
+  if (!backupReminderOffset) return false;
+
+  console.log("Scheduling automatic backups");
+  await TaskScheduler.register(
+    "automatic-backups",
+    BACKUP_CRON_EXPRESSIONS[backupReminderOffset],
+    () => {
+      console.log("Backing up automatically");
+      saveBackup();
+    }
+  );
+}
+
+export function shouldAddAutoBackupsDisabledReminder() {
+  const backupReminderOffset = Config.get("backupReminderOffset", 0);
+  if (!isUserPremium() && backupReminderOffset) {
+    Config.set("backupReminderOffset", 0);
+    return true;
+  }
+
+  return false;
+}
 
 export async function shouldAddBackupReminder() {
-  if (isIgnored("backup")) return false;
-
   const backupReminderOffset = Config.get(
     "backupReminderOffset",
     isUserPremium() ? 1 : 0
@@ -39,7 +78,10 @@ export async function shouldAddBackupReminder() {
   if (!backupReminderOffset) return false;
 
   const lastBackupTime = await db.backup.lastBackupTime();
-  if (!lastBackupTime) return true;
+  if (!lastBackupTime) {
+    await db.backup.updateBackupTime();
+    return false;
+  }
 
   const offsetToDays =
     backupReminderOffset === 1 ? 1 : backupReminderOffset === 2 ? 7 : 30;
@@ -66,14 +108,12 @@ export async function shouldAddConfirmEmailReminder() {
 }
 
 export const Reminders = {
-  backup: {
-    key: "backup",
-    subtitle: "Create a backup to keep your notes safe",
+  autoBackupsOff: {
+    key: "autoBackupsOff",
+    title: "Automatic backups disabled",
+    subtitle: "Please upgrade to Pro to enable automatic backups.",
+    action: () => showBuyDialog(),
     dismissable: true,
-    title: "Back up your data",
-    action: async () => {
-      if (await verifyAccount()) await createBackup();
-    },
     icon: Icon.Backup
   },
   login: {
@@ -106,33 +146,11 @@ var openedToast = null;
 export async function resetReminders() {
   const reminders = [];
 
+  if (shouldAddAutoBackupsDisabledReminder()) {
+    reminders.push({ type: "autoBackupsOff", priority: "high" });
+  }
   if (await shouldAddBackupReminder()) {
-    if (isDesktop()) {
-      await createBackup();
-    } else if (isUserPremium() && !isTesting()) {
-      if (openedToast !== null) return;
-      openedToast = showToast(
-        "success",
-        "Your backup is ready for download.",
-        [
-          {
-            text: "Later",
-            onClick: async () => {
-              await db.backup.updateBackupTime();
-              openedToast?.hide();
-              openedToast = null;
-            },
-            type: "text"
-          },
-          {
-            text: "Download",
-            onClick: () => createBackup(),
-            type: "primary"
-          }
-        ],
-        0
-      );
-    }
+    await saveBackup();
   }
   if (await shouldAddLoginReminder()) {
     reminders.push({ type: "login", priority: "low" });
@@ -148,4 +166,33 @@ export async function resetReminders() {
 
 function isIgnored(key) {
   return Config.get(`ignored:${key}`, false);
+}
+
+async function saveBackup() {
+  if (isDesktop()) {
+    await createBackup();
+  } else if (isUserPremium() && !isTesting()) {
+    if (openedToast !== null) return;
+    openedToast = showToast(
+      "success",
+      "Your backup is ready for download.",
+      [
+        {
+          text: "Later",
+          onClick: async () => {
+            await db.backup.updateBackupTime();
+            openedToast?.hide();
+            openedToast = null;
+          },
+          type: "text"
+        },
+        {
+          text: "Download",
+          onClick: () => createBackup(),
+          type: "primary"
+        }
+      ],
+      0
+    );
+  }
 }

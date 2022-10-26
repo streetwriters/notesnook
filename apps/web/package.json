@@ -30,6 +30,8 @@
     "async-mutex": "^0.3.2",
     "axios": "^0.21.4",
     "clipboard-polyfill": "^3.0.3",
+    "comlink": "^4.3.1",
+    "cronosjs": "^1.7.1",
     "dayjs": "^1.10.4",
     "event-source-polyfill": "^1.0.25",
     "fflate": "^0.7.2",
