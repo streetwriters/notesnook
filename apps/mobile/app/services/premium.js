@@ -60,16 +60,17 @@ async function setPremiumStatus() {
     }
   } catch (e) {
     premiumStatus = 0;
-  } finally {
-    if (get()) {
-      await subscriptions.clear();
-    }
-    try {
-      await RNIap.initConnection();
-      products = await RNIap.getSubscriptions(itemSkus);
-    } catch (e) {
-      console.log("subscriptions: ", e);
-    }
+  }
+  if (Config.GITHUB_RELEASE) return;
+
+  if (get()) {
+    await subscriptions.clear();
+  }
+  try {
+    await RNIap.initConnection();
+    products = await RNIap.getSubscriptions(itemSkus);
+  } catch (e) {
+    console.log("subscriptions: ", e);
   }
   if (premiumStatus === 0 && !__DEV__) {
     SettingsService.reset();

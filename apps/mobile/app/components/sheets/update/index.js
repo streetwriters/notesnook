@@ -156,6 +156,21 @@ export const Update = ({ version: appVersion, fwdRef }) => {
             }}
           >
             <Heading size={SIZE.md}>Release notes:</Heading>
+
+            {version.body ? (
+              <Paragraph
+                color={colors.icon}
+                style={{
+                  marginBottom: 5,
+                  fontFamily: "monospace",
+                  fontSize: 12,
+                  lineHeight: 20,
+                  marginTop: 10
+                }}
+              >
+                {version.body}
+              </Paragraph>
+            ) : null}
             {notes.map((item) => (
               <Paragraph
                 key={item}

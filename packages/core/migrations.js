@@ -33,12 +33,12 @@ const migrations = [
       attachment: replaceDateEditedWithDateModified(true),
       trash: replaceDateEditedWithDateModified(),
       tiny: (item) => {
-        item = replaceDateEditedWithDateModified(false)(item);
+        replaceDateEditedWithDateModified(false)(item);
 
-        if (!item.data || item.data.iv) return item;
+        if (!item.data || item.data.iv) return true;
 
         item.data = removeToxClassFromChecklist(wrapTablesWithDiv(item.data));
-        return item;
+        return true;
       },
       settings: replaceDateEditedWithDateModified(true)
     }
@@ -47,9 +47,9 @@ const migrations = [
     version: 5.3,
     items: {
       tiny: (item) => {
-        if (!item.data || item.data.iv) return item;
+        if (!item.data || item.data.iv) return false;
         item.data = decodeWrappedTableHtml(item.data);
-        return item;
+        return true;
       }
     }
   },
@@ -57,10 +57,10 @@ const migrations = [
     version: 5.4,
     items: {
       tiny: (item) => {
-        if (!item.data || item.data.iv) return item;
+        if (!item.data || item.data.iv) return false;
         item.type = "tiptap";
         item.data = tinyToTiptap(item.data);
-        return item;
+        return true;
       }
     }
   },
@@ -72,16 +72,16 @@ const migrations = [
     version: 5.6,
     items: {
       notebook: (item) => {
-        if (!item.topics) return item;
+        if (!item.topics) return false;
 
         item.topics = item.topics.map((topic) => {
           delete topic.notes;
           return topic;
         });
-        return item;
+        return item.topics.length > 0;
       },
       settings: async (item, db) => {
-        if (!item.pins) return item;
+        if (!item.pins) return false;
 
         for (const pin of item.pins) {
           if (!pin.data) continue;
@@ -94,7 +94,7 @@ const migrations = [
           });
         }
         delete item.pins;
-        return item;
+        return true;
       }
     }
   },
@@ -102,26 +102,28 @@ const migrations = [
     version: 5.7,
     items: {
       tiny: (item) => {
-        if (!item.data || item.data.iv) return item;
+        if (!item.data || item.data.iv) return false;
         item.type = "tiptap";
         return changeSessionContentType(item);
       },
       content: (item) => {
-        if (!item.data || item.data.iv) return item;
+        if (!item.data || item.data.iv) return false;
+        const oldType = item.type;
         item.type = "tiptap";
-        return item;
+        return oldType !== item.type;
       },
       shortcut: (item) => {
-        if (item.id === item.item.id) return item;
+        if (item.id === item.item.id) return false;
         item.id = item.item.id;
-        return item;
+        return true;
       },
       tiptap: (item) => {
         return changeSessionContentType(item);
       },
       notehistory: (item) => {
+        const oldType = item.type;
         item.type = "session";
-        return item;
+        return oldType !== item.type;
       }
     },
     collection: async (collection) => {
@@ -144,15 +146,17 @@ export async function migrateItem(item, version, type, database) {
     );
   }
 
+  let count = 0;
   for (; migrationStartIndex < migrations.length; ++migrationStartIndex) {
     const migration = migrations[migrationStartIndex];
     if (migration.version === CURRENT_DATABASE_VERSION) break;
 
     const itemMigrator = migration.items && migration.items[type];
     if (!itemMigrator) continue;
-    item = await itemMigrator(item, database);
+    if (await itemMigrator(item, database)) count++;
   }
-  return item;
+
+  return count > 0;
 }
 
 export async function migrateCollection(collection, version) {
@@ -182,7 +186,7 @@ function replaceDateEditedWithDateModified(removeDateEditedProperty = false) {
     item.dateModified = item.dateEdited;
     if (removeDateEditedProperty) delete item.dateEdited;
     delete item.persistDateEdited;
-    return item;
+    return true;
   };
 }
 
@@ -280,6 +284,7 @@ function changeSessionContentType(item) {
   if (item.id.endsWith("_content")) {
     item.contentType = item.type;
     item.type = "sessioncontent";
+    return true;
   }
-  return item;
+  return false;
 }

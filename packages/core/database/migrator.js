@@ -21,7 +21,7 @@ import { sendMigrationProgressEvent } from "../common";
 import { migrateCollection, migrateItem } from "../migrations";
 
 class Migrator {
-  async migrate(db, collections, get, version) {
+  async migrate(db, collections, get, version, restore = false) {
     for (let collection of collections) {
       if (!collection.index || !collection.dbCollection) continue;
 
@@ -56,23 +56,26 @@ class Migrator {
           await collection.dbCollection?._collection?.addItem(item);
           continue;
         }
+
         const itemId = item.id;
-        item = await migrateItem(
+        const migrated = await migrateItem(
           item,
           version,
           item.type || collection.type || collection.dbCollection.type,
           db
         );
 
-        if (collection.dbCollection.merge) {
-          await collection.dbCollection.merge(item);
-        } else if (collection.dbCollection.add) {
-          await collection.dbCollection.add(item);
-        }
+        if (migrated || restore) {
+          if (collection.dbCollection.merge) {
+            await collection.dbCollection.merge(item);
+          } else if (collection.dbCollection.add) {
+            await collection.dbCollection.add(item);
+          }
 
-        // if id changed after migration, we need to delete the old one.
-        if (item.id !== itemId) {
-          await collection.dbCollection?._collection?.deleteItem(itemId);
+          // if id changed after migration, we need to delete the old one.
+          if (item.id !== itemId) {
+            await collection.dbCollection?._collection?.deleteItem(itemId);
+          }
         }
       }
     }

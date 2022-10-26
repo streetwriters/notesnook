@@ -118,7 +118,7 @@ app.on("ready", async () => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  if (process.platform !== "darwin" || MAC_APP_STORE) {
     app.quit();
   }
 });
