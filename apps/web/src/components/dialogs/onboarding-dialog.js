@@ -40,6 +40,7 @@ import AccentItem from "../accent-item";
 import { useCallback, useState } from "react";
 import Config from "../../utils/config";
 import { getAllAccents } from "@notesnook/theme";
+import { isMacStoreApp } from "../../utils/platform";
 
 const newUserSteps = [
   {
@@ -420,7 +421,9 @@ function TrackingConsent() {
 function CrossPlatform() {
   return (
     <Flex my={4} sx={{ alignItems: "center" }}>
-      <Image src={GooglePlay} sx={{ flexShrink: 0, width: 135 }} />
+      {isMacStoreApp() ? null : (
+        <Image src={GooglePlay} sx={{ flexShrink: 0, width: 135 }} />
+      )}
       <Image src={AppleStore} sx={{ flexShrink: 0, width: 110 }} />
     </Flex>
   );
