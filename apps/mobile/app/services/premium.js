@@ -72,6 +72,9 @@ async function setPremiumStatus() {
   } catch (e) {
     console.log("subscriptions: ", e);
   }
+  if (premiumStatus === 0 && !__DEV__) {
+    SettingsService.reset();
+  }
 }
 
 function getMontlySub() {

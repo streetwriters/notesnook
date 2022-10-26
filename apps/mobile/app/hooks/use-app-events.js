@@ -67,6 +67,8 @@ import { useDragState } from "../screens/settings/editor/state";
 import { useCallback } from "react";
 import { clearAppState } from "../screens/editor/tiptap/utils";
 import { tabBarRef } from "../utils/global-refs";
+import BackupService from "../services/backup";
+import { sleep } from "../utils/time";
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 export const useAppEvents = () => {
@@ -75,6 +77,7 @@ export const useAppEvents = () => {
   const setUser = useUserStore((state) => state.setUser);
   const syncedOnLaunch = useRef(false);
   const verify = useUserStore((state) => state.verifyUser);
+  const syncing = useUserStore((state) => state.syncing);
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,
@@ -83,7 +86,8 @@ export const useAppEvents = () => {
     showingDialog: false,
     removeInternetStateListener: null,
     isReconnecting: false,
-    initialUrl: null
+    initialUrl: null,
+    backupDidWait: false
   });
 
   const onLoadingAttachmentProgress = (data) => {
@@ -348,9 +352,46 @@ export const useAppEvents = () => {
       refValues.current.isUserReady = true;
 
       syncedOnLaunch.current = true;
+      if (!login) {
+        checkAutoBackup();
+      }
     },
-    [attachIAPListeners, onEmailVerified, setLastSynced, setUser]
+    [
+      attachIAPListeners,
+      onEmailVerified,
+      setLastSynced,
+      setUser,
+      checkAutoBackup
+    ]
   );
+
+  const checkAutoBackup = useCallback(async () => {
+    if (verify || syncing) {
+      console.log("backup is waiting");
+      refValues.current.backupDidWait = true;
+      return;
+    }
+    console.log("backup running immediate");
+    const user = await db.user.getUser();
+    if (PremiumService.get() && user) {
+      if (SettingsService.get().reminder === "off") {
+        SettingsService.set({ reminder: "daily" });
+      }
+      if (
+        await BackupService.checkBackupRequired(SettingsService.get().reminder)
+      ) {
+        sleep(2000).then(() => BackupService.run());
+      }
+    }
+  }, [verify, syncing]);
+
+  useEffect(() => {
+    if (!verify && !syncing && refValues.current.backupDidWait) {
+      console.log("backup run after wait");
+      refValues.current.backupDidWait = false;
+      checkAutoBackup();
+    }
+  }, [verify, syncing, checkAutoBackup]);
 
   const onSuccessfulSubscription = async (subscription) => {
     await PremiumService.subscriptions.set(subscription);
@@ -382,7 +423,7 @@ export const useAppEvents = () => {
             return;
           }
         }
-
+        checkAutoBackup();
         await reconnectSSE();
         await checkIntentState();
         MMKV.removeItem("appState");
