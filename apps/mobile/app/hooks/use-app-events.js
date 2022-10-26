@@ -213,7 +213,6 @@ export const useAppEvents = () => {
   }, []);
 
   const onSyncComplete = useCallback(async () => {
-    console.log('Sync complete');
     initAfterSync();
     setLastSynced(await db.lastSynced());
     eSendEvent(eCloseProgressDialog, "sync_progress");

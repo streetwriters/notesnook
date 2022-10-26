@@ -55,7 +55,7 @@ import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
-import { Config } from "react-native-config";
+import Config from "react-native-config";
 
 const Launcher = React.memo(
   function Launcher() {

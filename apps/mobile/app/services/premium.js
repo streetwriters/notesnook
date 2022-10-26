@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { CHECK_IDS } from "@notesnook/core/common";
 import React from "react";
 import { Platform } from "react-native";
+import Config from "react-native-config";
 import * as RNIap from "react-native-iap";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
@@ -35,10 +36,8 @@ import {
   eShowGetPremium
 } from "../utils/events";
 import { eSendEvent, presentSheet, ToastEvent } from "./event-manager";
-import Config from "react-native-config";
 
 import SettingsService from "./settings";
-import { sleep } from "../utils/time";
 let premiumStatus = 0;
 let products = [];
 let user = null;
@@ -61,16 +60,17 @@ async function setPremiumStatus() {
     }
   } catch (e) {
     premiumStatus = 0;
-  } finally {
-    if (get()) {
-      await subscriptions.clear();
-    }
-    try {
-      await RNIap.initConnection();
-      products = await RNIap.getSubscriptions(itemSkus);
-    } catch (e) {
-      console.log("subscriptions: ", e);
-    }
+  }
+  if (Config.GITHUB_RELEASE) return;
+
+  if (get()) {
+    await subscriptions.clear();
+  }
+  try {
+    await RNIap.initConnection();
+    products = await RNIap.getSubscriptions(itemSkus);
+  } catch (e) {
+    console.log("subscriptions: ", e);
   }
 }
 
