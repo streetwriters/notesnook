@@ -135,15 +135,12 @@ class Sync {
         }
       })
       .withHubProtocol(new MessagePackHubProtocol({ ignoreUndefined: true }))
+      .withAutomaticReconnect()
       .build();
 
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.connection.stop();
       this.autoSync.stop();
-    });
-
-    this.connection.onclose((error) => {
-      this.logger.error(error || new Error("Connection closed."));
     });
 
     this.connection.on("SyncItem", async (syncStatus) => {
@@ -169,6 +166,11 @@ class Sync {
    */
   async start(full, force, serverLastSynced) {
     this.logger.info("Starting sync", { full, force, serverLastSynced });
+
+    this.connection.onclose((error) => {
+      this.logger.error(error || new Error("Connection closed."));
+      throw new Error("Connection closed.");
+    });
 
     const { lastSynced, oldLastSynced } = await this.init(force);
     this.logger.info("Initialized sync", { lastSynced, oldLastSynced });
@@ -403,15 +405,12 @@ class Sync {
   }
 
   async checkConnection() {
-    const CONNECTED_STATES = [
-      signalr.HubConnectionState.Connected,
-      signalr.HubConnectionState.Connecting,
-      signalr.HubConnectionState.Reconnecting,
-      signalr.HubConnectionState.Disconnecting
-    ];
-
     try {
-      if (!CONNECTED_STATES.includes(this.connection.state)) {
+      if (this.connection.state !== signalr.HubConnectionState.Connected) {
+        if (this.connection.state !== signalr.HubConnectionState.Disconnected) {
+          await this.connection.stop();
+        }
+
         await promiseTimeout(15000, this.connection.start());
       }
     } catch (e) {
