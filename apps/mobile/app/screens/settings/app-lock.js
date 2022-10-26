@@ -225,7 +225,7 @@ const AppLock = ({ route }) => {
           <WelcomeNotice />
         )}
 
-        {welcome ? (
+        {welcome && !colors.night ? (
           <BouncingView
             style={{
               position: "absolute",
