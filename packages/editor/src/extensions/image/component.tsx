@@ -223,7 +223,6 @@ export function ImageComponent(
               width={editor.isEditable ? "100%" : width}
               height={editor.isEditable ? "100%" : height}
               sx={{
-                bg: "bgSecondary",
                 border: selected
                   ? "2px solid var(--primary)"
                   : "2px solid transparent",
