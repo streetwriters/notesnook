@@ -172,7 +172,8 @@ function Auth(props: AuthProps) {
   useEffect(() => {
     if (!isAppLoaded) return;
     db.user?.getUser().then((user) => {
-      if (user && authorizedRoutes.includes(route)) return openURL("/");
+      if (user && authorizedRoutes.includes(route) && !isSessionExpired())
+        return openURL("/");
       setIsReady(true);
     });
   }, [isAppLoaded, route]);
@@ -392,8 +393,7 @@ function SessionExpiry(props: BaseAuthComponentProps<"sessionExpiry">) {
   useEffect(() => {
     (async () => {
       const user = await db.user?.getUser();
-      const isSessionExpired = Config.get("sessionExpired", false);
-      if (user && isSessionExpired) {
+      if (user && isSessionExpired()) {
         setUser(user);
       } else if (!user) {
         Config.set("sessionExpired", false);
@@ -987,4 +987,8 @@ function maskEmail(email: string) {
   return `${username.substring(0, 2)}${maskChars}${username.substring(
     username.length - 2
   )}@${domain}`;
+}
+
+function isSessionExpired() {
+  return Config.get("sessionExpired", false);
 }
