@@ -55,6 +55,8 @@ import { SvgView } from "../ui/svg";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { Walkthrough } from "../walkthroughs";
+import Config from "react-native-config";
+import { getGithubVersion } from "../../utils/github-version";
 
 const Launcher = React.memo(
   function Launcher() {
@@ -166,8 +168,11 @@ const Launcher = React.memo(
     const checkAppUpdateAvailable = async () => {
       if (__DEV__) return;
       try {
-        const version = await checkVersion();
-        if (!version.needsUpdate) return false;
+        const version =
+          Config.GITHUB_RELEASE !== "true"
+            ? await getGithubVersion()
+            : await checkVersion();
+        if (!version || !version?.needsUpdate) return false;
         presentSheet({
           component: (ref) => <Update version={version} fwdRef={ref} />
         });

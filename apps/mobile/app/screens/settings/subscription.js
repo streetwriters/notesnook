@@ -34,7 +34,7 @@ import {
 } from "../../utils/constants";
 import { eOpenPremiumDialog } from "../../utils/events";
 import { SIZE } from "../../utils/size";
-import { Config } from "react-native-config";
+import Config from "react-native-config";
 export const Subscription = () => {
   const user = useUserStore((state) => state.user);
   const monthlyPlan = usePricing("monthly");

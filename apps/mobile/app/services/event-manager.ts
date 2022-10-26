@@ -21,7 +21,7 @@ import Clipboard from "@react-native-clipboard/clipboard";
 import EventManager from "@notesnook/core/utils/event-manager";
 import { RefObject } from "react";
 import ActionSheet from "react-native-actions-sheet";
-import { Config } from "react-native-config";
+import Config from "react-native-config";
 import {
   eHideToast,
   eOnNoteEdited,
