@@ -56,11 +56,12 @@ export function CodeblockComponent(
       refractor.register(syntax);
 
       const preventUpdate = language === languageDefinition.filename;
+
       updateAttributes(
         {
           language: languageDefinition.filename
         },
-        { preventUpdate, addToHistory: false }
+        { preventUpdate, addToHistory: false, forceUpdate: true }
       );
     })();
   }, [language, languageDefinition, updateAttributes]);

@@ -30,7 +30,11 @@ export type ForwardRef = (node: HTMLElement | null) => void;
 export type ShouldUpdate = (prevNode: PMNode, nextNode: PMNode) => boolean;
 export type UpdateAttributes<T> = (
   attributes: Partial<T>,
-  options?: { addToHistory?: boolean; preventUpdate?: boolean }
+  options?: {
+    addToHistory?: boolean;
+    preventUpdate?: boolean;
+    forceUpdate?: boolean;
+  }
 ) => void;
 export type ContentDOM =
   | {

@@ -168,7 +168,8 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
               attr,
               this.getPos(),
               options?.addToHistory,
-              options?.preventUpdate
+              options?.preventUpdate,
+              options?.forceUpdate
             )
           }
         />
@@ -180,7 +181,8 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
     attributes: object,
     pos: number,
     addToHistory = false,
-    preventUpdate = false
+    preventUpdate = false,
+    forceUpdate = false
   ) {
     this.editor.commands.command(({ tr }) => {
       tr.setNodeMarkup(pos, undefined, {
@@ -189,6 +191,7 @@ export class ReactNodeView<P extends ReactNodeViewProps> implements NodeView {
       });
       tr.setMeta("addToHistory", addToHistory);
       tr.setMeta("preventUpdate", preventUpdate);
+      tr.setMeta("forceUpdate", forceUpdate);
       return true;
     });
   }

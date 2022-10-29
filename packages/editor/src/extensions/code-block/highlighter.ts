@@ -128,9 +128,20 @@ export function HighlighterPlugin({
 
         const isInsideCodeblock = oldNodeName === name || newNodeName === name;
         const isDocChanged = transaction.docChanged;
-
+        const isForceUpdate = transaction.getMeta("forceUpdate");
         // TODO: we need to find a way to trigger decoration changes
         // when user pastes something.
+        if (isForceUpdate) {
+          const allDecorations: Decoration[] = [];
+          findChildren(newState.doc, (node) => node.type.name === name).forEach(
+            (block) => {
+              allDecorations.push(
+                ...(getDecorations({ block, defaultLanguage }) || [])
+              );
+            }
+          );
+          return DecorationSet.create(newState.doc, allDecorations);
+        }
 
         if (isDocChanged && isInsideCodeblock) {
           const block = findParentNodeClosestToPos(
