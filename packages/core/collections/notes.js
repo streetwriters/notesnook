@@ -39,6 +39,10 @@ export default class Notes extends Collection {
     this.topicReferences.rebuild();
   }
 
+  trashed(id) {
+    return this.raw.find((item) => item.dateDeleted > 0 && item.id === id);
+  }
+
   async merge(remoteNote) {
     if (!remoteNote) return;
 

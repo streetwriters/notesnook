@@ -26,11 +26,16 @@ import TimeAgo from "../time-ago";
 import { pluralize, toTitleCase } from "../../utils/string";
 import { showUndoableToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
+import { hashNavigate } from "../../navigation";
+import { useStore } from "../../stores/note-store";
 
 function TrashItem({ item, index, date }) {
+  const isOpened = useStore((store) => store.selectedNote === item.id);
+
   return (
     <ListItem
       selectable
+      isFocused={isOpened}
       item={item}
       title={item.title}
       body={item.headline || item.description}
@@ -45,6 +50,9 @@ function TrashItem({ item, index, date }) {
         </Flex>
       }
       menu={{ items: menuItems, extraData: { item } }}
+      onClick={() => {
+        hashNavigate(`/notes/${item.id}/edit`, { replace: true });
+      }}
     />
   );
 }
