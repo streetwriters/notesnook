@@ -60,7 +60,7 @@ export function CodeblockComponent(
         {
           language: languageDefinition.filename
         },
-        { preventUpdate, addToHistory: false }
+        { preventUpdate, addToHistory: false, forceUpdate: true }
       );
     })();
   }, [language, languageDefinition, updateAttributes]);
