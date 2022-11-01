@@ -109,7 +109,8 @@ export class SelectionBasedNodeView<
               attr,
               this.pos,
               options?.addToHistory,
-              options?.preventUpdate
+              options?.preventUpdate,
+              options?.forceUpdate
             )
           }
         />

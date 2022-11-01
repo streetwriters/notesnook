@@ -56,7 +56,6 @@ export function CodeblockComponent(
       refractor.register(syntax);
 
       const preventUpdate = language === languageDefinition.filename;
-
       updateAttributes(
         {
           language: languageDefinition.filename
