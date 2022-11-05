@@ -385,9 +385,10 @@ function scrollIntoView(editor: Editor, from: number) {
   let { node: domNode } = editor.view.domAtPos(from);
   if (domNode.nodeType === Node.TEXT_NODE && domNode.parentNode)
     domNode = domNode.parentNode;
-  setTimeout(() => {
-    if (domNode instanceof HTMLElement) {
+  if (domNode instanceof HTMLElement) {
+    setTimeout(() => {
       domNode.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  }, 0);
+    });
+  }
+ 
 }
