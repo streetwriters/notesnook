@@ -287,7 +287,6 @@ class EditorStore extends BaseStore {
   };
 
   toggleProperties = (toggleState) => {
-    if (this.get().session.isDeleted) return;
     this.set(
       (state) =>
         (state.arePropertiesVisible =
