@@ -51,7 +51,8 @@ function TrashItem({ item, index, date }) {
       }
       menu={{ items: menuItems, extraData: { item } }}
       onClick={() => {
-        hashNavigate(`/notes/${item.id}/edit`, { replace: true });
+        if (item.itemType === "note")
+          hashNavigate(`/notes/${item.id}/edit`, { replace: true });
       }}
     />
   );
