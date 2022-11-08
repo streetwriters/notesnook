@@ -285,12 +285,6 @@ android {
 
         }
     }
-
-    
-    
-
-
-
 }
 
 dependencies {

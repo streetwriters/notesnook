@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 
 import { ToolbarGroupDefinition } from "@notesnook/editor";
 import { Editor } from "@notesnook/editor";
@@ -149,7 +150,10 @@ export function isReactNative(): boolean {
   return !!window.ReactNativeWebView;
 }
 
-export function logger(type: "info" | "warn" | "error", ...logs: unknown[]):void {
+export function logger(
+  type: "info" | "warn" | "error",
+  ...logs: unknown[]
+): void {
   const logString = logs
     .map((log) => {
       return typeof log !== "string" ? JSON.stringify(log) : log;
@@ -162,7 +166,7 @@ export function logger(type: "info" | "warn" | "error", ...logs: unknown[]):void
 export function post<T extends keyof typeof EventTypes>(
   type: typeof EventTypes[T],
   value?: unknown
-):void {
+): void {
   if (isReactNative()) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
@@ -172,6 +176,8 @@ export function post<T extends keyof typeof EventTypes>(
       })
     );
   } else {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     console.log(type, value);
   }
 }

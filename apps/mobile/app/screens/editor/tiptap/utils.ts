@@ -75,6 +75,7 @@ export async function post<T>(
   type: string,
   value: T | null = null
 ) {
+
   if (!sessionId) {
     console.warn("post called without sessionId of type:", type);
     return;

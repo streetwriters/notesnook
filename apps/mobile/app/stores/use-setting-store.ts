@@ -63,6 +63,7 @@ export type Settings = {
   sessionExpired: boolean;
   version: string | null;
   doubleSpacedLines?: boolean;
+  useGeckoView?:boolean
 };
 
 type DimensionsType = {

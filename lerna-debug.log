@@ -1,0 +1,36 @@
+0 silly argv {
+0 silly argv   _: [ 'bootstrap' ],
+0 silly argv   '--': [ '--legacy-peer-deps', '--no-audit' ],
+0 silly argv   lernaVersion: '5.4.3',
+0 silly argv   '$0': '/Users/ammarahmed/Repos/notesnook/node_modules/.bin/lerna'
+0 silly argv }
+1 notice cli v5.4.3
+2 verbose rootPath /Users/ammarahmed/Repos/notesnook
+3 info versioning independent
+4 silly npmConfig {
+4 silly npmConfig   registry: undefined,
+4 silly npmConfig   npmClient: 'npm',
+4 silly npmConfig   npmClientArgs: [ '--legacy-peer-deps', '--no-audit' ],
+4 silly npmConfig   mutex: undefined
+4 silly npmConfig }
+5 info Bootstrapping 10 packages
+6 verbose lifecycle preinstall
+7 silly lifecycle No script for "preinstall" in "@notesnook/crypto", continuing
+8 silly lifecycle No script for "preinstall" in "@notesnook/logger", continuing
+9 silly lifecycle No script for "preinstall" in "@notesnook/theme", continuing
+10 silly lifecycle No script for "preinstall" in "@notesnook/core", continuing
+11 silly lifecycle No script for "preinstall" in "@notesnook/crypto-worker", continuing
+12 silly lifecycle No script for "preinstall" in "@notesnook/editor", continuing
+13 silly lifecycle No script for "preinstall" in "@notesnook/streamable-fs", continuing
+14 silly lifecycle No script for "preinstall" in "@notesnook/web", continuing
+15 silly lifecycle No script for "preinstall" in "@notesnook/editor-mobile", continuing
+16 silly lifecycle No script for "preinstall" in "@notesnook/mobile", continuing
+17 silly hasDependencyInstalled @notesnook/editor-mobile @types/node
+18 silly hasDependencyInstalled @notesnook/mobile patch-package
+19 error JSONParseError: Unexpected token "}" (0x7D) in JSON at position 2780 while parsing near "...oview\": \"^1.0.0\",\n  },\n  \"devDependencie..."
+19 error     at /Users/ammarahmed/Repos/notesnook/node_modules/read-package-json-fast/index.js:11:61
+19 error     at async mapWorkspaces (/Users/ammarahmed/Repos/notesnook/node_modules/@npmcli/map-workspaces/lib/index.js:109:15)
+19 error     at async [loadWorkspaces] (/Users/ammarahmed/Repos/notesnook/node_modules/@npmcli/arborist/lib/arborist/load-workspaces.js:22:24)
+19 error     at async [loadActualActually] (/Users/ammarahmed/Repos/notesnook/node_modules/@npmcli/arborist/lib/arborist/load-actual.js:183:5)
+19 error     at async pMapSeries (/Users/ammarahmed/Repos/notesnook/node_modules/p-map-series/index.js:9:15)
+19 error     at async Promise.all (index 0)

@@ -286,13 +286,20 @@ export const useEditorEvents = (
   const onMessage = useCallback(
     (event: WebViewMessageEvent) => {
       const data = event.nativeEvent.data;
+      console.log(data);
+      if (data?.startsWith("Error")) {
+        console.log("WebView Error", data);
+        return;
+      }
       const editorMessage = JSON.parse(data) as EditorMessage;
+      console.log(editorMessage.sessionId, editor.sessionId);
       if (
         editorMessage.sessionId !== editor.sessionId &&
         editorMessage.type !== EditorEvents.status
       ) {
         return;
       }
+      console.log(editorMessage.type, "type");
       switch (editorMessage.type) {
         case EventTypes.logger:
           logger.info("[WEBVIEW LOG]", editorMessage.value);

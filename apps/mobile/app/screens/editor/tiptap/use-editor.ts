@@ -36,7 +36,7 @@ import { useTagStore } from "../../../stores/use-tag-store";
 import { ThemeStore, useThemeStore } from "../../../stores/use-theme-store";
 import { eClearEditor, eOnLoadNote } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
-import { timeConverter } from "../../../utils/time";
+import { sleep, timeConverter } from "../../../utils/time";
 import { NoteType } from "../../../utils/types";
 import Commands from "./commands";
 import { Content, EditorState, Note, SavePayload } from "./types";
@@ -51,6 +51,7 @@ import {
   post
 } from "./utils";
 import { EVENTS } from "@notesnook/core/common";
+import { useSettingStore } from "../../../stores/use-setting-store";
 
 export const useEditor = (
   editorId = "",
@@ -58,6 +59,7 @@ export const useEditor = (
   onChange?: (html: string) => void,
   theme?: ThemeStore["colors"]
 ) => {
+  const useGeckoView = useSettingStore((state) => state.settings.useGeckoView);
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string>(makeSessionId());
   const sessionIdRef = useRef(sessionId);
@@ -101,7 +103,6 @@ export const useEditor = (
     const unsub = useThemeStore.subscribe((state) => {
       postMessage(EditorEvents.theme, state.colors);
     });
-
     return () => {
       unsub();
     };
@@ -118,11 +119,12 @@ export const useEditor = (
   );
 
   const onReady = useCallback(async () => {
+    if (useGeckoView) await sleep(3000);
     if (!(await isEditorLoaded(editorRef, sessionIdRef.current))) {
       overlay(true);
       setLoading(true);
     }
-  }, [overlay]);
+  }, [overlay, useGeckoView]);
 
   useEffect(() => {
     state.current.saveCount = 0;

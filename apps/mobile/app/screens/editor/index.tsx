@@ -45,6 +45,8 @@ import { useEditor } from "./tiptap/use-editor";
 import { useEditorEvents } from "./tiptap/use-editor-events";
 import { editorController } from "./tiptap/utils";
 import { useLayoutEffect } from "react";
+import GeckoView from "@ammarahmed/react-native-geckoview";
+import { useSettingStore } from "../../stores/use-setting-store";
 
 const style: ViewStyle = {
   height: "100%",
@@ -84,6 +86,9 @@ const Editor = React.memo(
       ref
     ) => {
       const editor = useEditor(editorId || "", readonly, onChange, theme);
+      const useGeckoView = useSettingStore(
+        (state) => state.settings.useGeckoView
+      );
       const onMessage = useEditorEvents(editor, {
         readonly,
         noToolbar,
@@ -115,6 +120,7 @@ const Editor = React.memo(
 
       const onError = useCallback(() => {
         editor.setLoading(true);
+        console.log("loading editor");
         setTimeout(() => editor.setLoading(false), 10);
       }, [editor]);
 
@@ -129,54 +135,76 @@ const Editor = React.memo(
 
       useLayoutEffect(() => {
         onLoad && onLoad();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [onLoad]);
 
       if (withController) {
         editorController.current = editor;
       }
-
       return editor.loading ? null : (
         <>
-          <WebView
-            testID={notesnook.editor.id}
-            ref={editor.ref}
-            onLoad={editor.onLoad}
-            onRenderProcessGone={onError}
-            nestedScrollEnabled
-            onError={onError}
-            injectedJavaScriptBeforeContentLoaded={`
+          {!useGeckoView || editorId !== "" ? (
+            <WebView
+              testID={notesnook.editor.id}
+              ref={editor.ref}
+              onLoad={editor.onLoad}
+              onRenderProcessGone={onError}
+              nestedScrollEnabled
+              onError={onError}
+              injectedJavaScriptBeforeContentLoaded={`
           globalThis.readonly=${readonly};
           globalThis.noToolbar=${noToolbar};
           globalThis.noHeader=${noHeader};
           `}
-            injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
-            javaScriptEnabled={true}
-            focusable={true}
-            setSupportMultipleWindows={false}
-            overScrollMode="never"
-            scrollEnabled={false}
-            keyboardDisplayRequiresUserAction={false}
-            onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-            cacheMode="LOAD_DEFAULT"
-            cacheEnabled={true}
-            domStorageEnabled={true}
-            bounces={false}
-            setBuiltInZoomControls={false}
-            setDisplayZoomControls={false}
-            allowFileAccess={true}
-            scalesPageToFit={true}
-            hideKeyboardAccessoryView={false}
-            allowFileAccessFromFileURLs={true}
-            allowUniversalAccessFromFileURLs={true}
-            originWhitelist={["*"]}
-            source={{
-              uri: EDITOR_URI
-            }}
-            style={style}
-            autoManageStatusBarEnabled={false}
-            onMessage={onMessage || undefined}
-          />
+              injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
+              javaScriptEnabled={true}
+              focusable={true}
+              setSupportMultipleWindows={false}
+              overScrollMode="never"
+              scrollEnabled={false}
+              keyboardDisplayRequiresUserAction={false}
+              onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+              cacheMode="LOAD_DEFAULT"
+              cacheEnabled={true}
+              domStorageEnabled={true}
+              bounces={false}
+              setBuiltInZoomControls={false}
+              setDisplayZoomControls={false}
+              allowFileAccess={true}
+              scalesPageToFit={true}
+              hideKeyboardAccessoryView={false}
+              allowFileAccessFromFileURLs={true}
+              allowUniversalAccessFromFileURLs={true}
+              originWhitelist={["*"]}
+              source={{
+                uri: EDITOR_URI
+              }}
+              style={style}
+              autoManageStatusBarEnabled={false}
+              onMessage={onMessage || undefined}
+            />
+          ) : (
+            <GeckoView
+              //@ts-ignore
+              ref={editor.ref}
+              source={{
+                uri: EDITOR_URI
+              }}
+              onLoadingStart={(e) => {
+                console.log(e.nativeEvent);
+              }}
+              injectedJavaScript={`globalThis.sessionId="${editor.sessionId}";`}
+              style={style}
+              onLoadingFinish={editor.onLoad}
+              onMessagingDisconnected={() => {
+                //@ts-ignore
+                editor.ref?.connectMessagingPort();
+              }}
+              onLoadingError={onError}
+              onMessage={onMessage}
+            />
+          )}
+
           {editorId === "shareEditor" ? null : (
             <AppSection editor={editor} editorId={editorId} />
           )}
