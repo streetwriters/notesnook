@@ -43,8 +43,7 @@ export const ClipboardTextSerializer = Extension.create({
 
 function getTextBetween(slice: Slice, schema: Schema): string {
   const range = { from: 0, to: slice.size };
-  const separator = (node: ProseMirrorNode) =>
-    node.attrs.spacing === "single" ? "\n" : "\n";
+  const separator = "\n";
   let text = "";
   let separated = true;
 
@@ -54,7 +53,7 @@ function getTextBetween(slice: Slice, schema: Schema): string {
 
     if (textSerializer) {
       if (node.isBlock && !separated) {
-        text += separator(node);
+        text += separator;
         separated = true;
       }
 
@@ -71,7 +70,7 @@ function getTextBetween(slice: Slice, schema: Schema): string {
       text += node?.text;
       separated = false;
     } else if (node.isBlock) {
-      text += separator(node);
+      text += separator;
       separated = true;
     }
   });
