@@ -38,7 +38,7 @@ class Migrator {
       const index = (await collection.index()) || [];
       for (var i = 0; i < index.length; ++i) {
         let id = index[i];
-        let item = get(id);
+        let item = get(id, version, collection.dbCollection.collectionName);
         if (!item) {
           continue;
         }

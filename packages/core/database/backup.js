@@ -200,7 +200,8 @@ export default class Backup {
       await this._migrator.migrate(
         this._db,
         collections,
-        (id) => data[id],
+        (id, version, type) =>
+          version < 5.8 ? data[id] : data[`${id}_${type}`],
         version,
         true
       );
