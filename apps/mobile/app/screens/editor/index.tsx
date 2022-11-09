@@ -121,8 +121,12 @@ const Editor = React.memo(
       const onError = useCallback(() => {
         editor.setLoading(true);
         console.log("loading editor");
+        if (useGeckoView) {
+          //@ts-ignore
+          editor.ref?.connectMessagingPort();
+        }
         setTimeout(() => editor.setLoading(false), 10);
-      }, [editor]);
+      }, [editor, useGeckoView]);
 
       useEffect(() => {
         eSubscribeEvent("webview_reset", onError);
