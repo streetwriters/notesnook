@@ -41,7 +41,6 @@ const splitter = /\W+/gm;
 export class Tiptap {
   constructor(data) {
     this.data = data;
-    this.text;
     this.document = parseHTML(data);
   }
 
@@ -50,8 +49,34 @@ export class Tiptap {
   }
 
   toTXT() {
-    if (!this.document) this.document = parseHTML(this.data);
-    return this.document.body.innerText;
+    return convert(this.data, {
+      wordwrap: 80,
+      preserveNewlines: true,
+      selectors: [
+        { selector: "table", format: "dataTable" },
+        { selector: "ul.checklist", format: "taskList" }
+      ],
+      formatters: {
+        taskList: (elem, walk, builder, formatOptions) => {
+          return list(elem, walk, builder, formatOptions, (elem) => {
+            return elem.attribs.class.includes("checked") ? " ✅ " : " ☐ ";
+          });
+        },
+        paragraph: (elem, walk, builder, formatOptions) => {
+          if (elem.parent && elem.parent.name === "li") {
+            walk(elem.children, builder);
+          } else {
+            builder.openBlock({
+              leadingLineBreaks: formatOptions.leadingLineBreaks || 2
+            });
+            walk(elem.children, builder);
+            builder.closeBlock({
+              trailingLineBreaks: formatOptions.trailingLineBreaks || 2
+            });
+          }
+        }
+      }
+    });
   }
 
   toMD() {

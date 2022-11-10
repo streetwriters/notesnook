@@ -26,18 +26,42 @@ import { editorController } from "../../screens/editor/tiptap/utils";
 import { eSendEvent, ToastEvent } from "../../services/event-manager";
 import Navigation from "../../services/navigation";
 import { useEditorStore } from "../../stores/use-editor-store";
+import { useSelectionStore } from "../../stores/use-selection-store";
 import { useThemeStore } from "../../stores/use-theme-store";
+import { useTrashStore } from "../../stores/use-trash-store";
 import { eCloseProgressDialog, eOnLoadNote } from "../../utils/events";
 import { sleep } from "../../utils/time";
+import { Dialog } from "../dialog";
 import DialogHeader from "../dialog/dialog-header";
+import { presentDialog } from "../dialog/functions";
 import { Button } from "../ui/button";
 import Paragraph from "../ui/typography/paragraph";
 
-export default function NotePreview({ session, content }) {
+export default function NotePreview({ session, content, note }) {
   const colors = useThemeStore((state) => state.colors);
   const editorId = ":noteHistory";
 
   async function restore() {
+    if (note && note.type === "trash") {
+      await db.trash.restore(note.id);
+      Navigation.queueRoutesForUpdate(
+        "Tags",
+        "Notes",
+        "Notebooks",
+        "Favorites",
+        "Trash",
+        "TaggedNotes",
+        "ColoredNotes",
+        "TopicNotes"
+      );
+      useSelectionStore.getState().setSelectionMode(false);
+      ToastEvent.show({
+        heading: "Restore successful",
+        type: "success"
+      });
+      eSendEvent(eCloseProgressDialog);
+      return;
+    }
     await db.noteHistory.restore(session.id);
     if (useEditorStore.getState()?.currentEditingNote === session?.noteId) {
       if (editorController.current?.note) {
@@ -63,15 +87,38 @@ export default function NotePreview({ session, content }) {
     });
   }
 
+  const deleteNote = async () => {
+    presentDialog({
+      title: `Delete note permanently`,
+      paragraph: `Are you sure you want to delete this note from trash permanentaly`,
+      positiveText: "Delete",
+      negativeText: "Cancel",
+      context:"local",
+      positivePress: async () => {
+        await db.trash.delete(note.id);
+        useTrashStore.getState().setTrash();
+        useSelectionStore.getState().setSelectionMode(false);
+        ToastEvent.show({
+          heading: "Permanantly deleted items",
+          type: "success",
+          context: "local"
+        });
+        eSendEvent(eCloseProgressDialog);
+      },
+      positiveType:"error"
+    });
+  };
+
   return (
     <View
       style={{
-        height: session.locked ? null : 600,
+        height: note?.locked || session?.locked ? null : 600,
         width: "100%"
       }}
     >
-      <DialogHeader padding={12} title={session.session} />
-      {!session.locked ? (
+      <Dialog context="local" />
+      <DialogHeader padding={12} title={note?.title || session?.session} />
+      {!session?.locked && !note?.locked ? (
         <View
           style={{
             flex: 1
@@ -84,10 +131,10 @@ export default function NotePreview({ session, content }) {
             readonly
             editorId={editorId}
             onLoad={async () => {
-              const note = db.notes.note(session.noteId)?.data;
-              await sleep(300);
+              const _note = note || db.notes.note(session?.noteId)?.data;
+              await sleep(1000);
               eSendEvent(eOnLoadNote + editorId, {
-                ...note,
+                ..._note,
                 content: {
                   ...content,
                   isPreview: true
@@ -116,11 +163,15 @@ export default function NotePreview({ session, content }) {
           paddingHorizontal: 12
         }}
       >
+        <Button onPress={restore} title="Restore" type="accent" width="100%" />
         <Button
-          onPress={restore}
-          title="Restore this version"
-          type="accent"
+          onPress={deleteNote}
+          title="Delete permanently"
+          type="error"
           width="100%"
+          style={{
+            marginTop: 12
+          }}
         />
       </View>
     </View>

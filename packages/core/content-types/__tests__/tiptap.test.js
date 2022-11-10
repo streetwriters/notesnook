@@ -63,3 +63,10 @@ for (const html in HTMLS) {
     expect(tiptap.toMD()).toMatchSnapshot(`html-to-md-${html}.md`);
   });
 }
+
+for (const html in HTMLS) {
+  test(`convert HTML to text with ${html}`, () => {
+    const tiptap = new Tiptap(HTMLS[html]);
+    expect(tiptap.toTXT()).toMatchSnapshot(`html-to-txt-${html}.txt`);
+  });
+}

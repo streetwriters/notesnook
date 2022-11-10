@@ -33,6 +33,7 @@ import { useEditorInstance, useHistory, useSearch } from "./context";
 // TODO: this needs to be cleaned up!
 function Toolbar() {
   const sessionId = useStore((store) => store.session.id);
+  const isDeleted = useStore((store) => store.session.isDeleted);
   const isLocked = useStore((store) => store.session.locked);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
@@ -77,12 +78,12 @@ function Toolbar() {
       {
         title: isNotePublished ? "Published" : "Publish",
         icon: isNotePublished ? Icon.Published : Icon.Publish,
-        hidden: !sessionId,
+        hidden: !sessionId || isDeleted,
         enabled: !isLocked,
         onClick: () => showPublishView(store.get().session.id, "top")
       }
     ],
-    [sessionId, isLocked, isNotePublished]
+    [sessionId, isLocked, isNotePublished, isDeleted]
   );
 
   const inlineTools = useMemo(
@@ -127,28 +128,28 @@ function Toolbar() {
         title: "Search",
         icon: Icon.Search,
         enabled: true,
-        hidden: !sessionId,
+        hidden: !sessionId || isDeleted,
         onClick: () => toggleSearch()
       },
       {
         title: "Undo",
         icon: Icon.Undo,
         enabled: canUndo,
-        hidden: !sessionId,
+        hidden: !sessionId || isDeleted,
         onClick: () => undo()
       },
       {
         title: "Redo",
         icon: Icon.Redo,
         enabled: canRedo,
-        hidden: !sessionId,
+        hidden: !sessionId || isDeleted,
         onClick: () => redo()
       },
       {
         title: "Properties",
         icon: Icon.Properties,
         enabled: true,
-        hidden: !sessionId || isFocusMode,
+        hidden: !sessionId || isFocusMode || isDeleted,
         onClick: toggleProperties
       }
     ],
@@ -165,7 +166,8 @@ function Toolbar() {
       theme,
       toggleNightMode,
       sessionId,
-      toggleSearch
+      toggleSearch,
+      isDeleted
     ]
   );
 
