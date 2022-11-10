@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { config } from "../../utils/config";
 import { SplitButton } from "../components/split-button";
-import { ColorPicker } from "../popups/color-picker";
+import { ColorPicker, DEFAULT_COLORS } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
@@ -46,6 +46,12 @@ export function ColorTool(props: ColorToolProps) {
   const tColor = tinycolor(activeColor);
   const isBottom = useToolbarLocation() === "bottom";
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [colors, setColors] = useState<string[]>([]);
+  console.log("colors 50", colors);
+
+  useEffect(() => {
+    setColors(config.get<string[]>(`custom_${cacheKey}`, []) || []);
+  }, []);
 
   return (
     <SplitButton
@@ -78,10 +84,30 @@ export function ColorTool(props: ColorToolProps) {
         renderPopup={(close) => (
           <ColorPicker
             color={activeColor}
+            colors={colors}
+            onColorDelete={(color) => {
+              if (!DEFAULT_COLORS.includes(color)) {
+                setColors((colors) => {
+                  const newColors = colors.filter((item) => item !== color);
+                  config.set(`custom_${cacheKey}`, newColors);
+                  return newColors;
+                });
+              }
+            }}
             onClear={() => {
               onColorChange();
               config.set(cacheKey, null);
             }}
+            onSave={(currentColor) => {
+              if (!activeColor) return;
+              if (colors?.includes(currentColor)) return;
+              if (DEFAULT_COLORS.includes(currentColor)) return;
+              setColors((colors) => {
+                config.set(`custom_${cacheKey}`, [...colors, currentColor]);
+                return [...colors, currentColor];
+              });
+            }}
+            cacheKey={`custom_${cacheKey}`}
             onChange={(color) => {
               onColorChange(color);
               config.set(cacheKey, color);

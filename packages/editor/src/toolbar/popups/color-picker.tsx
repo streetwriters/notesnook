@@ -26,6 +26,7 @@ import tinycolor from "tinycolor2";
 import { HexColorPicker } from "react-colorful";
 import { Button } from "../../components/button";
 import { debounce } from "../../utils/debounce";
+import { config } from "../../utils/config";
 export const DEFAULT_COLORS = [
   "#e91e63",
   "#9c27b0",
@@ -44,30 +45,37 @@ export const DEFAULT_COLORS = [
 ];
 
 type ColorPickerProps = {
-  colors?: string[];
   color?: string;
   onClear: () => void;
   expanded?: boolean;
   onChange: (color: string) => void;
   onClose?: () => void;
   title?: string;
+  onSave?: (color: string) => void;
+  cacheKey?: string;
+  colors?: string[];
+  onColorDelete?: (color: string) => void;
 };
 const PALETTE_SIZE = [35, 35, 25];
 export function ColorPicker(props: ColorPickerProps) {
   const {
-    colors = DEFAULT_COLORS,
     color,
     onClear,
     onChange,
     title,
     onClose,
-    expanded
+    expanded,
+    onSave,
+    colors,
+    onColorDelete
   } = props;
+  console.log("color-picker", colors);
   const ref = useRef<HTMLDivElement>(null);
   const [isPickerOpen, setIsPickerOpen] = useState(expanded || false);
   const [currentColor, setCurrentColor] = useState<string>(
-    tinycolor(color || colors[0]).toHexString()
+    tinycolor(color || colors?.[0]).toHexString()
   );
+  const [trashMode, setTrashMode] = useState(false);
   const tColor = tinycolor(currentColor);
 
   useEffect(() => {
@@ -130,30 +138,47 @@ export function ColorPicker(props: ColorPickerProps) {
             onTouchEnd={() => onChange(currentColor)}
             onMouseUp={() => onChange(currentColor)}
           />
-          <Input
-            variant={"clean"}
-            placeholder="#000000"
-            spellCheck={false}
-            sx={{
-              my: 2,
-              p: 0,
-              borderRadius: 0,
-              fontSize: ["title", "title", "body"],
-              color: "fontTertiary",
-              textAlign: "center",
-              letterSpacing: 1.5
-            }}
-            value={currentColor.toUpperCase()}
-            maxLength={7}
-            onChange={(e) => {
-              const { value } = e.target;
-              if (!value) return;
-              if (tinycolor(value, { format: "hex" }).isValid()) {
-                setCurrentColor(value);
-                onChange(value);
-              }
-            }}
-          />
+          <Flex sx={{ flexDirection: "row" }}>
+            <Input
+              variant={"clean"}
+              placeholder="#000000"
+              spellCheck={false}
+              sx={{
+                my: 2,
+                p: 0,
+                borderRadius: 0,
+                fontSize: ["title", "title", "body"],
+                color: "fontTertiary",
+                textAlign: "center",
+                letterSpacing: 1.5
+              }}
+              value={currentColor.toUpperCase()}
+              maxLength={7}
+              onChange={(e) => {
+                const { value } = e.target;
+                if (!value) return;
+                if (tinycolor(value, { format: "hex" }).isValid()) {
+                  setCurrentColor(value);
+                  onChange(value);
+                }
+              }}
+            />
+            <Button
+              sx={{
+                width: "50%",
+                flexShrink: 0,
+                p: 0,
+                fontSize: ["title", "title", "body"],
+                fontWeight: 800,
+                color: `${currentColor}`,
+                bg: "transparent",
+                textAlign: "center"
+              }}
+              onClick={() => onSave?.(currentColor)}
+            >
+              Save Color
+            </Button>
+          </Flex>
         </>
       ) : null}
       <Flex>
@@ -204,24 +229,51 @@ export function ColorPicker(props: ColorPickerProps) {
               size={18}
             />
           </Button>
-          {colors.map((color) => (
+          <Button
+            variant={"icon"}
+            sx={{
+              flexShrink: 0,
+              width: PALETTE_SIZE,
+              height: PALETTE_SIZE,
+              bg: trashMode ? "primary" : "transparent",
+              borderRadius: 50,
+              boxShadow: "menu",
+              p: 0,
+              ml: [2, 2, 1],
+              ":hover": {
+                bg: trashMode ? "primary" : "transparent"
+              }
+            }}
+            onClick={() => setTrashMode(!trashMode)}
+          >
+            <Icon
+              path={Icons.delete}
+              color={trashMode ? "accent" : "text"}
+              size={20}
+            />
+          </Button>
+          {[...DEFAULT_COLORS, ...(colors || [])].map((colorItem) => (
             <Button
-              key={color}
+              key={colorItem}
               sx={{
                 flex: "0 0 auto",
-                bg: color,
+                bg: colorItem,
                 width: PALETTE_SIZE,
                 height: PALETTE_SIZE,
                 ml: [2, 1, 1],
                 mb: [0, 1, 1],
                 borderRadius: 50,
                 ":hover": {
-                  bg: color
+                  bg: colorItem
                 }
               }}
               onClick={() => {
-                setCurrentColor(color);
-                onChange(color);
+                if (trashMode) {
+                  onColorDelete?.(colorItem);
+                  return;
+                }
+                setCurrentColor(colorItem);
+                onChange(colorItem);
               }}
             />
           ))}
