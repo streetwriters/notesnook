@@ -43,6 +43,7 @@
     "entities": "^4.3.1",
     "fflate": "^0.7.3",
     "htmlparser2": "^8.0.1",
+    "html-to-text": "github:thecodrr/node-html-to-text",
     "linkedom": "^0.14.17",
     "liqe": "^1.13.0",
     "qclone": "^1.2.0",
