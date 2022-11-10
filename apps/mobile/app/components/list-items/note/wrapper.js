@@ -27,6 +27,7 @@ import { DDS } from "../../../services/device-detection";
 import {
   eSendEvent,
   openVault,
+  presentSheet,
   ToastEvent
 } from "../../../services/event-manager";
 import Navigation from "../../../services/navigation";
@@ -36,6 +37,7 @@ import { eOnLoadNote, eShowMergeDialog } from "../../../utils/events";
 import { tabBarRef } from "../../../utils/global-refs";
 import { presentDialog } from "../../dialog/functions";
 import SelectionWrapper from "../selection-wrapper";
+import NotePreview from "../../note-history/preview";
 
 const present = () =>
   presentDialog({
@@ -84,39 +86,11 @@ export const openNote = async (item, isTrash, setSelectedItem) => {
     return;
   }
   if (isTrash) {
-    presentDialog({
-      title: `Restore ${item.itemType}`,
-      paragraph: `Restore or delete ${item.itemType} forever`,
-      positiveText: "Restore",
-      negativeText: "Delete",
-      positivePress: async () => {
-        await db.trash.restore(item.id);
-        Navigation.queueRoutesForUpdate(
-          "Tags",
-          "Notes",
-          "Notebooks",
-          "Favorites",
-          "Trash",
-          "TaggedNotes",
-          "ColoredNotes",
-          "TopicNotes"
-        );
-        useSelectionStore.getState().setSelectionMode(false);
-        ToastEvent.show({
-          heading: "Restore successful",
-          type: "success"
-        });
-      },
-      onClose: async () => {
-        await db.trash.delete(item.id);
-        useTrashStore.getState().setTrash();
-        useSelectionStore.getState().setSelectionMode(false);
-        ToastEvent.show({
-          heading: "Permanantly deleted items",
-          type: "success",
-          context: "local"
-        });
-      }
+    const content = await db.content.get(item.contentId);
+    presentSheet({
+      component: (
+        <NotePreview note={item} content={{ type: "tiptap", data: content }} />
+      )
     });
   } else {
     useEditorStore.getState().setReadonly(_note?.readonly);
