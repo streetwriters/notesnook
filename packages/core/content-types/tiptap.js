@@ -19,7 +19,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import showdown from "@streetwriters/showdown";
 import dataurl from "../utils/dataurl";
-import { getDummyDocument, parseHTML } from "../utils/html-parser";
+import {
+  extractFirstParagraph,
+  getDummyDocument,
+  parseHTML
+} from "../utils/html-parser";
+import { Attributes, HTMLParser, HTMLRewriter } from "../utils/html-rewriter";
+
+const ATTRIBUTES = {
+  hash: "data-hash",
+  mime: "data-mime",
+  filename: "data-filename",
+  src: "src"
+};
 
 showdown.helper.document = getDummyDocument();
 var converter = new showdown.Converter();
@@ -38,6 +50,7 @@ export class Tiptap {
   }
 
   toTXT() {
+    if (!this.document) this.document = parseHTML(this.data);
     return this.document.body.innerText;
   }
 
@@ -46,15 +59,12 @@ export class Tiptap {
   }
 
   toHeadline() {
-    const paragraph = this.document.querySelector("p");
-    if (!paragraph) return;
-
-    return paragraph.innerText;
+    return extractFirstParagraph(this.data);
   }
 
-  isEmpty() {
-    return this.toTXT().trim().length <= 0;
-  }
+  // isEmpty() {
+  //   return this.toTXT().trim().length <= 0;
+  // }
 
   /**
    * @returns {Boolean}
@@ -66,109 +76,140 @@ export class Tiptap {
   }
 
   async insertMedia(getData) {
-    const attachmentElements = this.document.querySelectorAll("img");
-    for (var i = 0; i < attachmentElements.length; ++i) {
-      const attachment = attachmentElements[i];
-      switch (attachment.tagName) {
-        case "IMG": {
-          const hash = getDatasetAttribute(attachment, "hash");
-          if (!hash) continue;
+    let hashes = [];
+    new HTMLParser({
+      ontag: (name, attr) => {
+        const hash = Attributes.get(attr, ATTRIBUTES.hash);
+        if (name === "img" && hash) hashes.push(hash);
+      }
+    }).parse(this.data);
 
-          const src = await getData(hash, {
-            total: attachmentElements.length,
-            current: i
-          });
-          if (!src) continue;
-          attachment.setAttribute("src", src);
-          break;
+    const images = {};
+    for (let i = 0; i < hashes.length; ++i) {
+      const hash = hashes[i];
+      const src = await getData(hash, {
+        total: hashes.length,
+        current: i
+      });
+      if (!src) continue;
+      images[hash] = src;
+    }
+
+    return new HTMLRewriter({
+      ontag: (name, attr) => {
+        const hash = Attributes.get(attr, ATTRIBUTES.hash);
+        if (name === "img" && hash) {
+          const src = images[Attributes.get(attr, ATTRIBUTES.hash)];
+          if (!src) return;
+
+          return { name, attr: Attributes.set(attr, ATTRIBUTES.src, src) };
         }
       }
-    }
-    return this.document.body.innerHTML;
+    }).transform(this.data);
   }
 
+  /**
+   * @param {string[]} hashes
+   * @returns
+   */
   removeAttachments(hashes) {
-    const query = hashes.map((h) => `[data-hash="${h}"]`).join(",");
-    const attachmentElements = this.document.querySelectorAll(query);
-
-    for (var i = 0; i < attachmentElements.length; ++i) {
-      const attachment = attachmentElements[i];
-      attachment.remove();
-    }
-
-    return this.document.body.innerHTML;
+    return new HTMLRewriter({
+      ontag: (_name, attr) => {
+        if (hashes.includes(Attributes.get(attr, ATTRIBUTES.hash)))
+          return false;
+      }
+    }).transform(this.data);
   }
 
   async extractAttachments(store) {
-    const attachments = [];
-    const attachmentElements = this.document.querySelectorAll("img,span");
+    let sources = [];
+    new HTMLParser({
+      ontag: (name, attr, pos) => {
+        const hash = Attributes.get(attr, ATTRIBUTES.hash);
+        const src = Attributes.get(attr, ATTRIBUTES.src);
+        if (name === "img" && !hash && src) {
+          sources.push({
+            src,
+            id: `${pos.start}${pos.end}`
+          });
+        }
+      }
+    }).parse(this.data);
 
-    for (var i = 0; i < attachmentElements.length; ++i) {
-      const attachment = attachmentElements[i];
+    const images = {};
+    for (const image of sources) {
       try {
-        switch (attachment.tagName) {
-          case "IMG": {
-            if (!getDatasetAttribute(attachment, "hash")) {
-              const src = attachment.getAttribute("src");
-              if (!src) continue;
+        const { data, mime } = dataurl.toObject(image.src);
+        if (!data) continue;
+        const storeResult = await store(data, "base64");
+        if (!storeResult) continue;
 
-              const { data, mime } = dataurl.toObject(src);
-              if (!data) continue;
+        images[image.id] = { ...storeResult, mime };
+      } catch (e) {
+        console.error(e);
+        images[image.id] = false;
+      }
+    }
+
+    let attachments = [];
+    const html = new HTMLRewriter({
+      ontag: (name, attr, pos) => {
+        switch (name) {
+          case "img": {
+            const hash = Attributes.get(attr, ATTRIBUTES.hash);
+
+            if (hash) {
+              attachments.push({
+                hash
+              });
+              return {
+                name,
+                attr: Attributes.set(attr, ATTRIBUTES.src, "")
+              };
+            } else {
+              const imageData = images[`${pos.start}${pos.end}`];
+              if (!imageData) return imageData;
+
+              const { key, metadata, mime } = imageData;
+              if (!metadata.hash) return;
 
               const type =
-                getDatasetAttribute(attachment, "mime") || mime || "image/jpeg";
-
-              const storeResult = await store(data, "base64");
-              if (!storeResult) continue;
-
-              const { key, metadata } = storeResult;
-              if (!metadata.hash) continue;
-
-              setDatasetAttribute(attachment, "hash", metadata.hash);
+                Attributes.get(attr, ATTRIBUTES.mime) || mime || "image/jpeg";
+              const filename =
+                Attributes.get(attr, ATTRIBUTES.filename) || metadata.hash;
 
               attachments.push({
                 type,
-                filename:
-                  getDatasetAttribute(attachment, "filename") || metadata.hash,
+                filename,
                 ...metadata,
                 key
               });
-            } else {
-              attachments.push({
-                hash: getDatasetAttribute(attachment, "hash")
-              });
+
+              return {
+                name,
+                attr: Attributes.set(
+                  Attributes.set(attr, ATTRIBUTES.hash, metadata.hash),
+                  ATTRIBUTES.src,
+                  ""
+                )
+              };
             }
-            attachment.removeAttribute("src");
-            break;
           }
-          default: {
-            if (!getDatasetAttribute(attachment, "hash")) continue;
+          case "span": {
+            const hash = Attributes.get(attr, ATTRIBUTES.hash);
+            if (!hash) return;
             attachments.push({
-              hash: getDatasetAttribute(attachment, "hash")
+              hash
             });
             break;
           }
         }
-      } catch (e) {
-        if (e.message === "bad base-64") {
-          attachment.remove();
-          console.error(e);
-          continue;
-        }
-        throw e;
       }
-    }
+    }).transform(this.data);
+
     return {
-      data: this.document.body.innerHTML,
+      data: html,
       attachments
     };
   }
-}
-
-function getDatasetAttribute(element, attribute) {
-  return element.getAttribute(`data-${attribute}`);
-}
-
-function setDatasetAttribute(element, attribute, value) {
-  return element.setAttribute(`data-${attribute}`, value);
 }

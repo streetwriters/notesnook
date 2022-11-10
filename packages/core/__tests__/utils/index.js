@@ -49,7 +49,7 @@ const notebookTest = (notebook = TEST_NOTEBOOK) =>
 var TEST_NOTE = {
   content: {
     type: "tiptap",
-    data: `<p>Hello<br><span style="color:#f00">This is colorful</span></p>`
+    data: `<p>Hello<br/><span style="color:#f00">This is colorful</span></p>`
   }
 };
 

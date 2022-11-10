@@ -27,7 +27,7 @@ test("img src is empty after extract attachments", async () => {
   });
   expect(result.attachments).toHaveLength(1);
   expect(result.data).not.toContain(`src="data:image/png;`);
-  expect(result.data).not.toContain(`src=`);
+  expect(result.data).toContain(`src=""`);
   expect(result.data).toContain(`data-hash="helloworld"`);
 });
 
@@ -39,6 +39,12 @@ test("img src is present after insert attachments", async () => {
   const tiptap2 = new Tiptap(result.data);
   const result2 = await tiptap2.insertMedia(() => "i am a data");
   expect(result2).toContain(`src="i am a data"`);
+});
+
+test("remove attachments with particular hash", async () => {
+  const tiptap = new Tiptap(IMG_CONTENT);
+  const result = tiptap.removeAttachments(["d3eab72e94e3cd35"]);
+  expect(result).not.toContain(`d3eab72e94e3cd35`);
 });
 
 const HTMLS = {

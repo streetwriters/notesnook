@@ -106,7 +106,7 @@ test("note should not get headline if there is no p tag", () =>
     }
   }).then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.headline).toBeUndefined();
+    expect(note.headline).toBe("");
   }));
 
 test("note title should allow trailing space", () =>
@@ -132,7 +132,7 @@ test("update note", () =>
       title: "I am a new title",
       content: {
         type: TEST_NOTE.content.type,
-        data: "<p><br></p>"
+        data: "<p><br/></p>"
       },
       pinned: true,
       favorite: true
@@ -348,7 +348,7 @@ test("note content should not contain image base64 data after save", () =>
     const note = db.notes.note(id);
     const content = await note.content();
     expect(content).not.toContain(`src="data:image/png;`);
-    expect(content).not.toContain(`src=`);
+    expect(content).toContain(`src=""`);
   }));
 
 test("adding a note with an invalid tag should clean the tag array", () =>

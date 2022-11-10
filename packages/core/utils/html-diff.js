@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { Parser } from "htmlparser2";
 
-const ALLOWED_ATTRIBUTES = ["href", "src"];
+const ALLOWED_ATTRIBUTES = ["href", "src", "data-hash"];
 
 export function isHTMLEqual(one, two) {
   if (typeof one !== "string" || typeof two !== "string") return false;
@@ -29,13 +29,22 @@ export function isHTMLEqual(one, two) {
 
 function toDiffable(html) {
   let text = "";
-  const parser = new Parser({
-    ontext: (data) => (text += data.trim()),
-    onattribute: (name, value) => {
-      if (ALLOWED_ATTRIBUTES.includes(name)) text += value.trim();
+  const parser = new Parser(
+    {
+      ontext: (data) => (text += data.trim()),
+      onopentag: (_name, attr) => {
+        for (const key of ALLOWED_ATTRIBUTES) {
+          const value = attr[key];
+          if (!value) continue;
+          text += value.trim();
+        }
+      }
+    },
+    {
+      lowerCaseTags: false,
+      parseAttributes: true
     }
-  });
-  parser.write(html);
-  parser.end();
+  );
+  parser.end(html);
   return text;
 }

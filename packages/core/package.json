@@ -42,7 +42,7 @@
     "dayjs": "^1.11.3",
     "entities": "^4.3.1",
     "fflate": "^0.7.3",
-    "htmlparser2": "^8.0.1",
+    "htmlparser2": "github:thecodrr/htmlparser2",
     "linkedom": "^0.14.17",
     "liqe": "^1.13.0",
     "qclone": "^1.2.0",
