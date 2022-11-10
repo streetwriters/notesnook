@@ -35,21 +35,28 @@ class Collector {
 
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.getEncryptionKey();
+    const vaultKey = await this._db.vault._getKey();
 
-    const items = [
-      ...this._collect("note", this._db.notes.raw, isForceSync),
-      ...this._collect("shortcut", this._db.shortcuts.raw, isForceSync),
-      ...this._collect("notebook", this._db.notebooks.raw, isForceSync),
-      ...this._collect("content", await this._db.content.all(), isForceSync),
-      ...this._collect(
-        "attachment",
-        this._db.attachments.syncable,
-        isForceSync
-      ),
-      ...this._collect("settings", [this._db.settings.raw], isForceSync)
-    ];
+    const collections = {
+      note: this._db.notes.raw,
+      shortcut: this._db.shortcuts.raw,
+      notebook: this._db.notebooks.raw,
+      content: await this._db.content.all(),
+      attachment: this._db.attachments.syncable,
+      settings: [this._db.settings.raw]
+    };
 
-    return { items, vaultKey: await this._db.vault._getKey() };
+    const result = { items: [], types: [] };
+    for (const type in collections) {
+      this._collect(type, collections[type], result, isForceSync);
+    }
+
+    if (vaultKey) {
+      result.items.push(vaultKey);
+      result.types.push("vaultKey");
+    }
+
+    return result;
   }
 
   _serialize(item) {
@@ -62,38 +69,28 @@ class Collector {
     return Promise.all(array.map(this._map, this));
   }
 
-  /**
-   *
-   * @param {Array} array
-   * @returns {Array}
-   */
-  _collect(collectionId, array, isForceSync) {
-    if (!array.length) return [];
+  _collect(itemType, items, result, isForceSync) {
+    if (!items || !items.length) return;
 
-    const result = array.reduce((prev, item) => {
-      if (!item) return prev;
+    for (const item of items) {
+      if (!item) continue;
 
       const isSyncable = !item.synced || isForceSync;
       const isUnsynced =
         item.dateModified > this._lastSyncedTimestamp || isForceSync;
 
       if (item.localOnly) {
-        prev.push({
+        result.items.push({
           id: item.id,
-          collectionId,
           deleted: true,
           dateModified: Date.now()
         });
+        result.types.push(itemType);
       } else if (isUnsynced && isSyncable) {
-        prev.push({ ...item, collectionId });
+        result.items.push(item);
+        result.types.push(itemType);
       }
-
-      return prev;
-    }, []);
-    this.logger.info(
-      `Collected items: ${collectionId} (${result.length}/${array.length})`
-    );
-    return result;
+    }
   }
 
   // _map(item) {

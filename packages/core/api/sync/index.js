@@ -274,46 +274,29 @@ class Sync {
 
     if (data.items.length <= 0) return false;
 
-    const arrays = data.items.reduce(
-      (arrays, item) => {
-        arrays.types.push(item.collectionId);
+    let total = data.items.length;
 
-        delete item.collectionId;
-        arrays.items.push(item);
-        return arrays;
-      },
-      { items: [], types: [] }
-    );
-
-    if (data.vaultKey) {
-      arrays.types.push("vaultKey");
-      arrays.items.push(data.vaultKey);
-    }
-
-    let total = arrays.items.length;
-
-    arrays.types = toChunks(arrays.types, 30);
-    arrays.items = toChunks(arrays.items, 30);
+    const types = toChunks(data.types, 30);
+    const items = toChunks(data.items, 30);
 
     let done = 0;
-    for (let i = 0; i < arrays.items.length; ++i) {
+    for (let i = 0; i < items.length; ++i) {
       this.logger.info(`Sending batch ${done}/${total}`);
 
-      const items = (await this.collector.encrypt(arrays.items[i])).map(
+      const encryptedItems = (await this.collector.encrypt(items[i])).map(
         (item) => JSON.stringify(item)
       );
-      const types = arrays.types[i];
 
       const result = await this.sendBatchToServer({
         lastSynced,
         current: i,
         total,
-        items,
-        types
+        items: encryptedItems,
+        types: types[i]
       });
 
       if (result) {
-        done += items.length;
+        done += encryptedItems.length;
         sendSyncProgressEvent(this.db.eventManager, "upload", total, done);
 
         this.logger.info(`Batch sent (${done}/${total})`);
