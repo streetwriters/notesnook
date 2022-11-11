@@ -101,6 +101,14 @@ export default function EditorManager({
           }
 
           editorInstance.current?.updateContent(item.data);
+
+          db.eventManager.subscribe(
+            EVENTS.syncCompleted,
+            async () => {
+              await db.attachments?.downloadImages(id);
+            },
+            true
+          );
         } else if (isNote) {
           if (!locked && item.locked) return EV.publish(EVENTS.vaultLocked);
 
