@@ -25,6 +25,8 @@ import {
   parseHTML
 } from "../utils/html-parser";
 import { Attributes, HTMLParser, HTMLRewriter } from "../utils/html-rewriter";
+import { convert } from "html-to-text";
+import { list } from "html-to-text/lib/formatter";
 
 const ATTRIBUTES = {
   hash: "data-hash",
