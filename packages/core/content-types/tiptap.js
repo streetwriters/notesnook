@@ -19,11 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import showdown from "@streetwriters/showdown";
 import dataurl from "../utils/dataurl";
-import {
-  extractFirstParagraph,
-  getDummyDocument,
-  parseHTML
-} from "../utils/html-parser";
+import { extractFirstParagraph, getDummyDocument } from "../utils/html-parser";
 import { Attributes, HTMLParser, HTMLRewriter } from "../utils/html-rewriter";
 import { convert } from "html-to-text";
 import { list } from "html-to-text/lib/formatter";
@@ -43,7 +39,6 @@ const splitter = /\W+/gm;
 export class Tiptap {
   constructor(data) {
     this.data = data;
-    this.document = parseHTML(data);
   }
 
   toHTML() {
