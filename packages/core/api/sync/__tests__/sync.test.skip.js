@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import Database from "../../index";
 import { NodeStorageInterface } from "../../../__mocks__/node-storage.mock";
 import FS from "../../../__mocks__/fs.mock";
+import Compressor from "../../../__mocks__/compressor.mock";
 import { CHECK_IDS, EV, EVENTS } from "../../../common";
 import EventSource from "eventsource";
 import { delay } from "../../../__tests__/utils";
@@ -338,7 +339,12 @@ async function initializeDevice(id, capabilities = []) {
     };
   });
 
-  const device = new Database(new NodeStorageInterface(), EventSource, FS);
+  const device = new Database(
+    new NodeStorageInterface(),
+    EventSource,
+    FS,
+    Compressor
+  );
   // device.host({
   //   API_HOST: "http://192.168.10.29:5264",
   //   AUTH_HOST: "http://192.168.10.29:8264",

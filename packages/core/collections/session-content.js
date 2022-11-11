@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { tinyToTiptap } from "../migrations";
-import { compress, decompress } from "../utils/compression";
 import { makeSessionContentId } from "../utils/id";
 import Collection from "./collection";
 
@@ -34,7 +33,9 @@ export default class SessionContent extends Collection {
    */
   async add(sessionId, content, locked) {
     if (!sessionId || !content) return;
-    let data = locked ? content.data : compress(content.data);
+    let data = locked
+      ? content.data
+      : await this._db.compressor.compress(content.data);
 
     await this._collection.addItem({
       type: "sessioncontent",
@@ -57,13 +58,17 @@ export default class SessionContent extends Collection {
     let session = await this._collection.getItem(sessionContentId);
 
     if (session.contentType === "tiny" && session.compressed) {
-      session.compressed = compress(tinyToTiptap(decompress(session.data)));
+      session.compressed = await this._db.compressor.compress(
+        tinyToTiptap(await this._db.compressor.decompress(session.data))
+      );
       session.contentType = "tiptap";
       await this._collection.addItem(session);
     }
 
     return {
-      data: session.compressed ? decompress(session.data) : session.data,
+      data: session.compressed
+        ? await this._db.compressor.decompress(session.data)
+        : session.data,
       type: session.contentType
     };
   }

@@ -30,7 +30,13 @@ async function initializeDatabase(persistence) {
 
   const { default: Database } = await import("@notesnook/core/api");
   const { default: FS } = await import("../interfaces/fs");
-  db = new Database(new NNStorage("Notesnook", persistence), EventSource, FS);
+  const { Compressor } = await import("../utils/compressor");
+  db = new Database(
+    new NNStorage("Notesnook", persistence),
+    EventSource,
+    FS,
+    new Compressor()
+  );
 
   // if (isTesting()) {
   db.host({

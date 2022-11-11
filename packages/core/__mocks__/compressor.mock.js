@@ -17,27 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { decode, encode } from "base64-arraybuffer";
-import { compressSync, decompressSync, strToU8, strFromU8 } from "fflate";
+const zlib = require("zlib");
+const utils = require("util");
 
-/**
- *
- * @param {string} data
- * @returns {string | null} An object containing compressed data
- */
-export const compress = (data) => {
-  try {
-    return encode(compressSync(strToU8(data)).buffer);
-  } catch (e) {
-    return null;
-  }
-};
+const gzipAsync = utils.promisify(zlib.gzip);
+const gunzipAsync = utils.promisify(zlib.gunzip);
 
-/**
- *
- * @param {string} compressed
- * @returns {string} decompressed string
- */
-export const decompress = (compressed) => {
-  return strFromU8(decompressSync(new Uint8Array(decode(compressed))));
+async function compress(data) {
+  return (await gzipAsync(data, { level: 6 })).toString("base64");
+}
+
+async function decompress(data) {
+  return (await gunzipAsync(Buffer.from(data, "base64"))).toString("utf-8");
+}
+
+module.exports = {
+  compress,
+  decompress
 };

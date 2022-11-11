@@ -60,7 +60,7 @@ class Database {
    * @param {any} storage
    * @param {EventSource} eventsource
    */
-  constructor(storage, eventsource, fs) {
+  constructor(storage, eventsource, fs, compressor) {
     /**
      * @type {EventSource}
      */
@@ -69,6 +69,7 @@ class Database {
     this.lastHeartbeat = undefined; // { local: 0, server: 0 };
     this.timeErrorFailures = 0;
     this.eventManager = new EventManager();
+    this.compressor = compressor;
 
     this.storage = new Storage(storage);
     this.fs = new FileStorage(fs, storage);
