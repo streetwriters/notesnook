@@ -17,25 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { ipcMain } from "electron";
-import { logger } from "../logger";
-import { getAction } from "./actions";
-import { getCall } from "./calls";
+import { expose } from "comlink";
+import { gzipSync, gunzipSync } from "fflate";
+import { fromBase64, toBase64 } from "@aws-sdk/util-base64-browser";
 
-ipcMain.on("fromRenderer", async (event, args) => {
-  logger.info("Action requested by renderer", args);
+const module = {
+  gzip: ({ data, level }: { data: string; level: number }) => {
+    return toBase64(
+      gzipSync(new TextEncoder().encode(data), {
+        level: level as any
+      })
+    );
+  },
+  gunzip: ({ data }: { data: string }) => {
+    return new TextDecoder().decode(gunzipSync(fromBase64(data)));
+  }
+};
 
-  const { type } = args;
-  const action = getAction(type);
-  if (!action) return;
-  await action(args);
-});
-
-ipcMain.handle("fromRenderer", async (event, args) => {
-  const { type } = args;
-  logger.info("Call requested by renderer", type);
-  const call = getCall(type);
-  if (!call) return;
-
-  return await call(args, global.win);
-});
+expose(module);
+export type Compressor = typeof module;

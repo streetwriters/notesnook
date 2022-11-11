@@ -16,26 +16,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+import zlib from "node:zlib";
+import utils from "node:util";
 
-import { ipcMain } from "electron";
-import { logger } from "../logger";
-import { getAction } from "./actions";
-import { getCall } from "./calls";
+const gzipAsync = utils.promisify(zlib.gzip);
+const gunzipAsync = utils.promisify(zlib.gunzip);
 
-ipcMain.on("fromRenderer", async (event, args) => {
-  logger.info("Action requested by renderer", args);
+export async function gzip(args) {
+  const { data, level } = args;
+  return (await gzipAsync(data, { level })).toString("base64");
+}
 
-  const { type } = args;
-  const action = getAction(type);
-  if (!action) return;
-  await action(args);
-});
-
-ipcMain.handle("fromRenderer", async (event, args) => {
-  const { type } = args;
-  logger.info("Call requested by renderer", type);
-  const call = getCall(type);
-  if (!call) return;
-
-  return await call(args, global.win);
-});
+export async function gunzip(args) {
+  const { data } = args;
+  return (await gunzipAsync(Buffer.from(data, "base64"))).toString("utf-8");
+}
