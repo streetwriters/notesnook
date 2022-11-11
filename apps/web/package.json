@@ -8,6 +8,7 @@
   "repository": "https://github.com/streetwriters/notesnook",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@aws-sdk/util-base64-browser": "^3.208.0",
     "@brixtol/currency-symbols": "^1.1.1",
     "@dnd-kit/core": "^6.0.5",
     "@dnd-kit/modifiers": "^6.0.0",
