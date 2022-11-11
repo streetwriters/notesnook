@@ -574,7 +574,7 @@ function Settings() {
                     setBackupReminderOffset(index)
                   }
                 />
-                {isDesktop() && !!backupReminderOffset ? (
+                {isDesktop() ? (
                   <Button
                     key={"backupLocation"}
                     variant="list"
