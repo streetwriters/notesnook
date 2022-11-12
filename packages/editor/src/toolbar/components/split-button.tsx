@@ -78,6 +78,7 @@ function _SplitButton(props: PropsWithChildren<SplitButtonProps>) {
 export const SplitButton = React.memo(_SplitButton, (prev, next) => {
   return (
     prev.toggled === next.toggled &&
-    JSON.stringify(prev.sx) === JSON.stringify(next.sx)
+    JSON.stringify(prev.sx) === JSON.stringify(next.sx) &&
+    prev.children === next.children
   );
 });

@@ -28,7 +28,7 @@ import {
   useToolbarStore
 } from "../../toolbar/stores/toolbar-store";
 import React from "react";
-import { EditorContext, usePopupRenderer } from "./popuprenderer";
+import { usePopupRenderer } from "./popuprenderer";
 import { ResponsivePresenter, ResponsivePresenterProps } from "../responsive";
 import { ThemeProvider } from "../theme-provider";
 
@@ -237,10 +237,9 @@ export function PopupPresenter(props: PropsWithChildren<PopupPresenterProps>) {
 export type PopupWrapperProps = UsePopupHandlerOptions & {
   autoCloseOnUnmount?: boolean;
   position: PositionOptions;
-  renderPopup: (closePopup: () => void) => React.ReactNode;
 } & Partial<Omit<PopupPresenterProps, "onClose">>;
-export function PopupWrapper(props: PopupWrapperProps) {
-  const { id, position, renderPopup, autoCloseOnUnmount, ...presenterProps } =
+export function PopupWrapper(props: PropsWithChildren<PopupWrapperProps>) {
+  const { id, position, children, autoCloseOnUnmount, ...presenterProps } =
     props;
   const PopupRenderer = usePopupRenderer();
   const { closePopup, isPopupOpen } = usePopupHandler(props);
@@ -252,58 +251,27 @@ export function PopupWrapper(props: PopupWrapperProps) {
     };
   }, [autoCloseOnUnmount, id, PopupRenderer]);
 
-  useEffect(() => {
-    if (PopupRenderer && isPopupOpen && !PopupRenderer.isOpen(id)) {
-      PopupRenderer.openPopup(id, function Popup({ id }) {
-        const isPopupOpen = useToolbarStore(
-          (store) => !!store.openedPopups[id]
-        );
-
-        useEffect(() => {
-          if (!isPopupOpen) {
-            PopupRenderer.closePopup(id);
-          }
-        }, [id, isPopupOpen]);
-
-        return (
-          <PopupPresenter
-            key={id}
-            onClose={() => closePopup(id)}
-            position={position}
-            blocking
-            focusOnRender
-            {...presenterProps}
-            isOpen={isPopupOpen}
-          >
-            <Box
-              sx={{
-                boxShadow: "menu",
-                borderRadius: "default",
-                overflow: "hidden"
-                //          width,
-              }}
-            >
-              <EditorContext.Consumer>
-                {() => {
-                  return renderPopup(() => PopupRenderer.closePopup(id));
-                }}
-              </EditorContext.Consumer>
-            </Box>
-          </PopupPresenter>
-        );
-      });
-    }
-  }, [
-    PopupRenderer,
-    isPopupOpen,
-    closePopup,
-    id,
-    position,
-    presenterProps,
-    renderPopup
-  ]);
-
-  return null;
+  return (
+    <PopupPresenter
+      key={id}
+      onClose={() => closePopup(id)}
+      position={position}
+      blocking
+      focusOnRender
+      {...presenterProps}
+      isOpen={isPopupOpen}
+    >
+      <Box
+        sx={{
+          boxShadow: "menu",
+          borderRadius: "default",
+          overflow: "hidden"
+        }}
+      >
+        {children}
+      </Box>
+    </PopupPresenter>
+  );
 }
 
 type UsePopupHandlerOptions = {

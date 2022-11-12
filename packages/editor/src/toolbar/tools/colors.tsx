@@ -17,12 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import tinycolor from "tinycolor2";
 import { PopupWrapper } from "../../components/popup-presenter";
 import { config } from "../../utils/config";
 import { SplitButton } from "../components/split-button";
-import { ColorPicker } from "../popups/color-picker";
+import { ColorPicker, DEFAULT_COLORS } from "../popups/color-picker";
 import { useToolbarLocation } from "../stores/toolbar-store";
 import { ToolProps } from "../types";
 import { getToolbarElement } from "../utils/dom";
@@ -46,6 +46,13 @@ export function ColorTool(props: ColorToolProps) {
   const tColor = tinycolor(activeColor);
   const isBottom = useToolbarLocation() === "bottom";
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [colors, setColors] = useState(
+    config.get<string[]>(`custom_${cacheKey}`, []) || []
+  );
+
+  useEffect(() => {
+    config.set(`custom_${cacheKey}`, colors);
+  }, [cacheKey, colors]);
 
   return (
     <SplitButton
@@ -75,22 +82,32 @@ export function ColorTool(props: ColorToolProps) {
         }}
         focusOnRender={false}
         blocking={false}
-        renderPopup={(close) => (
-          <ColorPicker
-            color={activeColor}
-            onClear={() => {
-              onColorChange();
-              config.set(cacheKey, null);
-            }}
-            onChange={(color) => {
-              onColorChange(color);
-              config.set(cacheKey, color);
-            }}
-            onClose={close}
-            title={title}
-          />
-        )}
-      />
+      >
+        <ColorPicker
+          color={activeColor}
+          colors={colors}
+          onDelete={(color) => {
+            if (DEFAULT_COLORS.includes(color)) return;
+            setColors((colors) => colors.filter((item) => item !== color));
+          }}
+          onClear={() => {
+            onColorChange();
+            config.set(cacheKey, null);
+          }}
+          onSave={(color) => {
+            setColors((colors) =>
+              colors.includes(color) ? colors : [...colors, color]
+            );
+          }}
+          cacheKey={`custom_${cacheKey}`}
+          onChange={(color) => {
+            onColorChange(color);
+            config.set(cacheKey, color);
+          }}
+          onClose={() => setIsOpen(false)}
+          title={title}
+        />
+      </PopupWrapper>
     </SplitButton>
   );
 }

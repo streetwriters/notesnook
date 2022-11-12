@@ -105,7 +105,9 @@ import {
   mdiResizeBottomRight,
   mdiImageOutline,
   mdiProgressDownload,
-  mdiProgressAlert
+  mdiProgressAlert,
+  mdiContentSaveOutline,
+  mdiClipboardOutline
 } from "@mdi/js";
 
 export const Icons = {
@@ -146,6 +148,8 @@ export const Icons = {
   imageFailed: mdiProgressAlert,
   imageSettings: mdiImageEditOutline,
   colorClear: mdiInvertColorsOff,
+  save: mdiContentSaveOutline,
+  copy: mdiClipboardOutline,
   check: mdiCheck,
   checkbox: mdiCheckboxMarkedOutline,
   loading: mdiLoading,
