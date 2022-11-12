@@ -63,25 +63,24 @@ export function MoreTools(props: MoreToolsProps) {
         autoCloseOnUnmount={autoCloseOnUnmount}
         focusOnRender={false}
         blocking={false}
-        renderPopup={() => (
-          <ToolbarGroup
-            tools={tools}
-            editor={editor}
-            sx={{
-              flex: 1,
-              // this is intentionally set to a fixed value
-              // because we want the same padding on mobile
-              // and web.
-              p: "5px",
-              boxShadow: "menu",
-              bg: "background",
-              borderRadius: "default",
-              overflowX: "auto",
-              maxWidth: "95vw"
-            }}
-          />
-        )}
-      />
+      >
+        <ToolbarGroup
+          tools={tools}
+          editor={editor}
+          sx={{
+            flex: 1,
+            // this is intentionally set to a fixed value
+            // because we want the same padding on mobile
+            // and web.
+            p: "5px",
+            boxShadow: "menu",
+            bg: "background",
+            borderRadius: "default",
+            overflowX: "auto",
+            maxWidth: "95vw"
+          }}
+        />
+      </PopupWrapper>
     </>
   );
 }

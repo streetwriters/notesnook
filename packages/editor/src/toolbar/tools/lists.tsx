@@ -75,40 +75,39 @@ function _ListTool<TListStyleTypes extends string>(
           yOffset: 10
         }}
         onClosed={() => setIsOpen(false)}
-        renderPopup={() => (
-          <Box
-            sx={{
-              bg: "background",
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              p: 1
-            }}
-          >
-            {subTypes.map((item) => (
-              <Button
-                key={item.title}
-                variant={"menuitem"}
-                sx={{ width: 80 }}
-                onClick={() => {
-                  let chain = editor.current?.chain().focus();
-                  if (!chain || !editor.current) return;
+      >
+        <Box
+          sx={{
+            bg: "background",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            p: 1
+          }}
+        >
+          {subTypes.map((item) => (
+            <Button
+              key={item.title}
+              variant={"menuitem"}
+              sx={{ width: 80 }}
+              onClick={() => {
+                let chain = editor.current?.chain().focus();
+                if (!chain || !editor.current) return;
 
-                  if (!isListActive(editor.current)) {
-                    if (type === "bulletList") chain = chain.toggleBulletList();
-                    else chain = chain.toggleOrderedList();
-                  }
+                if (!isListActive(editor.current)) {
+                  if (type === "bulletList") chain = chain.toggleBulletList();
+                  else chain = chain.toggleOrderedList();
+                }
 
-                  return chain
-                    .updateAttributes(type, { listType: item.type })
-                    .run();
-                }}
-              >
-                <ListThumbnail listStyleType={item.type} />
-              </Button>
-            ))}
-          </Box>
-        )}
-      />
+                return chain
+                  .updateAttributes(type, { listType: item.type })
+                  .run();
+              }}
+            >
+              <ListThumbnail listStyleType={item.type} />
+            </Button>
+          ))}
+        </Box>
+      </PopupWrapper>
     </SplitButton>
   );
 }
