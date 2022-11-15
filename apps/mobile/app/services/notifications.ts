@@ -17,7 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import notifee, {
+  AndroidStyle,
+  RepeatFrequency,
+  Trigger,
+  TriggerType,
+  AuthorizationStatus
+} from "@notifee/react-native";
+import dayjs from "dayjs";
 import { Platform } from "react-native";
+import DeviceInfo from "react-native-device-info";
 import PushNotification, {
   Importance,
   PushNotificationDeliveredObject,
@@ -25,18 +34,231 @@ import PushNotification, {
 } from "react-native-push-notification";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
+import { editorState } from "../screens/editor/tiptap/utils";
+import { useNoteStore } from "../stores/use-notes-store";
 import { eOnLoadNote } from "../utils/events";
 import { tabBarRef } from "../utils/global-refs";
-import { useNoteStore } from "../stores/use-notes-store";
 import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
-import { editorState } from "../screens/editor/tiptap/utils";
-import DeviceInfo from "react-native-device-info";
 
 const NOTIFICATION_TAG = "notesnook";
 const CHANNEL_ID = "com.streetwriters.notesnook";
 let pinned: PushNotificationDeliveredObject[] = [];
+
+async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
+  switch (id) {
+    case "default":
+      return await notifee.createChannel({
+        id: "com.streetwriters.notesnook",
+        name: "Default"
+      });
+    case "silent":
+      return await notifee.createChannel({
+        id: "com.streetwriters.notesnook.silent",
+        name: "Silent",
+        vibration: false
+      });
+    case "vibrate":
+      return await notifee.createChannel({
+        id: "com.streetwriters.notesnook.silent",
+        name: "Silent",
+        vibration: true
+      });
+    case "urgent":
+      return await notifee.createChannel({
+        id: "com.streetwriters.notesnook.urgent",
+        name: "Urgent",
+        vibration: true,
+        sound: "default"
+      });
+  }
+}
+
+export type Reminder = {
+  id: string;
+  title: string;
+  details?: string;
+  priority: "silent" | "vibrate" | "urgent";
+  date: Date;
+  type: "recurring" | "once" | "permanent";
+  recurringMode: "weekly" | "monthly" | "daily";
+  selectedDays: number[];
+  dateCreated: number;
+  dateModified: number;
+};
+
+async function checkAndRequestPermissions() {
+  let permissionStatus = await notifee.getNotificationSettings();
+  if (Platform.OS === "android") {
+    if (
+      permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
+      permissionStatus.android.alarm === 1
+    )
+      return true;
+    if (permissionStatus.authorizationStatus === AuthorizationStatus.DENIED) {
+      permissionStatus = await notifee.requestPermission();
+    }
+    if (permissionStatus.android.alarm !== 1) {
+      await notifee.openAlarmPermissionSettings();
+    }
+    permissionStatus = await notifee.getNotificationSettings();
+    if (
+      permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED &&
+      permissionStatus.android.alarm === 1
+    )
+      return true;
+    return false;
+  }
+}
+
+function getTriggers(
+  reminder: Reminder
+): (Trigger & { id: string })[] | undefined {
+  const { date, recurringMode, selectedDays, type } = reminder;
+  switch (type) {
+    case "once":
+      return [
+        {
+          timestamp: date?.getTime() as number,
+          type: TriggerType.TIMESTAMP,
+          id: reminder.id,
+          alarmManager: {
+            allowWhileIdle: true
+          }
+        }
+      ];
+    case "permanent":
+      return undefined;
+    case "recurring": {
+      switch (recurringMode) {
+        case "daily":
+          return [
+            {
+              timestamp: date?.getTime() as number,
+              type: TriggerType.TIMESTAMP,
+              repeatFrequency: RepeatFrequency.DAILY,
+              id: reminder.id,
+              alarmManager: {
+                allowWhileIdle: true
+              }
+            }
+          ];
+        case "weekly":
+          return selectedDays.length === 7
+            ? [
+                {
+                  timestamp: date.getTime() as number,
+                  type: TriggerType.TIMESTAMP,
+                  repeatFrequency: RepeatFrequency.DAILY,
+                  id: reminder.id,
+                  alarmManager: {
+                    allowWhileIdle: true
+                  }
+                }
+              ]
+            : selectedDays.map((day) => ({
+                timestamp: dayjs(date).day(day).toDate().getTime() as number,
+                type: TriggerType.TIMESTAMP,
+                repeatFrequency: RepeatFrequency.WEEKLY,
+                id: `${reminder.id}_${day}`,
+                alarmManager: {
+                  allowWhileIdle: true
+                }
+              }));
+        case "monthly":
+          return selectedDays.length === 31
+            ? [
+                {
+                  timestamp: date?.getTime() as number,
+                  type: TriggerType.TIMESTAMP,
+                  repeatFrequency: RepeatFrequency.DAILY,
+                  id: reminder.id,
+                  alarmManager: {
+                    allowWhileIdle: true
+                  }
+                }
+              ]
+            : selectedDays.map((day) => ({
+                timestamp: dayjs(date).date(day).toDate().getTime() as number,
+                type: TriggerType.TIMESTAMP,
+                repeatFrequency: RepeatFrequency.WEEKLY,
+                id: `${reminder.id}_${day}`,
+                alarmManager: {
+                  allowWhileIdle: true
+                }
+              }));
+      }
+
+      break;
+    }
+  }
+}
+
+async function removeScheduledNotification(reminder: Reminder, day: number) {
+  return notifee.cancelTriggerNotification(
+    day ? `${reminder.id}_${day}` : reminder.id
+  );
+}
+
+async function getScheduledNotificationIds() {
+  return notifee.getTriggerNotificationIds();
+}
+
+async function clearAllPendingTriggersForId(_id: string) {
+  const ids = await getScheduledNotificationIds();
+  for (const id of ids) {
+    if (id.startsWith(_id)) {
+      await notifee.cancelTriggerNotification(id);
+    }
+  }
+}
+
+async function scheduleNotification(reminder: Reminder) {
+  try {
+    const { title, details, priority } = reminder;
+    const triggers = getTriggers(reminder);
+    if (!triggers && reminder.type === "permanent") {
+      present({
+        tag: reminder.id,
+        title: title,
+        message: details || "",
+        ongoing: true,
+        subtitle: details || ""
+      });
+      return;
+    }
+    await clearAllPendingTriggersForId(reminder.id);
+    if (!triggers) return;
+    for (const trigger of triggers) {
+      console.log(trigger);
+      await notifee.createTriggerNotification(
+        {
+          id: trigger.id,
+          title: title,
+          body: details,
+          android: {
+            channelId: await getChannelId(priority),
+            smallIcon: "ic_stat_name",
+            pressAction: {
+              id: "default",
+              mainComponent: "callofwriting"
+            },
+            style: !details
+              ? undefined
+              : {
+                  type: AndroidStyle.BIGTEXT,
+                  text: details
+                }
+          }
+        },
+        trigger
+      );
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 function loadNote(id: string, jump: boolean) {
   if (!id || id === "notesnook_note_input") return;
@@ -260,7 +482,11 @@ const Notifications = {
   get,
   getPinnedNotes,
   pinQuickNote,
-  unpinQuickNote
+  unpinQuickNote,
+  scheduleNotification,
+  removeScheduledNotification,
+  getScheduledNotificationIds,
+  checkAndRequestPermissions
 };
 
 export default Notifications;
