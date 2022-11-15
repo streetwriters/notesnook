@@ -95,7 +95,11 @@ export type PresentSheetOptions = {
   context: string;
   component:
     | JSX.Element
-    | ((ref: RefObject<ActionSheet>, close?: () => void) => JSX.Element);
+    | ((
+        ref: RefObject<ActionSheet>,
+        close?: () => void,
+        update?: (props: PresentSheetOptions) => void
+      ) => JSX.Element);
   disableClosing: boolean;
   onClose: () => void;
   progress: boolean;
