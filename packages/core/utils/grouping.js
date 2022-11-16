@@ -37,8 +37,10 @@ const comparators = {
     desc: (a, b) => b.dateDeleted - a.dateDeleted
   },
   title: {
-    asc: (a, b) => getTitle(a).localeCompare(getTitle(b)),
-    desc: (a, b) => getTitle(b).localeCompare(getTitle(a))
+    asc: (a, b) =>
+      getTitle(a).localeCompare(getTitle(b), undefined, { numeric: true }),
+    desc: (a, b) =>
+      getTitle(b).localeCompare(getTitle(a), undefined, { numeric: true })
   }
 };
 
