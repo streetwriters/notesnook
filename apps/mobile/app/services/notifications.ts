@@ -52,8 +52,8 @@ export type Reminder = {
   details?: string;
   priority: "silent" | "vibrate" | "urgent";
   date?: number;
-  mode: "recurring" | "once" | "permanent";
-  recurringMode: "weekly" | "monthly" | "daily";
+  mode: "repeat" | "once" | "permanent";
+  recurringMode: "week" | "month" | "day";
   selectedDays: number[];
   dateCreated: number;
   dateModified: number;
@@ -326,7 +326,7 @@ function getTriggers(
       return undefined;
     case "recurring": {
       switch (recurringMode) {
-        case "daily":
+        case "day":
           return [
             {
               timestamp: date as number,
@@ -338,7 +338,7 @@ function getTriggers(
               }
             }
           ];
-        case "weekly":
+        case "week":
           return selectedDays.length === 7
             ? [
                 {
@@ -360,7 +360,7 @@ function getTriggers(
                   allowWhileIdle: true
                 }
               }));
-        case "monthly":
+        case "month":
           return selectedDays.length === 31
             ? [
                 {
