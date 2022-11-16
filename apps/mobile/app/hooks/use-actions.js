@@ -86,7 +86,7 @@ export const useActions = ({ close = () => null, item }) => {
       return;
     }
 
-    let index = pinned.findIndex((notif) => notif.tag === item.id);
+    let index = pinned.findIndex((notif) => notif.id === item.id);
     if (index !== -1) {
       setNotifPinned(pinned[index]);
     } else {
@@ -176,14 +176,14 @@ export const useActions = ({ close = () => null, item }) => {
     if (item.locked) return;
     let html = await db.notes.note(item.id).content();
     let text = await toTXT(item);
-    Notifications.present({
+    Notifications.displayNotification({
       title: item.title,
       message: item.headline || text,
       subtitle: item.headline || text,
       bigText: html,
       ongoing: true,
       actions: ["UNPIN"],
-      tag: item.id
+      id: item.id
     });
     await sleep(1000);
     await Notifications.get();

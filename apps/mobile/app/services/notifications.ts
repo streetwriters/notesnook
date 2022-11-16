@@ -19,19 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import notifee, {
   AndroidStyle,
+  AuthorizationStatus,
+  DisplayedNotification,
+  EventType,
   RepeatFrequency,
   Trigger,
   TriggerType,
-  AuthorizationStatus
+  Event
 } from "@notifee/react-native";
 import dayjs from "dayjs";
 import { Platform } from "react-native";
-import DeviceInfo from "react-native-device-info";
-import PushNotification, {
-  Importance,
-  PushNotificationDeliveredObject,
-  PushNotificationObject
-} from "react-native-push-notification";
 import { db } from "../common/database";
 import { MMKV } from "../common/database/mmkv";
 import { editorState } from "../screens/editor/tiptap/utils";
@@ -42,10 +39,152 @@ import { DDS } from "./device-detection";
 import { eSendEvent } from "./event-manager";
 import SettingsService from "./settings";
 
-const NOTIFICATION_TAG = "notesnook";
-const CHANNEL_ID = "com.streetwriters.notesnook";
-let pinned: PushNotificationDeliveredObject[] = [];
+type ReferenceNode = {
+  id: string;
+  parentId?: string;
+  type: string;
+};
 
+export type Reminder = {
+  id: string;
+  type: string;
+  title: string;
+  details?: string;
+  priority: "silent" | "vibrate" | "urgent";
+  date?: number;
+  mode: "recurring" | "once" | "permanent";
+  recurringMode: "weekly" | "monthly" | "daily";
+  selectedDays: number[];
+  dateCreated: number;
+  dateModified: number;
+  references?: ReferenceNode[];
+};
+
+let pinned: DisplayedNotification[] = [];
+
+const onEvent = async ({ type, detail }: Event) => {
+  const { notification, pressAction, input } = detail;
+  if (type === EventType.PRESS) {
+    if (notification?.data?.type !== "pinnedNote") return;
+    editorState().movedAway = false;
+    MMKV.removeItem("appState");
+    if (useNoteStore?.getState()?.loading === false) {
+      await db.init();
+      await db.notes?.init();
+      loadNote(notification?.id as string, false);
+      return;
+    }
+    const unsub = useNoteStore.subscribe(
+      (loading) => {
+        if (loading === false) {
+          loadNote(notification?.id as string, true);
+        }
+        unsub();
+      },
+      (state) => state.loading
+    );
+  }
+
+  if (type === EventType.ACTION_PRESS) {
+    switch (pressAction?.id) {
+      case "UNPIN":
+        remove(notification?.id as string);
+        break;
+      case "Hide":
+        unpinQuickNote();
+        break;
+      case "ReplyInput":
+        displayNotification({
+          title: "Quick note",
+          message: 'Tap on "Take note" to add a note.',
+          ongoing: true,
+          actions: ["ReplyInput", "Hide"],
+          id: "notesnook_note_input",
+          reply_button_text: "Take note",
+          reply_placeholder_text: "Write something..."
+        });
+        await db.init();
+        await db.notes?.add({
+          content: {
+            type: "tiptap",
+            data: `<p>${input} </p>`
+          }
+        });
+        await db.notes?.init();
+        useNoteStore.getState().setNotes();
+        break;
+    }
+  }
+};
+
+async function scheduleNotification(reminder: Reminder, payload?: string) {
+  try {
+    const { title, details, priority } = reminder;
+    const triggers = getTriggers(reminder);
+    if (!triggers && reminder.mode === "permanent") {
+      displayNotification({
+        id: reminder.id,
+        title: title,
+        message: details || "",
+        ongoing: true,
+        subtitle: details || ""
+      });
+      return;
+    }
+    await clearAllPendingTriggersForId(reminder.id);
+    if (!triggers) return;
+    for (const trigger of triggers) {
+      await notifee.createTriggerNotification(
+        {
+          id: trigger.id,
+          title: title,
+          body: details,
+          data: {
+            type: "reminder",
+            payload: payload || ""
+          },
+          subtitle: details,
+          android: {
+            channelId: await getChannelId(priority),
+            smallIcon: "ic_stat_name",
+            pressAction: {
+              id: "default",
+              mainComponent: "notesnook"
+            },
+            style: !details
+              ? undefined
+              : {
+                  type: AndroidStyle.BIGTEXT,
+                  text: details
+                }
+          },
+          ios: {
+            sound: priority === "urgent" ? "default" : undefined,
+            interruptionLevel: priority === "silent" ? "passive" : "active"
+          }
+        },
+        trigger
+      );
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+function loadNote(id: string, jump: boolean) {
+  if (!id || id === "notesnook_note_input") return;
+  const note = db.notes?.note(id).data;
+  if (!DDS.isTab && jump) {
+    tabBarRef.current?.goToPage(1);
+  }
+  eSendEvent("loadingNote", note);
+  setTimeout(() => {
+    eSendEvent(eOnLoadNote, note);
+    if (!jump && !DDS.isTab) {
+      tabBarRef.current?.goToPage(1);
+    }
+  }, 2000);
+}
 async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
   switch (id) {
     case "default":
@@ -75,18 +214,68 @@ async function getChannelId(id: "silent" | "vibrate" | "urgent" | "default") {
   }
 }
 
-export type Reminder = {
-  id: string;
-  title: string;
-  details?: string;
-  priority: "silent" | "vibrate" | "urgent";
-  date: Date;
-  type: "recurring" | "once" | "permanent";
-  recurringMode: "weekly" | "monthly" | "daily";
-  selectedDays: number[];
-  dateCreated: number;
-  dateModified: number;
-};
+async function displayNotification({
+  title,
+  message,
+  subtitle,
+  bigText,
+  actions = [],
+  ongoing,
+  reply_placeholder_text,
+  reply_button_text,
+  id
+}: {
+  title?: string;
+  message: string;
+  subtitle?: string;
+  bigText?: string;
+  actions?: Array<string>;
+  ongoing?: boolean;
+  reply_placeholder_text?: string;
+  reply_button_text?: string;
+  id?: string;
+}) {
+  if (!(await checkAndRequestPermissions())) return;
+  try {
+    await notifee.displayNotification({
+      id: id,
+      title: title,
+      body: message,
+      subtitle: subtitle,
+      data: {
+        type: reply_placeholder_text ? "quickNote" : "pinnedNote"
+      },
+      android: {
+        ongoing: ongoing,
+        localOnly: true,
+        channelId: await getChannelId("default"),
+        autoCancel: false,
+        actions: actions?.map((action) => ({
+          pressAction: {
+            id: action
+          },
+          title:
+            action === "ReplyInput" ? (reply_button_text as string) : action,
+          input:
+            action !== "ReplyInput"
+              ? undefined
+              : {
+                  placeholder: reply_placeholder_text,
+                  allowFreeFormInput: true
+                }
+        })),
+        style: !bigText
+          ? undefined
+          : {
+              type: AndroidStyle.BIGTEXT,
+              text: bigText
+            }
+      }
+    });
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 async function checkAndRequestPermissions() {
   let permissionStatus = await notifee.getNotificationSettings();
@@ -109,6 +298,11 @@ async function checkAndRequestPermissions() {
     )
       return true;
     return false;
+  } else {
+    permissionStatus = await notifee.requestPermission();
+    if (permissionStatus.authorizationStatus === AuthorizationStatus.AUTHORIZED)
+      return true;
+    return false;
   }
 }
 
@@ -120,7 +314,7 @@ function getTriggers(
     case "once":
       return [
         {
-          timestamp: date?.getTime() as number,
+          timestamp: date as number,
           type: TriggerType.TIMESTAMP,
           id: reminder.id,
           alarmManager: {
@@ -135,7 +329,7 @@ function getTriggers(
         case "daily":
           return [
             {
-              timestamp: date?.getTime() as number,
+              timestamp: date as number,
               type: TriggerType.TIMESTAMP,
               repeatFrequency: RepeatFrequency.DAILY,
               id: reminder.id,
@@ -148,7 +342,7 @@ function getTriggers(
           return selectedDays.length === 7
             ? [
                 {
-                  timestamp: date.getTime() as number,
+                  timestamp: date as number,
                   type: TriggerType.TIMESTAMP,
                   repeatFrequency: RepeatFrequency.DAILY,
                   id: reminder.id,
@@ -170,7 +364,7 @@ function getTriggers(
           return selectedDays.length === 31
             ? [
                 {
-                  timestamp: date?.getTime() as number,
+                  timestamp: date as number,
                   type: TriggerType.TIMESTAMP,
                   repeatFrequency: RepeatFrequency.DAILY,
                   id: reminder.id,
@@ -189,10 +383,13 @@ function getTriggers(
                 }
               }));
       }
-
-      break;
     }
   }
+}
+
+async function unpinQuickNote() {
+  remove("notesnook_note_input");
+  SettingsService.set({ notifNotes: false });
 }
 
 async function removeScheduledNotification(reminder: Reminder, day: number) {
@@ -214,269 +411,59 @@ async function clearAllPendingTriggersForId(_id: string) {
   }
 }
 
-async function scheduleNotification(reminder: Reminder) {
-  try {
-    const { title, details, priority } = reminder;
-    const triggers = getTriggers(reminder);
-    if (!triggers && reminder.type === "permanent") {
-      present({
-        tag: reminder.id,
-        title: title,
-        message: details || "",
-        ongoing: true,
-        subtitle: details || ""
-      });
-      return;
-    }
-    await clearAllPendingTriggersForId(reminder.id);
-    if (!triggers) return;
-    for (const trigger of triggers) {
-      console.log(trigger);
-      await notifee.createTriggerNotification(
-        {
-          id: trigger.id,
-          title: title,
-          body: details,
-          android: {
-            channelId: await getChannelId(priority),
-            smallIcon: "ic_stat_name",
-            pressAction: {
-              id: "default",
-              mainComponent: "callofwriting"
-            },
-            style: !details
-              ? undefined
-              : {
-                  type: AndroidStyle.BIGTEXT,
-                  text: details
-                }
-          }
-        },
-        trigger
-      );
-    }
-  } catch (e) {
-    console.log(e);
-  }
+function clearAll() {
+  notifee.cancelDisplayedNotifications();
 }
 
-function loadNote(id: string, jump: boolean) {
-  if (!id || id === "notesnook_note_input") return;
-  const note = db.notes?.note(id).data;
-  if (!DDS.isTab && jump) {
-    tabBarRef.current?.goToPage(1);
-  }
-  eSendEvent("loadingNote", note);
-  setTimeout(() => {
-    eSendEvent(eOnLoadNote, note);
-    if (!jump && !DDS.isTab) {
-      tabBarRef.current?.goToPage(1);
-    }
-  }, 2000);
+function getPinnedNotes(): DisplayedNotification[] {
+  return pinned;
+}
+
+function get(): Promise<DisplayedNotification[]> {
+  return new Promise((resolve) => {
+    if (Platform.OS === "ios") resolve([]);
+    notifee.getDisplayedNotifications().then((notifications) => {
+      pinned = notifications;
+      resolve(notifications);
+    });
+  });
 }
 
 function init() {
   if (Platform.OS === "ios") return;
-  PushNotification.configure({
-    onNotification: async function (notification) {
-      editorState().movedAway = false;
-      MMKV.removeItem("appState");
-      if (useNoteStore?.getState()?.loading === false) {
-        await db.init();
-        await db.notes?.init();
-        loadNote(
-          (notification as unknown as PushNotificationDeliveredObject).tag,
-          false
-        );
-        return;
-      }
-
-      const unsub = useNoteStore.subscribe(
-        (loading) => {
-          if (loading === false) {
-            loadNote(
-              (notification as unknown as PushNotificationDeliveredObject).tag,
-              true
-            );
-          }
-          unsub();
-        },
-        (state) => state.loading
-      );
-    },
-    onAction: async function (notification) {
-      switch (notification.action) {
-        case "UNPIN":
-          remove(
-            (notification as unknown as PushNotificationDeliveredObject).tag,
-            notification.id
-          );
-          break;
-        case "Hide":
-          unpinQuickNote();
-          break;
-        case "ReplyInput":
-          present({
-            title: "Quick note",
-            message: 'Tap on "Take note" to add a note.',
-            ongoing: true,
-            actions: ["ReplyInput", "Hide"],
-            tag: "notesnook_note_input",
-            reply_button_text: "Take note",
-            reply_placeholder_text: "Write something...",
-            id: 256266
-          });
-          await db.init();
-          await db.notes?.add({
-            content: {
-              type: "tiptap",
-              data: `<p>${
-                (
-                  notification as unknown as PushNotificationDeliveredObject & {
-                    reply_text: string;
-                  }
-                ).reply_text
-              } </p>`
-            }
-          });
-          await db.notes?.init();
-          useNoteStore.getState().setNotes();
-
-          break;
-      }
-    },
-    popInitialNotification: true,
-    requestPermissions: false
-  });
-
-  PushNotification.createChannel(
-    {
-      channelId: CHANNEL_ID,
-      channelName: "Notesnook",
-      playSound: false,
-      soundName: "default",
-      importance: Importance.HIGH,
-      vibrate: true
-    },
-    (created) => console.log(`Android Notification Channel Status: ${created}`)
-  );
+  notifee.onBackgroundEvent(onEvent);
+  notifee.onForegroundEvent(onEvent);
 }
 
-function remove(tag: string, id: string) {
-  PushNotification.clearLocalNotification(
-    tag || NOTIFICATION_TAG,
-    parseInt(id)
-  );
+async function remove(id: string) {
+  await notifee.cancelNotification(id);
   get().then(() => {
     eSendEvent("onUpdate", "unpin");
   });
 }
 
-async function hasPermissions() {
-  if (DeviceInfo.getApiLevelSync() < 33) return true;
-  //@ts-ignore
-  if (!(await PushNotification.areNotificationsEnabled())) {
-    //@ts-ignore
-    const result = await PushNotification.askForPermission();
-    if (result) return true;
-    return true;
-  }
-  return true;
-}
-
 async function pinQuickNote(launch: boolean) {
-  if (!(await hasPermissions())) return;
+  if (!(await checkAndRequestPermissions())) return;
   get().then((items) => {
-    const notif = items.filter((i) => i.tag === "notesnook_note_input");
-    if (notif && launch) {
+    const notification = items.filter((n) => n.id === "notesnook_note_input");
+    if (notification && launch) {
       return;
     }
-    present({
+    displayNotification({
       title: "Quick note",
       message: 'Tap on "Take note" to add a note.',
       ongoing: true,
       actions: ["ReplyInput", "Hide"],
-      tag: "notesnook_note_input",
       reply_button_text: "Take note",
       reply_placeholder_text: "Write something...",
-      id: 256266
-    });
-  });
-}
-
-async function unpinQuickNote() {
-  remove("notesnook_note_input", 256266 + "");
-  SettingsService.set({ notifNotes: false });
-}
-
-async function present({
-  title,
-  message,
-  subtitle,
-  bigText,
-  actions = [],
-  ongoing,
-  tag,
-  reply_placeholder_text,
-  reply_button_text,
-  id
-}: {
-  title?: string;
-  message: string;
-  subtitle?: string;
-  bigText?: string;
-  actions?: Array<string>;
-  ongoing?: boolean;
-  tag?: string;
-  reply_placeholder_text?: string;
-  reply_button_text?: string;
-  id?: number;
-}) {
-  if (!(await hasPermissions())) return;
-  PushNotification.localNotification({
-    id: id,
-    channelId: CHANNEL_ID,
-    tag: tag || NOTIFICATION_TAG,
-    ongoing: ongoing,
-    visibility: "private",
-    ignoreInForeground: false,
-    actions: actions,
-    title: title,
-    subText: subtitle,
-    bigText: bigText,
-    message: message,
-    invokeApp: false,
-    autoCancel: false,
-    smallIcon: "ic_stat_name",
-    reply_placeholder_text,
-    reply_button_text
-  } as PushNotificationObject & {
-    reply_placeholder_text: string;
-  });
-}
-
-function clearAll() {
-  PushNotification.cancelAllLocalNotifications();
-  PushNotification.clearAllNotifications();
-}
-
-function getPinnedNotes(): PushNotificationDeliveredObject[] {
-  return pinned;
-}
-
-function get(): Promise<PushNotificationDeliveredObject[]> {
-  return new Promise((resolve) => {
-    if (Platform.OS === "ios") resolve([]);
-    PushNotification.getDeliveredNotifications((n) => {
-      pinned = n;
-      resolve(n);
+      id: "notesnook_note_input"
     });
   });
 }
 
 const Notifications = {
   init,
-  present,
+  displayNotification,
   clearAll,
   remove,
   get,
