@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { Box, Flex, Text } from "@theme-ui/components";
+import { Box, Button, Flex, Text } from "@theme-ui/components";
 import { ReactNodeViewProps } from "../react";
 import { Node } from "prosemirror-model";
-import { findChildren, getNodeType } from "@tiptap/core";
+import { Editor, findChildren, getNodeType } from "@tiptap/core";
 import { Icon } from "../../toolbar/components/icon";
 import { Icons } from "../../toolbar/icons";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -29,6 +29,7 @@ import { TaskItemNode } from "../task-item";
 import { TaskListAttributes } from "./task-list";
 import { findParentNodeOfTypeClosestToPos } from "prosemirror-utils";
 import { useIsMobile } from "../../toolbar/stores/toolbar-store";
+import TaskList from "@tiptap/extension-task-list";
 
 export function TaskListComponent(
   props: ReactNodeViewProps<TaskListAttributes>
@@ -170,6 +171,16 @@ export function TaskListComponent(
               }}
             />
             <Flex sx={{ flexShrink: 0, pr: 2 }}>
+              <Button
+                sx={{ flexShrink: 0, py: 0, mr: 4, zIndex: 5 }}
+                onClick={() => {
+                  node.forEach(() => {
+                    deleteListItems(node, editor);
+                  });
+                }}
+              >
+                Delete Completed Tasks
+              </Button>
               <Icon path={Icons.checkbox} size={15} color="fontTertiary" />
               <Text variant={"body"} sx={{ ml: 1, color: "fontTertiary" }}>
                 {stats.checked}/{stats.total}
@@ -198,6 +209,27 @@ export function TaskListComponent(
       />
     </>
   );
+}
+
+function deleteListItems(node: Node, editor: Editor) {
+  editor.commands.command(({ tr }) => {
+    findChildren(
+      editor.state.doc,
+      (n) => n.type.name === TaskList.name
+    ).forEach((item, index, array) => {
+      if (item.node.eq(node)) {
+        node.forEach((item2, offset, index2) => {
+          if (item2.attrs.checked) {
+            tr.delete(
+              tr.mapping.map(item.pos + offset),
+              tr.mapping.map(item.pos + offset + item2.nodeSize)
+            );
+          }
+        });
+      }
+    });
+    return true;
+  });
 }
 
 function areAllChecked(node: Node, pos: number, doc: Node) {
