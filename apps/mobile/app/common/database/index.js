@@ -25,6 +25,8 @@ import filesystem from "../filesystem";
 import EventSource from "../../utils/sse/even-source-ios";
 import AndroidEventSource from "../../utils/sse/event-source";
 import Storage, { KV } from "./storage";
+import * as Gzip from "react-native-gzip";
+
 const LoggerStorage = new MMKVLoader()
   .withInstanceID("notesnook_logs")
   .initialize();
@@ -37,7 +39,11 @@ export const DatabaseLogger = dbLogger;
 export var db = new Database(
   Storage,
   Platform.OS === "ios" ? EventSource : AndroidEventSource,
-  filesystem
+  filesystem,
+  {
+    compress: Gzip.deflate,
+    decompress: Gzip.inflate
+  }
 );
 
 db.host(

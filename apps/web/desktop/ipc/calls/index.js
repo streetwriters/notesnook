@@ -19,10 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import getZoomFactor from "./getZoomFactor";
 import selectDirectory from "./selectDirectory";
+import { gunzip, gzip } from "./gzip";
 
 const calls = {
   getZoomFactor,
-  selectDirectory
+  selectDirectory,
+  gunzip,
+  gzip
 };
 
 export const getCall = function getAction(callName) {

@@ -62,5 +62,18 @@ contextBridge.exposeInMainWorld("native", {
       buttonLabel,
       defaultPath
     });
+  },
+  gzip: ({ data, level }) => {
+    return ipcRenderer.invoke("fromRenderer", {
+      type: "gzip",
+      data,
+      level
+    });
+  },
+  gunzip: ({ data }) => {
+    return ipcRenderer.invoke("fromRenderer", {
+      type: "gunzip",
+      data
+    });
   }
 });

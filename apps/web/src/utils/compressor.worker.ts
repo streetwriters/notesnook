@@ -17,27 +17,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { decode, encode } from "base64-arraybuffer";
-import { compressSync, decompressSync, strToU8, strFromU8 } from "fflate";
+import { expose } from "comlink";
+import { gzipSync, gunzipSync } from "fflate";
+import { fromBase64, toBase64 } from "@aws-sdk/util-base64-browser";
 
-/**
- *
- * @param {string} data
- * @returns {string | null} An object containing compressed data
- */
-export const compress = (data) => {
-  try {
-    return encode(compressSync(strToU8(data)).buffer);
-  } catch (e) {
-    return null;
+const module = {
+  gzip: ({ data, level }: { data: string; level: number }) => {
+    return toBase64(
+      gzipSync(new TextEncoder().encode(data), {
+        level: level as any
+      })
+    );
+  },
+  gunzip: ({ data }: { data: string }) => {
+    return new TextDecoder().decode(gunzipSync(fromBase64(data)));
   }
 };
 
-/**
- *
- * @param {string} compressed
- * @returns {string} decompressed string
- */
-export const decompress = (compressed) => {
-  return strFromU8(decompressSync(new Uint8Array(decode(compressed))));
-};
+expose(module);
+export type Compressor = typeof module;

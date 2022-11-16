@@ -17,13 +17,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import { TEST_NOTE } from "../../__tests__/utils";
-import { compress, decompress } from "../compression";
+const zlib = require("zlib");
+const utils = require("util");
 
-test("String should compress and decompress", () => {
-  let compressed = compress(TEST_NOTE.content.data);
-  expect(compressed).not.toBe(TEST_NOTE.content.data);
+const gzipAsync = utils.promisify(zlib.gzip);
+const gunzipAsync = utils.promisify(zlib.gunzip);
 
-  let decompressed = decompress(compressed);
-  expect(decompressed).toBe(TEST_NOTE.content.data);
-});
+async function compress(data) {
+  return (await gzipAsync(data, { level: 6 })).toString("base64");
+}
+
+async function decompress(data) {
+  return (await gunzipAsync(Buffer.from(data, "base64"))).toString("utf-8");
+}
+
+module.exports = {
+  compress,
+  decompress
+};

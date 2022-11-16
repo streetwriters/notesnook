@@ -33,6 +33,7 @@ const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 
 export class NNStorage {
   database: LocalForage;
+
   constructor(name: string, persistence: DatabasePersistence = "db") {
     const drivers =
       persistence === "memory"

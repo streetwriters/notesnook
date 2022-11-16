@@ -22,6 +22,7 @@ import StorageInterface from "../../__mocks__/storage.mock";
 import dayjs from "dayjs";
 import { groupArray } from "../../utils/grouping";
 import FS from "../../__mocks__/fs.mock";
+import Compressor from "../../__mocks__/compressor.mock";
 
 const TEST_NOTEBOOK = {
   title: "Test Notebook",
@@ -36,7 +37,7 @@ const TEST_NOTEBOOK2 = {
 };
 
 function databaseTest() {
-  let db = new DB(StorageInterface, null, FS);
+  let db = new DB(StorageInterface, null, FS, Compressor);
   return db.init().then(() => db);
 }
 
@@ -49,7 +50,7 @@ const notebookTest = (notebook = TEST_NOTEBOOK) =>
 var TEST_NOTE = {
   content: {
     type: "tiptap",
-    data: `<p>Hello<br><span style="color:#f00">This is colorful</span></p>`
+    data: `<p>Hello<br/><span style="color:#f00">This is colorful</span></p>`
   }
 };
 
