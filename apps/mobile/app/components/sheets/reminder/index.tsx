@@ -30,6 +30,8 @@ import { Button } from "../../ui/button";
 import Input from "../../ui/input";
 
 import Notifications, { Reminder } from "../../../services/notifications";
+import Paragraph from "../../ui/typography/paragraph";
+import dayjs from "dayjs";
 
 type ReminderSheetProps = {
   actionSheetRef: RefObject<ActionSheet>;
@@ -42,17 +44,17 @@ const ReminderModes =
   Platform.OS === "ios"
     ? {
         Once: "once",
-        Recurring: "recurring"
+        Repeat: "repeat"
       }
     : {
         Once: "once",
-        Recurring: "recurring",
+        Repeat: "repeat",
         Permanent: "permanent"
       };
 
 const RecurringModes = {
-  Weekly: "weekly",
-  Monthly: "monthly"
+  Week: "week",
+  Month: "month"
 };
 
 const WeekDays = new Array(7).fill(true);
@@ -83,15 +85,16 @@ export default function ReminderSheet({
   const [reminderMode, setReminderMode] = useState<string | undefined>(
     ReminderModes.Once
   );
-  const [recurringMode, setRecurringMode] = useState(RecurringModes.Weekly);
+  const [recurringMode, setRecurringMode] = useState(RecurringModes.Week);
   const [selectedDays, setSelectedDays] = useState<number[]>([]);
-  const [date, setDate] = useState<Date>();
-  const [time, setTime] = useState<string>();
+  const [date, setDate] = useState<Date>(new Date(Date.now()));
+  const [time, setTime] = useState<string>(dayjs(Date.now()).format("HH:mm"));
   const [reminderNotificationMode, setReminderNotificatioMode] = useState(
     ReminderNotificationModes.Silent
   );
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [repeatFrequency, setRepeatFrequency] = useState(1);
   const title = useRef<string>();
   const details = useRef<string>();
 
@@ -109,10 +112,31 @@ export default function ReminderSheet({
   };
 
   const handleConfirm = (date: Date) => {
-    setTime(new Date(date).toLocaleTimeString());
+    setTime(dayjs(date).format("HH:mm"));
     setDate(date);
     hideDatePicker();
   };
+  function nth(n: number) {
+    return (
+      ["st", "nd", "rd"][(((((n < 0 ? -n : n) + 90) % 100) - 10) % 10) - 1] ||
+      "th"
+    );
+  }
+
+  function getSelectedDaysText(selectedDays: number[]) {
+    const text = selectedDays
+      .sort((a, b) => a - b)
+      .map((day, index) => {
+        const isLast = index === selectedDays.length - 1;
+        const isSecondLast = index === selectedDays.length - 2;
+        const joinWith = isSecondLast ? " & " : isLast ? "" : ", ";
+        return recurringMode === RecurringModes.Week
+          ? WeekDayNames[day as keyof typeof WeekDayNames] + joinWith
+          : `${day + 1}${nth(day + 1)} ${joinWith}`;
+      })
+      .join("");
+    return text;
+  }
 
   return (
     <View
@@ -164,7 +188,7 @@ export default function ReminderSheet({
         ))}
       </View>
 
-      {reminderMode === ReminderModes.Recurring ? (
+      {reminderMode === ReminderModes.Repeat ? (
         <View
           style={{
             backgroundColor: colors.nav,
@@ -176,22 +200,51 @@ export default function ReminderSheet({
           <View
             style={{
               flexDirection: "row",
-              marginBottom: 12
+              marginBottom: 12,
+              alignItems: "center"
             }}
           >
+            <Paragraph style={{ marginRight: 5 }}>Every</Paragraph>
+            {/* {Platform.OS === "android" ? (
+              <Input
+                containerStyle={{
+                  width: 40,
+                  height: 30,
+                  borderWidth: 0,
+                  borderBottomWidth: 1,
+                  borderColor: colors.accent
+                }}
+                inputStyle={{
+                  fontFamily: "mono",
+                  textAlign: "center"
+                }}
+                onChangeText={(text) => {
+                  setRepeatFrequency(!text ? 1 : parseInt(text));
+                }}
+                keyboardType="decimal-pad"
+                fontSize={SIZE.sm}
+                defaultValue="1"
+                height={30}
+                marginBottom={0}
+                marginRight={0}
+                flexGrow={0}
+              />
+            ) : null} */}
             {Object.keys(RecurringModes).map((mode) => (
               <Button
                 key={mode}
-                title={mode}
+                title={
+                  !repeatFrequency || repeatFrequency <= 1 ? mode : mode + "s"
+                }
                 style={{
-                  marginRight: 12,
+                  marginRight: 6,
                   borderRadius: 100
                 }}
                 height={35}
                 type={
                   recurringMode ===
                   RecurringModes[mode as keyof typeof RecurringModes]
-                    ? "accent"
+                    ? "grayAccent"
                     : "gray"
                 }
                 onPress={() => {
@@ -199,25 +252,31 @@ export default function ReminderSheet({
                     RecurringModes[mode as keyof typeof RecurringModes]
                   );
                   setSelectedDays([]);
+                  setRepeatFrequency(1);
                 }}
               />
             ))}
           </View>
 
-          <ScrollView horizontal>
-            {recurringMode === RecurringModes.Weekly
+          <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+            {recurringMode === RecurringModes.Week
               ? WeekDays.map((item, index) => (
                   <Button
                     key={WeekDayNames[index as keyof typeof WeekDayNames]}
                     title={WeekDayNames[
                       index as keyof typeof WeekDayNames
-                    ].slice(0, 3)}
-                    type={selectedDays.indexOf(index) > -1 ? "shade" : "gray"}
+                    ].slice(0, 1)}
+                    type={selectedDays.indexOf(index) > -1 ? "accent" : "gray"}
                     fontSize={SIZE.sm - 1}
                     style={{
-                      width: 65,
+                      width: 40,
+                      height: 40,
                       borderRadius: 100,
-                      marginRight: 10
+                      marginRight: 10,
+                      backgroundColor:
+                        selectedDays.indexOf(index) > -1
+                          ? colors.accent
+                          : colors.bg
                     }}
                     onPress={() => {
                       setSelectedDays((days) => {
@@ -235,12 +294,17 @@ export default function ReminderSheet({
                   <Button
                     key={index + "monthday"}
                     title={index + 1 + ""}
-                    type={selectedDays.indexOf(index) > -1 ? "shade" : "gray"}
+                    type={selectedDays.indexOf(index) > -1 ? "accent" : "gray"}
                     fontSize={SIZE.sm - 1}
                     style={{
-                      width: 50,
+                      width: 40,
+                      height: 40,
                       borderRadius: 100,
-                      marginRight: 10
+                      marginRight: 10,
+                      backgroundColor:
+                        selectedDays.indexOf(index) > -1
+                          ? colors.accent
+                          : colors.bg
                     }}
                     onPress={() => {
                       setSelectedDays((days) => {
@@ -283,7 +347,7 @@ export default function ReminderSheet({
             date={date || new Date(Date.now())}
           />
 
-          {reminderMode === ReminderModes.Recurring ? null : (
+          {reminderMode === ReminderModes.Repeat ? null : (
             <Button
               style={{
                 width: "48.5%"
@@ -299,7 +363,7 @@ export default function ReminderSheet({
 
           <Button
             style={{
-              width: reminderMode === ReminderModes.Recurring ? "100%" : "48.5%"
+              width: reminderMode === ReminderModes.Repeat ? "100%" : "48.5%"
             }}
             title={time || "Select time"}
             type={time ? "grayAccent" : "grayBg"}
@@ -353,6 +417,25 @@ export default function ReminderSheet({
           ))}
         </View>
       )}
+
+      <Paragraph
+        color={colors.icon}
+        size={SIZE.xs}
+        style={{ marginTop: 5, marginBottom: 12 }}
+      >
+        {reminderMode === ReminderModes.Once ||
+        reminderMode === ReminderModes.Permanent
+          ? undefined
+          : selectedDays.length === 7 && recurringMode === RecurringModes.Week
+          ? `The reminder will repeat daily at ${dayjs(date).format("HH:mm")}.`
+          : selectedDays.length === 0
+          ? recurringMode === RecurringModes.Week
+            ? "Select day of the week to repeat the reminder."
+            : "Select nth day of the month to repeat the reminder."
+          : `Repeats every${repeatFrequency > 1 ? " " + repeatFrequency : ""} ${
+              repeatFrequency > 1 ? recurringMode + "s" : recurringMode
+            } on ${getSelectedDaysText(selectedDays)}.`}
+      </Paragraph>
 
       <Button
         style={{
